@@ -132,6 +132,44 @@ h1 {
   animation: shake 0.3s ease-in-out;
 }
 
+/* Last move highlight */
+.cell-last-move {
+  box-shadow: inset 0 0 0 3px orange;
+}
+
+/* Don't override selected styling for last move */
+.cell-selected.cell-last-move {
+  box-shadow: inset 0 0 0 4px gold;
+}
+
+/* Trapped King highlight */
+.cell-trapped {
+  background-color: rgba(244, 67, 54, 0.5) !important;
+  animation: pulse-red 1s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(244, 67, 54, 0.7); }
+  50% { box-shadow: inset 0 0 0 6px rgba(244, 67, 54, 0.3); }
+}
+
+/* Game over state - dim the board slightly */
+.board.phase-gameOver {
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Pulsing New Game button when game is over */
+#new-game-btn.game-over-active {
+  background-color: #4caf50;
+  animation: pulse-green 1.5s infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.6); }
+  50% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+}
+
 /* Status styles */
 .status {
   margin-bottom: 20px;

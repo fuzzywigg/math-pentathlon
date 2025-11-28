@@ -6,7 +6,9 @@ import {
   placeQuadraphage,
   isValidMove,
   getCurrentPhaseMessage,
+  getKingPosition,
 } from './game-state';
+import { getOpponent } from './rules';
 
 // Click handler callback type
 export type CellClickCallback = (row: number, col: number) => void;
@@ -148,7 +150,29 @@ export function renderBoard(
         cell.classList.add('cell-valid-placement');
       }
 
+      // Highlight last move
+      if (state.moveHistory.length > 0) {
+        const lastMove = state.moveHistory[state.moveHistory.length - 1];
+        if (lastMove.to.row === row && lastMove.to.col === col) {
+          cell.classList.add('cell-last-move');
+        }
+      }
+
       boardEl.appendChild(cell);
+    }
+  }
+
+  // Highlight trapped king on game over
+  if (state.turnPhase === 'gameOver' && state.winner) {
+    const loser = getOpponent(state.winner);
+    const loserKingPos = getKingPosition(state, loser);
+    if (loserKingPos) {
+      const trappedCell = boardEl.querySelector(
+        `.cell[data-row="${loserKingPos.row}"][data-col="${loserKingPos.col}"]`
+      );
+      if (trappedCell) {
+        trappedCell.classList.add('cell-trapped');
+      }
     }
   }
 

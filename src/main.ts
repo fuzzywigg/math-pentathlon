@@ -11,7 +11,12 @@ const helpModal = document.getElementById('help-modal');
 const modalClose = helpModal?.querySelector('.modal-close');
 
 if (boardContainer && statusContainer) {
-  initGame(boardContainer, statusContainer, historyContainer || undefined);
+  initGame(
+    boardContainer,
+    statusContainer,
+    historyContainer || undefined,
+    newGameBtn || undefined
+  );
 }
 
 // Wire up New Game button

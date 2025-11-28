@@ -8,6 +8,7 @@ let gameState: GameState = createInitialGameState();
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let historyContainer: HTMLElement | null = null;
+let newGameButton: HTMLElement | null = null;
 
 // Render the current game state
 function render(): void {
@@ -21,6 +22,15 @@ function render(): void {
 
   if (historyContainer) {
     renderMoveHistory(gameState, historyContainer);
+  }
+
+  // Update New Game button styling based on game state
+  if (newGameButton) {
+    if (gameState.turnPhase === 'gameOver') {
+      newGameButton.classList.add('game-over-active');
+    } else {
+      newGameButton.classList.remove('game-over-active');
+    }
   }
 }
 
@@ -65,11 +75,13 @@ export function newGame(): void {
 export function initGame(
   boardEl: HTMLElement,
   statusEl: HTMLElement,
-  historyEl?: HTMLElement
+  historyEl?: HTMLElement,
+  newGameBtn?: HTMLElement
 ): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
   historyContainer = historyEl || null;
+  newGameButton = newGameBtn || null;
 
   // Initial render
   render();
