@@ -1,10 +1,22 @@
-import './style.css'
+import './style.css';
+import { createInitialBoard } from './games/kings-quadraphages/board';
+import { renderBoard } from './games/kings-quadraphages/board-renderer';
 
+// Set up the page structure
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div class="container">
-    <img src="/king.svg" alt="Chess King" class="king-icon" />
     <h1>Math Pentathlon</h1>
-    <p>Welcome to Math Pentathlon!</p>
-    <p class="subtitle">Your math game adventure starts here.</p>
+    <p class="subtitle">Kings & Quadraphages</p>
+    <div id="board-container"></div>
   </div>
-`
+`;
+
+// Create and render the board
+const board = createInitialBoard();
+const boardElement = renderBoard(board, {
+  onCellClick: (position) => {
+    console.log(`Clicked cell: row ${position.row}, col ${position.col}`);
+  },
+});
+
+document.querySelector('#board-container')!.appendChild(boardElement);
