@@ -11,17 +11,23 @@ import {
 // Click handler callback type
 export type CellClickCallback = (row: number, col: number) => void;
 
+// Result of handling a cell click
+export interface ClickResult {
+  state: GameState;
+  isInvalidClick: boolean;
+}
+
 // Handle cell click based on current game state
 export function handleCellClick(
   row: number,
   col: number,
   state: GameState
-): GameState {
+): ClickResult {
   const position: Position = { row, col };
 
   // Game over - ignore all clicks
   if (state.turnPhase === 'gameOver') {
-    return state;
+    return { state, isInvalidClick: false };
   }
 
   // Move King phase
@@ -37,21 +43,29 @@ export function handleCellClick(
         state.selectedKingPosition.col === col
       ) {
         return {
-          ...state,
-          selectedKingPosition: null,
+          state: {
+            ...state,
+            selectedKingPosition: null,
+          },
+          isInvalidClick: false,
         };
       }
       // Select the King
-      return selectKing(state);
+      return { state: selectKing(state), isInvalidClick: false };
     }
 
     // If King is selected and clicked a valid destination
     if (state.selectedKingPosition && isValidMove(state, position)) {
-      return moveKing(state, position);
+      return { state: moveKing(state, position), isInvalidClick: false };
     }
 
-    // Invalid click, return unchanged
-    return state;
+    // Invalid click - King selected but clicked invalid destination
+    if (state.selectedKingPosition) {
+      return { state, isInvalidClick: true };
+    }
+
+    // Clicked somewhere without King selected - not really "invalid", just ignored
+    return { state, isInvalidClick: false };
   }
 
   // Place Quadraphage phase
@@ -60,14 +74,14 @@ export function handleCellClick(
 
     // Only place on empty cells
     if (clickedCell === null) {
-      return placeQuadraphage(state, position);
+      return { state: placeQuadraphage(state, position), isInvalidClick: false };
     }
 
-    // Occupied cell, return unchanged
-    return state;
+    // Occupied cell - invalid click
+    return { state, isInvalidClick: true };
   }
 
-  return state;
+  return { state, isInvalidClick: false };
 }
 
 // Render the game board
@@ -126,6 +140,11 @@ export function renderBoard(
         cell.classList.add('cell-valid-move');
       }
 
+      // Mark valid placement cells during quadraphage phase
+      if (state.turnPhase === 'placeQuadraphage' && piece === null) {
+        cell.classList.add('cell-valid-placement');
+      }
+
       boardEl.appendChild(cell);
     }
   }
@@ -145,6 +164,12 @@ export function renderBoard(
   }
 
   container.appendChild(boardEl);
+}
+
+// Format a position as a coordinate string (e.g., "A1", "E5")
+function formatPosition(pos: Position): string {
+  const colLetter = String.fromCharCode(64 + pos.col); // 1 -> A, 2 -> B, etc.
+  return `${colLetter}${pos.row}`;
 }
 
 // Render the status display
@@ -187,4 +212,56 @@ export function renderStatus(state: GameState, container: HTMLElement): void {
   statusEl.appendChild(suppliesEl);
 
   container.appendChild(statusEl);
+}
+
+// Render the move history
+export function renderMoveHistory(state: GameState, container: HTMLElement): void {
+  container.innerHTML = '';
+
+  const historyEl = document.createElement('div');
+  historyEl.className = 'move-history';
+
+  const titleEl = document.createElement('div');
+  titleEl.className = 'move-history-title';
+  titleEl.textContent = 'Move History';
+  historyEl.appendChild(titleEl);
+
+  const listEl = document.createElement('div');
+  listEl.className = 'move-history-list';
+
+  if (state.moveHistory.length === 0) {
+    const emptyEl = document.createElement('div');
+    emptyEl.className = 'move-history-empty';
+    emptyEl.textContent = 'No moves yet';
+    listEl.appendChild(emptyEl);
+  } else {
+    // Show last 10 moves (most recent first)
+    const recentMoves = state.moveHistory.slice(-10).reverse();
+    const startIndex = state.moveHistory.length;
+
+    recentMoves.forEach((move, idx) => {
+      const moveEl = document.createElement('div');
+      moveEl.className = 'move-history-entry';
+      moveEl.classList.add(move.player === 'player1' ? 'move-p1' : 'move-p2');
+
+      const moveNumber = startIndex - idx;
+      const playerIcon = move.player === 'player1' ? '🔵' : '🔴';
+
+      let moveText: string;
+      if (move.action === 'moveKing') {
+        const from = move.from ? formatPosition(move.from) : '?';
+        const to = formatPosition(move.to);
+        moveText = `${moveNumber}. ${playerIcon} ♚ ${from}→${to}`;
+      } else {
+        const to = formatPosition(move.to);
+        moveText = `${moveNumber}. ${playerIcon} ● ${to}`;
+      }
+
+      moveEl.textContent = moveText;
+      listEl.appendChild(moveEl);
+    });
+  }
+
+  historyEl.appendChild(listEl);
+  container.appendChild(historyEl);
 }

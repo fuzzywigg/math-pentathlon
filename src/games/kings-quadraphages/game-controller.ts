@@ -1,5 +1,5 @@
 import { createInitialGameState, GameState } from './game-state';
-import { renderBoard, renderStatus, handleCellClick } from './board-ui';
+import { renderBoard, renderStatus, renderMoveHistory, handleCellClick } from './board-ui';
 
 // Game state
 let gameState: GameState = createInitialGameState();
@@ -7,6 +7,7 @@ let gameState: GameState = createInitialGameState();
 // Container references (set during initialization)
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
+let historyContainer: HTMLElement | null = null;
 
 // Render the current game state
 function render(): void {
@@ -17,14 +18,39 @@ function render(): void {
 
   renderBoard(gameState, boardContainer, onCellClick);
   renderStatus(gameState, statusContainer);
+
+  if (historyContainer) {
+    renderMoveHistory(gameState, historyContainer);
+  }
+}
+
+// Trigger invalid click animation on a cell
+function triggerInvalidAnimation(row: number, col: number): void {
+  if (!boardContainer) return;
+
+  const cell = boardContainer.querySelector(
+    `.cell[data-row="${row}"][data-col="${col}"]`
+  ) as HTMLElement | null;
+
+  if (cell) {
+    cell.classList.add('cell-invalid');
+    // Remove the class after animation completes
+    setTimeout(() => {
+      cell.classList.remove('cell-invalid');
+    }, 300);
+  }
 }
 
 // Handle cell clicks
 function onCellClick(row: number, col: number): void {
-  const newState = handleCellClick(row, col, gameState);
+  const result = handleCellClick(row, col, gameState);
 
-  if (newState !== gameState) {
-    gameState = newState;
+  if (result.isInvalidClick) {
+    triggerInvalidAnimation(row, col);
+  }
+
+  if (result.state !== gameState) {
+    gameState = result.state;
     render();
   }
 }
@@ -36,9 +62,14 @@ export function newGame(): void {
 }
 
 // Initialize the game
-export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
+export function initGame(
+  boardEl: HTMLElement,
+  statusEl: HTMLElement,
+  historyEl?: HTMLElement
+): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
+  historyContainer = historyEl || null;
 
   // Initial render
   render();
