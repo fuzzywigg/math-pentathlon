@@ -54,12 +54,12 @@ function createStyles(): HTMLStyleElement {
       border-radius: 8px;
     }
 
-    .piece.blue {
+    .piece.player1 {
       background: linear-gradient(135deg, #4169e1 0%, #1e3a8a 100%);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
-    .piece.red {
+    .piece.player2 {
       background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
