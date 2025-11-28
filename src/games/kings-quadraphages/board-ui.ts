@@ -269,17 +269,14 @@ export function renderStatus(state: GameState, container: HTMLElement): void {
   container.appendChild(statusEl);
 }
 
-// Render the move history
+// Render the move history (renders into the history-content div)
 export function renderMoveHistory(state: GameState, container: HTMLElement): void {
   container.innerHTML = '';
 
-  const historyEl = document.createElement('div');
-  historyEl.className = 'move-history';
-
   const titleEl = document.createElement('div');
   titleEl.className = 'move-history-title';
-  titleEl.textContent = 'Move History';
-  historyEl.appendChild(titleEl);
+  titleEl.textContent = 'Moves';
+  container.appendChild(titleEl);
 
   const listEl = document.createElement('div');
   listEl.className = 'move-history-list';
@@ -290,8 +287,8 @@ export function renderMoveHistory(state: GameState, container: HTMLElement): voi
     emptyEl.textContent = 'No moves yet';
     listEl.appendChild(emptyEl);
   } else {
-    // Show last 10 moves (most recent first)
-    const recentMoves = state.moveHistory.slice(-10).reverse();
+    // Show last 15 moves (most recent first)
+    const recentMoves = state.moveHistory.slice(-15).reverse();
     const startIndex = state.moveHistory.length;
 
     recentMoves.forEach((move, idx) => {
@@ -306,10 +303,10 @@ export function renderMoveHistory(state: GameState, container: HTMLElement): voi
       if (move.action === 'moveKing') {
         const from = move.from ? formatPosition(move.from) : '?';
         const to = formatPosition(move.to);
-        moveText = `${moveNumber}. ${playerIcon} ♚ ${from}→${to}`;
+        moveText = `${moveNumber}. ${playerIcon}♚${from}→${to}`;
       } else {
         const to = formatPosition(move.to);
-        moveText = `${moveNumber}. ${playerIcon} ● ${to}`;
+        moveText = `${moveNumber}. ${playerIcon}●${to}`;
       }
 
       moveEl.textContent = moveText;
@@ -317,6 +314,5 @@ export function renderMoveHistory(state: GameState, container: HTMLElement): voi
     });
   }
 
-  historyEl.appendChild(listEl);
-  container.appendChild(historyEl);
+  container.appendChild(listEl);
 }

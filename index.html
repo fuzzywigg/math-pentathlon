@@ -9,14 +9,20 @@
   <body>
     <div id="app">
       <h1>Kings & Quadraphages</h1>
-      <div id="status"></div>
-      <div class="game-area">
-        <div id="board"></div>
-        <div id="move-history"></div>
-      </div>
       <div class="button-row">
         <button id="new-game-btn">New Game</button>
         <button id="help-btn">How to Play</button>
+      </div>
+      <div id="status"></div>
+      <div class="game-area">
+        <div id="move-history" class="collapsible">
+          <button class="collapse-toggle" aria-expanded="true" aria-controls="history-content">
+            <span class="collapse-icon">◀</span>
+            <span class="collapse-label">History</span>
+          </button>
+          <div id="history-content" class="history-content"></div>
+        </div>
+        <div id="board"></div>
       </div>
     </div>
     <div id="help-modal" class="modal hidden">

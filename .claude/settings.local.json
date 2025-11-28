@@ -14,7 +14,10 @@
       "Bash(gh repo create:*)",
       "Bash(git push)",
       "Bash(npx tsc:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(npm run build:*)",
+      "Bash(git tag -a v0.1.0 -m \"$(cat <<''EOF''\nPhase 1 complete: Playable two-player Kings and Quadraphages game\n\nFeatures:\n- 9x9 game board with accurate rule enforcement\n- Two-player pass-and-play mode\n- Valid move highlighting for Kings (green cells)\n- Quadraphage placement with hover highlighting\n- Supply tracking (30 Quadraphages per player)\n- Win detection when King is trapped (red pulse animation)\n- Move history panel with chess-style notation\n- Last move highlight (orange border)\n- New Game reset functionality\n- How to Play modal with rules explanation\n- Responsive design for mobile/tablet\n- Keyboard accessibility support\n- Invalid move shake animation feedback\nEOF\n)\")",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
