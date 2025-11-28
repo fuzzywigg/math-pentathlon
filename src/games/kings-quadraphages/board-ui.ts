@@ -108,6 +108,10 @@ export function renderBoard(
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
 
+      // Accessibility: make cells focusable and clickable via keyboard
+      cell.setAttribute('role', 'button');
+      cell.setAttribute('tabindex', '0');
+
       // Checkerboard pattern
       const isLight = (row + col) % 2 === 0;
       cell.classList.add(isLight ? 'cell-light' : 'cell-dark');
@@ -115,17 +119,28 @@ export function renderBoard(
       // Get cell contents (convert to 0-based for array access)
       const piece = state.board[row - 1][col - 1];
 
+      // Build aria-label for accessibility
+      const colLetter = String.fromCharCode(64 + col);
+      let ariaLabel = `${colLetter}${row}`;
+
       if (piece === null) {
         cell.classList.add('cell-empty');
+        ariaLabel += ', empty';
       } else if (piece.type === 'king') {
         cell.classList.add('cell-king');
         cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
         cell.textContent = '♚';
+        const playerName = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+        ariaLabel += `, ${playerName} King`;
       } else if (piece.type === 'quadraphage') {
         cell.classList.add('cell-quad');
         cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
         cell.textContent = '●';
+        const playerName = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+        ariaLabel += `, ${playerName} Quadraphage`;
       }
+
+      cell.setAttribute('aria-label', ariaLabel);
 
       // Check if this cell is selected
       if (
@@ -178,15 +193,28 @@ export function renderBoard(
 
   // Event delegation for clicks
   if (onCellClick) {
+    const handleCellAction = (cellEl: HTMLElement) => {
+      const clickedRow = parseInt(cellEl.dataset.row!, 10);
+      const clickedCol = parseInt(cellEl.dataset.col!, 10);
+      onCellClick(clickedRow, clickedCol);
+    };
+
     boardEl.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       const cellEl = target.closest('.cell') as HTMLElement;
       if (!cellEl) return;
+      handleCellAction(cellEl);
+    });
 
-      const clickedRow = parseInt(cellEl.dataset.row!, 10);
-      const clickedCol = parseInt(cellEl.dataset.col!, 10);
-
-      onCellClick(clickedRow, clickedCol);
+    // Keyboard support for accessibility
+    boardEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const target = e.target as HTMLElement;
+        if (target.classList.contains('cell')) {
+          e.preventDefault();
+          handleCellAction(target);
+        }
+      }
     });
   }
 

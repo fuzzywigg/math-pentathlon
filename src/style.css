@@ -401,3 +401,78 @@ h1 {
 .rules-content li {
   margin-bottom: 4px;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #app {
+    padding: 1rem;
+  }
+
+  .game-area {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .board {
+    width: 90vw;
+    height: 90vw;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .move-history {
+    width: 90vw;
+    max-width: 400px;
+    max-height: 200px;
+  }
+
+  .modal-content {
+    margin: 16px;
+    padding: 20px;
+    max-width: calc(100vw - 32px);
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .cell {
+    font-size: 20px;
+  }
+
+  .cell-king {
+    font-size: 24px;
+  }
+
+  .status-turn {
+    font-size: 1rem;
+  }
+
+  .status-supplies {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .button-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .button-row button {
+    width: 100%;
+  }
+}
+
+/* Ensure touch targets are large enough on mobile */
+@media (pointer: coarse) {
+  .cell {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  button {
+    min-height: 44px;
+  }
+}
