@@ -95,6 +95,9 @@ export function renderBoard(
   const boardEl = document.createElement('div');
   boardEl.className = 'board';
 
+  // Add phase class for CSS styling
+  boardEl.classList.add(`phase-${state.turnPhase}`);
+
   // Loop through rows 1-9 and columns 1-9 (1-based indexing)
   for (let row = 1; row <= 9; row++) {
     for (let col = 1; col <= 9; col++) {

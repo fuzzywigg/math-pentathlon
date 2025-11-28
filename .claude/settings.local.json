@@ -10,7 +10,11 @@
       "Bash(npm run test:unit:*)",
       "Bash(npm run test:e2e:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh repo create:*)",
+      "Bash(git push)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": [],
     "ask": []

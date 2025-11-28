@@ -275,8 +275,16 @@ describe('Game State', () => {
     it('returns correct strings for each phase', () => {
       let state = createInitialGameState();
 
-      // moveKing phase for Player 1
-      expect(getCurrentPhaseMessage(state)).toBe('Player 1: Move your King');
+      // moveKing phase for Player 1 (no king selected)
+      expect(getCurrentPhaseMessage(state)).toBe(
+        'Player 1: Click your King to select it'
+      );
+
+      // moveKing phase with king selected
+      state = selectKing(state);
+      expect(getCurrentPhaseMessage(state)).toBe(
+        'Player 1: Click a green square to move'
+      );
 
       // placeQuadraphage phase for Player 1
       state = moveKing(state, { row: 2, col: 5 });
@@ -284,7 +292,9 @@ describe('Game State', () => {
 
       // moveKing phase for Player 2
       state = placeQuadraphage(state, { row: 5, col: 5 });
-      expect(getCurrentPhaseMessage(state)).toBe('Player 2: Move your King');
+      expect(getCurrentPhaseMessage(state)).toBe(
+        'Player 2: Click your King to select it'
+      );
     });
 
     it('returns game over message with winner', () => {

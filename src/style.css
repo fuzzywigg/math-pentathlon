@@ -92,6 +92,8 @@ h1 {
 
 .cell-valid-move {
   position: relative;
+  background-color: rgba(76, 175, 80, 0.4) !important;
+  cursor: pointer;
 }
 
 .cell-valid-move::after {
@@ -99,8 +101,12 @@ h1 {
   position: absolute;
   width: 30%;
   height: 30%;
-  background-color: rgba(0, 128, 0, 0.5);
+  background-color: rgba(0, 128, 0, 0.6);
   border-radius: 50%;
+}
+
+.cell-valid-move:hover {
+  background-color: rgba(76, 175, 80, 0.7) !important;
 }
 
 /* Valid placement cells (hover effect during quadraphage placement) */
