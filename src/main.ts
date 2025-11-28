@@ -1,22 +1,18 @@
 import './style.css';
-import { createInitialBoard } from './games/kings-quadraphages/board';
-import { renderBoard } from './games/kings-quadraphages/board-renderer';
+import { initGame, newGame } from './games/kings-quadraphages/game-controller';
 
-// Set up the page structure
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div class="container">
-    <h1>Math Pentathlon</h1>
-    <p class="subtitle">Kings & Quadraphages</p>
-    <div id="board-container"></div>
-  </div>
-`;
+// Initialize the game when DOM is ready
+const boardContainer = document.getElementById('board');
+const statusContainer = document.getElementById('status');
+const newGameBtn = document.getElementById('new-game-btn');
 
-// Create and render the board
-const board = createInitialBoard();
-const boardElement = renderBoard(board, {
-  onCellClick: (position) => {
-    console.log(`Clicked cell: row ${position.row}, col ${position.col}`);
-  },
-});
+if (boardContainer && statusContainer) {
+  initGame(boardContainer, statusContainer);
+}
 
-document.querySelector('#board-container')!.appendChild(boardElement);
+// Wire up New Game button
+if (newGameBtn) {
+  newGameBtn.addEventListener('click', () => {
+    newGame();
+  });
+}

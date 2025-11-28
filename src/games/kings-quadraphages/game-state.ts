@@ -3,7 +3,6 @@ import {
   isValidKingMove,
   isValidQuadraphagePlacement,
   checkWinCondition,
-  findKingPosition as findKingPositionOnBoard,
   getOpponent,
 } from './rules';
 
@@ -119,9 +118,10 @@ export function getCurrentPhaseMessage(state: GameState): string {
       return `${playerName}: Move your King`;
     case 'placeQuadraphage':
       return `${playerName}: Place a Quadraphage`;
-    case 'gameOver':
+    case 'gameOver': {
       const winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
       return `Game Over! ${winnerName} wins!`;
+    }
   }
 }
 

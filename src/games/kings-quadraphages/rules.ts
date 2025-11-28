@@ -5,7 +5,6 @@ import {
   BOARD_SIZE,
   isValidPosition,
   isEmpty,
-  getPiece,
   getSupply,
   PlayerOwner,
 } from './board';
