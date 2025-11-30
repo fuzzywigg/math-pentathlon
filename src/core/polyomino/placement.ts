@@ -188,7 +188,6 @@ export function checkPerfectCoverage<T>(
   }
 
   // Mark all cells covered by placements
-  let totalCells = 0;
   for (const placement of placements) {
     const cells = getAbsoluteCells(
       placement.polyomino,
@@ -209,7 +208,6 @@ export function checkPerfectCoverage<T>(
       }
 
       coverage[cell.row][cell.col] = true;
-      totalCells++;
     }
   }
 
