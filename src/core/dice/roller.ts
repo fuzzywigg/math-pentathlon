@@ -1,259 +1,152 @@
-/**
- * Dice Roller Logic
- * Core functionality for rolling dice with cryptographically secure randomness
- */
+// Dice Rolling Logic
 
-import {
-  DiceType,
-  DieRoll,
-  DiceRollResult,
-  DiceRollConfig,
-  DICE_FACES,
-} from './types';
+import { DiceConfig, DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
 
-// Generate a unique ID for rolls
+/** Generate a unique ID */
 function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+  return Math.random().toString(36).substring(2, 9);
 }
 
-/**
- * Roll a single die of the specified type
- */
-export function rollDie(diceType: DiceType): DieRoll {
-  const faces = DICE_FACES[diceType];
-  const value = Math.floor(Math.random() * faces) + 1;
+/** Roll a single die */
+export function rollDie(config: DiceConfig): DieRoll {
+  const values = config.values || Array.from({ length: config.faces }, (_, i) => i + 1);
+  const value = values[Math.floor(Math.random() * values.length)];
 
   return {
     id: generateId(),
-    diceType,
+    type: config.type,
     value,
-    timestamp: Date.now(),
-    isSelected: false,
-    isLocked: false,
+    selected: false,
+    used: false,
   };
 }
 
-/**
- * Roll multiple dice according to configuration
- */
-export function rollDice(config: DiceRollConfig): DiceRollResult {
-  const rolls = config.dice.map((diceType) => rollDie(diceType));
-  const total = rolls.reduce((sum, roll) => sum + roll.value, 0);
+/** Roll a single die by type */
+export function rollDieByType(type: DiceType): DieRoll {
+  return rollDie(DICE_CONFIGS[type]);
+}
+
+/** Roll multiple dice */
+export function rollDice(configs: DiceConfig[]): RollResult {
+  const dice = configs.map(config => rollDie(config));
 
   return {
     id: generateId(),
-    rolls,
     timestamp: Date.now(),
-    total,
+    dice,
+    total: dice.reduce((sum, die) => sum + die.value, 0),
   };
 }
 
-/**
- * Roll a specific set of dice (convenience function)
- * @param dice Array of dice types to roll
- */
-export function roll(...dice: DiceType[]): DiceRollResult {
-  return rollDice({ dice });
+/** Roll multiple dice of the same type */
+export function rollMultiple(type: DiceType, count: number): RollResult {
+  const config = DICE_CONFIGS[type];
+  const configs = Array(count).fill(config);
+  return rollDice(configs);
 }
 
-/**
- * Roll N dice of the same type
- */
-export function rollMultiple(diceType: DiceType, count: number): DiceRollResult {
-  const dice = Array(count).fill(diceType);
-  return rollDice({ dice });
-}
-
-/**
- * Re-roll specific dice from a previous result, keeping locked dice
- */
-export function rerollDice(
-  previousResult: DiceRollResult,
-  diceIdsToReroll: string[]
-): DiceRollResult {
-  const newRolls = previousResult.rolls.map((roll) => {
-    if (diceIdsToReroll.includes(roll.id) && !roll.isLocked) {
-      return rollDie(roll.diceType);
+/** Re-roll specific dice in a result */
+export function rerollDice(result: RollResult, dieIds: string[]): RollResult {
+  const newDice = result.dice.map(die => {
+    if (dieIds.includes(die.id)) {
+      const config = DICE_CONFIGS[die.type];
+      return rollDie(config);
     }
-    return { ...roll };
+    return die;
   });
 
-  const total = newRolls.reduce((sum, roll) => sum + roll.value, 0);
-
   return {
+    ...result,
     id: generateId(),
-    rolls: newRolls,
     timestamp: Date.now(),
-    total,
+    dice: newDice,
+    total: newDice.reduce((sum, die) => sum + die.value, 0),
   };
 }
 
-/**
- * Lock specific dice (prevent re-rolling)
- */
-export function lockDice(
-  result: DiceRollResult,
-  diceIds: string[]
-): DiceRollResult {
+/** Get selected dice from a roll result */
+export function getSelectedDice(result: RollResult): DieRoll[] {
+  return result.dice.filter(die => die.selected);
+}
+
+/** Get sum of selected dice */
+export function getSelectedSum(result: RollResult): number {
+  return getSelectedDice(result).reduce((sum, die) => sum + die.value, 0);
+}
+
+/** Toggle die selection */
+export function toggleDieSelection(result: RollResult, dieId: string): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map((roll) => ({
-      ...roll,
-      isLocked: diceIds.includes(roll.id) ? true : roll.isLocked,
-    })),
+    dice: result.dice.map(die =>
+      die.id === dieId ? { ...die, selected: !die.selected } : die
+    ),
   };
 }
 
-/**
- * Unlock specific dice (allow re-rolling)
- */
-export function unlockDice(
-  result: DiceRollResult,
-  diceIds: string[]
-): DiceRollResult {
+/** Mark dice as used */
+export function markDiceUsed(result: RollResult, dieIds: string[]): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map((roll) => ({
-      ...roll,
-      isLocked: diceIds.includes(roll.id) ? false : roll.isLocked,
-    })),
+    dice: result.dice.map(die =>
+      dieIds.includes(die.id) ? { ...die, used: true, selected: false } : die
+    ),
   };
 }
 
-/**
- * Toggle selection state of specific dice
- */
-export function toggleDiceSelection(
-  result: DiceRollResult,
-  diceId: string
-): DiceRollResult {
+/** Reset all dice to unused */
+export function resetDiceUsage(result: RollResult): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map((roll) => ({
-      ...roll,
-      isSelected: roll.id === diceId ? !roll.isSelected : roll.isSelected,
-    })),
+    dice: result.dice.map(die => ({ ...die, used: false, selected: false })),
   };
 }
 
-/**
- * Set selection state for multiple dice
- */
-export function selectDice(
-  result: DiceRollResult,
-  diceIds: string[],
-  selected: boolean = true
-): DiceRollResult {
-  return {
-    ...result,
-    rolls: result.rolls.map((roll) => ({
-      ...roll,
-      isSelected: diceIds.includes(roll.id) ? selected : roll.isSelected,
-    })),
-  };
+/** Check if specific sum can be made from available dice */
+export function canMakeSum(result: RollResult, target: number): boolean {
+  const availableDice = result.dice.filter(die => !die.used);
+  return findCombinationForSum(availableDice, target) !== null;
 }
 
-/**
- * Clear all selections
- */
-export function clearSelection(result: DiceRollResult): DiceRollResult {
-  return {
-    ...result,
-    rolls: result.rolls.map((roll) => ({
-      ...roll,
-      isSelected: false,
-    })),
-  };
+/** Find a combination of dice that makes target sum (returns die IDs or null) */
+export function findCombinationForSum(dice: DieRoll[], target: number): string[] | null {
+  const n = dice.length;
+
+  // Try all combinations using bit manipulation
+  for (let mask = 1; mask < (1 << n); mask++) {
+    let sum = 0;
+    const ids: string[] = [];
+
+    for (let i = 0; i < n; i++) {
+      if (mask & (1 << i)) {
+        sum += dice[i].value;
+        ids.push(dice[i].id);
+      }
+    }
+
+    if (sum === target) {
+      return ids;
+    }
+  }
+
+  return null;
 }
 
-/**
- * Get the values of selected dice
- */
-export function getSelectedValues(result: DiceRollResult): number[] {
-  return result.rolls.filter((roll) => roll.isSelected).map((roll) => roll.value);
-}
-
-/**
- * Get the sum of selected dice
- */
-export function getSelectedTotal(result: DiceRollResult): number {
-  return getSelectedValues(result).reduce((sum, val) => sum + val, 0);
-}
-
-/**
- * Check if selection meets requirements
- */
-export function isValidSelection(
-  result: DiceRollResult,
-  config: DiceRollConfig
-): boolean {
-  const selectedCount = result.rolls.filter((roll) => roll.isSelected).length;
-  const minRequired = config.minSelectable ?? 0;
-  const maxAllowed = config.maxSelectable ?? result.rolls.length;
-
-  return selectedCount >= minRequired && selectedCount <= maxAllowed;
-}
-
-/**
- * Calculate all possible sums from dice combinations
- * Useful for games like Contig 60 where players choose how to combine dice
- */
-export function getAllPossibleSums(values: number[]): number[] {
+/** Get all possible sums from available dice */
+export function getAllPossibleSums(result: RollResult): number[] {
+  const availableDice = result.dice.filter(die => !die.used);
   const sums = new Set<number>();
+  const n = availableDice.length;
 
-  // Generate all subsets and their sums
-  const n = values.length;
-  for (let mask = 1; mask < 1 << n; mask++) {
+  for (let mask = 1; mask < (1 << n); mask++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
       if (mask & (1 << i)) {
-        sum += values[i];
+        sum += availableDice[i].value;
       }
     }
     sums.add(sum);
   }
 
   return Array.from(sums).sort((a, b) => a - b);
-}
-
-/**
- * Calculate all possible products from dice combinations
- */
-export function getAllPossibleProducts(values: number[]): number[] {
-  const products = new Set<number>();
-
-  const n = values.length;
-  for (let mask = 1; mask < 1 << n; mask++) {
-    let product = 1;
-    for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) {
-        product *= values[i];
-      }
-    }
-    products.add(product);
-  }
-
-  return Array.from(products).sort((a, b) => a - b);
-}
-
-/**
- * Calculate all possible results using basic operations (+, -, *, /)
- * For two dice values
- */
-export function getTwoDiceResults(a: number, b: number): Map<string, number> {
-  const results = new Map<string, number>();
-
-  results.set(`${a} + ${b}`, a + b);
-  results.set(`${a} - ${b}`, a - b);
-  results.set(`${b} - ${a}`, b - a);
-  results.set(`${a} × ${b}`, a * b);
-
-  if (b !== 0 && a % b === 0) {
-    results.set(`${a} ÷ ${b}`, a / b);
-  }
-  if (a !== 0 && b % a === 0) {
-    results.set(`${b} ÷ ${a}`, b / a);
-  }
-
-  return results;
 }

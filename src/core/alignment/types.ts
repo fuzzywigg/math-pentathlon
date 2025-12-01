@@ -1,153 +1,127 @@
-/**
- * Alignment System Types
- * Core type definitions for detecting alignments, connections, and patterns
- */
+// Alignment Detection Types
 
-// Position on a grid (0-indexed)
-export interface Position {
+/** A position on a 2D grid */
+export interface GridPosition {
   row: number;
   col: number;
 }
 
-// Direction vectors for alignment detection
-export type Direction = 'horizontal' | 'vertical' | 'diagonal-down' | 'diagonal-up';
+/** A cell value that can be compared for alignment */
+export type CellValue = string | number | null;
 
-// Direction vectors as coordinate offsets
-export const DIRECTION_VECTORS: Record<Direction, Position> = {
-  horizontal: { row: 0, col: 1 },
-  vertical: { row: 1, col: 0 },
-  'diagonal-down': { row: 1, col: 1 }, // top-left to bottom-right
-  'diagonal-up': { row: -1, col: 1 }, // bottom-left to top-right
-};
+/** Function to get cell value at a position */
+export type CellGetter<T = CellValue> = (row: number, col: number) => T;
 
-// All 8 directions for neighbor/flood-fill operations
-export type FullDirection =
-  | 'n'
-  | 'ne'
-  | 'e'
-  | 'se'
-  | 's'
-  | 'sw'
-  | 'w'
-  | 'nw';
+/** Direction vectors for alignment checking */
+export interface Direction {
+  name: string;
+  dRow: number;
+  dCol: number;
+}
 
-export const FULL_DIRECTION_VECTORS: Record<FullDirection, Position> = {
-  n: { row: -1, col: 0 },
-  ne: { row: -1, col: 1 },
-  e: { row: 0, col: 1 },
-  se: { row: 1, col: 1 },
-  s: { row: 1, col: 0 },
-  sw: { row: 1, col: -1 },
-  w: { row: 0, col: -1 },
-  nw: { row: -1, col: -1 },
-};
+/** Standard directions for grid alignment */
+export const DIRECTIONS = {
+  HORIZONTAL: { name: 'horizontal', dRow: 0, dCol: 1 },
+  VERTICAL: { name: 'vertical', dRow: 1, dCol: 0 },
+  DIAGONAL_DOWN: { name: 'diagonal-down', dRow: 1, dCol: 1 },
+  DIAGONAL_UP: { name: 'diagonal-up', dRow: -1, dCol: 1 },
+} as const;
 
-// Cardinal directions only (4-connected)
-export const CARDINAL_DIRECTIONS: FullDirection[] = ['n', 'e', 's', 'w'];
+/** All standard directions as array */
+export const ALL_DIRECTIONS: Direction[] = Object.values(DIRECTIONS);
 
-// All 8 directions (8-connected)
-export const ALL_DIRECTIONS: FullDirection[] = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
-
-// Configuration for N-in-a-row detection
+/** Configuration for alignment detection */
 export interface AlignmentConfig {
-  requiredLength: number; // How many in a row to detect (e.g., 4 for Connect Four)
-  directions?: Direction[]; // Which directions to check (default: all 4)
-  wrapHorizontal?: boolean; // Does the board wrap horizontally?
-  wrapVertical?: boolean; // Does the board wrap vertically?
-}
-
-// Default alignment config
-export const DEFAULT_ALIGNMENT_CONFIG: AlignmentConfig = {
-  requiredLength: 4,
-  directions: ['horizontal', 'vertical', 'diagonal-down', 'diagonal-up'],
-  wrapHorizontal: false,
-  wrapVertical: false,
-};
-
-// Result of finding an alignment
-export interface AlignmentResult {
-  found: boolean;
-  positions: Position[]; // Cells that form the alignment
-  direction: Direction;
-  value: unknown; // The value that was aligned (for multi-value grids)
-}
-
-// Result of finding multiple alignments
-export interface AlignmentSearchResult {
-  alignments: AlignmentResult[];
-  hasAlignment: boolean;
-}
-
-// Configuration for contiguous region detection
-export interface ContiguousConfig {
-  connectivity: 4 | 8; // 4-connected (cardinal) or 8-connected (with diagonals)
-  minSize?: number; // Minimum region size to report
-  maxSize?: number; // Maximum region size to report
-}
-
-// Default contiguous config
-export const DEFAULT_CONTIGUOUS_CONFIG: ContiguousConfig = {
-  connectivity: 4,
-  minSize: 1,
-};
-
-// A contiguous region of cells
-export interface ContiguousRegion {
-  positions: Position[];
-  size: number;
-  value: unknown; // The value shared by all cells in the region
-  bounds: {
-    minRow: number;
-    maxRow: number;
-    minCol: number;
-    maxCol: number;
-  };
-}
-
-// Generic cell matcher function
-export type CellMatcher<T> = (value: T, row: number, col: number) => boolean;
-
-// Grid accessor function (allows any grid representation)
-export type GridAccessor<T> = (row: number, col: number) => T | undefined;
-
-// Grid dimensions
-export interface GridDimensions {
+  /** Number of pieces needed in a row to win/score */
+  targetLength: number;
+  /** Grid dimensions */
   rows: number;
   cols: number;
+  /** Directions to check (default: all 4) */
+  directions?: Direction[];
+  /** Whether to wrap around edges (for toroidal boards) */
+  wrap?: boolean;
 }
 
-// Visual highlight style
-export interface HighlightStyle {
-  color: string;
-  opacity?: number;
-  pulseAnimation?: boolean;
-  borderWidth?: number;
+/** Result of finding an alignment */
+export interface AlignmentResult {
+  /** The value that forms the alignment */
+  value: CellValue;
+  /** Starting position */
+  start: GridPosition;
+  /** Ending position */
+  end: GridPosition;
+  /** All positions in the alignment */
+  positions: GridPosition[];
+  /** Direction of the alignment */
+  direction: Direction;
+  /** Length of the alignment */
+  length: number;
 }
 
-// Highlight configuration for different alignment types
-export const DEFAULT_HIGHLIGHT_STYLES: Record<string, HighlightStyle> = {
-  winning: {
-    color: '#4caf50',
-    opacity: 0.6,
-    pulseAnimation: true,
-    borderWidth: 3,
-  },
-  selected: {
-    color: '#ffd700',
-    opacity: 0.4,
-    pulseAnimation: false,
-    borderWidth: 2,
-  },
-  preview: {
-    color: '#2196f3',
-    opacity: 0.3,
-    pulseAnimation: false,
-    borderWidth: 1,
-  },
-  danger: {
-    color: '#f44336',
-    opacity: 0.5,
-    pulseAnimation: true,
-    borderWidth: 3,
-  },
-};
+/** Result of checking for alignments on a board */
+export interface AlignmentCheckResult {
+  /** Whether any winning alignments were found */
+  hasWinner: boolean;
+  /** The winning value (if any) */
+  winner: CellValue;
+  /** All alignments found (may include multiple) */
+  alignments: AlignmentResult[];
+}
+
+/** A region of connected cells */
+export interface Region {
+  /** The value shared by cells in this region */
+  value: CellValue;
+  /** All positions in the region */
+  positions: GridPosition[];
+  /** Size of the region */
+  size: number;
+}
+
+/** Configuration for contiguous region detection */
+export interface ContiguousConfig {
+  /** Grid dimensions */
+  rows: number;
+  cols: number;
+  /** Whether to include diagonal connections (default: false for 4-way, true for 8-way) */
+  includeDiagonals?: boolean;
+  /** Whether to wrap around edges */
+  wrap?: boolean;
+}
+
+/** Neighbor offsets for 4-way connectivity */
+export const NEIGHBORS_4WAY: GridPosition[] = [
+  { row: -1, col: 0 },  // up
+  { row: 1, col: 0 },   // down
+  { row: 0, col: -1 },  // left
+  { row: 0, col: 1 },   // right
+];
+
+/** Neighbor offsets for 8-way connectivity */
+export const NEIGHBORS_8WAY: GridPosition[] = [
+  ...NEIGHBORS_4WAY,
+  { row: -1, col: -1 }, // up-left
+  { row: -1, col: 1 },  // up-right
+  { row: 1, col: -1 },  // down-left
+  { row: 1, col: 1 },   // down-right
+];
+
+/** Hex grid neighbor directions (pointy-top) */
+export const HEX_NEIGHBORS_EVEN_ROW: GridPosition[] = [
+  { row: -1, col: 0 },  // top-left
+  { row: -1, col: 1 },  // top-right
+  { row: 0, col: -1 },  // left
+  { row: 0, col: 1 },   // right
+  { row: 1, col: 0 },   // bottom-left
+  { row: 1, col: 1 },   // bottom-right
+];
+
+export const HEX_NEIGHBORS_ODD_ROW: GridPosition[] = [
+  { row: -1, col: -1 }, // top-left
+  { row: -1, col: 0 },  // top-right
+  { row: 0, col: -1 },  // left
+  { row: 0, col: 1 },   // right
+  { row: 1, col: -1 },  // bottom-left
+  { row: 1, col: 0 },   // bottom-right
+];

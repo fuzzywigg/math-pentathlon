@@ -1,356 +1,391 @@
-/**
- * Dice Selector Component
- * Interactive UI for rolling dice and selecting results
- */
+// Dice Selector - UI for selecting and combining dice results
 
-import type {
-  DiceRollConfig,
-  DiceSelectorState,
-  DiceHistoryEntry,
-  DiceAnimationConfig,
-} from './types';
-import { DEFAULT_ANIMATION_CONFIG } from './types';
-import {
-  rollDice,
-  rerollDice,
-  toggleDiceSelection,
-  lockDice,
-  unlockDice,
-  getSelectedValues,
-  getSelectedTotal,
-  isValidSelection,
-} from './roller';
-import { animateDiceRoll, renderDiceRollResult, getDiceStyles } from './dice-ui';
+import { DiceConfig, DieRoll, RollResult, DiceSet, COMMON_DICE_SETS } from './types';
+import { rollDice, toggleDieSelection, getSelectedSum, markDiceUsed, getAllPossibleSums } from './roller';
+import { renderRollResult, animateRoll, getDiceStyles } from './dice-ui';
 
 export interface DiceSelectorOptions {
-  config: DiceRollConfig;
-  container: HTMLElement;
-  animationConfig?: DiceAnimationConfig;
-  onSelectionChange?: (selectedValues: number[], total: number) => void;
-  onRollComplete?: (entry: DiceHistoryEntry) => void;
-  onConfirm?: (selectedValues: number[], total: number) => void;
-  showTotal?: boolean;
-  showRerollButton?: boolean;
-  showConfirmButton?: boolean;
-  confirmButtonText?: string;
+  /** Dice set to use */
+  diceSet?: DiceSet;
+  /** Custom dice configuration */
+  customDice?: DiceConfig[];
+  /** Allow selecting multiple dice */
+  multiSelect?: boolean;
+  /** Show possible sums */
+  showPossibleSums?: boolean;
+  /** Show roll button */
+  showRollButton?: boolean;
+  /** Auto-roll on mount */
+  autoRoll?: boolean;
+  /** Die size in pixels */
+  dieSize?: number;
+  /** Callback when dice are selected/deselected */
+  onSelectionChange?: (selectedDice: DieRoll[], sum: number) => void;
+  /** Callback when roll is complete */
+  onRollComplete?: (result: RollResult) => void;
+  /** Callback when selection is confirmed */
+  onConfirm?: (selectedDice: DieRoll[], sum: number) => void;
 }
 
-/**
- * Dice Selector Component
- * Manages the full dice rolling and selection UI
- */
 export class DiceSelector {
-  private state: DiceSelectorState;
-  private config: DiceRollConfig;
   private container: HTMLElement;
-  private animationConfig: DiceAnimationConfig;
-  private history: DiceHistoryEntry[] = [];
+  private options: Required<DiceSelectorOptions>;
+  private currentResult: RollResult | null = null;
+  private isRolling: boolean = false;
 
-  private onSelectionChange?: (selectedValues: number[], total: number) => void;
-  private onRollComplete?: (entry: DiceHistoryEntry) => void;
-  private onConfirm?: (selectedValues: number[], total: number) => void;
-
-  private showTotal: boolean;
-  private showRerollButton: boolean;
-  private showConfirmButton: boolean;
-  private confirmButtonText: string;
-
-  private diceContainer: HTMLElement | null = null;
-  private controlsContainer: HTMLElement | null = null;
-  private rollButton: HTMLButtonElement | null = null;
-  private rerollButton: HTMLButtonElement | null = null;
-  private confirmButton: HTMLButtonElement | null = null;
-  private selectedDisplay: HTMLElement | null = null;
-
-  constructor(options: DiceSelectorOptions) {
-    this.config = options.config;
-    this.container = options.container;
-    this.animationConfig = options.animationConfig || DEFAULT_ANIMATION_CONFIG;
-    this.onSelectionChange = options.onSelectionChange;
-    this.onRollComplete = options.onRollComplete;
-    this.onConfirm = options.onConfirm;
-    this.showTotal = options.showTotal ?? true;
-    this.showRerollButton = options.showRerollButton ?? (options.config.allowReroll ?? false);
-    this.showConfirmButton = options.showConfirmButton ?? true;
-    this.confirmButtonText = options.confirmButtonText ?? 'Confirm Selection';
-
-    this.state = {
-      currentRoll: null,
-      selectedDice: [],
-      lockedDice: [],
-      rerollsRemaining: options.config.maxRerolls ?? 0,
-      isRolling: false,
+  constructor(container: HTMLElement, options: DiceSelectorOptions = {}) {
+    this.container = container;
+    this.options = {
+      diceSet: options.diceSet || COMMON_DICE_SETS.standard,
+      customDice: options.customDice || [],
+      multiSelect: options.multiSelect ?? true,
+      showPossibleSums: options.showPossibleSums ?? false,
+      showRollButton: options.showRollButton ?? true,
+      autoRoll: options.autoRoll ?? false,
+      dieSize: options.dieSize ?? 60,
+      onSelectionChange: options.onSelectionChange || (() => {}),
+      onRollComplete: options.onRollComplete || (() => {}),
+      onConfirm: options.onConfirm || (() => {}),
     };
 
     this.injectStyles();
     this.render();
+
+    if (this.options.autoRoll) {
+      this.roll();
+    }
   }
 
   private injectStyles(): void {
     const styleId = 'dice-selector-styles';
-    if (document.getElementById(styleId)) return;
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = getDiceStyles() + `
+        .dice-selector {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          padding: 1.5rem;
+          background: white;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
 
-    const style = document.createElement('style');
-    style.id = styleId;
-    style.textContent = getDiceStyles() + this.getSelectorStyles();
-    document.head.appendChild(style);
+        .dice-selector-header {
+          font-size: 1.1rem;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .dice-result-area {
+          min-height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .dice-selector-controls {
+          display: flex;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+
+        .dice-btn {
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 600;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .dice-btn-primary {
+          background: #1976d2;
+          color: white;
+        }
+
+        .dice-btn-primary:hover:not(:disabled) {
+          background: #1565c0;
+          transform: translateY(-2px);
+        }
+
+        .dice-btn-success {
+          background: #4caf50;
+          color: white;
+        }
+
+        .dice-btn-success:hover:not(:disabled) {
+          background: #43a047;
+          transform: translateY(-2px);
+        }
+
+        .dice-btn:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .dice-selection-info {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.75rem 1rem;
+          background: #e3f2fd;
+          border-radius: 8px;
+          min-width: 120px;
+        }
+
+        .dice-selection-label {
+          font-size: 0.85rem;
+          color: #666;
+        }
+
+        .dice-selection-sum {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #1976d2;
+        }
+
+        .possible-sums {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          justify-content: center;
+          max-width: 300px;
+        }
+
+        .possible-sum {
+          padding: 0.25rem 0.5rem;
+          background: #f5f5f5;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          color: #666;
+        }
+
+        .possible-sum.achievable {
+          background: #e8f5e9;
+          color: #2e7d32;
+        }
+
+        .dice-placeholder {
+          color: #999;
+          font-style: italic;
+        }
+      `;
+      document.head.appendChild(style);
+    }
   }
 
-  private getSelectorStyles(): string {
-    return `
-      .dice-selector {
-        background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-      }
-      .dice-selector-controls {
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        margin-top: 16px;
-        flex-wrap: wrap;
-      }
-      .dice-selector-btn {
-        padding: 10px 20px;
-        font-size: 1rem;
-        font-weight: 600;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background-color 0.2s ease, transform 0.1s ease;
-      }
-      .dice-selector-btn:hover:not(:disabled) { transform: scale(1.02); }
-      .dice-selector-btn:active:not(:disabled) { transform: scale(0.98); }
-      .dice-selector-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-      .dice-selector-btn-roll { background-color: #1976d2; color: white; }
-      .dice-selector-btn-roll:hover:not(:disabled) { background-color: #1565c0; }
-      .dice-selector-btn-reroll { background-color: #ff9800; color: white; }
-      .dice-selector-btn-reroll:hover:not(:disabled) { background-color: #f57c00; }
-      .dice-selector-btn-confirm { background-color: #4caf50; color: white; }
-      .dice-selector-btn-confirm:hover:not(:disabled) { background-color: #43a047; }
-      .dice-selector-selected {
-        margin-top: 16px;
-        padding: 12px;
-        background: #f5f5f5;
-        border-radius: 8px;
-        font-size: 1.1rem;
-      }
-      .dice-selector-selected-values { font-weight: bold; color: #1976d2; }
-      .dice-selector-selected-total {
-        margin-top: 4px;
-        font-size: 1.25rem;
-        font-weight: bold;
-        color: #2e7d32;
-      }
-      .dice-selector-hint {
-        margin-top: 12px;
-        font-size: 0.9rem;
-        color: #666;
-        font-style: italic;
-      }
-      .dice-selector-empty { padding: 40px; color: #888; font-style: italic; }
-    `;
+  private getDiceConfigs(): DiceConfig[] {
+    if (this.options.customDice.length > 0) {
+      return this.options.customDice;
+    }
+    return this.options.diceSet.dice;
   }
 
   private render(): void {
     this.container.innerHTML = '';
-    this.container.classList.add('dice-selector');
+    this.container.className = 'dice-selector';
 
-    this.diceContainer = document.createElement('div');
-    this.diceContainer.classList.add('dice-selector-dice');
+    // Header
+    const header = document.createElement('div');
+    header.className = 'dice-selector-header';
+    header.textContent = this.options.diceSet.name;
+    this.container.appendChild(header);
 
-    if (this.state.currentRoll) {
-      renderDiceRollResult(
-        this.state.currentRoll,
-        this.diceContainer,
-        (dieId) => this.handleDieClick(dieId)
-      );
+    // Result area
+    const resultArea = document.createElement('div');
+    resultArea.className = 'dice-result-area';
+    resultArea.id = 'dice-result-area';
+
+    if (this.currentResult) {
+      renderRollResult(this.currentResult, resultArea, {
+        dieSize: this.options.dieSize,
+        showTotal: false,
+        selectable: true,
+        onDieClick: (die) => this.handleDieClick(die),
+      });
     } else {
-      this.diceContainer.innerHTML = '<div class="dice-selector-empty">Click Roll to start</div>';
+      resultArea.innerHTML = '<span class="dice-placeholder">Click Roll to begin</span>';
     }
 
-    this.container.appendChild(this.diceContainer);
+    this.container.appendChild(resultArea);
 
-    if (this.showTotal && this.state.currentRoll) {
-      this.selectedDisplay = document.createElement('div');
-      this.selectedDisplay.classList.add('dice-selector-selected');
-      this.updateSelectedDisplay();
-      this.container.appendChild(this.selectedDisplay);
-    }
+    // Selection info
+    if (this.currentResult) {
+      const selectionInfo = document.createElement('div');
+      selectionInfo.className = 'dice-selection-info';
 
-    if (this.state.currentRoll && !this.state.isRolling) {
-      const hint = document.createElement('div');
-      hint.classList.add('dice-selector-hint');
-      if (this.config.minSelectable || this.config.maxSelectable) {
-        const min = this.config.minSelectable ?? 0;
-        const max = this.config.maxSelectable ?? this.state.currentRoll.rolls.length;
-        hint.textContent = `Select ${min === max ? min : `${min}-${max}`} dice`;
-      } else {
-        hint.textContent = 'Click dice to select/deselect';
-      }
-      this.container.appendChild(hint);
-    }
+      const selectedSum = getSelectedSum(this.currentResult);
+      const selectedCount = this.currentResult.dice.filter(d => d.selected).length;
 
-    this.controlsContainer = document.createElement('div');
-    this.controlsContainer.classList.add('dice-selector-controls');
-
-    this.rollButton = document.createElement('button');
-    this.rollButton.classList.add('dice-selector-btn', 'dice-selector-btn-roll');
-    this.rollButton.textContent = this.state.currentRoll ? 'Roll Again' : 'Roll';
-    this.rollButton.disabled = this.state.isRolling;
-    this.rollButton.addEventListener('click', () => this.roll());
-    this.controlsContainer.appendChild(this.rollButton);
-
-    if (this.showRerollButton && this.state.currentRoll) {
-      this.rerollButton = document.createElement('button');
-      this.rerollButton.classList.add('dice-selector-btn', 'dice-selector-btn-reroll');
-      this.rerollButton.textContent = `Reroll (${this.state.rerollsRemaining} left)`;
-      this.rerollButton.disabled =
-        this.state.isRolling ||
-        this.state.rerollsRemaining <= 0 ||
-        this.state.selectedDice.length === 0;
-      this.rerollButton.addEventListener('click', () => this.reroll());
-      this.controlsContainer.appendChild(this.rerollButton);
-    }
-
-    if (this.showConfirmButton && this.state.currentRoll) {
-      this.confirmButton = document.createElement('button');
-      this.confirmButton.classList.add('dice-selector-btn', 'dice-selector-btn-confirm');
-      this.confirmButton.textContent = this.confirmButtonText;
-      this.confirmButton.disabled =
-        this.state.isRolling || !isValidSelection(this.state.currentRoll, this.config);
-      this.confirmButton.addEventListener('click', () => this.confirm());
-      this.controlsContainer.appendChild(this.confirmButton);
-    }
-
-    this.container.appendChild(this.controlsContainer);
-  }
-
-  private updateSelectedDisplay(): void {
-    if (!this.selectedDisplay || !this.state.currentRoll) return;
-    const selectedValues = getSelectedValues(this.state.currentRoll);
-    const total = getSelectedTotal(this.state.currentRoll);
-    if (selectedValues.length === 0) {
-      this.selectedDisplay.innerHTML = '<div>No dice selected</div>';
-    } else {
-      this.selectedDisplay.innerHTML = `
-        <div>Selected: <span class="dice-selector-selected-values">${selectedValues.join(', ')}</span></div>
-        <div class="dice-selector-selected-total">Total: ${total}</div>
+      selectionInfo.innerHTML = `
+        <span class="dice-selection-label">${selectedCount} dice selected</span>
+        <span class="dice-selection-sum">${selectedSum}</span>
       `;
+      this.container.appendChild(selectionInfo);
+
+      // Possible sums
+      if (this.options.showPossibleSums) {
+        const possibleSums = getAllPossibleSums(this.currentResult);
+        const sumsContainer = document.createElement('div');
+        sumsContainer.className = 'possible-sums';
+
+        for (const sum of possibleSums) {
+          const sumEl = document.createElement('span');
+          sumEl.className = `possible-sum ${sum === selectedSum ? 'achievable' : ''}`;
+          sumEl.textContent = String(sum);
+          sumsContainer.appendChild(sumEl);
+        }
+
+        this.container.appendChild(sumsContainer);
+      }
     }
+
+    // Controls
+    const controls = document.createElement('div');
+    controls.className = 'dice-selector-controls';
+
+    if (this.options.showRollButton) {
+      const rollBtn = document.createElement('button');
+      rollBtn.className = 'dice-btn dice-btn-primary';
+      rollBtn.textContent = this.currentResult ? 'Roll Again' : 'Roll';
+      rollBtn.disabled = this.isRolling;
+      rollBtn.addEventListener('click', () => this.roll());
+      controls.appendChild(rollBtn);
+    }
+
+    if (this.currentResult) {
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'dice-btn dice-btn-success';
+      confirmBtn.textContent = 'Confirm';
+      confirmBtn.disabled = this.isRolling || this.currentResult.dice.filter(d => d.selected).length === 0;
+      confirmBtn.addEventListener('click', () => this.confirm());
+      controls.appendChild(confirmBtn);
+    }
+
+    this.container.appendChild(controls);
   }
 
-  private handleDieClick(dieId: string): void {
-    if (this.state.isRolling || !this.state.currentRoll) return;
-    const newRoll = toggleDiceSelection(this.state.currentRoll, dieId);
-    this.state.currentRoll = newRoll;
-    const roll = newRoll.rolls.find((r) => r.id === dieId);
-    if (roll?.isSelected) {
-      this.state.selectedDice.push(dieId);
+  private handleDieClick(die: DieRoll): void {
+    if (!this.currentResult || this.isRolling || die.used) return;
+
+    if (!this.options.multiSelect) {
+      // Single select mode - deselect all others first
+      this.currentResult = {
+        ...this.currentResult,
+        dice: this.currentResult.dice.map(d => ({
+          ...d,
+          selected: d.id === die.id ? !d.selected : false,
+        })),
+      };
     } else {
-      this.state.selectedDice = this.state.selectedDice.filter((id) => id !== dieId);
+      this.currentResult = toggleDieSelection(this.currentResult, die.id);
     }
+
     this.render();
-    if (this.onSelectionChange) {
-      this.onSelectionChange(getSelectedValues(newRoll), getSelectedTotal(newRoll));
-    }
+
+    const selectedDice = this.currentResult.dice.filter(d => d.selected);
+    const selectedSum = getSelectedSum(this.currentResult);
+    this.options.onSelectionChange(selectedDice, selectedSum);
   }
 
-  async roll(): Promise<void> {
-    this.state.isRolling = true;
-    this.state.selectedDice = [];
-    this.state.lockedDice = [];
-    this.state.rerollsRemaining = this.config.maxRerolls ?? 0;
-    this.render();
-    const result = rollDice(this.config);
-    this.state.currentRoll = result;
-    if (this.diceContainer) {
-      await animateDiceRoll(
-        this.diceContainer,
-        result,
-        this.animationConfig,
-        (dieId) => this.handleDieClick(dieId)
-      );
-    }
-    this.state.isRolling = false;
-    this.render();
-    const entry: DiceHistoryEntry = { rollResult: result, selectedValues: [] };
-    this.history.push(entry);
-    if (this.onRollComplete) {
-      this.onRollComplete(entry);
-    }
-  }
+  /** Roll the dice */
+  public roll(): void {
+    if (this.isRolling) return;
 
-  async reroll(): Promise<void> {
-    if (!this.state.currentRoll || this.state.rerollsRemaining <= 0) return;
-    this.state.isRolling = true;
-    this.state.rerollsRemaining--;
-    this.render();
-    const result = rerollDice(this.state.currentRoll, this.state.selectedDice);
-    this.state.currentRoll = result;
-    this.state.selectedDice = [];
-    if (this.diceContainer) {
-      await animateDiceRoll(
-        this.diceContainer,
-        result,
-        this.animationConfig,
-        (dieId) => this.handleDieClick(dieId)
-      );
-    }
-    this.state.isRolling = false;
-    this.render();
-  }
+    this.isRolling = true;
+    const configs = this.getDiceConfigs();
+    const result = rollDice(configs);
 
-  confirm(): void {
-    if (!this.state.currentRoll || !isValidSelection(this.state.currentRoll, this.config)) return;
-    const selectedValues = getSelectedValues(this.state.currentRoll);
-    const total = getSelectedTotal(this.state.currentRoll);
-    if (this.history.length > 0) {
-      this.history[this.history.length - 1].selectedValues = selectedValues;
-    }
-    if (this.onConfirm) {
-      this.onConfirm(selectedValues, total);
+    const resultArea = this.container.querySelector('#dice-result-area') as HTMLElement;
+    if (resultArea) {
+      animateRoll(resultArea, result, {
+        duration: 800,
+        dieSize: this.options.dieSize,
+        onComplete: () => {
+          this.currentResult = result;
+          this.isRolling = false;
+          this.render();
+          this.options.onRollComplete(result);
+        },
+      });
     }
   }
 
-  getState(): DiceSelectorState {
-    return { ...this.state };
+  /** Confirm current selection */
+  public confirm(): void {
+    if (!this.currentResult) return;
+
+    const selectedDice = this.currentResult.dice.filter(d => d.selected);
+    const selectedSum = getSelectedSum(this.currentResult);
+
+    if (selectedDice.length > 0) {
+      this.options.onConfirm(selectedDice, selectedSum);
+
+      // Mark selected dice as used
+      const selectedIds = selectedDice.map(d => d.id);
+      this.currentResult = markDiceUsed(this.currentResult, selectedIds);
+      this.render();
+    }
   }
 
-  getHistory(): DiceHistoryEntry[] {
-    return [...this.history];
+  /** Get current roll result */
+  public getResult(): RollResult | null {
+    return this.currentResult;
   }
 
-  reset(): void {
-    this.state = {
-      currentRoll: null,
-      selectedDice: [],
-      lockedDice: [],
-      rerollsRemaining: this.config.maxRerolls ?? 0,
-      isRolling: false,
-    };
-    this.history = [];
+  /** Get selected dice */
+  public getSelectedDice(): DieRoll[] {
+    if (!this.currentResult) return [];
+    return this.currentResult.dice.filter(d => d.selected);
+  }
+
+  /** Get sum of selected dice */
+  public getSelectedSum(): number {
+    if (!this.currentResult) return 0;
+    return getSelectedSum(this.currentResult);
+  }
+
+  /** Reset the selector */
+  public reset(): void {
+    this.currentResult = null;
+    this.isRolling = false;
     this.render();
   }
 
-  lockSelectedDice(): void {
-    if (!this.state.currentRoll) return;
-    this.state.currentRoll = lockDice(this.state.currentRoll, this.state.selectedDice);
-    this.state.lockedDice = [...this.state.lockedDice, ...this.state.selectedDice];
-    this.state.selectedDice = [];
-    this.render();
+  /** Set a new dice set */
+  public setDiceSet(diceSet: DiceSet): void {
+    this.options.diceSet = diceSet;
+    this.reset();
   }
 
-  unlockAllDice(): void {
-    if (!this.state.currentRoll) return;
-    this.state.currentRoll = unlockDice(this.state.currentRoll, this.state.lockedDice);
-    this.state.lockedDice = [];
-    this.render();
+  /** Destroy the selector */
+  public destroy(): void {
+    this.container.innerHTML = '';
   }
 }
 
-export function createDiceSelector(options: DiceSelectorOptions): DiceSelector {
-  return new DiceSelector(options);
+/** Create a simple roll button that returns result via callback */
+export function createRollButton(
+  container: HTMLElement,
+  diceSet: DiceSet,
+  onRoll: (result: RollResult) => void
+): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.className = 'dice-btn dice-btn-primary';
+  btn.textContent = `Roll ${diceSet.name}`;
+
+  btn.addEventListener('click', () => {
+    const result = rollDice(diceSet.dice);
+    onRoll(result);
+  });
+
+  container.appendChild(btn);
+  return btn;
 }

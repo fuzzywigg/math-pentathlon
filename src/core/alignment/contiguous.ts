@@ -1,50 +1,42 @@
-/**
- * Contiguous Region Detection
- * Flood-fill based detection of connected regions
- */
+// Contiguous Region Detection (Flood Fill)
 
-import type {
-  Position,
-  FullDirection,
-  ContiguousConfig,
-  ContiguousRegion,
-  GridAccessor,
-  GridDimensions,
-  CellMatcher,
-} from './types';
 import {
-  CARDINAL_DIRECTIONS,
-  ALL_DIRECTIONS,
-  FULL_DIRECTION_VECTORS,
-  DEFAULT_CONTIGUOUS_CONFIG,
+  GridPosition,
+  CellValue,
+  CellGetter,
+  ContiguousConfig,
+  Region,
+  NEIGHBORS_4WAY,
+  NEIGHBORS_8WAY,
+  HEX_NEIGHBORS_EVEN_ROW,
+  HEX_NEIGHBORS_ODD_ROW,
 } from './types';
+import { isInBounds, wrapPosition } from './grid-alignment';
 
 /**
- * Get neighbors of a position based on connectivity
+ * Get neighbors for a position based on configuration
  */
 export function getNeighbors(
-  pos: Position,
-  dimensions: GridDimensions,
-  connectivity: 4 | 8 = 4
-): Position[] {
-  const directions: FullDirection[] = connectivity === 4 ? CARDINAL_DIRECTIONS : ALL_DIRECTIONS;
-  const neighbors: Position[] = [];
+  row: number,
+  col: number,
+  config: ContiguousConfig
+): GridPosition[] {
+  const { rows, cols, includeDiagonals = false, wrap = false } = config;
+  const offsets = includeDiagonals ? NEIGHBORS_8WAY : NEIGHBORS_4WAY;
+  const neighbors: GridPosition[] = [];
 
-  for (const dir of directions) {
-    const vector = FULL_DIRECTION_VECTORS[dir];
-    const neighbor: Position = {
-      row: pos.row + vector.row,
-      col: pos.col + vector.col,
-    };
+  for (const offset of offsets) {
+    let newRow = row + offset.row;
+    let newCol = col + offset.col;
 
-    // Check bounds
-    if (
-      neighbor.row >= 0 &&
-      neighbor.row < dimensions.rows &&
-      neighbor.col >= 0 &&
-      neighbor.col < dimensions.cols
-    ) {
-      neighbors.push(neighbor);
+    if (wrap) {
+      const wrapped = wrapPosition(newRow, newCol, rows, cols);
+      newRow = wrapped.row;
+      newCol = wrapped.col;
+    }
+
+    if (isInBounds(newRow, newCol, rows, cols)) {
+      neighbors.push({ row: newRow, col: newCol });
     }
   }
 
@@ -52,140 +44,124 @@ export function getNeighbors(
 }
 
 /**
- * Create a position key for Set/Map operations
+ * Get hex neighbors for a position (handles odd/even row offset)
  */
-function posKey(pos: Position): string {
-  return `${pos.row},${pos.col}`;
+export function getHexNeighbors(
+  row: number,
+  col: number,
+  config: ContiguousConfig
+): GridPosition[] {
+  const { rows, cols, wrap = false } = config;
+  const offsets = row % 2 === 0 ? HEX_NEIGHBORS_EVEN_ROW : HEX_NEIGHBORS_ODD_ROW;
+  const neighbors: GridPosition[] = [];
+
+  for (const offset of offsets) {
+    let newRow = row + offset.row;
+    let newCol = col + offset.col;
+
+    if (wrap) {
+      const wrapped = wrapPosition(newRow, newCol, rows, cols);
+      newRow = wrapped.row;
+      newCol = wrapped.col;
+    }
+
+    if (isInBounds(newRow, newCol, rows, cols)) {
+      neighbors.push({ row: newRow, col: newCol });
+    }
+  }
+
+  return neighbors;
 }
 
-
 /**
- * Find a single contiguous region starting from a position using flood-fill
+ * Find a contiguous region starting from a position using flood fill
  */
-export function findRegionAt<T>(
-  start: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): ContiguousRegion | null {
-  const startValue = getCell(start.row, start.col);
+export function findRegion(
+  startRow: number,
+  startCol: number,
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): Region | null {
+  const startValue = getCell(startRow, startCol);
 
-  // Can't start from empty cell
   if (startValue === null || startValue === undefined) {
     return null;
   }
 
-  // Check if matches custom criteria
-  if (matcher && !matcher(startValue, start.row, start.col)) {
-    return null;
-  }
-
+  const positions: GridPosition[] = [];
   const visited = new Set<string>();
-  const queue: Position[] = [start];
-  const positions: Position[] = [];
-
-  // Track bounds
-  let minRow = start.row;
-  let maxRow = start.row;
-  let minCol = start.col;
-  let maxCol = start.col;
+  const queue: GridPosition[] = [{ row: startRow, col: startCol }];
 
   while (queue.length > 0) {
     const current = queue.shift()!;
-    const key = posKey(current);
+    const key = `${current.row},${current.col}`;
 
     if (visited.has(key)) {
       continue;
     }
 
-    const value = getCell(current.row, current.col);
+    const cellValue = getCell(current.row, current.col);
 
-    // Check if this cell matches
-    if (value === null || value === undefined) {
-      continue;
-    }
-
-    // Must match the starting value
-    if (value !== startValue) {
-      // Try JSON comparison for objects
-      if (typeof value !== 'object' || typeof startValue !== 'object') {
-        continue;
-      }
-      if (JSON.stringify(value) !== JSON.stringify(startValue)) {
-        continue;
-      }
-    }
-
-    // Check custom matcher
-    if (matcher && !matcher(value, current.row, current.col)) {
+    if (cellValue !== startValue) {
       continue;
     }
 
     visited.add(key);
     positions.push(current);
 
-    // Update bounds
-    minRow = Math.min(minRow, current.row);
-    maxRow = Math.max(maxRow, current.row);
-    minCol = Math.min(minCol, current.col);
-    maxCol = Math.max(maxCol, current.col);
-
-    // Add neighbors to queue
-    const neighbors = getNeighbors(current, dimensions, config.connectivity);
+    // Add unvisited neighbors to queue
+    const neighbors = getNeighborsFn(current.row, current.col, config);
     for (const neighbor of neighbors) {
-      if (!visited.has(posKey(neighbor))) {
+      const neighborKey = `${neighbor.row},${neighbor.col}`;
+      if (!visited.has(neighborKey)) {
         queue.push(neighbor);
       }
     }
   }
 
-  // Check size constraints
-  if (config.minSize && positions.length < config.minSize) {
-    return null;
-  }
-  if (config.maxSize && positions.length > config.maxSize) {
-    return null;
-  }
-
   return {
+    value: startValue,
     positions,
     size: positions.length,
-    value: startValue,
-    bounds: { minRow, maxRow, minCol, maxCol },
   };
 }
 
 /**
- * Find all contiguous regions on the grid
+ * Find all distinct regions on the board
  */
-export function findAllRegions<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): ContiguousRegion[] {
+export function findAllRegions(
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): Region[] {
+  const { rows, cols } = config;
   const visited = new Set<string>();
-  const regions: ContiguousRegion[] = [];
+  const regions: Region[] = [];
 
-  for (let row = 0; row < dimensions.rows; row++) {
-    for (let col = 0; col < dimensions.cols; col++) {
-      const key = posKey({ row, col });
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const key = `${row},${col}`;
+
       if (visited.has(key)) {
         continue;
       }
 
-      const region = findRegionAt({ row, col }, dimensions, getCell, config, matcher);
+      const cellValue = getCell(row, col);
+
+      if (cellValue === null || cellValue === undefined) {
+        visited.add(key);
+        continue;
+      }
+
+      const region = findRegion(row, col, getCell, config, getNeighborsFn);
 
       if (region) {
         regions.push(region);
-        // Mark all positions in this region as visited
+        // Mark all positions in region as visited
         for (const pos of region.positions) {
-          visited.add(posKey(pos));
+          visited.add(`${pos.row},${pos.col}`);
         }
-      } else {
-        // Mark this cell as visited even if no region formed
-        visited.add(key);
       }
     }
   }
@@ -194,171 +170,165 @@ export function findAllRegions<T>(
 }
 
 /**
- * Find the largest contiguous region
+ * Find regions for a specific value
  */
-export function findLargestRegion<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): ContiguousRegion | null {
-  const regions = findAllRegions(dimensions, getCell, config, matcher);
+export function findRegionsForValue(
+  value: CellValue,
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): Region[] {
+  const allRegions = findAllRegions(getCell, config, getNeighborsFn);
+  return allRegions.filter(region => region.value === value);
+}
+
+/**
+ * Get the largest region for a value
+ */
+export function getLargestRegion(
+  value: CellValue,
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): Region | null {
+  const regions = findRegionsForValue(value, getCell, config, getNeighborsFn);
 
   if (regions.length === 0) {
     return null;
   }
 
-  return regions.reduce((largest, region) =>
-    region.size > largest.size ? region : largest
+  return regions.reduce((largest, current) =>
+    current.size > largest.size ? current : largest
   );
 }
 
 /**
- * Find all regions of a specific value
+ * Check if two positions are connected (same region)
  */
-export function findRegionsOfValue<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  targetValue: T,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG
-): ContiguousRegion[] {
-  const matcher: CellMatcher<T> = (value) => {
-    if (typeof value === 'object' && typeof targetValue === 'object') {
-      return JSON.stringify(value) === JSON.stringify(targetValue);
-    }
-    return value === targetValue;
-  };
-
-  return findAllRegions(dimensions, getCell, config, matcher);
-}
-
-/**
- * Check if two positions are in the same contiguous region
- */
-export function areConnected<T>(
-  pos1: Position,
-  pos2: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
+export function areConnected(
+  pos1: GridPosition,
+  pos2: GridPosition,
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
 ): boolean {
-  const region = findRegionAt(pos1, dimensions, getCell, config, matcher);
+  const region = findRegion(pos1.row, pos1.col, getCell, config, getNeighborsFn);
 
   if (!region) {
     return false;
   }
 
-  return region.positions.some((p) => p.row === pos2.row && p.col === pos2.col);
+  return region.positions.some(
+    pos => pos.row === pos2.row && pos.col === pos2.col
+  );
 }
 
 /**
- * Get the size of the region containing a position
+ * Check if a region touches a specific edge of the board
  */
-export function getRegionSize<T>(
-  pos: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): number {
-  const region = findRegionAt(pos, dimensions, getCell, config, matcher);
-  return region ? region.size : 0;
-}
-
-/**
- * Check if a position is isolated (region size of 1)
- */
-export function isIsolated<T>(
-  pos: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
+export function regionTouchesEdge(
+  region: Region,
+  edge: 'top' | 'bottom' | 'left' | 'right',
+  config: ContiguousConfig
 ): boolean {
-  return getRegionSize(pos, dimensions, getCell, config, matcher) === 1;
+  const { rows, cols } = config;
+
+  return region.positions.some(pos => {
+    switch (edge) {
+      case 'top':
+        return pos.row === 0;
+      case 'bottom':
+        return pos.row === rows - 1;
+      case 'left':
+        return pos.col === 0;
+      case 'right':
+        return pos.col === cols - 1;
+    }
+  });
 }
 
 /**
- * Find boundary cells of a region (cells with at least one non-matching neighbor)
+ * Check if a region connects two opposite edges (for Hex-style games)
  */
-export function findRegionBoundary(
-  region: ContiguousRegion,
-  dimensions: GridDimensions,
-  connectivity: 4 | 8 = 4
-): Position[] {
-  const regionSet = new Set(region.positions.map(posKey));
-  const boundary: Position[] = [];
+export function regionConnectsEdges(
+  region: Region,
+  edge1: 'top' | 'bottom' | 'left' | 'right',
+  edge2: 'top' | 'bottom' | 'left' | 'right',
+  config: ContiguousConfig
+): boolean {
+  return regionTouchesEdge(region, edge1, config) &&
+         regionTouchesEdge(region, edge2, config);
+}
 
-  for (const pos of region.positions) {
-    const neighbors = getNeighbors(pos, dimensions, connectivity);
-    const hasOutsideNeighbor = neighbors.some((n) => !regionSet.has(posKey(n)));
+/**
+ * Find a path from one position to another within connected cells
+ * Returns the path or null if not connected
+ */
+export function findPath(
+  start: GridPosition,
+  end: GridPosition,
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): GridPosition[] | null {
+  const startValue = getCell(start.row, start.col);
+  const endValue = getCell(end.row, end.col);
 
-    // Also consider edge of grid as boundary
-    const isEdge =
-      pos.row === 0 ||
-      pos.row === dimensions.rows - 1 ||
-      pos.col === 0 ||
-      pos.col === dimensions.cols - 1;
+  // Both positions must have the same value
+  if (startValue !== endValue || startValue === null) {
+    return null;
+  }
 
-    if (hasOutsideNeighbor || isEdge) {
-      boundary.push(pos);
+  // BFS to find path
+  const visited = new Set<string>();
+  const queue: { pos: GridPosition; path: GridPosition[] }[] = [
+    { pos: start, path: [start] }
+  ];
+
+  while (queue.length > 0) {
+    const { pos, path } = queue.shift()!;
+    const key = `${pos.row},${pos.col}`;
+
+    if (pos.row === end.row && pos.col === end.col) {
+      return path;
+    }
+
+    if (visited.has(key)) {
+      continue;
+    }
+
+    visited.add(key);
+
+    const neighbors = getNeighborsFn(pos.row, pos.col, config);
+    for (const neighbor of neighbors) {
+      const neighborKey = `${neighbor.row},${neighbor.col}`;
+      if (!visited.has(neighborKey) && getCell(neighbor.row, neighbor.col) === startValue) {
+        queue.push({
+          pos: neighbor,
+          path: [...path, neighbor]
+        });
+      }
     }
   }
 
-  return boundary;
+  return null;
 }
 
 /**
- * Count the number of distinct regions on the grid
+ * Count the number of separate regions for each value
  */
-export function countRegions<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): number {
-  return findAllRegions(dimensions, getCell, config, matcher).length;
-}
+export function countRegionsByValue(
+  getCell: CellGetter,
+  config: ContiguousConfig,
+  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+): Map<CellValue, number> {
+  const allRegions = findAllRegions(getCell, config, getNeighborsFn);
+  const counts = new Map<CellValue, number>();
 
-/**
- * Get region statistics
- */
-export function getRegionStats<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: ContiguousConfig = DEFAULT_CONTIGUOUS_CONFIG,
-  matcher?: CellMatcher<T>
-): {
-  count: number;
-  totalSize: number;
-  averageSize: number;
-  minSize: number;
-  maxSize: number;
-  sizes: number[];
-} {
-  const regions = findAllRegions(dimensions, getCell, config, matcher);
-
-  if (regions.length === 0) {
-    return {
-      count: 0,
-      totalSize: 0,
-      averageSize: 0,
-      minSize: 0,
-      maxSize: 0,
-      sizes: [],
-    };
+  for (const region of allRegions) {
+    const current = counts.get(region.value) || 0;
+    counts.set(region.value, current + 1);
   }
 
-  const sizes = regions.map((r) => r.size);
-  const totalSize = sizes.reduce((a, b) => a + b, 0);
-
-  return {
-    count: regions.length,
-    totalSize,
-    averageSize: totalSize / regions.length,
-    minSize: Math.min(...sizes),
-    maxSize: Math.max(...sizes),
-    sizes,
-  };
+  return counts;
 }

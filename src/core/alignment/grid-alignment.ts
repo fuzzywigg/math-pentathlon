@@ -1,372 +1,419 @@
-/**
- * Grid Alignment Detection
- * N-in-a-row detection for standard rectangular grids
- */
+// Grid-based N-in-a-row Alignment Detection
 
-import type {
-  Position,
+import {
+  GridPosition,
+  CellValue,
+  CellGetter,
   Direction,
   AlignmentConfig,
   AlignmentResult,
-  AlignmentSearchResult,
-  GridAccessor,
-  GridDimensions,
-  CellMatcher,
+  AlignmentCheckResult,
+  ALL_DIRECTIONS,
 } from './types';
-import { DIRECTION_VECTORS, DEFAULT_ALIGNMENT_CONFIG } from './types';
 
 /**
  * Check if a position is within grid bounds
  */
 export function isInBounds(
-  pos: Position,
-  dimensions: GridDimensions,
-  config?: Pick<AlignmentConfig, 'wrapHorizontal' | 'wrapVertical'>
+  row: number,
+  col: number,
+  rows: number,
+  cols: number
 ): boolean {
-  if (config?.wrapHorizontal && config?.wrapVertical) {
-    return true; // All positions valid with full wrapping
-  }
-
-  const rowValid = config?.wrapVertical || (pos.row >= 0 && pos.row < dimensions.rows);
-  const colValid = config?.wrapHorizontal || (pos.col >= 0 && pos.col < dimensions.cols);
-
-  return rowValid && colValid;
+  return row >= 0 && row < rows && col >= 0 && col < cols;
 }
 
 /**
- * Normalize a position for wrapping grids
+ * Wrap a position for toroidal boards
  */
-export function normalizePosition(
-  pos: Position,
-  dimensions: GridDimensions,
-  config?: Pick<AlignmentConfig, 'wrapHorizontal' | 'wrapVertical'>
-): Position {
-  let { row, col } = pos;
-
-  if (config?.wrapVertical) {
-    row = ((row % dimensions.rows) + dimensions.rows) % dimensions.rows;
-  }
-  if (config?.wrapHorizontal) {
-    col = ((col % dimensions.cols) + dimensions.cols) % dimensions.cols;
-  }
-
-  return { row, col };
+export function wrapPosition(
+  row: number,
+  col: number,
+  rows: number,
+  cols: number
+): GridPosition {
+  return {
+    row: ((row % rows) + rows) % rows,
+    col: ((col % cols) + cols) % cols,
+  };
 }
 
 /**
- * Get positions in a line starting from a position in a direction
+ * Find alignment starting from a position in a specific direction
  */
-export function getLinePositions(
-  start: Position,
+export function findAlignmentInDirection(
+  startRow: number,
+  startCol: number,
   direction: Direction,
-  length: number,
-  dimensions: GridDimensions,
-  config?: Pick<AlignmentConfig, 'wrapHorizontal' | 'wrapVertical'>
-): Position[] | null {
-  const vector = DIRECTION_VECTORS[direction];
-  const positions: Position[] = [];
-
-  for (let i = 0; i < length; i++) {
-    const pos: Position = {
-      row: start.row + vector.row * i,
-      col: start.col + vector.col * i,
-    };
-
-    const normalized = normalizePosition(pos, dimensions, config);
-
-    if (!isInBounds(normalized, dimensions, config)) {
-      return null; // Line goes out of bounds
-    }
-
-    positions.push(normalized);
-  }
-
-  return positions;
-}
-
-/**
- * Check if a specific line forms an alignment (all same non-null value)
- */
-export function checkLineAlignment<T>(
-  positions: Position[],
-  getCell: GridAccessor<T>,
-  matcher?: CellMatcher<T>
-): { isAligned: boolean; value: T | undefined } {
-  if (positions.length === 0) {
-    return { isAligned: false, value: undefined };
-  }
-
-  const firstValue = getCell(positions[0].row, positions[0].col);
-
-  // Empty cells don't count as alignment
-  if (firstValue === null || firstValue === undefined) {
-    return { isAligned: false, value: undefined };
-  }
-
-  // Check if custom matcher rejects the first value
-  if (matcher && !matcher(firstValue, positions[0].row, positions[0].col)) {
-    return { isAligned: false, value: undefined };
-  }
-
-  // Check all positions have the same value
-  for (let i = 1; i < positions.length; i++) {
-    const value = getCell(positions[i].row, positions[i].col);
-
-    if (value === null || value === undefined) {
-      return { isAligned: false, value: undefined };
-    }
-
-    if (matcher && !matcher(value, positions[i].row, positions[i].col)) {
-      return { isAligned: false, value: undefined };
-    }
-
-    // Compare values (handles primitives and objects with equality)
-    if (value !== firstValue) {
-      // For objects, try JSON comparison
-      if (typeof value === 'object' && typeof firstValue === 'object') {
-        if (JSON.stringify(value) !== JSON.stringify(firstValue)) {
-          return { isAligned: false, value: undefined };
-        }
-      } else {
-        return { isAligned: false, value: undefined };
-      }
-    }
-  }
-
-  return { isAligned: true, value: firstValue };
-}
-
-/**
- * Find an alignment starting from a specific position in a specific direction
- */
-export function findAlignmentAt<T>(
-  start: Position,
-  direction: Direction,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: AlignmentConfig = DEFAULT_ALIGNMENT_CONFIG,
-  matcher?: CellMatcher<T>
+  getCell: CellGetter,
+  config: AlignmentConfig
 ): AlignmentResult | null {
-  const positions = getLinePositions(start, direction, config.requiredLength, dimensions, config);
+  const { rows, cols, targetLength, wrap = false } = config;
+  const { dRow, dCol } = direction;
 
-  if (!positions) {
+  // Get the starting cell value
+  const startValue = getCell(startRow, startCol);
+
+  // Skip empty cells
+  if (startValue === null || startValue === undefined) {
     return null;
   }
 
-  const { isAligned, value } = checkLineAlignment(positions, getCell, matcher);
+  // Collect positions with matching values
+  const positions: GridPosition[] = [{ row: startRow, col: startCol }];
 
-  if (!isAligned) {
-    return null;
+  // Check forward direction
+  let row = startRow + dRow;
+  let col = startCol + dCol;
+
+  while (positions.length < targetLength) {
+    // Handle bounds
+    if (wrap) {
+      const wrapped = wrapPosition(row, col, rows, cols);
+      row = wrapped.row;
+      col = wrapped.col;
+    } else if (!isInBounds(row, col, rows, cols)) {
+      break;
+    }
+
+    const cellValue = getCell(row, col);
+
+    if (cellValue !== startValue) {
+      break;
+    }
+
+    positions.push({ row, col });
+    row += dRow;
+    col += dCol;
   }
 
-  return {
-    found: true,
-    positions,
-    direction,
-    value,
-  };
+  // Check if we found enough
+  if (positions.length >= targetLength) {
+    return {
+      value: startValue,
+      start: positions[0],
+      end: positions[positions.length - 1],
+      positions,
+      direction,
+      length: positions.length,
+    };
+  }
+
+  return null;
 }
 
 /**
- * Find all alignments on the grid
+ * Find all alignments of target length or more for a specific value
  */
-export function findAllAlignments<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: AlignmentConfig = DEFAULT_ALIGNMENT_CONFIG,
-  matcher?: CellMatcher<T>
-): AlignmentSearchResult {
+export function findAlignmentsForValue(
+  value: CellValue,
+  getCell: CellGetter,
+  config: AlignmentConfig
+): AlignmentResult[] {
+  const { rows, cols, directions = ALL_DIRECTIONS } = config;
   const alignments: AlignmentResult[] = [];
-  const directions = config.directions || DEFAULT_ALIGNMENT_CONFIG.directions!;
+  const found = new Set<string>(); // Track found alignments to avoid duplicates
 
-  // Check every starting position
-  for (let row = 0; row < dimensions.rows; row++) {
-    for (let col = 0; col < dimensions.cols; col++) {
-      const start: Position = { row, col };
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const cellValue = getCell(row, col);
+
+      if (cellValue !== value) {
+        continue;
+      }
 
       for (const direction of directions) {
-        const result = findAlignmentAt(start, direction, dimensions, getCell, config, matcher);
-        if (result) {
-          alignments.push(result);
+        const alignment = findAlignmentInDirection(row, col, direction, getCell, config);
+
+        if (alignment) {
+          // Create a unique key for this alignment
+          const key = `${direction.name}-${alignment.positions.map(p => `${p.row},${p.col}`).join('-')}`;
+
+          if (!found.has(key)) {
+            found.add(key);
+            alignments.push(alignment);
+          }
         }
       }
     }
   }
 
+  return alignments;
+}
+
+/**
+ * Find all alignments on the board for any value
+ */
+export function findAllAlignments(
+  getCell: CellGetter,
+  config: AlignmentConfig
+): AlignmentResult[] {
+  const { rows, cols, directions = ALL_DIRECTIONS } = config;
+  const alignments: AlignmentResult[] = [];
+  const found = new Set<string>();
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      for (const direction of directions) {
+        const alignment = findAlignmentInDirection(row, col, direction, getCell, config);
+
+        if (alignment) {
+          const key = `${direction.name}-${alignment.positions.map(p => `${p.row},${p.col}`).join('-')}`;
+
+          if (!found.has(key)) {
+            found.add(key);
+            alignments.push(alignment);
+          }
+        }
+      }
+    }
+  }
+
+  return alignments;
+}
+
+/**
+ * Check if there's a winner (any alignment of target length)
+ */
+export function checkForWinner(
+  getCell: CellGetter,
+  config: AlignmentConfig
+): AlignmentCheckResult {
+  const alignments = findAllAlignments(getCell, config);
+
+  if (alignments.length === 0) {
+    return {
+      hasWinner: false,
+      winner: null,
+      alignments: [],
+    };
+  }
+
+  // Return the first alignment found (typically the winner)
   return {
+    hasWinner: true,
+    winner: alignments[0].value,
     alignments,
-    hasAlignment: alignments.length > 0,
   };
 }
 
 /**
- * Check if there's any alignment on the grid (early exit on first find)
+ * Check if a specific move creates a winning alignment
  */
-export function hasAlignment<T>(
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: AlignmentConfig = DEFAULT_ALIGNMENT_CONFIG,
-  matcher?: CellMatcher<T>
-): boolean {
-  const directions = config.directions || DEFAULT_ALIGNMENT_CONFIG.directions!;
-
-  for (let row = 0; row < dimensions.rows; row++) {
-    for (let col = 0; col < dimensions.cols; col++) {
-      const start: Position = { row, col };
-
-      for (const direction of directions) {
-        const result = findAlignmentAt(start, direction, dimensions, getCell, config, matcher);
-        if (result) {
-          return true;
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
-/**
- * Find alignments containing a specific position
- * Useful for checking if a move creates a winning condition
- */
-export function findAlignmentsThrough<T>(
-  position: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config: AlignmentConfig = DEFAULT_ALIGNMENT_CONFIG,
-  matcher?: CellMatcher<T>
-): AlignmentSearchResult {
+export function checkMoveForWin(
+  row: number,
+  col: number,
+  value: CellValue,
+  getCell: CellGetter,
+  config: AlignmentConfig
+): AlignmentCheckResult {
+  const { directions = ALL_DIRECTIONS } = config;
   const alignments: AlignmentResult[] = [];
-  const directions = config.directions || DEFAULT_ALIGNMENT_CONFIG.directions!;
-  const length = config.requiredLength;
+
+  // Create a getter that includes the hypothetical move
+  const getWithMove: CellGetter = (r, c) => {
+    if (r === row && c === col) {
+      return value;
+    }
+    return getCell(r, c);
+  };
 
   for (const direction of directions) {
-    const vector = DIRECTION_VECTORS[direction];
+    // Check both directions from the move position
+    const alignment = findAlignmentFromCenter(row, col, direction, getWithMove, config);
 
-    // Check all possible starting positions that would include our target position
-    for (let offset = 0; offset < length; offset++) {
-      const start: Position = {
-        row: position.row - vector.row * offset,
-        col: position.col - vector.col * offset,
-      };
-
-      const normalized = normalizePosition(start, dimensions, config);
-      const result = findAlignmentAt(normalized, direction, dimensions, getCell, config, matcher);
-
-      if (result) {
-        // Verify the alignment actually contains our position
-        const containsPosition = result.positions.some(
-          (p) => p.row === position.row && p.col === position.col
-        );
-        if (containsPosition) {
-          alignments.push(result);
-        }
-      }
+    if (alignment && alignment.length >= config.targetLength) {
+      alignments.push(alignment);
     }
   }
 
-  // Remove duplicates (same positions)
-  const unique = alignments.filter(
-    (alignment, index, self) =>
-      index ===
-      self.findIndex(
-        (a) =>
-          a.direction === alignment.direction &&
-          a.positions[0].row === alignment.positions[0].row &&
-          a.positions[0].col === alignment.positions[0].col
-      )
-  );
-
   return {
-    alignments: unique,
-    hasAlignment: unique.length > 0,
+    hasWinner: alignments.length > 0,
+    winner: alignments.length > 0 ? value : null,
+    alignments,
   };
 }
 
 /**
- * Count how many cells are aligned in each direction from a position
- * Returns the maximum consecutive count in any direction
+ * Find alignment extending in both directions from a center position
  */
-export function countMaxAligned<T>(
-  position: Position,
-  dimensions: GridDimensions,
-  getCell: GridAccessor<T>,
-  config?: Pick<AlignmentConfig, 'directions' | 'wrapHorizontal' | 'wrapVertical'>,
-  matcher?: CellMatcher<T>
-): { direction: Direction; count: number; positions: Position[] } {
-  const directions = config?.directions || (['horizontal', 'vertical', 'diagonal-down', 'diagonal-up'] as Direction[]);
-  const targetValue = getCell(position.row, position.col);
+export function findAlignmentFromCenter(
+  centerRow: number,
+  centerCol: number,
+  direction: Direction,
+  getCell: CellGetter,
+  config: AlignmentConfig
+): AlignmentResult | null {
+  const { rows, cols, targetLength, wrap = false } = config;
+  const { dRow, dCol } = direction;
 
-  if (targetValue === null || targetValue === undefined) {
-    return { direction: 'horizontal', count: 0, positions: [] };
+  const centerValue = getCell(centerRow, centerCol);
+
+  if (centerValue === null || centerValue === undefined) {
+    return null;
   }
 
-  let maxResult = { direction: 'horizontal' as Direction, count: 0, positions: [] as Position[] };
+  const positions: GridPosition[] = [{ row: centerRow, col: centerCol }];
+
+  // Extend in positive direction
+  let row = centerRow + dRow;
+  let col = centerCol + dCol;
+
+  while (true) {
+    if (wrap) {
+      const wrapped = wrapPosition(row, col, rows, cols);
+      row = wrapped.row;
+      col = wrapped.col;
+    } else if (!isInBounds(row, col, rows, cols)) {
+      break;
+    }
+
+    if (getCell(row, col) !== centerValue) {
+      break;
+    }
+
+    positions.push({ row, col });
+    row += dRow;
+    col += dCol;
+  }
+
+  // Extend in negative direction
+  row = centerRow - dRow;
+  col = centerCol - dCol;
+
+  while (true) {
+    if (wrap) {
+      const wrapped = wrapPosition(row, col, rows, cols);
+      row = wrapped.row;
+      col = wrapped.col;
+    } else if (!isInBounds(row, col, rows, cols)) {
+      break;
+    }
+
+    if (getCell(row, col) !== centerValue) {
+      break;
+    }
+
+    positions.unshift({ row, col });
+    row -= dRow;
+    col -= dCol;
+  }
+
+  if (positions.length >= targetLength) {
+    // Sort positions for consistent ordering
+    positions.sort((a, b) => {
+      if (a.row !== b.row) return a.row - b.row;
+      return a.col - b.col;
+    });
+
+    return {
+      value: centerValue,
+      start: positions[0],
+      end: positions[positions.length - 1],
+      positions,
+      direction,
+      length: positions.length,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Count how many pieces a player has in each direction from a position
+ * Useful for AI evaluation
+ */
+export function countAlignmentPotential(
+  row: number,
+  col: number,
+  value: CellValue,
+  getCell: CellGetter,
+  config: AlignmentConfig
+): Map<string, { count: number; blocked: boolean }> {
+  const { rows, cols, directions = ALL_DIRECTIONS, wrap = false } = config;
+  const result = new Map<string, { count: number; blocked: boolean }>();
 
   for (const direction of directions) {
-    const vector = DIRECTION_VECTORS[direction];
-    const positions: Position[] = [position];
+    const { dRow, dCol, name } = direction;
+    let count = 1; // Count the center position
+    let blockedPositive = false;
+    let blockedNegative = false;
 
-    // Count forward
-    let pos = { row: position.row + vector.row, col: position.col + vector.col };
-    while (isInBounds(pos, dimensions, config)) {
-      const normalized = normalizePosition(pos, dimensions, config);
-      const value = getCell(normalized.row, normalized.col);
+    // Check positive direction
+    let r = row + dRow;
+    let c = col + dCol;
 
-      if (value === null || value === undefined || value !== targetValue) {
+    while (true) {
+      if (wrap) {
+        const wrapped = wrapPosition(r, c, rows, cols);
+        r = wrapped.row;
+        c = wrapped.col;
+      } else if (!isInBounds(r, c, rows, cols)) {
+        blockedPositive = true;
         break;
       }
-      if (matcher && !matcher(value, normalized.row, normalized.col)) {
+
+      const cellValue = getCell(r, c);
+
+      if (cellValue === value) {
+        count++;
+      } else if (cellValue === null || cellValue === undefined) {
+        break; // Open space
+      } else {
+        blockedPositive = true; // Blocked by opponent
         break;
       }
 
-      positions.push(normalized);
-      pos = { row: pos.row + vector.row, col: pos.col + vector.col };
+      r += dRow;
+      c += dCol;
     }
 
-    // Count backward
-    pos = { row: position.row - vector.row, col: position.col - vector.col };
-    while (isInBounds(pos, dimensions, config)) {
-      const normalized = normalizePosition(pos, dimensions, config);
-      const value = getCell(normalized.row, normalized.col);
+    // Check negative direction
+    r = row - dRow;
+    c = col - dCol;
 
-      if (value === null || value === undefined || value !== targetValue) {
+    while (true) {
+      if (wrap) {
+        const wrapped = wrapPosition(r, c, rows, cols);
+        r = wrapped.row;
+        c = wrapped.col;
+      } else if (!isInBounds(r, c, rows, cols)) {
+        blockedNegative = true;
         break;
       }
-      if (matcher && !matcher(value, normalized.row, normalized.col)) {
+
+      const cellValue = getCell(r, c);
+
+      if (cellValue === value) {
+        count++;
+      } else if (cellValue === null || cellValue === undefined) {
+        break; // Open space
+      } else {
+        blockedNegative = true;
         break;
       }
 
-      positions.unshift(normalized);
-      pos = { row: pos.row - vector.row, col: pos.col - vector.col };
+      r -= dRow;
+      c -= dCol;
     }
 
-    if (positions.length > maxResult.count) {
-      maxResult = { direction, count: positions.length, positions };
-    }
+    result.set(name, {
+      count,
+      blocked: blockedPositive && blockedNegative,
+    });
   }
 
-  return maxResult;
+  return result;
 }
 
 /**
- * Helper to create a grid accessor from a 2D array
+ * Helper: Create a cell getter from a 2D array
  */
-export function createArrayAccessor<T>(grid: T[][]): GridAccessor<T> {
-  return (row: number, col: number): T | undefined => {
-    if (row < 0 || row >= grid.length) return undefined;
-    if (col < 0 || col >= grid[row].length) return undefined;
-    return grid[row][col];
-  };
-}
-
-/**
- * Helper to get dimensions from a 2D array
- */
-export function getArrayDimensions<T>(grid: T[][]): GridDimensions {
-  return {
-    rows: grid.length,
-    cols: grid.length > 0 ? grid[0].length : 0,
+export function createArrayGetter<T extends CellValue>(board: T[][]): CellGetter<T> {
+  return (row, col) => {
+    if (row >= 0 && row < board.length && col >= 0 && col < board[row].length) {
+      return board[row][col];
+    }
+    return null as T;
   };
 }

@@ -228,25 +228,55 @@ function formatPosition(pos: Position): string {
 }
 
 // Render the status display
-export function renderStatus(state: GameState, container: HTMLElement): void {
+export function renderStatus(
+  state: GameState,
+  container: HTMLElement,
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
+  aiDifficulty: 'easy' | 'medium' | 'hard' = 'medium',
+  isAIThinking: boolean = false
+): void {
   container.innerHTML = '';
 
   const statusEl = document.createElement('div');
   statusEl.className = 'status';
 
+  // Game mode indicator (for AI mode)
+  if (gameMode === 'human-vs-ai') {
+    const modeEl = document.createElement('div');
+    modeEl.className = 'status-mode';
+    const difficultyLabel =
+      aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1);
+    modeEl.textContent = `vs AI (${difficultyLabel})`;
+    statusEl.appendChild(modeEl);
+  }
+
   // Turn/phase message
   const turnEl = document.createElement('div');
   turnEl.className = 'status-turn';
-  turnEl.textContent = getCurrentPhaseMessage(state);
+
+  if (isAIThinking) {
+    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.classList.add('status-ai-thinking');
+  } else {
+    turnEl.textContent = getCurrentPhaseMessage(state);
+  }
   statusEl.appendChild(turnEl);
 
   // Winner celebration
   if (state.winner) {
     const winnerEl = document.createElement('div');
     winnerEl.className = 'status-winner';
-    const winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
+
+    let winnerName: string;
+    if (gameMode === 'human-vs-ai') {
+      // In AI mode, show "You Win!" or "AI Wins!"
+      // AI is always player2 when human plays first
+      winnerName = state.winner === 'player1' ? 'You' : 'AI';
+    } else {
+      winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
+    }
     const winnerColor = state.winner === 'player1' ? '🔵' : '🔴';
-    winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Wins! 🎉`;
+    winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Win${winnerName === 'You' ? '' : 's'}! 🎉`;
     statusEl.appendChild(winnerEl);
   }
 
@@ -256,12 +286,14 @@ export function renderStatus(state: GameState, container: HTMLElement): void {
 
   const supply1El = document.createElement('span');
   supply1El.className = 'supply-p1';
-  supply1El.textContent = `🔵 ${state.player1Supply}`;
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'P1';
+  supply1El.textContent = `🔵 ${p1Label}: ${state.player1Supply}`;
   suppliesEl.appendChild(supply1El);
 
   const supply2El = document.createElement('span');
   supply2El.className = 'supply-p2';
-  supply2El.textContent = `🔴 ${state.player2Supply}`;
+  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'P2';
+  supply2El.textContent = `🔴 ${p2Label}: ${state.player2Supply}`;
   suppliesEl.appendChild(supply2El);
 
   statusEl.appendChild(suppliesEl);

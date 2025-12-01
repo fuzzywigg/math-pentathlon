@@ -1,139 +1,167 @@
-/**
- * Polyomino Placement
- * Grid placement, collision detection, and validation
- */
+// Polyomino Placement - Validation and Board Management
+// Handles placement rules, collision detection, and board state
 
-import type { Cell, Polyomino, PolyominoPlacement } from './types';
-import {
-  getAbsoluteCells,
-  areCellsInBounds,
-  transformCells,
-  getBounds,
-} from './transformations';
+import { Cell, PolyominoShape, PlacedPolyomino, PlacementResult, Rotation } from './types';
+import { getCellsAtPosition, getTransformedCells } from './transform';
 
-// Grid cell state
-export type GridCell<T = unknown> = {
-  occupied: boolean;
-  polyominoId?: string;
-  value?: T;
-};
-
-// Grid representation
-export interface PolyominoGrid<T = unknown> {
+/** Board representation for placement validation */
+export interface Board {
   rows: number;
   cols: number;
-  cells: GridCell<T>[][];
+  cells: boolean[][]; // true = occupied
+  placements: PlacedPolyomino[];
 }
 
 /**
- * Create an empty grid
+ * Create an empty board
  */
-export function createGrid<T = unknown>(rows: number, cols: number): PolyominoGrid<T> {
-  const cells: GridCell<T>[][] = [];
+export function createBoard(rows: number, cols: number): Board {
+  const cells: boolean[][] = [];
   for (let r = 0; r < rows; r++) {
-    cells[r] = [];
-    for (let c = 0; c < cols; c++) {
-      cells[r][c] = { occupied: false };
-    }
+    cells.push(new Array(cols).fill(false));
   }
-  return { rows, cols, cells };
+  return { rows, cols, cells, placements: [] };
 }
 
 /**
- * Check if a cell is occupied on the grid
+ * Check if a cell is within board bounds
  */
-export function isCellOccupied<T>(grid: PolyominoGrid<T>, row: number, col: number): boolean {
-  if (row < 0 || row >= grid.rows || col < 0 || col >= grid.cols) {
-    return true; // Out of bounds = occupied
-  }
-  return grid.cells[row][col].occupied;
+export function isInBounds(board: Board, cell: Cell): boolean {
+  return cell.row >= 0 && cell.row < board.rows && cell.col >= 0 && cell.col < board.cols;
 }
 
 /**
- * Check if a placement is valid (all cells in bounds and unoccupied)
+ * Check if a cell is occupied
  */
-export function isValidPlacement<T>(
-  grid: PolyominoGrid<T>,
-  polyomino: Polyomino,
+export function isOccupied(board: Board, cell: Cell): boolean {
+  if (!isInBounds(board, cell)) return true; // Out of bounds counts as occupied
+  return board.cells[cell.row][cell.col];
+}
+
+/**
+ * Validate placement of a polyomino at a position
+ */
+export function validatePlacement(
+  board: Board,
+  shape: PolyominoShape,
   position: Cell,
-  rotation: 0 | 90 | 180 | 270 = 0,
+  rotation: Rotation = 0,
   flipped: boolean = false
-): boolean {
-  const absoluteCells = getAbsoluteCells(polyomino, position, rotation, flipped);
+): PlacementResult {
+  const cells = getCellsAtPosition(shape, position, rotation, flipped);
 
-  // Check bounds
-  if (!areCellsInBounds(absoluteCells, grid.rows, grid.cols)) {
-    return false;
-  }
-
-  // Check collisions
-  for (const cell of absoluteCells) {
-    if (isCellOccupied(grid, cell.row, cell.col)) {
-      return false;
+  // Check all cells are in bounds and unoccupied
+  for (const cell of cells) {
+    if (!isInBounds(board, cell)) {
+      return {
+        valid: false,
+        cells,
+        reason: 'Shape extends beyond board boundaries',
+      };
+    }
+    if (isOccupied(board, cell)) {
+      return {
+        valid: false,
+        cells,
+        reason: 'Space is already occupied',
+      };
     }
   }
 
-  return true;
+  return { valid: true, cells };
 }
 
 /**
- * Place a polyomino on the grid
+ * Place a polyomino on the board
  */
-export function placePolyomino<T>(
-  grid: PolyominoGrid<T>,
-  polyomino: Polyomino,
+export function placePolyomino(
+  board: Board,
+  shape: PolyominoShape,
   position: Cell,
-  rotation: 0 | 90 | 180 | 270 = 0,
+  rotation: Rotation = 0,
   flipped: boolean = false,
-  value?: T
-): PolyominoGrid<T> {
-  const absoluteCells = getAbsoluteCells(polyomino, position, rotation, flipped);
+  playerId?: number
+): Board {
+  const validation = validatePlacement(board, shape, position, rotation, flipped);
 
-  // Create a new grid (immutable update)
-  const newCells = grid.cells.map((row) => row.map((cell) => ({ ...cell })));
-
-  for (const cell of absoluteCells) {
-    newCells[cell.row][cell.col] = {
-      occupied: true,
-      polyominoId: polyomino.id,
-      value,
-    };
+  if (!validation.valid) {
+    throw new Error(validation.reason || 'Invalid placement');
   }
 
-  return { ...grid, cells: newCells };
+  // Create new board state
+  const newCells = board.cells.map(row => [...row]);
+
+  for (const cell of validation.cells) {
+    newCells[cell.row][cell.col] = true;
+  }
+
+  const placement: PlacedPolyomino = {
+    shapeId: shape.id,
+    position,
+    rotation,
+    flipped,
+    playerId,
+  };
+
+  return {
+    ...board,
+    cells: newCells,
+    placements: [...board.placements, placement],
+  };
 }
 
 /**
- * Remove a polyomino from the grid by its ID
+ * Remove the last placed polyomino (undo)
  */
-export function removePolyomino<T>(grid: PolyominoGrid<T>, polyominoId: string): PolyominoGrid<T> {
-  const newCells = grid.cells.map((row) =>
-    row.map((cell) =>
-      cell.polyominoId === polyominoId ? { occupied: false } : { ...cell }
-    )
-  );
+export function removeLastPolyomino(board: Board, shapes: PolyominoShape[]): Board {
+  if (board.placements.length === 0) return board;
 
-  return { ...grid, cells: newCells };
+  const placements = [...board.placements];
+  const removed = placements.pop()!;
+
+  const shape = shapes.find(s => s.id === removed.shapeId);
+  if (!shape) return board;
+
+  const cells = getCellsAtPosition(shape, removed.position, removed.rotation, removed.flipped);
+  const newCells = board.cells.map(row => [...row]);
+
+  for (const cell of cells) {
+    if (isInBounds(board, cell)) {
+      newCells[cell.row][cell.col] = false;
+    }
+  }
+
+  return {
+    ...board,
+    cells: newCells,
+    placements,
+  };
 }
 
 /**
- * Get all valid positions for placing a polyomino on the grid
+ * Find all valid placement positions for a shape
  */
-export function getAllValidPositions<T>(
-  grid: PolyominoGrid<T>,
-  polyomino: Polyomino,
-  rotation: 0 | 90 | 180 | 270 = 0,
+export function findValidPlacements(
+  board: Board,
+  shape: PolyominoShape,
+  rotation: Rotation = 0,
   flipped: boolean = false
 ): Cell[] {
   const validPositions: Cell[] = [];
-  const transformedCells = transformCells(polyomino.cells, rotation, flipped);
-  const bounds = getBounds(transformedCells);
+  const transformed = getTransformedCells(shape, rotation, flipped);
 
-  // Only check positions where the polyomino could fit
-  for (let row = 0; row <= grid.rows - bounds.height; row++) {
-    for (let col = 0; col <= grid.cols - bounds.width; col++) {
+  // Get bounding box to optimize search
+  const minRow = Math.min(...transformed.map(c => c.row));
+  const maxRow = Math.max(...transformed.map(c => c.row));
+  const minCol = Math.min(...transformed.map(c => c.col));
+  const maxCol = Math.max(...transformed.map(c => c.col));
+
+  // Check all possible anchor positions
+  for (let row = -minRow; row < board.rows - maxRow; row++) {
+    for (let col = -minCol; col < board.cols - maxCol; col++) {
       const position = { row, col };
-      if (isValidPlacement(grid, polyomino, position, rotation, flipped)) {
+      const result = validatePlacement(board, shape, position, rotation, flipped);
+      if (result.valid) {
         validPositions.push(position);
       }
     }
@@ -143,110 +171,16 @@ export function getAllValidPositions<T>(
 }
 
 /**
- * Get all valid placements for a polyomino (including all rotations and flips)
+ * Check if any valid placement exists for a shape (any orientation)
  */
-export function getAllValidPlacements<T>(
-  grid: PolyominoGrid<T>,
-  polyomino: Polyomino
-): PolyominoPlacement[] {
-  const placements: PolyominoPlacement[] = [];
-  const rotations: (0 | 90 | 180 | 270)[] = [0, 90, 180, 270];
-  const flips = [false, true];
+export function canPlaceShape(board: Board, shape: PolyominoShape): boolean {
+  const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+  const flips = shape.canFlip ? [false, true] : [false];
 
-  for (const flipped of flips) {
-    for (const rotation of rotations) {
-      const positions = getAllValidPositions(grid, polyomino, rotation, flipped);
-      for (const position of positions) {
-        placements.push({
-          polyomino,
-          position,
-          rotation,
-          flipped,
-        });
-      }
-    }
-  }
-
-  return placements;
-}
-
-/**
- * Check if a set of polyominoes can tile a region perfectly
- * (covers all cells exactly once)
- */
-export function checkPerfectCoverage<T>(
-  grid: PolyominoGrid<T>,
-  placements: PolyominoPlacement[]
-): boolean {
-  // Create a temporary grid to track coverage
-  const coverage: boolean[][] = [];
-  for (let r = 0; r < grid.rows; r++) {
-    coverage[r] = [];
-    for (let c = 0; c < grid.cols; c++) {
-      coverage[r][c] = false;
-    }
-  }
-
-  // Mark all cells covered by placements
-  for (const placement of placements) {
-    const cells = getAbsoluteCells(
-      placement.polyomino,
-      placement.position,
-      placement.rotation,
-      placement.flipped
-    );
-
-    for (const cell of cells) {
-      // Check bounds
-      if (cell.row < 0 || cell.row >= grid.rows || cell.col < 0 || cell.col >= grid.cols) {
-        return false; // Out of bounds
-      }
-
-      // Check overlap
-      if (coverage[cell.row][cell.col]) {
-        return false; // Overlap detected
-      }
-
-      coverage[cell.row][cell.col] = true;
-    }
-  }
-
-  // Check if all unoccupied cells are covered
-  for (let r = 0; r < grid.rows; r++) {
-    for (let c = 0; c < grid.cols; c++) {
-      if (!grid.cells[r][c].occupied && !coverage[r][c]) {
-        return false; // Uncovered cell
-      }
-    }
-  }
-
-  return true;
-}
-
-/**
- * Get the cells that would be occupied by a placement
- */
-export function getPlacementCells(placement: PolyominoPlacement): Cell[] {
-  return getAbsoluteCells(
-    placement.polyomino,
-    placement.position,
-    placement.rotation,
-    placement.flipped
-  );
-}
-
-/**
- * Check if two placements overlap
- */
-export function doPlacementsOverlap(p1: PolyominoPlacement, p2: PolyominoPlacement): boolean {
-  const cells1 = getPlacementCells(p1);
-  const cells2 = getPlacementCells(p2);
-
-  const set1 = new Set(cells1.map((c) => `${c.row},${c.col}`));
-
-  for (const cell of cells2) {
-    if (set1.has(`${cell.row},${cell.col}`)) {
-      return true;
+  for (const rotation of rotations) {
+    for (const flipped of flips) {
+      const positions = findValidPlacements(board, shape, rotation, flipped);
+      if (positions.length > 0) return true;
     }
   }
 
@@ -254,98 +188,176 @@ export function doPlacementsOverlap(p1: PolyominoPlacement, p2: PolyominoPlaceme
 }
 
 /**
- * Find cells adjacent to a polyomino placement
+ * Count empty cells on the board
  */
-export function getAdjacentCells(
-  grid: PolyominoGrid,
-  placement: PolyominoPlacement,
-  diagonal: boolean = false
-): Cell[] {
-  const placementCells = getPlacementCells(placement);
-  const placementSet = new Set(placementCells.map((c) => `${c.row},${c.col}`));
-  const adjacentSet = new Set<string>();
+export function countEmptyCells(board: Board): number {
+  let count = 0;
+  for (let r = 0; r < board.rows; r++) {
+    for (let c = 0; c < board.cols; c++) {
+      if (!board.cells[r][c]) count++;
+    }
+  }
+  return count;
+}
 
-  const directions = diagonal
-    ? [
-        { row: -1, col: -1 },
-        { row: -1, col: 0 },
-        { row: -1, col: 1 },
-        { row: 0, col: -1 },
-        { row: 0, col: 1 },
-        { row: 1, col: -1 },
-        { row: 1, col: 0 },
-        { row: 1, col: 1 },
-      ]
-    : [
-        { row: -1, col: 0 },
-        { row: 0, col: -1 },
-        { row: 0, col: 1 },
-        { row: 1, col: 0 },
-      ];
+/**
+ * Get all empty cells on the board
+ */
+export function getEmptyCells(board: Board): Cell[] {
+  const empty: Cell[] = [];
+  for (let r = 0; r < board.rows; r++) {
+    for (let c = 0; c < board.cols; c++) {
+      if (!board.cells[r][c]) {
+        empty.push({ row: r, col: c });
+      }
+    }
+  }
+  return empty;
+}
 
-  for (const cell of placementCells) {
-    for (const dir of directions) {
-      const adjacent = { row: cell.row + dir.row, col: cell.col + dir.col };
-      const key = `${adjacent.row},${adjacent.col}`;
+/**
+ * Check if board is completely filled
+ */
+export function isBoardFilled(board: Board): boolean {
+  return countEmptyCells(board) === 0;
+}
 
-      // Check bounds and not part of the polyomino itself
-      if (
-        adjacent.row >= 0 &&
-        adjacent.row < grid.rows &&
-        adjacent.col >= 0 &&
-        adjacent.col < grid.cols &&
-        !placementSet.has(key)
-      ) {
-        adjacentSet.add(key);
+/**
+ * Get the cells occupied by a specific placement
+ */
+export function getPlacementCells(placement: PlacedPolyomino, shapes: PolyominoShape[]): Cell[] {
+  const shape = shapes.find(s => s.id === placement.shapeId);
+  if (!shape) return [];
+  return getCellsAtPosition(shape, placement.position, placement.rotation, placement.flipped);
+}
+
+/**
+ * Find which placement (if any) occupies a cell
+ */
+export function findPlacementAtCell(
+  board: Board,
+  cell: Cell,
+  shapes: PolyominoShape[]
+): PlacedPolyomino | undefined {
+  for (const placement of board.placements) {
+    const cells = getPlacementCells(placement, shapes);
+    if (cells.some(c => c.row === cell.row && c.col === cell.col)) {
+      return placement;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Create a board with specific cells blocked (for irregular board shapes)
+ */
+export function createBoardWithBlockedCells(
+  rows: number,
+  cols: number,
+  blockedCells: Cell[]
+): Board {
+  const board = createBoard(rows, cols);
+
+  for (const cell of blockedCells) {
+    if (isInBounds(board, cell)) {
+      board.cells[cell.row][cell.col] = true;
+    }
+  }
+
+  return board;
+}
+
+/**
+ * Create a hexagonal board shape (for Hex-a-Gone!)
+ */
+export function createHexagonalBoard(radius: number): Board {
+  const size = radius * 2 + 1;
+  const blocked: Cell[] = [];
+
+  // Block corners to create hexagonal shape
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      // Calculate distance from center using hex coordinates
+      const dr = r - radius;
+      const dc = c - radius;
+
+      // For pointy-top hex, check if outside hexagon
+      if (Math.abs(dr) + Math.abs(dc) + Math.abs(-dr - dc) > radius * 2) {
+        blocked.push({ row: r, col: c });
       }
     }
   }
 
-  return Array.from(adjacentSet).map((key) => {
-    const [row, col] = key.split(',').map(Number);
-    return { row, col };
-  });
+  return createBoardWithBlockedCells(size, size, blocked);
 }
 
 /**
- * Calculate the center position of a placed polyomino
+ * Solve placement puzzle - find if shapes can fill a board exactly
+ * Uses backtracking algorithm
  */
-export function getPlacementCenter(placement: PolyominoPlacement): { row: number; col: number } {
-  const cells = getPlacementCells(placement);
-  const avgRow = cells.reduce((sum, c) => sum + c.row, 0) / cells.length;
-  const avgCol = cells.reduce((sum, c) => sum + c.col, 0) / cells.length;
-  return { row: avgRow, col: avgCol };
-}
+export function solvePlacement(
+  initialBoard: Board,
+  shapes: PolyominoShape[],
+  maxSolutions: number = 1
+): PlacedPolyomino[][] {
+  const solutions: PlacedPolyomino[][] = [];
 
-/**
- * Snap a position to the nearest valid placement
- */
-export function snapToNearestValid<T>(
-  grid: PolyominoGrid<T>,
-  polyomino: Polyomino,
-  targetPosition: Cell,
-  rotation: 0 | 90 | 180 | 270 = 0,
-  flipped: boolean = false,
-  maxDistance: number = 3
-): Cell | null {
-  // Check if target is already valid
-  if (isValidPlacement(grid, polyomino, targetPosition, rotation, flipped)) {
-    return targetPosition;
-  }
+  function solve(currentBoard: Board, remainingShapes: PolyominoShape[]): boolean {
+    // Check if we have enough solutions
+    if (solutions.length >= maxSolutions) return true;
 
-  // Search in expanding squares
-  for (let dist = 1; dist <= maxDistance; dist++) {
-    for (let dr = -dist; dr <= dist; dr++) {
-      for (let dc = -dist; dc <= dist; dc++) {
-        if (Math.abs(dr) !== dist && Math.abs(dc) !== dist) continue; // Only check perimeter
+    // Check if board is filled
+    if (isBoardFilled(currentBoard)) {
+      solutions.push([...currentBoard.placements]);
+      return solutions.length >= maxSolutions;
+    }
 
-        const candidate = { row: targetPosition.row + dr, col: targetPosition.col + dc };
-        if (isValidPlacement(grid, polyomino, candidate, rotation, flipped)) {
-          return candidate;
+    // No more shapes to place
+    if (remainingShapes.length === 0) return false;
+
+    // Find first empty cell
+    const empty = getEmptyCells(currentBoard);
+    if (empty.length === 0) return false;
+
+    const targetCell = empty[0];
+
+    // Try each remaining shape
+    for (let i = 0; i < remainingShapes.length; i++) {
+      const shape = remainingShapes[i];
+      const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+      const flips = shape.canFlip ? [false, true] : [false];
+
+      for (const rotation of rotations) {
+        for (const flipped of flips) {
+          // Find placements that cover the target cell
+          const positions = findValidPlacements(currentBoard, shape, rotation, flipped);
+
+          for (const position of positions) {
+            const cells = getCellsAtPosition(shape, position, rotation, flipped);
+
+            // Only consider placements that cover the first empty cell
+            if (!cells.some(c => c.row === targetCell.row && c.col === targetCell.col)) {
+              continue;
+            }
+
+            try {
+              const newBoard = placePolyomino(currentBoard, shape, position, rotation, flipped);
+              const newRemaining = [...remainingShapes.slice(0, i), ...remainingShapes.slice(i + 1)];
+
+              if (solve(newBoard, newRemaining)) {
+                return true;
+              }
+            } catch {
+              // Invalid placement, continue
+            }
+          }
         }
       }
     }
+
+    return false;
   }
 
-  return null;
+  solve(initialBoard, shapes);
+  return solutions;
 }

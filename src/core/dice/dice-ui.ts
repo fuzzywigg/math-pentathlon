@@ -1,441 +1,406 @@
-/**
- * Dice UI Rendering
- * SVG-based dice rendering with animation support
- */
+// Dice UI - SVG rendering with animations
 
-import {
-  DiceType,
-  DieRoll,
-  DiceRollResult,
-  DiceAnimationConfig,
-  DiceColorScheme,
-  DEFAULT_ANIMATION_CONFIG,
-  DEFAULT_DICE_COLORS,
-  DICE_FACES,
-} from './types';
+import { DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
 
-// Size constants
-const DIE_SIZE = 60;
-const DIE_PADDING = 8;
+/** Pip positions for d6 faces (normalized 0-1 coordinates) */
+const D6_PIP_POSITIONS: Record<number, [number, number][]> = {
+  1: [[0.5, 0.5]],
+  2: [[0.25, 0.25], [0.75, 0.75]],
+  3: [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]],
+  4: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]],
+  5: [[0.25, 0.25], [0.75, 0.25], [0.5, 0.5], [0.25, 0.75], [0.75, 0.75]],
+  6: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.5], [0.75, 0.5], [0.25, 0.75], [0.75, 0.75]],
+};
 
-/**
- * Create SVG element with namespace
- */
-function createSvgElement(tag: string): SVGElement {
-  return document.createElementNS('http://www.w3.org/2000/svg', tag);
+/** Create SVG element helper */
+function createSVGElement<K extends keyof SVGElementTagNameMap>(
+  tag: K,
+  attrs: Record<string, string | number> = {}
+): SVGElementTagNameMap[K] {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    el.setAttribute(key, String(value));
+  }
+  return el;
 }
 
-/**
- * Generate pip positions for d6 faces
- */
-function getD6PipPositions(value: number): Array<{ x: number; y: number }> {
-  const center = DIE_SIZE / 2;
-  const offset = DIE_SIZE / 4;
+/** Render a d6 (standard six-sided die) */
+function renderD6(value: number, size: number, color: string): SVGElement {
+  const svg = createSVGElement('svg', {
+    width: size,
+    height: size,
+    viewBox: '0 0 100 100',
+    class: 'die die-d6',
+  });
 
-  const positions: Record<number, Array<{ x: number; y: number }>> = {
-    1: [{ x: center, y: center }],
-    2: [
-      { x: center - offset, y: center - offset },
-      { x: center + offset, y: center + offset },
-    ],
-    3: [
-      { x: center - offset, y: center - offset },
-      { x: center, y: center },
-      { x: center + offset, y: center + offset },
-    ],
-    4: [
-      { x: center - offset, y: center - offset },
-      { x: center + offset, y: center - offset },
-      { x: center - offset, y: center + offset },
-      { x: center + offset, y: center + offset },
-    ],
-    5: [
-      { x: center - offset, y: center - offset },
-      { x: center + offset, y: center - offset },
-      { x: center, y: center },
-      { x: center - offset, y: center + offset },
-      { x: center + offset, y: center + offset },
-    ],
-    6: [
-      { x: center - offset, y: center - offset },
-      { x: center + offset, y: center - offset },
-      { x: center - offset, y: center },
-      { x: center + offset, y: center },
-      { x: center - offset, y: center + offset },
-      { x: center + offset, y: center + offset },
-    ],
-  };
+  // Die body (rounded rectangle)
+  const body = createSVGElement('rect', {
+    x: 5,
+    y: 5,
+    width: 90,
+    height: 90,
+    rx: 12,
+    ry: 12,
+    fill: color,
+    stroke: '#333',
+    'stroke-width': 2,
+  });
+  svg.appendChild(body);
 
-  return positions[value] || [];
-}
+  // Add gradient for 3D effect
+  const defs = createSVGElement('defs');
+  const gradient = createSVGElement('linearGradient', { id: `d6-grad-${Math.random()}`, x1: '0%', y1: '0%', x2: '100%', y2: '100%' });
+  const stop1 = createSVGElement('stop', { offset: '0%', 'stop-color': 'rgba(255,255,255,0.3)' });
+  const stop2 = createSVGElement('stop', { offset: '100%', 'stop-color': 'rgba(0,0,0,0.2)' });
+  gradient.appendChild(stop1);
+  gradient.appendChild(stop2);
+  defs.appendChild(gradient);
+  svg.appendChild(defs);
 
-/**
- * Render a standard d6 die as SVG
- */
-export function renderD6(
-  value: number,
-  colors: DiceColorScheme = DEFAULT_DICE_COLORS.d6
-): SVGSVGElement {
-  const svg = createSvgElement('svg') as SVGSVGElement;
-  svg.setAttribute('width', String(DIE_SIZE));
-  svg.setAttribute('height', String(DIE_SIZE));
-  svg.setAttribute('viewBox', `0 0 ${DIE_SIZE} ${DIE_SIZE}`);
-  svg.classList.add('die', 'die-d6');
+  const overlay = createSVGElement('rect', {
+    x: 5,
+    y: 5,
+    width: 90,
+    height: 90,
+    rx: 12,
+    ry: 12,
+    fill: `url(#${gradient.getAttribute('id')})`,
+  });
+  svg.appendChild(overlay);
 
-  // Die face (rounded rectangle)
-  const rect = createSvgElement('rect');
-  rect.setAttribute('x', '2');
-  rect.setAttribute('y', '2');
-  rect.setAttribute('width', String(DIE_SIZE - 4));
-  rect.setAttribute('height', String(DIE_SIZE - 4));
-  rect.setAttribute('rx', '8');
-  rect.setAttribute('ry', '8');
-  rect.setAttribute('fill', colors.face);
-  rect.setAttribute('stroke', colors.border);
-  rect.setAttribute('stroke-width', '2');
-  svg.appendChild(rect);
-
-  // Pips
-  const pipPositions = getD6PipPositions(value);
-  const pipRadius = DIE_SIZE / 10;
-
-  for (const pos of pipPositions) {
-    const pip = createSvgElement('circle');
-    pip.setAttribute('cx', String(pos.x));
-    pip.setAttribute('cy', String(pos.y));
-    pip.setAttribute('r', String(pipRadius));
-    pip.setAttribute('fill', colors.pip);
+  // Draw pips
+  const pips = D6_PIP_POSITIONS[value] || [];
+  for (const [px, py] of pips) {
+    const pip = createSVGElement('circle', {
+      cx: 10 + px * 80,
+      cy: 10 + py * 80,
+      r: 8,
+      fill: '#fff',
+    });
     svg.appendChild(pip);
   }
 
   return svg;
 }
 
-/**
- * Render a polyhedral die (d4, d8, d10, d12, d20) as SVG
- * Uses text-based display for simplicity
- */
-export function renderPolyhedralDie(
-  diceType: DiceType,
-  value: number,
-  colors: DiceColorScheme = DEFAULT_DICE_COLORS[diceType]
-): SVGSVGElement {
-  const svg = createSvgElement('svg') as SVGSVGElement;
-  svg.setAttribute('width', String(DIE_SIZE));
-  svg.setAttribute('height', String(DIE_SIZE));
-  svg.setAttribute('viewBox', `0 0 ${DIE_SIZE} ${DIE_SIZE}`);
-  svg.classList.add('die', `die-${diceType}`);
+/** Render a polyhedral die (d4, d8, d10, d12, d20) - shows number */
+function renderPolyhedral(type: DiceType, value: number, size: number, color: string): SVGElement {
+  const svg = createSVGElement('svg', {
+    width: size,
+    height: size,
+    viewBox: '0 0 100 100',
+    class: `die die-${type}`,
+  });
 
-  const center = DIE_SIZE / 2;
-
-  // Draw shape based on dice type
-  if (diceType === 'd4') {
-    // Triangle
-    const points = `${center},8 ${DIE_SIZE - 8},${DIE_SIZE - 8} 8,${DIE_SIZE - 8}`;
-    const polygon = createSvgElement('polygon');
-    polygon.setAttribute('points', points);
-    polygon.setAttribute('fill', colors.face);
-    polygon.setAttribute('stroke', colors.border);
-    polygon.setAttribute('stroke-width', '2');
-    svg.appendChild(polygon);
-  } else if (diceType === 'd8') {
-    // Diamond/rhombus
-    const points = `${center},4 ${DIE_SIZE - 4},${center} ${center},${DIE_SIZE - 4} 4,${center}`;
-    const polygon = createSvgElement('polygon');
-    polygon.setAttribute('points', points);
-    polygon.setAttribute('fill', colors.face);
-    polygon.setAttribute('stroke', colors.border);
-    polygon.setAttribute('stroke-width', '2');
-    svg.appendChild(polygon);
-  } else if (diceType === 'd10' || diceType === 'd20') {
-    // Pentagon-ish shape
-    const r = center - 4;
-    const sides = diceType === 'd10' ? 5 : 6;
-    let points = '';
-    for (let i = 0; i < sides; i++) {
-      const angle = (i * 2 * Math.PI) / sides - Math.PI / 2;
-      const x = center + r * Math.cos(angle);
-      const y = center + r * Math.sin(angle);
-      points += `${x},${y} `;
-    }
-    const polygon = createSvgElement('polygon');
-    polygon.setAttribute('points', points.trim());
-    polygon.setAttribute('fill', colors.face);
-    polygon.setAttribute('stroke', colors.border);
-    polygon.setAttribute('stroke-width', '2');
-    svg.appendChild(polygon);
-  } else if (diceType === 'd12') {
-    // Hexagon
-    const r = center - 4;
-    let points = '';
-    for (let i = 0; i < 6; i++) {
-      const angle = (i * Math.PI) / 3;
-      const x = center + r * Math.cos(angle);
-      const y = center + r * Math.sin(angle);
-      points += `${x},${y} `;
-    }
-    const polygon = createSvgElement('polygon');
-    polygon.setAttribute('points', points.trim());
-    polygon.setAttribute('fill', colors.face);
-    polygon.setAttribute('stroke', colors.border);
-    polygon.setAttribute('stroke-width', '2');
-    svg.appendChild(polygon);
+  // Different shapes for different dice
+  let shape: SVGElement;
+  switch (type) {
+    case 'd4':
+      // Triangle
+      shape = createSVGElement('polygon', {
+        points: '50,10 90,85 10,85',
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
+      break;
+    case 'd8':
+      // Diamond/octahedron face
+      shape = createSVGElement('polygon', {
+        points: '50,5 95,50 50,95 5,50',
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
+      break;
+    case 'd10':
+      // Pentagon-ish
+      shape = createSVGElement('polygon', {
+        points: '50,5 92,35 75,90 25,90 8,35',
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
+      break;
+    case 'd12':
+      // Pentagon
+      shape = createSVGElement('polygon', {
+        points: '50,5 95,38 77,90 23,90 5,38',
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
+      break;
+    case 'd20':
+      // Hexagon-ish (icosahedron face approximation)
+      shape = createSVGElement('polygon', {
+        points: '50,5 90,25 90,75 50,95 10,75 10,25',
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
+      break;
+    default:
+      // Fallback to square
+      shape = createSVGElement('rect', {
+        x: 5,
+        y: 5,
+        width: 90,
+        height: 90,
+        rx: 8,
+        fill: color,
+        stroke: '#333',
+        'stroke-width': 2,
+      });
   }
+  svg.appendChild(shape);
 
-  // Value text
-  const text = createSvgElement('text');
-  text.setAttribute('x', String(center));
-  text.setAttribute('y', String(center + 6));
-  text.setAttribute('text-anchor', 'middle');
-  text.setAttribute('font-size', '20');
-  text.setAttribute('font-weight', 'bold');
-  text.setAttribute('fill', colors.pip);
+  // Add number
+  const text = createSVGElement('text', {
+    x: 50,
+    y: type === 'd4' ? 65 : 58,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'middle',
+    fill: '#fff',
+    'font-size': value >= 10 ? 28 : 36,
+    'font-weight': 'bold',
+    'font-family': 'Arial, sans-serif',
+  });
   text.textContent = String(value);
   svg.appendChild(text);
 
   return svg;
 }
 
-/**
- * Render any die type as SVG
- */
-export function renderDie(
-  diceType: DiceType,
-  value: number,
-  colors?: DiceColorScheme
-): SVGSVGElement {
-  if (diceType === 'd6') {
-    return renderD6(value, colors || DEFAULT_DICE_COLORS.d6);
+/** Render a single die */
+export function renderDie(die: DieRoll, size: number = 60): SVGElement {
+  const config = DICE_CONFIGS[die.type];
+  const color = config.color || '#2196f3';
+
+  if (die.type === 'd6') {
+    return renderD6(die.value, size, color);
   }
-  return renderPolyhedralDie(diceType, value, colors || DEFAULT_DICE_COLORS[diceType]);
+  return renderPolyhedral(die.type, die.value, size, color);
 }
 
-/**
- * Render a single DieRoll with state styling
- */
-export function renderDieRoll(roll: DieRoll): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('die-container');
-  container.dataset.dieId = roll.id;
+/** Create an interactive die element with click handling */
+export function createInteractiveDie(
+  die: DieRoll,
+  size: number = 60,
+  onClick?: (die: DieRoll) => void
+): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = `die-wrapper ${die.selected ? 'selected' : ''} ${die.used ? 'used' : ''}`;
+  wrapper.setAttribute('data-die-id', die.id);
 
-  if (roll.isSelected) {
-    container.classList.add('die-selected');
+  const svg = renderDie(die, size);
+  wrapper.appendChild(svg);
+
+  if (onClick && !die.used) {
+    wrapper.style.cursor = 'pointer';
+    wrapper.addEventListener('click', () => onClick(die));
   }
-  if (roll.isLocked) {
-    container.classList.add('die-locked');
-  }
 
-  const svg = renderDie(roll.diceType, roll.value);
-  container.appendChild(svg);
-
-  return container;
+  return wrapper;
 }
 
-/**
- * Render a complete dice roll result
- */
-export function renderDiceRollResult(
-  result: DiceRollResult,
+/** Render a complete roll result */
+export function renderRollResult(
+  result: RollResult,
   container: HTMLElement,
-  onDieClick?: (dieId: string) => void
+  options: {
+    dieSize?: number;
+    showTotal?: boolean;
+    selectable?: boolean;
+    onDieClick?: (die: DieRoll) => void;
+  } = {}
 ): void {
+  const { dieSize = 60, showTotal = true, selectable = false, onDieClick } = options;
+
   container.innerHTML = '';
-  container.classList.add('dice-roll-result');
+  container.className = 'dice-roll-result';
 
-  const diceRow = document.createElement('div');
-  diceRow.classList.add('dice-row');
+  const diceContainer = document.createElement('div');
+  diceContainer.className = 'dice-container';
 
-  for (const roll of result.rolls) {
-    const dieElement = renderDieRoll(roll);
-
-    if (onDieClick) {
-      dieElement.addEventListener('click', () => onDieClick(roll.id));
-      dieElement.classList.add('die-clickable');
-    }
-
-    diceRow.appendChild(dieElement);
+  for (const die of result.dice) {
+    const dieEl = createInteractiveDie(
+      die,
+      dieSize,
+      selectable ? onDieClick : undefined
+    );
+    diceContainer.appendChild(dieEl);
   }
 
-  container.appendChild(diceRow);
+  container.appendChild(diceContainer);
 
-  // Total display
-  const totalDisplay = document.createElement('div');
-  totalDisplay.classList.add('dice-total');
-  totalDisplay.innerHTML = `<span class="dice-total-label">Total:</span> <span class="dice-total-value">${result.total}</span>`;
-  container.appendChild(totalDisplay);
+  if (showTotal) {
+    const totalEl = document.createElement('div');
+    totalEl.className = 'dice-total';
+    totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${result.total}</span>`;
+    container.appendChild(totalEl);
+  }
 }
 
-/**
- * Animate a die roll with tumbling effect
- */
-export async function animateDieRoll(
-  dieElement: HTMLElement,
-  finalValue: number,
-  diceType: DiceType,
-  config: DiceAnimationConfig = DEFAULT_ANIMATION_CONFIG
-): Promise<void> {
-  const faces = DICE_FACES[diceType];
-  const intervalTime = config.duration / config.bounceCount;
-
-  return new Promise((resolve) => {
-    let bounces = 0;
-
-    const interval = setInterval(() => {
-      bounces++;
-
-      // Show random intermediate values
-      const intermediateValue = Math.floor(Math.random() * faces) + 1;
-      const svg = renderDie(diceType, intermediateValue);
-
-      // Apply rotation
-      const rotation = (bounces * 45) % 360;
-      svg.style.transform = `rotate(${rotation}deg)`;
-
-      // Clear and update
-      dieElement.innerHTML = '';
-      dieElement.appendChild(svg);
-
-      if (bounces >= config.bounceCount) {
-        clearInterval(interval);
-
-        // Show final value
-        const finalSvg = renderDie(diceType, finalValue);
-        finalSvg.style.transform = 'rotate(0deg)';
-        dieElement.innerHTML = '';
-        dieElement.appendChild(finalSvg);
-
-        resolve();
-      }
-    }, intervalTime);
-  });
-}
-
-/**
- * Animate multiple dice rolling simultaneously
- */
-export async function animateDiceRoll(
+/** Animation: Roll dice with tumbling effect */
+export function animateRoll(
   container: HTMLElement,
-  result: DiceRollResult,
-  config: DiceAnimationConfig = DEFAULT_ANIMATION_CONFIG,
-  onDieClick?: (dieId: string) => void
-): Promise<void> {
+  finalResult: RollResult,
+  options: {
+    duration?: number;
+    dieSize?: number;
+    onComplete?: () => void;
+  } = {}
+): void {
+  const { duration = 1000, dieSize = 60, onComplete } = options;
+
   container.innerHTML = '';
-  container.classList.add('dice-roll-result', 'dice-rolling');
+  container.className = 'dice-roll-result rolling';
 
-  const diceRow = document.createElement('div');
-  diceRow.classList.add('dice-row');
+  const diceContainer = document.createElement('div');
+  diceContainer.className = 'dice-container';
 
+  // Create dice elements for animation
   const dieElements: HTMLElement[] = [];
+  for (const die of finalResult.dice) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'die-wrapper rolling';
 
-  // Create placeholder elements
-  for (const roll of result.rolls) {
-    const dieContainer = document.createElement('div');
-    dieContainer.classList.add('die-container', 'die-animating');
-    dieContainer.dataset.dieId = roll.id;
+    // Start with random value
+    const config = DICE_CONFIGS[die.type];
+    const tempDie: DieRoll = { ...die, value: Math.ceil(Math.random() * config.faces) };
+    const svg = renderDie(tempDie, dieSize);
+    wrapper.appendChild(svg);
 
-    // Initial placeholder
-    const svg = renderDie(roll.diceType, 1);
-    dieContainer.appendChild(svg);
-    diceRow.appendChild(dieContainer);
-    dieElements.push(dieContainer);
+    diceContainer.appendChild(wrapper);
+    dieElements.push(wrapper);
   }
 
-  container.appendChild(diceRow);
+  container.appendChild(diceContainer);
 
-  // Animate all dice
-  const animations = result.rolls.map((roll, index) =>
-    animateDieRoll(dieElements[index], roll.value, roll.diceType, config)
-  );
+  // Animate through random values
+  const startTime = Date.now();
+  const interval = 50; // Update every 50ms
 
-  await Promise.all(animations);
+  const animate = () => {
+    const elapsed = Date.now() - startTime;
 
-  // Final render with click handlers
-  container.classList.remove('dice-rolling');
-  renderDiceRollResult(result, container, onDieClick);
+    if (elapsed < duration) {
+      // Update each die with random value
+      dieElements.forEach((wrapper, index) => {
+        const die = finalResult.dice[index];
+        const config = DICE_CONFIGS[die.type];
+        const randomValue = Math.ceil(Math.random() * config.faces);
+        const tempDie: DieRoll = { ...die, value: randomValue };
+
+        wrapper.innerHTML = '';
+        wrapper.appendChild(renderDie(tempDie, dieSize));
+      });
+
+      setTimeout(animate, interval);
+    } else {
+      // Animation complete - show final values
+      container.classList.remove('rolling');
+      dieElements.forEach((wrapper, index) => {
+        wrapper.classList.remove('rolling');
+        wrapper.classList.add('settled');
+        wrapper.innerHTML = '';
+        wrapper.appendChild(renderDie(finalResult.dice[index], dieSize));
+      });
+
+      // Add total
+      const totalEl = document.createElement('div');
+      totalEl.className = 'dice-total';
+      totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${finalResult.total}</span>`;
+      container.appendChild(totalEl);
+
+      if (onComplete) {
+        onComplete();
+      }
+    }
+  };
+
+  animate();
 }
 
-/**
- * Get CSS styles for dice UI components
- */
+/** Get CSS styles for dice UI */
 export function getDiceStyles(): string {
   return `
     .dice-roll-result {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      padding: 16px;
+      gap: 1rem;
+      padding: 1rem;
     }
 
-    .dice-row {
+    .dice-container {
       display: flex;
-      gap: ${DIE_PADDING}px;
+      gap: 0.75rem;
       flex-wrap: wrap;
       justify-content: center;
     }
 
-    .die-container {
-      position: relative;
-      width: ${DIE_SIZE}px;
-      height: ${DIE_SIZE}px;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    .die-wrapper {
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      border-radius: 8px;
     }
 
-    .die-container.die-clickable {
-      cursor: pointer;
-    }
-
-    .die-container.die-clickable:hover {
+    .die-wrapper:hover:not(.used) {
       transform: scale(1.1);
     }
 
-    .die-container.die-selected {
-      box-shadow: 0 0 0 3px #4caf50;
-      border-radius: 10px;
+    .die-wrapper.selected {
+      box-shadow: 0 0 0 3px #4caf50, 0 4px 12px rgba(76, 175, 80, 0.4);
+      transform: scale(1.05);
     }
 
-    .die-container.die-locked {
-      opacity: 0.6;
+    .die-wrapper.used {
+      opacity: 0.4;
+      filter: grayscale(0.5);
+      cursor: not-allowed;
     }
 
-    .die-container.die-locked::after {
-      content: '\\1F512';
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      font-size: 14px;
+    .die-wrapper.rolling {
+      animation: dice-tumble 0.1s ease-in-out infinite;
     }
 
-    .die-container.die-animating {
-      animation: die-bounce 0.1s ease-in-out infinite;
+    .die-wrapper.settled {
+      animation: dice-bounce 0.3s ease-out;
     }
 
-    @keyframes die-bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+    @keyframes dice-tumble {
+      0%, 100% { transform: rotate(-5deg) scale(1); }
+      50% { transform: rotate(5deg) scale(1.05); }
     }
 
-    .die {
-      filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
+    @keyframes dice-bounce {
+      0% { transform: scale(1.2); }
+      50% { transform: scale(0.95); }
+      100% { transform: scale(1); }
     }
 
     .dice-total {
       font-size: 1.25rem;
-      font-weight: bold;
+      font-weight: 600;
       color: #333;
+      padding: 0.5rem 1rem;
+      background: #f5f5f5;
+      border-radius: 8px;
     }
 
-    .dice-total-label {
+    .total-label {
       color: #666;
       font-weight: normal;
     }
 
-    .dice-total-value {
+    .total-value {
       color: #1976d2;
+      margin-left: 0.5rem;
     }
 
-    .dice-rolling .dice-total {
-      visibility: hidden;
+    .die {
+      filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.3));
     }
   `;
 }

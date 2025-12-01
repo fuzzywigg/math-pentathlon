@@ -1,434 +1,358 @@
-/**
- * Polyomino System Types
- * Core type definitions for polyomino shapes and operations
- */
+// Polyomino System - Types and Shape Definitions
+// Supports pattern blocks for Hex-a-Gone! and Jumpin' Jeannie
 
-// Cell position relative to the shape's origin (typically top-left or centroid)
+/** A single cell position within a shape */
 export interface Cell {
   row: number;
   col: number;
 }
 
-// Types of polyominoes by cell count
-export type PolyominoOrder = 1 | 2 | 3 | 4 | 5 | 6;
+/** Shape orientation (0°, 90°, 180°, 270°) */
+export type Rotation = 0 | 90 | 180 | 270;
 
-export const POLYOMINO_NAMES: Record<PolyominoOrder, string> = {
-  1: 'monomino',
-  2: 'domino',
-  3: 'tromino',
-  4: 'tetromino',
-  5: 'pentomino',
-  6: 'hexomino',
-};
-
-// A polyomino shape definition
-export interface Polyomino {
-  id: string; // Unique identifier (e.g., 'T', 'L', 'I')
-  name: string; // Human-readable name
-  order: PolyominoOrder; // Number of cells
-  cells: Cell[]; // Cells that make up the shape (normalized to origin)
-  color?: string; // Default display color
+/** A polyomino shape definition */
+export interface PolyominoShape {
+  /** Unique identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Cells that make up the shape (relative to origin 0,0) */
+  cells: Cell[];
+  /** Color for rendering */
+  color: string;
+  /** Whether the shape can be rotated */
+  canRotate: boolean;
+  /** Whether the shape can be flipped/reflected */
+  canFlip: boolean;
+  /** Number of cells (size) */
+  size: number;
 }
 
-// A polyomino with specific transformation state
-export interface TransformedPolyomino extends Polyomino {
-  rotation: 0 | 90 | 180 | 270; // Current rotation in degrees
-  flipped: boolean; // Whether horizontally flipped
-  originalId: string; // Reference to base shape ID
-}
-
-// Placement of a polyomino on a grid
-export interface PolyominoPlacement {
-  polyomino: Polyomino;
-  position: Cell; // Top-left corner position on grid
-  rotation: 0 | 90 | 180 | 270;
+/** A polyomino instance placed on the board */
+export interface PlacedPolyomino {
+  /** Reference to shape definition */
+  shapeId: string;
+  /** Position on board (anchor cell) */
+  position: Cell;
+  /** Current rotation */
+  rotation: Rotation;
+  /** Whether flipped horizontally */
   flipped: boolean;
+  /** Player who placed it (optional) */
+  playerId?: number;
 }
 
-// Bounds of a polyomino shape
-export interface PolyominoBounds {
-  minRow: number;
-  maxRow: number;
-  minCol: number;
-  maxCol: number;
-  width: number;
-  height: number;
+/** Board cell state */
+export interface BoardCell {
+  /** Whether cell is occupied */
+  occupied: boolean;
+  /** ID of polyomino occupying this cell */
+  polyominoId?: string;
+  /** Player who owns this cell */
+  playerId?: number;
+  /** Whether cell is valid for placement */
+  valid: boolean;
 }
 
-// Visual style options for polyomino rendering
-export interface PolyominoStyle {
+/** Polyomino placement result */
+export interface PlacementResult {
+  valid: boolean;
+  cells: Cell[];
+  reason?: string;
+}
+
+/** Configuration for polyomino rendering */
+export interface PolyominoRenderConfig {
   cellSize: number;
-  borderWidth: number;
-  borderColor: string;
-  borderRadius: number;
+  padding: number;
   showGrid: boolean;
-  gap: number;
+  highlightColor?: string;
+  invalidColor?: string;
 }
 
-export const DEFAULT_POLYOMINO_STYLE: PolyominoStyle = {
-  cellSize: 40,
-  borderWidth: 2,
-  borderColor: '#333',
-  borderRadius: 4,
-  showGrid: true,
-  gap: 1,
-};
+// =============================================================================
+// Standard Polyomino Sets
+// =============================================================================
 
-// Colors for polyominoes (based on standard conventions)
-export const POLYOMINO_COLORS: Record<string, string> = {
-  // Monomino
-  O1: '#808080', // Gray
-
-  // Domino
-  I2: '#00bcd4', // Cyan
-
-  // Trominoes
-  I3: '#2196f3', // Blue
-  L3: '#ff9800', // Orange (or V tromino)
-
-  // Tetrominoes (Tetris colors)
-  I: '#00bcd4', // Cyan
-  O: '#ffeb3b', // Yellow
-  T: '#9c27b0', // Purple
-  S: '#4caf50', // Green
-  Z: '#f44336', // Red
-  J: '#3f51b5', // Blue
-  L: '#ff9800', // Orange
-
-  // Pentominoes (standard naming)
-  F: '#e91e63', // Pink
-  I5: '#00bcd4', // Cyan
-  L5: '#ff9800', // Orange
-  N: '#795548', // Brown
-  P: '#9c27b0', // Purple
-  T5: '#673ab7', // Deep Purple
-  U: '#009688', // Teal
-  V: '#8bc34a', // Light Green
-  W: '#3f51b5', // Indigo
-  X: '#f44336', // Red
-  Y: '#ffeb3b', // Yellow
-  Z5: '#4caf50', // Green
-};
-
-// Standard tetromino definitions
-export const TETROMINOES: Polyomino[] = [
+/** Standard tetrominoes (4-cell shapes from Tetris) */
+export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'I',
-    name: 'I-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 0, col: 3 },
-    ],
-    color: POLYOMINO_COLORS.I,
+    name: 'I-piece',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }],
+    color: '#00bcd4',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'O',
-    name: 'O-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.O,
+    name: 'O-piece',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    color: '#ffeb3b',
+    canRotate: false,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'T',
-    name: 'T-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 1, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.T,
+    name: 'T-piece',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }],
+    color: '#9c27b0',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'S',
-    name: 'S-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.S,
+    name: 'S-piece',
+    cells: [{ row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    color: '#4caf50',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'Z',
-    name: 'Z-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 1, col: 1 },
-      { row: 1, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.Z,
+    name: 'Z-piece',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    color: '#f44336',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'J',
-    name: 'J-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 1, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.J,
+    name: 'J-piece',
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    color: '#3f51b5',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
   {
     id: 'L',
-    name: 'L-tetromino',
-    order: 4,
-    cells: [
-      { row: 0, col: 2 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 1, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.L,
+    name: 'L-piece',
+    cells: [{ row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    color: '#ff9800',
+    canRotate: true,
+    canFlip: false,
+    size: 4,
   },
 ];
 
-// Standard pentomino definitions (the 12 free pentominoes)
-export const PENTOMINOES: Polyomino[] = [
+/** Hex-a-Gone! pattern blocks (based on pattern block set) */
+export const HEX_PATTERN_BLOCKS: PolyominoShape[] = [
+  {
+    id: 'hexagon',
+    name: 'Hexagon',
+    // Hexagon covers 6 triangular cells (represented as a larger unit)
+    cells: [{ row: 0, col: 0 }],
+    color: '#ffeb3b', // Yellow
+    canRotate: false,
+    canFlip: false,
+    size: 6,
+  },
+  {
+    id: 'trapezoid',
+    name: 'Trapezoid',
+    // Trapezoid covers 3 triangular cells
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+    color: '#f44336', // Red
+    canRotate: true,
+    canFlip: true,
+    size: 3,
+  },
+  {
+    id: 'rhombus',
+    name: 'Rhombus',
+    // Rhombus covers 2 triangular cells
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+    color: '#2196f3', // Blue
+    canRotate: true,
+    canFlip: false,
+    size: 2,
+  },
+  {
+    id: 'triangle',
+    name: 'Triangle',
+    // Single triangular cell
+    cells: [{ row: 0, col: 0 }],
+    color: '#4caf50', // Green
+    canRotate: true,
+    canFlip: false,
+    size: 1,
+  },
+  {
+    id: 'square',
+    name: 'Square',
+    // Square covers 2 triangular cells (different orientation than rhombus)
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }],
+    color: '#ff9800', // Orange
+    canRotate: true,
+    canFlip: false,
+    size: 2,
+  },
+];
+
+/** Pentominoes (5-cell shapes for advanced puzzles) */
+export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'F',
     name: 'F-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 2, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.F,
+    cells: [{ row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
+    color: '#e91e63',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
   {
     id: 'I5',
     name: 'I-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 0, col: 3 },
-      { row: 0, col: 4 },
-    ],
-    color: POLYOMINO_COLORS.I5,
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }, { row: 0, col: 4 }],
+    color: '#00bcd4',
+    canRotate: true,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'L5',
     name: 'L-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 1, col: 0 },
-      { row: 2, col: 0 },
-      { row: 3, col: 0 },
-      { row: 3, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.L5,
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }, { row: 3, col: 0 }, { row: 3, col: 1 }],
+    color: '#ff9800',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
   {
     id: 'N',
     name: 'N-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 1 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 2, col: 0 },
-      { row: 3, col: 0 },
-    ],
-    color: POLYOMINO_COLORS.N,
+    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }, { row: 3, col: 0 }],
+    color: '#795548',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
   {
     id: 'P',
     name: 'P-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 2, col: 0 },
-    ],
-    color: POLYOMINO_COLORS.P,
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }],
+    color: '#9c27b0',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
   {
     id: 'T5',
     name: 'T-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 0, col: 2 },
-      { row: 1, col: 1 },
-      { row: 2, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.T5,
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
+    color: '#607d8b',
+    canRotate: true,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'U',
     name: 'U-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 2 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 1, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.U,
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    color: '#3f51b5',
+    canRotate: true,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'V',
     name: 'V-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 1, col: 0 },
-      { row: 2, col: 0 },
-      { row: 2, col: 1 },
-      { row: 2, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.V,
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    color: '#009688',
+    canRotate: true,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'W',
     name: 'W-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 2, col: 1 },
-      { row: 2, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.W,
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    color: '#8bc34a',
+    canRotate: true,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'X',
     name: 'X-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 1 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 1, col: 2 },
-      { row: 2, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.X,
+    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }, { row: 2, col: 1 }],
+    color: '#f44336',
+    canRotate: false,
+    canFlip: false,
+    size: 5,
   },
   {
     id: 'Y',
     name: 'Y-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 1 },
-      { row: 1, col: 0 },
-      { row: 1, col: 1 },
-      { row: 2, col: 1 },
-      { row: 3, col: 1 },
-    ],
-    color: POLYOMINO_COLORS.Y,
+    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 3, col: 1 }],
+    color: '#ffeb3b',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
   {
     id: 'Z5',
     name: 'Z-pentomino',
-    order: 5,
-    cells: [
-      { row: 0, col: 0 },
-      { row: 0, col: 1 },
-      { row: 1, col: 1 },
-      { row: 2, col: 1 },
-      { row: 2, col: 2 },
-    ],
-    color: POLYOMINO_COLORS.Z5,
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    color: '#4caf50',
+    canRotate: true,
+    canFlip: true,
+    size: 5,
   },
 ];
 
-// Get all polyominoes by order
-export function getPolyominoesByOrder(order: PolyominoOrder): Polyomino[] {
-  switch (order) {
-    case 1:
-      return [
-        {
-          id: 'O1',
-          name: 'Monomino',
-          order: 1,
-          cells: [{ row: 0, col: 0 }],
-          color: POLYOMINO_COLORS.O1,
-        },
-      ];
-    case 2:
-      return [
-        {
-          id: 'I2',
-          name: 'Domino',
-          order: 2,
-          cells: [
-            { row: 0, col: 0 },
-            { row: 0, col: 1 },
-          ],
-          color: POLYOMINO_COLORS.I2,
-        },
-      ];
-    case 3:
-      return [
-        {
-          id: 'I3',
-          name: 'I-tromino',
-          order: 3,
-          cells: [
-            { row: 0, col: 0 },
-            { row: 0, col: 1 },
-            { row: 0, col: 2 },
-          ],
-          color: POLYOMINO_COLORS.I3,
-        },
-        {
-          id: 'L3',
-          name: 'L-tromino',
-          order: 3,
-          cells: [
-            { row: 0, col: 0 },
-            { row: 1, col: 0 },
-            { row: 1, col: 1 },
-          ],
-          color: POLYOMINO_COLORS.L3,
-        },
-      ];
-    case 4:
-      return TETROMINOES;
-    case 5:
-      return PENTOMINOES;
-    case 6:
-      // Hexominoes are more complex (35 free hexominoes), not fully defined here
-      return [];
-    default:
-      return [];
-  }
+/** Simple shapes (1-3 cells) for beginners */
+export const SIMPLE_SHAPES: PolyominoShape[] = [
+  {
+    id: 'monomino',
+    name: 'Single',
+    cells: [{ row: 0, col: 0 }],
+    color: '#9e9e9e',
+    canRotate: false,
+    canFlip: false,
+    size: 1,
+  },
+  {
+    id: 'domino',
+    name: 'Domino',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+    color: '#607d8b',
+    canRotate: true,
+    canFlip: false,
+    size: 2,
+  },
+  {
+    id: 'tromino-I',
+    name: 'I-tromino',
+    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+    color: '#00bcd4',
+    canRotate: true,
+    canFlip: false,
+    size: 3,
+  },
+  {
+    id: 'tromino-L',
+    name: 'L-tromino',
+    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    color: '#ff9800',
+    canRotate: true,
+    canFlip: true,
+    size: 3,
+  },
+];
+
+/** Get all shapes in a set by ID */
+export function getShapeById(id: string, set: PolyominoShape[]): PolyominoShape | undefined {
+  return set.find(s => s.id === id);
 }
 
-// Get a specific polyomino by ID
-export function getPolyominoById(id: string): Polyomino | undefined {
-  const allPolyominoes = [
-    ...getPolyominoesByOrder(1),
-    ...getPolyominoesByOrder(2),
-    ...getPolyominoesByOrder(3),
-    ...TETROMINOES,
-    ...PENTOMINOES,
-  ];
-  return allPolyominoes.find((p) => p.id === id);
+/** Get shapes by size */
+export function getShapesBySize(size: number, set: PolyominoShape[]): PolyominoShape[] {
+  return set.filter(s => s.size === size);
 }

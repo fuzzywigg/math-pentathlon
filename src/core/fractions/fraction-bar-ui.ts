@@ -1,359 +1,539 @@
-/**
- * Fraction Bar UI
- * Visual representation of fractions using Cuisenaire-style bars
- */
+// Fraction Bar UI - Visual representation of fractions
 
-import type { Fraction, FractionBar, FractionStyle, FractionDisplayOptions } from './types';
 import {
-  getFractionBarColor,
-  DEFAULT_FRACTION_STYLE,
-  DEFAULT_DISPLAY_OPTIONS,
-  UNICODE_FRACTIONS,
+  Fraction,
+  FractionBarConfig,
+  FractionBarPiece,
+  FRACTION_COLORS,
 } from './types';
-import { simplify, toMixedNumber, toDecimal } from './arithmetic';
+import { simplify, toDecimal, formatFraction } from './arithmetic';
 
-/**
- * Format a fraction as a string
- */
-export function formatFraction(
-  f: Fraction,
-  options: FractionDisplayOptions = DEFAULT_DISPLAY_OPTIONS
-): string {
-  let fraction = f;
+/** Default configuration */
+const DEFAULT_CONFIG: Required<FractionBarConfig> = {
+  style: 'horizontal',
+  width: 200,
+  height: 40,
+  colors: {
+    filled: '#2196f3',
+    empty: '#e0e0e0',
+    border: '#333',
+  },
+  showLabel: true,
+  labelPosition: 'below',
+  interactive: false,
+};
 
-  if (options.simplify) {
-    const simplified = simplify(f);
-    fraction = {
-      numerator: simplified.isNegative ? -simplified.numerator : simplified.numerator,
-      denominator: simplified.denominator,
-    };
+/** Get color for a fraction based on denominator */
+export function getFractionColor(denominator: number): string {
+  return FRACTION_COLORS[denominator] || '#607d8b';
+}
+
+/** Create SVG namespace helper */
+function createSVGElement<K extends keyof SVGElementTagNameMap>(
+  tag: K,
+  attrs: Record<string, string | number> = {}
+): SVGElementTagNameMap[K] {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    el.setAttribute(key, String(value));
   }
-
-  const sign = fraction.numerator < 0 ? '-' : options.showSign ? '+' : '';
-  const absNum = Math.abs(fraction.numerator);
-
-  // Check for unicode fraction
-  if (options.useUnicodeFractions) {
-    const key = `${absNum}/${fraction.denominator}`;
-    if (UNICODE_FRACTIONS[key]) {
-      return sign + UNICODE_FRACTIONS[key];
-    }
-  }
-
-  // Mixed number format
-  if (options.showMixedNumber && absNum >= fraction.denominator) {
-    const mixed = toMixedNumber(fraction);
-    if (mixed.fraction.numerator === 0) {
-      return sign + String(mixed.whole);
-    }
-    return `${sign}${mixed.whole} ${mixed.fraction.numerator}/${mixed.fraction.denominator}`;
-  }
-
-  // Standard format
-  return `${sign}${absNum}/${fraction.denominator}`;
+  return el;
 }
 
 /**
- * Create a fraction bar data object
+ * Render a horizontal fraction bar
  */
-export function createFractionBar(
-  f: Fraction,
-  label?: string,
-  customColor?: string
-): FractionBar {
-  const simplified = simplify(f);
-  return {
-    fraction: {
-      numerator: simplified.isNegative ? -simplified.numerator : simplified.numerator,
-      denominator: simplified.denominator,
-    },
-    color: customColor || getFractionBarColor(simplified.denominator),
-    label,
-  };
-}
-
-/**
- * Render a single fraction bar as HTML
- */
-export function renderFractionBar(
-  bar: FractionBar,
-  style: FractionStyle = DEFAULT_FRACTION_STYLE
-): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('fraction-bar');
-  container.style.display = 'flex';
-  container.style.alignItems = 'center';
-  container.style.gap = '8px';
-
-  // Calculate width based on fraction value
-  const value = toDecimal(bar.fraction);
-  const barWidth = Math.abs(value) * style.barWidth;
-
-  // The bar itself
-  const barEl = document.createElement('div');
-  barEl.classList.add('fraction-bar-fill');
-  barEl.style.height = `${style.barHeight}px`;
-  barEl.style.width = `${barWidth}px`;
-  barEl.style.minWidth = '20px';
-  barEl.style.backgroundColor = bar.color;
-  barEl.style.borderRadius = `${style.borderRadius}px`;
-  barEl.style.border = `${style.borderWidth}px solid ${style.borderColor}`;
-  barEl.style.position = 'relative';
-
-  // Label inside bar if it fits
-  if (style.showLabel && barWidth > 40) {
-    const label = document.createElement('span');
-    label.classList.add('fraction-bar-label');
-    label.textContent = bar.label || formatFraction(bar.fraction);
-    label.style.position = 'absolute';
-    label.style.left = '50%';
-    label.style.top = '50%';
-    label.style.transform = 'translate(-50%, -50%)';
-    label.style.fontSize = `${style.fontSize}px`;
-    label.style.fontWeight = 'bold';
-    label.style.color = getContrastColor(bar.color);
-    barEl.appendChild(label);
-  }
-
-  container.appendChild(barEl);
-
-  // Value display outside bar
-  if (style.showValue && (barWidth <= 40 || !style.showLabel)) {
-    const valueEl = document.createElement('span');
-    valueEl.classList.add('fraction-bar-value');
-    valueEl.textContent = formatFraction(bar.fraction);
-    valueEl.style.fontSize = `${style.fontSize}px`;
-    valueEl.style.fontWeight = '600';
-    container.appendChild(valueEl);
-  }
-
-  return container;
-}
-
-/**
- * Render multiple fraction bars stacked vertically
- */
-export function renderFractionBars(
-  bars: FractionBar[],
-  style: FractionStyle = DEFAULT_FRACTION_STYLE
-): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('fraction-bars-container');
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.gap = '4px';
-
-  for (const bar of bars) {
-    container.appendChild(renderFractionBar(bar, style));
-  }
-
-  return container;
-}
-
-/**
- * Render a fraction bar comparison (side by side)
- */
-export function renderFractionComparison(
-  fractions: Fraction[],
-  style: FractionStyle = DEFAULT_FRACTION_STYLE
-): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('fraction-comparison');
-  container.style.display = 'flex';
-  container.style.flexDirection = 'column';
-  container.style.gap = '8px';
-
-  // Find max value for scaling
-  const maxValue = Math.max(...fractions.map((f) => Math.abs(toDecimal(f))));
-  const scaledStyle = { ...style, barWidth: style.barWidth / maxValue };
-
-  for (const f of fractions) {
-    const bar = createFractionBar(f);
-    container.appendChild(renderFractionBar(bar, scaledStyle));
-  }
-
-  return container;
-}
-
-/**
- * Render fraction as a circle (pie chart style)
- */
-export function renderFractionCircle(
-  f: Fraction,
-  size: number = 100,
-  color?: string
+export function renderHorizontalBar(
+  fraction: Fraction,
+  config: FractionBarConfig = {}
 ): SVGSVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', String(size));
-  svg.setAttribute('height', String(size));
-  svg.setAttribute('viewBox', '0 0 100 100');
-  svg.classList.add('fraction-circle');
+  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const { width, height, colors, showLabel, labelPosition } = cfg;
 
-  const simplified = simplify(f);
-  const fillColor = color || getFractionBarColor(simplified.denominator);
-  const decimal = toDecimal(f);
-  const angle = decimal * 360;
+  const simplified = simplify(fraction);
+  const { numerator, denominator } = simplified;
+  const fillRatio = Math.min(1, Math.max(0, numerator / denominator));
 
-  // Background circle
-  const bgCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-  bgCircle.setAttribute('cx', '50');
-  bgCircle.setAttribute('cy', '50');
-  bgCircle.setAttribute('r', '45');
-  bgCircle.setAttribute('fill', '#f5f5f5');
-  bgCircle.setAttribute('stroke', '#333');
-  bgCircle.setAttribute('stroke-width', '2');
-  svg.appendChild(bgCircle);
+  const totalHeight = showLabel && labelPosition === 'below' ? height + 25 : height;
 
-  // Filled arc
-  if (decimal > 0 && decimal < 1) {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const startAngle = -90; // Start at top
-    const endAngle = startAngle + angle;
+  const svg = createSVGElement('svg', {
+    width,
+    height: totalHeight,
+    viewBox: `0 0 ${width} ${totalHeight}`,
+    class: 'fraction-bar fraction-bar-horizontal',
+  });
 
-    const startX = 50 + 45 * Math.cos((startAngle * Math.PI) / 180);
-    const startY = 50 + 45 * Math.sin((startAngle * Math.PI) / 180);
-    const endX = 50 + 45 * Math.cos((endAngle * Math.PI) / 180);
-    const endY = 50 + 45 * Math.sin((endAngle * Math.PI) / 180);
+  // Background (empty)
+  const bg = createSVGElement('rect', {
+    x: 1,
+    y: 1,
+    width: width - 2,
+    height: height - 2,
+    fill: colors.empty || '#e0e0e0',
+    stroke: colors.border || '#333',
+    'stroke-width': 2,
+    rx: 4,
+    ry: 4,
+  });
+  svg.appendChild(bg);
 
-    const largeArc = angle > 180 ? 1 : 0;
+  // Filled portion
+  if (fillRatio > 0) {
+    const fillWidth = (width - 2) * fillRatio;
+    const fill = createSVGElement('rect', {
+      x: 1,
+      y: 1,
+      width: fillWidth,
+      height: height - 2,
+      fill: colors.filled || getFractionColor(denominator),
+      rx: 4,
+      ry: 4,
+    });
+    svg.appendChild(fill);
 
-    const d = `M 50 50 L ${startX} ${startY} A 45 45 0 ${largeArc} 1 ${endX} ${endY} Z`;
-    path.setAttribute('d', d);
-    path.setAttribute('fill', fillColor);
-    svg.appendChild(path);
-  } else if (decimal >= 1) {
-    // Full circle
-    const fullCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    fullCircle.setAttribute('cx', '50');
-    fullCircle.setAttribute('cy', '50');
-    fullCircle.setAttribute('r', '45');
-    fullCircle.setAttribute('fill', fillColor);
-    svg.appendChild(fullCircle);
+    // Clip the right side if not full
+    if (fillRatio < 1) {
+      fill.setAttribute('clip-path', 'inset(0 0 0 0 round 4px 0 0 4px)');
+    }
+  }
+
+  // Division lines
+  if (denominator > 1 && denominator <= 12) {
+    const segmentWidth = (width - 2) / denominator;
+    for (let i = 1; i < denominator; i++) {
+      const line = createSVGElement('line', {
+        x1: 1 + i * segmentWidth,
+        y1: 1,
+        x2: 1 + i * segmentWidth,
+        y2: height - 1,
+        stroke: colors.border || '#333',
+        'stroke-width': 1,
+        'stroke-opacity': 0.5,
+      });
+      svg.appendChild(line);
+    }
   }
 
   // Label
-  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  text.setAttribute('x', '50');
-  text.setAttribute('y', '55');
-  text.setAttribute('text-anchor', 'middle');
-  text.setAttribute('font-size', '16');
-  text.setAttribute('font-weight', 'bold');
-  text.setAttribute('fill', '#333');
-  text.textContent = formatFraction(f);
-  svg.appendChild(text);
+  if (showLabel) {
+    const labelText = formatFraction(simplified);
+
+    if (labelPosition === 'inside') {
+      const text = createSVGElement('text', {
+        x: width / 2,
+        y: height / 2,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central',
+        fill: 'white',
+        'font-size': 14,
+        'font-weight': 'bold',
+        'font-family': 'Arial, sans-serif',
+      });
+      text.textContent = labelText;
+      svg.appendChild(text);
+    } else if (labelPosition === 'below') {
+      const text = createSVGElement('text', {
+        x: width / 2,
+        y: height + 18,
+        'text-anchor': 'middle',
+        fill: '#333',
+        'font-size': 14,
+        'font-family': 'Arial, sans-serif',
+      });
+      text.textContent = labelText;
+      svg.appendChild(text);
+    }
+  }
 
   return svg;
 }
 
 /**
- * Render fraction as a rectangular grid
+ * Render a vertical fraction bar
  */
-export function renderFractionGrid(
-  f: Fraction,
-  cellSize: number = 30,
-  cols?: number
-): HTMLElement {
-  const simplified = simplify(f);
-  const numerator = simplified.numerator;
-  const denominator = simplified.denominator;
-  const color = getFractionBarColor(denominator);
+export function renderVerticalBar(
+  fraction: Fraction,
+  config: FractionBarConfig = {}
+): SVGSVGElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const { width, height, colors, showLabel, labelPosition } = cfg;
 
-  // Determine grid dimensions
-  const gridCols = cols || Math.ceil(Math.sqrt(denominator));
+  const simplified = simplify(fraction);
+  const { numerator, denominator } = simplified;
+  const fillRatio = Math.min(1, Math.max(0, numerator / denominator));
 
-  const container = document.createElement('div');
-  container.classList.add('fraction-grid');
-  container.style.display = 'grid';
-  container.style.gridTemplateColumns = `repeat(${gridCols}, ${cellSize}px)`;
-  container.style.gap = '2px';
-  container.style.padding = '4px';
-  container.style.backgroundColor = '#f5f5f5';
-  container.style.borderRadius = '4px';
-  container.style.border = '1px solid #333';
-  container.style.width = 'fit-content';
+  const totalWidth = showLabel && labelPosition === 'right' ? width + 40 : width;
 
-  for (let i = 0; i < denominator; i++) {
-    const cell = document.createElement('div');
-    cell.classList.add('fraction-grid-cell');
-    cell.style.width = `${cellSize}px`;
-    cell.style.height = `${cellSize}px`;
-    cell.style.borderRadius = '2px';
-    cell.style.border = '1px solid #999';
+  const svg = createSVGElement('svg', {
+    width: totalWidth,
+    height,
+    viewBox: `0 0 ${totalWidth} ${height}`,
+    class: 'fraction-bar fraction-bar-vertical',
+  });
 
-    if (i < numerator) {
-      cell.style.backgroundColor = color;
-      cell.classList.add('filled');
-    } else {
-      cell.style.backgroundColor = '#fff';
-      cell.classList.add('empty');
-    }
+  // Background
+  const bg = createSVGElement('rect', {
+    x: 1,
+    y: 1,
+    width: width - 2,
+    height: height - 2,
+    fill: colors.empty || '#e0e0e0',
+    stroke: colors.border || '#333',
+    'stroke-width': 2,
+    rx: 4,
+    ry: 4,
+  });
+  svg.appendChild(bg);
 
-    container.appendChild(cell);
+  // Filled portion (from bottom)
+  if (fillRatio > 0) {
+    const fillHeight = (height - 2) * fillRatio;
+    const fill = createSVGElement('rect', {
+      x: 1,
+      y: height - 1 - fillHeight,
+      width: width - 2,
+      height: fillHeight,
+      fill: colors.filled || getFractionColor(denominator),
+      rx: 4,
+      ry: 4,
+    });
+    svg.appendChild(fill);
   }
 
-  return container;
+  // Division lines
+  if (denominator > 1 && denominator <= 12) {
+    const segmentHeight = (height - 2) / denominator;
+    for (let i = 1; i < denominator; i++) {
+      const line = createSVGElement('line', {
+        x1: 1,
+        y1: 1 + i * segmentHeight,
+        x2: width - 1,
+        y2: 1 + i * segmentHeight,
+        stroke: colors.border || '#333',
+        'stroke-width': 1,
+        'stroke-opacity': 0.5,
+      });
+      svg.appendChild(line);
+    }
+  }
+
+  // Label
+  if (showLabel && labelPosition === 'right') {
+    const text = createSVGElement('text', {
+      x: width + 5,
+      y: height / 2,
+      'text-anchor': 'start',
+      'dominant-baseline': 'central',
+      fill: '#333',
+      'font-size': 14,
+      'font-family': 'Arial, sans-serif',
+    });
+    text.textContent = formatFraction(simplified);
+    svg.appendChild(text);
+  }
+
+  return svg;
 }
 
 /**
- * Get contrasting text color for a background
+ * Render a circular (pie) fraction representation
  */
-function getContrastColor(hexColor: string): string {
-  // Remove # if present
-  const hex = hexColor.replace('#', '');
+export function renderCircleBar(
+  fraction: Fraction,
+  config: FractionBarConfig = {}
+): SVGSVGElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const size = Math.min(cfg.width, cfg.height);
+  const { colors, showLabel, labelPosition } = cfg;
 
-  // Parse RGB
-  const r = parseInt(hex.substr(0, 2), 16);
-  const g = parseInt(hex.substr(2, 2), 16);
-  const b = parseInt(hex.substr(4, 2), 16);
+  const simplified = simplify(fraction);
+  const { numerator, denominator } = simplified;
+  const fillRatio = Math.min(1, Math.max(0, numerator / denominator));
 
-  // Calculate luminance
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  const totalHeight = showLabel && labelPosition === 'below' ? size + 25 : size;
 
-  return luminance > 0.5 ? '#000000' : '#ffffff';
+  const svg = createSVGElement('svg', {
+    width: size,
+    height: totalHeight,
+    viewBox: `0 0 ${size} ${totalHeight}`,
+    class: 'fraction-bar fraction-bar-circle',
+  });
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = (size - 4) / 2;
+
+  // Background circle
+  const bgCircle = createSVGElement('circle', {
+    cx,
+    cy,
+    r: radius,
+    fill: colors.empty || '#e0e0e0',
+    stroke: colors.border || '#333',
+    'stroke-width': 2,
+  });
+  svg.appendChild(bgCircle);
+
+  // Filled portion (pie slice)
+  if (fillRatio > 0 && fillRatio < 1) {
+    const angle = fillRatio * 2 * Math.PI;
+    const endX = cx + radius * Math.sin(angle);
+    const endY = cy - radius * Math.cos(angle);
+    const largeArc = fillRatio > 0.5 ? 1 : 0;
+
+    const path = createSVGElement('path', {
+      d: `M ${cx} ${cy} L ${cx} ${cy - radius} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`,
+      fill: colors.filled || getFractionColor(denominator),
+    });
+    svg.appendChild(path);
+  } else if (fillRatio >= 1) {
+    const fillCircle = createSVGElement('circle', {
+      cx,
+      cy,
+      r: radius,
+      fill: colors.filled || getFractionColor(denominator),
+    });
+    svg.appendChild(fillCircle);
+  }
+
+  // Division lines
+  if (denominator > 1 && denominator <= 12) {
+    for (let i = 0; i < denominator; i++) {
+      const angle = (i / denominator) * 2 * Math.PI - Math.PI / 2;
+      const line = createSVGElement('line', {
+        x1: cx,
+        y1: cy,
+        x2: cx + radius * Math.cos(angle),
+        y2: cy + radius * Math.sin(angle),
+        stroke: colors.border || '#333',
+        'stroke-width': 1,
+        'stroke-opacity': 0.5,
+      });
+      svg.appendChild(line);
+    }
+  }
+
+  // Label
+  if (showLabel && labelPosition === 'below') {
+    const text = createSVGElement('text', {
+      x: size / 2,
+      y: size + 18,
+      'text-anchor': 'middle',
+      fill: '#333',
+      'font-size': 14,
+      'font-family': 'Arial, sans-serif',
+    });
+    text.textContent = formatFraction(simplified);
+    svg.appendChild(text);
+  }
+
+  return svg;
 }
 
 /**
- * Get CSS styles for fraction UI components
+ * Render a fraction bar based on style config
  */
-export function getFractionStyles(): string {
+export function renderFractionBar(
+  fraction: Fraction,
+  config: FractionBarConfig = {}
+): SVGSVGElement {
+  const style = config.style || 'horizontal';
+
+  switch (style) {
+    case 'vertical':
+      return renderVerticalBar(fraction, config);
+    case 'circle':
+      return renderCircleBar(fraction, config);
+    case 'horizontal':
+    default:
+      return renderHorizontalBar(fraction, config);
+  }
+}
+
+/**
+ * Create an interactive fraction bar that can be clicked to set value
+ */
+export function createInteractiveFractionBar(
+  fraction: Fraction,
+  denominator: number,
+  onChange: (newFraction: Fraction) => void,
+  config: FractionBarConfig = {}
+): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'interactive-fraction-bar';
+
+  const cfg = { ...DEFAULT_CONFIG, ...config };
+  const { width, height, colors } = cfg;
+
+  const segments: HTMLElement[] = [];
+  const segmentWidth = (width - 2) / denominator;
+
+  for (let i = 0; i < denominator; i++) {
+    const segment = document.createElement('div');
+    segment.className = 'fraction-segment';
+    segment.style.cssText = `
+      width: ${segmentWidth}px;
+      height: ${height - 2}px;
+      background: ${i < fraction.numerator ? (colors?.filled || getFractionColor(denominator)) : (colors?.empty || '#e0e0e0')};
+      border-right: 1px solid ${colors?.border || '#333'};
+      display: inline-block;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    `;
+
+    segment.addEventListener('click', () => {
+      const newNumerator = i + 1;
+      onChange({ numerator: newNumerator, denominator });
+    });
+
+    segment.addEventListener('mouseenter', () => {
+      // Highlight potential selection
+      for (let j = 0; j <= i; j++) {
+        segments[j].style.opacity = '0.8';
+      }
+    });
+
+    segment.addEventListener('mouseleave', () => {
+      segments.forEach(s => s.style.opacity = '1');
+    });
+
+    segments.push(segment);
+    wrapper.appendChild(segment);
+  }
+
+  wrapper.style.cssText = `
+    display: inline-flex;
+    border: 2px solid ${colors?.border || '#333'};
+    border-radius: 4px;
+    overflow: hidden;
+  `;
+
+  return wrapper;
+}
+
+/**
+ * Create a fraction bar piece for dragging/manipulation
+ */
+export function createFractionBarPiece(
+  piece: FractionBarPiece,
+  config: FractionBarConfig = {}
+): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'fraction-bar-piece';
+  wrapper.setAttribute('data-piece-id', piece.id);
+  wrapper.setAttribute('data-fraction', `${piece.fraction.numerator}/${piece.fraction.denominator}`);
+  wrapper.setAttribute('draggable', 'true');
+
+  const svg = renderFractionBar(piece.fraction, {
+    ...config,
+    colors: { filled: piece.color, ...config.colors },
+  });
+
+  wrapper.appendChild(svg);
+
+  wrapper.style.cssText = `
+    display: inline-block;
+    cursor: grab;
+    transition: transform 0.2s ease;
+  `;
+
+  wrapper.addEventListener('dragstart', (e) => {
+    wrapper.style.opacity = '0.5';
+    e.dataTransfer?.setData('text/plain', piece.id);
+  });
+
+  wrapper.addEventListener('dragend', () => {
+    wrapper.style.opacity = '1';
+  });
+
+  return wrapper;
+}
+
+/**
+ * Get CSS styles for fraction bar components
+ */
+export function getFractionBarStyles(): string {
   return `
     .fraction-bar {
-      transition: opacity 0.2s ease;
+      display: inline-block;
     }
-    .fraction-bar:hover {
-      opacity: 0.9;
+
+    .fraction-bar-piece {
+      display: inline-block;
+      margin: 4px;
+      padding: 4px;
+      border-radius: 8px;
+      background: #f5f5f5;
     }
-    .fraction-bar-fill {
-      transition: width 0.3s ease;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .fraction-bar-piece:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .fraction-bars-container {
-      padding: 8px;
+
+    .fraction-bar-piece.selected {
+      box-shadow: 0 0 0 3px #2196f3;
     }
-    .fraction-circle {
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-    }
-    .fraction-grid {
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .fraction-grid-cell {
-      transition: background-color 0.2s ease;
-    }
-    .fraction-grid-cell.filled:hover {
+
+    .interactive-fraction-bar .fraction-segment:hover {
       filter: brightness(1.1);
+    }
+
+    .fraction-comparison {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .fraction-comparison .operator {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #666;
     }
   `;
 }
 
 /**
- * Inject fraction styles into document
+ * Inject fraction bar styles into document
  */
-export function injectFractionStyles(): void {
-  const styleId = 'fraction-ui-styles';
-  if (document.getElementById(styleId)) return;
+export function injectFractionBarStyles(): void {
+  const styleId = 'fraction-bar-styles';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = getFractionBarStyles();
+    document.head.appendChild(style);
+  }
+}
 
-  const style = document.createElement('style');
-  style.id = styleId;
-  style.textContent = getFractionStyles();
-  document.head.appendChild(style);
+/**
+ * Render a comparison of two fractions side by side
+ */
+export function renderFractionComparison(
+  a: Fraction,
+  b: Fraction,
+  config: FractionBarConfig = {}
+): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'fraction-comparison';
+
+  const aBar = renderFractionBar(a, config);
+  const bBar = renderFractionBar(b, config);
+
+  // Determine comparison symbol
+  const aValue = toDecimal(a);
+  const bValue = toDecimal(b);
+  let symbol = '=';
+  if (aValue < bValue) symbol = '<';
+  else if (aValue > bValue) symbol = '>';
+
+  const operator = document.createElement('span');
+  operator.className = 'operator';
+  operator.textContent = symbol;
+
+  wrapper.appendChild(aBar);
+  wrapper.appendChild(operator);
+  wrapper.appendChild(bBar);
+
+  return wrapper;
 }

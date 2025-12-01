@@ -1,313 +1,302 @@
-/**
- * Alignment Highlight UI
- * Visual highlighting utilities for alignments and regions
- */
+// Alignment Highlighting UI Utilities
 
-import type { Position, HighlightStyle, AlignmentResult, ContiguousRegion } from './types';
-import { DEFAULT_HIGHLIGHT_STYLES } from './types';
+import { GridPosition, AlignmentResult, Region } from './types';
 
-/**
- * Generate CSS class name for a highlight style
- */
-export function getHighlightClassName(styleName: string): string {
-  return `alignment-highlight-${styleName}`;
+/** Highlight style configuration */
+export interface HighlightStyle {
+  /** Fill color for highlighted cells */
+  fillColor?: string;
+  /** Fill opacity (0-1) */
+  fillOpacity?: number;
+  /** Stroke color for outline */
+  strokeColor?: string;
+  /** Stroke width */
+  strokeWidth?: number;
+  /** Whether to animate the highlight */
+  animate?: boolean;
+  /** Animation duration in ms */
+  animationDuration?: number;
+  /** CSS class to add */
+  className?: string;
 }
 
-/**
- * Generate CSS for highlight styles
- */
-export function generateHighlightCSS(
-  styles: Record<string, HighlightStyle> = DEFAULT_HIGHLIGHT_STYLES
-): string {
-  let css = '';
+/** Default highlight styles */
+export const HIGHLIGHT_STYLES = {
+  winning: {
+    fillColor: '#4caf50',
+    fillOpacity: 0.3,
+    strokeColor: '#2e7d32',
+    strokeWidth: 3,
+    animate: true,
+    animationDuration: 1000,
+    className: 'highlight-winning',
+  } as HighlightStyle,
+  selected: {
+    fillColor: '#2196f3',
+    fillOpacity: 0.2,
+    strokeColor: '#1976d2',
+    strokeWidth: 2,
+    animate: false,
+    className: 'highlight-selected',
+  } as HighlightStyle,
+  threat: {
+    fillColor: '#ff9800',
+    fillOpacity: 0.25,
+    strokeColor: '#f57c00',
+    strokeWidth: 2,
+    animate: true,
+    animationDuration: 500,
+    className: 'highlight-threat',
+  } as HighlightStyle,
+  path: {
+    fillColor: '#9c27b0',
+    fillOpacity: 0.2,
+    strokeColor: '#7b1fa2',
+    strokeWidth: 2,
+    animate: false,
+    className: 'highlight-path',
+  } as HighlightStyle,
+};
 
-  for (const [name, style] of Object.entries(styles)) {
-    const className = getHighlightClassName(name);
-    const opacity = style.opacity ?? 0.5;
-    const borderWidth = style.borderWidth ?? 2;
+/** Generate CSS for alignment highlights */
+export function getHighlightStyles(): string {
+  return `
+    .alignment-highlight {
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
 
-    css += `
-      .${className} {
-        background-color: ${style.color} !important;
-        opacity: ${opacity};
-        box-shadow: inset 0 0 0 ${borderWidth}px ${style.color};
+    .highlight-winning {
+      animation: pulse-win 1s ease-in-out infinite;
+    }
+
+    .highlight-threat {
+      animation: pulse-threat 0.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse-win {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
       }
-    `;
-
-    if (style.pulseAnimation) {
-      css += `
-        .${className} {
-          animation: ${className}-pulse 1s ease-in-out infinite;
-        }
-
-        @keyframes ${className}-pulse {
-          0%, 100% {
-            opacity: ${opacity};
-            box-shadow: inset 0 0 0 ${borderWidth}px ${style.color};
-          }
-          50% {
-            opacity: ${Math.min(1, opacity + 0.2)};
-            box-shadow: inset 0 0 0 ${borderWidth + 2}px ${style.color};
-          }
-        }
-      `;
+      50% {
+        opacity: 0.6;
+        transform: scale(1.02);
+      }
     }
-  }
 
-  return css;
+    @keyframes pulse-threat {
+      0%, 100% {
+        opacity: 0.25;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .highlight-line {
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .highlight-line.animated {
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: draw-line 0.5s ease-out forwards;
+    }
+
+    @keyframes draw-line {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  `;
 }
 
 /**
- * Inject highlight CSS styles into document
+ * Create SVG highlight overlay for a list of positions
+ * @param positions - Grid positions to highlight
+ * @param cellToPixel - Function to convert grid position to pixel coordinates
+ * @param cellSize - Size of each cell
+ * @param style - Highlight style configuration
  */
-export function injectHighlightStyles(
-  styles: Record<string, HighlightStyle> = DEFAULT_HIGHLIGHT_STYLES
-): void {
-  const styleId = 'alignment-highlight-styles';
-  if (document.getElementById(styleId)) return;
-
-  const styleElement = document.createElement('style');
-  styleElement.id = styleId;
-  styleElement.textContent = generateHighlightCSS(styles);
-  document.head.appendChild(styleElement);
-}
-
-/**
- * Apply highlight to cells by selector
- */
-export function highlightCells(
-  container: HTMLElement,
-  positions: Position[],
-  styleName: string,
-  cellSelector: (pos: Position) => string = (pos) => `[data-row="${pos.row}"][data-col="${pos.col}"]`
-): HTMLElement[] {
-  const className = getHighlightClassName(styleName);
-  const elements: HTMLElement[] = [];
+export function createHighlightOverlay(
+  positions: GridPosition[],
+  cellToPixel: (row: number, col: number) => { x: number; y: number },
+  cellSize: { width: number; height: number },
+  style: HighlightStyle = HIGHLIGHT_STYLES.selected
+): SVGGElement {
+  const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('class', `alignment-highlight ${style.className || ''}`);
 
   for (const pos of positions) {
-    const selector = cellSelector(pos);
-    const cell = container.querySelector(selector) as HTMLElement | null;
+    const { x, y } = cellToPixel(pos.row, pos.col);
 
-    if (cell) {
-      cell.classList.add(className);
-      elements.push(cell);
-    }
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', String(x - cellSize.width / 2));
+    rect.setAttribute('y', String(y - cellSize.height / 2));
+    rect.setAttribute('width', String(cellSize.width));
+    rect.setAttribute('height', String(cellSize.height));
+    rect.setAttribute('fill', style.fillColor || 'transparent');
+    rect.setAttribute('fill-opacity', String(style.fillOpacity || 0.2));
+    rect.setAttribute('stroke', style.strokeColor || 'transparent');
+    rect.setAttribute('stroke-width', String(style.strokeWidth || 0));
+    rect.setAttribute('rx', '4');
+    rect.setAttribute('ry', '4');
+
+    group.appendChild(rect);
   }
 
-  return elements;
+  return group;
 }
 
 /**
- * Remove highlight from cells
+ * Create SVG line connecting alignment positions
  */
-export function removeHighlight(
-  container: HTMLElement,
-  positions: Position[],
-  styleName: string,
-  cellSelector: (pos: Position) => string = (pos) => `[data-row="${pos.row}"][data-col="${pos.col}"]`
-): void {
-  const className = getHighlightClassName(styleName);
-
-  for (const pos of positions) {
-    const selector = cellSelector(pos);
-    const cell = container.querySelector(selector);
-
-    if (cell) {
-      cell.classList.remove(className);
-    }
-  }
-}
-
-/**
- * Remove all highlights of a specific style
- */
-export function removeAllHighlights(container: HTMLElement, styleName: string): void {
-  const className = getHighlightClassName(styleName);
-  const elements = container.querySelectorAll(`.${className}`);
-
-  elements.forEach((el) => el.classList.remove(className));
-}
-
-/**
- * Remove all alignment highlights
- */
-export function clearAllHighlights(
-  container: HTMLElement,
-  styles: Record<string, HighlightStyle> = DEFAULT_HIGHLIGHT_STYLES
-): void {
-  for (const name of Object.keys(styles)) {
-    removeAllHighlights(container, name);
-  }
-}
-
-/**
- * Highlight an alignment result
- */
-export function highlightAlignment(
-  container: HTMLElement,
+export function createAlignmentLine(
   alignment: AlignmentResult,
-  styleName: string = 'winning',
-  cellSelector?: (pos: Position) => string
-): HTMLElement[] {
-  return highlightCells(container, alignment.positions, styleName, cellSelector);
+  cellToPixel: (row: number, col: number) => { x: number; y: number },
+  style: HighlightStyle = HIGHLIGHT_STYLES.winning
+): SVGLineElement {
+  const startPixel = cellToPixel(alignment.start.row, alignment.start.col);
+  const endPixel = cellToPixel(alignment.end.row, alignment.end.col);
+
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', String(startPixel.x));
+  line.setAttribute('y1', String(startPixel.y));
+  line.setAttribute('x2', String(endPixel.x));
+  line.setAttribute('y2', String(endPixel.y));
+  line.setAttribute('stroke', style.strokeColor || '#4caf50');
+  line.setAttribute('stroke-width', String((style.strokeWidth || 2) * 2));
+  line.setAttribute('stroke-linecap', 'round');
+  line.setAttribute('class', `highlight-line ${style.animate ? 'animated' : ''}`);
+
+  return line;
 }
 
 /**
- * Highlight a contiguous region
+ * Create a complete highlight group for an alignment result
  */
-export function highlightRegion(
-  container: HTMLElement,
-  region: ContiguousRegion,
-  styleName: string = 'selected',
-  cellSelector?: (pos: Position) => string
-): HTMLElement[] {
-  return highlightCells(container, region.positions, styleName, cellSelector);
+export function createAlignmentHighlight(
+  alignment: AlignmentResult,
+  cellToPixel: (row: number, col: number) => { x: number; y: number },
+  cellSize: { width: number; height: number },
+  style: HighlightStyle = HIGHLIGHT_STYLES.winning
+): SVGGElement {
+  const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('class', `alignment-highlight ${style.className || ''}`);
+
+  // Add cell highlights
+  const cellHighlights = createHighlightOverlay(
+    alignment.positions,
+    cellToPixel,
+    cellSize,
+    style
+  );
+  group.appendChild(cellHighlights);
+
+  // Add connecting line
+  const line = createAlignmentLine(alignment, cellToPixel, style);
+  group.appendChild(line);
+
+  return group;
 }
 
 /**
- * Create a temporary highlight that auto-removes
+ * Create highlight for a region (contiguous cells)
  */
-export function flashHighlight(
-  container: HTMLElement,
-  positions: Position[],
-  styleName: string,
-  duration: number = 1000,
-  cellSelector?: (pos: Position) => string
-): Promise<void> {
-  const elements = highlightCells(container, positions, styleName, cellSelector);
+export function createRegionHighlight(
+  region: Region,
+  cellToPixel: (row: number, col: number) => { x: number; y: number },
+  cellSize: { width: number; height: number },
+  style: HighlightStyle = HIGHLIGHT_STYLES.path
+): SVGGElement {
+  return createHighlightOverlay(region.positions, cellToPixel, cellSize, style);
+}
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const className = getHighlightClassName(styleName);
-      elements.forEach((el) => el.classList.remove(className));
-      resolve();
-    }, duration);
+/**
+ * Create path highlight connecting positions in order
+ */
+export function createPathHighlight(
+  path: GridPosition[],
+  cellToPixel: (row: number, col: number) => { x: number; y: number },
+  style: HighlightStyle = HIGHLIGHT_STYLES.path
+): SVGPathElement {
+  if (path.length < 2) {
+    const emptyPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    emptyPath.setAttribute('d', '');
+    return emptyPath;
+  }
+
+  const points = path.map(pos => cellToPixel(pos.row, pos.col));
+  const pathData = points.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
+  ).join(' ');
+
+  const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  pathElement.setAttribute('d', pathData);
+  pathElement.setAttribute('stroke', style.strokeColor || '#9c27b0');
+  pathElement.setAttribute('stroke-width', String(style.strokeWidth || 2));
+  pathElement.setAttribute('fill', 'none');
+  pathElement.setAttribute('stroke-linecap', 'round');
+  pathElement.setAttribute('stroke-linejoin', 'round');
+  pathElement.setAttribute('class', `highlight-line ${style.animate ? 'animated' : ''} ${style.className || ''}`);
+
+  return pathElement;
+}
+
+/**
+ * Add data attributes to cell elements for CSS-based highlighting
+ */
+export function markCellsForHighlight(
+  container: HTMLElement,
+  positions: GridPosition[],
+  highlightClass: string,
+  cellSelector: (row: number, col: number) => string = (r, c) => `[data-row="${r}"][data-col="${c}"]`
+): void {
+  // Remove existing highlights
+  container.querySelectorAll(`.${highlightClass}`).forEach(el => {
+    el.classList.remove(highlightClass);
+  });
+
+  // Add highlights to specified positions
+  for (const pos of positions) {
+    const selector = cellSelector(pos.row, pos.col);
+    const cell = container.querySelector(selector);
+    if (cell) {
+      cell.classList.add(highlightClass);
+    }
+  }
+}
+
+/**
+ * Clear all highlights from a container
+ */
+export function clearHighlights(
+  container: HTMLElement,
+  highlightClasses: string[] = ['highlight-winning', 'highlight-selected', 'highlight-threat', 'highlight-path']
+): void {
+  for (const className of highlightClasses) {
+    container.querySelectorAll(`.${className}`).forEach(el => {
+      el.classList.remove(className);
+    });
+  }
+
+  // Also remove SVG highlight groups
+  container.querySelectorAll('.alignment-highlight').forEach(el => {
+    el.remove();
   });
 }
 
 /**
- * Animate highlighting positions one by one
+ * Inject highlight styles into the document
  */
-export async function animateHighlight(
-  container: HTMLElement,
-  positions: Position[],
-  styleName: string,
-  delayPerCell: number = 100,
-  cellSelector?: (pos: Position) => string
-): Promise<HTMLElement[]> {
-  const elements: HTMLElement[] = [];
-  const className = getHighlightClassName(styleName);
-
-  for (const pos of positions) {
-    const selector = cellSelector
-      ? cellSelector(pos)
-      : `[data-row="${pos.row}"][data-col="${pos.col}"]`;
-    const cell = container.querySelector(selector) as HTMLElement | null;
-
-    if (cell) {
-      cell.classList.add(className);
-      elements.push(cell);
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, delayPerCell));
+export function injectHighlightStyles(): void {
+  const styleId = 'alignment-highlight-styles';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = getHighlightStyles();
+    document.head.appendChild(style);
   }
-
-  return elements;
-}
-
-/**
- * Create an SVG overlay for highlighting (for non-cell-based grids)
- */
-export function createHighlightOverlay(
-  positions: Position[],
-  cellSize: number,
-  style: HighlightStyle,
-  offset: { x: number; y: number } = { x: 0, y: 0 }
-): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.classList.add('alignment-highlight-overlay');
-  svg.style.position = 'absolute';
-  svg.style.top = '0';
-  svg.style.left = '0';
-  svg.style.pointerEvents = 'none';
-
-  // Calculate bounds
-  if (positions.length === 0) return svg;
-
-  const minRow = Math.min(...positions.map((p) => p.row));
-  const maxRow = Math.max(...positions.map((p) => p.row));
-  const minCol = Math.min(...positions.map((p) => p.col));
-  const maxCol = Math.max(...positions.map((p) => p.col));
-
-  const width = (maxCol - minCol + 1) * cellSize;
-  const height = (maxRow - minRow + 1) * cellSize;
-
-  svg.setAttribute('width', String(width + offset.x));
-  svg.setAttribute('height', String(height + offset.y));
-
-  // Create highlight rectangles
-  for (const pos of positions) {
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', String((pos.col - minCol) * cellSize + offset.x));
-    rect.setAttribute('y', String((pos.row - minRow) * cellSize + offset.y));
-    rect.setAttribute('width', String(cellSize));
-    rect.setAttribute('height', String(cellSize));
-    rect.setAttribute('fill', style.color);
-    rect.setAttribute('fill-opacity', String(style.opacity ?? 0.5));
-    rect.setAttribute('stroke', style.color);
-    rect.setAttribute('stroke-width', String(style.borderWidth ?? 2));
-
-    if (style.pulseAnimation) {
-      const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-      animate.setAttribute('attributeName', 'fill-opacity');
-      animate.setAttribute('values', `${style.opacity ?? 0.5};${(style.opacity ?? 0.5) + 0.2};${style.opacity ?? 0.5}`);
-      animate.setAttribute('dur', '1s');
-      animate.setAttribute('repeatCount', 'indefinite');
-      rect.appendChild(animate);
-    }
-
-    svg.appendChild(rect);
-  }
-
-  return svg;
-}
-
-/**
- * Draw a line connecting alignment positions (for visual feedback)
- */
-export function createAlignmentLine(
-  positions: Position[],
-  cellSize: number,
-  color: string = '#4caf50',
-  strokeWidth: number = 4,
-  offset: { x: number; y: number } = { x: 0, y: 0 }
-): SVGElement {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.classList.add('alignment-line-overlay');
-  svg.style.position = 'absolute';
-  svg.style.top = '0';
-  svg.style.left = '0';
-  svg.style.pointerEvents = 'none';
-  svg.style.overflow = 'visible';
-
-  if (positions.length < 2) return svg;
-
-  // Create path through cell centers
-  const halfCell = cellSize / 2;
-  let pathD = `M ${positions[0].col * cellSize + halfCell + offset.x} ${positions[0].row * cellSize + halfCell + offset.y}`;
-
-  for (let i = 1; i < positions.length; i++) {
-    pathD += ` L ${positions[i].col * cellSize + halfCell + offset.x} ${positions[i].row * cellSize + halfCell + offset.y}`;
-  }
-
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', pathD);
-  path.setAttribute('stroke', color);
-  path.setAttribute('stroke-width', String(strokeWidth));
-  path.setAttribute('stroke-linecap', 'round');
-  path.setAttribute('fill', 'none');
-
-  svg.appendChild(path);
-
-  return svg;
 }

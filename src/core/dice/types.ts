@@ -1,137 +1,103 @@
-/**
- * Dice System Types
- * Core type definitions for the reusable dice system
- */
+// Dice System Types
 
-// Standard dice types used across Math Pentathlon games
+/** Standard dice types by number of faces */
 export type DiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
 
-// Number of faces for each dice type
-export const DICE_FACES: Record<DiceType, number> = {
-  d4: 4,
-  d6: 6,
-  d8: 8,
-  d10: 10,
-  d12: 12,
-  d20: 20,
+/** Dice face configuration */
+export interface DiceConfig {
+  type: DiceType;
+  faces: number;
+  /** Custom face values (default: 1 to faces) */
+  values?: number[];
+  /** Display color */
+  color?: string;
+}
+
+/** Standard dice configurations */
+export const DICE_CONFIGS: Record<DiceType, DiceConfig> = {
+  d4: { type: 'd4', faces: 4, color: '#e91e63' },
+  d6: { type: 'd6', faces: 6, color: '#2196f3' },
+  d8: { type: 'd8', faces: 8, color: '#4caf50' },
+  d10: { type: 'd10', faces: 10, color: '#ff9800' },
+  d12: { type: 'd12', faces: 12, color: '#9c27b0' },
+  d20: { type: 'd20', faces: 20, color: '#f44336' },
 };
 
-// Result of a single die roll
+/** Result of a single die roll */
 export interface DieRoll {
-  id: string; // Unique identifier for this roll
-  diceType: DiceType;
-  value: number;
-  timestamp: number;
-  isSelected?: boolean; // For dice selector UI
-  isLocked?: boolean; // For games that allow re-rolling
-}
-
-// Result of rolling multiple dice at once
-export interface DiceRollResult {
   id: string;
-  rolls: DieRoll[];
-  timestamp: number;
-  total: number; // Sum of all rolls
-}
-
-// Configuration for a dice roll action
-export interface DiceRollConfig {
-  dice: DiceType[]; // Which dice to roll
-  minSelectable?: number; // Minimum dice that must be selected
-  maxSelectable?: number; // Maximum dice that can be selected
-  allowReroll?: boolean; // Whether locked dice can be re-rolled
-  maxRerolls?: number; // Maximum number of re-rolls allowed
-}
-
-// State of the dice selector component
-export interface DiceSelectorState {
-  currentRoll: DiceRollResult | null;
-  selectedDice: string[]; // IDs of selected dice
-  lockedDice: string[]; // IDs of locked dice
-  rerollsRemaining: number;
-  isRolling: boolean;
-}
-
-// History entry for tracking rolls over time
-export interface DiceHistoryEntry {
-  rollResult: DiceRollResult;
-  selectedValues: number[];
-  action?: string; // Description of what the roll was used for
-}
-
-// Animation configuration for dice rolling
-export interface DiceAnimationConfig {
-  duration: number; // Total animation duration in ms
-  bounceCount: number; // Number of intermediate values to show
-  easing: 'linear' | 'easeOut' | 'bounce';
-}
-
-// Default animation settings
-export const DEFAULT_ANIMATION_CONFIG: DiceAnimationConfig = {
-  duration: 600,
-  bounceCount: 8,
-  easing: 'easeOut',
-};
-
-// Visual state of a die during animation
-export interface DieVisualState {
+  type: DiceType;
   value: number;
-  rotation: number; // Degrees of rotation
-  scale: number; // For bounce effect
-  opacity: number;
+  /** Whether this die is selected (for combination UI) */
+  selected?: boolean;
+  /** Whether this die has been used */
+  used?: boolean;
 }
 
-// Colors for dice faces (used in SVG rendering)
-export interface DiceColorScheme {
-  face: string;
-  border: string;
-  pip: string;
-  highlight: string;
-  shadow: string;
+/** Result of rolling multiple dice */
+export interface RollResult {
+  id: string;
+  timestamp: number;
+  dice: DieRoll[];
+  /** Sum of all dice */
+  total: number;
 }
 
-// Default color schemes for different dice types
-export const DEFAULT_DICE_COLORS: Record<DiceType, DiceColorScheme> = {
-  d4: {
-    face: '#e8f5e9',
-    border: '#2e7d32',
-    pip: '#1b5e20',
-    highlight: '#c8e6c9',
-    shadow: '#1b5e20',
+/** Dice set configuration for a game */
+export interface DiceSet {
+  /** Unique identifier */
+  id: string;
+  /** Display name */
+  name: string;
+  /** Dice in this set */
+  dice: DiceConfig[];
+}
+
+/** Common dice sets used in Math Pentathlon */
+export const COMMON_DICE_SETS: Record<string, DiceSet> = {
+  standard: {
+    id: 'standard',
+    name: 'Standard (2d6)',
+    dice: [
+      { type: 'd6', faces: 6, color: '#2196f3' },
+      { type: 'd6', faces: 6, color: '#f44336' },
+    ],
   },
-  d6: {
-    face: '#ffffff',
-    border: '#424242',
-    pip: '#212121',
-    highlight: '#f5f5f5',
-    shadow: '#9e9e9e',
+  triple: {
+    id: 'triple',
+    name: 'Triple (3d6)',
+    dice: [
+      { type: 'd6', faces: 6, color: '#2196f3' },
+      { type: 'd6', faces: 6, color: '#f44336' },
+      { type: 'd6', faces: 6, color: '#4caf50' },
+    ],
   },
-  d8: {
-    face: '#e3f2fd',
-    border: '#1565c0',
-    pip: '#0d47a1',
-    highlight: '#bbdefb',
-    shadow: '#0d47a1',
+  polyhedral: {
+    id: 'polyhedral',
+    name: 'Polyhedral Set',
+    dice: [
+      { type: 'd4', faces: 4, color: '#e91e63' },
+      { type: 'd6', faces: 6, color: '#2196f3' },
+      { type: 'd8', faces: 8, color: '#4caf50' },
+      { type: 'd10', faces: 10, color: '#ff9800' },
+      { type: 'd12', faces: 12, color: '#9c27b0' },
+      { type: 'd20', faces: 20, color: '#f44336' },
+    ],
   },
-  d10: {
-    face: '#fff3e0',
-    border: '#ef6c00',
-    pip: '#e65100',
-    highlight: '#ffe0b2',
-    shadow: '#e65100',
-  },
-  d12: {
-    face: '#fce4ec',
-    border: '#c2185b',
-    pip: '#880e4f',
-    highlight: '#f8bbd9',
-    shadow: '#880e4f',
-  },
-  d20: {
-    face: '#f3e5f5',
-    border: '#7b1fa2',
-    pip: '#4a148c',
-    highlight: '#e1bee7',
-    shadow: '#4a148c',
+  primeGold: {
+    id: 'primeGold',
+    name: 'Prime Gold (3 polyhedral)',
+    dice: [
+      { type: 'd6', faces: 6, color: '#2196f3' },
+      { type: 'd8', faces: 8, color: '#4caf50' },
+      { type: 'd10', faces: 10, color: '#ff9800' },
+    ],
   },
 };
+
+/** Animation state for dice rolling */
+export type DiceAnimationState = 'idle' | 'rolling' | 'settled';
+
+/** Callback types */
+export type RollCallback = (result: RollResult) => void;
+export type DieSelectCallback = (dieId: string, selected: boolean) => void;

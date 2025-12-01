@@ -1,97 +1,64 @@
-/**
- * Polyomino UI
- * Visual rendering of polyominoes and placement grids
- */
+// Polyomino UI - Visual Rendering and Interaction
+// Renders polyomino shapes, boards, and handles drag-and-drop
 
-import type { Cell, Polyomino, PolyominoStyle, PolyominoPlacement } from './types';
-import { DEFAULT_POLYOMINO_STYLE, POLYOMINO_COLORS } from './types';
-import { getBounds, transformCells, normalizeCells } from './transformations';
-import type { PolyominoGrid } from './placement';
+import { Cell, PolyominoShape, Rotation, PolyominoRenderConfig } from './types';
+import { Board, validatePlacement } from './placement';
+import { getTransformedCells, getBoundingBox, getCellsAtPosition } from './transform';
 
-/**
- * Render a polyomino as an HTML element
- */
-export function renderPolyomino(
-  polyomino: Polyomino,
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE
-): HTMLElement {
-  const cells = normalizeCells(polyomino.cells);
-  const bounds = getBounds(cells);
-
-  const container = document.createElement('div');
-  container.classList.add('polyomino');
-  container.dataset.polyominoId = polyomino.id;
-  container.style.display = 'grid';
-  container.style.gridTemplateColumns = `repeat(${bounds.width}, ${style.cellSize}px)`;
-  container.style.gridTemplateRows = `repeat(${bounds.height}, ${style.cellSize}px)`;
-  container.style.gap = `${style.gap}px`;
-  container.style.width = 'fit-content';
-
-  // Create cell lookup
-  const cellSet = new Set(cells.map((c) => `${c.row},${c.col}`));
-
-  // Fill grid
-  for (let row = 0; row < bounds.height; row++) {
-    for (let col = 0; col < bounds.width; col++) {
-      const cellEl = document.createElement('div');
-      cellEl.classList.add('polyomino-cell');
-      cellEl.style.width = `${style.cellSize}px`;
-      cellEl.style.height = `${style.cellSize}px`;
-
-      if (cellSet.has(`${row},${col}`)) {
-        cellEl.classList.add('filled');
-        cellEl.style.backgroundColor = polyomino.color || POLYOMINO_COLORS[polyomino.id] || '#888';
-        cellEl.style.border = `${style.borderWidth}px solid ${style.borderColor}`;
-        cellEl.style.borderRadius = `${style.borderRadius}px`;
-        cellEl.style.boxSizing = 'border-box';
-      } else {
-        cellEl.classList.add('empty');
-        cellEl.style.backgroundColor = 'transparent';
-      }
-
-      container.appendChild(cellEl);
-    }
-  }
-
-  return container;
-}
+/** Default render configuration */
+const DEFAULT_CONFIG: Required<PolyominoRenderConfig> = {
+  cellSize: 30,
+  padding: 2,
+  showGrid: true,
+  highlightColor: '#4caf50',
+  invalidColor: '#f44336',
+};
 
 /**
- * Render a polyomino as SVG
+ * Create SVG element with namespace
  */
-export function renderPolyominoSVG(
-  polyomino: Polyomino,
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE
-): SVGSVGElement {
-  const cells = normalizeCells(polyomino.cells);
-  const bounds = getBounds(cells);
-
-  const width = bounds.width * style.cellSize + (bounds.width - 1) * style.gap;
-  const height = bounds.height * style.cellSize + (bounds.height - 1) * style.gap;
-
+function createSVG(width: number, height: number): SVGSVGElement {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('width', String(width));
   svg.setAttribute('height', String(height));
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-  svg.classList.add('polyomino-svg');
-  svg.dataset.polyominoId = polyomino.id;
+  return svg;
+}
 
-  const color = polyomino.color || POLYOMINO_COLORS[polyomino.id] || '#888';
+/**
+ * Render a single polyomino shape as an SVG
+ */
+export function renderPolyomino(
+  shape: PolyominoShape,
+  rotation: Rotation = 0,
+  flipped: boolean = false,
+  config: Partial<PolyominoRenderConfig> = {}
+): SVGSVGElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
+  const cells = getTransformedCells(shape, rotation, flipped);
+  const bbox = getBoundingBox(cells);
 
+  const width = bbox.width * cfg.cellSize + cfg.padding * 2;
+  const height = bbox.height * cfg.cellSize + cfg.padding * 2;
+
+  const svg = createSVG(width, height);
+  svg.classList.add('polyomino');
+  svg.dataset.shapeId = shape.id;
+
+  // Render each cell
   for (const cell of cells) {
-    const x = cell.col * (style.cellSize + style.gap);
-    const y = cell.row * (style.cellSize + style.gap);
+    const x = (cell.col - bbox.minCol) * cfg.cellSize + cfg.padding;
+    const y = (cell.row - bbox.minRow) * cfg.cellSize + cfg.padding;
 
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', String(x));
-    rect.setAttribute('y', String(y));
-    rect.setAttribute('width', String(style.cellSize));
-    rect.setAttribute('height', String(style.cellSize));
-    rect.setAttribute('fill', color);
-    rect.setAttribute('stroke', style.borderColor);
-    rect.setAttribute('stroke-width', String(style.borderWidth));
-    rect.setAttribute('rx', String(style.borderRadius));
-    rect.setAttribute('ry', String(style.borderRadius));
+    rect.setAttribute('x', String(x + 1));
+    rect.setAttribute('y', String(y + 1));
+    rect.setAttribute('width', String(cfg.cellSize - 2));
+    rect.setAttribute('height', String(cfg.cellSize - 2));
+    rect.setAttribute('fill', shape.color);
+    rect.setAttribute('stroke', darkenColor(shape.color, 0.3));
+    rect.setAttribute('stroke-width', '2');
+    rect.setAttribute('rx', '3');
 
     svg.appendChild(rect);
   }
@@ -100,163 +67,181 @@ export function renderPolyominoSVG(
 }
 
 /**
- * Render a grid with placed polyominoes
+ * Render a board as an SVG
  */
-export function renderGrid(
-  grid: PolyominoGrid,
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE,
-  polyominoColors?: Record<string, string>
-): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('polyomino-grid');
-  container.style.display = 'grid';
-  container.style.gridTemplateColumns = `repeat(${grid.cols}, ${style.cellSize}px)`;
-  container.style.gridTemplateRows = `repeat(${grid.rows}, ${style.cellSize}px)`;
-  container.style.gap = `${style.gap}px`;
-  container.style.padding = '4px';
-  container.style.backgroundColor = '#e0e0e0';
-  container.style.borderRadius = `${style.borderRadius}px`;
-  container.style.width = 'fit-content';
+export function renderBoard(
+  board: Board,
+  shapes: PolyominoShape[],
+  config: Partial<PolyominoRenderConfig> = {}
+): SVGSVGElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
 
-  for (let row = 0; row < grid.rows; row++) {
-    for (let col = 0; col < grid.cols; col++) {
-      const cell = grid.cells[row][col];
-      const cellEl = document.createElement('div');
-      cellEl.classList.add('grid-cell');
-      cellEl.dataset.row = String(row);
-      cellEl.dataset.col = String(col);
-      cellEl.style.width = `${style.cellSize}px`;
-      cellEl.style.height = `${style.cellSize}px`;
-      cellEl.style.boxSizing = 'border-box';
-      cellEl.style.borderRadius = `${style.borderRadius}px`;
+  const width = board.cols * cfg.cellSize + cfg.padding * 2;
+  const height = board.rows * cfg.cellSize + cfg.padding * 2;
 
-      if (cell.occupied && cell.polyominoId) {
-        const color =
-          polyominoColors?.[cell.polyominoId] ||
-          POLYOMINO_COLORS[cell.polyominoId] ||
-          '#888';
-        cellEl.classList.add('occupied');
-        cellEl.style.backgroundColor = color;
-        cellEl.style.border = `${style.borderWidth}px solid ${style.borderColor}`;
-      } else {
-        cellEl.classList.add('empty');
-        cellEl.style.backgroundColor = '#fff';
-        cellEl.style.border = '1px solid #ccc';
-      }
+  const svg = createSVG(width, height);
+  svg.classList.add('polyomino-board');
 
-      container.appendChild(cellEl);
+  // Background
+  const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  bg.setAttribute('x', '0');
+  bg.setAttribute('y', '0');
+  bg.setAttribute('width', String(width));
+  bg.setAttribute('height', String(height));
+  bg.setAttribute('fill', '#f5f5f5');
+  svg.appendChild(bg);
+
+  // Grid cells
+  for (let r = 0; r < board.rows; r++) {
+    for (let c = 0; c < board.cols; c++) {
+      const x = c * cfg.cellSize + cfg.padding;
+      const y = r * cfg.cellSize + cfg.padding;
+
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('x', String(x));
+      rect.setAttribute('y', String(y));
+      rect.setAttribute('width', String(cfg.cellSize));
+      rect.setAttribute('height', String(cfg.cellSize));
+      rect.setAttribute('fill', board.cells[r][c] ? '#e0e0e0' : '#fff');
+      rect.setAttribute('stroke', '#ccc');
+      rect.setAttribute('stroke-width', '1');
+      rect.dataset.row = String(r);
+      rect.dataset.col = String(c);
+
+      svg.appendChild(rect);
     }
   }
 
-  return container;
+  // Render placed polyominoes
+  for (const placement of board.placements) {
+    const shape = shapes.find(s => s.id === placement.shapeId);
+    if (!shape) continue;
+
+    const cells = getCellsAtPosition(shape, placement.position, placement.rotation, placement.flipped);
+
+    for (const cell of cells) {
+      if (cell.row >= 0 && cell.row < board.rows && cell.col >= 0 && cell.col < board.cols) {
+        const x = cell.col * cfg.cellSize + cfg.padding;
+        const y = cell.row * cfg.cellSize + cfg.padding;
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', String(x + 1));
+        rect.setAttribute('y', String(y + 1));
+        rect.setAttribute('width', String(cfg.cellSize - 2));
+        rect.setAttribute('height', String(cfg.cellSize - 2));
+        rect.setAttribute('fill', shape.color);
+        rect.setAttribute('stroke', darkenColor(shape.color, 0.3));
+        rect.setAttribute('stroke-width', '2');
+        rect.setAttribute('rx', '3');
+
+        svg.appendChild(rect);
+      }
+    }
+  }
+
+  return svg;
 }
 
 /**
- * Render placement preview (ghost) on a grid
+ * Render a placement preview (ghost) on the board
  */
 export function renderPlacementPreview(
-  placement: PolyominoPlacement,
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE,
-  valid: boolean = true
-): HTMLElement {
-  const transformedCells = transformCells(
-    placement.polyomino.cells,
-    placement.rotation,
-    placement.flipped
-  );
-  const bounds = getBounds(transformedCells);
+  board: Board,
+  shape: PolyominoShape,
+  position: Cell,
+  rotation: Rotation = 0,
+  flipped: boolean = false,
+  config: Partial<PolyominoRenderConfig> = {}
+): SVGGElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
+  const cells = getCellsAtPosition(shape, position, rotation, flipped);
+  const validation = validatePlacement(board, shape, position, rotation, flipped);
 
-  const container = document.createElement('div');
-  container.classList.add('placement-preview');
-  container.classList.add(valid ? 'valid' : 'invalid');
-  container.style.position = 'absolute';
-  container.style.display = 'grid';
-  container.style.gridTemplateColumns = `repeat(${bounds.width}, ${style.cellSize}px)`;
-  container.style.gridTemplateRows = `repeat(${bounds.height}, ${style.cellSize}px)`;
-  container.style.gap = `${style.gap}px`;
-  container.style.pointerEvents = 'none';
-  container.style.opacity = '0.6';
+  const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.classList.add('placement-preview');
 
-  // Position on grid
-  const left = placement.position.col * (style.cellSize + style.gap);
-  const top = placement.position.row * (style.cellSize + style.gap);
-  container.style.left = `${left}px`;
-  container.style.top = `${top}px`;
+  const color = validation.valid ? cfg.highlightColor : cfg.invalidColor;
 
-  const cellSet = new Set(transformedCells.map((c) => `${c.row},${c.col}`));
-  const color = valid ? (placement.polyomino.color || '#4caf50') : '#f44336';
+  for (const cell of cells) {
+    const x = cell.col * cfg.cellSize + cfg.padding;
+    const y = cell.row * cfg.cellSize + cfg.padding;
 
-  for (let row = 0; row < bounds.height; row++) {
-    for (let col = 0; col < bounds.width; col++) {
-      const cellEl = document.createElement('div');
-      cellEl.classList.add('preview-cell');
-      cellEl.style.width = `${style.cellSize}px`;
-      cellEl.style.height = `${style.cellSize}px`;
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', String(x + 2));
+    rect.setAttribute('y', String(y + 2));
+    rect.setAttribute('width', String(cfg.cellSize - 4));
+    rect.setAttribute('height', String(cfg.cellSize - 4));
+    rect.setAttribute('fill', color);
+    rect.setAttribute('fill-opacity', '0.4');
+    rect.setAttribute('stroke', color);
+    rect.setAttribute('stroke-width', '2');
+    rect.setAttribute('stroke-dasharray', '4,4');
+    rect.setAttribute('rx', '3');
 
-      if (cellSet.has(`${row},${col}`)) {
-        cellEl.classList.add('filled');
-        cellEl.style.backgroundColor = color;
-        cellEl.style.border = `2px dashed ${style.borderColor}`;
-        cellEl.style.borderRadius = `${style.borderRadius}px`;
-        cellEl.style.boxSizing = 'border-box';
-      } else {
-        cellEl.style.backgroundColor = 'transparent';
-      }
-
-      container.appendChild(cellEl);
-    }
+    group.appendChild(rect);
   }
 
-  return container;
+  return group;
 }
 
 /**
- * Render a polyomino picker/palette
+ * Create a shape selector panel
  */
-export function renderPolyominoPalette(
-  polyominoes: Polyomino[],
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE,
-  onSelect?: (polyomino: Polyomino) => void
+export function createShapeSelector(
+  shapes: PolyominoShape[],
+  onSelect: (shape: PolyominoShape) => void,
+  config: Partial<PolyominoRenderConfig> = {}
 ): HTMLElement {
-  const container = document.createElement('div');
-  container.classList.add('polyomino-palette');
-  container.style.display = 'flex';
-  container.style.flexWrap = 'wrap';
-  container.style.gap = '12px';
-  container.style.padding = '8px';
+  const cfg = { ...DEFAULT_CONFIG, ...config };
 
-  for (const polyomino of polyominoes) {
+  const container = document.createElement('div');
+  container.className = 'shape-selector';
+  container.style.cssText = `
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 8px;
+  `;
+
+  for (const shape of shapes) {
     const wrapper = document.createElement('div');
-    wrapper.classList.add('palette-item');
-    wrapper.style.cursor = 'pointer';
-    wrapper.style.padding = '4px';
-    wrapper.style.borderRadius = '4px';
-    wrapper.style.border = '2px solid transparent';
-    wrapper.style.transition = 'border-color 0.2s';
+    wrapper.className = 'shape-option';
+    wrapper.style.cssText = `
+      cursor: pointer;
+      padding: 5px;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      transition: all 0.2s;
+    `;
 
     wrapper.addEventListener('mouseenter', () => {
-      wrapper.style.borderColor = '#2196f3';
+      wrapper.style.borderColor = shape.color;
+      wrapper.style.background = '#fff';
     });
 
     wrapper.addEventListener('mouseleave', () => {
       wrapper.style.borderColor = 'transparent';
+      wrapper.style.background = 'transparent';
     });
 
-    if (onSelect) {
-      wrapper.addEventListener('click', () => onSelect(polyomino));
-    }
+    wrapper.addEventListener('click', () => {
+      onSelect(shape);
+    });
 
-    const polyominoEl = renderPolyomino(polyomino, { ...style, cellSize: 20 });
-    wrapper.appendChild(polyominoEl);
+    const svg = renderPolyomino(shape, 0, false, { ...cfg, cellSize: 20 });
+    wrapper.appendChild(svg);
 
-    // Add label
+    // Label
     const label = document.createElement('div');
-    label.classList.add('polyomino-label');
-    label.textContent = polyomino.id;
-    label.style.textAlign = 'center';
-    label.style.fontSize = '12px';
-    label.style.fontWeight = 'bold';
-    label.style.marginTop = '4px';
+    label.style.cssText = `
+      font-size: 11px;
+      text-align: center;
+      color: #666;
+      margin-top: 2px;
+    `;
+    label.textContent = shape.name;
     wrapper.appendChild(label);
 
     container.appendChild(wrapper);
@@ -266,133 +251,257 @@ export function renderPolyominoPalette(
 }
 
 /**
- * Create a draggable polyomino element
+ * Create rotation controls for a shape
  */
-export function createDraggablePolyomino(
-  polyomino: Polyomino,
-  style: PolyominoStyle = DEFAULT_POLYOMINO_STYLE
+export function createRotationControls(
+  onRotate: (direction: 'cw' | 'ccw') => void,
+  onFlip: () => void,
+  canFlip: boolean = true
 ): HTMLElement {
-  const element = renderPolyomino(polyomino, style);
-  element.classList.add('draggable');
-  element.draggable = true;
-  element.style.cursor = 'grab';
+  const container = document.createElement('div');
+  container.className = 'rotation-controls';
+  container.style.cssText = `
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+  `;
 
-  element.addEventListener('dragstart', (e) => {
-    element.style.cursor = 'grabbing';
-    element.style.opacity = '0.5';
-    if (e.dataTransfer) {
-      e.dataTransfer.setData('polyomino-id', polyomino.id);
-      e.dataTransfer.effectAllowed = 'move';
-    }
-  });
+  const btnStyle = `
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+  `;
 
-  element.addEventListener('dragend', () => {
-    element.style.cursor = 'grab';
-    element.style.opacity = '1';
-  });
+  const ccwBtn = document.createElement('button');
+  ccwBtn.style.cssText = btnStyle;
+  ccwBtn.innerHTML = '↺';
+  ccwBtn.title = 'Rotate counter-clockwise';
+  ccwBtn.addEventListener('click', () => onRotate('ccw'));
+  container.appendChild(ccwBtn);
 
-  return element;
-}
+  const cwBtn = document.createElement('button');
+  cwBtn.style.cssText = btnStyle;
+  cwBtn.innerHTML = '↻';
+  cwBtn.title = 'Rotate clockwise';
+  cwBtn.addEventListener('click', () => onRotate('cw'));
+  container.appendChild(cwBtn);
 
-/**
- * Highlight cells on a grid element
- */
-export function highlightCells(
-  gridElement: HTMLElement,
-  cells: Cell[],
-  highlightClass: string = 'highlighted',
-  color?: string
-): void {
-  // Clear existing highlights
-  const highlighted = gridElement.querySelectorAll(`.${highlightClass}`);
-  highlighted.forEach((el) => {
-    el.classList.remove(highlightClass);
-    (el as HTMLElement).style.removeProperty('box-shadow');
-  });
-
-  // Add new highlights
-  for (const cell of cells) {
-    const cellEl = gridElement.querySelector(
-      `.grid-cell[data-row="${cell.row}"][data-col="${cell.col}"]`
-    );
-    if (cellEl) {
-      cellEl.classList.add(highlightClass);
-      if (color) {
-        (cellEl as HTMLElement).style.boxShadow = `inset 0 0 0 3px ${color}`;
-      }
-    }
+  if (canFlip) {
+    const flipBtn = document.createElement('button');
+    flipBtn.style.cssText = btnStyle;
+    flipBtn.innerHTML = '⇄';
+    flipBtn.title = 'Flip horizontally';
+    flipBtn.addEventListener('click', onFlip);
+    container.appendChild(flipBtn);
   }
+
+  return container;
 }
 
 /**
- * Get CSS styles for polyomino UI components
+ * Create an interactive board element with click handling
  */
-export function getPolyominoStyles(): string {
-  return `
+export function createInteractiveBoard(
+  board: Board,
+  shapes: PolyominoShape[],
+  onCellClick: (cell: Cell) => void,
+  onCellHover: (cell: Cell | null) => void,
+  config: Partial<PolyominoRenderConfig> = {}
+): HTMLElement {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
+
+  const container = document.createElement('div');
+  container.className = 'interactive-board';
+  container.style.cssText = 'position: relative; display: inline-block;';
+
+  const svg = renderBoard(board, shapes, cfg);
+  container.appendChild(svg);
+
+  // Add event listeners
+  svg.addEventListener('click', (e) => {
+    const target = e.target as SVGElement;
+    if (target.dataset.row !== undefined && target.dataset.col !== undefined) {
+      const cell = {
+        row: parseInt(target.dataset.row, 10),
+        col: parseInt(target.dataset.col, 10),
+      };
+      onCellClick(cell);
+    }
+  });
+
+  svg.addEventListener('mousemove', (e) => {
+    const rect = svg.getBoundingClientRect();
+    const x = e.clientX - rect.left - cfg.padding;
+    const y = e.clientY - rect.top - cfg.padding;
+
+    const col = Math.floor(x / cfg.cellSize);
+    const row = Math.floor(y / cfg.cellSize);
+
+    if (row >= 0 && row < board.rows && col >= 0 && col < board.cols) {
+      onCellHover({ row, col });
+    } else {
+      onCellHover(null);
+    }
+  });
+
+  svg.addEventListener('mouseleave', () => {
+    onCellHover(null);
+  });
+
+  return container;
+}
+
+/**
+ * Create a draggable shape element
+ */
+export function createDraggableShape(
+  shape: PolyominoShape,
+  rotation: Rotation = 0,
+  flipped: boolean = false,
+  config: Partial<PolyominoRenderConfig> = {}
+): HTMLElement {
+  const container = document.createElement('div');
+  container.className = 'draggable-shape';
+  container.draggable = true;
+  container.style.cssText = `
+    display: inline-block;
+    cursor: grab;
+    transition: transform 0.1s;
+  `;
+
+  container.dataset.shapeId = shape.id;
+  container.dataset.rotation = String(rotation);
+  container.dataset.flipped = String(flipped);
+
+  const svg = renderPolyomino(shape, rotation, flipped, config);
+  container.appendChild(svg);
+
+  // Drag events
+  container.addEventListener('dragstart', (e) => {
+    container.style.opacity = '0.5';
+    e.dataTransfer?.setData('application/json', JSON.stringify({
+      shapeId: shape.id,
+      rotation,
+      flipped,
+    }));
+  });
+
+  container.addEventListener('dragend', () => {
+    container.style.opacity = '1';
+  });
+
+  container.addEventListener('mouseenter', () => {
+    container.style.transform = 'scale(1.05)';
+  });
+
+  container.addEventListener('mouseleave', () => {
+    container.style.transform = 'scale(1)';
+  });
+
+  return container;
+}
+
+/**
+ * Inject required styles for polyomino components
+ */
+export function injectPolyominoStyles(): void {
+  if (document.getElementById('polyomino-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'polyomino-styles';
+  style.textContent = `
     .polyomino {
-      transition: transform 0.2s;
+      display: inline-block;
     }
-    .polyomino:hover {
-      transform: scale(1.02);
+
+    .polyomino-board rect {
+      transition: fill 0.15s;
     }
-    .polyomino-cell.filled {
-      box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+
+    .polyomino-board rect:hover {
+      fill-opacity: 0.8;
     }
-    .polyomino-grid {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    .shape-selector .shape-option:hover {
+      transform: translateY(-2px);
     }
-    .grid-cell {
-      transition: background-color 0.15s, box-shadow 0.15s;
+
+    .shape-selector .shape-option.selected {
+      border-color: #2196f3 !important;
+      background: #e3f2fd !important;
     }
-    .grid-cell:hover {
-      opacity: 0.9;
+
+    .draggable-shape:active {
+      cursor: grabbing;
     }
-    .grid-cell.highlighted {
-      box-shadow: inset 0 0 0 3px #ffd700;
-    }
+
     .placement-preview {
       pointer-events: none;
     }
-    .placement-preview.valid .preview-cell.filled {
-      animation: pulse 1s infinite;
-    }
-    .placement-preview.invalid .preview-cell.filled {
-      animation: shake 0.3s;
-    }
-    .palette-item {
-      background: #f5f5f5;
-    }
-    .palette-item:hover {
+
+    .rotation-controls button:hover {
+      border-color: #2196f3;
       background: #e3f2fd;
     }
-    .palette-item.selected {
-      border-color: #2196f3 !important;
-      background: #e3f2fd;
+
+    .rotation-controls button:active {
+      transform: scale(0.95);
     }
-    .draggable:active {
-      cursor: grabbing;
+
+    @keyframes pulse-valid {
+      0%, 100% { fill-opacity: 0.3; }
+      50% { fill-opacity: 0.6; }
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 0.8; }
+
+    @keyframes pulse-invalid {
+      0%, 100% { fill-opacity: 0.3; stroke-opacity: 0.5; }
+      50% { fill-opacity: 0.5; stroke-opacity: 1; }
     }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
+
+    .placement-preview.valid rect {
+      animation: pulse-valid 0.8s ease-in-out infinite;
+    }
+
+    .placement-preview.invalid rect {
+      animation: pulse-invalid 0.5s ease-in-out infinite;
     }
   `;
+
+  document.head.appendChild(style);
 }
 
 /**
- * Inject polyomino styles into document
+ * Darken a hex color by a percentage
  */
-export function injectPolyominoStyles(): void {
-  const styleId = 'polyomino-ui-styles';
-  if (document.getElementById(styleId)) return;
+function darkenColor(hex: string, percent: number): string {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const r = Math.max(0, (num >> 16) - Math.round(255 * percent));
+  const g = Math.max(0, ((num >> 8) & 0x00ff) - Math.round(255 * percent));
+  const b = Math.max(0, (num & 0x0000ff) - Math.round(255 * percent));
+  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+}
 
-  const style = document.createElement('style');
-  style.id = styleId;
-  style.textContent = getPolyominoStyles();
-  document.head.appendChild(style);
+/**
+ * Get cell from mouse position on board
+ */
+export function getCellFromMouseEvent(
+  e: MouseEvent,
+  boardElement: SVGSVGElement,
+  config: Partial<PolyominoRenderConfig> = {}
+): Cell | null {
+  const cfg = { ...DEFAULT_CONFIG, ...config };
+  const rect = boardElement.getBoundingClientRect();
+  const x = e.clientX - rect.left - cfg.padding;
+  const y = e.clientY - rect.top - cfg.padding;
+
+  const col = Math.floor(x / cfg.cellSize);
+  const row = Math.floor(y / cfg.cellSize);
+
+  if (row < 0 || col < 0) return null;
+
+  return { row, col };
 }

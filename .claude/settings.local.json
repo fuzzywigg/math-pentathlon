@@ -20,7 +20,14 @@
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(cat:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git fetch:*)",
+      "Bash(xcopy:*)",
+      "Bash(for game in kings-quadraphages hex star-track hex-a-gone calla fiar queens-guards contig-60 juggle fab-a-diffy sum-dominoes par-55 ramrod kwatro-sinko stars-bars prime-gold)",
+      "Bash(do echo '=== $game ===' wc -l c:/Users/fuzzy/.claude-worktrees/Math-Pentathlon/heuristic-curie/src/games/$game/*.ts)",
+      "Bash(do echo '=== $game ===' grep -h \"import.*core\\|from.*core\" c:/Users/fuzzy/.claude-worktrees/Math-Pentathlon/heuristic-curie/src/games/$game/*.ts)",
+      "Bash(find:*)",
+      "Bash(sort:*)"
     ],
     "deny": [],
     "ask": []
