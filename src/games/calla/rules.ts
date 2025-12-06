@@ -155,7 +155,7 @@ export function makeMove(
   };
 
   // Determine next player
-  let nextPlayer = gotFreeTurn ? currentPlayer : opponent;
+  const nextPlayer = gotFreeTurn ? currentPlayer : opponent;
 
   // Check for game end: if one side is empty
   const p1Empty = newP1Pits.every(c => c === 0);

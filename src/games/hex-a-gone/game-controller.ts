@@ -10,6 +10,7 @@ import {
   isGameOver,
 } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
+import { owlSystem } from '../../core/owl';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -20,6 +21,8 @@ let gameMode: GameMode = 'human-vs-human';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 const AI_THINKING_DELAY = 800;
 
@@ -35,7 +38,10 @@ export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('hex-a-gone');
 }
 
 // Start new game vs AI
@@ -43,7 +49,10 @@ export function newGameVsAI(): void {
   gameMode = 'human-vs-ai';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('hex-a-gone');
 }
 
 // Handle block selection from bank
@@ -81,7 +90,17 @@ function handleCellClick(q: number, r: number): void {
 
   const prevPlayer = gameState.currentPlayer;
   gameState = placeBlock(gameState, q, r);
+  moveCount++;
   render();
+
+  // Check for game end
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    owlSystem.onGameEnd('hex-a-gone', {
+      winner: gameState.winner,
+      moveCount,
+    });
+  }
 
   // Check if turn switched to AI
   if (
@@ -143,7 +162,17 @@ function triggerAITurn(): void {
       // Pick a random empty cell
       const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
       gameState = placeBlock(gameState, randomCell.q, randomCell.r);
+      moveCount++;
       render();
+
+      // Check for game end
+      if (gameState.winner && !hasNotifiedGameEnd) {
+        hasNotifiedGameEnd = true;
+        owlSystem.onGameEnd('hex-a-gone', {
+          winner: gameState.winner,
+          moveCount,
+        });
+      }
 
       // Continue placing if more blocks to place
       if (gameState.phase === 'placeBlocks' && gameState.currentPlayer === 'player2') {

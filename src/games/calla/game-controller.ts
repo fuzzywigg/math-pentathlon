@@ -3,6 +3,7 @@
 import { CallaGameState, createInitialState } from './types';
 import { makeMove, isGameOver, getValidPits } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
+import { owlSystem } from '../../core/owl';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -13,6 +14,8 @@ let gameMode: GameMode = 'human-vs-human';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 const AI_THINKING_DELAY = 800;
 
@@ -28,7 +31,10 @@ export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('calla');
 }
 
 // Start new game vs AI
@@ -36,7 +42,10 @@ export function newGameVsAI(): void {
   gameMode = 'human-vs-ai';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('calla');
 }
 
 // Handle pit click
@@ -46,7 +55,19 @@ function handlePitClick(pitIndex: number): void {
 
   const prevPlayer = gameState.currentPlayer;
   gameState = makeMove(gameState, pitIndex);
+  moveCount++;
   render();
+
+  // Check for game end
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    // Map 'tie' to 'draw' for OWL system compatibility
+    const owlWinner = gameState.winner === 'tie' ? 'draw' : gameState.winner;
+    owlSystem.onGameEnd('calla', {
+      winner: owlWinner,
+      moveCount,
+    });
+  }
 
   // Check if turn switched to AI
   if (
@@ -116,8 +137,20 @@ function triggerAITurn(): void {
     }
 
     gameState = makeMove(gameState, bestPit);
+    moveCount++;
     isAIThinking = false;
     render();
+
+    // Check for game end
+    if (gameState.winner && !hasNotifiedGameEnd) {
+      hasNotifiedGameEnd = true;
+      // Map 'tie' to 'draw' for OWL system compatibility
+      const owlWinner = gameState.winner === 'tie' ? 'draw' : gameState.winner;
+      owlSystem.onGameEnd('calla', {
+        winner: owlWinner,
+        moveCount,
+      });
+    }
 
     // Check if AI gets another turn (free turn from landing in Calla)
     if (

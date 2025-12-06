@@ -330,7 +330,7 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
       shape.setAttribute('height', (shapeSize * 1.2).toString());
       break;
 
-    case 'triangle':
+    case 'triangle': {
       const triSize = shapeSize;
       const triPoints = [
         `25,${25 - triSize}`,
@@ -340,8 +340,9 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
       shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       shape.setAttribute('points', triPoints);
       break;
+    }
 
-    case 'hexagon':
+    case 'hexagon': {
       const hexSize = shapeSize;
       const hexPoints: string[] = [];
       for (let i = 0; i < 6; i++) {
@@ -353,6 +354,7 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
       shape = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       shape.setAttribute('points', hexPoints.join(' '));
       break;
+    }
 
     default:
       shape = document.createElementNS('http://www.w3.org/2000/svg', 'circle');

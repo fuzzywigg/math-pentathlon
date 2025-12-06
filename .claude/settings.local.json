@@ -27,7 +27,11 @@
       "Bash(do echo '=== $game ===' wc -l c:/Users/fuzzy/.claude-worktrees/Math-Pentathlon/heuristic-curie/src/games/$game/*.ts)",
       "Bash(do echo '=== $game ===' grep -h \"import.*core\\|from.*core\" c:/Users/fuzzy/.claude-worktrees/Math-Pentathlon/heuristic-curie/src/games/$game/*.ts)",
       "Bash(find:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash(npx eslint:*)",
+      "Bash(ssh -T nft2.me echo \"Connected successfully\")",
+      "Bash(ssh:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []

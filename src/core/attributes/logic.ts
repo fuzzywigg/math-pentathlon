@@ -230,9 +230,10 @@ export function checkSetRelationship(
     case 'all_same':
       return values.every((v) => v === values[0]);
 
-    case 'all_different':
+    case 'all_different': {
       const uniqueValues = new Set(values);
       return uniqueValues.size === values.length;
+    }
 
     case 'any':
       return true;

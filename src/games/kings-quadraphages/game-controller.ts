@@ -4,6 +4,7 @@ import { tutorialManager } from '../../core/tutorial';
 import { kingsQuadraphagesTutorial } from './tutorial';
 import { getAIMove, AIDifficulty, isAITurn } from './ai';
 import { PlayerOwner } from './pieces';
+import { owlSystem } from '../../core/owl';
 
 // Game mode types
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -20,6 +21,9 @@ let isAIThinking: boolean = false;
 // AI thinking delay (ms) for better UX
 const AI_THINKING_DELAY = 500;
 const AI_MOVE_DELAY = 300;
+
+// Track if game has ended (to prevent multiple owl notifications)
+let hasNotifiedGameEnd = false;
 
 // Container references (set during initialization)
 let boardContainer: HTMLElement | null = null;
@@ -50,6 +54,17 @@ function render(): void {
     } else {
       newGameButton.classList.remove('game-over-active');
     }
+  }
+
+  // Notify Owl system when game ends
+  if (gameState.turnPhase === 'gameOver' && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    const winner = gameState.winner;
+
+    owlSystem.onGameEnd('kings-quadraphages', {
+      winner: winner === 'player1' ? 'player1' : winner === 'player2' ? 'player2' : 'draw',
+      moveCount: gameState.moveHistory.length,
+    });
   }
 }
 
@@ -179,7 +194,11 @@ function delay(ms: number): Promise<void> {
 export function newGame(): void {
   gameState = createInitialGameState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
   render();
+
+  // Notify Owl system about game start
+  owlSystem.onGameStart('kings-quadraphages');
 
   // If AI goes first (AI is player 1), trigger AI turn
   if (gameMode === 'human-vs-ai' && aiPlayer === 'player1') {

@@ -1,5 +1,7 @@
 import './style.css';
 import { addRoute, initRouter, getCurrentPath, getPathParams, navigate } from './core/router';
+import { owlSystem } from './core/owl';
+import { owlComponent } from './ui/owl';
 import { renderGameSelector } from './ui/game-selector';
 import { getGameById } from './core/game-registry';
 import {
@@ -84,6 +86,26 @@ import {
   newGameVsHuman as primeGoldNewGameVsHuman,
   newGameVsAI as primeGoldNewGameVsAI,
 } from './games/prime-gold/game-controller';
+import {
+  initGame as initPentEmInGame,
+  newGameVsHuman as pentNewGameVsHuman,
+  newGameVsAI as pentNewGameVsAI,
+} from './games/pent-em-in/game-controller';
+import {
+  initGame as initFracFactGame,
+  newGameVsHuman as fracNewGameVsHuman,
+  newGameVsAI as fracNewGameVsAI,
+} from './games/frac-fact/game-controller';
+import {
+  initGame as initRemainderGame,
+  newGameVsHuman as remainderNewGameVsHuman,
+  newGameVsAI as remainderNewGameVsAI,
+} from './games/remainder-islands/game-controller';
+import {
+  initGame as initPinballGame,
+  newGameVsHuman as pinballNewGameVsHuman,
+  newGameVsAI as pinballNewGameVsAI,
+} from './games/fraction-pinball/game-controller';
 import { renderDiceDemo } from './demos/dice-demo';
 import { renderAlignmentDemo } from './demos/alignment-demo';
 import { renderFractionDemo } from './demos/fraction-demo';
@@ -167,6 +189,14 @@ function renderGame(): void {
     renderStarsBars();
   } else if (gameId === 'prime-gold') {
     renderPrimeGold();
+  } else if (gameId === 'pent-em-in') {
+    renderPentEmIn();
+  } else if (gameId === 'frac-fact') {
+    renderFracFact();
+  } else if (gameId === 'remainder-islands') {
+    renderRemainderIslands();
+  } else if (gameId === 'fraction-pinball') {
+    renderFractionPinball();
   }
 }
 
@@ -3307,6 +3337,629 @@ function renderPrimeGold(): void {
   }
 }
 
+// Render Pent'Em In game
+function renderPentEmIn(): void {
+  appContainer!.innerHTML = `
+    <header class="game-header">
+      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
+      <h1>Pent'Em In</h1>
+    </header>
+    <div class="button-row">
+      <button id="new-game-btn">New Game</button>
+      <button id="help-btn">How to Play</button>
+    </div>
+    <div id="status"></div>
+    <div class="pent-game-container">
+      <div id="board"></div>
+    </div>
+    <div id="new-game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>New Game</h2>
+        <div class="mode-selector">
+          <h3>Choose Game Mode</h3>
+          <div class="mode-options">
+            <label class="mode-option" data-mode="human-vs-human">
+              <input type="radio" name="pent-mode" value="human-vs-human" checked>
+              <div class="mode-option-content">
+                <div class="mode-option-title">2 Player</div>
+                <div class="mode-option-desc">Pass & play with a friend</div>
+              </div>
+            </label>
+            <label class="mode-option" data-mode="human-vs-ai">
+              <input type="radio" name="pent-mode" value="human-vs-ai">
+              <div class="mode-option-content">
+                <div class="mode-option-title">Play vs AI</div>
+                <div class="mode-option-desc">Challenge the computer</div>
+              </div>
+            </label>
+          </div>
+          <button id="start-game-btn" class="start-game-btn">Start Game</button>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>How to Play Pent'Em In</h2>
+        <div class="rules-content">
+          <h3>Objective</h3>
+          <p>Trap your opponent so they can't place any more pieces!</p>
+
+          <h3>Setup</h3>
+          <ul>
+            <li>10x10 grid board</li>
+            <li>Each player has 12 pentomino pieces (5-cell shapes)</li>
+          </ul>
+
+          <h3>Turn Sequence</h3>
+          <ol>
+            <li><strong>Select:</strong> Choose a piece from your bank</li>
+            <li><strong>Rotate/Flip:</strong> Adjust orientation if needed</li>
+            <li><strong>Place:</strong> Put piece on empty board cells</li>
+          </ol>
+
+          <h3>Rules</h3>
+          <ul>
+            <li>Pieces cannot overlap</li>
+            <li>All 5 cells must fit on the board</li>
+            <li>Pieces stay where placed</li>
+          </ul>
+
+          <h3>Winning</h3>
+          <p>When your opponent cannot place any of their remaining pieces, you win!</p>
+
+          <h3>Strategy Tips</h3>
+          <ul>
+            <li>Control the center early</li>
+            <li>Leave awkward spaces for your opponent</li>
+            <li>Save flexible pieces for later</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const boardContainer = document.getElementById('board');
+  const statusContainer = document.getElementById('status');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const helpBtn = document.getElementById('help-btn');
+  const helpModal = document.getElementById('help-modal');
+  const newGameModal = document.getElementById('new-game-modal');
+  const backBtn = document.getElementById('back-btn');
+
+  if (boardContainer && statusContainer) {
+    initPentEmInGame(boardContainer, statusContainer);
+  }
+
+  // Wire up New Game button
+  if (newGameBtn && newGameModal) {
+    newGameBtn.addEventListener('click', () => {
+      newGameModal.classList.remove('hidden');
+    });
+  }
+
+  // Wire up Start Game button
+  const startGameBtn = document.getElementById('start-game-btn');
+  if (startGameBtn && newGameModal) {
+    startGameBtn.addEventListener('click', () => {
+      const selectedMode = document.querySelector('input[name="pent-mode"]:checked') as HTMLInputElement;
+      if (selectedMode?.value === 'human-vs-ai') {
+        pentNewGameVsAI();
+      } else {
+        pentNewGameVsHuman();
+      }
+      newGameModal.classList.add('hidden');
+    });
+  }
+
+  // Wire up Help button
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', () => {
+      helpModal.classList.add('show');
+    });
+  }
+
+  // Modal close handlers
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    });
+  });
+
+  // Back button
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
+  }
+
+  // Escape key to close modals
+  const escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
+
+// Render Frac Fact game
+function renderFracFact(): void {
+  appContainer!.innerHTML = `
+    <header class="game-header">
+      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
+      <h1>Frac Fact</h1>
+    </header>
+    <div class="button-row">
+      <button id="new-game-btn">New Game</button>
+      <button id="help-btn">How to Play</button>
+    </div>
+    <div id="game-container" class="frac-game-container"></div>
+    <div id="new-game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>New Game</h2>
+        <div class="mode-selector">
+          <h3>Choose Game Mode</h3>
+          <div class="mode-options">
+            <label class="mode-option" data-mode="human-vs-human">
+              <input type="radio" name="frac-mode" value="human-vs-human" checked>
+              <div class="mode-option-content">
+                <div class="mode-option-title">2 Player</div>
+                <div class="mode-option-desc">Take turns solving problems</div>
+              </div>
+            </label>
+            <label class="mode-option" data-mode="human-vs-ai">
+              <input type="radio" name="frac-mode" value="human-vs-ai">
+              <div class="mode-option-content">
+                <div class="mode-option-title">Play vs AI</div>
+                <div class="mode-option-desc">Compete against the computer</div>
+              </div>
+            </label>
+          </div>
+          <div class="difficulty-selector">
+            <h4>Difficulty</h4>
+            <div class="difficulty-options">
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="easy">
+                <span>Easy</span>
+              </label>
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="medium" checked>
+                <span>Medium</span>
+              </label>
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="hard">
+                <span>Hard</span>
+              </label>
+            </div>
+          </div>
+          <button id="start-game-btn" class="start-game-btn">Start Game</button>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>How to Play Frac Fact</h2>
+        <div class="rules-content">
+          <h3>Objective</h3>
+          <p>Score more points than your opponent by correctly solving fraction problems!</p>
+
+          <h3>Gameplay</h3>
+          <ul>
+            <li>Players take turns solving fraction arithmetic problems</li>
+            <li>Choose the correct answer from 4 options</li>
+            <li>Earn points for correct answers</li>
+            <li>Build streaks for bonus points!</li>
+          </ul>
+
+          <h3>Scoring</h3>
+          <ul>
+            <li><strong>Correct answer:</strong> 10 points</li>
+            <li><strong>Streak bonus:</strong> +5 points per consecutive correct answer</li>
+          </ul>
+
+          <h3>Difficulty Levels</h3>
+          <ul>
+            <li><strong>Easy:</strong> Addition and subtraction with simple fractions</li>
+            <li><strong>Medium:</strong> Includes multiplication</li>
+            <li><strong>Hard:</strong> All operations including division</li>
+          </ul>
+
+          <h3>Winning</h3>
+          <p>After 10 problems each, the player with the highest score wins!</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const gameContainer = document.getElementById('game-container');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const helpBtn = document.getElementById('help-btn');
+  const helpModal = document.getElementById('help-modal');
+  const newGameModal = document.getElementById('new-game-modal');
+  const backBtn = document.getElementById('back-btn');
+
+  if (gameContainer) {
+    initFracFactGame(gameContainer);
+  }
+
+  // Wire up New Game button
+  if (newGameBtn && newGameModal) {
+    newGameBtn.addEventListener('click', () => {
+      newGameModal.classList.remove('hidden');
+    });
+  }
+
+  // Wire up Start Game button
+  const startGameBtn = document.getElementById('start-game-btn');
+  if (startGameBtn && newGameModal) {
+    startGameBtn.addEventListener('click', () => {
+      const selectedMode = document.querySelector('input[name="frac-mode"]:checked') as HTMLInputElement;
+      const selectedDifficulty = document.querySelector('input[name="frac-difficulty"]:checked') as HTMLInputElement;
+      const difficulty = (selectedDifficulty?.value || 'medium') as 'easy' | 'medium' | 'hard';
+
+      if (selectedMode?.value === 'human-vs-ai') {
+        fracNewGameVsAI(difficulty);
+      } else {
+        fracNewGameVsHuman(difficulty);
+      }
+      newGameModal.classList.add('hidden');
+    });
+  }
+
+  // Wire up Help button
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', () => {
+      helpModal.classList.add('show');
+    });
+  }
+
+  // Modal close handlers
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    });
+  });
+
+  // Back button
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
+  }
+
+  // Mode option selection
+  document.querySelectorAll('.mode-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+    });
+  });
+
+  // Escape key to close modals
+  const escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
+
+// Render Remainder Islands game
+function renderRemainderIslands(): void {
+  appContainer!.innerHTML = `
+    <header class="game-header">
+      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
+      <h1>Remainder Islands</h1>
+    </header>
+    <div class="button-row">
+      <button id="new-game-btn">New Game</button>
+      <button id="help-btn">How to Play</button>
+    </div>
+    <div id="game-container" class="remainder-game-container"></div>
+    <div id="new-game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>New Game</h2>
+        <div class="mode-selector">
+          <h3>Choose Game Mode</h3>
+          <div class="mode-options">
+            <label class="mode-option" data-mode="human-vs-human">
+              <input type="radio" name="remainder-mode" value="human-vs-human" checked>
+              <div class="mode-option-content">
+                <div class="mode-option-title">2 Player</div>
+                <div class="mode-option-desc">Pass & play with a friend</div>
+              </div>
+            </label>
+            <label class="mode-option" data-mode="human-vs-ai">
+              <input type="radio" name="remainder-mode" value="human-vs-ai">
+              <div class="mode-option-content">
+                <div class="mode-option-title">Play vs AI</div>
+                <div class="mode-option-desc">Challenge the computer</div>
+              </div>
+            </label>
+          </div>
+          <button id="start-game-btn" class="start-game-btn">Start Game</button>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>How to Play Remainder Islands</h2>
+        <div class="rules-content">
+          <h3>Objective</h3>
+          <p>Score the most points by strategically placing chips on islands using division remainders!</p>
+
+          <h3>Gameplay</h3>
+          <ol>
+            <li><strong>Roll:</strong> Roll two dice to get your total</li>
+            <li><strong>Divide:</strong> Choose an island and divide your total by its value</li>
+            <li><strong>Score:</strong> Earn points equal to the remainder</li>
+          </ol>
+
+          <h3>Example</h3>
+          <p>Roll 7, choose island with value 3: 7 ÷ 3 = 2 R1 → Score 1 point</p>
+
+          <h3>Strategy Tips</h3>
+          <ul>
+            <li>Choose islands that give the highest remainder</li>
+            <li>Claim islands to block your opponent</li>
+            <li>Remember: higher divisors can give higher remainders!</li>
+          </ul>
+
+          <h3>Winning</h3>
+          <p>After all turns, the player with the most points wins!</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const gameContainer = document.getElementById('game-container');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const helpBtn = document.getElementById('help-btn');
+  const helpModal = document.getElementById('help-modal');
+  const newGameModal = document.getElementById('new-game-modal');
+  const backBtn = document.getElementById('back-btn');
+
+  if (gameContainer) {
+    initRemainderGame(gameContainer);
+  }
+
+  // Wire up New Game button
+  if (newGameBtn && newGameModal) {
+    newGameBtn.addEventListener('click', () => {
+      newGameModal.classList.remove('hidden');
+    });
+  }
+
+  // Wire up Start Game button
+  const startGameBtn = document.getElementById('start-game-btn');
+  if (startGameBtn && newGameModal) {
+    startGameBtn.addEventListener('click', () => {
+      const selectedMode = document.querySelector('input[name="remainder-mode"]:checked') as HTMLInputElement;
+
+      if (selectedMode?.value === 'human-vs-ai') {
+        remainderNewGameVsAI();
+      } else {
+        remainderNewGameVsHuman();
+      }
+      newGameModal.classList.add('hidden');
+    });
+  }
+
+  // Wire up Help button
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', () => {
+      helpModal.classList.add('show');
+    });
+  }
+
+  // Modal close handlers
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    });
+  });
+
+  // Back button
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
+  }
+
+  // Mode option selection
+  document.querySelectorAll('.mode-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+    });
+  });
+
+  // Escape key to close modals
+  const escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
+
+// Render Fraction Pinball game
+function renderFractionPinball(): void {
+  appContainer!.innerHTML = `
+    <header class="game-header">
+      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
+      <h1>Fraction Pinball</h1>
+    </header>
+    <div class="button-row">
+      <button id="new-game-btn">New Game</button>
+      <button id="help-btn">How to Play</button>
+    </div>
+    <div id="game-container" class="pinball-game-container"></div>
+    <div id="new-game-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>New Game</h2>
+        <div class="mode-selector">
+          <h3>Choose Game Mode</h3>
+          <div class="mode-options">
+            <label class="mode-option" data-mode="human-vs-human">
+              <input type="radio" name="pinball-mode" value="human-vs-human" checked>
+              <div class="mode-option-content">
+                <div class="mode-option-title">2 Player</div>
+                <div class="mode-option-desc">Take turns converting</div>
+              </div>
+            </label>
+            <label class="mode-option" data-mode="human-vs-ai">
+              <input type="radio" name="pinball-mode" value="human-vs-ai">
+              <div class="mode-option-content">
+                <div class="mode-option-title">Play vs AI</div>
+                <div class="mode-option-desc">Challenge the computer</div>
+              </div>
+            </label>
+          </div>
+          <button id="start-game-btn" class="start-game-btn">Start Game</button>
+        </div>
+      </div>
+    </div>
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close">&times;</button>
+        <h2>How to Play Fraction Pinball</h2>
+        <div class="rules-content">
+          <h3>Objective</h3>
+          <p>Score points by correctly converting between fractions and decimals!</p>
+
+          <h3>Gameplay</h3>
+          <ul>
+            <li>Each turn, convert a fraction to decimal or decimal to fraction</li>
+            <li>Correct answers hit pinball targets for points</li>
+            <li>Wrong answers lose a ball</li>
+          </ul>
+
+          <h3>Scoring</h3>
+          <p>Different targets award different points: 10, 20, 30, 50, or 100!</p>
+
+          <h3>Common Conversions</h3>
+          <ul>
+            <li>1/2 = 0.5</li>
+            <li>1/4 = 0.25, 3/4 = 0.75</li>
+            <li>1/5 = 0.2, 2/5 = 0.4</li>
+            <li>1/8 = 0.125</li>
+          </ul>
+
+          <h3>Winning</h3>
+          <p>Player with the most points after all rounds wins!</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const gameContainer = document.getElementById('game-container');
+  const newGameBtn = document.getElementById('new-game-btn');
+  const helpBtn = document.getElementById('help-btn');
+  const helpModal = document.getElementById('help-modal');
+  const newGameModal = document.getElementById('new-game-modal');
+  const backBtn = document.getElementById('back-btn');
+
+  if (gameContainer) {
+    initPinballGame(gameContainer);
+  }
+
+  // Wire up New Game button
+  if (newGameBtn && newGameModal) {
+    newGameBtn.addEventListener('click', () => {
+      newGameModal.classList.remove('hidden');
+    });
+  }
+
+  // Wire up Start Game button
+  const startGameBtn = document.getElementById('start-game-btn');
+  if (startGameBtn && newGameModal) {
+    startGameBtn.addEventListener('click', () => {
+      const selectedMode = document.querySelector('input[name="pinball-mode"]:checked') as HTMLInputElement;
+
+      if (selectedMode?.value === 'human-vs-ai') {
+        pinballNewGameVsAI();
+      } else {
+        pinballNewGameVsHuman();
+      }
+      newGameModal.classList.add('hidden');
+    });
+  }
+
+  // Wire up Help button
+  if (helpBtn && helpModal) {
+    helpBtn.addEventListener('click', () => {
+      helpModal.classList.add('show');
+    });
+  }
+
+  // Modal close handlers
+  document.querySelectorAll('.modal-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    });
+  });
+
+  // Back button
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
+  }
+
+  // Mode option selection
+  document.querySelectorAll('.mode-option').forEach(option => {
+    option.addEventListener('click', () => {
+      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
+      option.classList.add('selected');
+      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
+      if (radio) radio.checked = true;
+    });
+  });
+
+  // Escape key to close modals
+  const escapeHandler = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.classList.add('hidden');
+        modal.classList.remove('show');
+      });
+    }
+  };
+  document.addEventListener('keydown', escapeHandler);
+}
+
 // Render Stars & Bars game
 function renderStarsBars(): void {
   appContainer!.innerHTML = `
@@ -3580,3 +4233,7 @@ addRoute('/demo/expressions', renderExpressionDemoPage);
 
 // Initialize router
 initRouter();
+
+// Initialize Ollie the Owl mascot system
+owlComponent.init();
+owlSystem.initialize();

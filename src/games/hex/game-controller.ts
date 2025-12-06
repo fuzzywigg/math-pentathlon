@@ -3,6 +3,8 @@
 import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
+import { getBestMove, AIDifficulty } from './ai';
+import { owlSystem } from '../../core/owl';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -13,9 +15,14 @@ let gameMode: GameMode = 'human-vs-human';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
+let aiDifficulty: AIDifficulty = 'medium';
 
-// AI config (simple for now, can be enhanced later)
+// AI config
 const AI_THINKING_DELAY = 500;
+
+// Track game end for owl notifications
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 // Initialize the game
 export function initGame(
@@ -35,7 +42,10 @@ export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('hex');
 }
 
 // Start a new game vs AI
@@ -43,7 +53,10 @@ export function newGameVsAI(): void {
   gameMode = 'human-vs-ai';
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('hex');
 }
 
 // Handle cell click
@@ -61,7 +74,17 @@ function handleCellClick(row: number, col: number): void {
 
   // Make the move
   gameState = makeMove(gameState, pos);
+  moveCount++;
   render();
+
+  // Check for game end
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    owlSystem.onGameEnd('hex', {
+      winner: gameState.winner,
+      moveCount,
+    });
+  }
 
   // If AI mode and game not over, trigger AI move
   if (gameMode === 'human-vs-ai' && !gameState.winner && gameState.currentPlayer === 'player2') {
@@ -69,55 +92,34 @@ function handleCellClick(row: number, col: number): void {
   }
 }
 
-// Trigger AI move
+// Trigger AI move using sophisticated AI module
 function triggerAIMove(): void {
   isAIThinking = true;
   render();
 
   setTimeout(() => {
-    const aiMove = getAIMove(gameState);
+    const aiMove = getBestMove(gameState, 'player2', aiDifficulty);
     if (aiMove) {
       gameState = makeMove(gameState, aiMove);
+      moveCount++;
     }
     isAIThinking = false;
     render();
+
+    // Check for game end after AI move
+    if (gameState.winner && !hasNotifiedGameEnd) {
+      hasNotifiedGameEnd = true;
+      owlSystem.onGameEnd('hex', {
+        winner: gameState.winner,
+        moveCount,
+      });
+    }
   }, AI_THINKING_DELAY);
 }
 
-// Simple AI - picks a random valid move with some basic strategy
-function getAIMove(state: HexGameState): { row: number; col: number } | null {
-  const validMoves: { row: number; col: number }[] = [];
-
-  for (let row = 0; row < state.boardSize; row++) {
-    for (let col = 0; col < state.boardSize; col++) {
-      if (state.board[row][col] === null) {
-        validMoves.push({ row, col });
-      }
-    }
-  }
-
-  if (validMoves.length === 0) return null;
-
-  // Simple strategy: prefer center and moves that extend existing chains
-  // For now, just add some preference for center
-  const center = Math.floor(state.boardSize / 2);
-
-  // Score moves based on distance to center (lower is better)
-  const scoredMoves = validMoves.map((move) => {
-    const distToCenter = Math.abs(move.row - center) + Math.abs(move.col - center);
-    // Add randomness
-    const score = distToCenter + Math.random() * 3;
-    return { move, score };
-  });
-
-  // Sort by score and pick from top moves
-  scoredMoves.sort((a, b) => a.score - b.score);
-
-  // Pick from top 5 moves randomly
-  const topMoves = scoredMoves.slice(0, Math.min(5, scoredMoves.length));
-  const selected = topMoves[Math.floor(Math.random() * topMoves.length)];
-
-  return selected.move;
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
 
 // Render the game

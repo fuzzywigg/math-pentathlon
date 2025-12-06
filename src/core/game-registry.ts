@@ -249,7 +249,7 @@ export const GAMES: GameInfo[] = [
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🏝️',
-    available: false,
+    available: true,
   },
   {
     id: 'pent-em-in',
@@ -260,7 +260,7 @@ export const GAMES: GameInfo[] = [
     playerCount: '2 Players',
     difficulty: 'advanced',
     icon: '⊟',
-    available: false,
+    available: true,
   },
   {
     id: 'frac-fact',
@@ -271,7 +271,7 @@ export const GAMES: GameInfo[] = [
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⅔',
-    available: false,
+    available: true,
   },
   {
     id: 'fraction-pinball',
@@ -282,7 +282,7 @@ export const GAMES: GameInfo[] = [
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🎰',
-    available: false,
+    available: true,
   },
 ];
 

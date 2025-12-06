@@ -12,10 +12,11 @@ import {
   selectChip,
   moveChip,
   getValidMoves,
-  getSelectableNodes,
   isDraw,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
+import { getAIMove, applyAIMove, AIDifficulty } from './ai';
+import { owlSystem } from '../../core/owl';
 
 // =============================================================================
 // Module State
@@ -25,6 +26,9 @@ let gameState: FiarGameState;
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIMode = false;
+let aiDifficulty: AIDifficulty = 'medium';
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 // =============================================================================
 // Rendering
@@ -109,7 +113,17 @@ function handleNodeClick(nodeId: string): void {
     // Placement phase: place chip on clicked node
     if (canPlaceChip(gameState, nodeId)) {
       gameState = placeChip(gameState, nodeId);
+      moveCount++;
       render();
+
+      // Check for game end
+      if (gameState.winner && !hasNotifiedGameEnd) {
+        hasNotifiedGameEnd = true;
+        owlSystem.onGameEnd('fiar', {
+          winner: gameState.winner,
+          moveCount,
+        });
+      }
 
       // Check if AI should play
       if (isAIMode && gameState.currentPlayer === 'player2' && !gameState.winner) {
@@ -126,7 +140,17 @@ function handleNodeClick(nodeId: string): void {
       if (validMoves.includes(nodeId)) {
         // Move to valid destination
         gameState = moveChip(gameState, selectedNode, nodeId);
+        moveCount++;
         render();
+
+        // Check for game end
+        if (gameState.winner && !hasNotifiedGameEnd) {
+          hasNotifiedGameEnd = true;
+          owlSystem.onGameEnd('fiar', {
+            winner: gameState.winner,
+            moveCount,
+          });
+        }
 
         // Check if AI should play
         if (isAIMode && gameState.currentPlayer === 'player2' && !gameState.winner) {
@@ -161,42 +185,26 @@ function handleNodeClick(nodeId: string): void {
 function aiTurn(): void {
   if (gameState.winner || gameState.currentPlayer !== 'player2') return;
 
-  const { phase } = gameState;
+  const aiMove = getAIMove(gameState, 'player2', aiDifficulty);
+  if (aiMove) {
+    gameState = applyAIMove(gameState, aiMove);
+    moveCount++;
+    render();
 
-  if (phase === 'placement') {
-    // Simple AI: place on random empty node
-    const emptyNodes: string[] = [];
-    for (const [nodeId, node] of gameState.board.nodes) {
-      if (node.chip === null) {
-        emptyNodes.push(nodeId);
-      }
-    }
-
-    if (emptyNodes.length > 0) {
-      const randomNode = emptyNodes[Math.floor(Math.random() * emptyNodes.length)];
-      gameState = placeChip(gameState, randomNode);
-      render();
-
-      // Continue if still AI's turn (shouldn't happen in placement)
-      if (gameState.currentPlayer === 'player2' && !gameState.winner) {
-        setTimeout(aiTurn, 500);
-      }
-    }
-  } else if (phase === 'movement') {
-    // Simple AI: pick random move
-    const selectableNodes = getSelectableNodes(gameState);
-
-    if (selectableNodes.length > 0) {
-      const randomChip = selectableNodes[Math.floor(Math.random() * selectableNodes.length)];
-      const validMoves = getValidMoves(gameState, randomChip);
-
-      if (validMoves.length > 0) {
-        const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
-        gameState = moveChip(gameState, randomChip, randomMove);
-        render();
-      }
+    // Check for game end
+    if (gameState.winner && !hasNotifiedGameEnd) {
+      hasNotifiedGameEnd = true;
+      owlSystem.onGameEnd('fiar', {
+        winner: gameState.winner,
+        moveCount,
+      });
     }
   }
+}
+
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
 
 // =============================================================================
@@ -218,13 +226,19 @@ export function initGame(
 export function newGameVsHuman(): void {
   gameState = createInitialState();
   isAIMode = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('fiar');
 }
 
 export function newGameVsAI(): void {
   gameState = createInitialState();
   isAIMode = true;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('fiar');
 }
 
 export function getCurrentState(): FiarGameState {

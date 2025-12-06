@@ -12,6 +12,8 @@ import {
 } from './types';
 import { getValidMoves, makeMove, selectPiece, hasValidMoves } from './rules';
 import { renderBoard, injectQGStyles, getPlayerName } from './board-ui';
+import { getAIMove, applyAIMove, AIDifficulty } from './ai';
+import { owlSystem } from '../../core/owl';
 
 // =============================================================================
 // Game Controller State
@@ -22,6 +24,9 @@ let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
+let aiDifficulty: AIDifficulty = 'medium';
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 // =============================================================================
 // UI Rendering
@@ -49,6 +54,15 @@ function updateStatus(): void {
         ${winnerName} wins! 👑
       </div>
     `;
+
+    if (!hasNotifiedGameEnd) {
+      hasNotifiedGameEnd = true;
+      owlSystem.onGameEnd('queens-guards', {
+        winner: gameState.winner,
+        moveCount,
+      });
+    }
+
     return;
   }
 
@@ -62,6 +76,15 @@ function updateStatus(): void {
         ${stalematedPlayer} cannot move - ${winnerName} wins!
       </div>
     `;
+
+    if (!hasNotifiedGameEnd) {
+      hasNotifiedGameEnd = true;
+      owlSystem.onGameEnd('queens-guards', {
+        winner: winner,
+        moveCount,
+      });
+    }
+
     return;
   }
 
@@ -109,11 +132,12 @@ function handleCellClick(coord: BoardCoord): void {
     if (isValidMove) {
       // Execute move
       gameState = makeMove(gameState, fromCoord, coord);
+      moveCount++;
       updateUI();
 
       // Check for AI turn
       if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-        setTimeout(makeAIMove, 500);
+        setTimeout(performAIMove, 500);
       }
       return;
     }
@@ -137,65 +161,20 @@ function handleCellClick(coord: BoardCoord): void {
 // AI Logic
 // =============================================================================
 
-function makeAIMove(): void {
+function performAIMove(): void {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
-  // Get all pieces that can move
-  const movablePieces: { coord: BoardCoord; moves: BoardCoord[] }[] = [];
-
-  for (const [key, cell] of gameState.cells) {
-    if (cell.piece?.player === aiPlayer) {
-      const coord = parseKey(key);
-      const moves = getValidMoves(gameState, coord);
-      if (moves.length > 0) {
-        movablePieces.push({ coord, moves });
-      }
-    }
-  }
-
-  if (movablePieces.length === 0) return;
-
-  // Simple AI: prefer moves that get closer to center
-  let bestMove: { from: BoardCoord; to: BoardCoord; score: number } | null = null;
-
-  for (const { coord, moves } of movablePieces) {
-    const fromCell = gameState.cells.get(cellKey(coord.ring, coord.position));
-    const isQueen = fromCell?.piece?.type === 'queen';
-
-    for (const to of moves) {
-      let score = 0;
-
-      // Prefer moving toward center
-      score += (coord.ring - to.ring) * 10;
-
-      // Queen gets bonus for moving inward
-      if (isQueen) {
-        score += (coord.ring - to.ring) * 20;
-
-        // Big bonus for reaching center
-        if (to.ring === 0) {
-          score += 1000;
-        }
-      }
-
-      // Guards get bonus for moving to inner rings (near center)
-      if (!isQueen && to.ring === 1) {
-        score += 50;
-      }
-
-      // Add some randomness
-      score += Math.random() * 5;
-
-      if (!bestMove || score > bestMove.score) {
-        bestMove = { from: coord, to, score };
-      }
-    }
-  }
-
-  if (bestMove) {
-    gameState = makeMove(gameState, bestMove.from, bestMove.to);
+  const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
+  if (aiMove) {
+    gameState = applyAIMove(gameState, aiMove);
+    moveCount++;
     updateUI();
   }
+}
+
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
 
 // =============================================================================
@@ -218,13 +197,19 @@ export function initGame(
 
 export function newGameVsHuman(): void {
   vsAI = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   gameState = createInitialState();
   updateUI();
+  owlSystem.onGameStart('queens-guards');
 }
 
 export function newGameVsAI(): void {
   vsAI = true;
   aiPlayer = 'player2';
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   gameState = createInitialState();
   updateUI();
+  owlSystem.onGameStart('queens-guards');
 }

@@ -3,6 +3,7 @@
 import { StarTrackGameState, createInitialState } from './types';
 import { drawChains, selectChain, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
+import { owlSystem } from '../../core/owl';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -13,6 +14,8 @@ let gameMode: GameMode = 'human-vs-human';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
+let hasNotifiedGameEnd = false;
+let moveCount = 0;
 
 const AI_THINKING_DELAY = 600;
 
@@ -31,7 +34,10 @@ export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('star-track');
 }
 
 // Start new game vs AI
@@ -39,7 +45,10 @@ export function newGameVsAI(): void {
   gameMode = 'human-vs-ai';
   gameState = createInitialState();
   isAIThinking = false;
+  hasNotifiedGameEnd = false;
+  moveCount = 0;
   render();
+  owlSystem.onGameStart('star-track');
 }
 
 // Handle draw chains action
@@ -57,7 +66,17 @@ function handleSelectChain(index: 0 | 1): void {
   if (gameState.phase !== 'selectChain') return;
 
   gameState = selectChain(gameState, index);
+  moveCount++;
   render();
+
+  // Check for game end
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    owlSystem.onGameEnd('star-track', {
+      winner: gameState.winner,
+      moveCount,
+    });
+  }
 
   // Check for AI turn
   if (
@@ -85,9 +104,19 @@ function triggerAITurn(): void {
         // AI strategy: pick the longer chain (simple greedy)
         const choice = gameState.drawnChains[0].length >= gameState.drawnChains[1].length ? 0 : 1;
         gameState = selectChain(gameState, choice as 0 | 1);
+        moveCount++;
       }
       isAIThinking = false;
       render();
+
+      // Check for game end after AI move
+      if (gameState.winner && !hasNotifiedGameEnd) {
+        hasNotifiedGameEnd = true;
+        owlSystem.onGameEnd('star-track', {
+          winner: gameState.winner,
+          moveCount,
+        });
+      }
     }, AI_THINKING_DELAY);
   }, AI_THINKING_DELAY);
 }

@@ -188,7 +188,7 @@ function renderBlock(
       shapeEl.setAttribute('height', String(size));
       break;
 
-    case 'triangle':
+    case 'triangle': {
       shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       const triPoints = [
         `${cx},${cy - size / 2}`,
@@ -197,6 +197,7 @@ function renderBlock(
       ];
       shapeEl.setAttribute('points', triPoints.join(' '));
       break;
+    }
 
     case 'rectangle':
       shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -206,7 +207,7 @@ function renderBlock(
       shapeEl.setAttribute('height', String(size * 0.6));
       break;
 
-    case 'hexagon':
+    case 'hexagon': {
       shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
       const hexPoints: string[] = [];
       for (let i = 0; i < 6; i++) {
@@ -217,6 +218,7 @@ function renderBlock(
       }
       shapeEl.setAttribute('points', hexPoints.join(' '));
       break;
+    }
 
     default:
       shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');

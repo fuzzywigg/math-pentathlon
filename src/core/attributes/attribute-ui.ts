@@ -298,7 +298,7 @@ function renderSetShape(
       element.setAttribute('rx', String(halfW));
       element.setAttribute('ry', String(halfH));
       break;
-    case 'squiggle':
+    case 'squiggle': {
       element = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       const d = `M ${cx - halfW} ${cy}
         Q ${cx - halfW} ${cy - halfH}, ${cx} ${cy - halfH * 0.5}
@@ -308,6 +308,7 @@ function renderSetShape(
         Z`;
       element.setAttribute('d', d);
       break;
+    }
     default:
       element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       element.setAttribute('x', String(cx - halfW));
@@ -322,7 +323,7 @@ function renderSetShape(
       element.setAttribute('fill', color);
       element.setAttribute('stroke', color);
       break;
-    case 'striped':
+    case 'striped': {
       // Create pattern for stripes
       const patternId = `stripes-${Math.random().toString(36).substr(2, 9)}`;
       const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -347,10 +348,12 @@ function renderSetShape(
       element.setAttribute('fill', `url(#${patternId})`);
       element.setAttribute('stroke', color);
       break;
-    case 'empty':
+    }
+    case 'empty': {
       element.setAttribute('fill', 'none');
       element.setAttribute('stroke', color);
       break;
+    }
   }
 
   element.setAttribute('stroke-width', '2');

@@ -75,8 +75,6 @@ function createDivisionAccordion(divisionName: string, gradeRange: string, descr
   section.setAttribute('data-division', divisionName);
 
   const games = getGamesByDivision(divisionName);
-  const availableCount = games.filter(g => g.available).length;
-  const isComplete = availableCount === games.length;
 
   // Accordion header (clickable)
   const header = document.createElement('button');
@@ -100,17 +98,11 @@ function createDivisionAccordion(divisionName: string, gradeRange: string, descr
   grade.textContent = gradeRange;
   titleRow.appendChild(grade);
 
-  if (isComplete) {
-    const completeBadge = document.createElement('span');
-    completeBadge.className = 'division-complete-badge';
-    completeBadge.textContent = 'Complete!';
-    titleRow.appendChild(completeBadge);
-  } else if (availableCount > 0) {
-    const progressBadge = document.createElement('span');
-    progressBadge.className = 'division-progress-badge';
-    progressBadge.textContent = `${availableCount}/${games.length} Available`;
-    titleRow.appendChild(progressBadge);
-  }
+  // Game count badge
+  const gameCount = document.createElement('span');
+  gameCount.className = 'division-game-count';
+  gameCount.textContent = `${games.length} games`;
+  titleRow.appendChild(gameCount);
 
   headerContent.appendChild(titleRow);
 
@@ -197,25 +189,22 @@ export function renderGameSelector(container: HTMLElement): void {
   heroDescription.textContent = 'Master mathematical thinking through strategic gameplay. Practice your favorite Math Pentathlon games at home!';
   heroContent.appendChild(heroDescription);
 
-  // Stats row
+  // Stats row - simplified since all games are complete
   const stats = document.createElement('div');
   stats.className = 'hero-stats';
 
-  const totalGames = GAMES.length;
-  const availableGames = GAMES.filter(g => g.available).length;
-
   stats.innerHTML = `
     <div class="stat">
-      <span class="stat-number">${availableGames}</span>
-      <span class="stat-label">Games Ready</span>
+      <span class="stat-number">${GAMES.length}</span>
+      <span class="stat-label">Games</span>
     </div>
     <div class="stat">
       <span class="stat-number">${DIVISIONS.length}</span>
       <span class="stat-label">Divisions</span>
     </div>
     <div class="stat">
-      <span class="stat-number">${totalGames - availableGames}</span>
-      <span class="stat-label">Coming Soon</span>
+      <span class="stat-number">K-6</span>
+      <span class="stat-label">Grades</span>
     </div>
   `;
   heroContent.appendChild(stats);
@@ -229,16 +218,12 @@ export function renderGameSelector(container: HTMLElement): void {
   tabNav.setAttribute('aria-label', 'Division navigation');
 
   DIVISIONS.forEach((div, index) => {
-    const games = getGamesByDivision(div.name);
-    const availableCount = games.filter(g => g.available).length;
-
     const tab = document.createElement('button');
     tab.className = `division-tab ${index === 0 ? 'active' : ''}`;
     tab.setAttribute('data-division', div.name);
     tab.innerHTML = `
       <span class="tab-name">${div.name}</span>
       <span class="tab-grade">${div.gradeRange}</span>
-      ${availableCount > 0 ? `<span class="tab-count">${availableCount}</span>` : ''}
     `;
 
     tabNav.appendChild(tab);
