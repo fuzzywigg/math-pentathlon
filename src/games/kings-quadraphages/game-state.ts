@@ -115,7 +115,10 @@ export function getCurrentPhaseMessage(state: GameState): string {
 
   switch (state.turnPhase) {
     case 'moveKing':
-      return `${playerName}: Move your King`;
+      if (state.selectedKingPosition) {
+        return `${playerName}: Click a green square to move`;
+      }
+      return `${playerName}: Click your King to select it`;
     case 'placeQuadraphage':
       return `${playerName}: Place a Quadraphage`;
     case 'gameOver': {
