@@ -3,61 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Math Pentathlon - Kings & Quadraphages</title>
+    <title>Math Pentathlon</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <div id="app">
-      <h1>Kings & Quadraphages</h1>
-      <div class="button-row">
-        <button id="new-game-btn">New Game</button>
-        <button id="help-btn">How to Play</button>
-      </div>
-      <div id="status"></div>
-      <div class="game-area">
-        <div id="move-history" class="collapsible">
-          <button class="collapse-toggle" aria-expanded="true" aria-controls="history-content">
-            <span class="collapse-icon">◀</span>
-            <span class="collapse-label">History</span>
-          </button>
-          <div id="history-content" class="history-content"></div>
-        </div>
-        <div id="board"></div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Kings & Quadraphages</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
-          <p>Trap your opponent's King so it cannot move to any adjacent cell.</p>
-
-          <h3>Game Setup</h3>
-          <ul>
-            <li>Each player has 1 King and 30 Quadraphages</li>
-            <li>Player 1 (Blue) starts at the top, Player 2 (Red) at the bottom</li>
-          </ul>
-
-          <h3>Turn Sequence</h3>
-          <ol>
-            <li><strong>Move your King:</strong> Click your King, then click an adjacent empty cell (any of the 8 surrounding cells)</li>
-            <li><strong>Place a Quadraphage:</strong> Click any empty cell to place a blocker</li>
-          </ol>
-
-          <h3>Rules</h3>
-          <ul>
-            <li>Kings can move one cell in any direction (like chess)</li>
-            <li>Kings cannot move onto Quadraphages or the other King</li>
-            <li>Quadraphages stay where placed for the entire game</li>
-            <li>You must complete both actions each turn</li>
-          </ul>
-
-          <h3>Winning</h3>
-          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>
-        </div>
-      </div>
-    </div>
+    <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
