@@ -4,6 +4,7 @@ import { StarTrackGameState, createInitialState } from './types';
 import { drawChains, selectChain, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { owlSystem } from '../../core/owl';
+import { getAIChainChoice, AIDifficulty } from './ai';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -11,6 +12,7 @@ export type GameMode = 'human-vs-human' | 'human-vs-ai';
 // Controller state
 let gameState: StarTrackGameState;
 let gameMode: GameMode = 'human-vs-human';
+let aiDifficulty: AIDifficulty = 'medium';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
@@ -41,14 +43,20 @@ export function newGameVsHuman(): void {
 }
 
 // Start new game vs AI
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameMode = 'human-vs-ai';
+  aiDifficulty = difficulty;
   gameState = createInitialState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   render();
   owlSystem.onGameStart('star-track');
+}
+
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
 
 // Handle draw chains action
@@ -98,14 +106,15 @@ function triggerAITurn(): void {
     gameState = drawChains(gameState);
     render();
 
-    // AI selects chain (after a delay)
+    // AI selects chain (after a delay) using AI module
     setTimeout(() => {
-      if (gameState.drawnChains) {
-        // AI strategy: pick the longer chain (simple greedy)
-        const choice = gameState.drawnChains[0].length >= gameState.drawnChains[1].length ? 0 : 1;
-        gameState = selectChain(gameState, choice as 0 | 1);
+      const choice = getAIChainChoice(gameState, 'player2', aiDifficulty);
+
+      if (choice) {
+        gameState = selectChain(gameState, choice.chainIndex);
         moveCount++;
       }
+
       isAIThinking = false;
       render();
 

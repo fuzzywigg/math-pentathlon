@@ -8,9 +8,9 @@ import {
   clearSelection,
   placeRod,
   passTurn,
-  getValidPlacements,
   hasValidMoves,
 } from './rules';
+import { getAIMove, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderPlayerRods,
@@ -29,14 +29,15 @@ export interface RamrodGameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): RamrodGameController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): RamrodGameController {
   injectRamrodStyles();
 
   const controller: RamrodGameController = {
@@ -44,15 +45,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): RamrodG
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -208,88 +211,30 @@ function handleBoxClick(controller: RamrodGameController, boxId: string, slot: n
 // AI Logic
 // =============================================================================
 
-interface AIMove {
-  rodId: string;
-  boxId: string;
-  slot: number;
-  score: number;
-}
-
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: RamrodGameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver') return;
+  if (state.phase === 'gameOver' || !aiPlayer) return;
 
-  // If no valid moves, pass
-  if (!hasValidMoves(state)) {
-    controller.state = passTurn(state);
-    controller.update();
-    return;
-  }
-
-  // Find best move
-  const move = findBestMove(state);
+  // Get AI move using the AI module
+  const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
+    // No valid moves, pass
     controller.state = passTurn(state);
     controller.update();
     return;
   }
 
-  // Execute move
+  // Execute move step by step
   let newState = selectRod(state, move.rodId);
   newState = placeRod(newState, move.boxId, move.slot);
 
   controller.state = newState;
   controller.update();
-}
-
-/**
- * Find the best move for AI
- */
-function findBestMove(state: RamrodState): AIMove | null {
-  const playerRods = state.playerRods[state.currentPlayer];
-  const moves: AIMove[] = [];
-
-  for (const rodId of playerRods) {
-    const rod = state.rods.get(rodId);
-    if (!rod) continue;
-
-    const placements = getValidPlacements(state, rodId);
-
-    for (const { boxId, slot } of placements) {
-      const box = state.boxes.get(boxId);
-      if (!box) continue;
-
-      let score = 0;
-
-      // Check if this would complete the box
-      const otherSlot = slot === 0 ? 1 : 0;
-      const otherRod = box.rods[otherSlot];
-
-      if (otherRod && otherRod.length + rod.length === box.targetSum) {
-        // Completing the box - very good!
-        score = box.targetSum * 10;
-      } else {
-        // Just placing a rod
-        score = rod.length + Math.random() * 2;
-      }
-
-      moves.push({ rodId, boxId, slot, score });
-    }
-  }
-
-  if (moves.length === 0) return null;
-
-  // Sort by score and pick best
-  moves.sort((a, b) => b.score - a.score);
-
-  // Pick from top 3 for variety
-  const topMoves = moves.slice(0, Math.min(3, moves.length));
-  return topMoves[Math.floor(Math.random() * topMoves.length)];
 }
 
 // =============================================================================

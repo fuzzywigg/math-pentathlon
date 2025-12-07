@@ -19,6 +19,7 @@ import {
   getPlayerName,
   injectRemainderIslandsStyles,
 } from './board-ui';
+import { getAIIslandChoice, AIDifficulty } from './ai';
 
 // =============================================================================
 // Module State
@@ -27,6 +28,7 @@ import {
 let gameState: RemainderIslandsState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // Rendering
@@ -131,35 +133,13 @@ function aiRoll(): void {
 function aiSelectIsland(): void {
   if (gameState.phase !== 'selectIsland' || gameState.currentPlayer !== 'player2') return;
 
-  const validIslands = gameState.validIslands;
-  if (validIslands.length === 0) return;
+  // Use AI module to get choice
+  const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);
 
-  // AI strategy: choose island that gives highest remainder
-  let bestIsland = validIslands[0];
-  let bestRemainder = -1;
-
-  for (const islandId of validIslands) {
-    const island = gameState.islands.find(i => i.id === islandId);
-    if (!island || !gameState.currentRoll) continue;
-
-    const remainder = gameState.currentRoll.total % island.value;
-
-    // Prefer higher remainders, but also consider blocking opponent
-    let score = remainder;
-
-    // Bonus for unowned islands
-    if (island.owner === null) {
-      score += 0.5;
-    }
-
-    if (score > bestRemainder) {
-      bestRemainder = score;
-      bestIsland = islandId;
-    }
+  if (choice) {
+    gameState = selectIsland(gameState, choice.islandId);
+    render();
   }
-
-  gameState = selectIsland(gameState, bestIsland);
-  render();
 }
 
 // =============================================================================
@@ -180,9 +160,10 @@ export function newGameVsHuman(): void {
   render();
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  aiDifficulty = difficulty;
   render();
 }
 

@@ -31,7 +31,15 @@
       "Bash(npx eslint:*)",
       "Bash(ssh -T nft2.me echo \"Connected successfully\")",
       "Bash(ssh:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(for game in calla fiar hex hex-a-gone kings-quadraphages queens-guards star-track contig-60 fab-a-diffy juggle kwatro-sinko par-55 prime-gold ramrod stars-bars sum-dominoes frac-fact fraction-pinball pent-em-in remainder-islands)",
+      "Bash(do)",
+      "Bash(echo:*)",
+      "Bash(if [ -f \"src/games/$game/ai.ts\" ])",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

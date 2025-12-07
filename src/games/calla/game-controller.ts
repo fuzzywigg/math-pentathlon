@@ -1,9 +1,10 @@
 // Calla Game Controller
 
 import { CallaGameState, createInitialState } from './types';
-import { makeMove, isGameOver, getValidPits } from './rules';
+import { makeMove, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { owlSystem } from '../../core/owl';
+import { getAIMove, AIDifficulty } from './ai';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -11,11 +12,13 @@ export type GameMode = 'human-vs-human' | 'human-vs-ai';
 // Controller state
 let gameState: CallaGameState;
 let gameMode: GameMode = 'human-vs-human';
+let aiDifficulty: AIDifficulty = 'medium';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+let currentHint: string | null = null;
 
 const AI_THINKING_DELAY = 800;
 
@@ -38,14 +41,26 @@ export function newGameVsHuman(): void {
 }
 
 // Start new game vs AI
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameMode = 'human-vs-ai';
+  aiDifficulty = difficulty;
   gameState = createInitialState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
   moveCount = 0;
+  currentHint = null;
   render();
   owlSystem.onGameStart('calla');
+}
+
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
+}
+
+// Get current hint (for teaching mode)
+export function getCurrentHint(): string | null {
+  return currentHint;
 }
 
 // Handle pit click
@@ -89,54 +104,19 @@ function triggerAITurn(): void {
   render();
 
   setTimeout(() => {
-    // AI strategy: evaluate each valid pit
-    const validPits = getValidPits(gameState);
+    // Use the AI module to get the best move
+    const aiMove = getAIMove(gameState, 'player2', aiDifficulty);
 
-    if (validPits.length === 0) {
+    if (!aiMove) {
       isAIThinking = false;
       render();
       return;
     }
 
-    // Simple AI: prioritize moves that:
-    // 1. Land in Calla (free turn)
-    // 2. Can capture opponent's cubes
-    // 3. Otherwise pick the pit with most cubes
+    // Store hint for teaching mode (easy difficulty)
+    currentHint = aiMove.hint || null;
 
-    let bestPit = validPits[0];
-    let bestScore = -Infinity;
-
-    for (const pitIndex of validPits) {
-      let score = 0;
-      const cubes = gameState.player2Pits[pitIndex];
-
-      // Simulate move to check for free turn or capture
-      const afterMove = makeMove(gameState, pitIndex);
-
-      // Free turn is very valuable
-      if (afterMove.currentPlayer === 'player2' && !isGameOver(afterMove)) {
-        score += 100;
-      }
-
-      // Capture is valuable
-      const captured = afterMove.player2Calla - gameState.player2Calla;
-      if (captured > cubes) {
-        score += captured * 10;
-      }
-
-      // Prefer pits with more cubes (moves pieces forward faster)
-      score += cubes;
-
-      // Avoid leaving opponent with easy captures
-      // (this could be more sophisticated)
-
-      if (score > bestScore) {
-        bestScore = score;
-        bestPit = pitIndex;
-      }
-    }
-
-    gameState = makeMove(gameState, bestPit);
+    gameState = makeMove(gameState, aiMove.pit);
     moveCount++;
     isAIThinking = false;
     render();

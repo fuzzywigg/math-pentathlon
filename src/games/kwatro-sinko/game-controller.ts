@@ -8,9 +8,9 @@ import {
   clearSelection,
   moveChip,
   passTurn,
-  getValidMoves,
   hasValidMoves,
 } from './rules';
+import { getAIMove, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderChipInfo,
@@ -28,14 +28,15 @@ export interface KwaGameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): KwaGameController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): KwaGameController {
   injectKwaStyles();
 
   const controller: KwaGameController = {
@@ -43,15 +44,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): KwaGame
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -196,31 +199,19 @@ function handleNodeClick(controller: KwaGameController, nodeId: string): void {
 // AI Logic
 // =============================================================================
 
-interface AIMove {
-  chipId: string;
-  nodeId: string;
-  score: number;
-}
-
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: KwaGameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver') return;
+  if (state.phase === 'gameOver' || !aiPlayer) return;
 
-  // If no valid moves, pass
-  if (!hasValidMoves(state)) {
-    controller.state = passTurn(state);
-    controller.update();
-    return;
-  }
-
-  // Find best move
-  const move = findBestMove(state);
+  // Get AI move using the AI module
+  const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
+    // No valid moves, pass
     controller.state = passTurn(state);
     controller.update();
     return;
@@ -232,54 +223,6 @@ function makeAIMove(controller: KwaGameController): void {
 
   controller.state = newState;
   controller.update();
-}
-
-/**
- * Find the best move for AI
- */
-function findBestMove(state: KwaState): AIMove | null {
-  const moves: AIMove[] = [];
-
-  for (const chip of state.chips.values()) {
-    if (chip.owner !== state.currentPlayer) continue;
-
-    const validMoves = getValidMoves(state, chip.id);
-
-    for (const nodeId of validMoves) {
-      const node = state.nodes.get(nodeId);
-      if (!node) continue;
-
-      let score = 0;
-
-      // Prefer moving to non-numbered spaces
-      if (!node.isNumbered) {
-        score += 5;
-      }
-
-      // Prefer moving toward center
-      const match = nodeId.match(/n(\d+)-(\d+)/);
-      if (match) {
-        const row = parseInt(match[1]);
-        const col = parseInt(match[2]);
-        const centerDist = Math.abs(row - 2) + Math.abs(col - 2);
-        score += (4 - centerDist);
-      }
-
-      // Add randomness
-      score += Math.random() * 2;
-
-      moves.push({ chipId: chip.id, nodeId, score });
-    }
-  }
-
-  if (moves.length === 0) return null;
-
-  // Sort by score and pick best
-  moves.sort((a, b) => b.score - a.score);
-
-  // Pick from top 3 for variety
-  const topMoves = moves.slice(0, Math.min(3, moves.length));
-  return topMoves[Math.floor(Math.random() * topMoves.length)];
 }
 
 // =============================================================================

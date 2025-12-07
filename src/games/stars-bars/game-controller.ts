@@ -1,16 +1,16 @@
 // Stars & Bars Game Controller
 // Manages game flow, AI, and UI updates
 
-import { StarsState, Player, AttributeCard, countDifferences, CONFIG } from './types';
+import { StarsState, Player } from './types';
 import {
   createInitialState,
   selectCard,
   clearSelection,
   placeCard,
   passTurn,
-  getValidPlacements,
   hasValidMoves,
 } from './rules';
+import { getAIMove, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderPlayerHand,
@@ -29,14 +29,15 @@ export interface StarsGameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): StarsGameController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): StarsGameController {
   injectStarsStyles();
 
   const controller: StarsGameController = {
@@ -44,15 +45,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): StarsGa
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -196,119 +199,30 @@ function handleCellClick(controller: StarsGameController, row: number, col: numb
 // AI Logic
 // =============================================================================
 
-interface AIMove {
-  cardId: string;
-  row: number;
-  col: number;
-  score: number;
-}
-
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: StarsGameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver') return;
+  if (state.phase === 'gameOver' || !aiPlayer) return;
 
-  // If no valid moves, pass
-  if (!hasValidMoves(state)) {
-    controller.state = passTurn(state);
-    controller.update();
-    return;
-  }
-
-  // Find best move
-  const move = findBestMove(state);
+  // Get AI move using the AI module
+  const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
+    // No valid moves, pass
     controller.state = passTurn(state);
     controller.update();
     return;
   }
 
-  // Execute move
+  // Execute move step by step
   let newState = selectCard(state, move.cardId);
   newState = placeCard(newState, move.row, move.col);
 
   controller.state = newState;
   controller.update();
-}
-
-/**
- * Find the best move for AI
- */
-function findBestMove(state: StarsState): AIMove | null {
-  const hand = state.playerHands[state.currentPlayer];
-  const validPlacements = getValidPlacements(state);
-  const moves: AIMove[] = [];
-
-  for (const card of hand) {
-    for (const { row, col } of validPlacements) {
-      const score = calculateMoveScore(state, card, row, col);
-      moves.push({ cardId: card.id, row, col, score });
-    }
-  }
-
-  if (moves.length === 0) return null;
-
-  // Sort by score and pick best
-  moves.sort((a, b) => b.score - a.score);
-
-  // Pick from top 3 for variety
-  const topMoves = moves.slice(0, Math.min(3, moves.length));
-  return topMoves[Math.floor(Math.random() * topMoves.length)];
-}
-
-/**
- * Calculate score for a potential move
- */
-function calculateMoveScore(
-  state: StarsState,
-  card: AttributeCard,
-  row: number,
-  col: number
-): number {
-  const cell = state.cells[row][col];
-  let score = 0;
-
-  // Calculate adjacent differences
-  const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
-  ];
-
-  for (const [dr, dc] of directions) {
-    const adjRow = row + dr;
-    const adjCol = col + dc;
-
-    if (
-      adjRow >= 0 &&
-      adjRow < CONFIG.BOARD_SIZE &&
-      adjCol >= 0 &&
-      adjCol < CONFIG.BOARD_SIZE
-    ) {
-      const adjCell = state.cells[adjRow][adjCol];
-      if (adjCell.card) {
-        score += countDifferences(card, adjCell.card);
-      }
-    }
-  }
-
-  // Double for star cells
-  if (cell.isStar) score *= 2;
-
-  // Add some randomness
-  score += Math.random() * 2;
-
-  // Prefer center positions early in the game
-  if (state.moveHistory.length < 5) {
-    const centerDist = Math.abs(row - 2) + Math.abs(col - 2);
-    score += (4 - centerDist);
-  }
-
-  return score;
 }
 
 // =============================================================================

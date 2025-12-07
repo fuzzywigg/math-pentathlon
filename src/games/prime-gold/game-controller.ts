@@ -1,15 +1,15 @@
 // Prime Gold Game Controller
 // Manages game flow, AI, and UI updates
 
-import { PrimeGoldState, Player, CONFIG } from './types';
+import { PrimeGoldState, Player } from './types';
 import {
   createInitialState,
   rollDice,
   placeChip,
   passTurn,
-  getValidPlacements,
   hasValidMoves,
 } from './rules';
+import { getAIPlacement, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderDice,
@@ -29,14 +29,15 @@ export interface PrimeGoldController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): PrimeGoldController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): PrimeGoldController {
   injectPrimeGoldStyles();
 
   const controller: PrimeGoldController = {
@@ -44,15 +45,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): PrimeGo
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -188,12 +191,12 @@ function handlePlacement(controller: PrimeGoldController, value: number, expr: s
 // =============================================================================
 
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: PrimeGoldController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver') return;
+  if (state.phase === 'gameOver' || !aiPlayer) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
@@ -203,77 +206,19 @@ function makeAIMove(controller: PrimeGoldController): void {
     return;
   }
 
-  // Find best placement
+  // Find best placement using AI module
   if (state.phase === 'placing') {
-    const placements = getValidPlacements(state);
+    const placement = getAIPlacement(state, aiPlayer, aiDifficulty);
 
-    if (placements.length === 0) {
+    if (!placement) {
       controller.state = passTurn(state);
       controller.update();
       return;
     }
 
-    // Score each placement
-    const scored = placements.map((p) => ({
-      ...p,
-      score: scoreAIPlacement(state, p.value),
-    }));
-
-    // Sort by score
-    scored.sort((a, b) => b.score - a.score);
-
-    // Pick from top choices
-    const topMoves = scored.slice(0, Math.min(3, scored.length));
-    const choice = topMoves[Math.floor(Math.random() * topMoves.length)];
-
-    controller.state = placeChip(state, choice.value, choice.expr);
+    controller.state = placeChip(state, placement.value, placement.expression);
     controller.update();
   }
-}
-
-/**
- * Score a placement for AI
- */
-function scoreAIPlacement(state: PrimeGoldState, value: number): number {
-  let score = 0;
-
-  // Find the cell
-  for (const cell of state.cells.values()) {
-    if (cell.value === value) {
-      // Prefer primes (gold!)
-      if (cell.isPrime) score += 10;
-
-      // Prefer cells that could form veins
-      // Check if adjacent to other owned primes
-      const row = cell.row;
-      const col = cell.col;
-
-      // Check diagonal neighbors for our own primes
-      const diagonals = [
-        [row - 1, col - 1], [row - 1, col + 1],
-        [row + 1, col - 1], [row + 1, col + 1],
-      ];
-
-      for (const [dr, dc] of diagonals) {
-        const neighbor = state.cells.get(`${dr},${dc}`);
-        if (neighbor && neighbor.owner === state.currentPlayer && neighbor.isPrime) {
-          score += 5;
-        }
-      }
-
-      // Prefer center area
-      const center = Math.floor(CONFIG.BOARD_SIZE / 2);
-      const dist = Math.abs(row - center) + Math.abs(col - center);
-      score += (CONFIG.BOARD_SIZE - dist);
-
-      break;
-    }
-  }
-
-  // Add randomness
-  score += Math.random() * 3;
-
-  return score;
 }
 
 // =============================================================================

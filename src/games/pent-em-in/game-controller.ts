@@ -23,6 +23,7 @@ import {
   injectPentEmInStyles,
 } from './board-ui';
 import { Cell } from '../../core/polyomino/types';
+import { getAIMove, AIDifficulty } from './ai';
 
 // =============================================================================
 // Module State
@@ -32,6 +33,7 @@ let gameState: PentEmInState;
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIMode = false;
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // Rendering
@@ -194,36 +196,13 @@ function handleCellHover(cell: Cell | null): void {
 function aiTurn(): void {
   if (gameState.winner || gameState.currentPlayer !== 'player2') return;
 
-  const pieces = getPlayerPieces(gameState, 'player2');
+  // Use AI module to get move
+  const move = getAIMove(gameState, 'player2', aiDifficulty);
 
-  // Try each piece and find a valid placement
-  for (const shapeId of pieces.available) {
-    const shape = getPentominoShape(shapeId);
-    if (!shape) continue;
-
-    const rotations = shape.canRotate ? [0, 90, 180, 270] as const : [0 as const];
-    const flips = shape.canFlip ? [false, true] : [false];
-
-    for (const rotation of rotations) {
-      for (const flipped of flips) {
-        // Try to find a valid position
-        for (let row = 0; row < 10; row++) {
-          for (let col = 0; col < 10; col++) {
-            const pos = { row, col };
-            if (canPlacePiece(gameState, shapeId, pos, rotation, flipped)) {
-              // Found a valid move!
-              gameState = placePiece(gameState, shapeId, pos, rotation, flipped);
-              render();
-              return;
-            }
-          }
-        }
-      }
-    }
+  if (move) {
+    gameState = placePiece(gameState, move.shapeId, move.position, move.rotation, move.flipped);
+    render();
   }
-
-  // No valid moves - this shouldn't happen as it would mean game should be over
-  render();
 }
 
 // =============================================================================
@@ -248,9 +227,10 @@ export function newGameVsHuman(): void {
   render();
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  aiDifficulty = difficulty;
   render();
 }
 

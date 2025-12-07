@@ -8,10 +8,9 @@ import {
   clearSelection,
   placeBlock,
   passTurn,
-  getValidPlacements,
   hasValidMoves,
-  calculateScore,
 } from './rules';
+import { getAIMove, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderHand,
@@ -30,14 +29,15 @@ export interface Par55GameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): Par55GameController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): Par55GameController {
   injectPar55Styles();
 
   const controller: Par55GameController = {
@@ -45,15 +45,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): Par55Ga
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -209,31 +211,19 @@ function handleBaseClick(controller: Par55GameController, baseId: string): void 
 // AI Logic
 // =============================================================================
 
-interface AIMove {
-  blockId: string;
-  baseId: string;
-  score: number;
-}
-
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: Par55GameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver') return;
+  if (state.phase === 'gameOver' || !aiPlayer) return;
 
-  // If no valid moves, pass
-  if (!hasValidMoves(state)) {
-    controller.state = passTurn(state);
-    controller.update();
-    return;
-  }
-
-  // Find best move
-  const move = findBestMove(state);
+  // Get AI move using the AI module
+  const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
+    // No valid moves, pass
     controller.state = passTurn(state);
     controller.update();
     return;
@@ -245,38 +235,6 @@ function makeAIMove(controller: Par55GameController): void {
 
   controller.state = newState;
   controller.update();
-}
-
-/**
- * Find the best move for AI
- */
-function findBestMove(state: Par55State): AIMove | null {
-  const hand = state.hands[state.currentPlayer];
-  const validBases = getValidPlacements(state);
-
-  if (hand.length === 0 || validBases.length === 0) return null;
-
-  const moves: AIMove[] = [];
-
-  for (const block of hand) {
-    for (const baseId of validBases) {
-      const { totalPoints } = calculateScore(state, block, baseId);
-      moves.push({
-        blockId: block.id,
-        baseId,
-        score: totalPoints + Math.random() * 0.5, // Add slight randomness
-      });
-    }
-  }
-
-  if (moves.length === 0) return null;
-
-  // Sort by score and pick best
-  moves.sort((a, b) => b.score - a.score);
-
-  // Pick from top 3 for variety
-  const topMoves = moves.slice(0, Math.min(3, moves.length));
-  return topMoves[Math.floor(Math.random() * topMoves.length)];
 }
 
 // =============================================================================
