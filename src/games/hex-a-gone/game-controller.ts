@@ -1,6 +1,6 @@
 // Hex-a-Gone! Game Controller
 
-import { HexAGoneGameState, createInitialState, BlockShape, getAvailableShapes } from './types';
+import { HexAGoneGameState, createInitialState, BlockShape } from './types';
 import {
   selectBlock,
   deselectBlock,
@@ -11,6 +11,7 @@ import {
 } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { owlSystem } from '../../core/owl';
+import { getAISelection, getAIPlacement, AIDifficulty } from './ai';
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -18,6 +19,7 @@ export type GameMode = 'human-vs-human' | 'human-vs-ai';
 // Controller state
 let gameState: HexAGoneGameState;
 let gameMode: GameMode = 'human-vs-human';
+let aiDifficulty: AIDifficulty = 'medium';
 let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
@@ -45,14 +47,20 @@ export function newGameVsHuman(): void {
 }
 
 // Start new game vs AI
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameMode = 'human-vs-ai';
+  aiDifficulty = difficulty;
   gameState = createInitialState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   render();
   owlSystem.onGameStart('hex-a-gone');
+}
+
+// Set AI difficulty
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
 
 // Handle block selection from bank
@@ -119,21 +127,19 @@ function triggerAITurn(): void {
   render();
 
   setTimeout(() => {
-    // AI selects blocks
+    // AI selects blocks using AI module
     const aiSelectBlocks = (): void => {
-      const available = getAvailableShapes(gameState);
-      if (available.length === 0) {
+      const selection = getAISelection(gameState, 'player2', aiDifficulty);
+
+      if (!selection || selection.blocks.length === 0) {
         isAIThinking = false;
         render();
         return;
       }
 
-      // AI strategy: select 1-2 random blocks
-      const numToSelect = Math.min(2, available.length);
-      const shuffled = [...available].sort(() => Math.random() - 0.5);
-
-      for (let i = 0; i < numToSelect; i++) {
-        gameState = selectBlock(gameState, shuffled[i]);
+      // Select each block
+      for (const block of selection.blocks) {
+        gameState = selectBlock(gameState, block);
       }
 
       gameState = commitSelection(gameState);
@@ -143,7 +149,7 @@ function triggerAITurn(): void {
       setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
     };
 
-    // AI places blocks one by one
+    // AI places blocks one by one using AI module
     const aiPlaceBlocks = (): void => {
       if (gameState.phase !== 'placeBlocks' || !gameState.selectedBlockForPlacement) {
         isAIThinking = false;
@@ -151,17 +157,15 @@ function triggerAITurn(): void {
         return;
       }
 
-      // Find empty cells
-      const emptyCells = gameState.board.filter(c => !c.filled);
-      if (emptyCells.length === 0) {
+      const placement = getAIPlacement(gameState, 'player2', aiDifficulty);
+
+      if (!placement) {
         isAIThinking = false;
         render();
         return;
       }
 
-      // Pick a random empty cell
-      const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-      gameState = placeBlock(gameState, randomCell.q, randomCell.r);
+      gameState = placeBlock(gameState, placement.q, placement.r);
       moveCount++;
       render();
 

@@ -12,8 +12,6 @@ import {
   clearSelection,
   passTurn,
   hasAnyValidMove,
-  getPossibleResults,
-  findMatchingAnswers,
 } from './rules';
 import {
   renderFractionBarPool,
@@ -24,6 +22,7 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
+import { getAIMove, AIDifficulty } from './ai';
 
 // =============================================================================
 // Game Controller
@@ -34,14 +33,15 @@ export interface FabGameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false): FabGameController {
+export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): FabGameController {
   injectFabStyles();
 
   const controller: FabGameController = {
@@ -49,15 +49,17 @@ export function initGame(container: HTMLElement, vsAI: boolean = false): FabGame
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -231,15 +233,15 @@ function handleAnswerClick(controller: FabGameController, answerId: string): voi
 // =============================================================================
 
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: FabGameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.winner) return;
+  if (state.winner || !aiPlayer) return;
 
-  // Find best move
-  const move = findBestMove(state);
+  // Get AI move using the AI module
+  const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
     // No valid moves, pass
@@ -256,75 +258,6 @@ function makeAIMove(controller: FabGameController): void {
 
   controller.state = newState;
   controller.update();
-}
-
-interface AIMove {
-  bar1Id: string;
-  bar2Id: string;
-  operation: FractionOperation;
-  answerId: string;
-  score: number;
-}
-
-/**
- * Find the best move for AI
- */
-function findBestMove(state: FabADiffyState): AIMove | null {
-  const availableBars = Array.from(state.fractionBars.values()).filter((b) => !b.used);
-  const moves: AIMove[] = [];
-
-  // Try all pairs
-  for (let i = 0; i < availableBars.length; i++) {
-    for (let j = i + 1; j < availableBars.length; j++) {
-      const bar1 = availableBars[i];
-      const bar2 = availableBars[j];
-
-      const results = getPossibleResults(bar1, bar2);
-
-      for (const { operation, result } of results) {
-        const matches = findMatchingAnswers(state, result);
-
-        for (const answerId of matches) {
-          // Score the move
-          const score = evaluateMove(state, answerId);
-          moves.push({
-            bar1Id: bar1.id,
-            bar2Id: bar2.id,
-            operation,
-            answerId,
-            score,
-          });
-        }
-      }
-    }
-  }
-
-  if (moves.length === 0) return null;
-
-  // Sort by score and pick best
-  moves.sort((a, b) => b.score - a.score);
-
-  // Add some randomness for variety
-  const topMoves = moves.slice(0, Math.min(3, moves.length));
-  return topMoves[Math.floor(Math.random() * topMoves.length)];
-}
-
-/**
- * Evaluate a move's value
- */
-function evaluateMove(state: FabADiffyState, answerId: string): number {
-  let score = 10; // Base score
-
-  // Prefer unclaimed answers
-  const answer = state.answerBars.get(answerId);
-  if (answer && !answer.claimedBy) {
-    score += 5;
-  }
-
-  // Add randomness
-  score += Math.random() * 3;
-
-  return score;
 }
 
 // =============================================================================

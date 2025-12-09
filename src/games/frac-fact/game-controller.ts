@@ -21,6 +21,7 @@ import {
   injectFracFactStyles,
 } from './board-ui';
 import { Fraction } from '../../core/fractions/types';
+import { getAIAnswer, AIDifficulty } from './ai';
 
 // =============================================================================
 // Module State
@@ -29,6 +30,7 @@ import { Fraction } from '../../core/fractions/types';
 let gameState: FracFactState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // Rendering
@@ -98,38 +100,20 @@ function aiTurn(): void {
   if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2') return;
   if (!gameState.currentProblem) return;
 
-  // AI selects correct answer with some probability based on difficulty
-  const choices = gameState.currentProblem.answerChoices;
-  const correctAnswer = gameState.currentProblem.correctAnswer;
+  // Use AI module to get answer
+  const selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);
 
-  // Find correct answer index
-  const correctIndex = choices.findIndex(
-    c => c.numerator === correctAnswer.numerator && c.denominator === correctAnswer.denominator
-  );
+  if (selectedAnswer) {
+    gameState = submitAnswer(gameState, selectedAnswer);
+    render();
 
-  // AI accuracy based on difficulty
-  const accuracy = gameState.difficulty === 'easy' ? 0.7 :
-                   gameState.difficulty === 'medium' ? 0.8 : 0.9;
-
-  let selectedIndex: number;
-  if (Math.random() < accuracy) {
-    selectedIndex = correctIndex;
-  } else {
-    // Pick a random wrong answer
-    const wrongIndices = choices.map((_, i) => i).filter(i => i !== correctIndex);
-    selectedIndex = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+    // Auto-continue after showing result
+    setTimeout(() => {
+      if (gameState.phase === 'showingResult') {
+        handleContinue();
+      }
+    }, 1500);
   }
-
-  const selectedAnswer = choices[selectedIndex];
-  gameState = submitAnswer(gameState, selectedAnswer);
-  render();
-
-  // Auto-continue after showing result
-  setTimeout(() => {
-    if (gameState.phase === 'showingResult') {
-      handleContinue();
-    }
-  }, 1500);
 }
 
 // =============================================================================
@@ -152,10 +136,11 @@ export function newGameVsHuman(difficulty: Difficulty = 'medium'): void {
   render();
 }
 
-export function newGameVsAI(difficulty: Difficulty = 'medium'): void {
+export function newGameVsAI(difficulty: Difficulty = 'medium', aiDiff: AIDifficulty = 'medium'): void {
   gameState = createInitialState(difficulty);
   gameState = startGame(gameState);
   isAIMode = true;
+  aiDifficulty = aiDiff;
   render();
 }
 

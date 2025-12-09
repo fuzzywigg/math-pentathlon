@@ -1,15 +1,15 @@
 // Sum Dominoes & Dice Game Controller
 // Manages game flow, AI, and UI updates
 
-import { SumDominoesState, Player, BoardPosition, getDiceSum } from './types';
+import { SumDominoesState, Player, BoardPosition } from './types';
 import {
   createInitialState,
   doRollDice,
   selectDomino,
   placeDomino,
   passTurn,
-  getValidPlacements,
 } from './rules';
+import { getAIMove, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderHand,
@@ -27,8 +27,9 @@ export interface SDGameController {
   container: HTMLElement;
   isAI: boolean;
   aiPlayer: Player | null;
+  aiDifficulty: AIDifficulty;
   update: () => void;
-  newGame: (vsAI: boolean) => void;
+  newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /**
@@ -36,7 +37,8 @@ export interface SDGameController {
  */
 export function initGame(
   container: HTMLElement,
-  vsAI: boolean = false
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
 ): SDGameController {
   injectSDStyles();
 
@@ -45,15 +47,17 @@ export function initGame(
     container,
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
+    aiDifficulty: difficulty,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean) => {
+  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.aiDifficulty = diff || controller.aiDifficulty;
     controller.update();
   };
 
@@ -218,12 +222,12 @@ function handlePass(controller: SDGameController): void {
 // =============================================================================
 
 /**
- * Make an AI move
+ * Make an AI move using the AI module
  */
 function makeAIMove(controller: SDGameController): void {
-  const { state } = controller;
+  const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.winner) return;
+  if (state.winner || !aiPlayer) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
@@ -240,35 +244,13 @@ function makeAIMove(controller: SDGameController): void {
     return;
   }
 
-  // Find best move
+  // Get AI move from the module
   if (state.phase === 'placing' && state.currentDice) {
-    const sum = getDiceSum(state.currentDice);
-    const hand = state.hands[state.currentPlayer];
+    const move = getAIMove(state, aiPlayer, aiDifficulty);
 
-    // Find all playable dominoes and their placements
-    const moves: Array<{
-      domino: typeof hand[0];
-      placement: { position: BoardPosition; orientation: 'horizontal' | 'vertical' };
-      score: number;
-    }> = [];
-
-    for (const domino of hand) {
-      const placements = getValidPlacements(state, domino, sum);
-      for (const placement of placements) {
-        // Score: prefer getting rid of higher pip counts
-        const score = domino.face1 + domino.face2 + Math.random() * 2;
-        moves.push({ domino, placement, score });
-      }
-    }
-
-    if (moves.length > 0) {
-      // Pick best move
-      moves.sort((a, b) => b.score - a.score);
-      const best = moves[0];
-
-      // Select domino then place
-      let newState = selectDomino(state, best.domino.id);
-      newState = placeDomino(newState, best.placement.position, best.placement.orientation);
+    if (move) {
+      let newState = selectDomino(state, move.dominoId);
+      newState = placeDomino(newState, move.position, move.orientation);
       controller.state = newState;
       controller.update();
     }

@@ -19,6 +19,7 @@ import {
   getPlayerName,
   injectFractionPinballStyles,
 } from './board-ui';
+import { getAIAnswer, AIDifficulty } from './ai';
 
 // =============================================================================
 // Module State
@@ -27,6 +28,7 @@ import {
 let gameState: FractionPinballState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // Rendering
@@ -104,30 +106,20 @@ function aiTurn(): void {
   if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2') return;
   if (!gameState.currentChallenge) return;
 
-  const choices = gameState.currentChallenge.answerChoices;
-  const correctAnswer = gameState.currentChallenge.correctAnswer;
+  // Use AI module to get answer
+  const selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);
 
-  // AI accuracy - gets it right most of the time
-  const accuracy = 0.75;
+  if (selectedAnswer) {
+    gameState = submitAnswer(gameState, selectedAnswer);
+    render();
 
-  let selectedAnswer: string;
-  if (Math.random() < accuracy) {
-    selectedAnswer = correctAnswer;
-  } else {
-    // Pick a random wrong answer
-    const wrongChoices = choices.filter(c => c !== correctAnswer);
-    selectedAnswer = wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
+    // Auto-continue after showing result
+    setTimeout(() => {
+      if (gameState.phase === 'showResult') {
+        handleContinue();
+      }
+    }, 1500);
   }
-
-  gameState = submitAnswer(gameState, selectedAnswer);
-  render();
-
-  // Auto-continue after showing result
-  setTimeout(() => {
-    if (gameState.phase === 'showResult') {
-      handleContinue();
-    }
-  }, 1500);
 }
 
 // =============================================================================
@@ -150,10 +142,11 @@ export function newGameVsHuman(): void {
   render();
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = true;
+  aiDifficulty = difficulty;
   render();
 }
 

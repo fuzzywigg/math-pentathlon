@@ -1,9 +1,8 @@
 // Juggle Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import { JuggleState, Player, getCategoryFromDie, getShapesForDie } from './types';
-import { PolyominoShape, Rotation } from '../../core/polyomino/types';
-import { findValidPlacements } from '../../core/polyomino/placement';
+import { JuggleState, Player } from './types';
+import { PolyominoShape } from '../../core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
@@ -13,6 +12,12 @@ import {
   flipShape,
   placeShape,
 } from './rules';
+import {
+  getAIDieChoice,
+  getAIShapeChoice,
+  getAIPlacement,
+  AIDifficulty,
+} from './ai';
 import {
   renderBoard,
   renderDice,
@@ -31,6 +36,7 @@ let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // UI Rendering
@@ -208,70 +214,49 @@ function handleCellLeave(): void {
 function makeAIMove(): void {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
-  // Handle each phase
+  // Handle each phase using the AI module
   if (gameState.phase === 'selectingShape' && !gameState.selectedCategory) {
-    // Choose die with larger shape (more cells = faster fill)
-    const index = gameState.currentDice![0] >= gameState.currentDice![1] ? 0 : 1;
-    gameState = selectDie(gameState, index as 0 | 1);
-    setTimeout(makeAIMove, 300);
-    updateUI();
+    const dieChoice = getAIDieChoice(gameState, aiPlayer, aiDifficulty);
+    if (dieChoice) {
+      gameState = selectDie(gameState, dieChoice.index);
+      setTimeout(makeAIMove, 300);
+      updateUI();
+      return;
+    }
     return;
   }
 
   if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
-    // Choose first available shape
-    const dieValue = gameState.currentDice!.find(d =>
-      getCategoryFromDie(d) === gameState.selectedCategory
-    );
-    if (dieValue) {
-      const shapes = getShapesForDie(dieValue);
-      if (shapes.length > 0) {
-        // Pick random shape
-        const shape = shapes[Math.floor(Math.random() * shapes.length)];
-        gameState = selectShape(gameState, shape);
-        setTimeout(makeAIMove, 300);
-        updateUI();
-        return;
-      }
+    const shapeChoice = getAIShapeChoice(gameState, aiPlayer, aiDifficulty);
+    if (shapeChoice) {
+      gameState = selectShape(gameState, shapeChoice.shape);
+      setTimeout(makeAIMove, 300);
+      updateUI();
+      return;
     }
     return;
   }
 
   if (gameState.phase === 'placing' && gameState.selectedShape) {
-    // Find valid placement
-    const board = gameState.boards[aiPlayer];
-    const rotations: Rotation[] = [0, 90, 180, 270];
-    const flips = [false, true];
-
-    for (const rotation of rotations) {
-      for (const flipped of flips) {
-        if (flipped && !gameState.selectedShape.canFlip) continue;
-        if (rotation !== 0 && !gameState.selectedShape.canRotate) continue;
-
-        const positions = findValidPlacements(board, gameState.selectedShape, rotation, flipped);
-        if (positions.length > 0) {
-          // Set rotation/flip
-          let tempState = gameState;
-          while (tempState.selectedRotation !== rotation) {
-            tempState = rotateShape(tempState);
-          }
-          if (flipped !== tempState.selectedFlipped) {
-            tempState = flipShape(tempState);
-          }
-          gameState = tempState;
-
-          // Pick random valid position
-          const pos = positions[Math.floor(Math.random() * positions.length)];
-          gameState = placeShape(gameState, pos);
-          updateUI();
-
-          // Continue if still AI's turn
-          if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-            setTimeout(handleRollDice, 500);
-          }
-          return;
-        }
+    const placement = getAIPlacement(gameState, aiPlayer, aiDifficulty);
+    if (placement) {
+      // Apply rotation
+      while (gameState.selectedRotation !== placement.rotation) {
+        gameState = rotateShape(gameState);
       }
+      // Apply flip
+      if (placement.flipped !== gameState.selectedFlipped) {
+        gameState = flipShape(gameState);
+      }
+      // Place shape
+      gameState = placeShape(gameState, placement.position);
+      updateUI();
+
+      // Continue if still AI's turn
+      if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
+        setTimeout(handleRollDice, 500);
+      }
+      return;
     }
   }
 
@@ -302,9 +287,14 @@ export function newGameVsHuman(): void {
   updateUI();
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   vsAI = true;
   aiPlayer = 'player2';
+  aiDifficulty = difficulty;
   gameState = createInitialState();
   updateUI();
+}
+
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }

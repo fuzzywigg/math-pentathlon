@@ -8,7 +8,7 @@ import {
   getOpponent,
   getValidPlacements,
 } from './types';
-import { doRollDice, placeChip, passTurn, hasValidMoves, calculatePoints } from './rules';
+import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
   renderDice,
@@ -16,6 +16,7 @@ import {
   injectContigStyles,
   getPlayerName,
 } from './board-ui';
+import { getAIPlacement, AIDifficulty } from './ai';
 
 // =============================================================================
 // Game Controller State
@@ -26,6 +27,7 @@ let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
+let aiDifficulty: AIDifficulty = 'medium';
 
 // =============================================================================
 // UI Rendering
@@ -183,10 +185,11 @@ function makeAIMove(): void {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
   if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
 
-  const placements = getValidPlacements(gameState, gameState.currentDice);
+  // Use AI module to get the best placement
+  const placement = getAIPlacement(gameState, aiPlayer, aiDifficulty);
 
-  if (placements.length === 0) {
-    // Must pass
+  if (!placement) {
+    // Must pass - no valid moves
     gameState = passTurn(gameState);
     updateUI();
 
@@ -196,19 +199,7 @@ function makeAIMove(): void {
     return;
   }
 
-  // Choose the placement with most points, with some randomness
-  let bestPlacement = placements[0];
-  let bestScore = calculatePoints(gameState, placements[0].result);
-
-  for (const placement of placements) {
-    const score = calculatePoints(gameState, placement.result);
-    if (score > bestScore || (score === bestScore && Math.random() > 0.5)) {
-      bestPlacement = placement;
-      bestScore = score;
-    }
-  }
-
-  gameState = placeChip(gameState, bestPlacement.result, bestPlacement.expression);
+  gameState = placeChip(gameState, placement.value, placement.expression);
   updateUI();
 
   // Continue if AI's turn
@@ -241,9 +232,14 @@ export function newGameVsHuman(): void {
   updateUI();
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   vsAI = true;
   aiPlayer = 'player2';
+  aiDifficulty = difficulty;
   gameState = createInitialState();
   updateUI();
+}
+
+export function setAIDifficulty(difficulty: AIDifficulty): void {
+  aiDifficulty = difficulty;
 }
