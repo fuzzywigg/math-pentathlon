@@ -33,6 +33,55 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=math-pentathlon --branch=alpha
+      - name: Ensure custom domain DNS
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          api_base="https://api.cloudflare.com/client/v4"
+          zone_id="$(
+            curl --fail --silent --show-error \
+              --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              --header "Content-Type: application/json" \
+              "${api_base}/zones?name=pappas.work" |
+            jq -r '.result[0].id // empty'
+          )"
+
+          if [ -z "${zone_id}" ]; then
+            echo "Could not find Cloudflare zone for pappas.work"
+            exit 1
+          fi
+
+          dns_records_url="${api_base}/zones/${zone_id}/dns_records"
+          record_id="$(
+            curl --fail --silent --show-error \
+              --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              --header "Content-Type: application/json" \
+              "${dns_records_url}?type=CNAME&name=math.pappas.work" |
+            jq -r '.result[0].id // empty'
+          )"
+
+          payload='{"type":"CNAME","name":"math.pappas.work","content":"math-pentathlon.pages.dev","proxied":true,"ttl":1}'
+
+          if [ -z "${record_id}" ]; then
+            curl --fail --silent --show-error \
+              --request POST \
+              --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "${payload}" \
+              "${dns_records_url}" |
+            jq '{success, errors, record: {type: .result.type, name: .result.name, content: .result.content, proxied: .result.proxied}}'
+          else
+            curl --fail --silent --show-error \
+              --request PATCH \
+              --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              --header "Content-Type: application/json" \
+              --data "${payload}" \
+              "${dns_records_url}/${record_id}" |
+            jq '{success, errors, record: {type: .result.type, name: .result.name, content: .result.content, proxied: .result.proxied}}'
+          fi
       - name: Attach custom domain
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
