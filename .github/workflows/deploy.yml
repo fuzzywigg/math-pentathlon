@@ -20,9 +20,46 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
+      - name: Ensure Cloudflare Pages project exists
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create math-pentathlon --production-branch=alpha --compatibility-date=2026-05-06
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=math-pentathlon --branch=alpha
+      - name: Attach custom domain
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          domains_url="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/math-pentathlon/domains"
+          existing_domain="$(
+            curl --fail --silent --show-error \
+              --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              --header "Content-Type: application/json" \
+              "${domains_url}" |
+            jq -r '.result[]?.name' |
+            grep -Fx 'math.pappas.work' || true
+          )"
+
+          if [ "${existing_domain}" = "math.pappas.work" ]; then
+            echo "math.pappas.work is already attached"
+            exit 0
+          fi
+
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            --header "Content-Type: application/json" \
+            --data '{"name":"math.pappas.work"}' \
+            "${domains_url}" |
+          jq '{success, errors, domain: .result.name, status: .result.status}'
