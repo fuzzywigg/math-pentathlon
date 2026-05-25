@@ -27,7 +27,8 @@ async function playTurn(
 
 test.describe('Kings & Quadraphages - Full Game', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    // Navigate directly to the game
+    await page.goto('/#/game/kings-quadraphages');
   });
 
   test('displays initial game state correctly', async ({ page }) => {
@@ -269,8 +270,18 @@ test.describe('Kings & Quadraphages - Full Game', () => {
     await expect(page.locator('.supply-p1')).toContainText('29');
     await expect(page.locator('.status-turn')).toContainText('Player 2');
 
-    // Click New Game
+    // Click New Game to open modal
     await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+
+    // Select 2 Player mode (human vs human)
+    await page.click('.mode-option[data-mode="human-vs-human"]');
+
+    // Click Start Game
+    await page.click('#start-game-btn');
+
+    // Modal should close
+    await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
 
     // Verify reset
     await expect(page.locator('.supply-p1')).toContainText('30');
@@ -278,8 +289,6 @@ test.describe('Kings & Quadraphages - Full Game', () => {
     await expect(page.locator('.status-turn')).toContainText('Player 1');
 
     // Kings should be back at starting positions
-    const p1King = page.locator('.cell[data-row="1"][data-col="5"] .cell-king, .cell[data-row="1"][data-col="5"].cell-king');
-    // Check P1 king is at (1,5)
     const kingCell = page.locator('.cell[data-row="1"][data-col="5"]');
     await expect(kingCell).toHaveClass(/cell-king/);
   });
@@ -293,10 +302,10 @@ test.describe('Kings & Quadraphages - Full Game', () => {
 
     // Modal should be visible
     await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-    await expect(page.locator('.modal-content h2')).toContainText('How to Play');
+    await expect(page.locator('#help-modal .modal-content h2')).toContainText('How to Play');
 
     // Close with X button
-    await page.click('.modal-close');
+    await page.click('#help-modal .modal-close');
     await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
 
     // Open again and close with Escape
@@ -341,7 +350,7 @@ test.describe('Kings & Quadraphages - Full Game', () => {
 
 test.describe('Win Detection', () => {
   test('detects winner when king is trapped', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#/game/kings-quadraphages');
 
     // This is a simplified test that relies on the game working correctly
     // We'll verify the win detection UI elements exist and work
