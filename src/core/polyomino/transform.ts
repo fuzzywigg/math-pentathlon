@@ -93,13 +93,15 @@ export function centerCells(cells: Cell[]): Cell[] {
 }
 
 /**
- * Translate cells by an offset
+ * Translate cells by an offset (Cell object or two numbers)
  */
-export function translateCells(cells: Cell[], rowOffset: number, colOffset: number): Cell[] {
-  return cells.map(cell => ({
-    row: cell.row + rowOffset,
-    col: cell.col + colOffset,
-  }));
+export function translateCells(cells: Cell[], offset: Cell): Cell[];
+export function translateCells(cells: Cell[], rowOffset: number, colOffset: number): Cell[];
+export function translateCells(cells: Cell[], rowOrOffset: Cell | number, colOffset?: number): Cell[] {
+  if (typeof rowOrOffset === 'object') {
+    return cells.map(cell => ({ row: cell.row + rowOrOffset.row, col: cell.col + rowOrOffset.col }));
+  }
+  return cells.map(cell => ({ row: cell.row + rowOrOffset, col: cell.col + colOffset! }));
 }
 
 /**
@@ -301,4 +303,150 @@ export function areCellsConnected(cells: Cell[]): boolean {
   }
 
   return visited.size === cells.length;
+}
+
+/**
+ * Get the full bounding box with min/max row/col and dimensions
+ */
+export function getBounds(cells: Cell[]): {
+  minRow: number; maxRow: number; minCol: number; maxCol: number; width: number; height: number;
+} {
+  if (cells.length === 0) {
+    return { minRow: 0, maxRow: 0, minCol: 0, maxCol: 0, width: 0, height: 0 };
+  }
+  const rows = cells.map(c => c.row);
+  const cols = cells.map(c => c.col);
+  const minRow = Math.min(...rows);
+  const maxRow = Math.max(...rows);
+  const minCol = Math.min(...cols);
+  const maxCol = Math.max(...cols);
+  return { minRow, maxRow, minCol, maxCol, width: maxCol - minCol + 1, height: maxRow - minRow + 1 };
+}
+
+/**
+ * Sort cells top-to-bottom, left-to-right
+ */
+export function sortCells(cells: Cell[]): Cell[] {
+  return [...cells].sort((a, b) => a.row !== b.row ? a.row - b.row : a.col - b.col);
+}
+
+/**
+ * Canonicalize cells: normalize to origin then sort
+ */
+export function canonicalizeCells(cells: Cell[]): Cell[] {
+  return sortCells(normalizeCells(cells));
+}
+
+/**
+ * Rotate cells 90 degrees clockwise (convenience wrapper)
+ */
+export function rotateCells90CW(cells: Cell[]): Cell[] {
+  return rotateCells(cells, 90);
+}
+
+/**
+ * Apply rotation and optional flip to cells (ignores canFlip/canRotate flags)
+ */
+export function transformCells(cells: Cell[], rotation: Rotation, flipped: boolean): Cell[] {
+  let result = cells;
+  if (flipped) result = flipCellsHorizontal(result);
+  result = rotateCells(result, rotation);
+  return normalizeCells(result);
+}
+
+/**
+ * Rotate a polyomino 90° clockwise and return a new shape
+ */
+export function rotatePolyomino(shape: PolyominoShape): PolyominoShape {
+  return {
+    ...shape,
+    cells: normalizeCells(rotateCells(shape.cells, 90)),
+  };
+}
+
+/**
+ * Flip a polyomino horizontally and return a new shape
+ */
+export function flipPolyomino(shape: PolyominoShape): PolyominoShape {
+  return {
+    ...shape,
+    cells: normalizeCells(flipCellsHorizontal(shape.cells)),
+  };
+}
+
+/**
+ * Get a polyomino with a specific rotation and flip applied
+ */
+export function getTransformedPolyomino(
+  shape: PolyominoShape,
+  rotation: Rotation,
+  flipped: boolean
+): PolyominoShape {
+  return {
+    ...shape,
+    cells: transformCells(shape.cells, rotation, flipped),
+  };
+}
+
+/**
+ * Get all unique orientations (tries all 8: 4 rotations × 2 flips), ignoring canFlip/canRotate
+ */
+export function getAllTransformations(shape: PolyominoShape): PolyominoShape[] {
+  const seen = new Set<string>();
+  const results: PolyominoShape[] = [];
+
+  for (const flipped of [false, true]) {
+    for (const rotation of [0, 90, 180, 270] as Rotation[]) {
+      const cells = transformCells(shape.cells, rotation, flipped);
+      const key = cellsToKey(cells);
+      if (!seen.has(key)) {
+        seen.add(key);
+        results.push({ ...shape, cells });
+      }
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Check if two polyominoes are equivalent under any rotation/flip
+ */
+export function arePolyominoesEquivalent(a: PolyominoShape, b: PolyominoShape): boolean {
+  if (a.cells.length !== b.cells.length) return false;
+  const aTransforms = getAllTransformations(a);
+  const bKey = cellsToKey(normalizeCells(b.cells));
+  return aTransforms.some(t => cellsToKey(t.cells) === bKey);
+}
+
+/**
+ * Count the number of unique orientations of a shape (= symmetry count)
+ */
+export function getSymmetryCount(shape: PolyominoShape): number {
+  return getAllTransformations(shape).length;
+}
+
+/**
+ * Get absolute cell positions for a shape at a position with rotation and flip
+ * (alias for getCellsAtPosition)
+ */
+export function getAbsoluteCells(
+  shape: PolyominoShape,
+  position: Cell,
+  rotation: Rotation,
+  flipped: boolean
+): Cell[] {
+  const transformed = transformCells(shape.cells, rotation, flipped);
+  return translated(transformed, position);
+}
+
+function translated(cells: Cell[], offset: Cell): Cell[] {
+  return cells.map(c => ({ row: c.row + offset.row, col: c.col + offset.col }));
+}
+
+/**
+ * Check whether all cells are within a grid of given dimensions (0-based)
+ */
+export function areCellsInBounds(cells: Cell[], rows: number, cols: number): boolean {
+  return cells.every(c => c.row >= 0 && c.row < rows && c.col >= 0 && c.col < cols);
 }

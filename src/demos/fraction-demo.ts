@@ -676,8 +676,7 @@ function setupEquivalentFinder(): void {
     }
 
     const simplified = simplify(fraction);
-    const targetDenoms = [2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24];
-    const equivalents = findEquivalentFractions(simplified, targetDenoms);
+    const equivalents = findEquivalentFractions(simplified, 24);
 
     if (resultContainer) {
       resultContainer.innerHTML = '';

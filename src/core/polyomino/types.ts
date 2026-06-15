@@ -24,8 +24,10 @@ export interface PolyominoShape {
   canRotate: boolean;
   /** Whether the shape can be flipped/reflected */
   canFlip: boolean;
-  /** Number of cells (size) */
+  /** Number of cells (size) - kept for backward compat */
   size: number;
+  /** Polyomino order (same as size) */
+  order: number;
 }
 
 /** A polyomino instance placed on the board */
@@ -78,66 +80,73 @@ export interface PolyominoRenderConfig {
 export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'I',
-    name: 'I-piece',
+    name: 'I-tetromino',
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }],
     color: '#00bcd4',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'O',
-    name: 'O-piece',
+    name: 'O-tetromino',
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
     color: '#ffeb3b',
     canRotate: false,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'T',
-    name: 'T-piece',
+    name: 'T-tetromino',
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }],
     color: '#9c27b0',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'S',
-    name: 'S-piece',
+    name: 'S-tetromino',
     cells: [{ row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
     color: '#4caf50',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'Z',
-    name: 'Z-piece',
+    name: 'Z-tetromino',
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
     color: '#f44336',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'J',
-    name: 'J-piece',
+    name: 'J-tetromino',
     cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
     color: '#3f51b5',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
   {
     id: 'L',
-    name: 'L-piece',
+    name: 'L-tetromino',
     cells: [{ row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
     color: '#ff9800',
     canRotate: true,
     canFlip: false,
     size: 4,
+    order: 4,
   },
 ];
 
@@ -146,52 +155,52 @@ export const HEX_PATTERN_BLOCKS: PolyominoShape[] = [
   {
     id: 'hexagon',
     name: 'Hexagon',
-    // Hexagon covers 6 triangular cells (represented as a larger unit)
     cells: [{ row: 0, col: 0 }],
     color: '#ffeb3b', // Yellow
     canRotate: false,
     canFlip: false,
     size: 6,
+    order: 6,
   },
   {
     id: 'trapezoid',
     name: 'Trapezoid',
-    // Trapezoid covers 3 triangular cells
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
     color: '#f44336', // Red
     canRotate: true,
     canFlip: true,
     size: 3,
+    order: 3,
   },
   {
     id: 'rhombus',
     name: 'Rhombus',
-    // Rhombus covers 2 triangular cells
     cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
     color: '#2196f3', // Blue
     canRotate: true,
     canFlip: false,
     size: 2,
+    order: 2,
   },
   {
     id: 'triangle',
     name: 'Triangle',
-    // Single triangular cell
     cells: [{ row: 0, col: 0 }],
     color: '#4caf50', // Green
     canRotate: true,
     canFlip: false,
     size: 1,
+    order: 1,
   },
   {
     id: 'square',
     name: 'Square',
-    // Square covers 2 triangular cells (different orientation than rhombus)
     cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }],
     color: '#ff9800', // Orange
     canRotate: true,
     canFlip: false,
     size: 2,
+    order: 2,
   },
 ];
 
@@ -205,6 +214,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
   {
     id: 'I5',
@@ -214,6 +224,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'L5',
@@ -223,6 +234,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
   {
     id: 'N',
@@ -232,6 +244,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
   {
     id: 'P',
@@ -241,6 +254,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
   {
     id: 'T5',
@@ -250,6 +264,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'U',
@@ -259,6 +274,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'V',
@@ -268,6 +284,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'W',
@@ -277,6 +294,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'X',
@@ -286,6 +304,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: false,
     canFlip: false,
     size: 5,
+    order: 5,
   },
   {
     id: 'Y',
@@ -295,6 +314,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
   {
     id: 'Z5',
@@ -304,6 +324,7 @@ export const PENTOMINOES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 5,
+    order: 5,
   },
 ];
 
@@ -317,6 +338,7 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
     canRotate: false,
     canFlip: false,
     size: 1,
+    order: 1,
   },
   {
     id: 'domino',
@@ -326,6 +348,7 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 2,
+    order: 2,
   },
   {
     id: 'tromino-I',
@@ -335,6 +358,7 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
     canRotate: true,
     canFlip: false,
     size: 3,
+    order: 3,
   },
   {
     id: 'tromino-L',
@@ -344,6 +368,7 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
     canRotate: true,
     canFlip: true,
     size: 3,
+    order: 3,
   },
 ];
 
@@ -355,4 +380,16 @@ export function getShapeById(id: string, set: PolyominoShape[]): PolyominoShape 
 /** Get shapes by size */
 export function getShapesBySize(size: number, set: PolyominoShape[]): PolyominoShape[] {
   return set.filter(s => s.size === size);
+}
+
+/** Get all polyominoes of a given order from the standard sets */
+export function getPolyominoesByOrder(order: number): PolyominoShape[] {
+  const allSets = [...SIMPLE_SHAPES, ...TETROMINOES, ...PENTOMINOES];
+  return allSets.filter(s => s.order === order);
+}
+
+/** Look up a polyomino by ID across all standard sets */
+export function getPolyominoById(id: string): PolyominoShape | undefined {
+  const allSets = [...SIMPLE_SHAPES, ...TETROMINOES, ...PENTOMINOES, ...HEX_PATTERN_BLOCKS];
+  return allSets.find(s => s.id === id);
 }

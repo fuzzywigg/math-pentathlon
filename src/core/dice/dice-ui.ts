@@ -174,13 +174,13 @@ function renderPolyhedral(type: DiceType, value: number, size: number, color: st
 
 /** Render a single die */
 export function renderDie(die: DieRoll, size: number = 60): SVGElement {
-  const config = DICE_CONFIGS[die.type];
+  const config = DICE_CONFIGS[die.diceType];
   const color = config.color || '#2196f3';
 
-  if (die.type === 'd6') {
+  if (die.diceType === 'd6') {
     return renderD6(die.value, size, color);
   }
-  return renderPolyhedral(die.type, die.value, size, color);
+  return renderPolyhedral(die.diceType, die.value, size, color);
 }
 
 /** Create an interactive die element with click handling */
@@ -190,13 +190,13 @@ export function createInteractiveDie(
   onClick?: (die: DieRoll) => void
 ): HTMLElement {
   const wrapper = document.createElement('div');
-  wrapper.className = `die-wrapper ${die.selected ? 'selected' : ''} ${die.used ? 'used' : ''}`;
+  wrapper.className = `die-wrapper ${die.isSelected ? 'selected' : ''} ${die.isLocked ? 'used' : ''}`;
   wrapper.setAttribute('data-die-id', die.id);
 
   const svg = renderDie(die, size);
   wrapper.appendChild(svg);
 
-  if (onClick && !die.used) {
+  if (onClick && !die.isLocked) {
     wrapper.style.cursor = 'pointer';
     wrapper.addEventListener('click', () => onClick(die));
   }
@@ -223,7 +223,7 @@ export function renderRollResult(
   const diceContainer = document.createElement('div');
   diceContainer.className = 'dice-container';
 
-  for (const die of result.dice) {
+  for (const die of result.rolls) {
     const dieEl = createInteractiveDie(
       die,
       dieSize,
@@ -262,12 +262,12 @@ export function animateRoll(
 
   // Create dice elements for animation
   const dieElements: HTMLElement[] = [];
-  for (const die of finalResult.dice) {
+  for (const die of finalResult.rolls) {
     const wrapper = document.createElement('div');
     wrapper.className = 'die-wrapper rolling';
 
     // Start with random value
-    const config = DICE_CONFIGS[die.type];
+    const config = DICE_CONFIGS[die.diceType];
     const tempDie: DieRoll = { ...die, value: Math.ceil(Math.random() * config.faces) };
     const svg = renderDie(tempDie, dieSize);
     wrapper.appendChild(svg);
@@ -288,8 +288,8 @@ export function animateRoll(
     if (elapsed < duration) {
       // Update each die with random value
       dieElements.forEach((wrapper, index) => {
-        const die = finalResult.dice[index];
-        const config = DICE_CONFIGS[die.type];
+        const die = finalResult.rolls[index];
+        const config = DICE_CONFIGS[die.diceType];
         const randomValue = Math.ceil(Math.random() * config.faces);
         const tempDie: DieRoll = { ...die, value: randomValue };
 
@@ -305,7 +305,7 @@ export function animateRoll(
         wrapper.classList.remove('rolling');
         wrapper.classList.add('settled');
         wrapper.innerHTML = '';
-        wrapper.appendChild(renderDie(finalResult.dice[index], dieSize));
+        wrapper.appendChild(renderDie(finalResult.rolls[index], dieSize));
       });
 
       // Add total

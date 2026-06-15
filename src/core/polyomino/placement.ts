@@ -2,7 +2,11 @@
 // Handles placement rules, collision detection, and board state
 
 import { Cell, PolyominoShape, PlacedPolyomino, PlacementResult, Rotation } from './types';
-import { getCellsAtPosition, getTransformedCells } from './transform';
+import { getCellsAtPosition, getTransformedCells, transformCells, translateCells } from './transform';
+
+// =============================================================================
+// Legacy Board API (kept for backward compatibility with juggle and other games)
+// =============================================================================
 
 /** Board representation for placement validation */
 export interface Board {
@@ -10,6 +14,223 @@ export interface Board {
   cols: number;
   cells: boolean[][]; // true = occupied
   placements: PlacedPolyomino[];
+}
+
+// =============================================================================
+// New Grid API
+// =============================================================================
+
+/** A cell in the new Grid */
+export interface GridCell {
+  occupied: boolean;
+  polyominoId?: string;
+}
+
+/** A placement record for the new Grid API */
+export interface Placement {
+  polyomino: PolyominoShape;
+  position: Cell;
+  rotation: Rotation;
+  flipped: boolean;
+}
+
+/** New grid representation */
+export interface Grid {
+  kind: 'grid';
+  rows: number;
+  cols: number;
+  cells: GridCell[][];
+  placements: Placement[];
+}
+
+/**
+ * Create an empty Grid
+ */
+export function createGrid(rows: number, cols: number): Grid {
+  const cells: GridCell[][] = [];
+  for (let r = 0; r < rows; r++) {
+    cells.push(new Array(cols).fill(null).map(() => ({ occupied: false })));
+  }
+  return { kind: 'grid', rows, cols, cells, placements: [] };
+}
+
+/**
+ * Check if a grid cell is occupied (out-of-bounds counts as occupied)
+ */
+export function isCellOccupied(grid: Grid, row: number, col: number): boolean {
+  if (row < 0 || row >= grid.rows || col < 0 || col >= grid.cols) return true;
+  return grid.cells[row][col].occupied;
+}
+
+/**
+ * Check if a placement is valid on a Grid
+ */
+export function isValidPlacement(grid: Grid, polyomino: PolyominoShape, position: Cell): boolean {
+  const cells = translateCells(transformCells(polyomino.cells, 0, false), position);
+  for (const c of cells) {
+    if (isCellOccupied(grid, c.row, c.col)) return false;
+  }
+  return true;
+}
+
+/**
+ * Place a polyomino on a Grid (immutable) or on a Board (legacy, mutable-style)
+ */
+export function placePolyomino(grid: Grid, shape: PolyominoShape, position: Cell): Grid;
+export function placePolyomino(
+  board: Board,
+  shape: PolyominoShape,
+  position: Cell,
+  rotation?: Rotation,
+  flipped?: boolean,
+  playerId?: number
+): Board;
+export function placePolyomino(
+  boardOrGrid: Board | Grid,
+  shape: PolyominoShape,
+  position: Cell,
+  rotation: Rotation = 0,
+  flipped: boolean = false,
+  playerId?: number
+): Board | Grid {
+  if ('kind' in boardOrGrid && boardOrGrid.kind === 'grid') {
+    // New Grid API
+    const grid = boardOrGrid as Grid;
+    const shapeCells = translateCells(transformCells(shape.cells, 0, false), position);
+    // Deep-copy cells
+    const newCells: GridCell[][] = grid.cells.map(row => row.map(cell => ({ ...cell })));
+    for (const c of shapeCells) {
+      newCells[c.row][c.col] = { occupied: true, polyominoId: shape.id };
+    }
+    const placement: Placement = { polyomino: shape, position, rotation: 0, flipped: false };
+    return { ...grid, cells: newCells, placements: [...grid.placements, placement] };
+  }
+
+  // Legacy Board API
+  const board = boardOrGrid as Board;
+  const validation = validatePlacement(board, shape, position, rotation, flipped);
+  if (!validation.valid) {
+    throw new Error(validation.reason || 'Invalid placement');
+  }
+  const newCells = board.cells.map(row => [...row]);
+  for (const cell of validation.cells) {
+    newCells[cell.row][cell.col] = true;
+  }
+  const placement: PlacedPolyomino = { shapeId: shape.id, position, rotation, flipped, playerId };
+  return { ...board, cells: newCells, placements: [...board.placements, placement] };
+}
+
+/**
+ * Remove a polyomino by ID from a Grid
+ */
+export function removePolyomino(grid: Grid, polyominoId: string): Grid {
+  const newCells: GridCell[][] = grid.cells.map(row => row.map(cell => ({ ...cell })));
+  for (let r = 0; r < grid.rows; r++) {
+    for (let c = 0; c < grid.cols; c++) {
+      if (newCells[r][c].polyominoId === polyominoId) {
+        newCells[r][c] = { occupied: false };
+      }
+    }
+  }
+  const newPlacements = grid.placements.filter(p => p.polyomino.id !== polyominoId);
+  return { ...grid, cells: newCells, placements: newPlacements };
+}
+
+/**
+ * Get all valid positions for a polyomino on a Grid with given rotation/flip
+ */
+export function getAllValidPositions(
+  grid: Grid,
+  polyomino: PolyominoShape,
+  rotation: Rotation,
+  flipped: boolean
+): Cell[] {
+  const transformed = transformCells(polyomino.cells, rotation, flipped);
+  const minRow = Math.min(...transformed.map(c => c.row));
+  const maxRow = Math.max(...transformed.map(c => c.row));
+  const minCol = Math.min(...transformed.map(c => c.col));
+  const maxCol = Math.max(...transformed.map(c => c.col));
+
+  const valid: Cell[] = [];
+  for (let row = -minRow; row <= grid.rows - 1 - maxRow; row++) {
+    for (let col = -minCol; col <= grid.cols - 1 - maxCol; col++) {
+      const pos = { row, col };
+      const cells = translateCells(transformed, pos);
+      if (cells.every(c => !isCellOccupied(grid, c.row, c.col))) {
+        valid.push(pos);
+      }
+    }
+  }
+  return valid;
+}
+
+/**
+ * Get cells for a Placement (new API) or legacy PlacedPolyomino+shapes
+ */
+export function getPlacementCells(placement: Placement): Cell[];
+export function getPlacementCells(placement: PlacedPolyomino, shapes: PolyominoShape[]): Cell[];
+export function getPlacementCells(
+  placement: Placement | PlacedPolyomino,
+  shapes?: PolyominoShape[]
+): Cell[] {
+  if ('polyomino' in placement) {
+    // New Placement API
+    return translateCells(
+      transformCells(placement.polyomino.cells, placement.rotation, placement.flipped),
+      placement.position
+    );
+  }
+  // Legacy PlacedPolyomino API
+  const shape = shapes?.find(s => s.id === placement.shapeId);
+  if (!shape) return [];
+  return getCellsAtPosition(shape, placement.position, placement.rotation, placement.flipped);
+}
+
+/**
+ * Check if two Placements overlap
+ */
+export function doPlacementsOverlap(p1: Placement, p2: Placement): boolean {
+  const cells1 = getPlacementCells(p1);
+  const keys1 = new Set(cells1.map(c => `${c.row},${c.col}`));
+  const cells2 = getPlacementCells(p2);
+  return cells2.some(c => keys1.has(`${c.row},${c.col}`));
+}
+
+/**
+ * Get cells adjacent to all cells in a placement (4 or 8 connected, excluding placement cells)
+ */
+export function getAdjacentCells(grid: Grid, placement: Placement, diagonal: boolean): Cell[] {
+  const occupiedCells = getPlacementCells(placement);
+  const occupied = new Set(occupiedCells.map(c => `${c.row},${c.col}`));
+
+  const directions = diagonal
+    ? [
+        { row: -1, col: -1 }, { row: -1, col: 0 }, { row: -1, col: 1 },
+        { row: 0, col: -1 },                        { row: 0, col: 1 },
+        { row: 1, col: -1 },  { row: 1, col: 0 },  { row: 1, col: 1 },
+      ]
+    : [
+        { row: -1, col: 0 }, { row: 1, col: 0 },
+        { row: 0, col: -1 }, { row: 0, col: 1 },
+      ];
+
+  const seen = new Set<string>();
+  const adjacent: Cell[] = [];
+
+  for (const cell of occupiedCells) {
+    for (const dir of directions) {
+      const neighbor = { row: cell.row + dir.row, col: cell.col + dir.col };
+      const key = `${neighbor.row},${neighbor.col}`;
+      if (!occupied.has(key) && !seen.has(key) &&
+          neighbor.row >= 0 && neighbor.row < grid.rows &&
+          neighbor.col >= 0 && neighbor.col < grid.cols) {
+        seen.add(key);
+        adjacent.push(neighbor);
+      }
+    }
+  }
+
+  return adjacent;
 }
 
 /**
@@ -69,45 +290,6 @@ export function validatePlacement(
   }
 
   return { valid: true, cells };
-}
-
-/**
- * Place a polyomino on the board
- */
-export function placePolyomino(
-  board: Board,
-  shape: PolyominoShape,
-  position: Cell,
-  rotation: Rotation = 0,
-  flipped: boolean = false,
-  playerId?: number
-): Board {
-  const validation = validatePlacement(board, shape, position, rotation, flipped);
-
-  if (!validation.valid) {
-    throw new Error(validation.reason || 'Invalid placement');
-  }
-
-  // Create new board state
-  const newCells = board.cells.map(row => [...row]);
-
-  for (const cell of validation.cells) {
-    newCells[cell.row][cell.col] = true;
-  }
-
-  const placement: PlacedPolyomino = {
-    shapeId: shape.id,
-    position,
-    rotation,
-    flipped,
-    playerId,
-  };
-
-  return {
-    ...board,
-    cells: newCells,
-    placements: [...board.placements, placement],
-  };
 }
 
 /**
@@ -220,15 +402,6 @@ export function getEmptyCells(board: Board): Cell[] {
  */
 export function isBoardFilled(board: Board): boolean {
   return countEmptyCells(board) === 0;
-}
-
-/**
- * Get the cells occupied by a specific placement
- */
-export function getPlacementCells(placement: PlacedPolyomino, shapes: PolyominoShape[]): Cell[] {
-  const shape = shapes.find(s => s.id === placement.shapeId);
-  if (!shape) return [];
-  return getCellsAtPosition(shape, placement.position, placement.rotation, placement.flipped);
 }
 
 /**

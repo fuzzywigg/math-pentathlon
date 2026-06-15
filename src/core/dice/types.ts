@@ -3,6 +3,16 @@
 /** Standard dice types by number of faces */
 export type DiceType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20';
 
+/** Face counts for each die type */
+export const DICE_FACES: Record<DiceType, number> = {
+  d4: 4,
+  d6: 6,
+  d8: 8,
+  d10: 10,
+  d12: 12,
+  d20: 20,
+};
+
 /** Dice face configuration */
 export interface DiceConfig {
   type: DiceType;
@@ -26,19 +36,24 @@ export const DICE_CONFIGS: Record<DiceType, DiceConfig> = {
 /** Result of a single die roll */
 export interface DieRoll {
   id: string;
-  type: DiceType;
+  diceType: DiceType;
   value: number;
-  /** Whether this die is selected (for combination UI) */
-  selected?: boolean;
-  /** Whether this die has been used */
-  used?: boolean;
+  isSelected: boolean;
+  isLocked: boolean;
+  timestamp: number;
+}
+
+/** Configuration for a roll (dice types and selection constraints) */
+export interface RollConfig {
+  dice: DiceType[];
+  minSelectable?: number;
+  maxSelectable?: number;
 }
 
 /** Result of rolling multiple dice */
 export interface RollResult {
   id: string;
-  timestamp: number;
-  dice: DieRoll[];
+  rolls: DieRoll[];
   /** Sum of all dice */
   total: number;
 }
