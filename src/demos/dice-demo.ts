@@ -148,7 +148,7 @@ export function renderDiceDemo(container: HTMLElement): void {
       addLog(log2d6, `Selection changed: ${dice.map(d => d.value).join(' + ')} = ${sum}`);
     },
     onRollComplete: (result) => {
-      addLog(log2d6, `Rolled: [${result.dice.map(d => d.value).join(', ')}] Total: ${result.total}`);
+      addLog(log2d6, `Rolled: [${result.rolls.map(d => d.value).join(', ')}] Total: ${result.total}`);
     },
     onConfirm: (selectedDice, sum) => {
       addLog(log2d6, `✓ Confirmed: ${selectedDice.map(d => d.value).join(' + ')} = ${sum}`);
@@ -163,10 +163,10 @@ export function renderDiceDemo(container: HTMLElement): void {
     diceSet: COMMON_DICE_SETS.primeGold,
     multiSelect: true,
     onSelectionChange: (dice, sum) => {
-      addLog(logPoly, `Selection: ${dice.map(d => `${d.type}:${d.value}`).join(', ')} = ${sum}`);
+      addLog(logPoly, `Selection: ${dice.map(d => `${d.diceType}:${d.value}`).join(', ')} = ${sum}`);
     },
     onRollComplete: (result) => {
-      addLog(logPoly, `Rolled: ${result.dice.map(d => `${d.type}:${d.value}`).join(', ')}`);
+      addLog(logPoly, `Rolled: ${result.rolls.map(d => `${d.diceType}:${d.value}`).join(', ')}`);
     },
     onConfirm: (_dice, sum) => {
       addLog(logPoly, `✓ Confirmed sum: ${sum}`);

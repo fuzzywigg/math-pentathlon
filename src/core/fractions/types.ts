@@ -4,6 +4,8 @@
 export interface Fraction {
   numerator: number;
   denominator: number;
+  /** When true, the fraction is negative (numerator and denominator are positive) */
+  isNegative?: boolean;
 }
 
 /** A mixed number (whole + fraction) */
