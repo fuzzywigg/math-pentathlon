@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 
+const KINGS_QUADRAPHAGES_URL = '/#/game/kings-quadraphages';
+
 /**
  * Helper to click a cell on the board
  * Uses 1-based row/col indexing (matches game logic)
@@ -27,7 +29,7 @@ async function playTurn(
 
 test.describe('Kings & Quadraphages - Full Game', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto(KINGS_QUADRAPHAGES_URL);
   });
 
   test('displays initial game state correctly', async ({ page }) => {
@@ -341,7 +343,7 @@ test.describe('Kings & Quadraphages - Full Game', () => {
 
 test.describe('Win Detection', () => {
   test('detects winner when king is trapped', async ({ page }) => {
-    await page.goto('/');
+    await page.goto(KINGS_QUADRAPHAGES_URL);
 
     // This is a simplified test that relies on the game working correctly
     // We'll verify the win detection UI elements exist and work
