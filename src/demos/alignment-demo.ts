@@ -1,19 +1,18 @@
 // Alignment Detection Demo - Interactive test page
 
+import { AlignmentConfig, ContiguousConfig, CellValue } from '../core/alignment/types';
 import {
-  AlignmentConfig,
-  ContiguousConfig,
-  CellValue,
   createArrayGetter,
   checkForWinner,
   findAllAlignments,
   countAlignmentPotential,
+} from '../core/alignment/grid-alignment';
+import {
   findAllRegions,
   regionConnectsEdges,
   getHexNeighbors,
-  injectHighlightStyles,
-
-} from '../core/alignment';
+} from '../core/alignment/contiguous';
+import { injectHighlightStyles } from '../core/alignment/highlight-ui';
 
 type Board = CellValue[][];
 

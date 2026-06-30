@@ -20,8 +20,21 @@ jobs:
       - name: TypeScript type checking
         run: npx tsc --noEmit
 
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Security audit
+        run: npm audit --audit-level=high
+
   build:
     runs-on: ubuntu-latest
+    needs: audit
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

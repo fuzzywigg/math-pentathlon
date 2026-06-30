@@ -32,6 +32,9 @@ export interface GameState {
   player2Supply: number;
 }
 
+/** @alias GameState — compatibility alias used by tests and rules module */
+export type RulesGameState = GameState;
+
 // Convert 1-based position to 0-based Position
 export function fromOneBasedPosition(row: number, col: number): Position {
   return { row: row - 1, col: col - 1 };
