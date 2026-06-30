@@ -23,7 +23,6 @@
 
 import { GridPosition, CellValue, CellGetter, AlignmentResult, Region } from './types';
 import {
-  isInBounds as _isInBounds,
   findAlignmentFromCenter,
   findAllAlignments as _findAllAlignments,
 } from './grid-alignment';
