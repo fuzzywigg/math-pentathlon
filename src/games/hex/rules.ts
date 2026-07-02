@@ -22,34 +22,31 @@ export function isValidMove(state: HexGameState, pos: HexPosition): boolean {
   return true;
 }
 
-// Get all 6 neighbors of a hex cell
-// In a hex grid with offset coordinates (odd-q or even-q), neighbors depend on column parity
+// Get all 6 neighbors of a hex cell.
+// The board is rendered as a parallelogram/rhombus (pointy-top hexes) where each
+// row is shifted right by half a hex-width relative to the previous row.  In this
+// layout the coordinate system is axial: the six neighbors have FIXED offsets that
+// do not depend on row parity:
+//
+//   (-1, 0)  upper-left      (-1, +1)  upper-right
+//   ( 0,-1)  left            ( 0, +1)  right
+//   (+1,-1)  lower-left      (+1,  0)  lower-right
+//
+// (The old code had the same offsets but labelled them incorrectly as
+// "top/bottom/left/right", implying a rectangular grid.)
 export function getNeighbors(pos: HexPosition, boardSize: number): HexPosition[] {
-  const neighbors: HexPosition[] = [];
-
-  // For a hex grid displayed as a parallelogram/rhombus shape,
-  // we use axial-like coordinates where each cell has 6 neighbors
-  // The neighbor offsets for a "pointy-top" hex grid in offset coordinates:
   const offsets = [
-    { row: -1, col: 0 },  // top
-    { row: 1, col: 0 },   // bottom
-    { row: 0, col: -1 },  // left
-    { row: 0, col: 1 },   // right
-    { row: -1, col: 1 },  // top-right
-    { row: 1, col: -1 },  // bottom-left
+    { row: -1, col:  0 }, // upper-left
+    { row: -1, col: +1 }, // upper-right
+    { row:  0, col: -1 }, // left
+    { row:  0, col: +1 }, // right
+    { row: +1, col: -1 }, // lower-left
+    { row: +1, col:  0 }, // lower-right
   ];
 
-  for (const offset of offsets) {
-    const neighbor: HexPosition = {
-      row: pos.row + offset.row,
-      col: pos.col + offset.col,
-    };
-    if (isValidPosition(neighbor, boardSize)) {
-      neighbors.push(neighbor);
-    }
-  }
-
-  return neighbors;
+  return offsets
+    .map(o => ({ row: pos.row + o.row, col: pos.col + o.col }))
+    .filter(p => isValidPosition(p, boardSize));
 }
 
 // Check if player has won using BFS/flood fill
