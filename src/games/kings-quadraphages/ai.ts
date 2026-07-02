@@ -1,7 +1,7 @@
 // AI Opponent for Kings & Quadraphages
 
-import { GameState } from './game-state';
-import { BOARD_SIZE } from './board';
+import { GameState as FullGameState } from './game-state';
+import { GameState, BOARD_SIZE } from './board';
 import {
   getValidKingMoves,
   getValidQuadraphagePlacements,
@@ -378,7 +378,7 @@ export function evaluatePosition(
 
 // Check if AI should make a move (it's AI's turn)
 export function isAITurn(
-  state: GameState,
+  state: FullGameState,
   aiPlayer: PlayerOwner | null,
   gameMode: 'human-vs-human' | 'human-vs-ai'
 ): boolean {
