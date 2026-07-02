@@ -6,22 +6,21 @@ import {
   TRACK_LENGTH,
   getOpponent,
   getPlayerPosition,
+  createChainBucket,
 } from './types';
 
 // Draw two chains from the bucket
 export function drawChains(state: StarTrackGameState): StarTrackGameState {
   if (state.phase !== 'drawChains') return state;
-  if (state.chainBucket.length < 2) {
-    // Not enough chains - refill bucket (in a real game, might end differently)
-    // For simplicity, just end game as draw or continue with what's available
-    if (state.chainBucket.length === 0) {
-      return state;
-    }
-  }
 
-  const newBucket = [...state.chainBucket];
+  // If the bucket is depleted (or has fewer than 2 chains), reset it so the
+  // game can always continue — this is the recovery mechanism for Bug #5.
+  let newBucket = state.chainBucket.length < 2
+    ? createChainBucket()
+    : [...state.chainBucket];
+
   const chain1 = newBucket.pop()!;
-  const chain2 = newBucket.length > 0 ? newBucket.pop()! : chain1;
+  const chain2 = newBucket.pop()!;
 
   return {
     ...state,
