@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <text y=".9em" font-size="90">🔢</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Math Pentathlon favicon">
+  <rect width="64" height="64" rx="14" fill="#102a43"/>
+  <path d="M11 44V20h8v16h26v8H11Zm34 0V20h8v24h-8ZM19 20h26v8H19v-8Z" fill="#facc15"/>
+  <path d="M24 28h16v8H24z" fill="#34d399"/>
+  <text x="32" y="54" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="700" fill="#facc15">MP</text>
 </svg>

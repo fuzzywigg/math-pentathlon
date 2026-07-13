@@ -1,0 +1,19 @@
+{
+  "name": "Math Pentathlon",
+  "short_name": "MP",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#102a43",
+  "background_color": "#102a43",
+  "display": "standalone"
+}
