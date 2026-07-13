@@ -22,21 +22,28 @@ export function isValidMove(state: HexGameState, pos: HexPosition): boolean {
   return true;
 }
 
-// Get all 6 neighbors of a hex cell
-// In a hex grid with offset coordinates (odd-q or even-q), neighbors depend on column parity
+// Get all 6 neighbors of a hex cell.
+//
+// The board uses a parallelogram (skewed-axial) layout where every row is
+// shifted right by hexWidth/2 relative to the previous row — not an
+// alternating even/odd offset grid. In this coordinate system neighbor offsets
+// are UNIFORM (no row-parity switching):
+//
+//   (-1, 0)  upper-left   (-1,+1) upper-right
+//   ( 0,-1)  left         ( 0,+1) right
+//   (+1,-1)  lower-left   (+1, 0) lower-right
+//
+// This matches the rendering formula: x = base + col*W + row*(W/2)
 export function getNeighbors(pos: HexPosition, boardSize: number): HexPosition[] {
   const neighbors: HexPosition[] = [];
 
-  // For a hex grid displayed as a parallelogram/rhombus shape,
-  // we use axial-like coordinates where each cell has 6 neighbors
-  // The neighbor offsets for a "pointy-top" hex grid in offset coordinates:
   const offsets = [
-    { row: -1, col: 0 },  // top
-    { row: 1, col: 0 },   // bottom
-    { row: 0, col: -1 },  // left
-    { row: 0, col: 1 },   // right
-    { row: -1, col: 1 },  // top-right
-    { row: 1, col: -1 },  // bottom-left
+    { row: -1, col:  0 },  // upper-left
+    { row: -1, col:  1 },  // upper-right
+    { row:  0, col: -1 },  // left
+    { row:  0, col:  1 },  // right
+    { row:  1, col: -1 },  // lower-left
+    { row:  1, col:  0 },  // lower-right
   ];
 
   for (const offset of offsets) {
