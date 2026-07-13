@@ -194,8 +194,10 @@ export function renderBoard(
   // Event delegation for clicks
   if (onCellClick) {
     const handleCellAction = (cellEl: HTMLElement) => {
-      const clickedRow = parseInt(cellEl.dataset.row!, 10);
-      const clickedCol = parseInt(cellEl.dataset.col!, 10);
+      const clickedRow = parseInt(cellEl.dataset.row ?? '', 10);
+      const clickedCol = parseInt(cellEl.dataset.col ?? '', 10);
+      if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
+      if (clickedRow < 1 || clickedRow > 9 || clickedCol < 1 || clickedCol > 9) return;
       onCellClick(clickedRow, clickedCol);
     };
 
