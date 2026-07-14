@@ -3,6 +3,7 @@ import {
   isValidKingMove,
   isValidQuadraphagePlacement,
   checkWinCondition,
+  isDrawCondition,
   getOpponent,
 } from './rules';
 
@@ -128,15 +129,6 @@ export function getCurrentPhaseMessage(state: GameState): string {
   }
 }
 
-// Convert GameState to rules engine format
-function toRulesGameState(state: GameState) {
-  return {
-    board: state.board,
-    player1Supply: state.player1Supply,
-    player2Supply: state.player2Supply,
-  };
-}
-
 // Select the current player's king
 export function selectKing(state: GameState): GameState {
   if (state.turnPhase !== 'moveKing') {
@@ -165,12 +157,11 @@ export function moveKing(state: GameState, destination: Position): GameState {
     return state;
   }
 
-  // Convert to 0-based for rules engine
+  // Convert 1-based destination to 0-based index for rules engine
   const destIndex = toIndex(destination);
-  const rulesState = toRulesGameState(state);
 
   // Validate the move
-  if (!isValidKingMove(rulesState, state.currentPlayer, destIndex)) {
+  if (!isValidKingMove(state, state.currentPlayer, destIndex)) {
     return state;
   }
 
@@ -213,12 +204,11 @@ export function placeQuadraphage(state: GameState, position: Position): GameStat
     return state;
   }
 
-  // Convert to 0-based for rules engine
+  // Convert 1-based position to 0-based index for rules engine
   const posIndex = toIndex(position);
-  const rulesState = toRulesGameState(state);
 
   // Validate the placement
-  if (!isValidQuadraphagePlacement(rulesState, posIndex)) {
+  if (!isValidQuadraphagePlacement(state, posIndex)) {
     return state;
   }
 
@@ -256,20 +246,26 @@ export function placeQuadraphage(state: GameState, position: Position): GameStat
 export function endTurn(state: GameState): GameState {
   const opponent = getOpponent(state.currentPlayer);
 
-  // Check win condition using the rules engine
-  const rulesState = toRulesGameState(state);
-  const winner = checkWinCondition(rulesState);
+  const winner = checkWinCondition(state);
 
   if (winner) {
     return {
       ...state,
       winner,
       turnPhase: 'gameOver',
-      currentPlayer: opponent, // Switch player even though game is over
+      currentPlayer: opponent,
     };
   }
 
-  // Continue game
+  if (isDrawCondition(state)) {
+    return {
+      ...state,
+      winner: null,
+      turnPhase: 'gameOver',
+      currentPlayer: opponent,
+    };
+  }
+
   return {
     ...state,
     currentPlayer: opponent,
@@ -289,9 +285,7 @@ export function isValidMove(state: GameState, destination: Position): boolean {
   }
 
   const destIndex = toIndex(destination);
-  const rulesState = toRulesGameState(state);
-
-  return isValidKingMove(rulesState, state.currentPlayer, destIndex);
+  return isValidKingMove(state, state.currentPlayer, destIndex);
 }
 
 // Check if a placement is valid
@@ -301,7 +295,5 @@ export function isValidPlacement(state: GameState, position: Position): boolean 
   }
 
   const posIndex = toIndex(position);
-  const rulesState = toRulesGameState(state);
-
-  return isValidQuadraphagePlacement(rulesState, posIndex);
+  return isValidQuadraphagePlacement(state, posIndex);
 }
