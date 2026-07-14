@@ -8,20 +8,29 @@ import {
   getPlayerPosition,
 } from './types';
 
+// Determine winner by position when the bucket runs out
+function determineWinnerByPosition(state: StarTrackGameState): Player | null {
+  if (state.player1Position > state.player2Position) return 'player1';
+  if (state.player2Position > state.player1Position) return 'player2';
+  return null; // draw
+}
+
 // Draw two chains from the bucket
 export function drawChains(state: StarTrackGameState): StarTrackGameState {
   if (state.phase !== 'drawChains') return state;
+
   if (state.chainBucket.length < 2) {
-    // Not enough chains - refill bucket (in a real game, might end differently)
-    // For simplicity, just end game as draw or continue with what's available
-    if (state.chainBucket.length === 0) {
-      return state;
-    }
+    // Not enough chains to offer a real choice — end the game
+    return {
+      ...state,
+      phase: 'gameOver',
+      winner: determineWinnerByPosition(state),
+    };
   }
 
   const newBucket = [...state.chainBucket];
   const chain1 = newBucket.pop()!;
-  const chain2 = newBucket.length > 0 ? newBucket.pop()! : chain1;
+  const chain2 = newBucket.pop()!;
 
   return {
     ...state,
@@ -101,6 +110,7 @@ export function getPhaseMessage(state: StarTrackGameState): string {
     case 'selectChain':
       return `${playerName}: Choose a chain to move`;
     case 'gameOver': {
+      if (!state.winner) return `It's a draw! All chains exhausted.`;
       const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
       return `${winnerName} wins!`;
     }
