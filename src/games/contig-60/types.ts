@@ -51,7 +51,7 @@ export const BOARD_NUMBERS: number[][] = [
   [25,  27,  28,  30,  32,  35,  36,  40,  42,  45],
   [48,  50,  54,  55,  60,  64,  66,  72,  75,  80],
   [84,  90,  96,  100, 108, 120, 125, 144, 150, 180],
-  [216, 125, 100, 90,  80,  75,  72,  66,  64,  60],
+  [17,  19,  22,  23,  26,  29,  31,  33,  34,  216],
 ];
 
 // =============================================================================
@@ -100,14 +100,15 @@ export function createBoard(): { cells: Map<number, ContigCell>; grid: (number |
       const value = BOARD_NUMBERS[row][col];
       grid[row][col] = value;
 
-      if (!cells.has(value)) {
-        cells.set(value, {
-          value,
-          owner: null,
-          row,
-          col,
-        });
+      if (cells.has(value)) {
+        throw new Error(`Duplicate board number: ${value}`);
       }
+      cells.set(value, {
+        value,
+        owner: null,
+        row,
+        col,
+      });
     }
   }
 
