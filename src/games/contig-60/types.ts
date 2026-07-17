@@ -90,14 +90,14 @@ export function getAdjacentPositions(row: number, col: number): { row: number; c
 /**
  * Create initial board
  */
-export function createBoard(): { cells: Map<number, ContigCell>; grid: (number | null)[][] } {
+export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): { cells: Map<number, ContigCell>; grid: (number | null)[][] } {
   const cells = new Map<number, ContigCell>();
   const grid: (number | null)[][] = [];
 
   for (let row = 0; row < CONFIG.GRID_ROWS; row++) {
     grid[row] = [];
     for (let col = 0; col < CONFIG.GRID_COLS; col++) {
-      const value = BOARD_NUMBERS[row][col];
+      const value = boardNumbers[row][col];
       grid[row][col] = value;
 
       if (cells.has(value)) {

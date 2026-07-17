@@ -14,8 +14,10 @@ describe('Contig 60 Board', () => {
   });
 
   it('createBoard throws on duplicate numbers', () => {
-    // Sanity-check: the current board should not throw
-    expect(() => createBoard()).not.toThrow();
+    const duplicateBoard = BOARD_NUMBERS.map((row) => [...row]);
+    duplicateBoard[5][9] = duplicateBoard[0][0];
+
+    expect(() => createBoard(duplicateBoard)).toThrow('Duplicate board number: 1');
   });
 
   it('createBoard returns a cells map with 60 unique entries', () => {
