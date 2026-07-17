@@ -8,20 +8,45 @@ import {
   getPlayerPosition,
 } from './types';
 
+// Helper to determine winner by position
+function determineWinnerByPosition(state: StarTrackGameState): Player | null {
+  const p1Pos = getPlayerPosition(state, 'player1');
+  const p2Pos = getPlayerPosition(state, 'player2');
+
+  if (p1Pos > p2Pos) return 'player1';
+  if (p2Pos > p1Pos) return 'player2';
+  return null; // Draw
+}
+
 // Draw two chains from the bucket
 export function drawChains(state: StarTrackGameState): StarTrackGameState {
   if (state.phase !== 'drawChains') return state;
-  if (state.chainBucket.length < 2) {
-    // Not enough chains - refill bucket (in a real game, might end differently)
-    // For simplicity, just end game as draw or continue with what's available
-    if (state.chainBucket.length === 0) {
-      return state;
-    }
+
+  if (state.chainBucket.length === 0) {
+    // No chains left — end the game, determine winner by position
+    return {
+      ...state,
+      phase: 'gameOver',
+      winner: determineWinnerByPosition(state),
+    };
   }
 
+  if (state.chainBucket.length === 1) {
+    // Only one chain left — player must use it (no choice)
+    const lastChain = state.chainBucket[0];
+    return {
+      ...state,
+      chainBucket: [],
+      drawnChains: [lastChain],
+      selectedChainIndex: 0,  // Auto-select the only option
+      phase: 'placeChain',    // Skip selection, go straight to placement
+    };
+  }
+
+  // Normal draw: 2+ chains available
   const newBucket = [...state.chainBucket];
   const chain1 = newBucket.pop()!;
-  const chain2 = newBucket.length > 0 ? newBucket.pop()! : chain1;
+  const chain2 = newBucket.pop()!;
 
   return {
     ...state,
