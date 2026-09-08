@@ -54,8 +54,8 @@ npm run build
 ## Status (2026-08-16)
 
 - Issues #4-#7 merged
-- CI unit passes
-- e2e is continue-on-error and recently failed while the workflow stayed green
+- CI unit passes (job still continue-on-error for tracked alpha gaps)
+- CI e2e failures fail the workflow (see #48)
 
 ## Agent rules
 
