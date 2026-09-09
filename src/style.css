@@ -2606,7 +2606,7 @@ h1 {
   font-weight: 600;
 }
 
-/* Responsive */
+/* Responsive — detailed phone density lives in mobile-play-shell.css */
 @media (max-width: 480px) {
   .star-track-board {
     width: 100%;
@@ -2618,13 +2618,17 @@ h1 {
     width: 100%;
   }
 
+  /* Prefer row choices so select-chain doesn't double vertical height */
   .star-track-choices {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: nowrap;
     width: 100%;
   }
 
   .star-track-chain-btn {
-    width: 100%;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
   }
 }
 
