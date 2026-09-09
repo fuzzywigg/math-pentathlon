@@ -145,8 +145,11 @@ function createDivisionAccordion(divisionName: string, gradeRange: string, descr
 }
 
 function toggleAccordion(section: HTMLElement, open: boolean): void {
-  const header = section.querySelector('.accordion-header') as HTMLButtonElement;
-  const panel = section.querySelector('.accordion-panel') as HTMLElement;
+  const header = section.querySelector('.accordion-header') as HTMLButtonElement | null;
+  const panel = section.querySelector('.accordion-panel') as HTMLElement | null;
+  if (!header || !panel) {
+    return;
+  }
 
   if (open) {
     section.classList.add('accordion-open');
@@ -272,7 +275,10 @@ export function renderGameSelector(container: HTMLElement): void {
   tabNav.querySelectorAll('.division-tab').forEach((tab) => {
     tab.addEventListener('click', () => {
       const divisionName = tab.getAttribute('data-division');
-      const targetSection = wrapper.querySelector(`[data-division="${divisionName}"]`) as HTMLElement;
+      // Scope to accordion sections — tabs also use data-division and would match first
+      const targetSection = wrapper.querySelector(
+        `.division-accordion[data-division="${divisionName}"]`
+      ) as HTMLElement | null;
 
       if (targetSection) {
         // Close all accordions
