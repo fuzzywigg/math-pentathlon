@@ -48,6 +48,10 @@ export class TutorialManager {
 
   // Start a tutorial
   start(config: TutorialConfig): void {
+    // Drop any leftover overlay (e.g. navigated away mid-tutorial)
+    if (this.overlayElement || this.tooltipElement) {
+      this.removeOverlay();
+    }
     this.config = config;
     this.currentStepIndex = 0;
     this.isActive = true;
