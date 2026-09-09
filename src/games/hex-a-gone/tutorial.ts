@@ -32,7 +32,7 @@ export const hexAGoneTutorial: TutorialConfig = {
         <p>This is the hex board! It's made of hexagon spaces.</p>
         <p>You and your friend take turns filling it with shapes!</p>
       `,
-      highlightSelector: '.hex-board',
+      highlightSelector: '.hex-a-gone-board',
       position: 'right',
     },
     {
@@ -70,7 +70,7 @@ export const hexAGoneTutorial: TutorialConfig = {
         <p>Look at the shape bank below the board.</p>
         <p>Click on 1, 2, or 3 <strong>different</strong> shapes to use this turn!</p>
       `,
-      highlightSelector: '.shape-bank',
+      highlightSelector: '.hex-a-gone-bank',
       position: 'top',
     },
     {
@@ -80,7 +80,7 @@ export const hexAGoneTutorial: TutorialConfig = {
         <p>After selecting, click on the board to place each shape.</p>
         <p>Shapes must fit in empty spaces!</p>
       `,
-      highlightSelector: '.hex-board',
+      highlightSelector: '.hex-a-gone-board',
       position: 'bottom',
     },
     {

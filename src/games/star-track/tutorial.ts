@@ -68,7 +68,7 @@ export const starTrackTutorial: TutorialConfig = {
         <p>Click the <strong>"Draw Chains"</strong> button to pull 2 chains from the bucket.</p>
         <p>You'll see what lengths you got!</p>
       `,
-      highlightSelector: '.draw-chains-btn',
+      highlightSelector: '.star-track-draw-btn',
       position: 'bottom',
     },
     {
@@ -79,7 +79,7 @@ export const starTrackTutorial: TutorialConfig = {
         <p>Click on the chain you want to use!</p>
         <p><strong>Tip:</strong> Bigger numbers move you farther toward the star!</p>
       `,
-      highlightSelector: '.chain-options',
+      highlightSelector: '.star-track-choices',
       position: 'bottom',
     },
     {
