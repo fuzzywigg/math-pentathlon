@@ -65,11 +65,12 @@ h1 {
 /* Board styles */
 .board {
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(9, 1fr);
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  grid-template-rows: repeat(9, minmax(0, 1fr));
   gap: 2px;
-  width: 450px;
-  height: 450px;
+  width: min(450px, 100%);
+  height: auto;
+  aspect-ratio: 1;
   background: linear-gradient(145deg, #8b4513 0%, #6b3510 50%, #5d3a1a 100%);
   border: 4px solid #4a2c0f;
   border-radius: 8px;
@@ -79,6 +80,7 @@ h1 {
     0 2px 8px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   position: relative;
+  box-sizing: border-box;
 }
 
 .cell {
@@ -784,7 +786,8 @@ h1 {
 
   .board {
     width: min(70vw, 350px);
-    height: min(70vw, 350px);
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .history-content {
@@ -845,10 +848,10 @@ h1 {
   }
 
   .board {
-    width: 90vw;
-    height: 90vw;
-    max-width: 350px;
-    max-height: 350px;
+    width: min(90vw, 350px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+    max-width: 100%;
   }
 }
 
@@ -881,13 +884,10 @@ h1 {
   }
 }
 
-/* Ensure touch targets are large enough on mobile */
+/* Ensure touch targets are large enough on mobile.
+   Kings cells size from the board grid — do not set min-width on
+   .cell (it forces horizontal overflow on ~390px viewports). */
 @media (pointer: coarse) {
-  .cell {
-    min-width: 36px;
-    min-height: 36px;
-  }
-
   button {
     min-height: 44px;
   }
@@ -2010,8 +2010,10 @@ h1 {
 }
 
 .star-track-board {
-  max-width: 400px;
-  max-height: 400px;
+  width: min(400px, 100%);
+  height: auto;
+  max-width: 100%;
+  display: block;
   filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.15));
 }
 
@@ -2309,8 +2311,8 @@ h1 {
 /* Responsive */
 @media (max-width: 480px) {
   .star-track-board {
-    max-width: 95vw;
-    max-height: 95vw;
+    width: 100%;
+    max-width: 100%;
   }
 
   .star-track-chain-area {
@@ -2338,13 +2340,17 @@ h1 {
   align-items: center;
   gap: 1.5rem;
   padding: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .hex-a-gone-board {
-  width: 350px;
-  height: 350px;
-  max-width: 90vw;
-  max-height: 90vw;
+  width: min(350px, 100%);
+  height: auto;
+  aspect-ratio: 1;
+  max-width: 100%;
+  display: block;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
 }
 
@@ -2684,9 +2690,14 @@ h1 {
 
 /* Responsive */
 @media (max-width: 480px) {
+  .hex-a-gone-wrapper {
+    padding: 0.75rem 0;
+  }
+
   .hex-a-gone-board {
-    width: 95vw;
-    height: 95vw;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
   }
 
   .hex-a-gone-bank-blocks {
@@ -3466,37 +3477,11 @@ h1 {
   }
 }
 
-/* Mobile responsiveness */
+/* Mobile responsiveness — position/size owned by mobile-play-shell.css
+   so Ollie docks top-right and clears board / pattern bank. */
 @media (max-width: 480px) {
-  .owl-container {
-    bottom: 10px;
-    right: 10px;
-  }
-
-  .owl-body {
-    width: 60px;
-    height: 70px;
-  }
-
-  .owl-eye {
-    width: 18px;
-    height: 18px;
-  }
-
-  .owl-pupil {
-    width: 8px;
-    height: 8px;
-  }
-
   .owl-bubble {
-    max-width: 220px;
-    min-width: 150px;
     font-size: 13px;
-  }
-
-  .owl-minimized {
-    width: 48px;
-    height: 48px;
   }
 
   .owl-mini-icon {
