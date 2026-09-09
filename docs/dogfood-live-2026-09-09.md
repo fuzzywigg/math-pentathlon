@@ -107,6 +107,8 @@ Branch context: `alpha`. Reversible docs-only note (issue comment API unavailabl
 | S5 | ≥2 UX proposals | Pass |
 | S6 | Reversible only | Pass (this docs note; no closes/deletes) |
 
-## Issue comment status
+## Issue / PR status
 
-Preferred GitHub comments on #8 / #11 / #12 could not be posted from this agent (API 403 / no triage). Paste F1–F3 into those issues when write access is available; open F4 as a new issue if not already filed.
+- Novel P1 opened: https://github.com/fuzzywigg/math-pentathlon/issues/52
+- Docs PR (this file): https://github.com/fuzzywigg/math-pentathlon/pull/53
+- Preferred comments on #8 / #11 / #12 could not be posted from this agent (API 403 on `issues/*/comments`). Paste F1–F3 from this note onto those issues when comment scope is available. Issues were **not** closed.
