@@ -37,6 +37,12 @@ export interface TutorialEvent {
   step?: TutorialStep;
 }
 
+/** Extra padding around click-cell targets so kids can hit the hole reliably. */
+const CLICK_CELL_HIGHLIGHT_PADDING_PX = 24;
+const DEFAULT_HIGHLIGHT_PADDING_PX = 8;
+/** Minimum side length for the enlarged tutorial hit proxy (touch-friendly). */
+const CLICK_CELL_MIN_HIT_PX = 56;
+
 // Tutorial state manager
 export class TutorialManager {
   private config: TutorialConfig | null = null;
@@ -45,6 +51,8 @@ export class TutorialManager {
   private eventHandlers: TutorialEventHandler[] = [];
   private overlayElement: HTMLElement | null = null;
   private tooltipElement: HTMLElement | null = null;
+  private hitProxyElement: HTMLButtonElement | null = null;
+  private tapCueElement: HTMLElement | null = null;
 
   // Start a tutorial
   start(config: TutorialConfig): void {
@@ -78,6 +86,12 @@ export class TutorialManager {
   // Check if tutorial is active
   getIsActive(): boolean {
     return this.isActive;
+  }
+
+  /** Reposition highlight / tap helpers after the board re-renders. */
+  refreshHighlight(): void {
+    if (!this.isActive) return;
+    this.showCurrentStep();
   }
 
   // Move to next step
@@ -212,15 +226,107 @@ export class TutorialManager {
 
   private removeOverlay(): void {
     document.removeEventListener('keydown', this.handleKeyDown);
+    this.clearActionTargetHelpers();
     this.overlayElement?.remove();
     this.tooltipElement?.remove();
     this.overlayElement = null;
     this.tooltipElement = null;
   }
 
+  /** Remove enlarged hit proxy, tap cue, and target cell class from the prior step. */
+  private clearActionTargetHelpers(): void {
+    document.querySelectorAll('.tutorial-tap-target').forEach((el) => {
+      el.classList.remove('tutorial-tap-target');
+    });
+    this.hitProxyElement?.remove();
+    this.hitProxyElement = null;
+    this.tapCueElement?.remove();
+    this.tapCueElement = null;
+    const highlightRing = this.overlayElement?.querySelector(
+      '.tutorial-highlight-ring'
+    ) as HTMLElement | null;
+    highlightRing?.classList.remove('tutorial-highlight-ring--action');
+  }
+
+  private applyHighlightCutout(
+    backdrop: HTMLElement,
+    left: number,
+    top: number,
+    right: number,
+    bottom: number
+  ): void {
+    backdrop.style.clipPath = `polygon(
+      0% 0%,
+      0% 100%,
+      ${left}px 100%,
+      ${left}px ${top}px,
+      ${right}px ${top}px,
+      ${right}px ${bottom}px,
+      ${left}px ${bottom}px,
+      ${left}px 100%,
+      100% 100%,
+      100% 0%
+    )`;
+  }
+
+  /**
+   * For click-cell steps: enlarge the cutout + add a stable hit proxy and "Tap here" cue
+   * so small board cells (esp. ~390px) are easier to hit.
+   */
+  private setupClickCellTarget(
+    targetEl: HTMLElement,
+    highlightLeft: number,
+    highlightTop: number,
+    highlightWidth: number,
+    highlightHeight: number
+  ): void {
+    if (!this.overlayElement) return;
+
+    targetEl.classList.add('tutorial-tap-target');
+
+    const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
+    const hitLeft = highlightLeft + highlightWidth / 2 - hitSize / 2;
+    const hitTop = highlightTop + highlightHeight / 2 - hitSize / 2;
+
+    const hitProxy = document.createElement('button');
+    hitProxy.type = 'button';
+    hitProxy.className = 'tutorial-hit-proxy';
+    hitProxy.setAttribute('aria-label', 'Tap here');
+    hitProxy.style.left = `${hitLeft}px`;
+    hitProxy.style.top = `${hitTop}px`;
+    hitProxy.style.width = `${hitSize}px`;
+    hitProxy.style.height = `${hitSize}px`;
+    hitProxy.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Forward to the real board cell so game + tutorial handlers stay in sync
+      targetEl.click();
+    });
+    this.overlayElement.appendChild(hitProxy);
+    this.hitProxyElement = hitProxy;
+
+    const cue = document.createElement('div');
+    cue.className = 'tutorial-tap-cue';
+    cue.textContent = 'Tap here';
+    cue.setAttribute('aria-hidden', 'true');
+    const cueAbove = highlightTop >= 40;
+    cue.style.left = `${highlightLeft + highlightWidth / 2}px`;
+    if (cueAbove) {
+      cue.style.top = `${highlightTop - 8}px`;
+      cue.classList.add('tutorial-tap-cue--above');
+    } else {
+      cue.style.top = `${highlightTop + highlightHeight + 8}px`;
+      cue.classList.add('tutorial-tap-cue--below');
+    }
+    this.overlayElement.appendChild(cue);
+    this.tapCueElement = cue;
+  }
+
   private showCurrentStep(): void {
     const step = this.getCurrentStep();
     if (!step || !this.tooltipElement || !this.overlayElement) return;
+
+    this.clearActionTargetHelpers();
 
     // Update tooltip content
     const titleEl = this.tooltipElement.querySelector('.tutorial-tooltip-title');
@@ -261,27 +367,29 @@ export class TutorialManager {
       const targetEl = document.querySelector(step.highlightSelector) as HTMLElement;
       if (targetEl && highlightRing) {
         const rect = targetEl.getBoundingClientRect();
-        const padding = 8;
+        const isClickCellAction = step.requiredAction?.type === 'click-cell';
+        const padding = isClickCellAction
+          ? CLICK_CELL_HIGHLIGHT_PADDING_PX
+          : DEFAULT_HIGHLIGHT_PADDING_PX;
+
+        const left = rect.left - padding;
+        const top = rect.top - padding;
+        const width = rect.width + padding * 2;
+        const height = rect.height + padding * 2;
 
         highlightRing.style.display = 'block';
-        highlightRing.style.left = `${rect.left - padding}px`;
-        highlightRing.style.top = `${rect.top - padding}px`;
-        highlightRing.style.width = `${rect.width + padding * 2}px`;
-        highlightRing.style.height = `${rect.height + padding * 2}px`;
+        highlightRing.style.left = `${left}px`;
+        highlightRing.style.top = `${top}px`;
+        highlightRing.style.width = `${width}px`;
+        highlightRing.style.height = `${height}px`;
 
-        // Update backdrop clip path to cut out the highlight area
-        backdrop.style.clipPath = `polygon(
-          0% 0%,
-          0% 100%,
-          ${rect.left - padding}px 100%,
-          ${rect.left - padding}px ${rect.top - padding}px,
-          ${rect.right + padding}px ${rect.top - padding}px,
-          ${rect.right + padding}px ${rect.bottom + padding}px,
-          ${rect.left - padding}px ${rect.bottom + padding}px,
-          ${rect.left - padding}px 100%,
-          100% 100%,
-          100% 0%
-        )`;
+        if (isClickCellAction) {
+          highlightRing.classList.add('tutorial-highlight-ring--action');
+          this.setupClickCellTarget(targetEl, left, top, width, height);
+        }
+
+        // Update backdrop clip path to cut out the (possibly enlarged) highlight area
+        this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
 
         // Position tooltip relative to highlight
         this.positionTooltip(rect, step.position ?? 'bottom');
@@ -302,6 +410,7 @@ export class TutorialManager {
 
   private clearHighlight(highlightRing: HTMLElement, backdrop: HTMLElement): void {
     highlightRing.style.display = 'none';
+    highlightRing.classList.remove('tutorial-highlight-ring--action');
     backdrop.style.clipPath = 'none';
     this.positionTooltipCenter();
   }

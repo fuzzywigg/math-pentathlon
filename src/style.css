@@ -1784,6 +1784,122 @@ h1 {
   animation: tutorial-pulse 2s ease-in-out infinite;
 }
 
+/* Stable, non-jittery pulse for required click-cell actions (easier to aim) */
+@keyframes tutorial-action-pulse {
+  0%, 100% {
+    border-color: #ffc107;
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.5),
+      0 0 0 4px rgba(255, 193, 7, 0.35),
+      0 0 18px rgba(255, 193, 7, 0.55);
+  }
+  50% {
+    border-color: #ffca28;
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.5),
+      0 0 0 6px rgba(255, 193, 7, 0.5),
+      0 0 22px rgba(255, 193, 7, 0.7);
+  }
+}
+
+.tutorial-highlight-ring--action {
+  border-width: 4px;
+  border-radius: 12px;
+  animation: tutorial-action-pulse 1.6s ease-in-out infinite;
+}
+
+/* Enlarged transparent hit target over the highlighted cell */
+.tutorial-hit-proxy {
+  position: fixed;
+  z-index: 10001;
+  pointer-events: auto;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tutorial-hit-proxy:focus-visible {
+  outline: 3px solid #ffc107;
+  outline-offset: 2px;
+}
+
+/* Explicit "Tap here" label for kids */
+.tutorial-tap-cue {
+  position: fixed;
+  z-index: 10002;
+  pointer-events: none;
+  transform: translateX(-50%);
+  background: #ffc107;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  padding: 6px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.tutorial-tap-cue--above {
+  transform: translate(-50%, -100%);
+}
+
+.tutorial-tap-cue--below {
+  transform: translate(-50%, 0);
+}
+
+.tutorial-tap-cue::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+}
+
+.tutorial-tap-cue--above::after {
+  top: 100%;
+  transform: translateX(-50%);
+  border-top: 7px solid #ffc107;
+}
+
+.tutorial-tap-cue--below::after {
+  bottom: 100%;
+  transform: translateX(-50%);
+  border-bottom: 7px solid #ffc107;
+}
+
+/* Board cell marked as the required tutorial tap target */
+.cell.tutorial-tap-target {
+  z-index: 2;
+  outline: 3px solid #ffc107;
+  outline-offset: -1px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.65),
+    0 0 14px rgba(255, 193, 7, 0.7);
+  animation: none;
+}
+
+.cell.tutorial-tap-target.cell-king {
+  animation: none;
+  transform: none;
+}
+
+/* Expand the hit area around the required cell without changing layout */
+.cell.tutorial-tap-target::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 10px;
+  z-index: 1;
+}
+
 /* Tutorial tooltip */
 .tutorial-tooltip {
   position: fixed;
@@ -1972,6 +2088,15 @@ h1 {
   .tutorial-prev-btn,
   .tutorial-next-btn {
     width: 100%;
+  }
+
+  .tutorial-tap-cue {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+  }
+
+  .cell.tutorial-tap-target::before {
+    inset: -16px;
   }
 }
 
