@@ -1618,11 +1618,15 @@ h1 {
 /* Tutorial tooltip */
 .tutorial-tooltip {
   position: fixed;
+  box-sizing: border-box;
   background: white;
   border-radius: 12px;
   padding: 0;
-  max-width: 400px;
-  min-width: 300px;
+  /* Prefer vw clamp so absolute left never needs to go negative on narrow phones */
+  width: min(400px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  min-width: 0;
+  margin: 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   z-index: 10000;
   font-family: system-ui, -apple-system, sans-serif;
@@ -1780,9 +1784,8 @@ h1 {
 /* Responsive tutorial */
 @media (max-width: 480px) {
   .tutorial-tooltip {
+    width: calc(100vw - 32px);
     max-width: calc(100vw - 32px);
-    min-width: 280px;
-    margin: 16px;
   }
 
   .tutorial-tooltip-title {

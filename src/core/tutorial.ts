@@ -280,7 +280,7 @@ export class TutorialManager {
         )`;
 
         // Position tooltip relative to highlight
-        this.positionTooltip(rect, step.position || 'bottom');
+        this.positionTooltip(rect, step.position ?? 'bottom');
       } else if (highlightRing) {
         // Selector set but target not in DOM yet — clear stale ring from prior step
         this.clearHighlight(highlightRing, backdrop);
@@ -302,56 +302,137 @@ export class TutorialManager {
     this.positionTooltipCenter();
   }
 
-  private positionTooltip(targetRect: DOMRect, position: string): void {
+  private positionTooltip(
+    targetRect: DOMRect,
+    position: NonNullable<TutorialStep['position']>,
+  ): void {
     if (!this.tooltipElement) return;
 
-    const tooltip = this.tooltipElement;
-    tooltip.style.transform = '';
-    const tooltipRect = tooltip.getBoundingClientRect();
+    if (position === 'center') {
+      this.positionTooltipCenter();
+      return;
+    }
+
+    const { width, height } = this.prepareTooltipForAbsolutePosition();
     const margin = 16;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
 
     let left: number;
     let top: number;
 
     switch (position) {
       case 'top':
-        left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
-        top = targetRect.top - tooltipRect.height - margin;
+        left = targetRect.left + (targetRect.width - width) / 2;
+        top = targetRect.top - height - margin;
         break;
       case 'bottom':
-        left = targetRect.left + (targetRect.width - tooltipRect.width) / 2;
+        left = targetRect.left + (targetRect.width - width) / 2;
         top = targetRect.bottom + margin;
         break;
       case 'left':
-        left = targetRect.left - tooltipRect.width - margin;
-        top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
+        left = targetRect.left - width - margin;
+        top = targetRect.top + (targetRect.height - height) / 2;
         break;
       case 'right':
         left = targetRect.right + margin;
-        top = targetRect.top + (targetRect.height - tooltipRect.height) / 2;
+        top = targetRect.top + (targetRect.height - height) / 2;
         break;
-      default:
+      default: {
+        const _exhaustive: never = position;
+        void _exhaustive;
         this.positionTooltipCenter();
         return;
+      }
     }
 
-    // Keep tooltip within viewport
-    left = Math.max(margin, Math.min(left, viewportWidth - tooltipRect.width - margin));
-    top = Math.max(margin, Math.min(top, viewportHeight - tooltipRect.height - margin));
-
-    tooltip.style.left = `${left}px`;
-    tooltip.style.top = `${top}px`;
+    this.applyClampedTooltipPosition(left, top, width, height, margin);
   }
 
   private positionTooltipCenter(): void {
     if (!this.tooltipElement) return;
 
+    const margin = 16;
+    const { width, height } = this.prepareTooltipForAbsolutePosition();
+    const { width: viewportWidth, height: viewportHeight, offsetLeft, offsetTop } =
+      this.getViewportMetrics();
+
+    const left = offsetLeft + (viewportWidth - width) / 2;
+    const top = offsetTop + (viewportHeight - height) / 2;
+    this.applyClampedTooltipPosition(left, top, width, height, margin);
+  }
+
+  /**
+   * Clear centering transforms / CSS margin and constrain width so size
+   * measurements match the box we will place with left/top.
+   */
+  private prepareTooltipForAbsolutePosition(): { width: number; height: number } {
+    const tooltip = this.tooltipElement!;
+    const margin = 16;
+    const { width: viewportWidth } = this.getViewportMetrics();
+    const maxWidth = Math.max(0, viewportWidth - margin * 2);
+
+    tooltip.style.transform = 'none';
+    tooltip.style.margin = '0';
+    tooltip.style.right = 'auto';
+    tooltip.style.bottom = 'auto';
+    tooltip.style.maxWidth = `${maxWidth}px`;
+    tooltip.style.width = '';
+    // Park off-layout briefly so prior left/top/50% do not skew measurement
+    tooltip.style.left = '0px';
+    tooltip.style.top = '0px';
+
+    const width = Math.min(tooltip.offsetWidth || maxWidth, maxWidth);
+    const height = tooltip.offsetHeight;
+    return { width, height };
+  }
+
+  private applyClampedTooltipPosition(
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    margin: number,
+  ): void {
+    if (!this.tooltipElement) return;
+
     const tooltip = this.tooltipElement;
-    tooltip.style.left = '50%';
-    tooltip.style.top = '50%';
-    tooltip.style.transform = 'translate(-50%, -50%)';
+    const { width: viewportWidth, height: viewportHeight, offsetLeft, offsetTop } =
+      this.getViewportMetrics();
+
+    const minLeft = offsetLeft + margin;
+    const minTop = offsetTop + margin;
+    // When the tooltip is wider/taller than the viewport, pin to the min edge
+    // so text starts on-screen (never negative / mid-word clipped).
+    const maxLeft = Math.max(minLeft, offsetLeft + viewportWidth - width - margin);
+    const maxTop = Math.max(minTop, offsetTop + viewportHeight - height - margin);
+
+    const clampedLeft = Math.min(Math.max(left, minLeft), maxLeft);
+    const clampedTop = Math.min(Math.max(top, minTop), maxTop);
+
+    tooltip.style.left = `${clampedLeft}px`;
+    tooltip.style.top = `${clampedTop}px`;
+  }
+
+  private getViewportMetrics(): {
+    width: number;
+    height: number;
+    offsetLeft: number;
+    offsetTop: number;
+  } {
+    const vv = window.visualViewport;
+    if (vv) {
+      return {
+        width: vv.width,
+        height: vv.height,
+        offsetLeft: vv.offsetLeft,
+        offsetTop: vv.offsetTop,
+      };
+    }
+    return {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      offsetLeft: 0,
+      offsetTop: 0,
+    };
   }
 }
 
