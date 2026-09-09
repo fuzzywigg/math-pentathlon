@@ -1,8 +1,16 @@
 # math-pentathlon
 
+[![CI](https://github.com/fuzzywigg/math-pentathlon/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/fuzzywigg/math-pentathlon/actions/workflows/ci.yml)
+[![Deploy](https://github.com/fuzzywigg/math-pentathlon/actions/workflows/deploy.yml/badge.svg?branch=alpha)](https://github.com/fuzzywigg/math-pentathlon/actions/workflows/deploy.yml)
+![License: ISC](https://img.shields.io/badge/license-ISC-blue.svg)
+[![npm audit](https://img.shields.io/badge/npm%20audit-%E2%89%A5%20high-informational)](https://github.com/fuzzywigg/math-pentathlon/blob/alpha/.github/workflows/ci.yml)
+[![Tests](https://img.shields.io/badge/tests-Vitest%20%2B%20Playwright-informational)](https://github.com/fuzzywigg/math-pentathlon/blob/alpha/.github/workflows/ci.yml)
+
 Twenty registered games. Live at https://math.pappas.work
 
 There is **no Math Relay** in this tree. Do not invent one.
+
+<!-- TODO(#30): Public wiki outline (Overview, Games, Big Toads, Development, Accessibility, Roadmap) remains for HITL — deferred from this README-badges PR. -->
 
 ## Games
 
