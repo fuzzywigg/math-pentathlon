@@ -142,132 +142,42 @@ body {
     padding: 0.45rem 0.85rem;
   }
 
-  /* ----- Star Track (compact vertical density @ ~390×844) ----- */
-  /* Scope chrome tightening to Star Track so Hex/Kings stay unchanged */
-  #app:has(.star-track-game-area) {
-    /* Keep Ollie clear, but trim a few px of top chrome */
-    padding-top: calc(var(--play-shell-gutter) + var(--ollie-dock-size) + 4px);
-  }
-
-  #app:has(.star-track-game-area) .game-header {
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    text-align: left;
-  }
-
-  #app:has(.star-track-game-area) .game-header h1 {
-    font-size: 1.25rem;
-  }
-
-  #app:has(.star-track-game-area) .back-button {
-    padding: 6px 10px;
-    min-height: 36px;
-    font-size: 0.8rem;
-  }
-
-  #app:has(.star-track-game-area) .button-row {
-    margin-bottom: 8px;
-    gap: 6px;
-  }
-
-  #app:has(.star-track-game-area) .button-row button {
-    min-height: 40px;
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    min-width: 0;
-  }
-
+  /* ----- Star Track (vertical fit @ ~390×844) ----- */
+  /* Cap the 400×400 viewBox square by leftover dvh so chain/status stay on-screen.
+     Reversible: drop this block (or the shell import) to restore prior layout. */
   .star-track-game-area {
-    padding: 0.15rem 0;
+    padding: 0.25rem 0;
     gap: 8px;
   }
 
   .star-track-wrapper {
-    gap: 10px;
+    gap: 12px;
   }
 
   .star-track-board {
-    /* Smaller board frees ~80px vs full-column square for Draw Chains + status */
-    width: min(280px, calc(100vw - 2 * var(--play-shell-gutter)));
-    height: auto;
+    /* 35rem ≈ header + buttons + status + chain + gutters at kids-phone size */
+    width: min(
+      calc(100vw - 2 * var(--play-shell-gutter)),
+      calc(100dvh - 35rem)
+    );
     max-width: 100%;
-    max-height: none;
+    max-height: calc(100dvh - 35rem);
+    height: auto;
+    aspect-ratio: 1;
     display: block;
   }
 
-  .star-track-chain-area {
-    gap: 8px;
-    padding: 10px 12px;
-    min-width: 0;
-    width: 100%;
-    border-radius: 12px;
-  }
-
-  .star-track-draw-btn {
-    padding: 10px 22px;
-    font-size: 1rem;
-    border-radius: 8px;
-  }
-
-  .star-track-bucket-info {
-    font-size: 0.8rem;
-  }
-
-  .star-track-choice-label {
-    font-size: 0.9rem;
-  }
-
-  /* Keep chain choices side-by-side — column stack was a big vertical cost */
+  /* Row choices: column stack was a large vertical cost after Draw Chains */
   .star-track-choices {
     flex-direction: row;
-    flex-wrap: nowrap;
     width: 100%;
-    gap: 8px;
+    gap: 10px;
   }
 
   .star-track-chain-btn {
     flex: 1 1 0;
     width: auto;
     min-width: 0;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border-width: 2px;
-  }
-
-  .star-track-chain-btn .chain-links {
-    font-size: 1.15rem;
-    letter-spacing: -3px;
-  }
-
-  .star-track-chain-btn .chain-length {
-    font-size: 1.2rem;
-    margin-top: 4px;
-  }
-
-  .star-track-status {
-    padding: 8px 12px;
-    border-radius: 10px;
-  }
-
-  .star-track-progress {
-    gap: 6px;
-    margin-top: 8px;
-    max-width: 100%;
-  }
-
-  .progress-bar {
-    gap: 6px;
-  }
-
-  .progress-track {
-    height: 8px;
-  }
-
-  .progress-label,
-  .progress-value {
-    font-size: 0.8rem;
   }
 
   /* ----- Ollie: dock top-right, clear of board / bank / toasts ----- */
