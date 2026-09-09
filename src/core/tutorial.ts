@@ -278,7 +278,8 @@ export class TutorialManager {
     highlightLeft: number,
     highlightTop: number,
     highlightWidth: number,
-    highlightHeight: number
+    highlightHeight: number,
+    tooltipPosition: NonNullable<TutorialStep['position']>
   ): void {
     if (!this.overlayElement) return;
 
@@ -309,14 +310,17 @@ export class TutorialManager {
     cue.className = 'tutorial-tap-cue';
     cue.textContent = 'Tap here';
     cue.setAttribute('aria-hidden', 'true');
-    const cueAbove = highlightTop >= 40;
     cue.style.left = `${highlightLeft + highlightWidth / 2}px`;
-    if (cueAbove) {
-      cue.style.top = `${highlightTop - 8}px`;
-      cue.classList.add('tutorial-tap-cue--above');
-    } else {
+    // Prefer cue on the opposite side of the tooltip so they don't stack
+    const preferBelow =
+      tooltipPosition === 'top' ||
+      (tooltipPosition !== 'bottom' && highlightTop < 40);
+    if (preferBelow) {
       cue.style.top = `${highlightTop + highlightHeight + 8}px`;
       cue.classList.add('tutorial-tap-cue--below');
+    } else {
+      cue.style.top = `${highlightTop - 8}px`;
+      cue.classList.add('tutorial-tap-cue--above');
     }
     this.overlayElement.appendChild(cue);
     this.tapCueElement = cue;
@@ -385,14 +389,16 @@ export class TutorialManager {
 
         if (isClickCellAction) {
           highlightRing.classList.add('tutorial-highlight-ring--action');
-          this.setupClickCellTarget(targetEl, left, top, width, height);
+          // Resolve tooltip side first so the Tap here cue sits on the opposite side
+          const preferred = step.position ?? 'bottom';
+          const resolved = this.resolveTooltipPosition(rect, preferred, true);
+          this.setupClickCellTarget(targetEl, left, top, width, height, resolved);
+          this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
+          this.positionTooltip(rect, resolved);
+        } else {
+          this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
+          this.positionTooltip(rect, step.position ?? 'bottom');
         }
-
-        // Update backdrop clip path to cut out the (possibly enlarged) highlight area
-        this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
-
-        // Position tooltip relative to highlight
-        this.positionTooltip(rect, step.position ?? 'bottom');
       } else if (highlightRing) {
         // Selector set but target not in DOM yet — clear stale ring from prior step
         this.clearHighlight(highlightRing, backdrop);
@@ -413,6 +419,48 @@ export class TutorialManager {
     highlightRing.classList.remove('tutorial-highlight-ring--action');
     backdrop.style.clipPath = 'none';
     this.positionTooltipCenter();
+  }
+
+  /**
+   * When left/right placement would cover the target (common on ~390px),
+   * flip to top/bottom so kids can still see the Tap here cue.
+   * Also prefer the vertical side with enough room for the tooltip.
+   */
+  private resolveTooltipPosition(
+    targetRect: DOMRect,
+    position: NonNullable<TutorialStep['position']>,
+    keepTargetVisible: boolean
+  ): NonNullable<TutorialStep['position']> {
+    if (!keepTargetVisible || position === 'center') {
+      return position;
+    }
+
+    const { width: viewportWidth, height: viewportHeight } = this.getViewportMetrics();
+    const margin = 16;
+    const estimatedTooltipWidth = Math.min(400, Math.max(0, viewportWidth - margin * 2));
+    // Approximate height; exact size measured later in positionTooltip
+    const estimatedTooltipHeight = Math.min(320, viewportHeight * 0.45);
+    const spaceLeft = targetRect.left - margin;
+    const spaceRight = viewportWidth - targetRect.right - margin;
+    const spaceAbove = targetRect.top - margin;
+    const spaceBelow = viewportHeight - targetRect.bottom - margin;
+
+    const pickVertical = (): 'top' | 'bottom' =>
+      spaceAbove >= estimatedTooltipHeight || spaceAbove > spaceBelow ? 'top' : 'bottom';
+
+    if (position === 'left' && spaceLeft < estimatedTooltipWidth) {
+      return pickVertical();
+    }
+    if (position === 'right' && spaceRight < estimatedTooltipWidth) {
+      return pickVertical();
+    }
+    if (position === 'bottom' && spaceBelow < estimatedTooltipHeight && spaceAbove > spaceBelow) {
+      return 'top';
+    }
+    if (position === 'top' && spaceAbove < estimatedTooltipHeight && spaceBelow > spaceAbove) {
+      return 'bottom';
+    }
+    return position;
   }
 
   private positionTooltip(
