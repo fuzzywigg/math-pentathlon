@@ -708,10 +708,66 @@ function renderStarTrack(): void {
 
           <h3>Gameplay</h3>
           <ol>
-            <li><strong>Draw Chains:</strong> Click to draw two chain links from the bucket</li>
-            <li><strong>Choose:</strong> Select which chain to use for movement</li>
-            <li><strong>Move:</strong> Your piece advances by the chain's length</li>
+            <li><strong>Draw Chains:</strong> Tap <em>Draw Chains</em> once. You get <em>two chain options</em> (two different lengths) — not two moves.</li>
+            <li><strong>Choose:</strong> Tap <em>one</em> of the two chains to use.</li>
+            <li><strong>Move:</strong> Your piece advances by that chain's length. The unused chain goes back in the bucket.</li>
           </ol>
+
+          <h3>Example Turn</h3>
+          <div class="howto-example" aria-label="Illustrated example of one Star Track turn">
+            <ol class="howto-example-steps">
+              <li>
+                <p class="howto-example-caption"><strong>1. Draw</strong> — tap the button once</p>
+                <div class="howto-example-figure">
+                  <span class="howto-chip howto-chip-action">🔗 Draw Chains</span>
+                </div>
+              </li>
+              <li>
+                <p class="howto-example-caption"><strong>2. See 2 choices</strong> — two chains appear (pick later, not both)</p>
+                <div class="howto-example-figure howto-example-row">
+                  <span class="howto-chain" aria-hidden="true">
+                    <span class="howto-chain-links">○○○</span>
+                    <span class="howto-chain-num">3</span>
+                  </span>
+                  <span class="howto-chain" aria-hidden="true">
+                    <span class="howto-chain-links">○○○○○</span>
+                    <span class="howto-chain-num">5</span>
+                  </span>
+                </div>
+              </li>
+              <li>
+                <p class="howto-example-caption"><strong>3. Pick one</strong> — e.g. the longer chain (5)</p>
+                <div class="howto-example-figure howto-example-row">
+                  <span class="howto-chain howto-chain-dim" aria-hidden="true">
+                    <span class="howto-chain-links">○○○</span>
+                    <span class="howto-chain-num">3</span>
+                  </span>
+                  <span class="howto-arrow" aria-hidden="true">→</span>
+                  <span class="howto-chain howto-chain-picked" aria-hidden="true">
+                    <span class="howto-chain-links">○○○○○</span>
+                    <span class="howto-chain-num">5</span>
+                  </span>
+                </div>
+              </li>
+              <li>
+                <p class="howto-example-caption"><strong>4. Move</strong> — piece advances 5 spaces toward ★; the 3 goes back</p>
+                <div class="howto-example-figure">
+                  <svg class="howto-track-svg" viewBox="0 0 220 44" width="100%" height="44" role="img" aria-label="Piece moves five spaces toward the star">
+                    <circle cx="16" cy="22" r="8" fill="#90caf9" stroke="#1565c0" stroke-width="2"/>
+                    <circle cx="44" cy="22" r="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+                    <circle cx="72" cy="22" r="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+                    <circle cx="100" cy="22" r="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+                    <circle cx="128" cy="22" r="8" fill="#e3f2fd" stroke="#90caf9" stroke-width="2"/>
+                    <circle cx="156" cy="22" r="8" fill="#2196F3" stroke="#0d47a1" stroke-width="2"/>
+                    <text x="156" y="26" text-anchor="middle" font-size="10" fill="white" font-family="sans-serif">●</text>
+                    <line x1="24" y1="22" x2="148" y2="22" stroke="#90caf9" stroke-width="2" stroke-dasharray="3 3"/>
+                    <polygon points="200,22 184,14 184,30" fill="#FFD700" stroke="#f9a825" stroke-width="1"/>
+                    <text x="200" y="26" text-anchor="middle" font-size="14">★</text>
+                  </svg>
+                </div>
+              </li>
+            </ol>
+          </div>
 
           <h3>Chain Links</h3>
           <p>Chains have lengths from 1 to 6. The bucket contains multiple chains of each length.</p>
@@ -927,6 +983,52 @@ function renderHexAGone(): void {
             <li><strong>Confirm:</strong> Click "Confirm" to lock in your selection</li>
             <li><strong>Place Blocks:</strong> Place each selected block on an empty cell</li>
           </ol>
+
+          <h3>Example Turn</h3>
+          <div class="howto-example" aria-label="Illustrated example of one Hex-a-Gone turn">
+            <ol class="howto-example-steps">
+              <li>
+                <p class="howto-example-caption"><strong>1. Select</strong> — tap different shapes in the bank (here: triangle + rhombus)</p>
+                <div class="howto-example-figure howto-example-row">
+                  <span class="howto-shape howto-shape-picked" style="background-color:#32CD32" title="Triangle selected" aria-hidden="true">△</span>
+                  <span class="howto-shape howto-shape-picked" style="background-color:#4169E1" title="Rhombus selected" aria-hidden="true">◇</span>
+                  <span class="howto-shape" style="background-color:#FFD700" title="Hexagon not selected" aria-hidden="true">⬡</span>
+                  <span class="howto-shape" style="background-color:#FF4444" title="Trapezoid not selected" aria-hidden="true">⏢</span>
+                  <span class="howto-shape" style="background-color:#FF8C00" title="Square not selected" aria-hidden="true">□</span>
+                </div>
+                <p class="howto-example-note">Selected: <span class="howto-shape-inline" style="background-color:#32CD32">△</span> <span class="howto-shape-inline" style="background-color:#4169E1">◇</span> — then Confirm before placing</p>
+              </li>
+              <li>
+                <p class="howto-example-caption"><strong>2. Confirm</strong> — lock the selection before placing</p>
+                <div class="howto-example-figure">
+                  <span class="howto-chip howto-chip-action">Confirm (2 blocks)</span>
+                </div>
+              </li>
+              <li>
+                <p class="howto-example-caption"><strong>3. Place</strong> — fit each shape on empty board cells (no overlap)</p>
+                <div class="howto-example-figure">
+                  <svg class="howto-hex-svg" viewBox="0 0 180 110" width="100%" height="110" role="img" aria-label="Shapes fitting onto empty hex cells">
+                    <!-- empty hex grid sketch -->
+                    <polygon points="40,20 55,28 55,44 40,52 25,44 25,28" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <polygon points="70,20 85,28 85,44 70,52 55,44 55,28" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <polygon points="100,20 115,28 115,44 100,52 85,44 85,28" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <polygon points="55,44 70,52 70,68 55,76 40,68 40,52" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <polygon points="85,44 100,52 100,68 85,76 70,68 70,52" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <polygon points="115,44 130,52 130,68 115,76 100,68 100,52" fill="#f5f5f5" stroke="#bbb" stroke-width="1.5"/>
+                    <!-- placed triangle (covers one cell) -->
+                    <polygon points="70,20 85,28 85,44 70,52 55,44 55,28" fill="#32CD32" stroke="#1b5e20" stroke-width="1.5" opacity="0.9"/>
+                    <text x="70" y="40" text-anchor="middle" font-size="12" fill="#0d3d12">△</text>
+                    <!-- placed rhombus (covers two cells) -->
+                    <polygon points="55,44 70,52 70,68 55,76 40,68 40,52" fill="#4169E1" stroke="#1a237e" stroke-width="1.5" opacity="0.9"/>
+                    <polygon points="85,44 100,52 100,68 85,76 70,68 70,52" fill="#4169E1" stroke="#1a237e" stroke-width="1.5" opacity="0.9"/>
+                    <text x="70" y="64" text-anchor="middle" font-size="11" fill="#e8eaf6">◇</text>
+                    <text x="148" y="30" font-size="11" fill="#333" font-family="sans-serif">1. △</text>
+                    <text x="148" y="62" font-size="11" fill="#333" font-family="sans-serif">2. ◇</text>
+                  </svg>
+                </div>
+              </li>
+            </ol>
+          </div>
 
           <h3>Rules</h3>
           <ul>
