@@ -772,6 +772,175 @@ h1 {
   margin-bottom: 4px;
 }
 
+/* How-to-Play illustrated example turns (Star Track, Hex-a-Gone, reusable) */
+.howto-example {
+  margin: 8px 0 16px;
+  padding: 12px;
+  background: linear-gradient(160deg, #f7fafc 0%, #eef3f8 100%);
+  border: 1px solid #d7e0ea;
+  border-radius: 10px;
+}
+
+.howto-example-steps {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.howto-example-steps > li {
+  margin: 0;
+  padding: 0;
+}
+
+.howto-example-caption {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #1a1a2e;
+}
+
+.howto-example-note {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.howto-example-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.howto-example-row {
+  flex-direction: row;
+}
+
+.howto-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: sans-serif;
+  border: 2px solid #90a4ae;
+  background: #eceff1;
+  color: #37474f;
+}
+
+.howto-chip-action {
+  background: #e3f2fd;
+  border-color: #2196F3;
+  color: #0d47a1;
+}
+
+.howto-chain {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 2px solid #7e57c2;
+  background: #f3e5f5;
+  color: #4a148c;
+  font-family: sans-serif;
+}
+
+.howto-chain-links {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.howto-chain-num {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.howto-chain-picked {
+  background: #ede7f6;
+  border-color: #5e35b1;
+  box-shadow: 0 0 0 2px #b39ddb;
+}
+
+.howto-chain-dim {
+  opacity: 0.45;
+}
+
+.howto-arrow {
+  font-size: 1.25rem;
+  color: #546e7a;
+  font-weight: 700;
+}
+
+.howto-track-svg,
+.howto-hex-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.howto-shape {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  color: #111;
+  font-size: 1.1rem;
+  font-weight: 700;
+  opacity: 0.4;
+}
+
+.howto-shape-picked {
+  opacity: 1;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.howto-shape-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+@media (max-width: 390px) {
+  .howto-example {
+    padding: 10px;
+  }
+
+  .howto-example-caption {
+    font-size: 0.9rem;
+  }
+
+  .howto-chain {
+    min-width: 48px;
+    padding: 6px 8px;
+  }
+
+  .howto-shape {
+    width: 32px;
+    height: 32px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   #app {
