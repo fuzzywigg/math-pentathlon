@@ -49,6 +49,7 @@ body {
 .star-track-game-area,
 .game-area {
   width: 100%;
+  max-width: 100%;
   overflow-x: clip;
 }
 
@@ -62,11 +63,12 @@ body {
 
   #app {
     padding: var(--play-shell-gutter);
-    padding-top: calc(var(--play-shell-gutter) + 4px);
+    /* Keep chrome / titles below the top-right Ollie dock */
+    padding-top: calc(var(--play-shell-gutter) + var(--ollie-clearance));
   }
 
   .game-header {
-    padding-right: var(--ollie-clearance);
+    padding-right: 0;
   }
 
   .button-row {
@@ -82,7 +84,8 @@ body {
 
   /* ----- Kings & Quadraphages ----- */
   .board {
-    width: min(100%, calc(100vw - 2 * var(--play-shell-gutter)));
+    /* Use vw (not %): .game-area is shrink-to-fit, so % width collapses */
+    width: min(350px, calc(100vw - 2 * var(--play-shell-gutter)));
     height: auto;
     aspect-ratio: 1;
     max-width: 100%;
@@ -114,7 +117,7 @@ body {
   }
 
   .hex-a-gone-board {
-    width: min(100%, calc(100vw - 2 * var(--play-shell-gutter)));
+    width: min(350px, calc(100vw - 2 * var(--play-shell-gutter)));
     height: auto;
     aspect-ratio: 1;
     max-width: 100%;
@@ -145,7 +148,7 @@ body {
   }
 
   .star-track-board {
-    width: min(100%, calc(100vw - 2 * var(--play-shell-gutter)));
+    width: min(400px, calc(100vw - 2 * var(--play-shell-gutter)));
     height: auto;
     max-width: 100%;
     max-height: none;
