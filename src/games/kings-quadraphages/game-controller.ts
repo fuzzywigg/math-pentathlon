@@ -66,6 +66,11 @@ function render(): void {
       moveCount: gameState.moveHistory.length,
     });
   }
+
+  // Keep tutorial highlight / enlarged tap target aligned with the live board
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.refreshHighlight();
+  }
 }
 
 // Trigger invalid click animation on a cell

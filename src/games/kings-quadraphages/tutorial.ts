@@ -74,8 +74,9 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       id: 'select-king',
       title: 'Step 1: Select Your King',
       message: `
-        <p>Let's practice! <strong>Click on your Blue King</strong> to select it.</p>
-        <p>The King will be highlighted in gold when selected.</p>
+        <p>Let's practice! Look for the yellow <strong>Tap here</strong> cue
+        and <strong>tap your Blue King</strong>.</p>
+        <p>The King will glow gold when selected.</p>
       `,
       highlightSelector: '.cell[data-row="1"][data-col="5"]',
       position: 'left',
@@ -101,8 +102,9 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       id: 'move-king',
       title: 'Move Your King',
       message: `
-        <p>Now <strong>click on a green cell</strong> to move your King there.</p>
-        <p>Try moving to the cell directly below your King.</p>
+        <p>Now look for <strong>Tap here</strong> and tap the green cell
+        directly below your King.</p>
+        <p>That moves your King one square down.</p>
       `,
       highlightSelector: '.cell[data-row="2"][data-col="5"]',
       position: 'left',

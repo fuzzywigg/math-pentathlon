@@ -81,6 +81,133 @@ describe('TutorialManager highlight ring', () => {
   });
 });
 
+describe('TutorialManager click-cell tap target', () => {
+  let manager: TutorialManager;
+  let cell: HTMLElement;
+
+  beforeEach(() => {
+    manager = new TutorialManager();
+    cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.row = '1';
+    cell.dataset.col = '5';
+    Object.defineProperty(cell, 'getBoundingClientRect', {
+      value: () => ({
+        left: 160,
+        top: 80,
+        right: 200,
+        bottom: 120,
+        width: 40,
+        height: 40,
+        x: 160,
+        y: 80,
+        toJSON: () => ({}),
+      }),
+    });
+    document.body.appendChild(cell);
+  });
+
+  afterEach(() => {
+    manager.exit();
+    cell.remove();
+    document.querySelectorAll('.tutorial-tooltip, .tutorial-overlay').forEach((el) => el.remove());
+  });
+
+  it('adds enlarged hit proxy, Tap here cue, and stable action ring for click-cell steps', () => {
+    const config: TutorialConfig = {
+      id: 'kings-tap-target',
+      name: 'Kings Tap',
+      steps: [
+        {
+          id: 'select-king',
+          title: 'Select Your King',
+          message: 'Tap your King',
+          highlightSelector: '.cell[data-row="1"][data-col="5"]',
+          position: 'left',
+          requiredAction: { type: 'click-cell', row: 1, col: 5 },
+        },
+      ],
+    };
+
+    manager.start(config);
+
+    const ring = document.querySelector('.tutorial-highlight-ring') as HTMLElement;
+    expect(ring.classList.contains('tutorial-highlight-ring--action')).toBe(true);
+    // 40px cell + 24px padding each side = 88
+    expect(parseFloat(ring.style.width)).toBe(88);
+    expect(parseFloat(ring.style.height)).toBe(88);
+
+    expect(cell.classList.contains('tutorial-tap-target')).toBe(true);
+
+    const cue = document.querySelector('.tutorial-tap-cue') as HTMLElement;
+    expect(cue).toBeTruthy();
+    expect(cue.textContent).toBe('Tap here');
+
+    const proxy = document.querySelector('.tutorial-hit-proxy') as HTMLButtonElement;
+    expect(proxy).toBeTruthy();
+    expect(proxy.getAttribute('aria-label')).toBe('Tap here');
+    expect(parseFloat(proxy.style.width)).toBeGreaterThanOrEqual(56);
+    expect(parseFloat(proxy.style.height)).toBeGreaterThanOrEqual(56);
+  });
+
+  it('does not add hit proxy for highlight-only steps', () => {
+    const config: TutorialConfig = {
+      id: 'highlight-only',
+      name: 'Highlight Only',
+      steps: [
+        {
+          id: 'look',
+          title: 'Look',
+          message: 'See the king',
+          highlightSelector: '.cell[data-row="1"][data-col="5"]',
+          position: 'left',
+        },
+      ],
+    };
+
+    manager.start(config);
+
+    const ring = document.querySelector('.tutorial-highlight-ring') as HTMLElement;
+    expect(ring.classList.contains('tutorial-highlight-ring--action')).toBe(false);
+    expect(parseFloat(ring.style.width)).toBe(56); // 40 + 8*2
+    expect(document.querySelector('.tutorial-hit-proxy')).toBeNull();
+    expect(document.querySelector('.tutorial-tap-cue')).toBeNull();
+    expect(cell.classList.contains('tutorial-tap-target')).toBe(false);
+  });
+
+  it('forwards hit-proxy clicks to the target cell', () => {
+    const clickSpy = vi.fn();
+    cell.addEventListener('click', clickSpy);
+
+    const config: TutorialConfig = {
+      id: 'proxy-forward',
+      name: 'Proxy Forward',
+      steps: [
+        {
+          id: 'select-king',
+          title: 'Select',
+          message: 'Tap',
+          highlightSelector: '.cell[data-row="1"][data-col="5"]',
+          requiredAction: { type: 'click-cell', row: 1, col: 5 },
+        },
+        {
+          id: 'done',
+          title: 'Done',
+          message: 'Done',
+          position: 'center',
+        },
+      ],
+    };
+
+    manager.start(config);
+
+    const proxy = document.querySelector('.tutorial-hit-proxy') as HTMLButtonElement;
+    proxy.click();
+
+    expect(clickSpy).toHaveBeenCalled();
+  });
+});
+
 describe('TutorialManager tooltip viewport clamp', () => {
   let manager: TutorialManager;
   let board: HTMLElement;
