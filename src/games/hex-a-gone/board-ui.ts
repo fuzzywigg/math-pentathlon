@@ -49,9 +49,11 @@ export function renderBoard(
   // Create SVG for the board
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'hex-a-gone-board');
-  svg.setAttribute('viewBox', '-150 -150 300 300');
+  // Radius-3 hexes with HEX_SIZE=30 extend past ±150; pad viewBox so edges aren't clipped
+  svg.setAttribute('viewBox', '-185 -195 370 390');
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
   // Get valid placements for highlighting
   const validPlacements = state.phase === 'placeBlocks' ? getValidPlacements(state) : [];

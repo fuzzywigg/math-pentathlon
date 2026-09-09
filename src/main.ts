@@ -1,4 +1,5 @@
 import './style.css';
+import './ui/styles/mobile-play-shell.css';
 import { addRoute, initRouter, getCurrentPath, getPathParams, navigate } from './core/router';
 import { owlSystem } from './core/owl';
 import { owlComponent } from './ui/owl';
