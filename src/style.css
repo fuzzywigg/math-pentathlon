@@ -848,7 +848,7 @@ h1 {
   }
 
   .board {
-    width: min(90vw, 350px, 100%);
+    width: min(90vw, 350px);
     height: auto;
     aspect-ratio: 1;
     max-width: 100%;
