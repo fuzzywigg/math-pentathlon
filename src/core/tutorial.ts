@@ -42,6 +42,21 @@ const CLICK_CELL_HIGHLIGHT_PADDING_PX = 24;
 const DEFAULT_HIGHLIGHT_PADDING_PX = 8;
 /** Minimum side length for the enlarged tutorial hit proxy (touch-friendly). */
 const CLICK_CELL_MIN_HIT_PX = 56;
+/** Gap kept between tooltip and the highlight / tap cue (px). */
+const TOOLTIP_AVOID_GAP_PX = 12;
+/** Approximate height of the "Tap here" cue including arrow (for avoid rect). */
+const TAP_CUE_AVOID_HEIGHT_PX = 36;
+/** Prefer compact tooltip when the viewport is this narrow or less. */
+const COMPACT_TOOLTIP_VIEWPORT_PX = 480;
+
+type TooltipSide = Exclude<NonNullable<TutorialStep['position']>, 'center'>;
+
+interface AvoidRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
 
 // Tutorial state manager
 export class TutorialManager {
@@ -272,6 +287,7 @@ export class TutorialManager {
   /**
    * For click-cell steps: enlarge the cutout + add a stable hit proxy and "Tap here" cue
    * so small board cells (esp. ~390px) are easier to hit.
+   * @returns whether the Tap here cue was placed above the highlight
    */
   private setupClickCellTarget(
     targetEl: HTMLElement,
@@ -279,9 +295,7 @@ export class TutorialManager {
     highlightTop: number,
     highlightWidth: number,
     highlightHeight: number
-  ): void {
-    if (!this.overlayElement) return;
-
+  ): boolean {
     targetEl.classList.add('tutorial-tap-target');
 
     const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
@@ -302,7 +316,8 @@ export class TutorialManager {
       // Forward to the real board cell so game + tutorial handlers stay in sync
       targetEl.click();
     });
-    this.overlayElement.appendChild(hitProxy);
+    // Append to body (not overlay) so z-index stacks above the tooltip sibling
+    document.body.appendChild(hitProxy);
     this.hitProxyElement = hitProxy;
 
     const cue = document.createElement('div');
@@ -318,8 +333,9 @@ export class TutorialManager {
       cue.style.top = `${highlightTop + highlightHeight + 8}px`;
       cue.classList.add('tutorial-tap-cue--below');
     }
-    this.overlayElement.appendChild(cue);
+    document.body.appendChild(cue);
     this.tapCueElement = cue;
+    return cueAbove;
   }
 
   private showCurrentStep(): void {
@@ -383,16 +399,18 @@ export class TutorialManager {
         highlightRing.style.width = `${width}px`;
         highlightRing.style.height = `${height}px`;
 
+        let cueAbove = false;
         if (isClickCellAction) {
           highlightRing.classList.add('tutorial-highlight-ring--action');
-          this.setupClickCellTarget(targetEl, left, top, width, height);
+          cueAbove = this.setupClickCellTarget(targetEl, left, top, width, height);
         }
 
         // Update backdrop clip path to cut out the (possibly enlarged) highlight area
         this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
 
-        // Position tooltip relative to highlight
-        this.positionTooltip(rect, step.position ?? 'bottom');
+        // Keep tooltip clear of highlight cutout (+ Tap here cue / hit proxy for click-cell)
+        const avoidRect = this.buildAvoidRect(left, top, width, height, isClickCellAction, cueAbove);
+        this.positionTooltip(rect, step.position ?? 'bottom', avoidRect);
       } else if (highlightRing) {
         // Selector set but target not in DOM yet — clear stale ring from prior step
         this.clearHighlight(highlightRing, backdrop);
@@ -415,9 +433,46 @@ export class TutorialManager {
     this.positionTooltipCenter();
   }
 
+  /**
+   * Rect the tooltip must not cover: highlight cutout, and for click-cell also
+   * the Tap here cue band + enlarged hit proxy footprint.
+   */
+  private buildAvoidRect(
+    highlightLeft: number,
+    highlightTop: number,
+    highlightWidth: number,
+    highlightHeight: number,
+    isClickCellAction: boolean,
+    cueAbove: boolean,
+  ): AvoidRect {
+    let left = highlightLeft;
+    let top = highlightTop;
+    let right = highlightLeft + highlightWidth;
+    let bottom = highlightTop + highlightHeight;
+
+    if (isClickCellAction) {
+      const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
+      const hitLeft = highlightLeft + highlightWidth / 2 - hitSize / 2;
+      const hitTop = highlightTop + highlightHeight / 2 - hitSize / 2;
+      left = Math.min(left, hitLeft);
+      top = Math.min(top, hitTop);
+      right = Math.max(right, hitLeft + hitSize);
+      bottom = Math.max(bottom, hitTop + hitSize);
+
+      if (cueAbove) {
+        top -= TAP_CUE_AVOID_HEIGHT_PX;
+      } else {
+        bottom += TAP_CUE_AVOID_HEIGHT_PX;
+      }
+    }
+
+    return { left, top, right, bottom };
+  }
+
   private positionTooltip(
     targetRect: DOMRect,
     position: NonNullable<TutorialStep['position']>,
+    avoidRect?: AvoidRect,
   ): void {
     if (!this.tooltipElement) return;
 
@@ -426,50 +481,204 @@ export class TutorialManager {
       return;
     }
 
-    const { width, height } = this.prepareTooltipForAbsolutePosition();
     const margin = 16;
+    const { width: viewportWidth } = this.getViewportMetrics();
+    const preferCompact = viewportWidth <= COMPACT_TOOLTIP_VIEWPORT_PX;
+    const clearRect: AvoidRect = avoidRect ?? {
+      left: targetRect.left,
+      top: targetRect.top,
+      right: targetRect.right,
+      bottom: targetRect.bottom,
+    };
 
-    let left: number;
-    let top: number;
+    // Try preferred size first; if every side overlaps the target, compact and retry
+    const tryPlace = (compact: boolean): boolean => {
+      const { width, height } = this.prepareTooltipForAbsolutePosition(compact);
+      return this.placeTooltipAvoidingTarget(position, width, height, margin, clearRect);
+    };
 
-    switch (position) {
-      case 'top':
-        left = targetRect.left + (targetRect.width - width) / 2;
-        top = targetRect.top - height - margin;
-        break;
-      case 'bottom':
-        left = targetRect.left + (targetRect.width - width) / 2;
-        top = targetRect.bottom + margin;
-        break;
-      case 'left':
-        left = targetRect.left - width - margin;
-        top = targetRect.top + (targetRect.height - height) / 2;
-        break;
-      case 'right':
-        left = targetRect.right + margin;
-        top = targetRect.top + (targetRect.height - height) / 2;
-        break;
-      default: {
-        const _exhaustive: never = position;
-        void _exhaustive;
-        this.positionTooltipCenter();
-        return;
+    if (tryPlace(preferCompact)) return;
+    if (!preferCompact && tryPlace(true)) return;
+
+    // Last resort: keep preferred side clamped in-viewport (may still overlap on tiny screens)
+    const { width, height } = this.prepareTooltipForAbsolutePosition(preferCompact);
+    const fallback = this.computeSidePosition(position, clearRect, width, height, margin);
+    this.applyClampedTooltipPosition(fallback.left, fallback.top, width, height, margin);
+  }
+
+  /**
+   * Try preferred side first, then flip to other sides until the tooltip stays
+   * in-viewport and clear of the highlight / Tap here avoid rect.
+   */
+  private placeTooltipAvoidingTarget(
+    preferred: TooltipSide,
+    width: number,
+    height: number,
+    margin: number,
+    avoidRect: AvoidRect,
+  ): boolean {
+    const sides = this.orderedTooltipSides(preferred, avoidRect, width, height, margin);
+
+    for (const side of sides) {
+      const raw = this.computeSidePosition(side, avoidRect, width, height, margin);
+      const { left, top } = this.clampTooltipCoords(raw.left, raw.top, width, height, margin);
+      const tooltipBox: AvoidRect = {
+        left,
+        top,
+        right: left + width,
+        bottom: top + height,
+      };
+
+      if (!this.rectsOverlap(tooltipBox, avoidRect, TOOLTIP_AVOID_GAP_PX)) {
+        this.applyTooltipCoords(left, top);
+        return true;
       }
     }
 
-    this.applyClampedTooltipPosition(left, top, width, height, margin);
+    // No side fully clears the target after clamp — try parking in the largest
+    // free band above or below the avoid rect (common on ~390px phones).
+    const parked = this.parkTooltipInFreeBand(avoidRect, width, height, margin);
+    if (parked) {
+      this.applyTooltipCoords(parked.left, parked.top);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Place the tooltip fully above or below the avoid rect (horizontally centered
+   * in the viewport), choosing the band with more free space.
+   */
+  private parkTooltipInFreeBand(
+    avoidRect: AvoidRect,
+    width: number,
+    height: number,
+    margin: number,
+  ): { left: number; top: number } | null {
+    const { width: vw, height: vh, offsetLeft, offsetTop } = this.getViewportMetrics();
+    const gap = TOOLTIP_AVOID_GAP_PX;
+    const centerLeft = offsetLeft + (vw - width) / 2;
+
+    const belowTop = avoidRect.bottom + gap;
+    const aboveTop = avoidRect.top - height - gap;
+    const spaceBelow = offsetTop + vh - margin - belowTop;
+    const spaceAbove = aboveTop - (offsetTop + margin);
+
+    const candidates: { left: number; top: number; space: number }[] = [];
+    if (spaceBelow >= height) {
+      candidates.push({ left: centerLeft, top: belowTop, space: spaceBelow });
+    }
+    if (spaceAbove >= height) {
+      candidates.push({ left: centerLeft, top: aboveTop, space: spaceAbove });
+    }
+    if (candidates.length === 0) return null;
+
+    candidates.sort((a, b) => b.space - a.space);
+    const best = candidates[0]!;
+    return this.clampTooltipCoords(best.left, best.top, width, height, margin);
+  }
+
+  /** Preferred side first, then sides with the most free viewport space. */
+  private orderedTooltipSides(
+    preferred: TooltipSide,
+    avoidRect: AvoidRect,
+    width: number,
+    height: number,
+    margin: number,
+  ): TooltipSide[] {
+    const { width: vw, height: vh, offsetLeft, offsetTop } = this.getViewportMetrics();
+
+    const space: Record<TooltipSide, number> = {
+      top: avoidRect.top - offsetTop - margin,
+      bottom: offsetTop + vh - avoidRect.bottom - margin,
+      left: avoidRect.left - offsetLeft - margin,
+      right: offsetLeft + vw - avoidRect.right - margin,
+    };
+
+    // Only count a side as viable if the tooltip could roughly fit there
+    const fits: Record<TooltipSide, boolean> = {
+      top: space.top >= height + TOOLTIP_AVOID_GAP_PX,
+      bottom: space.bottom >= height + TOOLTIP_AVOID_GAP_PX,
+      left: space.left >= width + TOOLTIP_AVOID_GAP_PX,
+      right: space.right >= width + TOOLTIP_AVOID_GAP_PX,
+    };
+
+    const rest: TooltipSide[] = (['bottom', 'top', 'right', 'left'] as TooltipSide[])
+      .filter((s) => s !== preferred)
+      .sort((a, b) => {
+        const score = (s: TooltipSide) => (fits[s] ? 1_000_000 : 0) + space[s];
+        return score(b) - score(a);
+      });
+
+    return [preferred, ...rest];
+  }
+
+  private computeSidePosition(
+    position: TooltipSide,
+    anchor: AvoidRect,
+    width: number,
+    height: number,
+    margin: number,
+  ): { left: number; top: number } {
+    const gap = Math.max(margin, TOOLTIP_AVOID_GAP_PX);
+    const anchorWidth = anchor.right - anchor.left;
+    const anchorHeight = anchor.bottom - anchor.top;
+    const centerX = anchor.left + anchorWidth / 2;
+    const centerY = anchor.top + anchorHeight / 2;
+
+    switch (position) {
+      case 'top':
+        return {
+          left: centerX - width / 2,
+          top: anchor.top - height - gap,
+        };
+      case 'bottom':
+        return {
+          left: centerX - width / 2,
+          top: anchor.bottom + gap,
+        };
+      case 'left':
+        return {
+          left: anchor.left - width - gap,
+          top: centerY - height / 2,
+        };
+      case 'right':
+        return {
+          left: anchor.right + gap,
+          top: centerY - height / 2,
+        };
+      default: {
+        const _exhaustive: never = position;
+        void _exhaustive;
+        return {
+          left: centerX - width / 2,
+          top: anchor.bottom + gap,
+        };
+      }
+    }
+  }
+
+  private rectsOverlap(a: AvoidRect, b: AvoidRect, gap: number): boolean {
+    return !(
+      a.right + gap <= b.left ||
+      a.left >= b.right + gap ||
+      a.bottom + gap <= b.top ||
+      a.top >= b.bottom + gap
+    );
   }
 
   private positionTooltipCenter(): void {
     if (!this.tooltipElement) return;
 
     const margin = 16;
-    const { width, height } = this.prepareTooltipForAbsolutePosition();
-    const { width: viewportWidth, height: viewportHeight, offsetLeft, offsetTop } =
-      this.getViewportMetrics();
+    const { width: viewportWidth } = this.getViewportMetrics();
+    const compact = viewportWidth <= COMPACT_TOOLTIP_VIEWPORT_PX;
+    const { width, height } = this.prepareTooltipForAbsolutePosition(compact);
+    const { width: vw, height: vh, offsetLeft, offsetTop } = this.getViewportMetrics();
 
-    const left = offsetLeft + (viewportWidth - width) / 2;
-    const top = offsetTop + (viewportHeight - height) / 2;
+    const left = offsetLeft + (vw - width) / 2;
+    const top = offsetTop + (vh - height) / 2;
     this.applyClampedTooltipPosition(left, top, width, height, margin);
   }
 
@@ -477,12 +686,13 @@ export class TutorialManager {
    * Clear centering transforms / CSS margin and constrain width so size
    * measurements match the box we will place with left/top.
    */
-  private prepareTooltipForAbsolutePosition(): { width: number; height: number } {
+  private prepareTooltipForAbsolutePosition(compact = false): { width: number; height: number } {
     const tooltip = this.tooltipElement!;
     const margin = 16;
     const { width: viewportWidth } = this.getViewportMetrics();
     const maxWidth = Math.max(0, viewportWidth - margin * 2);
 
+    tooltip.classList.toggle('tutorial-tooltip--compact', compact);
     tooltip.style.transform = 'none';
     tooltip.style.margin = '0';
     tooltip.style.right = 'auto';
@@ -498,16 +708,13 @@ export class TutorialManager {
     return { width, height };
   }
 
-  private applyClampedTooltipPosition(
+  private clampTooltipCoords(
     left: number,
     top: number,
     width: number,
     height: number,
     margin: number,
-  ): void {
-    if (!this.tooltipElement) return;
-
-    const tooltip = this.tooltipElement;
+  ): { left: number; top: number } {
     const { width: viewportWidth, height: viewportHeight, offsetLeft, offsetTop } =
       this.getViewportMetrics();
 
@@ -518,11 +725,27 @@ export class TutorialManager {
     const maxLeft = Math.max(minLeft, offsetLeft + viewportWidth - width - margin);
     const maxTop = Math.max(minTop, offsetTop + viewportHeight - height - margin);
 
-    const clampedLeft = Math.min(Math.max(left, minLeft), maxLeft);
-    const clampedTop = Math.min(Math.max(top, minTop), maxTop);
+    return {
+      left: Math.min(Math.max(left, minLeft), maxLeft),
+      top: Math.min(Math.max(top, minTop), maxTop),
+    };
+  }
 
-    tooltip.style.left = `${clampedLeft}px`;
-    tooltip.style.top = `${clampedTop}px`;
+  private applyTooltipCoords(left: number, top: number): void {
+    if (!this.tooltipElement) return;
+    this.tooltipElement.style.left = `${left}px`;
+    this.tooltipElement.style.top = `${top}px`;
+  }
+
+  private applyClampedTooltipPosition(
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    margin: number,
+  ): void {
+    const clamped = this.clampTooltipCoords(left, top, width, height, margin);
+    this.applyTooltipCoords(clamped.left, clamped.top);
   }
 
   private getViewportMetrics(): {

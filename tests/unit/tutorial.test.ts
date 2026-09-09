@@ -92,6 +92,7 @@ describe('TutorialManager click-cell tap target', () => {
     cell.dataset.row = '1';
     cell.dataset.col = '5';
     Object.defineProperty(cell, 'getBoundingClientRect', {
+      configurable: true,
       value: () => ({
         left: 160,
         top: 80,
@@ -110,7 +111,9 @@ describe('TutorialManager click-cell tap target', () => {
   afterEach(() => {
     manager.exit();
     cell.remove();
-    document.querySelectorAll('.tutorial-tooltip, .tutorial-overlay').forEach((el) => el.remove());
+    document
+      .querySelectorAll('.tutorial-tooltip, .tutorial-overlay, .tutorial-hit-proxy, .tutorial-tap-cue')
+      .forEach((el) => el.remove());
   });
 
   it('adds enlarged hit proxy, Tap here cue, and stable action ring for click-cell steps', () => {
@@ -205,6 +208,184 @@ describe('TutorialManager click-cell tap target', () => {
     proxy.click();
 
     expect(clickSpy).toHaveBeenCalled();
+  });
+
+  it('keeps tooltip clear of Blue King highlight + Tap here at 390px (select-king)', () => {
+    vi.stubGlobal('innerWidth', 390);
+    vi.stubGlobal('innerHeight', 844);
+    vi.stubGlobal('visualViewport', {
+      width: 390,
+      height: 844,
+      offsetLeft: 0,
+      offsetTop: 0,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    });
+
+    // Top-center board cell (Player 1 King) — preferred position is "left" which cannot fit
+    Object.defineProperty(cell, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({
+        left: 175,
+        top: 168,
+        right: 215,
+        bottom: 208,
+        width: 40,
+        height: 40,
+        x: 175,
+        y: 168,
+        toJSON: () => ({}),
+      }),
+    });
+
+    const config: TutorialConfig = {
+      id: 'kings-select-no-occlude',
+      name: 'Select King Mobile',
+      steps: [
+        {
+          id: 'select-king',
+          title: 'Step 1: Select Your King',
+          message:
+            '<p>Look for the yellow <strong>Tap here</strong> cue and tap your Blue King.</p>',
+          highlightSelector: '.cell[data-row="1"][data-col="5"]',
+          position: 'left',
+          requiredAction: { type: 'click-cell', row: 1, col: 5 },
+        },
+      ],
+    };
+
+    const widthDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+    const heightDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get() {
+        return (this as HTMLElement).classList?.contains('tutorial-tooltip') ? 358 : 0;
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get() {
+        // Compact mode is shorter; non-compact would be taller
+        const el = this as HTMLElement;
+        if (!el.classList?.contains('tutorial-tooltip')) return 0;
+        return el.classList.contains('tutorial-tooltip--compact') ? 200 : 260;
+      },
+    });
+
+    try {
+      manager.start(config);
+
+      const tooltip = document.querySelector('.tutorial-tooltip') as HTMLElement;
+      const cue = document.querySelector('.tutorial-tap-cue') as HTMLElement;
+      const proxy = document.querySelector('.tutorial-hit-proxy') as HTMLElement;
+      const ring = document.querySelector('.tutorial-highlight-ring') as HTMLElement;
+
+      expect(cue).toBeTruthy();
+      expect(proxy).toBeTruthy();
+      expect(tooltip.classList.contains('tutorial-tooltip--compact')).toBe(true);
+
+      const tipLeft = parseFloat(tooltip.style.left);
+      const tipTop = parseFloat(tooltip.style.top);
+      const tipW = 358;
+      const tipH = tooltip.classList.contains('tutorial-tooltip--compact') ? 200 : 260;
+      const tipRight = tipLeft + tipW;
+      const tipBottom = tipTop + tipH;
+
+      // Highlight cutout: cell ± 24px padding → 151..239 x 144..232
+      const avoidLeft = 175 - 24;
+      const avoidTop = 168 - 24 - 36; // cue above
+      const avoidRight = 215 + 24;
+      const avoidBottom = 208 + 24;
+      const gap = 12;
+
+      const overlaps =
+        !(
+          tipRight + gap <= avoidLeft ||
+          tipLeft >= avoidRight + gap ||
+          tipBottom + gap <= avoidTop ||
+          tipTop >= avoidBottom + gap
+        );
+
+      expect(overlaps).toBe(false);
+      // Prefer flipping below the top king rather than covering it
+      expect(tipTop).toBeGreaterThanOrEqual(avoidBottom + gap);
+      expect(parseFloat(ring.style.top)).toBe(168 - 24);
+    } finally {
+      if (widthDesc) Object.defineProperty(HTMLElement.prototype, 'offsetWidth', widthDesc);
+      if (heightDesc) Object.defineProperty(HTMLElement.prototype, 'offsetHeight', heightDesc);
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('keeps preferred left placement on desktop when there is room beside the target', () => {
+    vi.stubGlobal('innerWidth', 1280);
+    vi.stubGlobal('innerHeight', 800);
+    vi.stubGlobal('visualViewport', {
+      width: 1280,
+      height: 800,
+      offsetLeft: 0,
+      offsetTop: 0,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    });
+
+    Object.defineProperty(cell, 'getBoundingClientRect', {
+      configurable: true,
+      value: () => ({
+        left: 520,
+        top: 160,
+        right: 560,
+        bottom: 200,
+        width: 40,
+        height: 40,
+        x: 520,
+        y: 160,
+        toJSON: () => ({}),
+      }),
+    });
+
+    const widthDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+    const heightDesc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetHeight');
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+      configurable: true,
+      get() {
+        return (this as HTMLElement).classList?.contains('tutorial-tooltip') ? 360 : 0;
+      },
+    });
+    Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get() {
+        return (this as HTMLElement).classList?.contains('tutorial-tooltip') ? 220 : 0;
+      },
+    });
+
+    try {
+      manager.start({
+        id: 'desktop-left',
+        name: 'Desktop Left',
+        steps: [
+          {
+            id: 'select-king',
+            title: 'Select Your King',
+            message: 'Tap your King',
+            highlightSelector: '.cell[data-row="1"][data-col="5"]',
+            position: 'left',
+            requiredAction: { type: 'click-cell', row: 1, col: 5 },
+          },
+        ],
+      });
+
+      const tooltip = document.querySelector('.tutorial-tooltip') as HTMLElement;
+      expect(tooltip.classList.contains('tutorial-tooltip--compact')).toBe(false);
+      const tipLeft = parseFloat(tooltip.style.left);
+      const tipRight = tipLeft + 360;
+      // Avoid left edge of padded highlight: 520 - 24 = 496
+      expect(tipRight).toBeLessThanOrEqual(496 - 12);
+    } finally {
+      if (widthDesc) Object.defineProperty(HTMLElement.prototype, 'offsetWidth', widthDesc);
+      if (heightDesc) Object.defineProperty(HTMLElement.prototype, 'offsetHeight', heightDesc);
+      vi.unstubAllGlobals();
+    }
   });
 });
 

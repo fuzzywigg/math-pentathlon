@@ -1920,6 +1920,39 @@ h1 {
   overflow: hidden;
 }
 
+/* Tighter layout on narrow phones so the dialog can clear the highlight target */
+.tutorial-tooltip--compact .tutorial-tooltip-header {
+  padding: 8px 12px;
+}
+
+.tutorial-tooltip--compact .tutorial-tooltip-title {
+  padding: 10px 12px 4px;
+  font-size: 0.95rem;
+}
+
+.tutorial-tooltip--compact .tutorial-tooltip-message {
+  padding: 0 12px 10px;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  max-height: min(28vh, 180px);
+  overflow-y: auto;
+}
+
+.tutorial-tooltip--compact .tutorial-tooltip-message p {
+  margin: 0 0 8px;
+}
+
+.tutorial-tooltip--compact .tutorial-tooltip-actions {
+  padding: 8px 12px;
+  gap: 8px;
+}
+
+.tutorial-tooltip--compact .tutorial-prev-btn,
+.tutorial-tooltip--compact .tutorial-next-btn {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
 .tutorial-tooltip-header {
   display: flex;
   justify-content: space-between;
