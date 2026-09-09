@@ -281,12 +281,13 @@ export class TutorialManager {
 
         // Position tooltip relative to highlight
         this.positionTooltip(rect, step.position || 'bottom');
+      } else if (highlightRing) {
+        // Selector set but target not in DOM yet — clear stale ring from prior step
+        this.clearHighlight(highlightRing, backdrop);
       }
     } else {
       // No highlight - center tooltip
-      highlightRing.style.display = 'none';
-      backdrop.style.clipPath = 'none';
-      this.positionTooltipCenter();
+      this.clearHighlight(highlightRing, backdrop);
     }
 
     // Call onShow callback
@@ -295,10 +296,17 @@ export class TutorialManager {
     }
   }
 
+  private clearHighlight(highlightRing: HTMLElement, backdrop: HTMLElement): void {
+    highlightRing.style.display = 'none';
+    backdrop.style.clipPath = 'none';
+    this.positionTooltipCenter();
+  }
+
   private positionTooltip(targetRect: DOMRect, position: string): void {
     if (!this.tooltipElement) return;
 
     const tooltip = this.tooltipElement;
+    tooltip.style.transform = '';
     const tooltipRect = tooltip.getBoundingClientRect();
     const margin = 16;
     const viewportWidth = window.innerWidth;
