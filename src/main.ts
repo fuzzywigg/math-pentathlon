@@ -20,11 +20,13 @@ import {
   initGame as initStarTrackGame,
   newGameVsHuman as starTrackNewGameVsHuman,
   newGameVsAI as starTrackNewGameVsAI,
+  startTutorial as startStarTrackTutorial,
 } from './games/star-track/game-controller';
 import {
   initGame as initHexAGoneGame,
   newGameVsHuman as hexAGoneNewGameVsHuman,
   newGameVsAI as hexAGoneNewGameVsAI,
+  startTutorial as startHexAGoneTutorial,
 } from './games/hex-a-gone/game-controller';
 import {
   initGame as initCallaGame,
@@ -656,6 +658,7 @@ function renderStarTrack(): void {
     </header>
     <div class="button-row">
       <button id="new-game-btn">New Game</button>
+      <button id="tutorial-btn">Tutorial</button>
       <button id="help-btn">How to Play</button>
     </div>
     <div id="status"></div>
@@ -731,6 +734,7 @@ function renderStarTrack(): void {
   const boardContainer = document.getElementById('board');
   const statusContainer = document.getElementById('status');
   const newGameBtn = document.getElementById('new-game-btn');
+  const tutorialBtn = document.getElementById('tutorial-btn');
   const helpBtn = document.getElementById('help-btn');
   const helpModal = document.getElementById('help-modal');
   const newGameModal = document.getElementById('new-game-modal');
@@ -799,6 +803,13 @@ function renderStarTrack(): void {
     });
   }
 
+  // Wire up Tutorial button
+  if (tutorialBtn) {
+    tutorialBtn.addEventListener('click', () => {
+      startStarTrackTutorial();
+    });
+  }
+
   // Wire up Back button
   if (backBtn) {
     backBtn.addEventListener('click', () => {
@@ -858,6 +869,7 @@ function renderHexAGone(): void {
     </header>
     <div class="button-row">
       <button id="new-game-btn">New Game</button>
+      <button id="tutorial-btn">Tutorial</button>
       <button id="help-btn">How to Play</button>
     </div>
     <div id="status"></div>
@@ -941,6 +953,7 @@ function renderHexAGone(): void {
   const boardContainer = document.getElementById('board');
   const statusContainer = document.getElementById('status');
   const newGameBtn = document.getElementById('new-game-btn');
+  const tutorialBtn = document.getElementById('tutorial-btn');
   const helpBtn = document.getElementById('help-btn');
   const helpModal = document.getElementById('help-modal');
   const newGameModal = document.getElementById('new-game-modal');
@@ -1006,6 +1019,13 @@ function renderHexAGone(): void {
       if (e.target === newGameModal) {
         closeNewGameModal();
       }
+    });
+  }
+
+  // Wire up Tutorial button
+  if (tutorialBtn) {
+    tutorialBtn.addEventListener('click', () => {
+      startHexAGoneTutorial();
     });
   }
 

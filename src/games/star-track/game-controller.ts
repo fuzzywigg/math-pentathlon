@@ -3,6 +3,8 @@
 import { StarTrackGameState, createInitialState } from './types';
 import { drawChains, selectChain, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
+import { tutorialManager } from '../../core/tutorial';
+import { starTrackTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAIChainChoice, AIDifficulty } from './ai';
 
@@ -163,4 +165,25 @@ export function resetGame(): void {
   } else {
     newGameVsHuman();
   }
+}
+
+// Start the tutorial
+export function startTutorial(): void {
+  newGameVsHuman();
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed') {
+        newGameVsHuman();
+      }
+    }
+  });
+
+  tutorialManager.start(starTrackTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }
