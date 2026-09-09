@@ -1810,7 +1810,9 @@ h1 {
   animation: tutorial-action-pulse 1.6s ease-in-out infinite;
 }
 
-/* Enlarged transparent hit target over the highlighted cell */
+/* Enlarged transparent hit target over the highlighted cell.
+   Must be a sibling of .tutorial-tooltip (not inside .tutorial-overlay) so
+   z-index 10001 stacks above the tooltip's 10000. */
 .tutorial-hit-proxy {
   position: fixed;
   z-index: 10001;
@@ -1829,7 +1831,7 @@ h1 {
   outline-offset: 2px;
 }
 
-/* Explicit "Tap here" label for kids */
+/* Explicit "Tap here" label for kids (sibling of tooltip; z above dialog) */
 .tutorial-tap-cue {
   position: fixed;
   z-index: 10002;
@@ -1918,39 +1920,6 @@ h1 {
   z-index: 10000;
   font-family: system-ui, -apple-system, sans-serif;
   overflow: hidden;
-}
-
-/* Tighter layout on narrow phones so the dialog can clear the highlight target */
-.tutorial-tooltip--compact .tutorial-tooltip-header {
-  padding: 8px 12px;
-}
-
-.tutorial-tooltip--compact .tutorial-tooltip-title {
-  padding: 10px 12px 4px;
-  font-size: 0.95rem;
-}
-
-.tutorial-tooltip--compact .tutorial-tooltip-message {
-  padding: 0 12px 10px;
-  font-size: 0.85rem;
-  line-height: 1.45;
-  max-height: min(28vh, 180px);
-  overflow-y: auto;
-}
-
-.tutorial-tooltip--compact .tutorial-tooltip-message p {
-  margin: 0 0 8px;
-}
-
-.tutorial-tooltip--compact .tutorial-tooltip-actions {
-  padding: 8px 12px;
-  gap: 8px;
-}
-
-.tutorial-tooltip--compact .tutorial-prev-btn,
-.tutorial-tooltip--compact .tutorial-next-btn {
-  padding: 8px 12px;
-  font-size: 0.85rem;
 }
 
 .tutorial-tooltip-header {

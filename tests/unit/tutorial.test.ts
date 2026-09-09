@@ -265,10 +265,7 @@ describe('TutorialManager click-cell tap target', () => {
     Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
       configurable: true,
       get() {
-        // Compact mode is shorter; non-compact would be taller
-        const el = this as HTMLElement;
-        if (!el.classList?.contains('tutorial-tooltip')) return 0;
-        return el.classList.contains('tutorial-tooltip--compact') ? 200 : 260;
+        return (this as HTMLElement).classList?.contains('tutorial-tooltip') ? 260 : 0;
       },
     });
 
@@ -282,12 +279,15 @@ describe('TutorialManager click-cell tap target', () => {
 
       expect(cue).toBeTruthy();
       expect(proxy).toBeTruthy();
-      expect(tooltip.classList.contains('tutorial-tooltip--compact')).toBe(true);
+      // Option 1: must be body siblings of tooltip — not trapped under overlay stacking
+      expect(proxy.parentElement).toBe(document.body);
+      expect(cue.parentElement).toBe(document.body);
+      expect(document.querySelector('.tutorial-overlay')?.contains(proxy)).toBe(false);
 
       const tipLeft = parseFloat(tooltip.style.left);
       const tipTop = parseFloat(tooltip.style.top);
       const tipW = 358;
-      const tipH = tooltip.classList.contains('tutorial-tooltip--compact') ? 200 : 260;
+      const tipH = 260;
       const tipRight = tipLeft + tipW;
       const tipBottom = tipTop + tipH;
 
@@ -376,7 +376,6 @@ describe('TutorialManager click-cell tap target', () => {
       });
 
       const tooltip = document.querySelector('.tutorial-tooltip') as HTMLElement;
-      expect(tooltip.classList.contains('tutorial-tooltip--compact')).toBe(false);
       const tipLeft = parseFloat(tooltip.style.left);
       const tipRight = tipLeft + 360;
       // Avoid left edge of padded highlight: 520 - 24 = 496
