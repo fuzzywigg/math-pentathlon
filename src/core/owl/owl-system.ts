@@ -34,6 +34,8 @@ class OwlSystem {
   private isProcessingQueue = false;
   private messageDisplayTime = 5000; // 5 seconds default
   private gameStartTime: number = 0;
+  /** Bumped by speakNow so in-flight processQueue delays do not clear inspect speech. */
+  private speakEpoch = 0;
 
   constructor() {
     // Listen to all events and process them
@@ -224,8 +226,12 @@ class OwlSystem {
     if (this.isProcessingQueue || this.messageQueue.length === 0) return;
 
     this.isProcessingQueue = true;
+    const epochAtStart = this.speakEpoch;
 
     while (this.messageQueue.length > 0) {
+      // speakNow may have taken over the bubble mid-queue
+      if (this.speakEpoch !== epochAtStart) break;
+
       const message = this.messageQueue.shift()!;
 
       // Check if we've seen this message recently (for non-important messages)
@@ -240,11 +246,13 @@ class OwlSystem {
       // Wait for display time
       await this.delay(this.getDisplayTime(message));
 
-      // Hide message
-      this.updateState({ message: null, isAnimating: false });
+      // Hide message only if speakNow did not replace it
+      if (this.speakEpoch === epochAtStart) {
+        this.updateState({ message: null, isAnimating: false });
+      }
 
       // Brief pause between messages
-      if (this.messageQueue.length > 0) {
+      if (this.messageQueue.length > 0 && this.speakEpoch === epochAtStart) {
         await this.delay(500);
       }
     }
@@ -374,6 +382,45 @@ class OwlSystem {
   // Dismiss current message
   dismissMessage(): void {
     this.updateState({ message: null, isAnimating: false });
+  }
+
+  /**
+   * Thin public speak API for Cycle-2 B drop-inspect (and similar soft-tutor lines).
+   * Callers pass copy themselves — this does NOT consult MESSAGE_LIBRARY.
+   * Shows immediately (soft tutor), then auto-dismisses after display time.
+   */
+  speakNow(text: string, mood: OwlMood = 'thinking'): void {
+    const settings = storage.getSettings();
+    if (!settings.owlEnabled) return;
+
+    const message: OwlMessage = {
+      id: `ollie-inspect-stub-${Date.now()}`,
+      text,
+      category: 'game:move',
+      priority: 'high',
+    };
+
+    // Invalidate in-flight queue timers so they cannot wipe this bubble
+    this.speakEpoch += 1;
+    const epoch = this.speakEpoch;
+    this.messageQueue = [];
+    this.isProcessingQueue = false;
+
+    storage.updateOwlMood(mood);
+    this.updateState({
+      isVisible: true,
+      mood,
+      message,
+      isAnimating: true,
+    });
+
+    const displayMs = this.getDisplayTime(message);
+    void this.delay(displayMs).then(() => {
+      if (this.speakEpoch !== epoch) return;
+      if (this.currentState.message?.id === message.id) {
+        this.updateState({ message: null, isAnimating: false });
+      }
+    });
   }
 
   // Get event emitter for external subscriptions

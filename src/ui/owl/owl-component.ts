@@ -1,6 +1,6 @@
 // Owl UI Component - Visual representation of Ollie the Owl
 
-import { owlSystem, OwlDisplayState } from '../../core/owl';
+import { owlSystem, OwlDisplayState, inspectDropSpeech } from '../../core/owl';
 import { storage } from '../../core/storage';
 
 /** Pixels of movement before a pointer gesture counts as a drag (not a tap). */
@@ -11,7 +11,7 @@ export class OwlComponent {
   private unsubscribe: (() => void) | null = null;
   private isMinimized = false;
 
-  /** Active pointer-drag state (Cycle-2 A shell only — no drop-inspect). */
+  /** Active pointer-drag state (Cycle-2 A + B drop-inspect on real drag). */
   private isDragging = false;
   private didDrag = false;
   private dragPointerId: number | null = null;
@@ -208,6 +208,10 @@ export class OwlComponent {
     if (!this.container || !this.isDragging) return;
     if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
 
+    const wasRealDrag = this.didDrag;
+    const dropX = e.clientX;
+    const dropY = e.clientY;
+
     this.isDragging = false;
     this.dragPointerId = null;
 
@@ -221,9 +225,38 @@ export class OwlComponent {
 
     this.container.classList.remove('owl-dragging');
 
-    // Cycle-2 A: always snap back to CSS dock home (no drop-inspect yet)
+    // Cycle-2 B: after a real drag, hit-test under the owl and soft-tutor narrate
+    if (wasRealDrag) {
+      this.inspectDropAt(dropX, dropY);
+    }
+
+    // Cycle-2 A: always snap back to CSS dock home (after inspect)
     this.snapBackToDock();
   };
+
+  /**
+   * Hit-test under the finger without the owl blocking (pointer-events none equivalent).
+   * Must not leave pointer-events:none during capture — that releases capture (Pointer Events).
+   */
+  private inspectDropAt(clientX: number, clientY: number): void {
+    if (!this.container) return;
+
+    const prev = this.container.style.pointerEvents;
+    this.container.style.pointerEvents = 'none';
+    let under: Element | null = null;
+    try {
+      // jsdom may lack elementFromPoint; browsers always have it
+      under =
+        typeof document.elementFromPoint === 'function'
+          ? document.elementFromPoint(clientX, clientY)
+          : null;
+    } finally {
+      this.container.style.pointerEvents = prev;
+    }
+
+    const speech = inspectDropSpeech(under instanceof Element ? under : null);
+    owlSystem.speakNow(speech, 'thinking');
+  }
 
   /** Clear inline position so CSS dock (top-right mobile / bottom-right desktop) wins. */
   snapBackToDock(): void {
@@ -234,9 +267,14 @@ export class OwlComponent {
     this.container.style.bottom = '';
   }
 
-  /** Whether Ollie is mid-drag (for tests / future drop-inspect). */
+  /** Whether Ollie is mid-drag (for tests / drop-inspect). */
   getIsDragging(): boolean {
     return this.isDragging;
+  }
+
+  /** Expose whether the last gesture crossed the drag threshold (for tests). */
+  getDidDrag(): boolean {
+    return this.didDrag;
   }
 
   // Subscribe to owl state changes
