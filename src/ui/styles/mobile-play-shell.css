@@ -6,7 +6,10 @@
 
 :root {
   --play-shell-gutter: 1rem;
-  --ollie-dock-size: 48px;
+  /* Cycle-2 A: dock 48→64 (+16); clearance derives from dock */
+  --ollie-dock-size: 64px;
+  --ollie-body-w: 68px;
+  --ollie-body-h: 76px;
   --ollie-clearance: 0px;
 }
 
@@ -177,50 +180,77 @@ body {
     z-index: 9000;
     transform: scale(0.85);
     transform-origin: top right;
+    /* Kids drag: follow finger without scrolling the page */
+    touch-action: none;
+    /* Snap-back must not slide via left/top transition */
+    transition: opacity 0.2s ease;
   }
 
   .owl-container.owl-hidden {
     transform: translateY(-12px) scale(0.85);
   }
 
+  /* Dragging: fixed left/top follow pointer; drop CSS right/bottom dock */
+  .owl-container.owl-dragging {
+    transition: none;
+    z-index: 10000;
+    cursor: grabbing;
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+
+  .owl-container.owl-dragging .owl-character,
+  .owl-container.owl-dragging .owl-minimized {
+    cursor: grabbing;
+  }
+
   .owl-body {
-    width: 52px;
-    height: 60px;
+    width: var(--ollie-body-w);
+    height: var(--ollie-body-h);
   }
 
   .owl-face {
-    top: 8px;
-    width: 52px;
+    top: 10px;
+    width: var(--ollie-body-w);
   }
 
   .owl-eye {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
   }
 
   .owl-pupil {
-    width: 7px;
-    height: 7px;
+    width: 9px;
+    height: 9px;
   }
 
   .owl-beak {
-    border-left-width: 8px;
-    border-right-width: 8px;
-    border-top-width: 11px;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-top-width: 13px;
   }
 
   .owl-wings {
-    top: 28px;
+    top: 34px;
   }
 
   .owl-wing {
-    width: 16px;
-    height: 28px;
+    width: 20px;
+    height: 34px;
   }
 
   .owl-minimized {
     width: var(--ollie-dock-size);
     height: var(--ollie-dock-size);
+  }
+
+  .owl-mini-icon {
+    font-size: 30px;
+  }
+
+  .owl-character {
+    touch-action: none;
+    cursor: grab;
   }
 
   /*
