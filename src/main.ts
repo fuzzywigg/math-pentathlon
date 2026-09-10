@@ -275,7 +275,7 @@ function renderKingsQuadraphages(): void {
   currentCleanup = shell.cleanup;
 }
 
-// Render Hex
+// Render Hex — no Tutorial button: only Hex-a-Gone has a tutorial module (do not invent Hex copy)
 function renderHex(): void {
   const shell = mountGameShell(appContainer!, {
     title: 'Hex',
@@ -914,7 +914,7 @@ function renderFabADiffy(): void {
   currentCleanup = shell.cleanup;
 }
 
-// Render Sum Dominoes
+// Render Sum Dominoes — Help only (no tutorial module exists; do not invent one)
 function renderSumDominoes(): void {
   const shell = mountGameShell(appContainer!, {
     title: 'Sum Dominoes & Dice',
@@ -960,6 +960,7 @@ function renderSumDominoes(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'sd-board-container',
+    showStatus: false,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode) => {
       if (mode === 'human-vs-ai') {

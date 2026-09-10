@@ -1857,22 +1857,27 @@ h1 {
 }
 
 .back-button {
-  background: var(--color-neutral-100);
+  background: #ffffff;
   border: 1px solid var(--color-neutral-200);
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
-  color: var(--color-neutral-600);
+  font-weight: 600;
+  color: var(--color-primary-dark);
+  box-shadow: var(--shadow-sm);
   transition:
     background-color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .back-button:hover {
-  background: var(--color-neutral-200);
-  border-color: var(--color-neutral-200);
-  filter: brightness(0.97);
+  background: var(--color-neutral-50);
+  border-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  box-shadow: var(--shadow-md);
 }
 
 .back-button:focus {
@@ -2503,15 +2508,15 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 1rem;
+  gap: 10px;
+  padding: 0.5rem 1rem 1rem;
 }
 
 .star-track-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 12px;
   width: 100%;
 }
 
@@ -2746,10 +2751,10 @@ h1 {
   margin-top: 8px;
 }
 
-/* Status display */
+/* Status display — keep compact so board stays in first viewport */
 .star-track-status {
   text-align: center;
-  padding: 12px 20px;
+  padding: 8px 16px;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.9) 0%,
@@ -2762,8 +2767,8 @@ h1 {
 .star-track-progress {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 6px;
+  margin-top: 8px;
   width: 100%;
   max-width: 300px;
   margin-left: auto;
@@ -3552,28 +3557,28 @@ h1 {
   padding: 1rem;
 }
 
+/* In-board actions share chrome tokens with .button-row (not accent orange) */
 .sd-roll-btn {
-  padding: 1rem 2rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-dark),
-    var(--color-accent)
-  );
+  padding: 10px 20px;
+  min-width: 120px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  box-shadow: var(--shadow-sm);
   transition:
+    background-color var(--transition-fast),
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
 }
 
 .sd-roll-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.4);
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .sd-roll-btn:focus-visible {
@@ -3652,17 +3657,21 @@ h1 {
 }
 
 .sd-pass-btn {
-  padding: 0.75rem 1.5rem;
-  background: var(--color-accent);
+  padding: 10px 20px;
+  min-width: 120px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: var(--color-neutral-600);
   color: white;
   border: none;
   border-radius: 6px;
-  font-weight: bold;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast);
 }
 
 .sd-pass-btn:hover {
-  background: var(--color-accent-dark);
+  background-color: #334155;
 }
 
 .sd-pass-btn:focus-visible {
@@ -3672,8 +3681,9 @@ h1 {
 
 .sd-controls {
   display: flex;
-  gap: 1rem;
+  gap: 12px;
   justify-content: center;
+  margin-top: 8px;
 }
 
 @media (max-width: 768px) {
@@ -3710,27 +3720,26 @@ h1 {
 }
 
 .contig-roll-btn {
-  padding: 1rem 2rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  background: linear-gradient(
-    135deg,
-    var(--color-accent-dark),
-    var(--color-accent)
-  );
+  padding: 10px 20px;
+  min-width: 120px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: var(--color-primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+  box-shadow: var(--shadow-sm);
   transition:
+    background-color var(--transition-fast),
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
 }
 
 .contig-roll-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.4);
+  background-color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .contig-roll-btn:focus-visible {
@@ -3744,17 +3753,21 @@ h1 {
 }
 
 .contig-pass-btn {
-  padding: 0.75rem 1.5rem;
-  background: var(--color-accent);
+  padding: 10px 20px;
+  min-width: 120px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background-color: var(--color-neutral-600);
   color: white;
   border: none;
   border-radius: 6px;
-  font-weight: bold;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: background-color var(--transition-fast);
 }
 
 .contig-pass-btn:hover {
-  background: var(--color-accent-dark);
+  background-color: #334155;
 }
 
 .contig-pass-btn:focus-visible {
@@ -3814,8 +3827,9 @@ h1 {
   --owl-primary: #8b5cf6;
   --owl-primary-dark: #7c3aed;
   --owl-secondary: #f59e0b;
-  --owl-bubble-bg: #fefce8;
-  --owl-bubble-border: #fde047;
+  --owl-bubble-bg: #fffbeb;
+  --owl-bubble-border: #f59e0b;
+  --owl-bubble-text: #0f172a;
   --owl-body: #8b5cf6;
   --owl-body-light: #a78bfa;
   --owl-eye-bg: #fefce8;
@@ -4111,8 +4125,9 @@ h1 {
 .owl-message {
   margin: 0;
   font-size: 14px;
+  font-weight: 500;
   line-height: 1.5;
-  color: #1e1b4b;
+  color: var(--owl-bubble-text);
   padding-right: 20px;
 }
 
