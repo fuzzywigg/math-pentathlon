@@ -190,7 +190,8 @@ body {
     transform: translateY(-12px) scale(0.85);
   }
 
-  /* Dragging: fixed left/top follow pointer; drop CSS right/bottom dock */
+  /* Dragging: fixed left/top follow pointer; drop CSS right/bottom dock.
+     Hit-test uses momentary pointer-events:none on drop (not here) so capture stays. */
   .owl-container.owl-dragging {
     transition: none;
     z-index: 10000;

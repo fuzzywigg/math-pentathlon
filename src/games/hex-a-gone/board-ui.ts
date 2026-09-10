@@ -89,6 +89,8 @@ export function renderBoard(
     }
 
     hex.setAttribute('class', className);
+    hex.setAttribute('data-q', String(cell.q));
+    hex.setAttribute('data-r', String(cell.r));
 
     if (!cell.filled && isValid && onCellClick) {
       hex.style.cursor = 'pointer';
@@ -132,6 +134,7 @@ export function renderBoard(
     shapes.forEach(shape => {
       const blockBtn = document.createElement('button');
       blockBtn.className = 'hex-a-gone-block-btn';
+      blockBtn.setAttribute('data-shape', shape);
 
       const isSelected = state.turnSelection.blocks.includes(shape);
       const isCurrentPlacement = state.selectedBlockForPlacement === shape;

@@ -76,6 +76,7 @@ export function renderBoard(
   p1Piece.setAttribute('cy', String(p1Pos.y));
   p1Piece.setAttribute('r', '12');
   p1Piece.setAttribute('class', 'star-track-piece star-track-piece-p1');
+  p1Piece.setAttribute('data-player', 'player1');
   piecesGroup.appendChild(p1Piece);
 
   // Player 2 piece
@@ -85,6 +86,7 @@ export function renderBoard(
   p2Piece.setAttribute('cy', String(p2Pos.y));
   p2Piece.setAttribute('r', '12');
   p2Piece.setAttribute('class', 'star-track-piece star-track-piece-p2');
+  p2Piece.setAttribute('data-player', 'player2');
   piecesGroup.appendChild(p2Piece);
 
   svg.appendChild(piecesGroup);
@@ -187,6 +189,8 @@ function createTrackSpaces(
     space.setAttribute('cy', String(y));
     space.setAttribute('r', i === TRACK_LENGTH ? '8' : '6');
     space.setAttribute('class', `star-track-space ${i === 0 ? 'star-track-start' : ''} ${i === TRACK_LENGTH ? 'star-track-end' : ''}`);
+    space.setAttribute('data-space', String(i));
+    space.setAttribute('data-player', player);
     group.appendChild(space);
 
     // Add number labels for some spaces

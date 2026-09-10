@@ -56,6 +56,9 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
     } else {
       vi.spyOn(root, 'hasPointerCapture').mockReturnValue(true);
     }
+
+    // Cycle-2 B hit-test: jsdom has no elementFromPoint
+    document.elementFromPoint = vi.fn(() => null) as typeof document.elementFromPoint;
   });
 
   afterEach(() => {
