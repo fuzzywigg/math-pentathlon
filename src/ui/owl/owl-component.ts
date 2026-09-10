@@ -174,9 +174,13 @@ export class OwlComponent {
     this.container.style.top = `${rect.top}px`;
     this.container.style.right = 'auto';
     this.container.style.bottom = 'auto';
-
-    this.container.setPointerCapture(e.pointerId);
     this.container.classList.add('owl-dragging');
+
+    try {
+      this.container.setPointerCapture(e.pointerId);
+    } catch {
+      // Capture can throw if the pointer is already gone; drag still works via bubbling.
+    }
   };
 
   private onPointerMove = (e: PointerEvent): void => {
@@ -207,8 +211,12 @@ export class OwlComponent {
     this.isDragging = false;
     this.dragPointerId = null;
 
-    if (this.container.hasPointerCapture?.(e.pointerId)) {
-      this.container.releasePointerCapture(e.pointerId);
+    try {
+      if (this.container.hasPointerCapture?.(e.pointerId)) {
+        this.container.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore — pointer may already be released
     }
 
     this.container.classList.remove('owl-dragging');

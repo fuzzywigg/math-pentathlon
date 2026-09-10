@@ -182,6 +182,8 @@ body {
     transform-origin: top right;
     /* Kids drag: follow finger without scrolling the page */
     touch-action: none;
+    /* Snap-back must not slide via left/top transition */
+    transition: opacity 0.2s ease;
   }
 
   .owl-container.owl-hidden {
