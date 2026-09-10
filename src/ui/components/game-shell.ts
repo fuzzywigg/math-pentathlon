@@ -177,7 +177,7 @@ function buildShellHtml(options: GameShellOptions): string {
     ${gameAreaBlock}
     <div id="new-game-modal" class="modal hidden">
       <div class="modal-content">
-        <button class="modal-close" type="button">&times;</button>
+        <button class="modal-close" type="button" aria-label="Close">&times;</button>
         <h2>New Game</h2>
         <div class="mode-selector">
           <h3>Choose Game Mode</h3>
@@ -190,7 +190,7 @@ ${modeOptionsHtml}
     </div>
     <div id="help-modal" class="modal hidden">
       <div class="modal-content">
-        <button class="modal-close" type="button">&times;</button>
+        <button class="modal-close" type="button" aria-label="Close">&times;</button>
         <h2>${escapeAttr(options.helpTitle)}</h2>
         <div class="rules-content">
           ${options.helpContentHtml}

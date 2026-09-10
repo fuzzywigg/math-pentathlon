@@ -72,6 +72,34 @@ body {
   min-height: 100vh;
 }
 
+/* Skip link: visually hidden until keyboard focus */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  padding: 0.75rem 1.25rem;
+  background: #1a1a2e;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 var(--radius-sm) 0;
+  transform: translateY(-120%);
+  transition: transform var(--transition-fast);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid var(--color-primary-light);
+  outline-offset: 2px;
+}
+
+/* Landmark wrapper for routes; layout still owned by #app */
+#main-content {
+  width: 100%;
+  max-width: 100%;
+}
+
 #app {
   max-width: 700px;
   margin: 0 auto;
@@ -873,15 +901,18 @@ h1 {
 
 .modal-close {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 8px;
+  right: 8px;
   background: none;
   border: none;
   font-size: 24px;
   cursor: pointer;
   color: #666;
-  width: 32px;
-  height: 32px;
+  /* WCAG 2.5.5 / touch: ≥44×44 hit target (was 32) */
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1045,8 +1076,9 @@ h1 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  /* Light bump toward touch size (not full 44 — illustrative only) */
+  width: 40px;
+  height: 40px;
   border-radius: 6px;
   border: 2px solid rgba(0, 0, 0, 0.2);
   color: #111;
@@ -1088,8 +1120,8 @@ h1 {
   }
 
   .howto-shape {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
   }
 }
 
@@ -3053,8 +3085,9 @@ h1 {
 }
 
 .block-icon {
-  width: 34px;
-  height: 34px;
+  /* Light bump toward touch size; parent .hex-a-gone-block-btn is the control */
+  width: 40px;
+  height: 40px;
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -3247,9 +3280,9 @@ h1 {
   }
 
   .block-icon {
-    width: 26px;
-    height: 26px;
-    font-size: 14px;
+    width: 32px;
+    height: 32px;
+    font-size: 15px;
   }
 
   .block-name {
