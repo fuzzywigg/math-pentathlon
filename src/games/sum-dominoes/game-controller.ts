@@ -100,7 +100,7 @@ function updateUI(controller: SDGameController): void {
   // Winner banner
   if (state.winner) {
     const banner = document.createElement('div');
-    banner.className = 'sd-winner-banner';
+    banner.className = 'sd-winner-banner game-winner-banner';
     banner.textContent = `${getPlayerName(state.winner)} Wins! 🎉`;
     gameArea.appendChild(banner);
   }
@@ -161,14 +161,10 @@ function updateUI(controller: SDGameController): void {
     controls.appendChild(passBtn);
   }
 
-  const newGameBtn = document.createElement('button');
-  newGameBtn.className = 'sd-roll-btn';
-  newGameBtn.style.background = 'linear-gradient(135deg, #2196f3, #1976d2)';
-  newGameBtn.textContent = 'New Game';
-  newGameBtn.addEventListener('click', () => controller.newGame(controller.isAI));
-  controls.appendChild(newGameBtn);
-
-  gameArea.appendChild(controls);
+  // New Game lives only in shared header chrome (#new-game-btn + modal)
+  if (controls.childElementCount > 0) {
+    gameArea.appendChild(controls);
+  }
   container.appendChild(gameArea);
 
   // AI turn
@@ -192,7 +188,10 @@ function handleRoll(controller: SDGameController): void {
 /**
  * Handle domino selection
  */
-function handleDominoClick(controller: SDGameController, dominoId: string): void {
+function handleDominoClick(
+  controller: SDGameController,
+  dominoId: string
+): void {
   controller.state = selectDomino(controller.state, dominoId);
   controller.update();
 }

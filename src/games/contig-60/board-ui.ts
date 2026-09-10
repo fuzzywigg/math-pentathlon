@@ -1,7 +1,12 @@
 // Contig 60 Board UI
 // Rendering the game board, dice, and expression selection
 
-import { ContigState, CONFIG, BOARD_NUMBERS, getValidPlacements } from './types';
+import {
+  ContigState,
+  CONFIG,
+  BOARD_NUMBERS,
+  getValidPlacements,
+} from './types';
 import { calculatePoints } from './rules';
 
 // Colors
@@ -178,9 +183,7 @@ export function renderExpressionSelector(
  * Format expression for display (replace operators with symbols)
  */
 function formatExpression(expr: string): string {
-  return expr
-    .replace(/\*/g, '×')
-    .replace(/\//g, '÷');
+  return expr.replace(/\*/g, '×').replace(/\//g, '÷');
 }
 
 /**
@@ -277,34 +280,7 @@ export function injectContigStyles(): void {
       color: white;
     }
 
-    .contig-dice-area {
-      display: flex;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .contig-roll-btn {
-      padding: 1rem 2rem;
-      font-size: 1.25rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, ${COLORS.diceBorder}, #ff9800);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .contig-roll-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(245, 124, 0, 0.4);
-    }
-
-    .contig-roll-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
+    /* Chrome (dice-area / roll / pass / status / scores / winner) → style.css */
 
     .contig-dice-display {
       display: flex;
@@ -389,72 +365,6 @@ export function injectContigStyles(): void {
     .contig-no-moves p {
       margin: 0 0 1rem 0;
       color: #e65100;
-    }
-
-    .contig-pass-btn {
-      padding: 0.75rem 1.5rem;
-      background: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .contig-pass-btn:hover {
-      background: #f57c00;
-    }
-
-    .contig-status {
-      text-align: center;
-      padding: 1rem;
-    }
-
-    .contig-status.player1 {
-      color: ${COLORS.player1};
-    }
-
-    .contig-status.player2 {
-      color: ${COLORS.player2};
-    }
-
-    .contig-scores {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      padding: 0.5rem;
-    }
-
-    .contig-score {
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-weight: 500;
-    }
-
-    .contig-score-p1 {
-      background: ${COLORS.player1Light};
-      color: ${COLORS.player1};
-    }
-
-    .contig-score-p2 {
-      background: ${COLORS.player2Light};
-      color: ${COLORS.player2};
-    }
-
-    .contig-winner-banner {
-      text-align: center;
-      padding: 1.5rem;
-      font-size: 1.5rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, #ffd700, #ffec8b);
-      border-radius: 8px;
-      margin: 1rem;
-      animation: contig-glow 1s ease-in-out infinite alternate;
-    }
-
-    @keyframes contig-glow {
-      from { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-      to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
     @media (max-width: 600px) {

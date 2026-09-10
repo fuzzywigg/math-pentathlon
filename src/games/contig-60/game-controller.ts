@@ -55,7 +55,8 @@ function updateUI(): void {
   const diceArea = renderDice(
     gameState.currentDice,
     handleRollDice,
-    gameState.phase === 'rolling' && (!vsAI || gameState.currentPlayer !== aiPlayer)
+    gameState.phase === 'rolling' &&
+      (!vsAI || gameState.currentPlayer !== aiPlayer)
   );
   boardContainer.appendChild(diceArea);
 
@@ -85,7 +86,7 @@ function updateStatus(): void {
     const winnerScore = gameState.scores[gameState.winner];
     const loserScore = gameState.scores[getOpponent(gameState.winner)];
     statusContainer.innerHTML = `
-      <div class="contig-winner-banner">
+      <div class="contig-winner-banner game-winner-banner">
         ${winnerName} wins! ${winnerScore} - ${loserScore}
       </div>
     `;
@@ -212,10 +213,7 @@ function makeAIMove(): void {
 // Public API
 // =============================================================================
 
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
 

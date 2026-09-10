@@ -1,9 +1,19 @@
 import './style.css';
 import './ui/styles/mobile-play-shell.css';
-import { addRoute, initRouter, getCurrentPath, getPathParams, navigate } from './core/router';
+import {
+  addRoute,
+  initRouter,
+  getCurrentPath,
+  getPathParams,
+  navigate,
+} from './core/router';
 import { owlSystem } from './core/owl';
 import { owlComponent } from './ui/owl';
 import { renderGameSelector } from './ui/game-selector';
+import {
+  mountGameShell,
+  type AIDifficultyLevel,
+} from './ui/components/game-shell';
 import { getGameById } from './core/game-registry';
 import {
   initGame as initKQGame,
@@ -204,69 +214,12 @@ function renderGame(): void {
   }
 }
 
-// Render Kings & Quadraphages game
+// Render Kings & Quadraphages
 function renderKingsQuadraphages(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Kings & Quadraphages</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="tutorial-btn">Tutorial</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="game-area">
-      <div id="move-history" class="move-history collapsible">
-        <button class="collapse-toggle" aria-expanded="true" aria-controls="history-content">
-          <span class="collapse-icon">◀</span>
-          <span class="collapse-label">History</span>
-        </button>
-        <div id="history-content" class="history-content"></div>
-      </div>
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option selected" data-mode="human-vs-ai">
-              <input type="radio" name="game-mode" value="human-vs-ai" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer opponent</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="game-mode" value="human-vs-human">
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-          </div>
-          <div id="difficulty-section" class="difficulty-selector">
-            <h4>AI Difficulty</h4>
-            <div class="difficulty-options">
-              <button class="difficulty-btn easy" data-difficulty="easy">Easy</button>
-              <button class="difficulty-btn medium selected" data-difficulty="medium">Medium</button>
-              <button class="difficulty-btn hard" data-difficulty="hard">Hard</button>
-            </div>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Kings & Quadraphages</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Kings & Quadraphages',
+    helpTitle: 'How to Play Kings & Quadraphages',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Trap your opponent's King so it cannot move to any adjacent cell.</p>
 
           <h3>Game Setup</h3>
@@ -290,215 +243,44 @@ function renderKingsQuadraphages(): void {
           </ul>
 
           <h3>Winning</h3>
-          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const historyContentContainer = document.getElementById('history-content');
-  const moveHistoryPanel = document.getElementById('move-history');
-  const collapseToggle = moveHistoryPanel?.querySelector('.collapse-toggle');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const tutorialBtn = document.getElementById('tutorial-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initKQGame(
-      boardContainer,
-      statusContainer,
-      historyContentContainer || undefined,
-      newGameBtn || undefined
-    );
-  }
-
-  // Wire up collapse toggle for move history
-  if (collapseToggle && moveHistoryPanel) {
-    collapseToggle.addEventListener('click', () => {
-      const isCollapsed = moveHistoryPanel.classList.toggle('collapsed');
-      collapseToggle.setAttribute('aria-expanded', String(!isCollapsed));
-    });
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const difficultySection = document.getElementById('difficulty-section');
-    const difficultyBtns = newGameModal.querySelectorAll('.difficulty-btn');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-ai';
-    let selectedDifficulty: AIDifficulty = 'medium';
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-
-        // Show/hide difficulty section
-        if (difficultySection) {
-          difficultySection.style.display =
-            selectedMode === 'human-vs-ai' ? 'block' : 'none';
-        }
-      });
-    });
-
-    // Difficulty selection
-    difficultyBtns.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        difficultyBtns.forEach((b) => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedDifficulty = (btn as HTMLElement).dataset.difficulty as AIDifficulty;
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        kqNewGameVsAI(selectedDifficulty, true);
+          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>`,
+    gameAreaClass: 'game-area',
+    modeRadioName: 'game-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer opponent',
+    showTutorial: true,
+    showMoveHistory: true,
+    showDifficulty: true,
+    defaultMode: 'human-vs-ai',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode, difficulty) => {
+      if (mode === 'human-vs-ai') {
+        kqNewGameVsAI((difficulty ?? 'medium') as AIDifficulty, true);
       } else {
         kqNewGameVsHuman();
       }
-    });
+    },
+    onTutorial: () => startTutorial(),
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initKQGame(
+      shell.board,
+      shell.status,
+      shell.historyContent || undefined,
+      shell.newGameBtn || undefined
+    );
   }
 
-  // Wire up Tutorial button
-  if (tutorialBtn) {
-    tutorialBtn.addEventListener('click', () => {
-      startTutorial();
-    });
-  }
-
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Hex game
+// Render Hex
 function renderHex(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Hex</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="hex-game-area">
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="hex-game-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="hex-game-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer (basic)</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Hex</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Hex',
+    helpTitle: 'How to Play Hex',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Connect your two opposite sides of the board with an unbroken chain of your pieces.</p>
 
           <h3>Players</h3>
@@ -523,182 +305,34 @@ function renderHex(): void {
             <li>Control the center of the board</li>
             <li>Create "bridges" - two pieces that can connect via two paths</li>
             <li>Block your opponent while building your own path</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initHexGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'hex-game-area',
+    modeRadioName: 'hex-game-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer (basic)',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         hexNewGameVsAI();
       } else {
         hexNewGameVsHuman();
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initHexGame(shell.board, shell.status);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Star Track game
+// Render Star Track
 function renderStarTrack(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Star Track</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="tutorial-btn">Tutorial</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="star-track-game-area">
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="star-track-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="star-track-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Race against the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Star Track</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Star Track',
+    helpTitle: 'How to Play Star Track',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to reach the center star!</p>
 
           <h3>Players</h3>
@@ -782,190 +416,36 @@ function renderStarTrack(): void {
             <li>Longer chains move you faster</li>
             <li>Sometimes a shorter chain is better to land exactly on the goal</li>
             <li>Watch what chains have been used to predict what's left</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const tutorialBtn = document.getElementById('tutorial-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initStarTrackGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'star-track-game-area',
+    modeRadioName: 'star-track-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Race against the computer',
+    showTutorial: true,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         starTrackNewGameVsAI();
       } else {
         starTrackNewGameVsHuman();
       }
-    });
+    },
+    onTutorial: () => startStarTrackTutorial(),
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initStarTrackGame(shell.board, shell.status);
   }
 
-  // Wire up Tutorial button
-  if (tutorialBtn) {
-    tutorialBtn.addEventListener('click', () => {
-      startStarTrackTutorial();
-    });
-  }
-
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Hex-a-Gone! game
+// Render Hex-a-Gone
 function renderHexAGone(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Hex-a-Gone!</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="tutorial-btn">Tutorial</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="hex-a-gone-game-area">
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="hex-a-gone-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="hex-a-gone-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Hex-a-Gone!</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Hex-a-Gone!',
+    helpTitle: 'How to Play Hex-a-Gone!',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the last player able to place a block on the board!</p>
 
           <h3>Pattern Blocks</h3>
@@ -1047,190 +527,36 @@ function renderHexAGone(): void {
             <li>Manage the block bank - don't let your opponent get the last blocks</li>
             <li>Fill strategic spaces to limit your opponent's options</li>
             <li>Sometimes placing fewer blocks is smarter</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const tutorialBtn = document.getElementById('tutorial-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initHexAGoneGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'hex-a-gone-game-area',
+    modeRadioName: 'hex-a-gone-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    showTutorial: true,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         hexAGoneNewGameVsAI();
       } else {
         hexAGoneNewGameVsHuman();
       }
-    });
+    },
+    onTutorial: () => startHexAGoneTutorial(),
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initHexAGoneGame(shell.board, shell.status);
   }
 
-  // Wire up Tutorial button
-  if (tutorialBtn) {
-    tutorialBtn.addEventListener('click', () => {
-      startHexAGoneTutorial();
-    });
-  }
-
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Calla game
+// Render Calla
 function renderCalla(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Calla</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="tutorial-btn">Tutorial</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="calla-game-area">
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="calla-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="calla-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Calla</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Calla',
+    helpTitle: 'How to Play Calla',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Collect the most cubes in your Calla (store) by the end of the game!</p>
 
           <h3>Setup</h3>
@@ -1262,189 +588,36 @@ function renderCalla(): void {
             <li>Plan moves to land in your Calla for free turns</li>
             <li>Set up captures by emptying your shields</li>
             <li>Watch for opponent's capture opportunities</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const tutorialBtn = document.getElementById('tutorial-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initCallaGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'calla-game-area',
+    modeRadioName: 'calla-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    showTutorial: true,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         callaNewGameVsAI();
       } else {
         callaNewGameVsHuman();
       }
-    });
+    },
+    onTutorial: () => startCallaTutorial(),
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initCallaGame(shell.board, shell.status);
   }
 
-  // Wire up Tutorial button
-  if (tutorialBtn) {
-    tutorialBtn.addEventListener('click', () => {
-      startCallaTutorial();
-    });
-  }
-
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render FIAR game
+// Render FIAR
 function renderFiar(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>FIAR (Four In A Row)</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="fiar-game-area">
-      <div id="board" class="fiar-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="fiar-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="fiar-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play FIAR</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'FIAR (Four In A Row)',
+    helpTitle: 'How to Play FIAR',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Get four of your chips in a row along connected pathways!</p>
 
           <h3>Game Phases</h3>
@@ -1473,181 +646,35 @@ function renderFiar(): void {
             <li>Block opponent's potential winning paths</li>
             <li>Set up multiple winning threats</li>
             <li>Control the center of the board</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initFiarGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'fiar-game-area',
+    modeRadioName: 'fiar-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'fiar-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         fiarNewGameVsAI();
       } else {
         fiarNewGameVsHuman();
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initFiarGame(shell.board, shell.status);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Queens & Guards game
+// Render Queens & Guards
 function renderQueensGuards(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Queens & Guards</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="qg-game-area">
-      <div id="board" class="qg-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="qg-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="qg-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Queens & Guards</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Queens & Guards',
+    helpTitle: 'How to Play Queens & Guards',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Get your Queen to the center cell (throne) surrounded by all 6 of your Guards!</p>
 
           <h3>Setup</h3>
@@ -1680,181 +707,35 @@ function renderQueensGuards(): void {
             <li>Protect your Queen while advancing toward the center</li>
             <li>Set up captures to slow your opponent</li>
             <li>Position guards strategically for the final winning formation</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initQGGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'qg-game-area',
+    modeRadioName: 'qg-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'qg-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         qgNewGameVsAI();
       } else {
         qgNewGameVsHuman();
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initQGGame(shell.board, shell.status);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Contig 60 game
+// Render Contig 60
 function renderContig60(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Contig 60</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="contig-game-area">
-      <div id="board" class="contig-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="contig-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="contig-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Contig 60</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Contig 60',
+    helpTitle: 'How to Play Contig 60',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Score the most points by placing chips on the board adjacent to other chips!</p>
 
           <h3>Turn Sequence</h3>
@@ -1889,181 +770,35 @@ function renderContig60(): void {
           <ul>
             <li><strong>5 in a row:</strong> First to get 5 chips in a line wins!</li>
             <li><strong>By points:</strong> When board is full, highest score wins</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initContigGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'contig-game-area',
+    modeRadioName: 'contig-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'contig-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         contigNewGameVsAI();
       } else {
         contigNewGameVsHuman();
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initContigGame(shell.board, shell.status);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Juggle game
+// Render Juggle
 function renderJuggle(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Juggle</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="juggle-game-area">
-      <div id="board" class="juggle-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="juggle-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="juggle-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Juggle</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Juggle',
+    helpTitle: 'How to Play Juggle',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to completely fill your 9x9 grid with polyomino shapes!</p>
 
           <h3>Turn Sequence</h3>
@@ -2095,181 +830,35 @@ function renderJuggle(): void {
             <li>Larger shapes fill the board faster</li>
             <li>Save small shapes for filling gaps</li>
             <li>Plan ahead to avoid getting stuck</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initJuggleGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'juggle-game-area',
+    modeRadioName: 'juggle-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'juggle-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         juggleNewGameVsAI();
       } else {
         juggleNewGameVsHuman();
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board && shell.status) {
+    initJuggleGame(shell.board, shell.status);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Fab-a-Diffy game
+// Render Fab-a-Diffy
 function renderFabADiffy(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Fab-a-Diffy</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="fab-game-area">
-      <div id="board" class="fab-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="fab-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="fab-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Fab-a-Diffy</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Fab-a-Diffy',
+    helpTitle: 'How to Play Fab-a-Diffy',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Claim the most answer bars by combining fraction bars with operations!</p>
 
           <h3>Turn Sequence</h3>
@@ -2302,180 +891,35 @@ function renderFabADiffy(): void {
             <li>Plan combinations that match multiple possible answers</li>
             <li>Block opponent's potential matches</li>
             <li>Save versatile fractions for later</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initFabGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        fabNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'fab-game-area',
+    modeRadioName: 'fab-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'fab-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        fabNewGameVsAI(shell.board!);
       } else {
-        fabNewGameVsHuman(boardContainer!);
+        fabNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initFabGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Sum Dominoes & Dice game
+// Render Sum Dominoes
 function renderSumDominoes(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Sum Dominoes & Dice</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="sd-game-area">
-      <div id="board" class="sd-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="sd-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="sd-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Sum Dominoes & Dice</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Sum Dominoes & Dice',
+    helpTitle: 'How to Play Sum Dominoes & Dice',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to get rid of all your dominoes!</p>
 
           <h3>Setup</h3>
@@ -2510,180 +954,35 @@ function renderSumDominoes(): void {
             <li>Try to play high-pip dominoes first</li>
             <li>Watch which sums are likely based on dice probabilities</li>
             <li>7 is the most common dice sum</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initSDGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        sdNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'sd-game-area',
+    modeRadioName: 'sd-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'sd-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        sdNewGameVsAI(shell.board!);
       } else {
-        sdNewGameVsHuman(boardContainer!);
+        sdNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initSDGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Par 55 game
+// Render Par 55
 function renderPar55(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Par 55</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="par55-game-area">
-      <div id="board" class="par55-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="par55-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="par55-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Par 55</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Par 55',
+    helpTitle: 'How to Play Par 55',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to score 55 points by matching attributes on the board!</p>
 
           <h3>Attribute Blocks</h3>
@@ -2717,180 +1016,35 @@ function renderPar55(): void {
             <li>Place blocks near multiple occupied bases for more points</li>
             <li>Match as many attributes as possible</li>
             <li>Watch what blocks your opponent has played</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initPar55Game(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        par55NewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'par55-game-area',
+    modeRadioName: 'par55-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'par55-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        par55NewGameVsAI(shell.board!);
       } else {
-        par55NewGameVsHuman(boardContainer!);
+        par55NewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initPar55Game(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Ramrod game
+// Render Ramrod
 function renderRamrod(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Ramrod</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="ramrod-game-area">
-      <div id="board" class="ramrod-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="ramrod-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="ramrod-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Ramrod</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Ramrod',
+    helpTitle: 'How to Play Ramrod',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to capture 24 cm worth of sum boxes!</p>
 
           <h3>Cuisenaire Rods</h3>
@@ -2925,180 +1079,35 @@ function renderRamrod(): void {
             <li>Set up captures for yourself</li>
             <li>Block opponent's potential captures</li>
             <li>Higher value boxes are worth more!</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initRamrodGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        ramrodNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'ramrod-game-area',
+    modeRadioName: 'ramrod-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'ramrod-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        ramrodNewGameVsAI(shell.board!);
       } else {
-        ramrodNewGameVsHuman(boardContainer!);
+        ramrodNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initRamrodGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Kwatro-Sinko game
+// Render Kwatro-Sinko
 function renderKwatrasinko(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">← Games</button>
-      <h1>Kwatro-Sinko</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="kwa-game-area">
-      <div id="board" class="kwa-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="kwa-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="kwa-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Kwatro-Sinko</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Kwatro-Sinko',
+    helpTitle: 'How to Play Kwatro-Sinko',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Create an alignment of three chips where <strong>a + b - c = 4 or 5</strong></p>
 
           <h3>Setup</h3>
@@ -3133,180 +1142,35 @@ function renderKwatrasinko(): void {
             <li>Control the center to maximize movement options</li>
             <li>Watch for potential winning combinations</li>
             <li>Block your opponent's alignments</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initKwaGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        kwaNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'kwa-game-area',
+    modeRadioName: 'kwa-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'kwa-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        kwaNewGameVsAI(shell.board!);
       } else {
-        kwaNewGameVsHuman(boardContainer!);
+        kwaNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initKwaGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Prime Gold game
+// Render Prime Gold
 function renderPrimeGold(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Prime Gold</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="pg-game-area">
-      <div id="board" class="pg-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="pg-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="pg-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Prime Gold</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Prime Gold',
+    helpTitle: 'How to Play Prime Gold',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Form 4 diagonal veins of prime numbers to win!</p>
 
           <h3>The Board</h3>
@@ -3343,180 +1207,35 @@ function renderPrimeGold(): void {
             <li>Build along diagonal lines</li>
             <li>Block opponent's potential veins</li>
             <li>Factorials give big numbers: 5!=120</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initPrimeGoldGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        primeGoldNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'pg-game-area',
+    modeRadioName: 'pg-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'pg-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        primeGoldNewGameVsAI(shell.board!);
       } else {
-        primeGoldNewGameVsHuman(boardContainer!);
+        primeGoldNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initPrimeGoldGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render Pent'Em In game
+// Render Pent'Em In
 function renderPentEmIn(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Pent'Em In</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="pent-game-container">
-      <div id="board"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="pent-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="pent-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Pent'Em In</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: "Pent'Em In",
+    helpTitle: "How to Play Pent'Em In",
+    helpContentHtml: `<h3>Objective</h3>
           <p>Trap your opponent so they can't place any more pieces!</p>
 
           <h3>Setup</h3>
@@ -3547,142 +1266,34 @@ function renderPentEmIn(): void {
             <li>Control the center early</li>
             <li>Leave awkward spaces for your opponent</li>
             <li>Save flexible pieces for later</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const boardContainer = document.getElementById('board');
-  const statusContainer = document.getElementById('status');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer && statusContainer) {
-    initPentEmInGame(boardContainer, statusContainer);
-  }
-
-  // Wire up New Game button
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up Start Game button
-  const startGameBtn = document.getElementById('start-game-btn');
-  if (startGameBtn && newGameModal) {
-    startGameBtn.addEventListener('click', () => {
-      const selectedMode = document.querySelector('input[name="pent-mode"]:checked') as HTMLInputElement;
-      if (selectedMode?.value === 'human-vs-ai') {
+          </ul>`,
+    gameAreaClass: 'pent-game-container',
+    modeRadioName: 'pent-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         pentNewGameVsAI();
       } else {
         pentNewGameVsHuman();
       }
-      newGameModal.classList.add('hidden');
-    });
-  }
-
-  // Wire up Help button
-  if (helpBtn && helpModal) {
-    helpBtn.addEventListener('click', () => {
-      helpModal.classList.add('show');
-    });
-  }
-
-  // Modal close handlers
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    });
+    },
   });
 
-  // Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
+  if (shell.board && shell.status) {
+    initPentEmInGame(shell.board, shell.status);
   }
 
-  // Escape key to close modals
-  const escapeHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
+  currentCleanup = shell.cleanup;
 }
 
-// Render Frac Fact game
+// Render Frac Fact
 function renderFracFact(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Frac Fact</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="game-container" class="frac-game-container"></div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="frac-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Take turns solving problems</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="frac-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Compete against the computer</div>
-              </div>
-            </label>
-          </div>
-          <div class="difficulty-selector">
-            <h4>Difficulty</h4>
-            <div class="difficulty-options">
-              <label class="difficulty-option">
-                <input type="radio" name="frac-difficulty" value="easy">
-                <span>Easy</span>
-              </label>
-              <label class="difficulty-option">
-                <input type="radio" name="frac-difficulty" value="medium" checked>
-                <span>Medium</span>
-              </label>
-              <label class="difficulty-option">
-                <input type="radio" name="frac-difficulty" value="hard">
-                <span>Hard</span>
-              </label>
-            </div>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Frac Fact</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Frac Fact',
+    helpTitle: 'How to Play Frac Fact',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Score more points than your opponent by correctly solving fraction problems!</p>
 
           <h3>Gameplay</h3>
@@ -3707,137 +1318,59 @@ function renderFracFact(): void {
           </ul>
 
           <h3>Winning</h3>
-          <p>After 10 problems each, the player with the highest score wins!</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const gameContainer = document.getElementById('game-container');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (gameContainer) {
-    initFracFactGame(gameContainer);
-  }
-
-  // Wire up New Game button
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up Start Game button
-  const startGameBtn = document.getElementById('start-game-btn');
-  if (startGameBtn && newGameModal) {
-    startGameBtn.addEventListener('click', () => {
-      const selectedMode = document.querySelector('input[name="frac-mode"]:checked') as HTMLInputElement;
-      const selectedDifficulty = document.querySelector('input[name="frac-difficulty"]:checked') as HTMLInputElement;
-      const difficulty = (selectedDifficulty?.value || 'medium') as 'easy' | 'medium' | 'hard';
-
-      if (selectedMode?.value === 'human-vs-ai') {
+          <p>After 10 problems each, the player with the highest score wins!</p>`,
+    modeRadioName: 'frac-mode',
+    vsHumanDescription: 'Take turns solving problems',
+    vsAiDescription: 'Compete against the computer',
+    showStatus: false,
+    mountId: 'game-container',
+    gameAreaHtml: `<div id="game-container" class="frac-game-container"></div>`,
+    newGameExtraHtml: `
+          <div class="difficulty-selector">
+            <h4>Difficulty</h4>
+            <div class="difficulty-options">
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="easy">
+                <span>Easy</span>
+              </label>
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="medium" checked>
+                <span>Medium</span>
+              </label>
+              <label class="difficulty-option">
+                <input type="radio" name="frac-difficulty" value="hard">
+                <span>Hard</span>
+              </label>
+            </div>
+          </div>`,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      const selectedDifficulty = document.querySelector(
+        'input[name="frac-difficulty"]:checked'
+      ) as HTMLInputElement | null;
+      const difficulty = (selectedDifficulty?.value ||
+        'medium') as AIDifficultyLevel;
+      if (mode === 'human-vs-ai') {
         fracNewGameVsAI(difficulty);
       } else {
         fracNewGameVsHuman(difficulty);
       }
-      newGameModal.classList.add('hidden');
-    });
-  }
-
-  // Wire up Help button
-  if (helpBtn && helpModal) {
-    helpBtn.addEventListener('click', () => {
-      helpModal.classList.add('show');
-    });
-  }
-
-  // Modal close handlers
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    });
+    },
   });
 
-  // Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
+  if (shell.board) {
+    initFracFactGame(shell.board);
   }
 
-  // Mode option selection
-  document.querySelectorAll('.mode-option').forEach(option => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
-      option.classList.add('selected');
-      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (radio) radio.checked = true;
-    });
-  });
-
-  // Escape key to close modals
-  const escapeHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
+  currentCleanup = shell.cleanup;
 }
 
-// Render Remainder Islands game
+// Render Remainder Islands
 function renderRemainderIslands(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Remainder Islands</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="game-container" class="remainder-game-container"></div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="remainder-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="remainder-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Remainder Islands</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Remainder Islands',
+    helpTitle: 'How to Play Remainder Islands',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Score the most points by strategically placing chips on islands using division remainders!</p>
 
           <h3>Gameplay</h3>
@@ -3858,135 +1391,36 @@ function renderRemainderIslands(): void {
           </ul>
 
           <h3>Winning</h3>
-          <p>After all turns, the player with the most points wins!</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const gameContainer = document.getElementById('game-container');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (gameContainer) {
-    initRemainderGame(gameContainer);
-  }
-
-  // Wire up New Game button
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up Start Game button
-  const startGameBtn = document.getElementById('start-game-btn');
-  if (startGameBtn && newGameModal) {
-    startGameBtn.addEventListener('click', () => {
-      const selectedMode = document.querySelector('input[name="remainder-mode"]:checked') as HTMLInputElement;
-
-      if (selectedMode?.value === 'human-vs-ai') {
+          <p>After all turns, the player with the most points wins!</p>`,
+    modeRadioName: 'remainder-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    showStatus: false,
+    mountId: 'game-container',
+    gameAreaHtml: `<div id="game-container" class="remainder-game-container"></div>`,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         remainderNewGameVsAI();
       } else {
         remainderNewGameVsHuman();
       }
-      newGameModal.classList.add('hidden');
-    });
-  }
-
-  // Wire up Help button
-  if (helpBtn && helpModal) {
-    helpBtn.addEventListener('click', () => {
-      helpModal.classList.add('show');
-    });
-  }
-
-  // Modal close handlers
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    });
+    },
   });
 
-  // Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
+  if (shell.board) {
+    initRemainderGame(shell.board);
   }
 
-  // Mode option selection
-  document.querySelectorAll('.mode-option').forEach(option => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
-      option.classList.add('selected');
-      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (radio) radio.checked = true;
-    });
-  });
-
-  // Escape key to close modals
-  const escapeHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
+  currentCleanup = shell.cleanup;
 }
 
-// Render Fraction Pinball game
+// Render Fraction Pinball
 function renderFractionPinball(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Fraction Pinball</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="game-container" class="pinball-game-container"></div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="pinball-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Take turns converting</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="pinball-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Fraction Pinball</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Fraction Pinball',
+    helpTitle: 'How to Play Fraction Pinball',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Score points by correctly converting between fractions and decimals!</p>
 
           <h3>Gameplay</h3>
@@ -4008,138 +1442,36 @@ function renderFractionPinball(): void {
           </ul>
 
           <h3>Winning</h3>
-          <p>Player with the most points after all rounds wins!</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const gameContainer = document.getElementById('game-container');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (gameContainer) {
-    initPinballGame(gameContainer);
-  }
-
-  // Wire up New Game button
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up Start Game button
-  const startGameBtn = document.getElementById('start-game-btn');
-  if (startGameBtn && newGameModal) {
-    startGameBtn.addEventListener('click', () => {
-      const selectedMode = document.querySelector('input[name="pinball-mode"]:checked') as HTMLInputElement;
-
-      if (selectedMode?.value === 'human-vs-ai') {
+          <p>Player with the most points after all rounds wins!</p>`,
+    modeRadioName: 'pinball-mode',
+    vsHumanDescription: 'Take turns converting',
+    vsAiDescription: 'Challenge the computer',
+    showStatus: false,
+    mountId: 'game-container',
+    gameAreaHtml: `<div id="game-container" class="pinball-game-container"></div>`,
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
         pinballNewGameVsAI();
       } else {
         pinballNewGameVsHuman();
       }
-      newGameModal.classList.add('hidden');
-    });
-  }
-
-  // Wire up Help button
-  if (helpBtn && helpModal) {
-    helpBtn.addEventListener('click', () => {
-      helpModal.classList.add('show');
-    });
-  }
-
-  // Modal close handlers
-  document.querySelectorAll('.modal-close').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    });
+    },
   });
 
-  // Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
+  if (shell.board) {
+    initPinballGame(shell.board);
   }
 
-  // Mode option selection
-  document.querySelectorAll('.mode-option').forEach(option => {
-    option.addEventListener('click', () => {
-      document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('selected'));
-      option.classList.add('selected');
-      const radio = option.querySelector('input[type="radio"]') as HTMLInputElement;
-      if (radio) radio.checked = true;
-    });
-  });
-
-  // Escape key to close modals
-  const escapeHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.classList.add('hidden');
-        modal.classList.remove('show');
-      });
-    }
-  };
-  document.addEventListener('keydown', escapeHandler);
+  currentCleanup = shell.cleanup;
 }
 
-// Render Stars & Bars game
+// Render Stars & Bars
 function renderStarsBars(): void {
-  appContainer!.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" aria-label="Back to game list">Games</button>
-      <h1>Stars & Bars</h1>
-    </header>
-    <div class="button-row">
-      <button id="new-game-btn">New Game</button>
-      <button id="help-btn">How to Play</button>
-    </div>
-    <div id="status"></div>
-    <div class="stars-game-area">
-      <div id="board" class="stars-board-container"></div>
-    </div>
-    <div id="new-game-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>New Game</h2>
-        <div class="mode-selector">
-          <h3>Choose Game Mode</h3>
-          <div class="mode-options">
-            <label class="mode-option" data-mode="human-vs-human">
-              <input type="radio" name="stars-mode" value="human-vs-human" checked>
-              <div class="mode-option-content">
-                <div class="mode-option-title">2 Player</div>
-                <div class="mode-option-desc">Pass & play with a friend</div>
-              </div>
-            </label>
-            <label class="mode-option" data-mode="human-vs-ai">
-              <input type="radio" name="stars-mode" value="human-vs-ai">
-              <div class="mode-option-content">
-                <div class="mode-option-title">Play vs AI</div>
-                <div class="mode-option-desc">Challenge the computer</div>
-              </div>
-            </label>
-          </div>
-          <button id="start-game-btn" class="start-game-btn">Start Game</button>
-        </div>
-      </div>
-    </div>
-    <div id="help-modal" class="modal hidden">
-      <div class="modal-content">
-        <button class="modal-close">&times;</button>
-        <h2>How to Play Stars & Bars</h2>
-        <div class="rules-content">
-          <h3>Objective</h3>
+  const shell = mountGameShell(appContainer!, {
+    title: 'Stars & Bars',
+    helpTitle: 'How to Play Stars & Bars',
+    helpContentHtml: `<h3>Objective</h3>
           <p>Score 30 points by placing attribute cards with maximum differences from adjacent cards!</p>
 
           <h3>Attribute Cards</h3>
@@ -4177,134 +1509,29 @@ function renderStarsBars(): void {
             <li>Maximize differences from adjacent cards</li>
             <li>Star cells (corners + center) double points</li>
             <li>Position cards for multiple adjacencies</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Initialize game
-  const boardContainer = document.getElementById('board');
-  const newGameBtn = document.getElementById('new-game-btn');
-  const helpBtn = document.getElementById('help-btn');
-  const helpModal = document.getElementById('help-modal');
-  const newGameModal = document.getElementById('new-game-modal');
-  const backBtn = document.getElementById('back-btn');
-
-  if (boardContainer) {
-    initStarsGame(boardContainer, false);
-  }
-
-  // Wire up New Game button to show modal
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
-
-  // Wire up New Game Modal
-  if (newGameModal) {
-    const modalClose = newGameModal.querySelector('.modal-close');
-    const modeOptions = newGameModal.querySelectorAll('.mode-option');
-    const startGameBtn = document.getElementById('start-game-btn');
-
-    let selectedMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human';
-
-    // Set initial selected state
-    modeOptions.forEach((option) => {
-      const input = option.querySelector('input') as HTMLInputElement;
-      if (input.checked) {
-        option.classList.add('selected');
-      }
-    });
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
-
-    // Mode selection
-    modeOptions.forEach((option) => {
-      option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
-        option.classList.add('selected');
-        const input = option.querySelector('input') as HTMLInputElement;
-        input.checked = true;
-        selectedMode = input.value as 'human-vs-human' | 'human-vs-ai';
-      });
-    });
-
-    // Start game button
-    startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
-      if (selectedMode === 'human-vs-ai') {
-        starsNewGameVsAI(boardContainer!);
+          </ul>`,
+    gameAreaClass: 'stars-game-area',
+    modeRadioName: 'stars-mode',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
+    boardClass: 'stars-board-container',
+    onNavigateHome: () => navigate('/'),
+    onStartGame: (mode) => {
+      if (mode === 'human-vs-ai') {
+        starsNewGameVsAI(shell.board!);
       } else {
-        starsNewGameVsHuman(boardContainer!);
+        starsNewGameVsHuman(shell.board!);
       }
-    });
+    },
+  });
 
-    // Close modal
-    modalClose?.addEventListener('click', closeNewGameModal);
-
-    // Close on backdrop click
-    newGameModal.addEventListener('click', (e) => {
-      if (e.target === newGameModal) {
-        closeNewGameModal();
-      }
-    });
+  if (shell.board) {
+    initStarsGame(shell.board, false);
   }
 
-  // Wire up Back button
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      navigate('/');
-    });
-  }
-
-  // Wire up Help modal
-  if (helpBtn && helpModal) {
-    const modalClose = helpModal.querySelector('.modal-close');
-
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-    };
-
-    const closeHelpModal = () => {
-      helpModal.classList.add('hidden');
-    };
-
-    helpBtn.addEventListener('click', openHelpModal);
-    modalClose?.addEventListener('click', closeHelpModal);
-
-    // Close modal on backdrop click
-    helpModal.addEventListener('click', (e) => {
-      if (e.target === helpModal) {
-        closeHelpModal();
-      }
-    });
-
-    // Close modals on Escape key
-    const escapeHandler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (!helpModal.classList.contains('hidden')) {
-          closeHelpModal();
-        }
-        if (newGameModal && !newGameModal.classList.contains('hidden')) {
-          newGameModal.classList.add('hidden');
-        }
-      }
-    };
-
-    document.addEventListener('keydown', escapeHandler);
-
-    // Store cleanup function
-    currentCleanup = () => {
-      document.removeEventListener('keydown', escapeHandler);
-    };
-  }
+  currentCleanup = shell.cleanup;
 }
 
-// Render dice demo
 function renderDiceDemoPage(): void {
   cleanup();
   document.title = 'Dice System Demo';

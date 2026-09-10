@@ -1,10 +1,6 @@
 // Hex-a-Gone! Board UI - Renders the hexagonal board and pattern blocks
 
-import {
-  HexAGoneGameState,
-  BlockShape,
-  BLOCK_COLORS,
-} from './types';
+import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 
 export type CellClickCallback = (q: number, r: number) => void;
@@ -16,8 +12,8 @@ const HEX_SIZE = 30;
 
 // Convert axial coordinates to pixel coordinates
 function axialToPixel(q: number, r: number): { x: number; y: number } {
-  const x = HEX_SIZE * (3 / 2 * q);
-  const y = HEX_SIZE * (Math.sqrt(3) / 2 * q + Math.sqrt(3) * r);
+  const x = HEX_SIZE * ((3 / 2) * q);
+  const y = HEX_SIZE * ((Math.sqrt(3) / 2) * q + Math.sqrt(3) * r);
   return { x, y };
 }
 
@@ -56,16 +52,23 @@ export function renderBoard(
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
 
   // Get valid placements for highlighting
-  const validPlacements = state.phase === 'placeBlocks' ? getValidPlacements(state) : [];
-  const validSet = new Set(validPlacements.map(p => `${p.q},${p.r}`));
+  const validPlacements =
+    state.phase === 'placeBlocks' ? getValidPlacements(state) : [];
+  const validSet = new Set(validPlacements.map((p) => `${p.q},${p.r}`));
 
   // Draw cells
-  const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const cellsGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   cellsGroup.setAttribute('class', 'hex-a-gone-cells');
 
-  state.board.forEach(cell => {
+  state.board.forEach((cell) => {
     const { x, y } = axialToPixel(cell.q, cell.r);
-    const hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    const hex = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'polygon'
+    );
     hex.setAttribute('points', hexagonPath(x, y, HEX_SIZE - 2));
 
     const isValid = validSet.has(`${cell.q},${cell.r}`);
@@ -80,7 +83,9 @@ export function renderBoard(
         className += ' hex-a-gone-cell-p2';
       }
       // Find the block to get its color
-      const block = state.placedBlocks.find(b => b.q === cell.q && b.r === cell.r);
+      const block = state.placedBlocks.find(
+        (b) => b.q === cell.q && b.r === cell.r
+      );
       if (block) {
         hex.setAttribute('fill', BLOCK_COLORS[block.shape]);
       }
@@ -129,9 +134,15 @@ export function renderBoard(
     const bankBlocks = document.createElement('div');
     bankBlocks.className = 'hex-a-gone-bank-blocks';
 
-    const shapes: BlockShape[] = ['hexagon', 'trapezoid', 'rhombus', 'triangle', 'square'];
+    const shapes: BlockShape[] = [
+      'hexagon',
+      'trapezoid',
+      'rhombus',
+      'triangle',
+      'square',
+    ];
 
-    shapes.forEach(shape => {
+    shapes.forEach((shape) => {
       const blockBtn = document.createElement('button');
       blockBtn.className = 'hex-a-gone-block-btn';
       blockBtn.setAttribute('data-shape', shape);
@@ -139,7 +150,8 @@ export function renderBoard(
       const isSelected = state.turnSelection.blocks.includes(shape);
       const isCurrentPlacement = state.selectedBlockForPlacement === shape;
       const isAvailable = state.bank[shape] > 0;
-      const canSelect = state.phase === 'selectBlocks' && !state.turnSelection.committed;
+      const canSelect =
+        state.phase === 'selectBlocks' && !state.turnSelection.committed;
 
       if (isSelected) blockBtn.classList.add('selected');
       if (isCurrentPlacement) blockBtn.classList.add('placing');
@@ -172,9 +184,12 @@ export function renderBoard(
       if (state.turnSelection.blocks.length > 0) {
         const selectedList = document.createElement('div');
         selectedList.className = 'selected-blocks';
-        selectedList.innerHTML = `<strong>Selected:</strong> ${state.turnSelection.blocks.map(s =>
-          `<span class="selected-shape" style="background-color: ${BLOCK_COLORS[s]}">${getShapeIcon(s)}</span>`
-        ).join(' ')}`;
+        selectedList.innerHTML = `<strong>Selected:</strong> ${state.turnSelection.blocks
+          .map(
+            (s) =>
+              `<span class="selected-shape" style="background-color: ${BLOCK_COLORS[s]}">${getShapeIcon(s)}</span>`
+          )
+          .join(' ')}`;
         selectionStatus.appendChild(selectedList);
 
         if (onConfirm) {
@@ -185,7 +200,8 @@ export function renderBoard(
           selectionStatus.appendChild(confirmBtn);
         }
       } else {
-        selectionStatus.textContent = 'Select 1-3 different blocks from the bank';
+        selectionStatus.textContent =
+          'Select 1-3 different blocks from the bank';
       }
 
       selectionArea.appendChild(selectionStatus);
@@ -208,7 +224,7 @@ export function renderBoard(
 
   if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
-    winnerMsg.className = 'hex-a-gone-winner';
+    winnerMsg.className = 'hex-a-gone-winner game-winner-banner';
     const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
     winnerMsg.textContent = `🎉 ${winnerName} wins! 🎉`;
     selectionArea.appendChild(winnerMsg);
@@ -282,7 +298,7 @@ export function renderStatus(
   statusEl.appendChild(playersEl);
 
   // Board coverage
-  const filledCells = state.board.filter(c => c.filled).length;
+  const filledCells = state.board.filter((c) => c.filled).length;
   const totalCells = state.board.length;
   const coverageEl = document.createElement('div');
   coverageEl.className = 'hex-a-gone-coverage';

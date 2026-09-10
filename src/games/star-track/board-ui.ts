@@ -35,19 +35,37 @@ export function renderBoard(
   // Both race to the center
 
   // Draw track backgrounds
-  const trackGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const trackGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   trackGroup.setAttribute('class', 'star-track-paths');
 
   // Draw spaces for Player 1 (top to center - blue path)
-  const p1Spaces = createTrackSpaces(centerX, centerY - outerRadius, centerX, centerY, 'player1');
+  const p1Spaces = createTrackSpaces(
+    centerX,
+    centerY - outerRadius,
+    centerX,
+    centerY,
+    'player1'
+  );
   trackGroup.appendChild(p1Spaces);
 
   // Draw spaces for Player 2 (bottom to center - red path)
-  const p2Spaces = createTrackSpaces(centerX, centerY + outerRadius, centerX, centerY, 'player2');
+  const p2Spaces = createTrackSpaces(
+    centerX,
+    centerY + outerRadius,
+    centerX,
+    centerY,
+    'player2'
+  );
   trackGroup.appendChild(p2Spaces);
 
   // Draw center goal
-  const goalCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const goalCircle = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   goalCircle.setAttribute('cx', String(centerX));
   goalCircle.setAttribute('cy', String(centerY));
   goalCircle.setAttribute('r', '25');
@@ -55,7 +73,10 @@ export function renderBoard(
   trackGroup.appendChild(goalCircle);
 
   // Goal label
-  const goalLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const goalLabel = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
   goalLabel.setAttribute('x', String(centerX));
   goalLabel.setAttribute('y', String(centerY + 5));
   goalLabel.setAttribute('text-anchor', 'middle');
@@ -66,12 +87,24 @@ export function renderBoard(
   svg.appendChild(trackGroup);
 
   // Draw player pieces
-  const piecesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const piecesGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   piecesGroup.setAttribute('class', 'star-track-pieces');
 
   // Player 1 piece
-  const p1Pos = getSpacePosition(state.player1Position, centerX, centerY - outerRadius, centerX, centerY);
-  const p1Piece = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const p1Pos = getSpacePosition(
+    state.player1Position,
+    centerX,
+    centerY - outerRadius,
+    centerX,
+    centerY
+  );
+  const p1Piece = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   p1Piece.setAttribute('cx', String(p1Pos.x));
   p1Piece.setAttribute('cy', String(p1Pos.y));
   p1Piece.setAttribute('r', '12');
@@ -80,8 +113,17 @@ export function renderBoard(
   piecesGroup.appendChild(p1Piece);
 
   // Player 2 piece
-  const p2Pos = getSpacePosition(state.player2Position, centerX, centerY + outerRadius, centerX, centerY);
-  const p2Piece = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const p2Pos = getSpacePosition(
+    state.player2Position,
+    centerX,
+    centerY + outerRadius,
+    centerX,
+    centerY
+  );
+  const p2Piece = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   p2Piece.setAttribute('cx', String(p2Pos.x));
   p2Piece.setAttribute('cy', String(p2Pos.y));
   p2Piece.setAttribute('r', '12');
@@ -92,17 +134,29 @@ export function renderBoard(
   svg.appendChild(piecesGroup);
 
   // Add decorative star points
-  const decorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const decorGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   decorGroup.setAttribute('class', 'star-track-decor');
 
   // Add star rays for visual appeal
   for (let i = 0; i < 5; i++) {
     const angle = (i * 72 - 90) * (Math.PI / 180);
-    const rayLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const rayLine = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'line'
+    );
     rayLine.setAttribute('x1', String(centerX));
     rayLine.setAttribute('y1', String(centerY));
-    rayLine.setAttribute('x2', String(centerX + Math.cos(angle) * outerRadius * 0.4));
-    rayLine.setAttribute('y2', String(centerY + Math.sin(angle) * outerRadius * 0.4));
+    rayLine.setAttribute(
+      'x2',
+      String(centerX + Math.cos(angle) * outerRadius * 0.4)
+    );
+    rayLine.setAttribute(
+      'y2',
+      String(centerY + Math.sin(angle) * outerRadius * 0.4)
+    );
     rayLine.setAttribute('class', 'star-track-ray');
     decorGroup.appendChild(rayLine);
   }
@@ -127,7 +181,11 @@ export function renderBoard(
     bucketInfo.className = 'star-track-bucket-info';
     bucketInfo.textContent = `${state.chainBucket.length} chains in bucket`;
     chainArea.appendChild(bucketInfo);
-  } else if (state.phase === 'selectChain' && state.drawnChains && onSelectChain) {
+  } else if (
+    state.phase === 'selectChain' &&
+    state.drawnChains &&
+    onSelectChain
+  ) {
     // Show chain choices
     const choiceLabel = document.createElement('div');
     choiceLabel.className = 'star-track-choice-label';
@@ -148,7 +206,7 @@ export function renderBoard(
     chainArea.appendChild(choices);
   } else if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
-    winnerMsg.className = 'star-track-winner';
+    winnerMsg.className = 'star-track-winner game-winner-banner';
     const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
     winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
     chainArea.appendChild(winnerMsg);
@@ -167,10 +225,16 @@ function createTrackSpaces(
   player: Player
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('class', `star-track-path star-track-path-${player === 'player1' ? 'p1' : 'p2'}`);
+  group.setAttribute(
+    'class',
+    `star-track-path star-track-path-${player === 'player1' ? 'p1' : 'p2'}`
+  );
 
   // Draw the track line
-  const trackLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  const trackLine = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'line'
+  );
   trackLine.setAttribute('x1', String(startX));
   trackLine.setAttribute('y1', String(startY));
   trackLine.setAttribute('x2', String(endX));
@@ -184,18 +248,27 @@ function createTrackSpaces(
     const x = startX + (endX - startX) * t;
     const y = startY + (endY - startY) * t;
 
-    const space = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const space = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     space.setAttribute('cx', String(x));
     space.setAttribute('cy', String(y));
     space.setAttribute('r', i === TRACK_LENGTH ? '8' : '6');
-    space.setAttribute('class', `star-track-space ${i === 0 ? 'star-track-start' : ''} ${i === TRACK_LENGTH ? 'star-track-end' : ''}`);
+    space.setAttribute(
+      'class',
+      `star-track-space ${i === 0 ? 'star-track-start' : ''} ${i === TRACK_LENGTH ? 'star-track-end' : ''}`
+    );
     space.setAttribute('data-space', String(i));
     space.setAttribute('data-player', player);
     group.appendChild(space);
 
     // Add number labels for some spaces
     if (i > 0 && i < TRACK_LENGTH && i % 3 === 0) {
-      const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const label = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       const offsetX = player === 'player1' ? -15 : 15;
       label.setAttribute('x', String(x + offsetX));
       label.setAttribute('y', String(y + 4));
