@@ -44,7 +44,7 @@ export const callaTutorial: TutorialConfig = {
         <p>Each pit starts with <strong>3 cubes</strong>.</p>
         <p>You'll pick up cubes from YOUR pits and drop them around the board!</p>
       `,
-      highlightSelector: '.player-pits',
+      highlightSelector: '.calla-pit',
       position: 'top',
     },
     {

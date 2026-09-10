@@ -33,6 +33,7 @@ import {
   initGame as initCallaGame,
   newGameVsHuman as callaNewGameVsHuman,
   newGameVsAI as callaNewGameVsAI,
+  startTutorial as startCallaTutorial,
 } from './games/calla/game-controller';
 import {
   initGame as initFiarGame,
@@ -1191,6 +1192,7 @@ function renderCalla(): void {
     </header>
     <div class="button-row">
       <button id="new-game-btn">New Game</button>
+      <button id="tutorial-btn">Tutorial</button>
       <button id="help-btn">How to Play</button>
     </div>
     <div id="status"></div>
@@ -1270,6 +1272,7 @@ function renderCalla(): void {
   const boardContainer = document.getElementById('board');
   const statusContainer = document.getElementById('status');
   const newGameBtn = document.getElementById('new-game-btn');
+  const tutorialBtn = document.getElementById('tutorial-btn');
   const helpBtn = document.getElementById('help-btn');
   const helpModal = document.getElementById('help-modal');
   const newGameModal = document.getElementById('new-game-modal');
@@ -1335,6 +1338,13 @@ function renderCalla(): void {
       if (e.target === newGameModal) {
         closeNewGameModal();
       }
+    });
+  }
+
+  // Wire up Tutorial button
+  if (tutorialBtn) {
+    tutorialBtn.addEventListener('click', () => {
+      startCallaTutorial();
     });
   }
 
