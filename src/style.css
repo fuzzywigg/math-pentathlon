@@ -3773,7 +3773,10 @@ h1 {
   .owl-wing,
   .owl-pupil,
   .owl-bubble,
-  .owl-notification-dot {
+  .owl-notification-dot,
+  .cell-king,
+  .cell-selected,
+  .cell-valid-move::after {
     animation: none !important;
     transition: opacity 0.2s ease !important;
   }

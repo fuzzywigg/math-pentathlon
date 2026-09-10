@@ -4,10 +4,12 @@ const KINGS_QUADRAPHAGES_URL = '/#/game/kings-quadraphages';
 
 /**
  * Helper to click a cell on the board
- * Uses 1-based row/col indexing (matches game logic)
+ * Uses 1-based row/col indexing (matches game logic).
+ * force: true — kingFloat / selectedPulse infinite animations make
+ * Playwright's stability check fail ("element is not stable").
  */
 async function clickCell(page: Page, row: number, col: number) {
-  await page.click(`.cell[data-row="${row}"][data-col="${col}"]`);
+  await page.locator(`.cell[data-row="${row}"][data-col="${col}"]`).click({ force: true });
 }
 
 /**
@@ -271,8 +273,10 @@ test.describe('Kings & Quadraphages - Full Game', () => {
     await expect(page.locator('.supply-p1')).toContainText('29');
     await expect(page.locator('.status-turn')).toContainText('Player 2');
 
-    // Click New Game
+    // New Game opens mode modal — confirm Start Game to reset
     await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
 
     // Verify reset
     await expect(page.locator('.supply-p1')).toContainText('30');
@@ -280,8 +284,6 @@ test.describe('Kings & Quadraphages - Full Game', () => {
     await expect(page.locator('.status-turn')).toContainText('Player 1');
 
     // Kings should be back at starting positions
-    const p1King = page.locator('.cell[data-row="1"][data-col="5"] .cell-king, .cell[data-row="1"][data-col="5"].cell-king');
-    // Check P1 king is at (1,5)
     const kingCell = page.locator('.cell[data-row="1"][data-col="5"]');
     await expect(kingCell).toHaveClass(/cell-king/);
   });
@@ -295,10 +297,10 @@ test.describe('Kings & Quadraphages - Full Game', () => {
 
     // Modal should be visible
     await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-    await expect(page.locator('.modal-content h2')).toContainText('How to Play');
+    await expect(page.locator('#help-modal .modal-content h2')).toContainText('How to Play');
 
-    // Close with X button
-    await page.click('.modal-close');
+    // Close with X button (scoped — new-game modal also has .modal-close)
+    await page.click('#help-modal .modal-close');
     await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
 
     // Open again and close with Escape
