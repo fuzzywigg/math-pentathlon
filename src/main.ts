@@ -1,5 +1,6 @@
 import './style.css';
 import './ui/styles/mobile-play-shell.css';
+import './ui/styles/stats-dashboard.css';
 import {
   addRoute,
   initRouter,
@@ -10,6 +11,7 @@ import {
 import { owlSystem } from './core/owl';
 import { owlComponent } from './ui/owl';
 import { renderGameSelector } from './ui/game-selector';
+import { renderStatsDashboard } from './ui/stats-dashboard';
 import {
   mountGameShell,
   type AIDifficultyLevel,
@@ -151,6 +153,13 @@ function renderHome(): void {
   cleanup();
   document.title = 'Math Pentathlon';
   renderGameSelector(appContainer!);
+}
+
+// Read-only progress dashboard (existing storage APIs only)
+function renderStats(): void {
+  cleanup();
+  document.title = 'Math Pentathlon - Your Progress';
+  renderStatsDashboard(appContainer!);
 }
 
 // Render a specific game
@@ -1583,6 +1592,7 @@ function renderExpressionDemoPage(): void {
 
 // Set up routes
 addRoute('/', renderHome);
+addRoute('/stats', renderStats);
 addRoute('/game/:id', renderGame);
 addRoute('/demo/dice', renderDiceDemoPage);
 addRoute('/demo/alignment', renderAlignmentDemoPage);

@@ -212,6 +212,21 @@ export function renderGameSelector(container: HTMLElement): void {
   `;
   heroContent.appendChild(stats);
 
+  const heroActions = document.createElement('div');
+  heroActions.className = 'hero-actions';
+
+  const progressLink = document.createElement('a');
+  progressLink.className = 'hero-progress-link';
+  progressLink.href = '#/stats';
+  progressLink.textContent = 'Your Progress';
+  progressLink.setAttribute('aria-label', 'View your play progress and stats');
+  progressLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    navigate('/stats');
+  });
+  heroActions.appendChild(progressLink);
+  heroContent.appendChild(heroActions);
+
   hero.appendChild(heroContent);
   wrapper.appendChild(hero);
 
