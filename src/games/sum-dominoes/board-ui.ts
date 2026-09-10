@@ -38,7 +38,10 @@ const CELL_SIZE = 22;
  */
 export function renderBoard(
   state: SumDominoesState,
-  onCellClick: (pos: BoardPosition, orientation: 'horizontal' | 'vertical') => void
+  onCellClick: (
+    pos: BoardPosition,
+    orientation: 'horizontal' | 'vertical'
+  ) => void
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'sd-board';
@@ -53,7 +56,9 @@ export function renderBoard(
       const sum = getDiceSum(state.currentDice);
       const placements = getValidPlacements(state, domino, sum);
       placements.forEach((p) => {
-        validPlacements.add(`${p.position.row}-${p.position.col}-${p.orientation}`);
+        validPlacements.add(
+          `${p.position.row}-${p.position.col}-${p.orientation}`
+        );
       });
     }
   }
@@ -214,7 +219,8 @@ export function renderHand(
 
   const hand = state.hands[player];
   const isCurrentPlayer = state.currentPlayer === player;
-  const canSelect = isCurrentPlayer && state.phase === 'placing' && state.currentDice;
+  const canSelect =
+    isCurrentPlayer && state.phase === 'placing' && state.currentDice;
 
   for (const domino of hand) {
     const dominoEl = createHandDomino(
@@ -336,19 +342,7 @@ export function injectSDStyles(): void {
   const style = document.createElement('style');
   style.id = 'sd-styles';
   style.textContent = `
-    .sd-game-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-    }
-
-    .sd-main-layout {
-      display: flex;
-      gap: 2rem;
-      align-items: flex-start;
-    }
+    /* .sd-game-area / .sd-main-layout chrome → style.css */
 
     .sd-board {
       background: ${COLORS.background};
@@ -469,142 +463,7 @@ export function injectSDStyles(): void {
       transform: translateY(-4px);
     }
 
-    .sd-dice-area {
-      display: flex;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .sd-roll-btn {
-      padding: 1rem 2rem;
-      font-size: 1.25rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, #f57c00, #ff9800);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(245, 124, 0, 0.3);
-      transition: all 0.2s ease;
-    }
-
-    .sd-roll-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(245, 124, 0, 0.4);
-    }
-
-    .sd-roll-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .sd-dice-display {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .sd-die {
-      width: 50px;
-      height: 50px;
-      background: white;
-      border: 2px solid #333;
-      border-radius: 8px;
-      position: relative;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .sd-die-pip {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: #111;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-    }
-
-    .sd-dice-sum {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: #333;
-    }
-
-    .sd-status {
-      text-align: center;
-      padding: 1rem;
-      font-size: 1.2rem;
-      font-weight: 500;
-    }
-
-    .sd-status.player1 {
-      color: ${COLORS.player1};
-    }
-
-    .sd-status.player2 {
-      color: ${COLORS.player2};
-    }
-
-    .sd-hands-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    .sd-hand-label {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-
-    .sd-hand-label.player1 {
-      color: ${COLORS.player1};
-    }
-
-    .sd-hand-label.player2 {
-      color: ${COLORS.player2};
-    }
-
-    .sd-winner-banner {
-      text-align: center;
-      padding: 1.5rem;
-      font-size: 1.5rem;
-      font-weight: bold;
-      background: linear-gradient(135deg, #ffd700, #ffec8b);
-      border-radius: 12px;
-      margin: 1rem;
-      animation: sd-glow 1s ease-in-out infinite alternate;
-    }
-
-    @keyframes sd-glow {
-      from { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
-      to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
-    }
-
-    .sd-pass-btn {
-      padding: 0.75rem 1.5rem;
-      background: #ff9800;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .sd-pass-btn:hover {
-      background: #f57c00;
-    }
-
-    .sd-controls {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-    }
-
-    @media (max-width: 768px) {
-      .sd-main-layout {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
+    /* Chrome (.sd-game-area / controls / dice / status / winner) lives in style.css */
   `;
   document.head.appendChild(style);
 }
