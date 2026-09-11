@@ -2,6 +2,7 @@
 
 import { StarTrackGameState, Player, TRACK_LENGTH, ChainLink } from './types';
 import { getProgress, getPhaseMessage } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 export type DrawChainsCallback = () => void;
 export type SelectChainCallback = (index: 0 | 1) => void;
@@ -339,7 +340,7 @@ export function renderStatus(
   const p1Progress = document.createElement('div');
   p1Progress.className = 'progress-bar progress-p1';
   p1Progress.innerHTML = `
-    <span class="progress-label">🔵 Blue</span>
+    <span class="progress-label">${seatIcon('player1')} Blue</span>
     <div class="progress-track">
       <div class="progress-fill" style="width: ${getProgress(state, 'player1')}%"></div>
     </div>
@@ -350,7 +351,7 @@ export function renderStatus(
   const p2Progress = document.createElement('div');
   p2Progress.className = 'progress-bar progress-p2';
   p2Progress.innerHTML = `
-    <span class="progress-label">🔴 Red</span>
+    <span class="progress-label">${seatIcon('player2')} Red</span>
     <div class="progress-track">
       <div class="progress-fill" style="width: ${getProgress(state, 'player2')}%"></div>
     </div>

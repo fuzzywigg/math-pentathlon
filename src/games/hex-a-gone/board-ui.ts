@@ -2,6 +2,7 @@
 
 import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 export type CellClickCallback = (q: number, r: number) => void;
 export type BlockSelectCallback = (shape: BlockShape) => void;
@@ -287,12 +288,12 @@ export function renderStatus(
 
   const p1El = document.createElement('div');
   p1El.className = `player-indicator ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1El.innerHTML = '🔵 Blue Player';
+  p1El.innerHTML = `${seatIcon('player1')} Blue Player`;
   playersEl.appendChild(p1El);
 
   const p2El = document.createElement('div');
   p2El.className = `player-indicator ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2El.innerHTML = '🔴 Red Player';
+  p2El.innerHTML = `${seatIcon('player2')} Red Player`;
   playersEl.appendChild(p2El);
 
   statusEl.appendChild(playersEl);

@@ -3,6 +3,7 @@ import {
   applyGameModeChrome,
   clearGameModeChrome,
   getPlayerSeatColors,
+  seatIcon,
 } from '../../src/ui/player-colors';
 
 describe('getPlayerSeatColors', () => {
@@ -44,5 +45,19 @@ describe('getPlayerSeatColors', () => {
     expect(colors.player2).toBe('#ef4444');
     expect(colors.player1Light).toBe('#ddd6fe');
     expect(colors.player2Light).toBe('#ffcdd2');
+  });
+
+  it('seatIcon uses purple circle for AI seat', () => {
+    applyGameModeChrome(app, 'human-vs-human');
+    expect(seatIcon('player1')).toBe('🔵');
+    expect(seatIcon('player2')).toBe('🔴');
+
+    applyGameModeChrome(app, 'human-vs-ai');
+    expect(seatIcon('player1')).toBe('🔵');
+    expect(seatIcon('player2')).toBe('🟣');
+
+    applyGameModeChrome(app, 'human-vs-ai', 'player1');
+    expect(seatIcon('player1')).toBe('🟣');
+    expect(seatIcon('player2')).toBe('🔴');
   });
 });

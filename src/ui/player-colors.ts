@@ -100,3 +100,15 @@ export function colorForSeat(
   const colors = getPlayerSeatColors(root);
   return seat === 'player1' ? colors.player1 : colors.player2;
 }
+
+/** Blue / red / purple circle emoji for a seat (AI seat → purple). */
+export function seatIcon(
+  seat: PlayerSeat,
+  root?: HTMLElement | null
+): string {
+  const el = getGameModeChromeRoot(root);
+  const mode = el?.dataset.gameMode;
+  const aiSeat = (el?.dataset.aiSeat as PlayerSeat | undefined) ?? 'player2';
+  if (mode === 'ai' && seat === aiSeat) return '🟣';
+  return seat === 'player1' ? '🔵' : '🔴';
+}

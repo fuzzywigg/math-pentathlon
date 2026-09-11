@@ -5,6 +5,7 @@ import {
   PITS_PER_SIDE,
 } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 export type PitClickCallback = (pitIndex: number) => void;
 
@@ -261,7 +262,7 @@ function createCalla(
   label.setAttribute('y', String(y + 20));
   label.setAttribute('text-anchor', 'middle');
   label.setAttribute('class', 'calla-store-label');
-  label.textContent = player === 'player1' ? '🔵' : '🔴';
+  label.textContent = seatIcon(player);
   group.appendChild(label);
 
   return group;
@@ -306,12 +307,12 @@ export function renderStatus(
 
   const p1Score = document.createElement('div');
   p1Score.className = `calla-score calla-score-p1 ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1Score.innerHTML = `🔵 Blue: <strong>${state.player1Calla}</strong>`;
+  p1Score.innerHTML = `${seatIcon('player1')} Blue: <strong>${state.player1Calla}</strong>`;
   scoreEl.appendChild(p1Score);
 
   const p2Score = document.createElement('div');
   p2Score.className = `calla-score calla-score-p2 ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2Score.innerHTML = `🔴 Red: <strong>${state.player2Calla}</strong>`;
+  p2Score.innerHTML = `${seatIcon('player2')} Red: <strong>${state.player2Calla}</strong>`;
   scoreEl.appendChild(p2Score);
 
   statusEl.appendChild(scoreEl);

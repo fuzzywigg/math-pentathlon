@@ -7,6 +7,7 @@ import {
   getPlayerStats,
 } from './types';
 import { formatDecimal, formatFraction } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 // =============================================================================
 // Challenge Display
@@ -241,7 +242,7 @@ export function renderScores(state: FractionPinballState): HTMLElement {
     <div class="pinball-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1">
       <div class="pinball-player-name">Blue</div>
       <div class="pinball-score-value">${p1Stats.score}</div>
-      <div class="pinball-balls">${'🔵'.repeat(p1Stats.ballsRemaining)}</div>
+      <div class="pinball-balls">${seatIcon('player1').repeat(p1Stats.ballsRemaining)}</div>
     </div>
     <div class="pinball-round">
       <div class="pinball-round-label">Round</div>
@@ -250,7 +251,7 @@ export function renderScores(state: FractionPinballState): HTMLElement {
     <div class="pinball-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2">
       <div class="pinball-player-name">Red</div>
       <div class="pinball-score-value">${p2Stats.score}</div>
-      <div class="pinball-balls">${'🔴'.repeat(p2Stats.ballsRemaining)}</div>
+      <div class="pinball-balls">${seatIcon('player2').repeat(p2Stats.ballsRemaining)}</div>
     </div>
   `;
 
