@@ -22,6 +22,13 @@ import {
 import { getAIAnswer, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Module State
@@ -134,6 +141,7 @@ export function initGame(containerEl: HTMLElement): void {
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
@@ -141,6 +149,7 @@ export function newGameVsHuman(): void {
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
@@ -148,6 +157,7 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = true;
+  syncOpponentChrome();
   aiDifficulty = difficulty;
   render();
 }

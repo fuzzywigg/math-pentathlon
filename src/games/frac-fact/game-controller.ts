@@ -24,6 +24,13 @@ import { Fraction } from '../../core/fractions/types';
 import { getAIAnswer, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fracFactTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Module State
@@ -128,6 +135,7 @@ export function initGame(containerEl: HTMLElement): void {
   gameState = createInitialState('medium');
   gameState = startGame(gameState);
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
@@ -135,6 +143,7 @@ export function newGameVsHuman(difficulty: Difficulty = 'medium'): void {
   gameState = createInitialState(difficulty);
   gameState = startGame(gameState);
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
@@ -142,6 +151,7 @@ export function newGameVsAI(difficulty: Difficulty = 'medium', aiDiff: AIDifficu
   gameState = createInitialState(difficulty);
   gameState = startGame(gameState);
   isAIMode = true;
+  syncOpponentChrome();
   aiDifficulty = aiDiff;
   render();
 }

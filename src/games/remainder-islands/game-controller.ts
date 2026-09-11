@@ -22,6 +22,13 @@ import {
 import { getAIIslandChoice, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Module State
@@ -153,18 +160,21 @@ export function initGame(containerEl: HTMLElement): void {
   gameContainer = containerEl;
   gameState = createInitialState();
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
 export function newGameVsHuman(): void {
   gameState = createInitialState();
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  syncOpponentChrome();
   aiDifficulty = difficulty;
   render();
 }
