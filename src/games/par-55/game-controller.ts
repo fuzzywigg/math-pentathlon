@@ -176,15 +176,10 @@ function updateUI(controller: Par55GameController): void {
     controls.appendChild(passBtn);
   }
 
-  const newGameBtn = document.createElement('button');
-  newGameBtn.className = 'par55-btn par55-btn-primary';
-  newGameBtn.textContent = 'New Game';
-  newGameBtn.addEventListener('click', () => {
-    controller.newGame(controller.isAI);
-  });
-  controls.appendChild(newGameBtn);
-
-  gameArea.appendChild(controls);
+  // New Game lives only in shared header chrome (#new-game-btn + modal)
+  if (controls.childElementCount > 0) {
+    gameArea.appendChild(controls);
+  }
   container.appendChild(gameArea);
 
   // AI turn
