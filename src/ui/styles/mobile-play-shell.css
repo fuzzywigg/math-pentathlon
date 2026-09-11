@@ -205,6 +205,14 @@ body {
     cursor: grabbing;
   }
 
+  /* Resting after a real drag: keep inline left/top; above board, below drag. */
+  .owl-container.owl-resting {
+    transition: none;
+    z-index: 9500;
+    transform: scale(0.85);
+    transform-origin: top left;
+  }
+
   .owl-body {
     width: var(--ollie-body-w);
     height: var(--ollie-body-h);
