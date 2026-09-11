@@ -112,26 +112,31 @@ import {
   initGame as initPrimeGoldGame,
   newGameVsHuman as primeGoldNewGameVsHuman,
   newGameVsAI as primeGoldNewGameVsAI,
+  startTutorial as startPrimeGoldTutorial,
 } from './games/prime-gold/game-controller';
 import {
   initGame as initPentEmInGame,
   newGameVsHuman as pentNewGameVsHuman,
   newGameVsAI as pentNewGameVsAI,
+  startTutorial as startPentTutorial,
 } from './games/pent-em-in/game-controller';
 import {
   initGame as initFracFactGame,
   newGameVsHuman as fracNewGameVsHuman,
   newGameVsAI as fracNewGameVsAI,
+  startTutorial as startFracTutorial,
 } from './games/frac-fact/game-controller';
 import {
   initGame as initRemainderGame,
   newGameVsHuman as remainderNewGameVsHuman,
   newGameVsAI as remainderNewGameVsAI,
+  startTutorial as startRemainderTutorial,
 } from './games/remainder-islands/game-controller';
 import {
   initGame as initPinballGame,
   newGameVsHuman as pinballNewGameVsHuman,
   newGameVsAI as pinballNewGameVsAI,
+  startTutorial as startPinballTutorial,
 } from './games/fraction-pinball/game-controller';
 import { renderDiceDemo } from './demos/dice-demo';
 import { renderAlignmentDemo } from './demos/alignment-demo';
@@ -1274,6 +1279,7 @@ function renderPrimeGold(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'pg-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1283,6 +1289,7 @@ function renderPrimeGold(): void {
         primeGoldNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startPrimeGoldTutorial(),
   });
 
   if (shell.board) {
@@ -1333,6 +1340,7 @@ function renderPentEmIn(): void {
     modeRadioName: 'pent-mode',
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1342,6 +1350,7 @@ function renderPentEmIn(): void {
         pentNewGameVsHuman();
       }
     },
+    onTutorial: () => startPentTutorial(),
   });
 
   if (shell.board && shell.status) {
@@ -1386,6 +1395,7 @@ function renderFracFact(): void {
     vsHumanDescription: 'Take turns solving problems',
     vsAiDescription: 'Compete against the computer',
     showStatus: false,
+    showTutorial: true,
     showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="frac-game-container"></div>`,
@@ -1423,6 +1433,7 @@ function renderFracFact(): void {
         fracNewGameVsHuman(problemDifficulty);
       }
     },
+    onTutorial: () => startFracTutorial(),
   });
 
   if (shell.board) {
@@ -1463,6 +1474,7 @@ function renderRemainderIslands(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     showStatus: false,
+    showTutorial: true,
     showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="remainder-game-container"></div>`,
@@ -1474,6 +1486,7 @@ function renderRemainderIslands(): void {
         remainderNewGameVsHuman();
       }
     },
+    onTutorial: () => startRemainderTutorial(),
   });
 
   if (shell.board) {
@@ -1515,6 +1528,7 @@ function renderFractionPinball(): void {
     vsHumanDescription: 'Take turns converting',
     vsAiDescription: 'Challenge the computer',
     showStatus: false,
+    showTutorial: true,
     showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="pinball-game-container"></div>`,
@@ -1526,6 +1540,7 @@ function renderFractionPinball(): void {
         pinballNewGameVsHuman();
       }
     },
+    onTutorial: () => startPinballTutorial(),
   });
 
   if (shell.board) {

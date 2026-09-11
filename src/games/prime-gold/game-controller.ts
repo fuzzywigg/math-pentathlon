@@ -19,6 +19,8 @@ import {
   injectPrimeGoldStyles,
   getPlayerName,
 } from './board-ui';
+import { tutorialManager } from '../../core/tutorial';
+import { primeGoldTutorial } from './tutorial';
 
 // =============================================================================
 // Game Controller
@@ -34,11 +36,15 @@ export interface PrimeGoldController {
   newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
+/** Last initialized board container — used by startTutorial. */
+let activeContainer: HTMLElement | null = null;
+
 /**
  * Initialize the game
  */
 export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): PrimeGoldController {
   injectPrimeGoldStyles();
+  activeContainer = container;
 
   const controller: PrimeGoldController = {
     state: createInitialState(),
@@ -240,4 +246,26 @@ export function newGameVsAI(
   difficulty: AIDifficulty = 'medium'
 ): PrimeGoldController {
   return initGame(container, true, difficulty);
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  if (!activeContainer) return;
+  newGameVsHuman(activeContainer);
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed' && activeContainer) {
+        newGameVsHuman(activeContainer);
+      }
+    }
+  });
+
+  tutorialManager.start(primeGoldTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }

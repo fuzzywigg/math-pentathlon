@@ -24,6 +24,8 @@ import {
 } from './board-ui';
 import { Cell } from '../../core/polyomino/types';
 import { getAIMove, AIDifficulty } from './ai';
+import { tutorialManager } from '../../core/tutorial';
+import { pentEmInTutorial } from './tutorial';
 
 // =============================================================================
 // Module State
@@ -236,4 +238,25 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
 
 export function getCurrentState(): PentEmInState {
   return gameState;
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  newGameVsHuman();
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed') {
+        newGameVsHuman();
+      }
+    }
+  });
+
+  tutorialManager.start(pentEmInTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }
