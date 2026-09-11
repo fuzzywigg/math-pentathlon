@@ -19,7 +19,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { sumDominoesTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -86,6 +91,7 @@ export function initGame(
  */
 function updateUI(controller: SDGameController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -95,19 +101,20 @@ function updateUI(controller: SDGameController): void {
   // Status
   const status = document.createElement('div');
   status.className = `sd-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.phase === 'rolling') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
   } else if (state.phase === 'placing') {
     if (state.selectedDomino) {
-      status.textContent = `${getPlayerName(state.currentPlayer)} - Click a valid position to place`;
+      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Click a valid position to place`;
     } else {
-      status.textContent = `${getPlayerName(state.currentPlayer)} - Select a domino to play`;
+      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Select a domino to play`;
     }
   } else if (state.phase === 'passing') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} cannot play - must pass`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} cannot play - must pass`;
   }
 
   gameArea.appendChild(status);
@@ -116,7 +123,7 @@ function updateUI(controller: SDGameController): void {
   if (state.winner) {
     const banner = document.createElement('div');
     banner.className = 'sd-winner-banner game-winner-banner';
-    banner.textContent = `${getPlayerName(state.winner)} Wins! 🎉`;
+    banner.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} Wins! 🎉`;
     gameArea.appendChild(banner);
   }
 
@@ -137,7 +144,7 @@ function updateUI(controller: SDGameController): void {
   const p1Container = document.createElement('div');
   const p1Label = document.createElement('div');
   p1Label.className = 'sd-hand-label player1';
-  p1Label.textContent = `Blue (${state.hands.player1.length} left)`;
+  p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length} left)`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
     renderHand(state, 'player1', (id) => handleDominoClick(controller, id))
@@ -152,7 +159,7 @@ function updateUI(controller: SDGameController): void {
   const p2Container = document.createElement('div');
   const p2Label = document.createElement('div');
   p2Label.className = 'sd-hand-label player2';
-  p2Label.textContent = `Red (${state.hands.player2.length} left)`;
+  p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length} left)`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
     renderHand(state, 'player2', (id) => handleDominoClick(controller, id))
@@ -181,6 +188,7 @@ function updateUI(controller: SDGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreFocusedCell(container, previousFocus);
 
   // AI turn
   if (

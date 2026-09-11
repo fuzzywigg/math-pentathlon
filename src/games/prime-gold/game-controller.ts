@@ -21,7 +21,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { primeGoldTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -84,6 +89,7 @@ export function initGame(container: HTMLElement, vsAI: boolean = false, difficul
  */
 function updateUI(controller: PrimeGoldController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -93,15 +99,16 @@ function updateUI(controller: PrimeGoldController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `pg-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins with ${state.primeVeins[state.winner]} prime veins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.primeVeins[state.winner]} prime veins!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (state.phase === 'rolling') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
   } else if (state.phase === 'placing') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} - Select a number to place`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Select a number to place`;
   }
 
   gameArea.appendChild(status);
@@ -169,6 +176,7 @@ function updateUI(controller: PrimeGoldController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreFocusedCell(container, previousFocus);
 
   // AI turn
   if (

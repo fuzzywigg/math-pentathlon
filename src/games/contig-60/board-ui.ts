@@ -8,6 +8,11 @@ import {
   getValidPlacements,
 } from './types';
 import { calculatePoints } from './rules';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -47,6 +52,11 @@ export function renderBoard(
       const cellEl = document.createElement('div');
       cellEl.className = 'contig-cell';
       cellEl.dataset.value = value.toString();
+      cellEl.dataset.row = String(row);
+      cellEl.dataset.col = String(col);
+
+      const isValid =
+        validPlacements.has(value) && state.phase === 'calculating';
 
       // Apply owner color
       if (cell?.owner === 'player1') {
@@ -69,10 +79,23 @@ export function renderBoard(
       valueSpan.textContent = value.toString();
       cellEl.appendChild(valueSpan);
 
-      // Click handler
-      if (validPlacements.has(value) && state.phase === 'calculating') {
+      const ownerLabel = cell?.owner ? getPlayerName(cell.owner) : undefined;
+      makeCellFocusable(
+        cellEl,
+        buildCellAriaLabel({
+          coord: String(value),
+          empty: !cell?.owner,
+          owner: ownerLabel,
+          validPlacement: isValid,
+        })
+      );
+
+      // Click + keyboard on valid placements
+      if (isValid) {
         cellEl.style.cursor = 'pointer';
-        cellEl.addEventListener('click', () => onCellClick(value));
+        const activate = () => onCellClick(value);
+        cellEl.addEventListener('click', activate);
+        bindCellActivateKeys(cellEl, activate);
       }
 
       rowEl.appendChild(cellEl);
