@@ -20,6 +20,8 @@ import {
   injectRemainderIslandsStyles,
 } from './board-ui';
 import { getAIIslandChoice, AIDifficulty } from './ai';
+import { tutorialManager } from '../../core/tutorial';
+import { remainderIslandsTutorial } from './tutorial';
 
 // =============================================================================
 // Module State
@@ -169,4 +171,25 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
 
 export function getCurrentState(): RemainderIslandsState {
   return gameState;
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  newGameVsHuman();
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed') {
+        newGameVsHuman();
+      }
+    }
+  });
+
+  tutorialManager.start(remainderIslandsTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }
