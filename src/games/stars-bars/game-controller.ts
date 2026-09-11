@@ -239,6 +239,9 @@ export function newGameVsHuman(container: HTMLElement): StarsGameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): StarsGameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): StarsGameController {
+  return initGame(container, true, difficulty);
 }

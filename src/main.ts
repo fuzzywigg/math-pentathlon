@@ -131,6 +131,13 @@ import { renderGraphDemo } from './demos/graph-demo';
 import { renderAttributeDemo } from './demos/attribute-demo';
 import { renderExpressionDemo } from './demos/expression-demo';
 
+/** Resolve New Game modal AI difficulty (shell Easy/Medium/Hard). */
+function resolveAIDifficulty(
+  difficulty?: AIDifficultyLevel
+): AIDifficultyLevel {
+  return difficulty ?? 'medium';
+}
+
 // Get the app container
 const appContainer = document.getElementById('app');
 
@@ -265,7 +272,7 @@ function renderKingsQuadraphages(): void {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        kqNewGameVsAI((difficulty ?? 'medium') as AIDifficulty, true);
+        kqNewGameVsAI(resolveAIDifficulty(difficulty) as AIDifficulty, true);
       } else {
         kqNewGameVsHuman();
       }
@@ -321,10 +328,11 @@ function renderHex(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer (basic)',
     showTutorial: true,
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        hexNewGameVsAI();
+        hexNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         hexNewGameVsHuman();
       }
@@ -434,10 +442,11 @@ function renderStarTrack(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Race against the computer',
     showTutorial: true,
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        starTrackNewGameVsAI();
+        starTrackNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         starTrackNewGameVsHuman();
       }
@@ -545,10 +554,11 @@ function renderHexAGone(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     showTutorial: true,
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        hexAGoneNewGameVsAI();
+        hexAGoneNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         hexAGoneNewGameVsHuman();
       }
@@ -606,10 +616,11 @@ function renderCalla(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     showTutorial: true,
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        callaNewGameVsAI();
+        callaNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         callaNewGameVsHuman();
       }
@@ -664,10 +675,11 @@ function renderFiar(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'fiar-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        fiarNewGameVsAI();
+        fiarNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         fiarNewGameVsHuman();
       }
@@ -725,10 +737,11 @@ function renderQueensGuards(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'qg-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        qgNewGameVsAI();
+        qgNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         qgNewGameVsHuman();
       }
@@ -788,10 +801,11 @@ function renderContig60(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'contig-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        contigNewGameVsAI();
+        contigNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         contigNewGameVsHuman();
       }
@@ -848,10 +862,11 @@ function renderJuggle(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'juggle-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        juggleNewGameVsAI();
+        juggleNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         juggleNewGameVsHuman();
       }
@@ -909,10 +924,11 @@ function renderFabADiffy(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'fab-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        fabNewGameVsAI(shell.board!);
+        fabNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         fabNewGameVsHuman(shell.board!);
       }
@@ -973,10 +989,11 @@ function renderSumDominoes(): void {
     vsAiDescription: 'Challenge the computer',
     boardClass: 'sd-board-container',
     showStatus: false,
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        sdNewGameVsAI(shell.board!);
+        sdNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         sdNewGameVsHuman(shell.board!);
       }
@@ -1035,10 +1052,11 @@ function renderPar55(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'par55-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        par55NewGameVsAI(shell.board!);
+        par55NewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         par55NewGameVsHuman(shell.board!);
       }
@@ -1098,10 +1116,11 @@ function renderRamrod(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'ramrod-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        ramrodNewGameVsAI(shell.board!);
+        ramrodNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         ramrodNewGameVsHuman(shell.board!);
       }
@@ -1161,10 +1180,11 @@ function renderKwatrasinko(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'kwa-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        kwaNewGameVsAI(shell.board!);
+        kwaNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         kwaNewGameVsHuman(shell.board!);
       }
@@ -1226,10 +1246,11 @@ function renderPrimeGold(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'pg-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        primeGoldNewGameVsAI(shell.board!);
+        primeGoldNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         primeGoldNewGameVsHuman(shell.board!);
       }
@@ -1284,10 +1305,11 @@ function renderPentEmIn(): void {
     modeRadioName: 'pent-mode',
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        pentNewGameVsAI();
+        pentNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         pentNewGameVsHuman();
       }
@@ -1336,11 +1358,12 @@ function renderFracFact(): void {
     vsHumanDescription: 'Take turns solving problems',
     vsAiDescription: 'Compete against the computer',
     showStatus: false,
+    showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="frac-game-container"></div>`,
     newGameExtraHtml: `
           <div class="difficulty-selector">
-            <h4>Difficulty</h4>
+            <h4>Problem Difficulty</h4>
             <div class="difficulty-options">
               <label class="difficulty-option">
                 <input type="radio" name="frac-difficulty" value="easy">
@@ -1357,16 +1380,19 @@ function renderFracFact(): void {
             </div>
           </div>`,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, aiDifficulty) => {
       const selectedDifficulty = document.querySelector(
         'input[name="frac-difficulty"]:checked'
       ) as HTMLInputElement | null;
-      const difficulty = (selectedDifficulty?.value ||
+      const problemDifficulty = (selectedDifficulty?.value ||
         'medium') as AIDifficultyLevel;
       if (mode === 'human-vs-ai') {
-        fracNewGameVsAI(difficulty);
+        fracNewGameVsAI(
+          problemDifficulty,
+          resolveAIDifficulty(aiDifficulty)
+        );
       } else {
-        fracNewGameVsHuman(difficulty);
+        fracNewGameVsHuman(problemDifficulty);
       }
     },
   });
@@ -1409,12 +1435,13 @@ function renderRemainderIslands(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     showStatus: false,
+    showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="remainder-game-container"></div>`,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        remainderNewGameVsAI();
+        remainderNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         remainderNewGameVsHuman();
       }
@@ -1460,12 +1487,13 @@ function renderFractionPinball(): void {
     vsHumanDescription: 'Take turns converting',
     vsAiDescription: 'Challenge the computer',
     showStatus: false,
+    showDifficulty: true,
     mountId: 'game-container',
     gameAreaHtml: `<div id="game-container" class="pinball-game-container"></div>`,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        pinballNewGameVsAI();
+        pinballNewGameVsAI(resolveAIDifficulty(difficulty));
       } else {
         pinballNewGameVsHuman();
       }
@@ -1528,10 +1556,11 @@ function renderStarsBars(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'stars-board-container',
+    showDifficulty: true,
     onNavigateHome: () => navigate('/'),
-    onStartGame: (mode) => {
+    onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        starsNewGameVsAI(shell.board!);
+        starsNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
       } else {
         starsNewGameVsHuman(shell.board!);
       }

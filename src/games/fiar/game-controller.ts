@@ -232,9 +232,10 @@ export function newGameVsHuman(): void {
   owlSystem.onGameStart('fiar');
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  aiDifficulty = difficulty;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   render();

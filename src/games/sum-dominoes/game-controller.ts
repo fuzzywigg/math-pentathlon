@@ -270,6 +270,9 @@ export function newGameVsHuman(container: HTMLElement): SDGameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): SDGameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): SDGameController {
+  return initGame(container, true, difficulty);
 }

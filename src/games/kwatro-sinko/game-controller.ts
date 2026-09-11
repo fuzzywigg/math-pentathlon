@@ -239,6 +239,9 @@ export function newGameVsHuman(container: HTMLElement): KwaGameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): KwaGameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): KwaGameController {
+  return initGame(container, true, difficulty);
 }

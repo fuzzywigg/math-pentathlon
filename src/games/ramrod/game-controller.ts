@@ -251,6 +251,9 @@ export function newGameVsHuman(container: HTMLElement): RamrodGameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): RamrodGameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): RamrodGameController {
+  return initGame(container, true, difficulty);
 }
