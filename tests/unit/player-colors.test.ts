@@ -6,7 +6,7 @@ import {
   seatIcon,
 } from '../../src/ui/player-colors';
 
-describe('getPlayerSeatColors', () => {
+describe('player-colors / Scope A mode chrome', () => {
   let app: HTMLElement;
 
   beforeEach(() => {
@@ -18,6 +18,18 @@ describe('getPlayerSeatColors', () => {
   afterEach(() => {
     clearGameModeChrome(app);
     app.remove();
+  });
+
+  it('stamps data-opponent=ai for vs-AI and clears it for 2P', () => {
+    applyGameModeChrome(app, 'human-vs-ai');
+    expect(app.dataset.opponent).toBe('ai');
+    expect(app.dataset.aiSeat).toBe('player2');
+    expect(app.classList.contains('game-vs-ai')).toBe(true);
+
+    applyGameModeChrome(app, 'human-vs-human');
+    expect(app.dataset.opponent).toBeUndefined();
+    expect(app.dataset.aiSeat).toBeUndefined();
+    expect(app.classList.contains('game-vs-ai')).toBe(false);
   });
 
   it('human mode → blue/red', () => {
@@ -40,6 +52,7 @@ describe('getPlayerSeatColors', () => {
 
   it('ai mode ai-seat=player1 → P1 purple, P2 red', () => {
     applyGameModeChrome(app, 'human-vs-ai', 'player1');
+    expect(app.dataset.aiSeat).toBe('player1');
     const colors = getPlayerSeatColors();
     expect(colors.player1).toBe('#8b5cf6');
     expect(colors.player2).toBe('#ef4444');

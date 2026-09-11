@@ -49,15 +49,15 @@ export function injectStarsStyles(): void {
       color: var(--color-player2, #e53935);
     }
 
-    [data-game-mode="ai"] .stars-status.player2 {
+    [data-opponent="ai"] .stars-status.player2 {
       background: rgba(139, 92, 246, 0.2);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-status.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-status.player1 {
       background: rgba(139, 92, 246, 0.2);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-status.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-status.player2 {
       background: rgba(229, 57, 53, 0.2);
     }
 
@@ -83,15 +83,15 @@ export function injectStarsStyles(): void {
       color: var(--color-player2, #e53935);
     }
 
-    [data-game-mode="ai"] .stars-score.player2 {
+    [data-opponent="ai"] .stars-score.player2 {
       background: rgba(139, 92, 246, 0.15);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-score.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-score.player1 {
       background: rgba(139, 92, 246, 0.15);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-score.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-score.player2 {
       background: rgba(229, 57, 53, 0.15);
     }
 
@@ -163,15 +163,15 @@ export function injectStarsStyles(): void {
       box-shadow: inset 0 0 0 2px rgba(229, 57, 53, 0.5);
     }
 
-    [data-game-mode="ai"] .stars-cell.player2 {
+    [data-opponent="ai"] .stars-cell.player2 {
       box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.5);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-cell.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-cell.player1 {
       box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.5);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .stars-cell.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-cell.player2 {
       box-shadow: inset 0 0 0 2px rgba(229, 57, 53, 0.5);
     }
 

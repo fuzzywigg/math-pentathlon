@@ -478,15 +478,15 @@ export function injectFabStyles(): void {
       background: #ffcdd2;
     }
 
-    [data-game-mode="ai"] .fab-answer-player2 {
+    [data-opponent="ai"] .fab-answer-player2 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-answer-player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-answer-player1 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-answer-player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-answer-player2 {
       background: #ffcdd2;
     }
 
@@ -598,15 +598,15 @@ export function injectFabStyles(): void {
       color: var(--color-player2, #f44336);
     }
 
-    [data-game-mode="ai"] .fab-score-p2 {
+    [data-opponent="ai"] .fab-score-p2 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-score-p1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-score-p1 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-score-p2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-score-p2 {
       background: #ffcdd2;
     }
 
@@ -644,15 +644,15 @@ export function injectFabStyles(): void {
       background: #ffcdd2;
     }
 
-    [data-game-mode="ai"] .fab-history-player2 {
+    [data-opponent="ai"] .fab-history-player2 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-history-player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-history-player1 {
       background: #ddd6fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .fab-history-player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .fab-history-player2 {
       background: #ffcdd2;
     }
 

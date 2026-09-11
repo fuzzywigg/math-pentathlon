@@ -209,6 +209,7 @@ export function renderBoard(
     const winnerMsg = document.createElement('div');
     winnerMsg.className = 'star-track-winner game-winner-banner';
     const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
+    // Board banner uses generic Blue/Red; status panel uses mode-aware labels
     winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
     chainArea.appendChild(winnerMsg);
   }
@@ -308,7 +309,7 @@ function renderChainLink(chain: ChainLink): string {
 export function renderStatus(
   state: StarTrackGameState,
   container: HTMLElement,
-  _gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
   container.innerHTML = '';
@@ -322,8 +323,15 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-    turnEl.textContent = `🎉 ${winnerName} Wins! 🎉`;
+    const winnerName =
+      gameMode === 'human-vs-ai'
+        ? state.winner === 'player1'
+          ? 'You'
+          : 'AI'
+        : state.winner === 'player1'
+          ? 'Blue'
+          : 'Red';
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
     turnEl.classList.add('status-ai-thinking');
@@ -337,10 +345,13 @@ export function renderStatus(
   const progressEl = document.createElement('div');
   progressEl.className = 'star-track-progress';
 
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
+  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red';
+
   const p1Progress = document.createElement('div');
   p1Progress.className = 'progress-bar progress-p1';
   p1Progress.innerHTML = `
-    <span class="progress-label">${seatIcon('player1')} Blue</span>
+    <span class="progress-label">${seatIcon('player1')} ${p1Label}</span>
     <div class="progress-track">
       <div class="progress-fill" style="width: ${getProgress(state, 'player1')}%"></div>
     </div>
@@ -351,7 +362,7 @@ export function renderStatus(
   const p2Progress = document.createElement('div');
   p2Progress.className = 'progress-bar progress-p2';
   p2Progress.innerHTML = `
-    <span class="progress-label">${seatIcon('player2')} Red</span>
+    <span class="progress-label">${seatIcon('player2')} ${p2Label}</span>
     <div class="progress-track">
       <div class="progress-fill" style="width: ${getProgress(state, 'player2')}%"></div>
     </div>

@@ -516,15 +516,15 @@ export function injectRemainderIslandsStyles(): void {
       color: var(--color-player2, #c62828);
     }
 
-    [data-game-mode="ai"] .remainder-status.player2 {
+    [data-opponent="ai"] .remainder-status.player2 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .remainder-status.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .remainder-status.player1 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .remainder-status.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .remainder-status.player2 {
       background: #ffebee;
     }
 

@@ -604,15 +604,15 @@ export function injectFracFactStyles(): void {
       color: var(--color-player2, #c62828);
     }
 
-    [data-game-mode="ai"] .frac-status.player2 {
+    [data-opponent="ai"] .frac-status.player2 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .frac-status.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .frac-status.player1 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .frac-status.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .frac-status.player2 {
       background: #ffebee;
     }
 

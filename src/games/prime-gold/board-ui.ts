@@ -47,15 +47,15 @@ export function injectPrimeGoldStyles(): void {
       color: var(--color-player2, #e53935);
     }
 
-    [data-game-mode="ai"] .pg-status.player2 {
+    [data-opponent="ai"] .pg-status.player2 {
       background: rgba(139, 92, 246, 0.2);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pg-status.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pg-status.player1 {
       background: rgba(139, 92, 246, 0.2);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pg-status.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pg-status.player2 {
       background: rgba(229, 57, 53, 0.2);
     }
 
@@ -80,15 +80,15 @@ export function injectPrimeGoldStyles(): void {
       color: var(--color-player2, #e53935);
     }
 
-    [data-game-mode="ai"] .pg-score.player2 {
+    [data-opponent="ai"] .pg-score.player2 {
       background: rgba(139, 92, 246, 0.15);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pg-score.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pg-score.player1 {
       background: rgba(139, 92, 246, 0.15);
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pg-score.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pg-score.player2 {
       background: rgba(229, 57, 53, 0.15);
     }
 

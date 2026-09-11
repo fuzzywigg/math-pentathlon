@@ -1,6 +1,6 @@
 /**
  * Player seat colors for 2P (blue/red) vs vs-AI (human blue/red, AI purple).
- * Mode chrome lives on the game shell container via data-game-mode / data-ai-seat.
+ * Mode chrome: `#app[data-opponent="ai"]` (+ optional `data-ai-seat` for Kings flip).
  */
 
 export type PlayerSeat = 'player1' | 'player2';
@@ -24,7 +24,8 @@ function readRootVar(name: string, fallback: string): string {
 }
 
 /**
- * Stamp vs-AI / 2P chrome on the shell container so CSS and board-uis can branch.
+ * Stamp vs-AI chrome on the shell (`#app`).
+ * Sets `data-opponent="ai"` for vs-AI; clears it for 2P human.
  * Default AI seat is player2; Kings may pass player1 when the human plays second.
  */
 export function applyGameModeChrome(
@@ -33,17 +34,19 @@ export function applyGameModeChrome(
   aiSeat: PlayerSeat = 'player2'
 ): void {
   const isAi = mode === 'human-vs-ai';
-  container.dataset.gameMode = isAi ? 'ai' : 'human';
-  container.classList.toggle('game-vs-ai', isAi);
   if (isAi) {
+    container.dataset.opponent = 'ai';
     container.dataset.aiSeat = aiSeat;
+    container.classList.add('game-vs-ai');
   } else {
+    delete container.dataset.opponent;
     delete container.dataset.aiSeat;
+    container.classList.remove('game-vs-ai');
   }
 }
 
 export function clearGameModeChrome(container: HTMLElement): void {
-  delete container.dataset.gameMode;
+  delete container.dataset.opponent;
   delete container.dataset.aiSeat;
   container.classList.remove('game-vs-ai');
 }
@@ -54,6 +57,10 @@ export function getGameModeChromeRoot(
   if (root) return root;
   if (typeof document === 'undefined') return null;
   return document.getElementById('app');
+}
+
+function isAiOpponent(el: HTMLElement | null | undefined): boolean {
+  return el?.dataset.opponent === 'ai';
 }
 
 /**
@@ -68,7 +75,6 @@ export function getPlayerSeatColors(root?: HTMLElement | null): {
   player2Light: string;
 } {
   const el = getGameModeChromeRoot(root);
-  const mode = el?.dataset.gameMode;
   const aiSeat = (el?.dataset.aiSeat as PlayerSeat | undefined) ?? 'player2';
 
   const player1Base = readRootVar('--color-player1', FALLBACK.player1);
@@ -80,7 +86,7 @@ export function getPlayerSeatColors(root?: HTMLElement | null): {
   let player1Light: string = FALLBACK.player1Light;
   let player2Light: string = FALLBACK.player2Light;
 
-  if (mode === 'ai') {
+  if (isAiOpponent(el)) {
     if (aiSeat === 'player1') {
       player1 = ai;
       player1Light = FALLBACK.aiLight;
@@ -107,8 +113,7 @@ export function seatIcon(
   root?: HTMLElement | null
 ): string {
   const el = getGameModeChromeRoot(root);
-  const mode = el?.dataset.gameMode;
   const aiSeat = (el?.dataset.aiSeat as PlayerSeat | undefined) ?? 'player2';
-  if (mode === 'ai' && seat === aiSeat) return '🟣';
+  if (isAiOpponent(el) && seat === aiSeat) return '🟣';
   return seat === 'player1' ? '🔵' : '🔴';
 }

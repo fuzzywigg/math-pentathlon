@@ -272,7 +272,7 @@ function createCalla(
 export function renderStatus(
   state: CallaGameState,
   container: HTMLElement,
-  _gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
   container.innerHTML = '';
@@ -289,8 +289,15 @@ export function renderStatus(
     if (state.winner === 'tie') {
       turnEl.textContent = "🤝 It's a Tie! 🤝";
     } else {
-      const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-      turnEl.textContent = `🎉 ${winnerName} Wins! 🎉`;
+      const winnerName =
+        gameMode === 'human-vs-ai'
+          ? state.winner === 'player1'
+            ? 'You'
+            : 'AI'
+          : state.winner === 'player1'
+            ? 'Blue'
+            : 'Red';
+      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
     }
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
@@ -305,14 +312,17 @@ export function renderStatus(
   const scoreEl = document.createElement('div');
   scoreEl.className = 'calla-scores';
 
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
+  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red';
+
   const p1Score = document.createElement('div');
   p1Score.className = `calla-score calla-score-p1 ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1Score.innerHTML = `${seatIcon('player1')} Blue: <strong>${state.player1Calla}</strong>`;
+  p1Score.innerHTML = `${seatIcon('player1')} ${p1Label}: <strong>${state.player1Calla}</strong>`;
   scoreEl.appendChild(p1Score);
 
   const p2Score = document.createElement('div');
   p2Score.className = `calla-score calla-score-p2 ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2Score.innerHTML = `${seatIcon('player2')} Red: <strong>${state.player2Calla}</strong>`;
+  p2Score.innerHTML = `${seatIcon('player2')} ${p2Label}: <strong>${state.player2Calla}</strong>`;
   scoreEl.appendChild(p2Score);
 
   statusEl.appendChild(scoreEl);

@@ -314,15 +314,15 @@ export function injectPentEmInStyles(): void {
       color: var(--color-player2, #c62828);
     }
 
-    [data-game-mode="ai"] .pent-status.player2 {
+    [data-opponent="ai"] .pent-status.player2 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pent-status.player1 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pent-status.player1 {
       background: #ede9fe;
     }
 
-    [data-game-mode="ai"][data-ai-seat="player1"] .pent-status.player2 {
+    [data-opponent="ai"][data-ai-seat="player1"] .pent-status.player2 {
       background: #ffebee;
     }
 
