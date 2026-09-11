@@ -52,21 +52,25 @@ import {
   initGame as initFiarGame,
   newGameVsHuman as fiarNewGameVsHuman,
   newGameVsAI as fiarNewGameVsAI,
+  startTutorial as startFiarTutorial,
 } from './games/fiar/game-controller';
 import {
   initGame as initQGGame,
   newGameVsHuman as qgNewGameVsHuman,
   newGameVsAI as qgNewGameVsAI,
+  startTutorial as startQGTutorial,
 } from './games/queens-guards/game-controller';
 import {
   initGame as initContigGame,
   newGameVsHuman as contigNewGameVsHuman,
   newGameVsAI as contigNewGameVsAI,
+  startTutorial as startContigTutorial,
 } from './games/contig-60/game-controller';
 import {
   initGame as initJuggleGame,
   newGameVsHuman as juggleNewGameVsHuman,
   newGameVsAI as juggleNewGameVsAI,
+  startTutorial as startJuggleTutorial,
 } from './games/juggle/game-controller';
 import {
   initGame as initFabGame,
@@ -77,6 +81,7 @@ import {
   initGame as initSDGame,
   newGameVsHuman as sdNewGameVsHuman,
   newGameVsAI as sdNewGameVsAI,
+  startTutorial as startSDTutorial,
 } from './games/sum-dominoes/game-controller';
 import {
   initGame as initPar55Game,
@@ -675,6 +680,7 @@ function renderFiar(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'fiar-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -684,6 +690,7 @@ function renderFiar(): void {
         fiarNewGameVsHuman();
       }
     },
+    onTutorial: () => startFiarTutorial(),
   });
 
   if (shell.board && shell.status) {
@@ -737,6 +744,7 @@ function renderQueensGuards(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'qg-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -746,6 +754,7 @@ function renderQueensGuards(): void {
         qgNewGameVsHuman();
       }
     },
+    onTutorial: () => startQGTutorial(),
   });
 
   if (shell.board && shell.status) {
@@ -801,6 +810,7 @@ function renderContig60(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'contig-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -810,6 +820,7 @@ function renderContig60(): void {
         contigNewGameVsHuman();
       }
     },
+    onTutorial: () => startContigTutorial(),
   });
 
   if (shell.board && shell.status) {
@@ -862,6 +873,7 @@ function renderJuggle(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'juggle-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -871,6 +883,7 @@ function renderJuggle(): void {
         juggleNewGameVsHuman();
       }
     },
+    onTutorial: () => startJuggleTutorial(),
   });
 
   if (shell.board && shell.status) {
@@ -942,7 +955,7 @@ function renderFabADiffy(): void {
   currentCleanup = shell.cleanup;
 }
 
-// Render Sum Dominoes — Help only (no tutorial module exists; do not invent one)
+// Render Sum Dominoes
 function renderSumDominoes(): void {
   const shell = mountGameShell(appContainer!, {
     title: 'Sum Dominoes & Dice',
@@ -989,6 +1002,7 @@ function renderSumDominoes(): void {
     vsAiDescription: 'Challenge the computer',
     boardClass: 'sd-board-container',
     showStatus: false,
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -998,6 +1012,7 @@ function renderSumDominoes(): void {
         sdNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startSDTutorial(),
   });
 
   if (shell.board) {

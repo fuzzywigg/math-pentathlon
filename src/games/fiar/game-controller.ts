@@ -16,6 +16,8 @@ import {
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
 import { getAIMove, applyAIMove, AIDifficulty } from './ai';
+import { tutorialManager } from '../../core/tutorial';
+import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 
 // =============================================================================
@@ -244,4 +246,25 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
 
 export function getCurrentState(): FiarGameState {
   return gameState;
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  newGameVsHuman();
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed') {
+        newGameVsHuman();
+      }
+    }
+  });
+
+  tutorialManager.start(fiarTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }

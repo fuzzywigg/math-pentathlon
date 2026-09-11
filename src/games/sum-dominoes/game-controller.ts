@@ -17,6 +17,8 @@ import {
   injectSDStyles,
   getPlayerName,
 } from './board-ui';
+import { tutorialManager } from '../../core/tutorial';
+import { sumDominoesTutorial } from './tutorial';
 
 // =============================================================================
 // Game Controller
@@ -32,6 +34,9 @@ export interface SDGameController {
   newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
+/** Last initialized board container — used by startTutorial. */
+let activeContainer: HTMLElement | null = null;
+
 /**
  * Initialize the game
  */
@@ -41,6 +46,7 @@ export function initGame(
   difficulty: AIDifficulty = 'medium'
 ): SDGameController {
   injectSDStyles();
+  activeContainer = container;
 
   const controller: SDGameController = {
     state: createInitialState(),
@@ -275,4 +281,26 @@ export function newGameVsAI(
   difficulty: AIDifficulty = 'medium'
 ): SDGameController {
   return initGame(container, true, difficulty);
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  if (!activeContainer) return;
+  newGameVsHuman(activeContainer);
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed' && activeContainer) {
+        newGameVsHuman(activeContainer);
+      }
+    }
+  });
+
+  tutorialManager.start(sumDominoesTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }
