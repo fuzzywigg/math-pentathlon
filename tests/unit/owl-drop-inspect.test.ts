@@ -76,7 +76,7 @@ describe('Ollie drop-inspect (Cycle-2 B)', () => {
     vi.restoreAllMocks();
   });
 
-  it('on real drag drop: hit-tests under owl, speaks STUB, snaps back', () => {
+  it('on real drag drop: hit-tests under owl, speaks STUB, retains position', () => {
     const character = root.querySelector('.owl-character')!;
 
     dispatchPointer(character, 'pointerdown', { clientX: 320, clientY: 30 });
@@ -90,9 +90,10 @@ describe('Ollie drop-inspect (Cycle-2 B)', () => {
     expect(speech).toContain('row 2');
     expect(speech).toContain('column 4');
 
-    // Snap-back still happens (Cycle-2 A)
-    expect(root.style.left).toBe('');
-    expect(root.style.top).toBe('');
+    // Stay where dropped (overlay physics); drop-inspect still fires
+    expect(root.style.left).toBe('130px');
+    expect(root.style.top).toBe('478px');
+    expect(root.classList.contains('owl-resting')).toBe(true);
     expect(owl.getIsDragging()).toBe(false);
   });
 

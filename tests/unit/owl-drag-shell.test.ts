@@ -1,4 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { OwlComponent } from '../../src/ui/owl/owl-component';
 
 function dispatchPointer(
@@ -84,20 +86,23 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
     expect(root.style.bottom).toBe('auto');
   });
 
-  it('snaps back to dock on pointerup', () => {
+  it('retains inline position on pointerup after real drag', () => {
     const character = root.querySelector('.owl-character')!;
 
     dispatchPointer(character, 'pointerdown', { clientX: 320, clientY: 30 });
     dispatchPointer(root, 'pointermove', { clientX: 150, clientY: 500 });
-    expect(root.style.left).not.toBe('');
+    expect(root.style.left).toBe('130px');
+    expect(root.style.top).toBe('478px');
 
     dispatchPointer(root, 'pointerup', { clientX: 150, clientY: 500 });
     expect(owl.getIsDragging()).toBe(false);
     expect(root.classList.contains('owl-dragging')).toBe(false);
-    expect(root.style.left).toBe('');
-    expect(root.style.top).toBe('');
-    expect(root.style.right).toBe('');
-    expect(root.style.bottom).toBe('');
+    // Stay where dropped (no snap-back)
+    expect(root.style.left).toBe('130px');
+    expect(root.style.top).toBe('478px');
+    expect(root.style.right).toBe('auto');
+    expect(root.style.bottom).toBe('auto');
+    expect(root.classList.contains('owl-resting')).toBe(true);
   });
 
   it('snaps back to dock on pointercancel', () => {
@@ -109,6 +114,7 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
 
     expect(root.style.left).toBe('');
     expect(root.style.top).toBe('');
+    expect(root.classList.contains('owl-resting')).toBe(false);
     expect(owl.getIsDragging()).toBe(false);
   });
 
@@ -125,8 +131,20 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
     root.style.top = '20px';
     root.style.right = 'auto';
     root.style.bottom = 'auto';
+    root.classList.add('owl-resting');
     owl.snapBackToDock();
     expect(root.style.left).toBe('');
     expect(root.style.top).toBe('');
+    expect(root.classList.contains('owl-resting')).toBe(false);
+  });
+
+  it('keeps --ollie-dock-size at 64px (token lock)', () => {
+    const css = readFileSync(
+      resolve(__dirname, '../../src/ui/styles/mobile-play-shell.css'),
+      'utf8'
+    );
+    expect(css).toMatch(/--ollie-dock-size:\s*64px/);
+    expect(css).toMatch(/--ollie-body-w:\s*68px/);
+    expect(css).toMatch(/--ollie-body-h:\s*76px/);
   });
 });

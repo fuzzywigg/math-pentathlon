@@ -1,6 +1,13 @@
 // Owl UI Component - Visual representation of Ollie the Owl
 
-import { owlSystem, OwlDisplayState, inspectDropSpeech } from '../../core/owl';
+import {
+  owlSystem,
+  OwlDisplayState,
+  inspectDropSpeech,
+  integrate,
+  clampToViewport,
+  isAtRest,
+} from '../../core/owl';
 import { storage } from '../../core/storage';
 
 /** Pixels of movement before a pointer gesture counts as a drag (not a tap). */
@@ -19,6 +26,13 @@ export class OwlComponent {
   private dragOffsetY = 0;
   private dragStartX = 0;
   private dragStartY = 0;
+
+  /** Last drag-frame top-left for Δ → velocity (coast after drop). */
+  private lastPosX = 0;
+  private lastPosY = 0;
+  private velocityX = 0;
+  private velocityY = 0;
+  private coastRaf: number | null = null;
 
   // Initialize the Owl UI
   init(): void {
@@ -135,11 +149,11 @@ export class OwlComponent {
       this.onOwlClick();
     });
 
-    // Pointer drag (touch + mouse) with capture; snap-back on release
+    // Pointer drag (touch + mouse) with capture; stay after real drag, dock on cancel/tap
     this.container.addEventListener('pointerdown', this.onPointerDown);
     this.container.addEventListener('pointermove', this.onPointerMove);
     this.container.addEventListener('pointerup', this.onPointerUp);
-    this.container.addEventListener('pointercancel', this.onPointerUp);
+    this.container.addEventListener('pointercancel', this.onPointerCancel);
     this.container.addEventListener('lostpointercapture', this.onPointerUp);
 
     // Eye tracking (fun feature)
@@ -159,6 +173,8 @@ export class OwlComponent {
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (!this.isDragHandle(e.target)) return;
 
+    this.stopCoast();
+
     const rect = this.container.getBoundingClientRect();
     this.dragOffsetX = e.clientX - rect.left;
     this.dragOffsetY = e.clientY - rect.top;
@@ -167,6 +183,10 @@ export class OwlComponent {
     this.isDragging = true;
     this.didDrag = false;
     this.dragPointerId = e.pointerId;
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.lastPosX = rect.left;
+    this.lastPosY = rect.top;
 
     // Lock visual top-left before switching transform-origin (dock uses top-right)
     // so scale(0.85) does not jump when .owl-dragging applies.
@@ -174,6 +194,7 @@ export class OwlComponent {
     this.container.style.top = `${rect.top}px`;
     this.container.style.right = 'auto';
     this.container.style.bottom = 'auto';
+    this.container.classList.remove('owl-resting');
     this.container.classList.add('owl-dragging');
 
     try {
@@ -197,6 +218,11 @@ export class OwlComponent {
     const x = e.clientX - this.dragOffsetX;
     const y = e.clientY - this.dragOffsetY;
 
+    this.velocityX = x - this.lastPosX;
+    this.velocityY = y - this.lastPosY;
+    this.lastPosX = x;
+    this.lastPosY = y;
+
     // Follow pointer with fixed left/top; release CSS dock (right/bottom)
     this.container.style.left = `${x}px`;
     this.container.style.top = `${y}px`;
@@ -209,8 +235,6 @@ export class OwlComponent {
     if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
 
     const wasRealDrag = this.didDrag;
-    const dropX = e.clientX;
-    const dropY = e.clientY;
 
     this.isDragging = false;
     this.dragPointerId = null;
@@ -227,10 +251,37 @@ export class OwlComponent {
 
     // Cycle-2 B: after a real drag, hit-test under the owl and soft-tutor narrate
     if (wasRealDrag) {
-      this.inspectDropAt(dropX, dropY);
+      this.inspectDropAt(e.clientX, e.clientY);
+      // Stay where dropped: keep inline left/top and coast with friction
+      this.container.classList.add('owl-resting');
+      this.startCoast();
+      return;
     }
 
-    // Cycle-2 A: always snap back to CSS dock home (after inspect)
+    // Tap (no real drag): clear the temporary lock and return to CSS dock
+    this.snapBackToDock();
+  };
+
+  /** Cancelled gesture: return to dock (even after a real drag). */
+  private onPointerCancel = (e: PointerEvent): void => {
+    if (!this.container || !this.isDragging) return;
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
+
+    this.isDragging = false;
+    this.dragPointerId = null;
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.stopCoast();
+
+    try {
+      if (this.container.hasPointerCapture?.(e.pointerId)) {
+        this.container.releasePointerCapture(e.pointerId);
+      }
+    } catch {
+      // ignore
+    }
+
+    this.container.classList.remove('owl-dragging');
     this.snapBackToDock();
   };
 
@@ -261,10 +312,84 @@ export class OwlComponent {
   /** Clear inline position so CSS dock (top-right mobile / bottom-right desktop) wins. */
   snapBackToDock(): void {
     if (!this.container) return;
+    this.stopCoast();
+    this.velocityX = 0;
+    this.velocityY = 0;
+    this.container.classList.remove('owl-resting');
     this.container.style.left = '';
     this.container.style.top = '';
     this.container.style.right = '';
     this.container.style.bottom = '';
+  }
+
+  private stopCoast(): void {
+    if (this.coastRaf !== null) {
+      cancelAnimationFrame(this.coastRaf);
+      this.coastRaf = null;
+    }
+  }
+
+  /** Friction coast after drop until rest; clamp to viewport (no bounce). */
+  private startCoast(): void {
+    if (!this.container) return;
+    this.stopCoast();
+
+    // Soft-cap release speed so a single large pointermove does not slingshot.
+    const maxV = 28;
+    this.velocityX = Math.max(-maxV, Math.min(maxV, this.velocityX));
+    this.velocityY = Math.max(-maxV, Math.min(maxV, this.velocityY));
+
+    const boxW = (): number => this.container?.getBoundingClientRect().width || 64;
+    const boxH = (): number => this.container?.getBoundingClientRect().height || 64;
+    const vw = (): number => window.innerWidth || 390;
+    const vh = (): number => window.innerHeight || 844;
+
+    // Clamp drop position into viewport before coasting
+    {
+      const x = parseFloat(this.container.style.left) || 0;
+      const y = parseFloat(this.container.style.top) || 0;
+      const clamped = clampToViewport(x, y, boxW(), boxH(), vw(), vh());
+      this.container.style.left = `${clamped.x}px`;
+      this.container.style.top = `${clamped.y}px`;
+    }
+
+    const tick = (): void => {
+      if (!this.container) {
+        this.coastRaf = null;
+        return;
+      }
+
+      const x = parseFloat(this.container.style.left) || 0;
+      const y = parseFloat(this.container.style.top) || 0;
+      const next = integrate({ x, y, vx: this.velocityX, vy: this.velocityY });
+      const clamped = clampToViewport(next.x, next.y, boxW(), boxH(), vw(), vh());
+
+      // Soft stop on edges (clamp only — no bounce invent)
+      if (clamped.x !== next.x) this.velocityX = 0;
+      else this.velocityX = next.vx;
+      if (clamped.y !== next.y) this.velocityY = 0;
+      else this.velocityY = next.vy;
+
+      this.container.style.left = `${clamped.x}px`;
+      this.container.style.top = `${clamped.y}px`;
+
+      if (isAtRest(this.velocityX, this.velocityY)) {
+        this.velocityX = 0;
+        this.velocityY = 0;
+        this.coastRaf = null;
+        return;
+      }
+
+      this.coastRaf = requestAnimationFrame(tick);
+    };
+
+    if (isAtRest(this.velocityX, this.velocityY)) {
+      this.velocityX = 0;
+      this.velocityY = 0;
+      return;
+    }
+
+    this.coastRaf = requestAnimationFrame(tick);
   }
 
   /** Whether Ollie is mid-drag (for tests / drop-inspect). */
@@ -375,6 +500,8 @@ export class OwlComponent {
 
   // Clean up
   destroy(): void {
+    this.stopCoast();
+
     if (this.unsubscribe) {
       this.unsubscribe();
       this.unsubscribe = null;
@@ -386,7 +513,7 @@ export class OwlComponent {
       this.container.removeEventListener('pointerdown', this.onPointerDown);
       this.container.removeEventListener('pointermove', this.onPointerMove);
       this.container.removeEventListener('pointerup', this.onPointerUp);
-      this.container.removeEventListener('pointercancel', this.onPointerUp);
+      this.container.removeEventListener('pointercancel', this.onPointerCancel);
       this.container.removeEventListener('lostpointercapture', this.onPointerUp);
       this.container.remove();
       this.container = null;
@@ -395,6 +522,8 @@ export class OwlComponent {
     this.isDragging = false;
     this.didDrag = false;
     this.dragPointerId = null;
+    this.velocityX = 0;
+    this.velocityY = 0;
   }
 
   // Check if owl is currently visible
