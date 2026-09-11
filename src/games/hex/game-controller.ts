@@ -59,8 +59,9 @@ export function newGameVsHuman(): void {
 }
 
 // Start a new game vs AI
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameMode = 'human-vs-ai';
+  aiDifficulty = difficulty;
   syncOpponentChrome();
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
   isAIThinking = false;

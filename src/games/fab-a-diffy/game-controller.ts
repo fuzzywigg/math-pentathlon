@@ -274,6 +274,9 @@ export function newGameVsHuman(container: HTMLElement): FabGameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): FabGameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): FabGameController {
+  return initGame(container, true, difficulty);
 }

@@ -41,4 +41,45 @@ describe('Cycle-3 a11y shell (light)', () => {
       expect(btn.getAttribute('type')).toBe('button');
     });
   });
+
+  it('showDifficulty renders Easy/Medium/Hard and passes selection on vs-AI start', () => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+    let startedMode: string | undefined;
+    let startedDifficulty: string | undefined;
+
+    mountGameShell(container, {
+      title: 'Test Game',
+      helpTitle: 'How to Play',
+      helpContentHtml: '<p>Rules</p>',
+      modeRadioName: 'test-mode-diff',
+      defaultMode: 'human-vs-ai',
+      showDifficulty: true,
+      onNavigateHome: () => undefined,
+      onStartGame: (mode, difficulty) => {
+        startedMode = mode;
+        startedDifficulty = difficulty;
+      },
+    });
+
+    const difficultySection = container.querySelector('#difficulty-section');
+    expect(difficultySection).toBeTruthy();
+    expect(difficultySection?.querySelectorAll('.difficulty-btn').length).toBe(
+      3
+    );
+
+    const hardBtn = container.querySelector(
+      '.difficulty-btn.hard'
+    ) as HTMLButtonElement;
+    hardBtn.click();
+
+    const startBtn = container.querySelector(
+      '#start-game-btn'
+    ) as HTMLButtonElement;
+    startBtn.click();
+
+    expect(startedMode).toBe('human-vs-ai');
+    expect(startedDifficulty).toBe('hard');
+  });
 });

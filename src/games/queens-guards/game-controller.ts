@@ -204,9 +204,10 @@ export function newGameVsHuman(): void {
   owlSystem.onGameStart('queens-guards');
 }
 
-export function newGameVsAI(): void {
+export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   vsAI = true;
   aiPlayer = 'player2';
+  aiDifficulty = difficulty;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   gameState = createInitialState();

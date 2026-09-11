@@ -251,6 +251,9 @@ export function newGameVsHuman(container: HTMLElement): Par55GameController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): Par55GameController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): Par55GameController {
+  return initGame(container, true, difficulty);
 }

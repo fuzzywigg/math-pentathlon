@@ -235,6 +235,9 @@ export function newGameVsHuman(container: HTMLElement): PrimeGoldController {
 /**
  * Create a new game vs AI
  */
-export function newGameVsAI(container: HTMLElement): PrimeGoldController {
-  return initGame(container, true);
+export function newGameVsAI(
+  container: HTMLElement,
+  difficulty: AIDifficulty = 'medium'
+): PrimeGoldController {
+  return initGame(container, true, difficulty);
 }
