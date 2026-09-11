@@ -23,6 +23,8 @@ import {
   getPlayerName,
 } from './board-ui';
 import { getAIMove, AIDifficulty } from './ai';
+import { tutorialManager } from '../../core/tutorial';
+import { fabADiffyTutorial } from './tutorial';
 
 // =============================================================================
 // Game Controller
@@ -38,11 +40,15 @@ export interface FabGameController {
   newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
+/** Last initialized board container — used by startTutorial. */
+let activeContainer: HTMLElement | null = null;
+
 /**
  * Initialize the game
  */
 export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): FabGameController {
   injectFabStyles();
+  activeContainer = container;
 
   const controller: FabGameController = {
     state: createInitialState(),
@@ -279,4 +285,26 @@ export function newGameVsAI(
   difficulty: AIDifficulty = 'medium'
 ): FabGameController {
   return initGame(container, true, difficulty);
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  if (!activeContainer) return;
+  newGameVsHuman(activeContainer);
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed' && activeContainer) {
+        newGameVsHuman(activeContainer);
+      }
+    }
+  });
+
+  tutorialManager.start(fabADiffyTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }

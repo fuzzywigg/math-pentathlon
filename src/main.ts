@@ -76,6 +76,7 @@ import {
   initGame as initFabGame,
   newGameVsHuman as fabNewGameVsHuman,
   newGameVsAI as fabNewGameVsAI,
+  startTutorial as startFabTutorial,
 } from './games/fab-a-diffy/game-controller';
 import {
   initGame as initSDGame,
@@ -87,21 +88,25 @@ import {
   initGame as initPar55Game,
   newGameVsHuman as par55NewGameVsHuman,
   newGameVsAI as par55NewGameVsAI,
+  startTutorial as startPar55Tutorial,
 } from './games/par-55/game-controller';
 import {
   initGame as initRamrodGame,
   newGameVsHuman as ramrodNewGameVsHuman,
   newGameVsAI as ramrodNewGameVsAI,
+  startTutorial as startRamrodTutorial,
 } from './games/ramrod/game-controller';
 import {
   initGame as initKwaGame,
   newGameVsHuman as kwaNewGameVsHuman,
   newGameVsAI as kwaNewGameVsAI,
+  startTutorial as startKwaTutorial,
 } from './games/kwatro-sinko/game-controller';
 import {
   initGame as initStarsGame,
   newGameVsHuman as starsNewGameVsHuman,
   newGameVsAI as starsNewGameVsAI,
+  startTutorial as startStarsTutorial,
 } from './games/stars-bars/game-controller';
 import {
   initGame as initPrimeGoldGame,
@@ -937,6 +942,7 @@ function renderFabADiffy(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'fab-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -946,6 +952,7 @@ function renderFabADiffy(): void {
         fabNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startFabTutorial(),
   });
 
   if (shell.board) {
@@ -1067,6 +1074,7 @@ function renderPar55(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'par55-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1076,6 +1084,7 @@ function renderPar55(): void {
         par55NewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startPar55Tutorial(),
   });
 
   if (shell.board) {
@@ -1131,6 +1140,7 @@ function renderRamrod(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'ramrod-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1140,6 +1150,7 @@ function renderRamrod(): void {
         ramrodNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startRamrodTutorial(),
   });
 
   if (shell.board) {
@@ -1195,6 +1206,7 @@ function renderKwatrasinko(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'kwa-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1204,6 +1216,7 @@ function renderKwatrasinko(): void {
         kwaNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startKwaTutorial(),
   });
 
   if (shell.board) {
@@ -1571,6 +1584,7 @@ function renderStarsBars(): void {
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     boardClass: 'stars-board-container',
+    showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
@@ -1580,6 +1594,7 @@ function renderStarsBars(): void {
         starsNewGameVsHuman(shell.board!);
       }
     },
+    onTutorial: () => startStarsTutorial(),
   });
 
   if (shell.board) {
