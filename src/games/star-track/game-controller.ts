@@ -7,6 +7,13 @@ import { tutorialManager } from '../../core/tutorial';
 import { starTrackTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAIChainChoice, AIDifficulty } from './ai';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, gameMode);
+}
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -36,6 +43,7 @@ export function initGame(
 // Start new human vs human game
 export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
+  syncOpponentChrome();
   gameState = createInitialState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
@@ -47,6 +55,7 @@ export function newGameVsHuman(): void {
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameMode = 'human-vs-ai';
+  syncOpponentChrome();
   aiDifficulty = difficulty;
   gameState = createInitialState();
   isAIThinking = false;

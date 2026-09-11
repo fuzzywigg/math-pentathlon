@@ -5,6 +5,13 @@ import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { getBestMove, AIDifficulty } from './ai';
 import { owlSystem } from '../../core/owl';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, gameMode);
+}
 
 // Game mode
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -40,6 +47,7 @@ export function initGame(
 // Start a new human vs human game
 export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
+  syncOpponentChrome();
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
   isAIThinking = false;
   hasNotifiedGameEnd = false;
@@ -51,6 +59,7 @@ export function newGameVsHuman(): void {
 // Start a new game vs AI
 export function newGameVsAI(): void {
   gameMode = 'human-vs-ai';
+  syncOpponentChrome();
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
   isAIThinking = false;
   hasNotifiedGameEnd = false;
