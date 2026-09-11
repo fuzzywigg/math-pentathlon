@@ -8,6 +8,12 @@ import {
   isPrime,
 } from './types';
 import { getValidPlacements } from './rules';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
+import { seatIcon } from '../../ui/player-colors';
 
 // =============================================================================
 // Style Injection
@@ -393,19 +399,37 @@ export function renderBoard(
 
       const cellEl = document.createElement('div');
       cellEl.className = 'pg-cell';
+      cellEl.dataset.row = String(row);
+      cellEl.dataset.col = String(col);
 
       if (cell) {
         cellEl.textContent = cell.value.toString();
+        cellEl.dataset.value = String(cell.value);
 
         if (cell.isPrime && !cell.owner) cellEl.classList.add('prime');
         if (cell.owner) cellEl.classList.add(cell.owner);
         if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
 
         const expr = validMap.get(cell.value);
+        const isValid = !!expr;
+
         if (expr) {
           cellEl.classList.add('valid');
-          cellEl.addEventListener('click', () => onCellClick(cell.value, expr));
+          const activate = () => onCellClick(cell.value, expr);
+          cellEl.addEventListener('click', activate);
+          bindCellActivateKeys(cellEl, activate);
         }
+
+        makeCellFocusable(
+          cellEl,
+          buildCellAriaLabel({
+            coord: String(cell.value),
+            empty: !cell.owner,
+            owner: cell.owner ? getPlayerName(cell.owner) : undefined,
+            validPlacement: isValid,
+            extras: cell.isPrime ? ['prime'] : undefined,
+          })
+        );
       }
 
       board.appendChild(cellEl);
@@ -547,11 +571,11 @@ export function renderScores(state: PrimeGoldState): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'pg-score player1';
-  p1Score.innerHTML = `Blue: ${state.playerChips.player1} chips | ${state.primeVeins.player1} veins`;
+  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerChips.player1} chips | ${state.primeVeins.player1} veins`;
 
   const p2Score = document.createElement('div');
   p2Score.className = 'pg-score player2';
-  p2Score.innerHTML = `Red: ${state.playerChips.player2} chips | ${state.primeVeins.player2} veins`;
+  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerChips.player2} chips | ${state.primeVeins.player2} veins`;
 
   container.appendChild(p1Score);
   container.appendChild(p2Score);

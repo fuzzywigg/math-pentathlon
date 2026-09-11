@@ -19,7 +19,12 @@ import {
 import { getAIPlacement, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -45,6 +50,7 @@ let aiDifficulty: AIDifficulty = 'medium';
 function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
+  const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
 
   // Render scores
@@ -52,10 +58,10 @@ function updateUI(): void {
   scoresDiv.className = 'contig-scores';
   scoresDiv.innerHTML = `
     <div class="contig-score contig-score-p1">
-      Blue: <strong>${gameState.scores.player1}</strong> pts
+      ${seatIcon('player1')} Blue: <strong>${gameState.scores.player1}</strong> pts
     </div>
     <div class="contig-score contig-score-p2">
-      Red: <strong>${gameState.scores.player2}</strong> pts
+      ${seatIcon('player2')} Red: <strong>${gameState.scores.player2}</strong> pts
     </div>
   `;
   boardContainer.appendChild(scoresDiv);
@@ -85,10 +91,12 @@ function updateUI(): void {
 
   // Update status
   updateStatus();
+  restoreFocusedCell(boardContainer, previousFocus);
 }
 
 function updateStatus(): void {
   if (!statusContainer) return;
+  markStatusLive(statusContainer);
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);
@@ -96,7 +104,7 @@ function updateStatus(): void {
     const loserScore = gameState.scores[getOpponent(gameState.winner)];
     statusContainer.innerHTML = `
       <div class="contig-winner-banner game-winner-banner">
-        ${winnerName} wins! ${winnerScore} - ${loserScore}
+        ${seatIcon(gameState.winner)} ${winnerName} wins! ${winnerScore} - ${loserScore}
       </div>
     `;
     return;
@@ -104,6 +112,7 @@ function updateStatus(): void {
 
   const playerName = getPlayerName(gameState.currentPlayer);
   const playerClass = gameState.currentPlayer;
+  const icon = seatIcon(gameState.currentPlayer);
 
   let instruction = '';
   switch (gameState.phase) {
@@ -127,7 +136,7 @@ function updateStatus(): void {
 
   statusContainer.innerHTML = `
     <div class="contig-status ${playerClass}">
-      <strong>${playerName}'s turn</strong> - ${instruction}${passWarning}
+      <strong>${icon} ${playerName}'s turn</strong> - ${instruction}${passWarning}
     </div>
   `;
 }

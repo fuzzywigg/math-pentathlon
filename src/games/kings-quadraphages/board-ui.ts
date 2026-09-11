@@ -10,6 +10,14 @@ import {
 } from './game-state';
 import { getOpponent } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindBoardCellKeys,
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 // Click handler callback type
 export type CellClickCallback = (row: number, col: number) => void;
@@ -93,6 +101,7 @@ export function renderBoard(
   container: HTMLElement,
   onCellClick?: CellClickCallback
 ): void {
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   const boardEl = document.createElement('div');
@@ -109,10 +118,6 @@ export function renderBoard(
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
 
-      // Accessibility: make cells focusable and clickable via keyboard
-      cell.setAttribute('role', 'button');
-      cell.setAttribute('tabindex', '0');
-
       // Checkerboard pattern
       const isLight = (row + col) % 2 === 0;
       cell.classList.add(isLight ? 'cell-light' : 'cell-dark');
@@ -120,28 +125,28 @@ export function renderBoard(
       // Get cell contents (convert to 0-based for array access)
       const piece = state.board[row - 1][col - 1];
 
-      // Build aria-label for accessibility
       const colLetter = String.fromCharCode(64 + col);
-      let ariaLabel = `${colLetter}${row}`;
+      const coord = `${colLetter}${row}`;
+      let owner: string | undefined;
+      let pieceName: string | undefined;
+      let empty = false;
 
       if (piece === null) {
         cell.classList.add('cell-empty');
-        ariaLabel += ', empty';
+        empty = true;
       } else if (piece.type === 'king') {
         cell.classList.add('cell-king');
         cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
         cell.textContent = '♚';
-        const playerName = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
-        ariaLabel += `, ${playerName} King`;
+        owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+        pieceName = 'King';
       } else if (piece.type === 'quadraphage') {
         cell.classList.add('cell-quad');
         cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
         cell.textContent = '●';
-        const playerName = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
-        ariaLabel += `, ${playerName} Quadraphage`;
+        owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+        pieceName = 'Quadraphage';
       }
-
-      cell.setAttribute('aria-label', ariaLabel);
 
       // Check if this cell is selected
       if (
@@ -152,19 +157,35 @@ export function renderBoard(
         cell.classList.add('cell-selected');
       }
 
-      // Highlight valid moves when king is selected
-      if (
-        state.selectedKingPosition &&
+      const isValidMoveTarget =
+        !!state.selectedKingPosition &&
         state.turnPhase === 'moveKing' &&
-        isValidMove(state, { row, col })
-      ) {
+        isValidMove(state, { row, col });
+
+      // Highlight valid moves when king is selected
+      if (isValidMoveTarget) {
         cell.classList.add('cell-valid-move');
       }
 
+      const isValidPlacement =
+        state.turnPhase === 'placeQuadraphage' && piece === null;
+
       // Mark valid placement cells during quadraphage phase
-      if (state.turnPhase === 'placeQuadraphage' && piece === null) {
+      if (isValidPlacement) {
         cell.classList.add('cell-valid-placement');
       }
+
+      makeCellFocusable(
+        cell,
+        buildCellAriaLabel({
+          coord,
+          empty,
+          owner,
+          piece: pieceName,
+          validMove: isValidMoveTarget,
+          validPlacement: isValidPlacement,
+        })
+      );
 
       // Highlight last move
       if (state.moveHistory.length > 0) {
@@ -209,19 +230,15 @@ export function renderBoard(
       handleCellAction(cellEl);
     });
 
-    // Keyboard support for accessibility
-    boardEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        const target = e.target as HTMLElement;
-        if (target.classList.contains('cell')) {
-          e.preventDefault();
-          handleCellAction(target);
-        }
-      }
-    });
+    bindBoardCellKeys(
+      boardEl,
+      (el) => el.classList.contains('cell'),
+      handleCellAction
+    );
   }
 
   container.appendChild(boardEl);
+  restoreFocusedCell(container, previousFocus);
 }
 
 // Format a position as a coordinate string (e.g., "A1", "E5")
@@ -238,6 +255,7 @@ export function renderStatus(
   aiDifficulty: 'easy' | 'medium' | 'hard' = 'medium',
   isAIThinking: boolean = false
 ): void {
+  markStatusLive(container);
   container.innerHTML = '';
 
   const statusEl = document.createElement('div');

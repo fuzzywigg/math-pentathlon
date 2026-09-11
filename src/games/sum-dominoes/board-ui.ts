@@ -10,6 +10,11 @@ import {
   getDiceSum,
 } from './types';
 import { getValidPlacements } from './rules';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -97,16 +102,28 @@ export function renderBoard(
         // Check if valid placement
         const isValidH = validPlacements.has(`${row}-${col}-horizontal`);
         const isValidV = validPlacements.has(`${row}-${col}-vertical`);
+        const isValid = isValidH || isValidV;
 
-        if (isValidH || isValidV) {
+        if (isValid) {
           cell.classList.add('sd-cell-valid');
 
-          cell.addEventListener('click', () => {
+          const activate = () => {
             // Prefer horizontal, but use vertical if only that works
             const orientation = isValidH ? 'horizontal' : 'vertical';
             onCellClick({ row, col }, orientation);
-          });
+          };
+          cell.addEventListener('click', activate);
+          bindCellActivateKeys(cell, activate);
         }
+
+        makeCellFocusable(
+          cell,
+          buildCellAriaLabel({
+            coord: `${String.fromCharCode(65 + col)}${row + 1}`,
+            empty: true,
+            validPlacement: isValid,
+          })
+        );
 
         rowEl.appendChild(cell);
       }
