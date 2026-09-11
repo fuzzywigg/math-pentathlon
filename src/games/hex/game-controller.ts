@@ -4,6 +4,8 @@ import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { getBestMove, AIDifficulty } from './ai';
+import { tutorialManager } from '../../core/tutorial';
+import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 
@@ -153,4 +155,25 @@ export function resetGame(): void {
   } else {
     newGameVsHuman();
   }
+}
+
+// Start the tutorial (Next-only; How-to modal remains available)
+export function startTutorial(): void {
+  newGameVsHuman();
+
+  const unsubscribe = tutorialManager.on((event) => {
+    if (event.type === 'completed' || event.type === 'exited') {
+      unsubscribe();
+      if (event.type === 'completed') {
+        newGameVsHuman();
+      }
+    }
+  });
+
+  tutorialManager.start(hexTutorial);
+}
+
+// Check if tutorial is active
+export function isTutorialActive(): boolean {
+  return tutorialManager.getIsActive();
 }

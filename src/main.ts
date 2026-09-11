@@ -28,6 +28,7 @@ import {
   initGame as initHexGame,
   newGameVsHuman as hexNewGameVsHuman,
   newGameVsAI as hexNewGameVsAI,
+  startTutorial as startHexTutorial,
 } from './games/hex/game-controller';
 import {
   initGame as initStarTrackGame,
@@ -284,7 +285,7 @@ function renderKingsQuadraphages(): void {
   currentCleanup = shell.cleanup;
 }
 
-// Render Hex — no Tutorial button: only Hex-a-Gone has a tutorial module (do not invent Hex copy)
+// Render Hex
 function renderHex(): void {
   const shell = mountGameShell(appContainer!, {
     title: 'Hex',
@@ -319,6 +320,7 @@ function renderHex(): void {
     modeRadioName: 'hex-game-mode',
     vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer (basic)',
+    showTutorial: true,
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode) => {
       if (mode === 'human-vs-ai') {
@@ -327,6 +329,7 @@ function renderHex(): void {
         hexNewGameVsHuman();
       }
     },
+    onTutorial: () => startHexTutorial(),
   });
 
   if (shell.board && shell.status) {
