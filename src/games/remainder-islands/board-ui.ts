@@ -9,17 +9,16 @@ import {
   getPlayerChips,
 } from './types';
 import { previewDivision } from './rules';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 const HEX_SIZE = 45;
 const HEX_WIDTH = HEX_SIZE * 2;
 const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
 const BOARD_PADDING = 40;
 
-// Player colors
-const PLAYER_COLORS = {
-  player1: '#2196F3',  // Blue
-  player2: '#e53935',  // Red
-};
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 // =============================================================================
 // Hexagon Helpers
@@ -112,8 +111,9 @@ export function renderBoard(
 
     // Color based on ownership
     let fillColor = '#8bc34a';  // Green for unclaimed
-    if (island.owner === 'player1') fillColor = PLAYER_COLORS.player1;
-    else if (island.owner === 'player2') fillColor = PLAYER_COLORS.player2;
+    const seats = playerColors();
+    if (island.owner === 'player1') fillColor = seats.player1;
+    else if (island.owner === 'player2') fillColor = seats.player2;
 
     hex.setAttribute('fill', fillColor);
     hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
@@ -431,8 +431,8 @@ export function injectRemainderIslandsStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .remainder-player-score.player1 .remainder-player-name { color: #1565c0; }
-    .remainder-player-score.player2 .remainder-player-name { color: #c62828; }
+    .remainder-player-score.player1 .remainder-player-name { color: var(--color-player1, #1565c0); }
+    .remainder-player-score.player2 .remainder-player-name { color: var(--color-player2, #c62828); }
 
     .remainder-player-name {
       font-size: 14px;
@@ -508,12 +508,24 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-status.player1 {
       background: #e3f2fd;
-      color: #1565c0;
+      color: var(--color-player1, #1565c0);
     }
 
     .remainder-status.player2 {
       background: #ffebee;
-      color: #c62828;
+      color: var(--color-player2, #c62828);
+    }
+
+    [data-opponent="ai"] .remainder-status.player2 {
+      background: #ede9fe;
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .remainder-status.player1 {
+      background: #ede9fe;
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .remainder-status.player2 {
+      background: #ffebee;
     }
 
     .remainder-game-over {
@@ -543,8 +555,8 @@ export function injectRemainderIslandsStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .remainder-final-score.player1 { border-top: 4px solid #2196F3; }
-    .remainder-final-score.player2 { border-top: 4px solid #e53935; }
+    .remainder-final-score.player1 { border-top: 4px solid var(--color-player1, #2196F3); }
+    .remainder-final-score.player2 { border-top: 4px solid var(--color-player2, #e53935); }
 
     .remainder-final-name {
       font-size: 18px;

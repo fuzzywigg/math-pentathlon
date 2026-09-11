@@ -2,6 +2,7 @@
 
 import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 export type CellClickCallback = (q: number, r: number) => void;
 export type BlockSelectCallback = (shape: BlockShape) => void;
@@ -256,7 +257,7 @@ function getShapeIcon(shape: BlockShape): string {
 export function renderStatus(
   state: HexAGoneGameState,
   container: HTMLElement,
-  _gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
   container.innerHTML = '';
@@ -270,8 +271,15 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-    turnEl.textContent = `🎉 ${winnerName} Wins! 🎉`;
+    const winnerName =
+      gameMode === 'human-vs-ai'
+        ? state.winner === 'player1'
+          ? 'You'
+          : 'AI'
+        : state.winner === 'player1'
+          ? 'Blue'
+          : 'Red';
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
     turnEl.classList.add('status-ai-thinking');
@@ -285,14 +293,17 @@ export function renderStatus(
   const playersEl = document.createElement('div');
   playersEl.className = 'hex-a-gone-players';
 
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue Player';
+  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red Player';
+
   const p1El = document.createElement('div');
   p1El.className = `player-indicator ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1El.innerHTML = '🔵 Blue Player';
+  p1El.innerHTML = `${seatIcon('player1')} ${p1Label}`;
   playersEl.appendChild(p1El);
 
   const p2El = document.createElement('div');
   p2El.className = `player-indicator ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2El.innerHTML = '🔴 Red Player';
+  p2El.innerHTML = `${seatIcon('player2')} ${p2Label}`;
   playersEl.appendChild(p2El);
 
   statusEl.appendChild(playersEl);

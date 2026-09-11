@@ -14,10 +14,6 @@ const COLORS = {
   background: '#f0f0f0',
   cellEmpty: '#ffffff',
   cellBorder: '#999999',
-  player1: '#2196f3',
-  player2: '#f44336',
-  player1Light: '#bbdefb',
-  player2Light: '#ffcdd2',
   validMove: '#4caf50',
   validMoveLight: '#c8e6c9',
   diceBackground: '#fff8e1',
@@ -238,7 +234,7 @@ export function injectContigStyles(): void {
     }
 
     .contig-cell-p1 {
-      background: ${COLORS.player1};
+      background: var(--color-player1, #2196f3);
     }
 
     .contig-cell-p1 .contig-cell-value {
@@ -246,7 +242,7 @@ export function injectContigStyles(): void {
     }
 
     .contig-cell-p2 {
-      background: ${COLORS.player2};
+      background: var(--color-player2, #f44336);
     }
 
     .contig-cell-p2 .contig-cell-value {

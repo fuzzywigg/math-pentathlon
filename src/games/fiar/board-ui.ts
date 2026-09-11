@@ -3,6 +3,7 @@
 
 import { FiarGameState, CONFIG, Player } from './types';
 import { getValidMoves, getSelectableNodes, findPaths } from './rules';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 // Colors
 const COLORS = {
@@ -10,13 +11,15 @@ const COLORS = {
   edge: '#8b7355',
   node: '#dcd0c0',
   nodeHover: '#c9baa0',
-  player1: '#2196f3',
-  player2: '#f44336',
   validMove: '#4caf50',
   selected: '#ff9800',
   winningPath: '#ffd700',
   blockedPath: '#ff9800',
 };
+
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 /**
  * Render the FIAR game board as SVG
@@ -134,7 +137,8 @@ export function renderBoard(
       chipCircle.setAttribute('cx', node.x.toString());
       chipCircle.setAttribute('cy', node.y.toString());
       chipCircle.setAttribute('r', (CONFIG.NODE_RADIUS - 6).toString());
-      chipCircle.setAttribute('fill', node.chip === 'player1' ? COLORS.player1 : COLORS.player2);
+      const seats = playerColors();
+      chipCircle.setAttribute('fill', node.chip === 'player1' ? seats.player1 : seats.player2);
       chipCircle.setAttribute('stroke', '#fff');
       chipCircle.setAttribute('stroke-width', '2');
 
@@ -218,11 +222,11 @@ export function injectFiarStyles(): void {
     }
 
     .fiar-status.player1 {
-      color: ${COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .fiar-status.player2 {
-      color: ${COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .fiar-chips-info {
@@ -248,11 +252,11 @@ export function injectFiarStyles(): void {
     }
 
     .fiar-chip-icon.player1 {
-      background: ${COLORS.player1};
+      background: var(--color-player1, #2196f3);
     }
 
     .fiar-chip-icon.player2 {
-      background: ${COLORS.player2};
+      background: var(--color-player2, #f44336);
     }
 
     .fiar-winner-banner {
@@ -285,5 +289,6 @@ export function getPlayerName(player: Player): string {
  * Get player color
  */
 export function getPlayerColor(player: Player): string {
-  return player === 'player1' ? COLORS.player1 : COLORS.player2;
+  const colors = playerColors();
+  return player === 'player1' ? colors.player1 : colors.player2;
 }

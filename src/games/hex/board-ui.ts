@@ -2,6 +2,7 @@
 
 import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -267,7 +268,7 @@ export function renderStatus(
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    const winnerIcon = state.winner === 'player1' ? '🔵' : '🔴';
+    const winnerIcon = seatIcon(state.winner);
     turnEl.textContent = `${winnerIcon} ${winnerName} Win${winnerName === 'You' ? '' : 's'}!`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
@@ -295,9 +296,17 @@ export function renderStatus(
   // Player legend
   const legendEl = document.createElement('div');
   legendEl.className = 'hex-legend';
+  const p1Legend =
+    gameMode === 'human-vs-ai'
+      ? `${seatIcon('player1')} You: Top ↔ Bottom`
+      : `${seatIcon('player1')} Blue: Top ↔ Bottom`;
+  const p2Legend =
+    gameMode === 'human-vs-ai'
+      ? `${seatIcon('player2')} AI: Left ↔ Right`
+      : `${seatIcon('player2')} Red: Left ↔ Right`;
   legendEl.innerHTML = `
-    <span class="hex-legend-item hex-legend-p1">🔵 Blue: Top ↔ Bottom</span>
-    <span class="hex-legend-item hex-legend-p2">🔴 Red: Left ↔ Right</span>
+    <span class="hex-legend-item hex-legend-p1">${p1Legend}</span>
+    <span class="hex-legend-item hex-legend-p2">${p2Legend}</span>
   `;
   statusEl.appendChild(legendEl);
 

@@ -41,12 +41,24 @@ export function injectStarsStyles(): void {
 
     .stars-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: #1976d2;
+      color: var(--color-player1, #1976d2);
     }
 
     .stars-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: #e53935;
+      color: var(--color-player2, #e53935);
+    }
+
+    [data-opponent="ai"] .stars-status.player2 {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-status.player1 {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-status.player2 {
+      background: rgba(229, 57, 53, 0.2);
     }
 
     .stars-scores {
@@ -63,12 +75,24 @@ export function injectStarsStyles(): void {
 
     .stars-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: #1976d2;
+      color: var(--color-player1, #1976d2);
     }
 
     .stars-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: #e53935;
+      color: var(--color-player2, #e53935);
+    }
+
+    [data-opponent="ai"] .stars-score.player2 {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-score.player1 {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-score.player2 {
+      background: rgba(229, 57, 53, 0.15);
     }
 
     .stars-main-layout {
@@ -139,6 +163,18 @@ export function injectStarsStyles(): void {
       box-shadow: inset 0 0 0 2px rgba(229, 57, 53, 0.5);
     }
 
+    [data-opponent="ai"] .stars-cell.player2 {
+      box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.5);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-cell.player1 {
+      box-shadow: inset 0 0 0 2px rgba(139, 92, 246, 0.5);
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .stars-cell.player2 {
+      box-shadow: inset 0 0 0 2px rgba(229, 57, 53, 0.5);
+    }
+
     .stars-hand-container {
       background: #2d2d2d;
       padding: 1rem;
@@ -151,8 +187,8 @@ export function injectStarsStyles(): void {
       text-align: center;
     }
 
-    .stars-hand-label.player1 { color: #1976d2; }
-    .stars-hand-label.player2 { color: #e53935; }
+    .stars-hand-label.player1 { color: var(--color-player1, #1976d2); }
+    .stars-hand-label.player2 { color: var(--color-player2, #e53935); }
 
     .stars-hand {
       display: flex;
@@ -261,8 +297,8 @@ export function injectStarsStyles(): void {
       border-bottom: none;
     }
 
-    .stars-move-item.player1 { color: #64b5f6; }
-    .stars-move-item.player2 { color: #ef9a9a; }
+    .stars-move-item.player1 { color: var(--color-player1, #64b5f6); }
+    .stars-move-item.player2 { color: var(--color-player2, #ef9a9a); }
 
     .stars-tooltip {
       position: absolute;

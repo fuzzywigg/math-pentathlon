@@ -8,16 +8,15 @@ import {
   Player,
 } from './types';
 import { getValidMoves } from './rules';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 // Dimensions
 const NODE_RADIUS = 22;
 const CHIP_RADIUS = 18;
 
-// Colors
-const PLAYER_COLORS = {
-  player1: '#2196f3',
-  player2: '#f44336',
-};
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 /**
  * Render the game board
@@ -161,7 +160,7 @@ function renderChip(
   circle.setAttribute('cx', String(cx));
   circle.setAttribute('cy', String(cy));
   circle.setAttribute('r', String(CHIP_RADIUS));
-  circle.setAttribute('fill', PLAYER_COLORS[chip.owner]);
+  circle.setAttribute('fill', playerColors()[chip.owner]);
   circle.setAttribute('stroke', '#333');
   circle.setAttribute('stroke-width', '2');
 
@@ -312,11 +311,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-player-info.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .kwa-player-info.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .kwa-status {
@@ -327,11 +326,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-status.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .kwa-status.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .kwa-winner-banner {

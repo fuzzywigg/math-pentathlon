@@ -3,6 +3,7 @@
 
 import { QueensGuardsState, CONFIG, BoardCoord, cellKey, cellsInRing, parseKey } from './types';
 import { getValidMoves } from './rules';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 // Colors
 const COLORS = {
@@ -12,14 +13,14 @@ const COLORS = {
   cellCenter: '#ffd700',
   cellRing1: '#ffeb99',
   stroke: '#8b7355',
-  player1: '#2196f3',
-  player2: '#f44336',
-  player1Light: '#90caf9',
-  player2Light: '#ef9a9a',
   validMove: '#4caf50',
   selected: '#ff9800',
   queen: '#ffd700',
 };
+
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 /**
  * Convert ring/position to pixel coordinates
@@ -141,7 +142,8 @@ export function renderBoard(
 
     // Draw piece if present
     if (cell.piece) {
-      const pieceColor = cell.piece.player === 'player1' ? COLORS.player1 : COLORS.player2;
+      const seats = playerColors();
+      const pieceColor = cell.piece.player === 'player1' ? seats.player1 : seats.player2;
       const pieceSize = CONFIG.HEX_SIZE * 0.6;
 
       if (cell.piece.type === 'queen') {
@@ -243,11 +245,11 @@ export function injectQGStyles(): void {
     }
 
     .qg-status.player1 {
-      color: ${COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .qg-status.player2 {
-      color: ${COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .qg-info {

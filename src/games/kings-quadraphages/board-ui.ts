@@ -9,6 +9,7 @@ import {
   getKingPosition,
 } from './game-state';
 import { getOpponent } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 // Click handler callback type
 export type CellClickCallback = (row: number, col: number) => void;
@@ -277,7 +278,7 @@ export function renderStatus(
     } else {
       winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
     }
-    const winnerColor = state.winner === 'player1' ? '🔵' : '🔴';
+    const winnerColor = seatIcon(state.winner);
     winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Win${winnerName === 'You' ? '' : 's'}! 🎉`;
     statusEl.appendChild(winnerEl);
   }
@@ -289,13 +290,13 @@ export function renderStatus(
   const supply1El = document.createElement('span');
   supply1El.className = 'supply-p1';
   const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'P1';
-  supply1El.textContent = `🔵 ${p1Label}: ${state.player1Supply}`;
+  supply1El.textContent = `${seatIcon('player1')} ${p1Label}: ${state.player1Supply}`;
   suppliesEl.appendChild(supply1El);
 
   const supply2El = document.createElement('span');
   supply2El.className = 'supply-p2';
   const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'P2';
-  supply2El.textContent = `🔴 ${p2Label}: ${state.player2Supply}`;
+  supply2El.textContent = `${seatIcon('player2')} ${p2Label}: ${state.player2Supply}`;
   suppliesEl.appendChild(supply2El);
 
   statusEl.appendChild(suppliesEl);
@@ -331,7 +332,7 @@ export function renderMoveHistory(state: GameState, container: HTMLElement): voi
       moveEl.classList.add(move.player === 'player1' ? 'move-p1' : 'move-p2');
 
       const moveNumber = startIndex - idx;
-      const playerIcon = move.player === 'player1' ? '🔵' : '🔴';
+      const playerIcon = seatIcon(move.player);
 
       let moveText: string;
       if (move.action === 'moveKing') {

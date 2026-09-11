@@ -500,8 +500,8 @@ export function injectFracFactStyles(): void {
       text-transform: uppercase;
     }
 
-    .frac-player-name.player1 { color: #1565c0; }
-    .frac-player-name.player2 { color: #c62828; }
+    .frac-player-name.player1 { color: var(--color-player1, #1565c0); }
+    .frac-player-name.player2 { color: var(--color-player2, #c62828); }
 
     .frac-score-value {
       font-size: 32px;
@@ -566,8 +566,8 @@ export function injectFracFactStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .frac-final-score.player1 { border-top: 4px solid #2196F3; }
-    .frac-final-score.player2 { border-top: 4px solid #e53935; }
+    .frac-final-score.player1 { border-top: 4px solid var(--color-player1, #2196F3); }
+    .frac-final-score.player2 { border-top: 4px solid var(--color-player2, #e53935); }
 
     .frac-final-name {
       font-size: 18px;
@@ -596,12 +596,24 @@ export function injectFracFactStyles(): void {
 
     .frac-status.player1 {
       background: #e3f2fd;
-      color: #1565c0;
+      color: var(--color-player1, #1565c0);
     }
 
     .frac-status.player2 {
       background: #ffebee;
-      color: #c62828;
+      color: var(--color-player2, #c62828);
+    }
+
+    [data-opponent="ai"] .frac-status.player2 {
+      background: #ede9fe;
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .frac-status.player1 {
+      background: #ede9fe;
+    }
+
+    [data-opponent="ai"][data-ai-seat="player1"] .frac-status.player2 {
+      background: #ffebee;
     }
 
     .frac-controls {

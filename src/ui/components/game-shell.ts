@@ -3,6 +3,11 @@
  * Keeps page-to-page cohesion without changing game logic.
  */
 
+import {
+  applyGameModeChrome,
+  clearGameModeChrome,
+} from '../player-colors';
+
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
 export type AIDifficultyLevel = 'easy' | 'medium' | 'hard';
 
@@ -226,6 +231,10 @@ export function mountGameShell(
   let selectedDifficulty: AIDifficultyLevel =
     options.defaultDifficulty ?? 'medium';
 
+  // Mode chrome for CSS / board-ui branching (vs-AI purple vs 2P red/blue).
+  // defaultMode only selects the modal radio — games init as human until Start.
+  applyGameModeChrome(container, 'human-vs-human');
+
   // Move-history collapse
   const collapseToggle = moveHistoryPanel?.querySelector('.collapse-toggle');
   if (collapseToggle && moveHistoryPanel) {
@@ -293,6 +302,7 @@ export function mountGameShell(
 
     startGameBtn?.addEventListener('click', () => {
       closeNewGameModal();
+      applyGameModeChrome(container, selectedMode);
       options.onStartGame(
         selectedMode,
         options.showDifficulty ? selectedDifficulty : undefined
@@ -350,6 +360,7 @@ export function mountGameShell(
 
   const cleanup = () => {
     document.removeEventListener('keydown', escapeHandler);
+    clearGameModeChrome(container);
   };
 
   return {
