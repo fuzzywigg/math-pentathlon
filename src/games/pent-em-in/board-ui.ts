@@ -10,16 +10,15 @@ import {
 import { getPieceCells, canPlacePiece } from './rules';
 import { Cell } from '../../core/polyomino/types';
 import { normalizeCells } from '../../core/polyomino/transform';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 const CELL_SIZE = 36;
 const PREVIEW_CELL_SIZE = 16;
 const BOARD_PADDING = 20;
 
-// Player colors
-const PLAYER_COLORS = {
-  player1: '#2196F3',  // Blue
-  player2: '#e53935',  // Red
-};
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 // =============================================================================
 // Board Rendering
@@ -87,7 +86,7 @@ export function renderBoard(
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
       rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', PLAYER_COLORS[piece.player]);
+      rect.setAttribute('fill', playerColors()[piece.player]);
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.9');
       piecesGroup.appendChild(rect);
@@ -138,7 +137,7 @@ export function renderBoard(
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
       rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', isValid ? PLAYER_COLORS[state.currentPlayer] : '#ff5252');
+      rect.setAttribute('fill', isValid ? playerColors()[state.currentPlayer] : '#ff5252');
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.5');
       previewGroup.appendChild(rect);
@@ -184,7 +183,7 @@ export function renderPieceSelector(
   container.className = 'pent-piece-selector';
 
   const pieces = getPlayerPieces(state, state.currentPlayer);
-  const playerColor = PLAYER_COLORS[state.currentPlayer];
+  const playerColor = playerColors()[state.currentPlayer];
 
   for (const shapeId of pieces.available) {
     const shape = getPentominoShape(shapeId);
@@ -307,12 +306,24 @@ export function injectPentEmInStyles(): void {
 
     .pent-status.player1 {
       background: #e3f2fd;
-      color: #1565c0;
+      color: var(--color-player1, #1565c0);
     }
 
     .pent-status.player2 {
       background: #ffebee;
-      color: #c62828;
+      color: var(--color-player2, #c62828);
+    }
+
+    [data-game-mode="ai"] .pent-status.player2 {
+      background: #ede9fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pent-status.player1 {
+      background: #ede9fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pent-status.player2 {
+      background: #ffebee;
     }
 
     .pent-winner-banner {

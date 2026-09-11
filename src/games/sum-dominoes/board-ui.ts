@@ -19,10 +19,6 @@ const COLORS = {
   domino: '#f5f5dc',
   dominoBorder: '#333',
   pip: '#111',
-  player1: '#2196f3',
-  player2: '#f44336',
-  player1Light: '#bbdefb',
-  player2Light: '#ffcdd2',
   valid: '#4caf50',
   validLight: '#81c784',
   selected: '#ff9800',
@@ -428,11 +424,11 @@ export function injectSDStyles(): void {
     }
 
     .sd-hand-player1 {
-      border: 2px solid ${COLORS.player1};
+      border: 2px solid var(--color-player1, #2196f3);
     }
 
     .sd-hand-player2 {
-      border: 2px solid ${COLORS.player2};
+      border: 2px solid var(--color-player2, #f44336);
     }
 
     .sd-hand-domino {

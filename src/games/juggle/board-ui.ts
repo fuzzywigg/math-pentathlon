@@ -12,10 +12,6 @@ const COLORS = {
   background: '#f5f5f5',
   cellEmpty: '#ffffff',
   cellBorder: '#ccc',
-  player1: '#2196f3',
-  player2: '#f44336',
-  player1Light: '#bbdefb',
-  player2Light: '#ffcdd2',
   validPlacement: '#4caf50',
   invalidPlacement: '#ef5350',
   previewValid: 'rgba(76, 175, 80, 0.5)',
@@ -326,8 +322,8 @@ export function injectJuggleStyles(): void {
       border-color: #ffc107;
     }
 
-    .juggle-board.player1 .juggle-board-header { color: ${COLORS.player1}; }
-    .juggle-board.player2 .juggle-board-header { color: ${COLORS.player2}; }
+    .juggle-board.player1 .juggle-board-header { color: var(--color-player1, #2196f3); }
+    .juggle-board.player2 .juggle-board-header { color: var(--color-player2, #f44336); }
 
     .juggle-board-header {
       display: flex;
@@ -357,8 +353,8 @@ export function injectJuggleStyles(): void {
       transition: background 0.1s;
     }
 
-    .juggle-cell.occupied-player1 { background: ${COLORS.player1}; }
-    .juggle-cell.occupied-player2 { background: ${COLORS.player2}; }
+    .juggle-cell.occupied-player1 { background: var(--color-player1, #2196f3); }
+    .juggle-cell.occupied-player2 { background: var(--color-player2, #f44336); }
 
     .juggle-cell.preview-valid { background: ${COLORS.previewValid}; }
     .juggle-cell.preview-invalid { background: ${COLORS.previewInvalid}; }
@@ -520,8 +516,8 @@ export function injectJuggleStyles(): void {
       padding: 1rem;
     }
 
-    .juggle-status.player1 { color: ${COLORS.player1}; }
-    .juggle-status.player2 { color: ${COLORS.player2}; }
+    .juggle-status.player1 { color: var(--color-player1, #2196f3); }
+    .juggle-status.player2 { color: var(--color-player2, #f44336); }
 
     .juggle-winner-banner {
       text-align: center;

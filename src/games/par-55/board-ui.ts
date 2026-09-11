@@ -10,12 +10,11 @@ import {
   BlockColor,
 } from './types';
 import { getValidPlacements, calculateScore } from './rules';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
-// Colors
-const PLAYER_COLORS = {
-  player1: '#2196f3',
-  player2: '#f44336',
-};
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 const BLOCK_COLORS: Record<BlockColor, string> = {
   red: '#e53935',
@@ -238,7 +237,7 @@ function renderBlock(
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(size / 2 + 4));
     ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', PLAYER_COLORS[placedBy]);
+    ring.setAttribute('stroke', playerColors()[placedBy]);
     ring.setAttribute('stroke-width', '2');
     ring.setAttribute('opacity', '0.6');
     group.appendChild(ring);
@@ -443,11 +442,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-hand-player1 {
-      border: 3px solid ${PLAYER_COLORS.player1};
+      border: 3px solid var(--color-player1, #2196f3);
     }
 
     .par55-hand-player2 {
-      border: 3px solid ${PLAYER_COLORS.player2};
+      border: 3px solid var(--color-player2, #f44336);
     }
 
     .par55-hand-block {
@@ -494,11 +493,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-score.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .par55-score.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .par55-score .value {
@@ -518,11 +517,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-status.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .par55-status.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .par55-winner-banner {
@@ -615,11 +614,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-hand-label.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .par55-hand-label.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     @media (max-width: 768px) {

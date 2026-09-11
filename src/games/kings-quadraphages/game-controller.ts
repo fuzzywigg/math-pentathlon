@@ -5,7 +5,7 @@ import { kingsQuadraphagesTutorial } from './tutorial';
 import { getAIMove, AIDifficulty, isAITurn } from './ai';
 import { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
-
+import { applyGameModeChrome } from '../../ui/player-colors';
 // Game mode types
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
 
@@ -211,11 +211,22 @@ export function newGame(): void {
   }
 }
 
+function syncModeChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(
+    root,
+    gameMode,
+    aiPlayer === 'player1' ? 'player1' : 'player2'
+  );
+}
+
 // Start a new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty, humanPlaysFirst: boolean = true): void {
   gameMode = 'human-vs-ai';
   aiDifficulty = difficulty;
   aiPlayer = humanPlaysFirst ? 'player2' : 'player1';
+  syncModeChrome();
   newGame();
 }
 
@@ -223,6 +234,7 @@ export function newGameVsAI(difficulty: AIDifficulty, humanPlaysFirst: boolean =
 export function newGameVsHuman(): void {
   gameMode = 'human-vs-human';
   aiPlayer = null;
+  syncModeChrome();
   newGame();
 }
 
@@ -246,9 +258,9 @@ export function startTutorial(): void {
   // Reset to fresh game state for tutorial (human vs human mode)
   gameMode = 'human-vs-human';
   aiPlayer = null;
+  syncModeChrome();
   gameState = createInitialGameState();
   render();
-
   // Subscribe to tutorial events
   const unsubscribe = tutorialManager.on((event) => {
     if (event.type === 'completed' || event.type === 'exited') {

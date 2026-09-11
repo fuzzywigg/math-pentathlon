@@ -33,6 +33,12 @@
   --color-neutral-600: #475569;
   --color-player1: #3b82f6;
   --color-player2: #ef4444;
+  /* vs-AI opponent pieces — purple family (same hex as --color-secondary / Ollie),
+     dedicated so AI tiles ≠ Ollie dock CSS vars */
+  --color-ai: #8b5cf6;
+  --color-ai-dark: #7c3aed;
+  --color-ai-soft: rgba(139, 92, 246, 0.15);
+  --color-ai-soft-strong: rgba(139, 92, 246, 0.25);
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md:
@@ -527,9 +533,128 @@ h1 {
   letter-spacing: 0.5px;
 }
 
-/* AI thinking animation — system teal, not Ollie purple */
+/* AI thinking animation — system teal, not Ollie purple / AI piece purple */
 .status-ai-thinking {
   color: var(--color-system);
+}
+
+/* ------------------------------------------------------------------
+   vs-AI seat colors: AI pieces use --color-ai; 2P human stays blue/red.
+   Default AI seat is player2. Kings may set data-ai-seat="player1".
+   Thinking status stays on --color-system (do not purple it).
+   ------------------------------------------------------------------ */
+[data-game-mode='ai']:not([data-ai-seat='player1']),
+.game-vs-ai:not([data-ai-seat='player1']) {
+  --color-player2: var(--color-ai);
+}
+
+[data-game-mode='ai'][data-ai-seat='player1'],
+.game-vs-ai[data-ai-seat='player1'] {
+  --color-player1: var(--color-ai);
+}
+
+/* Kings / Div I board cells */
+[data-game-mode='ai']:not([data-ai-seat='player1']) .cell-p2,
+.game-vs-ai:not([data-ai-seat='player1']) .cell-p2 {
+  color: var(--color-ai);
+  filter: drop-shadow(0 2px 3px rgba(139, 92, 246, 0.4));
+}
+
+[data-game-mode='ai'][data-ai-seat='player1'] .cell-p1,
+.game-vs-ai[data-ai-seat='player1'] .cell-p1 {
+  color: var(--color-ai);
+  filter: drop-shadow(0 2px 3px rgba(139, 92, 246, 0.4));
+}
+
+[data-game-mode='ai']:not([data-ai-seat='player1']) .supply-p2,
+.game-vs-ai:not([data-ai-seat='player1']) .supply-p2 {
+  color: var(--color-ai-dark);
+  text-shadow: 0 1px 2px rgba(139, 92, 246, 0.25);
+}
+
+[data-game-mode='ai'][data-ai-seat='player1'] .supply-p1,
+.game-vs-ai[data-ai-seat='player1'] .supply-p1 {
+  color: var(--color-ai-dark);
+  text-shadow: 0 1px 2px rgba(139, 92, 246, 0.25);
+}
+
+[data-game-mode='ai']:not([data-ai-seat='player1']) .move-p2,
+.game-vs-ai:not([data-ai-seat='player1']) .move-p2 {
+  color: var(--color-ai-dark);
+}
+
+[data-game-mode='ai'][data-ai-seat='player1'] .move-p1,
+.game-vs-ai[data-ai-seat='player1'] .move-p1 {
+  color: var(--color-ai-dark);
+}
+
+/* Hex */
+[data-game-mode='ai'] .hex-cell-p2,
+.game-vs-ai .hex-cell-p2 {
+  fill: var(--color-ai);
+  stroke: var(--color-ai-dark);
+  filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.4));
+}
+
+[data-game-mode='ai'] .hex-edge-p2,
+.game-vs-ai .hex-edge-p2 {
+  stroke: var(--color-ai);
+}
+
+[data-game-mode='ai'] .hex-legend-p2,
+.game-vs-ai .hex-legend-p2 {
+  color: var(--color-ai-dark);
+  border-left-color: var(--color-ai);
+}
+
+/* Star Track */
+[data-game-mode='ai'] .star-track-path-p2 .star-track-line,
+.game-vs-ai .star-track-path-p2 .star-track-line {
+  stroke: rgba(139, 92, 246, 0.25);
+}
+
+[data-game-mode='ai'] .star-track-piece-p2,
+.game-vs-ai .star-track-piece-p2 {
+  fill: var(--color-ai);
+  filter: drop-shadow(0 3px 6px rgba(139, 92, 246, 0.4));
+}
+
+[data-game-mode='ai'] .progress-p2 .progress-fill,
+.game-vs-ai .progress-p2 .progress-fill {
+  background: linear-gradient(90deg, var(--color-ai) 0%, var(--color-ai-dark) 100%);
+  box-shadow: 0 1px 4px rgba(139, 92, 246, 0.4);
+}
+
+/* Hex-a-Gone (ownership stroke; fill is block-shape color) */
+[data-game-mode='ai'] .hex-a-gone-cell-p2,
+.game-vs-ai .hex-a-gone-cell-p2 {
+  stroke: var(--color-ai-dark);
+  filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3));
+}
+
+/* Calla */
+[data-game-mode='ai'] .calla-store-p2.calla-store-active .calla-store-rect,
+.game-vs-ai .calla-store-p2.calla-store-active .calla-store-rect {
+  stroke: var(--color-ai);
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+}
+
+[data-game-mode='ai'] .calla-arrow-p2,
+.game-vs-ai .calla-arrow-p2 {
+  stroke: var(--color-ai);
+}
+
+[data-game-mode='ai'] .calla-score-p2.active,
+.game-vs-ai .calla-score-p2.active {
+  background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+/* Contig scores already use var(--color-player2); soft bg needs override */
+[data-game-mode='ai'] .contig-score-p2,
+.game-vs-ai .contig-score-p2 {
+  background: #ddd6fe;
 }
 
 @keyframes thinking-dots {

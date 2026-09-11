@@ -17,12 +17,6 @@ const BOX_HEIGHT = 80;
 const ROD_HEIGHT = 24;
 const CM_SCALE = 10; // 10 pixels per cm
 
-// Colors
-const PLAYER_COLORS = {
-  player1: '#2196f3',
-  player2: '#f44336',
-};
-
 /**
  * Render the game board
  */
@@ -336,12 +330,12 @@ export function injectRamrodStyles(): void {
 
     .ramrod-box.completed.player1 {
       background: rgba(33, 150, 243, 0.1);
-      border-color: ${PLAYER_COLORS.player1};
+      border-color: var(--color-player1, #2196f3);
     }
 
     .ramrod-box.completed.player2 {
       background: rgba(244, 67, 54, 0.1);
-      border-color: ${PLAYER_COLORS.player2};
+      border-color: var(--color-player2, #f44336);
     }
 
     .ramrod-box-label {
@@ -404,11 +398,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-player-player1 {
-      border: 3px solid ${PLAYER_COLORS.player1};
+      border: 3px solid var(--color-player1, #2196f3);
     }
 
     .ramrod-player-player2 {
-      border: 3px solid ${PLAYER_COLORS.player2};
+      border: 3px solid var(--color-player2, #f44336);
     }
 
     .ramrod-rod-wrapper {
@@ -445,11 +439,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-score.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .ramrod-score.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .ramrod-score .value {
@@ -469,11 +463,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-status.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .ramrod-status.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .ramrod-winner-banner {
@@ -566,11 +560,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-hand-label.player1 {
-      color: ${PLAYER_COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .ramrod-hand-label.player2 {
-      color: ${PLAYER_COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .ramrod-legend {

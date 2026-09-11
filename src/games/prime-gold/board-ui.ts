@@ -39,12 +39,24 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: #1976d2;
+      color: var(--color-player1, #1976d2);
     }
 
     .pg-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: #e53935;
+      color: var(--color-player2, #e53935);
+    }
+
+    [data-game-mode="ai"] .pg-status.player2 {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pg-status.player1 {
+      background: rgba(139, 92, 246, 0.2);
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pg-status.player2 {
+      background: rgba(229, 57, 53, 0.2);
     }
 
     .pg-scores {
@@ -60,12 +72,24 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: #1976d2;
+      color: var(--color-player1, #1976d2);
     }
 
     .pg-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: #e53935;
+      color: var(--color-player2, #e53935);
+    }
+
+    [data-game-mode="ai"] .pg-score.player2 {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pg-score.player1 {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .pg-score.player2 {
+      background: rgba(229, 57, 53, 0.15);
     }
 
     .pg-main-layout {
@@ -119,12 +143,12 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-cell.player1 {
-      background: #1976d2 !important;
+      background: var(--color-player1, #1976d2) !important;
       color: white !important;
     }
 
     .pg-cell.player2 {
-      background: #e53935 !important;
+      background: var(--color-player2, #e53935) !important;
       color: white !important;
     }
 
@@ -296,11 +320,11 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-legend-swatch.p1 {
-      background: #1976d2;
+      background: var(--color-player1, #1976d2);
     }
 
     .pg-legend-swatch.p2 {
-      background: #e53935;
+      background: var(--color-player2, #e53935);
     }
 
     .pg-move-history {
@@ -328,8 +352,8 @@ export function injectPrimeGoldStyles(): void {
       border-bottom: none;
     }
 
-    .pg-move-item.player1 { color: #64b5f6; }
-    .pg-move-item.player2 { color: #ef9a9a; }
+    .pg-move-item.player1 { color: var(--color-player1, #64b5f6); }
+    .pg-move-item.player2 { color: var(--color-player2, #ef9a9a); }
   `;
   document.head.appendChild(style);
 }

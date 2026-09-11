@@ -558,8 +558,8 @@ export function injectFractionPinballStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    .pinball-final-score.player1 { border-top: 4px solid #2196F3; }
-    .pinball-final-score.player2 { border-top: 4px solid #e53935; }
+    .pinball-final-score.player1 { border-top: 4px solid var(--color-player1, #2196F3); }
+    .pinball-final-score.player2 { border-top: 4px solid var(--color-player2, #e53935); }
 
     .pinball-final-name {
       font-size: 18px;

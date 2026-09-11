@@ -10,19 +10,20 @@ import {
   getOperationSymbol,
 } from './rules';
 import { renderHorizontalBar, getFractionColor } from '../../core/fractions/fraction-bar-ui';
+import { getPlayerSeatColors } from '../../ui/player-colors';
 
 // Colors
 const COLORS = {
   background: '#f5f5f5',
-  player1: '#2196f3',
-  player2: '#f44336',
-  player1Light: '#bbdefb',
-  player2Light: '#ffcdd2',
   selected: '#ff9800',
   valid: '#4caf50',
   validLight: '#c8e6c9',
   disabled: '#bdbdbd',
 };
+
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 /**
  * Render the fraction bar pool
@@ -196,10 +197,11 @@ function createAnswerBarElement(
   }
 
   // Create visual bar
+  const seats = playerColors();
   const color = isClaimed
     ? answer.claimedBy === 'player1'
-      ? COLORS.player1
-      : COLORS.player2
+      ? seats.player1
+      : seats.player2
     : isMatchable
       ? COLORS.valid
       : getFractionColor(answer.fraction.denominator);
@@ -469,11 +471,23 @@ export function injectFabStyles(): void {
     }
 
     .fab-answer-player1 {
-      background: ${COLORS.player1Light};
+      background: #bbdefb;
     }
 
     .fab-answer-player2 {
-      background: ${COLORS.player2Light};
+      background: #ffcdd2;
+    }
+
+    [data-game-mode="ai"] .fab-answer-player2 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-answer-player1 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-answer-player2 {
+      background: #ffcdd2;
     }
 
     .fab-operation-selector {
@@ -575,13 +589,25 @@ export function injectFabStyles(): void {
     }
 
     .fab-score-p1 {
-      background: ${COLORS.player1Light};
-      color: ${COLORS.player1};
+      background: #bbdefb;
+      color: var(--color-player1, #2196f3);
     }
 
     .fab-score-p2 {
-      background: ${COLORS.player2Light};
-      color: ${COLORS.player2};
+      background: #ffcdd2;
+      color: var(--color-player2, #f44336);
+    }
+
+    [data-game-mode="ai"] .fab-score-p2 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-score-p1 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-score-p2 {
+      background: #ffcdd2;
     }
 
     .fab-score-value {
@@ -611,11 +637,23 @@ export function injectFabStyles(): void {
     }
 
     .fab-history-player1 {
-      background: ${COLORS.player1Light};
+      background: #bbdefb;
     }
 
     .fab-history-player2 {
-      background: ${COLORS.player2Light};
+      background: #ffcdd2;
+    }
+
+    [data-game-mode="ai"] .fab-history-player2 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-history-player1 {
+      background: #ddd6fe;
+    }
+
+    [data-game-mode="ai"][data-ai-seat="player1"] .fab-history-player2 {
+      background: #ffcdd2;
     }
 
     .fab-move-num {
@@ -631,11 +669,11 @@ export function injectFabStyles(): void {
     }
 
     .fab-status.player1 {
-      color: ${COLORS.player1};
+      color: var(--color-player1, #2196f3);
     }
 
     .fab-status.player2 {
-      color: ${COLORS.player2};
+      color: var(--color-player2, #f44336);
     }
 
     .fab-winner-banner {
@@ -671,7 +709,7 @@ export function injectFabStyles(): void {
     }
 
     .fab-btn-primary {
-      background: ${COLORS.player1};
+      background: var(--color-player1, #2196f3);
       color: white;
     }
 
