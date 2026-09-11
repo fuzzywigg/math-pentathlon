@@ -28,6 +28,13 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Game Controller State
@@ -279,18 +286,21 @@ export function initGame(
   injectJuggleStyles();
   gameState = createInitialState();
   vsAI = false;
+  syncOpponentChrome();
 
   updateUI();
 }
 
 export function newGameVsHuman(): void {
   vsAI = false;
+  syncOpponentChrome();
   gameState = createInitialState();
   updateUI();
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   vsAI = true;
+  syncOpponentChrome();
   aiPlayer = 'player2';
   aiDifficulty = difficulty;
   gameState = createInitialState();

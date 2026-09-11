@@ -19,6 +19,13 @@ import {
 import { getAIPlacement, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Game Controller State
@@ -222,18 +229,21 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   injectContigStyles();
   gameState = createInitialState();
   vsAI = false;
+  syncOpponentChrome();
 
   updateUI();
 }
 
 export function newGameVsHuman(): void {
   vsAI = false;
+  syncOpponentChrome();
   gameState = createInitialState();
   updateUI();
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   vsAI = true;
+  syncOpponentChrome();
   aiPlayer = 'player2';
   aiDifficulty = difficulty;
   gameState = createInitialState();

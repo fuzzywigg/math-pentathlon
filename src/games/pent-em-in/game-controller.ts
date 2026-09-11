@@ -26,6 +26,13 @@ import { Cell } from '../../core/polyomino/types';
 import { getAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Module State
@@ -220,18 +227,21 @@ export function initGame(
   statusContainer = statusEl;
   gameState = createInitialState();
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
 export function newGameVsHuman(): void {
   gameState = createInitialState();
   isAIMode = false;
+  syncOpponentChrome();
   render();
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  syncOpponentChrome();
   aiDifficulty = difficulty;
   render();
 }

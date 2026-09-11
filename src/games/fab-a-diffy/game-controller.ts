@@ -25,6 +25,13 @@ import {
 import { getAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
+import { applyGameModeChrome } from '../../ui/player-colors';
+
+function syncOpponentChrome(isAI: boolean): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+}
 
 // =============================================================================
 // Game Controller
@@ -66,9 +73,11 @@ export function initGame(container: HTMLElement, vsAI: boolean = false, difficul
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
     controller.aiDifficulty = diff || controller.aiDifficulty;
+    syncOpponentChrome(vsAI);
     controller.update();
   };
 
+  syncOpponentChrome(vsAI);
   controller.update();
 
   return controller;
