@@ -12,10 +12,12 @@ import { getOpponent } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindBoardCellKeys,
   captureFocusedCell,
-  restoreFocusedCell,
+  restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
@@ -106,6 +108,7 @@ export function renderBoard(
 
   const boardEl = document.createElement('div');
   boardEl.className = 'board';
+  markBoardAsGrid(boardEl);
 
   // Add phase class for CSS styling
   boardEl.classList.add(`phase-${state.turnPhase}`);
@@ -175,7 +178,7 @@ export function renderBoard(
         cell.classList.add('cell-valid-placement');
       }
 
-      makeCellFocusable(
+      makeGridCell(
         cell,
         buildCellAriaLabel({
           coord,
@@ -237,8 +240,10 @@ export function renderBoard(
     );
   }
 
+  bindGridNavigation(boardEl);
+
   container.appendChild(boardEl);
-  restoreFocusedCell(container, previousFocus);
+  restoreGridFocus(container, previousFocus);
 }
 
 // Format a position as a coordinate string (e.g., "A1", "E5")

@@ -12,8 +12,12 @@ import {
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -46,6 +50,7 @@ export function renderBoard(
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'sd-board';
+  markBoardAsGrid(container);
 
   // Get valid placements for selected domino
   const validPlacements = new Set<string>();
@@ -116,7 +121,7 @@ export function renderBoard(
           bindCellActivateKeys(cell, activate);
         }
 
-        makeCellFocusable(
+        makeGridCell(
           cell,
           buildCellAriaLabel({
             coord: `${String.fromCharCode(65 + col)}${row + 1}`,
@@ -131,6 +136,9 @@ export function renderBoard(
 
     container.appendChild(rowEl);
   }
+
+  bindGridNavigation(container);
+  applyRovingTabindex(collectGridCells(container));
 
   return container;
 }

@@ -10,6 +10,12 @@ import {
   ROD_COLORS,
 } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
+import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Dimensions
 const BOX_WIDTH = 120;
@@ -49,7 +55,7 @@ export function renderBoard(
       const box = state.boxes.get(boxId);
       if (!box) continue;
 
-      const boxEl = renderSumBox(state, box, validPlacements, onBoxClick);
+      const boxEl = renderSumBox(state, box, validPlacements, onBoxClick, row, col);
       rowEl.appendChild(boxEl);
     }
 
@@ -67,7 +73,9 @@ function renderSumBox(
   _state: RamrodState,
   box: SumBox,
   validPlacements: Set<string>,
-  onClick: (boxId: string, slot: number) => void
+  onClick: (boxId: string, slot: number) => void,
+  row: number,
+  col: number
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'ramrod-box';
@@ -85,14 +93,19 @@ function renderSumBox(
   for (let slot = 0; slot < 2; slot++) {
     const slotEl = document.createElement('div');
     slotEl.className = 'ramrod-slot';
+    slotEl.dataset.row = String(row);
+    slotEl.dataset.col = String(col * 2 + slot);
 
     const isValid = validPlacements.has(`${box.id}-${slot}`);
+    const rod = box.rods[slot];
+
     if (isValid) {
       slotEl.classList.add('valid');
-      slotEl.addEventListener('click', () => onClick(box.id, slot));
+      const activate = () => onClick(box.id, slot);
+      slotEl.addEventListener('click', activate);
+      bindCellActivateKeys(slotEl, activate);
     }
 
-    const rod = box.rods[slot];
     if (rod) {
       const rodEl = renderRod(rod, false);
       slotEl.appendChild(rodEl);
@@ -103,6 +116,21 @@ function renderSumBox(
       hint.textContent = `Need: ${getRemainingValue(box)}`;
       slotEl.appendChild(hint);
     }
+
+      makeCellFocusable(
+        slotEl,
+        buildCellAriaLabel({
+          coord: `Sum ${box.targetSum} slot ${slot + 1}`,
+          empty: !rod,
+          piece: rod ? `${rod.length}cm rod` : undefined,
+          owner: rod?.owner
+            ? getPlayerName(rod.owner)
+            : box.completedBy
+              ? getPlayerName(box.completedBy)
+              : undefined,
+          validPlacement: isValid,
+        })
+      );
 
     wrapper.appendChild(slotEl);
   }
@@ -187,7 +215,7 @@ export function renderScores(state: RamrodState): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'ramrod-score player1';
-  p1Score.innerHTML = `<span class="label">Blue:</span> <span class="value">${state.scores.player1}cm</span>`;
+  p1Score.innerHTML = `<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}cm</span>`;
 
   const target = document.createElement('div');
   target.className = 'ramrod-target';
@@ -195,7 +223,7 @@ export function renderScores(state: RamrodState): HTMLElement {
 
   const p2Score = document.createElement('div');
   p2Score.className = 'ramrod-score player2';
-  p2Score.innerHTML = `<span class="label">Red:</span> <span class="value">${state.scores.player2}cm</span>`;
+  p2Score.innerHTML = `<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}cm</span>`;
 
   container.appendChild(p1Score);
   container.appendChild(target);

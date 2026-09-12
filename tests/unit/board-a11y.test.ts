@@ -2,6 +2,13 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   buildCellAriaLabel,
   makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  applyRovingTabindex,
+  collectGridCells,
+  findGridNeighbor,
+  bindGridNavigation,
+  restoreGridFocus,
   bindCellActivateKeys,
   bindBoardCellKeys,
   captureFocusedCell,
@@ -130,5 +137,117 @@ describe('board-a11y helpers (Wave 1)', () => {
     markStatusLive(status);
     expect(status.getAttribute('role')).toBe('status');
     expect(status.getAttribute('aria-live')).toBe('polite');
+  });
+});
+
+describe('board-a11y helpers (Wave 2 grid + roving)', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  function makeCell(row: number, col: number, label = `${row},${col}`): HTMLElement {
+    const cell = document.createElement('div');
+    cell.dataset.row = String(row);
+    cell.dataset.col = String(col);
+    makeGridCell(cell, label);
+    return cell;
+  }
+
+  it('makeGridCell sets role=gridcell and tabindex=-1', () => {
+    const cell = document.createElement('div');
+    makeGridCell(cell, 'E2, empty');
+    expect(cell.getAttribute('role')).toBe('gridcell');
+    expect(cell.getAttribute('tabindex')).toBe('-1');
+    expect(cell.getAttribute('aria-label')).toBe('E2, empty');
+  });
+
+  it('markBoardAsGrid sets role=grid', () => {
+    const board = document.createElement('div');
+    markBoardAsGrid(board);
+    expect(board.getAttribute('role')).toBe('grid');
+  });
+
+  it('applyRovingTabindex leaves exactly one tabindex=0', () => {
+    const cells = [makeCell(0, 0), makeCell(0, 1), makeCell(1, 0)];
+    const active = applyRovingTabindex(cells);
+    expect(active).toBe(cells[0]);
+    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual(['0', '-1', '-1']);
+
+    applyRovingTabindex(cells, { row: '0', col: '1' });
+    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual(['-1', '0', '-1']);
+  });
+
+  it('findGridNeighbor steps over holes', () => {
+    const cells = [makeCell(0, 0), makeCell(0, 2)];
+    const next = findGridNeighbor(cells, 0, 0, 0, 1);
+    expect(next).toBe(cells[1]);
+  });
+
+  it('bindGridNavigation moves focus with arrows and updates roving tabindex', () => {
+    const board = document.createElement('div');
+    markBoardAsGrid(board);
+    const a = makeCell(0, 0);
+    const b = makeCell(0, 1);
+    const c = makeCell(1, 0);
+    board.append(a, b, c);
+    document.body.appendChild(board);
+
+    applyRovingTabindex(collectGridCells(board));
+    bindGridNavigation(board);
+    a.focus();
+
+    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(document.activeElement).toBe(b);
+    expect(b.getAttribute('tabindex')).toBe('0');
+    expect(a.getAttribute('tabindex')).toBe('-1');
+
+    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    // no (1,1) cell — stays
+    expect(document.activeElement).toBe(b);
+
+    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    expect(document.activeElement).toBe(a);
+
+    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    expect(document.activeElement).toBe(c);
+  });
+
+  it('restoreGridFocus reapplies roving and focuses previous cell', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    const first = makeCell(2, 3);
+    container.appendChild(first);
+    applyRovingTabindex([first]);
+    first.focus();
+
+    const focus = captureFocusedCell(container);
+    container.innerHTML = '';
+
+    const board = document.createElement('div');
+    markBoardAsGrid(board);
+    const nextA = makeCell(1, 1);
+    const nextB = makeCell(2, 3);
+    board.append(nextA, nextB);
+    container.appendChild(board);
+
+    restoreGridFocus(container, focus);
+    expect(document.activeElement).toBe(nextB);
+    expect(nextB.getAttribute('tabindex')).toBe('0');
+    expect(nextA.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('restoreGridFocus with null focus does not steal focus', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const board = document.createElement('div');
+    markBoardAsGrid(board);
+    const cell = makeCell(0, 0);
+    board.appendChild(cell);
+    container.appendChild(board);
+
+    restoreGridFocus(container, null);
+    expect(cell.getAttribute('tabindex')).toBe('0');
+    expect(document.activeElement).not.toBe(cell);
   });
 });

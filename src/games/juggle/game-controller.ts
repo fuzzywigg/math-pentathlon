@@ -28,7 +28,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -54,6 +59,7 @@ let aiDifficulty: AIDifficulty = 'medium';
 function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
+  const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
 
   // Render dice area
@@ -105,16 +111,18 @@ function updateUI(): void {
 
   // Update status
   updateStatus();
+  restoreFocusedCell(boardContainer, previousFocus);
 }
 
 function updateStatus(): void {
   if (!statusContainer) return;
+  markStatusLive(statusContainer);
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);
     statusContainer.innerHTML = `
       <div class="juggle-winner-banner">
-        ${winnerName} filled their board first and wins!
+        ${seatIcon(gameState.winner)} ${winnerName} filled their board first and wins!
       </div>
     `;
     return;
@@ -122,6 +130,7 @@ function updateStatus(): void {
 
   const playerName = getPlayerName(gameState.currentPlayer);
   const playerClass = gameState.currentPlayer;
+  const icon = seatIcon(gameState.currentPlayer);
 
   let instruction = '';
   switch (gameState.phase) {
@@ -142,7 +151,7 @@ function updateStatus(): void {
 
   statusContainer.innerHTML = `
     <div class="juggle-status ${playerClass}">
-      <strong>${playerName}'s turn</strong> - ${instruction}
+      <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
   `;
 }

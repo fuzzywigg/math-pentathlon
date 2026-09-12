@@ -25,7 +25,8 @@ import {
 import { getAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -97,17 +98,18 @@ function updateUI(controller: FabGameController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `fab-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.phase === 'selectingBar1') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select first fraction bar`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select first fraction bar`;
   } else if (state.phase === 'selectingBar2') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select second fraction bar`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select second fraction bar`;
   } else if (state.phase === 'selectingOperation') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Choose an operation`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Choose an operation`;
   } else if (state.phase === 'confirmingMove') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select matching answer`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select matching answer`;
   }
 
   gameArea.appendChild(status);
