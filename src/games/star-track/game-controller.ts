@@ -75,14 +75,27 @@ function handleDrawChains(): void {
   if (isAIThinking) return;
   if (gameState.phase !== 'drawChains') return;
 
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.handleAction('click', { selector: '.star-track-draw-btn' });
+  }
+
   gameState = drawChains(gameState);
   render();
+
+  // Choices appear after draw; re-ring the choose-chain highlight
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.refreshHighlight();
+  }
 }
 
 // Handle chain selection
 function handleSelectChain(index: 0 | 1): void {
   if (isAIThinking) return;
   if (gameState.phase !== 'selectChain') return;
+
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.handleAction('click', { selector: '.star-track-choices' });
+  }
 
   gameState = selectChain(gameState, index);
   moveCount++;

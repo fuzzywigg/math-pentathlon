@@ -70,6 +70,10 @@ export const starTrackTutorial: TutorialConfig = {
       `,
       highlightSelector: '.star-track-draw-btn',
       position: 'bottom',
+      requiredAction: {
+        type: 'click',
+        selector: '.star-track-draw-btn',
+      },
     },
     {
       id: 'choose-chain',
@@ -81,6 +85,10 @@ export const starTrackTutorial: TutorialConfig = {
       `,
       highlightSelector: '.star-track-choices',
       position: 'bottom',
+      requiredAction: {
+        type: 'click',
+        selector: '.star-track-choices',
+      },
     },
     {
       id: 'strategy-tip',
