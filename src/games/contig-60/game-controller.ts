@@ -22,7 +22,7 @@ import { contig60Tutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
-  restoreFocusedCell,
+  restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
@@ -91,7 +91,7 @@ function updateUI(): void {
 
   // Update status
   updateStatus();
-  restoreFocusedCell(boardContainer, previousFocus);
+  restoreGridFocus(boardContainer, previousFocus);
 }
 
 function updateStatus(): void {

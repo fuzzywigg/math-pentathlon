@@ -10,8 +10,12 @@ import {
 import { calculatePoints } from './rules';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -34,6 +38,7 @@ export function renderBoard(
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'contig-board';
+  markBoardAsGrid(container);
 
   // Get valid placements if dice are rolled
   const validPlacements = state.currentDice
@@ -80,7 +85,7 @@ export function renderBoard(
       cellEl.appendChild(valueSpan);
 
       const ownerLabel = cell?.owner ? getPlayerName(cell.owner) : undefined;
-      makeCellFocusable(
+      makeGridCell(
         cellEl,
         buildCellAriaLabel({
           coord: String(value),
@@ -103,6 +108,9 @@ export function renderBoard(
 
     container.appendChild(rowEl);
   }
+
+  bindGridNavigation(container);
+  applyRovingTabindex(collectGridCells(container));
 
   return container;
 }

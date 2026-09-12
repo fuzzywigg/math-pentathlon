@@ -10,7 +10,12 @@ import {
   getOperationSymbol,
 } from './rules';
 import { renderHorizontalBar, getFractionColor } from '../../core/fractions/fraction-bar-ui';
-import { getPlayerSeatColors } from '../../ui/player-colors';
+import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -123,8 +128,22 @@ function createFractionBarElement(
   // Click handler
   if (isSelectable) {
     wrapper.style.cursor = 'pointer';
-    wrapper.addEventListener('click', () => onClick(bar.id));
+    const activate = () => onClick(bar.id);
+    wrapper.addEventListener('click', activate);
+    bindCellActivateKeys(wrapper, activate);
   }
+
+  makeCellFocusable(
+    wrapper,
+    buildCellAriaLabel({
+      coord: formatFraction(simplify(bar.fraction)),
+      empty: !isUsed && !isSelected,
+      extras: [
+        isSelected ? 'selected' : '',
+        isUsed ? 'used' : '',
+      ].filter(Boolean),
+    })
+  );
 
   return wrapper;
 }
@@ -223,8 +242,20 @@ function createAnswerBarElement(
   // Click handler
   if (isMatchable && !isClaimed) {
     wrapper.style.cursor = 'pointer';
-    wrapper.addEventListener('click', () => onClick(answer.id));
+    const activate = () => onClick(answer.id);
+    wrapper.addEventListener('click', activate);
+    bindCellActivateKeys(wrapper, activate);
   }
+
+  makeCellFocusable(
+    wrapper,
+    buildCellAriaLabel({
+      coord: formatFraction(simplify(answer.fraction)),
+      empty: !isClaimed,
+      owner: isClaimed && answer.claimedBy ? getPlayerName(answer.claimedBy) : undefined,
+      validPlacement: isMatchable && !isClaimed,
+    })
+  );
 
   return wrapper;
 }
@@ -309,11 +340,11 @@ export function renderScores(state: FabADiffyState): HTMLElement {
 
   const p1 = document.createElement('div');
   p1.className = 'fab-score fab-score-p1';
-  p1.innerHTML = `<span class="fab-score-label">Blue</span><span class="fab-score-value">${state.scores.player1}</span>`;
+  p1.innerHTML = `<span class="fab-score-label">${seatIcon('player1')} Blue</span><span class="fab-score-value">${state.scores.player1}</span>`;
 
   const p2 = document.createElement('div');
   p2.className = 'fab-score fab-score-p2';
-  p2.innerHTML = `<span class="fab-score-label">Red</span><span class="fab-score-value">${state.scores.player2}</span>`;
+  p2.innerHTML = `<span class="fab-score-label">${seatIcon('player2')} Red</span><span class="fab-score-value">${state.scores.player2}</span>`;
 
   container.appendChild(p1);
   container.appendChild(p2);

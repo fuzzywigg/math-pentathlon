@@ -21,7 +21,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { ramrodTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreFocusedCell,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -84,6 +89,7 @@ export function initGame(container: HTMLElement, vsAI: boolean = false, difficul
  */
 function updateUI(controller: RamrodGameController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -93,15 +99,16 @@ function updateUI(controller: RamrodGameController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `ramrod-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins with ${state.scores[state.winner]}cm!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.scores[state.winner]}cm!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (state.phase === 'selectingRod') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select a rod`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a rod`;
   } else if (state.phase === 'placingRod') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} - Place rod in a valid box`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place rod in a valid box`;
   }
 
   gameArea.appendChild(status);
@@ -129,7 +136,7 @@ function updateUI(controller: RamrodGameController): void {
   const p1Container = document.createElement('div');
   const p1Label = document.createElement('div');
   p1Label.className = 'ramrod-hand-label player1';
-  p1Label.textContent = `Blue (${state.playerRods.player1.length})`;
+  p1Label.textContent = `${seatIcon('player1')} Blue (${state.playerRods.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
     renderPlayerRods(state, 'player1', (rodId) => handleRodClick(controller, rodId))
@@ -142,7 +149,7 @@ function updateUI(controller: RamrodGameController): void {
   const p2Container = document.createElement('div');
   const p2Label = document.createElement('div');
   p2Label.className = 'ramrod-hand-label player2';
-  p2Label.textContent = `Red (${state.playerRods.player2.length})`;
+  p2Label.textContent = `${seatIcon('player2')} Red (${state.playerRods.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
     renderPlayerRods(state, 'player2', (rodId) => handleRodClick(controller, rodId))
@@ -190,6 +197,7 @@ function updateUI(controller: RamrodGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreFocusedCell(container, previousFocus);
 
   // AI turn
   if (

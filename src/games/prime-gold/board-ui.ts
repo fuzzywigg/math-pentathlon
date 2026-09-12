@@ -10,8 +10,12 @@ import {
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 import { seatIcon } from '../../ui/player-colors';
 
@@ -388,6 +392,7 @@ export function renderBoard(
 
   const board = document.createElement('div');
   board.className = 'pg-board';
+  markBoardAsGrid(board);
 
   const validPlacements = getValidPlacements(state);
   const validMap = new Map(validPlacements.map((p) => [p.value, p.expr]));
@@ -420,7 +425,7 @@ export function renderBoard(
           bindCellActivateKeys(cellEl, activate);
         }
 
-        makeCellFocusable(
+        makeGridCell(
           cellEl,
           buildCellAriaLabel({
             coord: String(cell.value),
@@ -435,6 +440,9 @@ export function renderBoard(
       board.appendChild(cellEl);
     }
   }
+
+  bindGridNavigation(board);
+  applyRovingTabindex(collectGridCells(board));
 
   container.appendChild(board);
 

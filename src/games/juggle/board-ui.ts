@@ -6,6 +6,11 @@ import { getPreviewCells, isPlacementValid, getBoardFillPercentage } from './rul
 import { Board } from '../../core/polyomino/placement';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
+import {
+  buildCellAriaLabel,
+  makeCellFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -60,6 +65,8 @@ export function renderBoard(
     for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
       const cell = document.createElement('div');
       cell.className = 'juggle-cell';
+      cell.dataset.row = String(row);
+      cell.dataset.col = String(col);
 
       const isOccupied = board.cells[row][col];
       const isPreview = previewSet.has(`${row},${col}`);
@@ -70,9 +77,25 @@ export function renderBoard(
         cell.classList.add(isPreviewValid ? 'preview-valid' : 'preview-invalid');
       }
 
-      if (isCurrentPlayer && state.phase === 'placing' && !isOccupied) {
+      const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
+      const canPlace =
+        isCurrentPlayer && state.phase === 'placing' && !isOccupied;
+
+      makeCellFocusable(
+        cell,
+        buildCellAriaLabel({
+          coord,
+          empty: !isOccupied,
+          owner: isOccupied ? getPlayerName(player) : undefined,
+          validPlacement: canPlace && isPreview && !!isPreviewValid,
+        })
+      );
+
+      if (canPlace) {
         cell.style.cursor = 'pointer';
-        cell.addEventListener('click', () => onCellClick(row, col));
+        const activate = () => onCellClick(row, col);
+        cell.addEventListener('click', activate);
+        bindCellActivateKeys(cell, activate);
         cell.addEventListener('mouseenter', () => onCellHover(row, col));
         cell.addEventListener('mouseleave', onCellLeave);
       }
