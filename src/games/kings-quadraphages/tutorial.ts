@@ -79,7 +79,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
         <p>The King will glow gold when selected.</p>
       `,
       highlightSelector: '.cell[data-row="1"][data-col="5"]',
-      position: 'left',
+      position: 'bottom',
       requiredAction: {
         type: 'click-cell',
         row: 1,
@@ -107,7 +107,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
         <p>That moves your King one square down.</p>
       `,
       highlightSelector: '.cell[data-row="2"][data-col="5"]',
-      position: 'left',
+      position: 'bottom',
       requiredAction: {
         type: 'click-cell',
         row: 2,

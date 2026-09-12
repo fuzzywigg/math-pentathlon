@@ -2256,6 +2256,8 @@ h1 {
 .cell.tutorial-tap-target.cell-king {
   animation: none;
   transform: none;
+  /* Slightly larger glyph during tutorial tap steps (esp. ~390px) */
+  font-size: 30px;
 }
 
 /* Expand the hit area around the required cell without changing layout */
@@ -2472,6 +2474,10 @@ h1 {
 
   .cell.tutorial-tap-target::before {
     inset: -16px;
+  }
+
+  .cell.tutorial-tap-target.cell-king {
+    font-size: 28px;
   }
 }
 
