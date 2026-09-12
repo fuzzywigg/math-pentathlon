@@ -283,9 +283,9 @@ export class TutorialManager {
   }
 
   /**
-   * For click-cell steps: enlarge the cutout + add a stable hit proxy and "Tap here" cue
+   * For click-cell steps: enlarge the cutout + add a stable hit proxy
    * so small board cells (esp. ~390px) are easier to hit.
-   * @returns whether the Tap here cue was placed above the highlight
+   * Tap here cue is placed later, opposite the resolved tooltip side.
    */
   private setupClickCellTarget(
     targetEl: HTMLElement,
@@ -293,7 +293,7 @@ export class TutorialManager {
     highlightTop: number,
     highlightWidth: number,
     highlightHeight: number
-  ): boolean {
+  ): void {
     targetEl.classList.add('tutorial-tap-target');
 
     const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
@@ -318,12 +318,28 @@ export class TutorialManager {
     // Inside .tutorial-overlay (z 9998) their z-index is capped below the tooltip (z 10000).
     document.body.appendChild(hitProxy);
     this.hitProxyElement = hitProxy;
+  }
 
+  /**
+   * Place Tap here opposite the tooltip so cue + dialog do not stack on the same side.
+   * @returns whether the cue was placed above the highlight
+   */
+  private placeTapCueOppositeTooltip(
+    highlightLeft: number,
+    highlightTop: number,
+    highlightWidth: number,
+    highlightHeight: number,
+    tooltipSide: NonNullable<TutorialStep['position']>
+  ): boolean {
     const cue = document.createElement('div');
     cue.className = 'tutorial-tap-cue';
     cue.textContent = 'Tap here';
     cue.setAttribute('aria-hidden', 'true');
-    const cueAbove = highlightTop >= 40;
+    // Prefer cue on the opposite side of the tooltip so they don't stack
+    const preferBelow =
+      tooltipSide === 'top' ||
+      (tooltipSide !== 'bottom' && highlightTop < 40);
+    const cueAbove = !preferBelow;
     cue.style.left = `${highlightLeft + highlightWidth / 2}px`;
     if (cueAbove) {
       cue.style.top = `${highlightTop - 8}px`;
@@ -398,18 +414,20 @@ export class TutorialManager {
         highlightRing.style.width = `${width}px`;
         highlightRing.style.height = `${height}px`;
 
-        let cueAbove = false;
         if (isClickCellAction) {
           highlightRing.classList.add('tutorial-highlight-ring--action');
-          cueAbove = this.setupClickCellTarget(targetEl, left, top, width, height);
+          this.setupClickCellTarget(targetEl, left, top, width, height);
         }
 
         // Update backdrop clip path to cut out the (possibly enlarged) highlight area
         this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
 
-        // Keep tooltip clear of highlight cutout (+ Tap here cue / hit proxy for click-cell)
-        const avoidRect = this.buildAvoidRect(left, top, width, height, isClickCellAction, cueAbove);
-        this.positionTooltip(rect, step.position ?? 'bottom', avoidRect);
+        // Live flip first, then Tap here on the opposite side of the resolved tooltip
+        const avoidRect = this.buildAvoidRect(left, top, width, height, isClickCellAction, false);
+        const resolvedSide = this.positionTooltip(rect, step.position ?? 'bottom', avoidRect);
+        if (isClickCellAction) {
+          this.placeTapCueOppositeTooltip(left, top, width, height, resolvedSide);
+        }
       } else if (highlightRing) {
         // Selector set but target not in DOM yet — clear stale ring from prior step
         this.clearHighlight(highlightRing, backdrop);
@@ -472,12 +490,12 @@ export class TutorialManager {
     targetRect: DOMRect,
     position: NonNullable<TutorialStep['position']>,
     avoidRect?: AvoidRect,
-  ): void {
-    if (!this.tooltipElement) return;
+  ): NonNullable<TutorialStep['position']> {
+    if (!this.tooltipElement) return position;
 
     if (position === 'center') {
       this.positionTooltipCenter();
-      return;
+      return 'center';
     }
 
     const margin = 16;
@@ -504,15 +522,16 @@ export class TutorialManager {
     }
 
     const placed = this.tryPlaceOnSide(side, clearRect, width, height, margin);
-    if (placed) return;
+    if (placed) return side;
 
     // One flip to the other vertical band if preferred still overlaps after clamp
     const flip: TooltipSide = side === 'top' ? 'bottom' : side === 'bottom' ? 'top' : this.preferVerticalSide(clearRect, height, margin);
-    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin)) return;
+    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin)) return flip;
 
     // Last resort: clamp preferred side (proxy/cue still tappable via option 1 stacking)
     const fallback = this.computeSidePosition(position, clearRect, width, height, margin);
     this.applyClampedTooltipPosition(fallback.left, fallback.top, width, height, margin);
+    return position;
   }
 
   /** More free viewport space above vs below the avoid rect. */
