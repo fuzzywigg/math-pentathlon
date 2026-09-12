@@ -11,6 +11,15 @@ import { getPieceCells, canPlacePiece } from './rules';
 import { Cell } from '../../core/polyomino/types';
 import { normalizeCells } from '../../core/polyomino/transform';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  applyRovingTabindex,
+  collectGridCells,
+} from '../../ui/board-a11y';
 
 const CELL_SIZE = 36;
 const PREVIEW_CELL_SIZE = 16;
@@ -37,6 +46,7 @@ export function renderBoard(
   svg.setAttribute('height', String(height));
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
   svg.classList.add('pent-board');
+  markBoardAsGrid(svg);
 
   // Background
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -149,6 +159,14 @@ export function renderBoard(
   const interactionGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   interactionGroup.classList.add('interaction');
 
+  // Occupancy map for labels (owner of cell if covered by a placed piece)
+  const occupancy = new Map<string, 'player1' | 'player2' | null>();
+  for (const piece of state.placedPieces) {
+    for (const cell of piece.cells) {
+      occupancy.set(`${cell.row},${cell.col}`, piece.player);
+    }
+  }
+
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -157,9 +175,26 @@ export function renderBoard(
       rect.setAttribute('width', String(CELL_SIZE));
       rect.setAttribute('height', String(CELL_SIZE));
       rect.setAttribute('fill', 'transparent');
+      rect.setAttribute('data-row', String(row));
+      rect.setAttribute('data-col', String(col));
       rect.style.cursor = 'pointer';
 
-      rect.addEventListener('click', () => onCellClick({ row, col }));
+      const occupant = occupancy.get(`${row},${col}`) ?? null;
+      const owner =
+        occupant === 'player1' ? 'Blue' : occupant === 'player2' ? 'Red' : undefined;
+      makeGridCell(
+        rect,
+        buildCellAriaLabel({
+          coord: `${row},${col}`,
+          empty: occupant === null,
+          owner,
+          validPlacement: state.phase === 'placePiece' && !!state.selectedPiece,
+        })
+      );
+
+      const activate = () => onCellClick({ row, col });
+      rect.addEventListener('click', activate);
+      bindCellActivateKeys(rect, activate);
       rect.addEventListener('mouseenter', () => onCellHover({ row, col }));
       rect.addEventListener('mouseleave', () => onCellHover(null));
 
@@ -167,6 +202,8 @@ export function renderBoard(
     }
   }
   svg.appendChild(interactionGroup);
+  bindGridNavigation(svg);
+  applyRovingTabindex(collectGridCells(svg));
 
   return svg;
 }

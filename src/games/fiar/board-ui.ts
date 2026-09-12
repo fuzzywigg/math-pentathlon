@@ -4,6 +4,11 @@
 import { FiarGameState, CONFIG, Player } from './types';
 import { getValidMoves, getSelectableNodes, findPaths } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeSvgFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -168,8 +173,28 @@ export function renderBoard(
       }
     }
 
-    // Click handler
-    g.addEventListener('click', () => onNodeClick(nodeId));
+    // Click / keyboard handler
+    const activate = () => onNodeClick(nodeId);
+    g.addEventListener('click', activate);
+
+    const owner =
+      node.chip === 'player1' ? 'Blue' : node.chip === 'player2' ? 'Red' : undefined;
+    const isValidMove = validMoves.includes(nodeId);
+    const isSelectable =
+      selectableNodes.includes(nodeId) ||
+      (state.phase === 'placement' && node.chip === null);
+    makeSvgFocusable(
+      g,
+      buildCellAriaLabel({
+        coord: nodeId.replace('-', ','),
+        empty: node.chip === null,
+        owner,
+        validMove: isValidMove,
+        validPlacement: state.phase === 'placement' && node.chip === null && isSelectable,
+        extras: state.selectedNode === nodeId ? ['selected'] : undefined,
+      })
+    );
+    bindCellActivateKeys(g, activate);
 
     // Hover effects
     g.addEventListener('mouseenter', () => {

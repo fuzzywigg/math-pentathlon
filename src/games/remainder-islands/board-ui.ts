@@ -10,6 +10,11 @@ import {
 } from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeSvgFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 const HEX_SIZE = 45;
 const HEX_WIDTH = HEX_SIZE * 2;
@@ -104,6 +109,9 @@ export function renderBoard(
     group.classList.add('island');
     if (isValid) group.classList.add('valid');
     if (isSelected) group.classList.add('selected');
+    group.setAttribute('data-island-id', island.id);
+    group.setAttribute('data-row', String(island.row));
+    group.setAttribute('data-col', String(island.col));
 
     // Island hexagon
     const hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
@@ -175,6 +183,27 @@ export function renderBoard(
       }
     }
 
+    const owner =
+      island.owner === 'player1'
+        ? 'Blue'
+        : island.owner === 'player2'
+          ? 'Red'
+          : undefined;
+    makeSvgFocusable(
+      group,
+      buildCellAriaLabel({
+        coord: `${island.row},${island.col}`,
+        empty: !island.owner,
+        owner,
+        validMove: isValid,
+        extras: [
+          `value ${island.value}`,
+          ...(island.chips > 0 ? [`${island.chips} chips`] : []),
+          ...(isSelected ? ['selected'] : []),
+        ],
+      })
+    );
+
     // Interaction layer
     if (state.phase === 'selectIsland') {
       const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
@@ -183,9 +212,11 @@ export function renderBoard(
       hitArea.style.cursor = isValid ? 'pointer' : 'not-allowed';
 
       if (isValid) {
-        hitArea.addEventListener('click', () => onIslandClick(island.id));
+        const activate = () => onIslandClick(island.id);
+        hitArea.addEventListener('click', activate);
         hitArea.addEventListener('mouseenter', () => onIslandHover(island.id));
         hitArea.addEventListener('mouseleave', () => onIslandHover(null));
+        bindCellActivateKeys(group, activate);
       }
 
       group.appendChild(hitArea);

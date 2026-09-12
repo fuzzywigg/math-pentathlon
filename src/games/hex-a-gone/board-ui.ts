@@ -3,6 +3,16 @@
 import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  captureFocusedCell,
+  restoreGridFocus,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 export type CellClickCallback = (q: number, r: number) => void;
 export type BlockSelectCallback = (shape: BlockShape) => void;
@@ -38,6 +48,7 @@ export function renderBoard(
   onBlockSelect?: BlockSelectCallback,
   onConfirm?: ConfirmCallback
 ): void {
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   const wrapper = document.createElement('div');
@@ -51,6 +62,7 @@ export function renderBoard(
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  markBoardAsGrid(svg);
 
   // Get valid placements for highlighting
   const validPlacements =
@@ -97,10 +109,33 @@ export function renderBoard(
     hex.setAttribute('class', className);
     hex.setAttribute('data-q', String(cell.q));
     hex.setAttribute('data-r', String(cell.r));
+    // Stamp row/col for ARIA grid roving (axial q/r mapped 1:1)
+    hex.setAttribute('data-row', String(cell.r));
+    hex.setAttribute('data-col', String(cell.q));
 
-    if (!cell.filled && isValid && onCellClick) {
+    const owner =
+      cell.filledBy === 'player1'
+        ? 'Blue'
+        : cell.filledBy === 'player2'
+          ? 'Red'
+          : undefined;
+    const isValidPlacement = !cell.filled && isValid && !!onCellClick;
+
+    makeGridCell(
+      hex,
+      buildCellAriaLabel({
+        coord: `${cell.q},${cell.r}`,
+        empty: !cell.filled,
+        owner,
+        validPlacement: isValidPlacement,
+      })
+    );
+
+    if (isValidPlacement) {
       hex.style.cursor = 'pointer';
-      hex.addEventListener('click', () => onCellClick(cell.q, cell.r));
+      const activate = () => onCellClick!(cell.q, cell.r);
+      hex.addEventListener('click', activate);
+      bindCellActivateKeys(hex, activate);
     }
 
     cellsGroup.appendChild(hex);
@@ -116,6 +151,7 @@ export function renderBoard(
   });
 
   svg.appendChild(cellsGroup);
+  bindGridNavigation(svg);
   wrapper.appendChild(svg);
 
   // Block selection area
@@ -233,6 +269,7 @@ export function renderBoard(
 
   wrapper.appendChild(selectionArea);
   container.appendChild(wrapper);
+  restoreGridFocus(container, previousFocus);
 }
 
 // Get icon for shape
@@ -260,6 +297,7 @@ export function renderStatus(
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
+  markStatusLive(container);
   container.innerHTML = '';
 
   const statusEl = document.createElement('div');
