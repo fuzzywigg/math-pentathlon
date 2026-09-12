@@ -520,3 +520,79 @@ describe('TutorialManager tooltip viewport clamp', () => {
     }
   });
 });
+
+describe('TutorialManager click selector requiredAction', () => {
+  let manager: TutorialManager;
+
+  beforeEach(() => {
+    manager = new TutorialManager();
+  });
+
+  afterEach(() => {
+    manager.exit();
+  });
+
+  it('advances when handleAction receives the matching click selector', () => {
+    const drawBtn = document.createElement('button');
+    drawBtn.className = 'star-track-draw-btn';
+    document.body.appendChild(drawBtn);
+
+    const config: TutorialConfig = {
+      id: 'click-selector',
+      name: 'Click Selector',
+      steps: [
+        {
+          id: 'draw-button',
+          title: 'Drawing Chains',
+          message: 'Click draw',
+          highlightSelector: '.star-track-draw-btn',
+          position: 'bottom',
+          requiredAction: { type: 'click', selector: '.star-track-draw-btn' },
+        },
+        {
+          id: 'choose-chain',
+          title: 'Choosing Your Chain',
+          message: 'Pick a chain',
+          highlightSelector: '.star-track-choices',
+          position: 'bottom',
+          requiredAction: { type: 'click', selector: '.star-track-choices' },
+        },
+      ],
+    };
+
+    manager.start(config);
+
+    const nextBtn = document.querySelector('.tutorial-next-btn') as HTMLButtonElement;
+    expect(nextBtn.disabled).toBe(true);
+    expect(nextBtn.textContent).toBe('Complete the action above');
+
+    expect(manager.handleAction('click', { selector: '.star-track-draw-btn' })).toBe(true);
+    expect(manager.getCurrentStep()?.id).toBe('choose-chain');
+
+    drawBtn.remove();
+  });
+
+  it('does not advance on a mismatched click selector', () => {
+    const config: TutorialConfig = {
+      id: 'click-mismatch',
+      name: 'Click Mismatch',
+      steps: [
+        {
+          id: 'draw-button',
+          title: 'Drawing Chains',
+          message: 'Click draw',
+          requiredAction: { type: 'click', selector: '.star-track-draw-btn' },
+        },
+        {
+          id: 'next',
+          title: 'Next',
+          message: 'Done',
+        },
+      ],
+    };
+
+    manager.start(config);
+    expect(manager.handleAction('click', { selector: '.star-track-choices' })).toBe(false);
+    expect(manager.getCurrentStep()?.id).toBe('draw-button');
+  });
+});
