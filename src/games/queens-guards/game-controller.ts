@@ -17,6 +17,7 @@ import { tutorialManager } from '../../core/tutorial';
 import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -55,6 +56,7 @@ function updateUI(): void {
 
 function updateStatus(): void {
   if (!statusContainer) return;
+  markStatusLive(statusContainer);
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);

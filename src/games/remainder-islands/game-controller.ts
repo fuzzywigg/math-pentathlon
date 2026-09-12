@@ -23,6 +23,7 @@ import { getAIIslandChoice, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -62,6 +63,7 @@ function render(): void {
     const status = document.createElement('div');
     status.className = `remainder-status ${gameState.currentPlayer}`;
     status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
+    markStatusLive(status);
     wrapper.appendChild(status);
 
     // Dice

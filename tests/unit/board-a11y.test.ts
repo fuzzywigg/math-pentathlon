@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import {
   buildCellAriaLabel,
   makeCellFocusable,
+  makeSvgFocusable,
   makeGridCell,
   markBoardAsGrid,
   applyRovingTabindex,
@@ -71,6 +72,14 @@ describe('board-a11y helpers (Wave 1)', () => {
     expect(cell.getAttribute('role')).toBe('button');
     expect(cell.getAttribute('tabindex')).toBe('0');
     expect(cell.getAttribute('aria-label')).toBe('E2, empty, valid move');
+  });
+
+  it('makeSvgFocusable sets the same button attrs on SVG nodes', () => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    makeSvgFocusable(g, 'A1, empty, valid placement');
+    expect(g.getAttribute('role')).toBe('button');
+    expect(g.getAttribute('tabindex')).toBe('0');
+    expect(g.getAttribute('aria-label')).toBe('A1, empty, valid placement');
   });
 
   it('bindCellActivateKeys fires on Enter and Space', () => {
@@ -249,5 +258,49 @@ describe('board-a11y helpers (Wave 2 grid + roving)', () => {
     restoreGridFocus(container, null);
     expect(cell.getAttribute('tabindex')).toBe('0');
     expect(document.activeElement).not.toBe(cell);
+  });
+});
+
+describe('board-a11y helpers (Wave 3 SVG)', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('bindCellActivateKeys works on SVG elements', () => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    document.body.appendChild(g);
+    let count = 0;
+    makeSvgFocusable(g, 'node 2,3, empty');
+    bindCellActivateKeys(g, () => {
+      count += 1;
+    });
+
+    g.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    g.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(count).toBe(2);
+  });
+
+  it('SVG gridcells participate in arrow roving', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    markBoardAsGrid(svg);
+    const a = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    a.setAttribute('data-row', '0');
+    a.setAttribute('data-col', '0');
+    makeGridCell(a, '0,0');
+    const b = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    b.setAttribute('data-row', '0');
+    b.setAttribute('data-col', '1');
+    makeGridCell(b, '0,1');
+    svg.append(a, b);
+    document.body.appendChild(svg);
+
+    applyRovingTabindex(collectGridCells(svg));
+    bindGridNavigation(svg);
+    (a as SVGElement).focus();
+
+    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    expect(document.activeElement).toBe(b);
+    expect(b.getAttribute('tabindex')).toBe('0');
+    expect(a.getAttribute('tabindex')).toBe('-1');
   });
 });

@@ -27,6 +27,7 @@ import { getAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -65,6 +66,7 @@ function render(): void {
 
 function renderStatusAndControls(): void {
   if (!statusContainer) return;
+  markStatusLive(statusContainer);
 
   // Winner banner
   if (gameState.winner) {

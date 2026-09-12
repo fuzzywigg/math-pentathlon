@@ -6,6 +6,12 @@ import {
 } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeSvgFocusable,
+  bindCellActivateKeys,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 export type PitClickCallback = (pitIndex: number) => void;
 
@@ -172,13 +178,15 @@ function createPit(
   cy: number,
   cubes: number,
   player: 'player1' | 'player2',
-  _index: number,
+  index: number,
   isValid: boolean,
   isLastSown: boolean,
   onClick?: () => void
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('class', `calla-pit calla-pit-${player === 'player1' ? 'p1' : 'p2'}${isValid ? ' calla-pit-valid' : ''}${isLastSown ? ' calla-pit-last' : ''}`);
+  group.setAttribute('data-side', player);
+  group.setAttribute('data-pit-index', String(index));
 
   // Pit circle
   const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -217,10 +225,22 @@ function createPit(
     group.appendChild(cubeGroup);
   }
 
-  // Click handler
+  const owner = player === 'player1' ? 'Blue' : 'Red';
+  makeSvgFocusable(
+    group,
+    buildCellAriaLabel({
+      coord: `${owner} pit ${index + 1}`,
+      owner,
+      extras: [`${cubes} cube${cubes === 1 ? '' : 's'}`],
+      validMove: isValid,
+    })
+  );
+
+  // Click / keyboard handler
   if (onClick) {
     group.style.cursor = 'pointer';
     group.addEventListener('click', onClick);
+    bindCellActivateKeys(group, onClick);
   }
 
   return group;
@@ -275,6 +295,7 @@ export function renderStatus(
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
+  markStatusLive(container);
   container.innerHTML = '';
 
   const statusEl = document.createElement('div');

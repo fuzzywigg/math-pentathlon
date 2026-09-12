@@ -3,6 +3,16 @@
 import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  captureFocusedCell,
+  restoreGridFocus,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -12,6 +22,7 @@ export function renderBoard(
   container: HTMLElement,
   onCellClick?: CellClickCallback
 ): void {
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   const size = state.boardSize;
@@ -34,6 +45,7 @@ export function renderBoard(
   svg.setAttribute('viewBox', `0 0 ${boardWidth} ${boardHeight}`);
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
+  markBoardAsGrid(svg);
 
   // Create defs for hex shape
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
@@ -189,10 +201,32 @@ export function renderBoard(
       hex.setAttribute('class', cellClass);
       cellGroup.appendChild(hex);
 
-      // Add click handler
-      if (onCellClick && cellState === null && state.winner === null) {
+      const coord = formatPosition({ row, col });
+      const owner =
+        cellState === 'player1'
+          ? 'Blue'
+          : cellState === 'player2'
+            ? 'Red'
+            : undefined;
+      const isValidPlacement =
+        cellState === null && state.winner === null && !!onCellClick;
+
+      makeGridCell(
+        cellGroup,
+        buildCellAriaLabel({
+          coord,
+          empty: cellState === null,
+          owner,
+          validPlacement: isValidPlacement,
+        })
+      );
+
+      // Add click / keyboard activation for empty cells
+      if (isValidPlacement) {
         cellGroup.style.cursor = 'pointer';
-        cellGroup.addEventListener('click', () => onCellClick(row, col));
+        const activate = () => onCellClick!(row, col);
+        cellGroup.addEventListener('click', activate);
+        bindCellActivateKeys(cellGroup, activate);
       }
 
       cellsGroup.appendChild(cellGroup);
@@ -200,6 +234,7 @@ export function renderBoard(
   }
 
   svg.appendChild(cellsGroup);
+  bindGridNavigation(svg);
 
   // Add coordinate labels (optional, for reference)
   const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -232,6 +267,7 @@ export function renderBoard(
   svg.appendChild(labelsGroup);
 
   container.appendChild(svg);
+  restoreGridFocus(container, previousFocus);
 }
 
 // Render game status
@@ -241,6 +277,7 @@ export function renderStatus(
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
+  markStatusLive(container);
   container.innerHTML = '';
 
   const statusEl = document.createElement('div');

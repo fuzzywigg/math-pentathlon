@@ -20,6 +20,7 @@ import { tutorialManager } from '../../core/tutorial';
 import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -57,6 +58,7 @@ function render(): void {
 
 function renderStatus(): void {
   if (!statusContainer) return;
+  markStatusLive(statusContainer);
 
   const { phase, currentPlayer, winner, chipsPlaced, selectedNode } = gameState;
 

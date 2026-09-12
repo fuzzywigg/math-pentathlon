@@ -19,6 +19,7 @@ import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
+  type BoardFocusable,
 } from '../../ui/board-a11y';
 
 // Click handler callback type
@@ -218,9 +219,9 @@ export function renderBoard(
 
   // Event delegation for clicks
   if (onCellClick) {
-    const handleCellAction = (cellEl: HTMLElement) => {
-      const clickedRow = parseInt(cellEl.dataset.row ?? '', 10);
-      const clickedCol = parseInt(cellEl.dataset.col ?? '', 10);
+    const handleCellAction = (cellEl: BoardFocusable) => {
+      const clickedRow = parseInt(cellEl.getAttribute('data-row') ?? '', 10);
+      const clickedCol = parseInt(cellEl.getAttribute('data-col') ?? '', 10);
       if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
       if (clickedRow < 1 || clickedRow > 9 || clickedCol < 1 || clickedCol > 9) return;
       onCellClick(clickedRow, clickedCol);
@@ -228,7 +229,7 @@ export function renderBoard(
 
     boardEl.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
-      const cellEl = target.closest('.cell') as HTMLElement;
+      const cellEl = target.closest('.cell') as HTMLElement | null;
       if (!cellEl) return;
       handleCellAction(cellEl);
     });

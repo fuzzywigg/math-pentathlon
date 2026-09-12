@@ -4,6 +4,11 @@
 import { QueensGuardsState, CONFIG, BoardCoord, cellKey, cellsInRing, parseKey } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeSvgFocusable,
+  bindCellActivateKeys,
+} from '../../ui/board-a11y';
 
 // Colors
 const COLORS = {
@@ -198,10 +203,36 @@ export function renderBoard(
       }
     }
 
-    // Click handler
-    g.addEventListener('click', () => {
+    // Click / keyboard handler
+    const activate = () => {
       onCellClick({ ring: cell.ring, position: cell.position });
-    });
+    };
+    g.addEventListener('click', activate);
+
+    const owner =
+      cell.piece?.player === 'player1'
+        ? 'Blue'
+        : cell.piece?.player === 'player2'
+          ? 'Red'
+          : undefined;
+    const pieceName =
+      cell.piece?.type === 'queen'
+        ? 'Queen'
+        : cell.piece?.type === 'guard'
+          ? 'Guard'
+          : undefined;
+    makeSvgFocusable(
+      g,
+      buildCellAriaLabel({
+        coord: `ring ${cell.ring} pos ${cell.position}`,
+        empty: !cell.piece,
+        owner,
+        piece: pieceName,
+        validMove: validMoves.has(key),
+        extras: state.selectedPiece === key ? ['selected'] : undefined,
+      })
+    );
+    bindCellActivateKeys(g, activate);
 
     // Hover effect
     g.addEventListener('mouseenter', () => {
