@@ -1131,3 +1131,100 @@ describe('Wave 12 — controller illegal-click deepenings (Calla / Hex / FIAR / 
     ).toBeTruthy();
   });
 });
+
+describe('Wave 13 — Frac setDifficulty + Kings AI difficulty', () => {
+  it('Frac setDifficulty updates before problems start', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initFrac(container);
+    fracVsHuman('easy');
+    expect(getFracState().difficulty).toBe('easy');
+    setFracDifficulty('hard');
+    expect(getFracState().difficulty).toBe('hard');
+    setFracDifficulty('medium');
+    expect(getFracState().difficulty).toBe('medium');
+    expect(
+      container.querySelector('.frac-problem, .frac-scores, .frac-game-area')
+    ).toBeTruthy();
+  });
+
+  it('Kings setAIDifficulty round-trips via vsAI', () => {
+    const { board, status } = mountPair();
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsAI('easy');
+    expect(getAIDifficulty()).toBe('easy');
+    setKingsAI('hard');
+    expect(getAIDifficulty()).toBe('hard');
+    setKingsAI('medium');
+    expect(getAIDifficulty()).toBe('medium');
+    expect(getKingsState().board.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Wave 13 — controller illegal-click deepenings (Ramrod / Stars / Par / Kwatro / Prime / Fab / Kings)', () => {
+  it('Ramrod / Stars / Par / Kwatro / Prime / Fab premature clicks keep chrome', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    ramrodVsHuman(container);
+    container
+      .querySelector('.ramrod-box, .ramrod-board, [data-box-id]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.ramrod-player-rods, .ramrod-board')
+    ).toBeTruthy();
+
+    starsVsHuman(container);
+    container
+      .querySelector('.stars-cell, .stars-board, [data-row]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.stars-hand, .stars-hand-container, .stars-board')
+    ).toBeTruthy();
+
+    parVsHuman(container);
+    container
+      .querySelector('.par55-base, .par55-board, [data-base-id]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(container.querySelector('.par55-hand, .par55-board')).toBeTruthy();
+
+    kwaVsHuman(container);
+    container
+      .querySelector('.kwa-node, .kwa-board, [data-node-id]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(container.querySelector('.kwa-board')).toBeTruthy();
+
+    primeVsHuman(container);
+    container
+      .querySelector('.pg-cell, .pg-board, [data-row]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.pg-roll-btn, .pg-dice-area, .pg-board')
+    ).toBeTruthy();
+
+    fabVsHuman(container);
+    container
+      .querySelector('.fab-bar-wrapper, .fab-bar-pool, button')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.fab-bar-pool, .fab-answer-board, .fab-scores')
+    ).toBeTruthy();
+  });
+
+  it('Kings premature cell click keeps board', () => {
+    const { board, status } = mountPair();
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsHuman();
+    const before = getKingsState().moveHistory.length;
+    const cell = board.querySelector(
+      '.cell[data-row="5"][data-col="5"], .cell'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().moveHistory.length).toBeGreaterThanOrEqual(before);
+    expect(board.querySelector('.cell, .board')).toBeTruthy();
+  });
+});
