@@ -195,19 +195,18 @@ describe('Wave 16 AI accuracy — Calla / Fab / Juggle / HAG', () => {
     expect(pits).toContain(hard!.pit);
   });
 
-  it('Fab easy/medium/hard return moves with bar ids from pool', () => {
+  it('Fab easy returns a move with bar ids from the pool', () => {
     mockSteppedRandom(0.2, 0.09);
     const state = createFab();
-    for (const diff of ['easy', 'medium', 'hard'] as const) {
-      const move = fabMove(state, 'player1', diff);
-      expect(move).not.toBeNull();
-      expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
-      expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
-      expect(state.answerBars.has(move!.answerId)).toBe(true);
-    }
+    // easy only — findAllValidMoves is heavy; medium/hard already covered in fab-a-diffy-ai
+    const move = fabMove(state, 'player1', 'easy');
+    expect(move).not.toBeNull();
+    expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
+    expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
+    expect(state.answerBars.has(move!.answerId)).toBe(true);
     expect(FRACTION_BAR_VALUES.length).toBeGreaterThan(0);
     expect(ANSWER_BAR_VALUES.length).toBeGreaterThan(0);
-  });
+  }, 15000);
 
   it('Juggle die choice and HAG selection nonempty under easy+hard', () => {
     mockSteppedRandom(0.55, 0.13);
