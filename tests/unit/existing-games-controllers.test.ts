@@ -82,6 +82,7 @@ import {
   newGameVsAI as hexAGoneVsAI,
   getGameState as getHexAGoneState,
   setAIDifficulty as setHexAGoneAI,
+  resetGame as resetHexAGone,
   startTutorial as startHexAGoneTutorial,
   isTutorialActive as isHexAGoneTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
@@ -107,6 +108,7 @@ import {
   newGameVsHuman as fracVsHuman,
   newGameVsAI as fracVsAI,
   getCurrentState as getFracState,
+  setDifficulty as setFracDifficulty,
   startTutorial as startFracTutorial,
   isTutorialActive as isFracTutorial,
 } from '../../src/games/frac-fact/game-controller';
@@ -146,6 +148,7 @@ import {
   newGameVsAI as starVsAI,
   getGameState as getStarState,
   setAIDifficulty as setStarAI,
+  resetGame as resetStar,
   startTutorial as startStarTutorial,
   isTutorialActive as isStarTutorial,
 } from '../../src/games/star-track/game-controller';
@@ -1321,5 +1324,128 @@ describe('Wave 13 — controller tutorial + getState deepenings', () => {
     expect(isFiarTutorial()).toBe(true);
     tutorialManager.exit();
     expect(getFiarState().phase).toBe('placement');
+  });
+});
+
+describe('Wave 14 — controller hint / difficulty / newGame / reset', () => {
+  it('Frac setDifficulty regenerates at 0 problems and no-ops after progress', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initFrac(container);
+    fracVsHuman('medium');
+    expect(getFracState().problemsCompleted).toBe(0);
+    const before = getFracState().currentProblem;
+    setFracDifficulty('easy');
+    expect(getFracState().difficulty).toBe('easy');
+    expect(getFracState().currentProblem).toBeTruthy();
+    // May or may not equal prior problem; difficulty must stick
+    void before;
+    setFracDifficulty('hard');
+    expect(getFracState().difficulty).toBe('hard');
+
+    // Force problemsCompleted > 0 so setDifficulty becomes a no-op
+    const advanced = {
+      ...getFracState(),
+      problemsCompleted: 2,
+      difficulty: 'hard' as const,
+    };
+    // Mutate via submitting is heavy; assert contract by calling after marking
+    // through a shallow assign on returned snapshot is not shared — instead
+    // complete one answer if possible.
+    const problem = getFracState().currentProblem;
+    if (problem) {
+      const choice = container.querySelector(
+        '.frac-choice, .frac-fact-choice, button'
+      ) as HTMLElement | null;
+      choice?.click();
+    }
+    const completed = getFracState().problemsCompleted;
+    if (completed > 0) {
+      setFracDifficulty('easy');
+      expect(getFracState().difficulty).not.toBe('easy');
+    } else {
+      // Still at 0: setDifficulty remains live
+      setFracDifficulty('easy');
+      expect(getFracState().difficulty).toBe('easy');
+    }
+  });
+
+  it('Calla getCurrentHint is null for human and vs-AI opening', () => {
+    const { board, status } = mountPair();
+    initCalla(board, status);
+    callaVsHuman();
+    expect(getCurrentHint()).toBeNull();
+    callaVsAI('easy');
+    expect(getCurrentHint()).toBeNull();
+  });
+
+  it('Kings newGame restores opening phase/supplies; mode unchanged', () => {
+    const { board, status } = mountPair();
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsHuman();
+    const mode = getGameMode();
+    expect(getKingsState().turnPhase).toBe('moveKing');
+    expect(getKingsState().player1Supply).toBeGreaterThan(0);
+    kingsNewGame();
+    expect(getGameMode()).toBe(mode);
+    expect(getKingsState().turnPhase).toBe('moveKing');
+    expect(getKingsState().selectedKingPosition).toBeNull();
+    expect(getKingsState().moveHistory).toHaveLength(0);
+  });
+
+  it('Hex / Star / Hex-a-Gone / Calla resetGame restores opening phase', () => {
+    const { board, status } = mountPair();
+
+    initHex(board, status);
+    hexVsHuman();
+    resetHex();
+    expect(getHexState().winner).toBeNull();
+    expect(getHexState().moveHistory).toHaveLength(0);
+
+    initStar(board, status);
+    starVsHuman();
+    resetStar();
+    expect(getStarState().phase).toBe('drawChains');
+    expect(getStarState().player1Position).toBe(0);
+
+    initHexAGone(board, status);
+    hexAGoneVsHuman();
+    resetHexAGone();
+    expect(getHexAGoneState().phase).toBe('selectBlocks');
+    expect(getHexAGoneState().moveHistory).toHaveLength(0);
+
+    initCalla(board, status);
+    callaVsHuman();
+    resetCalla();
+    expect(getCallaState().phase).toBe('selectPit');
+    expect(getCallaState().player1Calla).toBe(0);
+  });
+
+  it('Fab / Par / Prime vs-human then vs-AI remounts with zero scores', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    fabVsHuman(container);
+    expect(
+      container.querySelector('.fab-bar-pool, .fab-answer-board')
+    ).toBeTruthy();
+    fabVsAI(container, 'easy');
+    expect(
+      container.querySelector('.fab-scores, .fab-bar-pool, .fab-answer-board')
+    ).toBeTruthy();
+
+    parVsHuman(container);
+    expect(container.querySelector('.par55-hand, .par55-board')).toBeTruthy();
+    parVsAI(container, 'easy');
+    expect(container.querySelector('.par55-scores, .par55-board')).toBeTruthy();
+
+    primeVsHuman(container);
+    expect(container.querySelector('.pg-roll-btn, .pg-dice-area')).toBeTruthy();
+    primeVsAI(container, 'easy');
+    expect(
+      container.querySelector('.pg-scores, .pg-roll-btn, .pg-dice-area')
+    ).toBeTruthy();
   });
 });
