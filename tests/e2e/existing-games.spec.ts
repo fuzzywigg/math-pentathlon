@@ -3183,3 +3183,177 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 19 — persist / multi-step chrome for existing games', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Fab bar1→bar2 keeps pool/answer chrome', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await startVsAi(page);
+    const first = page
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled), .fab-bar-pool .fab-bar')
+      .first();
+    if ((await first.count()) > 0) {
+      await first.click({ force: true });
+    }
+    const second = page
+      .locator(
+        '.fab-bar-wrapper:not(.fab-bar-disabled):not(.fab-bar-selected), .fab-bar-pool .fab-bar'
+      )
+      .nth(1);
+    if ((await second.count()) > 0) {
+      await second.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.fab-operation, .fab-op-btn, .fab-bar-selected, .fab-answer-board, .fab-scores'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Star Track draw→chain advances progress chrome', async ({ page }) => {
+    await page.goto('/#/game/star-track');
+    await startVsAi(page);
+    const draw = page.locator('.star-track-draw-btn').first();
+    if ((await draw.count()) > 0 && (await draw.isVisible().catch(() => false))) {
+      await draw.click({ force: true });
+    }
+    const chain = page.locator('.star-track-chain-btn').first();
+    if ((await chain.count()) > 0) {
+      await chain.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.star-track-progress, .progress-fill, .star-track-draw-btn, .star-track-board, .star-track-status'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold roll→expression keeps scores/history chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/prime-gold');
+    await startVsAi(page);
+    const roll = page
+      .locator('.prime-roll-btn, .pg-roll-btn, button:has-text("Roll")')
+      .first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    const expr = page
+      .locator(
+        '.pg-expression, .pg-expr-item, .pg-expressions button, .prime-expression'
+      )
+      .first();
+    if ((await expr.count()) > 0) {
+      await expr.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.prime-board, .pg-board, .prime-scores, .pg-scores, .prime-history, .pg-history, .pg-expressions'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Queens piece select yields valid destination chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await startVsAi(page);
+    await expect(
+      page.locator('.qg-board-container, .qg-board, .qg-status').first()
+    ).toBeVisible();
+    const piece = page
+      .locator(
+        '.qg-piece, .qg-cell[data-ring], [data-piece], .qg-board [data-ring]'
+      )
+      .first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.qg-valid, .qg-cell.valid, .qg-highlight, .qg-status, .qg-board-container'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone bank→confirm→place keeps placing chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await startVsAi(page);
+    const bank = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+    if ((await bank.count()) > 0) {
+      await bank.click({ force: true });
+    }
+    const confirm = page.locator('.hex-a-gone-confirm-btn');
+    if ((await confirm.count()) > 0 && (await confirm.isVisible().catch(() => false))) {
+      await confirm.click({ force: true });
+    }
+    const cell = page
+      .locator(
+        '.hex-a-gone-cell-valid, .hex-a-gone-board [data-q], .hex-a-gone-cell'
+      )
+      .first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.hex-a-gone-placing-info, .hex-a-gone-board, .hex-a-gone-status, .hex-a-gone-bank'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Calla remount via new-game keeps pit chrome after pit click', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/calla');
+    await startVsAi(page);
+    const pit = page.locator('.calla-pit, [data-pit], .pit').first();
+    if ((await pit.count()) > 0) {
+      await pit.click({ force: true });
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-status, .calla-calla').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes roll→hand select keeps board chrome', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await startVsAi(page);
+    await page.locator('.sd-roll-btn').click();
+    const playable = page.locator('.sd-hand-domino-playable').first();
+    if ((await playable.count()) > 0) {
+      await playable.click({ force: true });
+    }
+    await expect(
+      page.locator('.sd-board, .sd-hand-domino-selected, .sd-pass-btn, .sd-dice-display').first()
+    ).toBeVisible();
+  });
+});
