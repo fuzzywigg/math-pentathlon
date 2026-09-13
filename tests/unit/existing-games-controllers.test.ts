@@ -1130,3 +1130,196 @@ describe('Wave 12 — controller illegal-click deepenings (Calla / Hex / FIAR / 
     ).toBeTruthy();
   });
 });
+
+describe('Wave 13 — controller AI difficulty leftovers', () => {
+  it('Fab / Par / Stars / Ramrod / Kwa / Prime vs-AI round-trips', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    fabVsAI(container, 'easy');
+    fabVsAI(container, 'hard');
+    expect(
+      container.querySelector('.fab-bar-pool, .fab-answer-board')
+    ).toBeTruthy();
+
+    parVsAI(container, 'medium');
+    parVsAI(container, 'easy');
+    expect(container.querySelector('.par55-hand, .par55-board')).toBeTruthy();
+
+    starsVsAI(container, 'hard');
+    starsVsAI(container, 'medium');
+    expect(
+      container.querySelector(
+        '.stars-hand, .stars-hand-container, .stars-board'
+      )
+    ).toBeTruthy();
+
+    ramrodVsAI(container, 'easy');
+    ramrodVsAI(container, 'hard');
+    expect(
+      container.querySelector('.ramrod-player-rods, .ramrod-board')
+    ).toBeTruthy();
+
+    kwaVsAI(container, 'medium');
+    kwaVsAI(container, 'easy');
+    expect(container.querySelector('.kwa-board, .kwa-chip-info')).toBeTruthy();
+
+    primeVsAI(container, 'hard');
+    primeVsAI(container, 'medium');
+    expect(container.querySelector('.pg-roll-btn, .pg-dice-area')).toBeTruthy();
+  });
+
+  it('Pent / Remainder / Pinball / Kings / Frac AI deepenings', () => {
+    const { board, status } = mountPair();
+    initPent(board, status);
+    pentVsAI('easy');
+    pentVsAI('hard');
+    expect(getPentState().currentPlayer).toBe('player1');
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initRemainder(container);
+    remainderVsAI('medium');
+    remainderVsAI('easy');
+    expect(getRemainderState().phase).toBeTruthy();
+
+    initPinball(container);
+    pinballVsAI('hard');
+    pinballVsAI('medium');
+    expect(getPinballState().phase).toBeTruthy();
+
+    initFrac(container);
+    fracVsAI('easy', 'easy');
+    fracVsAI('hard', 'hard');
+    expect(getFracState().phase).toBeTruthy();
+
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsAI('medium');
+    setKingsAI('hard');
+    setKingsAI('easy');
+    expect(getKingsState().currentPlayer).toBe('player1');
+  });
+});
+
+describe('Wave 13 — controller illegal-click deepenings', () => {
+  it('Fab / Par / Prime / Stars / Ramrod / Kwa premature clicks keep chrome', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    fabVsHuman(container);
+    container
+      .querySelector('.fab-answer-wrapper, .fab-answer-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.fab-bar-pool, .fab-answer-board')
+    ).toBeTruthy();
+
+    parVsHuman(container);
+    container
+      .querySelector('.par55-base, .par55-board, svg')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(container.querySelector('.par55-hand, .par55-board')).toBeTruthy();
+
+    primeVsHuman(container);
+    container
+      .querySelector('.pg-cell, .pg-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(container.querySelector('.pg-roll-btn, .pg-dice-area')).toBeTruthy();
+
+    starsVsHuman(container);
+    container
+      .querySelector('.stars-cell, .stars-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector(
+        '.stars-hand, .stars-hand-container, .stars-board'
+      )
+    ).toBeTruthy();
+
+    ramrodVsHuman(container);
+    container
+      .querySelector('.ramrod-box, .ramrod-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.ramrod-player-rods, .ramrod-board')
+    ).toBeTruthy();
+
+    kwaVsHuman(container);
+    container
+      .querySelector('.kwa-node, .kwa-board, svg')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(container.querySelector('.kwa-board, .kwa-chip-info')).toBeTruthy();
+  });
+
+  it('Pent / Remainder / Kings illegal clicks keep opening chrome', () => {
+    const { board, status } = mountPair();
+    initPent(board, status);
+    pentVsHuman();
+    board
+      .querySelector('.pent-cell, .pent-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector('.pent-piece-selector, .pent-board')
+    ).toBeTruthy();
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initRemainder(container);
+    remainderVsHuman();
+    container
+      .querySelector('.remainder-island, .remainder-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.remainder-dice, .remainder-board')
+    ).toBeTruthy();
+
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsHuman();
+    const far = board.querySelector(
+      '.cell[data-row="5"][data-col="5"]'
+    ) as HTMLElement | null;
+    far?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().selectedKingPosition).toBeNull();
+    expect(board.querySelector('.board, .cell')).toBeTruthy();
+  });
+});
+
+describe('Wave 13 — controller tutorial + getState deepenings', () => {
+  it('double-start tutorial stays active; exit restores opening phase', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    hexVsHuman();
+    startHexTutorial();
+    startHexTutorial();
+    expect(isHexTutorial()).toBe(true);
+    expect(getHexState().moveHistory).toHaveLength(0);
+    tutorialManager.exit();
+    expect(isHexTutorial()).toBe(false);
+    expect(getHexState().winner).toBeNull();
+
+    initCalla(board, status);
+    callaVsHuman();
+    startCallaTutorial();
+    expect(isCallaTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(getCallaState().currentPlayer).toBe('player1');
+
+    initStar(board, status);
+    starVsHuman();
+    startStarTutorial();
+    expect(isStarTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(getStarState().phase).toBe('drawChains');
+
+    initFiar(board, status);
+    fiarVsHuman();
+    startFiarTutorial();
+    expect(isFiarTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(getFiarState().phase).toBe('placement');
+  });
+});
