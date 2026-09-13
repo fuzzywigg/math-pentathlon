@@ -3456,3 +3456,189 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 23 — inventory / resource chrome after legal play', () => {
+  test('Par 55 place keeps hand inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const before = await page.locator('.par55-hand-block').count();
+    const block = page.locator('.par55-hand-block.clickable').first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+      const valid = page.locator('.par55-base.valid, .par55-cell.valid').first();
+      if ((await valid.count()) > 0) {
+        await valid.click({ force: true });
+      }
+    }
+    await expect(page.locator('.par55-hand, .par55-board').first()).toBeVisible();
+    expect(before).toBeGreaterThan(0);
+    expect(await page.locator('.par55-hand-block').count()).toBeGreaterThan(0);
+  });
+
+  test('Sum Dominoes roll→place shrinks or preserves hand chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    const before = await page
+      .locator('.sd-hand-player1 .sd-hand-domino')
+      .count();
+    await page.locator('.sd-roll-btn').click();
+    const playable = page.locator('.sd-hand-domino-playable');
+    if ((await playable.count()) > 0) {
+      await playable.first().click();
+      const valid = page.locator('.sd-cell-valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+        const after = await page
+          .locator('.sd-hand-player1 .sd-hand-domino')
+          .count();
+        expect(after).toBeLessThanOrEqual(before);
+      }
+    }
+    await expect(
+      page.locator('.sd-hand-player1, .sd-board, .sd-roll-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone bank block-count chrome after select/confirm', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const bankBtn = page.locator('.hex-a-gone-block-btn[data-shape]').first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+      const confirm = page.locator(
+        '.hex-a-gone-confirm-btn, button:has-text("Confirm")'
+      );
+      if ((await confirm.count()) > 0) {
+        await confirm.first().click({ force: true });
+      }
+    }
+    await expect(page.locator('.block-count').first()).toBeVisible();
+  });
+
+  test('Ramrod rod-strip inventory chrome after select', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    const selectable = page.locator('.ramrod-rod-wrapper.selectable');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.ramrod-rod-wrapper, .ramrod-board, .ramrod-rods').first()
+    ).toBeVisible();
+  });
+
+  test('Stars hand inventory chrome after card select/place', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page.locator('.stars-card:not(.disabled)').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+      const valid = page.locator('.stars-cell.valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+      }
+    }
+    await expect(
+      page.locator('.stars-card, .stars-hand, .stars-score').first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact score inventory chrome after answer', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.frac-choice-btn').first()).toBeVisible();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-scores, .frac-score-value, .frac-result').first()
+    ).toBeVisible();
+  });
+
+  test('Pinball balls inventory chrome after choice', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    const choice = page.locator('.pinball-choice-btn').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page.locator('.pinball-balls, .pinball-scores, .pinball-feedback').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track progress inventory chrome after draw→select', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    const draw = page.locator('.star-track-draw-btn').first();
+    await expect(draw).toBeVisible();
+    await draw.click({ force: true });
+    const chain = page.locator('.star-track-chain-btn').first();
+    if ((await chain.count()) > 0) {
+      await chain.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.star-track-progress, .star-track-position, .star-track-board, .star-track-draw-btn'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Pent piece-bank inventory chrome after select', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page.locator('.pent-piece-option').first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-piece-option, .pent-piece-selector, .pent-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kings supply inventory chrome after king move', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="2"][data-col="5"]')
+      .click({ force: true });
+    await expect(
+      page.locator('.supply-p1, .status-supplies, .status-turn, .kings-board').first()
+    ).toBeVisible();
+  });
+
+  test('Calla pit inventory chrome after pit click', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    const pit = page.locator('.calla-pit, [data-pit]').first();
+    if ((await pit.count()) > 0) {
+      await pit.click({ force: true });
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-store, .calla-wrapper').first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold chip inventory chrome after roll', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.pg-roll-btn, .prime-roll-btn, button:has-text("Roll")').first();
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.pg-board, .prime-board, .pg-dice, .prime-status, canvas, svg').first()
+    ).toBeVisible();
+  });
+});
