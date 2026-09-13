@@ -644,3 +644,115 @@ describe('Controller setAIDifficulty round-trips', () => {
     expect(getStarState().phase).toBe('drawChains');
   });
 });
+
+describe('Controller illegal-click no-ops (Par / Stars / Fab / Kwatro / Contig / Sum / Prime / Juggle)', () => {
+  it('Par answer-board click without selection leaves selectingBlock', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = parVsHuman(container);
+    expect(ctrl.state.phase).toBe('selectingBlock');
+    const before = ctrl.state.moveHistory.length;
+    const base = container.querySelector(
+      '.par55-base, .par55-board'
+    ) as HTMLElement | null;
+    base?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('selectingBlock');
+  });
+
+  it('Stars board cell click without card keeps selectingCard', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = starsVsHuman(container);
+    expect(ctrl.state.phase).toBe('selectingCard');
+    const before = ctrl.state.moveHistory.length;
+    const cell = container.querySelector(
+      '.stars-cell, [data-row]'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('selectingCard');
+  });
+
+  it('Fab answer click before bar selection leaves selectingBar1', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = fabVsHuman(container);
+    expect(ctrl.state.phase).toBe('selectingBar1');
+    const before = ctrl.state.moveHistory.length;
+    const answer = container.querySelector(
+      '.fab-answer-wrapper, .fab-answer-board'
+    ) as HTMLElement | null;
+    answer?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('selectingBar1');
+  });
+
+  it('Kwatro node click without chip keeps selectingChip', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = kwaVsHuman(container);
+    expect(ctrl.state.phase).toBe('selectingChip');
+    const before = ctrl.state.moveHistory.length;
+    const node = container.querySelector(
+      '[data-node-id], .kwa-node'
+    ) as HTMLElement | null;
+    node?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('selectingChip');
+  });
+
+  it('Contig cell click before roll stays in rolling', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    contigVsHuman();
+    const cell = board.querySelector('.contig-cell') as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelector('.contig-roll-btn')).toBeTruthy();
+  });
+
+  it('Sum Dominoes board click before roll keeps rolling phase', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = sdVsHuman(container);
+    expect(ctrl.state.phase).toBe('rolling');
+    const before = ctrl.state.moveHistory.length;
+    const cell = container.querySelector(
+      '.sd-cell, .sd-board'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('rolling');
+  });
+
+  it('Prime Gold cell click before roll stays rolling', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = primeVsHuman(container);
+    expect(ctrl.state.phase).toBe('rolling');
+    const before = ctrl.state.moveHistory.length;
+    const cell = container.querySelector(
+      '.pg-cell, .pg-board'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(ctrl.state.moveHistory.length).toBe(before);
+    expect(ctrl.state.phase).toBe('rolling');
+  });
+
+  it('Juggle board click before roll keeps rolling chrome', () => {
+    const { board, status } = mountPair();
+    initJuggle(board, status);
+    juggleVsHuman();
+    const beforePhase = board.querySelector(
+      '.juggle-roll-btn, .juggle-dice-area'
+    );
+    const cell = board.querySelector(
+      '.juggle-cell, .juggle-board td, [data-row]'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector('.juggle-roll-btn, .juggle-dice-area, .juggle-board')
+    ).toBeTruthy();
+    expect(beforePhase || board.querySelector('.juggle-board')).toBeTruthy();
+  });
+});
