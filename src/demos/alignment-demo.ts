@@ -1,6 +1,10 @@
 // Alignment Detection Demo - Interactive test page
 
-import { AlignmentConfig, ContiguousConfig, CellValue } from '../core/alignment/types';
+import {
+  AlignmentConfig,
+  ContiguousConfig,
+  CellValue,
+} from '../core/alignment/types';
 import {
   createArrayGetter,
   checkForWinner,
@@ -20,9 +24,10 @@ type Board = CellValue[][];
 let currentBoard: Board = [];
 let currentPlayer: 'X' | 'O' = 'X';
 
-
 function createEmptyBoard(rows: number, cols: number): Board {
-  return Array(rows).fill(null).map(() => Array(cols).fill(null));
+  return Array(rows)
+    .fill(null)
+    .map(() => Array(cols).fill(null));
 }
 
 function renderFourInRowDemo(container: HTMLElement): void {
@@ -86,7 +91,9 @@ function renderFourInRowDemo(container: HTMLElement): void {
       // Highlight winning cells
       for (const alignment of result.alignments) {
         for (const pos of alignment.positions) {
-          const cell = boardEl.querySelector(`[data-row="${pos.row}"][data-col="${pos.col}"]`);
+          const cell = boardEl.querySelector(
+            `[data-row="${pos.row}"][data-col="${pos.col}"]`
+          );
           if (cell) {
             cell.classList.add('winning-cell');
           }
@@ -97,9 +104,12 @@ function renderFourInRowDemo(container: HTMLElement): void {
     }
 
     // Show alignment info
-    const alignments = findAllAlignments(getCell, { ...config, targetLength: 2 });
-    const xAlignments = alignments.filter(a => a.value === 'X');
-    const oAlignments = alignments.filter(a => a.value === 'O');
+    const alignments = findAllAlignments(getCell, {
+      ...config,
+      targetLength: 2,
+    });
+    const xAlignments = alignments.filter((a) => a.value === 'X');
+    const oAlignments = alignments.filter((a) => a.value === 'O');
     infoEl.innerHTML = `
       <div>X has ${xAlignments.length} alignments (2+)</div>
       <div>O has ${oAlignments.length} alignments (2+)</div>
@@ -201,18 +211,28 @@ function renderHexConnectDemo(container: HTMLElement): void {
     let winner: string | null = null;
 
     for (const region of regions) {
-      if (region.value === 'B' && regionConnectsEdges(region, 'top', 'bottom', config)) {
+      if (
+        region.value === 'B' &&
+        regionConnectsEdges(region, 'top', 'bottom', config)
+      ) {
         winner = 'Blue';
         // Highlight winning path
         for (const pos of region.positions) {
-          const cell = boardEl.querySelector(`[data-row="${pos.row}"][data-col="${pos.col}"]`);
+          const cell = boardEl.querySelector(
+            `[data-row="${pos.row}"][data-col="${pos.col}"]`
+          );
           if (cell) cell.classList.add('winning-cell');
         }
       }
-      if (region.value === 'R' && regionConnectsEdges(region, 'left', 'right', config)) {
+      if (
+        region.value === 'R' &&
+        regionConnectsEdges(region, 'left', 'right', config)
+      ) {
         winner = 'Red';
         for (const pos of region.positions) {
-          const cell = boardEl.querySelector(`[data-row="${pos.row}"][data-col="${pos.col}"]`);
+          const cell = boardEl.querySelector(
+            `[data-row="${pos.row}"][data-col="${pos.col}"]`
+          );
           if (cell) cell.classList.add('winning-cell');
         }
       }
@@ -226,11 +246,11 @@ function renderHexConnectDemo(container: HTMLElement): void {
     }
 
     // Show region info
-    const blueRegions = regions.filter(r => r.value === 'B');
-    const redRegions = regions.filter(r => r.value === 'R');
+    const blueRegions = regions.filter((r) => r.value === 'B');
+    const redRegions = regions.filter((r) => r.value === 'R');
     infoEl.innerHTML = `
-      <div>Blue: ${blueRegions.length} region(s), largest: ${Math.max(0, ...blueRegions.map(r => r.size))}</div>
-      <div>Red: ${redRegions.length} region(s), largest: ${Math.max(0, ...redRegions.map(r => r.size))}</div>
+      <div>Blue: ${blueRegions.length} region(s), largest: ${Math.max(0, ...blueRegions.map((r) => r.size))}</div>
+      <div>Red: ${redRegions.length} region(s), largest: ${Math.max(0, ...redRegions.map((r) => r.size))}</div>
     `;
   }
 
@@ -241,8 +261,16 @@ function renderHexConnectDemo(container: HTMLElement): void {
     const getCell = createArrayGetter(board);
     const regions = findAllRegions(getCell, config, getHexNeighbors);
     for (const region of regions) {
-      if (region.value === 'B' && regionConnectsEdges(region, 'top', 'bottom', config)) return;
-      if (region.value === 'R' && regionConnectsEdges(region, 'left', 'right', config)) return;
+      if (
+        region.value === 'B' &&
+        regionConnectsEdges(region, 'top', 'bottom', config)
+      )
+        return;
+      if (
+        region.value === 'R' &&
+        regionConnectsEdges(region, 'left', 'right', config)
+      )
+        return;
     }
 
     board[row][col] = player;
@@ -293,7 +321,9 @@ function renderPotentialDemo(container: HTMLElement): void {
 
   const boardEl = wrapper.querySelector('#potential-board') as HTMLElement;
   const infoEl = wrapper.querySelector('#potential-info') as HTMLElement;
-  const resetBtn = wrapper.querySelector('#potential-reset') as HTMLButtonElement;
+  const resetBtn = wrapper.querySelector(
+    '#potential-reset'
+  ) as HTMLButtonElement;
 
   function render(selectedRow?: number, selectedCol?: number): void {
     boardEl.innerHTML = '';
@@ -323,7 +353,13 @@ function renderPotentialDemo(container: HTMLElement): void {
     // Show potential for selected cell
     if (selectedRow !== undefined && selectedCol !== undefined) {
       const getCell = createArrayGetter(board);
-      const potential = countAlignmentPotential(selectedRow, selectedCol, 'X', getCell, config);
+      const potential = countAlignmentPotential(
+        selectedRow,
+        selectedCol,
+        'X',
+        getCell,
+        config
+      );
 
       let html = `<strong>Alignment potential at (${selectedRow}, ${selectedCol}):</strong><br>`;
       potential.forEach((data, direction) => {

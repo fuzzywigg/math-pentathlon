@@ -9,14 +9,16 @@ export interface TutorialStep {
   // Position for tooltip: which side of the highlighted element
   position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
   // Required action to proceed (optional - if not set, user clicks "Next")
-  requiredAction?: {
-    type: 'click';
-    selector: string;
-  } | {
-    type: 'click-cell';
-    row: number;
-    col: number;
-  };
+  requiredAction?:
+    | {
+        type: 'click';
+        selector: string;
+      }
+    | {
+        type: 'click-cell';
+        row: number;
+        col: number;
+      };
   // Callback when step is shown
   onShow?: () => void;
   // Callback when step is completed
@@ -122,7 +124,11 @@ export class TutorialManager {
       this.complete();
     } else {
       this.showCurrentStep();
-      this.emit({ type: 'step-changed', stepIndex: this.currentStepIndex, step: this.getCurrentStep()! });
+      this.emit({
+        type: 'step-changed',
+        stepIndex: this.currentStepIndex,
+        step: this.getCurrentStep()!,
+      });
     }
   }
 
@@ -132,7 +138,11 @@ export class TutorialManager {
 
     this.currentStepIndex--;
     this.showCurrentStep();
-    this.emit({ type: 'step-changed', stepIndex: this.currentStepIndex, step: this.getCurrentStep()! });
+    this.emit({
+      type: 'step-changed',
+      stepIndex: this.currentStepIndex,
+      step: this.getCurrentStep()!,
+    });
   }
 
   // Complete the tutorial
@@ -152,12 +162,21 @@ export class TutorialManager {
   }
 
   // Handle an action (e.g., cell click) to check if it completes the current step
-  handleAction(actionType: string, data?: { row?: number; col?: number; selector?: string }): boolean {
+  handleAction(
+    actionType: string,
+    data?: { row?: number; col?: number; selector?: string }
+  ): boolean {
     const step = this.getCurrentStep();
     if (!step?.requiredAction) return false;
 
-    if (step.requiredAction.type === 'click-cell' && actionType === 'click-cell') {
-      if (data?.row === step.requiredAction.row && data?.col === step.requiredAction.col) {
+    if (
+      step.requiredAction.type === 'click-cell' &&
+      actionType === 'click-cell'
+    ) {
+      if (
+        data?.row === step.requiredAction.row &&
+        data?.col === step.requiredAction.col
+      ) {
         this.nextStep();
         return true;
       }
@@ -296,7 +315,11 @@ export class TutorialManager {
   ): void {
     targetEl.classList.add('tutorial-tap-target');
 
-    const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
+    const hitSize = Math.max(
+      highlightWidth,
+      highlightHeight,
+      CLICK_CELL_MIN_HIT_PX
+    );
     const hitLeft = highlightLeft + highlightWidth / 2 - hitSize / 2;
     const hitTop = highlightTop + highlightHeight / 2 - hitSize / 2;
 
@@ -337,8 +360,7 @@ export class TutorialManager {
     cue.setAttribute('aria-hidden', 'true');
     // Prefer cue on the opposite side of the tooltip so they don't stack
     const preferBelow =
-      tooltipSide === 'top' ||
-      (tooltipSide !== 'bottom' && highlightTop < 40);
+      tooltipSide === 'top' || (tooltipSide !== 'bottom' && highlightTop < 40);
     const cueAbove = !preferBelow;
     cue.style.left = `${highlightLeft + highlightWidth / 2}px`;
     if (cueAbove) {
@@ -360,20 +382,32 @@ export class TutorialManager {
     this.clearActionTargetHelpers();
 
     // Update tooltip content
-    const titleEl = this.tooltipElement.querySelector('.tutorial-tooltip-title');
-    const messageEl = this.tooltipElement.querySelector('.tutorial-tooltip-message');
-    const counterEl = this.tooltipElement.querySelector('.tutorial-step-counter');
-    const prevBtn = this.tooltipElement.querySelector('.tutorial-prev-btn') as HTMLButtonElement;
-    const nextBtn = this.tooltipElement.querySelector('.tutorial-next-btn') as HTMLButtonElement;
+    const titleEl = this.tooltipElement.querySelector(
+      '.tutorial-tooltip-title'
+    );
+    const messageEl = this.tooltipElement.querySelector(
+      '.tutorial-tooltip-message'
+    );
+    const counterEl = this.tooltipElement.querySelector(
+      '.tutorial-step-counter'
+    );
+    const prevBtn = this.tooltipElement.querySelector(
+      '.tutorial-prev-btn'
+    ) as HTMLButtonElement;
+    const nextBtn = this.tooltipElement.querySelector(
+      '.tutorial-next-btn'
+    ) as HTMLButtonElement;
 
     if (titleEl) titleEl.textContent = step.title;
     if (messageEl) messageEl.innerHTML = step.message;
-    if (counterEl) counterEl.textContent = `Step ${this.currentStepIndex + 1} of ${this.getTotalSteps()}`;
+    if (counterEl)
+      counterEl.textContent = `Step ${this.currentStepIndex + 1} of ${this.getTotalSteps()}`;
 
     // Update button states
     if (prevBtn) {
       prevBtn.disabled = this.currentStepIndex === 0;
-      prevBtn.style.visibility = this.currentStepIndex === 0 ? 'hidden' : 'visible';
+      prevBtn.style.visibility =
+        this.currentStepIndex === 0 ? 'hidden' : 'visible';
     }
 
     if (nextBtn) {
@@ -391,11 +425,17 @@ export class TutorialManager {
     }
 
     // Position highlight ring
-    const highlightRing = this.overlayElement.querySelector('.tutorial-highlight-ring') as HTMLElement;
-    const backdrop = this.overlayElement.querySelector('.tutorial-backdrop') as HTMLElement;
+    const highlightRing = this.overlayElement.querySelector(
+      '.tutorial-highlight-ring'
+    ) as HTMLElement;
+    const backdrop = this.overlayElement.querySelector(
+      '.tutorial-backdrop'
+    ) as HTMLElement;
 
     if (step.highlightSelector) {
-      const targetEl = document.querySelector(step.highlightSelector) as HTMLElement;
+      const targetEl = document.querySelector(
+        step.highlightSelector
+      ) as HTMLElement;
       if (targetEl && highlightRing) {
         const rect = targetEl.getBoundingClientRect();
         const isClickCellAction = step.requiredAction?.type === 'click-cell';
@@ -420,13 +460,36 @@ export class TutorialManager {
         }
 
         // Update backdrop clip path to cut out the (possibly enlarged) highlight area
-        this.applyHighlightCutout(backdrop, left, top, left + width, top + height);
+        this.applyHighlightCutout(
+          backdrop,
+          left,
+          top,
+          left + width,
+          top + height
+        );
 
         // Live flip first, then Tap here on the opposite side of the resolved tooltip
-        const avoidRect = this.buildAvoidRect(left, top, width, height, isClickCellAction, false);
-        const resolvedSide = this.positionTooltip(rect, step.position ?? 'bottom', avoidRect);
+        const avoidRect = this.buildAvoidRect(
+          left,
+          top,
+          width,
+          height,
+          isClickCellAction,
+          false
+        );
+        const resolvedSide = this.positionTooltip(
+          rect,
+          step.position ?? 'bottom',
+          avoidRect
+        );
         if (isClickCellAction) {
-          this.placeTapCueOppositeTooltip(left, top, width, height, resolvedSide);
+          this.placeTapCueOppositeTooltip(
+            left,
+            top,
+            width,
+            height,
+            resolvedSide
+          );
         }
       } else if (highlightRing) {
         // Selector set but target not in DOM yet — clear stale ring from prior step
@@ -443,7 +506,10 @@ export class TutorialManager {
     }
   }
 
-  private clearHighlight(highlightRing: HTMLElement, backdrop: HTMLElement): void {
+  private clearHighlight(
+    highlightRing: HTMLElement,
+    backdrop: HTMLElement
+  ): void {
     highlightRing.style.display = 'none';
     highlightRing.classList.remove('tutorial-highlight-ring--action');
     backdrop.style.clipPath = 'none';
@@ -460,7 +526,7 @@ export class TutorialManager {
     highlightWidth: number,
     highlightHeight: number,
     isClickCellAction: boolean,
-    cueAbove: boolean,
+    cueAbove: boolean
   ): AvoidRect {
     let left = highlightLeft;
     let top = highlightTop;
@@ -468,7 +534,11 @@ export class TutorialManager {
     let bottom = highlightTop + highlightHeight;
 
     if (isClickCellAction) {
-      const hitSize = Math.max(highlightWidth, highlightHeight, CLICK_CELL_MIN_HIT_PX);
+      const hitSize = Math.max(
+        highlightWidth,
+        highlightHeight,
+        CLICK_CELL_MIN_HIT_PX
+      );
       const hitLeft = highlightLeft + highlightWidth / 2 - hitSize / 2;
       const hitTop = highlightTop + highlightHeight / 2 - hitSize / 2;
       left = Math.min(left, hitLeft);
@@ -489,7 +559,7 @@ export class TutorialManager {
   private positionTooltip(
     targetRect: DOMRect,
     position: NonNullable<TutorialStep['position']>,
-    avoidRect?: AvoidRect,
+    avoidRect?: AvoidRect
   ): NonNullable<TutorialStep['position']> {
     if (!this.tooltipElement) return position;
 
@@ -525,17 +595,39 @@ export class TutorialManager {
     if (placed) return side;
 
     // One flip to the other vertical band if preferred still overlaps after clamp
-    const flip: TooltipSide = side === 'top' ? 'bottom' : side === 'bottom' ? 'top' : this.preferVerticalSide(clearRect, height, margin);
-    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin)) return flip;
+    const flip: TooltipSide =
+      side === 'top'
+        ? 'bottom'
+        : side === 'bottom'
+          ? 'top'
+          : this.preferVerticalSide(clearRect, height, margin);
+    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin))
+      return flip;
 
     // Last resort: clamp preferred side (proxy/cue still tappable via option 1 stacking)
-    const fallback = this.computeSidePosition(position, clearRect, width, height, margin);
-    this.applyClampedTooltipPosition(fallback.left, fallback.top, width, height, margin);
+    const fallback = this.computeSidePosition(
+      position,
+      clearRect,
+      width,
+      height,
+      margin
+    );
+    this.applyClampedTooltipPosition(
+      fallback.left,
+      fallback.top,
+      width,
+      height,
+      margin
+    );
     return position;
   }
 
   /** More free viewport space above vs below the avoid rect. */
-  private preferVerticalSide(avoidRect: AvoidRect, height: number, margin: number): TooltipSide {
+  private preferVerticalSide(
+    avoidRect: AvoidRect,
+    height: number,
+    margin: number
+  ): TooltipSide {
     const { height: vh, offsetTop } = this.getViewportMetrics();
     const spaceBelow = offsetTop + vh - avoidRect.bottom - margin;
     const spaceAbove = avoidRect.top - offsetTop - margin;
@@ -549,11 +641,28 @@ export class TutorialManager {
     avoidRect: AvoidRect,
     width: number,
     height: number,
-    margin: number,
+    margin: number
   ): boolean {
-    const raw = this.computeSidePosition(side, avoidRect, width, height, margin);
-    const { left, top } = this.clampTooltipCoords(raw.left, raw.top, width, height, margin);
-    const box: AvoidRect = { left, top, right: left + width, bottom: top + height };
+    const raw = this.computeSidePosition(
+      side,
+      avoidRect,
+      width,
+      height,
+      margin
+    );
+    const { left, top } = this.clampTooltipCoords(
+      raw.left,
+      raw.top,
+      width,
+      height,
+      margin
+    );
+    const box: AvoidRect = {
+      left,
+      top,
+      right: left + width,
+      bottom: top + height,
+    };
     if (this.rectsOverlap(box, avoidRect, TOOLTIP_AVOID_GAP_PX)) return false;
     this.applyTooltipCoords(left, top);
     return true;
@@ -564,7 +673,7 @@ export class TutorialManager {
     anchor: AvoidRect,
     width: number,
     height: number,
-    margin: number,
+    margin: number
   ): { left: number; top: number } {
     const gap = Math.max(margin, TOOLTIP_AVOID_GAP_PX);
     const centerX = anchor.left + (anchor.right - anchor.left) / 2;
@@ -601,7 +710,12 @@ export class TutorialManager {
 
     const margin = 16;
     const { width, height } = this.prepareTooltipForAbsolutePosition();
-    const { width: vw, height: vh, offsetLeft, offsetTop } = this.getViewportMetrics();
+    const {
+      width: vw,
+      height: vh,
+      offsetLeft,
+      offsetTop,
+    } = this.getViewportMetrics();
 
     const left = offsetLeft + (vw - width) / 2;
     const top = offsetTop + (vh - height) / 2;
@@ -612,7 +726,10 @@ export class TutorialManager {
    * Clear centering transforms / CSS margin and constrain width so size
    * measurements match the box we will place with left/top.
    */
-  private prepareTooltipForAbsolutePosition(): { width: number; height: number } {
+  private prepareTooltipForAbsolutePosition(): {
+    width: number;
+    height: number;
+  } {
     const tooltip = this.tooltipElement!;
     const margin = 16;
     const { width: viewportWidth } = this.getViewportMetrics();
@@ -639,17 +756,27 @@ export class TutorialManager {
     top: number,
     width: number,
     height: number,
-    margin: number,
+    margin: number
   ): { left: number; top: number } {
-    const { width: viewportWidth, height: viewportHeight, offsetLeft, offsetTop } =
-      this.getViewportMetrics();
+    const {
+      width: viewportWidth,
+      height: viewportHeight,
+      offsetLeft,
+      offsetTop,
+    } = this.getViewportMetrics();
 
     const minLeft = offsetLeft + margin;
     const minTop = offsetTop + margin;
     // When the tooltip is wider/taller than the viewport, pin to the min edge
     // so text starts on-screen (never negative / mid-word clipped).
-    const maxLeft = Math.max(minLeft, offsetLeft + viewportWidth - width - margin);
-    const maxTop = Math.max(minTop, offsetTop + viewportHeight - height - margin);
+    const maxLeft = Math.max(
+      minLeft,
+      offsetLeft + viewportWidth - width - margin
+    );
+    const maxTop = Math.max(
+      minTop,
+      offsetTop + viewportHeight - height - margin
+    );
 
     return {
       left: Math.min(Math.max(left, minLeft), maxLeft),
@@ -668,7 +795,7 @@ export class TutorialManager {
     top: number,
     width: number,
     height: number,
-    margin: number,
+    margin: number
   ): void {
     const clamped = this.clampTooltipCoords(left, top, width, height, margin);
     this.applyTooltipCoords(clamped.left, clamped.top);

@@ -159,7 +159,9 @@ function buildEmptyState(): string {
 function buildGameRow(stats: GameStats): string {
   const { name, icon } = gameDisplayName(stats.gameId);
   const winRate =
-    stats.gamesPlayed > 0 ? formatWinRate(stats.gamesWon / stats.gamesPlayed) : '—';
+    stats.gamesPlayed > 0
+      ? formatWinRate(stats.gamesWon / stats.gamesPlayed)
+      : '—';
 
   return `
     <article class="stats-game-card" data-game-id="${escapeText(stats.gameId)}">

@@ -22,7 +22,10 @@ const KING_DIRECTIONS: Position[] = [
 ];
 
 // Find a player's King position on the board
-export function findKingPosition(board: Board, player: PlayerOwner): Position | null {
+export function findKingPosition(
+  board: Board,
+  player: PlayerOwner
+): Position | null {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const piece = board[row][col];
@@ -35,7 +38,10 @@ export function findKingPosition(board: Board, player: PlayerOwner): Position | 
 }
 
 // Get all valid positions a King can move to
-export function getValidKingMoves(state: GameState, player: PlayerOwner): Position[] {
+export function getValidKingMoves(
+  state: GameState,
+  player: PlayerOwner
+): Position[] {
   const kingPos = findKingPosition(state.board, player);
   if (!kingPos) {
     return [];
@@ -145,7 +151,10 @@ export function checkWinCondition(state: GameState): PlayerOwner | null {
 }
 
 // Check if a player can complete a full turn (move King + place Quadraphage)
-export function canCompleteTurn(state: GameState, player: PlayerOwner): boolean {
+export function canCompleteTurn(
+  state: GameState,
+  player: PlayerOwner
+): boolean {
   // Check if King has at least 1 valid move
   const validMoves = getValidKingMoves(state, player);
   if (validMoves.length === 0) {
@@ -174,11 +183,7 @@ export function isDrawCondition(state: GameState): boolean {
 
   // Check if board is completely full except Kings and neither is trapped
   const emptyCount = getValidQuadraphagePlacements(state).length;
-  if (
-    emptyCount === 0 &&
-    player1Moves.length > 0 &&
-    player2Moves.length > 0
-  ) {
+  if (emptyCount === 0 && player1Moves.length > 0 && player2Moves.length > 0) {
     // Board is full, but both Kings can still move (into each other's space)
     // This is actually impossible since Kings can't occupy the same space
     // But handle it as a draw just in case

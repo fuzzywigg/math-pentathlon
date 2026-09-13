@@ -15,10 +15,7 @@ const DIFFICULTY_CONFIG = {
 
 // Calculate shortest path distance from a player's starting edge to their goal edge
 // Uses Dijkstra's algorithm with distance = 0 for own pieces, 1 for empty, Infinity for opponent
-function shortestPathDistance(
-  state: HexGameState,
-  player: Player
-): number {
+function shortestPathDistance(state: HexGameState, player: Player): number {
   const { board, boardSize } = state;
   const INF = Infinity;
 
@@ -162,7 +159,14 @@ function minimax(
     let maxEval = -Infinity;
     for (const move of limitedMoves) {
       const newState = makeMove(state, move);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, false, aiPlayer);
+      const evalScore = minimax(
+        newState,
+        depth - 1,
+        alpha,
+        beta,
+        false,
+        aiPlayer
+      );
       maxEval = Math.max(maxEval, evalScore);
       alpha = Math.max(alpha, evalScore);
       if (beta <= alpha) break;
@@ -172,7 +176,14 @@ function minimax(
     let minEval = Infinity;
     for (const move of limitedMoves) {
       const newState = makeMove(state, move);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, true, aiPlayer);
+      const evalScore = minimax(
+        newState,
+        depth - 1,
+        alpha,
+        beta,
+        true,
+        aiPlayer
+      );
       minEval = Math.min(minEval, evalScore);
       beta = Math.min(beta, evalScore);
       if (beta <= alpha) break;
@@ -196,7 +207,7 @@ export function getBestMove(
   if (state.moveHistory.length < 2) {
     const center = Math.floor(state.boardSize / 2);
     const centerMoves = moves.filter(
-      m => Math.abs(m.row - center) <= 1 && Math.abs(m.col - center) <= 1
+      (m) => Math.abs(m.row - center) <= 1 && Math.abs(m.col - center) <= 1
     );
     if (centerMoves.length > 0) {
       return centerMoves[Math.floor(Math.random() * centerMoves.length)];
@@ -204,7 +215,7 @@ export function getBestMove(
   }
 
   // Evaluate all moves
-  const scoredMoves = moves.map(move => {
+  const scoredMoves = moves.map((move) => {
     const newState = makeMove(state, move);
 
     // Check for immediate win

@@ -334,7 +334,10 @@ function initTargetGame(): void {
   if (!challengeGrid) return;
 
   // Combine challenges
-  const allChallenges = [...MAKE_TEN_CHALLENGES, ...TWENTY_FOUR_CHALLENGES.slice(0, 4)];
+  const allChallenges = [
+    ...MAKE_TEN_CHALLENGES,
+    ...TWENTY_FOUR_CHALLENGES.slice(0, 4),
+  ];
 
   // Render challenge cards
   for (const challenge of allChallenges) {

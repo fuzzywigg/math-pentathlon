@@ -32,16 +32,16 @@ export interface FabMove {
 
 // Game phase
 export type GamePhase =
-  | 'selectingBar1'    // Choose first fraction bar
-  | 'selectingBar2'    // Choose second fraction bar
+  | 'selectingBar1' // Choose first fraction bar
+  | 'selectingBar2' // Choose second fraction bar
   | 'selectingOperation' // Choose operation (+, -, ×, ÷)
-  | 'confirmingMove'   // Confirm the move
+  | 'confirmingMove' // Confirm the move
   | 'gameOver';
 
 // Game state
 export interface FabADiffyState {
   fractionBars: Map<string, FractionBar>; // Available fraction bars
-  answerBars: Map<string, AnswerBar>;     // Target answers on board
+  answerBars: Map<string, AnswerBar>; // Target answers on board
   currentPlayer: Player;
   selectedBar1: string | null;
   selectedBar2: string | null;

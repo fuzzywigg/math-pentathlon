@@ -41,8 +41,8 @@ export interface RamrodMove {
 
 // Game phase
 export type GamePhase =
-  | 'selectingRod'   // Player selecting a rod
-  | 'placingRod'     // Player placing the rod in a box
+  | 'selectingRod' // Player selecting a rod
+  | 'placingRod' // Player placing the rod in a box
   | 'gameOver';
 
 // Game state
@@ -125,15 +125,15 @@ export function createRodSet(): Rod[] {
 
   // Create multiple rods of each length (similar to standard Cuisenaire set)
   const counts: Record<number, number> = {
-    1: 8,  // White - many small
-    2: 6,  // Red
-    3: 5,  // Light Green
-    4: 4,  // Purple
-    5: 4,  // Yellow
-    6: 3,  // Dark Green
-    7: 3,  // Black
-    8: 2,  // Brown
-    9: 2,  // Blue
+    1: 8, // White - many small
+    2: 6, // Red
+    3: 5, // Light Green
+    4: 4, // Purple
+    5: 4, // Yellow
+    6: 3, // Dark Green
+    7: 3, // Black
+    8: 2, // Brown
+    9: 2, // Blue
     10: 2, // Orange
   };
 

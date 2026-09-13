@@ -13,12 +13,7 @@
 // 4. Position blocks where they can score from multiple directions
 // 5. Watch what attributes are already on the board to find the best matches
 
-import {
-  Par55State,
-  AttributeBlock,
-  Player,
-  CONFIG,
-} from './types';
+import { Par55State, AttributeBlock, Player, CONFIG } from './types';
 import {
   selectBlock,
   placeBlock,
@@ -103,11 +98,15 @@ function evaluateMoves(
 
   for (const block of hand) {
     for (const baseId of validBases) {
-      const { totalPoints, matchDetails } = calculateScore(state, block, baseId);
+      const { totalPoints, matchDetails } = calculateScore(
+        state,
+        block,
+        baseId
+      );
       const potentialScore = evaluatePositionPotential(state, baseId, block);
 
       let score = totalPoints * 100; // Immediate points are important
-      score += potentialScore * 10;  // Future potential matters too
+      score += potentialScore * 10; // Future potential matters too
 
       const reasons: string[] = [];
 
@@ -120,7 +119,10 @@ function evaluateMoves(
       }
 
       // Factor 2: Multi-attribute matches (educational value)
-      const maxMatch = Math.max(...matchDetails.map(m => m.matchingAttributes.length), 0);
+      const maxMatch = Math.max(
+        ...matchDetails.map((m) => m.matchingAttributes.length),
+        0
+      );
       if (maxMatch >= 3) {
         score += 30;
         reasons.push(`${maxMatch}-attribute match`);
@@ -164,10 +166,7 @@ function evaluateMoves(
 /**
  * In easy mode, occasionally make suboptimal moves
  */
-function getTeachingMove(
-  state: Par55State,
-  player: Player
-): MoveOption | null {
+function getTeachingMove(state: Par55State, player: Player): MoveOption | null {
   const moves = evaluateMoves(state, player, 'easy');
 
   if (moves.length === 0) return null;
@@ -175,9 +174,8 @@ function getTeachingMove(
   // 40% chance to pick a lower-scoring move
   if (Math.random() < 0.4 && moves.length > 1) {
     // Pick a move that scores fewer points (but not 0)
-    const suboptimal = moves.filter(m =>
-      m.immediateScore < moves[0].immediateScore &&
-      m.immediateScore > 0
+    const suboptimal = moves.filter(
+      (m) => m.immediateScore < moves[0].immediateScore && m.immediateScore > 0
     );
     if (suboptimal.length > 0) {
       return suboptimal[Math.floor(Math.random() * suboptimal.length)];

@@ -41,7 +41,10 @@ export function getCurrentPath(): string {
 }
 
 // Get path parameters (simple extraction)
-export function getPathParams(pattern: string, path: string): Record<string, string> {
+export function getPathParams(
+  pattern: string,
+  path: string
+): Record<string, string> {
   const paramNames: string[] = [];
   const regexPattern = pattern.replace(/:([^/]+)/g, (_, name) => {
     paramNames.push(name);

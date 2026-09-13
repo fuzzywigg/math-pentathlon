@@ -533,7 +533,8 @@ function setupArithmeticCalculator(): void {
 
     if (!a || !b) {
       if (resultContainer) {
-        resultContainer.innerHTML = '<p style="color: red;">Invalid fraction format. Use format like "3/4" or "1 1/2"</p>';
+        resultContainer.innerHTML =
+          '<p style="color: red;">Invalid fraction format. Use format like "3/4" or "1 1/2"</p>';
       }
       return;
     }
@@ -541,7 +542,8 @@ function setupArithmeticCalculator(): void {
     const result = performOperation(a, b, currentOp);
 
     if (resultContainer) {
-      const stepsHtml = result.steps?.map((s) => `<div>${s}</div>`).join('') || '';
+      const stepsHtml =
+        result.steps?.map((s) => `<div>${s}</div>`).join('') || '';
 
       resultContainer.innerHTML = `
         <div class="steps">${stepsHtml}</div>
@@ -570,7 +572,9 @@ function setupArithmeticCalculator(): void {
 
 function setupInteractiveBar(): void {
   const container = document.getElementById('interactive-bar');
-  const denominatorSelect = document.getElementById('denominator-select') as HTMLSelectElement;
+  const denominatorSelect = document.getElementById(
+    'denominator-select'
+  ) as HTMLSelectElement;
   const valueDisplay = document.getElementById('interactive-value');
 
   let currentDenom = 4;
@@ -600,7 +604,10 @@ function setupInteractiveBar(): void {
     currentDenom = parseInt(denominatorSelect.value, 10);
     currentNumer = Math.min(currentNumer, currentDenom);
     if (valueDisplay) {
-      valueDisplay.textContent = formatFraction({ numerator: currentNumer, denominator: currentDenom });
+      valueDisplay.textContent = formatFraction({
+        numerator: currentNumer,
+        denominator: currentDenom,
+      });
     }
     renderInteractive();
   });
@@ -620,7 +627,8 @@ function setupComparison(): void {
 
     if (!a || !b) {
       if (resultContainer) {
-        resultContainer.innerHTML = '<p style="color: red;">Invalid fraction format</p>';
+        resultContainer.innerHTML =
+          '<p style="color: red;">Invalid fraction format</p>';
       }
       return;
     }
@@ -670,7 +678,8 @@ function setupEquivalentFinder(): void {
 
     if (!fraction) {
       if (resultContainer) {
-        resultContainer.innerHTML = '<p style="color: red;">Invalid fraction format</p>';
+        resultContainer.innerHTML =
+          '<p style="color: red;">Invalid fraction format</p>';
       }
       return;
     }
@@ -699,7 +708,10 @@ function setupEquivalentFinder(): void {
 
       // Show equivalent fractions
       equivalents.forEach((eq) => {
-        if (!areEquivalent(eq, simplified) || eq.denominator !== simplified.denominator) {
+        if (
+          !areEquivalent(eq, simplified) ||
+          eq.denominator !== simplified.denominator
+        ) {
           const item = document.createElement('div');
           item.className = 'equivalent-item';
           item.innerHTML = `<span>/ ${eq.denominator}</span>`;

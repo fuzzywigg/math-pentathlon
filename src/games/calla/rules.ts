@@ -158,8 +158,8 @@ export function makeMove(
   const nextPlayer = gotFreeTurn ? currentPlayer : opponent;
 
   // Check for game end: if one side is empty
-  const p1Empty = newP1Pits.every(c => c === 0);
-  const p2Empty = newP2Pits.every(c => c === 0);
+  const p1Empty = newP1Pits.every((c) => c === 0);
+  const p2Empty = newP2Pits.every((c) => c === 0);
 
   let winner: Player | 'tie' | null = null;
   let phase = state.phase;

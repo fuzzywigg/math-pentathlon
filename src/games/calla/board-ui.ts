@@ -1,9 +1,6 @@
 // Calla Board UI - Renders the Mancala-style board
 
-import {
-  CallaGameState,
-  PITS_PER_SIDE,
-} from './types';
+import { CallaGameState, PITS_PER_SIDE } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
@@ -21,7 +18,8 @@ const BOARD_HEIGHT = 200;
 const PIT_RADIUS = 32;
 const CALLA_WIDTH = 50;
 const CALLA_HEIGHT = 140;
-const PIT_SPACING = (BOARD_WIDTH - CALLA_WIDTH * 2 - PIT_RADIUS * 2) / (PITS_PER_SIDE + 1);
+const PIT_SPACING =
+  (BOARD_WIDTH - CALLA_WIDTH * 2 - PIT_RADIUS * 2) / (PITS_PER_SIDE + 1);
 
 // Render the game board
 export function renderBoard(
@@ -42,7 +40,10 @@ export function renderBoard(
   svg.setAttribute('height', '100%');
 
   // Board background
-  const boardBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const boardBg = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect'
+  );
   boardBg.setAttribute('x', '0');
   boardBg.setAttribute('y', '0');
   boardBg.setAttribute('width', String(BOARD_WIDTH));
@@ -57,12 +58,28 @@ export function renderBoard(
   // Player 2's Calla (left side)
   const p2CallaX = 10;
   const p2CallaY = (BOARD_HEIGHT - CALLA_HEIGHT) / 2;
-  svg.appendChild(createCalla(p2CallaX, p2CallaY, state.player2Calla, 'player2', state.currentPlayer === 'player2'));
+  svg.appendChild(
+    createCalla(
+      p2CallaX,
+      p2CallaY,
+      state.player2Calla,
+      'player2',
+      state.currentPlayer === 'player2'
+    )
+  );
 
   // Player 1's Calla (right side)
   const p1CallaX = BOARD_WIDTH - CALLA_WIDTH - 10;
   const p1CallaY = (BOARD_HEIGHT - CALLA_HEIGHT) / 2;
-  svg.appendChild(createCalla(p1CallaX, p1CallaY, state.player1Calla, 'player1', state.currentPlayer === 'player1'));
+  svg.appendChild(
+    createCalla(
+      p1CallaX,
+      p1CallaY,
+      state.player1Calla,
+      'player1',
+      state.currentPlayer === 'player1'
+    )
+  );
 
   // Pits start after left calla
   const pitsStartX = CALLA_WIDTH + 30;
@@ -72,8 +89,11 @@ export function renderBoard(
   for (let i = 0; i < PITS_PER_SIDE; i++) {
     const displayIndex = PITS_PER_SIDE - 1 - i; // Reverse for display
     const x = pitsStartX + PIT_SPACING * (i + 0.5);
-    const isValid = state.currentPlayer === 'player2' && validPits.includes(displayIndex);
-    const isLastSown = state.lastSownPit?.side === 'player2' && state.lastSownPit?.index === displayIndex;
+    const isValid =
+      state.currentPlayer === 'player2' && validPits.includes(displayIndex);
+    const isLastSown =
+      state.lastSownPit?.side === 'player2' &&
+      state.lastSownPit?.index === displayIndex;
 
     const pitGroup = createPit(
       x,
@@ -93,7 +113,8 @@ export function renderBoard(
   for (let i = 0; i < PITS_PER_SIDE; i++) {
     const x = pitsStartX + PIT_SPACING * (i + 0.5);
     const isValid = state.currentPlayer === 'player1' && validPits.includes(i);
-    const isLastSown = state.lastSownPit?.side === 'player1' && state.lastSownPit?.index === i;
+    const isLastSown =
+      state.lastSownPit?.side === 'player1' && state.lastSownPit?.index === i;
 
     const pitGroup = createPit(
       x,
@@ -109,19 +130,28 @@ export function renderBoard(
   }
 
   // Add arrows showing direction
-  const arrowGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const arrowGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   arrowGroup.setAttribute('class', 'calla-arrows');
 
   // Arrow for player 1 (bottom row, left to right)
   const arrow1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  arrow1.setAttribute('d', `M ${pitsStartX} ${p1Y + 25} L ${pitsStartX + PIT_SPACING * 4.5} ${p1Y + 25}`);
+  arrow1.setAttribute(
+    'd',
+    `M ${pitsStartX} ${p1Y + 25} L ${pitsStartX + PIT_SPACING * 4.5} ${p1Y + 25}`
+  );
   arrow1.setAttribute('class', 'calla-arrow calla-arrow-p1');
   arrow1.setAttribute('marker-end', 'url(#arrowhead-p1)');
   arrowGroup.appendChild(arrow1);
 
   // Arrow for player 2 (top row, right to left)
   const arrow2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  arrow2.setAttribute('d', `M ${pitsStartX + PIT_SPACING * 4.5} ${p2Y - 25} L ${pitsStartX} ${p2Y - 25}`);
+  arrow2.setAttribute(
+    'd',
+    `M ${pitsStartX + PIT_SPACING * 4.5} ${p2Y - 25} L ${pitsStartX} ${p2Y - 25}`
+  );
   arrow2.setAttribute('class', 'calla-arrow calla-arrow-p2');
   arrow2.setAttribute('marker-end', 'url(#arrowhead-p2)');
   arrowGroup.appendChild(arrow2);
@@ -129,27 +159,39 @@ export function renderBoard(
   // Arrowhead markers
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
 
-  const marker1 = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  const marker1 = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'marker'
+  );
   marker1.setAttribute('id', 'arrowhead-p1');
   marker1.setAttribute('markerWidth', '10');
   marker1.setAttribute('markerHeight', '7');
   marker1.setAttribute('refX', '9');
   marker1.setAttribute('refY', '3.5');
   marker1.setAttribute('orient', 'auto');
-  const polygon1 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  const polygon1 = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'polygon'
+  );
   polygon1.setAttribute('points', '0 0, 10 3.5, 0 7');
   polygon1.setAttribute('fill', '#1976d2');
   marker1.appendChild(polygon1);
   defs.appendChild(marker1);
 
-  const marker2 = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+  const marker2 = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'marker'
+  );
   marker2.setAttribute('id', 'arrowhead-p2');
   marker2.setAttribute('markerWidth', '10');
   marker2.setAttribute('markerHeight', '7');
   marker2.setAttribute('refX', '9');
   marker2.setAttribute('refY', '3.5');
   marker2.setAttribute('orient', 'auto');
-  const polygon2 = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  const polygon2 = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'polygon'
+  );
   polygon2.setAttribute('points', '0 0, 10 3.5, 0 7');
   polygon2.setAttribute('fill', '#d32f2f');
   marker2.appendChild(polygon2);
@@ -184,12 +226,18 @@ function createPit(
   onClick?: () => void
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('class', `calla-pit calla-pit-${player === 'player1' ? 'p1' : 'p2'}${isValid ? ' calla-pit-valid' : ''}${isLastSown ? ' calla-pit-last' : ''}`);
+  group.setAttribute(
+    'class',
+    `calla-pit calla-pit-${player === 'player1' ? 'p1' : 'p2'}${isValid ? ' calla-pit-valid' : ''}${isLastSown ? ' calla-pit-last' : ''}`
+  );
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
   // Pit circle
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const circle = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   circle.setAttribute('cx', String(cx));
   circle.setAttribute('cy', String(cy));
   circle.setAttribute('r', String(PIT_RADIUS));
@@ -197,7 +245,10 @@ function createPit(
   group.appendChild(circle);
 
   // Cube count
-  const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const countText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
   countText.setAttribute('x', String(cx));
   countText.setAttribute('y', String(cy + 6));
   countText.setAttribute('text-anchor', 'middle');
@@ -207,7 +258,10 @@ function createPit(
 
   // Cube indicators (small dots)
   if (cubes > 0 && cubes <= 6) {
-    const cubeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const cubeGroup = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
     cubeGroup.setAttribute('class', 'calla-cubes');
     const angleStep = (Math.PI * 2) / Math.max(cubes, 1);
     const cubeRadius = PIT_RADIUS * 0.6;
@@ -215,7 +269,10 @@ function createPit(
       const angle = angleStep * i - Math.PI / 2;
       const cubeX = cx + Math.cos(angle) * cubeRadius;
       const cubeY = cy + Math.sin(angle) * cubeRadius;
-      const cube = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      const cube = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
       cube.setAttribute('cx', String(cubeX));
       cube.setAttribute('cy', String(cubeY));
       cube.setAttribute('r', '4');
@@ -255,7 +312,10 @@ function createCalla(
   isCurrentPlayer: boolean
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('class', `calla-store calla-store-${player === 'player1' ? 'p1' : 'p2'}${isCurrentPlayer ? ' calla-store-active' : ''}`);
+  group.setAttribute(
+    'class',
+    `calla-store calla-store-${player === 'player1' ? 'p1' : 'p2'}${isCurrentPlayer ? ' calla-store-active' : ''}`
+  );
 
   // Calla rectangle (rounded)
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -268,7 +328,10 @@ function createCalla(
   group.appendChild(rect);
 
   // Cube count
-  const countText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const countText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
   countText.setAttribute('x', String(x + CALLA_WIDTH / 2));
   countText.setAttribute('y', String(y + CALLA_HEIGHT / 2 + 8));
   countText.setAttribute('text-anchor', 'middle');

@@ -33,7 +33,7 @@ function createBoard(): Map<string, BoardNode> {
   for (let row = 0; row < SIZE; row++) {
     for (let col = 0; col < SIZE; col++) {
       const id = `n${row}-${col}`;
-      const isNumbered = (row === 0 || row === SIZE - 1); // Top and bottom rows are start positions
+      const isNumbered = row === 0 || row === SIZE - 1; // Top and bottom rows are start positions
 
       nodes.set(id, {
         id,
@@ -188,7 +188,11 @@ export function getValidMoves(state: KwaState, chipId: string): string[] {
 /**
  * Check if a move is valid
  */
-export function isValidMove(state: KwaState, chipId: string, toNodeId: string): boolean {
+export function isValidMove(
+  state: KwaState,
+  chipId: string,
+  toNodeId: string
+): boolean {
   const validMoves = getValidMoves(state, chipId);
   return validMoves.includes(toNodeId);
 }
@@ -272,7 +276,10 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
     ...state,
     nodes: newNodes,
     chips: newChips,
-    currentPlayer: phase === 'gameOver' ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer:
+      phase === 'gameOver'
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
     selectedChip: null,
     phase,
     winner,
@@ -297,10 +304,22 @@ function findWinningAlignment(
 
   // Check all lines through this node
   const directions = [
-    [[0, -1], [0, 1]],   // Horizontal
-    [[-1, 0], [1, 0]],   // Vertical
-    [[-1, -1], [1, 1]],  // Diagonal \
-    [[-1, 1], [1, -1]],  // Diagonal /
+    [
+      [0, -1],
+      [0, 1],
+    ], // Horizontal
+    [
+      [-1, 0],
+      [1, 0],
+    ], // Vertical
+    [
+      [-1, -1],
+      [1, 1],
+    ], // Diagonal \
+    [
+      [-1, 1],
+      [1, -1],
+    ], // Diagonal /
   ];
 
   // Parse node position
@@ -361,10 +380,22 @@ function checkLineForWin(
 
         // Try different combinations: a + b - c, a - b + c, etc.
         const combinations = [
-          { expr: `${values[0]} + ${values[1]} - ${values[2]}`, result: values[0] + values[1] - values[2] },
-          { expr: `${values[0]} - ${values[1]} + ${values[2]}`, result: values[0] - values[1] + values[2] },
-          { expr: `${values[1]} + ${values[2]} - ${values[0]}`, result: values[1] + values[2] - values[0] },
-          { expr: `${values[0]} + ${values[2]} - ${values[1]}`, result: values[0] + values[2] - values[1] },
+          {
+            expr: `${values[0]} + ${values[1]} - ${values[2]}`,
+            result: values[0] + values[1] - values[2],
+          },
+          {
+            expr: `${values[0]} - ${values[1]} + ${values[2]}`,
+            result: values[0] - values[1] + values[2],
+          },
+          {
+            expr: `${values[1]} + ${values[2]} - ${values[0]}`,
+            result: values[1] + values[2] - values[0],
+          },
+          {
+            expr: `${values[0]} + ${values[2]} - ${values[1]}`,
+            result: values[0] + values[2] - values[1],
+          },
         ];
 
         for (const combo of combinations) {

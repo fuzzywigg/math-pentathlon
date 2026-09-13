@@ -36,7 +36,10 @@ export function renderBoard(
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
   // Calculate bounds
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const node of state.board.nodes.values()) {
     minX = Math.min(minX, node.x);
     minY = Math.min(minY, node.y);
@@ -48,7 +51,10 @@ export function renderBoard(
   const width = maxX - minX + padding * 2;
   const height = maxY - minY + padding * 2;
 
-  svg.setAttribute('viewBox', `${minX - padding} ${minY - padding} ${width} ${height}`);
+  svg.setAttribute(
+    'viewBox',
+    `${minX - padding} ${minY - padding} ${width} ${height}`
+  );
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
   svg.style.maxWidth = `${width}px`;
@@ -65,7 +71,9 @@ export function renderBoard(
   svg.appendChild(bg);
 
   // Get valid moves and selectable nodes
-  const validMoves = state.selectedNode ? getValidMoves(state, state.selectedNode) : [];
+  const validMoves = state.selectedNode
+    ? getValidMoves(state, state.selectedNode)
+    : [];
   const selectableNodes = getSelectableNodes(state);
 
   // Get winning paths for highlighting
@@ -104,7 +112,10 @@ export function renderBoard(
     g.style.cursor = 'pointer';
 
     // Node circle background
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const circle = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     circle.setAttribute('cx', node.x.toString());
     circle.setAttribute('cy', node.y.toString());
     circle.setAttribute('r', CONFIG.NODE_RADIUS.toString());
@@ -138,17 +149,26 @@ export function renderBoard(
 
     // Draw chip if present
     if (node.chip) {
-      const chipCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      const chipCircle = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
       chipCircle.setAttribute('cx', node.x.toString());
       chipCircle.setAttribute('cy', node.y.toString());
       chipCircle.setAttribute('r', (CONFIG.NODE_RADIUS - 6).toString());
       const seats = playerColors();
-      chipCircle.setAttribute('fill', node.chip === 'player1' ? seats.player1 : seats.player2);
+      chipCircle.setAttribute(
+        'fill',
+        node.chip === 'player1' ? seats.player1 : seats.player2
+      );
       chipCircle.setAttribute('stroke', '#fff');
       chipCircle.setAttribute('stroke-width', '2');
 
       // Add shine effect
-      const shine = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      const shine = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'ellipse'
+      );
       shine.setAttribute('cx', (node.x - 4).toString());
       shine.setAttribute('cy', (node.y - 4).toString());
       shine.setAttribute('rx', '6');
@@ -160,7 +180,10 @@ export function renderBoard(
 
       // Highlight selectable chips
       if (selectableNodes.includes(nodeId)) {
-        const highlight = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const highlight = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
         highlight.setAttribute('cx', node.x.toString());
         highlight.setAttribute('cy', node.y.toString());
         highlight.setAttribute('r', (CONFIG.NODE_RADIUS + 4).toString());
@@ -178,7 +201,11 @@ export function renderBoard(
     g.addEventListener('click', activate);
 
     const owner =
-      node.chip === 'player1' ? 'Blue' : node.chip === 'player2' ? 'Red' : undefined;
+      node.chip === 'player1'
+        ? 'Blue'
+        : node.chip === 'player2'
+          ? 'Red'
+          : undefined;
     const isValidMove = validMoves.includes(nodeId);
     const isSelectable =
       selectableNodes.includes(nodeId) ||
@@ -190,7 +217,8 @@ export function renderBoard(
         empty: node.chip === null,
         owner,
         validMove: isValidMove,
-        validPlacement: state.phase === 'placement' && node.chip === null && isSelectable,
+        validPlacement:
+          state.phase === 'placement' && node.chip === null && isSelectable,
         extras: state.selectedNode === nodeId ? ['selected'] : undefined,
       })
     );

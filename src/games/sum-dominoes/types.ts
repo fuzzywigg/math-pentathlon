@@ -39,9 +39,9 @@ export interface SDMove {
 
 // Game phase
 export type GamePhase =
-  | 'rolling'       // Player needs to roll dice
-  | 'placing'       // Player selecting where to place domino
-  | 'passing'       // Player cannot play, must pass
+  | 'rolling' // Player needs to roll dice
+  | 'placing' // Player selecting where to place domino
+  | 'passing' // Player cannot play, must pass
   | 'gameOver';
 
 // Game state
@@ -62,8 +62,8 @@ export interface SumDominoesState {
 
 // Configuration
 export const CONFIG = {
-  BOARD_SIZE: 11,       // 11x11 board
-  MAX_FACE_VALUE: 6,    // Standard double-six dominoes
+  BOARD_SIZE: 11, // 11x11 board
+  MAX_FACE_VALUE: 6, // Standard double-six dominoes
   STARTING_HAND_SIZE: 7,
   CENTER_ROW: 5,
   CENTER_COL: 5,

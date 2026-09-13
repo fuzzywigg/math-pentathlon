@@ -13,12 +13,7 @@ import {
   cellsInRing,
 } from './types';
 
-import {
-  getValidMoves,
-  makeMove,
-  checkWinner,
-  hasValidMoves,
-} from './rules';
+import { getValidMoves, makeMove, checkWinner, hasValidMoves } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -116,7 +111,10 @@ function evaluatePosition(state: QueensGuardsState, player: Player): number {
 /**
  * Find queen position for a player
  */
-function findQueen(state: QueensGuardsState, player: Player): BoardCoord | null {
+function findQueen(
+  state: QueensGuardsState,
+  player: Player
+): BoardCoord | null {
   for (const [key, cell] of state.cells) {
     if (cell.piece?.player === player && cell.piece.type === 'queen') {
       return parseKey(key);
@@ -143,13 +141,18 @@ function findGuards(state: QueensGuardsState, player: Player): BoardCoord[] {
  */
 function isAdjacent(a: BoardCoord, b: BoardCoord): boolean {
   const adjacent = getAdjacent(a);
-  return adjacent.some(adj => adj.ring === b.ring && adj.position === b.position);
+  return adjacent.some(
+    (adj) => adj.ring === b.ring && adj.position === b.position
+  );
 }
 
 /**
  * Count capture threats for a player
  */
-function evaluateCaptureThreats(state: QueensGuardsState, player: Player): number {
+function evaluateCaptureThreats(
+  state: QueensGuardsState,
+  player: Player
+): number {
   let threats = 0;
 
   for (const [key, cell] of state.cells) {
@@ -164,7 +167,7 @@ function evaluateCaptureThreats(state: QueensGuardsState, player: Player): numbe
       if (simState.capturedPieces.length > state.capturedPieces.length) {
         threats++;
         // Extra value for capturing queen
-        const capturedQueens = simState.capturedPieces.filter(c => {
+        const capturedQueens = simState.capturedPieces.filter((c) => {
           const capturedCell = state.cells.get(cellKey(c.ring, c.position));
           return capturedCell?.piece?.type === 'queen';
         });
@@ -229,7 +232,14 @@ function minimax(
     let maxEval = -Infinity;
     for (const move of orderedMoves) {
       const newState = makeMove(state, move.from, move.to);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, false, aiPlayer);
+      const evalScore = minimax(
+        newState,
+        depth - 1,
+        alpha,
+        beta,
+        false,
+        aiPlayer
+      );
       maxEval = Math.max(maxEval, evalScore);
       alpha = Math.max(alpha, evalScore);
       if (beta <= alpha) break;
@@ -239,7 +249,14 @@ function minimax(
     let minEval = Infinity;
     for (const move of orderedMoves) {
       const newState = makeMove(state, move.from, move.to);
-      const evalScore = minimax(newState, depth - 1, alpha, beta, true, aiPlayer);
+      const evalScore = minimax(
+        newState,
+        depth - 1,
+        alpha,
+        beta,
+        true,
+        aiPlayer
+      );
       minEval = Math.min(minEval, evalScore);
       beta = Math.min(beta, evalScore);
       if (beta <= alpha) break;
@@ -251,7 +268,9 @@ function minimax(
 /**
  * Get all possible moves for current player
  */
-function getAllMoves(state: QueensGuardsState): { from: BoardCoord; to: BoardCoord }[] {
+function getAllMoves(
+  state: QueensGuardsState
+): { from: BoardCoord; to: BoardCoord }[] {
   const moves: { from: BoardCoord; to: BoardCoord }[] = [];
 
   for (const [key, cell] of state.cells) {
@@ -283,8 +302,10 @@ function orderMoves(
     // Captures first
     const stateA = makeMove(state, a.from, a.to);
     const stateB = makeMove(state, b.from, b.to);
-    const captureA = stateA.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
-    const captureB = stateB.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
+    const captureA =
+      stateA.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
+    const captureB =
+      stateB.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
     if (captureA !== captureB) return captureB - captureA;
 
     // Queen moves first
@@ -350,7 +371,9 @@ export function getAIMove(
 
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && scoredMoves.length > 1) {
-    const randomIndex = Math.floor(Math.random() * Math.min(3, scoredMoves.length));
+    const randomIndex = Math.floor(
+      Math.random() * Math.min(3, scoredMoves.length)
+    );
     return scoredMoves[randomIndex].move;
   }
 
@@ -384,6 +407,9 @@ function getRestoreMove(state: QueensGuardsState): AIMove | null {
 /**
  * Apply an AI move to the game state
  */
-export function applyAIMove(state: QueensGuardsState, move: AIMove): QueensGuardsState {
+export function applyAIMove(
+  state: QueensGuardsState,
+  move: AIMove
+): QueensGuardsState {
   return makeMove(state, move.from, move.to);
 }

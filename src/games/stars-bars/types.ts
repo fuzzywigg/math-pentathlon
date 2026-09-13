@@ -55,7 +55,13 @@ export const CONFIG = {
   TARGET_SCORE: 30,
 };
 
-export const SHAPES: Shape[] = ['circle', 'square', 'triangle', 'hexagon', 'rectangle'];
+export const SHAPES: Shape[] = [
+  'circle',
+  'square',
+  'triangle',
+  'hexagon',
+  'rectangle',
+];
 export const COLORS: CardColor[] = ['red', 'blue', 'yellow'];
 export const SIZES: Size[] = ['small', 'large'];
 export const THICKNESSES: Thickness[] = ['thin', 'thick'];
@@ -70,7 +76,10 @@ export const COLOR_VALUES: Record<CardColor, string> = {
 /**
  * Count how many attributes differ between two cards
  */
-export function countDifferences(card1: AttributeCard, card2: AttributeCard): number {
+export function countDifferences(
+  card1: AttributeCard,
+  card2: AttributeCard
+): number {
   let diff = 0;
   if (card1.shape !== card2.shape) diff++;
   if (card1.color !== card2.color) diff++;
@@ -82,7 +91,10 @@ export function countDifferences(card1: AttributeCard, card2: AttributeCard): nu
 /**
  * Get a description of the differences
  */
-export function getDifferenceDescription(card1: AttributeCard, card2: AttributeCard): string {
+export function getDifferenceDescription(
+  card1: AttributeCard,
+  card2: AttributeCard
+): string {
   const diffs: string[] = [];
   if (card1.shape !== card2.shape) diffs.push('shape');
   if (card1.color !== card2.color) diffs.push('color');

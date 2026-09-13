@@ -1,14 +1,7 @@
 // Ramrod Board UI
 // Rendering Cuisenaire rods, sum boxes, and game state
 
-import {
-  RamrodState,
-  SumBox,
-  Rod,
-  Player,
-  CONFIG,
-  ROD_COLORS,
-} from './types';
+import { RamrodState, SumBox, Rod, Player, CONFIG, ROD_COLORS } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
@@ -55,7 +48,14 @@ export function renderBoard(
       const box = state.boxes.get(boxId);
       if (!box) continue;
 
-      const boxEl = renderSumBox(state, box, validPlacements, onBoxClick, row, col);
+      const boxEl = renderSumBox(
+        state,
+        box,
+        validPlacements,
+        onBoxClick,
+        row,
+        col
+      );
       rowEl.appendChild(boxEl);
     }
 
@@ -117,20 +117,20 @@ function renderSumBox(
       slotEl.appendChild(hint);
     }
 
-      makeCellFocusable(
-        slotEl,
-        buildCellAriaLabel({
-          coord: `Sum ${box.targetSum} slot ${slot + 1}`,
-          empty: !rod,
-          piece: rod ? `${rod.length}cm rod` : undefined,
-          owner: rod?.owner
-            ? getPlayerName(rod.owner)
-            : box.completedBy
-              ? getPlayerName(box.completedBy)
-              : undefined,
-          validPlacement: isValid,
-        })
-      );
+    makeCellFocusable(
+      slotEl,
+      buildCellAriaLabel({
+        coord: `Sum ${box.targetSum} slot ${slot + 1}`,
+        empty: !rod,
+        piece: rod ? `${rod.length}cm rod` : undefined,
+        owner: rod?.owner
+          ? getPlayerName(rod.owner)
+          : box.completedBy
+            ? getPlayerName(box.completedBy)
+            : undefined,
+        validPlacement: isValid,
+      })
+    );
 
     wrapper.appendChild(slotEl);
   }

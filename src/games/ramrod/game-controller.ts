@@ -54,7 +54,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): RamrodGameController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): RamrodGameController {
   injectRamrodStyles();
   activeContainer = container;
 
@@ -139,11 +143,15 @@ function updateUI(controller: RamrodGameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.playerRods.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderPlayerRods(state, 'player1', (rodId) => handleRodClick(controller, rodId))
+    renderPlayerRods(state, 'player1', (rodId) =>
+      handleRodClick(controller, rodId)
+    )
   );
 
   // Board
-  const board = renderBoard(state, (boxId, slot) => handleBoxClick(controller, boxId, slot));
+  const board = renderBoard(state, (boxId, slot) =>
+    handleBoxClick(controller, boxId, slot)
+  );
 
   // Player 2 rods
   const p2Container = document.createElement('div');
@@ -152,7 +160,9 @@ function updateUI(controller: RamrodGameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.playerRods.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderPlayerRods(state, 'player2', (rodId) => handleRodClick(controller, rodId))
+    renderPlayerRods(state, 'player2', (rodId) =>
+      handleRodClick(controller, rodId)
+    )
   );
 
   mainLayout.appendChild(p1Container);
@@ -220,7 +230,11 @@ function handleRodClick(controller: RamrodGameController, rodId: string): void {
 /**
  * Handle box click
  */
-function handleBoxClick(controller: RamrodGameController, boxId: string, slot: number): void {
+function handleBoxClick(
+  controller: RamrodGameController,
+  boxId: string,
+  slot: number
+): void {
   controller.state = placeRod(controller.state, boxId, slot);
   controller.update();
 }

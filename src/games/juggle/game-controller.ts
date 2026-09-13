@@ -67,7 +67,8 @@ function updateUI(): void {
     gameState.currentDice,
     handleRollDice,
     handleSelectDie,
-    gameState.phase === 'rolling' && (!vsAI || gameState.currentPlayer !== aiPlayer),
+    gameState.phase === 'rolling' &&
+      (!vsAI || gameState.currentPlayer !== aiPlayer),
     gameState.phase
   );
   boardContainer.appendChild(diceArea);
@@ -77,7 +78,11 @@ function updateUI(): void {
     const shapeSelector = renderShapeSelector(gameState, handleSelectShape);
     boardContainer.appendChild(shapeSelector);
   } else if (gameState.phase === 'placing') {
-    const shapeControls = renderShapeControls(gameState, handleRotate, handleFlip);
+    const shapeControls = renderShapeControls(
+      gameState,
+      handleRotate,
+      handleFlip
+    );
     boardContainer.appendChild(shapeControls);
   }
 
@@ -285,10 +290,7 @@ function makeAIMove(): void {
 // Public API
 // =============================================================================
 
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
 

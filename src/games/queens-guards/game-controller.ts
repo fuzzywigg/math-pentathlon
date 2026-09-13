@@ -100,11 +100,13 @@ function updateStatus(): void {
   }
 
   const playerName = getPlayerName(gameState.currentPlayer);
-  const playerClass = gameState.currentPlayer === 'player1' ? 'player1' : 'player2';
+  const playerClass =
+    gameState.currentPlayer === 'player1' ? 'player1' : 'player2';
 
   let instruction = 'Select a piece to move';
   if (gameState.selectedPiece) {
-    instruction = 'Click a highlighted cell to move, or select a different piece';
+    instruction =
+      'Click a highlighted cell to move, or select a different piece';
   }
   if (gameState.capturedPieces.length > 0) {
     instruction = 'Place captured pieces on the outer ring';
@@ -138,7 +140,9 @@ function handleCellClick(coord: BoardCoord): void {
   if (gameState.selectedPiece) {
     const fromCoord = parseKey(gameState.selectedPiece);
     const validMoves = getValidMoves(gameState, fromCoord);
-    const isValidMove = validMoves.some((m) => m.ring === coord.ring && m.position === coord.position);
+    const isValidMove = validMoves.some(
+      (m) => m.ring === coord.ring && m.position === coord.position
+    );
 
     if (isValidMove) {
       // Execute move
@@ -192,10 +196,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 // Public API
 // =============================================================================
 
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
 

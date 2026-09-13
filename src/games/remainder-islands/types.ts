@@ -11,9 +11,9 @@ export interface Island {
   id: string;
   row: number;
   col: number;
-  value: number;  // The divisor value
+  value: number; // The divisor value
   owner: Player | null;
-  chips: number;  // Number of chips on this island
+  chips: number; // Number of chips on this island
 }
 
 // Dice roll result
@@ -25,15 +25,15 @@ export interface DiceRoll {
 
 // Division result
 export interface DivisionResult {
-  dividend: number;  // Total from dice
-  divisor: number;   // Island value
+  dividend: number; // Total from dice
+  divisor: number; // Island value
   quotient: number;
   remainder: number;
 }
 
 // Game phases
 export type GamePhase =
-  | 'rolling'      // Waiting for dice roll
+  | 'rolling' // Waiting for dice roll
   | 'selectIsland' // Choose which island to land on
   | 'gameOver';
 
@@ -47,7 +47,7 @@ export interface RemainderIslandsState {
   currentRoll: DiceRoll | null;
 
   // Valid islands for current roll
-  validIslands: string[];  // Island IDs
+  validIslands: string[]; // Island IDs
 
   // Selected island preview
   selectedIsland: string | null;
@@ -82,7 +82,7 @@ export interface MoveRecord {
 
 // Game configuration
 export const INITIAL_CHIPS_PER_PLAYER = 12;
-export const TOTAL_TURNS = 24;  // 12 turns each player
+export const TOTAL_TURNS = 24; // 12 turns each player
 
 // Hexagonal grid configuration
 export const GRID_ROWS = 5;
@@ -142,11 +142,17 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get player chips
-export function getPlayerChips(state: RemainderIslandsState, player: Player): number {
+export function getPlayerChips(
+  state: RemainderIslandsState,
+  player: Player
+): number {
   return player === 'player1' ? state.player1Chips : state.player2Chips;
 }
 
 // Get player score
-export function getPlayerScore(state: RemainderIslandsState, player: Player): number {
+export function getPlayerScore(
+  state: RemainderIslandsState,
+  player: Player
+): number {
   return player === 'player1' ? state.player1Score : state.player2Score;
 }

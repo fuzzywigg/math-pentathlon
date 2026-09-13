@@ -5,7 +5,7 @@ export type Player = 'player1' | 'player2';
 
 // A cell on the Contig board
 export interface ContigCell {
-  value: number;        // The number displayed on this cell
+  value: number; // The number displayed on this cell
   owner: Player | null; // Who has marked this cell
   row: number;
   col: number;
@@ -14,10 +14,10 @@ export interface ContigCell {
 // Game state
 export interface ContigState {
   cells: Map<number, ContigCell>; // Map from value to cell
-  grid: (number | null)[][];       // 2D grid for adjacency (value at each position)
+  grid: (number | null)[][]; // 2D grid for adjacency (value at each position)
   currentPlayer: Player;
   currentDice: [number, number, number] | null; // Current dice roll
-  currentExpression: string | null;             // Expression being built
+  currentExpression: string | null; // Expression being built
   scores: { player1: number; player2: number };
   consecutivePasses: { player1: number; player2: number };
   winner: Player | null;
@@ -39,19 +39,19 @@ export interface ContigMove {
 export const CONFIG = {
   GRID_ROWS: 6,
   GRID_COLS: 10,
-  MAX_CONSECUTIVE_PASSES: 3,  // Eliminated after 3 passes
-  WIN_BY_ALIGNMENT: 5,        // 5 in a row to win (optional)
+  MAX_CONSECUTIVE_PASSES: 3, // Eliminated after 3 passes
+  WIN_BY_ALIGNMENT: 5, // 5 in a row to win (optional)
 };
 
 // The Contig 60 board numbers (6x10 grid = 60 cells)
 // These are carefully chosen numbers that can be made from 3 dice + operations
 export const BOARD_NUMBERS: number[][] = [
-  [1,   2,   3,   4,   5,   6,   7,   8,   9,   10],
-  [11,  12,  13,  14,  15,  16,  18,  20,  21,  24],
-  [25,  27,  28,  30,  32,  35,  36,  40,  42,  45],
-  [48,  50,  54,  55,  60,  64,  66,  72,  75,  80],
-  [84,  90,  96,  100, 108, 120, 125, 144, 150, 180],
-  [17,  19,  22,  23,  26,  29,  31,  33,  34,  216],
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  [11, 12, 13, 14, 15, 16, 18, 20, 21, 24],
+  [25, 27, 28, 30, 32, 35, 36, 40, 42, 45],
+  [48, 50, 54, 55, 60, 64, 66, 72, 75, 80],
+  [84, 90, 96, 100, 108, 120, 125, 144, 150, 180],
+  [17, 19, 22, 23, 26, 29, 31, 33, 34, 216],
 ];
 
 // =============================================================================
@@ -68,12 +68,20 @@ export function getOpponent(player: Player): Player {
 /**
  * Get all adjacent cells for a position
  */
-export function getAdjacentPositions(row: number, col: number): { row: number; col: number }[] {
+export function getAdjacentPositions(
+  row: number,
+  col: number
+): { row: number; col: number }[] {
   const adjacent: { row: number; col: number }[] = [];
   const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1],           [0, 1],
-    [1, -1],  [1, 0],  [1, 1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
   ];
 
   for (const [dr, dc] of directions) {
@@ -90,7 +98,10 @@ export function getAdjacentPositions(row: number, col: number): { row: number; c
 /**
  * Create initial board
  */
-export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): { cells: Map<number, ContigCell>; grid: (number | null)[][] } {
+export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): {
+  cells: Map<number, ContigCell>;
+  grid: (number | null)[][];
+} {
   const cells = new Map<number, ContigCell>();
   const grid: (number | null)[][] = [];
 
@@ -158,10 +169,14 @@ const OPERATORS: Operator[] = ['+', '-', '*', '/'];
  */
 function evaluate(a: number, op: Operator, b: number): number | null {
   switch (op) {
-    case '+': return a + b;
-    case '-': return a - b;
-    case '*': return a * b;
-    case '/': return b !== 0 && a % b === 0 ? a / b : null; // Must divide evenly
+    case '+':
+      return a + b;
+    case '-':
+      return a - b;
+    case '*':
+      return a * b;
+    case '/':
+      return b !== 0 && a % b === 0 ? a / b : null; // Must divide evenly
   }
 }
 
@@ -169,15 +184,20 @@ function evaluate(a: number, op: Operator, b: number): number | null {
  * Get all possible results from three dice using two operations
  * Returns array of { result, expression } pairs
  */
-export function getAllPossibleResults(dice: [number, number, number]): { result: number; expression: string }[] {
+export function getAllPossibleResults(
+  dice: [number, number, number]
+): { result: number; expression: string }[] {
   const [a, b, c] = dice;
   const results: Map<number, string> = new Map();
 
   // Try all orderings of the three dice
   const orderings = [
-    [a, b, c], [a, c, b],
-    [b, a, c], [b, c, a],
-    [c, a, b], [c, b, a],
+    [a, b, c],
+    [a, c, b],
+    [b, a, c],
+    [b, c, a],
+    [c, a, b],
+    [c, b, a],
   ];
 
   for (const [x, y, z] of orderings) {

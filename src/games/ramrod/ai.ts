@@ -12,11 +12,7 @@
 // 4. Higher value boxes (9, 10) give more points but are harder to complete
 // 5. Sometimes it's better to wait for the right rod than place randomly
 
-import {
-  RamrodState,
-  Player,
-  CONFIG,
-} from './types';
+import { RamrodState, Player, CONFIG } from './types';
 import {
   selectRod,
   placeRod,
@@ -97,7 +93,7 @@ function evaluateMoves(
         // Can't complete - check if opponent could complete with a rod they have
         const needed = box.targetSum - rod.length;
         const opponentRodIds = state.playerRods[opponent];
-        const opponentHasNeeded = opponentRodIds.some(id => {
+        const opponentHasNeeded = opponentRodIds.some((id) => {
           const r = state.rods.get(id);
           return r && r.length === needed;
         });
@@ -111,7 +107,7 @@ function evaluateMoves(
         // Empty box - placing first rod
         // Check if we have the complementary rod
         const needed = box.targetSum - rod.length;
-        const weHaveComplement = playerRods.some(id => {
+        const weHaveComplement = playerRods.some((id) => {
           if (id === rodId) return false;
           const r = state.rods.get(id);
           return r && r.length === needed;
@@ -161,7 +157,7 @@ function getTeachingMove(
 
   // 40% chance to pick a non-completing move
   if (Math.random() < 0.4) {
-    const nonCompleting = moves.filter(m => !m.completesBox);
+    const nonCompleting = moves.filter((m) => !m.completesBox);
     if (nonCompleting.length > 0) {
       return nonCompleting[Math.floor(Math.random() * nonCompleting.length)];
     }

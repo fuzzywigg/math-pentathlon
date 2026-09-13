@@ -1,15 +1,8 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  FractionPinballState,
-  createInitialState,
-} from './types';
-import {
-  submitAnswer,
-  nextChallenge,
-  startGame,
-} from './rules';
+import { FractionPinballState, createInitialState } from './types';
+import { submitAnswer, nextChallenge, startGame } from './rules';
 import {
   renderChallenge,
   renderResult,
@@ -84,7 +77,11 @@ function render(): void {
   gameContainer.appendChild(wrapper);
 
   // AI turn
-  if (isAIMode && gameState.phase === 'answering' && gameState.currentPlayer === 'player2') {
+  if (
+    isAIMode &&
+    gameState.phase === 'answering' &&
+    gameState.currentPlayer === 'player2'
+  ) {
     setTimeout(aiTurn, 1000);
   }
 }
@@ -112,7 +109,8 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2') return;
+  if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2')
+    return;
   if (!gameState.currentChallenge) return;
 
   // Use AI module to get answer

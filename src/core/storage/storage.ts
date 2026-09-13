@@ -63,7 +63,12 @@ class StorageManager {
     return {
       version: data.version || CURRENT_DATA_VERSION,
       profile: data.profile || null,
-      streak: data.streak || { currentStreak: 0, bestStreak: 0, lastPlayDate: '', streakStartDate: '' },
+      streak: data.streak || {
+        currentStreak: 0,
+        bestStreak: 0,
+        lastPlayDate: '',
+        streakStartDate: '',
+      },
       achievements: data.achievements || [],
       gameStats: data.gameStats || {},
       owlState: data.owlState || { ...DEFAULT_OWL_STATE },
@@ -261,7 +266,8 @@ class StorageManager {
 
       // Prevent unbounded growth
       if (this.data.owlState.messagesSeen.length > MAX_MESSAGES_HISTORY) {
-        this.data.owlState.messagesSeen = this.data.owlState.messagesSeen.slice(-MAX_MESSAGES_HISTORY);
+        this.data.owlState.messagesSeen =
+          this.data.owlState.messagesSeen.slice(-MAX_MESSAGES_HISTORY);
       }
 
       this.save();
@@ -295,11 +301,17 @@ class StorageManager {
 
   // Aggregate statistics
   public getTotalGamesPlayed(): number {
-    return Object.values(this.data.gameStats).reduce((sum, stats) => sum + stats.gamesPlayed, 0);
+    return Object.values(this.data.gameStats).reduce(
+      (sum, stats) => sum + stats.gamesPlayed,
+      0
+    );
   }
 
   public getTotalPlayTime(): number {
-    return Object.values(this.data.gameStats).reduce((sum, stats) => sum + stats.totalPlayTime, 0);
+    return Object.values(this.data.gameStats).reduce(
+      (sum, stats) => sum + stats.totalPlayTime,
+      0
+    );
   }
 
   public getOverallWinRate(): number {

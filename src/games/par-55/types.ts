@@ -48,7 +48,7 @@ export interface MatchDetail {
 // Game phase
 export type GamePhase =
   | 'selectingBlock' // Player selecting a block from their hand
-  | 'placingBlock'   // Player placing the block on a base
+  | 'placingBlock' // Player placing the block on a base
   | 'gameOver';
 
 // Game state
@@ -79,7 +79,13 @@ export const CONFIG = {
 };
 
 // All possible attribute values
-export const SHAPES: Shape[] = ['circle', 'square', 'triangle', 'rectangle', 'hexagon'];
+export const SHAPES: Shape[] = [
+  'circle',
+  'square',
+  'triangle',
+  'rectangle',
+  'hexagon',
+];
 export const COLORS: BlockColor[] = ['red', 'blue', 'yellow'];
 export const SIZES: Size[] = ['small', 'large'];
 export const THICKNESSES: Thickness[] = ['thin', 'thick'];
@@ -136,7 +142,10 @@ export function getOpponent(player: Player): Player {
 /**
  * Count matching attributes between two blocks
  */
-export function countMatchingAttributes(block1: AttributeBlock, block2: AttributeBlock): string[] {
+export function countMatchingAttributes(
+  block1: AttributeBlock,
+  block2: AttributeBlock
+): string[] {
   const matches: string[] = [];
 
   if (block1.shape === block2.shape) matches.push('shape');

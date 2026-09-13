@@ -39,7 +39,10 @@ export function lcm(a: number, b: number): number {
 /**
  * Create a fraction from numerator and denominator
  */
-export function createFraction(numerator: number, denominator: number): Fraction {
+export function createFraction(
+  numerator: number,
+  denominator: number
+): Fraction {
   if (denominator === 0) {
     throw new Error('Denominator cannot be zero');
   }
@@ -82,7 +85,10 @@ function signedNumerator(f: Fraction): number {
 /**
  * Create a fraction from a decimal (with limited precision)
  */
-export function fromDecimal(decimal: number, maxDenominator: number = 1000): Fraction {
+export function fromDecimal(
+  decimal: number,
+  maxDenominator: number = 1000
+): Fraction {
   if (Number.isInteger(decimal)) {
     return fromWhole(decimal);
   }
@@ -95,13 +101,18 @@ export function fromDecimal(decimal: number, maxDenominator: number = 1000): Fra
   for (const denom of commonDenoms) {
     const numer = decimal * denom;
     if (Math.abs(numer - Math.round(numer)) < 0.0001) {
-      return simplify({ numerator: sign * Math.round(numer), denominator: denom });
+      return simplify({
+        numerator: sign * Math.round(numer),
+        denominator: denom,
+      });
     }
   }
 
   // Continued fraction approximation
-  let h1 = 1, h2 = 0;
-  let k1 = 0, k2 = 1;
+  let h1 = 1,
+    h2 = 0;
+  let k1 = 0,
+    k2 = 1;
   let b = decimal;
 
   do {
@@ -204,7 +215,11 @@ export function toMixedNumber(fraction: Fraction): MixedNumber {
  * Convert from mixed number to improper fraction.
  * New signature: fromMixedNumber(whole, numerator, denominator)
  */
-export function fromMixedNumber(whole: number, numerator: number, denominator: number): Fraction {
+export function fromMixedNumber(
+  whole: number,
+  numerator: number,
+  denominator: number
+): Fraction {
   const sign = whole < 0 ? -1 : 1;
   const absWhole = Math.abs(whole);
   const num = sign * (absWhole * denominator + numerator);
@@ -281,7 +296,10 @@ export function negate(fraction: Fraction): Fraction {
  * Get absolute value of a fraction
  */
 export function abs(fraction: Fraction): Fraction {
-  return { numerator: Math.abs(fraction.numerator), denominator: fraction.denominator };
+  return {
+    numerator: Math.abs(fraction.numerator),
+    denominator: fraction.denominator,
+  };
 }
 
 /**
@@ -325,7 +343,10 @@ export function isWholeNumber(fraction: Fraction): boolean {
  * Find the LCD (Least Common Denominator) of multiple fractions
  */
 export function findLCD(...fractions: Fraction[]): number {
-  return fractions.reduce((acc, f) => lcm(acc, f.denominator), fractions[0]?.denominator ?? 1);
+  return fractions.reduce(
+    (acc, f) => lcm(acc, f.denominator),
+    fractions[0]?.denominator ?? 1
+  );
 }
 
 /**
@@ -333,7 +354,7 @@ export function findLCD(...fractions: Fraction[]): number {
  */
 export function toCommonDenominator(...fractions: Fraction[]): Fraction[] {
   const lcd = findLCD(...fractions);
-  return fractions.map(f => {
+  return fractions.map((f) => {
     const na = toStandardForm(f);
     const multiplier = lcd / na.denominator;
     return { numerator: na.numerator * multiplier, denominator: lcd };
@@ -387,7 +408,10 @@ export function power(fraction: Fraction, exponent: number): Fraction {
 /**
  * Round a fraction to the nearest value with a given denominator
  */
-export function roundToDenominator(fraction: Fraction, targetDenominator: number): Fraction {
+export function roundToDenominator(
+  fraction: Fraction,
+  targetDenominator: number
+): Fraction {
   const value = toDecimal(fraction);
   const numerator = Math.round(value * targetDenominator);
   return { numerator, denominator: targetDenominator };
@@ -413,8 +437,14 @@ export function performOperation(
       if (a.denominator !== b.denominator) {
         const common = lcm(a.denominator, b.denominator);
         steps.push(`Find common denominator: ${common}`);
-        const newA = { numerator: a.numerator * (common / a.denominator), denominator: common };
-        const newB = { numerator: b.numerator * (common / b.denominator), denominator: common };
+        const newA = {
+          numerator: a.numerator * (common / a.denominator),
+          denominator: common,
+        };
+        const newB = {
+          numerator: b.numerator * (common / b.denominator),
+          denominator: common,
+        };
         steps.push(`${formatFraction(newA)} + ${formatFraction(newB)}`);
       }
       result = add(a, b);
@@ -425,8 +455,14 @@ export function performOperation(
       if (a.denominator !== b.denominator) {
         const common = lcm(a.denominator, b.denominator);
         steps.push(`Find common denominator: ${common}`);
-        const newA = { numerator: a.numerator * (common / a.denominator), denominator: common };
-        const newB = { numerator: b.numerator * (common / b.denominator), denominator: common };
+        const newA = {
+          numerator: a.numerator * (common / a.denominator),
+          denominator: common,
+        };
+        const newB = {
+          numerator: b.numerator * (common / b.denominator),
+          denominator: common,
+        };
         steps.push(`${formatFraction(newA)} - ${formatFraction(newB)}`);
       }
       result = subtract(a, b);
@@ -434,7 +470,9 @@ export function performOperation(
 
     case 'multiply':
       steps.push(`${aStr} × ${bStr}`);
-      steps.push(`(${a.numerator} × ${b.numerator}) / (${a.denominator} × ${b.denominator})`);
+      steps.push(
+        `(${a.numerator} × ${b.numerator}) / (${a.denominator} × ${b.denominator})`
+      );
       result = multiply(a, b);
       break;
 
@@ -448,7 +486,10 @@ export function performOperation(
   const simplified = simplify(result);
   steps.push(`= ${formatFraction(result)}`);
 
-  if (!areEqual(result, simplified) || result.denominator !== simplified.denominator) {
+  if (
+    !areEqual(result, simplified) ||
+    result.denominator !== simplified.denominator
+  ) {
     steps.push(`= ${formatFraction(simplified)} (simplified)`);
   }
 
@@ -462,10 +503,24 @@ export function performOperation(
 
 /** Unicode fraction map */
 const UNICODE_FRACTIONS: Record<string, string> = {
-  '1/2': '½', '1/3': '⅓', '2/3': '⅔', '1/4': '¼', '3/4': '¾',
-  '1/5': '⅕', '2/5': '⅖', '3/5': '⅗', '4/5': '⅘', '1/6': '⅙',
-  '5/6': '⅚', '1/7': '⅐', '1/8': '⅛', '3/8': '⅜', '5/8': '⅝',
-  '7/8': '⅞', '1/9': '⅑', '1/10': '⅒',
+  '1/2': '½',
+  '1/3': '⅓',
+  '2/3': '⅔',
+  '1/4': '¼',
+  '3/4': '¾',
+  '1/5': '⅕',
+  '2/5': '⅖',
+  '3/5': '⅗',
+  '4/5': '⅘',
+  '1/6': '⅙',
+  '5/6': '⅚',
+  '1/7': '⅐',
+  '1/8': '⅛',
+  '3/8': '⅜',
+  '5/8': '⅝',
+  '7/8': '⅞',
+  '1/9': '⅑',
+  '1/10': '⅒',
 };
 
 export interface FormatFractionOptions {
@@ -477,13 +532,18 @@ export interface FormatFractionOptions {
 /**
  * Format a fraction as a string
  */
-export function formatFraction(fraction: Fraction, options: FormatFractionOptions = {}): string {
+export function formatFraction(
+  fraction: Fraction,
+  options: FormatFractionOptions = {}
+): string {
   let f = fraction;
 
   if (options.simplify) {
     const s = simplify(f);
     // Convert back to standard negative-numerator form for display
-    f = s.isNegative ? { numerator: -s.numerator, denominator: s.denominator } : { numerator: s.numerator, denominator: s.denominator };
+    f = s.isNegative
+      ? { numerator: -s.numerator, denominator: s.denominator }
+      : { numerator: s.numerator, denominator: s.denominator };
   }
 
   // Determine sign and absolute values
@@ -501,17 +561,20 @@ export function formatFraction(fraction: Fraction, options: FormatFractionOption
     const remainder = absNum % denom;
     if (whole === 0) {
       const basic = `${absNum}/${denom}`;
-      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+        return `${prefix}${UNICODE_FRACTIONS[basic]}`;
       return `${prefix}${basic}`;
     }
     if (remainder === 0) return `${prefix}${whole}`;
     const fracPart = `${remainder}/${denom}`;
-    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart]) return `${prefix}${whole} ${UNICODE_FRACTIONS[fracPart]}`;
+    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart])
+      return `${prefix}${whole} ${UNICODE_FRACTIONS[fracPart]}`;
     return `${prefix}${whole} ${fracPart}`;
   }
 
   const basic = `${absNum}/${denom}`;
-  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+    return `${prefix}${UNICODE_FRACTIONS[basic]}`;
   return `${prefix}${basic}`;
 }
 

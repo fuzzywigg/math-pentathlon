@@ -12,11 +12,7 @@
 // 4. Always simplify your answer (divide by GCD)
 // 5. Watch for distractors that use common mistakes
 
-import {
-  FracFactState,
-  Player,
-  FractionProblem,
-} from './types';
+import { FracFactState, Player, FractionProblem } from './types';
 import { Fraction } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
 
@@ -24,7 +20,7 @@ export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
 const DIFFICULTY_CONFIG = {
   easy: { accuracy: 0.65, teachingMode: true },
-  medium: { accuracy: 0.80, teachingMode: false },
+  medium: { accuracy: 0.8, teachingMode: false },
   hard: { accuracy: 0.95, teachingMode: false },
 };
 
@@ -36,8 +32,8 @@ const DIFFICULTY_CONFIG = {
  * Find the correct answer index in the choices
  */
 function findCorrectAnswerIndex(problem: FractionProblem): number {
-  return problem.answerChoices.findIndex(
-    choice => areEquivalent(choice, problem.correctAnswer)
+  return problem.answerChoices.findIndex((choice) =>
+    areEquivalent(choice, problem.correctAnswer)
   );
 }
 
@@ -63,9 +59,12 @@ export function getAIAnswer(
   // to model that mistakes are okay
   if (config.teachingMode && Math.random() < 0.35) {
     // Pick a random wrong answer
-    const wrongIndices = choices.map((_, i) => i).filter(i => i !== correctIndex);
+    const wrongIndices = choices
+      .map((_, i) => i)
+      .filter((i) => i !== correctIndex);
     if (wrongIndices.length > 0) {
-      const selectedIndex = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+      const selectedIndex =
+        wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
       return choices[selectedIndex];
     }
   }
@@ -76,9 +75,12 @@ export function getAIAnswer(
     return choices[correctIndex];
   } else {
     // Pick a random wrong answer
-    const wrongIndices = choices.map((_, i) => i).filter(i => i !== correctIndex);
+    const wrongIndices = choices
+      .map((_, i) => i)
+      .filter((i) => i !== correctIndex);
     if (wrongIndices.length > 0) {
-      const selectedIndex = wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
+      const selectedIndex =
+        wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
       return choices[selectedIndex];
     }
     // Fallback to correct if no wrong answers

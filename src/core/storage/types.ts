@@ -29,7 +29,8 @@ export interface OwlState {
   totalMessagesShown: number;
 }
 
-export type OwlMood = 'happy' | 'encouraging' | 'celebrating' | 'thinking' | 'sleepy' | 'proud';
+export type OwlMood =
+  'happy' | 'encouraging' | 'celebrating' | 'thinking' | 'sleepy' | 'proud';
 
 export interface StreakData {
   currentStreak: number;

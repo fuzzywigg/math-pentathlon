@@ -4,15 +4,16 @@
 export type Player = 'player1' | 'player2';
 
 // Pattern block shapes based on standard pattern blocks
-export type BlockShape = 'hexagon' | 'trapezoid' | 'rhombus' | 'triangle' | 'square';
+export type BlockShape =
+  'hexagon' | 'trapezoid' | 'rhombus' | 'triangle' | 'square';
 
 // Block colors matching standard pattern blocks
 export const BLOCK_COLORS: Record<BlockShape, string> = {
-  hexagon: '#FFD700',      // Yellow
-  trapezoid: '#FF4444',    // Red
-  rhombus: '#4169E1',      // Blue (wide rhombus)
-  triangle: '#32CD32',     // Green
-  square: '#FF8C00',       // Orange
+  hexagon: '#FFD700', // Yellow
+  trapezoid: '#FF4444', // Red
+  rhombus: '#4169E1', // Blue (wide rhombus)
+  triangle: '#32CD32', // Green
+  square: '#FF8C00', // Orange
 };
 
 // How many unit triangles each shape covers
@@ -21,7 +22,7 @@ export const BLOCK_SIZES: Record<BlockShape, number> = {
   trapezoid: 3,
   rhombus: 2,
   triangle: 1,
-  square: 2,  // Actually covers 2 triangular units in our hex grid
+  square: 2, // Actually covers 2 triangular units in our hex grid
 };
 
 // Starting inventory for each shape in the bank
@@ -38,9 +39,9 @@ export interface PlacedBlock {
   shape: BlockShape;
   player: Player;
   // Position in the grid (using axial coordinates for hex grid)
-  q: number;  // Column
-  r: number;  // Row
-  rotation: number;  // 0-5 for 60-degree increments
+  q: number; // Column
+  r: number; // Row
+  rotation: number; // 0-5 for 60-degree increments
 }
 
 // A cell on the board that can be filled
@@ -49,13 +50,13 @@ export interface BoardCell {
   r: number;
   filled: boolean;
   filledBy: Player | null;
-  blockId: number | null;  // Which placed block fills this cell
+  blockId: number | null; // Which placed block fills this cell
 }
 
 // Player's selection during a turn (1-3 different blocks)
 export interface TurnSelection {
-  blocks: BlockShape[];  // Max 3, must be different shapes
-  committed: boolean;    // Once placed, can't select more
+  blocks: BlockShape[]; // Max 3, must be different shapes
+  committed: boolean; // Once placed, can't select more
 }
 
 // Game phases
@@ -126,7 +127,7 @@ function createHexBoard(): BoardCell[] {
 export function createInitialState(): HexAGoneGameState {
   return {
     board: createHexBoard(),
-    boardWidth: 7,  // Diameter of hex board
+    boardWidth: 7, // Diameter of hex board
     boardHeight: 7,
     placedBlocks: [],
     nextBlockId: 1,
@@ -149,41 +150,60 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get cell at position
-export function getCellAt(state: HexAGoneGameState, q: number, r: number): BoardCell | undefined {
-  return state.board.find(cell => cell.q === q && cell.r === r);
+export function getCellAt(
+  state: HexAGoneGameState,
+  q: number,
+  r: number
+): BoardCell | undefined {
+  return state.board.find((cell) => cell.q === q && cell.r === r);
 }
 
 // Check if position is valid on board
-export function isValidPosition(state: HexAGoneGameState, q: number, r: number): boolean {
+export function isValidPosition(
+  state: HexAGoneGameState,
+  q: number,
+  r: number
+): boolean {
   return getCellAt(state, q, r) !== undefined;
 }
 
 // Get all shapes available to select (in bank and not already selected)
 export function getAvailableShapes(state: HexAGoneGameState): BlockShape[] {
-  const shapes: BlockShape[] = ['hexagon', 'trapezoid', 'rhombus', 'triangle', 'square'];
-  return shapes.filter(shape =>
-    state.bank[shape] > 0 &&
-    !state.turnSelection.blocks.includes(shape)
+  const shapes: BlockShape[] = [
+    'hexagon',
+    'trapezoid',
+    'rhombus',
+    'triangle',
+    'square',
+  ];
+  return shapes.filter(
+    (shape) =>
+      state.bank[shape] > 0 && !state.turnSelection.blocks.includes(shape)
   );
 }
 
 // Get the cells that a shape would cover at a given position
-export function getShapeCells(shape: BlockShape, q: number, r: number, _rotation: number): { q: number; r: number }[] {
+export function getShapeCells(
+  shape: BlockShape,
+  q: number,
+  r: number,
+  _rotation: number
+): { q: number; r: number }[] {
   // Define shape footprints in axial coordinates
   // Each shape is defined relative to its anchor point (0, 0)
   const footprints: Record<BlockShape, { q: number; r: number }[]> = {
-    hexagon: [{ q: 0, r: 0 }],  // Single hex cell
-    trapezoid: [{ q: 0, r: 0 }],  // Simplified - covers one hex
-    rhombus: [{ q: 0, r: 0 }],    // Simplified - covers one hex
-    triangle: [{ q: 0, r: 0 }],   // Simplified - covers one hex
-    square: [{ q: 0, r: 0 }],     // Simplified - covers one hex
+    hexagon: [{ q: 0, r: 0 }], // Single hex cell
+    trapezoid: [{ q: 0, r: 0 }], // Simplified - covers one hex
+    rhombus: [{ q: 0, r: 0 }], // Simplified - covers one hex
+    triangle: [{ q: 0, r: 0 }], // Simplified - covers one hex
+    square: [{ q: 0, r: 0 }], // Simplified - covers one hex
   };
 
   const baseCells = footprints[shape];
 
   // Apply rotation (simplified - just return base position for now)
   // In a full implementation, we'd rotate around the anchor
-  return baseCells.map(cell => ({
+  return baseCells.map((cell) => ({
     q: q + cell.q,
     r: r + cell.r,
   }));

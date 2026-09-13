@@ -31,10 +31,7 @@ let moveCount = 0;
 const AI_THINKING_DELAY = 600;
 
 // Initialize the game
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   boardContainer = boardEl;
   statusContainer = statusEl;
   newGameVsHuman();

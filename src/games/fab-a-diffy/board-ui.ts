@@ -9,7 +9,10 @@ import {
   calculateResult,
   getOperationSymbol,
 } from './rules';
-import { renderHorizontalBar, getFractionColor } from '../../core/fractions/fraction-bar-ui';
+import {
+  renderHorizontalBar,
+  getFractionColor,
+} from '../../core/fractions/fraction-bar-ui';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
@@ -94,7 +97,8 @@ function createFractionBarElement(
   wrapper.dataset.barId = bar.id;
 
   // Determine state
-  const isSelected = state.selectedBar1 === bar.id || state.selectedBar2 === bar.id;
+  const isSelected =
+    state.selectedBar1 === bar.id || state.selectedBar2 === bar.id;
   const isUsed = bar.used;
   const isSelectable =
     !isUsed &&
@@ -138,10 +142,9 @@ function createFractionBarElement(
     buildCellAriaLabel({
       coord: formatFraction(simplify(bar.fraction)),
       empty: !isUsed && !isSelected,
-      extras: [
-        isSelected ? 'selected' : '',
-        isUsed ? 'used' : '',
-      ].filter(Boolean),
+      extras: [isSelected ? 'selected' : '', isUsed ? 'used' : ''].filter(
+        Boolean
+      ),
     })
   );
 
@@ -172,7 +175,11 @@ export function renderAnswerBoard(
     const bar1 = state.fractionBars.get(state.selectedBar1);
     const bar2 = state.fractionBars.get(state.selectedBar2);
     if (bar1 && bar2) {
-      const result = calculateResult(bar1.fraction, bar2.fraction, state.selectedOperation);
+      const result = calculateResult(
+        bar1.fraction,
+        bar2.fraction,
+        state.selectedOperation
+      );
       if (result) {
         const matches = findMatchingAnswers(state, result);
         matches.forEach((id) => matchableAnswers.add(id));
@@ -252,7 +259,10 @@ function createAnswerBarElement(
     buildCellAriaLabel({
       coord: formatFraction(simplify(answer.fraction)),
       empty: !isClaimed,
-      owner: isClaimed && answer.claimedBy ? getPlayerName(answer.claimedBy) : undefined,
+      owner:
+        isClaimed && answer.claimedBy
+          ? getPlayerName(answer.claimedBy)
+          : undefined,
       validPlacement: isMatchable && !isClaimed,
     })
   );
@@ -291,14 +301,21 @@ export function renderOperationSelector(
   container.appendChild(preview);
 
   // Get possible results for each operation
-  const operations: FractionOperation[] = ['add', 'subtract', 'multiply', 'divide'];
+  const operations: FractionOperation[] = [
+    'add',
+    'subtract',
+    'multiply',
+    'divide',
+  ];
 
   const buttons = document.createElement('div');
   buttons.className = 'fab-operation-buttons';
 
   for (const op of operations) {
     const result = calculateResult(bar1.fraction, bar2.fraction, op);
-    const hasMatch = result ? findMatchingAnswers(state, result).length > 0 : false;
+    const hasMatch = result
+      ? findMatchingAnswers(state, result).length > 0
+      : false;
 
     const btn = document.createElement('button');
     btn.className = 'fab-op-btn';

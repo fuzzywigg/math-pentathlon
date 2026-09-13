@@ -53,12 +53,21 @@ interface MoveOption {
 /**
  * Get adjacent cells with cards
  */
-function getAdjacentCards(state: StarsState, row: number, col: number): AttributeCard[] {
+function getAdjacentCards(
+  state: StarsState,
+  row: number,
+  col: number
+): AttributeCard[] {
   const cards: AttributeCard[] = [];
   const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
   ];
 
   for (const [dr, dc] of directions) {
@@ -155,9 +164,13 @@ function evaluateMoves(
 
       // Factor 4: Card efficiency - use cards that are "extreme"
       // (all-different from common cards)
-      const avgDifference = adjacentCards.length > 0
-        ? adjacentCards.reduce((sum, adj) => sum + countDifferences(card, adj), 0) / adjacentCards.length
-        : 2;
+      const avgDifference =
+        adjacentCards.length > 0
+          ? adjacentCards.reduce(
+              (sum, adj) => sum + countDifferences(card, adj),
+              0
+            ) / adjacentCards.length
+          : 2;
       if (avgDifference >= 3.5) {
         score += 20;
         reasons.push('High-contrast card');
@@ -171,8 +184,11 @@ function evaluateMoves(
       }
 
       // Factor 6: Edge positions are less valuable (fewer potential neighbors)
-      const isEdge = row === 0 || row === CONFIG.BOARD_SIZE - 1 ||
-                     col === 0 || col === CONFIG.BOARD_SIZE - 1;
+      const isEdge =
+        row === 0 ||
+        row === CONFIG.BOARD_SIZE - 1 ||
+        col === 0 ||
+        col === CONFIG.BOARD_SIZE - 1;
       if (isEdge && !cell.isStar) {
         score -= 10;
       }

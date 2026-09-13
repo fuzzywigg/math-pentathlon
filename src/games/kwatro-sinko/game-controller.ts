@@ -48,7 +48,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): KwaGameController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): KwaGameController {
   injectKwaStyles();
   activeContainer = container;
 
@@ -109,7 +113,8 @@ function updateUI(controller: KwaGameController): void {
   // Target info
   const targetInfo = document.createElement('div');
   targetInfo.className = 'kwa-target-info';
-  targetInfo.innerHTML = 'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
+  targetInfo.innerHTML =
+    'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
   gameArea.appendChild(targetInfo);
 
   // Winner banner

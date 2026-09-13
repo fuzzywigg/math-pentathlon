@@ -1,7 +1,20 @@
 // Dice Selector - UI for selecting and combining dice results
 
-import { DiceConfig, DiceType, DieRoll, RollResult, DiceSet, COMMON_DICE_SETS } from './types';
-import { rollDice, toggleDiceSelection, getSelectedTotal, lockDice, getAllPossibleSums } from './roller';
+import {
+  DiceConfig,
+  DiceType,
+  DieRoll,
+  RollResult,
+  DiceSet,
+  COMMON_DICE_SETS,
+} from './types';
+import {
+  rollDice,
+  toggleDiceSelection,
+  getSelectedTotal,
+  lockDice,
+  getAllPossibleSums,
+} from './roller';
 import { renderRollResult, animateRoll, getDiceStyles } from './dice-ui';
 
 export interface DiceSelectorOptions {
@@ -61,7 +74,9 @@ export class DiceSelector {
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
-      style.textContent = getDiceStyles() + `
+      style.textContent =
+        getDiceStyles() +
+        `
         .dice-selector {
           display: flex;
           flex-direction: column;
@@ -183,9 +198,9 @@ export class DiceSelector {
 
   private getDiceTypes(): DiceType[] {
     if (this.options.customDice.length > 0) {
-      return this.options.customDice.map(c => c.type);
+      return this.options.customDice.map((c) => c.type);
     }
-    return this.options.diceSet.dice.map(c => c.type);
+    return this.options.diceSet.dice.map((c) => c.type);
   }
 
   private render(): void {
@@ -211,7 +226,8 @@ export class DiceSelector {
         onDieClick: (die) => this.handleDieClick(die),
       });
     } else {
-      resultArea.innerHTML = '<span class="dice-placeholder">Click Roll to begin</span>';
+      resultArea.innerHTML =
+        '<span class="dice-placeholder">Click Roll to begin</span>';
     }
 
     this.container.appendChild(resultArea);
@@ -222,7 +238,9 @@ export class DiceSelector {
       selectionInfo.className = 'dice-selection-info';
 
       const selectedSum = getSelectedTotal(this.currentResult);
-      const selectedCount = this.currentResult.rolls.filter(d => d.isSelected).length;
+      const selectedCount = this.currentResult.rolls.filter(
+        (d) => d.isSelected
+      ).length;
 
       selectionInfo.innerHTML = `
         <span class="dice-selection-label">${selectedCount} dice selected</span>
@@ -232,7 +250,7 @@ export class DiceSelector {
 
       // Possible sums
       if (this.options.showPossibleSums) {
-        const allValues = this.currentResult.rolls.map(d => d.value);
+        const allValues = this.currentResult.rolls.map((d) => d.value);
         const possibleSums = getAllPossibleSums(allValues);
         const sumsContainer = document.createElement('div');
         sumsContainer.className = 'possible-sums';
@@ -265,7 +283,9 @@ export class DiceSelector {
       const confirmBtn = document.createElement('button');
       confirmBtn.className = 'dice-btn dice-btn-success';
       confirmBtn.textContent = 'Confirm';
-      confirmBtn.disabled = this.isRolling || this.currentResult.rolls.filter(d => d.isSelected).length === 0;
+      confirmBtn.disabled =
+        this.isRolling ||
+        this.currentResult.rolls.filter((d) => d.isSelected).length === 0;
       confirmBtn.addEventListener('click', () => this.confirm());
       controls.appendChild(confirmBtn);
     }
@@ -280,7 +300,7 @@ export class DiceSelector {
       // Single select mode - deselect all others first
       this.currentResult = {
         ...this.currentResult,
-        rolls: this.currentResult.rolls.map(d => ({
+        rolls: this.currentResult.rolls.map((d) => ({
           ...d,
           isSelected: d.id === die.id ? !d.isSelected : false,
         })),
@@ -291,7 +311,7 @@ export class DiceSelector {
 
     this.render();
 
-    const selectedDice = this.currentResult.rolls.filter(d => d.isSelected);
+    const selectedDice = this.currentResult.rolls.filter((d) => d.isSelected);
     const selectedSum = getSelectedTotal(this.currentResult);
     this.options.onSelectionChange(selectedDice, selectedSum);
   }
@@ -304,7 +324,9 @@ export class DiceSelector {
     const types = this.getDiceTypes();
     const result = rollDice({ dice: types });
 
-    const resultArea = this.container.querySelector('#dice-result-area') as HTMLElement;
+    const resultArea = this.container.querySelector(
+      '#dice-result-area'
+    ) as HTMLElement;
     if (resultArea) {
       animateRoll(resultArea, result, {
         duration: 800,
@@ -323,14 +345,14 @@ export class DiceSelector {
   public confirm(): void {
     if (!this.currentResult) return;
 
-    const selectedDice = this.currentResult.rolls.filter(d => d.isSelected);
+    const selectedDice = this.currentResult.rolls.filter((d) => d.isSelected);
     const selectedSum = getSelectedTotal(this.currentResult);
 
     if (selectedDice.length > 0) {
       this.options.onConfirm(selectedDice, selectedSum);
 
       // Lock selected dice
-      const selectedIds = selectedDice.map(d => d.id);
+      const selectedIds = selectedDice.map((d) => d.id);
       this.currentResult = lockDice(this.currentResult, selectedIds);
       this.render();
     }
@@ -344,7 +366,7 @@ export class DiceSelector {
   /** Get selected dice */
   public getSelectedDice(): DieRoll[] {
     if (!this.currentResult) return [];
-    return this.currentResult.rolls.filter(d => d.isSelected);
+    return this.currentResult.rolls.filter((d) => d.isSelected);
   }
 
   /** Get sum of selected dice */
@@ -383,11 +405,10 @@ export function createRollButton(
   btn.textContent = `Roll ${diceSet.name}`;
 
   btn.addEventListener('click', () => {
-    const result = rollDice({ dice: diceSet.dice.map(c => c.type) });
+    const result = rollDice({ dice: diceSet.dice.map((c) => c.type) });
     onRoll(result);
   });
 
   container.appendChild(btn);
   return btn;
 }
-

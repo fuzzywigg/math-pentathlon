@@ -163,8 +163,11 @@ export class OwlComponent {
   /** True when the event target is a drag handle (body / mini icon), not chrome. */
   private isDragHandle(target: EventTarget | null): boolean {
     if (!(target instanceof Element) || !this.container) return false;
-    if (target.closest('.owl-bubble') || target.closest('.owl-controls')) return false;
-    return Boolean(target.closest('.owl-character') || target.closest('.owl-minimized'));
+    if (target.closest('.owl-bubble') || target.closest('.owl-controls'))
+      return false;
+    return Boolean(
+      target.closest('.owl-character') || target.closest('.owl-minimized')
+    );
   }
 
   private onPointerDown = (e: PointerEvent): void => {
@@ -206,7 +209,8 @@ export class OwlComponent {
 
   private onPointerMove = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+      return;
 
     const dx = e.clientX - this.dragStartX;
     const dy = e.clientY - this.dragStartY;
@@ -232,7 +236,8 @@ export class OwlComponent {
 
   private onPointerUp = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+      return;
 
     const wasRealDrag = this.didDrag;
 
@@ -265,7 +270,8 @@ export class OwlComponent {
   /** Cancelled gesture: return to dock (even after a real drag). */
   private onPointerCancel = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) return;
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+      return;
 
     this.isDragging = false;
     this.dragPointerId = null;
@@ -339,8 +345,10 @@ export class OwlComponent {
     this.velocityX = Math.max(-maxV, Math.min(maxV, this.velocityX));
     this.velocityY = Math.max(-maxV, Math.min(maxV, this.velocityY));
 
-    const boxW = (): number => this.container?.getBoundingClientRect().width || 64;
-    const boxH = (): number => this.container?.getBoundingClientRect().height || 64;
+    const boxW = (): number =>
+      this.container?.getBoundingClientRect().width || 64;
+    const boxH = (): number =>
+      this.container?.getBoundingClientRect().height || 64;
     const vw = (): number => window.innerWidth || 390;
     const vh = (): number => window.innerHeight || 844;
 
@@ -362,7 +370,14 @@ export class OwlComponent {
       const x = parseFloat(this.container.style.left) || 0;
       const y = parseFloat(this.container.style.top) || 0;
       const next = integrate({ x, y, vx: this.velocityX, vy: this.velocityY });
-      const clamped = clampToViewport(next.x, next.y, boxW(), boxH(), vw(), vh());
+      const clamped = clampToViewport(
+        next.x,
+        next.y,
+        boxW(),
+        boxH(),
+        vw(),
+        vh()
+      );
 
       // Soft stop on edges (clamp only — no bounce invent)
       if (clamped.x !== next.x) this.velocityX = 0;
@@ -421,7 +436,14 @@ export class OwlComponent {
     this.container.classList.toggle('owl-hidden', !state.isVisible);
 
     // Mood classes
-    const moods = ['happy', 'encouraging', 'celebrating', 'thinking', 'sleepy', 'proud'];
+    const moods = [
+      'happy',
+      'encouraging',
+      'celebrating',
+      'thinking',
+      'sleepy',
+      'proud',
+    ];
     moods.forEach((mood) => {
       this.container!.classList.toggle(`owl-mood-${mood}`, state.mood === mood);
     });
@@ -431,7 +453,9 @@ export class OwlComponent {
 
     // Message display
     const bubble = this.container.querySelector('.owl-bubble') as HTMLElement;
-    const messageEl = this.container.querySelector('.owl-message') as HTMLElement;
+    const messageEl = this.container.querySelector(
+      '.owl-message'
+    ) as HTMLElement;
 
     if (state.message) {
       messageEl.textContent = state.message.text;
@@ -439,7 +463,9 @@ export class OwlComponent {
       this.container.classList.add('owl-has-message');
 
       // Show notification dot if minimized
-      const notificationDot = this.container.querySelector('.owl-notification-dot') as HTMLElement;
+      const notificationDot = this.container.querySelector(
+        '.owl-notification-dot'
+      ) as HTMLElement;
       if (this.isMinimized && notificationDot) {
         notificationDot.classList.add('visible');
       }
@@ -463,7 +489,9 @@ export class OwlComponent {
     this.container.classList.remove('owl-minimized-state');
 
     // Clear notification dot
-    const notificationDot = this.container.querySelector('.owl-notification-dot');
+    const notificationDot = this.container.querySelector(
+      '.owl-notification-dot'
+    );
     notificationDot?.classList.remove('visible');
   }
 
@@ -488,7 +516,10 @@ export class OwlComponent {
     const owlCenterY = owlRect.top + owlRect.height / 2;
 
     const angle = Math.atan2(e.clientY - owlCenterY, e.clientX - owlCenterX);
-    const distance = Math.min(3, Math.hypot(e.clientX - owlCenterX, e.clientY - owlCenterY) / 100);
+    const distance = Math.min(
+      3,
+      Math.hypot(e.clientX - owlCenterX, e.clientY - owlCenterY) / 100
+    );
 
     const x = Math.cos(angle) * distance;
     const y = Math.sin(angle) * distance;
@@ -514,7 +545,10 @@ export class OwlComponent {
       this.container.removeEventListener('pointermove', this.onPointerMove);
       this.container.removeEventListener('pointerup', this.onPointerUp);
       this.container.removeEventListener('pointercancel', this.onPointerCancel);
-      this.container.removeEventListener('lostpointercapture', this.onPointerUp);
+      this.container.removeEventListener(
+        'lostpointercapture',
+        this.onPointerUp
+      );
       this.container.remove();
       this.container = null;
     }

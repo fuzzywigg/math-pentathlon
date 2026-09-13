@@ -8,7 +8,8 @@
 /**
  * Supported operators in expressions
  */
-export type Operator = '+' | '-' | '*' | '/' | '^' | '=' | '<' | '>' | '≤' | '≥';
+export type Operator =
+  '+' | '-' | '*' | '/' | '^' | '=' | '<' | '>' | '≤' | '≥';
 
 /**
  * Arithmetic operators only
@@ -31,7 +32,12 @@ export type ExpressionToken =
 export type ExpressionNode =
   | { type: 'number'; value: number }
   | { type: 'variable'; name: string }
-  | { type: 'binary'; operator: Operator; left: ExpressionNode; right: ExpressionNode }
+  | {
+      type: 'binary';
+      operator: Operator;
+      left: ExpressionNode;
+      right: ExpressionNode;
+    }
   | { type: 'unary'; operator: '-'; operand: ExpressionNode };
 
 /**
@@ -181,7 +187,10 @@ export function createNumberCard(value: number, id?: string): ExpressionCard {
 /**
  * Create an operator card
  */
-export function createOperatorCard(operator: Operator, id?: string): ExpressionCard {
+export function createOperatorCard(
+  operator: Operator,
+  id?: string
+): ExpressionCard {
   return {
     id: id ?? `op-${operator}-${Math.random().toString(36).slice(2, 6)}`,
     content: operator,
@@ -195,7 +204,9 @@ export function createOperatorCard(operator: Operator, id?: string): ExpressionC
  */
 export function createParenCard(isLeft: boolean, id?: string): ExpressionCard {
   return {
-    id: id ?? `paren-${isLeft ? 'l' : 'r'}-${Math.random().toString(36).slice(2, 6)}`,
+    id:
+      id ??
+      `paren-${isLeft ? 'l' : 'r'}-${Math.random().toString(36).slice(2, 6)}`,
     content: isLeft ? '(' : ')',
     tokenType: isLeft ? 'lparen' : 'rparen',
   };
@@ -204,7 +215,11 @@ export function createParenCard(isLeft: boolean, id?: string): ExpressionCard {
 /**
  * Create an empty expression slot
  */
-export function createSlot(index: number, card?: ExpressionCard, locked?: boolean): ExpressionSlot {
+export function createSlot(
+  index: number,
+  card?: ExpressionCard,
+  locked?: boolean
+): ExpressionSlot {
   return {
     id: `slot-${index}`,
     index,

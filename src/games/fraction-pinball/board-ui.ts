@@ -1,11 +1,7 @@
 // Fraction Pinball Board UI
 // Renders the pinball-style game board, challenges, and scores
 
-import {
-  FractionPinballState,
-  Player,
-  getPlayerStats,
-} from './types';
+import { FractionPinballState, Player, getPlayerStats } from './types';
 import { formatDecimal, formatFraction } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 
@@ -24,7 +20,8 @@ export function renderChallenge(
   container.className = 'pinball-challenge';
 
   if (!state.currentChallenge) {
-    container.innerHTML = '<div class="pinball-no-challenge">No challenge loaded</div>';
+    container.innerHTML =
+      '<div class="pinball-no-challenge">No challenge loaded</div>';
     return container;
   }
 
@@ -142,7 +139,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
   // Decorative elements
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
 
-  const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'radialGradient');
+  const gradient = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'radialGradient'
+  );
   gradient.setAttribute('id', 'target-glow');
   gradient.innerHTML = `
     <stop offset="0%" stop-color="#ffeb3b" stop-opacity="0.8"/>
@@ -169,7 +169,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
     // Glow
-    const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const glow = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     glow.setAttribute('cx', String(pos.x));
     glow.setAttribute('cy', String(pos.y));
     glow.setAttribute('r', '25');
@@ -177,7 +180,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
     group.appendChild(glow);
 
     // Target circle
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const circle = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     circle.setAttribute('cx', String(pos.x));
     circle.setAttribute('cy', String(pos.y));
     circle.setAttribute('r', '18');
@@ -201,7 +207,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
   }
 
   // Flippers at bottom
-  const leftFlipper = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const leftFlipper = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect'
+  );
   leftFlipper.setAttribute('x', '40');
   leftFlipper.setAttribute('y', '380');
   leftFlipper.setAttribute('width', '60');
@@ -211,7 +220,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
   leftFlipper.setAttribute('transform', 'rotate(-20 70 385)');
   svg.appendChild(leftFlipper);
 
-  const rightFlipper = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  const rightFlipper = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'rect'
+  );
   rightFlipper.setAttribute('x', '200');
   rightFlipper.setAttribute('y', '380');
   rightFlipper.setAttribute('width', '60');

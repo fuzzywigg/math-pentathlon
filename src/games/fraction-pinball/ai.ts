@@ -13,15 +13,12 @@
 // 4. To convert fraction to decimal: divide numerator by denominator
 // 5. To convert decimal to fraction: use place value (0.75 = 75/100 = 3/4)
 
-import {
-  FractionPinballState,
-  Player,
-} from './types';
+import { FractionPinballState, Player } from './types';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
 const DIFFICULTY_CONFIG = {
-  easy: { accuracy: 0.60, teachingMode: true },
+  easy: { accuracy: 0.6, teachingMode: true },
   medium: { accuracy: 0.78, teachingMode: false },
   hard: { accuracy: 0.92, teachingMode: false },
 };
@@ -48,8 +45,8 @@ export function getAIAnswer(
   const correctAnswer = challenge.correctAnswer;
 
   // Teaching mode: intentionally miss sometimes to model learning
-  if (config.teachingMode && Math.random() < 0.40) {
-    const wrongChoices = choices.filter(c => c !== correctAnswer);
+  if (config.teachingMode && Math.random() < 0.4) {
+    const wrongChoices = choices.filter((c) => c !== correctAnswer);
     if (wrongChoices.length > 0) {
       return wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
     }
@@ -59,7 +56,7 @@ export function getAIAnswer(
   if (Math.random() < config.accuracy) {
     return correctAnswer;
   } else {
-    const wrongChoices = choices.filter(c => c !== correctAnswer);
+    const wrongChoices = choices.filter((c) => c !== correctAnswer);
     if (wrongChoices.length > 0) {
       return wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
     }

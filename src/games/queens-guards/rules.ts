@@ -22,7 +22,10 @@ import {
 /**
  * Get all valid moves for a piece
  */
-export function getValidMoves(state: QueensGuardsState, from: BoardCoord): BoardCoord[] {
+export function getValidMoves(
+  state: QueensGuardsState,
+  from: BoardCoord
+): BoardCoord[] {
   const cell = state.cells.get(cellKey(from.ring, from.position));
   if (!cell?.piece) return [];
 
@@ -58,7 +61,11 @@ export function getValidMoves(state: QueensGuardsState, from: BoardCoord): Board
 /**
  * Check if placing a piece at coord would result in being sandwiched
  */
-function wouldBeSandwiched(state: QueensGuardsState, coord: BoardCoord, player: Player): boolean {
+function wouldBeSandwiched(
+  state: QueensGuardsState,
+  coord: BoardCoord,
+  player: Player
+): boolean {
   const opponent = getOpponent(player);
 
   // Check all three directions through this hex
@@ -125,9 +132,15 @@ function getDirectionPairs(coord: BoardCoord): [BoardCoord, BoardCoord][] {
 /**
  * Execute a move
  */
-export function makeMove(state: QueensGuardsState, from: BoardCoord, to: BoardCoord): QueensGuardsState {
+export function makeMove(
+  state: QueensGuardsState,
+  from: BoardCoord,
+  to: BoardCoord
+): QueensGuardsState {
   const validMoves = getValidMoves(state, from);
-  const isValid = validMoves.some((m) => m.ring === to.ring && m.position === to.position);
+  const isValid = validMoves.some(
+    (m) => m.ring === to.ring && m.position === to.position
+  );
 
   if (!isValid) return state;
 
@@ -165,7 +178,10 @@ export function makeMove(state: QueensGuardsState, from: BoardCoord, to: BoardCo
     cells: newCells,
     selectedPiece: null,
     capturedPieces: [...state.capturedPieces, ...captured],
-    currentPlayer: captured.length > 0 ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer:
+      captured.length > 0
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
     moveHistory: [...state.moveHistory, move],
   };
 
@@ -181,7 +197,18 @@ export function makeMove(state: QueensGuardsState, from: BoardCoord, to: BoardCo
 /**
  * Check for captures after a move and mark captured pieces
  */
-function checkCaptures(cells: Map<string, { ring: number; position: number; piece: { id: string; player: Player; type: 'queen' | 'guard' } | null }>, movedTo: BoardCoord, mover: Player): BoardCoord[] {
+function checkCaptures(
+  cells: Map<
+    string,
+    {
+      ring: number;
+      position: number;
+      piece: { id: string; player: Player; type: 'queen' | 'guard' } | null;
+    }
+  >,
+  movedTo: BoardCoord,
+  mover: Player
+): BoardCoord[] {
   const captured: BoardCoord[] = [];
   const opponent = getOpponent(mover);
 
@@ -197,7 +224,8 @@ function checkCaptures(cells: Map<string, { ring: number; position: number; piec
 
     for (const far of furtherAdjacent) {
       // Skip if it's the cell we just moved to
-      if (far.ring === movedTo.ring && far.position === movedTo.position) continue;
+      if (far.ring === movedTo.ring && far.position === movedTo.position)
+        continue;
 
       const farCell = cells.get(cellKey(far.ring, far.position));
 
@@ -223,9 +251,15 @@ function formsLine(a: BoardCoord, b: BoardCoord, c: BoardCoord): boolean {
   // Simplified: check if b is "between" a and c geometrically
   // All three on same ring
   if (a.ring === b.ring && b.ring === c.ring) {
-    const positions = [a.position, b.position, c.position].sort((x, y) => x - y);
+    const positions = [a.position, b.position, c.position].sort(
+      (x, y) => x - y
+    );
     // Check if middle position is actually between
-    return positions[1] === b.position || positions[1] === a.position || positions[1] === c.position;
+    return (
+      positions[1] === b.position ||
+      positions[1] === a.position ||
+      positions[1] === c.position
+    );
   }
 
   // Line going through rings (radial)
@@ -273,14 +307,18 @@ export function restoreCapturedPiece(
 
   // Remove from captured list
   const newCaptured = state.capturedPieces.filter(
-    (c) => c.ring !== capturedCoord.ring || c.position !== capturedCoord.position
+    (c) =>
+      c.ring !== capturedCoord.ring || c.position !== capturedCoord.position
   );
 
   return {
     ...state,
     cells: newCells,
     capturedPieces: newCaptured,
-    currentPlayer: newCaptured.length > 0 ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer:
+      newCaptured.length > 0
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
   };
 }
 
@@ -327,7 +365,10 @@ export function hasValidMoves(state: QueensGuardsState): boolean {
 /**
  * Select a piece
  */
-export function selectPiece(state: QueensGuardsState, coord: BoardCoord): QueensGuardsState {
+export function selectPiece(
+  state: QueensGuardsState,
+  coord: BoardCoord
+): QueensGuardsState {
   const key = cellKey(coord.ring, coord.position);
   const cell = state.cells.get(key);
 

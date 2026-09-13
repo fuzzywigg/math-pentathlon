@@ -110,7 +110,12 @@ function evaluatePotentialPaths(state: FiarGameState, player: Player): number {
       }
 
       // Check backward direction
-      const backward = getNodesInDirection(state.board, nodeId, -dir.dx, -dir.dy);
+      const backward = getNodesInDirection(
+        state.board,
+        nodeId,
+        -dir.dx,
+        -dir.dy
+      );
       for (const id of backward) {
         const n = state.board.nodes.get(id);
         if (!n) break;
@@ -147,7 +152,7 @@ function evaluateCenterControl(state: FiarGameState, player: Player): number {
 
     // Center of 5x5 is (2, 2)
     const distFromCenter = Math.abs(row - 2) + Math.abs(col - 2);
-    score += (4 - distFromCenter); // Max 4 for center, less for edges
+    score += 4 - distFromCenter; // Max 4 for center, less for edges
   }
 
   return score;
@@ -194,7 +199,9 @@ function getBestPlacement(
 
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && placements.length > 1) {
-    const randomIndex = Math.floor(Math.random() * Math.min(3, placements.length));
+    const randomIndex = Math.floor(
+      Math.random() * Math.min(3, placements.length)
+    );
     return placements[randomIndex].nodeId;
   }
 
@@ -289,7 +296,14 @@ function minimax(
       let maxEval = -Infinity;
       for (const nodeId of availableNodes) {
         const newState = placeChip(state, nodeId);
-        const evalScore = minimax(newState, depth - 1, alpha, beta, false, aiPlayer);
+        const evalScore = minimax(
+          newState,
+          depth - 1,
+          alpha,
+          beta,
+          false,
+          aiPlayer
+        );
         maxEval = Math.max(maxEval, evalScore);
         alpha = Math.max(alpha, evalScore);
         if (beta <= alpha) break;
@@ -299,7 +313,14 @@ function minimax(
       let minEval = Infinity;
       for (const nodeId of availableNodes) {
         const newState = placeChip(state, nodeId);
-        const evalScore = minimax(newState, depth - 1, alpha, beta, true, aiPlayer);
+        const evalScore = minimax(
+          newState,
+          depth - 1,
+          alpha,
+          beta,
+          true,
+          aiPlayer
+        );
         minEval = Math.min(minEval, evalScore);
         beta = Math.min(beta, evalScore);
         if (beta <= alpha) break;
@@ -327,7 +348,14 @@ function minimax(
       let maxEval = -Infinity;
       for (const move of allMoves) {
         const newState = moveChip(state, move.from, move.to);
-        const evalScore = minimax(newState, depth - 1, alpha, beta, false, aiPlayer);
+        const evalScore = minimax(
+          newState,
+          depth - 1,
+          alpha,
+          beta,
+          false,
+          aiPlayer
+        );
         maxEval = Math.max(maxEval, evalScore);
         alpha = Math.max(alpha, evalScore);
         if (beta <= alpha) break;
@@ -337,7 +365,14 @@ function minimax(
       let minEval = Infinity;
       for (const move of allMoves) {
         const newState = moveChip(state, move.from, move.to);
-        const evalScore = minimax(newState, depth - 1, alpha, beta, true, aiPlayer);
+        const evalScore = minimax(
+          newState,
+          depth - 1,
+          alpha,
+          beta,
+          true,
+          aiPlayer
+        );
         minEval = Math.min(minEval, evalScore);
         beta = Math.min(beta, evalScore);
         if (beta <= alpha) break;
@@ -353,9 +388,9 @@ function minimax(
 
 export interface AIMove {
   type: 'place' | 'move';
-  nodeId?: string;  // For placement
-  from?: string;    // For movement
-  to?: string;      // For movement
+  nodeId?: string; // For placement
+  from?: string; // For movement
+  to?: string; // For movement
 }
 
 /**

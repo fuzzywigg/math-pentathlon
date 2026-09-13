@@ -49,7 +49,10 @@ export function handleCellClick(
     const clickedCell = state.board[row - 1][col - 1]; // Convert 1-based to 0-based
 
     // Check if clicked on current player's King
-    if (clickedCell?.type === 'king' && clickedCell?.owner === state.currentPlayer) {
+    if (
+      clickedCell?.type === 'king' &&
+      clickedCell?.owner === state.currentPlayer
+    ) {
       // If King is already selected and we click it again, deselect
       if (
         state.selectedKingPosition &&
@@ -88,7 +91,10 @@ export function handleCellClick(
 
     // Only place on empty cells
     if (clickedCell === null) {
-      return { state: placeQuadraphage(state, position), isInvalidClick: false };
+      return {
+        state: placeQuadraphage(state, position),
+        isInvalidClick: false,
+      };
     }
 
     // Occupied cell - invalid click
@@ -223,7 +229,8 @@ export function renderBoard(
       const clickedRow = parseInt(cellEl.getAttribute('data-row') ?? '', 10);
       const clickedCol = parseInt(cellEl.getAttribute('data-col') ?? '', 10);
       if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
-      if (clickedRow < 1 || clickedRow > 9 || clickedCol < 1 || clickedCol > 9) return;
+      if (clickedRow < 1 || clickedRow > 9 || clickedCol < 1 || clickedCol > 9)
+        return;
       onCellClick(clickedRow, clickedCol);
     };
 
@@ -329,7 +336,10 @@ export function renderStatus(
 }
 
 // Render the move history (renders into the history-content div)
-export function renderMoveHistory(state: GameState, container: HTMLElement): void {
+export function renderMoveHistory(
+  state: GameState,
+  container: HTMLElement
+): void {
   container.innerHTML = '';
 
   const titleEl = document.createElement('div');

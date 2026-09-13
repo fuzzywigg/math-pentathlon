@@ -18,21 +18,22 @@ npm run test:unit
 npm run test:e2e
 npm run build
 npm run lint
+npm run format:check
 ```
 
 ## Branches
 
-| Branch | Role |
-|--------|------|
-| `alpha` | Trunk. Target PRs here. |
-| `main` | Not the default for new work. |
+| Branch  | Role                          |
+| ------- | ----------------------------- |
+| `alpha` | Trunk. Target PRs here.       |
+| `main`  | Not the default for new work. |
 
 ## CI posture (public)
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, TypeScript check, `npm audit --audit-level=high`, build, unit, Chromium e2e
-- **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e
+- **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 README badges link those workflows. License is **ISC** (`package.json`).
 

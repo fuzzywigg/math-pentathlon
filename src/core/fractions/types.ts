@@ -44,15 +44,15 @@ export interface FractionBarConfig {
 
 /** Default color schemes for common fraction denominators */
 export const FRACTION_COLORS: Record<number, string> = {
-  1: '#f44336',   // Red - whole
-  2: '#e91e63',   // Pink - halves
-  3: '#9c27b0',   // Purple - thirds
-  4: '#673ab7',   // Deep Purple - quarters
-  5: '#3f51b5',   // Indigo - fifths
-  6: '#2196f3',   // Blue - sixths
-  8: '#00bcd4',   // Cyan - eighths
-  10: '#009688',  // Teal - tenths
-  12: '#4caf50',  // Green - twelfths
+  1: '#f44336', // Red - whole
+  2: '#e91e63', // Pink - halves
+  3: '#9c27b0', // Purple - thirds
+  4: '#673ab7', // Deep Purple - quarters
+  5: '#3f51b5', // Indigo - fifths
+  6: '#2196f3', // Blue - sixths
+  8: '#00bcd4', // Cyan - eighths
+  10: '#009688', // Teal - tenths
+  12: '#4caf50', // Green - twelfths
 };
 
 /** Common fractions used in Math Pentathlon */

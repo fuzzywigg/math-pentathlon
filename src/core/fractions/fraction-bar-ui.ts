@@ -47,14 +47,19 @@ export function renderHorizontalBar(
   fraction: Fraction,
   config: FractionBarConfig = {}
 ): SVGSVGElement {
-  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const cfg = {
+    ...DEFAULT_CONFIG,
+    ...config,
+    colors: { ...DEFAULT_CONFIG.colors, ...config.colors },
+  };
   const { width, height, colors, showLabel, labelPosition } = cfg;
 
   const simplified = simplify(fraction);
   const { numerator, denominator } = simplified;
   const fillRatio = Math.min(1, Math.max(0, numerator / denominator));
 
-  const totalHeight = showLabel && labelPosition === 'below' ? height + 25 : height;
+  const totalHeight =
+    showLabel && labelPosition === 'below' ? height + 25 : height;
 
   const svg = createSVGElement('svg', {
     width,
@@ -155,14 +160,19 @@ export function renderVerticalBar(
   fraction: Fraction,
   config: FractionBarConfig = {}
 ): SVGSVGElement {
-  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const cfg = {
+    ...DEFAULT_CONFIG,
+    ...config,
+    colors: { ...DEFAULT_CONFIG.colors, ...config.colors },
+  };
   const { width, height, colors, showLabel, labelPosition } = cfg;
 
   const simplified = simplify(fraction);
   const { numerator, denominator } = simplified;
   const fillRatio = Math.min(1, Math.max(0, numerator / denominator));
 
-  const totalWidth = showLabel && labelPosition === 'right' ? width + 40 : width;
+  const totalWidth =
+    showLabel && labelPosition === 'right' ? width + 40 : width;
 
   const svg = createSVGElement('svg', {
     width: totalWidth,
@@ -242,7 +252,11 @@ export function renderCircleBar(
   fraction: Fraction,
   config: FractionBarConfig = {}
 ): SVGSVGElement {
-  const cfg = { ...DEFAULT_CONFIG, ...config, colors: { ...DEFAULT_CONFIG.colors, ...config.colors } };
+  const cfg = {
+    ...DEFAULT_CONFIG,
+    ...config,
+    colors: { ...DEFAULT_CONFIG.colors, ...config.colors },
+  };
   const size = Math.min(cfg.width, cfg.height);
   const { colors, showLabel, labelPosition } = cfg;
 
@@ -374,7 +388,7 @@ export function createInteractiveFractionBar(
     segment.style.cssText = `
       width: ${segmentWidth}px;
       height: ${height - 2}px;
-      background: ${i < fraction.numerator ? (colors?.filled || getFractionColor(denominator)) : (colors?.empty || '#e0e0e0')};
+      background: ${i < fraction.numerator ? colors?.filled || getFractionColor(denominator) : colors?.empty || '#e0e0e0'};
       border-right: 1px solid ${colors?.border || '#333'};
       display: inline-block;
       cursor: pointer;
@@ -394,7 +408,7 @@ export function createInteractiveFractionBar(
     });
 
     segment.addEventListener('mouseleave', () => {
-      segments.forEach(s => s.style.opacity = '1');
+      segments.forEach((s) => (s.style.opacity = '1'));
     });
 
     segments.push(segment);
@@ -421,7 +435,10 @@ export function createFractionBarPiece(
   const wrapper = document.createElement('div');
   wrapper.className = 'fraction-bar-piece';
   wrapper.setAttribute('data-piece-id', piece.id);
-  wrapper.setAttribute('data-fraction', `${piece.fraction.numerator}/${piece.fraction.denominator}`);
+  wrapper.setAttribute(
+    'data-fraction',
+    `${piece.fraction.numerator}/${piece.fraction.denominator}`
+  );
   wrapper.setAttribute('draggable', 'true');
 
   const svg = renderFractionBar(piece.fraction, {

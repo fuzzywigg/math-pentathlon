@@ -61,7 +61,10 @@ export function renderBoard(
 
   for (let i = 0; i <= BOARD_SIZE; i++) {
     // Horizontal lines
-    const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const hLine = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'line'
+    );
     hLine.setAttribute('x1', String(BOARD_PADDING));
     hLine.setAttribute('y1', String(BOARD_PADDING + i * CELL_SIZE));
     hLine.setAttribute('x2', String(BOARD_PADDING + BOARD_SIZE * CELL_SIZE));
@@ -71,7 +74,10 @@ export function renderBoard(
     gridGroup.appendChild(hLine);
 
     // Vertical lines
-    const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    const vLine = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'line'
+    );
     vLine.setAttribute('x1', String(BOARD_PADDING + i * CELL_SIZE));
     vLine.setAttribute('y1', String(BOARD_PADDING));
     vLine.setAttribute('x2', String(BOARD_PADDING + i * CELL_SIZE));
@@ -83,7 +89,10 @@ export function renderBoard(
   svg.appendChild(gridGroup);
 
   // Placed pieces
-  const piecesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const piecesGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   piecesGroup.classList.add('placed-pieces');
 
   for (const piece of state.placedPieces) {
@@ -91,7 +100,10 @@ export function renderBoard(
     if (!shape) continue;
 
     for (const cell of piece.cells) {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
@@ -103,9 +115,18 @@ export function renderBoard(
 
       // Add piece label on first cell
       if (cell === piece.cells[0]) {
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + CELL_SIZE / 2));
-        text.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + CELL_SIZE / 2 + 4));
+        const text = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
+        text.setAttribute(
+          'x',
+          String(BOARD_PADDING + cell.col * CELL_SIZE + CELL_SIZE / 2)
+        );
+        text.setAttribute(
+          'y',
+          String(BOARD_PADDING + cell.row * CELL_SIZE + CELL_SIZE / 2 + 4)
+        );
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('fill', 'white');
         text.setAttribute('font-size', '12');
@@ -134,20 +155,34 @@ export function renderBoard(
       state.selectedFlipped
     );
 
-    const previewGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const previewGroup = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
     previewGroup.classList.add('preview');
 
     for (const cell of previewCells) {
-      if (cell.row < 0 || cell.row >= BOARD_SIZE || cell.col < 0 || cell.col >= BOARD_SIZE) {
+      if (
+        cell.row < 0 ||
+        cell.row >= BOARD_SIZE ||
+        cell.col < 0 ||
+        cell.col >= BOARD_SIZE
+      ) {
         continue;
       }
 
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
       rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', isValid ? playerColors()[state.currentPlayer] : '#ff5252');
+      rect.setAttribute(
+        'fill',
+        isValid ? playerColors()[state.currentPlayer] : '#ff5252'
+      );
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.5');
       previewGroup.appendChild(rect);
@@ -156,7 +191,10 @@ export function renderBoard(
   }
 
   // Click/hover areas
-  const interactionGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const interactionGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   interactionGroup.classList.add('interaction');
 
   // Occupancy map for labels (owner of cell if covered by a placed piece)
@@ -169,7 +207,10 @@ export function renderBoard(
 
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(BOARD_PADDING + col * CELL_SIZE));
       rect.setAttribute('y', String(BOARD_PADDING + row * CELL_SIZE));
       rect.setAttribute('width', String(CELL_SIZE));
@@ -181,7 +222,11 @@ export function renderBoard(
 
       const occupant = occupancy.get(`${row},${col}`) ?? null;
       const owner =
-        occupant === 'player1' ? 'Blue' : occupant === 'player2' ? 'Red' : undefined;
+        occupant === 'player1'
+          ? 'Blue'
+          : occupant === 'player2'
+            ? 'Red'
+            : undefined;
       makeGridCell(
         rect,
         buildCellAriaLabel({
@@ -228,12 +273,15 @@ export function renderPieceSelector(
 
     const pieceEl = document.createElement('div');
     pieceEl.className = `pent-piece-option ${state.selectedPiece === shapeId ? 'selected' : ''}`;
-    pieceEl.style.border = state.selectedPiece === shapeId ? `2px solid ${playerColor}` : '2px solid #ddd';
+    pieceEl.style.border =
+      state.selectedPiece === shapeId
+        ? `2px solid ${playerColor}`
+        : '2px solid #ddd';
 
     // Mini SVG preview
     const cells = normalizeCells(shape.cells);
-    const maxRow = Math.max(...cells.map(c => c.row)) + 1;
-    const maxCol = Math.max(...cells.map(c => c.col)) + 1;
+    const maxRow = Math.max(...cells.map((c) => c.row)) + 1;
+    const maxCol = Math.max(...cells.map((c) => c.col)) + 1;
 
     const svgWidth = maxCol * PREVIEW_CELL_SIZE + 4;
     const svgHeight = maxRow * PREVIEW_CELL_SIZE + 4;
@@ -243,7 +291,10 @@ export function renderPieceSelector(
     svg.setAttribute('height', String(Math.max(svgHeight, 50)));
 
     for (const cell of cells) {
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(2 + cell.col * PREVIEW_CELL_SIZE));
       rect.setAttribute('y', String(2 + cell.row * PREVIEW_CELL_SIZE));
       rect.setAttribute('width', String(PREVIEW_CELL_SIZE - 1));

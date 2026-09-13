@@ -5,11 +5,36 @@ import { DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
 /** Pip positions for d6 faces (normalized 0-1 coordinates) */
 const D6_PIP_POSITIONS: Record<number, [number, number][]> = {
   1: [[0.5, 0.5]],
-  2: [[0.25, 0.25], [0.75, 0.75]],
-  3: [[0.25, 0.25], [0.5, 0.5], [0.75, 0.75]],
-  4: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.75], [0.75, 0.75]],
-  5: [[0.25, 0.25], [0.75, 0.25], [0.5, 0.5], [0.25, 0.75], [0.75, 0.75]],
-  6: [[0.25, 0.25], [0.75, 0.25], [0.25, 0.5], [0.75, 0.5], [0.25, 0.75], [0.75, 0.75]],
+  2: [
+    [0.25, 0.25],
+    [0.75, 0.75],
+  ],
+  3: [
+    [0.25, 0.25],
+    [0.5, 0.5],
+    [0.75, 0.75],
+  ],
+  4: [
+    [0.25, 0.25],
+    [0.75, 0.25],
+    [0.25, 0.75],
+    [0.75, 0.75],
+  ],
+  5: [
+    [0.25, 0.25],
+    [0.75, 0.25],
+    [0.5, 0.5],
+    [0.25, 0.75],
+    [0.75, 0.75],
+  ],
+  6: [
+    [0.25, 0.25],
+    [0.75, 0.25],
+    [0.25, 0.5],
+    [0.75, 0.5],
+    [0.25, 0.75],
+    [0.75, 0.75],
+  ],
 };
 
 /** Create SVG element helper */
@@ -49,9 +74,21 @@ function renderD6(value: number, size: number, color: string): SVGElement {
 
   // Add gradient for 3D effect
   const defs = createSVGElement('defs');
-  const gradient = createSVGElement('linearGradient', { id: `d6-grad-${Math.random()}`, x1: '0%', y1: '0%', x2: '100%', y2: '100%' });
-  const stop1 = createSVGElement('stop', { offset: '0%', 'stop-color': 'rgba(255,255,255,0.3)' });
-  const stop2 = createSVGElement('stop', { offset: '100%', 'stop-color': 'rgba(0,0,0,0.2)' });
+  const gradient = createSVGElement('linearGradient', {
+    id: `d6-grad-${Math.random()}`,
+    x1: '0%',
+    y1: '0%',
+    x2: '100%',
+    y2: '100%',
+  });
+  const stop1 = createSVGElement('stop', {
+    offset: '0%',
+    'stop-color': 'rgba(255,255,255,0.3)',
+  });
+  const stop2 = createSVGElement('stop', {
+    offset: '100%',
+    'stop-color': 'rgba(0,0,0,0.2)',
+  });
   gradient.appendChild(stop1);
   gradient.appendChild(stop2);
   defs.appendChild(gradient);
@@ -84,7 +121,12 @@ function renderD6(value: number, size: number, color: string): SVGElement {
 }
 
 /** Render a polyhedral die (d4, d8, d10, d12, d20) - shows number */
-function renderPolyhedral(type: DiceType, value: number, size: number, color: string): SVGElement {
+function renderPolyhedral(
+  type: DiceType,
+  value: number,
+  size: number,
+  color: string
+): SVGElement {
   const svg = createSVGElement('svg', {
     width: size,
     height: size,
@@ -215,7 +257,12 @@ export function renderRollResult(
     onDieClick?: (die: DieRoll) => void;
   } = {}
 ): void {
-  const { dieSize = 60, showTotal = true, selectable = false, onDieClick } = options;
+  const {
+    dieSize = 60,
+    showTotal = true,
+    selectable = false,
+    onDieClick,
+  } = options;
 
   container.innerHTML = '';
   container.className = 'dice-roll-result';
@@ -268,7 +315,10 @@ export function animateRoll(
 
     // Start with random value
     const config = DICE_CONFIGS[die.diceType];
-    const tempDie: DieRoll = { ...die, value: Math.ceil(Math.random() * config.faces) };
+    const tempDie: DieRoll = {
+      ...die,
+      value: Math.ceil(Math.random() * config.faces),
+    };
     const svg = renderDie(tempDie, dieSize);
     wrapper.appendChild(svg);
 

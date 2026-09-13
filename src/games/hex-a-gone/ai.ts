@@ -44,7 +44,7 @@ const DIFFICULTY_CONFIG = {
  * Count empty cells on the board
  */
 function countEmptyCells(state: HexAGoneGameState): number {
-  return state.board.filter(cell => !cell.filled).length;
+  return state.board.filter((cell) => !cell.filled).length;
 }
 
 /**
@@ -52,8 +52,8 @@ function countEmptyCells(state: HexAGoneGameState): number {
  */
 function getEmptyCells(state: HexAGoneGameState): { q: number; r: number }[] {
   return state.board
-    .filter(cell => !cell.filled)
-    .map(cell => ({ q: cell.q, r: cell.r }));
+    .filter((cell) => !cell.filled)
+    .map((cell) => ({ q: cell.q, r: cell.r }));
 }
 
 // =============================================================================
@@ -82,11 +82,14 @@ function evaluateSelections(
   const maxBlocks = Math.min(3, emptyCells, availableShapes.length);
 
   if (maxBlocks === 0) {
-    return [{ blocks: [], score: -1000, reasoning: "No blocks can be placed" }];
+    return [{ blocks: [], score: -1000, reasoning: 'No blocks can be placed' }];
   }
 
   // Generate all valid combinations of 1-maxBlocks shapes
-  const generateCombinations = (shapes: BlockShape[], size: number): BlockShape[][] => {
+  const generateCombinations = (
+    shapes: BlockShape[],
+    size: number
+  ): BlockShape[][] => {
     if (size === 0) return [[]];
     if (shapes.length < size) return [];
 
@@ -119,16 +122,16 @@ function evaluateSelections(
       const emptyCellsList = getEmptyCells(simState);
       if (emptyCellsList.length < blocks.length) {
         score -= 1000; // Can't place all blocks
-        reasons.push("Not enough empty cells");
+        reasons.push('Not enough empty cells');
       } else {
         // Score based on block types
         for (const block of blocks) {
           if (block === 'triangle') {
             score += 15;
-            reasons.push("Triangle is flexible");
+            reasons.push('Triangle is flexible');
           } else if (block === 'hexagon') {
             score += 12;
-            reasons.push("Hexagon fills space well");
+            reasons.push('Hexagon fills space well');
           } else {
             score += 8;
           }
@@ -140,23 +143,23 @@ function evaluateSelections(
         // Late game: fewer blocks might be safer
         if (emptyCells <= 5) {
           score -= (blocks.length - 1) * 10;
-          reasons.push("Late game - conservative selection");
+          reasons.push('Late game - conservative selection');
         }
       }
 
       // Consider what's left for opponent
-      const shapesAfter = availableShapes.filter(s => !blocks.includes(s));
+      const shapesAfter = availableShapes.filter((s) => !blocks.includes(s));
       const cellsAfterOurTurn = emptyCells - blocks.length;
 
       if (cellsAfterOurTurn > 0 && shapesAfter.length === 0) {
         score += 100; // Opponent might be stuck!
-        reasons.push("May leave opponent with no options");
+        reasons.push('May leave opponent with no options');
       }
 
       options.push({
         blocks,
         score,
-        reasoning: reasons.join('; ') || "Standard selection",
+        reasoning: reasons.join('; ') || 'Standard selection',
       });
     }
   }
@@ -200,15 +203,16 @@ function evaluatePlacements(
     // Factor 1: Does this create winning position?
     if (simState.winner === aiPlayer) {
       score += 10000;
-      reasons.push("Winning move!");
+      reasons.push('Winning move!');
     }
 
     // Factor 2: Center control (center cells are more flexible)
-    const distFromCenter = Math.abs(cell.q) + Math.abs(cell.r) + Math.abs(-cell.q - cell.r);
+    const distFromCenter =
+      Math.abs(cell.q) + Math.abs(cell.r) + Math.abs(-cell.q - cell.r);
     const centerBonus = Math.max(0, 6 - distFromCenter) * 3;
     score += centerBonus;
     if (distFromCenter <= 2) {
-      reasons.push("Good center position");
+      reasons.push('Good center position');
     }
 
     // Factor 3: Don't isolate single empty cells
@@ -216,13 +220,15 @@ function evaluatePlacements(
     const neighbors = getHexNeighbors(cell.q, cell.r);
     let isolatedCount = 0;
     for (const neighbor of neighbors) {
-      const neighborCell = state.board.find(c => c.q === neighbor.q && c.r === neighbor.r);
+      const neighborCell = state.board.find(
+        (c) => c.q === neighbor.q && c.r === neighbor.r
+      );
       if (neighborCell && !neighborCell.filled) {
         // Check if this neighbor would be isolated after our move
         const neighborNeighbors = getHexNeighbors(neighbor.q, neighbor.r);
-        const emptyNeighborsAfter = neighborNeighbors.filter(nn => {
+        const emptyNeighborsAfter = neighborNeighbors.filter((nn) => {
           if (nn.q === cell.q && nn.r === cell.r) return false; // We're filling this
-          const nnCell = state.board.find(c => c.q === nn.q && c.r === nn.r);
+          const nnCell = state.board.find((c) => c.q === nn.q && c.r === nn.r);
           return nnCell && !nnCell.filled;
         });
         if (emptyNeighborsAfter.length === 0) {
@@ -232,21 +238,23 @@ function evaluatePlacements(
     }
     if (isolatedCount > 0) {
       score -= isolatedCount * 5;
-      reasons.push("May create isolated cells");
+      reasons.push('May create isolated cells');
     }
 
     // Factor 4: Edge vs interior
-    const isEdge = neighbors.some(n => !state.board.find(c => c.q === n.q && c.r === n.r));
+    const isEdge = neighbors.some(
+      (n) => !state.board.find((c) => c.q === n.q && c.r === n.r)
+    );
     if (!isEdge) {
       score += 3;
-      reasons.push("Interior position");
+      reasons.push('Interior position');
     }
 
     options.push({
       q: cell.q,
       r: cell.r,
       score,
-      reasoning: reasons.join('; ') || "Standard placement",
+      reasoning: reasons.join('; ') || 'Standard placement',
     });
   }
 
@@ -287,11 +295,13 @@ function getTeachingSelection(
 
   // 30% chance to make a suboptimal selection
   if (Math.random() < 0.3 && options.length > 1) {
-    const suboptimal = options.slice(1).find(o => o.score < options[0].score - 20);
+    const suboptimal = options
+      .slice(1)
+      .find((o) => o.score < options[0].score - 20);
     if (suboptimal) {
       return {
         blocks: suboptimal.blocks,
-        hint: "Think about which blocks to select carefully!",
+        hint: 'Think about which blocks to select carefully!',
       };
     }
   }
@@ -413,7 +423,10 @@ export function executeAITurn(
   }
 
   // Phase 2: Placement
-  while (currentState.phase === 'placeBlocks' && currentState.currentPlayer === aiPlayer) {
+  while (
+    currentState.phase === 'placeBlocks' &&
+    currentState.currentPlayer === aiPlayer
+  ) {
     const placement = getAIPlacement(currentState, aiPlayer, difficulty);
     if (!placement) break;
 

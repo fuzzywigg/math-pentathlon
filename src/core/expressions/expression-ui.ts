@@ -598,11 +598,14 @@ export function createInteractiveBuilder(
   injectExpressionStyles();
 
   // State
-  const slots: ExpressionSlot[] = Array.from({ length: options.slotCount }, (_, i) => ({
-    id: `slot-${i}`,
-    index: i,
-    card: null,
-  }));
+  const slots: ExpressionSlot[] = Array.from(
+    { length: options.slotCount },
+    (_, i) => ({
+      id: `slot-${i}`,
+      index: i,
+      card: null,
+    })
+  );
 
   let selectedCard: ExpressionCard | null = null;
   const usedCardIds = new Set<string>();
@@ -650,7 +653,8 @@ export function createInteractiveBuilder(
 
     // Card tray
     const trayLabel = document.createElement('div');
-    trayLabel.style.cssText = 'margin: 1rem 0 0.5rem; color: #666; text-align: center;';
+    trayLabel.style.cssText =
+      'margin: 1rem 0 0.5rem; color: #666; text-align: center;';
     trayLabel.textContent = selectedCard
       ? 'Click a slot to place the card'
       : 'Select a card to place';
@@ -704,7 +708,7 @@ export function createInteractiveBuilder(
 
   function getResult(): number | null {
     const result = evaluate(getExpression());
-    return result.success ? result.value ?? null : null;
+    return result.success ? (result.value ?? null) : null;
   }
 
   function reset(): void {
@@ -742,7 +746,8 @@ export function renderCalculatorDisplay(
   `;
 
   const exprEl = document.createElement('div');
-  exprEl.style.cssText = 'font-size: 1.25rem; color: #aaa; margin-bottom: 0.5rem;';
+  exprEl.style.cssText =
+    'font-size: 1.25rem; color: #aaa; margin-bottom: 0.5rem;';
   exprEl.textContent = expression || '0';
   container.appendChild(exprEl);
 

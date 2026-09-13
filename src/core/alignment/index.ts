@@ -29,7 +29,7 @@ export {
   // Constants (renamed / shadowed)
   DIRECTION_VECTORS,
   CARDINAL_DIRECTIONS,
-  ALL_DIRECTIONS_8 as ALL_DIRECTIONS,   // shadow: 8 directions, not 4
+  ALL_DIRECTIONS_8 as ALL_DIRECTIONS, // shadow: 8 directions, not 4
   // isInBounds ergonomic wrapper (shadows internal row,col,rows,cols signature)
   isInBounds,
   // Dimension helpers

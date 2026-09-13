@@ -43,9 +43,12 @@ export function deselectBlock(
     ...state,
     turnSelection: {
       ...state.turnSelection,
-      blocks: state.turnSelection.blocks.filter(b => b !== shape),
+      blocks: state.turnSelection.blocks.filter((b) => b !== shape),
     },
-    selectedBlockForPlacement: state.selectedBlockForPlacement === shape ? null : state.selectedBlockForPlacement,
+    selectedBlockForPlacement:
+      state.selectedBlockForPlacement === shape
+        ? null
+        : state.selectedBlockForPlacement,
   };
 }
 
@@ -102,7 +105,7 @@ export function placeBlock(
   const shape = state.selectedBlockForPlacement;
 
   // Update board
-  const newBoard = state.board.map(cell => {
+  const newBoard = state.board.map((cell) => {
     if (cell.q === q && cell.r === r) {
       return {
         ...cell,
@@ -130,7 +133,7 @@ export function placeBlock(
   };
 
   // Remove from selection
-  const remainingBlocks = state.turnSelection.blocks.filter(b => b !== shape);
+  const remainingBlocks = state.turnSelection.blocks.filter((b) => b !== shape);
 
   // Check if turn is complete (all selected blocks placed)
   const turnComplete = remainingBlocks.length === 0;
@@ -194,19 +197,21 @@ export function canPlayerMove(state: HexAGoneGameState): boolean {
   if (availableShapes.length === 0) return false;
 
   // Check if there are any empty cells
-  const emptyCells = state.board.filter(cell => !cell.filled);
+  const emptyCells = state.board.filter((cell) => !cell.filled);
   if (emptyCells.length === 0) return false;
 
   return true;
 }
 
 // Get valid placement positions for current block
-export function getValidPlacements(state: HexAGoneGameState): { q: number; r: number }[] {
+export function getValidPlacements(
+  state: HexAGoneGameState
+): { q: number; r: number }[] {
   if (!state.selectedBlockForPlacement) return [];
 
   return state.board
-    .filter(cell => !cell.filled)
-    .map(cell => ({ q: cell.q, r: cell.r }));
+    .filter((cell) => !cell.filled)
+    .map((cell) => ({ q: cell.q, r: cell.r }));
 }
 
 // Check if game is over

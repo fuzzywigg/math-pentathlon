@@ -109,7 +109,11 @@ export function getValidMoves(state: FiarGameState, nodeId: string): string[] {
 /**
  * Check if a move is valid
  */
-export function canMove(state: FiarGameState, fromId: string, toId: string): boolean {
+export function canMove(
+  state: FiarGameState,
+  fromId: string,
+  toId: string
+): boolean {
   const validMoves = getValidMoves(state, fromId);
   return validMoves.includes(toId);
 }
@@ -117,7 +121,11 @@ export function canMove(state: FiarGameState, fromId: string, toId: string): boo
 /**
  * Move a chip from one node to another
  */
-export function moveChip(state: FiarGameState, fromId: string, toId: string): FiarGameState {
+export function moveChip(
+  state: FiarGameState,
+  fromId: string,
+  toId: string
+): FiarGameState {
   if (!canMove(state, fromId, toId)) return state;
 
   const newBoard = {
@@ -192,7 +200,12 @@ export function findPaths(state: FiarGameState, player: Player): PathResult[] {
       // Extend in positive direction
       let currentId = nodeId;
       while (true) {
-        const nodesInDir = getNodesInDirection(state.board, currentId, dir.dx, dir.dy);
+        const nodesInDir = getNodesInDirection(
+          state.board,
+          currentId,
+          dir.dx,
+          dir.dy
+        );
         if (nodesInDir.length === 0) break;
 
         const nextId = nodesInDir[0];
@@ -206,7 +219,12 @@ export function findPaths(state: FiarGameState, player: Player): PathResult[] {
       // Extend in negative direction
       currentId = nodeId;
       while (true) {
-        const nodesInDir = getNodesInDirection(state.board, currentId, -dir.dx, -dir.dy);
+        const nodesInDir = getNodesInDirection(
+          state.board,
+          currentId,
+          -dir.dx,
+          -dir.dy
+        );
         if (nodesInDir.length === 0) break;
 
         const nextId = nodesInDir[0];
@@ -231,7 +249,11 @@ export function findPaths(state: FiarGameState, player: Player): PathResult[] {
 /**
  * Check if a winning path is blocked by an adjacent opponent chip
  */
-export function isPathBlocked(state: FiarGameState, path: string[], player: Player): boolean {
+export function isPathBlocked(
+  state: FiarGameState,
+  path: string[],
+  player: Player
+): boolean {
   const opponent = getOpponent(player);
 
   // Check if any node in the path has an adjacent opponent chip
@@ -258,7 +280,9 @@ export function checkWinner(state: FiarGameState): Player | null {
     const paths = findPaths(state, player);
 
     // Find unblocked winning paths
-    const winningPath = paths.find((p) => !p.isBlocked && p.nodes.length >= CONFIG.WIN_LENGTH);
+    const winningPath = paths.find(
+      (p) => !p.isBlocked && p.nodes.length >= CONFIG.WIN_LENGTH
+    );
     if (winningPath) {
       return player;
     }
@@ -301,7 +325,10 @@ export function isDraw(state: FiarGameState): boolean {
 /**
  * Select a chip for movement
  */
-export function selectChip(state: FiarGameState, nodeId: string): FiarGameState {
+export function selectChip(
+  state: FiarGameState,
+  nodeId: string
+): FiarGameState {
   const selectable = getSelectableNodes(state);
   if (!selectable.includes(nodeId)) return state;
 

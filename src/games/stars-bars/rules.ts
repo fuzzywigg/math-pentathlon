@@ -69,9 +69,11 @@ function createBoard(): BoardCell[][] {
 
   // Star positions (corners and center are worth double)
   const starPositions = new Set([
-    '0,0', '0,4',
+    '0,0',
+    '0,4',
     '2,2', // center
-    '4,0', '4,4',
+    '4,0',
+    '4,4',
   ]);
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
@@ -94,7 +96,10 @@ function createBoard(): BoardCell[][] {
 /**
  * Draw cards from deck
  */
-function drawCards(deck: AttributeCard[], count: number): { drawn: AttributeCard[]; remaining: AttributeCard[] } {
+function drawCards(
+  deck: AttributeCard[],
+  count: number
+): { drawn: AttributeCard[]; remaining: AttributeCard[] } {
   const drawn = deck.slice(0, count);
   const remaining = deck.slice(count);
   return { drawn, remaining };
@@ -174,7 +179,9 @@ export function clearSelection(state: StarsState): StarsState {
 /**
  * Get valid placement positions
  */
-export function getValidPlacements(state: StarsState): { row: number; col: number }[] {
+export function getValidPlacements(
+  state: StarsState
+): { row: number; col: number }[] {
   const validPositions: { row: number; col: number }[] = [];
 
   // Check if board is empty - if so, all positions are valid
@@ -195,7 +202,9 @@ export function getValidPlacements(state: StarsState): { row: number; col: numbe
       if (state.cells[row][col].card !== null) continue;
 
       // Check if adjacent to any existing card (orthogonal and diagonal)
-      const hasAdjacent = getAdjacentCells(state, row, col).some((cell) => cell.card !== null);
+      const hasAdjacent = getAdjacentCells(state, row, col).some(
+        (cell) => cell.card !== null
+      );
 
       if (hasAdjacent) {
         validPositions.push({ row, col });
@@ -209,12 +218,21 @@ export function getValidPlacements(state: StarsState): { row: number; col: numbe
 /**
  * Get all adjacent cells (orthogonal and diagonal)
  */
-function getAdjacentCells(state: StarsState, row: number, col: number): BoardCell[] {
+function getAdjacentCells(
+  state: StarsState,
+  row: number,
+  col: number
+): BoardCell[] {
   const adjacent: BoardCell[] = [];
   const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
   ];
 
   for (const [dr, dc] of directions) {
@@ -265,14 +283,19 @@ function calculatePlacementScore(
 
   return {
     score: totalScore,
-    breakdown: breakdownParts.length > 0 ? breakdownParts.join(' + ') : 'first card',
+    breakdown:
+      breakdownParts.length > 0 ? breakdownParts.join(' + ') : 'first card',
   };
 }
 
 /**
  * Place a card on the board
  */
-export function placeCard(state: StarsState, row: number, col: number): StarsState {
+export function placeCard(
+  state: StarsState,
+  row: number,
+  col: number
+): StarsState {
   if (state.phase !== 'placingCard' || !state.selectedCard) return state;
 
   const cell = state.cells[row][col];
@@ -335,7 +358,8 @@ export function placeCard(state: StarsState, row: number, col: number): StarsSta
   };
 
   // Check for winner
-  const nextPlayer: Player = state.currentPlayer === 'player1' ? 'player2' : 'player1';
+  const nextPlayer: Player =
+    state.currentPlayer === 'player1' ? 'player2' : 'player1';
   let winner: Player | null = null;
   let phase: StarsState['phase'] = 'selectingCard';
 
@@ -385,7 +409,8 @@ export function placeCard(state: StarsState, row: number, col: number): StarsSta
 export function passTurn(state: StarsState): StarsState {
   if (state.phase === 'gameOver') return state;
 
-  const nextPlayer: Player = state.currentPlayer === 'player1' ? 'player2' : 'player1';
+  const nextPlayer: Player =
+    state.currentPlayer === 'player1' ? 'player2' : 'player1';
 
   return {
     ...state,

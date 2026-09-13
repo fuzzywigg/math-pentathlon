@@ -20,10 +20,7 @@ import {
   getPentominoShape,
   BOARD_SIZE,
 } from './types';
-import {
-  placePiece,
-  getValidPlacements,
-} from './rules';
+import { placePiece, getValidPlacements } from './rules';
 import { Cell, Rotation } from '../../core/polyomino/types';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
@@ -60,7 +57,13 @@ function countReachableEmpty(state: PentEmInState, start: Cell): number {
     const key = `${cell.row},${cell.col}`;
 
     if (visited.has(key)) continue;
-    if (cell.row < 0 || cell.row >= BOARD_SIZE || cell.col < 0 || cell.col >= BOARD_SIZE) continue;
+    if (
+      cell.row < 0 ||
+      cell.row >= BOARD_SIZE ||
+      cell.col < 0 ||
+      cell.col >= BOARD_SIZE
+    )
+      continue;
     if (state.board[cell.row][cell.col].occupied) continue;
 
     visited.add(key);
@@ -91,15 +94,20 @@ function evaluateMove(
   let score = 0;
 
   // Factor 1: Central positions are often better for control
-  const centerDist = Math.abs(position.row - 4.5) + Math.abs(position.col - 4.5);
+  const centerDist =
+    Math.abs(position.row - 4.5) + Math.abs(position.col - 4.5);
   if (centerDist < 3) {
     score += 15 - centerDist * 3;
     reasons.push('Central control');
   }
 
   // Factor 2: Pieces that use corners and edges can be strategic
-  if (position.row === 0 || position.row === BOARD_SIZE - 1 ||
-      position.col === 0 || position.col === BOARD_SIZE - 1) {
+  if (
+    position.row === 0 ||
+    position.row === BOARD_SIZE - 1 ||
+    position.col === 0 ||
+    position.col === BOARD_SIZE - 1
+  ) {
     score += 5;
     reasons.push('Edge placement');
   }
@@ -130,14 +138,14 @@ function evaluateMove(
 
   // Factor 5: Piece flexibility - save flexible pieces for later
   const piecePriority: Record<string, number> = {
-    'X': -5,  // Very symmetric, save for tight spots
-    'I': -3,  // Long, good for blocking
-    'F': 3,   // Use asymmetric pieces early
-    'L': 2,
-    'N': 2,
-    'P': 1,
-    'Y': 2,
-    'Z': 2,
+    X: -5, // Very symmetric, save for tight spots
+    I: -3, // Long, good for blocking
+    F: 3, // Use asymmetric pieces early
+    L: 2,
+    N: 2,
+    P: 1,
+    Y: 2,
+    Z: 2,
   };
   if (piecePriority[shapeId]) {
     score += piecePriority[shapeId];
@@ -176,7 +184,14 @@ function evaluateMoves(
         const positions = getValidPlacements(state, shapeId, rotation, flipped);
 
         for (const position of positions) {
-          const move = evaluateMove(state, player, shapeId, position, rotation, flipped);
+          const move = evaluateMove(
+            state,
+            player,
+            shapeId,
+            position,
+            rotation,
+            flipped
+          );
           moves.push(move);
         }
       }

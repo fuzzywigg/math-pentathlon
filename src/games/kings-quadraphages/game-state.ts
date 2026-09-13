@@ -93,7 +93,10 @@ export function createInitialGameState(): GameState {
 }
 
 // Get king position for a player (returns 1-based position)
-export function getKingPosition(state: GameState, player: PlayerOwner): Position | null {
+export function getKingPosition(
+  state: GameState,
+  player: PlayerOwner
+): Position | null {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
       const cell = state.board[row][col];
@@ -112,7 +115,8 @@ export function getSupply(state: GameState, player: PlayerOwner): number {
 
 // Get current phase message
 export function getCurrentPhaseMessage(state: GameState): string {
-  const playerName = state.currentPlayer === 'player1' ? 'Player 1' : 'Player 2';
+  const playerName =
+    state.currentPlayer === 'player1' ? 'Player 1' : 'Player 2';
 
   switch (state.turnPhase) {
     case 'moveKing':
@@ -173,7 +177,10 @@ export function moveKing(state: GameState, destination: Position): GameState {
   newBoard[fromIndex.row][fromIndex.col] = null;
 
   // Place king at new position
-  newBoard[destIndex.row][destIndex.col] = { type: 'king', owner: state.currentPlayer };
+  newBoard[destIndex.row][destIndex.col] = {
+    type: 'king',
+    owner: state.currentPlayer,
+  };
 
   // Create move history entry
   const moveEntry: MoveHistoryEntry = {
@@ -193,7 +200,10 @@ export function moveKing(state: GameState, destination: Position): GameState {
 }
 
 // Place a quadraphage at a position
-export function placeQuadraphage(state: GameState, position: Position): GameState {
+export function placeQuadraphage(
+  state: GameState,
+  position: Position
+): GameState {
   if (state.turnPhase !== 'placeQuadraphage') {
     return state;
   }
@@ -214,13 +224,20 @@ export function placeQuadraphage(state: GameState, position: Position): GameStat
 
   // Create new board with quadraphage placed
   const newBoard = cloneBoard(state.board);
-  newBoard[posIndex.row][posIndex.col] = { type: 'quadraphage', owner: state.currentPlayer };
+  newBoard[posIndex.row][posIndex.col] = {
+    type: 'quadraphage',
+    owner: state.currentPlayer,
+  };
 
   // Update supply
   const newPlayer1Supply =
-    state.currentPlayer === 'player1' ? state.player1Supply - 1 : state.player1Supply;
+    state.currentPlayer === 'player1'
+      ? state.player1Supply - 1
+      : state.player1Supply;
   const newPlayer2Supply =
-    state.currentPlayer === 'player2' ? state.player2Supply - 1 : state.player2Supply;
+    state.currentPlayer === 'player2'
+      ? state.player2Supply - 1
+      : state.player2Supply;
 
   // Create move history entry
   const moveEntry: MoveHistoryEntry = {
@@ -289,7 +306,10 @@ export function isValidMove(state: GameState, destination: Position): boolean {
 }
 
 // Check if a placement is valid
-export function isValidPlacement(state: GameState, position: Position): boolean {
+export function isValidPlacement(
+  state: GameState,
+  position: Position
+): boolean {
   if (state.turnPhase !== 'placeQuadraphage') {
     return false;
   }

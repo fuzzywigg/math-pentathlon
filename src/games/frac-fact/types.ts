@@ -15,7 +15,7 @@ export interface FractionProblem {
   operand2: Fraction;
   operation: FractionOperation;
   correctAnswer: Fraction;
-  answerChoices: Fraction[];  // Multiple choice options
+  answerChoices: Fraction[]; // Multiple choice options
 }
 
 // Player's game stats
@@ -42,7 +42,7 @@ export interface FracFactState {
 
   // Problems completed
   problemsCompleted: number;
-  maxProblems: number;  // Total problems in the game
+  maxProblems: number; // Total problems in the game
 
   // Player stats
   player1Stats: PlayerStats;
@@ -64,13 +64,13 @@ export interface ProblemResult {
   player: Player;
   selectedAnswer: Fraction;
   isCorrect: boolean;
-  timeSpent: number;  // in milliseconds
+  timeSpent: number; // in milliseconds
 }
 
 // Constants
 export const DEFAULT_MAX_PROBLEMS = 10;
 export const POINTS_PER_CORRECT = 10;
-export const STREAK_BONUS = 5;  // Extra points for each problem in a streak
+export const STREAK_BONUS = 5; // Extra points for each problem in a streak
 
 // Create initial player stats
 function createPlayerStats(): PlayerStats {
@@ -84,7 +84,9 @@ function createPlayerStats(): PlayerStats {
 }
 
 // Create initial game state
-export function createInitialState(difficulty: Difficulty = 'medium'): FracFactState {
+export function createInitialState(
+  difficulty: Difficulty = 'medium'
+): FracFactState {
   return {
     currentPlayer: 'player1',
     phase: 'playing',
@@ -107,6 +109,9 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get player stats
-export function getPlayerStats(state: FracFactState, player: Player): PlayerStats {
+export function getPlayerStats(
+  state: FracFactState,
+  player: Player
+): PlayerStats {
   return player === 'player1' ? state.player1Stats : state.player2Stats;
 }

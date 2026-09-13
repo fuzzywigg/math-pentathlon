@@ -424,7 +424,8 @@ export function renderBoard(
   const board = document.createElement('div');
   board.className = 'stars-board';
 
-  const validPlacements = state.phase === 'placingCard' ? getValidPlacements(state) : [];
+  const validPlacements =
+    state.phase === 'placingCard' ? getValidPlacements(state) : [];
   const validSet = new Set(validPlacements.map((p) => `${p.row},${p.col}`));
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
@@ -435,7 +436,11 @@ export function renderBoard(
 
       if (cell.isStar) cellEl.classList.add('star');
       if (cell.owner) cellEl.classList.add(cell.owner);
-      if (state.lastMove && state.lastMove.row === row && state.lastMove.col === col) {
+      if (
+        state.lastMove &&
+        state.lastMove.row === row &&
+        state.lastMove.col === col
+      ) {
         cellEl.classList.add('last-move');
       }
 
@@ -446,7 +451,12 @@ export function renderBoard(
 
         // Show score preview on hover
         if (state.selectedCard) {
-          const previewScore = calculatePreviewScore(state, state.selectedCard, row, col);
+          const previewScore = calculatePreviewScore(
+            state,
+            state.selectedCard,
+            row,
+            col
+          );
           cellEl.title = `+${previewScore} points`;
         }
       }
@@ -477,9 +487,14 @@ function calculatePreviewScore(
   let score = 0;
 
   const directions = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
   ];
 
   for (const [dr, dc] of directions) {

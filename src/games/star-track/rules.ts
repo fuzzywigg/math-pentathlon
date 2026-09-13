@@ -56,7 +56,10 @@ export function selectChain(
 
   // Calculate new position
   const currentPosition = getPlayerPosition(state, state.currentPlayer);
-  const newPosition = Math.min(currentPosition + selectedChain.length, TRACK_LENGTH);
+  const newPosition = Math.min(
+    currentPosition + selectedChain.length,
+    TRACK_LENGTH
+  );
 
   // Check for winner
   const isWinner = newPosition >= TRACK_LENGTH;
@@ -83,7 +86,9 @@ export function selectChain(
     moveHistory: [...state.moveHistory, move],
     winner: isWinner ? state.currentPlayer : null,
     phase: isWinner ? 'gameOver' : 'drawChains',
-    currentPlayer: isWinner ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer: isWinner
+      ? state.currentPlayer
+      : getOpponent(state.currentPlayer),
   };
 
   return newState;

@@ -1,12 +1,7 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import {
-  PrimeGoldState,
-  Player,
-  CONFIG,
-  isPrime,
-} from './types';
+import { PrimeGoldState, Player, CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
@@ -606,7 +601,11 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
   title.textContent = 'Move History';
   container.appendChild(title);
 
-  for (let i = state.moveHistory.length - 1; i >= Math.max(0, state.moveHistory.length - 10); i--) {
+  for (
+    let i = state.moveHistory.length - 1;
+    i >= Math.max(0, state.moveHistory.length - 10);
+    i--
+  ) {
     const move = state.moveHistory[i];
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;

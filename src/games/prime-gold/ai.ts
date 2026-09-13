@@ -13,11 +13,7 @@
 // 4. Look for expressions: (a + b) × c, a × b - c, a^b, etc.
 // 5. Block opponent's prime veins when you can
 
-import {
-  PrimeGoldState,
-  Player,
-  CONFIG,
-} from './types';
+import { PrimeGoldState, Player, CONFIG } from './types';
 import {
   rollDice,
   placeChip,
@@ -49,8 +45,10 @@ function getDiagonalNeighborCount(
   player: Player
 ): number {
   const diagonals = [
-    [row - 1, col - 1], [row - 1, col + 1],
-    [row + 1, col - 1], [row + 1, col + 1],
+    [row - 1, col - 1],
+    [row - 1, col + 1],
+    [row + 1, col - 1],
+    [row + 1, col + 1],
   ];
 
   let count = 0;
@@ -74,8 +72,14 @@ function wouldExtendVein(
 ): boolean {
   // Check both diagonal directions
   const directions = [
-    [[-1, -1], [1, 1]],  // top-left to bottom-right
-    [[-1, 1], [1, -1]],  // top-right to bottom-left
+    [
+      [-1, -1],
+      [1, 1],
+    ], // top-left to bottom-right
+    [
+      [-1, 1],
+      [1, -1],
+    ], // top-right to bottom-left
   ];
 
   for (const [[dr1, dc1], [dr2, dc2]] of directions) {
@@ -170,14 +174,22 @@ function evaluatePlacements(
     }
 
     // Factor 3: Adjacent to our other primes
-    const neighborCount = getDiagonalNeighborCount(state, cell.row, cell.col, player);
+    const neighborCount = getDiagonalNeighborCount(
+      state,
+      cell.row,
+      cell.col,
+      player
+    );
     if (neighborCount > 0 && cell.isPrime) {
       score += neighborCount * 50;
       reasons.push(`Near ${neighborCount} owned prime(s)`);
     }
 
     // Factor 4: Block opponent's vein
-    if (cell.isPrime && wouldBlockOpponentVein(state, cell.row, cell.col, opponent)) {
+    if (
+      cell.isPrime &&
+      wouldBlockOpponentVein(state, cell.row, cell.col, opponent)
+    ) {
       score += 150;
       reasons.push('Blocks opponent vein');
     }
@@ -222,7 +234,7 @@ function getTeachingPlacement(
 
   // 40% chance to pick a non-prime or lower-scoring move
   if (Math.random() < 0.4 && moves.length > 1) {
-    const suboptimal = moves.filter(m => {
+    const suboptimal = moves.filter((m) => {
       const cell = findCellByValue(state, m.value);
       return cell && !cell.isPrime;
     });
@@ -324,7 +336,11 @@ export function executeAITurn(
     const placement = getAIPlacement(currentState, aiPlayer, difficulty);
 
     if (placement) {
-      currentState = placeChip(currentState, placement.value, placement.expression);
+      currentState = placeChip(
+        currentState,
+        placement.value,
+        placement.expression
+      );
     } else {
       currentState = passTurn(currentState);
     }

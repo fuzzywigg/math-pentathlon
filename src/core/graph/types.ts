@@ -101,7 +101,11 @@ export const DEFAULT_GRAPH_CONFIG: GraphRenderConfig = {
 /**
  * Create a grid graph (rows × cols)
  */
-export function createGridGraph(rows: number, cols: number, spacing: number = 60): Graph {
+export function createGridGraph(
+  rows: number,
+  cols: number,
+  spacing: number = 60
+): Graph {
   const nodes = new Map<NodeId, GraphNode>();
   const edges: GraphEdge[] = [];
 

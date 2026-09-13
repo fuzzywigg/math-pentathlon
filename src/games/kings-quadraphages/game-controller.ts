@@ -1,5 +1,15 @@
-import { createInitialGameState, GameState, moveKing, placeQuadraphage } from './game-state';
-import { renderBoard, renderStatus, renderMoveHistory, handleCellClick } from './board-ui';
+import {
+  createInitialGameState,
+  GameState,
+  moveKing,
+  placeQuadraphage,
+} from './game-state';
+import {
+  renderBoard,
+  renderStatus,
+  renderMoveHistory,
+  handleCellClick,
+} from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kingsQuadraphagesTutorial } from './tutorial';
 import { getAIMove, AIDifficulty, isAITurn } from './ai';
@@ -41,7 +51,13 @@ function render(): void {
   // Disable board interaction during AI turn
   const allowClicks = !isAIThinking && !isAITurn(gameState, aiPlayer, gameMode);
   renderBoard(gameState, boardContainer, allowClicks ? onCellClick : undefined);
-  renderStatus(gameState, statusContainer, gameMode, aiDifficulty, isAIThinking);
+  renderStatus(
+    gameState,
+    statusContainer,
+    gameMode,
+    aiDifficulty,
+    isAIThinking
+  );
 
   if (historyContainer) {
     renderMoveHistory(gameState, historyContainer);
@@ -62,7 +78,12 @@ function render(): void {
     const winner = gameState.winner;
 
     owlSystem.onGameEnd('kings-quadraphages', {
-      winner: winner === 'player1' ? 'player1' : winner === 'player2' ? 'player2' : 'draw',
+      winner:
+        winner === 'player1'
+          ? 'player1'
+          : winner === 'player2'
+            ? 'player2'
+            : 'draw',
       moveCount: gameState.moveHistory.length,
     });
   }
@@ -169,7 +190,10 @@ async function executeAITurn(): Promise<void> {
   }
 
   // Execute king move (convert from 0-based to 1-based)
-  const kingMovePos = { row: aiMove.kingMove.row + 1, col: aiMove.kingMove.col + 1 };
+  const kingMovePos = {
+    row: aiMove.kingMove.row + 1,
+    col: aiMove.kingMove.col + 1,
+  };
   gameState = moveKing(gameState, kingMovePos);
   render();
 
@@ -222,7 +246,10 @@ function syncModeChrome(): void {
 }
 
 // Start a new game vs AI
-export function newGameVsAI(difficulty: AIDifficulty, humanPlaysFirst: boolean = true): void {
+export function newGameVsAI(
+  difficulty: AIDifficulty,
+  humanPlaysFirst: boolean = true
+): void {
   gameMode = 'human-vs-ai';
   aiDifficulty = difficulty;
   aiPlayer = humanPlaysFirst ? 'player2' : 'player1';

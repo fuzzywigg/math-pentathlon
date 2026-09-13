@@ -1,7 +1,14 @@
 // Queens & Guards Board UI
 // SVG rendering for the hexagonal game board
 
-import { QueensGuardsState, CONFIG, BoardCoord, cellKey, cellsInRing, parseKey } from './types';
+import {
+  QueensGuardsState,
+  CONFIG,
+  BoardCoord,
+  cellKey,
+  cellsInRing,
+  parseKey,
+} from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import {
@@ -30,7 +37,12 @@ function playerColors() {
 /**
  * Convert ring/position to pixel coordinates
  */
-function ringPosToPixel(ring: number, position: number, centerX: number, centerY: number): { x: number; y: number } {
+function ringPosToPixel(
+  ring: number,
+  position: number,
+  centerX: number,
+  centerY: number
+): { x: number; y: number } {
   if (ring === 0) {
     return { x: centerX, y: centerY };
   }
@@ -48,7 +60,11 @@ function ringPosToPixel(ring: number, position: number, centerX: number, centerY
 /**
  * Get hex corners for a cell
  */
-function getHexCorners(cx: number, cy: number, size: number): { x: number; y: number }[] {
+function getHexCorners(
+  cx: number,
+  cy: number,
+  size: number
+): { x: number; y: number }[] {
   const corners: { x: number; y: number }[] = [];
   for (let i = 0; i < 6; i++) {
     const angle = (Math.PI / 3) * i - Math.PI / 6;
@@ -65,7 +81,11 @@ function getHexCorners(cx: number, cy: number, size: number): { x: number; y: nu
  */
 function hexPath(cx: number, cy: number, size: number): string {
   const corners = getHexCorners(cx, cy, size);
-  return corners.map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`)).join(' ') + ' Z';
+  return (
+    corners
+      .map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`))
+      .join(' ') + ' Z'
+  );
 }
 
 /**
@@ -132,7 +152,11 @@ export function renderBoard(
     }
 
     // Highlight captured pieces
-    if (state.capturedPieces.some((c) => c.ring === cell.ring && c.position === cell.position)) {
+    if (
+      state.capturedPieces.some(
+        (c) => c.ring === cell.ring && c.position === cell.position
+      )
+    ) {
       strokeColor = '#f44336';
       strokeWidth = 3;
     }
@@ -148,12 +172,16 @@ export function renderBoard(
     // Draw piece if present
     if (cell.piece) {
       const seats = playerColors();
-      const pieceColor = cell.piece.player === 'player1' ? seats.player1 : seats.player2;
+      const pieceColor =
+        cell.piece.player === 'player1' ? seats.player1 : seats.player2;
       const pieceSize = CONFIG.HEX_SIZE * 0.6;
 
       if (cell.piece.type === 'queen') {
         // Queen: larger circle with crown
-        const queenBg = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const queenBg = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
         queenBg.setAttribute('cx', x.toString());
         queenBg.setAttribute('cy', y.toString());
         queenBg.setAttribute('r', (pieceSize + 4).toString());
@@ -162,7 +190,10 @@ export function renderBoard(
         queenBg.setAttribute('stroke-width', '2');
         g.appendChild(queenBg);
 
-        const queen = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const queen = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
         queen.setAttribute('cx', x.toString());
         queen.setAttribute('cy', y.toString());
         queen.setAttribute('r', pieceSize.toString());
@@ -172,7 +203,10 @@ export function renderBoard(
         g.appendChild(queen);
 
         // Crown symbol
-        const crown = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const crown = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
         crown.setAttribute('x', x.toString());
         crown.setAttribute('y', (y + 5).toString());
         crown.setAttribute('text-anchor', 'middle');
@@ -183,7 +217,10 @@ export function renderBoard(
         g.appendChild(crown);
       } else {
         // Guard: simple circle
-        const guard = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        const guard = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'circle'
+        );
         guard.setAttribute('cx', x.toString());
         guard.setAttribute('cy', y.toString());
         guard.setAttribute('r', pieceSize.toString());
@@ -193,7 +230,10 @@ export function renderBoard(
         g.appendChild(guard);
 
         // Shine effect
-        const shine = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+        const shine = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'ellipse'
+        );
         shine.setAttribute('cx', (x - 4).toString());
         shine.setAttribute('cy', (y - 4).toString());
         shine.setAttribute('rx', '4');

@@ -81,7 +81,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'I',
     name: 'I-tetromino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 0, col: 3 },
+    ],
     color: '#00bcd4',
     canRotate: true,
     canFlip: false,
@@ -91,7 +96,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'O',
     name: 'O-tetromino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+    ],
     color: '#ffeb3b',
     canRotate: false,
     canFlip: false,
@@ -101,7 +111,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'T',
     name: 'T-tetromino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 1 },
+    ],
     color: '#9c27b0',
     canRotate: true,
     canFlip: false,
@@ -111,7 +126,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'S',
     name: 'S-tetromino',
-    cells: [{ row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    cells: [
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+    ],
     color: '#4caf50',
     canRotate: true,
     canFlip: false,
@@ -121,7 +141,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'Z',
     name: 'Z-tetromino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ],
     color: '#f44336',
     canRotate: true,
     canFlip: false,
@@ -131,7 +156,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'J',
     name: 'J-tetromino',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ],
     color: '#3f51b5',
     canRotate: true,
     canFlip: false,
@@ -141,7 +171,12 @@ export const TETROMINOES: PolyominoShape[] = [
   {
     id: 'L',
     name: 'L-tetromino',
-    cells: [{ row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    cells: [
+      { row: 0, col: 2 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ],
     color: '#ff9800',
     canRotate: true,
     canFlip: false,
@@ -165,7 +200,11 @@ export const HEX_PATTERN_BLOCKS: PolyominoShape[] = [
   {
     id: 'trapezoid',
     name: 'Trapezoid',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ],
     color: '#f44336', // Red
     canRotate: true,
     canFlip: true,
@@ -175,7 +214,10 @@ export const HEX_PATTERN_BLOCKS: PolyominoShape[] = [
   {
     id: 'rhombus',
     name: 'Rhombus',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+    ],
     color: '#2196f3', // Blue
     canRotate: true,
     canFlip: false,
@@ -195,7 +237,10 @@ export const HEX_PATTERN_BLOCKS: PolyominoShape[] = [
   {
     id: 'square',
     name: 'Square',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+    ],
     color: '#ff9800', // Orange
     canRotate: true,
     canFlip: false,
@@ -209,7 +254,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'F',
     name: 'F-pentomino',
-    cells: [{ row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
+    cells: [
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 2, col: 1 },
+    ],
     color: '#e91e63',
     canRotate: true,
     canFlip: true,
@@ -219,7 +270,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'I5',
     name: 'I-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 0, col: 3 }, { row: 0, col: 4 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 0, col: 3 },
+      { row: 0, col: 4 },
+    ],
     color: '#00bcd4',
     canRotate: true,
     canFlip: false,
@@ -229,7 +286,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'L5',
     name: 'L-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }, { row: 3, col: 0 }, { row: 3, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 2, col: 0 },
+      { row: 3, col: 0 },
+      { row: 3, col: 1 },
+    ],
     color: '#ff9800',
     canRotate: true,
     canFlip: true,
@@ -239,7 +302,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'N',
     name: 'N-pentomino',
-    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }, { row: 3, col: 0 }],
+    cells: [
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 2, col: 0 },
+      { row: 3, col: 0 },
+    ],
     color: '#795548',
     canRotate: true,
     canFlip: true,
@@ -249,7 +318,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'P',
     name: 'P-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 0 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 2, col: 0 },
+    ],
     color: '#9c27b0',
     canRotate: true,
     canFlip: true,
@@ -259,7 +334,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'T5',
     name: 'T-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }, { row: 1, col: 1 }, { row: 2, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+      { row: 1, col: 1 },
+      { row: 2, col: 1 },
+    ],
     color: '#607d8b',
     canRotate: true,
     canFlip: false,
@@ -269,7 +350,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'U',
     name: 'U-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 2 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 2 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+    ],
     color: '#3f51b5',
     canRotate: true,
     canFlip: false,
@@ -279,7 +366,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'V',
     name: 'V-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 2, col: 0 },
+      { row: 2, col: 1 },
+      { row: 2, col: 2 },
+    ],
     color: '#009688',
     canRotate: true,
     canFlip: false,
@@ -289,7 +382,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'W',
     name: 'W-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 2, col: 1 },
+      { row: 2, col: 2 },
+    ],
     color: '#8bc34a',
     canRotate: true,
     canFlip: false,
@@ -299,7 +398,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'X',
     name: 'X-pentomino',
-    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }, { row: 2, col: 1 }],
+    cells: [
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 1, col: 2 },
+      { row: 2, col: 1 },
+    ],
     color: '#f44336',
     canRotate: false,
     canFlip: false,
@@ -309,7 +414,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'Y',
     name: 'Y-pentomino',
-    cells: [{ row: 0, col: 1 }, { row: 1, col: 0 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 3, col: 1 }],
+    cells: [
+      { row: 0, col: 1 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+      { row: 2, col: 1 },
+      { row: 3, col: 1 },
+    ],
     color: '#ffeb3b',
     canRotate: true,
     canFlip: true,
@@ -319,7 +430,13 @@ export const PENTOMINOES: PolyominoShape[] = [
   {
     id: 'Z5',
     name: 'Z-pentomino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 1, col: 1 }, { row: 2, col: 1 }, { row: 2, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 1, col: 1 },
+      { row: 2, col: 1 },
+      { row: 2, col: 2 },
+    ],
     color: '#4caf50',
     canRotate: true,
     canFlip: true,
@@ -343,7 +460,10 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
   {
     id: 'domino',
     name: 'Domino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+    ],
     color: '#607d8b',
     canRotate: true,
     canFlip: false,
@@ -353,7 +473,11 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
   {
     id: 'tromino-I',
     name: 'I-tromino',
-    cells: [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: 2 },
+    ],
     color: '#00bcd4',
     canRotate: true,
     canFlip: false,
@@ -363,7 +487,11 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
   {
     id: 'tromino-L',
     name: 'L-tromino',
-    cells: [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 1, col: 1 }],
+    cells: [
+      { row: 0, col: 0 },
+      { row: 1, col: 0 },
+      { row: 1, col: 1 },
+    ],
     color: '#ff9800',
     canRotate: true,
     canFlip: true,
@@ -373,23 +501,34 @@ export const SIMPLE_SHAPES: PolyominoShape[] = [
 ];
 
 /** Get all shapes in a set by ID */
-export function getShapeById(id: string, set: PolyominoShape[]): PolyominoShape | undefined {
-  return set.find(s => s.id === id);
+export function getShapeById(
+  id: string,
+  set: PolyominoShape[]
+): PolyominoShape | undefined {
+  return set.find((s) => s.id === id);
 }
 
 /** Get shapes by size */
-export function getShapesBySize(size: number, set: PolyominoShape[]): PolyominoShape[] {
-  return set.filter(s => s.size === size);
+export function getShapesBySize(
+  size: number,
+  set: PolyominoShape[]
+): PolyominoShape[] {
+  return set.filter((s) => s.size === size);
 }
 
 /** Get all polyominoes of a given order from the standard sets */
 export function getPolyominoesByOrder(order: number): PolyominoShape[] {
   const allSets = [...SIMPLE_SHAPES, ...TETROMINOES, ...PENTOMINOES];
-  return allSets.filter(s => s.order === order);
+  return allSets.filter((s) => s.order === order);
 }
 
 /** Look up a polyomino by ID across all standard sets */
 export function getPolyominoById(id: string): PolyominoShape | undefined {
-  const allSets = [...SIMPLE_SHAPES, ...TETROMINOES, ...PENTOMINOES, ...HEX_PATTERN_BLOCKS];
-  return allSets.find(s => s.id === id);
+  const allSets = [
+    ...SIMPLE_SHAPES,
+    ...TETROMINOES,
+    ...PENTOMINOES,
+    ...HEX_PATTERN_BLOCKS,
+  ];
+  return allSets.find((s) => s.id === id);
 }

@@ -12,7 +12,13 @@ export interface OwlMessage {
 }
 
 export interface MessageCondition {
-  type: 'timeOfDay' | 'streak' | 'gamesPlayed' | 'firstTime' | 'winStreak' | 'playerWon';
+  type:
+    | 'timeOfDay'
+    | 'streak'
+    | 'gamesPlayed'
+    | 'firstTime'
+    | 'winStreak'
+    | 'playerWon';
   value?: string | number | boolean;
   operator?: 'eq' | 'gt' | 'lt' | 'gte' | 'lte';
 }
@@ -112,7 +118,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'return-generic-2',
     category: 'app:return',
     priority: 'normal',
-    text: "Great to see you again! Your math skills have been missed!",
+    text: 'Great to see you again! Your math skills have been missed!',
   },
   {
     id: 'return-generic-3',
@@ -185,14 +191,20 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     category: 'game:end',
     priority: 'high',
     text: 'YOU WON YOUR FIRST {gameName} GAME! This calls for a celebration!',
-    conditions: [{ type: 'playerWon', value: true }, { type: 'gamesPlayed', value: 1 }],
+    conditions: [
+      { type: 'playerWon', value: true },
+      { type: 'gamesPlayed', value: 1 },
+    ],
   },
   {
     id: 'win-streak-1',
     category: 'game:end',
     priority: 'high',
     text: "{winStreak} wins in a row at {gameName}! You're on fire!",
-    conditions: [{ type: 'playerWon', value: true }, { type: 'winStreak', value: 3, operator: 'gte' }],
+    conditions: [
+      { type: 'playerWon', value: true },
+      { type: 'winStreak', value: 3, operator: 'gte' },
+    ],
   },
   {
     id: 'win-generic-1',
@@ -205,28 +217,28 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'win-generic-2',
     category: 'game:end',
     priority: 'normal',
-    text: "Hoot hoot! Winner winner! That was some impressive play!",
+    text: 'Hoot hoot! Winner winner! That was some impressive play!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
     id: 'win-generic-3',
     category: 'game:end',
     priority: 'normal',
-    text: "Amazing! Your math brain is really showing off today!",
+    text: 'Amazing! Your math brain is really showing off today!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
     id: 'win-generic-4',
     category: 'game:end',
     priority: 'normal',
-    text: "Brilliant moves! I knew you had it in you!",
+    text: 'Brilliant moves! I knew you had it in you!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
     id: 'win-generic-5',
     category: 'game:end',
     priority: 'normal',
-    text: "Champion! Want to try for another win?",
+    text: 'Champion! Want to try for another win?',
     conditions: [{ type: 'playerWon', value: true }],
   },
 
@@ -237,14 +249,14 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'loss-encouraging-1',
     category: 'game:end',
     priority: 'normal',
-    text: "That was a tough game! Every loss teaches us something. Want another go?",
+    text: 'That was a tough game! Every loss teaches us something. Want another go?',
     conditions: [{ type: 'playerWon', value: false }],
   },
   {
     id: 'loss-encouraging-2',
     category: 'game:end',
     priority: 'normal',
-    text: "Not this time, but I saw some great moves in there! Try again?",
+    text: 'Not this time, but I saw some great moves in there! Try again?',
     conditions: [{ type: 'playerWon', value: false }],
   },
   {
@@ -258,7 +270,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'loss-encouraging-4',
     category: 'game:end',
     priority: 'normal',
-    text: "Close game! A few different moves and it could have been yours!",
+    text: 'Close game! A few different moves and it could have been yours!',
     conditions: [{ type: 'playerWon', value: false }],
   },
   {
@@ -276,13 +288,13 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'draw-1',
     category: 'game:end',
     priority: 'normal',
-    text: "A draw! Both players matched wits perfectly. Impressive!",
+    text: 'A draw! Both players matched wits perfectly. Impressive!',
   },
   {
     id: 'draw-2',
     category: 'game:end',
     priority: 'normal',
-    text: "Tied game! That means you were evenly matched. Great job!",
+    text: 'Tied game! That means you were evenly matched. Great job!',
   },
 
   // =====================
@@ -308,7 +320,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'tutorial-complete-1',
     category: 'tutorial:complete',
     priority: 'high',
-    text: "Tutorial complete! You now know how to play {gameName}. Time to put it into practice!",
+    text: 'Tutorial complete! You now know how to play {gameName}. Time to put it into practice!',
   },
   {
     id: 'tutorial-complete-2',
@@ -394,20 +406,29 @@ class OwlMessageManager {
   private messages: OwlMessage[] = MESSAGE_LIBRARY;
 
   // Select a message based on event type and context
-  selectMessage(eventType: OwlEventType, context: MessageContext): OwlMessage | null {
+  selectMessage(
+    eventType: OwlEventType,
+    context: MessageContext
+  ): OwlMessage | null {
     // Filter messages by category
-    const categoryMessages = this.messages.filter((m) => m.category === eventType);
+    const categoryMessages = this.messages.filter(
+      (m) => m.category === eventType
+    );
 
     if (categoryMessages.length === 0) {
       return null;
     }
 
     // Find messages that match conditions
-    const matchingMessages = categoryMessages.filter((m) => this.matchesConditions(m, context));
+    const matchingMessages = categoryMessages.filter((m) =>
+      this.matchesConditions(m, context)
+    );
 
     if (matchingMessages.length === 0) {
       // Fall back to messages without conditions
-      const fallbackMessages = categoryMessages.filter((m) => !m.conditions || m.conditions.length === 0);
+      const fallbackMessages = categoryMessages.filter(
+        (m) => !m.conditions || m.conditions.length === 0
+      );
       if (fallbackMessages.length === 0) return null;
       return this.selectAndFormat(fallbackMessages, context);
     }
@@ -416,31 +437,51 @@ class OwlMessageManager {
   }
 
   // Check if a message matches all its conditions
-  private matchesConditions(message: OwlMessage, context: MessageContext): boolean {
+  private matchesConditions(
+    message: OwlMessage,
+    context: MessageContext
+  ): boolean {
     if (!message.conditions || message.conditions.length === 0) {
       return true;
     }
 
-    return message.conditions.every((condition) => this.checkCondition(condition, context));
+    return message.conditions.every((condition) =>
+      this.checkCondition(condition, context)
+    );
   }
 
   // Check a single condition
-  private checkCondition(condition: MessageCondition, context: MessageContext): boolean {
+  private checkCondition(
+    condition: MessageCondition,
+    context: MessageContext
+  ): boolean {
     switch (condition.type) {
       case 'timeOfDay':
         return context.timeOfDay === condition.value;
 
       case 'streak':
-        return this.compareNumber(context.currentStreak || 0, condition.value as number, condition.operator);
+        return this.compareNumber(
+          context.currentStreak || 0,
+          condition.value as number,
+          condition.operator
+        );
 
       case 'gamesPlayed':
-        return this.compareNumber(context.gamesPlayedThisGame || 0, condition.value as number, condition.operator);
+        return this.compareNumber(
+          context.gamesPlayedThisGame || 0,
+          condition.value as number,
+          condition.operator
+        );
 
       case 'firstTime':
-        return (context.gamesPlayedThisGame || 0) === 0 === condition.value;
+        return ((context.gamesPlayedThisGame || 0) === 0) === condition.value;
 
       case 'winStreak':
-        return this.compareNumber(context.winStreak || 0, condition.value as number, condition.operator);
+        return this.compareNumber(
+          context.winStreak || 0,
+          condition.value as number,
+          condition.operator
+        );
 
       case 'playerWon':
         return context.playerWon === condition.value;
@@ -451,7 +492,11 @@ class OwlMessageManager {
   }
 
   // Compare numbers with operator
-  private compareNumber(actual: number, expected: number, operator?: string): boolean {
+  private compareNumber(
+    actual: number,
+    expected: number,
+    operator?: string
+  ): boolean {
     switch (operator) {
       case 'eq':
         return actual === expected;
@@ -469,7 +514,10 @@ class OwlMessageManager {
   }
 
   // Select a random message and format it
-  private selectAndFormat(messages: OwlMessage[], context: MessageContext): OwlMessage {
+  private selectAndFormat(
+    messages: OwlMessage[],
+    context: MessageContext
+  ): OwlMessage {
     // Prioritize high priority messages
     const highPriority = messages.filter((m) => m.priority === 'high');
     const pool = highPriority.length > 0 ? highPriority : messages;

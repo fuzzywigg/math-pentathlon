@@ -37,7 +37,10 @@ export function tokenize(expression: string): ExpressionToken[] {
     }
 
     // Numbers (including decimals)
-    if (/[0-9]/.test(char) || (char === '.' && /[0-9]/.test(expression[i + 1] ?? ''))) {
+    if (
+      /[0-9]/.test(char) ||
+      (char === '.' && /[0-9]/.test(expression[i + 1] ?? ''))
+    ) {
       let numStr = '';
       while (i < expression.length && /[0-9.]/.test(expression[i])) {
         numStr += expression[i];
@@ -51,7 +54,10 @@ export function tokenize(expression: string): ExpressionToken[] {
     if (['+', '-', '*', '/', '^', '=', '<', '>'].includes(char)) {
       // Check for ≤ or ≥ (<=, >=)
       if ((char === '<' || char === '>') && expression[i + 1] === '=') {
-        tokens.push({ type: 'operator', value: (char === '<' ? '≤' : '≥') as Operator });
+        tokens.push({
+          type: 'operator',
+          value: (char === '<' ? '≤' : '≥') as Operator,
+        });
         i += 2;
         continue;
       }
@@ -126,7 +132,10 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
   function parseAdditive(): ExpressionNode {
     let left = parseMultiplicative();
 
-    while (peek()?.type === 'operator' && ['+', '-'].includes((peek() as { value: Operator }).value)) {
+    while (
+      peek()?.type === 'operator' &&
+      ['+', '-'].includes((peek() as { value: Operator }).value)
+    ) {
       const op = (consume() as { type: 'operator'; value: Operator }).value;
       const right = parseMultiplicative();
       left = { type: 'binary', operator: op, left, right };
@@ -138,7 +147,10 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
   function parseMultiplicative(): ExpressionNode {
     let left = parsePower();
 
-    while (peek()?.type === 'operator' && ['*', '/'].includes((peek() as { value: Operator }).value)) {
+    while (
+      peek()?.type === 'operator' &&
+      ['*', '/'].includes((peek() as { value: Operator }).value)
+    ) {
       const op = (consume() as { type: 'operator'; value: Operator }).value;
       const right = parsePower();
       left = { type: 'binary', operator: op, left, right };
@@ -150,7 +162,10 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
   function parsePower(): ExpressionNode {
     let left = parseUnary();
 
-    while (peek()?.type === 'operator' && (peek() as { value: Operator }).value === '^') {
+    while (
+      peek()?.type === 'operator' &&
+      (peek() as { value: Operator }).value === '^'
+    ) {
       consume();
       const right = parseUnary();
       left = { type: 'binary', operator: '^', left, right };
@@ -160,7 +175,10 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
   }
 
   function parseUnary(): ExpressionNode {
-    if (peek()?.type === 'operator' && (peek() as { value: Operator }).value === '-') {
+    if (
+      peek()?.type === 'operator' &&
+      (peek() as { value: Operator }).value === '-'
+    ) {
       consume();
       const operand = parseUnary();
       return { type: 'unary', operator: '-', operand };
@@ -214,7 +232,10 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
 /**
  * Evaluate an AST node
  */
-export function evaluateNode(node: ExpressionNode, variables?: VariableMap): number {
+export function evaluateNode(
+  node: ExpressionNode,
+  variables?: VariableMap
+): number {
   switch (node.type) {
     case 'number':
       return node.value;
@@ -256,7 +277,10 @@ export function evaluateNode(node: ExpressionNode, variables?: VariableMap): num
 /**
  * Evaluate a string expression
  */
-export function evaluate(expression: string, variables?: VariableMap): EvaluationResult {
+export function evaluate(
+  expression: string,
+  variables?: VariableMap
+): EvaluationResult {
   try {
     const tokens = tokenize(expression);
     if (tokens.length === 0) {
@@ -347,9 +371,18 @@ export function validateSlots(slots: ExpressionSlot[]): ExpressionValidation {
     const result = evaluate(exprStr);
 
     if (result.success) {
-      return { isValid: true, canEvaluate: true, result: result.value, errors: [] };
+      return {
+        isValid: true,
+        canEvaluate: true,
+        result: result.value,
+        errors: [],
+      };
     } else {
-      return { isValid: true, canEvaluate: false, errors: [result.error ?? 'Evaluation failed'] };
+      return {
+        isValid: true,
+        canEvaluate: false,
+        errors: [result.error ?? 'Evaluation failed'],
+      };
     }
   }
 
@@ -380,7 +413,10 @@ function* permutations<T>(arr: T[]): Generator<T[]> {
 /**
  * Generate all possible operator combinations
  */
-function* operatorCombinations(operators: Operator[], count: number): Generator<Operator[]> {
+function* operatorCombinations(
+  operators: Operator[],
+  count: number
+): Generator<Operator[]> {
   if (count === 0) {
     yield [];
     return;
@@ -411,7 +447,8 @@ function buildExpression(numbers: number[], operators: Operator[]): string {
  * Build expressions with parentheses for 4 numbers
  */
 function buildParenExpressions(nums: number[], ops: Operator[]): string[] {
-  if (nums.length !== 4 || ops.length !== 3) return [buildExpression(nums, ops)];
+  if (nums.length !== 4 || ops.length !== 3)
+    return [buildExpression(nums, ops)];
 
   const [a, b, c, d] = nums;
   const [op1, op2, op3] = ops;
@@ -440,8 +477,8 @@ export function solveTargetChallenge(
 ): TargetSolution[] {
   const solutions: TargetSolution[] = [];
   const seen = new Set<string>();
-  const arithmeticOps = challenge.operators.filter((op): op is ArithmeticOperator =>
-    ['+', '-', '*', '/'].includes(op)
+  const arithmeticOps = challenge.operators.filter(
+    (op): op is ArithmeticOperator => ['+', '-', '*', '/'].includes(op)
   );
 
   // Generate permutations of numbers
@@ -450,7 +487,9 @@ export function solveTargetChallenge(
     for (const ops of operatorCombinations(arithmeticOps, numPerm.length - 1)) {
       // Build expressions (with parens for 4 numbers)
       const expressions =
-        numPerm.length === 4 ? buildParenExpressions(numPerm, ops) : [buildExpression(numPerm, ops)];
+        numPerm.length === 4
+          ? buildParenExpressions(numPerm, ops)
+          : [buildExpression(numPerm, ops)];
 
       for (const expr of expressions) {
         if (seen.has(expr)) continue;
@@ -500,7 +539,10 @@ export function validateSolution(
   }
 
   if (Math.abs((result.value ?? 0) - challenge.target) > 0.0001) {
-    return { valid: false, error: `Result ${result.value} does not equal target ${challenge.target}` };
+    return {
+      valid: false,
+      error: `Result ${result.value} does not equal target ${challenge.target}`,
+    };
   }
 
   // Check numbers used
@@ -514,13 +556,19 @@ export function validateSolution(
     for (const num of numbersUsed) {
       const idx = available.indexOf(num);
       if (idx === -1) {
-        return { valid: false, error: `Number ${num} not available or used multiple times` };
+        return {
+          valid: false,
+          error: `Number ${num} not available or used multiple times`,
+        };
       }
       available.splice(idx, 1);
     }
   }
 
-  if (challenge.useAllNumbers && numbersUsed.length !== challenge.numbers.length) {
+  if (
+    challenge.useAllNumbers &&
+    numbersUsed.length !== challenge.numbers.length
+  ) {
     return { valid: false, error: 'Must use all available numbers' };
   }
 
@@ -554,7 +602,10 @@ export function parseEquation(equation: string): Equation | null {
 /**
  * Check if an equation is true
  */
-export function checkEquation(equation: Equation, variables?: VariableMap): EquationResult {
+export function checkEquation(
+  equation: Equation,
+  variables?: VariableMap
+): EquationResult {
   try {
     const leftValue = evaluateNode(equation.left, variables);
     const rightValue = evaluateNode(equation.right, variables);
@@ -577,10 +628,18 @@ export function checkEquation(equation: Equation, variables?: VariableMap): Equa
 /**
  * Evaluate an equation string
  */
-export function evaluateEquation(equation: string, variables?: VariableMap): EquationResult {
+export function evaluateEquation(
+  equation: string,
+  variables?: VariableMap
+): EquationResult {
   const parsed = parseEquation(equation);
   if (!parsed) {
-    return { isTrue: false, leftValue: NaN, rightValue: NaN, error: 'Invalid equation format' };
+    return {
+      isTrue: false,
+      leftValue: NaN,
+      rightValue: NaN,
+      error: 'Invalid equation format',
+    };
   }
   return checkEquation(parsed, variables);
 }

@@ -49,7 +49,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
     },
     {
       id: 'opponent-king',
-      title: 'Opponent\'s King',
+      title: "Opponent's King",
       message: `
         <p>This is <span style="color: #e53935">Player 2's King</span> (Red).</p>
         <p>Your opponent's King starts at the bottom center.</p>

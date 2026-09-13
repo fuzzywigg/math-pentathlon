@@ -55,10 +55,11 @@ export function renderBoard(
   onIslandClick: (islandId: string) => void,
   onIslandHover: (islandId: string | null) => void
 ): SVGElement {
-  const maxCol = Math.max(...state.islands.map(i => i.col));
-  const maxRow = Math.max(...state.islands.map(i => i.row));
+  const maxCol = Math.max(...state.islands.map((i) => i.col));
+  const maxRow = Math.max(...state.islands.map((i) => i.row));
 
-  const width = (maxCol + 1) * (HEX_WIDTH * 0.75) + HEX_SIZE + BOARD_PADDING * 2;
+  const width =
+    (maxCol + 1) * (HEX_WIDTH * 0.75) + HEX_SIZE + BOARD_PADDING * 2;
   const height = (maxRow + 1) * HEX_HEIGHT + BOARD_PADDING * 2;
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -77,12 +78,18 @@ export function renderBoard(
 
   // Water pattern (decorative)
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-  const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+  const pattern = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'pattern'
+  );
   pattern.setAttribute('id', 'water-pattern');
   pattern.setAttribute('width', '20');
   pattern.setAttribute('height', '20');
   pattern.setAttribute('patternUnits', 'userSpaceOnUse');
-  const wavePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const wavePath = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   wavePath.setAttribute('d', 'M0 10 Q5 5, 10 10 T20 10');
   wavePath.setAttribute('stroke', '#b3d9e6');
   wavePath.setAttribute('stroke-width', '1');
@@ -114,11 +121,14 @@ export function renderBoard(
     group.setAttribute('data-col', String(island.col));
 
     // Island hexagon
-    const hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    const hex = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'polygon'
+    );
     hex.setAttribute('points', hexPoints(x, y, HEX_SIZE - 2));
 
     // Color based on ownership
-    let fillColor = '#8bc34a';  // Green for unclaimed
+    let fillColor = '#8bc34a'; // Green for unclaimed
     const seats = playerColors();
     if (island.owner === 'player1') fillColor = seats.player1;
     else if (island.owner === 'player2') fillColor = seats.player2;
@@ -135,7 +145,10 @@ export function renderBoard(
     group.appendChild(hex);
 
     // Island value (divisor)
-    const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const valueText = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
     valueText.setAttribute('x', String(x));
     valueText.setAttribute('y', String(y + 6));
     valueText.setAttribute('text-anchor', 'middle');
@@ -147,7 +160,10 @@ export function renderBoard(
 
     // Chip count indicator
     if (island.chips > 0) {
-      const chipBadge = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      const chipBadge = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
       chipBadge.setAttribute('cx', String(x + HEX_SIZE * 0.6));
       chipBadge.setAttribute('cy', String(y - HEX_SIZE * 0.5));
       chipBadge.setAttribute('r', '12');
@@ -156,7 +172,10 @@ export function renderBoard(
       chipBadge.setAttribute('stroke-width', '2');
       group.appendChild(chipBadge);
 
-      const chipCount = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const chipCount = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       chipCount.setAttribute('x', String(x + HEX_SIZE * 0.6));
       chipCount.setAttribute('y', String(y - HEX_SIZE * 0.5 + 5));
       chipCount.setAttribute('text-anchor', 'middle');
@@ -171,7 +190,10 @@ export function renderBoard(
     if (isSelected && state.currentRoll) {
       const preview = previewDivision(state, island.id);
       if (preview) {
-        const previewText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const previewText = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
         previewText.setAttribute('x', String(x));
         previewText.setAttribute('y', String(y + HEX_SIZE * 0.6));
         previewText.setAttribute('text-anchor', 'middle');
@@ -206,7 +228,10 @@ export function renderBoard(
 
     // Interaction layer
     if (state.phase === 'selectIsland') {
-      const hitArea = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      const hitArea = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
       hitArea.setAttribute('points', hexPoints(x, y, HEX_SIZE));
       hitArea.setAttribute('fill', 'transparent');
       hitArea.style.cursor = isValid ? 'pointer' : 'not-allowed';
@@ -301,7 +326,9 @@ export function renderScores(state: RemainderIslandsState): HTMLElement {
 // Division Preview
 // =============================================================================
 
-export function renderDivisionPreview(state: RemainderIslandsState): HTMLElement {
+export function renderDivisionPreview(
+  state: RemainderIslandsState
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'remainder-preview';
 

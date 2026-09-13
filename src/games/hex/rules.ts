@@ -2,11 +2,19 @@
 // Player 1 (Blue) wins by connecting top edge to bottom edge
 // Player 2 (Red) wins by connecting left edge to right edge
 
-import { HexBoard, HexPosition, Player, HexGameState, getOpponent } from './types';
+import {
+  HexBoard,
+  HexPosition,
+  Player,
+  HexGameState,
+  getOpponent,
+} from './types';
 
 // Check if a position is valid on the board
 export function isValidPosition(pos: HexPosition, boardSize: number): boolean {
-  return pos.row >= 0 && pos.row < boardSize && pos.col >= 0 && pos.col < boardSize;
+  return (
+    pos.row >= 0 && pos.row < boardSize && pos.col >= 0 && pos.col < boardSize
+  );
 }
 
 // Check if a cell is empty
@@ -34,16 +42,19 @@ export function isValidMove(state: HexGameState, pos: HexPosition): boolean {
 //   (+1,-1)  lower-left   (+1, 0) lower-right
 //
 // This matches the rendering formula: x = base + col*W + row*(W/2)
-export function getNeighbors(pos: HexPosition, boardSize: number): HexPosition[] {
+export function getNeighbors(
+  pos: HexPosition,
+  boardSize: number
+): HexPosition[] {
   const neighbors: HexPosition[] = [];
 
   const offsets = [
-    { row: -1, col:  0 },  // upper-left
-    { row: -1, col:  1 },  // upper-right
-    { row:  0, col: -1 },  // left
-    { row:  0, col:  1 },  // right
-    { row:  1, col: -1 },  // lower-left
-    { row:  1, col:  0 },  // lower-right
+    { row: -1, col: 0 }, // upper-left
+    { row: -1, col: 1 }, // upper-right
+    { row: 0, col: -1 }, // left
+    { row: 0, col: 1 }, // right
+    { row: 1, col: -1 }, // lower-left
+    { row: 1, col: 0 }, // lower-right
   ];
 
   for (const offset of offsets) {
@@ -60,7 +71,11 @@ export function getNeighbors(pos: HexPosition, boardSize: number): HexPosition[]
 }
 
 // Check if player has won using BFS/flood fill
-export function checkWinner(board: HexBoard, player: Player, boardSize: number): boolean {
+export function checkWinner(
+  board: HexBoard,
+  player: Player,
+  boardSize: number
+): boolean {
   // Player 1 connects top (row 0) to bottom (row boardSize-1)
   // Player 2 connects left (col 0) to right (col boardSize-1)
 
@@ -135,7 +150,7 @@ export function makeMove(state: HexGameState, pos: HexPosition): HexGameState {
   }
 
   // Create new board with the move
-  const newBoard = state.board.map(row => [...row]);
+  const newBoard = state.board.map((row) => [...row]);
   newBoard[pos.row][pos.col] = state.currentPlayer;
 
   // Check for winner
@@ -152,7 +167,9 @@ export function makeMove(state: HexGameState, pos: HexPosition): HexGameState {
 
   return {
     board: newBoard,
-    currentPlayer: winner ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer: winner
+      ? state.currentPlayer
+      : getOpponent(state.currentPlayer),
     winner,
     boardSize: state.boardSize,
     moveHistory: [...state.moveHistory, move],
@@ -177,7 +194,11 @@ export function getValidMoves(state: HexGameState): HexPosition[] {
 }
 
 // Get cells that form the winning path (for highlighting)
-export function getWinningPath(board: HexBoard, player: Player, boardSize: number): HexPosition[] {
+export function getWinningPath(
+  board: HexBoard,
+  player: Player,
+  boardSize: number
+): HexPosition[] {
   if (!checkWinner(board, player, boardSize)) return [];
 
   const visited = new Set<string>();

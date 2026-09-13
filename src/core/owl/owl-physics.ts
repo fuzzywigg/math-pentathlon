@@ -42,6 +42,10 @@ export function clampToViewport(
   };
 }
 
-export function isAtRest(vx: number, vy: number, threshold: number = OWL_REST_SPEED): boolean {
+export function isAtRest(
+  vx: number,
+  vy: number,
+  threshold: number = OWL_REST_SPEED
+): boolean {
   return Math.hypot(vx, vy) < threshold;
 }

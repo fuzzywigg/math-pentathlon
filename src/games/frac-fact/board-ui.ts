@@ -47,7 +47,10 @@ function createFractionSVG(
   const centerY = s.height / 2;
 
   // Numerator
-  const numText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const numText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
   numText.setAttribute('x', String(s.width / 2));
   numText.setAttribute('y', String(centerY - 8));
   numText.setAttribute('text-anchor', 'middle');
@@ -68,7 +71,10 @@ function createFractionSVG(
   svg.appendChild(line);
 
   // Denominator
-  const denText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  const denText = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
   denText.setAttribute('x', String(s.width / 2));
   denText.setAttribute('y', String(centerY + s.fontSize + 2));
   denText.setAttribute('text-anchor', 'middle');
@@ -93,7 +99,8 @@ export function renderProblem(state: FracFactState): HTMLElement {
   container.className = 'frac-problem';
 
   if (!state.currentProblem) {
-    container.innerHTML = '<div class="frac-no-problem">No problem loaded</div>';
+    container.innerHTML =
+      '<div class="frac-no-problem">No problem loaded</div>';
     return container;
   }
 
@@ -181,7 +188,10 @@ export function renderAnswerChoices(
 /**
  * Render result feedback after answering
  */
-export function renderResult(state: FracFactState, onContinue: () => void): HTMLElement {
+export function renderResult(
+  state: FracFactState,
+  onContinue: () => void
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'frac-result';
 
@@ -198,7 +208,10 @@ export function renderResult(state: FracFactState, onContinue: () => void): HTML
       <div class="frac-feedback-text">Correct!</div>
     `;
   } else {
-    const correctSvg = createFractionSVG(state.currentProblem.correctAnswer, 'medium');
+    const correctSvg = createFractionSVG(
+      state.currentProblem.correctAnswer,
+      'medium'
+    );
     feedback.innerHTML = `
       <div class="frac-feedback-icon">✗</div>
       <div class="frac-feedback-text">Incorrect. The answer is:</div>

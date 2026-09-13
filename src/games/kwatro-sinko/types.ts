@@ -41,8 +41,8 @@ export interface KwaMove {
 
 // Game phase
 export type GamePhase =
-  | 'selectingChip'  // Player selecting which chip to move
-  | 'selectingDest'  // Player selecting destination
+  | 'selectingChip' // Player selecting which chip to move
+  | 'selectingDest' // Player selecting destination
   | 'gameOver';
 
 // Game state

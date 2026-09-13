@@ -1,16 +1,8 @@
 // Frac Fact Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  FracFactState,
-  createInitialState,
-  Difficulty,
-} from './types';
-import {
-  submitAnswer,
-  nextProblem,
-  startGame,
-} from './rules';
+import { FracFactState, createInitialState, Difficulty } from './types';
+import { submitAnswer, nextProblem, startGame } from './rules';
 import {
   renderProblem,
   renderAnswerChoices,
@@ -78,7 +70,11 @@ function render(): void {
   gameContainer.appendChild(wrapper);
 
   // AI turn
-  if (isAIMode && gameState.phase === 'playing' && gameState.currentPlayer === 'player2') {
+  if (
+    isAIMode &&
+    gameState.phase === 'playing' &&
+    gameState.currentPlayer === 'player2'
+  ) {
     setTimeout(aiTurn, 1000);
   }
 }
@@ -106,7 +102,8 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2') return;
+  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2')
+    return;
   if (!gameState.currentProblem) return;
 
   // Use AI module to get answer
@@ -147,7 +144,10 @@ export function newGameVsHuman(difficulty: Difficulty = 'medium'): void {
   render();
 }
 
-export function newGameVsAI(difficulty: Difficulty = 'medium', aiDiff: AIDifficulty = 'medium'): void {
+export function newGameVsAI(
+  difficulty: Difficulty = 'medium',
+  aiDiff: AIDifficulty = 'medium'
+): void {
   gameState = createInitialState(difficulty);
   gameState = startGame(gameState);
   isAIMode = true;

@@ -99,7 +99,11 @@ function handleCellClick(row: number, col: number): void {
   }
 
   // If AI mode and game not over, trigger AI move
-  if (gameMode === 'human-vs-ai' && !gameState.winner && gameState.currentPlayer === 'player2') {
+  if (
+    gameMode === 'human-vs-ai' &&
+    !gameState.winner &&
+    gameState.currentPlayer === 'player2'
+  ) {
     triggerAIMove();
   }
 }

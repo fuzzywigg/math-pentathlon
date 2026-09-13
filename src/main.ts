@@ -1425,10 +1425,7 @@ function renderFracFact(): void {
       const problemDifficulty = (selectedDifficulty?.value ||
         'medium') as AIDifficultyLevel;
       if (mode === 'human-vs-ai') {
-        fracNewGameVsAI(
-          problemDifficulty,
-          resolveAIDifficulty(aiDifficulty)
-        );
+        fracNewGameVsAI(problemDifficulty, resolveAIDifficulty(aiDifficulty));
       } else {
         fracNewGameVsHuman(problemDifficulty);
       }

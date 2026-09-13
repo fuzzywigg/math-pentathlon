@@ -621,7 +621,11 @@ h1 {
 
 [data-opponent='ai'] .progress-p2 .progress-fill,
 .game-vs-ai .progress-p2 .progress-fill {
-  background: linear-gradient(90deg, var(--color-ai) 0%, var(--color-ai-dark) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--color-ai) 0%,
+    var(--color-ai-dark) 100%
+  );
   box-shadow: 0 1px 4px rgba(139, 92, 246, 0.4);
 }
 
