@@ -13,7 +13,7 @@
 // 4. Some answers can be made multiple ways - find the one using bars you want to use
 // 5. Check if your answer simplifies to match a target (2/4 = 1/2)
 
-import { FabADiffyState, Player } from './types';
+import { FabADiffyState, Player, FractionBar } from './types';
 
 import { FractionOperation } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
@@ -25,6 +25,7 @@ import {
   executeMove,
   passTurn,
   getPossibleResults,
+  calculateResult,
 } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
@@ -49,7 +50,8 @@ interface ValidMove {
 }
 
 /**
- * Find all valid moves for the current player
+ * Find all valid moves for the current player.
+ * Uses ordered bar pairs so subtract/divide match executeMove(bar1 op bar2).
  */
 function findAllValidMoves(state: FabADiffyState): ValidMove[] {
   const moves: ValidMove[] = [];
@@ -63,86 +65,98 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
 
   if (availableBars.length < 2) return moves;
 
-  // Try all pairs of bars
+  const operations: FractionOperation[] = [
+    'add',
+    'subtract',
+    'multiply',
+    'divide',
+  ];
+
+  const orderedPairs: Array<[FractionBar, FractionBar]> = [];
   for (let i = 0; i < availableBars.length; i++) {
-    for (let j = i + 1; j < availableBars.length; j++) {
-      const bar1 = availableBars[i];
-      const bar2 = availableBars[j];
+    for (let j = 0; j < availableBars.length; j++) {
+      if (i === j) continue;
+      orderedPairs.push([availableBars[i], availableBars[j]]);
+    }
+  }
 
-      // Get all possible results from this pair
-      const results = getPossibleResults(bar1, bar2);
+  for (const [bar1, bar2] of orderedPairs) {
+    for (const operation of operations) {
+      // Skip duplicate commutative ops (add/multiply) for reverse order
+      if (
+        (operation === 'add' || operation === 'multiply') &&
+        bar1.id > bar2.id
+      ) {
+        continue;
+      }
 
-      for (const { operation, result } of results) {
-        // Find matching answer bars
-        const matchingAnswers = unclaimedAnswers.filter((a) =>
-          areEquivalent(a.fraction, result)
-        );
+      const result = calculateResult(bar1.fraction, bar2.fraction, operation);
+      if (!result || result.numerator < 0) continue;
 
-        for (const answer of matchingAnswers) {
-          // Score this move
-          let score = 10; // Base score for any valid move
-          const reasons: string[] = [];
+      const matchingAnswers = unclaimedAnswers.filter((a) =>
+        areEquivalent(a.fraction, result)
+      );
 
-          // Factor 1: Using bars with common denominators (easier math)
-          if (bar1.fraction.denominator === bar2.fraction.denominator) {
-            score += 5;
-            reasons.push('Same denominator makes calculation easier');
-          }
+      for (const answer of matchingAnswers) {
+        let score = 10;
+        const reasons: string[] = [];
 
-          // Factor 2: Simple operations preferred for teaching
-          if (operation === 'add' || operation === 'subtract') {
-            score += 3;
-          } else if (operation === 'multiply') {
-            score += 2;
-          }
+        if (bar1.fraction.denominator === bar2.fraction.denominator) {
+          score += 5;
+          reasons.push('Same denominator makes calculation easier');
+        }
 
-          // Factor 3: Answers that are harder to make later (fewer options)
-          // Check how many other ways to make this answer
-          let alternateWays = 0;
-          for (let k = 0; k < availableBars.length; k++) {
-            for (let l = k + 1; l < availableBars.length; l++) {
-              if ((k === i && l === j) || (k === j && l === i)) continue;
-              const otherResults = getPossibleResults(
-                availableBars[k],
-                availableBars[l]
-              );
-              if (
-                otherResults.some((r) =>
-                  areEquivalent(r.result, answer.fraction)
-                )
-              ) {
-                alternateWays++;
-              }
+        if (operation === 'add' || operation === 'subtract') {
+          score += 3;
+        } else if (operation === 'multiply') {
+          score += 2;
+        }
+
+        let alternateWays = 0;
+        for (let k = 0; k < availableBars.length; k++) {
+          for (let l = k + 1; l < availableBars.length; l++) {
+            const a = availableBars[k];
+            const b = availableBars[l];
+            if (
+              (a.id === bar1.id && b.id === bar2.id) ||
+              (a.id === bar2.id && b.id === bar1.id)
+            ) {
+              continue;
+            }
+            const otherResults = getPossibleResults(a, b);
+            if (
+              otherResults.some((r) => areEquivalent(r.result, answer.fraction))
+            ) {
+              alternateWays++;
             }
           }
-          if (alternateWays === 0) {
-            score += 20; // This is the only way to get this answer!
-            reasons.push('Only way to make this answer - grab it!');
-          } else if (alternateWays <= 2) {
-            score += 10;
-            reasons.push('Few ways to make this answer');
-          }
-
-          // Factor 4: Prefer claiming answers that use nice fractions
-          if (answer.fraction.denominator <= 4) {
-            score += 5;
-            reasons.push('Simple fraction target');
-          }
-
-          moves.push({
-            bar1Id: bar1.id,
-            bar2Id: bar2.id,
-            operation,
-            answerId: answer.id,
-            score,
-            reasoning: reasons.join('; ') || 'Valid combination',
-          });
         }
+
+        if (alternateWays === 0) {
+          score += 20;
+          reasons.push('Only way to make this answer - grab it!');
+        } else if (alternateWays <= 2) {
+          score += 10;
+          reasons.push('Few ways to make this answer');
+        }
+
+        if (answer.fraction.denominator <= 4) {
+          score += 5;
+          reasons.push('Simple fraction target');
+        }
+
+        moves.push({
+          bar1Id: bar1.id,
+          bar2Id: bar2.id,
+          operation,
+          answerId: answer.id,
+          score,
+          reasoning: reasons.join('; ') || 'Valid combination',
+        });
       }
     }
   }
 
-  // Sort by score
   moves.sort((a, b) => b.score - a.score);
 
   return moves;

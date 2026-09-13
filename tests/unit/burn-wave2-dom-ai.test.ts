@@ -72,16 +72,31 @@ describe('Burn Wave 2 — #11 Kings incremental DOM', () => {
 });
 
 describe('Burn Wave 2 — #12 Fab-a-Diffy AI step validation', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it('executeAITurn completes a valid move without stalling', () => {
     const state = createInitialState();
+
+    // Pin AI randomness after shuffle so hard always takes the top-scored move
+    // (hard still has a small random top-3 branch that can pick a move the
+    // step validator later rejects → passTurn, which flakes this test).
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+
     const move = getAIMove(state, 'player1', 'hard');
     // Fresh board always has moves for player1
     expect(move).not.toBeNull();
 
     const next = executeAITurn(state, 'player1', 'hard');
+    // Non-stall contract (#12): seat flips and phase returns to bar select
+    // (successful place — never mid-confirm).
     expect(next.currentPlayer).toBe('player2');
     expect(next.phase).toBe('selectingBar1');
     expect(next.moveHistory.length).toBe(1);
+    expect(next.selectedBar1).toBeNull();
+    expect(next.selectedBar2).toBeNull();
+    expect(next.selectedOperation).toBeNull();
   });
 
   it('applyAIMoveSteps passes instead of silently stalling on bad bar1', () => {
