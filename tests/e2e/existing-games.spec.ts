@@ -1197,3 +1197,207 @@ test.describe('FIAR / Par — help modal', () => {
     await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
   });
 });
+
+test.describe('Vs-AI start smoke (Hex / Contig / Frac Fact)', () => {
+  test('Hex vs-AI starts and mounts board', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.hex-board')).toBeVisible();
+    await expect(
+      page.locator('.status-turn, .hex-status').first()
+    ).toBeVisible();
+  });
+
+  test('Contig vs-AI starts with roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.contig-board')).toBeVisible();
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+
+  test('Frac Fact vs-AI starts with choices', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.frac-choice-btn, .frac-problem').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Help + new-game deepenings (Ramrod / Kwatro / Queens / Fab)', () => {
+  test('Ramrod help opens and new game restores rod chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+  });
+
+  test('Kwatro help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Queens help + new game keeps board', async ({ page }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.qg-board, svg').first()).toBeVisible();
+  });
+
+  test('Fab help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+});
+
+test.describe('More illegal / premature no-ops', () => {
+  test('Stars board click before card keeps hand chrome', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.stars-cell, [data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-hand, .stars-board, .stars-status').first()
+    ).toBeVisible();
+  });
+
+  test('Fab answer click before bars keeps pool chrome', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    const answer = page
+      .locator('.fab-answer-wrapper, .fab-answer-board')
+      .first();
+    if ((await answer.count()) > 0) {
+      await answer.click({ force: true });
+    }
+    await expect(
+      page.locator('.fab-bar-pool, .fab-game-area').first()
+    ).toBeVisible();
+  });
+
+  test('Kwatro node before chip keeps board', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    const node = page.locator('[data-node-id], .kwa-node').first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true });
+    }
+    await expect(page.locator('.kwa-board')).toBeVisible();
+  });
+
+  test('Contig cell before roll keeps roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-cell').first().click({ force: true });
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+
+  test('Sum Dominoes cell before roll keeps roll CTA', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.sd-cell, .sd-board').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+  });
+});
+
+test.describe('Ramrod / Contig / Stars interaction deepenings', () => {
+  test('Ramrod selects a rod and keeps board chrome', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    await page.locator('.ramrod-rod, .ramrod-rod-wrapper').first().click({
+      force: true,
+    });
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+  });
+
+  test('Contig roll then pass-or-place restores rolling CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const valid = page.locator('.contig-cell-valid');
+    const pass = page.locator('.contig-pass-btn');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    } else if (await pass.isVisible().catch(() => false)) {
+      await pass.click();
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+
+  test('Stars selects a hand card when available', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page.locator('.stars-card:not(.disabled)').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-board, .stars-hand, .stars-status').first()
+    ).toBeVisible();
+  });
+});
