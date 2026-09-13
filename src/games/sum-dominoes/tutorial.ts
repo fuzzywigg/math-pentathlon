@@ -48,6 +48,10 @@ export const sumDominoesTutorial: TutorialConfig = {
       `,
       highlightSelector: '.sd-dice-area',
       position: 'bottom',
+      requiredAction: {
+        type: 'click',
+        selector: '.sd-roll-btn',
+      },
     },
     {
       id: 'matching-rules',

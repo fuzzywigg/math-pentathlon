@@ -36,6 +36,10 @@ export const contig60Tutorial: TutorialConfig = {
       `,
       highlightSelector: '.contig-dice-area',
       position: 'bottom',
+      requiredAction: {
+        type: 'click',
+        selector: '.contig-roll-btn',
+      },
     },
     {
       id: 'scoring',

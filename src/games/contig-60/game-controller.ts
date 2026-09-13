@@ -149,8 +149,16 @@ function handleRollDice(): void {
   if (gameState.phase !== 'rolling') return;
   if (vsAI && gameState.currentPlayer === aiPlayer) return;
 
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
+  }
+
   gameState = doRollDice(gameState);
   updateUI();
+
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.refreshHighlight();
+  }
 
   // AI takes over after showing dice
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {

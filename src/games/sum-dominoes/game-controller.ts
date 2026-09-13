@@ -204,8 +204,16 @@ function updateUI(controller: SDGameController): void {
  * Handle dice roll
  */
 function handleRoll(controller: SDGameController): void {
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.handleAction('click', { selector: '.sd-roll-btn' });
+  }
+
   controller.state = doRollDice(controller.state);
   controller.update();
+
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.refreshHighlight();
+  }
 }
 
 /**
