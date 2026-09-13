@@ -2425,7 +2425,7 @@ h1 {
   font-size: 0.8rem;
 }
 
-.tutorial-next-btn.tutorial-btn-waiting:hover {
+.tutorial-next-btn.tutorial-btn-waiting:hover:not(:disabled) {
   background: #f57c00;
 }
 
