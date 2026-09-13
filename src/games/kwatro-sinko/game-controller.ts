@@ -20,7 +20,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kwatroSinkoTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreGridFocus,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -87,6 +92,7 @@ export function initGame(
  */
 function updateUI(controller: KwaGameController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -96,13 +102,14 @@ function updateUI(controller: KwaGameController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `kwa-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.phase === 'selectingChip') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select a chip to move`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a chip to move`;
   } else if (state.phase === 'selectingDest') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} - Click a green space to move`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Click a green space to move`;
   }
 
   gameArea.appendChild(status);
@@ -183,6 +190,7 @@ function updateUI(controller: KwaGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreGridFocus(container, previousFocus);
 
   // AI turn
   if (

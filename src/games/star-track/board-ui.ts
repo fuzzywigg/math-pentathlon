@@ -3,6 +3,7 @@
 import { StarTrackGameState, Player, TRACK_LENGTH, ChainLink } from './types';
 import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 export type DrawChainsCallback = () => void;
 export type SelectChainCallback = (index: 0 | 1) => void;
@@ -316,6 +317,7 @@ export function renderStatus(
 
   const statusEl = document.createElement('div');
   statusEl.className = 'star-track-status';
+  markStatusLive(statusEl);
 
   // Turn indicator
   const turnEl = document.createElement('div');

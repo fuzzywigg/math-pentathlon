@@ -21,7 +21,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { starsBarsTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreGridFocus,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -88,6 +93,7 @@ export function initGame(
  */
 function updateUI(controller: StarsGameController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -97,15 +103,16 @@ function updateUI(controller: StarsGameController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `stars-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins with ${state.playerScores[state.winner]} points!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.playerScores[state.winner]} points!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (state.phase === 'selectingCard') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select a card`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a card`;
   } else if (state.phase === 'placingCard') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} - Place card on a green cell`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place card on a green cell`;
   }
 
   gameArea.appendChild(status);
@@ -186,6 +193,7 @@ function updateUI(controller: StarsGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreGridFocus(container, previousFocus);
 
   // AI turn
   if (

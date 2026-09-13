@@ -21,7 +21,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { par55Tutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import {
+  captureFocusedCell,
+  restoreGridFocus,
+  markStatusLive,
+} from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -88,6 +93,7 @@ export function initGame(
  */
 function updateUI(controller: Par55GameController): void {
   const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
   // Main game area
@@ -97,15 +103,16 @@ function updateUI(controller: Par55GameController): void {
   // Status bar
   const status = document.createElement('div');
   status.className = `par55-status ${state.currentPlayer}`;
+  markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${getPlayerName(state.winner)} wins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (state.phase === 'selectingBlock') {
-    status.textContent = `${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
   } else if (state.phase === 'placingBlock') {
-    status.textContent = `${getPlayerName(state.currentPlayer)} - Place block on a green base`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place block on a green base`;
   }
 
   gameArea.appendChild(status);
@@ -133,7 +140,7 @@ function updateUI(controller: Par55GameController): void {
   const p1Container = document.createElement('div');
   const p1Label = document.createElement('div');
   p1Label.className = 'par55-hand-label player1';
-  p1Label.textContent = `Blue (${state.hands.player1.length})`;
+  p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
     renderHand(state, 'player1', (blockId) =>
@@ -150,7 +157,7 @@ function updateUI(controller: Par55GameController): void {
   const p2Container = document.createElement('div');
   const p2Label = document.createElement('div');
   p2Label.className = 'par55-hand-label player2';
-  p2Label.textContent = `Red (${state.hands.player2.length})`;
+  p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
     renderHand(state, 'player2', (blockId) =>
@@ -200,6 +207,7 @@ function updateUI(controller: Par55GameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+  restoreGridFocus(container, previousFocus);
 
   // AI turn
   if (
