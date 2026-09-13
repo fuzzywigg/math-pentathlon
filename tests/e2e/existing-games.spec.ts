@@ -1595,3 +1595,211 @@ test.describe('Wave 10 — more illegal / premature no-ops', () => {
     await expect(page.locator('.kwa-board')).toBeVisible();
   });
 });
+
+test.describe('Wave 11 — help / new-game deepenings', () => {
+  test('Calla help + new game restores pits', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.calla-board, .calla-pit').first()
+    ).toBeVisible();
+  });
+
+  test('Contig 60 help + new game restores roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.contig-roll-btn, .contig-dice-area').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes help + new game restores dice', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.sd-roll-btn, .sd-dice-area, .sd-board').first()
+    ).toBeVisible();
+  });
+
+  test('Queens & Guards help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Fab-a-Diffy help + new game keeps bar pool', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.fab-bar-pool, .fab-bar-wrapper').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track help + new game keeps draw CTA', async ({ page }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.star-track-draw-btn').first()).toBeVisible();
+  });
+});
+
+test.describe('Wave 11 — vs-AI start smoke', () => {
+  test('Calla vs-AI starts with board chrome', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit').first()
+    ).toBeVisible();
+  });
+
+  test('Queens vs-AI starts with board', async ({ page }) => {
+    await page.goto('/#/game/queens-guards');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.qg-board, .qg-board-container, svg').first()
+    ).toBeVisible();
+  });
+
+  test('Fab-a-Diffy vs-AI starts with bar pool', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.fab-bar-pool, .fab-bar-wrapper').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track vs-AI starts with draw CTA', async ({ page }) => {
+    await page.goto('/#/game/star-track');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.star-track-draw-btn').first()).toBeVisible();
+  });
+});
+
+test.describe('Wave 11 — more illegal / premature no-ops', () => {
+  test('Hex-a-Gone board click before commit keeps bank', async ({ page }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const board = page.locator('.hex-a-gone-board, .hex-a-gone-cell').first();
+    if ((await board.count()) > 0) {
+      await board.click({ force: true, position: { x: 8, y: 8 } });
+    }
+    await expect(
+      page.locator('.hex-a-gone-bank, .hex-a-gone-board').first()
+    ).toBeVisible();
+  });
+
+  test("Pent'Em In board click without piece keeps selector", async ({
+    page,
+  }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const board = page.locator('.pent-board, .pent-cell, svg').first();
+    if ((await board.count()) > 0) {
+      await board.click({ force: true, position: { x: 10, y: 10 } });
+    }
+    await expect(
+      page.locator('.pent-piece-selector, .pent-board').first()
+    ).toBeVisible();
+  });
+
+  test('Remainder island click before roll keeps roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    const island = page.locator('.remainder-island, [data-island-id]').first();
+    if ((await island.count()) > 0) {
+      await island.click({ force: true });
+    }
+    await expect(
+      page.locator('.remainder-roll-btn, .remainder-dice').first()
+    ).toBeVisible();
+  });
+
+  test('Contig cell click before roll keeps roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.contig-cell').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.contig-roll-btn, .contig-dice-area').first()
+    ).toBeVisible();
+  });
+});
