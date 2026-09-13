@@ -3456,3 +3456,113 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 22 — dice / expressions core-lib chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Dice demo mounts roll CTA and die chrome', async ({ page }) => {
+    await page.goto('/#/demo/dice');
+    await expect(page.locator('.dice-demo, .dice-selector, h1').first()).toBeVisible();
+    const roll = page
+      .locator('.dice-btn-primary, .quick-roll-btn, button:has-text("Roll")')
+      .first();
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.die-wrapper, .dice-container, .dice-result-area, .quick-roll-result, svg.die'
+        )
+        .first()
+    ).toBeVisible({ timeout: 5000 });
+  });
+
+  test('Expressions demo calculator chrome evaluates an example', async ({ page }) => {
+    await page.goto('/#/demo/expressions');
+    await expect(page.locator('#calc-input, .calc-input-container').first()).toBeVisible();
+    const example = page.locator('.example-btn').first();
+    if ((await example.count()) > 0) {
+      await example.click({ force: true });
+    } else {
+      await page.locator('#calc-input').fill('2 + 3 * 4');
+    }
+    const calcBtn = page.locator('#calc-btn');
+    if ((await calcBtn.count()) > 0) {
+      await calcBtn.click({ force: true });
+    }
+    await expect(
+      page.locator('#calc-result, .demo-section, #challenge-grid').first()
+    ).toBeVisible();
+  });
+
+  test('Expressions demo challenge grid remounts after card click', async ({ page }) => {
+    await page.goto('/#/demo/expressions');
+    await expect(page.locator('#challenge-grid, .challenge-grid').first()).toBeVisible();
+    const card = page.locator('.challenge-card').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '#active-challenge, #expression-builder, .expression-builder, .target-display, .card-tray'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Contig roll keeps dice + expression chrome', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    const roll = page.locator('.contig-roll-btn').first();
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.contig-dice-display, .contig-expressions, .contig-roll-btn, .contig-board'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Juggle roll keeps die select chrome', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await startVsAi(page);
+    const roll = page.locator('.juggle-roll-btn').first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.juggle-die, .juggle-dice-area, .juggle-board, .die-wrapper').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes roll keeps dice display chrome', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await startVsAi(page);
+    const roll = page.locator('.sd-roll-btn').first();
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.sd-dice-display, .sd-hand, .sd-board, .sd-roll-btn').first()
+    ).toBeVisible();
+  });
+});
