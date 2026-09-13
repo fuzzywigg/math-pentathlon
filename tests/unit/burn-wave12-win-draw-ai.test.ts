@@ -546,9 +546,9 @@ describe('Burn wave 12 — Hex-a-Gone place + pass + executeAI', () => {
     expect(isHagAI(fresh, 'player1', 'human-vs-ai')).toBe(true);
     expect(getAISelection(fresh, 'player1', 'easy')).not.toBeNull();
     const next = executeHagAI(fresh, 'player1', 'medium');
-    expect(next.currentPlayer === 'player2' || next.moveHistory.length > 0).toBe(
-      true
-    );
+    expect(
+      next.currentPlayer === 'player2' || next.moveHistory.length > 0
+    ).toBe(true);
   });
 });
 
@@ -562,20 +562,22 @@ describe('Burn wave 12 — Frac / Pinball answer helpers + AI', () => {
     expect(frac.phase).toBe('playing');
     expect(frac.currentProblem).not.toBeNull();
     const problem = frac.currentProblem!;
+    expect(checkFrac(problem, problem.correctAnswer)).toBe(true);
+    // Use a clearly non-equivalent fraction (99/99 ≡ 1 can match some answers)
     expect(
-      checkFrac(problem, problem.correctAnswer)
-    ).toBe(true);
-    expect(
-      checkFrac(problem, { numerator: 99, denominator: 99 })
+      checkFrac(problem, {
+        numerator: problem.correctAnswer.numerator + 17,
+        denominator: problem.correctAnswer.denominator + 23,
+      })
     ).toBe(false);
     expect(isFracAI(frac, 'player1')).toBe(true);
     expect(getFracAI(frac, 'player1', 'easy')).not.toBeNull();
     const submitted = submitFrac(frac, problem.correctAnswer);
     expect(submitted.isCorrect).toBe(true);
     const advanced = nextProblem(submitted);
-    expect(
-      advanced.phase === 'playing' || advanced.phase === 'gameOver'
-    ).toBe(true);
+    expect(advanced.phase === 'playing' || advanced.phase === 'gameOver').toBe(
+      true
+    );
 
     expect(formatDecimal(0.5)).toMatch(/0\.5|0,5/);
     expect(formatPinFrac({ numerator: 3, denominator: 4 })).toMatch(/3/);
@@ -693,7 +695,11 @@ describe('Burn wave 12 — Juggle fill/winner + executeAI', () => {
         expect(next.currentPlayer === 'player2' || next.phase).toBeTruthy();
       }
     }
-    const executed = executeJuggleAI(juggleRoll(createJuggle()), 'player1', 'easy');
+    const executed = executeJuggleAI(
+      juggleRoll(createJuggle()),
+      'player1',
+      'easy'
+    );
     expect(
       executed.currentPlayer === 'player2' ||
         executed.moveHistory?.length !== undefined
@@ -709,9 +715,9 @@ describe('Burn wave 12 — Pent getPieceCells / canPlace / hard AI', () => {
     const piece = fresh.player1Pieces.available[0]!;
     const cells = getPieceCells(piece, { row: 0, col: 0 }, 0, false);
     expect(cells.length).toBeGreaterThan(0);
-    expect(
-      canPlacePiece(fresh, piece, { row: -5, col: -5 }, 0, false)
-    ).toBe(false);
+    expect(canPlacePiece(fresh, piece, { row: -5, col: -5 }, 0, false)).toBe(
+      false
+    );
 
     let state = selectPent(fresh, piece);
     state = flipSelectedPiece(state);
@@ -925,9 +931,9 @@ describe('Burn wave 12 — Kings king moves / win / AI evaluate', () => {
     const moves = getValidKingMoves(rulesBoard, 'player1');
     expect(moves.length).toBeGreaterThan(0);
     expect(isValidKingMove(rulesBoard, 'player1', moves[0]!)).toBe(true);
-    expect(
-      isValidKingMove(rulesBoard, 'player1', { row: -1, col: -1 })
-    ).toBe(false);
+    expect(isValidKingMove(rulesBoard, 'player1', { row: -1, col: -1 })).toBe(
+      false
+    );
     expect(getValidQuadraphagePlacements(rulesBoard).length).toBeGreaterThan(0);
     expect(checkWinCondition(rulesBoard)).toBeNull();
     expect(kingsOpponent('player1')).toBe('player2');

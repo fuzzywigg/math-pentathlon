@@ -2509,3 +2509,173 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
     await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
   });
 });
+
+test.describe('Wave 14 — Contig/Sum/Star/Calla/Hex/Queens/Fab/Par/Prime/Juggle deepenings', () => {
+  test('Contig roll then pass/new-game restores roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.contig-roll-btn').first();
+    if ((await roll.count()) > 0) {
+      await roll.click();
+    }
+    const pass = page.locator('.contig-pass-btn');
+    if (
+      (await pass.count()) > 0 &&
+      (await pass.isVisible().catch(() => false))
+    ) {
+      await pass.click();
+    }
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.contig-roll-btn, .contig-dice-area').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes hand + dice chrome remounts after new-game', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.sd-hand-player1 .sd-hand-domino').first()
+    ).toBeVisible();
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.sd-board')).toBeVisible();
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+  });
+
+  test('Star Track draw phase chrome after help close + new-game', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.star-draw-btn, .star-track-board, .star-status').first()
+    ).toBeVisible();
+  });
+
+  test('Calla pits mount; vs-AI starts without crash', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.calla-pit, .calla-board').first()
+    ).toBeVisible();
+    await page.click('#new-game-btn');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit').first()
+    ).toBeVisible();
+  });
+
+  test('Hex board cells + vs-AI start smoke', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.hex-cell-group, .hex-board').first()
+    ).toBeVisible();
+    await page.click('#new-game-btn');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.hex-cell-group, .hex-board').first()
+    ).toBeVisible();
+  });
+
+  test('Queens ring board mounts; premature empty click no crash', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.qg-board-container, .qg-board').first()
+    ).toBeVisible();
+    const empty = page.locator('.qg-cell, [data-ring], circle').first();
+    if ((await empty.count()) > 0) {
+      await empty.click({ force: true });
+    }
+    await expect(
+      page.locator('.qg-board-container, .qg-status').first()
+    ).toBeVisible();
+  });
+
+  test('Fab fraction pool visible after start', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
+    ).toBeVisible();
+  });
+
+  test('Par hand blocks + bases visible', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.par55-hand, .par55-hand-block').first()
+    ).toBeVisible();
+    await expect(
+      page.locator('.par55-board, .par55-base').first()
+    ).toBeVisible();
+  });
+
+  test('Prime roll enables expression/board chrome', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.pg-roll-btn').first();
+    if ((await roll.count()) > 0) {
+      await roll.click();
+    }
+    await expect(
+      page
+        .locator('.pg-expressions, .pg-expression, .pg-dice-display, .pg-board')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Juggle roll → die → shape selector mounts', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page.locator('.juggle-roll-btn').click();
+    await expect(page.locator('.juggle-dice-display')).toBeVisible();
+    const die = page.locator('.juggle-die.selectable');
+    if ((await die.count()) > 0) {
+      await die.first().click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.juggle-shape-option, .juggle-shape-selector, .juggle-board')
+        .first()
+    ).toBeVisible();
+  });
+});
