@@ -6,6 +6,11 @@ import {
   selectPiece,
   placePiece,
   canPlayerMove,
+  getValidPlacements,
+  rotateSelectedPiece,
+  flipSelectedPiece,
+  cancelSelection,
+  setPreviewPosition,
 } from '../../src/games/pent-em-in/rules';
 
 describe('Pent\'Em In – getPieceCells / canPlacePiece', () => {
@@ -76,5 +81,57 @@ describe('Pent\'Em In – selectPiece / placePiece / canPlayerMove', () => {
     const state = createInitialState();
     expect(canPlayerMove(state, 'player1')).toBe(true);
     expect(canPlayerMove(state, 'player2')).toBe(true);
+  });
+});
+
+describe("Pent'Em In – rotate / flip / cancel / preview / placements", () => {
+  it('getValidPlacements is nonempty for I5 on an empty board', () => {
+    const state = createInitialState();
+    const placements = getValidPlacements(state, 'I5', 0, false);
+    expect(placements.length).toBeGreaterThan(0);
+  });
+
+  it('rotateSelectedPiece cycles 0→90 for a rotatable piece', () => {
+    const selected = selectPiece(createInitialState(), 'I5');
+    expect(selected.selectedRotation).toBe(0);
+    const rotated = rotateSelectedPiece(selected);
+    expect(rotated.selectedRotation).toBe(90);
+  });
+
+  it('flipSelectedPiece toggles for a flippable piece', () => {
+    const selected = selectPiece(createInitialState(), 'F');
+    expect(selected.selectedFlipped).toBe(false);
+    const flipped = flipSelectedPiece(selected);
+    expect(flipped.selectedFlipped).toBe(true);
+    expect(flipSelectedPiece(flipped).selectedFlipped).toBe(false);
+  });
+
+  it('cancelSelection returns to selectPiece and clears preview', () => {
+    let state = selectPiece(createInitialState(), 'I5');
+    state = setPreviewPosition(state, { row: 1, col: 1 });
+    const cancelled = cancelSelection(state);
+    expect(cancelled.selectedPiece).toBeNull();
+    expect(cancelled.previewPosition).toBeNull();
+    expect(cancelled.phase).toBe('selectPiece');
+    expect(cancelled.selectedRotation).toBe(0);
+    expect(cancelled.selectedFlipped).toBe(false);
+  });
+
+  it('setPreviewPosition updates preview coordinates', () => {
+    const state = selectPiece(createInitialState(), 'I5');
+    const next = setPreviewPosition(state, { row: 3, col: 4 });
+    expect(next.previewPosition).toEqual({ row: 3, col: 4 });
+    expect(setPreviewPosition(next, null).previewPosition).toBeNull();
+  });
+
+  it('rotate / flip are no-ops without a selection', () => {
+    const state = createInitialState();
+    expect(rotateSelectedPiece(state)).toBe(state);
+    expect(flipSelectedPiece(state)).toBe(state);
+  });
+
+  it('flipSelectedPiece is a no-op for non-flippable I5', () => {
+    const selected = selectPiece(createInitialState(), 'I5');
+    expect(flipSelectedPiece(selected)).toBe(selected);
   });
 });

@@ -5,6 +5,7 @@ import {
   generateExpressions,
   isGoldbachNumber,
   PrimeGoldState,
+  CONFIG,
 } from '../../src/games/prime-gold/types';
 import {
   createInitialState,
@@ -131,5 +132,55 @@ describe('Prime Gold – dice and placement', () => {
     expect(next.currentPlayer).toBe('player2');
     expect(next.phase).toBe('rolling');
     expect(next.diceRoll).toBeNull();
+  });
+});
+
+describe('Prime Gold – win / illegal / pass edge cases', () => {
+  it('placeChip is a no-op outside placing phase', () => {
+    const state = createInitialState();
+    expect(placeChip(state, 2, '2')).toBe(state);
+  });
+
+  it('passTurn is a no-op when game is over', () => {
+    const state = placingState(
+      { die1: 1, die2: 1, die3: 1 },
+      { phase: 'gameOver', winner: 'player1' }
+    );
+    expect(passTurn(state)).toBe(state);
+  });
+
+  it('hasValidMoves is false when all candidate cells are owned', () => {
+    let state = placingState({ die1: 2, die2: 3, die3: 4 });
+    const placements = getValidPlacements(state);
+    const cells = new Map(state.cells);
+    for (const p of placements) {
+      const cell = findCellByValue(state, p.value)!;
+      cells.set(`${cell.row},${cell.col}`, { ...cell, owner: 'player2' });
+    }
+    state = { ...state, cells };
+    expect(hasValidMoves(state)).toBe(false);
+    expect(getValidPlacements(state)).toEqual([]);
+  });
+
+  it('ends game when both chip piles are exhausted', () => {
+    const state = placingState(
+      { die1: 2, die2: 3, die3: 4 },
+      {
+        playerChips: { player1: 1, player2: 0 },
+      }
+    );
+    const [first] = getValidPlacements(state);
+    expect(first).toBeTruthy();
+    const next = placeChip(state, first.value, first.expr);
+    expect(next.phase).toBe('gameOver');
+    expect(next.playerChips.player1).toBe(0);
+    expect(next.playerChips.player2).toBe(0);
+    // Winner is whichever has more veins (may be null on tie)
+    expect(['player1', 'player2', null]).toContain(next.winner);
+  });
+
+  it('CONFIG exposes vein win thresholds used by rules', () => {
+    expect(CONFIG.VEINS_TO_WIN).toBe(4);
+    expect(CONFIG.MIN_VEIN_LENGTH).toBe(4);
   });
 });

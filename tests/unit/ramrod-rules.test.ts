@@ -15,6 +15,10 @@ import {
   passTurn,
   hasValidMoves,
   isValidPlacement,
+  clearSelection,
+  formatMove,
+  getBoxSum,
+  getRemainingValue,
 } from '../../src/games/ramrod/rules';
 
 afterEach(() => {
@@ -199,5 +203,65 @@ describe('Ramrod – passTurn / hasValidMoves', () => {
       completedBy: null,
     });
     expect(hasValidMoves(controlledState([huge], tinyBoxes))).toBe(false);
+  });
+});
+
+describe('Ramrod – clearSelection / formatMove / box helpers', () => {
+  it('clearSelection returns to selectingRod', () => {
+    const rod = createRod('r1', 2);
+    const selected = selectRod(controlledState([rod]), rod.id);
+    const cleared = clearSelection(selected);
+    expect(cleared.selectedRod).toBeNull();
+    expect(cleared.phase).toBe('selectingRod');
+  });
+
+  it('formatMove includes capture bonus when present', () => {
+    const rod = createRod('r', 3);
+    expect(
+      formatMove({
+        player: 'player1',
+        rod,
+        boxId: createBoxId(0, 0),
+        slot: 0,
+        capturedBox: false,
+        pointsScored: 0,
+        moveNumber: 1,
+      })
+    ).toBe('Rod 3cm');
+    expect(
+      formatMove({
+        player: 'player1',
+        rod,
+        boxId: createBoxId(0, 0),
+        slot: 1,
+        capturedBox: true,
+        pointsScored: 5,
+        moveNumber: 2,
+      })
+    ).toBe('Rod 3cm (+5cm)');
+  });
+
+  it('getBoxSum and getRemainingValue reflect box contents', () => {
+    const a = createRod('a', 2);
+    const b = createRod('b', 3);
+    const empty: SumBox = {
+      id: createBoxId(0, 0),
+      targetSum: 5,
+      row: 0,
+      col: 0,
+      rods: [null, null],
+      completedBy: null,
+    };
+    expect(getBoxSum(empty)).toBeNull();
+    expect(getRemainingValue(empty)).toBe(5);
+
+    const half: SumBox = { ...empty, rods: [a, null] };
+    expect(getRemainingValue(half)).toBe(3);
+    expect(getBoxSum({ ...empty, rods: [a, b] })).toBe(5);
+  });
+
+  it('placeRod is a no-op without selection', () => {
+    const state = controlledState([createRod('r', 2)]);
+    expect(placeRod(state, createBoxId(0, 0), 0)).toBe(state);
   });
 });

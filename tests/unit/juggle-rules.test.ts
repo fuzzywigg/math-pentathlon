@@ -9,6 +9,10 @@ import {
   rotateShape,
   flipShape,
   isPlacementValid,
+  getPreviewCells,
+  checkWinner,
+  canMakeAnyMove,
+  getBoardFillPercentage,
 } from '../../src/games/juggle/rules';
 import { PENTOMINOES, TETROMINOES } from '../../src/core/polyomino/types';
 
@@ -126,5 +130,46 @@ describe('Juggle – rotateShape / flipShape', () => {
     const state = createInitialState();
     expect(rotateShape(state)).toBe(state);
     expect(flipShape(state)).toBe(state);
+  });
+});
+
+describe('Juggle – getPreviewCells / checkWinner / canMakeAnyMove / fill %', () => {
+  it('getPreviewCells returns occupied cells for the selected shape', () => {
+    let state = withDice(createInitialState(), [1, 1]);
+    state = selectDie(state, 0);
+    const cells = getPreviewCells(state, { row: 1, col: 1 });
+    expect(cells).toEqual([{ row: 1, col: 1 }]);
+    expect(getPreviewCells(createInitialState(), { row: 0, col: 0 })).toEqual(
+      []
+    );
+  });
+
+  it('checkWinner detects a fully filled board', () => {
+    const state = createInitialState();
+    expect(checkWinner(state.boards)).toBeNull();
+
+    const filled = {
+      ...state.boards.player1,
+      cells: state.boards.player1.cells.map((row) => row.map(() => true)),
+    };
+    expect(
+      checkWinner({ player1: filled, player2: state.boards.player2 })
+    ).toBe('player1');
+  });
+
+  it('canMakeAnyMove is true with open board and dice', () => {
+    const state = withDice(createInitialState(), [1, 1]);
+    expect(canMakeAnyMove(state)).toBe(true);
+    expect(canMakeAnyMove(createInitialState())).toBe(false);
+  });
+
+  it('getBoardFillPercentage is 0 on empty and 100 when full', () => {
+    const state = createInitialState();
+    expect(getBoardFillPercentage(state.boards.player1)).toBe(0);
+    const full = {
+      ...state.boards.player1,
+      cells: state.boards.player1.cells.map((row) => row.map(() => true)),
+    };
+    expect(getBoardFillPercentage(full)).toBe(100);
   });
 });

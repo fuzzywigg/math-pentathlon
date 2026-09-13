@@ -9,6 +9,9 @@ import {
   selectIsland,
   performRoll,
   previewDivision,
+  setSelectedIsland,
+  countOwnedIslands,
+  rollDice,
 } from '../../src/games/remainder-islands/rules';
 
 afterEach(() => {
@@ -103,5 +106,48 @@ describe('Remainder Islands – islands and scoring', () => {
     if (next.phase === 'selectIsland') {
       expect(next.validIslands.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('Remainder Islands – setSelectedIsland / countOwned / rollDice', () => {
+  it('setSelectedIsland updates preview selection', () => {
+    const state = selectingState();
+    const id = state.validIslands[0];
+    const next = setSelectedIsland(state, id);
+    expect(next.selectedIsland).toBe(id);
+    expect(setSelectedIsland(next, null).selectedIsland).toBeNull();
+  });
+
+  it('countOwnedIslands tallies owners after a claim', () => {
+    const state = selectingState();
+    expect(countOwnedIslands(state)).toEqual({ player1: 0, player2: 0 });
+    const next = selectIsland(state, state.validIslands[0]);
+    expect(countOwnedIslands(next).player1).toBe(1);
+  });
+
+  it('rollDice returns faces in 1–6 with total sum', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const roll = rollDice();
+    expect(roll.die1).toBeGreaterThanOrEqual(1);
+    expect(roll.die1).toBeLessThanOrEqual(6);
+    expect(roll.die2).toBeGreaterThanOrEqual(1);
+    expect(roll.die2).toBeLessThanOrEqual(6);
+    expect(roll.total).toBe(roll.die1 + roll.die2);
+  });
+
+  it('performRoll is a no-op outside rolling phase', () => {
+    const state = selectingState();
+    expect(performRoll(state)).toBe(state);
+  });
+
+  it('score win path sets winner when turnsRemaining hits zero', () => {
+    const state = selectingState({
+      turnsRemaining: 1,
+      player1Score: 20,
+      player2Score: 5,
+    });
+    const next = selectIsland(state, state.validIslands[0]);
+    expect(next.phase).toBe('gameOver');
+    expect(next.winner).toBe('player1');
   });
 });

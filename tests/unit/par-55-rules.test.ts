@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { CONFIG } from '../../src/games/par-55/types';
 import {
   createInitialState,
   selectBlock,
@@ -8,6 +9,9 @@ import {
   placeBlock,
   passTurn,
   hasValidMoves,
+  isValidPlacement,
+  formatMove,
+  getAttributeDisplayName,
 } from '../../src/games/par-55/rules';
 
 describe('Par 55 – selectBlock / placeBlock', () => {
@@ -94,5 +98,78 @@ describe('Par 55 – getValidPlacements / calculateScore / passTurn', () => {
 
   it('hasValidMoves is true on a fresh board with a hand', () => {
     expect(hasValidMoves(createInitialState())).toBe(true);
+  });
+});
+
+describe('Par 55 – target win / format / isValidPlacement / empty hand', () => {
+  it('reaches gameOver when placing pushes score to TARGET_SCORE', () => {
+    const state = createInitialState();
+    const blockId = state.hands.player1[0].id;
+    let next = selectBlock(state, blockId);
+    const baseId = getValidPlacements(next)[0];
+    const { totalPoints } = calculateScore(
+      next,
+      next.hands.player1.find((b) => b.id === blockId)!,
+      baseId
+    );
+    // Inject score so this placement crosses the target
+    next = {
+      ...next,
+      scores: {
+        player1: Math.max(0, CONFIG.TARGET_SCORE - Math.max(totalPoints, 1)),
+        player2: 0,
+      },
+    };
+    // If totalPoints is 0, bump to TARGET_SCORE - 0 so we need points; place anyway
+    if (totalPoints === 0) {
+      next = {
+        ...next,
+        scores: { player1: CONFIG.TARGET_SCORE, player2: 0 },
+      };
+    }
+    next = placeBlock(next, baseId);
+    if (next.scores.player1 >= CONFIG.TARGET_SCORE) {
+      expect(next.phase).toBe('gameOver');
+      expect(next.winner).toBe('player1');
+    } else {
+      // Placement scored 0 and injected score was below target — still a valid place
+      expect(next.moveHistory).toHaveLength(1);
+    }
+  });
+
+  it('formatMove and getAttributeDisplayName are exported helpers', () => {
+    const state = createInitialState();
+    const block = state.hands.player1[0];
+    const move = {
+      player: 'player1' as const,
+      block,
+      baseId: '0-0',
+      pointsScored: 6,
+      matchDetails: [],
+      moveNumber: 1,
+    };
+    expect(formatMove(move)).toContain('pts');
+    expect(formatMove(move)).toContain(block.shape);
+    expect(getAttributeDisplayName('shape')).toBe('Shape');
+    expect(getAttributeDisplayName('color')).toBe('Color');
+    expect(getAttributeDisplayName('unknown')).toBe('unknown');
+  });
+
+  it('isValidPlacement is true for empty adjacent bases and false for seed', () => {
+    const state = createInitialState();
+    const valid = getValidPlacements(state);
+    expect(isValidPlacement(state, valid[0])).toBe(true);
+    const occupied = [...state.bases.values()].find((b) => b.block);
+    expect(occupied).toBeTruthy();
+    expect(isValidPlacement(state, occupied!.id)).toBe(false);
+  });
+
+  it('empty hand makes hasValidMoves false; passTurn still flips seat', () => {
+    const state = {
+      ...createInitialState(),
+      hands: { player1: [], player2: createInitialState().hands.player2 },
+    };
+    expect(hasValidMoves(state)).toBe(false);
+    expect(passTurn(state).currentPlayer).toBe('player2');
   });
 });

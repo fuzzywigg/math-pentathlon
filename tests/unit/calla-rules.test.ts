@@ -11,6 +11,7 @@ import {
   makeMove,
   isGameOver,
   getPhaseMessage,
+  getLastMoveInfo,
 } from '../../src/games/calla/rules';
 
 describe('Calla – selection helpers', () => {
@@ -86,5 +87,72 @@ describe('Calla – makeMove', () => {
       winner: 'player1',
     };
     expect(getPhaseMessage(over)).toMatch(/wins/i);
+  });
+});
+
+describe('Calla – capture / tie / last-move info / phases', () => {
+  it('captures when last sow lands in empty own pit with opposite occupied', () => {
+    // Sow 1 cube from pit 3 → lands in empty pit 4; opposite of 4 is opponent pit 0
+    const state: CallaGameState = {
+      ...createInitialState(),
+      player1Pits: [0, 0, 0, 1, 0],
+      player2Pits: [4, 0, 0, 0, 0],
+      player1Calla: 2,
+      player2Calla: 0,
+    };
+    const beforeCalla = state.player1Calla;
+    const next = makeMove(state, 3);
+
+    expect(next.moveHistory[0].captured).toBeGreaterThan(0);
+    expect(next.player1Calla).toBeGreaterThan(beforeCalla);
+    expect(next.player2Pits[0]).toBe(0);
+    expect(next.player1Pits[4]).toBe(0);
+  });
+
+  it('tie win when a side empties with equal callas after sweep', () => {
+    // Last cube from pit 4 lands in calla → p1 side empty; sweep p2's 2 cubes
+    const state: CallaGameState = {
+      ...createInitialState(),
+      player1Pits: [0, 0, 0, 0, 1],
+      player2Pits: [2, 0, 0, 0, 0],
+      player1Calla: 10,
+      player2Calla: 9, // +2 sweep → 11; p1 calla becomes 11
+    };
+    const next = makeMove(state, 4);
+    expect(isGameOver(next)).toBe(true);
+    expect(next.winner).toBe('tie');
+    expect(next.player1Calla).toBe(next.player2Calla);
+  });
+
+  it('getLastMoveInfo is null on fresh; includes Free turn / captured', () => {
+    expect(getLastMoveInfo(createInitialState())).toBeNull();
+
+    const free = makeMove(createInitialState(), 2);
+    expect(getLastMoveInfo(free)).toMatch(/Free turn/);
+
+    const captureState: CallaGameState = {
+      ...createInitialState(),
+      player1Pits: [0, 0, 0, 1, 0],
+      player2Pits: [3, 0, 0, 0, 0],
+      player1Calla: 0,
+      player2Calla: 0,
+    };
+    const captured = makeMove(captureState, 3);
+    expect(getLastMoveInfo(captured)).toMatch(/captured/);
+  });
+
+  it('getPhaseMessage covers animating and tie', () => {
+    const animating: CallaGameState = {
+      ...createInitialState(),
+      phase: 'animating',
+    };
+    expect(getPhaseMessage(animating)).toMatch(/distributing/i);
+
+    const tie: CallaGameState = {
+      ...createInitialState(),
+      phase: 'gameOver',
+      winner: 'tie',
+    };
+    expect(getPhaseMessage(tie)).toMatch(/tie/i);
   });
 });

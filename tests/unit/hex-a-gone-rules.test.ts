@@ -11,6 +11,9 @@ import {
   canPlaceAt,
   passTurn,
   isGameOver,
+  deselectBlock,
+  getValidPlacements,
+  getPhaseMessage,
 } from '../../src/games/hex-a-gone/rules';
 
 function fillCell(
@@ -110,5 +113,79 @@ describe('Hex-a-Gone – passTurn / isGameOver', () => {
         winner: 'player1',
       })
     ).toBe(true);
+  });
+});
+
+describe('Hex-a-Gone – deselect / multi-select / placements / messages', () => {
+  it('deselectBlock removes a shape from the turn selection', () => {
+    let state = selectBlock(createInitialState(), 'triangle');
+    state = selectBlock(state, 'rhombus');
+    state = deselectBlock(state, 'triangle');
+    expect(state.turnSelection.blocks).toEqual(['rhombus']);
+    expect(deselectBlock(state, 'triangle')).toBe(state); // already gone
+  });
+
+  it('multi-selects up to 3 then commitSelection → placeBlocks', () => {
+    let state = createInitialState();
+    state = selectBlock(state, 'triangle');
+    state = selectBlock(state, 'rhombus');
+    state = selectBlock(state, 'trapezoid');
+    expect(state.turnSelection.blocks).toHaveLength(3);
+    // Fourth distinct shape is ignored at cap
+    const capped = selectBlock(state, 'hexagon');
+    expect(capped).toBe(state);
+
+    state = commitSelection(state);
+    expect(state.phase).toBe('placeBlocks');
+    expect(state.turnSelection.committed).toBe(true);
+    expect(state.selectedBlockForPlacement).toBe('triangle');
+  });
+
+  it('places one block then continues with remaining selection', () => {
+    let state = selectBlock(createInitialState(), 'triangle');
+    state = selectBlock(state, 'rhombus');
+    state = commitSelection(state);
+    expect(getValidPlacements(state).length).toBeGreaterThan(0);
+
+    state = placeBlock(state, 0, 0);
+    expect(state.phase).toBe('placeBlocks');
+    expect(state.turnSelection.blocks).toEqual(['rhombus']);
+    expect(state.selectedBlockForPlacement).toBe('rhombus');
+    expect(state.currentPlayer).toBe('player1');
+  });
+
+  it('getPhaseMessage covers select, place, and game-over', () => {
+    const fresh = createInitialState();
+    expect(getPhaseMessage(fresh)).toMatch(/Select 1-3/);
+
+    const selected = selectBlock(fresh, 'triangle');
+    expect(getPhaseMessage(selected)).toMatch(/1 block/);
+
+    const placing = commitSelection(selected);
+    expect(getPhaseMessage(placing)).toMatch(/Place your blocks/);
+
+    expect(
+      getPhaseMessage({
+        ...fresh,
+        phase: 'gameOver',
+        winner: 'player2',
+      })
+    ).toMatch(/Red wins/);
+  });
+
+  it('selectBlock is a no-op when the bank is empty for that shape', () => {
+    const state: HexAGoneGameState = {
+      ...createInitialState(),
+      bank: {
+        ...createInitialState().bank,
+        triangle: 0,
+      },
+    };
+    expect(selectBlock(state, 'triangle')).toBe(state);
+  });
+
+  it('passTurn flips seat when selection is empty', () => {
+    const next = passTurn(createInitialState());
+    expect(next.currentPlayer).toBe('player2');
   });
 });
