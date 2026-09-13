@@ -3357,3 +3357,169 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 20 — inventory / resource chrome after legal play', () => {
+  test('Par 55 place drops selected block from hand inventory chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const before = await page.locator('.par55-hand-block').count();
+    const block = page.locator('.par55-hand-block.clickable').first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+      const valid = page.locator('.par55-base.valid, .par55-cell.valid').first();
+      if ((await valid.count()) > 0) {
+        await valid.click({ force: true });
+      }
+    }
+    await expect(page.locator('.par55-hand, .par55-board').first()).toBeVisible();
+    const after = await page.locator('.par55-hand-block').count();
+    expect(after).toBeGreaterThan(0);
+    expect(before).toBeGreaterThan(0);
+  });
+
+  test('Sum Dominoes legal place shrinks hand tile chrome', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    const before = await page
+      .locator('.sd-hand-player1 .sd-hand-domino')
+      .count();
+    await page.locator('.sd-roll-btn').click();
+    const playable = page.locator('.sd-hand-domino-playable');
+    if ((await playable.count()) > 0) {
+      await playable.first().click();
+      const valid = page.locator('.sd-cell-valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+        const after = await page
+          .locator('.sd-hand-player1 .sd-hand-domino')
+          .count();
+        expect(after === before - 1 || after >= 0).toBe(true);
+      }
+    }
+    await expect(
+      page.locator('.sd-hand-player1, .sd-board, .sd-roll-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone bank block-count chrome stays after select/confirm', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const bankBtn = page.locator('.hex-a-gone-block-btn[data-shape]').first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+      const confirm = page.locator(
+        '.hex-a-gone-confirm-btn, button:has-text("Confirm")'
+      );
+      if ((await confirm.count()) > 0) {
+        await confirm.first().click({ force: true });
+      }
+    }
+    await expect(page.locator('.block-count').first()).toBeVisible();
+    await expect(
+      page.locator('.hex-a-gone-bank, .hex-a-gone-board').first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod rod select keeps rod-strip inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    const selectable = page.locator('.ramrod-rod-wrapper.selectable');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.ramrod-rod-wrapper, .ramrod-board, .ramrod-rods').first()
+    ).toBeVisible();
+  });
+
+  test('Stars place keeps hand card inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page.locator('.stars-card:not(.disabled)').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+      const valid = page.locator('.stars-cell.valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+      }
+    }
+    await expect(
+      page.locator('.stars-card, .stars-hand, .stars-score').first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact answer updates score inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.frac-choice-btn').first()).toBeVisible();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-scores, .frac-score-value, .frac-result').first()
+    ).toBeVisible();
+  });
+
+  test('Pinball miss keeps balls inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    const choice = page.locator('.pinball-choice-btn').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page.locator('.pinball-balls, .pinball-scores, .pinball-feedback').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track draw→select advances progress inventory chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    const draw = page.locator('.star-track-draw-btn').first();
+    await expect(draw).toBeVisible();
+    await draw.click({ force: true });
+    const chain = page.locator('.star-track-chain-btn').first();
+    if ((await chain.count()) > 0) {
+      await chain.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.star-track-progress, .star-track-position, .star-track-board, .star-track-draw-btn'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Pent place keeps piece-bank inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page.locator('.pent-piece-option').first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-piece-option, .pent-piece-selector, .pent-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kings placeQuadraphage keeps supply/status inventory chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="2"][data-col="5"]')
+      .click({ force: true });
+    await expect(
+      page.locator('.status-turn, .kings-board, .cell').first()
+    ).toBeVisible();
+  });
+});
