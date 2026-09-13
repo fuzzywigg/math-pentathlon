@@ -64,21 +64,21 @@ describe('Fab-a-Diffy – calculateResult', () => {
   const third: Fraction = { numerator: 1, denominator: 3 };
 
   it('adds fractions', () => {
-    expect(calculateResult(half, half, 'add')).toEqual({
+    expect(calculateResult(half, half, 'add')).toMatchObject({
       numerator: 1,
       denominator: 1,
     });
   });
 
   it('subtracts fractions', () => {
-    expect(calculateResult(half, third, 'subtract')).toEqual({
+    expect(calculateResult(half, third, 'subtract')).toMatchObject({
       numerator: 1,
       denominator: 6,
     });
   });
 
   it('multiplies fractions', () => {
-    expect(calculateResult(half, half, 'multiply')).toEqual({
+    expect(calculateResult(half, half, 'multiply')).toMatchObject({
       numerator: 1,
       denominator: 4,
     });

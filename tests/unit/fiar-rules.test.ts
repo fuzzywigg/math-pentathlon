@@ -128,16 +128,16 @@ describe('FIAR – movement / win', () => {
   });
 
   it('scripts a 4-in-a-row win via place then move', () => {
-    // P1: 0-0,0-1,0-2,0-4 — leave 0-3 open. P2 far on row 4.
+    // P1: 0-0,0-1,0-2,0-4 — leave 0-3 open. P2 scattered so no 4-in-a-row.
     let state = placeMany(createInitialState(), [
       '0-0',
-      '4-4',
+      '4-0',
       '0-1',
-      '4-3',
-      '0-2',
       '4-2',
+      '0-2',
+      '4-4',
       '0-4',
-      '4-1',
+      '3-4',
     ]);
     expect(state.phase).toBe('movement');
     expect(checkWinner(state)).toBeNull();
