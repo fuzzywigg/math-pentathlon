@@ -1,10 +1,16 @@
 import { describe, it, expect, afterEach } from 'vitest';
 
 import { createInitialState as createHexState } from '../../src/games/hex/types';
-import { renderBoard as renderHexBoard } from '../../src/games/hex/board-ui';
+import {
+  renderBoard as renderHexBoard,
+  renderStatus as renderHexStatus,
+} from '../../src/games/hex/board-ui';
 
 import { createInitialState as createCallaState } from '../../src/games/calla/types';
-import { renderBoard as renderCallaBoard } from '../../src/games/calla/board-ui';
+import {
+  renderBoard as renderCallaBoard,
+  renderStatus as renderCallaStatus,
+} from '../../src/games/calla/board-ui';
 
 import { createInitialState as createHexAGoneState } from '../../src/games/hex-a-gone/types';
 import { renderBoard as renderHexAGoneBoard } from '../../src/games/hex-a-gone/board-ui';
@@ -34,6 +40,7 @@ import { startGame as startFracFact } from '../../src/games/frac-fact/rules';
 import {
   renderProblem,
   renderAnswerChoices,
+  renderResult as renderFracResult,
 } from '../../src/games/frac-fact/board-ui';
 
 afterEach(() => {
@@ -142,5 +149,36 @@ describe('Burn Wave 3 — board UI smoke', () => {
     expect(choices.querySelectorAll('.frac-choice-btn').length).toBeGreaterThan(
       0
     );
+  });
+
+  it('hex: renderStatus mounts .hex-status with turn text', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    renderHexStatus(createHexState(5), container);
+    expect(container.querySelector('.hex-status')).toBeTruthy();
+    expect(container.querySelector('.status-turn')?.textContent).toMatch(/turn/i);
+  });
+
+  it('calla: renderStatus mounts .calla-status with scores', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    renderCallaStatus(createCallaState(), container);
+    expect(container.querySelector('.calla-status')).toBeTruthy();
+    expect(container.querySelector('.calla-scores')).toBeTruthy();
+  });
+
+  it('frac-fact: renderResult shows continue when showingResult', () => {
+    const started = startFracFact(createFracFactState());
+    const showing = {
+      ...started,
+      phase: 'showingResult' as const,
+      isCorrect: true,
+      selectedAnswer: started.currentProblem!.correctAnswer,
+    };
+    const result = renderFracResult(showing, () => undefined);
+    document.body.appendChild(result);
+    expect(result.classList.contains('frac-result')).toBe(true);
+    expect(result.querySelector('.frac-continue-btn')).toBeTruthy();
+    expect(result.querySelector('.frac-feedback.correct')).toBeTruthy();
   });
 });
