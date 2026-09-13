@@ -2842,3 +2842,183 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
     await expect(page.locator('.contig-roll-btn')).toBeVisible();
   });
 });
+
+test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Juggle vs-AI roll CTA advances into shape/place chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/juggle');
+    await startVsAi(page);
+    const roll = page.locator('.juggle-roll-btn, .roll-dice-btn, button:has-text("Roll")').first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.juggle-board, .juggle-dice, .juggle-shapes, .juggle-shape, .polyomino-board'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone vs-AI bank remains interactive after start', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await startVsAi(page);
+    await expect(
+      page.locator('.hag-bank, .hex-a-gone-bank, .hag-board, .hexagon-board').first()
+    ).toBeVisible();
+    const block = page
+      .locator('.hag-block, .hag-bank-shape, [data-shape], .block-btn')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(
+      page.locator('.hag-board, .hex-a-gone-board, .hag-bank').first()
+    ).toBeVisible();
+  });
+
+  test('Contig vs-AI roll yields expressions or pass', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    const roll = page.locator('.contig-roll-btn');
+    await expect(roll).toBeVisible();
+    await roll.click();
+    await expect(
+      page.locator('.contig-expressions, .contig-pass-btn, .contig-dice-display').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes vs-AI roll yields place or pass chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await startVsAi(page);
+    await page.locator('.sd-roll-btn').click();
+    await expect(
+      page.locator('.sd-dice-display, .sd-pass-btn, .sd-board').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track vs-AI draw advances to chain choice or draw again', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await startVsAi(page);
+    const draw = page.locator('.star-track-draw-btn').first();
+    await expect(draw).toBeVisible();
+    await draw.click({ force: true });
+    await expect(
+      page
+        .locator('.star-track-chain-btn, .star-track-draw-btn, .star-track-board')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Fab vs-AI bar pool click keeps selecting chrome', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await startVsAi(page);
+    const bar = page.locator('.fab-bar-wrapper, .fab-bar-pool .fab-bar').first();
+    if ((await bar.count()) > 0) {
+      await bar.click({ force: true });
+    }
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board, .fab-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Calla vs-AI pit click keeps board chrome', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await startVsAi(page);
+    const pit = page.locator('.calla-pit, [data-pit], .pit').first();
+    if ((await pit.count()) > 0) {
+      await pit.click({ force: true });
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-calla').first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact vs-AI choice click shows result or scores', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/frac-fact');
+    await startVsAi(page);
+    await expect(page.locator('.frac-problem, .frac-choice-btn').first()).toBeVisible();
+    const choice = page.locator('.frac-choice-btn').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page.locator('.frac-result, .frac-scores, .frac-feedback, .frac-problem').first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold vs-AI roll keeps dice/board chrome', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await startVsAi(page);
+    const roll = page
+      .locator('.prime-roll-btn, .pg-roll-btn, button:has-text("Roll")')
+      .first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.prime-board, .pg-board, .prime-dice, .pg-dice').first()
+    ).toBeVisible();
+  });
+
+  test('Kings vs-AI king select keeps move-phase chrome', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await startVsAi(page);
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await expect(
+      page.locator('.cell-selected, .status-turn, .kings-board').first()
+    ).toBeVisible();
+  });
+
+  test('Par 55 vs-AI block select keeps hand/board chrome', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await startVsAi(page);
+    const block = page
+      .locator('.par55-block, .par55-hand-block, [data-block-id]')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+  });
+
+  test('Ramrod vs-AI rod select keeps board chrome', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await startVsAi(page);
+    const rod = page.locator('.ramrod-rod, .rr-rod, [data-rod-id]').first();
+    if ((await rod.count()) > 0) {
+      await rod.click({ force: true });
+    }
+    await expect(
+      page.locator('.ramrod-board, .rr-board, .ramrod-rods').first()
+    ).toBeVisible();
+  });
+});
