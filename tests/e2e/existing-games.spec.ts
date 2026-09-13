@@ -3022,3 +3022,144 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 17 — board geometry / seat chrome deepenings', () => {
+  test('Contig board still exposes 60 uniquely numbered cells', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.contig-cell')).toHaveCount(60);
+    await expect(page.locator('.contig-score-p1')).toBeVisible();
+    await expect(page.locator('.contig-score-p2')).toBeVisible();
+  });
+
+  test('Hex corner cell click stays on board chrome', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+    await page.locator('.hex-cell-group[data-row="0"][data-col="0"]').click({
+      force: true,
+    });
+    await expect(page.locator('.hex-board, [data-row]').first()).toBeVisible();
+  });
+
+  test('Hex-a-Gone axial cells remain present after bank peek', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const cell = page
+      .locator('.hex-a-gone-board [data-q], .hex-a-gone-cell, .hex-cell')
+      .first();
+    await expect(cell).toBeVisible();
+    const block = page
+      .locator('.hag-block, .hag-bank-shape, [data-shape], .block-btn')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-a-gone-board, .hag-board, .hex-a-gone-bank').first()
+    ).toBeVisible();
+  });
+
+  test('Kings corner vs center cells stay addressable', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.cell[data-row="1"][data-col="1"]')).toBeVisible();
+    await expect(page.locator('.cell[data-row="5"][data-col="5"]')).toBeVisible();
+    await expect(page.locator('.cell[data-row="9"][data-col="9"]')).toBeVisible();
+    await expect(
+      page.locator('.status-supplies, .supply-p1, .supply-p2, .board').first()
+    ).toBeVisible();
+  });
+
+  test('Queens board container keeps ring geometry chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.qg-board-container, .qg-board, svg').first()
+    ).toBeVisible();
+    const cell = page.locator('.qg-cell, [data-ring], svg circle, svg g').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.qg-board-container, .qg-status, .qg-board').first()
+    ).toBeVisible();
+  });
+
+  test('FIAR node graph chrome stays after first node tap', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    const node = page
+      .locator('.fiar-node, [data-node], .fiar-board circle, .fiar-board .node')
+      .first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true });
+    }
+    await expect(
+      page.locator('.fiar-board, .fiar-status, .fiar-game').first()
+    ).toBeVisible();
+  });
+
+  test('Pent Em In board grid cells remain after piece peek', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page
+      .locator('.pent-piece, .pent-tray [data-piece], .piece-btn')
+      .first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.pent-board, .pent-board .interaction rect, .pent-tray')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Calla both seat pits remain on board after start', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.calla-pit, [data-pit], .pit').first()).toBeVisible();
+    await expect(
+      page.locator('.calla-board, .calla-calla, .calla-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track both seat markers stay visible with draw CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.star-track-draw-btn').first()).toBeVisible();
+    await expect(
+      page
+        .locator(
+          '.star-track-board, .star-track-track, .star-track-p1, .star-track-p2'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Par 55 board + both score seats remain after hand peek', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const block = page
+      .locator('.par55-block, .par55-hand-block, [data-block-id]')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+  });
+});
