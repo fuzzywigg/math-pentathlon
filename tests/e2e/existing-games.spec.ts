@@ -1901,13 +1901,14 @@ test.describe('Wave 12 — dice / roll turn chains', () => {
   }) => {
     await page.goto('/#/game/remainder-islands');
     await dismissModeIfNeeded(page);
-    await page.locator('.remainder-roll-btn').click();
+    await page.locator('.remainder-btn-roll').click();
+    await expect(page.locator('.remainder-board')).toBeVisible();
+    const valid = page.locator('.island.valid');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
     await expect(
-      page
-        .locator(
-          '.remainder-island, .remainder-roll-btn, .remainder-dice, [data-island-id]'
-        )
-        .first()
+      page.locator('.remainder-btn-roll, .remainder-dice, .remainder-board').first()
     ).toBeVisible();
   });
 });
