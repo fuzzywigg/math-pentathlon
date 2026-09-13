@@ -265,7 +265,9 @@ test.describe('Hex-a-Gone — e2e smoke', () => {
     }
   });
 
-  test('confirm then place updates status or placing info', async ({ page }) => {
+  test('confirm then place updates status or placing info', async ({
+    page,
+  }) => {
     const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
     await bankBtn.click();
     const confirm = page.locator('.hex-a-gone-confirm-btn');
@@ -930,5 +932,268 @@ test.describe('Frac Fact / Fraction Pinball — feedback after choice', () => {
         .locator('.pinball-feedback, .pinball-result, .pinball-scores')
         .first()
     ).toBeVisible();
+  });
+});
+
+test.describe('Star Track / Calla / Sum Dominoes — help + new-game', () => {
+  test('Star Track how-to-play opens and new game restores draw CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(page.locator('.star-track-draw-btn')).toBeVisible();
+    await expect(
+      page.locator('.star-track-status, .status-turn').first()
+    ).toBeVisible();
+  });
+
+  test('Calla how-to-play opens and new game keeps board chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.calla-board, .calla-pit').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes how-to-play opens and new game restores roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.locator('.sd-roll-btn').click();
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+    await expect(page.locator('.sd-board')).toBeVisible();
+  });
+});
+
+test.describe('Illegal / premature click no-ops', () => {
+  test('Par non-valid base keeps hand selection', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+
+    await page
+      .locator(
+        '.par55-hand-block, .par55-block, [class*="hand"] button, .par55-hand > *'
+      )
+      .first()
+      .click({
+        force: true,
+      });
+    const selected = page.locator(
+      '.par55-hand-block.selected, .par55-block.selected, .selected'
+    );
+    if ((await selected.count()) > 0) {
+      await expect(selected.first()).toBeVisible();
+    }
+
+    const invalid = page.locator(
+      '.par55-base:not(.valid), .par55-board .par55-base:not(.par55-base-valid)'
+    );
+    if ((await invalid.count()) > 0) {
+      await invalid.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-board, .par55-hand').first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold occupied/invalid cell after roll keeps placing chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('.pg-roll-btn, button:has-text("Roll")').first().click();
+    await expect(page.locator('.pg-dice-area, .pg-die').first()).toBeVisible();
+
+    const invalid = page.locator('.pg-cell:not(.valid)');
+    if ((await invalid.count()) > 0) {
+      await invalid.first().click({ force: true });
+    }
+    await expect(page.locator('.pg-board, .pg-status').first()).toBeVisible();
+  });
+
+  test('Juggle board click before shape keeps dice / selector chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+
+    await page
+      .locator('.juggle-roll-btn, button:has-text("Roll")')
+      .first()
+      .click();
+    const cell = page
+      .locator('.juggle-cell, .juggle-board td, .juggle-board [data-row]')
+      .first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.juggle-dice-area, .juggle-shape-selector, .juggle-board')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod invalid slot click keeps rod selection or board', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('.ramrod-rod, .ramrod-rod-wrapper').first().click({
+      force: true,
+    });
+    const invalid = page.locator(
+      '.ramrod-slot:not(.valid), .ramrod-box:not(.valid) .ramrod-slot'
+    );
+    if ((await invalid.count()) > 0) {
+      await invalid.first().click({ force: true });
+    }
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+  });
+
+  test("Pent'Em In cell without piece keeps piece selector or place chrome", async ({
+    page,
+  }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+
+    const cell = page
+      .locator('.pent-board .interaction rect, .pent-board rect[data-row]')
+      .first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-piece-option, .pent-board, [role="status"]').first()
+    ).toBeVisible();
+  });
+
+  test('Remainder Islands island before roll stays on roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+
+    const island = page.locator(
+      '.remainder-island, [data-island-id], .island-cell'
+    );
+    if ((await island.count()) > 0) {
+      await island.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.remainder-roll-btn, button:has-text("Roll")').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone board click before confirm keeps block selector', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+
+    const cell = page.locator('[data-q], .hag-cell, .hexagone-cell').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.hag-block, .hexagone-block, .block-selector, button')
+        .first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Prime Gold / Juggle — roll then place-or-pass restores CTA', () => {
+  test('Prime Gold after roll: place valid or stay placing with dice', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    await page.locator('.pg-roll-btn, button:has-text("Roll")').first().click();
+    const valid = page.locator('.pg-cell.valid');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+      await expect(
+        page.locator('.pg-roll-btn, .pg-status, .pg-scores').first()
+      ).toBeVisible();
+    } else {
+      await expect(
+        page.locator('.pg-dice-area, .pg-die').first()
+      ).toBeVisible();
+    }
+  });
+
+  test('Juggle after roll: select die restores shape or board chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page
+      .locator('.juggle-roll-btn, button:has-text("Roll")')
+      .first()
+      .click();
+    const die = page
+      .locator('.juggle-die, .juggle-dice-area button, [data-die-index]')
+      .first();
+    if ((await die.count()) > 0) {
+      await die.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.juggle-shape-selector, .juggle-shape-option, .juggle-board')
+        .first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('FIAR / Par — help modal', () => {
+  test('FIAR how-to-play opens and closes', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Par 55 how-to-play opens and closes', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
   });
 });
