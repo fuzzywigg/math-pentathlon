@@ -37,7 +37,9 @@ const DIRECTIONS: Pos[] = [
 
 // Check if position is valid (0-based)
 function isValid(pos: Pos): boolean {
-  return pos.row >= 0 && pos.row < BOARD_SIZE && pos.col >= 0 && pos.col < BOARD_SIZE;
+  return (
+    pos.row >= 0 && pos.row < BOARD_SIZE && pos.col >= 0 && pos.col < BOARD_SIZE
+  );
 }
 
 // Calculate distance from edge (0 = on edge, higher = more central)
@@ -165,10 +167,16 @@ function scoreQuadraphagePlacement(
   // Factor 6: Winning move detection (all difficulties)
   // If placing here leaves the opponent with zero valid moves, it's a win.
   // Give an overwhelming bonus so this is always chosen over any other move.
-  const tempBoard = state.board.map(row => [...row]);
-  tempBoard[placement.row][placement.col] = { type: 'quadraphage', owner: aiPlayer };
+  const tempBoard = state.board.map((row) => [...row]);
+  tempBoard[placement.row][placement.col] = {
+    type: 'quadraphage',
+    owner: aiPlayer,
+  };
   const tempStateWithPlacement = { ...state, board: tempBoard };
-  const opponentMovesAfter = getValidKingMoves(tempStateWithPlacement, opponent);
+  const opponentMovesAfter = getValidKingMoves(
+    tempStateWithPlacement,
+    opponent
+  );
   if (opponentMovesAfter.length === 0) {
     score += 10000; // Guaranteed win — always pick this
   }
@@ -177,7 +185,11 @@ function scoreQuadraphagePlacement(
 }
 
 // Simulate a king move (create temporary state)
-function simulateKingMove(state: GameState, player: PlayerOwner, destination: Pos): GameState {
+function simulateKingMove(
+  state: GameState,
+  player: PlayerOwner,
+  destination: Pos
+): GameState {
   const kingPos = findKingPosition(state.board, player);
   if (!kingPos) return state;
 
@@ -185,7 +197,8 @@ function simulateKingMove(state: GameState, player: PlayerOwner, destination: Po
   const newBoard = state.board.map((row) => [...row]);
 
   // Move the king (0-based positions)
-  newBoard[destination.row][destination.col] = newBoard[kingPos.row][kingPos.col];
+  newBoard[destination.row][destination.col] =
+    newBoard[kingPos.row][kingPos.col];
   newBoard[kingPos.row][kingPos.col] = null;
 
   return {
@@ -200,7 +213,8 @@ function getEasyMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   if (validKingMoves.length === 0) return null;
 
   // Random king move (getValidKingMoves returns 0-based positions)
-  const kingMove = validKingMoves[Math.floor(Math.random() * validKingMoves.length)];
+  const kingMove =
+    validKingMoves[Math.floor(Math.random() * validKingMoves.length)];
 
   // Simulate the king move to get valid placements
   const tempState = simulateKingMove(state, aiPlayer, kingMove);
@@ -209,7 +223,8 @@ function getEasyMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   if (validPlacements.length === 0) return null;
 
   // Random quadraphage placement (getValidQuadraphagePlacements returns 0-based)
-  const quadraphagePlacement = validPlacements[Math.floor(Math.random() * validPlacements.length)];
+  const quadraphagePlacement =
+    validPlacements[Math.floor(Math.random() * validPlacements.length)];
 
   return { kingMove, quadraphagePlacement };
 }
@@ -229,7 +244,10 @@ function getMediumMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   scoredKingMoves.sort((a, b) => b.score - a.score);
 
   // Pick from top 3 moves with some randomness
-  const topMoves = scoredKingMoves.slice(0, Math.min(3, scoredKingMoves.length));
+  const topMoves = scoredKingMoves.slice(
+    0,
+    Math.min(3, scoredKingMoves.length)
+  );
   const kingMove = topMoves[Math.floor(Math.random() * topMoves.length)].move;
 
   // Simulate the king move
@@ -241,14 +259,23 @@ function getMediumMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   // Score placements
   const scoredPlacements = validPlacements.map((placement) => ({
     placement,
-    score: scoreQuadraphagePlacement(tempState, aiPlayer, placement, kingMove, 'medium'),
+    score: scoreQuadraphagePlacement(
+      tempState,
+      aiPlayer,
+      placement,
+      kingMove,
+      'medium'
+    ),
   }));
 
   // Sort by score (descending)
   scoredPlacements.sort((a, b) => b.score - a.score);
 
   // Pick from top 5 placements with some randomness
-  const topPlacements = scoredPlacements.slice(0, Math.min(5, scoredPlacements.length));
+  const topPlacements = scoredPlacements.slice(
+    0,
+    Math.min(5, scoredPlacements.length)
+  );
   const quadraphagePlacement =
     topPlacements[Math.floor(Math.random() * topPlacements.length)].placement;
 
@@ -357,14 +384,14 @@ export function evaluatePosition(
   const opponentKingPos = findKingPosition(state.board, opponent);
 
   // Win/loss conditions
-  if (!opponentKingPos) return 10000;   // opponent has no king (shouldn't happen)
-  if (!playerKingPos) return -10000;    // we have no king (shouldn't happen)
+  if (!opponentKingPos) return 10000; // opponent has no king (shouldn't happen)
+  if (!playerKingPos) return -10000; // we have no king (shouldn't happen)
 
   const opponentMoves = getValidKingMoves(state, opponent);
   const playerMoves = getValidKingMoves(state, player);
 
-  if (opponentMoves.length === 0) return 10000;   // opponent is trapped → we win
-  if (playerMoves.length === 0) return -10000;    // we are trapped → we lose
+  if (opponentMoves.length === 0) return 10000; // opponent is trapped → we win
+  if (playerMoves.length === 0) return -10000; // we are trapped → we lose
 
   // Heuristic: mobility differential + centrality
   const mobilityScore = (playerMoves.length - opponentMoves.length) * 10;

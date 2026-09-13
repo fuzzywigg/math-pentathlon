@@ -3,7 +3,11 @@
 
 import { Cell, PolyominoShape, Rotation, PolyominoRenderConfig } from './types';
 import { Board, validatePlacement } from './placement';
-import { getTransformedCells, getBoundingBox, getCellsAtPosition } from './transform';
+import {
+  getTransformedCells,
+  getBoundingBox,
+  getCellsAtPosition,
+} from './transform';
 
 /** Default render configuration */
 const DEFAULT_CONFIG: Required<PolyominoRenderConfig> = {
@@ -97,7 +101,10 @@ export function renderBoard(
       const x = c * cfg.cellSize + cfg.padding;
       const y = r * cfg.cellSize + cfg.padding;
 
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(x));
       rect.setAttribute('y', String(y));
       rect.setAttribute('width', String(cfg.cellSize));
@@ -114,17 +121,30 @@ export function renderBoard(
 
   // Render placed polyominoes
   for (const placement of board.placements) {
-    const shape = shapes.find(s => s.id === placement.shapeId);
+    const shape = shapes.find((s) => s.id === placement.shapeId);
     if (!shape) continue;
 
-    const cells = getCellsAtPosition(shape, placement.position, placement.rotation, placement.flipped);
+    const cells = getCellsAtPosition(
+      shape,
+      placement.position,
+      placement.rotation,
+      placement.flipped
+    );
 
     for (const cell of cells) {
-      if (cell.row >= 0 && cell.row < board.rows && cell.col >= 0 && cell.col < board.cols) {
+      if (
+        cell.row >= 0 &&
+        cell.row < board.rows &&
+        cell.col >= 0 &&
+        cell.col < board.cols
+      ) {
         const x = cell.col * cfg.cellSize + cfg.padding;
         const y = cell.row * cfg.cellSize + cfg.padding;
 
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        const rect = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'rect'
+        );
         rect.setAttribute('x', String(x + 1));
         rect.setAttribute('y', String(y + 1));
         rect.setAttribute('width', String(cfg.cellSize - 2));
@@ -155,7 +175,13 @@ export function renderPlacementPreview(
 ): SVGGElement {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const cells = getCellsAtPosition(shape, position, rotation, flipped);
-  const validation = validatePlacement(board, shape, position, rotation, flipped);
+  const validation = validatePlacement(
+    board,
+    shape,
+    position,
+    rotation,
+    flipped
+  );
 
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.classList.add('placement-preview');
@@ -383,11 +409,14 @@ export function createDraggableShape(
   // Drag events
   container.addEventListener('dragstart', (e) => {
     container.style.opacity = '0.5';
-    e.dataTransfer?.setData('application/json', JSON.stringify({
-      shapeId: shape.id,
-      rotation,
-      flipped,
-    }));
+    e.dataTransfer?.setData(
+      'application/json',
+      JSON.stringify({
+        shapeId: shape.id,
+        rotation,
+        flipped,
+      })
+    );
   });
 
   container.addEventListener('dragend', () => {
@@ -482,7 +511,7 @@ function darkenColor(hex: string, percent: number): string {
   const r = Math.max(0, (num >> 16) - Math.round(255 * percent));
   const g = Math.max(0, ((num >> 8) & 0x00ff) - Math.round(255 * percent));
   const b = Math.max(0, (num & 0x0000ff) - Math.round(255 * percent));
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
 }
 
 /**

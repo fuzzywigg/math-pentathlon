@@ -52,9 +52,9 @@ export interface MatchResult {
 
 /** Set relationship between pieces */
 export type SetRelationship =
-  | 'all_same'      // All pieces have same value for attribute
+  | 'all_same' // All pieces have same value for attribute
   | 'all_different' // All pieces have different values for attribute
-  | 'any';          // No constraint
+  | 'any'; // No constraint
 
 /** A rule for valid sets (like in SET card game) */
 export interface SetRule {
@@ -178,10 +178,15 @@ export const BASIC_ATTRIBUTES: AttributeDefinition[] = [
 /**
  * Generate all possible pieces from attribute definitions
  */
-export function generateAllPieces(attributes: AttributeDefinition[]): AttributePiece[] {
+export function generateAllPieces(
+  attributes: AttributeDefinition[]
+): AttributePiece[] {
   const pieces: AttributePiece[] = [];
 
-  function generate(index: number, current: Record<string, AttributeValue>): void {
+  function generate(
+    index: number,
+    current: Record<string, AttributeValue>
+  ): void {
     if (index === attributes.length) {
       const id = Object.entries(current)
         .map(([k, v]) => `${k}:${v}`)
@@ -209,7 +214,7 @@ export function getAttributeColor(
   attrName: string,
   value: AttributeValue
 ): string | undefined {
-  const attr = attributes.find(a => a.name === attrName);
+  const attr = attributes.find((a) => a.name === attrName);
   return attr?.colorMap?.[String(value)];
 }
 

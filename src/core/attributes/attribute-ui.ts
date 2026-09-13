@@ -29,8 +29,14 @@ export function renderAttributePiece(
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('width', String(size));
-  svg.setAttribute('height', String(size + (cfg.showLabels && cfg.labelPosition === 'below' ? 20 : 0)));
-  svg.setAttribute('viewBox', `0 0 ${size} ${size + (cfg.showLabels && cfg.labelPosition === 'below' ? 20 : 0)}`);
+  svg.setAttribute(
+    'height',
+    String(size + (cfg.showLabels && cfg.labelPosition === 'below' ? 20 : 0))
+  );
+  svg.setAttribute(
+    'viewBox',
+    `0 0 ${size} ${size + (cfg.showLabels && cfg.labelPosition === 'below' ? 20 : 0)}`
+  );
   svg.classList.add('attribute-piece');
   svg.dataset.pieceId = piece.id;
 
@@ -107,7 +113,10 @@ function renderCard(
 
   // Add labels below if configured
   if (cfg.showLabels && cfg.labelPosition === 'below') {
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const label = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
     label.setAttribute('x', String(size / 2));
     label.setAttribute('y', String(size + 14));
     label.setAttribute('text-anchor', 'middle');
@@ -138,7 +147,10 @@ function renderCircle(
   const radius = size / 2 - 4;
 
   // Circle background
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const circle = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   circle.setAttribute('cx', String(center));
   circle.setAttribute('cy', String(center));
   circle.setAttribute('r', String(radius));
@@ -203,7 +215,10 @@ function renderSquare(
 
   // Labels
   if (cfg.showLabels && cfg.labelPosition === 'below') {
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const label = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
     label.setAttribute('x', String(size / 2));
     label.setAttribute('y', String(size + 14));
     label.setAttribute('text-anchor', 'middle');
@@ -266,7 +281,16 @@ export function renderSetCard(
 
   for (let i = 0; i < count; i++) {
     const y = startY + i * (shapeHeight + spacing);
-    renderSetShape(svg, shape, shading, strokeColor, size / 2, y, size * 0.6, shapeHeight);
+    renderSetShape(
+      svg,
+      shape,
+      shading,
+      strokeColor,
+      size / 2,
+      y,
+      size * 0.6,
+      shapeHeight
+    );
   }
 
   return svg;
@@ -288,11 +312,20 @@ function renderSetShape(
 
   switch (shape) {
     case 'diamond':
-      element = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-      element.setAttribute('points', `${cx},${cy - halfH} ${cx + halfW},${cy} ${cx},${cy + halfH} ${cx - halfW},${cy}`);
+      element = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
+      element.setAttribute(
+        'points',
+        `${cx},${cy - halfH} ${cx + halfW},${cy} ${cx},${cy + halfH} ${cx - halfW},${cy}`
+      );
       break;
     case 'oval':
-      element = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      element = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'ellipse'
+      );
       element.setAttribute('cx', String(cx));
       element.setAttribute('cy', String(cy));
       element.setAttribute('rx', String(halfW));
@@ -326,14 +359,23 @@ function renderSetShape(
     case 'striped': {
       // Create pattern for stripes
       const patternId = `stripes-${Math.random().toString(36).substr(2, 9)}`;
-      const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-      const pattern = document.createElementNS('http://www.w3.org/2000/svg', 'pattern');
+      const defs = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'defs'
+      );
+      const pattern = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'pattern'
+      );
       pattern.setAttribute('id', patternId);
       pattern.setAttribute('patternUnits', 'userSpaceOnUse');
       pattern.setAttribute('width', '4');
       pattern.setAttribute('height', '4');
 
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      const line = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'line'
+      );
       line.setAttribute('x1', '0');
       line.setAttribute('y1', '0');
       line.setAttribute('x2', '0');

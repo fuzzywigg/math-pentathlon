@@ -233,9 +233,9 @@ export function placeRod(
 
   // Remove rod from player's collection
   const newPlayerRods = { ...state.playerRods };
-  newPlayerRods[state.currentPlayer] = state.playerRods[state.currentPlayer].filter(
-    (id) => id !== state.selectedRod
-  );
+  newPlayerRods[state.currentPlayer] = state.playerRods[
+    state.currentPlayer
+  ].filter((id) => id !== state.selectedRod);
 
   // Draw a new rod if available
   const usedRodIds = new Set<string>();
@@ -290,8 +290,12 @@ export function placeRod(
 
     if (!nextPlayerHasRods && !currentPlayerHasRods) {
       // Both players out of rods
-      winner = newScores.player1 > newScores.player2 ? 'player1' :
-               newScores.player2 > newScores.player1 ? 'player2' : null;
+      winner =
+        newScores.player1 > newScores.player2
+          ? 'player1'
+          : newScores.player2 > newScores.player1
+            ? 'player2'
+            : null;
       phase = 'gameOver';
     }
   }
@@ -301,7 +305,10 @@ export function placeRod(
     boxes: newBoxes,
     rods: newRods,
     playerRods: newPlayerRods,
-    currentPlayer: phase === 'gameOver' ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer:
+      phase === 'gameOver'
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
     selectedRod: null,
     phase,
     scores: newScores,

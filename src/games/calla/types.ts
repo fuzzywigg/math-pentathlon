@@ -80,11 +80,14 @@ export function getPlayerCalla(state: CallaGameState, player: Player): number {
 // Check if a side is empty
 export function isSideEmpty(state: CallaGameState, player: Player): boolean {
   const pits = getPlayerPits(state, player);
-  return pits.every(count => count === 0);
+  return pits.every((count) => count === 0);
 }
 
 // Get total cubes on a side
-export function getSideTotalCubes(state: CallaGameState, player: Player): number {
+export function getSideTotalCubes(
+  state: CallaGameState,
+  player: Player
+): number {
   const pits = getPlayerPits(state, player);
   return pits.reduce((sum, count) => sum + count, 0);
 }

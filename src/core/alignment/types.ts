@@ -92,36 +92,36 @@ export interface ContiguousConfig {
 
 /** Neighbor offsets for 4-way connectivity */
 export const NEIGHBORS_4WAY: GridPosition[] = [
-  { row: -1, col: 0 },  // up
-  { row: 1, col: 0 },   // down
-  { row: 0, col: -1 },  // left
-  { row: 0, col: 1 },   // right
+  { row: -1, col: 0 }, // up
+  { row: 1, col: 0 }, // down
+  { row: 0, col: -1 }, // left
+  { row: 0, col: 1 }, // right
 ];
 
 /** Neighbor offsets for 8-way connectivity */
 export const NEIGHBORS_8WAY: GridPosition[] = [
   ...NEIGHBORS_4WAY,
   { row: -1, col: -1 }, // up-left
-  { row: -1, col: 1 },  // up-right
-  { row: 1, col: -1 },  // down-left
-  { row: 1, col: 1 },   // down-right
+  { row: -1, col: 1 }, // up-right
+  { row: 1, col: -1 }, // down-left
+  { row: 1, col: 1 }, // down-right
 ];
 
 /** Hex grid neighbor directions (pointy-top) */
 export const HEX_NEIGHBORS_EVEN_ROW: GridPosition[] = [
-  { row: -1, col: 0 },  // top-left
-  { row: -1, col: 1 },  // top-right
-  { row: 0, col: -1 },  // left
-  { row: 0, col: 1 },   // right
-  { row: 1, col: 0 },   // bottom-left
-  { row: 1, col: 1 },   // bottom-right
+  { row: -1, col: 0 }, // top-left
+  { row: -1, col: 1 }, // top-right
+  { row: 0, col: -1 }, // left
+  { row: 0, col: 1 }, // right
+  { row: 1, col: 0 }, // bottom-left
+  { row: 1, col: 1 }, // bottom-right
 ];
 
 export const HEX_NEIGHBORS_ODD_ROW: GridPosition[] = [
   { row: -1, col: -1 }, // top-left
-  { row: -1, col: 0 },  // top-right
-  { row: 0, col: -1 },  // left
-  { row: 0, col: 1 },   // right
-  { row: 1, col: -1 },  // bottom-left
-  { row: 1, col: 0 },   // bottom-right
+  { row: -1, col: 0 }, // top-right
+  { row: 0, col: -1 }, // left
+  { row: 0, col: 1 }, // right
+  { row: 1, col: -1 }, // bottom-left
+  { row: 1, col: 0 }, // bottom-right
 ];

@@ -36,7 +36,10 @@ export function renderBoard(
   const container = document.createElement('div');
   container.className = 'par55-board';
 
-  const validPlacements = state.phase === 'placingBlock' ? new Set(getValidPlacements(state)) : new Set<string>();
+  const validPlacements =
+    state.phase === 'placingBlock'
+      ? new Set(getValidPlacements(state))
+      : new Set<string>();
 
   // Create SVG
   const svgWidth = CONFIG.BOARD_COLS * BASE_SIZE * 1.2 + BASE_SIZE;
@@ -89,8 +92,14 @@ function renderBase(
   // Pentagon path
   const pentagon = createPentagon(pos.x, pos.y, BASE_SIZE / 2);
   pentagon.setAttribute('fill', base.block ? '#e8e8e8' : '#f5f5f5');
-  pentagon.setAttribute('stroke', isLastMove ? '#ff9800' : (isValid ? '#4caf50' : '#999'));
-  pentagon.setAttribute('stroke-width', isLastMove ? '3' : (isValid ? '3' : '1.5'));
+  pentagon.setAttribute(
+    'stroke',
+    isLastMove ? '#ff9800' : isValid ? '#4caf50' : '#999'
+  );
+  pentagon.setAttribute(
+    'stroke-width',
+    isLastMove ? '3' : isValid ? '3' : '1.5'
+  );
 
   if (isValid) {
     pentagon.style.cursor = 'pointer';
@@ -114,7 +123,10 @@ function renderBase(
       // Show potential score on hover
       const { totalPoints } = calculateScore(state, selectedBlock, base.id);
       if (totalPoints > 0) {
-        const scorePreview = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        const scorePreview = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
         scorePreview.setAttribute('x', String(pos.x));
         scorePreview.setAttribute('y', String(pos.y + BASE_SIZE / 2 + 12));
         scorePreview.setAttribute('text-anchor', 'middle');
@@ -139,8 +151,15 @@ function renderBase(
 /**
  * Create pentagon SVG path
  */
-function createPentagon(cx: number, cy: number, radius: number): SVGPolygonElement {
-  const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+function createPentagon(
+  cx: number,
+  cy: number,
+  radius: number
+): SVGPolygonElement {
+  const polygon = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'polygon'
+  );
   const points: string[] = [];
 
   for (let i = 0; i < 5; i++) {
@@ -173,7 +192,10 @@ function renderBlock(
 
   switch (block.shape) {
     case 'circle':
-      shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      shapeEl = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
       shapeEl.setAttribute('cx', String(cx));
       shapeEl.setAttribute('cy', String(cy));
       shapeEl.setAttribute('r', String(size / 2));
@@ -188,7 +210,10 @@ function renderBlock(
       break;
 
     case 'triangle': {
-      shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      shapeEl = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
       const triPoints = [
         `${cx},${cy - size / 2}`,
         `${cx - size / 2},${cy + size / 2}`,
@@ -207,7 +232,10 @@ function renderBlock(
       break;
 
     case 'hexagon': {
-      shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      shapeEl = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
       const hexPoints: string[] = [];
       for (let i = 0; i < 6; i++) {
         const angle = (i * 60 - 30) * (Math.PI / 180);
@@ -220,7 +248,10 @@ function renderBlock(
     }
 
     default:
-      shapeEl = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      shapeEl = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
       shapeEl.setAttribute('cx', String(cx));
       shapeEl.setAttribute('cy', String(cy));
       shapeEl.setAttribute('r', String(size / 2));
@@ -232,7 +263,10 @@ function renderBlock(
 
   // Add player indicator ring if placed by a player
   if (placedBy) {
-    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const ring = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     ring.setAttribute('cx', String(cx));
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(size / 2 + 4));

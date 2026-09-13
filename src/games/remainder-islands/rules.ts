@@ -30,7 +30,9 @@ export function rollDice(): DiceRoll {
 /**
  * Perform roll and determine valid islands
  */
-export function performRoll(state: RemainderIslandsState): RemainderIslandsState {
+export function performRoll(
+  state: RemainderIslandsState
+): RemainderIslandsState {
   if (state.phase !== 'rolling') return state;
 
   const roll = rollDice();
@@ -42,8 +44,12 @@ export function performRoll(state: RemainderIslandsState): RemainderIslandsState
     validIslands,
     phase: validIslands.length > 0 ? 'selectIsland' : 'rolling',
     // If no valid islands, automatically skip to next player
-    currentPlayer: validIslands.length > 0 ? state.currentPlayer : getOpponent(state.currentPlayer),
-    turnsRemaining: validIslands.length > 0 ? state.turnsRemaining : state.turnsRemaining - 1,
+    currentPlayer:
+      validIslands.length > 0
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
+    turnsRemaining:
+      validIslands.length > 0 ? state.turnsRemaining : state.turnsRemaining - 1,
   };
 }
 
@@ -57,13 +63,16 @@ export function performRoll(state: RemainderIslandsState): RemainderIslandsState
  * 1. It's not already owned by the opponent
  * 2. The remainder when dividing total by island value is useful (not 0, or island not owned)
  */
-export function findValidIslands(state: RemainderIslandsState, _total: number): string[] {
+export function findValidIslands(
+  state: RemainderIslandsState,
+  _total: number
+): string[] {
   const currentPlayer = state.currentPlayer;
 
   // All islands that aren't owned by opponent are valid
   // Player will score the remainder (_total % island.value) when they select
   return state.islands
-    .filter(island => {
+    .filter((island) => {
       // Can't place on opponent's island
       if (island.owner !== null && island.owner !== currentPlayer) {
         return false;
@@ -73,13 +82,16 @@ export function findValidIslands(state: RemainderIslandsState, _total: number): 
       // Even 0 remainder can be strategic to block
       return true;
     })
-    .map(island => island.id);
+    .map((island) => island.id);
 }
 
 /**
  * Calculate division result
  */
-export function calculateDivision(dividend: number, divisor: number): DivisionResult {
+export function calculateDivision(
+  dividend: number,
+  divisor: number
+): DivisionResult {
   return {
     dividend,
     divisor,
@@ -98,7 +110,7 @@ export function selectIsland(
   if (state.phase !== 'selectIsland' || !state.currentRoll) return state;
   if (!state.validIslands.includes(islandId)) return state;
 
-  const island = state.islands.find(i => i.id === islandId);
+  const island = state.islands.find((i) => i.id === islandId);
   if (!island) return state;
 
   const division = calculateDivision(state.currentRoll.total, island.value);
@@ -108,7 +120,7 @@ export function selectIsland(
   const pointsEarned = division.remainder;
 
   // Update island
-  const newIslands = state.islands.map(i => {
+  const newIslands = state.islands.map((i) => {
     if (i.id !== islandId) return i;
     return {
       ...i,
@@ -118,19 +130,19 @@ export function selectIsland(
   });
 
   // Update player score and chips
-  const newPlayer1Score = currentPlayer === 'player1'
-    ? state.player1Score + pointsEarned
-    : state.player1Score;
-  const newPlayer2Score = currentPlayer === 'player2'
-    ? state.player2Score + pointsEarned
-    : state.player2Score;
+  const newPlayer1Score =
+    currentPlayer === 'player1'
+      ? state.player1Score + pointsEarned
+      : state.player1Score;
+  const newPlayer2Score =
+    currentPlayer === 'player2'
+      ? state.player2Score + pointsEarned
+      : state.player2Score;
 
-  const newPlayer1Chips = currentPlayer === 'player1'
-    ? state.player1Chips - 1
-    : state.player1Chips;
-  const newPlayer2Chips = currentPlayer === 'player2'
-    ? state.player2Chips - 1
-    : state.player2Chips;
+  const newPlayer1Chips =
+    currentPlayer === 'player1' ? state.player1Chips - 1 : state.player1Chips;
+  const newPlayer2Chips =
+    currentPlayer === 'player2' ? state.player2Chips - 1 : state.player2Chips;
 
   // Record move
   const move: MoveRecord = {
@@ -144,8 +156,8 @@ export function selectIsland(
 
   // Check for game over
   const turnsRemaining = state.turnsRemaining - 1;
-  const isGameOver = turnsRemaining <= 0 ||
-    (newPlayer1Chips <= 0 && newPlayer2Chips <= 0);
+  const isGameOver =
+    turnsRemaining <= 0 || (newPlayer1Chips <= 0 && newPlayer2Chips <= 0);
 
   // Determine winner if game over
   let winner: Player | null = null;
@@ -202,7 +214,7 @@ export function previewDivision(
 ): DivisionResult | null {
   if (!state.currentRoll) return null;
 
-  const island = state.islands.find(i => i.id === islandId);
+  const island = state.islands.find((i) => i.id === islandId);
   if (!island) return null;
 
   return calculateDivision(state.currentRoll.total, island.value);
@@ -211,7 +223,10 @@ export function previewDivision(
 /**
  * Count islands owned by each player
  */
-export function countOwnedIslands(state: RemainderIslandsState): { player1: number; player2: number } {
+export function countOwnedIslands(state: RemainderIslandsState): {
+  player1: number;
+  player2: number;
+} {
   return state.islands.reduce(
     (acc, island) => {
       if (island.owner === 'player1') acc.player1++;

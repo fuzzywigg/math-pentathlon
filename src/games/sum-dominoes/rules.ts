@@ -47,7 +47,9 @@ export function createInitialState(): SumDominoesState {
 
   // Place starting domino in center (double-six if available, otherwise highest double)
   const remainingDominoes = dominoes.slice(CONFIG.STARTING_HAND_SIZE * 2);
-  let startingDomino = remainingDominoes.find((d) => d.face1 === 6 && d.face2 === 6);
+  let startingDomino = remainingDominoes.find(
+    (d) => d.face1 === 6 && d.face2 === 6
+  );
   if (!startingDomino) {
     startingDomino = remainingDominoes.find((d) => d.face1 === d.face2);
   }
@@ -122,7 +124,9 @@ export function canPlayDomino(
 
       // Check both orientations
       for (const orientation of ['horizontal', 'vertical'] as const) {
-        if (isValidPlacement(state, domino, { row, col }, orientation, targetSum)) {
+        if (
+          isValidPlacement(state, domino, { row, col }, orientation, targetSum)
+        ) {
           return true;
         }
       }
@@ -144,13 +148,19 @@ export function isValidPlacement(
   const { row, col } = position;
 
   // Check bounds
-  if (row < 0 || row >= CONFIG.BOARD_SIZE || col < 0 || col >= CONFIG.BOARD_SIZE) {
+  if (
+    row < 0 ||
+    row >= CONFIG.BOARD_SIZE ||
+    col < 0 ||
+    col >= CONFIG.BOARD_SIZE
+  ) {
     return false;
   }
 
   // For horizontal: check col+1 is also in bounds (domino occupies 2 cells)
   // For vertical: check row+1 is also in bounds
-  if (orientation === 'horizontal' && col + 1 >= CONFIG.BOARD_SIZE) return false;
+  if (orientation === 'horizontal' && col + 1 >= CONFIG.BOARD_SIZE)
+    return false;
   if (orientation === 'vertical' && row + 1 >= CONFIG.BOARD_SIZE) return false;
 
   // Check cells are empty
@@ -159,7 +169,13 @@ export function isValidPlacement(
   if (orientation === 'vertical' && state.board[row + 1][col]) return false;
 
   // Find adjacent faces and check if any match the target sum
-  const adjacentMatches = getAdjacentMatches(state, domino, position, orientation, targetSum);
+  const adjacentMatches = getAdjacentMatches(
+    state,
+    domino,
+    position,
+    orientation,
+    targetSum
+  );
 
   return adjacentMatches.length > 0;
 }
@@ -205,7 +221,12 @@ function getAdjacentMatches(
       const nc = cell.c + dc;
 
       // Skip if out of bounds
-      if (nr < 0 || nr >= CONFIG.BOARD_SIZE || nc < 0 || nc >= CONFIG.BOARD_SIZE) {
+      if (
+        nr < 0 ||
+        nr >= CONFIG.BOARD_SIZE ||
+        nc < 0 ||
+        nc >= CONFIG.BOARD_SIZE
+      ) {
         continue;
       }
 
@@ -215,7 +236,10 @@ function getAdjacentMatches(
       const adjacentPlaced = state.board[nr][nc];
       if (adjacentPlaced) {
         // Get the face value that's adjacent to our cell
-        const adjacentFace = getFaceAtPosition(adjacentPlaced, { row: nr, col: nc });
+        const adjacentFace = getFaceAtPosition(adjacentPlaced, {
+          row: nr,
+          col: nc,
+        });
         if (adjacentFace !== null) {
           // Check if my face + adjacent face = target sum
           if (cell.face + adjacentFace === targetSum) {
@@ -236,7 +260,10 @@ function getAdjacentMatches(
 /**
  * Get the face value at a specific board position
  */
-function getFaceAtPosition(placed: PlacedDomino, position: BoardPosition): number | null {
+function getFaceAtPosition(
+  placed: PlacedDomino,
+  position: BoardPosition
+): number | null {
   const { row, col } = position;
   const pRow = placed.position.row;
   const pCol = placed.position.col;
@@ -268,7 +295,9 @@ export function getValidPlacements(
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
       for (const orientation of ['horizontal', 'vertical'] as const) {
-        if (isValidPlacement(state, domino, { row, col }, orientation, targetSum)) {
+        if (
+          isValidPlacement(state, domino, { row, col }, orientation, targetSum)
+        ) {
           placements.push({ position: { row, col }, orientation });
         }
       }
@@ -285,7 +314,10 @@ export function getValidPlacements(
 /**
  * Select a domino from hand
  */
-export function selectDomino(state: SumDominoesState, dominoId: string): SumDominoesState {
+export function selectDomino(
+  state: SumDominoesState,
+  dominoId: string
+): SumDominoesState {
   if (state.phase !== 'placing') return state;
 
   const hand = state.hands[state.currentPlayer];
@@ -311,7 +343,11 @@ export function placeDomino(
   position: BoardPosition,
   orientation: 'horizontal' | 'vertical'
 ): SumDominoesState {
-  if (state.phase !== 'placing' || !state.selectedDomino || !state.currentDice) {
+  if (
+    state.phase !== 'placing' ||
+    !state.selectedDomino ||
+    !state.currentDice
+  ) {
     return state;
   }
 
@@ -371,7 +407,9 @@ export function placeDomino(
     ...state,
     board: newBoard,
     hands: newHands,
-    currentPlayer: winner ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer: winner
+      ? state.currentPlayer
+      : getOpponent(state.currentPlayer),
     currentDice: null,
     selectedDomino: null,
     phase: winner ? 'gameOver' : 'rolling',
@@ -401,7 +439,8 @@ export function passTurn(state: SumDominoesState): SumDominoesState {
       0
     );
 
-    const winner = p1Pips < p2Pips ? 'player1' : p2Pips < p1Pips ? 'player2' : null;
+    const winner =
+      p1Pips < p2Pips ? 'player1' : p2Pips < p1Pips ? 'player2' : null;
 
     return {
       ...state,
@@ -435,6 +474,9 @@ export function formatMove(move: SDMove): string {
 /**
  * Get remaining dominoes count
  */
-export function getRemainingCount(state: SumDominoesState, player: Player): number {
+export function getRemainingCount(
+  state: SumDominoesState,
+  player: Player
+): number {
   return state.hands[player].length;
 }

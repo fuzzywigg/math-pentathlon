@@ -1,7 +1,12 @@
 // Pent'Em In Game Types
 // Pentomino entrapment strategy game - trap your opponent so they can't place pieces
 
-import { PolyominoShape, Cell, Rotation, PENTOMINOES } from '../../core/polyomino/types';
+import {
+  PolyominoShape,
+  Cell,
+  Rotation,
+  PENTOMINOES,
+} from '../../core/polyomino/types';
 
 export type Player = 'player1' | 'player2';
 
@@ -25,16 +30,16 @@ export interface PlacedPiece {
   id: string;
   shapeId: string;
   player: Player;
-  position: Cell;  // anchor cell
+  position: Cell; // anchor cell
   rotation: Rotation;
   flipped: boolean;
-  cells: Cell[];  // actual cells occupied
+  cells: Cell[]; // actual cells occupied
 }
 
 // Player's remaining pieces
 export interface PlayerPieces {
-  available: string[];  // shape IDs that haven't been placed
-  placed: string[];     // shape IDs that have been placed
+  available: string[]; // shape IDs that haven't been placed
+  placed: string[]; // shape IDs that have been placed
 }
 
 // Game phases
@@ -96,7 +101,7 @@ function createBoard(): BoardCell[][] {
 
 // Get all pentomino IDs
 function getAllPentominoIds(): string[] {
-  return PENTOMINOES.map(p => p.id);
+  return PENTOMINOES.map((p) => p.id);
 }
 
 // Create initial game state
@@ -131,11 +136,14 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get player's pieces
-export function getPlayerPieces(state: PentEmInState, player: Player): PlayerPieces {
+export function getPlayerPieces(
+  state: PentEmInState,
+  player: Player
+): PlayerPieces {
   return player === 'player1' ? state.player1Pieces : state.player2Pieces;
 }
 
 // Get pentomino shape by ID
 export function getPentominoShape(shapeId: string): PolyominoShape | undefined {
-  return PENTOMINOES.find(p => p.id === shapeId);
+  return PENTOMINOES.find((p) => p.id === shapeId);
 }

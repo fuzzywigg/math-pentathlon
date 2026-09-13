@@ -145,7 +145,11 @@ export function getOpponent(player: Player): Player {
 /**
  * Check if two nodes are connected by an edge
  */
-export function areConnected(board: FiarBoard, nodeA: string, nodeB: string): boolean {
+export function areConnected(
+  board: FiarBoard,
+  nodeA: string,
+  nodeB: string
+): boolean {
   return board.edges.some(
     (edge) =>
       (edge.from === nodeA && edge.to === nodeB) ||
@@ -195,7 +199,10 @@ export function getNodesInDirection(
     // Find node at this position
     let found = false;
     for (const [id, node] of board.nodes) {
-      if (Math.abs(node.x - currentX) < 10 && Math.abs(node.y - currentY) < 10) {
+      if (
+        Math.abs(node.x - currentX) < 10 &&
+        Math.abs(node.y - currentY) < 10
+      ) {
         // Check if connected to previous node
         const prevId = result.length > 0 ? result[result.length - 1] : startId;
         if (areConnected(board, prevId, id)) {
@@ -218,13 +225,13 @@ export function getNodesInDirection(
 export function getDirections(): { dx: number; dy: number }[] {
   const spacing = 80; // Must match board spacing
   return [
-    { dx: spacing, dy: 0 },    // Right
-    { dx: -spacing, dy: 0 },   // Left
-    { dx: 0, dy: spacing },    // Down
-    { dx: 0, dy: -spacing },   // Up
-    { dx: spacing, dy: spacing },   // Down-right
+    { dx: spacing, dy: 0 }, // Right
+    { dx: -spacing, dy: 0 }, // Left
+    { dx: 0, dy: spacing }, // Down
+    { dx: 0, dy: -spacing }, // Up
+    { dx: spacing, dy: spacing }, // Down-right
     { dx: -spacing, dy: -spacing }, // Up-left
-    { dx: spacing, dy: -spacing },  // Up-right
-    { dx: -spacing, dy: spacing },  // Down-left
+    { dx: spacing, dy: -spacing }, // Up-right
+    { dx: -spacing, dy: spacing }, // Down-left
   ];
 }

@@ -21,7 +21,11 @@ import {
   getShapesForDie,
 } from './types';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
-import { Board, findValidPlacements, countEmptyCells } from '../../core/polyomino/placement';
+import {
+  Board,
+  findValidPlacements,
+  countEmptyCells,
+} from '../../core/polyomino/placement';
 import { getCellsAtPosition } from '../../core/polyomino/transform';
 import {
   selectDie,
@@ -55,7 +59,7 @@ function countHolesCreated(
 ): number {
   // Get cells that would be filled
   const filledCells = getCellsAtPosition(shape, position, rotation, flipped);
-  const filledSet = new Set(filledCells.map(c => `${c.row},${c.col}`));
+  const filledSet = new Set(filledCells.map((c) => `${c.row},${c.col}`));
 
   // Create a copy of the board state
   const boardCopy: boolean[][] = [];
@@ -82,7 +86,12 @@ function countHolesCreated(
       ];
 
       for (const n of neighbors) {
-        if (n.row >= 0 && n.row < board.rows && n.col >= 0 && n.col < board.cols) {
+        if (
+          n.row >= 0 &&
+          n.row < board.rows &&
+          n.col >= 0 &&
+          n.col < board.cols
+        ) {
           if (!boardCopy[n.row][n.col]) {
             emptyNeighbors++;
           }
@@ -122,7 +131,12 @@ function evaluatePositionQuality(
     ];
 
     for (const n of neighbors) {
-      if (n.row >= 0 && n.row < board.rows && n.col >= 0 && n.col < board.cols) {
+      if (
+        n.row >= 0 &&
+        n.row < board.rows &&
+        n.col >= 0 &&
+        n.col < board.cols
+      ) {
         if (board.cells[n.row][n.col]) {
           score += 5; // Adjacent to filled cell
         }
@@ -139,8 +153,10 @@ function evaluatePositionQuality(
 
     // Small bonus for filling edges
     const isEdge =
-      cell.row === 0 || cell.row === board.rows - 1 ||
-      cell.col === 0 || cell.col === board.cols - 1;
+      cell.row === 0 ||
+      cell.row === board.rows - 1 ||
+      cell.col === 0 ||
+      cell.col === board.cols - 1;
     if (isEdge && !isCorner) {
       score += 3;
     }
@@ -213,7 +229,12 @@ function evaluateDiceOptions(
           break;
         }
         if (shape.canFlip) {
-          const flippedPositions = findValidPlacements(board, shape, rotation, true);
+          const flippedPositions = findValidPlacements(
+            board,
+            shape,
+            rotation,
+            true
+          );
           if (flippedPositions.length > 0) {
             canPlace = true;
             break;
@@ -267,7 +288,9 @@ function evaluatePlacements(
   const config = DIFFICULTY_CONFIG[difficulty];
 
   // Get shapes for the selected category
-  const dieValue = state.currentDice.find(d => getCategoryFromDie(d) === state.selectedCategory);
+  const dieValue = state.currentDice.find(
+    (d) => getCategoryFromDie(d) === state.selectedCategory
+  );
   if (!dieValue) return [];
 
   const shapes = getShapesForDie(dieValue);
@@ -287,7 +310,13 @@ function evaluatePlacements(
           const reasons: string[] = [];
 
           // Factor 1: Position quality
-          const positionScore = evaluatePositionQuality(board, position, shape, rotation, flipped);
+          const positionScore = evaluatePositionQuality(
+            board,
+            position,
+            shape,
+            rotation,
+            flipped
+          );
           score += positionScore;
           if (positionScore > 20) {
             reasons.push('Good position near existing pieces');
@@ -295,7 +324,13 @@ function evaluatePlacements(
 
           // Factor 2: Avoid creating isolated holes (hard difficulty)
           if (config.considerHoles) {
-            const holes = countHolesCreated(board, shape, position, rotation, flipped);
+            const holes = countHolesCreated(
+              board,
+              shape,
+              position,
+              rotation,
+              flipped
+            );
             score -= holes * 15;
             if (holes > 2) {
               reasons.push('Creates isolated holes');
@@ -304,9 +339,10 @@ function evaluatePlacements(
 
           // Factor 3: Corners are valuable
           const cells = getCellsAtPosition(shape, position, rotation, flipped);
-          const touchesCorner = cells.some(c =>
-            (c.row === 0 || c.row === board.rows - 1) &&
-            (c.col === 0 || c.col === board.cols - 1)
+          const touchesCorner = cells.some(
+            (c) =>
+              (c.row === 0 || c.row === board.rows - 1) &&
+              (c.col === 0 || c.col === board.cols - 1)
           );
           if (touchesCorner) {
             score += 15;
@@ -343,14 +379,16 @@ function getTeachingDieChoice(options: DieOption[]): DieOption | null {
   // 40% chance to pick the smaller die (less optimal)
   if (Math.random() < 0.4 && options.length > 1) {
     // Pick the smaller option (usually second best)
-    const smaller = options.find(o => o.score < options[0].score);
+    const smaller = options.find((o) => o.score < options[0].score);
     if (smaller) return smaller;
   }
 
   return options[0];
 }
 
-function getTeachingPlacement(placements: ShapePlacement[]): ShapePlacement | null {
+function getTeachingPlacement(
+  placements: ShapePlacement[]
+): ShapePlacement | null {
   if (placements.length === 0) return null;
 
   // 40% chance to pick a suboptimal placement
@@ -464,15 +502,32 @@ export function getAIPlacement(
     for (const flipped of [false, true]) {
       if (flipped && !state.selectedShape.canFlip) continue;
 
-      const positions = findValidPlacements(board, state.selectedShape, rotation, flipped);
+      const positions = findValidPlacements(
+        board,
+        state.selectedShape,
+        rotation,
+        flipped
+      );
 
       for (const position of positions) {
         let score = 100;
-        const positionScore = evaluatePositionQuality(board, position, state.selectedShape, rotation, flipped);
+        const positionScore = evaluatePositionQuality(
+          board,
+          position,
+          state.selectedShape,
+          rotation,
+          flipped
+        );
         score += positionScore;
 
         if (config.considerHoles) {
-          const holes = countHolesCreated(board, state.selectedShape, position, rotation, flipped);
+          const holes = countHolesCreated(
+            board,
+            state.selectedShape,
+            position,
+            rotation,
+            flipped
+          );
           score -= holes * 15;
         }
 
@@ -507,7 +562,8 @@ export function getAIPlacement(
   // Add randomness
   if (Math.random() < config.randomness && placements.length > 1) {
     const topPlacements = placements.slice(0, 3);
-    const chosen = topPlacements[Math.floor(Math.random() * topPlacements.length)];
+    const chosen =
+      topPlacements[Math.floor(Math.random() * topPlacements.length)];
     return {
       position: chosen.position,
       rotation: chosen.rotation,
@@ -548,7 +604,10 @@ export function executeAITurn(
   let currentState = state;
 
   // Phase 1: Select die (if needed)
-  if (currentState.phase === 'selectingShape' && !currentState.selectedCategory) {
+  if (
+    currentState.phase === 'selectingShape' &&
+    !currentState.selectedCategory
+  ) {
     const dieChoice = getAIDieChoice(currentState, aiPlayer, difficulty);
     if (dieChoice) {
       currentState = selectDie(currentState, dieChoice.index);
@@ -558,7 +617,10 @@ export function executeAITurn(
   }
 
   // Phase 2: Select shape (if needed)
-  if (currentState.phase === 'selectingShape' && currentState.selectedCategory) {
+  if (
+    currentState.phase === 'selectingShape' &&
+    currentState.selectedCategory
+  ) {
     const shapeChoice = getAIShapeChoice(currentState, aiPlayer, difficulty);
     if (shapeChoice) {
       currentState = selectShape(currentState, shapeChoice.shape);

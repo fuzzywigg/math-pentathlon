@@ -13,7 +13,10 @@ import {
   getPentominoShape,
 } from './types';
 import { Cell, Rotation } from '../../core/polyomino/types';
-import { rotateCells, flipCellsHorizontal as flipCells } from '../../core/polyomino/transform';
+import {
+  rotateCells,
+  flipCellsHorizontal as flipCells,
+} from '../../core/polyomino/transform';
 
 // =============================================================================
 // Piece Transformation
@@ -45,7 +48,7 @@ export function getPieceCells(
   }
 
   // Translate to position
-  return cells.map(cell => ({
+  return cells.map((cell) => ({
     row: position.row + cell.row,
     col: position.col + cell.col,
   }));
@@ -59,11 +62,12 @@ export function getPieceCells(
  * Check if cells are within board bounds
  */
 function areCellsInBounds(cells: Cell[]): boolean {
-  return cells.every(cell =>
-    cell.row >= 0 &&
-    cell.row < BOARD_SIZE &&
-    cell.col >= 0 &&
-    cell.col < BOARD_SIZE
+  return cells.every(
+    (cell) =>
+      cell.row >= 0 &&
+      cell.row < BOARD_SIZE &&
+      cell.col >= 0 &&
+      cell.col < BOARD_SIZE
   );
 }
 
@@ -71,7 +75,7 @@ function areCellsInBounds(cells: Cell[]): boolean {
  * Check if cells are all unoccupied
  */
 function areCellsFree(state: PentEmInState, cells: Cell[]): boolean {
-  return cells.every(cell => !state.board[cell.row][cell.col].occupied);
+  return cells.every((cell) => !state.board[cell.row][cell.col].occupied);
 }
 
 /**
@@ -134,7 +138,9 @@ export function canPlayerMove(state: PentEmInState, player: Player): boolean {
     if (!pieceShape) continue;
 
     // Try all rotations
-    const rotations: Rotation[] = pieceShape.canRotate ? [0, 90, 180, 270] : [0];
+    const rotations: Rotation[] = pieceShape.canRotate
+      ? [0, 90, 180, 270]
+      : [0];
     const flips = pieceShape.canFlip ? [false, true] : [false];
 
     for (const rotation of rotations) {
@@ -181,8 +187,8 @@ export function placePiece(
   };
 
   // Update board
-  const newBoard: BoardCell[][] = state.board.map(row =>
-    row.map(cell => ({ ...cell }))
+  const newBoard: BoardCell[][] = state.board.map((row) =>
+    row.map((cell) => ({ ...cell }))
   );
 
   for (const cell of cells) {
@@ -196,15 +202,17 @@ export function placePiece(
 
   // Update player pieces
   const currentPieces = getPlayerPieces(state, state.currentPlayer);
-  const newAvailable = currentPieces.available.filter(id => id !== shapeId);
+  const newAvailable = currentPieces.available.filter((id) => id !== shapeId);
   const newPlaced = [...currentPieces.placed, shapeId];
 
-  const newPlayer1Pieces = state.currentPlayer === 'player1'
-    ? { available: newAvailable, placed: newPlaced }
-    : state.player1Pieces;
-  const newPlayer2Pieces = state.currentPlayer === 'player2'
-    ? { available: newAvailable, placed: newPlaced }
-    : state.player2Pieces;
+  const newPlayer1Pieces =
+    state.currentPlayer === 'player1'
+      ? { available: newAvailable, placed: newPlaced }
+      : state.player1Pieces;
+  const newPlayer2Pieces =
+    state.currentPlayer === 'player2'
+      ? { available: newAvailable, placed: newPlaced }
+      : state.player2Pieces;
 
   // Record move
   const move: MoveRecord = {
@@ -263,7 +271,10 @@ export function placePiece(
 /**
  * Select a piece for placement
  */
-export function selectPiece(state: PentEmInState, shapeId: string): PentEmInState {
+export function selectPiece(
+  state: PentEmInState,
+  shapeId: string
+): PentEmInState {
   const pieces = getPlayerPieces(state, state.currentPlayer);
 
   if (!pieces.available.includes(shapeId)) {
@@ -330,7 +341,10 @@ export function cancelSelection(state: PentEmInState): PentEmInState {
 /**
  * Update preview position
  */
-export function setPreviewPosition(state: PentEmInState, position: Cell | null): PentEmInState {
+export function setPreviewPosition(
+  state: PentEmInState,
+  position: Cell | null
+): PentEmInState {
   return {
     ...state,
     previewPosition: position,

@@ -15,8 +15,8 @@ export interface Piece {
 // Hex cell using ring-based coordinates
 // Ring 0 = center (throne), Ring 1 = inner ring (6 cells), etc.
 export interface HexCell {
-  ring: number;      // 0 = center, 1-5 = outer rings
-  position: number;  // Position within ring (0 to 6*ring - 1, or 0 for center)
+  ring: number; // 0 = center, 1-5 = outer rings
+  position: number; // Position within ring (0 to 6*ring - 1, or 0 for center)
   piece: Piece | null;
 }
 
@@ -30,8 +30,8 @@ export interface BoardCoord {
 export interface QueensGuardsState {
   cells: Map<string, HexCell>;
   currentPlayer: Player;
-  selectedPiece: string | null;  // Cell key of selected piece
-  capturedPieces: BoardCoord[];  // Pieces that must be moved to outer ring
+  selectedPiece: string | null; // Cell key of selected piece
+  capturedPieces: BoardCoord[]; // Pieces that must be moved to outer ring
   winner: Player | null;
   moveHistory: QGMove[];
 }
@@ -48,9 +48,9 @@ export interface QGMove {
 
 // Configuration
 export const CONFIG = {
-  NUM_RINGS: 6,       // 0 (center) + 5 outer rings
+  NUM_RINGS: 6, // 0 (center) + 5 outer rings
   GUARDS_PER_PLAYER: 6,
-  HEX_SIZE: 32,       // Visual hex size
+  HEX_SIZE: 32, // Visual hex size
 };
 
 // =============================================================================
@@ -114,10 +114,17 @@ export function getAdjacent(coord: BoardCoord): BoardCoord[] {
       const innerCount = cellsInRing(ring - 1);
       // Approximate inner position
       const innerPos = Math.floor((position / count) * innerCount);
-      adjacent.push({ ring: ring - 1, position: normalizePosition(ring - 1, innerPos) });
+      adjacent.push({
+        ring: ring - 1,
+        position: normalizePosition(ring - 1, innerPos),
+      });
       // Sometimes two inner cells are adjacent
       const nextInnerPos = (innerPos + 1) % innerCount;
-      if (!adjacent.some((a) => a.ring === ring - 1 && a.position === nextInnerPos)) {
+      if (
+        !adjacent.some(
+          (a) => a.ring === ring - 1 && a.position === nextInnerPos
+        )
+      ) {
         // Check if actually adjacent based on geometry
         const ratio = position / count;
         const innerRatio2 = nextInnerPos / innerCount;
@@ -136,9 +143,15 @@ export function getAdjacent(coord: BoardCoord): BoardCoord[] {
       // Each cell connects to ~2 outer cells
       const outerPos1 = Math.floor((position / count) * outerCount);
       const outerPos2 = Math.ceil(((position + 0.5) / count) * outerCount);
-      adjacent.push({ ring: ring + 1, position: normalizePosition(ring + 1, outerPos1) });
+      adjacent.push({
+        ring: ring + 1,
+        position: normalizePosition(ring + 1, outerPos1),
+      });
       if (outerPos2 !== outerPos1) {
-        adjacent.push({ ring: ring + 1, position: normalizePosition(ring + 1, outerPos2) });
+        adjacent.push({
+          ring: ring + 1,
+          position: normalizePosition(ring + 1, outerPos2),
+        });
       }
     }
   }

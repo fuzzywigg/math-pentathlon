@@ -85,10 +85,10 @@ function wouldCreateFiveInRow(
   if (!cell) return false;
 
   const directions = [
-    [0, 1],   // Horizontal
-    [1, 0],   // Vertical
-    [1, 1],   // Diagonal down-right
-    [1, -1],  // Diagonal down-left
+    [0, 1], // Horizontal
+    [1, 0], // Vertical
+    [1, 1], // Diagonal down-right
+    [1, -1], // Diagonal down-left
   ];
 
   for (const [dr, dc] of directions) {
@@ -122,7 +122,10 @@ function getBlockingMoves(
     if (!cell) continue;
 
     const directions = [
-      [0, 1], [1, 0], [1, 1], [1, -1],
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [1, -1],
     ];
 
     for (const [dr, dc] of directions) {
@@ -164,7 +167,7 @@ function evaluateMoves(
   if (placements.length === 0) return [];
 
   const opponent = getOpponent(aiPlayer);
-  const validValues = placements.map(p => p.result);
+  const validValues = placements.map((p) => p.result);
   const blockingMoves = getBlockingMoves(state, validValues, opponent);
   const options: MoveOption[] = [];
 
@@ -183,7 +186,7 @@ function evaluateMoves(
     // Factor 2: Block opponent's 5-in-a-row
     if (blockingMoves.includes(result)) {
       score += 5000;
-      reasons.push('Blocks opponent\'s 5-in-a-row!');
+      reasons.push("Blocks opponent's 5-in-a-row!");
     }
 
     // Factor 3: Points from adjacency
@@ -195,7 +198,7 @@ function evaluateMoves(
 
     // Factor 4: Position value (cells with more potential neighbors)
     const adjacent = getAdjacentPositions(cell.row, cell.col);
-    const emptyNeighbors = adjacent.filter(pos => {
+    const emptyNeighbors = adjacent.filter((pos) => {
       const v = state.grid[pos.row][pos.col];
       return v !== null && state.cells.get(v)?.owner === null;
     }).length;
@@ -205,7 +208,12 @@ function evaluateMoves(
     }
 
     // Factor 5: Building toward 5-in-a-row
-    const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+    const directions = [
+      [0, 1],
+      [1, 0],
+      [1, 1],
+      [1, -1],
+    ];
     let maxChain = 0;
     for (const [dr, dc] of directions) {
       const forward = countInDirection(state, result, aiPlayer, dr, dc);
@@ -339,16 +347,26 @@ export function executeAITurn(
   let currentState = state;
 
   // Phase 1: Roll dice
-  if (currentState.phase === 'rolling' && currentState.currentPlayer === aiPlayer) {
+  if (
+    currentState.phase === 'rolling' &&
+    currentState.currentPlayer === aiPlayer
+  ) {
     currentState = doRollDice(currentState);
   }
 
   // Phase 2: Place or pass
-  if (currentState.phase === 'calculating' && currentState.currentPlayer === aiPlayer) {
+  if (
+    currentState.phase === 'calculating' &&
+    currentState.currentPlayer === aiPlayer
+  ) {
     const placement = getAIPlacement(currentState, aiPlayer, difficulty);
 
     if (placement) {
-      currentState = placeChip(currentState, placement.value, placement.expression);
+      currentState = placeChip(
+        currentState,
+        placement.value,
+        placement.expression
+      );
     } else {
       // No valid moves, must pass
       currentState = passTurn(currentState);

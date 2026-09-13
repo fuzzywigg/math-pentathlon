@@ -135,7 +135,10 @@ export interface FormatTimeOptions {
  * Format a duration (in ms) as MM:SS or MM:SS.cs.
  * By default pads both minutes and seconds with leading zeros.
  */
-export function formatTime(ms: number, options: FormatTimeOptions = {}): string {
+export function formatTime(
+  ms: number,
+  options: FormatTimeOptions = {}
+): string {
   const {
     showMilliseconds = false,
     padMinutes = true,
@@ -148,8 +151,12 @@ export function formatTime(ms: number, options: FormatTimeOptions = {}): string 
   const seconds = totalSeconds % 60;
   const centiseconds = Math.floor((ms % 1000) / 10);
 
-  const minStr = padMinutes ? String(minutes).padStart(2, '0') : String(minutes);
-  const secStr = padSeconds ? String(seconds).padStart(2, '0') : String(seconds);
+  const minStr = padMinutes
+    ? String(minutes).padStart(2, '0')
+    : String(minutes);
+  const secStr = padSeconds
+    ? String(seconds).padStart(2, '0')
+    : String(seconds);
 
   let result = `${minStr}${separator}${secStr}`;
   if (showMilliseconds) {
@@ -175,7 +182,9 @@ export function parseTime(str: string): number {
   const m = parseInt(parts[0], 10);
   const secParts = parts[1].split('.');
   const s = parseInt(secParts[0], 10);
-  const cs = secParts[1] ? parseInt(secParts[1].padEnd(2, '0').slice(0, 2), 10) : 0;
+  const cs = secParts[1]
+    ? parseInt(secParts[1].padEnd(2, '0').slice(0, 2), 10)
+    : 0;
   return (m * 60 + s) * 1000 + cs * 10;
 }
 
@@ -286,7 +295,10 @@ export function addPlayer(
 }
 
 /** Remove a player from the scoring state. */
-export function removePlayer(state: ScoringState, playerId: string): ScoringState {
+export function removePlayer(
+  state: ScoringState,
+  playerId: string
+): ScoringState {
   return {
     ...state,
     players: state.players.filter((p) => p.playerId !== playerId),
@@ -297,10 +309,7 @@ function applyMultipliers(amount: number, multipliers: Multiplier[]): number {
   return multipliers.reduce((acc, m) => acc * m.multiplier, amount);
 }
 
-function clampScore(
-  score: number,
-  config: ScoringConfig
-): number {
+function clampScore(score: number, config: ScoringConfig): number {
   let s = score;
   if (config.maxScore !== undefined) s = Math.min(s, config.maxScore);
   if (config.minScore !== undefined) s = Math.max(s, config.minScore);
@@ -421,7 +430,10 @@ export function checkWinCondition(state: ScoringState): string | null {
   for (const player of state.players) {
     if (winCondition.type === 'target' && winCondition.value !== undefined) {
       if (player.total >= winCondition.value) return player.playerId;
-    } else if (winCondition.type === 'exact' && winCondition.value !== undefined) {
+    } else if (
+      winCondition.type === 'exact' &&
+      winCondition.value !== undefined
+    ) {
       if (player.total === winCondition.value) return player.playerId;
     }
   }
@@ -429,15 +441,24 @@ export function checkWinCondition(state: ScoringState): string | null {
 }
 
 /** Add a score multiplier. */
-export function addMultiplier(state: ScoringState, multiplier: Multiplier): ScoringState {
+export function addMultiplier(
+  state: ScoringState,
+  multiplier: Multiplier
+): ScoringState {
   return {
     ...state,
-    multipliers: [...state.multipliers.filter((m) => m.id !== multiplier.id), multiplier],
+    multipliers: [
+      ...state.multipliers.filter((m) => m.id !== multiplier.id),
+      multiplier,
+    ],
   };
 }
 
 /** Remove a multiplier by id. */
-export function removeMultiplier(state: ScoringState, id: string): ScoringState {
+export function removeMultiplier(
+  state: ScoringState,
+  id: string
+): ScoringState {
   return {
     ...state,
     multipliers: state.multipliers.filter((m) => m.id !== id),
@@ -481,7 +502,14 @@ export function calculateGameResult(
   }
 
   if (lb.length === 0) {
-    return { winnerId: null, winnerName: null, isTie: false, tiedPlayerIds: [], totalDuration, finalScores };
+    return {
+      winnerId: null,
+      winnerName: null,
+      isTie: false,
+      tiedPlayerIds: [],
+      totalDuration,
+      finalScores,
+    };
   }
 
   const topScore = lb[0].total;

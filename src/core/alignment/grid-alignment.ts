@@ -123,11 +123,17 @@ export function findAlignmentsForValue(
       }
 
       for (const direction of directions) {
-        const alignment = findAlignmentInDirection(row, col, direction, getCell, config);
+        const alignment = findAlignmentInDirection(
+          row,
+          col,
+          direction,
+          getCell,
+          config
+        );
 
         if (alignment) {
           // Create a unique key for this alignment
-          const key = `${direction.name}-${alignment.positions.map(p => `${p.row},${p.col}`).join('-')}`;
+          const key = `${direction.name}-${alignment.positions.map((p) => `${p.row},${p.col}`).join('-')}`;
 
           if (!found.has(key)) {
             found.add(key);
@@ -155,10 +161,16 @@ export function findAllAlignments(
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       for (const direction of directions) {
-        const alignment = findAlignmentInDirection(row, col, direction, getCell, config);
+        const alignment = findAlignmentInDirection(
+          row,
+          col,
+          direction,
+          getCell,
+          config
+        );
 
         if (alignment) {
-          const key = `${direction.name}-${alignment.positions.map(p => `${p.row},${p.col}`).join('-')}`;
+          const key = `${direction.name}-${alignment.positions.map((p) => `${p.row},${p.col}`).join('-')}`;
 
           if (!found.has(key)) {
             found.add(key);
@@ -220,7 +232,13 @@ export function checkMoveForWin(
 
   for (const direction of directions) {
     // Check both directions from the move position
-    const alignment = findAlignmentFromCenter(row, col, direction, getWithMove, config);
+    const alignment = findAlignmentFromCenter(
+      row,
+      col,
+      direction,
+      getWithMove,
+      config
+    );
 
     if (alignment && alignment.length >= config.targetLength) {
       alignments.push(alignment);
@@ -409,7 +427,9 @@ export function countAlignmentPotential(
 /**
  * Helper: Create a cell getter from a 2D array
  */
-export function createArrayGetter<T extends CellValue>(board: T[][]): CellGetter<T> {
+export function createArrayGetter<T extends CellValue>(
+  board: T[][]
+): CellGetter<T> {
   return (row, col) => {
     if (row >= 0 && row < board.length && col >= 0 && col < board[row].length) {
       return board[row][col];

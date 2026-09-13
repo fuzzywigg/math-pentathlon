@@ -21,7 +21,13 @@
  *   from production bundles if unused.
  */
 
-import { GridPosition, CellValue, CellGetter, AlignmentResult, Region } from './types';
+import {
+  GridPosition,
+  CellValue,
+  CellGetter,
+  AlignmentResult,
+  Region,
+} from './types';
 import {
   findAlignmentFromCenter,
   findAllAlignments as _findAllAlignments,
@@ -66,8 +72,6 @@ export function createArrayAccessor<T extends CellValue>(
   };
 }
 
-
-
 // ─── Direction constants (test-expected names) ─────────────────────────────
 
 /**
@@ -75,18 +79,27 @@ export function createArrayAccessor<T extends CellValue>(
  * The module uses DIRECTIONS with dRow/dCol; the test expects { row, col }.
  */
 export const DIRECTION_VECTORS: Record<string, { row: number; col: number }> = {
-  horizontal:      { row: DIRECTIONS.HORIZONTAL.dRow,      col: DIRECTIONS.HORIZONTAL.dCol },
-  vertical:        { row: DIRECTIONS.VERTICAL.dRow,        col: DIRECTIONS.VERTICAL.dCol },
-  'diagonal-down': { row: DIRECTIONS.DIAGONAL_DOWN.dRow,   col: DIRECTIONS.DIAGONAL_DOWN.dCol },
-  'diagonal-up':   { row: DIRECTIONS.DIAGONAL_UP.dRow,     col: DIRECTIONS.DIAGONAL_UP.dCol },
+  horizontal: {
+    row: DIRECTIONS.HORIZONTAL.dRow,
+    col: DIRECTIONS.HORIZONTAL.dCol,
+  },
+  vertical: { row: DIRECTIONS.VERTICAL.dRow, col: DIRECTIONS.VERTICAL.dCol },
+  'diagonal-down': {
+    row: DIRECTIONS.DIAGONAL_DOWN.dRow,
+    col: DIRECTIONS.DIAGONAL_DOWN.dCol,
+  },
+  'diagonal-up': {
+    row: DIRECTIONS.DIAGONAL_UP.dRow,
+    col: DIRECTIONS.DIAGONAL_UP.dCol,
+  },
 };
 
 /** 4-directional set (horizontal + vertical, cardinal axes). */
 export const CARDINAL_DIRECTIONS = [
   DIRECTIONS.HORIZONTAL,
   DIRECTIONS.VERTICAL,
-  { name: 'horizontal-rev', dRow: 0,  dCol: -1 },
-  { name: 'vertical-rev',   dRow: -1, dCol: 0  },
+  { name: 'horizontal-rev', dRow: 0, dCol: -1 },
+  { name: 'vertical-rev', dRow: -1, dCol: 0 },
 ];
 
 /**
@@ -98,10 +111,10 @@ export const ALL_DIRECTIONS_8 = [
   DIRECTIONS.VERTICAL,
   DIRECTIONS.DIAGONAL_DOWN,
   DIRECTIONS.DIAGONAL_UP,
-  { name: 'horizontal-rev',    dRow: 0,  dCol: -1 },
-  { name: 'vertical-rev',      dRow: -1, dCol: 0  },
+  { name: 'horizontal-rev', dRow: 0, dCol: -1 },
+  { name: 'vertical-rev', dRow: -1, dCol: 0 },
   { name: 'diagonal-down-rev', dRow: -1, dCol: -1 },
-  { name: 'diagonal-up-rev',   dRow: 1,  dCol: -1 },
+  { name: 'diagonal-up-rev', dRow: 1, dCol: -1 },
 ];
 
 // ─── isInBounds ergonomic wrapper ───────────────────────────────────────────────
@@ -162,13 +175,14 @@ export function normalizePosition(
 
 // ─── Line helpers ─────────────────────────────────────────────────────────────
 
-type DirectionName = 'horizontal' | 'vertical' | 'diagonal-down' | 'diagonal-up';
+type DirectionName =
+  'horizontal' | 'vertical' | 'diagonal-down' | 'diagonal-up';
 
 const DIR_DELTAS: Record<DirectionName, { dRow: number; dCol: number }> = {
-  'horizontal':      { dRow: 0,  dCol: 1  },
-  'vertical':        { dRow: 1,  dCol: 0  },
-  'diagonal-down':   { dRow: 1,  dCol: 1  },
-  'diagonal-up':     { dRow: -1, dCol: 1  },
+  horizontal: { dRow: 0, dCol: 1 },
+  vertical: { dRow: 1, dCol: 0 },
+  'diagonal-down': { dRow: 1, dCol: 1 },
+  'diagonal-up': { dRow: -1, dCol: 1 },
 };
 
 /**
@@ -186,7 +200,12 @@ export function getLinePositions(
 
   for (let i = 0; i < length; i++) {
     const pos = { row: start.row + i * dRow, col: start.col + i * dCol };
-    if (pos.row < 0 || pos.row >= dimensions.rows || pos.col < 0 || pos.col >= dimensions.cols) {
+    if (
+      pos.row < 0 ||
+      pos.row >= dimensions.rows ||
+      pos.col < 0 ||
+      pos.col >= dimensions.cols
+    ) {
       return null;
     }
     positions.push(pos);
@@ -221,8 +240,9 @@ export function checkLineAlignment(
 ): LineAlignmentResult {
   if (positions.length === 0) return { isAligned: false, value: null };
   const first = getCell(positions[0].row, positions[0].col);
-  if (first === null || first === undefined) return { isAligned: false, value: null };
-  const aligned = positions.every(p => {
+  if (first === null || first === undefined)
+    return { isAligned: false, value: null };
+  const aligned = positions.every((p) => {
     const v = getCell(p.row, p.col);
     return v !== null && v !== undefined && v === first;
   });
@@ -243,8 +263,12 @@ export function findAlignmentAt(
   const { requiredLength = 4 } = options;
 
   // Map direction name to the internal Direction object
-  const dirKey = direction.toUpperCase().replace(/-/g, '_') as keyof typeof DIRECTIONS;
-  const dir = DIRECTIONS[dirKey] ?? Object.values(DIRECTIONS).find(d => d.name === direction);
+  const dirKey = direction
+    .toUpperCase()
+    .replace(/-/g, '_') as keyof typeof DIRECTIONS;
+  const dir =
+    DIRECTIONS[dirKey] ??
+    Object.values(DIRECTIONS).find((d) => d.name === direction);
   if (!dir) return null;
 
   const safeGet: CellGetter = (r, c) => {
@@ -332,8 +356,19 @@ export function findAlignmentsThrough(
     });
     if (result) {
       // Deduplicate: only add if this set of positions isn't already recorded
-      const key = result.positions.map(p => `${p.row},${p.col}`).sort().join('|');
-      if (!alignments.some(a => a.positions.map(p => `${p.row},${p.col}`).sort().join('|') === key)) {
+      const key = result.positions
+        .map((p) => `${p.row},${p.col}`)
+        .sort()
+        .join('|');
+      if (
+        !alignments.some(
+          (a) =>
+            a.positions
+              .map((p) => `${p.row},${p.col}`)
+              .sort()
+              .join('|') === key
+        )
+      ) {
         alignments.push(result);
       }
     }
@@ -384,7 +419,10 @@ export interface ConnectivityOptions {
   connectivity?: 4 | 8;
 }
 
-function toContiguousConfig(dimensions: Dimensions, options: ConnectivityOptions = {}) {
+function toContiguousConfig(
+  dimensions: Dimensions,
+  options: ConnectivityOptions = {}
+) {
   return {
     rows: dimensions.rows,
     cols: dimensions.cols,
@@ -401,7 +439,11 @@ export function getNeighbors(
   dimensions: Dimensions,
   connectivity: 4 | 8 = 4
 ): GridPosition[] {
-  return _getNeighbors(pos.row, pos.col, toContiguousConfig(dimensions, { connectivity }));
+  return _getNeighbors(
+    pos.row,
+    pos.col,
+    toContiguousConfig(dimensions, { connectivity })
+  );
 }
 
 /**
@@ -418,7 +460,12 @@ export function findRegionAt(
     const v = getCell(r, c);
     return (v === undefined ? null : v) as CellValue;
   };
-  return findRegion(pos.row, pos.col, safeGet, toContiguousConfig(dimensions, options));
+  return findRegion(
+    pos.row,
+    pos.col,
+    safeGet,
+    toContiguousConfig(dimensions, options)
+  );
 }
 
 /**
@@ -437,7 +484,7 @@ export function findAllRegions(
   };
 
   const all = _findAllRegions(safeGet, toContiguousConfig(dimensions, options));
-  return filter ? all.filter(r => filter(r.value)) : all;
+  return filter ? all.filter((r) => filter(r.value)) : all;
 }
 
 /**
@@ -451,7 +498,7 @@ export function findLargestRegion(
 ): Region | null {
   const regions = findAllRegions(dimensions, getCell, options, filter);
   if (regions.length === 0) return null;
-  return regions.reduce((a, b) => b.size > a.size ? b : a);
+  return regions.reduce((a, b) => (b.size > a.size ? b : a));
 }
 
 /**
@@ -468,7 +515,12 @@ export function areConnected(
     const v = getCell(r, c);
     return (v === undefined ? null : v) as CellValue;
   };
-  return _areConnected(pos1, pos2, safeGet, toContiguousConfig(dimensions, options));
+  return _areConnected(
+    pos1,
+    pos2,
+    safeGet,
+    toContiguousConfig(dimensions, options)
+  );
 }
 
 /**
@@ -533,7 +585,7 @@ export function getRegionStats(
     return { count: 0, totalSize: 0, minSize: 0, maxSize: 0, averageSize: 0 };
   }
 
-  const sizes = regions.map(r => r.size);
+  const sizes = regions.map((r) => r.size);
   const totalSize = sizes.reduce((a, b) => a + b, 0);
 
   return {

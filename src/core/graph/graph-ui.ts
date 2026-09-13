@@ -14,7 +14,12 @@ import { getNeighbors } from './algorithms';
 /**
  * Calculate the bounding box of all nodes
  */
-function getBounds(graph: Graph): { minX: number; minY: number; maxX: number; maxY: number } {
+function getBounds(graph: Graph): {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+} {
   let minX = Infinity,
     minY = Infinity,
     maxX = -Infinity,
@@ -41,8 +46,10 @@ export function renderGraph(
   const cfg = { ...DEFAULT_GRAPH_CONFIG, ...config };
   const bounds = getBounds(graph);
 
-  const width = bounds.maxX - bounds.minX + cfg.padding * 2 + cfg.nodeRadius * 2;
-  const height = bounds.maxY - bounds.minY + cfg.padding * 2 + cfg.nodeRadius * 2;
+  const width =
+    bounds.maxX - bounds.minX + cfg.padding * 2 + cfg.nodeRadius * 2;
+  const height =
+    bounds.maxY - bounds.minY + cfg.padding * 2 + cfg.nodeRadius * 2;
   const offsetX = -bounds.minX + cfg.padding + cfg.nodeRadius;
   const offsetY = -bounds.minY + cfg.padding + cfg.nodeRadius;
 
@@ -53,7 +60,10 @@ export function renderGraph(
   svg.classList.add('graph-view');
 
   // Render edges first (behind nodes)
-  const edgesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const edgesGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   edgesGroup.classList.add('edges');
 
   for (const edge of graph.edges) {
@@ -84,7 +94,10 @@ export function renderGraph(
       const midX = (x1 + x2) / 2;
       const midY = (y1 + y2) / 2;
 
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       text.setAttribute('x', String(midX));
       text.setAttribute('y', String(midY));
       text.setAttribute('text-anchor', 'middle');
@@ -100,7 +113,10 @@ export function renderGraph(
   svg.appendChild(edgesGroup);
 
   // Render nodes
-  const nodesGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const nodesGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   nodesGroup.classList.add('nodes');
 
   graph.nodes.forEach((node, nodeId) => {
@@ -121,7 +137,10 @@ export function renderGraph(
     }
 
     // Node circle
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const circle = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     circle.setAttribute('cx', String(x));
     circle.setAttribute('cy', String(y));
     circle.setAttribute('r', String(cfg.nodeRadius));
@@ -139,7 +158,10 @@ export function renderGraph(
 
     // Node label
     if (cfg.showLabels && node.label) {
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const text = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       text.setAttribute('x', String(x));
       text.setAttribute('y', String(y));
       text.setAttribute('text-anchor', 'middle');
@@ -155,7 +177,10 @@ export function renderGraph(
 
     // Value indicator
     if (state?.value !== undefined) {
-      const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      const valueText = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'text'
+      );
       valueText.setAttribute('x', String(x));
       valueText.setAttribute('y', String(y + cfg.nodeRadius + 14));
       valueText.setAttribute('text-anchor', 'middle');
@@ -217,7 +242,8 @@ export function highlightPath(
     const from = path[i];
     const to = path[i + 1];
 
-    const edge = svg.querySelector(`line[data-from="${from}"][data-to="${to}"]`) ||
+    const edge =
+      svg.querySelector(`line[data-from="${from}"][data-to="${to}"]`) ||
       svg.querySelector(`line[data-from="${to}"][data-to="${from}"]`);
 
     if (edge) {
@@ -239,7 +265,10 @@ export function highlightPath(
 /**
  * Clear all highlights from graph
  */
-export function clearHighlights(svg: SVGSVGElement, config: Partial<GraphRenderConfig> = {}): void {
+export function clearHighlights(
+  svg: SVGSVGElement,
+  config: Partial<GraphRenderConfig> = {}
+): void {
   const cfg = { ...DEFAULT_GRAPH_CONFIG, ...config };
 
   // Reset edges
@@ -299,7 +328,10 @@ export function animateMove(
     }
 
     // Create animated marker
-    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const marker = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     marker.setAttribute('r', '10');
     marker.setAttribute('fill', '#ff9800');
     marker.setAttribute('stroke', '#f57c00');

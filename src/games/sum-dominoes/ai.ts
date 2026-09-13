@@ -81,7 +81,8 @@ function evaluateMoves(
       }
 
       // Factor 3: Central positions are more valuable (more connection options)
-      const centerDist = Math.abs(position.row - 5) + Math.abs(position.col - 5);
+      const centerDist =
+        Math.abs(position.row - 5) + Math.abs(position.col - 5);
       if (centerDist <= 3) {
         score += 10 - centerDist * 2;
         reasons.push('Central placement');
@@ -89,7 +90,7 @@ function evaluateMoves(
 
       // Factor 4: Consider versatility of remaining hand
       // After this move, which faces remain in hand?
-      const remainingAfter = hand.filter(d => d.id !== domino.id);
+      const remainingAfter = hand.filter((d) => d.id !== domino.id);
       const remainingFaces = new Set<number>();
       for (const d of remainingAfter) {
         remainingFaces.add(d.face1);
@@ -217,7 +218,7 @@ export function hasPlayableMove(
   diceSum: number
 ): boolean {
   const hand = state.hands[player];
-  return hand.some(domino => canPlayDomino(state, domino, diceSum));
+  return hand.some((domino) => canPlayDomino(state, domino, diceSum));
 }
 
 /**

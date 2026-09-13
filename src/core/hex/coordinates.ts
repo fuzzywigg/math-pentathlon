@@ -38,7 +38,10 @@ export function cubeToAxial(cube: CubeCoord): AxialCoord {
 /**
  * Convert axial to offset coordinates (odd-q layout)
  */
-export function axialToOffset(axial: AxialCoord, parity: OffsetParity = 'odd'): OffsetCoord {
+export function axialToOffset(
+  axial: AxialCoord,
+  parity: OffsetParity = 'odd'
+): OffsetCoord {
   const col = axial.q;
   const offset = parity === 'odd' ? axial.q & 1 : (axial.q + 1) & 1;
   const row = axial.r + Math.floor((axial.q + offset) / 2);
@@ -48,7 +51,10 @@ export function axialToOffset(axial: AxialCoord, parity: OffsetParity = 'odd'): 
 /**
  * Convert offset to axial coordinates (odd-q layout)
  */
-export function offsetToAxial(offset: OffsetCoord, parity: OffsetParity = 'odd'): AxialCoord {
+export function offsetToAxial(
+  offset: OffsetCoord,
+  parity: OffsetParity = 'odd'
+): AxialCoord {
   const q = offset.col;
   const parityOffset = parity === 'odd' ? offset.col & 1 : (offset.col + 1) & 1;
   const r = offset.row - Math.floor((offset.col + parityOffset) / 2);
@@ -62,7 +68,10 @@ export function offsetToAxial(offset: OffsetCoord, parity: OffsetParity = 'odd')
 /**
  * Convert axial to pixel coordinates (pointy-top orientation)
  */
-export function axialToPixelPointy(axial: AxialCoord, layout: HexLayout): PixelCoord {
+export function axialToPixelPointy(
+  axial: AxialCoord,
+  layout: HexLayout
+): PixelCoord {
   const size = layout.size;
   const x = size * (Math.sqrt(3) * axial.q + (Math.sqrt(3) / 2) * axial.r);
   const y = size * ((3 / 2) * axial.r);
@@ -75,7 +84,10 @@ export function axialToPixelPointy(axial: AxialCoord, layout: HexLayout): PixelC
 /**
  * Convert axial to pixel coordinates (flat-top orientation)
  */
-export function axialToPixelFlat(axial: AxialCoord, layout: HexLayout): PixelCoord {
+export function axialToPixelFlat(
+  axial: AxialCoord,
+  layout: HexLayout
+): PixelCoord {
   const size = layout.size;
   const x = size * ((3 / 2) * axial.q);
   const y = size * ((Math.sqrt(3) / 2) * axial.q + Math.sqrt(3) * axial.r);
@@ -97,7 +109,10 @@ export function axialToPixel(axial: AxialCoord, layout: HexLayout): PixelCoord {
 /**
  * Convert pixel to axial coordinates (pointy-top)
  */
-export function pixelToAxialPointy(pixel: PixelCoord, layout: HexLayout): AxialCoord {
+export function pixelToAxialPointy(
+  pixel: PixelCoord,
+  layout: HexLayout
+): AxialCoord {
   const pt = {
     x: (pixel.x - layout.origin.x) / layout.size,
     y: (pixel.y - layout.origin.y) / layout.size,
@@ -110,7 +125,10 @@ export function pixelToAxialPointy(pixel: PixelCoord, layout: HexLayout): AxialC
 /**
  * Convert pixel to axial coordinates (flat-top)
  */
-export function pixelToAxialFlat(pixel: PixelCoord, layout: HexLayout): AxialCoord {
+export function pixelToAxialFlat(
+  pixel: PixelCoord,
+  layout: HexLayout
+): AxialCoord {
   const pt = {
     x: (pixel.x - layout.origin.x) / layout.size,
     y: (pixel.y - layout.origin.y) / layout.size,
@@ -173,7 +191,9 @@ export function hexRound(axial: AxialCoord): AxialCoord {
  * Get all 6 neighbors of a hex
  */
 export function getNeighbors(coord: AxialCoord): AxialCoord[] {
-  return AXIAL_DIRECTIONS.map((dir) => createAxial(coord.q + dir.q, coord.r + dir.r));
+  return AXIAL_DIRECTIONS.map((dir) =>
+    createAxial(coord.q + dir.q, coord.r + dir.r)
+  );
 }
 
 /**
@@ -219,7 +239,11 @@ export function areNeighbors(a: AxialCoord, b: AxialCoord): boolean {
 export function hexDistance(a: AxialCoord, b: AxialCoord): number {
   const ac = axialToCube(a);
   const bc = axialToCube(b);
-  return Math.max(Math.abs(ac.x - bc.x), Math.abs(ac.y - bc.y), Math.abs(ac.z - bc.z));
+  return Math.max(
+    Math.abs(ac.x - bc.x),
+    Math.abs(ac.y - bc.y),
+    Math.abs(ac.z - bc.z)
+  );
 }
 
 /**
@@ -229,7 +253,11 @@ export function hexesInRange(center: AxialCoord, range: number): AxialCoord[] {
   const results: AxialCoord[] = [];
 
   for (let q = -range; q <= range; q++) {
-    for (let r = Math.max(-range, -q - range); r <= Math.min(range, -q + range); r++) {
+    for (
+      let r = Math.max(-range, -q - range);
+      r <= Math.min(range, -q + range);
+      r++
+    ) {
       results.push(createAxial(center.q + q, center.r + r));
     }
   }
@@ -244,7 +272,10 @@ export function hexRing(center: AxialCoord, radius: number): AxialCoord[] {
   if (radius === 0) return [center];
 
   const results: AxialCoord[] = [];
-  let current = createAxial(center.q + AXIAL_DIRECTIONS[4].q * radius, center.r + AXIAL_DIRECTIONS[4].r * radius);
+  let current = createAxial(
+    center.q + AXIAL_DIRECTIONS[4].q * radius,
+    center.r + AXIAL_DIRECTIONS[4].r * radius
+  );
 
   for (let i = 0; i < 6; i++) {
     for (let j = 0; j < radius; j++) {
@@ -328,7 +359,11 @@ export function rotateLeft(coord: AxialCoord): AxialCoord {
 /**
  * Rotate a hex coordinate around a center point
  */
-export function rotateAround(coord: AxialCoord, center: AxialCoord, steps: number): AxialCoord {
+export function rotateAround(
+  coord: AxialCoord,
+  center: AxialCoord,
+  steps: number
+): AxialCoord {
   // Translate to origin
   let relative = createAxial(coord.q - center.q, coord.r - center.r);
 

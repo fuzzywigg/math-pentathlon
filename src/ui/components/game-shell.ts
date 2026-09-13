@@ -3,10 +3,7 @@
  * Keeps page-to-page cohesion without changing game logic.
  */
 
-import {
-  applyGameModeChrome,
-  clearGameModeChrome,
-} from '../player-colors';
+import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
 export type AIDifficultyLevel = 'easy' | 'medium' | 'hard';

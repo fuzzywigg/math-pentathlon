@@ -1,15 +1,8 @@
 // Remainder Islands Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  RemainderIslandsState,
-  createInitialState,
-} from './types';
-import {
-  performRoll,
-  selectIsland,
-  setSelectedIsland,
-} from './rules';
+import { RemainderIslandsState, createInitialState } from './types';
+import { performRoll, selectIsland, setSelectedIsland } from './rules';
 import {
   renderBoard,
   renderDice,
@@ -92,13 +85,19 @@ function render(): void {
     wrapper.appendChild(controls);
 
     // Board
-    wrapper.appendChild(renderBoard(gameState, handleIslandClick, handleIslandHover));
+    wrapper.appendChild(
+      renderBoard(gameState, handleIslandClick, handleIslandHover)
+    );
   }
 
   gameContainer.appendChild(wrapper);
 
   // AI turn
-  if (isAIMode && gameState.phase !== 'gameOver' && gameState.currentPlayer === 'player2') {
+  if (
+    isAIMode &&
+    gameState.phase !== 'gameOver' &&
+    gameState.currentPlayer === 'player2'
+  ) {
     if (gameState.phase === 'rolling') {
       setTimeout(aiRoll, 800);
     } else if (gameState.phase === 'selectIsland') {
@@ -137,12 +136,17 @@ function handleIslandHover(islandId: string | null): void {
 // =============================================================================
 
 function aiRoll(): void {
-  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2') return;
+  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2')
+    return;
   handleRoll();
 }
 
 function aiSelectIsland(): void {
-  if (gameState.phase !== 'selectIsland' || gameState.currentPlayer !== 'player2') return;
+  if (
+    gameState.phase !== 'selectIsland' ||
+    gameState.currentPlayer !== 'player2'
+  )
+    return;
 
   // Use AI module to get choice
   const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);

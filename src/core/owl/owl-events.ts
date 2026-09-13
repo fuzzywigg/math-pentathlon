@@ -85,7 +85,8 @@ export interface StreakBrokenEvent extends OwlEventBase {
 
 export interface MilestoneEvent extends OwlEventBase {
   type: 'milestone:reached';
-  milestoneType: 'games_played' | 'games_won' | 'time_played' | 'division_complete';
+  milestoneType:
+    'games_played' | 'games_won' | 'time_played' | 'division_complete';
   value: number;
   description: string;
 }

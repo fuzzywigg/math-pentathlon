@@ -34,10 +34,10 @@ function getFractionsForDifficulty(difficulty: Difficulty): Fraction[] {
   switch (difficulty) {
     case 'easy':
       // Simple fractions with small denominators
-      return COMMON_FRACTIONS.filter(f => f.denominator <= 4);
+      return COMMON_FRACTIONS.filter((f) => f.denominator <= 4);
     case 'medium':
       // Common fractions
-      return COMMON_FRACTIONS.filter(f => f.denominator <= 8);
+      return COMMON_FRACTIONS.filter((f) => f.denominator <= 8);
     case 'hard':
       // All common fractions
       return COMMON_FRACTIONS;
@@ -47,7 +47,9 @@ function getFractionsForDifficulty(difficulty: Difficulty): Fraction[] {
 /**
  * Get operations based on difficulty
  */
-function getOperationsForDifficulty(difficulty: Difficulty): FractionOperation[] {
+function getOperationsForDifficulty(
+  difficulty: Difficulty
+): FractionOperation[] {
   switch (difficulty) {
     case 'easy':
       return ['add', 'subtract'];
@@ -69,7 +71,10 @@ function randomFraction(difficulty: Difficulty): Fraction {
 /**
  * Generate wrong answer choices (distractors)
  */
-function generateDistractors(correctAnswer: Fraction, count: number): Fraction[] {
+function generateDistractors(
+  correctAnswer: Fraction,
+  count: number
+): Fraction[] {
   const distractors: Fraction[] = [];
   const seen = new Set<string>();
   seen.add(`${correctAnswer.numerator}/${correctAnswer.denominator}`);
@@ -105,7 +110,10 @@ function generateDistractors(correctAnswer: Fraction, count: number): Fraction[]
       // Random nearby fraction
       () => ({
         numerator: correctAnswer.numerator + Math.floor(Math.random() * 3) - 1,
-        denominator: Math.max(1, correctAnswer.denominator + Math.floor(Math.random() * 3) - 1),
+        denominator: Math.max(
+          1,
+          correctAnswer.denominator + Math.floor(Math.random() * 3) - 1
+        ),
       }),
     ];
 
@@ -164,7 +172,10 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Generate a new fraction problem
  */
-export function generateProblem(difficulty: Difficulty, problemNumber: number): FractionProblem {
+export function generateProblem(
+  difficulty: Difficulty,
+  problemNumber: number
+): FractionProblem {
   const operations = getOperationsForDifficulty(difficulty);
   const operation = operations[Math.floor(Math.random() * operations.length)];
 
@@ -197,8 +208,8 @@ export function generateProblem(difficulty: Difficulty, problemNumber: number): 
   } while (
     attempts < 20 &&
     (correctAnswer.numerator < 0 ||
-     correctAnswer.denominator > 100 ||
-     correctAnswer.numerator > 100)
+      correctAnswer.denominator > 100 ||
+      correctAnswer.numerator > 100)
   );
 
   // Generate answer choices
@@ -222,7 +233,10 @@ export function generateProblem(difficulty: Difficulty, problemNumber: number): 
 /**
  * Check if the selected answer is correct
  */
-export function checkAnswer(problem: FractionProblem, selectedAnswer: Fraction): boolean {
+export function checkAnswer(
+  problem: FractionProblem,
+  selectedAnswer: Fraction
+): boolean {
   return areEquivalent(problem.correctAnswer, selectedAnswer);
 }
 
@@ -247,19 +261,27 @@ export function submitAnswer(
   // Update stats
   const newStats: PlayerStats = {
     ...currentStats,
-    correctAnswers: isCorrect ? currentStats.correctAnswers + 1 : currentStats.correctAnswers,
-    wrongAnswers: isCorrect ? currentStats.wrongAnswers : currentStats.wrongAnswers + 1,
+    correctAnswers: isCorrect
+      ? currentStats.correctAnswers + 1
+      : currentStats.correctAnswers,
+    wrongAnswers: isCorrect
+      ? currentStats.wrongAnswers
+      : currentStats.wrongAnswers + 1,
     currentStreak: isCorrect ? currentStats.currentStreak + 1 : 0,
     bestStreak: isCorrect
       ? Math.max(currentStats.bestStreak, currentStats.currentStreak + 1)
       : currentStats.bestStreak,
     score: isCorrect
-      ? currentStats.score + POINTS_PER_CORRECT + (currentStats.currentStreak * STREAK_BONUS)
+      ? currentStats.score +
+        POINTS_PER_CORRECT +
+        currentStats.currentStreak * STREAK_BONUS
       : currentStats.score,
   };
 
-  const newPlayer1Stats = state.currentPlayer === 'player1' ? newStats : state.player1Stats;
-  const newPlayer2Stats = state.currentPlayer === 'player2' ? newStats : state.player2Stats;
+  const newPlayer1Stats =
+    state.currentPlayer === 'player1' ? newStats : state.player1Stats;
+  const newPlayer2Stats =
+    state.currentPlayer === 'player2' ? newStats : state.player2Stats;
 
   return {
     ...state,
@@ -311,7 +333,10 @@ export function nextProblem(state: FracFactState): FracFactState {
 
   // Generate next problem and switch player
   const nextPlayer = getOpponent(state.currentPlayer);
-  const nextProblemData = generateProblem(state.difficulty, newProblemsCompleted + 1);
+  const nextProblemData = generateProblem(
+    state.difficulty,
+    newProblemsCompleted + 1
+  );
 
   return {
     ...state,
@@ -346,10 +371,14 @@ export function startGame(state: FracFactState): FracFactState {
  */
 export function getOperationSymbol(operation: FractionOperation): string {
   switch (operation) {
-    case 'add': return '+';
-    case 'subtract': return '−';
-    case 'multiply': return '×';
-    case 'divide': return '÷';
+    case 'add':
+      return '+';
+    case 'subtract':
+      return '−';
+    case 'multiply':
+      return '×';
+    case 'divide':
+      return '÷';
   }
 }
 

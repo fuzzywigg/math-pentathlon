@@ -100,7 +100,8 @@ function handlePitClick(pitIndex: number): void {
     gameMode === 'human-vs-ai' &&
     !isGameOver(gameState) &&
     gameState.currentPlayer === 'player2' &&
-    (gameState.currentPlayer !== prevPlayer || gameState.currentPlayer === 'player2')
+    (gameState.currentPlayer !== prevPlayer ||
+      gameState.currentPlayer === 'player2')
   ) {
     triggerAITurn();
   }
@@ -144,10 +145,7 @@ function triggerAITurn(): void {
     }
 
     // Check if AI gets another turn (free turn from landing in Calla)
-    if (
-      !isGameOver(gameState) &&
-      gameState.currentPlayer === 'player2'
-    ) {
+    if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
       setTimeout(triggerAITurn, AI_THINKING_DELAY);
     }
   }, AI_THINKING_DELAY);

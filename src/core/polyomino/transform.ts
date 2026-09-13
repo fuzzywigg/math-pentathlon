@@ -7,9 +7,9 @@ import { Cell, Rotation, PolyominoShape } from './types';
  * Rotate a set of cells by the given angle around the origin
  */
 export function rotateCells(cells: Cell[], rotation: Rotation): Cell[] {
-  if (rotation === 0) return cells.map(c => ({ ...c }));
+  if (rotation === 0) return cells.map((c) => ({ ...c }));
 
-  return cells.map(cell => {
+  return cells.map((cell) => {
     switch (rotation) {
       case 90:
         return { row: cell.col, col: -cell.row };
@@ -27,14 +27,14 @@ export function rotateCells(cells: Cell[], rotation: Rotation): Cell[] {
  * Flip cells horizontally (mirror across Y axis)
  */
 export function flipCellsHorizontal(cells: Cell[]): Cell[] {
-  return cells.map(cell => ({ row: cell.row, col: -cell.col }));
+  return cells.map((cell) => ({ row: cell.row, col: -cell.col }));
 }
 
 /**
  * Flip cells vertically (mirror across X axis)
  */
 export function flipCellsVertical(cells: Cell[]): Cell[] {
-  return cells.map(cell => ({ row: -cell.row, col: cell.col }));
+  return cells.map((cell) => ({ row: -cell.row, col: cell.col }));
 }
 
 /**
@@ -44,10 +44,10 @@ export function flipCellsVertical(cells: Cell[]): Cell[] {
 export function normalizeCells(cells: Cell[]): Cell[] {
   if (cells.length === 0) return [];
 
-  const minRow = Math.min(...cells.map(c => c.row));
-  const minCol = Math.min(...cells.map(c => c.col));
+  const minRow = Math.min(...cells.map((c) => c.row));
+  const minCol = Math.min(...cells.map((c) => c.col));
 
-  return cells.map(cell => ({
+  return cells.map((cell) => ({
     row: cell.row - minRow,
     col: cell.col - minCol,
   }));
@@ -56,13 +56,18 @@ export function normalizeCells(cells: Cell[]): Cell[] {
 /**
  * Get the bounding box of a set of cells
  */
-export function getBoundingBox(cells: Cell[]): { width: number; height: number; minRow: number; minCol: number } {
+export function getBoundingBox(cells: Cell[]): {
+  width: number;
+  height: number;
+  minRow: number;
+  minCol: number;
+} {
   if (cells.length === 0) {
     return { width: 0, height: 0, minRow: 0, minCol: 0 };
   }
 
-  const rows = cells.map(c => c.row);
-  const cols = cells.map(c => c.col);
+  const rows = cells.map((c) => c.row);
+  const cols = cells.map((c) => c.col);
 
   const minRow = Math.min(...rows);
   const maxRow = Math.max(...rows);
@@ -86,7 +91,7 @@ export function centerCells(cells: Cell[]): Cell[] {
   const offsetRow = minRow + Math.floor(height / 2);
   const offsetCol = minCol + Math.floor(width / 2);
 
-  return cells.map(cell => ({
+  return cells.map((cell) => ({
     row: cell.row - offsetRow,
     col: cell.col - offsetCol,
   }));
@@ -96,12 +101,26 @@ export function centerCells(cells: Cell[]): Cell[] {
  * Translate cells by an offset (Cell object or two numbers)
  */
 export function translateCells(cells: Cell[], offset: Cell): Cell[];
-export function translateCells(cells: Cell[], rowOffset: number, colOffset: number): Cell[];
-export function translateCells(cells: Cell[], rowOrOffset: Cell | number, colOffset?: number): Cell[] {
+export function translateCells(
+  cells: Cell[],
+  rowOffset: number,
+  colOffset: number
+): Cell[];
+export function translateCells(
+  cells: Cell[],
+  rowOrOffset: Cell | number,
+  colOffset?: number
+): Cell[] {
   if (typeof rowOrOffset === 'object') {
-    return cells.map(cell => ({ row: cell.row + rowOrOffset.row, col: cell.col + rowOrOffset.col }));
+    return cells.map((cell) => ({
+      row: cell.row + rowOrOffset.row,
+      col: cell.col + rowOrOffset.col,
+    }));
   }
-  return cells.map(cell => ({ row: cell.row + rowOrOffset, col: cell.col + colOffset! }));
+  return cells.map((cell) => ({
+    row: cell.row + rowOrOffset,
+    col: cell.col + colOffset!,
+  }));
 }
 
 /**
@@ -173,7 +192,7 @@ export function cellsToKey(cells: Cell[]): string {
     if (a.row !== b.row) return a.row - b.row;
     return a.col - b.col;
   });
-  return sorted.map(c => `${c.row},${c.col}`).join('|');
+  return sorted.map((c) => `${c.row},${c.col}`).join('|');
 }
 
 /**
@@ -263,8 +282,10 @@ export function isAdjacent(cell: Cell, cells: Cell[]): boolean {
     { row: 0, col: 1 },
   ];
 
-  return cells.some(c =>
-    directions.some(d => c.row + d.row === cell.row && c.col + d.col === cell.col)
+  return cells.some((c) =>
+    directions.some(
+      (d) => c.row + d.row === cell.row && c.col + d.col === cell.col
+    )
   );
 }
 
@@ -274,7 +295,7 @@ export function isAdjacent(cell: Cell, cells: Cell[]): boolean {
 export function areCellsConnected(cells: Cell[]): boolean {
   if (cells.length <= 1) return true;
 
-  const cellSet = new Set(cells.map(c => `${c.row},${c.col}`));
+  const cellSet = new Set(cells.map((c) => `${c.row},${c.col}`));
   const visited = new Set<string>();
   const queue: Cell[] = [cells[0]];
 
@@ -309,25 +330,39 @@ export function areCellsConnected(cells: Cell[]): boolean {
  * Get the full bounding box with min/max row/col and dimensions
  */
 export function getBounds(cells: Cell[]): {
-  minRow: number; maxRow: number; minCol: number; maxCol: number; width: number; height: number;
+  minRow: number;
+  maxRow: number;
+  minCol: number;
+  maxCol: number;
+  width: number;
+  height: number;
 } {
   if (cells.length === 0) {
     return { minRow: 0, maxRow: 0, minCol: 0, maxCol: 0, width: 0, height: 0 };
   }
-  const rows = cells.map(c => c.row);
-  const cols = cells.map(c => c.col);
+  const rows = cells.map((c) => c.row);
+  const cols = cells.map((c) => c.col);
   const minRow = Math.min(...rows);
   const maxRow = Math.max(...rows);
   const minCol = Math.min(...cols);
   const maxCol = Math.max(...cols);
-  return { minRow, maxRow, minCol, maxCol, width: maxCol - minCol + 1, height: maxRow - minRow + 1 };
+  return {
+    minRow,
+    maxRow,
+    minCol,
+    maxCol,
+    width: maxCol - minCol + 1,
+    height: maxRow - minRow + 1,
+  };
 }
 
 /**
  * Sort cells top-to-bottom, left-to-right
  */
 export function sortCells(cells: Cell[]): Cell[] {
-  return [...cells].sort((a, b) => a.row !== b.row ? a.row - b.row : a.col - b.col);
+  return [...cells].sort((a, b) =>
+    a.row !== b.row ? a.row - b.row : a.col - b.col
+  );
 }
 
 /**
@@ -347,7 +382,11 @@ export function rotateCells90CW(cells: Cell[]): Cell[] {
 /**
  * Apply rotation and optional flip to cells (ignores canFlip/canRotate flags)
  */
-export function transformCells(cells: Cell[], rotation: Rotation, flipped: boolean): Cell[] {
+export function transformCells(
+  cells: Cell[],
+  rotation: Rotation,
+  flipped: boolean
+): Cell[] {
   let result = cells;
   if (flipped) result = flipCellsHorizontal(result);
   result = rotateCells(result, rotation);
@@ -412,11 +451,14 @@ export function getAllTransformations(shape: PolyominoShape): PolyominoShape[] {
 /**
  * Check if two polyominoes are equivalent under any rotation/flip
  */
-export function arePolyominoesEquivalent(a: PolyominoShape, b: PolyominoShape): boolean {
+export function arePolyominoesEquivalent(
+  a: PolyominoShape,
+  b: PolyominoShape
+): boolean {
   if (a.cells.length !== b.cells.length) return false;
   const aTransforms = getAllTransformations(a);
   const bKey = cellsToKey(normalizeCells(b.cells));
-  return aTransforms.some(t => cellsToKey(t.cells) === bKey);
+  return aTransforms.some((t) => cellsToKey(t.cells) === bKey);
 }
 
 /**
@@ -441,12 +483,21 @@ export function getAbsoluteCells(
 }
 
 function translated(cells: Cell[], offset: Cell): Cell[] {
-  return cells.map(c => ({ row: c.row + offset.row, col: c.col + offset.col }));
+  return cells.map((c) => ({
+    row: c.row + offset.row,
+    col: c.col + offset.col,
+  }));
 }
 
 /**
  * Check whether all cells are within a grid of given dimensions (0-based)
  */
-export function areCellsInBounds(cells: Cell[], rows: number, cols: number): boolean {
-  return cells.every(c => c.row >= 0 && c.row < rows && c.col >= 0 && c.col < cols);
+export function areCellsInBounds(
+  cells: Cell[],
+  rows: number,
+  cols: number
+): boolean {
+  return cells.every(
+    (c) => c.row >= 0 && c.row < rows && c.col >= 0 && c.col < cols
+  );
 }

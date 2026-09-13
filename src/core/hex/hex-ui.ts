@@ -60,7 +60,11 @@ export function injectHexStyles(): void {
 /**
  * Get the 6 corner points of a hex at given center
  */
-export function getHexCorners(center: PixelCoord, size: number, flat: boolean = false): PixelCoord[] {
+export function getHexCorners(
+  center: PixelCoord,
+  size: number,
+  flat: boolean = false
+): PixelCoord[] {
   const corners: PixelCoord[] = [];
   const startAngle = flat ? 0 : 30;
 
@@ -79,9 +83,15 @@ export function getHexCorners(center: PixelCoord, size: number, flat: boolean = 
 /**
  * Create SVG path string for a hex
  */
-export function hexPath(center: PixelCoord, size: number, flat: boolean = false): string {
+export function hexPath(
+  center: PixelCoord,
+  size: number,
+  flat: boolean = false
+): string {
   const corners = getHexCorners(center, size, flat);
-  const path = corners.map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`)).join(' ');
+  const path = corners
+    .map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`))
+    .join(' ');
   return path + ' Z';
 }
 
@@ -182,7 +192,12 @@ export function renderHexGrid(
   layout: HexLayout,
   options: HexGridRenderOptions = {}
 ): SVGSVGElement {
-  const { getCellOptions, showCoords = false, background, padding = 20 } = options;
+  const {
+    getCellOptions,
+    showCoords = false,
+    background,
+    padding = 20,
+  } = options;
 
   const hexes = hexesInRange({ q: 0, r: 0 }, radius);
 
@@ -237,7 +252,12 @@ export function renderRectHexGrid(
   layout: HexLayout,
   options: HexGridRenderOptions = {}
 ): SVGSVGElement {
-  const { getCellOptions, showCoords = false, background, padding = 20 } = options;
+  const {
+    getCellOptions,
+    showCoords = false,
+    background,
+    padding = 20,
+  } = options;
 
   // Generate hex coordinates for rectangular grid
   const hexes: AxialCoord[] = [];
@@ -364,7 +384,11 @@ export function createInteractiveHexGrid(
  * Get the 6 triangular sub-cells within a hex
  * Returns pixel coordinates for each triangle's center
  */
-export function getHexTriangles(center: PixelCoord, size: number, flat: boolean = false): PixelCoord[] {
+export function getHexTriangles(
+  center: PixelCoord,
+  size: number,
+  flat: boolean = false
+): PixelCoord[] {
   const corners = getHexCorners(center, size, flat);
   const triangles: PixelCoord[] = [];
 
@@ -388,7 +412,10 @@ export function getHexTriangles(center: PixelCoord, size: number, flat: boolean 
 export function renderHexWithTriangles(
   coord: AxialCoord,
   layout: HexLayout,
-  getTriangleOptions?: (hexCoord: AxialCoord, triangleIndex: number) => {
+  getTriangleOptions?: (
+    hexCoord: AxialCoord,
+    triangleIndex: number
+  ) => {
     fill?: string;
     onClick?: () => void;
   }
@@ -407,7 +434,10 @@ export function renderHexWithTriangles(
 
     const options = getTriangleOptions?.(coord, i) ?? {};
 
-    const triangle = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const triangle = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
     triangle.setAttribute(
       'd',
       `M ${center.x} ${center.y} L ${c1.x} ${c1.y} L ${c2.x} ${c2.y} Z`

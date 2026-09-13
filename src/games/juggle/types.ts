@@ -1,13 +1,19 @@
 // Juggle Game Types
 // Polyomino placement game with dice selection
 
-import { PolyominoShape, TETROMINOES, PENTOMINOES, SIMPLE_SHAPES } from '../../core/polyomino/types';
+import {
+  PolyominoShape,
+  TETROMINOES,
+  PENTOMINOES,
+  SIMPLE_SHAPES,
+} from '../../core/polyomino/types';
 import { Board } from '../../core/polyomino/placement';
 
 export type Player = 'player1' | 'player2';
 
 // Define the 5 shape categories for Juggle
-export type ShapeCategory = 'monomino' | 'domino' | 'tromino' | 'tetromino' | 'pentomino';
+export type ShapeCategory =
+  'monomino' | 'domino' | 'tromino' | 'tetromino' | 'pentomino';
 
 // Map dice values to shape categories
 export const DICE_TO_CATEGORY: Record<number, ShapeCategory> = {
@@ -21,9 +27,9 @@ export const DICE_TO_CATEGORY: Record<number, ShapeCategory> = {
 
 // Shape pools for each category
 export const SHAPE_POOLS: Record<ShapeCategory, PolyominoShape[]> = {
-  monomino: SIMPLE_SHAPES.filter(s => s.size === 1),
-  domino: SIMPLE_SHAPES.filter(s => s.size === 2),
-  tromino: SIMPLE_SHAPES.filter(s => s.size === 3),
+  monomino: SIMPLE_SHAPES.filter((s) => s.size === 1),
+  domino: SIMPLE_SHAPES.filter((s) => s.size === 2),
+  tromino: SIMPLE_SHAPES.filter((s) => s.size === 3),
   tetromino: TETROMINOES,
   pentomino: PENTOMINOES,
 };
@@ -64,7 +70,7 @@ export interface JuggleMove {
 
 // Configuration
 export const CONFIG = {
-  GRID_SIZE: 9,  // 9x9 grid
+  GRID_SIZE: 9, // 9x9 grid
   CELLS_TO_FILL: 81, // Total cells (9x9)
 };
 
@@ -83,10 +89,7 @@ export function getOpponent(player: Player): Player {
  * Roll two dice
  */
 export function rollDice(): [number, number] {
-  return [
-    Math.floor(Math.random() * 6) + 1,
-    Math.floor(Math.random() * 6) + 1,
-  ];
+  return [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1];
 }
 
 /**
@@ -108,7 +111,7 @@ export function getShapesForDie(value: number): PolyominoShape[] {
  * Get shape by ID
  */
 export function getShapeById(id: string): PolyominoShape | undefined {
-  return ALL_SHAPES.find(s => s.id === id);
+  return ALL_SHAPES.find((s) => s.id === id);
 }
 
 /**

@@ -304,7 +304,13 @@ class OwlSystem {
   }
 
   // Call when a game ends
-  onGameEnd(gameId: string, result: { winner: 'player1' | 'player2' | 'ai' | 'draw' | null; moveCount: number }): void {
+  onGameEnd(
+    gameId: string,
+    result: {
+      winner: 'player1' | 'player2' | 'ai' | 'draw' | null;
+      moveCount: number;
+    }
+  ): void {
     const game = getGameById(gameId);
     if (!game) return;
 
@@ -335,7 +341,8 @@ class OwlSystem {
       duration,
       moveCount: result.moveCount,
       winStreak: updatedStats.currentWinStreak,
-      isNewBestStreak: updatedStats.currentWinStreak > previousBest && playerWon,
+      isNewBestStreak:
+        updatedStats.currentWinStreak > previousBest && playerWon,
     });
 
     // Check for streak updates

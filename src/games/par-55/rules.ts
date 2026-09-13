@@ -56,27 +56,31 @@ function createBoard(): Map<string, Base> {
 /**
  * Find adjacent bases for a given position
  */
-function findAdjacentBases(row: number, col: number, bases: Map<string, Base>): string[] {
+function findAdjacentBases(
+  row: number,
+  col: number,
+  bases: Map<string, Base>
+): string[] {
   const adjacent: string[] = [];
   const isOddRow = row % 2 === 1;
 
   // Possible neighbors in a hexagonal grid
   const neighbors = isOddRow
     ? [
-        [row - 1, col],     // top-left
+        [row - 1, col], // top-left
         [row - 1, col + 1], // top-right
-        [row, col - 1],     // left
-        [row, col + 1],     // right
-        [row + 1, col],     // bottom-left
+        [row, col - 1], // left
+        [row, col + 1], // right
+        [row + 1, col], // bottom-left
         [row + 1, col + 1], // bottom-right
       ]
     : [
         [row - 1, col - 1], // top-left
-        [row - 1, col],     // top-right
-        [row, col - 1],     // left
-        [row, col + 1],     // right
+        [row - 1, col], // top-right
+        [row, col - 1], // left
+        [row, col + 1], // right
         [row + 1, col - 1], // bottom-left
-        [row + 1, col],     // bottom-right
+        [row + 1, col], // bottom-right
       ];
 
   for (const [r, c] of neighbors) {
@@ -296,16 +300,28 @@ export function placeBlock(state: Par55State, baseId: string): Par55State {
   let winner: Player | null = null;
   let phase: Par55State['phase'] = 'selectingBlock';
 
-  if (newScores.player1 >= CONFIG.TARGET_SCORE || newScores.player2 >= CONFIG.TARGET_SCORE) {
+  if (
+    newScores.player1 >= CONFIG.TARGET_SCORE ||
+    newScores.player2 >= CONFIG.TARGET_SCORE
+  ) {
     // Check if tie is possible (opponent gets one more turn)
-    if (state.currentPlayer === 'player1' && newScores.player1 >= CONFIG.TARGET_SCORE) {
+    if (
+      state.currentPlayer === 'player1' &&
+      newScores.player1 >= CONFIG.TARGET_SCORE
+    ) {
       // Player 2 hasn't had their turn this round yet
       // For simplicity, if either reaches 55, they win
       winner = 'player1';
       phase = 'gameOver';
-    } else if (state.currentPlayer === 'player2' && newScores.player2 >= CONFIG.TARGET_SCORE) {
+    } else if (
+      state.currentPlayer === 'player2' &&
+      newScores.player2 >= CONFIG.TARGET_SCORE
+    ) {
       // Both had a turn, check tie
-      if (newScores.player1 >= CONFIG.TARGET_SCORE && newScores.player1 === newScores.player2) {
+      if (
+        newScores.player1 >= CONFIG.TARGET_SCORE &&
+        newScores.player1 === newScores.player2
+      ) {
         // Tie - continue playing
       } else if (newScores.player2 >= CONFIG.TARGET_SCORE) {
         winner = newScores.player2 > newScores.player1 ? 'player2' : 'player1';
@@ -321,13 +337,18 @@ export function placeBlock(state: Par55State, baseId: string): Par55State {
 
   // Check for game over due to no more moves
   if (newHand.length === 0 && !winner) {
-    const opponentHand = state.currentPlayer === 'player1'
-      ? state.hands.player2
-      : state.hands.player1;
+    const opponentHand =
+      state.currentPlayer === 'player1'
+        ? state.hands.player2
+        : state.hands.player1;
 
     if (opponentHand.length === 0) {
-      winner = newScores.player1 > newScores.player2 ? 'player1' :
-               newScores.player2 > newScores.player1 ? 'player2' : null;
+      winner =
+        newScores.player1 > newScores.player2
+          ? 'player1'
+          : newScores.player2 > newScores.player1
+            ? 'player2'
+            : null;
       phase = 'gameOver';
     }
   }
@@ -339,7 +360,10 @@ export function placeBlock(state: Par55State, baseId: string): Par55State {
       ...state.hands,
       [state.currentPlayer]: newHand,
     },
-    currentPlayer: phase === 'gameOver' ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer:
+      phase === 'gameOver'
+        ? state.currentPlayer
+        : getOpponent(state.currentPlayer),
     selectedBlock: null,
     phase,
     scores: newScores,
@@ -370,7 +394,9 @@ export function passTurn(state: Par55State): Par55State {
  */
 export function hasValidMoves(state: Par55State): boolean {
   const validPlacements = getValidPlacements(state);
-  return validPlacements.length > 0 && state.hands[state.currentPlayer].length > 0;
+  return (
+    validPlacements.length > 0 && state.hands[state.currentPlayer].length > 0
+  );
 }
 
 /**

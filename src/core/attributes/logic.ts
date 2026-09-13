@@ -33,16 +33,24 @@ export function compare(
       return left !== right;
 
     case 'greater_than':
-      return typeof left === 'number' && typeof right === 'number' && left > right;
+      return (
+        typeof left === 'number' && typeof right === 'number' && left > right
+      );
 
     case 'less_than':
-      return typeof left === 'number' && typeof right === 'number' && left < right;
+      return (
+        typeof left === 'number' && typeof right === 'number' && left < right
+      );
 
     case 'greater_equal':
-      return typeof left === 'number' && typeof right === 'number' && left >= right;
+      return (
+        typeof left === 'number' && typeof right === 'number' && left >= right
+      );
 
     case 'less_equal':
-      return typeof left === 'number' && typeof right === 'number' && left <= right;
+      return (
+        typeof left === 'number' && typeof right === 'number' && left <= right
+      );
 
     default:
       return false;
@@ -246,7 +254,10 @@ export function checkSetRelationship(
 /**
  * Check if a set of pieces is valid according to rules
  */
-export function isValidSet(pieces: AttributePiece[], rules: SetRule[]): boolean {
+export function isValidSet(
+  pieces: AttributePiece[],
+  rules: SetRule[]
+): boolean {
   return rules.every((rule) =>
     checkSetRelationship(pieces, rule.attribute, rule.relationship)
   );
@@ -284,10 +295,7 @@ export function findAllValidSets(
 ): AttributePiece[][] {
   const validSets: AttributePiece[][] = [];
 
-  function findSets(
-    start: number,
-    current: AttributePiece[]
-  ): void {
+  function findSets(start: number, current: AttributePiece[]): void {
     if (current.length === setSize) {
       if (isValidSet(current, rules)) {
         validSets.push([...current]);

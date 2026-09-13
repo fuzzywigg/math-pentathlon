@@ -1,6 +1,11 @@
 // Dice System Demo - Test page for dice functionality
 
-import { DiceSelector, COMMON_DICE_SETS, rollMultiple, renderRollResult } from '../core/dice';
+import {
+  DiceSelector,
+  COMMON_DICE_SETS,
+  rollMultiple,
+  renderRollResult,
+} from '../core/dice';
 
 export function renderDiceDemo(container: HTMLElement): void {
   container.innerHTML = '';
@@ -127,8 +132,10 @@ export function renderDiceDemo(container: HTMLElement): void {
   container.appendChild(wrapper);
 
   // Quick roll buttons
-  const quickRollResult = wrapper.querySelector('#quick-roll-result') as HTMLElement;
-  wrapper.querySelectorAll('.quick-roll-btn').forEach(btn => {
+  const quickRollResult = wrapper.querySelector(
+    '#quick-roll-result'
+  ) as HTMLElement;
+  wrapper.querySelectorAll('.quick-roll-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const diceType = btn.getAttribute('data-dice') as 'd6' | 'd20' | 'd10';
       const count = parseInt(btn.getAttribute('data-count') || '1');
@@ -138,35 +145,54 @@ export function renderDiceDemo(container: HTMLElement): void {
   });
 
   // Interactive selector - 2d6
-  const selector2d6Container = wrapper.querySelector('#selector-2d6') as HTMLElement;
+  const selector2d6Container = wrapper.querySelector(
+    '#selector-2d6'
+  ) as HTMLElement;
   const log2d6 = wrapper.querySelector('#log-2d6') as HTMLElement;
 
   new DiceSelector(selector2d6Container, {
     diceSet: COMMON_DICE_SETS.standard,
     multiSelect: true,
     onSelectionChange: (dice, sum) => {
-      addLog(log2d6, `Selection changed: ${dice.map(d => d.value).join(' + ')} = ${sum}`);
+      addLog(
+        log2d6,
+        `Selection changed: ${dice.map((d) => d.value).join(' + ')} = ${sum}`
+      );
     },
     onRollComplete: (result) => {
-      addLog(log2d6, `Rolled: [${result.rolls.map(d => d.value).join(', ')}] Total: ${result.total}`);
+      addLog(
+        log2d6,
+        `Rolled: [${result.rolls.map((d) => d.value).join(', ')}] Total: ${result.total}`
+      );
     },
     onConfirm: (selectedDice, sum) => {
-      addLog(log2d6, `✓ Confirmed: ${selectedDice.map(d => d.value).join(' + ')} = ${sum}`);
+      addLog(
+        log2d6,
+        `✓ Confirmed: ${selectedDice.map((d) => d.value).join(' + ')} = ${sum}`
+      );
     },
   });
 
   // Interactive selector - Polyhedral
-  const selectorPolyContainer = wrapper.querySelector('#selector-poly') as HTMLElement;
+  const selectorPolyContainer = wrapper.querySelector(
+    '#selector-poly'
+  ) as HTMLElement;
   const logPoly = wrapper.querySelector('#log-poly') as HTMLElement;
 
   new DiceSelector(selectorPolyContainer, {
     diceSet: COMMON_DICE_SETS.primeGold,
     multiSelect: true,
     onSelectionChange: (dice, sum) => {
-      addLog(logPoly, `Selection: ${dice.map(d => `${d.diceType}:${d.value}`).join(', ')} = ${sum}`);
+      addLog(
+        logPoly,
+        `Selection: ${dice.map((d) => `${d.diceType}:${d.value}`).join(', ')} = ${sum}`
+      );
     },
     onRollComplete: (result) => {
-      addLog(logPoly, `Rolled: ${result.rolls.map(d => `${d.diceType}:${d.value}`).join(', ')}`);
+      addLog(
+        logPoly,
+        `Rolled: ${result.rolls.map((d) => `${d.diceType}:${d.value}`).join(', ')}`
+      );
     },
     onConfirm: (_dice, sum) => {
       addLog(logPoly, `✓ Confirmed sum: ${sum}`);
@@ -174,7 +200,9 @@ export function renderDiceDemo(container: HTMLElement): void {
   });
 
   // Possible sums display
-  const selectorSumsContainer = wrapper.querySelector('#selector-sums') as HTMLElement;
+  const selectorSumsContainer = wrapper.querySelector(
+    '#selector-sums'
+  ) as HTMLElement;
 
   new DiceSelector(selectorSumsContainer, {
     diceSet: COMMON_DICE_SETS.triple,

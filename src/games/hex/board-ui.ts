@@ -37,7 +37,11 @@ export function renderBoard(
 
   // Board dimensions with padding for edge colors
   const padding = 40;
-  const boardWidth = (size - 1) * horizSpacing + (size - 1) * (hexWidth / 2) + hexWidth + padding * 2;
+  const boardWidth =
+    (size - 1) * horizSpacing +
+    (size - 1) * (hexWidth / 2) +
+    hexWidth +
+    padding * 2;
   const boardHeight = (size - 1) * vertSpacing + hexHeight + padding * 2;
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -61,10 +65,19 @@ export function renderBoard(
   const hexPath = hexPoints.join(' ');
 
   // Create hex symbol
-  const hexSymbol = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
+  const hexSymbol = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'symbol'
+  );
   hexSymbol.setAttribute('id', 'hex-cell');
-  hexSymbol.setAttribute('viewBox', `${-hexRadius} ${-hexRadius} ${hexRadius * 2} ${hexRadius * 2}`);
-  const hexPolygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+  hexSymbol.setAttribute(
+    'viewBox',
+    `${-hexRadius} ${-hexRadius} ${hexRadius * 2} ${hexRadius * 2}`
+  );
+  const hexPolygon = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'polygon'
+  );
   hexPolygon.setAttribute('points', hexPath);
   hexSymbol.appendChild(hexPolygon);
   defs.appendChild(hexSymbol);
@@ -77,7 +90,8 @@ export function renderBoard(
 
   // Calculate hex center positions
   const getHexCenter = (row: number, col: number): { x: number; y: number } => {
-    const x = padding + hexWidth / 2 + col * horizSpacing + row * (hexWidth / 2);
+    const x =
+      padding + hexWidth / 2 + col * horizSpacing + row * (hexWidth / 2);
     const y = padding + hexRadius + row * vertSpacing;
     return { x, y };
   };
@@ -92,7 +106,10 @@ export function renderBoard(
     topEdgePath.push(`L ${center.x} ${center.y - hexRadius}`);
     topEdgePath.push(`L ${center.x + hexWidth / 2} ${center.y - hexRadius}`);
   }
-  const topEdge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const topEdge = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   topEdge.setAttribute('d', topEdgePath.join(' '));
   topEdge.setAttribute('class', 'hex-edge hex-edge-p1');
   edgeGroup.appendChild(topEdge);
@@ -102,12 +119,17 @@ export function renderBoard(
   for (let col = 0; col < size; col++) {
     const center = getHexCenter(size - 1, col);
     if (col === 0) {
-      bottomEdgePath.push(`M ${center.x - hexWidth / 2} ${center.y + hexRadius}`);
+      bottomEdgePath.push(
+        `M ${center.x - hexWidth / 2} ${center.y + hexRadius}`
+      );
     }
     bottomEdgePath.push(`L ${center.x} ${center.y + hexRadius}`);
     bottomEdgePath.push(`L ${center.x + hexWidth / 2} ${center.y + hexRadius}`);
   }
-  const bottomEdge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const bottomEdge = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   bottomEdge.setAttribute('d', bottomEdgePath.join(' '));
   bottomEdge.setAttribute('class', 'hex-edge hex-edge-p1');
   edgeGroup.appendChild(bottomEdge);
@@ -120,13 +142,18 @@ export function renderBoard(
       leftEdgePath.push(`M ${center.x - hexWidth / 2} ${center.y - hexRadius}`);
     }
     leftEdgePath.push(`L ${center.x - hexWidth / 2} ${center.y}`);
-    leftEdgePath.push(`L ${center.x - hexWidth / 2 + (hexWidth / 2) / 2} ${center.y + hexRadius * 0.75}`);
+    leftEdgePath.push(
+      `L ${center.x - hexWidth / 2 + hexWidth / 2 / 2} ${center.y + hexRadius * 0.75}`
+    );
   }
   // Connect to bottom-left corner
   const blCorner = getHexCenter(size - 1, 0);
   leftEdgePath.push(`L ${blCorner.x - hexWidth / 2} ${blCorner.y + hexRadius}`);
 
-  const leftEdge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const leftEdge = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   leftEdge.setAttribute('d', leftEdgePath.join(' '));
   leftEdge.setAttribute('class', 'hex-edge hex-edge-p2');
   edgeGroup.appendChild(leftEdge);
@@ -136,15 +163,24 @@ export function renderBoard(
   for (let row = 0; row < size; row++) {
     const center = getHexCenter(row, size - 1);
     if (row === 0) {
-      rightEdgePath.push(`M ${center.x + hexWidth / 2} ${center.y - hexRadius}`);
+      rightEdgePath.push(
+        `M ${center.x + hexWidth / 2} ${center.y - hexRadius}`
+      );
     }
     rightEdgePath.push(`L ${center.x + hexWidth / 2} ${center.y}`);
-    rightEdgePath.push(`L ${center.x + hexWidth / 2 - (hexWidth / 2) / 2} ${center.y + hexRadius * 0.75}`);
+    rightEdgePath.push(
+      `L ${center.x + hexWidth / 2 - hexWidth / 2 / 2} ${center.y + hexRadius * 0.75}`
+    );
   }
   const brCorner = getHexCenter(size - 1, size - 1);
-  rightEdgePath.push(`L ${brCorner.x + hexWidth / 2} ${brCorner.y + hexRadius}`);
+  rightEdgePath.push(
+    `L ${brCorner.x + hexWidth / 2} ${brCorner.y + hexRadius}`
+  );
 
-  const rightEdge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const rightEdge = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   rightEdge.setAttribute('d', rightEdgePath.join(' '));
   rightEdge.setAttribute('class', 'hex-edge hex-edge-p2');
   edgeGroup.appendChild(rightEdge);
@@ -158,7 +194,10 @@ export function renderBoard(
   const winningSet = new Set(winningPath.map((p) => `${p.row},${p.col}`));
 
   // Draw hex cells
-  const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const cellsGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   cellsGroup.setAttribute('class', 'hex-cells');
 
   for (let row = 0; row < size; row++) {
@@ -167,14 +206,23 @@ export function renderBoard(
       const cellState = state.board[row][col];
       const isWinningCell = winningSet.has(`${row},${col}`);
 
-      const cellGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      const cellGroup = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'g'
+      );
       cellGroup.setAttribute('class', 'hex-cell-group');
-      cellGroup.setAttribute('transform', `translate(${center.x}, ${center.y})`);
+      cellGroup.setAttribute(
+        'transform',
+        `translate(${center.x}, ${center.y})`
+      );
       cellGroup.setAttribute('data-row', String(row));
       cellGroup.setAttribute('data-col', String(col));
 
       // Draw hex
-      const hex = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+      const hex = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
       hex.setAttribute('points', hexPath);
 
       let cellClass = 'hex-cell';
@@ -237,13 +285,19 @@ export function renderBoard(
   bindGridNavigation(svg);
 
   // Add coordinate labels (optional, for reference)
-  const labelsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const labelsGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
   labelsGroup.setAttribute('class', 'hex-labels');
 
   // Column labels (A-K for 11x11)
   for (let col = 0; col < size; col++) {
     const center = getHexCenter(0, col);
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const label = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
     label.setAttribute('x', String(center.x));
     label.setAttribute('y', String(center.y - hexRadius - 8));
     label.setAttribute('text-anchor', 'middle');
@@ -255,7 +309,10 @@ export function renderBoard(
   // Row labels (1-11)
   for (let row = 0; row < size; row++) {
     const center = getHexCenter(row, 0);
-    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const label = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'text'
+    );
     label.setAttribute('x', String(center.x - hexWidth / 2 - 12));
     label.setAttribute('y', String(center.y + 4));
     label.setAttribute('text-anchor', 'middle');

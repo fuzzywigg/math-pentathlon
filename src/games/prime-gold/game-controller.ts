@@ -54,7 +54,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): PrimeGoldController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): PrimeGoldController {
   injectPrimeGoldStyles();
   activeContainer = container;
 
@@ -133,19 +137,21 @@ function updateUI(controller: PrimeGoldController): void {
   mainLayout.className = 'pg-main-layout';
 
   // Dice area
-  mainLayout.appendChild(
-    renderDice(state, () => handleRoll(controller))
-  );
+  mainLayout.appendChild(renderDice(state, () => handleRoll(controller)));
 
   // Board
   mainLayout.appendChild(
-    renderBoard(state, (value, expr) => handlePlacement(controller, value, expr))
+    renderBoard(state, (value, expr) =>
+      handlePlacement(controller, value, expr)
+    )
   );
 
   // Expressions list (when placing)
   if (state.phase === 'placing') {
     mainLayout.appendChild(
-      renderExpressions(state, (value, expr) => handlePlacement(controller, value, expr))
+      renderExpressions(state, (value, expr) =>
+        handlePlacement(controller, value, expr)
+      )
     );
   }
 
@@ -199,7 +205,11 @@ function handleRoll(controller: PrimeGoldController): void {
 /**
  * Handle chip placement
  */
-function handlePlacement(controller: PrimeGoldController, value: number, expr: string): void {
+function handlePlacement(
+  controller: PrimeGoldController,
+  value: number,
+  expr: string
+): void {
   controller.state = placeChip(controller.state, value, expr);
   controller.update();
 }

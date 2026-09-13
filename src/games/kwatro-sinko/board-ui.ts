@@ -1,12 +1,7 @@
 // Kwatro-Sinko Board UI
 // Rendering the pathway board, chips, and game state
 
-import {
-  KwaState,
-  BoardNode,
-  Chip,
-  Player,
-} from './types';
+import { KwaState, BoardNode, Chip, Player } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 
@@ -48,8 +43,12 @@ export function renderBoard(
   for (const node of state.nodes.values()) {
     for (const connId of node.connections) {
       const connNode = state.nodes.get(connId);
-      if (connNode && connId > node.id) { // Only draw each line once
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      if (connNode && connId > node.id) {
+        // Only draw each line once
+        const line = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'line'
+        );
         line.setAttribute('x1', String(node.x));
         line.setAttribute('y1', String(node.y));
         line.setAttribute('x2', String(connNode.x));
@@ -65,7 +64,14 @@ export function renderBoard(
   for (const node of state.nodes.values()) {
     const isValid = validMoves.has(node.id);
     const isWinning = state.winningAlignment?.nodes.includes(node.id) ?? false;
-    const nodeGroup = renderNode(state, node, isValid, isWinning, onNodeClick, onChipClick);
+    const nodeGroup = renderNode(
+      state,
+      node,
+      isValid,
+      isWinning,
+      onNodeClick,
+      onChipClick
+    );
     svg.appendChild(nodeGroup);
   }
 
@@ -87,7 +93,10 @@ function renderNode(
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
   // Node circle
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const circle = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   circle.setAttribute('cx', String(node.x));
   circle.setAttribute('cy', String(node.y));
   circle.setAttribute('r', String(NODE_RADIUS));
@@ -122,8 +131,17 @@ function renderNode(
   // Render chip if present
   if (node.chip) {
     const isSelected = state.selectedChip === node.chip.id;
-    const canSelect = state.phase === 'selectingChip' && node.chip.owner === state.currentPlayer;
-    const chipGroup = renderChip(node.chip, node.x, node.y, isSelected, canSelect, onChipClick);
+    const canSelect =
+      state.phase === 'selectingChip' &&
+      node.chip.owner === state.currentPlayer;
+    const chipGroup = renderChip(
+      node.chip,
+      node.x,
+      node.y,
+      isSelected,
+      canSelect,
+      onChipClick
+    );
     group.appendChild(chipGroup);
   }
 
@@ -145,7 +163,10 @@ function renderChip(
 
   // Selection ring
   if (isSelected) {
-    const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    const ring = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
     ring.setAttribute('cx', String(cx));
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(CHIP_RADIUS + 4));
@@ -156,7 +177,10 @@ function renderChip(
   }
 
   // Chip circle
-  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  const circle = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
   circle.setAttribute('cx', String(cx));
   circle.setAttribute('cy', String(cy));
   circle.setAttribute('r', String(CHIP_RADIUS));

@@ -79,10 +79,22 @@ function isOnAlignmentPath(
 
   // Check each direction for alignment potential
   const directions = [
-    [[0, -1], [0, 1]],   // Horizontal
-    [[-1, 0], [1, 0]],   // Vertical
-    [[-1, -1], [1, 1]],  // Diagonal \
-    [[-1, 1], [1, -1]],  // Diagonal /
+    [
+      [0, -1],
+      [0, 1],
+    ], // Horizontal
+    [
+      [-1, 0],
+      [1, 0],
+    ], // Vertical
+    [
+      [-1, -1],
+      [1, 1],
+    ], // Diagonal \
+    [
+      [-1, 1],
+      [1, -1],
+    ], // Diagonal /
   ];
 
   const match = nodeId.match(/n(\d+)-(\d+)/);
@@ -112,7 +124,7 @@ function isOnAlignmentPath(
 
     // If we have 3 chips that could form a winning equation
     if (chipsInLine.length >= 3) {
-      const values = chipsInLine.map(c => c.value);
+      const values = chipsInLine.map((c) => c.value);
       // Check all combinations of 3 from these chips
       for (let i = 0; i < values.length - 2; i++) {
         for (let j = i + 1; j < values.length - 1; j++) {
@@ -160,10 +172,22 @@ function wouldCreateWin(
 
   // Check for alignment
   const directions = [
-    [[0, -1], [0, 1]],
-    [[-1, 0], [1, 0]],
-    [[-1, -1], [1, 1]],
-    [[-1, 1], [1, -1]],
+    [
+      [0, -1],
+      [0, 1],
+    ],
+    [
+      [-1, 0],
+      [1, 0],
+    ],
+    [
+      [-1, -1],
+      [1, 1],
+    ],
+    [
+      [-1, 1],
+      [1, -1],
+    ],
   ];
 
   const match = toNodeId.match(/n(\d+)-(\d+)/);
@@ -194,11 +218,15 @@ function wouldCreateWin(
     }
 
     if (lineChips.length >= 3) {
-      const values = lineChips.map(c => c.value);
+      const values = lineChips.map((c) => c.value);
       for (let i = 0; i < values.length - 2; i++) {
         for (let j = i + 1; j < values.length - 1; j++) {
           for (let k = j + 1; k < values.length; k++) {
-            const result = canFormWinningEquation([values[i], values[j], values[k]]);
+            const result = canFormWinningEquation([
+              values[i],
+              values[j],
+              values[k],
+            ]);
             if (result) return result;
           }
         }
@@ -312,10 +340,7 @@ function evaluateMoves(
 /**
  * In easy mode, make intentionally suboptimal moves
  */
-function getTeachingMove(
-  state: KwaState,
-  player: Player
-): MoveOption | null {
+function getTeachingMove(state: KwaState, player: Player): MoveOption | null {
   const moves = evaluateMoves(state, player, 'easy');
 
   if (moves.length === 0) return null;

@@ -49,7 +49,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): Par55GameController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): Par55GameController {
   injectPar55Styles();
   activeContainer = container;
 
@@ -132,11 +136,15 @@ function updateUI(controller: Par55GameController): void {
   p1Label.textContent = `Blue (${state.hands.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderHand(state, 'player1', (blockId) => handleBlockClick(controller, blockId))
+    renderHand(state, 'player1', (blockId) =>
+      handleBlockClick(controller, blockId)
+    )
   );
 
   // Board
-  const board = renderBoard(state, (baseId) => handleBaseClick(controller, baseId));
+  const board = renderBoard(state, (baseId) =>
+    handleBaseClick(controller, baseId)
+  );
 
   // Player 2 hand
   const p2Container = document.createElement('div');
@@ -145,7 +153,9 @@ function updateUI(controller: Par55GameController): void {
   p2Label.textContent = `Red (${state.hands.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderHand(state, 'player2', (blockId) => handleBlockClick(controller, blockId))
+    renderHand(state, 'player2', (blockId) =>
+      handleBlockClick(controller, blockId)
+    )
   );
 
   mainLayout.appendChild(p1Container);
@@ -204,7 +214,10 @@ function updateUI(controller: Par55GameController): void {
 /**
  * Handle block click
  */
-function handleBlockClick(controller: Par55GameController, blockId: string): void {
+function handleBlockClick(
+  controller: Par55GameController,
+  blockId: string
+): void {
   controller.state = selectBlock(controller.state, blockId);
   controller.update();
 }
@@ -212,7 +225,10 @@ function handleBlockClick(controller: Par55GameController, blockId: string): voi
 /**
  * Handle base click
  */
-function handleBaseClick(controller: Par55GameController, baseId: string): void {
+function handleBaseClick(
+  controller: Par55GameController,
+  baseId: string
+): void {
   controller.state = placeBlock(controller.state, baseId);
   controller.update();
 }

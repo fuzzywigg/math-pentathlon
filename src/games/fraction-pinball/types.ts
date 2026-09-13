@@ -11,22 +11,22 @@ export interface ConversionChallenge {
   type: 'fractionToDecimal' | 'decimalToFraction';
   fraction: Fraction;
   decimal: number;
-  answerChoices: string[];  // Mix of fractions and decimals as display strings
+  answerChoices: string[]; // Mix of fractions and decimals as display strings
   correctAnswer: string;
 }
 
 // Pinball targets/zones with different point values
 export interface PinballTarget {
   id: string;
-  value: number;  // Points for hitting this target
+  value: number; // Points for hitting this target
   label: string;
   hit: boolean;
 }
 
 // Game phases
 export type GamePhase =
-  | 'answering'   // Answer the conversion question
-  | 'showResult'  // Show if correct
+  | 'answering' // Answer the conversion question
+  | 'showResult' // Show if correct
   | 'gameOver';
 
 // Player stats
@@ -112,6 +112,9 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get player stats
-export function getPlayerStats(state: FractionPinballState, player: Player): PlayerStats {
+export function getPlayerStats(
+  state: FractionPinballState,
+  player: Player
+): PlayerStats {
   return player === 'player1' ? state.player1Stats : state.player2Stats;
 }

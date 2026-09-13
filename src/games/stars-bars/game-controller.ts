@@ -49,7 +49,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): StarsGameController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): StarsGameController {
   injectStarsStyles();
   activeContainer = container;
 
@@ -127,7 +131,9 @@ function updateUI(controller: StarsGameController): void {
 
   // Player 1 hand
   mainLayout.appendChild(
-    renderPlayerHand(state, 'player1', (cardId) => handleCardClick(controller, cardId))
+    renderPlayerHand(state, 'player1', (cardId) =>
+      handleCardClick(controller, cardId)
+    )
   );
 
   // Board
@@ -137,7 +143,9 @@ function updateUI(controller: StarsGameController): void {
 
   // Player 2 hand
   mainLayout.appendChild(
-    renderPlayerHand(state, 'player2', (cardId) => handleCardClick(controller, cardId))
+    renderPlayerHand(state, 'player2', (cardId) =>
+      handleCardClick(controller, cardId)
+    )
   );
 
   // Move history
@@ -192,7 +200,10 @@ function updateUI(controller: StarsGameController): void {
 /**
  * Handle card click
  */
-function handleCardClick(controller: StarsGameController, cardId: string): void {
+function handleCardClick(
+  controller: StarsGameController,
+  cardId: string
+): void {
   controller.state = selectCard(controller.state, cardId);
   controller.update();
 }
@@ -200,7 +211,11 @@ function handleCardClick(controller: StarsGameController, cardId: string): void 
 /**
  * Handle cell click
  */
-function handleCellClick(controller: StarsGameController, row: number, col: number): void {
+function handleCellClick(
+  controller: StarsGameController,
+  row: number,
+  col: number
+): void {
   controller.state = placeCard(controller.state, row, col);
   controller.update();
 }

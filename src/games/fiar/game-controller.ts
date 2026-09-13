@@ -1,11 +1,7 @@
 // FIAR Game Controller
 // Main game logic and UI orchestration
 
-import {
-  FiarGameState,
-  createInitialState,
-  CONFIG,
-} from './types';
+import { FiarGameState, createInitialState, CONFIG } from './types';
 import {
   canPlaceChip,
   placeChip,
@@ -137,7 +133,11 @@ function handleNodeClick(nodeId: string): void {
       }
 
       // Check if AI should play
-      if (isAIMode && gameState.currentPlayer === 'player2' && !gameState.winner) {
+      if (
+        isAIMode &&
+        gameState.currentPlayer === 'player2' &&
+        !gameState.winner
+      ) {
         setTimeout(aiTurn, 500);
       }
     }
@@ -164,7 +164,11 @@ function handleNodeClick(nodeId: string): void {
         }
 
         // Check if AI should play
-        if (isAIMode && gameState.currentPlayer === 'player2' && !gameState.winner) {
+        if (
+          isAIMode &&
+          gameState.currentPlayer === 'player2' &&
+          !gameState.winner
+        ) {
           setTimeout(aiTurn, 500);
         }
       } else if (node?.chip === gameState.currentPlayer) {
@@ -222,10 +226,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 // Public API
 // =============================================================================
 
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   injectFiarStyles();
   boardContainer = boardEl;
   statusContainer = statusEl;

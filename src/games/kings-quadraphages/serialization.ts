@@ -125,7 +125,11 @@ export function gameStateFromJSON(json: string): GameState {
   return deserializeGameState(data);
 }
 
-const VALID_TURN_PHASES: TurnPhase[] = ['moveKing', 'placeQuadraphage', 'gameOver'];
+const VALID_TURN_PHASES: TurnPhase[] = [
+  'moveKing',
+  'placeQuadraphage',
+  'gameOver',
+];
 const VALID_PLAYERS: PlayerOwner[] = ['player1', 'player2'];
 
 /**
@@ -138,7 +142,8 @@ export function validateSerializedState(data: unknown): boolean {
   const obj = data as Record<string, unknown>;
 
   if (typeof obj['version'] !== 'number') return false;
-  if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner)) return false;
+  if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner))
+    return false;
   if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) return false;
 
   if (

@@ -54,7 +54,11 @@ let activeContainer: HTMLElement | null = null;
 /**
  * Initialize the game
  */
-export function initGame(container: HTMLElement, vsAI: boolean = false, difficulty: AIDifficulty = 'medium'): FabGameController {
+export function initGame(
+  container: HTMLElement,
+  vsAI: boolean = false,
+  difficulty: AIDifficulty = 'medium'
+): FabGameController {
   injectFabStyles();
   activeContainer = container;
 
@@ -141,7 +145,9 @@ function updateUI(controller: FabGameController): void {
   // Operation selector (when two bars selected)
   if (state.selectedBar1 && state.selectedBar2) {
     leftColumn.appendChild(
-      renderOperationSelector(state, (op) => handleOperationSelect(controller, op))
+      renderOperationSelector(state, (op) =>
+        handleOperationSelect(controller, op)
+      )
     );
   }
 
@@ -152,7 +158,9 @@ function updateUI(controller: FabGameController): void {
   rightColumn.className = 'fab-right-column';
 
   rightColumn.appendChild(
-    renderAnswerBoard(state, (answerId) => handleAnswerClick(controller, answerId))
+    renderAnswerBoard(state, (answerId) =>
+      handleAnswerClick(controller, answerId)
+    )
   );
 
   if (state.moveHistory.length > 0) {
@@ -233,7 +241,10 @@ function handleOperationSelect(
 /**
  * Handle answer click
  */
-function handleAnswerClick(controller: FabGameController, answerId: string): void {
+function handleAnswerClick(
+  controller: FabGameController,
+  answerId: string
+): void {
   if (controller.state.phase !== 'confirmingMove') return;
 
   controller.state = executeMove(controller.state, answerId);

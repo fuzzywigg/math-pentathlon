@@ -48,7 +48,9 @@ export function bfs(graph: Graph, start: NodeId, end: NodeId): PathResult {
   }
 
   const visited = new Set<NodeId>();
-  const queue: { node: NodeId; path: NodeId[] }[] = [{ node: start, path: [start] }];
+  const queue: { node: NodeId; path: NodeId[] }[] = [
+    { node: start, path: [start] },
+  ];
 
   while (queue.length > 0) {
     const { node, path } = queue.shift()!;
@@ -240,7 +242,12 @@ export function findAllPaths(
 ): GraphPath[] {
   const paths: GraphPath[] = [];
 
-  function dfs(current: NodeId, path: NodeId[], visited: Set<NodeId>, weight: number): void {
+  function dfs(
+    current: NodeId,
+    path: NodeId[],
+    visited: Set<NodeId>,
+    weight: number
+  ): void {
     if (path.length > maxDepth) return;
 
     if (current === end) {
@@ -269,7 +276,11 @@ export function findAllPaths(
 /**
  * Find nodes at exact distance from start
  */
-export function findNodesAtDistance(graph: Graph, start: NodeId, distance: number): NodeId[] {
+export function findNodesAtDistance(
+  graph: Graph,
+  start: NodeId,
+  distance: number
+): NodeId[] {
   const distances = new Map<NodeId, number>();
   const queue: NodeId[] = [start];
   distances.set(start, 0);
@@ -297,7 +308,11 @@ export function findNodesAtDistance(graph: Graph, start: NodeId, distance: numbe
 /**
  * Find nodes within distance from start
  */
-export function findNodesWithinDistance(graph: Graph, start: NodeId, maxDistance: number): NodeId[] {
+export function findNodesWithinDistance(
+  graph: Graph,
+  start: NodeId,
+  maxDistance: number
+): NodeId[] {
   const distances = new Map<NodeId, number>();
   const queue: NodeId[] = [start];
   distances.set(start, 0);
@@ -363,7 +378,10 @@ export function findPlayerRegion(
 /**
  * Find all regions owned by a player
  */
-export function findAllPlayerRegions(board: GraphBoard, playerId: number): NodeId[][] {
+export function findAllPlayerRegions(
+  board: GraphBoard,
+  playerId: number
+): NodeId[][] {
   const visited = new Set<NodeId>();
   const regions: NodeId[][] = [];
 
@@ -427,7 +445,10 @@ export function playerConnectsSets(
 /**
  * Count the longest path owned by a player
  */
-export function findLongestPlayerPath(board: GraphBoard, playerId: number): NodeId[] {
+export function findLongestPlayerPath(
+  board: GraphBoard,
+  playerId: number
+): NodeId[] {
   let longestPath: NodeId[] = [];
 
   // Get all player nodes

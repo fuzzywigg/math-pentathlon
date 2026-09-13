@@ -134,7 +134,9 @@ export function passTurn(state: ContigState): ContigState {
   };
 
   // Check if player is eliminated
-  if (newConsecutivePasses[state.currentPlayer] >= CONFIG.MAX_CONSECUTIVE_PASSES) {
+  if (
+    newConsecutivePasses[state.currentPlayer] >= CONFIG.MAX_CONSECUTIVE_PASSES
+  ) {
     // Current player loses
     return {
       ...state,
@@ -168,10 +170,10 @@ function checkFiveInRow(state: ContigState, player: Player): boolean {
 
   // Check all directions from each cell
   const directions = [
-    [0, 1],   // Horizontal
-    [1, 0],   // Vertical
-    [1, 1],   // Diagonal down-right
-    [1, -1],  // Diagonal down-left
+    [0, 1], // Horizontal
+    [1, 0], // Vertical
+    [1, 1], // Diagonal down-right
+    [1, -1], // Diagonal down-left
   ];
 
   for (let row = 0; row < rows; row++) {

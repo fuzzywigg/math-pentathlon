@@ -42,7 +42,9 @@ export function createEmptyBoard(size: number = DEFAULT_BOARD_SIZE): HexBoard {
 }
 
 // Create initial game state
-export function createInitialState(boardSize: number = DEFAULT_BOARD_SIZE): HexGameState {
+export function createInitialState(
+  boardSize: number = DEFAULT_BOARD_SIZE
+): HexGameState {
   return {
     board: createEmptyBoard(boardSize),
     currentPlayer: 'player1',

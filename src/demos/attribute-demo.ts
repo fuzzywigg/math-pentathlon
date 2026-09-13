@@ -292,7 +292,9 @@ function initAttributePiecesSection(): void {
     if (!gridContainer) return;
 
     gridContainer.innerHTML = '';
-    const selectedIds = selectedPiece ? new Set([selectedPiece.id]) : new Set<string>();
+    const selectedIds = selectedPiece
+      ? new Set([selectedPiece.id])
+      : new Set<string>();
 
     const grid = createPieceGrid(
       allPieces.slice(0, 15),
@@ -312,7 +314,8 @@ function initAttributePiecesSection(): void {
   function showInfo(): void {
     if (!infoContainer || !selectedPiece) {
       if (infoContainer) {
-        infoContainer.innerHTML = '<span class="placeholder">Click a piece to see its attributes</span>';
+        infoContainer.innerHTML =
+          '<span class="placeholder">Click a piece to see its attributes</span>';
       }
       return;
     }
@@ -333,8 +336,16 @@ function initAttributePiecesSection(): void {
       if (setName === 'math') {
         currentDefs = [
           { name: 'number', displayName: 'Number', possibleValues: [] },
-          { name: 'isPrime', displayName: 'Prime', possibleValues: [true, false] },
-          { name: 'isEven', displayName: 'Even', possibleValues: [true, false] },
+          {
+            name: 'isPrime',
+            displayName: 'Prime',
+            possibleValues: [true, false],
+          },
+          {
+            name: 'isEven',
+            displayName: 'Even',
+            possibleValues: [true, false],
+          },
         ];
       } else {
         currentDefs = BASIC_ATTRIBUTES;
@@ -364,12 +375,14 @@ function initSetGameSection(): void {
 
   // Generate 12 random cards
   for (let i = 0; i < 12; i++) {
-    setCards.push(createPiece(`set-${i}`, {
-      number: (i % 3) + 1,
-      shape: shapes[Math.floor(i / 4) % 3],
-      color: colors[i % 3],
-      shading: shadings[Math.floor(i / 3) % 3],
-    }));
+    setCards.push(
+      createPiece(`set-${i}`, {
+        number: (i % 3) + 1,
+        shape: shapes[Math.floor(i / 4) % 3],
+        color: colors[i % 3],
+        shading: shadings[Math.floor(i / 3) % 3],
+      })
+    );
   }
 
   const selectedCards = new Set<string>();
@@ -500,7 +513,10 @@ function initComparisonSection(): void {
       slot1.innerHTML = '';
       if (piece1) {
         slot1.classList.add('filled');
-        const svg = renderAttributePiece(piece1, BASIC_ATTRIBUTES, { pieceSize: 80, shape: 'circle' });
+        const svg = renderAttributePiece(piece1, BASIC_ATTRIBUTES, {
+          pieceSize: 80,
+          shape: 'circle',
+        });
         slot1.appendChild(svg);
       } else {
         slot1.classList.remove('filled');
@@ -512,7 +528,10 @@ function initComparisonSection(): void {
       slot2.innerHTML = '';
       if (piece2) {
         slot2.classList.add('filled');
-        const svg = renderAttributePiece(piece2, BASIC_ATTRIBUTES, { pieceSize: 80, shape: 'circle' });
+        const svg = renderAttributePiece(piece2, BASIC_ATTRIBUTES, {
+          pieceSize: 80,
+          shape: 'circle',
+        });
         slot2.appendChild(svg);
       } else {
         slot2.classList.remove('filled');
@@ -525,7 +544,8 @@ function initComparisonSection(): void {
     if (!resultsContainer) return;
 
     if (!piece1 || !piece2) {
-      resultsContainer.innerHTML = '<span class="placeholder">Select two pieces to compare</span>';
+      resultsContainer.innerHTML =
+        '<span class="placeholder">Select two pieces to compare</span>';
       return;
     }
 

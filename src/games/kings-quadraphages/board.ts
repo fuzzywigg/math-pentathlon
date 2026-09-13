@@ -1,4 +1,9 @@
-import { Piece, PieceType, PlayerOwner, INITIAL_QUADRAPHAGE_COUNT } from './pieces';
+import {
+  Piece,
+  PieceType,
+  PlayerOwner,
+  INITIAL_QUADRAPHAGE_COUNT,
+} from './pieces';
 
 // Re-export piece types for convenience
 export type { Piece, PieceType, PlayerOwner };
@@ -41,7 +46,10 @@ export function fromOneBasedPosition(row: number, col: number): Position {
 }
 
 // Convert 0-based Position to 1-based values
-export function toOneBasedPosition(pos: Position): { row: number; col: number } {
+export function toOneBasedPosition(pos: Position): {
+  row: number;
+  col: number;
+} {
   return { row: pos.row + 1, col: pos.col + 1 };
 }
 
@@ -78,7 +86,9 @@ export function createInitialBoard(): Board {
 
 // Helper to check if a position is within the board
 export function isValidPosition(pos: Position): boolean {
-  return pos.row >= 0 && pos.row < BOARD_SIZE && pos.col >= 0 && pos.col < BOARD_SIZE;
+  return (
+    pos.row >= 0 && pos.row < BOARD_SIZE && pos.col >= 0 && pos.col < BOARD_SIZE
+  );
 }
 
 // Get the piece at a position (returns null if empty or invalid)

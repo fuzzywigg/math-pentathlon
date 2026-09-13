@@ -1,8 +1,18 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
-import { JuggleState, CONFIG, getCategoryFromDie, getShapesForDie, getCategoryName } from './types';
-import { getPreviewCells, isPlacementValid, getBoardFillPercentage } from './rules';
+import {
+  JuggleState,
+  CONFIG,
+  getCategoryFromDie,
+  getShapesForDie,
+  getCategoryName,
+} from './types';
+import {
+  getPreviewCells,
+  isPlacementValid,
+  getBoardFillPercentage,
+} from './rules';
 import { Board } from '../../core/polyomino/placement';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
@@ -53,13 +63,15 @@ export function renderBoard(
   grid.style.gridTemplateColumns = `repeat(${CONFIG.GRID_SIZE}, 1fr)`;
 
   // Get preview cells if hovering
-  const previewCells: Cell[] = state.hoverPosition && isCurrentPlayer
-    ? getPreviewCells(state, state.hoverPosition)
-    : [];
-  const isPreviewValid = state.hoverPosition && isCurrentPlayer
-    ? isPlacementValid(state, state.hoverPosition)
-    : false;
-  const previewSet = new Set(previewCells.map(c => `${c.row},${c.col}`));
+  const previewCells: Cell[] =
+    state.hoverPosition && isCurrentPlayer
+      ? getPreviewCells(state, state.hoverPosition)
+      : [];
+  const isPreviewValid =
+    state.hoverPosition && isCurrentPlayer
+      ? isPlacementValid(state, state.hoverPosition)
+      : false;
+  const previewSet = new Set(previewCells.map((c) => `${c.row},${c.col}`));
 
   for (let row = 0; row < CONFIG.GRID_SIZE; row++) {
     for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
@@ -74,7 +86,9 @@ export function renderBoard(
       if (isOccupied) {
         cell.classList.add(`occupied-${player}`);
       } else if (isPreview) {
-        cell.classList.add(isPreviewValid ? 'preview-valid' : 'preview-invalid');
+        cell.classList.add(
+          isPreviewValid ? 'preview-valid' : 'preview-invalid'
+        );
       }
 
       const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
@@ -183,7 +197,9 @@ export function renderShapeSelector(
   if (!state.currentDice || !state.selectedCategory) return container;
 
   // Get selected die value
-  const dieValue = state.currentDice.find(d => getCategoryFromDie(d) === state.selectedCategory);
+  const dieValue = state.currentDice.find(
+    (d) => getCategoryFromDie(d) === state.selectedCategory
+  );
   if (!dieValue) return container;
 
   const shapes = getShapesForDie(dieValue);
@@ -225,10 +241,10 @@ function renderShapePreview(
   cellSize: number = 12
 ): HTMLElement {
   const cells = getTransformedCells(shape, rotation, flipped);
-  const minRow = Math.min(...cells.map(c => c.row));
-  const maxRow = Math.max(...cells.map(c => c.row));
-  const minCol = Math.min(...cells.map(c => c.col));
-  const maxCol = Math.max(...cells.map(c => c.col));
+  const minRow = Math.min(...cells.map((c) => c.row));
+  const maxRow = Math.max(...cells.map((c) => c.row));
+  const minCol = Math.min(...cells.map((c) => c.col));
+  const maxCol = Math.max(...cells.map((c) => c.col));
 
   const width = (maxCol - minCol + 1) * cellSize + 4;
   const height = (maxRow - minRow + 1) * cellSize + 4;
@@ -270,12 +286,14 @@ export function renderShapeControls(
   // Show current shape preview
   const preview = document.createElement('div');
   preview.className = 'juggle-current-shape';
-  preview.appendChild(renderShapePreview(
-    state.selectedShape,
-    state.selectedRotation,
-    state.selectedFlipped,
-    16
-  ));
+  preview.appendChild(
+    renderShapePreview(
+      state.selectedShape,
+      state.selectedRotation,
+      state.selectedFlipped,
+      16
+    )
+  );
   container.appendChild(preview);
 
   // Control buttons

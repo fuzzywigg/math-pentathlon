@@ -74,12 +74,12 @@ export interface HexLayout {
  * For pointy-top hexes starting from right, going counter-clockwise
  */
 export const AXIAL_DIRECTIONS: readonly AxialCoord[] = [
-  { q: 1, r: 0 },   // East
-  { q: 1, r: -1 },  // Northeast
-  { q: 0, r: -1 },  // Northwest
-  { q: -1, r: 0 },  // West
-  { q: -1, r: 1 },  // Southwest
-  { q: 0, r: 1 },   // Southeast
+  { q: 1, r: 0 }, // East
+  { q: 1, r: -1 }, // Northeast
+  { q: 0, r: -1 }, // Northwest
+  { q: -1, r: 0 }, // West
+  { q: -1, r: 1 }, // Southwest
+  { q: 0, r: 1 }, // Southeast
 ] as const;
 
 /**
@@ -135,7 +135,9 @@ export function createAxial(q: number, r: number): AxialCoord {
 
 export function createCube(x: number, y: number, z: number): CubeCoord {
   if (Math.round(x + y + z) !== 0) {
-    throw new Error(`Invalid cube coordinates: ${x} + ${y} + ${z} = ${x + y + z} (must equal 0)`);
+    throw new Error(
+      `Invalid cube coordinates: ${x} + ${y} + ${z} = ${x + y + z} (must equal 0)`
+    );
   }
   return { x, y, z };
 }

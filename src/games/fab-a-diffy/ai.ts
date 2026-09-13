@@ -13,10 +13,7 @@
 // 4. Some answers can be made multiple ways - find the one using bars you want to use
 // 5. Check if your answer simplifies to match a target (2/4 = 1/2)
 
-import {
-  FabADiffyState,
-  Player,
-} from './types';
+import { FabADiffyState, Player } from './types';
 
 import { FractionOperation } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
@@ -57,8 +54,12 @@ interface ValidMove {
 function findAllValidMoves(state: FabADiffyState): ValidMove[] {
   const moves: ValidMove[] = [];
 
-  const availableBars = Array.from(state.fractionBars.values()).filter(b => !b.used);
-  const unclaimedAnswers = Array.from(state.answerBars.values()).filter(a => !a.claimedBy);
+  const availableBars = Array.from(state.fractionBars.values()).filter(
+    (b) => !b.used
+  );
+  const unclaimedAnswers = Array.from(state.answerBars.values()).filter(
+    (a) => !a.claimedBy
+  );
 
   if (availableBars.length < 2) return moves;
 
@@ -73,7 +74,7 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
 
       for (const { operation, result } of results) {
         // Find matching answer bars
-        const matchingAnswers = unclaimedAnswers.filter(a =>
+        const matchingAnswers = unclaimedAnswers.filter((a) =>
           areEquivalent(a.fraction, result)
         );
 
@@ -101,8 +102,15 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
           for (let k = 0; k < availableBars.length; k++) {
             for (let l = k + 1; l < availableBars.length; l++) {
               if ((k === i && l === j) || (k === j && l === i)) continue;
-              const otherResults = getPossibleResults(availableBars[k], availableBars[l]);
-              if (otherResults.some(r => areEquivalent(r.result, answer.fraction))) {
+              const otherResults = getPossibleResults(
+                availableBars[k],
+                availableBars[l]
+              );
+              if (
+                otherResults.some((r) =>
+                  areEquivalent(r.result, answer.fraction)
+                )
+              ) {
                 alternateWays++;
               }
             }

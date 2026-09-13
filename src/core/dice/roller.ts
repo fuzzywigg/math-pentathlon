@@ -1,6 +1,14 @@
 // Dice Rolling Logic
 
-import { DiceConfig, DiceType, DieRoll, RollResult, RollConfig, DICE_CONFIGS, DICE_FACES } from './types';
+import {
+  DiceConfig,
+  DiceType,
+  DieRoll,
+  RollResult,
+  RollConfig,
+  DICE_CONFIGS,
+  DICE_FACES,
+} from './types';
 
 /** Generate a unique ID */
 function generateId(): string {
@@ -23,7 +31,7 @@ export function rollDie(type: DiceType): DieRoll {
 
 /** Roll multiple dice from a config */
 export function rollDice(config: RollConfig): RollResult {
-  const rolls = config.dice.map(type => rollDie(type));
+  const rolls = config.dice.map((type) => rollDie(type));
   return {
     id: generateId(),
     rolls,
@@ -43,7 +51,7 @@ export function rollMultiple(type: DiceType, count: number): RollResult {
 
 /** Re-roll specific dice (skips locked dice) */
 export function rerollDice(result: RollResult, dieIds: string[]): RollResult {
-  const newRolls = result.rolls.map(die => {
+  const newRolls = result.rolls.map((die) => {
     if (dieIds.includes(die.id) && !die.isLocked) {
       return rollDie(die.diceType);
     }
@@ -60,7 +68,7 @@ export function rerollDice(result: RollResult, dieIds: string[]): RollResult {
 export function lockDice(result: RollResult, dieIds: string[]): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map(die =>
+    rolls: result.rolls.map((die) =>
       dieIds.includes(die.id) ? { ...die, isLocked: true } : die
     ),
   };
@@ -70,27 +78,34 @@ export function lockDice(result: RollResult, dieIds: string[]): RollResult {
 export function unlockDice(result: RollResult, dieIds: string[]): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map(die =>
+    rolls: result.rolls.map((die) =>
       dieIds.includes(die.id) ? { ...die, isLocked: false } : die
     ),
   };
 }
 
 /** Toggle selection state of a single die */
-export function toggleDiceSelection(result: RollResult, dieId: string): RollResult {
+export function toggleDiceSelection(
+  result: RollResult,
+  dieId: string
+): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map(die =>
+    rolls: result.rolls.map((die) =>
       die.id === dieId ? { ...die, isSelected: !die.isSelected } : die
     ),
   };
 }
 
 /** Select or deselect specific dice */
-export function selectDice(result: RollResult, dieIds: string[], selected: boolean): RollResult {
+export function selectDice(
+  result: RollResult,
+  dieIds: string[],
+  selected: boolean
+): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map(die =>
+    rolls: result.rolls.map((die) =>
       dieIds.includes(die.id) ? { ...die, isSelected: selected } : die
     ),
   };
@@ -100,27 +115,38 @@ export function selectDice(result: RollResult, dieIds: string[], selected: boole
 export function clearSelection(result: RollResult): RollResult {
   return {
     ...result,
-    rolls: result.rolls.map(die => ({ ...die, isSelected: false })),
+    rolls: result.rolls.map((die) => ({ ...die, isSelected: false })),
   };
 }
 
 /** Get values of selected dice */
 export function getSelectedValues(result: RollResult): number[] {
-  return result.rolls.filter(die => die.isSelected).map(die => die.value);
+  return result.rolls.filter((die) => die.isSelected).map((die) => die.value);
 }
 
 /** Get sum of selected dice */
 export function getSelectedTotal(result: RollResult): number {
   return result.rolls
-    .filter(die => die.isSelected)
+    .filter((die) => die.isSelected)
     .reduce((sum, die) => sum + die.value, 0);
 }
 
 /** Check if current selection satisfies the config constraints */
-export function isValidSelection(result: RollResult, config: RollConfig): boolean {
-  const selectedCount = result.rolls.filter(d => d.isSelected).length;
-  if (config.minSelectable !== undefined && selectedCount < config.minSelectable) return false;
-  if (config.maxSelectable !== undefined && selectedCount > config.maxSelectable) return false;
+export function isValidSelection(
+  result: RollResult,
+  config: RollConfig
+): boolean {
+  const selectedCount = result.rolls.filter((d) => d.isSelected).length;
+  if (
+    config.minSelectable !== undefined &&
+    selectedCount < config.minSelectable
+  )
+    return false;
+  if (
+    config.maxSelectable !== undefined &&
+    selectedCount > config.maxSelectable
+  )
+    return false;
   return true;
 }
 
@@ -128,7 +154,7 @@ export function isValidSelection(result: RollResult, config: RollConfig): boolea
 export function getAllPossibleSums(values: number[]): number[] {
   const sums = new Set<number>();
   const n = values.length;
-  for (let mask = 1; mask < (1 << n); mask++) {
+  for (let mask = 1; mask < 1 << n; mask++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
       if (mask & (1 << i)) sum += values[i];
@@ -142,7 +168,7 @@ export function getAllPossibleSums(values: number[]): number[] {
 export function getAllPossibleProducts(values: number[]): number[] {
   const products = new Set<number>();
   const n = values.length;
-  for (let mask = 1; mask < (1 << n); mask++) {
+  for (let mask = 1; mask < 1 << n; mask++) {
     let product = 1;
     for (let i = 0; i < n; i++) {
       if (mask & (1 << i)) product *= values[i];

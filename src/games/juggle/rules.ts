@@ -100,7 +100,10 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
 /**
  * Select a specific shape
  */
-export function selectShape(state: JuggleState, shape: PolyominoShape): JuggleState {
+export function selectShape(
+  state: JuggleState,
+  shape: PolyominoShape
+): JuggleState {
   if (state.phase !== 'selectingShape' || !state.selectedCategory) return state;
 
   return {
@@ -229,7 +232,9 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
   return {
     ...state,
     boards: newBoards,
-    currentPlayer: winner ? state.currentPlayer : getOpponent(state.currentPlayer),
+    currentPlayer: winner
+      ? state.currentPlayer
+      : getOpponent(state.currentPlayer),
     currentDice: null,
     selectedCategory: null,
     selectedShape: null,
@@ -249,7 +254,10 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
 /**
  * Check for winner
  */
-export function checkWinner(boards: { player1: Board; player2: Board }): Player | null {
+export function checkWinner(boards: {
+  player1: Board;
+  player2: Board;
+}): Player | null {
   // Player wins by filling their board first
   if (isBoardFilled(boards.player1)) return 'player1';
   if (isBoardFilled(boards.player2)) return 'player2';

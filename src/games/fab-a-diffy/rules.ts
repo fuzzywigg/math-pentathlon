@@ -81,7 +81,10 @@ export function createInitialState(): FabADiffyState {
 /**
  * Select first fraction bar
  */
-export function selectBar1(state: FabADiffyState, barId: string): FabADiffyState {
+export function selectBar1(
+  state: FabADiffyState,
+  barId: string
+): FabADiffyState {
   if (state.phase !== 'selectingBar1') return state;
 
   const bar = state.fractionBars.get(barId);
@@ -97,7 +100,10 @@ export function selectBar1(state: FabADiffyState, barId: string): FabADiffyState
 /**
  * Select second fraction bar
  */
-export function selectBar2(state: FabADiffyState, barId: string): FabADiffyState {
+export function selectBar2(
+  state: FabADiffyState,
+  barId: string
+): FabADiffyState {
   if (state.phase !== 'selectingBar2') return state;
   if (barId === state.selectedBar1) return state;
 
@@ -170,7 +176,12 @@ export function getPossibleResults(
   bar1: FractionBar,
   bar2: FractionBar
 ): Array<{ operation: FractionOperation; result: Fraction }> {
-  const operations: FractionOperation[] = ['add', 'subtract', 'multiply', 'divide'];
+  const operations: FractionOperation[] = [
+    'add',
+    'subtract',
+    'multiply',
+    'divide',
+  ];
   const results: Array<{ operation: FractionOperation; result: Fraction }> = [];
 
   for (const op of operations) {
@@ -259,7 +270,11 @@ export function executeMove(
   }
 
   // Calculate result
-  const result = calculateResult(bar1.fraction, bar2.fraction, state.selectedOperation);
+  const result = calculateResult(
+    bar1.fraction,
+    bar2.fraction,
+    state.selectedOperation
+  );
   if (!result || !areEquivalent(result, answer.fraction)) {
     return state;
   }
@@ -291,7 +306,9 @@ export function executeMove(
   const winner = checkWinner(newAnswerBars, newFractionBars);
 
   // Switch turns
-  const nextPlayer = winner ? state.currentPlayer : getOpponent(state.currentPlayer);
+  const nextPlayer = winner
+    ? state.currentPlayer
+    : getOpponent(state.currentPlayer);
 
   return {
     ...state,
@@ -367,8 +384,11 @@ export function checkWinner(
 
   // If most bars are used, end game
   if (usedBars >= fractionBars.size - 1) {
-    return player1Claims > player2Claims ? 'player1' :
-           player2Claims > player1Claims ? 'player2' : null;
+    return player1Claims > player2Claims
+      ? 'player1'
+      : player2Claims > player1Claims
+        ? 'player2'
+        : null;
   }
 
   return null;
@@ -377,7 +397,10 @@ export function checkWinner(
 /**
  * Determine winner based on scores
  */
-function determineWinner(scores: { player1: number; player2: number }): Player | null {
+function determineWinner(scores: {
+  player1: number;
+  player2: number;
+}): Player | null {
   if (scores.player1 > scores.player2) return 'player1';
   if (scores.player2 > scores.player1) return 'player2';
   return null; // Tie
@@ -387,7 +410,9 @@ function determineWinner(scores: { player1: number; player2: number }): Player |
  * Check if any valid moves exist
  */
 export function hasAnyValidMove(state: FabADiffyState): boolean {
-  const availableBars = Array.from(state.fractionBars.values()).filter((b) => !b.used);
+  const availableBars = Array.from(state.fractionBars.values()).filter(
+    (b) => !b.used
+  );
   if (availableBars.length < 2) return false;
 
   // Check if any pair can make a matching result

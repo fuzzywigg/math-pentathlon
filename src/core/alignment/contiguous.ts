@@ -52,7 +52,8 @@ export function getHexNeighbors(
   config: ContiguousConfig
 ): GridPosition[] {
   const { rows, cols, wrap = false } = config;
-  const offsets = row % 2 === 0 ? HEX_NEIGHBORS_EVEN_ROW : HEX_NEIGHBORS_ODD_ROW;
+  const offsets =
+    row % 2 === 0 ? HEX_NEIGHBORS_EVEN_ROW : HEX_NEIGHBORS_ODD_ROW;
   const neighbors: GridPosition[] = [];
 
   for (const offset of offsets) {
@@ -81,7 +82,11 @@ export function findRegion(
   startCol: number,
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): Region | null {
   const startValue = getCell(startRow, startCol);
 
@@ -133,7 +138,11 @@ export function findRegion(
 export function findAllRegions(
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): Region[] {
   const { rows, cols } = config;
   const visited = new Set<string>();
@@ -176,10 +185,14 @@ export function findRegionsForValue(
   value: CellValue,
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): Region[] {
   const allRegions = findAllRegions(getCell, config, getNeighborsFn);
-  return allRegions.filter(region => region.value === value);
+  return allRegions.filter((region) => region.value === value);
 }
 
 /**
@@ -189,7 +202,11 @@ export function getLargestRegion(
   value: CellValue,
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): Region | null {
   const regions = findRegionsForValue(value, getCell, config, getNeighborsFn);
 
@@ -210,16 +227,26 @@ export function areConnected(
   pos2: GridPosition,
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): boolean {
-  const region = findRegion(pos1.row, pos1.col, getCell, config, getNeighborsFn);
+  const region = findRegion(
+    pos1.row,
+    pos1.col,
+    getCell,
+    config,
+    getNeighborsFn
+  );
 
   if (!region) {
     return false;
   }
 
   return region.positions.some(
-    pos => pos.row === pos2.row && pos.col === pos2.col
+    (pos) => pos.row === pos2.row && pos.col === pos2.col
   );
 }
 
@@ -233,7 +260,7 @@ export function regionTouchesEdge(
 ): boolean {
   const { rows, cols } = config;
 
-  return region.positions.some(pos => {
+  return region.positions.some((pos) => {
     switch (edge) {
       case 'top':
         return pos.row === 0;
@@ -256,8 +283,10 @@ export function regionConnectsEdges(
   edge2: 'top' | 'bottom' | 'left' | 'right',
   config: ContiguousConfig
 ): boolean {
-  return regionTouchesEdge(region, edge1, config) &&
-         regionTouchesEdge(region, edge2, config);
+  return (
+    regionTouchesEdge(region, edge1, config) &&
+    regionTouchesEdge(region, edge2, config)
+  );
 }
 
 /**
@@ -269,7 +298,11 @@ export function findPath(
   end: GridPosition,
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): GridPosition[] | null {
   const startValue = getCell(start.row, start.col);
   const endValue = getCell(end.row, end.col);
@@ -282,7 +315,7 @@ export function findPath(
   // BFS to find path
   const visited = new Set<string>();
   const queue: { pos: GridPosition; path: GridPosition[] }[] = [
-    { pos: start, path: [start] }
+    { pos: start, path: [start] },
   ];
 
   while (queue.length > 0) {
@@ -302,10 +335,13 @@ export function findPath(
     const neighbors = getNeighborsFn(pos.row, pos.col, config);
     for (const neighbor of neighbors) {
       const neighborKey = `${neighbor.row},${neighbor.col}`;
-      if (!visited.has(neighborKey) && getCell(neighbor.row, neighbor.col) === startValue) {
+      if (
+        !visited.has(neighborKey) &&
+        getCell(neighbor.row, neighbor.col) === startValue
+      ) {
         queue.push({
           pos: neighbor,
-          path: [...path, neighbor]
+          path: [...path, neighbor],
         });
       }
     }
@@ -320,7 +356,11 @@ export function findPath(
 export function countRegionsByValue(
   getCell: CellGetter,
   config: ContiguousConfig,
-  getNeighborsFn: (row: number, col: number, config: ContiguousConfig) => GridPosition[] = getNeighbors
+  getNeighborsFn: (
+    row: number,
+    col: number,
+    config: ContiguousConfig
+  ) => GridPosition[] = getNeighbors
 ): Map<CellValue, number> {
   const allRegions = findAllRegions(getCell, config, getNeighborsFn);
   const counts = new Map<CellValue, number>();

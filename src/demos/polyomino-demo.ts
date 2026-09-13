@@ -429,10 +429,17 @@ function updateSelectedShapeDisplay(): void {
   const orientationsGallery = document.getElementById('all-orientations');
   const orientationCount = document.getElementById('orientation-count');
 
-  if (!display || !controlsContainer || !orientationsGallery || !orientationCount) return;
+  if (
+    !display ||
+    !controlsContainer ||
+    !orientationsGallery ||
+    !orientationCount
+  )
+    return;
 
   if (!selectedShape) {
-    display.innerHTML = '<div class="placeholder">Click a shape above to select</div>';
+    display.innerHTML =
+      '<div class="placeholder">Click a shape above to select</div>';
     controlsContainer.innerHTML = '';
     orientationsGallery.innerHTML = '';
     orientationCount.textContent = '';
@@ -441,7 +448,9 @@ function updateSelectedShapeDisplay(): void {
 
   // Render current orientation
   display.innerHTML = '';
-  const svg = renderPolyomino(selectedShape, currentRotation, isFlipped, { cellSize: 30 });
+  const svg = renderPolyomino(selectedShape, currentRotation, isFlipped, {
+    cellSize: 30,
+  });
   display.appendChild(svg);
 
   // Rotation controls
@@ -480,7 +489,10 @@ function updateSelectedShapeDisplay(): void {
     const width = bbox.width * cellSize + 4;
     const height = bbox.height * cellSize + 4;
 
-    const miniSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const miniSvg = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    );
     miniSvg.setAttribute('width', String(width));
     miniSvg.setAttribute('height', String(height));
     miniSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -489,7 +501,10 @@ function updateSelectedShapeDisplay(): void {
       const x = (cell.col - bbox.minCol) * cellSize + 2;
       const y = (cell.row - bbox.minRow) * cellSize + 2;
 
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(x));
       rect.setAttribute('y', String(y));
       rect.setAttribute('width', String(cellSize - 1));
@@ -591,15 +606,29 @@ function renderBoardSection(): void {
 
     if (!hoverCell || !selectedShape) return;
 
-    const validation = validatePlacement(board, selectedShape, hoverCell, currentRotation, isFlipped);
-    const cells = getTransformedCells(selectedShape, currentRotation, isFlipped);
+    const validation = validatePlacement(
+      board,
+      selectedShape,
+      hoverCell,
+      currentRotation,
+      isFlipped
+    );
+    const cells = getTransformedCells(
+      selectedShape,
+      currentRotation,
+      isFlipped
+    );
 
     // Create preview SVG
-    const previewSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    const previewSvg = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'svg'
+    );
     previewSvg.classList.add('preview-overlay');
     previewSvg.setAttribute('width', String(board.cols * 30 + 4));
     previewSvg.setAttribute('height', String(board.rows * 30 + 4));
-    previewSvg.style.cssText = 'position: absolute; top: 0; left: 0; pointer-events: none;';
+    previewSvg.style.cssText =
+      'position: absolute; top: 0; left: 0; pointer-events: none;';
 
     const color = validation.valid ? '#4caf50' : '#f44336';
 
@@ -607,7 +636,10 @@ function renderBoardSection(): void {
       const x = (hoverCell!.col + cell.col) * 30 + 2;
       const y = (hoverCell!.row + cell.row) * 30 + 2;
 
-      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
       rect.setAttribute('x', String(x + 3));
       rect.setAttribute('y', String(y + 3));
       rect.setAttribute('width', '24');
@@ -628,9 +660,21 @@ function renderBoardSection(): void {
   function handleBoardClick(cell: Cell): void {
     if (!selectedShape) return;
 
-    const validation = validatePlacement(board, selectedShape, cell, currentRotation, isFlipped);
+    const validation = validatePlacement(
+      board,
+      selectedShape,
+      cell,
+      currentRotation,
+      isFlipped
+    );
     if (validation.valid) {
-      board = placePolyomino(board, selectedShape, cell, currentRotation, isFlipped);
+      board = placePolyomino(
+        board,
+        selectedShape,
+        cell,
+        currentRotation,
+        isFlipped
+      );
       renderCurrentBoard();
     }
   }
@@ -664,7 +708,12 @@ function updateValidPositions(): void {
     return;
   }
 
-  const positions = findValidPlacements(board, selectedShape, currentRotation, isFlipped);
+  const positions = findValidPlacements(
+    board,
+    selectedShape,
+    currentRotation,
+    isFlipped
+  );
   const canPlace = canPlaceShape(board, selectedShape);
 
   positionsInfo.innerHTML = `

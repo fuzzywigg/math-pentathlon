@@ -83,13 +83,23 @@ export function factorial(n: number): number {
  * Generate all possible expressions from three dice values
  * Returns expressions and their results
  */
-export function generateExpressions(d1: number, d2: number, d3: number): { expr: string; value: number }[] {
+export function generateExpressions(
+  d1: number,
+  d2: number,
+  d3: number
+): { expr: string; value: number }[] {
   const results: { expr: string; value: number }[] = [];
   const seen = new Set<number>();
 
   // Helper to add unique results
   const addResult = (expr: string, value: number) => {
-    if (!isNaN(value) && isFinite(value) && value > 0 && value <= 49 && Number.isInteger(value)) {
+    if (
+      !isNaN(value) &&
+      isFinite(value) &&
+      value > 0 &&
+      value <= 49 &&
+      Number.isInteger(value)
+    ) {
       if (!seen.has(value)) {
         seen.add(value);
         results.push({ expr, value });

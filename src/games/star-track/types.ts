@@ -22,10 +22,10 @@ export interface StarTrackPosition {
 
 // Game phases
 export type GamePhase =
-  | 'drawChains'      // Player draws two chains from bucket
-  | 'selectChain'     // Player chooses which chain to use
-  | 'moving'          // Animating movement (optional)
-  | 'gameOver';       // Someone reached the goal
+  | 'drawChains' // Player draws two chains from bucket
+  | 'selectChain' // Player chooses which chain to use
+  | 'moving' // Animating movement (optional)
+  | 'gameOver'; // Someone reached the goal
 
 // Game state
 export interface StarTrackGameState {
@@ -114,6 +114,9 @@ export function getOpponent(player: Player): Player {
 }
 
 // Get player's current position
-export function getPlayerPosition(state: StarTrackGameState, player: Player): number {
+export function getPlayerPosition(
+  state: StarTrackGameState,
+  player: Player
+): number {
   return player === 'player1' ? state.player1Position : state.player2Position;
 }

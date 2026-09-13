@@ -28,7 +28,9 @@ function createBoard(): Map<string, BoardCell> {
   const center = Math.floor(size / 2);
 
   // Generate spiral pattern
-  const values: number[][] = Array.from({ length: size }, () => Array(size).fill(0));
+  const values: number[][] = Array.from({ length: size }, () =>
+    Array(size).fill(0)
+  );
 
   let value = 1;
   let row = center;
@@ -85,7 +87,10 @@ function createBoard(): Map<string, BoardCell> {
 /**
  * Find cell by value
  */
-export function findCellByValue(state: PrimeGoldState, value: number): BoardCell | null {
+export function findCellByValue(
+  state: PrimeGoldState,
+  value: number
+): BoardCell | null {
   for (const cell of state.cells.values()) {
     if (cell.value === value) {
       return cell;
@@ -131,9 +136,12 @@ export function rollDice(state: PrimeGoldState): PrimeGoldState {
   if (state.phase !== 'rolling') return state;
 
   const diceRoll: DiceRoll = {
-    die1: Math.floor(Math.random() * DICE_CONFIG.die1.max) + DICE_CONFIG.die1.min,
-    die2: Math.floor(Math.random() * DICE_CONFIG.die2.max) + DICE_CONFIG.die2.min,
-    die3: Math.floor(Math.random() * DICE_CONFIG.die3.max) + DICE_CONFIG.die3.min,
+    die1:
+      Math.floor(Math.random() * DICE_CONFIG.die1.max) + DICE_CONFIG.die1.min,
+    die2:
+      Math.floor(Math.random() * DICE_CONFIG.die2.max) + DICE_CONFIG.die2.min,
+    die3:
+      Math.floor(Math.random() * DICE_CONFIG.die3.max) + DICE_CONFIG.die3.min,
   };
 
   return {
@@ -150,7 +158,9 @@ export function rollDice(state: PrimeGoldState): PrimeGoldState {
 /**
  * Get all valid placement values given current dice
  */
-export function getValidPlacements(state: PrimeGoldState): { value: number; expr: string }[] {
+export function getValidPlacements(
+  state: PrimeGoldState
+): { value: number; expr: string }[] {
   if (!state.diceRoll || state.phase !== 'placing') return [];
 
   const expressions = generateExpressions(
@@ -237,7 +247,8 @@ export function placeChip(
     else if (p2Veins > p1Veins) winner = 'player2';
   }
 
-  const nextPlayer: Player = state.currentPlayer === 'player1' ? 'player2' : 'player1';
+  const nextPlayer: Player =
+    state.currentPlayer === 'player1' ? 'player2' : 'player1';
 
   return {
     ...state,
@@ -258,7 +269,10 @@ export function placeChip(
 /**
  * Count diagonal prime veins for a player
  */
-function countPrimeVeins(cells: Map<string, BoardCell>, player: Player): number {
+function countPrimeVeins(
+  cells: Map<string, BoardCell>,
+  player: Player
+): number {
   const size = CONFIG.BOARD_SIZE;
   let veins = 0;
 
@@ -314,7 +328,8 @@ function countPrimeVeins(cells: Map<string, BoardCell>, player: Player): number 
 export function passTurn(state: PrimeGoldState): PrimeGoldState {
   if (state.phase === 'gameOver') return state;
 
-  const nextPlayer: Player = state.currentPlayer === 'player1' ? 'player2' : 'player1';
+  const nextPlayer: Player =
+    state.currentPlayer === 'player1' ? 'player2' : 'player1';
 
   return {
     ...state,

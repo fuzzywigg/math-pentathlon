@@ -83,7 +83,10 @@ function evaluateChainChoices(
     }
 
     // Factor 4: Consider opponent's position
-    const opponentPos = getPlayerPosition(state, aiPlayer === 'player1' ? 'player2' : 'player1');
+    const opponentPos = getPlayerPosition(
+      state,
+      aiPlayer === 'player1' ? 'player2' : 'player1'
+    );
     const opponentNeeds = TRACK_LENGTH - opponentPos;
 
     // Don't give back exactly what opponent needs
@@ -129,12 +132,18 @@ function getTeachingChoice(
     let hint: string | undefined;
     if (state.drawnChains) {
       const betterChain = state.drawnChains[betterChoice.chainIndex];
-      const currentPos = getPlayerPosition(state, aiPlayer === 'player1' ? 'player2' : 'player1');
+      const currentPos = getPlayerPosition(
+        state,
+        aiPlayer === 'player1' ? 'player2' : 'player1'
+      );
       const spacesNeeded = TRACK_LENGTH - currentPos;
 
       if (betterChain.length >= spacesNeeded) {
         hint = `Look! You could have won by choosing the ${betterChain.length}-chain!`;
-      } else if (betterChain.length > state.drawnChains[worseChoice.chainIndex].length + 2) {
+      } else if (
+        betterChain.length >
+        state.drawnChains[worseChoice.chainIndex].length + 2
+      ) {
         hint = `Think about which chain moves you further ahead!`;
       }
     }
@@ -213,12 +222,18 @@ export function executeAITurn(
   let currentState = state;
 
   // Phase 1: Draw chains
-  if (currentState.phase === 'drawChains' && currentState.currentPlayer === aiPlayer) {
+  if (
+    currentState.phase === 'drawChains' &&
+    currentState.currentPlayer === aiPlayer
+  ) {
     currentState = drawChains(currentState);
   }
 
   // Phase 2: Select chain
-  if (currentState.phase === 'selectChain' && currentState.currentPlayer === aiPlayer) {
+  if (
+    currentState.phase === 'selectChain' &&
+    currentState.currentPlayer === aiPlayer
+  ) {
     const choice = getAIChainChoice(currentState, aiPlayer, difficulty);
     if (choice) {
       currentState = selectChain(currentState, choice.chainIndex);

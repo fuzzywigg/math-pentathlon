@@ -276,7 +276,10 @@ function initTemplateSection(): void {
     if (!graphContainer || !infoContainer) return;
 
     graphContainer.innerHTML = '';
-    const svg = renderGraph(currentGraph, undefined, { nodeRadius: 18, showLabels: true });
+    const svg = renderGraph(currentGraph, undefined, {
+      nodeRadius: 18,
+      showLabels: true,
+    });
     graphContainer.appendChild(svg);
 
     // Show graph info
@@ -390,15 +393,18 @@ function initPathfindingSection(): void {
   function handleNodeClick(nodeId: NodeId): void {
     if (!startNode) {
       startNode = nodeId;
-      if (statusEl) statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
+      if (statusEl)
+        statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
     } else if (!endNode && nodeId !== startNode) {
       endNode = nodeId;
-      if (statusEl) statusEl.textContent = `Path from ${startNode} to ${endNode}`;
+      if (statusEl)
+        statusEl.textContent = `Path from ${startNode} to ${endNode}`;
     } else {
       // Reset and start new selection
       startNode = nodeId;
       endNode = null;
-      if (statusEl) statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
+      if (statusEl)
+        statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
       if (resultEl) resultEl.innerHTML = '';
     }
 

@@ -162,7 +162,10 @@ function triggerAITurn(): void {
 
     // AI places blocks one by one using AI module
     const aiPlaceBlocks = (): void => {
-      if (gameState.phase !== 'placeBlocks' || !gameState.selectedBlockForPlacement) {
+      if (
+        gameState.phase !== 'placeBlocks' ||
+        !gameState.selectedBlockForPlacement
+      ) {
         isAIThinking = false;
         render();
         return;
@@ -190,7 +193,10 @@ function triggerAITurn(): void {
       }
 
       // Continue placing if more blocks to place
-      if (gameState.phase === 'placeBlocks' && gameState.currentPlayer === 'player2') {
+      if (
+        gameState.phase === 'placeBlocks' &&
+        gameState.currentPlayer === 'player2'
+      ) {
         setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
       } else {
         isAIThinking = false;

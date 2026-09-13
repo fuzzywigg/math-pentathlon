@@ -169,7 +169,10 @@ export function createAlignmentLine(
   line.setAttribute('stroke', style.strokeColor || '#4caf50');
   line.setAttribute('stroke-width', String((style.strokeWidth || 2) * 2));
   line.setAttribute('stroke-linecap', 'round');
-  line.setAttribute('class', `highlight-line ${style.animate ? 'animated' : ''}`);
+  line.setAttribute(
+    'class',
+    `highlight-line ${style.animate ? 'animated' : ''}`
+  );
 
   return line;
 }
@@ -223,24 +226,33 @@ export function createPathHighlight(
   style: HighlightStyle = HIGHLIGHT_STYLES.path
 ): SVGPathElement {
   if (path.length < 2) {
-    const emptyPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const emptyPath = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'path'
+    );
     emptyPath.setAttribute('d', '');
     return emptyPath;
   }
 
-  const points = path.map(pos => cellToPixel(pos.row, pos.col));
-  const pathData = points.map((p, i) =>
-    `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`
-  ).join(' ');
+  const points = path.map((pos) => cellToPixel(pos.row, pos.col));
+  const pathData = points
+    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
+    .join(' ');
 
-  const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  const pathElement = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'path'
+  );
   pathElement.setAttribute('d', pathData);
   pathElement.setAttribute('stroke', style.strokeColor || '#9c27b0');
   pathElement.setAttribute('stroke-width', String(style.strokeWidth || 2));
   pathElement.setAttribute('fill', 'none');
   pathElement.setAttribute('stroke-linecap', 'round');
   pathElement.setAttribute('stroke-linejoin', 'round');
-  pathElement.setAttribute('class', `highlight-line ${style.animate ? 'animated' : ''} ${style.className || ''}`);
+  pathElement.setAttribute(
+    'class',
+    `highlight-line ${style.animate ? 'animated' : ''} ${style.className || ''}`
+  );
 
   return pathElement;
 }
@@ -252,10 +264,11 @@ export function markCellsForHighlight(
   container: HTMLElement,
   positions: GridPosition[],
   highlightClass: string,
-  cellSelector: (row: number, col: number) => string = (r, c) => `[data-row="${r}"][data-col="${c}"]`
+  cellSelector: (row: number, col: number) => string = (r, c) =>
+    `[data-row="${r}"][data-col="${c}"]`
 ): void {
   // Remove existing highlights
-  container.querySelectorAll(`.${highlightClass}`).forEach(el => {
+  container.querySelectorAll(`.${highlightClass}`).forEach((el) => {
     el.classList.remove(highlightClass);
   });
 
@@ -274,16 +287,21 @@ export function markCellsForHighlight(
  */
 export function clearHighlights(
   container: HTMLElement,
-  highlightClasses: string[] = ['highlight-winning', 'highlight-selected', 'highlight-threat', 'highlight-path']
+  highlightClasses: string[] = [
+    'highlight-winning',
+    'highlight-selected',
+    'highlight-threat',
+    'highlight-path',
+  ]
 ): void {
   for (const className of highlightClasses) {
-    container.querySelectorAll(`.${className}`).forEach(el => {
+    container.querySelectorAll(`.${className}`).forEach((el) => {
       el.classList.remove(className);
     });
   }
 
   // Also remove SVG highlight groups
-  container.querySelectorAll('.alignment-highlight').forEach(el => {
+  container.querySelectorAll('.alignment-highlight').forEach((el) => {
     el.remove();
   });
 }

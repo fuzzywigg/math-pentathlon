@@ -131,7 +131,8 @@ function renderStatusAndControls(): void {
     // Instructions
     const instructions = document.createElement('div');
     instructions.className = 'pent-instructions';
-    instructions.textContent = 'Click on the board to place your piece. The preview shows where it will go.';
+    instructions.textContent =
+      'Click on the board to place your piece. The preview shows where it will go.';
     statusContainer.appendChild(instructions);
   }
 
@@ -171,13 +172,15 @@ function handleCancel(): void {
 function handleCellClick(cell: Cell): void {
   if (gameState.phase !== 'placePiece' || !gameState.selectedPiece) return;
 
-  if (canPlacePiece(
-    gameState,
-    gameState.selectedPiece,
-    cell,
-    gameState.selectedRotation,
-    gameState.selectedFlipped
-  )) {
+  if (
+    canPlacePiece(
+      gameState,
+      gameState.selectedPiece,
+      cell,
+      gameState.selectedRotation,
+      gameState.selectedFlipped
+    )
+  ) {
     gameState = placePiece(
       gameState,
       gameState.selectedPiece,
@@ -188,7 +191,11 @@ function handleCellClick(cell: Cell): void {
     render();
 
     // AI turn
-    if (isAIMode && !gameState.winner && gameState.currentPlayer === 'player2') {
+    if (
+      isAIMode &&
+      !gameState.winner &&
+      gameState.currentPlayer === 'player2'
+    ) {
       setTimeout(aiTurn, 500);
     }
   }
@@ -211,7 +218,13 @@ function aiTurn(): void {
   const move = getAIMove(gameState, 'player2', aiDifficulty);
 
   if (move) {
-    gameState = placePiece(gameState, move.shapeId, move.position, move.rotation, move.flipped);
+    gameState = placePiece(
+      gameState,
+      move.shapeId,
+      move.position,
+      move.rotation,
+      move.flipped
+    );
     render();
   }
 }
@@ -220,10 +233,7 @@ function aiTurn(): void {
 // Public API
 // =============================================================================
 
-export function initGame(
-  boardEl: HTMLElement,
-  statusEl: HTMLElement
-): void {
+export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   injectPentEmInStyles();
   boardContainer = boardEl;
   statusContainer = statusEl;

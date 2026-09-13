@@ -11,7 +11,11 @@ import {
   TARGET_POINTS,
 } from './types';
 import { Fraction, COMMON_FRACTIONS } from '../../core/fractions/types';
-import { toDecimal, simplify, areEquivalent } from '../../core/fractions/arithmetic';
+import {
+  toDecimal,
+  simplify,
+  areEquivalent,
+} from '../../core/fractions/arithmetic';
 
 // =============================================================================
 // Challenge Generation
@@ -22,7 +26,7 @@ import { toDecimal, simplify, areEquivalent } from '../../core/fractions/arithme
  */
 function getConvertibleFractions(): Fraction[] {
   // Use fractions that have nice decimal representations
-  return COMMON_FRACTIONS.filter(f => {
+  return COMMON_FRACTIONS.filter((f) => {
     const decimal = f.numerator / f.denominator;
     // Check if decimal is terminating (ends within 4 decimal places)
     const rounded = Math.round(decimal * 10000) / 10000;
@@ -111,13 +115,34 @@ function generateWrongFractions(correct: Fraction, count: number): string[] {
   seen.add(formatFraction(simplify(correct)));
 
   const strategies = [
-    () => ({ numerator: correct.numerator + 1, denominator: correct.denominator }),
-    () => ({ numerator: correct.numerator - 1, denominator: correct.denominator }),
-    () => ({ numerator: correct.numerator, denominator: correct.denominator + 1 }),
-    () => ({ numerator: correct.numerator, denominator: correct.denominator - 1 }),
-    () => ({ numerator: correct.denominator, denominator: correct.numerator || 1 }),
-    () => ({ numerator: correct.numerator * 2, denominator: correct.denominator }),
-    () => ({ numerator: correct.numerator, denominator: correct.denominator * 2 }),
+    () => ({
+      numerator: correct.numerator + 1,
+      denominator: correct.denominator,
+    }),
+    () => ({
+      numerator: correct.numerator - 1,
+      denominator: correct.denominator,
+    }),
+    () => ({
+      numerator: correct.numerator,
+      denominator: correct.denominator + 1,
+    }),
+    () => ({
+      numerator: correct.numerator,
+      denominator: correct.denominator - 1,
+    }),
+    () => ({
+      numerator: correct.denominator,
+      denominator: correct.numerator || 1,
+    }),
+    () => ({
+      numerator: correct.numerator * 2,
+      denominator: correct.denominator,
+    }),
+    () => ({
+      numerator: correct.numerator,
+      denominator: correct.denominator * 2,
+    }),
   ];
 
   let attempts = 0;
@@ -166,13 +191,16 @@ function shuffleArray<T>(array: T[]): T[] {
 /**
  * Generate a conversion challenge
  */
-export function generateChallenge(challengeNumber: number): ConversionChallenge {
+export function generateChallenge(
+  challengeNumber: number
+): ConversionChallenge {
   const fractions = getConvertibleFractions();
   const fraction = fractions[Math.floor(Math.random() * fractions.length)];
   const decimal = toDecimal(fraction);
 
   // Alternate between types
-  const type = challengeNumber % 2 === 0 ? 'fractionToDecimal' : 'decimalToFraction';
+  const type =
+    challengeNumber % 2 === 0 ? 'fractionToDecimal' : 'decimalToFraction';
 
   let correctAnswer: string;
   let wrongs: string[];
@@ -204,7 +232,10 @@ export function generateChallenge(challengeNumber: number): ConversionChallenge 
 /**
  * Check if answer is correct
  */
-export function checkAnswer(challenge: ConversionChallenge, answer: string): boolean {
+export function checkAnswer(
+  challenge: ConversionChallenge,
+  answer: string
+): boolean {
   return answer === challenge.correctAnswer;
 }
 
@@ -215,7 +246,10 @@ export function checkAnswer(challenge: ConversionChallenge, answer: string): boo
 /**
  * Calculate points for correct answer (hit a random target)
  */
-export function hitRandomTarget(targets: PinballTarget[]): { target: PinballTarget; points: number } {
+export function hitRandomTarget(targets: PinballTarget[]): {
+  target: PinballTarget;
+  points: number;
+} {
   // Weight towards lower-value targets
   const weights = TARGET_POINTS.map((_, i) => Math.pow(0.6, i));
   const totalWeight = weights.reduce((a, b) => a + b, 0);
@@ -271,8 +305,10 @@ export function submitAnswer(
     };
   }
 
-  const newPlayer1Stats = state.currentPlayer === 'player1' ? newStats : state.player1Stats;
-  const newPlayer2Stats = state.currentPlayer === 'player2' ? newStats : state.player2Stats;
+  const newPlayer1Stats =
+    state.currentPlayer === 'player1' ? newStats : state.player1Stats;
+  const newPlayer2Stats =
+    state.currentPlayer === 'player2' ? newStats : state.player2Stats;
 
   return {
     ...state,
@@ -287,7 +323,9 @@ export function submitAnswer(
 /**
  * Continue to next challenge or end game
  */
-export function nextChallenge(state: FractionPinballState): FractionPinballState {
+export function nextChallenge(
+  state: FractionPinballState
+): FractionPinballState {
   const nextRound = state.roundNumber + 1;
   const nextPlayer = getOpponent(state.currentPlayer);
 
@@ -295,7 +333,8 @@ export function nextChallenge(state: FractionPinballState): FractionPinballState
   const p1Stats = state.player1Stats;
   const p2Stats = state.player2Stats;
 
-  const isGameOver = nextRound > state.maxRounds ||
+  const isGameOver =
+    nextRound > state.maxRounds ||
     (p1Stats.ballsRemaining <= 0 && p2Stats.ballsRemaining <= 0);
 
   if (isGameOver) {

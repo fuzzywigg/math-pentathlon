@@ -1,6 +1,11 @@
 // Game selector / landing page UI with accordion divisions
 
-import { GAMES, DIVISIONS, GameInfo, getGamesByDivision } from '../core/game-registry';
+import {
+  GAMES,
+  DIVISIONS,
+  GameInfo,
+  getGamesByDivision,
+} from '../core/game-registry';
 import { navigate } from '../core/router';
 
 function createGameCard(game: GameInfo): HTMLElement {
@@ -8,7 +13,10 @@ function createGameCard(game: GameInfo): HTMLElement {
   card.className = `game-card ${game.available ? '' : 'game-card-disabled'}`;
   card.setAttribute('role', 'button');
   card.setAttribute('tabindex', game.available ? '0' : '-1');
-  card.setAttribute('aria-label', `${game.name} - ${game.available ? 'Available' : 'Coming Soon'}`);
+  card.setAttribute(
+    'aria-label',
+    `${game.name} - ${game.available ? 'Available' : 'Coming Soon'}`
+  );
 
   const icon = document.createElement('div');
   icon.className = 'game-card-icon';
@@ -38,7 +46,8 @@ function createGameCard(game: GameInfo): HTMLElement {
 
   const difficulty = document.createElement('span');
   difficulty.className = `game-card-difficulty difficulty-${game.difficulty}`;
-  difficulty.textContent = game.difficulty.charAt(0).toUpperCase() + game.difficulty.slice(1);
+  difficulty.textContent =
+    game.difficulty.charAt(0).toUpperCase() + game.difficulty.slice(1);
   meta.appendChild(difficulty);
 
   content.appendChild(meta);
@@ -69,7 +78,12 @@ function createGameCard(game: GameInfo): HTMLElement {
   return card;
 }
 
-function createDivisionAccordion(divisionName: string, gradeRange: string, description: string, isFirst: boolean): HTMLElement {
+function createDivisionAccordion(
+  divisionName: string,
+  gradeRange: string,
+  description: string,
+  isFirst: boolean
+): HTMLElement {
   const section = document.createElement('section');
   section.className = `division-accordion ${isFirst ? 'accordion-open' : ''}`;
   section.setAttribute('data-division', divisionName);
@@ -80,7 +94,10 @@ function createDivisionAccordion(divisionName: string, gradeRange: string, descr
   const header = document.createElement('button');
   header.className = 'accordion-header';
   header.setAttribute('aria-expanded', isFirst ? 'true' : 'false');
-  header.setAttribute('aria-controls', `games-${divisionName.replace(/\s+/g, '-').toLowerCase()}`);
+  header.setAttribute(
+    'aria-controls',
+    `games-${divisionName.replace(/\s+/g, '-').toLowerCase()}`
+  );
 
   const headerContent = document.createElement('div');
   headerContent.className = 'accordion-header-content';
@@ -145,7 +162,9 @@ function createDivisionAccordion(divisionName: string, gradeRange: string, descr
 }
 
 function toggleAccordion(section: HTMLElement, open: boolean): void {
-  const header = section.querySelector('.accordion-header') as HTMLButtonElement | null;
+  const header = section.querySelector(
+    '.accordion-header'
+  ) as HTMLButtonElement | null;
   const panel = section.querySelector('.accordion-panel') as HTMLElement | null;
   if (!header || !panel) {
     return;
@@ -189,7 +208,8 @@ export function renderGameSelector(container: HTMLElement): void {
 
   const heroDescription = document.createElement('p');
   heroDescription.className = 'hero-description';
-  heroDescription.textContent = 'Master mathematical thinking through strategic gameplay. Practice your favorite Math Pentathlon games at home!';
+  heroDescription.textContent =
+    'Master mathematical thinking through strategic gameplay. Practice your favorite Math Pentathlon games at home!';
   heroContent.appendChild(heroDescription);
 
   // Stats row - simplified since all games are complete
@@ -255,7 +275,12 @@ export function renderGameSelector(container: HTMLElement): void {
 
   DIVISIONS.forEach((div, index) => {
     accordionContainer.appendChild(
-      createDivisionAccordion(div.name, div.gradeRange, div.description, index === 0)
+      createDivisionAccordion(
+        div.name,
+        div.gradeRange,
+        div.description,
+        index === 0
+      )
     );
   });
 
@@ -310,7 +335,9 @@ export function renderGameSelector(container: HTMLElement): void {
         }, 50);
 
         // Update active tab
-        tabNav.querySelectorAll('.division-tab').forEach(t => t.classList.remove('active'));
+        tabNav
+          .querySelectorAll('.division-tab')
+          .forEach((t) => t.classList.remove('active'));
         tab.classList.add('active');
       }
     });
