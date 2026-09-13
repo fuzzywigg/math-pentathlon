@@ -2924,28 +2924,25 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
   }) => {
     await page.goto('/#/game/star-track');
     await startVsAi(page);
-    const draw = page
-      .locator('.star-draw-btn, .st-draw-btn, button:has-text("Draw")')
-      .first();
-    if ((await draw.count()) > 0 && (await draw.isVisible().catch(() => false))) {
-      await draw.click({ force: true });
-    }
+    const draw = page.locator('.star-track-draw-btn').first();
+    await expect(draw).toBeVisible();
+    await draw.click({ force: true });
     await expect(
-      page.locator('.star-track, .st-board, .star-chains, .st-chain').first()
+      page
+        .locator('.star-track-chain-btn, .star-track-draw-btn, .star-track-board')
+        .first()
     ).toBeVisible();
   });
 
   test('Fab vs-AI bar pool click keeps selecting chrome', async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await startVsAi(page);
-    const bar = page
-      .locator('.fab-bar, .fab-fraction-bar, [data-bar-id], .fraction-bar')
-      .first();
+    const bar = page.locator('.fab-bar-wrapper, .fab-bar-pool .fab-bar').first();
     if ((await bar.count()) > 0) {
       await bar.click({ force: true });
     }
     await expect(
-      page.locator('.fab-board, .fab-bars, .fab-answers, .fab-pool').first()
+      page.locator('.fab-bar-pool, .fab-answer-board, .fab-scores').first()
     ).toBeVisible();
   });
 
