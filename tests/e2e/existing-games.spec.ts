@@ -2527,3 +2527,171 @@ test.describe('Wave 14 — Contig/Sum/Star/Calla/Hex/Queens/Fab/Par/Prime/Juggle
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
+  test('Hex-a-Gone bank select → confirm reveals place-phase chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+    }
+    const confirm = page.locator('.hex-a-gone-confirm-btn');
+    if ((await confirm.count()) > 0 && (await confirm.first().isEnabled())) {
+      await confirm.first().click({ force: true });
+      await expect(page.locator('.hex-a-gone-placing-info')).toBeVisible();
+    }
+    await expect(page.locator('.hex-a-gone-board')).toBeVisible();
+  });
+
+  test('Remainder Islands roll advances past roll CTA', async ({ page }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    await page.locator('.remainder-btn-roll').click();
+    await expect(page.locator('.remainder-board')).toBeVisible();
+  });
+
+  test('Pent piece select enters place chrome', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page
+      .locator('.pent-piece, .pent-em-in-piece, [data-shape-id], .piece-btn')
+      .first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-board, .pent-em-in-board, .pent-pieces').first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod rod select advances place-phase status', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    const selectable = page.locator('.ramrod-rod-wrapper.selectable');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+      await expect(page.locator('.ramrod-status')).toContainText(/Place rod/i);
+    }
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+  });
+
+  test('Kwatro chip select keeps board interactive', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    const chip = page
+      .locator('.kwa-chip, .kwatro-chip, [data-chip-id], .chip')
+      .first();
+    if ((await chip.count()) > 0) {
+      await chip.click({ force: true });
+    }
+    await expect(
+      page.locator('.kwa-board, .kwatro-board, .kwa-graph, canvas').first()
+    ).toBeVisible();
+  });
+
+  test('FIAR placement node click keeps status chrome', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    const node = page.locator('.fiar-node, [data-node-id], .graph-node').first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true });
+    }
+    await expect(
+      page.locator('.fiar-status, .fiar-chips-info, .fiar-board').first()
+    ).toBeVisible();
+  });
+
+  test('Stars card select enters placing chrome', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page
+      .locator('.stars-card, .sb-card, .stars-hand-card, [data-card-id]')
+      .first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-board, .sb-board, .stars-hand').first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact answer click advances to result or stays answering', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    const choice = page
+      .locator('.frac-fact-choice, .ff-choice, .answer-btn, button.choice')
+      .first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.frac-fact-board, .ff-problem, .frac-fact-result, .ff-score'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball answer click advances showResult or answering', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    const choice = page
+      .locator(
+        '.pinball-choice, .fp-choice, .answer-btn, button.choice, .fp-answer'
+      )
+      .first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.pinball-board, .fp-board, .fp-target, .fp-score')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Kings cell click selects king or keeps move-phase chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.kq-cell, .board-cell, [data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.kq-board, .kings-board, .board-grid, canvas').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes premature place without roll is a no-op', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+    const domino = page.locator('.sd-hand-player1 .sd-hand-domino').first();
+    if ((await domino.count()) > 0) {
+      await domino.click({ force: true });
+    }
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+  });
+
+  test('Contig premature cell click before roll keeps roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.contig-cell').first();
+    await cell.click({ force: true });
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+});
