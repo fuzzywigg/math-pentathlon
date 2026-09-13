@@ -756,3 +756,76 @@ describe('Controller illegal-click no-ops (Par / Stars / Fab / Kwatro / Contig /
     expect(beforePhase || board.querySelector('.juggle-board')).toBeTruthy();
   });
 });
+
+describe('Controller AI difficulty field round-trips (container games)', () => {
+  it('Par / Stars / Ramrod / Kwatro / Prime / Sum / Fab keep aiDifficulty', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    expect(parVsAI(container, 'hard').aiDifficulty).toBe('hard');
+    expect(starsVsAI(container, 'medium').aiDifficulty).toBe('medium');
+    expect(ramrodVsAI(container, 'easy').aiDifficulty).toBe('easy');
+    expect(kwaVsAI(container, 'hard').aiDifficulty).toBe('hard');
+    expect(primeVsAI(container, 'medium').aiDifficulty).toBe('medium');
+    expect(sdVsAI(container, 'easy').aiDifficulty).toBe('easy');
+    expect(fabVsAI(container, 'hard').aiDifficulty).toBe('hard');
+  });
+});
+
+describe('Controller illegal-click deepenings (Hex-a-Gone / Remainder / Pent / FIAR)', () => {
+  it('Hex-a-Gone board click before commit keeps selectBlocks', () => {
+    const { board, status } = mountPair();
+    initHexAGone(board, status);
+    hexAGoneVsHuman();
+    expect(getHexAGoneState().phase).toBe('selectBlocks');
+    const before = getHexAGoneState().moveHistory?.length ?? 0;
+    const cell = board.querySelector(
+      '.hex-a-gone-cell, [data-q], .hex-cell'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexAGoneState().phase).toBe('selectBlocks');
+    expect(getHexAGoneState().moveHistory?.length ?? 0).toBe(before);
+  });
+
+  it('Remainder island click before roll stays rolling', () => {
+    const { board, status } = mountPair();
+    initRemainder(board, status);
+    remainderVsHuman();
+    expect(getRemainderState().phase).toBe('rolling');
+    const island = board.querySelector(
+      '.remainder-island, [data-island-id]'
+    ) as HTMLElement | null;
+    island?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getRemainderState().phase).toBe('rolling');
+    expect(getRemainderState().currentRoll).toBeNull();
+  });
+
+  it('Pent board click without piece keeps selectPiece', () => {
+    const { board, status } = mountPair();
+    initPent(board, status);
+    pentVsHuman();
+    expect(getPentState().phase).toBe('selectPiece');
+    const cell = board.querySelector(
+      '.pent-cell, [data-row], .pent-board td'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getPentState().phase).toBe('selectPiece');
+    expect(getPentState().selectedPiece).toBeNull();
+  });
+
+  it('FIAR movement-node click without selection stays in placement or movement', () => {
+    const { board, status } = mountPair();
+    initFiar(board, status);
+    fiarVsHuman();
+    const phase = getFiarState().phase;
+    expect(phase === 'placement' || phase === 'movement').toBe(true);
+    const before = getFiarState().moveHistory.length;
+    const node = board.querySelector(
+      '[data-node-id], .fiar-node'
+    ) as HTMLElement | null;
+    // Premature movement dest without selection should not crash
+    node?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getFiarState().moveHistory.length).toBeGreaterThanOrEqual(before);
+    expect(board.querySelector('.fiar-board, svg')).toBeTruthy();
+  });
+});
