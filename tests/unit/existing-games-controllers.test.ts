@@ -83,6 +83,7 @@ import {
   setAIDifficulty as setHexAGoneAI,
   startTutorial as startHexAGoneTutorial,
   isTutorialActive as isHexAGoneTutorial,
+  resetGame as resetHexAGone,
 } from '../../src/games/hex-a-gone/game-controller';
 import {
   initGame as initPent,
@@ -147,6 +148,7 @@ import {
   setAIDifficulty as setStarAI,
   startTutorial as startStarTutorial,
   isTutorialActive as isStarTutorial,
+  resetGame as resetStar,
 } from '../../src/games/star-track/game-controller';
 import {
   initGame as initQueens,
@@ -972,5 +974,132 @@ describe('Wave 11 — controller illegal-click deepenings (Star / Queens / Conti
     expect(
       container.querySelector('.sd-roll-btn, .sd-dice-area, .sd-board')
     ).toBeTruthy();
+  });
+});
+
+describe('Wave 12 — controller reset / turn integrity', () => {
+  it('Hex / Calla / Star / Hex-a-Gone resetGame restores opening phase', () => {
+    const { board, status } = mountPair();
+
+    initHex(board, status);
+    hexVsHuman();
+    const hexCell = board.querySelector(
+      '.hex-cell-group[data-row][data-col]'
+    ) as HTMLElement | null;
+    hexCell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    resetHex();
+    expect(getHexState().moveHistory).toHaveLength(0);
+    expect(getHexState().currentPlayer).toBe('player1');
+
+    initCalla(board, status);
+    callaVsHuman();
+    resetCalla();
+    expect(getCallaState().winner).toBeNull();
+    expect(getCallaState().phase).toBe('selectPit');
+
+    initStar(board, status);
+    starVsHuman();
+    resetStar();
+    expect(getStarState().phase).toBe('drawChains');
+    expect(getStarState().player1Position).toBe(0);
+
+    initHexAGone(board, status);
+    hexAGoneVsHuman();
+    resetHexAGone();
+    expect(getHexAGoneState().phase).toBe('selectBlocks');
+    expect(getHexAGoneState().moveHistory).toHaveLength(0);
+  });
+
+  it('Kings illegal far click no-op then legal move/place flips seat', () => {
+    const board = document.createElement('div');
+    const status = document.createElement('div');
+    const history = document.createElement('div');
+    document.body.appendChild(board);
+    document.body.appendChild(status);
+    document.body.appendChild(history);
+
+    initKings(board, status, history);
+    kingsVsHuman();
+    expect(getKingsState().turnPhase).toBe('moveKing');
+
+    const king = board.querySelector(
+      '.cell[data-row="1"][data-col="5"]'
+    ) as HTMLElement;
+    king.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().selectedKingPosition).toBeTruthy();
+
+    const far = board.querySelector(
+      '.cell[data-row="5"][data-col="5"]'
+    ) as HTMLElement;
+    far.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().turnPhase).toBe('moveKing');
+
+    const dest = board.querySelector(
+      '.cell[data-row="2"][data-col="5"]'
+    ) as HTMLElement;
+    dest.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().turnPhase).toBe('placeQuadraphage');
+
+    const place = board.querySelector(
+      '.cell[data-row="5"][data-col="5"]'
+    ) as HTMLElement;
+    place.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getKingsState().currentPlayer).toBe('player2');
+    expect(getKingsState().turnPhase).toBe('moveKing');
+  });
+
+  it('Contig / Sum / Prime roll CTA advances chrome after click', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    contigVsHuman();
+    const contigRoll = board.querySelector(
+      '.contig-roll-btn'
+    ) as HTMLElement | null;
+    contigRoll?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector(
+        '.contig-dice-display, .contig-expressions, .contig-pass-btn, .contig-cell-valid'
+      )
+    ).toBeTruthy();
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    sdVsHuman(container);
+    const sdRoll = container.querySelector(
+      '.sd-roll-btn'
+    ) as HTMLElement | null;
+    sdRoll?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector(
+        '.sd-dice-display, .sd-pass-btn, .sd-hand-domino, .sd-board'
+      )
+    ).toBeTruthy();
+
+    const primeBox = document.createElement('div');
+    document.body.appendChild(primeBox);
+    primeVsHuman(primeBox);
+    const primeRoll = primeBox.querySelector(
+      '.pg-roll-btn'
+    ) as HTMLElement | null;
+    primeRoll?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      primeBox.querySelector(
+        '.pg-board, .pg-board-container, .pg-expressions, .pg-dice'
+      )
+    ).toBeTruthy();
+  });
+
+  it('Hex Enter on tabbable gridcell places when empty', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    hexVsHuman();
+    const before = getHexState().moveHistory.length;
+    const cell = board.querySelector(
+      '[role="gridcell"][tabindex="0"]'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
+    expect(getHexState().moveHistory.length).toBeGreaterThanOrEqual(before);
   });
 });

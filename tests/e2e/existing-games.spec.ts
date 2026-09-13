@@ -1803,3 +1803,171 @@ test.describe('Wave 11 — more illegal / premature no-ops', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 12 — keyboard / a11y smoke', () => {
+  test('Hex grid exposes labeled cells; Enter activates empty cell', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+    const grid = page.locator('[role="grid"]').first();
+    await expect(grid).toBeVisible();
+    const cell = page.locator('[role="gridcell"][tabindex="0"]').first();
+    await expect(cell).toBeVisible();
+    const before = await page.locator('.status-turn').textContent();
+    await cell.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('.status-turn')).not.toHaveText(before ?? '');
+  });
+
+  test('Contig board is an ARIA grid with 60 labeled cells', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.contig-board[role="grid"]')).toBeVisible();
+    await expect(page.locator('.contig-cell[role="gridcell"]')).toHaveCount(60);
+  });
+
+  test('Sum Dominoes board has ARIA grid role', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.sd-board[role="grid"]')).toBeVisible();
+  });
+
+  test('Kings board is ARIA grid with king cells', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await expect(page.locator('.board[role="grid"]')).toBeVisible();
+    await expect(page.locator('.cell-king')).toHaveCount(2);
+  });
+});
+
+test.describe('Wave 12 — dice / roll turn chains', () => {
+  test('Contig roll → place-or-pass → roll CTA returns', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const valid = page.locator('.contig-cell-valid');
+    const pass = page.locator('.contig-pass-btn');
+    if ((await valid.count()) > 0) {
+      await valid.first().click();
+    } else {
+      await pass.click();
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+
+  test('Sum Dominoes roll restores place/pass then can new-game', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await page.locator('.sd-roll-btn').click();
+    await expect(page.locator('.sd-dice-display')).toBeVisible();
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.sd-roll-btn')).toBeVisible();
+  });
+
+  test('Prime Gold roll then pass-or-place restores roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.pg-roll-btn');
+    await expect(roll).toBeVisible();
+    await roll.click();
+    const pass = page.locator('.pg-pass-btn');
+    const valid = page.locator('.pg-cell-valid, .pg-cell.valid');
+    if ((await pass.count()) > 0 && (await pass.isVisible())) {
+      await pass.click();
+    } else if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+    await expect(page.locator('.pg-roll-btn')).toBeVisible();
+  });
+
+  test('Juggle roll restores die/shape chrome', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page.locator('.juggle-roll-btn').click();
+    await expect(
+      page.locator('.juggle-die, .juggle-shape-selector, .juggle-board').first()
+    ).toBeVisible();
+  });
+
+  test('Remainder roll advances to island select or next roll', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    await page.locator('.remainder-roll-btn').click();
+    await expect(
+      page
+        .locator(
+          '.remainder-island, .remainder-roll-btn, .remainder-dice, [data-island-id]'
+        )
+        .first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Wave 12 — Kings turn integrity deepen', () => {
+  test('second full turn flips seat back to Player 1', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+
+    // P1 turn
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="2"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="5"][data-col="5"]')
+      .click({ force: true });
+    await expect(page.locator('.status-turn')).toContainText('Player 2');
+
+    // P2 turn
+    await page
+      .locator('.cell[data-row="9"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="8"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="5"][data-col="4"]')
+      .click({ force: true });
+    await expect(page.locator('.status-turn')).toContainText('Player 1');
+    await expect(page.locator('.supply-p2')).toContainText('29');
+  });
+});
+
+test.describe('Wave 12 — thin-game help / new-game leftovers', () => {
+  test('Kings help + new game restores board', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.board, .cell-king').first()).toBeVisible();
+  });
+
+  test('FIAR new-game restores placement board', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.fiar-board, svg').first()).toBeVisible();
+  });
+
+  test('Juggle help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+});
