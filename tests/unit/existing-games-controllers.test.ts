@@ -1130,3 +1130,126 @@ describe('Wave 12 — controller illegal-click deepenings (Calla / Hex / FIAR / 
     ).toBeTruthy();
   });
 });
+
+describe('Wave 13 — focus-slice controllers (Kings / Star / Sum / Queens / Contig / HAG / Remainder)', () => {
+  it('Kings vs-human / vs-AI / difficulty / tutorial round-trip', () => {
+    const { board, status } = mountPair();
+    initKings(board, status);
+    kingsVsHuman();
+    expect(getKingsState().currentPlayer).toBe('player1');
+    expect(getGameMode()).toBe('human-vs-human');
+    kingsVsAI('hard');
+    expect(getAIDifficulty()).toBe('hard');
+    setKingsAI('easy');
+    expect(getAIDifficulty()).toBe('easy');
+    startKingsTutorial();
+    expect(isKingsTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isKingsTutorial()).toBe(false);
+    expect(board.querySelector('.cell, .board')).toBeTruthy();
+  });
+
+  it('Star Track / Contig / Queens AI difficulty + chrome', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    starVsAI('medium');
+    setStarAI('hard');
+    expect(getStarState().phase).toBe('drawChains');
+    expect(
+      board.querySelector('.star-track-board, .star-track-draw-btn')
+    ).toBeTruthy();
+    startStarTutorial();
+    expect(isStarTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initContig(board, status);
+    contigVsAI('easy');
+    setContigAI('hard');
+    contigVsHuman();
+    expect(
+      board.querySelector('.contig-board, .contig-roll-btn')
+    ).toBeTruthy();
+    startContigTutorial();
+    expect(isContigTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initQueens(board, status);
+    queensVsAI('medium');
+    setQueensAI('easy');
+    queensVsHuman();
+    expect(board.querySelector('svg, .qg-board-container')).toBeTruthy();
+    startQueensTutorial();
+    expect(isQueensTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Hex-a-Gone / Remainder / Sum Dominoes start + premature no-ops', () => {
+    const { board, status } = mountPair();
+    initHexAGone(board, status);
+    hexAGoneVsHuman();
+    expect(getHexAGoneState().phase).toBe('selectBlocks');
+    const beforeHag = getHexAGoneState().moveHistory.length;
+    board
+      .querySelector('.hex-a-gone-cell, .hex-a-gone-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexAGoneState().moveHistory.length).toBe(beforeHag);
+    hexAGoneVsAI('easy');
+    setHexAGoneAI('hard');
+    startHexAGoneTutorial();
+    expect(isHexAGoneTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initRemainder(container);
+    remainderVsHuman();
+    expect(getRemainderState().phase).toBe('rolling');
+    container
+      .querySelector('.remainder-island, [data-island-id], svg')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getRemainderState().currentRoll).toBeNull();
+    remainderVsAI('medium');
+    startRemainderTutorial();
+    expect(isRemainderTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    sdVsHuman(container);
+    expect(container.querySelector('.sd-board, .sd-roll-btn')).toBeTruthy();
+    container
+      .querySelector('.sd-cell, .sd-board')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.sd-roll-btn, .sd-dice-area, .sd-board')
+    ).toBeTruthy();
+    sdVsAI(container, 'easy');
+    startSdTutorial();
+    expect(isSdTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Star / Contig / Queens illegal clicks keep opening chrome', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    starVsHuman();
+    board
+      .querySelector('.star-track-choice, .star-track-choices, svg')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelector('.star-track-draw-btn')).toBeTruthy();
+
+    initContig(board, status);
+    contigVsHuman();
+    const before = board.querySelectorAll('.contig-cell-p1').length;
+    board
+      .querySelector('.contig-cell')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelectorAll('.contig-cell-p1').length).toBe(before);
+    expect(board.querySelector('.contig-roll-btn')).toBeTruthy();
+
+    initQueens(board, status);
+    queensVsHuman();
+    board
+      .querySelector('[data-cell-key], svg')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelector('svg')).toBeTruthy();
+  });
+});
