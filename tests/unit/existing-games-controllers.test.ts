@@ -71,6 +71,7 @@ import {
   initGame as initJuggle,
   newGameVsHuman as juggleVsHuman,
   newGameVsAI as juggleVsAI,
+  setAIDifficulty as setJuggleAI,
   startTutorial as startJuggleTutorial,
   isTutorialActive as isJuggleTutorial,
 } from '../../src/games/juggle/game-controller';
@@ -79,6 +80,7 @@ import {
   newGameVsHuman as hexAGoneVsHuman,
   newGameVsAI as hexAGoneVsAI,
   getGameState as getHexAGoneState,
+  setAIDifficulty as setHexAGoneAI,
   startTutorial as startHexAGoneTutorial,
   isTutorialActive as isHexAGoneTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
@@ -95,6 +97,7 @@ import {
   newGameVsHuman as fiarVsHuman,
   newGameVsAI as fiarVsAI,
   getCurrentState as getFiarState,
+  setAIDifficulty as setFiarAI,
   startTutorial as startFiarTutorial,
   isTutorialActive as isFiarTutorial,
 } from '../../src/games/fiar/game-controller';
@@ -126,6 +129,7 @@ import {
   initGame as initContig,
   newGameVsHuman as contigVsHuman,
   newGameVsAI as contigVsAI,
+  setAIDifficulty as setContigAI,
   startTutorial as startContigTutorial,
   isTutorialActive as isContigTutorial,
 } from '../../src/games/contig-60/game-controller';
@@ -140,6 +144,7 @@ import {
   newGameVsHuman as starVsHuman,
   newGameVsAI as starVsAI,
   getGameState as getStarState,
+  setAIDifficulty as setStarAI,
   startTutorial as startStarTutorial,
   isTutorialActive as isStarTutorial,
 } from '../../src/games/star-track/game-controller';
@@ -147,6 +152,7 @@ import {
   initGame as initQueens,
   newGameVsHuman as queensVsHuman,
   newGameVsAI as queensVsAI,
+  setAIDifficulty as setQueensAI,
   startTutorial as startQueensTutorial,
   isTutorialActive as isQueensTutorial,
 } from '../../src/games/queens-guards/game-controller';
@@ -463,7 +469,9 @@ describe('Previously untested controllers (Contig / Sum Dominoes / Star Track / 
     const { board, status } = mountPair();
     initStar(board, status);
     expect(getStarState().phase).toBe('drawChains');
-    expect(board.querySelector('.star-track-board, .star-track-draw-btn')).toBeTruthy();
+    expect(
+      board.querySelector('.star-track-board, .star-track-draw-btn')
+    ).toBeTruthy();
     starVsAI('easy');
     expect(getStarState().player1Position).toBe(0);
     starVsHuman();
@@ -476,8 +484,9 @@ describe('Previously untested controllers (Contig / Sum Dominoes / Star Track / 
     const { board, status } = mountPair();
     initQueens(board, status);
     expect(board.querySelector('svg, .qg-board')).toBeTruthy();
-    expect(status.querySelector('.qg-status, [role="status"]') || status.textContent)
-      .toBeTruthy();
+    expect(
+      status.querySelector('.qg-status, [role="status"]') || status.textContent
+    ).toBeTruthy();
     queensVsAI('easy');
     queensVsHuman();
     startQueensTutorial();
@@ -519,5 +528,119 @@ describe('Controller illegal-click no-ops (Hex / Calla)', () => {
     } else {
       expect(getCallaState().player1Pits.length).toBeGreaterThan(0);
     }
+  });
+});
+
+describe('Controller illegal-click no-ops (FIAR / Star / Pent / Hex-a-Gone / Remainder)', () => {
+  it('FIAR re-click occupied node does not grow moveHistory twice', () => {
+    const { board, status } = mountPair();
+    initFiar(board, status);
+    const node = board.querySelector('[data-node-id]') as HTMLElement | null;
+    expect(node).toBeTruthy();
+    node!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const afterFirst = getFiarState().moveHistory.length;
+    expect(afterFirst).toBeGreaterThanOrEqual(1);
+    node!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getFiarState().moveHistory.length).toBe(afterFirst);
+  });
+
+  it('Star Track board space click before draw leaves phase at drawChains', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    expect(getStarState().phase).toBe('drawChains');
+    const space = board.querySelector('[data-space]') as HTMLElement | null;
+    space?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getStarState().phase).toBe('drawChains');
+    expect(getStarState().player1Position).toBe(0);
+  });
+
+  it("Pent'Em In board click without piece keeps selectPiece phase", () => {
+    const { board, status } = mountPair();
+    initPent(board, status);
+    expect(getPentState().phase).toBe('selectPiece');
+    const cell = board.querySelector(
+      '.pent-board .interaction rect, .pent-board rect[data-row], rect'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getPentState().phase).toBe('selectPiece');
+    expect(getPentState().selectedPiece).toBeFalsy();
+  });
+
+  it('Hex-a-Gone board click before confirm leaves selection uncommitted', () => {
+    const { board, status } = mountPair();
+    initHexAGone(board, status);
+    const before = getHexAGoneState().moveHistory.length;
+    const cell = board.querySelector(
+      '[data-q], .hexagone-cell, .hag-cell, svg'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexAGoneState().moveHistory.length).toBe(before);
+    expect(getHexAGoneState().phase).not.toBe('gameOver');
+  });
+
+  it('Remainder Islands island click before roll stays in rolling', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initRemainder(container);
+    expect(getRemainderState().phase).toBe('rolling');
+    const island = container.querySelector(
+      '[data-island-id], .remainder-island, .island'
+    ) as HTMLElement | null;
+    island?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getRemainderState().phase).toBe('rolling');
+    expect(getRemainderState().currentRoll).toBeNull();
+  });
+});
+
+describe('Controller setAIDifficulty round-trips', () => {
+  it('Hex / Calla / Kings / Contig / Juggle / FIAR / Queens / Hex-a-Gone / Star', () => {
+    const { board, status } = mountPair();
+
+    initHex(board, status);
+    hexVsAI('easy');
+    setHexAI('hard');
+    expect(getHexState().currentPlayer).toBeTruthy();
+
+    initCalla(board, status);
+    callaVsAI('easy');
+    setCallaAI('medium');
+    expect(getCallaState().currentPlayer).toBeTruthy();
+
+    initKings(board, status);
+    kingsVsAI('easy');
+    setKingsAI('hard');
+    expect(getAIDifficulty()).toBe('hard');
+
+    initContig(board, status);
+    contigVsAI('easy');
+    setContigAI('hard');
+    expect(board.querySelector('.contig-board, .contig-roll-btn')).toBeTruthy();
+
+    initJuggle(board, status);
+    juggleVsAI('easy');
+    setJuggleAI('medium');
+    expect(
+      board.querySelector('.juggle-board, .juggle-dice-area')
+    ).toBeTruthy();
+
+    initFiar(board, status);
+    fiarVsAI('easy');
+    setFiarAI('hard');
+    expect(getFiarState().phase).toBe('placement');
+
+    initQueens(board, status);
+    queensVsAI('easy');
+    setQueensAI('medium');
+    expect(board.querySelector('svg, .qg-board')).toBeTruthy();
+
+    initHexAGone(board, status);
+    hexAGoneVsAI('easy');
+    setHexAGoneAI('hard');
+    expect(getHexAGoneState().currentPlayer).toBeTruthy();
+
+    initStar(board, status);
+    starVsAI('easy');
+    setStarAI('hard');
+    expect(getStarState().phase).toBe('drawChains');
   });
 });
