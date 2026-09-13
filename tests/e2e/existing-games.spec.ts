@@ -303,9 +303,8 @@ test.describe('Stars & Bars — e2e smoke', () => {
 
   test('loads title and board or hand cards', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Stars & Bars');
-    const board = page.locator('.stars-board');
-    const card = page.locator('.stars-card');
-    await expect(board.or(card.first())).toBeVisible();
+    await expect(page.locator('.stars-board')).toBeVisible();
+    await expect(page.locator('.stars-card').first()).toBeVisible();
   });
 });
 
