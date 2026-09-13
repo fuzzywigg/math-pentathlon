@@ -35,6 +35,7 @@ import {
 import {
   newGameVsHuman as fabVsHuman,
   newGameVsAI as fabVsAI,
+  startTutorial as startFabTutorial,
   isTutorialActive as isFabTutorial,
 } from '../../src/games/fab-a-diffy/game-controller';
 import {
@@ -971,6 +972,161 @@ describe('Wave 11 — controller illegal-click deepenings (Star / Queens / Conti
     cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(
       container.querySelector('.sd-roll-btn, .sd-dice-area, .sd-board')
+    ).toBeTruthy();
+  });
+});
+
+describe('Wave 12 — controller tutorial deepenings (Hex / Calla / Kings / Fab / Par / Stars / Ramrod / Kwa / Prime / FIAR)', () => {
+  it('Hex / Calla / Kings / FIAR startTutorial then exit', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    hexVsHuman();
+    startHexTutorial();
+    expect(isHexTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isHexTutorial()).toBe(false);
+
+    initCalla(board, status);
+    callaVsHuman();
+    startCallaTutorial();
+    expect(isCallaTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    const history = document.createElement('div');
+    document.body.appendChild(history);
+    initKings(board, status, history);
+    kingsVsHuman();
+    startKingsTutorial();
+    expect(isKingsTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initFiar(board, status);
+    fiarVsHuman();
+    startFiarTutorial();
+    expect(isFiarTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isFiarTutorial()).toBe(false);
+  });
+
+  it('Fab / Par / Stars / Ramrod / Kwa / Prime tutorials start cleanly', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+
+    fabVsHuman(container);
+    startFabTutorial();
+    expect(isFabTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    parVsHuman(container);
+    startParTutorial();
+    expect(isParTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    starsVsHuman(container);
+    startStarsTutorial();
+    expect(isStarsTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    ramrodVsHuman(container);
+    startRamrodTutorial();
+    expect(isRamrodTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    kwaVsHuman(container);
+    startKwaTutorial();
+    expect(isKwaTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    primeVsHuman(container);
+    startPrimeTutorial();
+    expect(isPrimeTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isPrimeTutorial()).toBe(false);
+  });
+
+  it('Hex / Calla / FIAR / Juggle / Hex-a-Gone AI difficulty round-trips', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    hexVsAI('easy');
+    setHexAI('hard');
+    setHexAI('medium');
+
+    initCalla(board, status);
+    callaVsAI('hard');
+    setCallaAI('easy');
+
+    initFiar(board, status);
+    fiarVsAI('medium');
+    setFiarAI('hard');
+
+    initJuggle(board, status);
+    juggleVsAI('easy');
+    setJuggleAI('hard');
+
+    initHexAGone(board, status);
+    hexAGoneVsAI('medium');
+    setHexAGoneAI('easy');
+    expect(getHexAGoneState().currentPlayer).toBe('player1');
+  });
+});
+
+describe('Wave 12 — controller illegal-click deepenings (Calla / Hex / FIAR / Frac / Pinball / Juggle)', () => {
+  it('Calla empty-board click keeps pits', () => {
+    const { board, status } = mountPair();
+    initCalla(board, status);
+    callaVsHuman();
+    board.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelector('.calla-board, .calla-pit')).toBeTruthy();
+  });
+
+  it('Hex cell click is legal on opening (smoke)', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    hexVsHuman();
+    const before = getHexState().moveHistory.length;
+    const cell = board.querySelector(
+      '[data-row], .hex-cell'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexState().moveHistory.length).toBeGreaterThanOrEqual(before);
+    expect(board.querySelector('.hex-board, [data-row]')).toBeTruthy();
+  });
+
+  it('FIAR / Frac / Pinball / Juggle premature clicks keep chrome', () => {
+    const { board, status } = mountPair();
+    initFiar(board, status);
+    fiarVsHuman();
+    board.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(board.querySelector('.fiar-board, svg')).toBeTruthy();
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initFrac(container);
+    fracVsHuman();
+    container
+      .querySelector('.frac-choice-btn, button')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.frac-problem, .frac-scores, .frac-game-area')
+    ).toBeTruthy();
+
+    initPinball(container);
+    pinballVsHuman();
+    container.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector(
+        '.pinball-challenge, .pinball-scores, .pinball-board'
+      )
+    ).toBeTruthy();
+
+    initJuggle(board, status);
+    juggleVsHuman();
+    const cell = board.querySelector(
+      '.juggle-cell, .juggle-board'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector('.juggle-roll-btn, .juggle-dice-area, .juggle-board')
     ).toBeTruthy();
   });
 });

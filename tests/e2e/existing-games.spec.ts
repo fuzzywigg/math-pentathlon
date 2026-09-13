@@ -1803,3 +1803,223 @@ test.describe('Wave 11 — more illegal / premature no-ops', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 12 — help / new-game deepenings', () => {
+  test('Hex help + new game restores board', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.hex-board, [data-row]').first()).toBeVisible();
+  });
+
+  test('Prime Gold help + new game restores roll CTA', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.pg-roll-btn, .pg-dice-area').first()).toBeVisible();
+  });
+
+  test('Ramrod help + new game keeps rods', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.ramrod-player-rods, .ramrod-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kwatro-Sinko help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Par 55 help + new game keeps hand', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.par55-hand, .par55-board').first()).toBeVisible();
+  });
+
+  test('Stars & Bars help + new game keeps hand', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.stars-hand, .stars-hand-container, .stars-board').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle help + new game keeps dice CTA', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.juggle-roll-btn, .juggle-dice-area').first()
+    ).toBeVisible();
+  });
+
+  test('FIAR help opens and closes', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+});
+
+test.describe('Wave 12 — vs-AI start smoke', () => {
+  test('Hex vs-AI starts with board', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.hex-board, [data-row]').first()).toBeVisible();
+  });
+
+  test('Prime Gold vs-AI starts with dice CTA', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.pg-roll-btn, .pg-dice-area').first()).toBeVisible();
+  });
+
+  test('Par 55 vs-AI starts with hand', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.par55-hand, .par55-board').first()).toBeVisible();
+  });
+
+  test('Juggle vs-AI starts with dice CTA', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.juggle-roll-btn, .juggle-dice-area').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Wave 12 — more illegal / premature no-ops', () => {
+  test('Sum Dominoes cell click before roll keeps dice CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.sd-cell, .sd-board td, [data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.sd-roll-btn, .sd-dice-area, .sd-board').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track choice click before draw keeps draw CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    const choice = page.locator('.star-track-choice, .star-track-choices').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(page.locator('.star-track-draw-btn').first()).toBeVisible();
+  });
+
+  test('Queens empty click without selection keeps board', async ({ page }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.qg-cell, [data-ring], svg').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true, position: { x: 5, y: 5 } });
+    }
+    await expect(
+      page.locator('.qg-board, .qg-board-container, svg').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle board click before roll keeps dice CTA', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    const board = page.locator('.juggle-board, .juggle-cell').first();
+    if ((await board.count()) > 0) {
+      await board.click({ force: true, position: { x: 8, y: 8 } });
+    }
+    await expect(
+      page.locator('.juggle-roll-btn, .juggle-dice-area').first()
+    ).toBeVisible();
+  });
+});
