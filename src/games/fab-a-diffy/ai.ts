@@ -279,7 +279,10 @@ export function applyAIMoveSteps(
 
   currentState = executeMove(currentState, move.answerId);
   if (currentState.phase === 'confirmingMove') {
-    console.error('AI: executeMove failed', { move, phase: currentState.phase });
+    console.error('AI: executeMove failed', {
+      move,
+      phase: currentState.phase,
+    });
     return passTurn(state);
   }
 

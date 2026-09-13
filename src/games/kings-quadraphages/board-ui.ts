@@ -198,7 +198,9 @@ function ensureKingsBoard(container: HTMLElement): {
   boardEl: HTMLElement;
   created: boolean;
 } {
-  let boardEl = container.querySelector(':scope > .board') as HTMLElement | null;
+  let boardEl = container.querySelector(
+    ':scope > .board'
+  ) as HTMLElement | null;
   const cells = boardEl
     ? (Array.from(boardEl.querySelectorAll(':scope > .cell')) as HTMLElement[])
     : [];
