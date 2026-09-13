@@ -2570,9 +2570,15 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
   test('Ramrod rod select advances place-phase status', async ({ page }) => {
     await page.goto('/#/game/ramrod');
     await dismissModeIfNeeded(page);
+    const dismissOwl = page.locator(
+      '#ollie-owl button[aria-label="Dismiss message"]'
+    );
+    if (await dismissOwl.isVisible().catch(() => false)) {
+      await dismissOwl.click({ force: true });
+    }
     const selectable = page.locator('.ramrod-rod-wrapper.selectable');
     if ((await selectable.count()) > 0) {
-      await selectable.first().click({ force: true });
+      await selectable.first().evaluate((el) => (el as HTMLElement).click());
       await expect(page.locator('.ramrod-status')).toContainText(/Place rod/i);
     }
     await expect(page.locator('.ramrod-board')).toBeVisible();
@@ -2595,7 +2601,7 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
   test('FIAR placement node click keeps status chrome', async ({ page }) => {
     await page.goto('/#/game/fiar');
     await dismissModeIfNeeded(page);
-    const node = page.locator('.fiar-node, [data-node-id], .graph-node').first();
+    const node = page.locator('[data-node-id]').first();
     if ((await node.count()) > 0) {
       await node.click({ force: true });
     }
@@ -2623,18 +2629,10 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
   }) => {
     await page.goto('/#/game/frac-fact');
     await dismissModeIfNeeded(page);
-    const choice = page
-      .locator('.frac-fact-choice, .ff-choice, .answer-btn, button.choice')
-      .first();
-    if ((await choice.count()) > 0) {
-      await choice.click({ force: true });
-    }
+    await expect(page.locator('.frac-problem')).toBeVisible();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
     await expect(
-      page
-        .locator(
-          '.frac-fact-board, .ff-problem, .frac-fact-result, .ff-score'
-        )
-        .first()
+      page.locator('.frac-result, .frac-scores, .frac-feedback').first()
     ).toBeVisible();
   });
 
@@ -2663,13 +2661,10 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
   }) => {
     await page.goto('/#/game/kings-quadraphages');
     await dismissModeIfNeeded(page);
-    const cell = page.locator('.kq-cell, .board-cell, [data-row]').first();
-    if ((await cell.count()) > 0) {
-      await cell.click({ force: true });
-    }
-    await expect(
-      page.locator('.kq-board, .kings-board, .board-grid, canvas').first()
-    ).toBeVisible();
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await expect(page.locator('.cell-selected, .status-turn').first()).toBeVisible();
   });
 
   test('Sum Dominoes premature place without roll is a no-op', async ({
