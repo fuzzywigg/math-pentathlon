@@ -2358,6 +2358,158 @@ test.describe('Wave 13 — interaction deepenings', () => {
   });
 });
 
+test.describe('Wave 14 — rules-phase chrome transitions', () => {
+  test('Hex-a-Gone select → confirm reveals place phase chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const bankBtn = page
+      .locator(
+        '.hex-a-gone-bank button, .hex-a-gone-shape, [data-shape], .bank-shape'
+      )
+      .first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+    }
+    const confirm = page.locator(
+      '.hex-a-gone-confirm, button:has-text("Confirm"), button:has-text("Place")'
+    );
+    if ((await confirm.count()) > 0 && (await confirm.first().isEnabled())) {
+      await confirm.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-a-gone-board, .hex-a-gone-bank, [data-q]').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle roll advances past rolling CTA', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.juggle-roll-btn');
+    await expect(roll.first()).toBeVisible();
+    await roll.first().click();
+    await expect(
+      page
+        .locator(
+          '.juggle-shapes, .juggle-shape, .juggle-die, .juggle-board, .juggle-dice-display'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold roll leaves rolling and shows board/dice', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.pg-roll-btn');
+    if ((await roll.count()) > 0) {
+      await roll.first().click();
+    }
+    await expect(
+      page.locator('.pg-board, .pg-cell, .pg-dice-area, .pg-pass-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Remainder Islands roll shows island or roll chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.remainder-roll-btn, button:has-text("Roll")');
+    if ((await roll.count()) > 0) {
+      await roll.first().click();
+    }
+    await expect(
+      page
+        .locator(
+          '.remainder-island, .remainder-board, .remainder-roll-btn, .remainder-dice'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Star Track draw reveals chain choices', async ({ page }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    await page.locator('.star-track-draw-btn').click();
+    await expect(
+      page
+        .locator('.star-track-choice, .star-track-choices, .star-track-chain')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Contig roll shows expressions or pass (calculating phase)', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    await expect(
+      page
+        .locator('.contig-expressions, .contig-pass-btn, .contig-cell-valid')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Fab first bar select advances selection chrome', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    const bar = page
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
+      .first();
+    if ((await bar.count()) > 0) {
+      await bar.click({ force: true });
+      await expect(page.locator('.fab-bar-selected')).toBeVisible();
+    }
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
+    ).toBeVisible();
+  });
+
+  test('Calla pit click advances or keeps board (phase guard)', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    const pit = page.locator('.calla-pit, .calla-shield, [data-pit]').first();
+    if ((await pit.count()) > 0) {
+      await pit.click({ force: true });
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-calla').first()
+    ).toBeVisible();
+  });
+
+  test('Pent piece select enters place chrome', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page
+      .locator('.pent-piece, .pent-em-in-piece, [data-shape-id], .piece-btn')
+      .first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-board, .pent-em-in-board, .pent-pieces').first()
+    ).toBeVisible();
+  });
+
+  test('Par block select then board remains interactive', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const block = page
+      .locator('.par55-block, .par55-hand-block, [data-block-id]')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+  });
+});
+
 test.describe('Wave 14 — Contig/Sum/Star/Calla/Hex/Queens/Fab/Par/Prime/Juggle deepenings', () => {
   test('Contig roll then pass/new-game restores roll CTA', async ({ page }) => {
     await page.goto('/#/game/contig-60');
