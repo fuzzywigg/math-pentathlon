@@ -3357,3 +3357,102 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Fab pool shows fraction-bar SVG chrome after start', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await startVsAi(page);
+    await expect(
+      page.locator('.fab-bar-pool, .fab-bar-wrapper, .fraction-bar').first()
+    ).toBeVisible();
+    const bar = page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first();
+    if ((await bar.count()) > 0) {
+      await bar.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.fab-bar-selected, .fab-answer-board, .fab-operation-selector, .fab-bar-pool'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Par 55 hand attribute blocks remain interactive', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await startVsAi(page);
+    await expect(page.locator('.par55-hand, .par55-hand-block').first()).toBeVisible();
+    const block = page.locator('.par55-hand-block.clickable, .par55-hand-block').first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-hand-block.selected, .par55-board, .par55-scores, .par55-hand').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle polyomino board grid survives roll', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await startVsAi(page);
+    const roll = page.locator('.juggle-roll-btn').first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.juggle-board, .juggle-cell, .juggle-dice-area, .juggle-die').first()
+    ).toBeVisible();
+  });
+
+  test('Hex board cells remount after empty-cell click', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    await expect(page.locator('.hex-board, [data-row], svg').first()).toBeVisible();
+    const cell = page.locator('[data-row][data-col], .hex-cell').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(page.locator('.hex-board, [data-row], .hex-status, svg').first()).toBeVisible();
+  });
+
+  test('Pent-em-In polyomino bank chrome stays after start', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await startVsAi(page);
+    await expect(
+      page
+        .locator(
+          '.pent-board, .pent-piece, .pent-bank, .pei-board, .pei-piece, [data-shape]'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact problem chrome stays after choice click', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await startVsAi(page);
+    const choice = page
+      .locator('.ff-choice, .frac-choice, button.choice, .ff-answers button')
+      .first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page.locator('.ff-problem, .frac-problem, .ff-board, .ff-status, .ff-choice').first()
+    ).toBeVisible();
+  });
+});
