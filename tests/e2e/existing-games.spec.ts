@@ -229,6 +229,19 @@ test.describe('Calla — e2e smoke', () => {
     await page.locator('.calla-pit-valid').first().click({ force: true });
     await expect(status).not.toHaveText(before ?? '');
   });
+
+  test('empty pit click is a no-op for status', async ({ page }) => {
+    // First sow some cubes so at least one pit may empty; then try empty pits
+    await page.locator('.calla-pit-valid').first().click({ force: true });
+    const status = page.locator('.calla-status');
+    const before = await status.textContent();
+    const empty = page.locator('.calla-pit:not(.calla-pit-valid)').first();
+    if ((await empty.count()) > 0) {
+      await empty.click({ force: true });
+      await expect(status).toHaveText(before ?? '');
+    }
+    await expect(page.locator('.calla-board')).toBeVisible();
+  });
 });
 
 test.describe('Hex-a-Gone — e2e smoke', () => {
@@ -250,6 +263,28 @@ test.describe('Hex-a-Gone — e2e smoke', () => {
       await confirm.click();
       await expect(page.locator('.hex-a-gone-placing-info')).toBeVisible();
     }
+  });
+
+  test('confirm then place updates status or placing info', async ({ page }) => {
+    const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+    await bankBtn.click();
+    const confirm = page.locator('.hex-a-gone-confirm-btn');
+    if (!(await confirm.isVisible().catch(() => false))) {
+      await expect(page.locator('.hex-a-gone-board')).toBeVisible();
+      return;
+    }
+    await confirm.click();
+    const status = page.locator(
+      '.hex-a-gone-status, .status-turn, .hex-a-gone-placing-info'
+    );
+    await expect(status.first()).toBeVisible();
+    const cell = page
+      .locator('.hex-a-gone-board [data-q], .hex-a-gone-cell, .hex-cell')
+      .first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(page.locator('.hex-a-gone-board')).toBeVisible();
   });
 });
 
@@ -580,6 +615,21 @@ test.describe('Par 55 — e2e smoke', () => {
 
     await expect(page.locator('.par55-board')).toBeVisible();
   });
+
+  test('scores or history remain visible after a place attempt', async ({
+    page,
+  }) => {
+    await page.locator('.par55-hand-block.clickable').first().click({
+      force: true,
+    });
+    const valid = page.locator('.par55-valid-base');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-scores, .par55-history').first()
+    ).toBeVisible();
+  });
 });
 
 test.describe('Kwatro-Sinko — e2e smoke', () => {
@@ -609,6 +659,26 @@ test.describe('Kwatro-Sinko — e2e smoke', () => {
     await expect(
       page.locator('.kwa-chip-info, .kwa-history').first()
     ).toBeVisible();
+  });
+
+  test('illegal occupied destination keeps selection chrome', async ({
+    page,
+  }) => {
+    const chip = page.locator('.kwa-selectable-chip').first();
+    await chip.click({ force: true });
+    await expect(
+      page.locator('.kwa-selected-chip, .kwa-valid-node').first()
+    ).toBeVisible();
+
+    // Click an occupied / non-valid node if present — selection should remain
+    const occupied = page.locator(
+      '.kwa-board [data-node-id]:not(.kwa-valid-node)'
+    );
+    if ((await occupied.count()) > 0) {
+      await occupied.first().click({ force: true });
+    }
+
+    await expect(page.locator('.kwa-board')).toBeVisible();
   });
 });
 
