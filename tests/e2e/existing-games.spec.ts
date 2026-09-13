@@ -3504,6 +3504,12 @@ test.describe('Wave 23 — owl/storage chrome', () => {
     await page.goto('/#/game/fiar');
     const modal = page.locator('#new-game-modal');
     if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
       const start = page.locator('#start-game-btn');
       if (await start.isVisible().catch(() => false)) {
         await start.click();
@@ -3517,7 +3523,11 @@ test.describe('Wave 23 — owl/storage chrome', () => {
     }
     await expect(page.locator('#ollie-owl')).toBeAttached();
     await expect(
-      page.locator('.fiar-board, .fiar-cell, [data-col], .board').first()
+      page
+        .locator(
+          '.fiar-board-container, .fiar-status, .fiar-chips-info, [data-node-id], svg'
+        )
+        .first()
     ).toBeVisible();
   });
 });
