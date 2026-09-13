@@ -174,6 +174,30 @@ test.describe('Hex — e2e smoke', () => {
     });
     await expect(status).not.toHaveText(before ?? '');
   });
+
+  test('legal click flips seat; occupied re-click is a no-op', async ({
+    page,
+  }) => {
+    const status = page.locator('.status-turn');
+    await page.locator('.hex-cell-group[data-row="5"][data-col="5"]').click({
+      force: true,
+    });
+    // After P1 places, status should mention player 2 / red / second seat
+    await expect(status).toBeVisible();
+    const afterP1 = await status.textContent();
+
+    // Occupied cell should not change status
+    await page.locator('.hex-cell-group[data-row="5"][data-col="5"]').click({
+      force: true,
+    });
+    await expect(status).toHaveText(afterP1 ?? '');
+
+    // Empty cell for P2 advances again
+    await page.locator('.hex-cell-group[data-row="4"][data-col="4"]').click({
+      force: true,
+    });
+    await expect(status).not.toHaveText(afterP1 ?? '');
+  });
 });
 
 test.describe('Calla — e2e smoke', () => {
@@ -189,6 +213,13 @@ test.describe('Calla — e2e smoke', () => {
     await expect(valid.first()).toBeVisible();
     await valid.first().click({ force: true });
     await expect(page.locator('.calla-status')).toBeVisible();
+  });
+
+  test('valid pit click updates status text', async ({ page }) => {
+    const status = page.locator('.calla-status');
+    const before = await status.textContent();
+    await page.locator('.calla-pit-valid').first().click({ force: true });
+    await expect(status).not.toHaveText(before ?? '');
   });
 });
 
@@ -488,6 +519,16 @@ test.describe('Fab-a-Diffy — e2e smoke', () => {
       page.locator('.fab-bar-pool, .fab-answer-board').first()
     ).toBeVisible();
   });
+
+  test('status updates after selecting the first bar', async ({ page }) => {
+    const status = page.locator('.fab-status');
+    await expect(status).toBeVisible();
+    const before = await status.textContent();
+    await page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first().click({
+      force: true,
+    });
+    await expect(status).not.toHaveText(before ?? '');
+  });
 });
 
 test.describe('Par 55 — e2e smoke', () => {
@@ -566,6 +607,23 @@ test.describe('Queens & Guards — e2e smoke', () => {
     await piece.click({ force: true });
 
     await expect(page.locator('.qg-status')).toContainText(/highlighted|Select|move/i);
+    await expect(page.locator('.qg-board-container')).toBeVisible();
+  });
+
+  test('selects then moves to a valid destination when highlighted', async ({
+    page,
+  }) => {
+    const piece = page.locator('[data-cell-key="5-7"]');
+    await piece.click({ force: true });
+    await expect(page.locator('.qg-status')).toContainText(/highlighted|Select|move/i);
+
+    const destination = page.locator('[data-cell-key][aria-label*="valid move"]').first();
+    if ((await destination.count()) > 0) {
+      const before = await page.locator('.qg-status').textContent();
+      await destination.click({ force: true });
+      await expect(page.locator('.qg-status')).not.toHaveText(before ?? '');
+    }
+
     await expect(page.locator('.qg-board-container')).toBeVisible();
   });
 });
