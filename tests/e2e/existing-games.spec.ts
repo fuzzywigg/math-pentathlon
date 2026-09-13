@@ -138,17 +138,25 @@ test.describe('Kings & Quadraphages — e2e turn integrity', () => {
   }) => {
     await page.goto('/#/game/kings-quadraphages');
 
-    await page.locator('.cell[data-row="1"][data-col="5"]').click({ force: true });
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
     await expect(page.locator('.cell-selected')).toBeVisible();
     await expect(page.locator('.cell-valid-move')).toHaveCount(5);
 
     // Invalid destination — stay in move phase
-    await page.locator('.cell[data-row="5"][data-col="5"]').click({ force: true });
+    await page
+      .locator('.cell[data-row="5"][data-col="5"]')
+      .click({ force: true });
     await expect(page.locator('.status-turn')).toContainText('green square');
 
-    await page.locator('.cell[data-row="2"][data-col="5"]').click({ force: true });
+    await page
+      .locator('.cell[data-row="2"][data-col="5"]')
+      .click({ force: true });
     await expect(page.locator('.status-turn')).toContainText('Quadraphage');
-    await page.locator('.cell[data-row="5"][data-col="5"]').click({ force: true });
+    await page
+      .locator('.cell[data-row="5"][data-col="5"]')
+      .click({ force: true });
 
     await expect(page.locator('.status-turn')).toContainText('Player 2');
     await expect(page.locator('.supply-p1')).toContainText('29');
@@ -256,12 +264,16 @@ test.describe('Prime Gold — e2e smoke', () => {
     await expect(page.locator('.pg-board')).toBeVisible();
     await expect(page.locator('.pg-roll-btn')).toBeVisible();
     await page.locator('.pg-roll-btn').click();
-    await expect(page.locator('.pg-dice-container .pg-die').first()).toBeVisible();
+    await expect(
+      page.locator('.pg-dice-container .pg-die').first()
+    ).toBeVisible();
   });
 
   test('after roll, places on valid cell when available', async ({ page }) => {
     await page.locator('.pg-roll-btn').click();
-    await expect(page.locator('.pg-dice-container .pg-die').first()).toBeVisible();
+    await expect(
+      page.locator('.pg-dice-container .pg-die').first()
+    ).toBeVisible();
 
     const valid = page.locator('.pg-cell.valid');
     const pass = page.locator('.pg-btn-secondary, .pg-controls button').filter({
@@ -420,10 +432,14 @@ test.describe('FIAR — e2e smoke', () => {
     const node = page.locator('[data-node-id]').first();
     await expect(node).toBeVisible();
     await node.click({ force: true });
-    await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
+    await expect(
+      page.locator('.fiar-status, .fiar-chips-info').first()
+    ).toBeVisible();
   });
 
-  test('places chips then tries movement UI if it appears', async ({ page }) => {
+  test('places chips then tries movement UI if it appears', async ({
+    page,
+  }) => {
     const nodes = page.locator('[data-node-id]');
     const nodeCount = await nodes.count();
     const placements = Math.min(8, nodeCount);
@@ -432,7 +448,9 @@ test.describe('FIAR — e2e smoke', () => {
       await nodes.nth(i).click({ force: true });
     }
 
-    await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
+    await expect(
+      page.locator('.fiar-status, .fiar-chips-info').first()
+    ).toBeVisible();
 
     const selectable = page.locator('[data-node-id]:has(.pulse-highlight)');
     if ((await selectable.count()) > 0) {
@@ -444,7 +462,9 @@ test.describe('FIAR — e2e smoke', () => {
       }
     }
 
-    await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
+    await expect(
+      page.locator('.fiar-status, .fiar-chips-info').first()
+    ).toBeVisible();
   });
 });
 
@@ -524,9 +544,12 @@ test.describe('Fab-a-Diffy — e2e smoke', () => {
     const status = page.locator('.fab-status');
     await expect(status).toBeVisible();
     const before = await status.textContent();
-    await page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first().click({
-      force: true,
-    });
+    await page
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
+      .first()
+      .click({
+        force: true,
+      });
     await expect(status).not.toHaveText(before ?? '');
   });
 });
@@ -583,7 +606,9 @@ test.describe('Kwatro-Sinko — e2e smoke', () => {
     }
 
     await expect(page.locator('.kwa-board')).toBeVisible();
-    await expect(page.locator('.kwa-chip-info, .kwa-history').first()).toBeVisible();
+    await expect(
+      page.locator('.kwa-chip-info, .kwa-history').first()
+    ).toBeVisible();
   });
 });
 
@@ -606,7 +631,9 @@ test.describe('Queens & Guards — e2e smoke', () => {
     await expect(piece).toBeVisible();
     await piece.click({ force: true });
 
-    await expect(page.locator('.qg-status')).toContainText(/highlighted|Select|move/i);
+    await expect(page.locator('.qg-status')).toContainText(
+      /highlighted|Select|move/i
+    );
     await expect(page.locator('.qg-board-container')).toBeVisible();
   });
 
@@ -615,9 +642,13 @@ test.describe('Queens & Guards — e2e smoke', () => {
   }) => {
     const piece = page.locator('[data-cell-key="5-7"]');
     await piece.click({ force: true });
-    await expect(page.locator('.qg-status')).toContainText(/highlighted|Select|move/i);
+    await expect(page.locator('.qg-status')).toContainText(
+      /highlighted|Select|move/i
+    );
 
-    const destination = page.locator('[data-cell-key][aria-label*="valid move"]').first();
+    const destination = page
+      .locator('[data-cell-key][aria-label*="valid move"]')
+      .first();
     if ((await destination.count()) > 0) {
       const before = await page.locator('.qg-status').textContent();
       await destination.click({ force: true });
@@ -644,9 +675,9 @@ test.describe("Pent'Em In — e2e smoke", () => {
     await expect(piece).toBeVisible();
     await piece.click({ force: true });
     // Selecting moves into placePiece phase (selector may unmount); status confirms
-    await expect(page.locator('[role="status"], .pent-instructions').first()).toContainText(
-      /Place/i
-    );
+    await expect(
+      page.locator('[role="status"], .pent-instructions').first()
+    ).toContainText(/Place/i);
 
     const cell = page
       .locator('.pent-board .interaction rect, .pent-board rect[data-row]')
@@ -668,7 +699,9 @@ test.describe('Fraction Pinball — e2e smoke', () => {
   test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Fraction Pinball');
     await expect(
-      page.locator('.pinball-board, .pinball-challenge, .pinball-game-container').first()
+      page
+        .locator('.pinball-board, .pinball-challenge, .pinball-game-container')
+        .first()
     ).toBeVisible();
   });
 
@@ -677,7 +710,9 @@ test.describe('Fraction Pinball — e2e smoke', () => {
     await expect(choice).toBeVisible();
     await choice.click({ force: true });
     await expect(
-      page.locator('.pinball-result, .pinball-feedback, .pinball-scores').first()
+      page
+        .locator('.pinball-result, .pinball-feedback, .pinball-scores')
+        .first()
     ).toBeVisible();
   });
 });

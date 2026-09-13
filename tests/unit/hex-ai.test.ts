@@ -33,7 +33,7 @@ describe('Hex AI', () => {
       board: [
         ['player1', 'player2'],
         ['player2', 'player1'],
-      ] as (typeof state.board),
+      ] as typeof state.board,
       currentPlayer: 'player1' as const,
     };
     expect(getValidMoves(full)).toHaveLength(0);
@@ -73,9 +73,11 @@ describe('Hex AI', () => {
     expect(state.moveHistory.length).toBeGreaterThanOrEqual(2);
     const move = getBestMove(state, 'player1', 'medium');
     expect(move).not.toBeNull();
-    expect(getValidMoves(state).some((m) => m.row === move!.row && m.col === move!.col)).toBe(
-      true
-    );
+    expect(
+      getValidMoves(state).some(
+        (m) => m.row === move!.row && m.col === move!.col
+      )
+    ).toBe(true);
   });
 });
 

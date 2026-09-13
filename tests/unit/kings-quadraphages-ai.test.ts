@@ -38,11 +38,7 @@ describe('Kings & Quadraphages — modern AI API', () => {
     expect(isAITurn(state, null, 'human-vs-ai')).toBe(false);
     expect(isAITurn(state, 'player2', 'human-vs-ai')).toBe(false);
     expect(
-      isAITurn(
-        { ...state, currentPlayer: 'player2' },
-        'player2',
-        'human-vs-ai'
-      )
+      isAITurn({ ...state, currentPlayer: 'player2' }, 'player2', 'human-vs-ai')
     ).toBe(true);
     expect(
       isAITurn(
@@ -79,9 +75,21 @@ describe('Kings & Quadraphages — modern AI API', () => {
     const board = createEmptyBoard();
     placePiece(board, { row: 4, col: 4 }, { type: 'king', owner: 'player1' });
     placePiece(board, { row: 0, col: 0 }, { type: 'king', owner: 'player2' });
-    placePiece(board, { row: 0, col: 1 }, { type: 'quadraphage', owner: 'player1' });
-    placePiece(board, { row: 1, col: 0 }, { type: 'quadraphage', owner: 'player1' });
-    placePiece(board, { row: 1, col: 1 }, { type: 'quadraphage', owner: 'player1' });
+    placePiece(
+      board,
+      { row: 0, col: 1 },
+      { type: 'quadraphage', owner: 'player1' }
+    );
+    placePiece(
+      board,
+      { row: 1, col: 0 },
+      { type: 'quadraphage', owner: 'player1' }
+    );
+    placePiece(
+      board,
+      { row: 1, col: 1 },
+      { type: 'quadraphage', owner: 'player1' }
+    );
     expect(getAIMove(createRulesState(board), 'player2', 'easy')).toBeNull();
   });
 

@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { createInitialState, selectBar1, selectBar2 } from '../../src/games/fab-a-diffy/rules';
+import {
+  createInitialState,
+  selectBar1,
+  selectBar2,
+} from '../../src/games/fab-a-diffy/rules';
 import {
   getAIMove,
   isAITurn,
@@ -24,11 +28,7 @@ describe('Fab-a-Diffy AI', () => {
     expect(isAITurn(state, null, 'human-vs-ai')).toBe(false);
     expect(isAITurn(state, 'player2', 'human-vs-ai')).toBe(false);
     expect(
-      isAITurn(
-        { ...state, currentPlayer: 'player2' },
-        'player2',
-        'human-vs-ai'
-      )
+      isAITurn({ ...state, currentPlayer: 'player2' }, 'player2', 'human-vs-ai')
     ).toBe(true);
     expect(
       isAITurn(
@@ -59,7 +59,9 @@ describe('Fab-a-Diffy AI', () => {
     expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
     expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
     expect(state.answerBars.has(move!.answerId)).toBe(true);
-    expect(['add', 'subtract', 'multiply', 'divide']).toContain(move!.operation);
+    expect(['add', 'subtract', 'multiply', 'divide']).toContain(
+      move!.operation
+    );
   });
 
   it('getAIMove medium returns a concrete move', () => {
@@ -116,7 +118,9 @@ describe('Fab-a-Diffy secondary UI', () => {
     document.body.appendChild(el);
     expect(el.classList.contains('fab-operation-selector')).toBe(true);
     expect(el.querySelector('.fab-operation-preview')).toBeTruthy();
-    expect(el.querySelectorAll('.fab-op-btn, .fab-op-valid').length).toBeGreaterThan(0);
+    expect(
+      el.querySelectorAll('.fab-op-btn, .fab-op-valid').length
+    ).toBeGreaterThan(0);
   });
 
   it('renderScores and renderMoveHistory mount with expected classes', () => {

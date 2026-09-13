@@ -5,7 +5,10 @@ import {
   cellKey,
   CONFIG,
 } from '../../src/games/queens-guards/types';
-import { getValidMoves, hasValidMoves } from '../../src/games/queens-guards/rules';
+import {
+  getValidMoves,
+  hasValidMoves,
+} from '../../src/games/queens-guards/rules';
 import { getAIMove, applyAIMove } from '../../src/games/queens-guards/ai';
 
 afterEach(() => {

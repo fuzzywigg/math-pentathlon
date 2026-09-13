@@ -11,10 +11,7 @@ import {
   checkWinner,
 } from '../../src/games/fiar/rules';
 import { getConnectedNodes } from '../../src/games/fiar/types';
-import {
-  getPlayerColor,
-  getPlayerName,
-} from '../../src/games/fiar/board-ui';
+import { getPlayerColor, getPlayerName } from '../../src/games/fiar/board-ui';
 
 function placeMany(state: FiarGameState, nodeIds: string[]): FiarGameState {
   let s = state;

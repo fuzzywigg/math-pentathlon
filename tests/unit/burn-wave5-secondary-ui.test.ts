@@ -23,9 +23,7 @@ import {
   getPlayerName as primeName,
 } from '../../src/games/prime-gold/board-ui';
 
-import {
-  createInitialState as createHexAGone,
-} from '../../src/games/hex-a-gone/types';
+import { createInitialState as createHexAGone } from '../../src/games/hex-a-gone/types';
 import {
   canPlayerMove,
   selectBlockForPlacement,
@@ -54,9 +52,9 @@ describe('Ramrod secondary UI', () => {
     document.body.appendChild(scores);
     document.body.appendChild(history);
     document.body.appendChild(legend);
-    expect(rods.classList.contains('ramrod-rods') || rods.children.length > 0).toBe(
-      true
-    );
+    expect(
+      rods.classList.contains('ramrod-rods') || rods.children.length > 0
+    ).toBe(true);
     expect(scores.classList.contains('ramrod-scores')).toBe(true);
     expect(history.classList.contains('ramrod-history')).toBe(true);
     expect(legend.classList.contains('ramrod-legend')).toBe(true);
@@ -67,7 +65,11 @@ describe('Ramrod secondary UI', () => {
 describe('Juggle secondary UI', () => {
   it('renderShapeControls mounts an empty shell without selected shape', () => {
     const state = createJuggle();
-    const controls = renderShapeControls(state, () => undefined, () => undefined);
+    const controls = renderShapeControls(
+      state,
+      () => undefined,
+      () => undefined
+    );
     document.body.appendChild(controls);
     expect(controls.classList.contains('juggle-shape-controls')).toBe(true);
     expect(juggleName('player2').length).toBeGreaterThan(0);

@@ -85,7 +85,9 @@ describe('Kings & Quadraphages — status / history UI', () => {
     renderStatus(state, status);
     renderMoveHistory(state, history);
     expect(status.textContent?.length).toBeGreaterThan(0);
-    expect(history.querySelector('.move-history-list, .move-history-empty')).toBeTruthy();
+    expect(
+      history.querySelector('.move-history-list, .move-history-empty')
+    ).toBeTruthy();
   });
 
   it('renderBoard paints initial kings', () => {
@@ -93,7 +95,9 @@ describe('Kings & Quadraphages — status / history UI', () => {
     document.body.appendChild(container);
     renderBoard(createInitialGameState(), container);
     expect(container.querySelectorAll('.cell').length).toBe(81);
-    expect(container.querySelector('.cell[data-row="1"][data-col="5"]')).toBeTruthy();
+    expect(
+      container.querySelector('.cell[data-row="1"][data-col="5"]')
+    ).toBeTruthy();
   });
 });
 
@@ -120,8 +124,8 @@ describe('Kings & Quadraphages — rules leftovers', () => {
     board[7][8] = { type: 'quadraphage', owner: 'player1' };
     board[7][7] = { type: 'quadraphage', owner: 'player1' };
 
-    expect(
-      isDrawCondition({ board, player1Supply: 0, player2Supply: 0 })
-    ).toBe(true);
+    expect(isDrawCondition({ board, player1Supply: 0, player2Supply: 0 })).toBe(
+      true
+    );
   });
 });
