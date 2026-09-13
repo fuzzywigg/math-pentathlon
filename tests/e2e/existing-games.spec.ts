@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { GAMES } from '../../src/core/game-registry';
 
 async function dismissModeIfNeeded(page: Page) {
   const modal = page.locator('#new-game-modal');
@@ -9,6 +10,8 @@ async function dismissModeIfNeeded(page: Page) {
     }
   }
 }
+
+const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
 test.describe('Contig 60 — e2e smoke', () => {
   test.beforeEach(async ({ page }) => {
@@ -224,6 +227,26 @@ test.describe('Prime Gold — e2e smoke', () => {
     await page.locator('.pg-roll-btn').click();
     await expect(page.locator('.pg-dice-container .pg-die').first()).toBeVisible();
   });
+
+  test('after roll, places on valid cell when available', async ({ page }) => {
+    await page.locator('.pg-roll-btn').click();
+    await expect(page.locator('.pg-dice-container .pg-die').first()).toBeVisible();
+
+    const valid = page.locator('.pg-cell.valid');
+    const pass = page.locator('.pg-btn-secondary, .pg-controls button').filter({
+      hasText: /pass/i,
+    });
+
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+      await expect(page.locator('.pg-board')).toBeVisible();
+    } else if ((await pass.count()) > 0) {
+      await pass.first().click();
+      await expect(page.locator('.pg-roll-btn')).toBeVisible();
+    } else {
+      await expect(page.locator('.pg-board')).toBeVisible();
+    }
+  });
 });
 
 test.describe('Remainder Islands — e2e smoke', () => {
@@ -237,6 +260,19 @@ test.describe('Remainder Islands — e2e smoke', () => {
     await expect(page.locator('.remainder-board')).toBeVisible();
     await expect(page.locator('.remainder-btn-roll')).toBeVisible();
     await page.locator('.remainder-btn-roll').click();
+  });
+
+  test('after roll, clicks a valid island when available', async ({ page }) => {
+    await page.locator('.remainder-btn-roll').click();
+    await expect(page.locator('.remainder-board')).toBeVisible();
+
+    const valid = page.locator('.island.valid');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+      await expect(page.locator('.remainder-board')).toBeVisible();
+    } else {
+      await expect(page.locator('.remainder-board')).toBeVisible();
+    }
   });
 });
 
@@ -253,6 +289,29 @@ test.describe('Juggle — e2e smoke', () => {
     await page.locator('.juggle-roll-btn').click();
     await expect(page.locator('.juggle-dice-display')).toBeVisible();
   });
+
+  test('after roll, selects die/shape and tries a board cell', async ({
+    page,
+  }) => {
+    await page.locator('.juggle-roll-btn').click();
+    await expect(page.locator('.juggle-dice-display')).toBeVisible();
+
+    const die = page.locator('.juggle-die.selectable');
+    if ((await die.count()) > 0) {
+      await die.first().click({ force: true });
+    }
+
+    const shape = page.locator('.juggle-shape-option');
+    if ((await shape.count()) > 0) {
+      await shape.first().click({ force: true });
+      const cell = page.locator('.juggle-cell').first();
+      if ((await cell.count()) > 0) {
+        await cell.click({ force: true });
+      }
+    }
+
+    await expect(page.locator('.juggle-board').first()).toBeVisible();
+  });
 });
 
 test.describe('Ramrod — e2e smoke', () => {
@@ -264,6 +323,31 @@ test.describe('Ramrod — e2e smoke', () => {
   test('loads title and board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Ramrod');
     await expect(page.locator('.ramrod-board')).toBeVisible();
+  });
+
+  test('selects a rod and places on a valid slot when available', async ({
+    page,
+  }) => {
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+
+    const selectable = page.locator('.ramrod-rod-wrapper.selectable');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+      await expect(page.locator('.ramrod-rod-wrapper.selected')).toBeVisible();
+
+      const validSlot = page.locator('.ramrod-slot.valid');
+      if ((await validSlot.count()) > 0) {
+        await validSlot.first().click({ force: true });
+      }
+    }
+
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+    const statusOrHistory = page.locator(
+      '.ramrod-scores, .ramrod-history, .ramrod-controls'
+    );
+    if ((await statusOrHistory.count()) > 0) {
+      await expect(statusOrHistory.first()).toBeVisible();
+    }
   });
 });
 
@@ -277,6 +361,15 @@ test.describe('Frac Fact — e2e smoke', () => {
     await expect(page.locator('h1')).toContainText('Frac Fact');
     await expect(page.locator('.frac-problem')).toBeVisible();
     await expect(page.locator('.frac-choice-btn').first()).toBeVisible();
+  });
+
+  test('clicking a choice shows result or keeps scores visible', async ({
+    page,
+  }) => {
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-result, .frac-scores, .frac-feedback').first()
+    ).toBeVisible();
   });
 });
 
@@ -293,6 +386,30 @@ test.describe('FIAR — e2e smoke', () => {
     await node.click({ force: true });
     await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
   });
+
+  test('places chips then tries movement UI if it appears', async ({ page }) => {
+    const nodes = page.locator('[data-node-id]');
+    const nodeCount = await nodes.count();
+    const placements = Math.min(8, nodeCount);
+
+    for (let i = 0; i < placements; i++) {
+      await nodes.nth(i).click({ force: true });
+    }
+
+    await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
+
+    const selectable = page.locator('[data-node-id]:has(.pulse-highlight)');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+      // After selection, another empty/valid destination may be clickable
+      const destinations = page.locator('[data-node-id]');
+      if ((await destinations.count()) > 1) {
+        await destinations.nth(1).click({ force: true });
+      }
+    }
+
+    await expect(page.locator('.fiar-status, .fiar-chips-info').first()).toBeVisible();
+  });
 });
 
 test.describe('Stars & Bars — e2e smoke', () => {
@@ -306,13 +423,62 @@ test.describe('Stars & Bars — e2e smoke', () => {
     await expect(page.locator('.stars-board')).toBeVisible();
     await expect(page.locator('.stars-card').first()).toBeVisible();
   });
+
+  test('selects a hand card then places on a valid cell when available', async ({
+    page,
+  }) => {
+    const card = page.locator('.stars-card:not(.disabled)').first();
+    await expect(card).toBeVisible();
+    await card.click({ force: true });
+    await expect(page.locator('.stars-card.selected')).toBeVisible();
+
+    const valid = page.locator('.stars-cell.valid');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+
+    await expect(page.locator('.stars-board')).toBeVisible();
+  });
 });
 
 test.describe('Fab-a-Diffy — e2e smoke', () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Fab-a-Diffy');
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
+    ).toBeVisible();
+  });
+
+  test('selects bars from pool and tries answer or operation when available', async ({
+    page,
+  }) => {
+    const bar = page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first();
+    await expect(bar).toBeVisible();
+    await bar.click({ force: true });
+    await expect(page.locator('.fab-bar-selected')).toBeVisible();
+
+    const second = page.locator(
+      '.fab-bar-wrapper:not(.fab-bar-disabled):not(.fab-bar-selected)'
+    );
+    if ((await second.count()) > 0) {
+      await second.first().click({ force: true });
+    }
+
+    const op = page.locator('.fab-op-valid, .fab-op-btn:not(.fab-op-disabled)');
+    if ((await op.count()) > 0) {
+      await op.first().click({ force: true });
+    }
+
+    const answer = page.locator('.fab-answer-matchable');
+    if ((await answer.count()) > 0) {
+      await answer.first().click({ force: true });
+    }
+
     await expect(
       page.locator('.fab-bar-pool, .fab-answer-board').first()
     ).toBeVisible();
@@ -320,48 +486,142 @@ test.describe('Fab-a-Diffy — e2e smoke', () => {
 });
 
 test.describe('Par 55 — e2e smoke', () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/par-55');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Par 55');
+    await expect(page.locator('.par55-board')).toBeVisible();
+  });
+
+  test('selects a hand block and places on a valid base when available', async ({
+    page,
+  }) => {
+    const block = page.locator('.par55-hand-block.clickable').first();
+    await expect(block).toBeVisible();
+    await block.click({ force: true });
+    await expect(page.locator('.par55-hand-block.selected')).toBeVisible();
+
+    const valid = page.locator('.par55-valid-base');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+
     await expect(page.locator('.par55-board')).toBeVisible();
   });
 });
 
 test.describe('Kwatro-Sinko — e2e smoke', () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/kwatro-sinko');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Kwatro-Sinko');
     await expect(page.locator('.kwa-board')).toBeVisible();
+  });
+
+  test('selects a chip then a destination node when available', async ({
+    page,
+  }) => {
+    const chip = page.locator('.kwa-selectable-chip').first();
+    await expect(chip).toBeVisible();
+    await chip.click({ force: true });
+
+    const dest = page.locator('.kwa-valid-node');
+    if ((await dest.count()) > 0) {
+      await dest.first().click({ force: true });
+    }
+
+    await expect(page.locator('.kwa-board')).toBeVisible();
+    await expect(page.locator('.kwa-chip-info, .kwa-history').first()).toBeVisible();
   });
 });
 
 test.describe('Queens & Guards — e2e smoke', () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/queens-guards');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Queens & Guards');
+    await expect(page.locator('.qg-board-container')).toBeVisible();
+  });
+
+  test('selects a piece and asserts status / move instruction', async ({
+    page,
+  }) => {
+    // Player 1 queen starts at ring 5, position 7
+    const piece = page.locator('[data-cell-key="5-7"]');
+    await expect(piece).toBeVisible();
+    await piece.click({ force: true });
+
+    await expect(page.locator('.qg-status')).toContainText(/highlighted|Select|move/i);
     await expect(page.locator('.qg-board-container')).toBeVisible();
   });
 });
 
 test.describe("Pent'Em In — e2e smoke", () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/pent-em-in');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText("Pent'Em In");
+    await expect(page.locator('.pent-board')).toBeVisible();
+  });
+
+  test('selects a piece then clicks a board cell', async ({ page }) => {
+    const piece = page.locator('.pent-piece-option').first();
+    await expect(piece).toBeVisible();
+    await piece.click({ force: true });
+    await expect(page.locator('.pent-piece-option.selected')).toBeVisible();
+
+    const cell = page.locator('.pent-board .interaction rect, .pent-board rect[data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+
     await expect(page.locator('.pent-board')).toBeVisible();
   });
 });
 
 test.describe('Fraction Pinball — e2e smoke', () => {
-  test('loads title and primary board', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
     await page.goto('/#/game/fraction-pinball');
     await dismissModeIfNeeded(page);
+  });
+
+  test('loads title and primary board', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Fraction Pinball');
     await expect(
       page.locator('.pinball-board, .pinball-challenge, .pinball-game-container').first()
     ).toBeVisible();
   });
+
+  test('clicks an answer choice after start', async ({ page }) => {
+    const choice = page.locator('.pinball-choice-btn').first();
+    await expect(choice).toBeVisible();
+    await choice.click({ force: true });
+    await expect(
+      page.locator('.pinball-result, .pinball-feedback, .pinball-scores').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Registry games — load titles', () => {
+  for (const game of AVAILABLE_GAMES) {
+    test(`${game.id} loads its title`, async ({ page }) => {
+      await page.goto(`/#/game/${game.id}`);
+      await dismissModeIfNeeded(page);
+      // Titles may append punctuation / subtitles; match the registry name stem
+      const stem = game.name.replace(/[!?]+$/, '').split(' (')[0];
+      await expect(page.locator('h1')).toContainText(stem);
+    });
+  }
 });
