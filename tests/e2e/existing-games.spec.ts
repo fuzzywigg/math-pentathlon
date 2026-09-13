@@ -2458,13 +2458,14 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
     await page.goto('/#/game/fab-a-diffy');
     await dismissModeIfNeeded(page);
     const bar = page
-      .locator('.fab-bar, .fab-fraction-bar, [data-bar-id]')
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
       .first();
     if ((await bar.count()) > 0) {
       await bar.click({ force: true });
+      await expect(page.locator('.fab-bar-selected')).toBeVisible();
     }
     await expect(
-      page.locator('.fab-board, .fab-bars, .fab-answers, .fab-ops').first()
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
     ).toBeVisible();
   });
 
