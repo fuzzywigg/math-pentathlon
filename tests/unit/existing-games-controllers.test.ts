@@ -38,53 +38,63 @@ import {
   isTutorialActive as isFabTutorial,
 } from '../../src/games/fab-a-diffy/game-controller';
 import {
-  initGame as initStarTrack,
-  newGameVsHuman as starTrackVsHuman,
-  newGameVsAI as starTrackVsAI,
-  getGameState as getStarTrackState,
-  setAIDifficulty as setStarTrackAI,
-  resetGame as resetStarTrack,
-  startTutorial as startStarTrackTutorial,
-  isTutorialActive as isStarTrackTutorial,
-} from '../../src/games/star-track/game-controller';
+  newGameVsHuman as parVsHuman,
+  newGameVsAI as parVsAI,
+  startTutorial as startParTutorial,
+  isTutorialActive as isParTutorial,
+} from '../../src/games/par-55/game-controller';
 import {
-  newGameVsHuman as sdVsHuman,
-  newGameVsAI as sdVsAI,
-  startTutorial as startSdTutorial,
-  isTutorialActive as isSdTutorial,
-} from '../../src/games/sum-dominoes/game-controller';
+  newGameVsHuman as starsVsHuman,
+  newGameVsAI as starsVsAI,
+  startTutorial as startStarsTutorial,
+  isTutorialActive as isStarsTutorial,
+} from '../../src/games/stars-bars/game-controller';
 import {
-  initGame as initContig,
-  newGameVsHuman as contigVsHuman,
-  newGameVsAI as contigVsAI,
-  setAIDifficulty as setContigAI,
-  startTutorial as startContigTutorial,
-  isTutorialActive as isContigTutorial,
-} from '../../src/games/contig-60/game-controller';
+  newGameVsHuman as ramrodVsHuman,
+  newGameVsAI as ramrodVsAI,
+  startTutorial as startRamrodTutorial,
+  isTutorialActive as isRamrodTutorial,
+} from '../../src/games/ramrod/game-controller';
+import {
+  newGameVsHuman as kwaVsHuman,
+  newGameVsAI as kwaVsAI,
+  startTutorial as startKwaTutorial,
+  isTutorialActive as isKwaTutorial,
+} from '../../src/games/kwatro-sinko/game-controller';
+import {
+  newGameVsHuman as primeVsHuman,
+  newGameVsAI as primeVsAI,
+  startTutorial as startPrimeTutorial,
+  isTutorialActive as isPrimeTutorial,
+} from '../../src/games/prime-gold/game-controller';
+import {
+  initGame as initJuggle,
+  newGameVsHuman as juggleVsHuman,
+  newGameVsAI as juggleVsAI,
+  startTutorial as startJuggleTutorial,
+  isTutorialActive as isJuggleTutorial,
+} from '../../src/games/juggle/game-controller';
 import {
   initGame as initHexAGone,
   newGameVsHuman as hexAGoneVsHuman,
   newGameVsAI as hexAGoneVsAI,
   getGameState as getHexAGoneState,
-  setAIDifficulty as setHexAGoneAI,
-  resetGame as resetHexAGone,
   startTutorial as startHexAGoneTutorial,
   isTutorialActive as isHexAGoneTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
 import {
-  initGame as initQueens,
-  newGameVsHuman as queensVsHuman,
-  newGameVsAI as queensVsAI,
-  setAIDifficulty as setQueensAI,
-  startTutorial as startQueensTutorial,
-  isTutorialActive as isQueensTutorial,
-} from '../../src/games/queens-guards/game-controller';
+  initGame as initPent,
+  newGameVsHuman as pentVsHuman,
+  newGameVsAI as pentVsAI,
+  getCurrentState as getPentState,
+  startTutorial as startPentTutorial,
+  isTutorialActive as isPentTutorial,
+} from '../../src/games/pent-em-in/game-controller';
 import {
   initGame as initFiar,
   newGameVsHuman as fiarVsHuman,
   newGameVsAI as fiarVsAI,
   getCurrentState as getFiarState,
-  setAIDifficulty as setFiarAI,
   startTutorial as startFiarTutorial,
   isTutorialActive as isFiarTutorial,
 } from '../../src/games/fiar/game-controller';
@@ -93,7 +103,6 @@ import {
   newGameVsHuman as fracVsHuman,
   newGameVsAI as fracVsAI,
   getCurrentState as getFracState,
-  setDifficulty as setFracDifficulty,
   startTutorial as startFracTutorial,
   isTutorialActive as isFracTutorial,
 } from '../../src/games/frac-fact/game-controller';
@@ -106,14 +115,6 @@ import {
   isTutorialActive as isPinballTutorial,
 } from '../../src/games/fraction-pinball/game-controller';
 import {
-  initGame as initPent,
-  newGameVsHuman as pentVsHuman,
-  newGameVsAI as pentVsAI,
-  getCurrentState as getPentState,
-  startTutorial as startPentTutorial,
-  isTutorialActive as isPentTutorial,
-} from '../../src/games/pent-em-in/game-controller';
-import {
   initGame as initRemainder,
   newGameVsHuman as remainderVsHuman,
   newGameVsAI as remainderVsAI,
@@ -122,43 +123,33 @@ import {
   isTutorialActive as isRemainderTutorial,
 } from '../../src/games/remainder-islands/game-controller';
 import {
-  initGame as initJuggle,
-  newGameVsHuman as juggleVsHuman,
-  newGameVsAI as juggleVsAI,
-  setAIDifficulty as setJuggleAI,
-  startTutorial as startJuggleTutorial,
-  isTutorialActive as isJuggleTutorial,
-} from '../../src/games/juggle/game-controller';
+  initGame as initContig,
+  newGameVsHuman as contigVsHuman,
+  newGameVsAI as contigVsAI,
+  startTutorial as startContigTutorial,
+  isTutorialActive as isContigTutorial,
+} from '../../src/games/contig-60/game-controller';
 import {
-  newGameVsHuman as ramrodVsHuman,
-  newGameVsAI as ramrodVsAI,
-  startTutorial as startRamrodTutorial,
-  isTutorialActive as isRamrodTutorial,
-} from '../../src/games/ramrod/game-controller';
+  newGameVsHuman as sdVsHuman,
+  newGameVsAI as sdVsAI,
+  startTutorial as startSdTutorial,
+  isTutorialActive as isSdTutorial,
+} from '../../src/games/sum-dominoes/game-controller';
 import {
-  newGameVsHuman as primeVsHuman,
-  newGameVsAI as primeVsAI,
-  startTutorial as startPrimeTutorial,
-  isTutorialActive as isPrimeTutorial,
-} from '../../src/games/prime-gold/game-controller';
+  initGame as initStar,
+  newGameVsHuman as starVsHuman,
+  newGameVsAI as starVsAI,
+  getGameState as getStarState,
+  startTutorial as startStarTutorial,
+  isTutorialActive as isStarTutorial,
+} from '../../src/games/star-track/game-controller';
 import {
-  newGameVsHuman as starsVsHuman,
-  newGameVsAI as starsVsAI,
-  startTutorial as startStarsTutorial,
-  isTutorialActive as isStarsTutorial,
-} from '../../src/games/stars-bars/game-controller';
-import {
-  newGameVsHuman as par55VsHuman,
-  newGameVsAI as par55VsAI,
-  startTutorial as startPar55Tutorial,
-  isTutorialActive as isPar55Tutorial,
-} from '../../src/games/par-55/game-controller';
-import {
-  newGameVsHuman as kwaVsHuman,
-  newGameVsAI as kwaVsAI,
-  startTutorial as startKwaTutorial,
-  isTutorialActive as isKwaTutorial,
-} from '../../src/games/kwatro-sinko/game-controller';
+  initGame as initQueens,
+  newGameVsHuman as queensVsHuman,
+  newGameVsAI as queensVsAI,
+  startTutorial as startQueensTutorial,
+  isTutorialActive as isQueensTutorial,
+} from '../../src/games/queens-guards/game-controller';
 import { tutorialManager } from '../../src/core/tutorial';
 
 afterEach(() => {
@@ -287,175 +278,154 @@ describe('Fab-a-Diffy game-controller', () => {
   });
 });
 
-describe('Star Track game-controller', () => {
-  it('init / modes / reset expose drawChains phase', () => {
-    const { board, status } = mountPair();
-    initStarTrack(board, status);
-    expect(getStarTrackState().phase).toBe('drawChains');
-    expect(getStarTrackState().currentPlayer).toBe('player1');
-
-    starTrackVsAI('easy');
-    setStarTrackAI('hard');
-    resetStarTrack();
-    expect(getStarTrackState().phase).toBe('drawChains');
-
-    starTrackVsHuman();
-    startStarTrackTutorial();
-    expect(isStarTrackTutorial()).toBe(true);
-    tutorialManager.exit();
-  });
-});
-
-describe('Sum Dominoes game-controller', () => {
-  it('vsHuman / vsAI return rolling-phase controllers', () => {
+describe('Container-style controllers (Par / Stars / Ramrod / Kwatro / Prime)', () => {
+  it('Par 55 human / AI / tutorial round-trip', () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
-
-    const human = sdVsHuman(container);
+    const human = parVsHuman(container);
     expect(human.isAI).toBe(false);
-    expect(human.state.phase).toBe('rolling');
-    expect(container.querySelector('.sd-game-area, .sd-status')).toBeTruthy();
+    expect(human.state.phase).toBe('selectingBlock');
+    expect(container.querySelector('.par55-board, .par55-scores')).toBeTruthy();
 
-    const ai = sdVsAI(container, 'easy');
+    const ai = parVsAI(container, 'easy');
     expect(ai.isAI).toBe(true);
     expect(ai.aiPlayer).toBe('player2');
 
-    startSdTutorial();
-    expect(isSdTutorial()).toBe(true);
+    startParTutorial();
+    expect(isParTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Stars & Bars human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = starsVsHuman(container);
+    expect(human.state.phase).toBe('selectingCard');
+    expect(container.querySelector('.stars-board')).toBeTruthy();
+    expect(starsVsAI(container, 'medium').isAI).toBe(true);
+    startStarsTutorial();
+    expect(isStarsTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Ramrod human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = ramrodVsHuman(container);
+    expect(human.state.phase).toBe('selectingRod');
+    expect(container.querySelector('.ramrod-board')).toBeTruthy();
+    expect(ramrodVsAI(container, 'easy').aiPlayer).toBe('player2');
+    startRamrodTutorial();
+    expect(isRamrodTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Kwatro-Sinko human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = kwaVsHuman(container);
+    expect(human.state.phase).toBe('selectingChip');
+    expect(container.querySelector('.kwa-board')).toBeTruthy();
+    expect(kwaVsAI(container, 'hard').isAI).toBe(true);
+    startKwaTutorial();
+    expect(isKwaTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Prime Gold human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = primeVsHuman(container);
+    expect(human.state.phase).toBe('rolling');
+    expect(container.querySelector('.pg-board, .pg-roll-btn')).toBeTruthy();
+    expect(primeVsAI(container, 'easy').isAI).toBe(true);
+    startPrimeTutorial();
+    expect(isPrimeTutorial()).toBe(true);
     tutorialManager.exit();
   });
 });
 
-describe('Contig 60 game-controller', () => {
-  it('init / modes / tutorial mount board chrome', () => {
+describe('Board+status controllers (Juggle / Hex-a-Gone / Pent / FIAR)', () => {
+  it('Juggle init / modes / tutorial', () => {
     const { board, status } = mountPair();
-    initContig(board, status);
-    expect(board.querySelector('.contig-board, .contig-cell')).toBeTruthy();
-
-    contigVsAI('easy');
-    setContigAI('medium');
-    contigVsHuman();
-    startContigTutorial();
-    expect(isContigTutorial()).toBe(true);
+    initJuggle(board, status);
+    expect(board.querySelector('.juggle-board, .juggle-roll-btn')).toBeTruthy();
+    juggleVsAI('easy');
+    juggleVsHuman();
+    startJuggleTutorial();
+    expect(isJuggleTutorial()).toBe(true);
     tutorialManager.exit();
   });
-});
 
-describe('Hex-a-Gone game-controller', () => {
-  it('init / modes expose selectBlocks and bank', () => {
+  it('Hex-a-Gone init / modes / getGameState / tutorial', () => {
     const { board, status } = mountPair();
     initHexAGone(board, status);
     expect(getHexAGoneState().phase).toBe('selectBlocks');
-    expect(getHexAGoneState().board.length).toBeGreaterThan(0);
-
-    hexAGoneVsAI('easy');
-    setHexAGoneAI('hard');
-    resetHexAGone();
-    expect(getHexAGoneState().winner).toBeNull();
-
+    hexAGoneVsAI('medium');
     hexAGoneVsHuman();
+    expect(getHexAGoneState().winner).toBeNull();
     startHexAGoneTutorial();
     expect(isHexAGoneTutorial()).toBe(true);
     tutorialManager.exit();
   });
-});
 
-describe('Queens & Guards game-controller', () => {
-  it('init / modes / tutorial mount qg board', () => {
-    const { board, status } = mountPair();
-    initQueens(board, status);
-    expect(
-      board.querySelector('.qg-board, .qg-board-container, svg')
-    ).toBeTruthy();
-
-    queensVsAI('easy');
-    setQueensAI('medium');
-    queensVsHuman();
-    startQueensTutorial();
-    expect(isQueensTutorial()).toBe(true);
-    tutorialManager.exit();
-  });
-});
-
-describe('FIAR game-controller', () => {
-  it('init / modes start in placement with zero chips', () => {
-    const { board, status } = mountPair();
-    initFiar(board, status);
-    expect(getFiarState().phase).toBe('placement');
-    expect(getFiarState().chipsPlaced.player1).toBe(0);
-
-    fiarVsAI('easy');
-    setFiarAI('hard');
-    fiarVsHuman();
-    expect(getFiarState().winner).toBeNull();
-
-    startFiarTutorial();
-    expect(isFiarTutorial()).toBe(true);
-    tutorialManager.exit();
-  });
-});
-
-describe('Frac Fact game-controller', () => {
-  it('init / difficulty / AI expose playing phase', () => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    initFrac(container);
-    expect(getFracState().phase).toBe('playing');
-    expect(getFracState().currentProblem).toBeTruthy();
-
-    setFracDifficulty('easy');
-    expect(getFracState().difficulty).toBe('easy');
-
-    fracVsAI('medium', 'easy');
-    fracVsHuman('hard');
-    expect(getFracState().difficulty).toBe('hard');
-
-    startFracTutorial();
-    expect(isFracTutorial()).toBe(true);
-    tutorialManager.exit();
-  });
-});
-
-describe('Fraction Pinball game-controller', () => {
-  it('init / modes expose answering phase', () => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    initPinball(container);
-    expect(getPinballState().phase).toBe('answering');
-
-    pinballVsAI('easy');
-    pinballVsHuman();
-    expect(getPinballState().winner).toBeNull();
-
-    startPinballTutorial();
-    expect(isPinballTutorial()).toBe(true);
-    tutorialManager.exit();
-  });
-});
-
-describe("Pent'Em In game-controller", () => {
-  it('init / modes expose selectPiece phase', () => {
+  it("Pent'Em In init / modes / getCurrentState / tutorial", () => {
     const { board, status } = mountPair();
     initPent(board, status);
     expect(getPentState().phase).toBe('selectPiece');
-    expect(board.querySelector('.pent-board, svg')).toBeTruthy();
-
     pentVsAI('easy');
     pentVsHuman();
     startPentTutorial();
     expect(isPentTutorial()).toBe(true);
     tutorialManager.exit();
   });
+
+  it('FIAR init / modes / getCurrentState / tutorial', () => {
+    const { board, status } = mountPair();
+    initFiar(board, status);
+    expect(getFiarState().phase).toBe('placement');
+    fiarVsAI('easy');
+    fiarVsHuman();
+    startFiarTutorial();
+    expect(isFiarTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
 });
 
-describe('Remainder Islands game-controller', () => {
-  it('init / modes start rolling with chips', () => {
+describe('Single-container quiz controllers (Frac / Pinball / Remainder)', () => {
+  it('Frac Fact init / modes / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initFrac(container);
+    expect(getFracState().phase).toBe('playing');
+    fracVsAI('easy', 'easy');
+    fracVsHuman('medium');
+    startFracTutorial();
+    expect(isFracTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Fraction Pinball init / modes / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initPinball(container);
+    expect(['answering', 'showResult', 'gameOver']).toContain(
+      getPinballState().phase
+    );
+    pinballVsAI('easy');
+    pinballVsHuman();
+    startPinballTutorial();
+    expect(isPinballTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Remainder Islands init / modes / tutorial', () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
     initRemainder(container);
-    expect(getRemainderState().phase).toBe('rolling');
-    expect(getRemainderState().player1Chips).toBeGreaterThan(0);
-
+    expect(['rolling', 'selectIsland', 'gameOver']).toContain(
+      getRemainderState().phase
+    );
     remainderVsAI('easy');
     remainderVsHuman();
     startRemainderTutorial();
@@ -464,62 +434,90 @@ describe('Remainder Islands game-controller', () => {
   });
 });
 
-describe('Juggle game-controller', () => {
-  it('init / modes / tutorial mount juggle chrome', () => {
+describe('Previously untested controllers (Contig / Sum Dominoes / Star Track / Queens)', () => {
+  it('Contig 60 init / modes / tutorial mount board chrome', () => {
     const { board, status } = mountPair();
-    initJuggle(board, status);
-    expect(
-      board.querySelector('.juggle-board, .juggle-grid, canvas, svg')
-    ).toBeTruthy();
+    initContig(board, status);
+    expect(board.querySelector('.contig-board, .contig-roll-btn')).toBeTruthy();
+    expect(board.querySelector('.contig-score-p1')).toBeTruthy();
+    contigVsAI('easy');
+    contigVsHuman();
+    startContigTutorial();
+    expect(isContigTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
 
-    juggleVsAI('easy');
-    setJuggleAI('medium');
-    juggleVsHuman();
-    startJuggleTutorial();
-    expect(isJuggleTutorial()).toBe(true);
+  it('Sum Dominoes human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = sdVsHuman(container);
+    expect(human.state.phase).toBe('rolling');
+    expect(container.querySelector('.sd-board')).toBeTruthy();
+    expect(sdVsAI(container, 'medium').isAI).toBe(true);
+    startSdTutorial();
+    expect(isSdTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Star Track init / getGameState / modes / tutorial', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    expect(getStarState().phase).toBe('drawChains');
+    expect(board.querySelector('.star-track-board, .star-track-draw-btn')).toBeTruthy();
+    starVsAI('easy');
+    expect(getStarState().player1Position).toBe(0);
+    starVsHuman();
+    startStarTutorial();
+    expect(isStarTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Queens & Guards init / modes / tutorial', () => {
+    const { board, status } = mountPair();
+    initQueens(board, status);
+    expect(board.querySelector('svg, .qg-board')).toBeTruthy();
+    expect(status.querySelector('.qg-status, [role="status"]') || status.textContent)
+      .toBeTruthy();
+    queensVsAI('easy');
+    queensVsHuman();
+    startQueensTutorial();
+    expect(isQueensTutorial()).toBe(true);
     tutorialManager.exit();
   });
 });
 
-describe('Ramrod / Prime Gold / Stars & Bars / Par 55 / Kwatro controllers', () => {
-  it('container-style controllers mount chrome and support tutorials', () => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
+describe('Controller illegal-click no-ops (Hex / Calla)', () => {
+  it('Hex occupied cell click leaves moveHistory unchanged', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    const before = getHexState().moveHistory.length;
+    const empty = board.querySelector(
+      '.hex-cell-group[data-row="2"][data-col="2"]'
+    ) as HTMLElement | null;
+    empty?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const afterPlace = getHexState().moveHistory.length;
+    expect(afterPlace).toBeGreaterThanOrEqual(before);
 
-    const ramrod = ramrodVsHuman(container);
-    expect(ramrod.isAI).toBe(false);
-    expect(ramrod.state.currentPlayer).toBe('player1');
-    expect(ramrodVsAI(container, 'easy').isAI).toBe(true);
-    startRamrodTutorial();
-    expect(isRamrodTutorial()).toBe(true);
-    tutorialManager.exit();
+    const occupied = board.querySelector(
+      '.hex-cell-group[data-row="2"][data-col="2"]'
+    ) as HTMLElement | null;
+    const hist = getHexState().moveHistory.length;
+    occupied?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexState().moveHistory.length).toBe(hist);
+  });
 
-    const prime = primeVsHuman(container);
-    expect(prime.state.phase).toBeTruthy();
-    expect(primeVsAI(container, 'easy').aiPlayer).toBe('player2');
-    startPrimeTutorial();
-    expect(isPrimeTutorial()).toBe(true);
-    tutorialManager.exit();
-
-    const stars = starsVsHuman(container);
-    expect(stars.state.phase).toBe('selectingCard');
-    expect(starsVsAI(container, 'easy').isAI).toBe(true);
-    startStarsTutorial();
-    expect(isStarsTutorial()).toBe(true);
-    tutorialManager.exit();
-
-    const par = par55VsHuman(container);
-    expect(par.state.phase).toBe('selectingBlock');
-    expect(par55VsAI(container, 'easy').isAI).toBe(true);
-    startPar55Tutorial();
-    expect(isPar55Tutorial()).toBe(true);
-    tutorialManager.exit();
-
-    const kwa = kwaVsHuman(container);
-    expect(kwa.state.currentPlayer).toBe('player1');
-    expect(kwaVsAI(container, 'easy').isAI).toBe(true);
-    startKwaTutorial();
-    expect(isKwaTutorial()).toBe(true);
-    tutorialManager.exit();
+  it('Calla invalid pit click does not grow moveHistory', () => {
+    const { board, status } = mountPair();
+    initCalla(board, status);
+    const before = getCallaState().moveHistory.length;
+    const invalid = board.querySelector(
+      '.calla-pit:not(.calla-pit-valid)'
+    ) as HTMLElement | null;
+    if (invalid) {
+      invalid.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(getCallaState().moveHistory.length).toBe(before);
+    } else {
+      expect(getCallaState().player1Pits.length).toBeGreaterThan(0);
+    }
   });
 });

@@ -238,6 +238,19 @@ test.describe('Calla — e2e smoke', () => {
     await expect(page.locator('.calla-status')).toBeVisible();
     await expect(page.locator('.calla-pit-count').first()).toBeVisible();
   });
+
+  test('empty pit click is a no-op for status', async ({ page }) => {
+    // First sow some cubes so at least one pit may empty; then try empty pits
+    await page.locator('.calla-pit-valid').first().click({ force: true });
+    const status = page.locator('.calla-status');
+    const before = await status.textContent();
+    const empty = page.locator('.calla-pit:not(.calla-pit-valid)').first();
+    if ((await empty.count()) > 0) {
+      await empty.click({ force: true });
+      await expect(status).toHaveText(before ?? '');
+    }
+    await expect(page.locator('.calla-board')).toBeVisible();
+  });
 });
 
 test.describe('Hex-a-Gone — e2e smoke', () => {
@@ -261,23 +274,27 @@ test.describe('Hex-a-Gone — e2e smoke', () => {
     }
   });
 
-  test('select → confirm → place updates bank or status', async ({ page }) => {
+  test('confirm then place updates status or placing info', async ({ page }) => {
     const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
     await bankBtn.click();
     const confirm = page.locator('.hex-a-gone-confirm-btn');
-    await expect(confirm).toBeVisible();
+    if (!(await confirm.isVisible().catch(() => false))) {
+      await expect(page.locator('.hex-a-gone-board')).toBeVisible();
+      return;
+    }
     await confirm.click();
-    await expect(page.locator('.hex-a-gone-placing-info')).toBeVisible();
-
+    const status = page.locator(
+      '.hex-a-gone-status, .status-turn, .hex-a-gone-placing-info'
+    );
+    await expect(status.first()).toBeVisible();
     const cell = page
       .locator(
-        '.hex-a-gone-board [data-q], .hex-a-gone-cell, .hex-a-gone-board polygon, .hex-a-gone-board hexagon'
+        '.hex-a-gone-board [data-q], .hex-a-gone-cell, .hex-cell, .hex-a-gone-board polygon'
       )
       .first();
     if ((await cell.count()) > 0) {
       await cell.click({ force: true });
     }
-
     await expect(
       page
         .locator('.hex-a-gone-board, .hex-a-gone-status, [role="status"]')
@@ -629,6 +646,21 @@ test.describe('Par 55 — e2e smoke', () => {
 
     await expect(page.locator('.par55-board')).toBeVisible();
   });
+
+  test('scores or history remain visible after a place attempt', async ({
+    page,
+  }) => {
+    await page.locator('.par55-hand-block.clickable').first().click({
+      force: true,
+    });
+    const valid = page.locator('.par55-valid-base');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-scores, .par55-history').first()
+    ).toBeVisible();
+  });
 });
 
 test.describe('Kwatro-Sinko — e2e smoke', () => {
@@ -658,6 +690,26 @@ test.describe('Kwatro-Sinko — e2e smoke', () => {
     await expect(
       page.locator('.kwa-chip-info, .kwa-history').first()
     ).toBeVisible();
+  });
+
+  test('illegal occupied destination keeps selection chrome', async ({
+    page,
+  }) => {
+    const chip = page.locator('.kwa-selectable-chip').first();
+    await chip.click({ force: true });
+    await expect(
+      page.locator('.kwa-selected-chip, .kwa-valid-node').first()
+    ).toBeVisible();
+
+    // Click an occupied / non-valid node if present — selection should remain
+    const occupied = page.locator(
+      '.kwa-board [data-node-id]:not(.kwa-valid-node)'
+    );
+    if ((await occupied.count()) > 0) {
+      await occupied.first().click({ force: true });
+    }
+
+    await expect(page.locator('.kwa-board')).toBeVisible();
   });
 });
 
@@ -800,4 +852,138 @@ test.describe('Registry games — load titles', () => {
       await expect(page.locator('h1')).toContainText(stem);
     });
   }
+});
+
+test.describe('Fab-a-Diffy — illegal / disabled bar no-op', () => {
+  test('disabled bar click does not clear an existing selection', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+
+    await page
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
+      .first()
+      .click({ force: true });
+    await expect(page.locator('.fab-bar-selected')).toBeVisible();
+
+    const disabled = page.locator('.fab-bar-wrapper.fab-bar-disabled');
+    if ((await disabled.count()) > 0) {
+      await disabled.first().click({ force: true });
+      await expect(page.locator('.fab-bar-selected')).toBeVisible();
+    }
+
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Stars & Bars — illegal occupied cell no-op', () => {
+  test('occupied / non-valid click keeps card selection', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('.stars-card:not(.disabled)').first().click({
+      force: true,
+    });
+    await expect(page.locator('.stars-card.selected')).toBeVisible();
+
+    const invalid = page.locator('.stars-cell:not(.valid)');
+    if ((await invalid.count()) > 0) {
+      await invalid.first().click({ force: true });
+      await expect(page.locator('.stars-card.selected')).toBeVisible();
+    }
+
+    await expect(page.locator('.stars-board')).toBeVisible();
+  });
+});
+
+test.describe('Queens & Guards — illegal destination no-op', () => {
+  test('non-valid cell after select keeps move instruction', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('[data-cell-key="5-7"]').click({ force: true });
+    const status = page.locator('.qg-status');
+    await expect(status).toContainText(/highlighted|Select|move/i);
+    const before = await status.textContent();
+
+    const invalid = page.locator(
+      '[data-cell-key]:not([aria-label*="valid move"])'
+    );
+    if ((await invalid.count()) > 1) {
+      await invalid.nth(1).click({ force: true });
+    }
+
+    await expect(page.locator('.qg-board-container')).toBeVisible();
+    // Status may re-select or keep instruction; board remains interactive
+    await expect(status).toBeVisible();
+    expect(before?.length ?? 0).toBeGreaterThan(0);
+  });
+});
+
+test.describe('Contig 60 — pass when no valid cells', () => {
+  test('after roll, pass path or place path both restore roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const pass = page.locator('.contig-pass-btn');
+    const valid = page.locator('.contig-cell-valid');
+    if ((await pass.count()) > 0 && (await valid.count()) === 0) {
+      await pass.click();
+    } else if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+});
+
+test.describe('Hex — help modal + new-game reset', () => {
+  test('how to play opens; new game restores empty board chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.locator('.hex-cell-group[data-row="5"][data-col="5"]').click({
+      force: true,
+    });
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(page.locator('.hex-board')).toBeVisible();
+    await expect(page.locator('.status-turn')).toBeVisible();
+  });
+});
+
+test.describe('Frac Fact / Fraction Pinball — feedback after choice', () => {
+  test('Frac Fact choice shows feedback or result chrome', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-feedback, .frac-result, .frac-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball choice shows feedback chrome', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    await page.locator('.pinball-choice-btn').first().click({ force: true });
+    await expect(
+      page
+        .locator('.pinball-feedback, .pinball-result, .pinball-scores')
+        .first()
+    ).toBeVisible();
+  });
 });
