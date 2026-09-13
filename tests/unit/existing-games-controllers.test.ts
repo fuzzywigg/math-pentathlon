@@ -122,6 +122,34 @@ import {
   startTutorial as startRemainderTutorial,
   isTutorialActive as isRemainderTutorial,
 } from '../../src/games/remainder-islands/game-controller';
+import {
+  initGame as initContig,
+  newGameVsHuman as contigVsHuman,
+  newGameVsAI as contigVsAI,
+  startTutorial as startContigTutorial,
+  isTutorialActive as isContigTutorial,
+} from '../../src/games/contig-60/game-controller';
+import {
+  newGameVsHuman as sdVsHuman,
+  newGameVsAI as sdVsAI,
+  startTutorial as startSdTutorial,
+  isTutorialActive as isSdTutorial,
+} from '../../src/games/sum-dominoes/game-controller';
+import {
+  initGame as initStar,
+  newGameVsHuman as starVsHuman,
+  newGameVsAI as starVsAI,
+  getGameState as getStarState,
+  startTutorial as startStarTutorial,
+  isTutorialActive as isStarTutorial,
+} from '../../src/games/star-track/game-controller';
+import {
+  initGame as initQueens,
+  newGameVsHuman as queensVsHuman,
+  newGameVsAI as queensVsAI,
+  startTutorial as startQueensTutorial,
+  isTutorialActive as isQueensTutorial,
+} from '../../src/games/queens-guards/game-controller';
 import { tutorialManager } from '../../src/core/tutorial';
 
 afterEach(() => {
@@ -403,5 +431,93 @@ describe('Single-container quiz controllers (Frac / Pinball / Remainder)', () =>
     startRemainderTutorial();
     expect(isRemainderTutorial()).toBe(true);
     tutorialManager.exit();
+  });
+});
+
+describe('Previously untested controllers (Contig / Sum Dominoes / Star Track / Queens)', () => {
+  it('Contig 60 init / modes / tutorial mount board chrome', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    expect(board.querySelector('.contig-board, .contig-roll-btn')).toBeTruthy();
+    expect(board.querySelector('.contig-score-p1')).toBeTruthy();
+    contigVsAI('easy');
+    contigVsHuman();
+    startContigTutorial();
+    expect(isContigTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Sum Dominoes human / AI / tutorial', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const human = sdVsHuman(container);
+    expect(human.state.phase).toBe('rolling');
+    expect(container.querySelector('.sd-board')).toBeTruthy();
+    expect(sdVsAI(container, 'medium').isAI).toBe(true);
+    startSdTutorial();
+    expect(isSdTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Star Track init / getGameState / modes / tutorial', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    expect(getStarState().phase).toBe('drawChains');
+    expect(board.querySelector('.star-track-board, .star-track-draw-btn')).toBeTruthy();
+    starVsAI('easy');
+    expect(getStarState().player1Position).toBe(0);
+    starVsHuman();
+    startStarTutorial();
+    expect(isStarTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+
+  it('Queens & Guards init / modes / tutorial', () => {
+    const { board, status } = mountPair();
+    initQueens(board, status);
+    expect(board.querySelector('svg, .qg-board')).toBeTruthy();
+    expect(status.querySelector('.qg-status, [role="status"]') || status.textContent)
+      .toBeTruthy();
+    queensVsAI('easy');
+    queensVsHuman();
+    startQueensTutorial();
+    expect(isQueensTutorial()).toBe(true);
+    tutorialManager.exit();
+  });
+});
+
+describe('Controller illegal-click no-ops (Hex / Calla)', () => {
+  it('Hex occupied cell click leaves moveHistory unchanged', () => {
+    const { board, status } = mountPair();
+    initHex(board, status);
+    const before = getHexState().moveHistory.length;
+    const empty = board.querySelector(
+      '.hex-cell-group[data-row="2"][data-col="2"]'
+    ) as HTMLElement | null;
+    empty?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const afterPlace = getHexState().moveHistory.length;
+    expect(afterPlace).toBeGreaterThanOrEqual(before);
+
+    const occupied = board.querySelector(
+      '.hex-cell-group[data-row="2"][data-col="2"]'
+    ) as HTMLElement | null;
+    const hist = getHexState().moveHistory.length;
+    occupied?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getHexState().moveHistory.length).toBe(hist);
+  });
+
+  it('Calla invalid pit click does not grow moveHistory', () => {
+    const { board, status } = mountPair();
+    initCalla(board, status);
+    const before = getCallaState().moveHistory.length;
+    const invalid = board.querySelector(
+      '.calla-pit:not(.calla-pit-valid)'
+    ) as HTMLElement | null;
+    if (invalid) {
+      invalid.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      expect(getCallaState().moveHistory.length).toBe(before);
+    } else {
+      expect(getCallaState().player1Pits.length).toBeGreaterThan(0);
+    }
   });
 });

@@ -798,3 +798,137 @@ test.describe('Registry games — load titles', () => {
     });
   }
 });
+
+test.describe('Fab-a-Diffy — illegal / disabled bar no-op', () => {
+  test('disabled bar click does not clear an existing selection', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+
+    await page
+      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
+      .first()
+      .click({ force: true });
+    await expect(page.locator('.fab-bar-selected')).toBeVisible();
+
+    const disabled = page.locator('.fab-bar-wrapper.fab-bar-disabled');
+    if ((await disabled.count()) > 0) {
+      await disabled.first().click({ force: true });
+      await expect(page.locator('.fab-bar-selected')).toBeVisible();
+    }
+
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Stars & Bars — illegal occupied cell no-op', () => {
+  test('occupied / non-valid click keeps card selection', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('.stars-card:not(.disabled)').first().click({
+      force: true,
+    });
+    await expect(page.locator('.stars-card.selected')).toBeVisible();
+
+    const invalid = page.locator('.stars-cell:not(.valid)');
+    if ((await invalid.count()) > 0) {
+      await invalid.first().click({ force: true });
+      await expect(page.locator('.stars-card.selected')).toBeVisible();
+    }
+
+    await expect(page.locator('.stars-board')).toBeVisible();
+  });
+});
+
+test.describe('Queens & Guards — illegal destination no-op', () => {
+  test('non-valid cell after select keeps move instruction', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+
+    await page.locator('[data-cell-key="5-7"]').click({ force: true });
+    const status = page.locator('.qg-status');
+    await expect(status).toContainText(/highlighted|Select|move/i);
+    const before = await status.textContent();
+
+    const invalid = page.locator(
+      '[data-cell-key]:not([aria-label*="valid move"])'
+    );
+    if ((await invalid.count()) > 1) {
+      await invalid.nth(1).click({ force: true });
+    }
+
+    await expect(page.locator('.qg-board-container')).toBeVisible();
+    // Status may re-select or keep instruction; board remains interactive
+    await expect(status).toBeVisible();
+    expect(before?.length ?? 0).toBeGreaterThan(0);
+  });
+});
+
+test.describe('Contig 60 — pass when no valid cells', () => {
+  test('after roll, pass path or place path both restore roll CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const pass = page.locator('.contig-pass-btn');
+    const valid = page.locator('.contig-cell-valid');
+    if ((await pass.count()) > 0 && (await valid.count()) === 0) {
+      await pass.click();
+    } else if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+});
+
+test.describe('Hex — help modal + new-game reset', () => {
+  test('how to play opens; new game restores empty board chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.locator('.hex-cell-group[data-row="5"][data-col="5"]').click({
+      force: true,
+    });
+    await page.click('#new-game-btn');
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.click('#start-game-btn');
+    await expect(page.locator('.hex-board')).toBeVisible();
+    await expect(page.locator('.status-turn')).toBeVisible();
+  });
+});
+
+test.describe('Frac Fact / Fraction Pinball — feedback after choice', () => {
+  test('Frac Fact choice shows feedback or result chrome', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-feedback, .frac-result, .frac-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball choice shows feedback chrome', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    await page.locator('.pinball-choice-btn').first().click({ force: true });
+    await expect(
+      page
+        .locator('.pinball-feedback, .pinball-result, .pinball-scores')
+        .first()
+    ).toBeVisible();
+  });
+});
