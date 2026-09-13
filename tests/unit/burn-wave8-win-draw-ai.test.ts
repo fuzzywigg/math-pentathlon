@@ -400,6 +400,8 @@ describe('Burn wave 8 — Ramrod medium AI + executeAITurn history', () => {
   });
 
   it('hard prefers completing a near-full box when available', () => {
+    // Pin RNG: hard AI has 3% randomness that otherwise flakes CI.
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const first = createRod('r-fill', 4);
     first.owner = 'player2';
     first.position = { boxId: createBoxId(1, 1), slot: 0 };
