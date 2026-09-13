@@ -29,7 +29,7 @@ import {
   translateCells,
   getAbsoluteCells,
   areCellsInBounds,
-  // Placement
+  // Placement (Grid API)
   createGrid,
   isCellOccupied,
   isValidPlacement,
@@ -39,6 +39,14 @@ import {
   getPlacementCells,
   doPlacementsOverlap,
   getAdjacentCells,
+  // Placement (legacy Board API)
+  createBoard,
+  validatePlacement,
+  findValidPlacements,
+  canPlaceShape,
+  countEmptyCells,
+  isBoardFilled,
+  removeLastPolyomino,
 } from '../../src/core/polyomino';
 
 describe('getPolyominoesByOrder', () => {
@@ -496,5 +504,36 @@ describe('getAdjacentCells', () => {
     };
     const adjacent = getAdjacentCells(grid, placement, true);
     expect(adjacent).toHaveLength(8); // N, NE, E, SE, S, SW, W, NW
+  });
+});
+
+describe('legacy Board placement API', () => {
+  it('validates bounds and overlap on a board', () => {
+    const board = createBoard(3, 3);
+    const iPiece = TETROMINOES.find((t) => t.id === 'I')!;
+    expect(validatePlacement(board, iPiece, { row: 0, col: 0 }).valid).toBe(false);
+
+    const oPiece = TETROMINOES.find((t) => t.id === 'O')!;
+    expect(validatePlacement(board, oPiece, { row: 0, col: 0 }).valid).toBe(true);
+
+    const placed = placePolyomino(board, oPiece, { row: 0, col: 0 });
+    expect(validatePlacement(placed, oPiece, { row: 0, col: 0 }).valid).toBe(false);
+    expect(validatePlacement(placed, oPiece, { row: 0, col: 0 }).reason).toMatch(/occupied/i);
+  });
+
+  it('finds placements, places, and undoes on a board', () => {
+    const board = createBoard(4, 4);
+    const oPiece = TETROMINOES.find((t) => t.id === 'O')!;
+    const positions = findValidPlacements(board, oPiece);
+    expect(positions.length).toBeGreaterThan(0);
+    expect(canPlaceShape(board, oPiece)).toBe(true);
+
+    const placed = placePolyomino(board, oPiece, { row: 0, col: 0 });
+    expect(countEmptyCells(placed)).toBe(12);
+    expect(isBoardFilled(placed)).toBe(false);
+
+    const undone = removeLastPolyomino(placed, [oPiece]);
+    expect(countEmptyCells(undone)).toBe(16);
+    expect(undone.placements).toHaveLength(0);
   });
 });

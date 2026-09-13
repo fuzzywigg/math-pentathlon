@@ -89,6 +89,14 @@ describe('createFraction', () => {
   it('should throw on zero denominator', () => {
     expect(() => createFraction(1, 0)).toThrow();
   });
+
+  it('normalizes negative denominators and zero over -1', () => {
+    expect(createFraction(1, -2)).toEqual({ numerator: -1, denominator: 2 });
+    const zeroNegDenom = createFraction(0, -1);
+    expect(zeroNegDenom.denominator).toBe(1);
+    expect(zeroNegDenom.numerator === 0).toBe(true);
+    expect(createFraction(0, 1).numerator).toBe(0);
+  });
 });
 
 describe('fromWhole', () => {
@@ -231,6 +239,11 @@ describe('multiply', () => {
   it('should handle multiplication by whole', () => {
     const result = multiply(createFraction(1, 2), fromWhole(3));
     expect(areEqual(result, createFraction(3, 2))).toBe(true);
+  });
+
+  it('should multiply by zero', () => {
+    const result = multiply(createFraction(3, 4), createFraction(0, 1));
+    expect(isZero(result)).toBe(true);
   });
 });
 
