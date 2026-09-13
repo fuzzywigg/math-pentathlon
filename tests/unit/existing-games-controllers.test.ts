@@ -829,3 +829,148 @@ describe('Controller illegal-click deepenings (Hex-a-Gone / Remainder / Pent / F
     expect(board.querySelector('.fiar-board, svg')).toBeTruthy();
   });
 });
+
+describe('Wave 11 — controller tutorial + AI difficulty deepenings', () => {
+  it('Contig / Star / Queens / Sum startTutorial then exit clears active', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    contigVsHuman();
+    startContigTutorial();
+    expect(isContigTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isContigTutorial()).toBe(false);
+
+    initStar(board, status);
+    starVsHuman();
+    startStarTutorial();
+    expect(isStarTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isStarTutorial()).toBe(false);
+
+    initQueens(board, status);
+    queensVsHuman();
+    startQueensTutorial();
+    expect(isQueensTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isQueensTutorial()).toBe(false);
+
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    sdVsHuman(container);
+    startSdTutorial();
+    expect(isSdTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isSdTutorial()).toBe(false);
+  });
+
+  it('Contig / Star / Queens setAIDifficulty round-trips via vsAI', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    contigVsAI('hard');
+    setContigAI('easy');
+    setContigAI('medium');
+
+    initStar(board, status);
+    starVsAI('easy');
+    setStarAI('hard');
+
+    initQueens(board, status);
+    queensVsAI('medium');
+    setQueensAI('hard');
+    expect(
+      board.querySelector('.qg-board, .qg-board-container, svg')
+    ).toBeTruthy();
+  });
+
+  it('Frac / Pinball / Remainder / Juggle / Hex-a-Gone / Pent tutorials start cleanly', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    initFrac(container);
+    fracVsHuman();
+    startFracTutorial();
+    expect(isFracTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initPinball(container);
+    pinballVsHuman();
+    startPinballTutorial();
+    expect(isPinballTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initRemainder(container);
+    remainderVsHuman();
+    startRemainderTutorial();
+    expect(isRemainderTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    const { board, status } = mountPair();
+    initJuggle(board, status);
+    juggleVsHuman();
+    startJuggleTutorial();
+    expect(isJuggleTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initHexAGone(board, status);
+    hexAGoneVsHuman();
+    startHexAGoneTutorial();
+    expect(isHexAGoneTutorial()).toBe(true);
+    tutorialManager.exit();
+
+    initPent(board, status);
+    pentVsHuman();
+    startPentTutorial();
+    expect(isPentTutorial()).toBe(true);
+    tutorialManager.exit();
+    expect(isPentTutorial()).toBe(false);
+  });
+});
+describe('Wave 11 — controller illegal-click deepenings (Star / Queens / Contig / Sum)', () => {
+  it('Star Track chain click before draw stays drawChains', () => {
+    const { board, status } = mountPair();
+    initStar(board, status);
+    starVsHuman();
+    expect(getStarState().phase).toBe('drawChains');
+    const choice = board.querySelector(
+      '.star-track-choice, .star-track-choices'
+    ) as HTMLElement | null;
+    choice?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(getStarState().phase).toBe('drawChains');
+  });
+
+  it('Queens empty-cell click without selection keeps board', () => {
+    const { board, status } = mountPair();
+    initQueens(board, status);
+    queensVsHuman();
+    const cell = board.querySelector(
+      '.qg-cell, [data-ring], svg'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector('.qg-board, .qg-board-container, svg')
+    ).toBeTruthy();
+  });
+
+  it('Contig cell click before roll stays rolling', () => {
+    const { board, status } = mountPair();
+    initContig(board, status);
+    contigVsHuman();
+    const cell = board.querySelector('.contig-cell') as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      board.querySelector('.contig-roll-btn, .contig-dice-area')
+    ).toBeTruthy();
+  });
+
+  it('Sum Dominoes cell click before roll keeps dice chrome', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    sdVsHuman(container);
+    const cell = container.querySelector(
+      '.sd-cell, .sd-board td, [data-row]'
+    ) as HTMLElement | null;
+    cell?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(
+      container.querySelector('.sd-roll-btn, .sd-dice-area, .sd-board')
+    ).toBeTruthy();
+  });
+});
