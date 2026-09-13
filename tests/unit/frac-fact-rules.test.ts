@@ -13,6 +13,7 @@ import {
   startGame,
   formatFraction,
   getOperationSymbol,
+  generateProblem,
 } from '../../src/games/frac-fact/rules';
 
 const FIXED_PROBLEM: FractionProblem = {
@@ -143,5 +144,65 @@ describe('Frac Fact – scoring flow', () => {
     expect(next.currentPlayer).toBe('player2');
     expect(next.problemsCompleted).toBe(1);
     expect(next.currentProblem).not.toBeNull();
+  });
+});
+
+describe('Frac Fact – generateProblem / submit no-op / tie winner', () => {
+  it('generateProblem returns choices including the correct answer', () => {
+    const problem = generateProblem('easy', 1);
+    expect(problem.answerChoices.length).toBeGreaterThanOrEqual(2);
+    expect(
+      problem.answerChoices.some(
+        (c) =>
+          c.numerator === problem.correctAnswer.numerator &&
+          c.denominator === problem.correctAnswer.denominator
+      )
+    ).toBe(true);
+  });
+
+  it('submitAnswer is a no-op outside playing phase', () => {
+    const state = createInitialState('easy');
+    expect(submitAnswer(state, { numerator: 1, denominator: 2 })).toBe(state);
+  });
+
+  it('nextProblem tie leaves winner null when scores equal', () => {
+    const state = playingState({
+      maxProblems: 1,
+      problemsCompleted: 0,
+      phase: 'showingResult',
+      player1Stats: {
+        score: 10,
+        correctAnswers: 1,
+        wrongAnswers: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+      },
+      player2Stats: {
+        score: 10,
+        correctAnswers: 1,
+        wrongAnswers: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+      },
+    });
+    const over = nextProblem(state);
+    expect(over.phase).toBe('gameOver');
+    expect(over.winner).toBeNull();
+  });
+
+  it('awards player2 score when it is their turn', () => {
+    const state = playingState({
+      currentPlayer: 'player2',
+      player2Stats: {
+        score: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        currentStreak: 0,
+        bestStreak: 0,
+      },
+    });
+    const next = submitAnswer(state, FIXED_PROBLEM.correctAnswer);
+    expect(next.player2Stats.correctAnswers).toBe(1);
+    expect(next.player2Stats.score).toBeGreaterThan(0);
   });
 });

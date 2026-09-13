@@ -12,6 +12,11 @@ import {
   passTurn,
   hasAnyValidMove,
   findMatchingAnswers,
+  clearSelection,
+  getOperationSymbol,
+  formatMove,
+  checkWinner,
+  getPossibleResults,
 } from '../../src/games/fab-a-diffy/rules';
 
 afterEach(() => {
@@ -171,5 +176,64 @@ describe('Fab-a-Diffy – passTurn / hasAnyValidMove', () => {
     bars.set(firstId, { ...bars.get(firstId)!, used: false });
     state = { ...state, fractionBars: bars };
     expect(hasAnyValidMove(state)).toBe(false);
+  });
+});
+
+describe('Fab-a-Diffy – clearSelection / formatMove / helpers / winner', () => {
+  it('clearSelection resets bars and phase', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    let state = createInitialState();
+    const barA = findBarId(state, { numerator: 1, denominator: 4 });
+    state = selectBar1(state, barA);
+    const cleared = clearSelection(state);
+    expect(cleared.selectedBar1).toBeNull();
+    expect(cleared.selectedBar2).toBeNull();
+    expect(cleared.phase).toBe('selectingBar1');
+  });
+
+  it('getOperationSymbol and getPossibleResults cover ops', () => {
+    expect(getOperationSymbol('add')).toBe('+');
+    expect(getOperationSymbol('multiply')).toBe('×');
+    const half = { numerator: 1, denominator: 2 };
+    const results = getPossibleResults(
+      { id: 'a', fraction: half, used: false, owner: null },
+      { id: 'b', fraction: half, used: false, owner: null }
+    );
+    expect(results.length).toBeGreaterThan(0);
+    expect(results.some((r) => r.operation === 'add')).toBe(true);
+  });
+
+  it('formatMove renders a completed claim', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    let state = createInitialState();
+    const barA = findBarId(state, { numerator: 1, denominator: 4 });
+    const barB = findBarId(state, { numerator: 3, denominator: 4 });
+    const answerId = findAnswerId(state, { numerator: 1, denominator: 1 });
+    state = selectBar1(state, barA);
+    state = selectBar2(state, barB);
+    state = selectOperation(state, 'add');
+    state = executeMove(state, answerId);
+    const move = state.moveHistory[0];
+    expect(formatMove(state, move)).toMatch(/=/);
+  });
+
+  it('checkWinner returns a leader when all answers are claimed', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const state = createInitialState();
+    const answers = new Map(state.answerBars);
+    let i = 0;
+    for (const [id, answer] of answers) {
+      answers.set(id, {
+        ...answer,
+        claimedBy: i % 2 === 0 ? 'player1' : 'player2',
+      });
+      i++;
+    }
+    // Ensure player1 has more claims
+    for (const [id, answer] of answers) {
+      answers.set(id, { ...answer, claimedBy: 'player1' });
+    }
+    expect(checkWinner(answers, state.fractionBars)).toBe('player1');
+    expect(checkWinner(state.answerBars, state.fractionBars)).toBeNull();
   });
 });

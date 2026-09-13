@@ -12,6 +12,9 @@ import {
   selectChip,
   isDraw,
   getSelectableNodes,
+  deselectChip,
+  getValidMoves,
+  canMove,
 } from '../../src/games/fiar/rules';
 
 function placeMany(state: FiarGameState, nodeIds: string[]): FiarGameState {
@@ -185,5 +188,45 @@ describe('FIAR – movement / win', () => {
 
   it('getSelectableNodes is empty during placement', () => {
     expect(getSelectableNodes(createInitialState())).toEqual([]);
+  });
+});
+
+describe('FIAR – deselectChip / getValidMoves / canMove', () => {
+  const movementSetup = () =>
+    placeMany(createInitialState(), [
+      '0-0',
+      '4-4',
+      '0-1',
+      '4-3',
+      '0-2',
+      '4-2',
+      '0-4',
+      '4-1',
+    ]);
+
+  it('deselectChip clears selectedNode', () => {
+    let state = movementSetup();
+    state = selectChip(state, '0-4');
+    expect(state.selectedNode).toBe('0-4');
+    state = deselectChip(state);
+    expect(state.selectedNode).toBeNull();
+  });
+
+  it('getValidMoves lists empty destinations along lines', () => {
+    const state = movementSetup();
+    const moves = getValidMoves(state, '0-4');
+    expect(moves.length).toBeGreaterThan(0);
+    expect(moves).toContain('0-3');
+  });
+
+  it('canMove mirrors getValidMoves membership', () => {
+    const state = movementSetup();
+    expect(canMove(state, '0-4', '0-3')).toBe(true);
+    expect(canMove(state, '0-4', '4-4')).toBe(false);
+  });
+
+  it('placeChip is a no-op during movement phase', () => {
+    const state = movementSetup();
+    expect(placeChip(state, '2-2')).toBe(state);
   });
 });

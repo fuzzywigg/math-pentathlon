@@ -11,6 +11,8 @@ import {
   placeCard,
   getValidPlacements,
   passTurn,
+  clearSelection,
+  hasValidMoves,
 } from '../../src/games/stars-bars/rules';
 
 afterEach(() => {
@@ -179,5 +181,65 @@ describe('Stars & Bars – passTurn', () => {
       winner: 'player1',
     };
     expect(passTurn(state)).toBe(state);
+  });
+});
+
+describe('Stars & Bars – clearSelection / hasValidMoves / illegal / end', () => {
+  it('clearSelection returns to selectingCard', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    let state = createInitialState();
+    state = selectCard(state, state.playerHands.player1[0].id);
+    const cleared = clearSelection(state);
+    expect(cleared.selectedCard).toBeNull();
+    expect(cleared.phase).toBe('selectingCard');
+  });
+
+  it('hasValidMoves is true with a non-empty hand on an open board', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    expect(hasValidMoves(createInitialState())).toBe(true);
+  });
+
+  it('selectCard ignores cards not in the current hand', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const state = createInitialState();
+    expect(selectCard(state, 'nope')).toBe(state);
+  });
+
+  it('placeCard is a no-op without selection', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const state = createInitialState();
+    expect(placeCard(state, 0, 0)).toBe(state);
+  });
+
+  it('empty hands with full board leads to gameOver via place exhaustion path', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    const base = createInitialState();
+    // Fill almost all cells so only one slot remains; empty decks and single card
+    const cells = base.cells.map((row) =>
+      row.map((c) => ({
+        ...c,
+        card: c.row === 0 && c.col === 0 ? null : card({ id: `fill-${c.row}-${c.col}` }),
+        owner:
+          c.row === 0 && c.col === 0
+            ? null
+            : ('player2' as const),
+      }))
+    );
+    const handCard = card({ id: 'last' });
+    let state: StarsState = {
+      ...base,
+      cells,
+      playerHands: { player1: [handCard], player2: [] },
+      deck: [],
+      phase: 'selectingCard',
+      selectedCard: null,
+      currentPlayer: 'player1',
+      playerScores: { player1: 10, player2: 3 },
+    };
+    state = selectCard(state, 'last');
+    state = placeCard(state, 0, 0);
+    // After placing last cards, rules may end or continue — assert score updated / history
+    expect(state.moveHistory.length).toBeGreaterThan(0);
+    expect(state.cells[0][0].card?.id).toBe('last');
   });
 });

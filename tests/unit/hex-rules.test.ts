@@ -10,6 +10,9 @@ import {
   checkWinner,
   getValidMoves,
   getWinningPath,
+  isValidPosition,
+  isCellEmpty,
+  getNeighbors,
 } from '../../src/games/hex/rules';
 
 function boardWith(
@@ -109,5 +112,35 @@ describe('Hex – win paths', () => {
   it('getWinningPath is empty when there is no winner', () => {
     const board = boardWith(3, [{ row: 0, col: 0, player: 'player1' }]);
     expect(getWinningPath(board, 'player1', 3)).toEqual([]);
+  });
+});
+
+describe('Hex – position helpers / neighbors / valid moves list', () => {
+  it('isValidPosition and isCellEmpty cover bounds and occupancy', () => {
+    expect(isValidPosition({ row: 0, col: 0 }, 3)).toBe(true);
+    expect(isValidPosition({ row: -1, col: 0 }, 3)).toBe(false);
+    const board = boardWith(3, [{ row: 1, col: 1, player: 'player1' }]);
+    expect(isCellEmpty(board, { row: 0, col: 0 })).toBe(true);
+    expect(isCellEmpty(board, { row: 1, col: 1 })).toBe(false);
+  });
+
+  it('getNeighbors returns in-bounds adjacent hexes', () => {
+    const neighbors = getNeighbors({ row: 1, col: 1 }, 3);
+    expect(neighbors.length).toBeGreaterThan(0);
+    expect(
+      neighbors.every((n) => isValidPosition(n, 3))
+    ).toBe(true);
+  });
+
+  it('getValidMoves lists all empty cells on a fresh board', () => {
+    const state = createInitialState(3);
+    expect(getValidMoves(state)).toHaveLength(9);
+    const after = makeMove(state, { row: 0, col: 0 });
+    expect(getValidMoves(after)).toHaveLength(8);
+  });
+
+  it('makeMove is a no-op for out-of-bounds positions', () => {
+    const state = createInitialState(3);
+    expect(makeMove(state, { row: -1, col: 0 })).toBe(state);
   });
 });
