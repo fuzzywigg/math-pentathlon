@@ -22,7 +22,7 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
-import { getAIMove, AIDifficulty } from './ai';
+import { executeAITurn, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
@@ -256,30 +256,14 @@ function handleAnswerClick(
 // =============================================================================
 
 /**
- * Make an AI move using the AI module
+ * Make an AI move via validated executeAITurn (#12).
  */
 function makeAIMove(controller: FabGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.winner || !aiPlayer) return;
 
-  // Get AI move using the AI module
-  const move = getAIMove(state, aiPlayer, aiDifficulty);
-
-  if (!move) {
-    // No valid moves, pass
-    controller.state = passTurn(state);
-    controller.update();
-    return;
-  }
-
-  // Execute move step by step
-  let newState = selectBar1(state, move.bar1Id);
-  newState = selectBar2(newState, move.bar2Id);
-  newState = selectOperation(newState, move.operation);
-  newState = executeMove(newState, move.answerId);
-
-  controller.state = newState;
+  controller.state = executeAITurn(state, aiPlayer, aiDifficulty);
   controller.update();
 }
 

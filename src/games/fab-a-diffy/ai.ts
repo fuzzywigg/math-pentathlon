@@ -249,7 +249,48 @@ export function isAITurn(
 }
 
 /**
- * Execute a complete AI turn
+ * Apply a concrete AI move with per-step phase validation (#12).
+ * Any failed step falls back to passTurn — never silently stalls.
+ */
+export function applyAIMoveSteps(
+  state: FabADiffyState,
+  move: AIMove
+): FabADiffyState {
+  let currentState = selectBar1(state, move.bar1Id);
+  if (currentState.phase !== 'selectingBar2') {
+    console.error('AI: selectBar1 failed', { move, phase: currentState.phase });
+    return passTurn(state);
+  }
+
+  currentState = selectBar2(currentState, move.bar2Id);
+  if (currentState.phase !== 'selectingOperation') {
+    console.error('AI: selectBar2 failed', { move, phase: currentState.phase });
+    return passTurn(state);
+  }
+
+  currentState = selectOperation(currentState, move.operation);
+  if (currentState.phase !== 'confirmingMove') {
+    console.error('AI: selectOperation failed', {
+      move,
+      phase: currentState.phase,
+    });
+    return passTurn(state);
+  }
+
+  currentState = executeMove(currentState, move.answerId);
+  if (currentState.phase === 'confirmingMove') {
+    console.error('AI: executeMove failed', {
+      move,
+      phase: currentState.phase,
+    });
+    return passTurn(state);
+  }
+
+  return currentState;
+}
+
+/**
+ * Execute a complete AI turn with per-step phase validation (#12).
  */
 export function executeAITurn(
   state: FabADiffyState,
@@ -259,17 +300,8 @@ export function executeAITurn(
   const move = getAIMove(state, aiPlayer, difficulty);
 
   if (!move) {
-    // No valid moves, pass
     return passTurn(state);
   }
 
-  // Execute the move step by step
-  let currentState = state;
-
-  currentState = selectBar1(currentState, move.bar1Id);
-  currentState = selectBar2(currentState, move.bar2Id);
-  currentState = selectOperation(currentState, move.operation);
-  currentState = executeMove(currentState, move.answerId);
-
-  return currentState;
+  return applyAIMoveSteps(state, move);
 }

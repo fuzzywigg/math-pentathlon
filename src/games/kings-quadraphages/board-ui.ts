@@ -104,112 +104,199 @@ export function handleCellClick(
   return { state, isInvalidClick: false };
 }
 
-// Render the game board
+const KINGS_BOARD_SIZE = 9;
+const KINGS_CELL_COUNT = KINGS_BOARD_SIZE * KINGS_BOARD_SIZE;
+
+/** Mutable click binding so listeners can be attached once (#11). */
+interface BoardClickBinding {
+  onCellClick?: CellClickCallback;
+}
+
+const boardClickBindings = new WeakMap<HTMLElement, BoardClickBinding>();
+
+function syncKingsCell(
+  cell: HTMLElement,
+  state: GameState,
+  row: number,
+  col: number
+): void {
+  const isLight = (row + col) % 2 === 0;
+  cell.className = `cell ${isLight ? 'cell-light' : 'cell-dark'}`;
+  cell.dataset.row = String(row);
+  cell.dataset.col = String(col);
+
+  const piece = state.board[row - 1][col - 1];
+  const colLetter = String.fromCharCode(64 + col);
+  const coord = `${colLetter}${row}`;
+  let owner: string | undefined;
+  let pieceName: string | undefined;
+  let empty = false;
+
+  if (piece === null) {
+    cell.classList.add('cell-empty');
+    cell.textContent = '';
+    empty = true;
+  } else if (piece.type === 'king') {
+    cell.classList.add('cell-king');
+    cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
+    cell.textContent = '♚';
+    owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+    pieceName = 'King';
+  } else if (piece.type === 'quadraphage') {
+    cell.classList.add('cell-quad');
+    cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
+    cell.textContent = '●';
+    owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+    pieceName = 'Quadraphage';
+  }
+
+  if (
+    state.selectedKingPosition &&
+    state.selectedKingPosition.row === row &&
+    state.selectedKingPosition.col === col
+  ) {
+    cell.classList.add('cell-selected');
+  }
+
+  const isValidMoveTarget =
+    !!state.selectedKingPosition &&
+    state.turnPhase === 'moveKing' &&
+    isValidMove(state, { row, col });
+
+  if (isValidMoveTarget) {
+    cell.classList.add('cell-valid-move');
+  }
+
+  const isValidPlacement =
+    state.turnPhase === 'placeQuadraphage' && piece === null;
+
+  if (isValidPlacement) {
+    cell.classList.add('cell-valid-placement');
+  }
+
+  makeGridCell(
+    cell,
+    buildCellAriaLabel({
+      coord,
+      empty,
+      owner,
+      piece: pieceName,
+      validMove: isValidMoveTarget,
+      validPlacement: isValidPlacement,
+    })
+  );
+
+  if (state.moveHistory.length > 0) {
+    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    if (lastMove.to.row === row && lastMove.to.col === col) {
+      cell.classList.add('cell-last-move');
+    }
+  }
+}
+
+function ensureKingsBoard(container: HTMLElement): {
+  boardEl: HTMLElement;
+  created: boolean;
+} {
+  let boardEl = container.querySelector(
+    ':scope > .board'
+  ) as HTMLElement | null;
+  const cells = boardEl
+    ? (Array.from(boardEl.querySelectorAll(':scope > .cell')) as HTMLElement[])
+    : [];
+
+  if (boardEl && cells.length === KINGS_CELL_COUNT) {
+    return { boardEl, created: false };
+  }
+
+  container.replaceChildren();
+  boardEl = document.createElement('div');
+  boardEl.className = 'board';
+  markBoardAsGrid(boardEl);
+
+  const fragment = document.createDocumentFragment();
+  for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
+    for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.row = String(row);
+      cell.dataset.col = String(col);
+      fragment.appendChild(cell);
+    }
+  }
+  boardEl.appendChild(fragment);
+  container.appendChild(boardEl);
+  return { boardEl, created: true };
+}
+
+function bindKingsBoardInteractions(
+  boardEl: HTMLElement,
+  container: HTMLElement
+): void {
+  const handleCellAction = (cellEl: BoardFocusable) => {
+    const binding = boardClickBindings.get(container);
+    if (!binding?.onCellClick) return;
+
+    const clickedRow = parseInt(cellEl.getAttribute('data-row') ?? '', 10);
+    const clickedCol = parseInt(cellEl.getAttribute('data-col') ?? '', 10);
+    if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
+    if (
+      clickedRow < 1 ||
+      clickedRow > KINGS_BOARD_SIZE ||
+      clickedCol < 1 ||
+      clickedCol > KINGS_BOARD_SIZE
+    ) {
+      return;
+    }
+    binding.onCellClick(clickedRow, clickedCol);
+  };
+
+  boardEl.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const cellEl = target.closest('.cell') as HTMLElement | null;
+    if (!cellEl || !boardEl.contains(cellEl)) return;
+    handleCellAction(cellEl);
+  });
+
+  bindBoardCellKeys(
+    boardEl,
+    (el) => el.classList.contains('cell'),
+    handleCellAction
+  );
+  bindGridNavigation(boardEl);
+}
+
+/**
+ * Render the game board.
+ * Cells are created once and updated in place (#11) so focus / CSS transitions
+ * survive state changes and Playwright "element is not stable" churn drops.
+ */
 export function renderBoard(
   state: GameState,
   container: HTMLElement,
   onCellClick?: CellClickCallback
 ): void {
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  const { boardEl, created } = ensureKingsBoard(container);
 
-  const boardEl = document.createElement('div');
+  boardClickBindings.set(container, { onCellClick });
+  if (created) {
+    bindKingsBoardInteractions(boardEl, container);
+  }
+
   boardEl.className = 'board';
-  markBoardAsGrid(boardEl);
-
-  // Add phase class for CSS styling
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  // Loop through rows 1-9 and columns 1-9 (1-based indexing)
-  for (let row = 1; row <= 9; row++) {
-    for (let col = 1; col <= 9; col++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.row = String(row);
-      cell.dataset.col = String(col);
-
-      // Checkerboard pattern
-      const isLight = (row + col) % 2 === 0;
-      cell.classList.add(isLight ? 'cell-light' : 'cell-dark');
-
-      // Get cell contents (convert to 0-based for array access)
-      const piece = state.board[row - 1][col - 1];
-
-      const colLetter = String.fromCharCode(64 + col);
-      const coord = `${colLetter}${row}`;
-      let owner: string | undefined;
-      let pieceName: string | undefined;
-      let empty = false;
-
-      if (piece === null) {
-        cell.classList.add('cell-empty');
-        empty = true;
-      } else if (piece.type === 'king') {
-        cell.classList.add('cell-king');
-        cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
-        cell.textContent = '♚';
-        owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
-        pieceName = 'King';
-      } else if (piece.type === 'quadraphage') {
-        cell.classList.add('cell-quad');
-        cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
-        cell.textContent = '●';
-        owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
-        pieceName = 'Quadraphage';
-      }
-
-      // Check if this cell is selected
-      if (
-        state.selectedKingPosition &&
-        state.selectedKingPosition.row === row &&
-        state.selectedKingPosition.col === col
-      ) {
-        cell.classList.add('cell-selected');
-      }
-
-      const isValidMoveTarget =
-        !!state.selectedKingPosition &&
-        state.turnPhase === 'moveKing' &&
-        isValidMove(state, { row, col });
-
-      // Highlight valid moves when king is selected
-      if (isValidMoveTarget) {
-        cell.classList.add('cell-valid-move');
-      }
-
-      const isValidPlacement =
-        state.turnPhase === 'placeQuadraphage' && piece === null;
-
-      // Mark valid placement cells during quadraphage phase
-      if (isValidPlacement) {
-        cell.classList.add('cell-valid-placement');
-      }
-
-      makeGridCell(
-        cell,
-        buildCellAriaLabel({
-          coord,
-          empty,
-          owner,
-          piece: pieceName,
-          validMove: isValidMoveTarget,
-          validPlacement: isValidPlacement,
-        })
-      );
-
-      // Highlight last move
-      if (state.moveHistory.length > 0) {
-        const lastMove = state.moveHistory[state.moveHistory.length - 1];
-        if (lastMove.to.row === row && lastMove.to.col === col) {
-          cell.classList.add('cell-last-move');
-        }
-      }
-
-      boardEl.appendChild(cell);
+  const cells = Array.from(
+    boardEl.querySelectorAll(':scope > .cell')
+  ) as HTMLElement[];
+  let i = 0;
+  for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
+    for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {
+      syncKingsCell(cells[i++]!, state, row, col);
     }
   }
 
-  // Highlight trapped king on game over
   if (state.turnPhase === 'gameOver' && state.winner) {
     const loser = getOpponent(state.winner);
     const loserKingPos = getKingPosition(state, loser);
@@ -223,34 +310,6 @@ export function renderBoard(
     }
   }
 
-  // Event delegation for clicks
-  if (onCellClick) {
-    const handleCellAction = (cellEl: BoardFocusable) => {
-      const clickedRow = parseInt(cellEl.getAttribute('data-row') ?? '', 10);
-      const clickedCol = parseInt(cellEl.getAttribute('data-col') ?? '', 10);
-      if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
-      if (clickedRow < 1 || clickedRow > 9 || clickedCol < 1 || clickedCol > 9)
-        return;
-      onCellClick(clickedRow, clickedCol);
-    };
-
-    boardEl.addEventListener('click', (e) => {
-      const target = e.target as HTMLElement;
-      const cellEl = target.closest('.cell') as HTMLElement | null;
-      if (!cellEl) return;
-      handleCellAction(cellEl);
-    });
-
-    bindBoardCellKeys(
-      boardEl,
-      (el) => el.classList.contains('cell'),
-      handleCellAction
-    );
-  }
-
-  bindGridNavigation(boardEl);
-
-  container.appendChild(boardEl);
   restoreGridFocus(container, previousFocus);
 }
 
