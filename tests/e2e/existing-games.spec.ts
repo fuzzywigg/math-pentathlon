@@ -3456,3 +3456,68 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     ).toBeVisible();
   });
 });
+
+
+test.describe('Wave 23 — owl/storage chrome', () => {
+  test('Ollie dock mounts on home selector', async ({ page }) => {
+    await page.goto('/#/');
+    await expect(page.locator('#ollie-owl')).toBeAttached({ timeout: 15_000 });
+    await expect(
+      page.locator('#ollie-owl .owl-minimized, #ollie-owl .owl-character, #ollie-owl .owl-wrapper').first()
+    ).toBeAttached();
+  });
+
+  test('Ollie dock remains present after Hex vs-AI start', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('#ollie-owl')).toBeAttached();
+    await expect(page.locator('.hex-board, [data-row], svg').first()).toBeVisible();
+  });
+
+  test('Stats route paints dashboard shell for storage-backed progress', async ({
+    page,
+  }) => {
+    await page.goto('/#/stats');
+    await expect(
+      page
+        .locator(
+          '.stats-dashboard, .stats-dashboard-empty, .stats-dashboard-summary, .stats-game-list'
+        )
+        .first()
+    ).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('#ollie-owl')).toBeAttached();
+  });
+
+  test('FIAR start keeps Ollie and board chrome coexisting', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    const dismissOwl = page.locator(
+      '#ollie-owl button[aria-label="Dismiss message"]'
+    );
+    if (await dismissOwl.isVisible().catch(() => false)) {
+      await dismissOwl.click({ force: true });
+    }
+    await expect(page.locator('#ollie-owl')).toBeAttached();
+    await expect(
+      page.locator('.fiar-board, .fiar-cell, [data-col], .board').first()
+    ).toBeVisible();
+  });
+});
