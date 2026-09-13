@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { CONFIG } from '../../src/games/par-55/types';
+import {
+  CONFIG,
+  AttributeBlock,
+  countMatchingAttributes,
+  createBaseId,
+} from '../../src/games/par-55/types';
 import {
   createInitialState,
   selectBlock,
@@ -13,6 +18,54 @@ import {
   formatMove,
   getAttributeDisplayName,
 } from '../../src/games/par-55/rules';
+
+function block(overrides: Partial<AttributeBlock> = {}): AttributeBlock {
+  return {
+    id: 'b1',
+    shape: 'circle',
+    color: 'red',
+    size: 'small',
+    thickness: 'thin',
+    ...overrides,
+  };
+}
+
+describe('Par 55 – attribute helpers', () => {
+  it('countMatchingAttributes lists shared traits', () => {
+    const a = block();
+    const b = block({
+      id: 'b2',
+      shape: 'square',
+      color: 'red',
+      size: 'large',
+      thickness: 'thick',
+    });
+    expect(countMatchingAttributes(a, a)).toEqual([
+      'shape',
+      'color',
+      'size',
+      'thickness',
+    ]);
+    expect(countMatchingAttributes(a, b)).toEqual(['color']);
+    expect(
+      countMatchingAttributes(
+        a,
+        block({
+          id: 'b3',
+          shape: 'square',
+          color: 'blue',
+          size: 'large',
+          thickness: 'thick',
+        })
+      )
+    ).toEqual([]);
+  });
+
+  it('createBaseId formats row/col ids', () => {
+    expect(createBaseId(1, 2)).toBe('base-1-2');
+    expect(createBaseId(0, 0)).toBe('base-0-0');
+  });
+});
 
 describe('Par 55 – selectBlock / placeBlock', () => {
   it('selectBlock moves into placing phase for a hand block', () => {
@@ -83,9 +136,9 @@ describe('Par 55 – getValidPlacements / calculateScore / passTurn', () => {
     const { totalPoints, matchDetails } = calculateScore(state, block, target);
     expect(totalPoints).toBeGreaterThanOrEqual(0);
     expect(matchDetails.every((m) => m.points > 0)).toBe(true);
-    expect(
-      matchDetails.reduce((sum, m) => sum + m.points, 0)
-    ).toBe(totalPoints);
+    expect(matchDetails.reduce((sum, m) => sum + m.points, 0)).toBe(
+      totalPoints
+    );
   });
 
   it('passTurn flips the current player', () => {

@@ -3,6 +3,12 @@ import {
   createInitialState,
   getOppositePitIndex,
   isSideEmpty,
+  getPlayerPits,
+  getPlayerCalla,
+  getSideTotalCubes,
+  PITS_PER_SIDE,
+  INITIAL_CUBES_PER_PIT,
+  TOTAL_CUBES,
   CallaGameState,
 } from '../../src/games/calla/types';
 import {
@@ -13,6 +19,24 @@ import {
   getPhaseMessage,
   getLastMoveInfo,
 } from '../../src/games/calla/rules';
+
+describe('Calla – opening constants and pit helpers', () => {
+  it('exposes cube totals and opening pit/calla values', () => {
+    expect(PITS_PER_SIDE).toBe(5);
+    expect(INITIAL_CUBES_PER_PIT).toBe(3);
+    expect(TOTAL_CUBES).toBe(30);
+
+    const state = createInitialState();
+    expect(getPlayerPits(state, 'player1')).toEqual([3, 3, 3, 3, 3]);
+    expect(getPlayerPits(state, 'player2')).toEqual([3, 3, 3, 3, 3]);
+    expect(getPlayerCalla(state, 'player1')).toBe(0);
+    expect(getPlayerCalla(state, 'player2')).toBe(0);
+    expect(getSideTotalCubes(state, 'player1')).toBe(
+      PITS_PER_SIDE * INITIAL_CUBES_PER_PIT
+    );
+    expect(getSideTotalCubes(state, 'player2')).toBe(15);
+  });
+});
 
 describe('Calla – selection helpers', () => {
   it('maps opposite pit indices across the board', () => {

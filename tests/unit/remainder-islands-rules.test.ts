@@ -2,6 +2,11 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
   RemainderIslandsState,
+  getPlayerChips,
+  getPlayerScore,
+  ISLAND_VALUES,
+  INITIAL_CHIPS_PER_PLAYER,
+  TOTAL_TURNS,
 } from '../../src/games/remainder-islands/types';
 import {
   calculateDivision,
@@ -32,6 +37,34 @@ function selectingState(
     ...overrides,
   };
 }
+
+describe('Remainder Islands – opening helpers', () => {
+  it('exposes island values, chip counts, and zero scores', () => {
+    expect(ISLAND_VALUES).toEqual([2, 3, 4, 5, 6, 7, 8, 9]);
+    expect(INITIAL_CHIPS_PER_PLAYER).toBe(12);
+    expect(TOTAL_TURNS).toBe(24);
+
+    const state = createInitialState();
+    expect(getPlayerChips(state, 'player1')).toBe(INITIAL_CHIPS_PER_PLAYER);
+    expect(getPlayerChips(state, 'player2')).toBe(INITIAL_CHIPS_PER_PLAYER);
+    expect(getPlayerScore(state, 'player1')).toBe(0);
+    expect(getPlayerScore(state, 'player2')).toBe(0);
+  });
+
+  it('getPlayerScore tracks ownership via countOwnedIslands', () => {
+    const base = createInitialState();
+    const islands = base.islands.map((island, i) =>
+      i < 3 ? { ...island, owner: 'player1' as const } : island
+    );
+    const state: RemainderIslandsState = {
+      ...base,
+      islands,
+      player1Score: 3,
+    };
+    expect(countOwnedIslands(state)).toEqual({ player1: 3, player2: 0 });
+    expect(getPlayerScore(state, 'player1')).toBe(3);
+  });
+});
 
 describe('Remainder Islands – division math', () => {
   it('calculateDivision returns quotient and remainder', () => {

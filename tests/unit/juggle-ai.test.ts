@@ -81,4 +81,23 @@ describe('Juggle AI', () => {
     expect(next.currentPlayer).toBe('player1');
     expect(next.moveHistory.length).toBe(rolled.moveHistory.length);
   });
+
+  it('medium path: die → shape → placement are non-null when needed', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.55);
+    let state = doRollDice(createInitialState());
+    const die = getAIDieChoice(state, 'player1', 'medium');
+    expect(die).not.toBeNull();
+    state = selectDie(state, die!.index);
+
+    if (state.phase === 'selectingShape') {
+      const shape = getAIShapeChoice(state, 'player1', 'medium');
+      expect(shape).not.toBeNull();
+      expect(shape!.shape.id).toBeTruthy();
+    } else if (state.phase === 'placing') {
+      const placement = getAIPlacement(state, 'player1', 'medium');
+      expect(placement).not.toBeNull();
+      expect(typeof placement!.position.row).toBe('number');
+      expect(typeof placement!.position.col).toBe('number');
+    }
+  });
 });

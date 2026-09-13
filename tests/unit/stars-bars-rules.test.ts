@@ -3,6 +3,7 @@ import {
   AttributeCard,
   StarsState,
   countDifferences,
+  getDifferenceDescription,
   CONFIG,
 } from '../../src/games/stars-bars/types';
 import {
@@ -46,6 +47,30 @@ describe('Stars & Bars – countDifferences', () => {
     expect(
       countDifferences(a, card({ id: 'c', color: 'blue', size: 'large' }))
     ).toBe(2);
+  });
+});
+
+describe('Stars & Bars – getDifferenceDescription', () => {
+  it('returns empty string for identical cards', () => {
+    const a = card({ id: 'a' });
+    expect(getDifferenceDescription(a, a)).toBe('');
+  });
+
+  it('names a single differing attribute', () => {
+    const a = card({ id: 'a' });
+    const b = card({ id: 'b', color: 'blue' });
+    expect(getDifferenceDescription(a, b)).toBe('color');
+  });
+
+  it('joins multiple diffs in shape/color/size/thickness order', () => {
+    const a = card({ id: 'a' });
+    const b = card({
+      id: 'b',
+      shape: 'square',
+      size: 'large',
+      thickness: 'thick',
+    });
+    expect(getDifferenceDescription(a, b)).toBe('shape, size, thickness');
   });
 });
 
@@ -95,7 +120,7 @@ describe('Stars & Bars – placement adjacency', () => {
     expect(valid.every((p) => !(p.row === 0 && p.col === 0) || true)).toBe(
       true
     );
-    // Far corner is not adjacent to center (2,2) on a 5x5? 0,0 is adjacent diagonally? 
+    // Far corner is not adjacent to center (2,2) on a 5x5? 0,0 is adjacent diagonally?
     // Adjacent includes diagonals within 1 cell — (0,0) is 2 away → invalid
     expect(valid.some((p) => p.row === 0 && p.col === 0)).toBe(false);
     expect(valid.some((p) => p.row === 1 && p.col === 1)).toBe(true);
@@ -218,11 +243,11 @@ describe('Stars & Bars – clearSelection / hasValidMoves / illegal / end', () =
     const cells = base.cells.map((row) =>
       row.map((c) => ({
         ...c,
-        card: c.row === 0 && c.col === 0 ? null : card({ id: `fill-${c.row}-${c.col}` }),
-        owner:
+        card:
           c.row === 0 && c.col === 0
             ? null
-            : ('player2' as const),
+            : card({ id: `fill-${c.row}-${c.col}` }),
+        owner: c.row === 0 && c.col === 0 ? null : ('player2' as const),
       }))
     );
     const handCard = card({ id: 'last' });

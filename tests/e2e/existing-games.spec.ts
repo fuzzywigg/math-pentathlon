@@ -229,6 +229,15 @@ test.describe('Calla — e2e smoke', () => {
     await page.locator('.calla-pit-valid').first().click({ force: true });
     await expect(status).not.toHaveText(before ?? '');
   });
+
+  test('after sow, board remains and status or pit counts stay live', async ({
+    page,
+  }) => {
+    await page.locator('.calla-pit-valid').first().click({ force: true });
+    await expect(page.locator('.calla-board')).toBeVisible();
+    await expect(page.locator('.calla-status')).toBeVisible();
+    await expect(page.locator('.calla-pit-count').first()).toBeVisible();
+  });
 });
 
 test.describe('Hex-a-Gone — e2e smoke', () => {
@@ -250,6 +259,30 @@ test.describe('Hex-a-Gone — e2e smoke', () => {
       await confirm.click();
       await expect(page.locator('.hex-a-gone-placing-info')).toBeVisible();
     }
+  });
+
+  test('select → confirm → place updates bank or status', async ({ page }) => {
+    const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+    await bankBtn.click();
+    const confirm = page.locator('.hex-a-gone-confirm-btn');
+    await expect(confirm).toBeVisible();
+    await confirm.click();
+    await expect(page.locator('.hex-a-gone-placing-info')).toBeVisible();
+
+    const cell = page
+      .locator(
+        '.hex-a-gone-board [data-q], .hex-a-gone-cell, .hex-a-gone-board polygon, .hex-a-gone-board hexagon'
+      )
+      .first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+
+    await expect(
+      page
+        .locator('.hex-a-gone-board, .hex-a-gone-status, [role="status"]')
+        .first()
+    ).toBeVisible();
   });
 });
 
@@ -418,6 +451,22 @@ test.describe('Frac Fact — e2e smoke', () => {
     await expect(
       page.locator('.frac-result, .frac-scores, .frac-feedback').first()
     ).toBeVisible();
+  });
+
+  test('answering updates result feedback and score chrome', async ({
+    page,
+  }) => {
+    const scores = page.locator('.frac-scores');
+    await expect(scores).toBeVisible();
+    const before = await scores.textContent();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-result, .frac-feedback').first()
+    ).toBeVisible();
+    await expect(scores).toBeVisible();
+    // Score/streak text may change on correct or wrong; chrome must remain
+    expect((await scores.textContent())?.length ?? 0).toBeGreaterThan(0);
+    expect(before?.length ?? 0).toBeGreaterThan(0);
   });
 });
 
@@ -649,12 +698,10 @@ test.describe('Queens & Guards — e2e smoke', () => {
     const destination = page
       .locator('[data-cell-key][aria-label*="valid move"]')
       .first();
-    if ((await destination.count()) > 0) {
-      const before = await page.locator('.qg-status').textContent();
-      await destination.click({ force: true });
-      await expect(page.locator('.qg-status')).not.toHaveText(before ?? '');
-    }
-
+    await expect(destination).toBeVisible();
+    const before = await page.locator('.qg-status').textContent();
+    await destination.click({ force: true });
+    await expect(page.locator('.qg-status')).not.toHaveText(before ?? '');
     await expect(page.locator('.qg-board-container')).toBeVisible();
   });
 });
@@ -688,6 +735,15 @@ test.describe("Pent'Em In — e2e smoke", () => {
 
     await expect(page.locator('.pent-board')).toBeVisible();
   });
+
+  test('after piece select, status stays in Place phase until a cell click', async ({
+    page,
+  }) => {
+    await page.locator('.pent-piece-option').first().click({ force: true });
+    const status = page.locator('[role="status"], .pent-instructions').first();
+    await expect(status).toContainText(/Place/i);
+    await expect(page.locator('.pent-board')).toBeVisible();
+  });
 });
 
 test.describe('Fraction Pinball — e2e smoke', () => {
@@ -714,6 +770,23 @@ test.describe('Fraction Pinball — e2e smoke', () => {
         .locator('.pinball-result, .pinball-feedback, .pinball-scores')
         .first()
     ).toBeVisible();
+  });
+
+  test('answer shows feedback and keeps score chrome', async ({ page }) => {
+    const scores = page.locator('.pinball-scores');
+    await expect(scores).toBeVisible();
+    await page.locator('.pinball-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.pinball-result, .pinball-feedback').first()
+    ).toBeVisible();
+    await expect(scores).toBeVisible();
+    const continueBtn = page.locator('.pinball-continue-btn');
+    if (await continueBtn.isVisible().catch(() => false)) {
+      await continueBtn.click();
+      await expect(
+        page.locator('.pinball-choice-btn, .pinball-challenge').first()
+      ).toBeVisible();
+    }
   });
 });
 

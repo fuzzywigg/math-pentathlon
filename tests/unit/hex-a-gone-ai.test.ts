@@ -19,14 +19,14 @@ describe('Hex-A-Gone AI', () => {
     expect(isAITurn(state, null, 'human-vs-ai')).toBe(false);
     expect(isAITurn(state, 'player2', 'human-vs-ai')).toBe(false);
     expect(
-      isAITurn(
-        { ...state, currentPlayer: 'player2' },
-        'player2',
-        'human-vs-ai'
-      )
+      isAITurn({ ...state, currentPlayer: 'player2' }, 'player2', 'human-vs-ai')
     ).toBe(true);
     expect(
-      isAITurn({ ...state, phase: 'gameOver', winner: 'player1' }, 'player1', 'human-vs-ai')
+      isAITurn(
+        { ...state, phase: 'gameOver', winner: 'player1' },
+        'player1',
+        'human-vs-ai'
+      )
     ).toBe(false);
   });
 
@@ -81,6 +81,34 @@ describe('Hex-A-Gone AI', () => {
       next.currentPlayer === 'player2' ||
         next.phase === 'placeBlocks' ||
         next.phase === 'gameOver'
+    ).toBe(true);
+  });
+
+  it('medium selection + placement after commit stays legal', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.25);
+    let state = createInitialState();
+    const selection = getAISelection(state, 'player1', 'medium');
+    expect(selection).not.toBeNull();
+    for (const block of selection!.blocks) {
+      state = selectBlock(state, block);
+    }
+    state = commitSelection(state);
+    expect(state.phase).toBe('placeBlocks');
+
+    const placement = getAIPlacement(state, 'player1', 'medium');
+    expect(placement).not.toBeNull();
+    expect(typeof placement!.q).toBe('number');
+    expect(typeof placement!.r).toBe('number');
+  });
+
+  it('executeAITurn medium advances the seat or placement phase', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.4);
+    const next = executeAITurn(createInitialState(), 'player1', 'medium');
+    expect(['selectBlocks', 'placeBlocks', 'gameOver']).toContain(next.phase);
+    expect(
+      next.moveHistory.length > 0 ||
+        next.phase === 'placeBlocks' ||
+        next.currentPlayer === 'player2'
     ).toBe(true);
   });
 });
