@@ -15,7 +15,8 @@ import {
 import { getAIAnswer, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -54,7 +55,8 @@ function render(): void {
     // Current player status
     const status = document.createElement('div');
     status.className = `pinball-status ${gameState.currentPlayer}`;
-    status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
+    markStatusLive(status);
+    status.textContent = `${seatIcon(gameState.currentPlayer)} ${getPlayerName(gameState.currentPlayer)}'s turn`;
     wrapper.appendChild(status);
 
     // Main game area

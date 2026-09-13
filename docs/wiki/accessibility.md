@@ -11,12 +11,13 @@ Documented waves in source:
 | Wave 1 | Focusable cells, Enter/Space activation, aria-label parts, focus restore, live status |
 | Wave 2 | ARIA grid pattern, one roving tabindex, arrow-key navigation |
 | Wave 3 | SVG click-board focusables with the same attributes as HTML cells |
+| Burn 1/2 | Remaining click boards (Stars & Bars · Kwatro-Sinko · Par 55) + live status on Frac Fact / Fraction Pinball / Star Track |
 
-Helpers include `buildCellAriaLabel`, `makeCellFocusable`, grid/roving helpers, and live-status marking. Labels can announce coordinates, ownership, emptiness, and valid move/placement — so color is not the only cue.
+Helpers include `buildCellAriaLabel`, `makeCellFocusable`, grid/roving helpers, and live-status marking. Labels can announce coordinates, ownership, emptiness, and valid move/placement — so color is not the only cue. Status/score chrome often uses `seatIcon` (🔵/🔴/🟣) beside seat names.
 
 ## Coverage reality
 
-Adoption is **uneven across games**. Some boards wire the shared helpers more thoroughly than others. Treat the live site and unit tests under `tests/unit/*a11y*` as the checkable surface; do not assume every catalog game has full keyboard parity yet.
+Catalog practice boards wire the shared helpers for keyboard activation, named labels, and polite live status. Decorative track SVGs (Star Track path) and quiz-style answer UIs rely on native `<button>` controls plus live status rather than grid cells. Treat unit tests under `tests/unit/*a11y*` and a live Tab/arrow smoke as the checkable surface.
 
 ## Reviewer checklist (public)
 
@@ -29,3 +30,4 @@ Adoption is **uneven across games**. Some boards wire the shared helpers more th
 
 - Private school or family accommodation workflows
 - Changing scoring or game engines (escalate per `AGENTS.md`)
+- Full WCAG audit / VDOM rewrite (#11) / inventing new chrome

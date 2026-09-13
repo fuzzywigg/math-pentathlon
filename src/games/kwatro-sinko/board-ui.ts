@@ -3,7 +3,16 @@
 
 import { KwaState, BoardNode, Chip, Player } from './types';
 import { getValidMoves } from './rules';
-import { getPlayerSeatColors } from '../../ui/player-colors';
+import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
+} from '../../ui/board-a11y';
 
 // Dimensions
 const NODE_RADIUS = 22;
@@ -33,6 +42,7 @@ export function renderBoard(
   svg.setAttribute('height', String(svgHeight));
   svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
   svg.classList.add('kwa-svg');
+  markBoardAsGrid(svg);
 
   // Get valid moves for selected chip
   const validMoves = state.selectedChip
@@ -76,6 +86,8 @@ export function renderBoard(
   }
 
   container.appendChild(svg);
+  bindGridNavigation(svg);
+  applyRovingTabindex(collectGridCells(svg));
   return container;
 }
 
@@ -91,6 +103,12 @@ function renderNode(
   onChipClick: (chipId: string) => void
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  const match = /^n(\d+)-(\d+)$/.exec(node.id);
+  const row = match ? match[1] : '0';
+  const col = match ? match[2] : '0';
+  group.setAttribute('data-row', row);
+  group.setAttribute('data-col', col);
+  group.setAttribute('data-node-id', node.id);
 
   // Node circle
   const circle = document.createElementNS(
@@ -128,12 +146,14 @@ function renderNode(
     group.addEventListener('click', () => onNodeClick(node.id));
   }
 
+  const canSelect =
+    !!node.chip &&
+    state.phase === 'selectingChip' &&
+    node.chip.owner === state.currentPlayer;
+
   // Render chip if present
   if (node.chip) {
     const isSelected = state.selectedChip === node.chip.id;
-    const canSelect =
-      state.phase === 'selectingChip' &&
-      node.chip.owner === state.currentPlayer;
     const chipGroup = renderChip(
       node.chip,
       node.x,
@@ -143,6 +163,34 @@ function renderNode(
       onChipClick
     );
     group.appendChild(chipGroup);
+  }
+
+  const owner = node.chip ? getPlayerName(node.chip.owner) : undefined;
+  const piece = node.chip ? `chip ${node.chip.value}` : undefined;
+  makeGridCell(
+    group,
+    buildCellAriaLabel({
+      coord: `${row},${col}`,
+      empty: !node.chip,
+      owner,
+      piece,
+      validMove: isValid && !node.chip,
+      extras: [
+        node.isNumbered ? 'numbered' : '',
+        state.selectedChip && node.chip?.id === state.selectedChip
+          ? 'selected'
+          : '',
+        canSelect ? 'selectable' : '',
+        isWinning ? 'winning' : '',
+      ].filter(Boolean),
+    })
+  );
+
+  if (canSelect && node.chip) {
+    const chipId = node.chip.id;
+    bindCellActivateKeys(group, () => onChipClick(chipId));
+  } else if (isValid && !node.chip) {
+    bindCellActivateKeys(group, () => onNodeClick(node.id));
   }
 
   return group;
@@ -226,11 +274,11 @@ export function renderChipInfo(_state: KwaState): HTMLElement {
 
   const p1Info = document.createElement('div');
   p1Info.className = 'kwa-player-info player1';
-  p1Info.innerHTML = `<span class="label">Blue (Even):</span> 0, 2, 4, 6, 8`;
+  p1Info.innerHTML = `<span class="label">${seatIcon('player1')} Blue (Even):</span> 0, 2, 4, 6, 8`;
 
   const p2Info = document.createElement('div');
   p2Info.className = 'kwa-player-info player2';
-  p2Info.innerHTML = `<span class="label">Red (Odd):</span> 1, 3, 5, 7, 9`;
+  p2Info.innerHTML = `<span class="label">${seatIcon('player2')} Red (Odd):</span> 1, 3, 5, 7, 9`;
 
   container.appendChild(p1Info);
   container.appendChild(p2Info);

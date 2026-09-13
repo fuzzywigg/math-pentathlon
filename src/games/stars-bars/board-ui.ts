@@ -10,6 +10,17 @@ import {
   countDifferences,
 } from './types';
 import { getValidPlacements } from './rules';
+import { seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  makeCellFocusable,
+  collectGridCells,
+  applyRovingTabindex,
+} from '../../ui/board-a11y';
 
 // =============================================================================
 // Style Injection
@@ -423,6 +434,7 @@ export function renderBoard(
 
   const board = document.createElement('div');
   board.className = 'stars-board';
+  markBoardAsGrid(board);
 
   const validPlacements =
     state.phase === 'placingCard' ? getValidPlacements(state) : [];
@@ -433,6 +445,8 @@ export function renderBoard(
       const cell = state.cells[row][col];
       const cellEl = document.createElement('div');
       cellEl.className = 'stars-cell';
+      cellEl.dataset.row = String(row);
+      cellEl.dataset.col = String(col);
 
       if (cell.isStar) cellEl.classList.add('star');
       if (cell.owner) cellEl.classList.add(cell.owner);
@@ -447,7 +461,9 @@ export function renderBoard(
       const isValid = validSet.has(`${row},${col}`);
       if (isValid) {
         cellEl.classList.add('valid');
-        cellEl.addEventListener('click', () => onCellClick(row, col));
+        const activate = () => onCellClick(row, col);
+        cellEl.addEventListener('click', activate);
+        bindCellActivateKeys(cellEl, activate);
 
         // Show score preview on hover
         if (state.selectedCard) {
@@ -466,10 +482,28 @@ export function renderBoard(
         cellEl.appendChild(cardSvg);
       }
 
+      const owner = cell.owner ? getPlayerName(cell.owner) : undefined;
+      const piece = cell.card
+        ? `${cell.card.size} ${cell.card.thickness} ${cell.card.color} ${cell.card.shape}`
+        : undefined;
+      makeGridCell(
+        cellEl,
+        buildCellAriaLabel({
+          coord: `${row},${col}`,
+          empty: !cell.card,
+          owner,
+          piece,
+          validPlacement: isValid,
+          extras: cell.isStar ? ['star'] : undefined,
+        })
+      );
+
       board.appendChild(cellEl);
     }
   }
 
+  bindGridNavigation(board);
+  applyRovingTabindex(collectGridCells(board));
   container.appendChild(board);
   return container;
 }
@@ -535,7 +569,7 @@ export function renderPlayerHand(
 
   const label = document.createElement('div');
   label.className = `stars-hand-label ${player}`;
-  label.textContent = `${getPlayerName(player)}'s Hand`;
+  label.textContent = `${seatIcon(player)} ${getPlayerName(player)}'s Hand`;
   container.appendChild(label);
 
   const hand = document.createElement('div');
@@ -560,10 +594,29 @@ export function renderPlayerHand(
     cardEl.appendChild(cardSvg);
 
     // Tooltip showing attributes
-    cardEl.title = `${card.size} ${card.thickness} ${card.color} ${card.shape}`;
+    const attrs = `${card.size} ${card.thickness} ${card.color} ${card.shape}`;
+    cardEl.title = attrs;
 
-    if (isCurrentPlayer && state.phase !== 'gameOver') {
-      cardEl.addEventListener('click', () => onCardClick(card.id));
+    const canSelect = isCurrentPlayer && state.phase !== 'gameOver';
+    if (canSelect) {
+      const activate = () => onCardClick(card.id);
+      cardEl.addEventListener('click', activate);
+      bindCellActivateKeys(cardEl, activate);
+    }
+
+    makeCellFocusable(
+      cardEl,
+      buildCellAriaLabel({
+        coord: attrs,
+        extras: [
+          state.selectedCard?.id === card.id ? 'selected' : '',
+          !canSelect ? 'disabled' : '',
+        ].filter(Boolean),
+      })
+    );
+    if (!canSelect) {
+      cardEl.setAttribute('tabindex', '-1');
+      cardEl.setAttribute('aria-disabled', 'true');
     }
 
     hand.appendChild(cardEl);
@@ -586,11 +639,11 @@ export function renderScores(state: StarsState): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'stars-score player1';
-  p1Score.textContent = `Blue: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
+  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
 
   const p2Score = document.createElement('div');
   p2Score.className = 'stars-score player2';
-  p2Score.textContent = `Red: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
+  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
 
   container.appendChild(p1Score);
   container.appendChild(p2Score);

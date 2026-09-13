@@ -4,6 +4,7 @@
 import { FracFactState, Player, getPlayerStats } from './types';
 import { Fraction } from '../../core/fractions/types';
 import { getOperationSymbol } from './rules';
+import { seatIcon } from '../../ui/player-colors';
 
 // =============================================================================
 // Fraction Visual Rendering
@@ -172,6 +173,11 @@ export function renderAnswerChoices(
   for (const choice of state.currentProblem.answerChoices) {
     const button = document.createElement('button');
     button.className = 'frac-choice-btn';
+    button.type = 'button';
+    button.setAttribute(
+      'aria-label',
+      `Answer ${choice.numerator}/${choice.denominator}`
+    );
     button.appendChild(createFractionSVG(choice, 'medium'));
 
     button.addEventListener('click', () => onSelect(choice));
@@ -250,7 +256,7 @@ export function renderScores(state: FracFactState): HTMLElement {
   const p1Score = document.createElement('div');
   p1Score.className = `frac-player-score ${state.currentPlayer === 'player1' ? 'active' : ''}`;
   p1Score.innerHTML = `
-    <div class="frac-player-name player1">Blue</div>
+    <div class="frac-player-name player1">${seatIcon('player1')} Blue</div>
     <div class="frac-score-value">${p1Stats.score}</div>
     <div class="frac-streak">${p1Stats.currentStreak > 0 ? `🔥 ${p1Stats.currentStreak}` : ''}</div>
   `;
@@ -271,7 +277,7 @@ export function renderScores(state: FracFactState): HTMLElement {
   const p2Score = document.createElement('div');
   p2Score.className = `frac-player-score ${state.currentPlayer === 'player2' ? 'active' : ''}`;
   p2Score.innerHTML = `
-    <div class="frac-player-name player2">Red</div>
+    <div class="frac-player-name player2">${seatIcon('player2')} Red</div>
     <div class="frac-score-value">${p2Stats.score}</div>
     <div class="frac-streak">${p2Stats.currentStreak > 0 ? `🔥 ${p2Stats.currentStreak}` : ''}</div>
   `;

@@ -10,7 +10,17 @@ import {
   BlockColor,
 } from './types';
 import { getValidPlacements, calculateScore } from './rules';
-import { getPlayerSeatColors } from '../../ui/player-colors';
+import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import {
+  buildCellAriaLabel,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
+  bindCellActivateKeys,
+  makeCellFocusable,
+  collectGridCells,
+  applyRovingTabindex,
+} from '../../ui/board-a11y';
 
 function playerColors() {
   return getPlayerSeatColors();
@@ -50,6 +60,7 @@ export function renderBoard(
   svg.setAttribute('height', String(svgHeight));
   svg.setAttribute('viewBox', `0 0 ${svgWidth} ${svgHeight}`);
   svg.classList.add('par55-svg');
+  markBoardAsGrid(svg);
 
   // Render bases
   for (const base of state.bases.values()) {
@@ -59,6 +70,8 @@ export function renderBoard(
     svg.appendChild(baseGroup);
   }
 
+  bindGridNavigation(svg);
+  applyRovingTabindex(collectGridCells(svg));
   container.appendChild(svg);
   return container;
 }
@@ -87,6 +100,9 @@ function renderBase(
   onClick: (baseId: string) => void
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  group.setAttribute('data-row', String(base.row));
+  group.setAttribute('data-col', String(base.col));
+  group.setAttribute('data-base-id', base.id);
   const pos = getBasePosition(base.row, base.col);
 
   // Pentagon path
@@ -142,8 +158,26 @@ function renderBase(
 
   // Click handler
   if (isValid) {
-    group.addEventListener('click', () => onClick(base.id));
+    const activate = () => onClick(base.id);
+    group.addEventListener('click', activate);
+    bindCellActivateKeys(group, activate);
   }
+
+  const owner = base.placedBy ? getPlayerName(base.placedBy) : undefined;
+  const piece = base.block
+    ? `${base.block.size} ${base.block.thickness} ${base.block.color} ${base.block.shape}`
+    : undefined;
+  makeGridCell(
+    group,
+    buildCellAriaLabel({
+      coord: `${base.row},${base.col}`,
+      empty: !base.block,
+      owner,
+      piece,
+      validPlacement: isValid,
+      extras: isLastMove ? ['last move'] : undefined,
+    })
+  );
 
   return group;
 }
@@ -304,7 +338,25 @@ export function renderHand(
     );
 
     if (canSelect) {
-      blockEl.addEventListener('click', () => onBlockClick(block.id));
+      const activate = () => onBlockClick(block.id);
+      blockEl.addEventListener('click', activate);
+      bindCellActivateKeys(blockEl, activate);
+    }
+
+    const attrs = `${block.size} ${block.thickness} ${block.color} ${block.shape}`;
+    makeCellFocusable(
+      blockEl,
+      buildCellAriaLabel({
+        coord: attrs,
+        extras: [
+          state.selectedBlock === block.id ? 'selected' : '',
+          !canSelect ? 'disabled' : '',
+        ].filter(Boolean),
+      })
+    );
+    if (!canSelect) {
+      blockEl.setAttribute('tabindex', '-1');
+      blockEl.setAttribute('aria-disabled', 'true');
     }
 
     container.appendChild(blockEl);
@@ -368,7 +420,7 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'par55-score player1';
-  p1Score.innerHTML = `<span class="label">Blue:</span> <span class="value">${state.scores.player1}</span>`;
+  p1Score.innerHTML = `<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}</span>`;
 
   const target = document.createElement('div');
   target.className = 'par55-target';
@@ -376,7 +428,7 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p2Score = document.createElement('div');
   p2Score.className = 'par55-score player2';
-  p2Score.innerHTML = `<span class="label">Red:</span> <span class="value">${state.scores.player2}</span>`;
+  p2Score.innerHTML = `<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}</span>`;
 
   container.appendChild(p1Score);
   container.appendChild(target);

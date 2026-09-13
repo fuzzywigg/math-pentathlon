@@ -3,6 +3,8 @@
  * Wave 1: focusable cells, Enter/Space, label parts, focus restore, live status.
  * Wave 2: ARIA grid + one roving tabindex + arrow navigation.
  * Wave 3: SVG click-board focusables (same attrs as HTML cells).
+ * Burn Wave 1/2: remaining HTML/SVG click boards (Stars & Bars · Kwatro · Par 55)
+ * plus live status on button-UI games (Frac Fact · Pinball · Star Track).
  */
 
 /** HTML or SVG node that can take tabindex / role / focus. */
