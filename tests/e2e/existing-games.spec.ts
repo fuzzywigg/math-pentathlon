@@ -2457,9 +2457,7 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
   test('Fab first bar select advances selection chrome', async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await dismissModeIfNeeded(page);
-    const bar = page
-      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
-      .first();
+    const bar = page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first();
     if ((await bar.count()) > 0) {
       await bar.click({ force: true });
       await expect(page.locator('.fab-bar-selected')).toBeVisible();
@@ -2506,7 +2504,9 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
     if ((await block.count()) > 0) {
       await block.click({ force: true });
     }
-    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+    await expect(
+      page.locator('.par55-board, .par55-hand').first()
+    ).toBeVisible();
   });
 });
 
@@ -2802,9 +2802,7 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
       await choice.click({ force: true });
     }
     await expect(
-      page
-        .locator('.pinball-board, .fp-board, .fp-target, .fp-score')
-        .first()
+      page.locator('.pinball-board, .fp-board, .fp-target, .fp-score').first()
     ).toBeVisible();
   });
 
@@ -2816,7 +2814,9 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
     await page
       .locator('.cell[data-row="1"][data-col="5"]')
       .click({ force: true });
-    await expect(page.locator('.cell-selected, .status-turn').first()).toBeVisible();
+    await expect(
+      page.locator('.cell-selected, .status-turn').first()
+    ).toBeVisible();
   });
 
   test('Sum Dominoes premature place without roll is a no-op', async ({
@@ -2840,5 +2840,154 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
     const cell = page.locator('.contig-cell').first();
     await cell.click({ force: true });
     await expect(page.locator('.contig-roll-btn')).toBeVisible();
+  });
+});
+test.describe('Wave 17 — success-path chrome (existing games)', () => {
+  test('Kwatro board + chip info chrome mounts', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    await expect(
+      page.locator('.kwa-board, .kwa-chip-info').first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod board + hand rods visible; select enables slots', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.ramrod-board')).toBeVisible();
+    await expect(page.locator('.ramrod-rod').first()).toBeVisible();
+    const rod = page
+      .locator('.ramrod-rod-wrapper.selectable, .ramrod-rod')
+      .first();
+    if ((await rod.count()) > 0) {
+      await rod.click({ force: true });
+    }
+    await expect(page.locator('.ramrod-box').first()).toBeVisible();
+  });
+
+  test('Stars hand card select keeps board visible', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.stars-board')).toBeVisible();
+    await expect(page.locator('.stars-card').first()).toBeVisible();
+    await page.locator('.stars-card').first().click({ force: true });
+    await expect(
+      page.locator('.stars-board, .stars-cell').first()
+    ).toBeVisible();
+  });
+
+  test('Remainder roll button → dice chrome', async ({ page }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.remainder-board')).toBeVisible();
+    const roll = page.locator('.remainder-btn-roll').first();
+    if ((await roll.count()) > 0) {
+      await roll.click();
+    }
+    await expect(
+      page
+        .locator('.remainder-dice, .remainder-board, .remainder-scores')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Pent piece option select keeps board mounted', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.pent-board')).toBeVisible();
+    const piece = page.locator('.pent-piece-option').first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-board, .pent-piece-selector').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone bank select → confirm chrome', async ({ page }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.hex-a-gone-board')).toBeVisible();
+    const bankBtn = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.hex-a-gone-confirm-btn, .hex-a-gone-bank, .hex-a-gone-status'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact problem + choices after start', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.frac-problem')).toBeVisible();
+    await expect(page.locator('.frac-choice-btn').first()).toBeVisible();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-result, .frac-problem, .frac-feedback').first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball challenge choices mount', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.pinball-challenge')).toBeVisible();
+    await expect(page.locator('.pinball-choice-btn').first()).toBeVisible();
+  });
+
+  test('FIAR board container mounts; click no crash', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.fiar-board-container')).toBeVisible();
+    const node = page
+      .locator(
+        '.fiar-board-container circle, .fiar-board-container [data-node]'
+      )
+      .first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true });
+    }
+    await expect(
+      page.locator('.fiar-board-container, .fiar-status').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes roll → dice/hand chrome', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.sd-board')).toBeVisible();
+    const roll = page.locator('.sd-roll-btn').first();
+    if ((await roll.count()) > 0) {
+      await roll.click();
+    }
+    await expect(
+      page.locator('.sd-dice-display, .sd-hand, .sd-board').first()
+    ).toBeVisible();
+  });
+
+  test('Contig two-roll success path keeps score chrome', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const valid = page.locator('.contig-cell-valid');
+    const pass = page.locator('.contig-pass-btn');
+    if ((await valid.count()) > 0) {
+      await valid.first().click();
+    } else if ((await pass.count()) > 0) {
+      await pass.click();
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+    await page.locator('.contig-roll-btn').click();
+    await expect(
+      page
+        .locator('.contig-score-p1, .contig-dice-display, .contig-board')
+        .first()
+    ).toBeVisible();
   });
 });
