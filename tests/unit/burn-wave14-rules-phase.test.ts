@@ -1,6 +1,6 @@
 /**
- * Wave 13 — vertical rules-phase / illegal-sequence / getValid* matrix.
- * Distinct from waves 7–12 (win-draw-AI, secondary UI, tutorial wiring, controllers).
+ * Wave 14 — vertical rules-phase / illegal-sequence / getValid* matrix.
+ * Distinct from waves 7–13 (win-draw-AI, secondary UI, tutorial wiring, controllers).
  * Tests-only: assert existing identity no-ops and empty-valid edges. No product inventing.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -173,7 +173,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('Wave 13 rules-phase — Hex-a-Gone empty / wrong-phase guards', () => {
+describe('Wave 14 rules-phase — Hex-a-Gone empty / wrong-phase guards', () => {
   it('getValidPlacements is [] without selectedBlockForPlacement', () => {
     expect(hagPlacements(createHag())).toEqual([]);
   });
@@ -250,7 +250,7 @@ describe('Wave 13 rules-phase — Hex-a-Gone empty / wrong-phase guards', () => 
   });
 });
 
-describe('Wave 13 rules-phase — Juggle wrong-phase / empty preview', () => {
+describe('Wave 14 rules-phase — Juggle wrong-phase / empty preview', () => {
   it('roll / selectDie / selectShape / placeShape are identity outside their phases', () => {
     const rolling = createJuggle();
     expect(selectDie(rolling, 0)).toBe(rolling);
@@ -307,7 +307,7 @@ describe('Wave 13 rules-phase — Juggle wrong-phase / empty preview', () => {
   });
 });
 
-describe("Wave 13 rules-phase — Pent'Em In placements / selection guards", () => {
+describe("Wave 14 rules-phase — Pent'Em In placements / selection guards", () => {
   it('getPieceCells for unknown shape is []', () => {
     expect(getPieceCells('nope', { row: 0, col: 0 }, 0, false)).toEqual([]);
   });
@@ -348,7 +348,7 @@ describe("Wave 13 rules-phase — Pent'Em In placements / selection guards", () 
   });
 });
 
-describe('Wave 13 rules-phase — Prime Gold rolling / miss / history', () => {
+describe('Wave 14 rules-phase — Prime Gold rolling / miss / history', () => {
   it('getValidPlacements / hasValidMoves on rolling are empty/false', () => {
     const state = createPrime();
     expect(state.phase).toBe('rolling');
@@ -378,7 +378,7 @@ describe('Wave 13 rules-phase — Prime Gold rolling / miss / history', () => {
   });
 });
 
-describe('Wave 13 rules-phase — Remainder Islands preview / skip / select guards', () => {
+describe('Wave 14 rules-phase — Remainder Islands preview / skip / select guards', () => {
   it('previewDivision null without roll or unknown island', () => {
     const fresh = createRemainder();
     expect(previewDivision(fresh, 'island-0-0')).toBeNull();
@@ -436,7 +436,7 @@ describe('Wave 13 rules-phase — Remainder Islands preview / skip / select guar
   });
 });
 
-describe('Wave 13 rules-phase — Calla animating/gameOver pit gates', () => {
+describe('Wave 14 rules-phase — Calla animating/gameOver pit gates', () => {
   it('getValidPits / canSelectPit empty on animating and gameOver', () => {
     const animating = { ...createCalla(), phase: 'animating' as const };
     expect(getValidPits(animating)).toEqual([]);
@@ -485,7 +485,7 @@ describe('Wave 13 rules-phase — Calla animating/gameOver pit gates', () => {
   });
 });
 
-describe('Wave 13 rules-phase — Star Track draw/select identity + progress', () => {
+describe('Wave 14 rules-phase — Star Track draw/select identity + progress', () => {
   it('drawChains / selectChain are identity outside their phases', () => {
     const fresh = createStar();
     expect(selectChain(fresh, 0)).toBe(fresh);
@@ -529,7 +529,7 @@ describe('Wave 13 rules-phase — Star Track draw/select identity + progress', (
   });
 });
 
-describe('Wave 13 rules-phase — Fab pipeline illegal matrix', () => {
+describe('Wave 14 rules-phase — Fab pipeline illegal matrix', () => {
   it('selectBar2 same as bar1 is identity; wrong-phase selectOperation is identity', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.2);
     let state = createFab();
@@ -609,7 +609,7 @@ describe('Wave 13 rules-phase — Fab pipeline illegal matrix', () => {
   });
 });
 
-describe('Wave 13 rules-phase — Stars / Par / Ramrod / Kwatro / Sum / FIAR / Contig / Quiz', () => {
+describe('Wave 14 rules-phase — Stars / Par / Ramrod / Kwatro / Sum / FIAR / Contig / Quiz', () => {
   it('Stars: selectCard on gameOver identity; placeCard on occupied cell identity', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.25);
     const over = { ...createStars(), phase: 'gameOver' as const, winner: 'player1' as const };

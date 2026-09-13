@@ -1,6 +1,6 @@
 /**
- * Wave 13b — getPhaseMessage / formatMove / clearSelection edges.
- * Complements burn-wave13-rules-phase (illegal/getValid*). Still rules-only.
+ * Wave 14b — getPhaseMessage / formatMove / clearSelection edges.
+ * Complements burn-wave14-rules-phase (illegal/getValid*). Still rules-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
@@ -97,7 +97,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('Wave 13b — Hex-a-Gone / Calla / Star phase messages', () => {
+describe('Wave 14b — Hex-a-Gone / Calla / Star phase messages', () => {
   it('hagMsg covers empty select, selected count, and getBlockColor', () => {
     const fresh = createHag();
     expect(hagMsg(fresh)).toMatch(/Select 1-3/);
@@ -147,7 +147,7 @@ describe('Wave 13b — Hex-a-Gone / Calla / Star phase messages', () => {
   });
 });
 
-describe('Wave 13b — Fab / Par / Ramrod / Kwatro / Stars clearSelection matrix', () => {
+describe('Wave 14b — Fab / Par / Ramrod / Kwatro / Stars clearSelection matrix', () => {
   it('Fab clearSelection from confirmingMove; getOperationSymbol set', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.22);
     let state = createFab();
@@ -211,7 +211,7 @@ describe('Wave 13b — Fab / Par / Ramrod / Kwatro / Stars clearSelection matrix
   });
 });
 
-describe('Wave 13b — Prime / Remainder / Sum / FIAR phase helpers', () => {
+describe('Wave 14b — Prime / Remainder / Sum / FIAR phase helpers', () => {
   it('Prime passTurn from placing clears dice and returns to rolling', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const placing = primeRoll(createPrime());
