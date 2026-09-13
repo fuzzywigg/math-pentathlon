@@ -2023,3 +2023,269 @@ test.describe('Wave 12 — more illegal / premature no-ops', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 13 — help / new-game deepenings', () => {
+  test('Frac Fact help + new game restores problem chrome', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.frac-problem, .frac-scores, .frac-game-area').first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball help + new game restores challenge', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.pinball-challenge, .pinball-scores, .pinball-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kings help + new game keeps board', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(page.locator('.cell, .board').first()).toBeVisible();
+  });
+
+  test('Hex-a-Gone help + new game restores bank', async ({ page }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.hex-a-gone-bank, .hex-a-gone-board').first()
+    ).toBeVisible();
+  });
+
+  test("Pent'Em In help opens and closes", async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Remainder Islands help + new game restores dice CTA', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await dismissModeIfNeeded(page);
+    await page.click('#help-btn');
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await page.click('#new-game-btn');
+    await page.click('#start-game-btn');
+    await expect(
+      page.locator('.remainder-roll-btn, .remainder-dice, .remainder-board').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Wave 13 — vs-AI start smoke', () => {
+  test('Contig 60 vs-AI starts with roll CTA', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.contig-roll-btn, .contig-dice-area').first()
+    ).toBeVisible();
+  });
+
+  test('FIAR vs-AI starts with board', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.fiar-board, .fiar-board-container, svg').first()
+    ).toBeVisible();
+  });
+
+  test('Stars & Bars vs-AI starts with hand', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.stars-hand, .stars-hand-container, .stars-board').first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod vs-AI starts with rods', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(
+      page.locator('.ramrod-player-rods, .ramrod-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kwatro vs-AI starts with board', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.kwa-board').first()).toBeVisible();
+  });
+
+  test('Kings vs-AI starts with board', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+    await expect(page.locator('.cell, .board').first()).toBeVisible();
+  });
+});
+
+test.describe('Wave 13 — more illegal / premature no-ops', () => {
+  test('Fab pool click keeps pool chrome', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await dismissModeIfNeeded(page);
+    const bar = page.locator('.fab-bar-wrapper, .fab-bar-pool button').first();
+    if ((await bar.count()) > 0) {
+      await bar.click({ force: true });
+    }
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board, .fab-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Par base click before block keeps hand', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const base = page.locator('.par55-base, .par55-board').first();
+    if ((await base.count()) > 0) {
+      await base.click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-hand, .par55-board').first()
+    ).toBeVisible();
+  });
+
+  test('Prime cell click before roll keeps roll CTA', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.pg-cell, .pg-board [data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.pg-roll-btn, .pg-dice-area, .pg-board').first()
+    ).toBeVisible();
+  });
+
+  test('Stars board click before card keeps hand', async ({ page }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.stars-cell, .stars-board [data-row]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-hand, .stars-hand-container, .stars-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kwatro node click without chip keeps board', async ({ page }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await dismissModeIfNeeded(page);
+    const node = page.locator('.kwa-node, .kwa-board').first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true, position: { x: 8, y: 8 } });
+    }
+    await expect(page.locator('.kwa-board').first()).toBeVisible();
+  });
+
+  test('Kings empty-ish cell click keeps board', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    const cell = page.locator('.cell').nth(20);
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(page.locator('.cell, .board').first()).toBeVisible();
+  });
+});

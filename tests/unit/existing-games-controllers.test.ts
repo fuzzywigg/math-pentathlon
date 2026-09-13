@@ -107,6 +107,7 @@ import {
   newGameVsHuman as fracVsHuman,
   newGameVsAI as fracVsAI,
   getCurrentState as getFracState,
+  setDifficulty as setFracDifficulty,
   startTutorial as startFracTutorial,
   isTutorialActive as isFracTutorial,
 } from '../../src/games/frac-fact/game-controller';
