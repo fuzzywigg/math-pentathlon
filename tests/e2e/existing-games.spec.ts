@@ -2457,9 +2457,7 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
   test('Fab first bar select advances selection chrome', async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await dismissModeIfNeeded(page);
-    const bar = page
-      .locator('.fab-bar-wrapper:not(.fab-bar-disabled)')
-      .first();
+    const bar = page.locator('.fab-bar-wrapper:not(.fab-bar-disabled)').first();
     if ((await bar.count()) > 0) {
       await bar.click({ force: true });
       await expect(page.locator('.fab-bar-selected')).toBeVisible();
@@ -2506,7 +2504,9 @@ test.describe('Wave 14 — rules-phase chrome transitions', () => {
     if ((await block.count()) > 0) {
       await block.click({ force: true });
     }
-    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+    await expect(
+      page.locator('.par55-board, .par55-hand').first()
+    ).toBeVisible();
   });
 });
 
@@ -2802,9 +2802,7 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
       await choice.click({ force: true });
     }
     await expect(
-      page
-        .locator('.pinball-board, .fp-board, .fp-target, .fp-score')
-        .first()
+      page.locator('.pinball-board, .fp-board, .fp-target, .fp-score').first()
     ).toBeVisible();
   });
 
@@ -2816,7 +2814,9 @@ test.describe('Wave 15 — rules-phase / illegal chrome transitions', () => {
     await page
       .locator('.cell[data-row="1"][data-col="5"]')
       .click({ force: true });
-    await expect(page.locator('.cell-selected, .status-turn').first()).toBeVisible();
+    await expect(
+      page.locator('.cell-selected, .status-turn').first()
+    ).toBeVisible();
   });
 
   test('Sum Dominoes premature place without roll is a no-op', async ({
@@ -2865,8 +2865,13 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
   }) => {
     await page.goto('/#/game/juggle');
     await startVsAi(page);
-    const roll = page.locator('.juggle-roll-btn, .roll-dice-btn, button:has-text("Roll")').first();
-    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+    const roll = page
+      .locator('.juggle-roll-btn, .roll-dice-btn, button:has-text("Roll")')
+      .first();
+    if (
+      (await roll.count()) > 0 &&
+      (await roll.isVisible().catch(() => false))
+    ) {
       await roll.click({ force: true });
     }
     await expect(
@@ -2884,7 +2889,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     await page.goto('/#/game/hex-a-gone');
     await startVsAi(page);
     await expect(
-      page.locator('.hag-bank, .hex-a-gone-bank, .hag-board, .hexagon-board').first()
+      page
+        .locator('.hag-bank, .hex-a-gone-bank, .hag-board, .hexagon-board')
+        .first()
     ).toBeVisible();
     const block = page
       .locator('.hag-block, .hag-bank-shape, [data-shape], .block-btn')
@@ -2904,7 +2911,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     await expect(roll).toBeVisible();
     await roll.click();
     await expect(
-      page.locator('.contig-expressions, .contig-pass-btn, .contig-dice-display').first()
+      page
+        .locator('.contig-expressions, .contig-pass-btn, .contig-dice-display')
+        .first()
     ).toBeVisible();
   });
 
@@ -2929,7 +2938,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     await draw.click({ force: true });
     await expect(
       page
-        .locator('.star-track-chain-btn, .star-track-draw-btn, .star-track-board')
+        .locator(
+          '.star-track-chain-btn, .star-track-draw-btn, .star-track-board'
+        )
         .first()
     ).toBeVisible();
   });
@@ -2937,7 +2948,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
   test('Fab vs-AI bar pool click keeps selecting chrome', async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await startVsAi(page);
-    const bar = page.locator('.fab-bar-wrapper, .fab-bar-pool .fab-bar').first();
+    const bar = page
+      .locator('.fab-bar-wrapper, .fab-bar-pool .fab-bar')
+      .first();
     if ((await bar.count()) > 0) {
       await bar.click({ force: true });
     }
@@ -2963,13 +2976,17 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
   }) => {
     await page.goto('/#/game/frac-fact');
     await startVsAi(page);
-    await expect(page.locator('.frac-problem, .frac-choice-btn').first()).toBeVisible();
+    await expect(
+      page.locator('.frac-problem, .frac-choice-btn').first()
+    ).toBeVisible();
     const choice = page.locator('.frac-choice-btn').first();
     if ((await choice.count()) > 0) {
       await choice.click({ force: true });
     }
     await expect(
-      page.locator('.frac-result, .frac-scores, .frac-feedback, .frac-problem').first()
+      page
+        .locator('.frac-result, .frac-scores, .frac-feedback, .frac-problem')
+        .first()
     ).toBeVisible();
   });
 
@@ -2979,7 +2996,10 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     const roll = page
       .locator('.prime-roll-btn, .pg-roll-btn, button:has-text("Roll")')
       .first();
-    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+    if (
+      (await roll.count()) > 0 &&
+      (await roll.isVisible().catch(() => false))
+    ) {
       await roll.click({ force: true });
     }
     await expect(
@@ -2998,7 +3018,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     ).toBeVisible();
   });
 
-  test('Par 55 vs-AI block select keeps hand/board chrome', async ({ page }) => {
+  test('Par 55 vs-AI block select keeps hand/board chrome', async ({
+    page,
+  }) => {
     await page.goto('/#/game/par-55');
     await startVsAi(page);
     const block = page
@@ -3007,7 +3029,9 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     if ((await block.count()) > 0) {
       await block.click({ force: true });
     }
-    await expect(page.locator('.par55-board, .par55-hand').first()).toBeVisible();
+    await expect(
+      page.locator('.par55-board, .par55-hand').first()
+    ).toBeVisible();
   });
 
   test('Ramrod vs-AI rod select keeps board chrome', async ({ page }) => {
@@ -3040,7 +3064,9 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
     }
   }
 
-  test('Hex vs-AI cell chrome stays after one legal click', async ({ page }) => {
+  test('Hex vs-AI cell chrome stays after one legal click', async ({
+    page,
+  }) => {
     await page.goto('/#/game/hex');
     await startVsAi(page);
     await expect(
@@ -3051,7 +3077,9 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
       await cell.click({ force: true });
     }
     await expect(
-      page.locator('.hex-cell-group, .hex-legend, .status-turn, .hex-status').first()
+      page
+        .locator('.hex-cell-group, .hex-legend, .status-turn, .hex-status')
+        .first()
     ).toBeVisible();
   });
 
@@ -3063,7 +3091,9 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
     ).toBeVisible();
   });
 
-  test('Pinball vs-AI choice may reveal continue/feedback', async ({ page }) => {
+  test('Pinball vs-AI choice may reveal continue/feedback', async ({
+    page,
+  }) => {
     await page.goto('/#/game/fraction-pinball');
     await startVsAi(page);
     await expect(
@@ -3087,12 +3117,16 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
   }) => {
     await page.goto('/#/game/stars-bars');
     await startVsAi(page);
-    const card = page.locator('.stars-card:not(.disabled), .stars-card').first();
+    const card = page
+      .locator('.stars-card:not(.disabled), .stars-card')
+      .first();
     if ((await card.count()) > 0) {
       await card.click({ force: true });
     }
     await expect(
-      page.locator('.stars-cell.valid, .stars-board, .stars-score, .stars-card').first()
+      page
+        .locator('.stars-cell.valid, .stars-board, .stars-score, .stars-card')
+        .first()
     ).toBeVisible();
   });
 
@@ -3125,10 +3159,15 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
         .first()
     ).toBeVisible();
     const rotate = page.locator('.pent-btn-rotate');
-    if ((await rotate.count()) > 0 && (await rotate.isVisible().catch(() => false))) {
+    if (
+      (await rotate.count()) > 0 &&
+      (await rotate.isVisible().catch(() => false))
+    ) {
       await rotate.click({ force: true });
     }
-    await expect(page.locator('.pent-board, .pent-piece-option').first()).toBeVisible();
+    await expect(
+      page.locator('.pent-board, .pent-piece-option').first()
+    ).toBeVisible();
   });
 
   test('Juggle roll→die may mount rotate/flip controls', async ({ page }) => {
@@ -3137,7 +3176,10 @@ test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
     const roll = page
       .locator('.juggle-roll-btn, .roll-dice-btn, button:has-text("Roll")')
       .first();
-    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+    if (
+      (await roll.count()) > 0 &&
+      (await roll.isVisible().catch(() => false))
+    ) {
       await roll.click({ force: true });
     }
     const die = page.locator('.juggle-die.selectable, .juggle-die').first();
@@ -3205,7 +3247,9 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
     await page.goto('/#/game/fab-a-diffy');
     await startVsAi(page);
     const first = page
-      .locator('.fab-bar-wrapper:not(.fab-bar-disabled), .fab-bar-pool .fab-bar')
+      .locator(
+        '.fab-bar-wrapper:not(.fab-bar-disabled), .fab-bar-pool .fab-bar'
+      )
       .first();
     if ((await first.count()) > 0) {
       await first.click({ force: true });
@@ -3231,7 +3275,10 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
     await page.goto('/#/game/star-track');
     await startVsAi(page);
     const draw = page.locator('.star-track-draw-btn').first();
-    if ((await draw.count()) > 0 && (await draw.isVisible().catch(() => false))) {
+    if (
+      (await draw.count()) > 0 &&
+      (await draw.isVisible().catch(() => false))
+    ) {
       await draw.click({ force: true });
     }
     const chain = page.locator('.star-track-chain-btn').first();
@@ -3255,7 +3302,10 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
     const roll = page
       .locator('.prime-roll-btn, .pg-roll-btn, button:has-text("Roll")')
       .first();
-    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+    if (
+      (await roll.count()) > 0 &&
+      (await roll.isVisible().catch(() => false))
+    ) {
       await roll.click({ force: true });
     }
     const expr = page
@@ -3310,7 +3360,10 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
       await bank.click({ force: true });
     }
     const confirm = page.locator('.hex-a-gone-confirm-btn');
-    if ((await confirm.count()) > 0 && (await confirm.isVisible().catch(() => false))) {
+    if (
+      (await confirm.count()) > 0 &&
+      (await confirm.isVisible().catch(() => false))
+    ) {
       await confirm.click({ force: true });
     }
     const cell = page
@@ -3340,7 +3393,9 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
       await pit.click({ force: true });
     }
     await expect(
-      page.locator('.calla-board, .calla-pit, .calla-status, .calla-calla').first()
+      page
+        .locator('.calla-board, .calla-pit, .calla-status, .calla-calla')
+        .first()
     ).toBeVisible();
   });
 
@@ -3353,7 +3408,11 @@ test.describe('Wave 19 — persist / multi-step chrome for existing games', () =
       await playable.click({ force: true });
     }
     await expect(
-      page.locator('.sd-board, .sd-hand-domino-selected, .sd-pass-btn, .sd-dice-display').first()
+      page
+        .locator(
+          '.sd-board, .sd-hand-domino-selected, .sd-pass-btn, .sd-dice-display'
+        )
+        .first()
     ).toBeVisible();
   });
 });
@@ -3375,7 +3434,9 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     }
   }
 
-  test('Fab pool shows fraction-bar SVG chrome after start', async ({ page }) => {
+  test('Fab pool shows fraction-bar SVG chrome after start', async ({
+    page,
+  }) => {
     await page.goto('/#/game/fab-a-diffy');
     await startVsAi(page);
     await expect(
@@ -3397,13 +3458,21 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
   test('Par 55 hand attribute blocks remain interactive', async ({ page }) => {
     await page.goto('/#/game/par-55');
     await startVsAi(page);
-    await expect(page.locator('.par55-hand, .par55-hand-block').first()).toBeVisible();
-    const block = page.locator('.par55-hand-block.clickable, .par55-hand-block').first();
+    await expect(
+      page.locator('.par55-hand, .par55-hand-block').first()
+    ).toBeVisible();
+    const block = page
+      .locator('.par55-hand-block.clickable, .par55-hand-block')
+      .first();
     if ((await block.count()) > 0) {
       await block.click({ force: true });
     }
     await expect(
-      page.locator('.par55-hand-block.selected, .par55-board, .par55-scores, .par55-hand').first()
+      page
+        .locator(
+          '.par55-hand-block.selected, .par55-board, .par55-scores, .par55-hand'
+        )
+        .first()
     ).toBeVisible();
   });
 
@@ -3411,26 +3480,37 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     await page.goto('/#/game/juggle');
     await startVsAi(page);
     const roll = page.locator('.juggle-roll-btn').first();
-    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+    if (
+      (await roll.count()) > 0 &&
+      (await roll.isVisible().catch(() => false))
+    ) {
       await roll.click({ force: true });
     }
     await expect(
-      page.locator('.juggle-board, .juggle-cell, .juggle-dice-area, .juggle-die').first()
+      page
+        .locator('.juggle-board, .juggle-cell, .juggle-dice-area, .juggle-die')
+        .first()
     ).toBeVisible();
   });
 
   test('Hex board cells remount after empty-cell click', async ({ page }) => {
     await page.goto('/#/game/hex');
     await startVsAi(page);
-    await expect(page.locator('.hex-board, [data-row], svg').first()).toBeVisible();
+    await expect(
+      page.locator('.hex-board, [data-row], svg').first()
+    ).toBeVisible();
     const cell = page.locator('[data-row][data-col], .hex-cell').first();
     if ((await cell.count()) > 0) {
       await cell.click({ force: true });
     }
-    await expect(page.locator('.hex-board, [data-row], .hex-status, svg').first()).toBeVisible();
+    await expect(
+      page.locator('.hex-board, [data-row], .hex-status, svg').first()
+    ).toBeVisible();
   });
 
-  test('Pent-em-In polyomino bank chrome stays after start', async ({ page }) => {
+  test('Pent-em-In polyomino bank chrome stays after start', async ({
+    page,
+  }) => {
     await page.goto('/#/game/pent-em-in');
     await startVsAi(page);
     await expect(
@@ -3442,7 +3522,9 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
     ).toBeVisible();
   });
 
-  test('Frac Fact problem chrome stays after choice click', async ({ page }) => {
+  test('Frac Fact problem chrome stays after choice click', async ({
+    page,
+  }) => {
     await page.goto('/#/game/frac-fact');
     await startVsAi(page);
     const choice = page
@@ -3452,7 +3534,162 @@ test.describe('Wave 21 — core-lib / attribute-fraction-polyomino chrome', () =
       await choice.click({ force: true });
     }
     await expect(
-      page.locator('.ff-problem, .frac-problem, .ff-board, .ff-status, .ff-choice').first()
+      page
+        .locator(
+          '.ff-problem, .frac-problem, .ff-board, .ff-status, .ff-choice'
+        )
+        .first()
     ).toBeVisible();
+  });
+});
+
+test.describe('Wave 22 — tutorial runtime / apply-reject chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Hex Tutorial button opens overlay then Next advances', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    await page.locator('#tutorial-btn').click();
+    await expect(
+      page.locator('.tutorial-overlay, .tutorial-tooltip').first()
+    ).toBeVisible();
+    const next = page
+      .locator(
+        '.tutorial-tooltip-actions button, button:has-text("Next"), .tutorial-next'
+      )
+      .first();
+    if (
+      (await next.count()) > 0 &&
+      (await next.isVisible().catch(() => false))
+    ) {
+      await next.click({ force: true });
+    }
+    await expect(
+      page.locator('.tutorial-tooltip, .tutorial-overlay').first()
+    ).toBeVisible();
+    const exit = page
+      .locator(
+        'button:has-text("Exit"), button:has-text("Skip"), .tutorial-exit, .tutorial-close'
+      )
+      .first();
+    if (
+      (await exit.count()) > 0 &&
+      (await exit.isVisible().catch(() => false))
+    ) {
+      await exit.click({ force: true });
+    }
+  });
+
+  test('Calla Tutorial overlay mounts and board chrome remains', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/calla');
+    await startVsAi(page);
+    await page.locator('#tutorial-btn').click();
+    await expect(
+      page.locator('.tutorial-tooltip, .tutorial-overlay').first()
+    ).toBeVisible();
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-status').first()
+    ).toBeVisible();
+  });
+
+  test('Fab Tutorial + pool chrome survive start', async ({ page }) => {
+    await page.goto('/#/game/fab-a-diffy');
+    await startVsAi(page);
+    await page.locator('#tutorial-btn').click();
+    await expect(
+      page.locator('.tutorial-tooltip, .tutorial-overlay').first()
+    ).toBeVisible();
+    await expect(
+      page.locator('.fab-bar-pool, .fab-answer-board, .fab-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Hex illegal re-click occupied cell keeps board chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    const cell = page.locator('[data-row][data-col], .hex-cell').first();
+    await expect(page.locator('.hex-board, svg').first()).toBeVisible();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-board, .hex-status, [data-row]').first()
+    ).toBeVisible();
+  });
+
+  test('Queens select then junk board remount keeps ring chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await startVsAi(page);
+    const piece = page
+      .locator('.qg-piece, [data-piece], .piece, .qg-cell')
+      .first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.qg-board, .queens-board, .qg-status, svg, [data-ring]')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Ramrod / Stars board chrome after hand select', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await startVsAi(page);
+    const rod = page
+      .locator('.ramrod-player-rods .rod, .ramrod-rod, [data-rod]')
+      .first();
+    if ((await rod.count()) > 0) {
+      await rod.click({ force: true });
+    }
+    await expect(
+      page.locator('.ramrod-board, .ramrod-box, .ramrod-scores').first()
+    ).toBeVisible();
+
+    await page.goto('/#/game/stars-bars');
+    await startVsAi(page);
+    const card = page
+      .locator('.stars-hand-card, .stars-card, [data-card]')
+      .first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-board, .stars-hand, .stars-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Registry-backed game pages: Contig + Prime load titles', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Contig/i);
+    await page.goto('/#/game/prime-gold');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Prime/i);
   });
 });
