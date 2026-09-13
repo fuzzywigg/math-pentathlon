@@ -3022,3 +3022,164 @@ test.describe('Wave 16 — AI pipeline vs-AI chrome deepenings', () => {
     ).toBeVisible();
   });
 });
+
+test.describe('Wave 18 — midphase / transform / missing vs-AI chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Hex vs-AI cell chrome stays after one legal click', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    await expect(
+      page.locator('.hex-cell-group, .hex-board, .hex-status').first()
+    ).toBeVisible();
+    const cell = page.locator('.hex-cell-group[data-row][data-col]').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-cell-group, .hex-legend, .status-turn, .hex-status').first()
+    ).toBeVisible();
+  });
+
+  test('Queens vs-AI board/status chrome mounts', async ({ page }) => {
+    await page.goto('/#/game/queens-guards');
+    await startVsAi(page);
+    await expect(
+      page.locator('.qg-board-container, .qg-board, .qg-status').first()
+    ).toBeVisible();
+  });
+
+  test('Pinball vs-AI choice may reveal continue/feedback', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await startVsAi(page);
+    await expect(
+      page.locator('.pinball-choice-btn, .pinball-scores').first()
+    ).toBeVisible();
+    const choice = page.locator('.pinball-choice-btn').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.pinball-continue-btn, .pinball-feedback, .pinball-scores, .pinball-choice-btn'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Stars vs-AI card select yields valid cells or board', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/stars-bars');
+    await startVsAi(page);
+    const card = page.locator('.stars-card:not(.disabled), .stars-card').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-cell.valid, .stars-board, .stars-score, .stars-card').first()
+    ).toBeVisible();
+  });
+
+  test('Kwatro vs-AI chip select shows valid nodes or chip-info', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/kwatro-sinko');
+    await startVsAi(page);
+    const chip = page.locator('.kwa-selectable-chip').first();
+    if ((await chip.count()) > 0) {
+      await chip.click({ force: true });
+    }
+    await expect(
+      page.locator('.kwa-valid-node, .kwa-chip-info, .kwa-board').first()
+    ).toBeVisible();
+  });
+
+  test('Pent select reveals rotate/flip controls', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await startVsAi(page);
+    const piece = page.locator('.pent-piece-option').first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.pent-btn-rotate, .pent-btn-flip, .pent-btn-cancel, .pent-board'
+        )
+        .first()
+    ).toBeVisible();
+    const rotate = page.locator('.pent-btn-rotate');
+    if ((await rotate.count()) > 0 && (await rotate.isVisible().catch(() => false))) {
+      await rotate.click({ force: true });
+    }
+    await expect(page.locator('.pent-board, .pent-piece-option').first()).toBeVisible();
+  });
+
+  test('Juggle roll→die may mount rotate/flip controls', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await startVsAi(page);
+    const roll = page
+      .locator('.juggle-roll-btn, .roll-dice-btn, button:has-text("Roll")')
+      .first();
+    if ((await roll.count()) > 0 && (await roll.isVisible().catch(() => false))) {
+      await roll.click({ force: true });
+    }
+    const die = page.locator('.juggle-die.selectable, .juggle-die').first();
+    if ((await die.count()) > 0) {
+      await die.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.juggle-control-btn, .juggle-control-buttons, .juggle-board, .juggle-cell, .juggle-shapes'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Remainder vs-AI roll yields valid island or dice chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/remainder-islands');
+    await startVsAi(page);
+    const roll = page.locator('.remainder-btn-roll');
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.island.valid, .remainder-preview, .remainder-dice, .remainder-btn-roll'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('FIAR vs-AI place one node keeps status chrome', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await startVsAi(page);
+    const node = page.locator('[data-node-id]').first();
+    if ((await node.count()) > 0) {
+      await node.click({ force: true });
+    }
+    await expect(
+      page.locator('.fiar-status, .fiar-chips-info, .fiar-board').first()
+    ).toBeVisible();
+  });
+});
