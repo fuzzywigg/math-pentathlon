@@ -10,7 +10,9 @@ Twenty registered games. Live at https://math.pappas.work
 
 There is **no Math Relay** in this tree. Do not invent one.
 
-<!-- TODO(#30): Public wiki outline (Overview, Games, Big Toads, Development, Accessibility, Roadmap) remains for HITL — deferred from this README-badges PR. -->
+## Wiki
+
+Public learning-game wiki (in-repo): [docs/wiki](./docs/wiki/README.md) — Overview, Games, Big Toads, Development, Accessibility, Roadmap.
 
 ## Games
 
