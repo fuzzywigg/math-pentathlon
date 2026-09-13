@@ -47,6 +47,12 @@ describe('Juggle AI', () => {
     const die = getAIDieChoice(state, 'player1', 'easy');
     expect(die).not.toBeNull();
     state = selectDie(state, die!.index);
+    // Single-shape dice auto-advance to placing with selectedShape set
+    if (state.phase === 'placing') {
+      expect(state.selectedShape).not.toBeNull();
+      expect(state.selectedShape!.id).toBeTruthy();
+      return;
+    }
     const shape = getAIShapeChoice(state, 'player1', 'easy');
     expect(shape).not.toBeNull();
     expect(shape!.shape.id).toBeTruthy();
