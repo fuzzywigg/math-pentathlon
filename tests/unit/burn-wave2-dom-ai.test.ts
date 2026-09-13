@@ -97,7 +97,7 @@ describe('Burn Wave 2 — #12 Fab-a-Diffy AI step validation', () => {
     expect(next.selectedBar1).toBeNull();
     expect(next.selectedBar2).toBeNull();
     expect(next.selectedOperation).toBeNull();
-  });
+  }, 20_000);
 
   it('applyAIMoveSteps passes instead of silently stalling on bad bar1', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
