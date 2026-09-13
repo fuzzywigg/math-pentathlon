@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, develop, alpha]
+    branches: [main, development, alpha]
   pull_request:
-    branches: [main, develop, alpha]
+    branches: [main, development, alpha]
 
 jobs:
   lint:
@@ -17,6 +17,8 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run lint
+      - name: Check formatting
+        run: npm run format:check
       - name: TypeScript type checking
         run: npx tsc --noEmit
 
@@ -49,12 +51,26 @@ jobs:
           test -d dist || (echo "::error::dist/ not produced"; exit 1)
           test -f dist/health.txt || (echo "::error::dist/health.txt missing"; exit 1)
           echo "Build artifacts OK"
+      - name: Enforce JS chunk size budget
+        run: |
+          set -euo pipefail
+          limit_kb=250
+          oversized="$(
+            find dist/assets -name '*.js' -printf '%s %p\n' |
+            awk -v limit="$limit_kb" '{
+              kb = $1 / 1024
+              if (kb > limit) printf "%.2f kB  %s\n", kb, $2
+            }'
+          )"
+          if [ -n "${oversized}" ]; then
+            echo "::error::JS chunk(s) exceed ${limit_kb} kB budget:"
+            echo "${oversized}"
+            exit 1
+          fi
+          echo "All JS chunks under ${limit_kb} kB"
 
   unit:
     runs-on: ubuntu-latest
-    # Pre-existing alpha branch test failures (missing exports in src/games/kings-quadraphages/*)
-    # are tracked separately. Keep this job non-blocking for deploy gating.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
