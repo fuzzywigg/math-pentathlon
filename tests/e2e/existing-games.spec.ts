@@ -330,10 +330,18 @@ test.describe('Ramrod — e2e smoke', () => {
   }) => {
     await expect(page.locator('.ramrod-board')).toBeVisible();
 
+    // Dismiss Ollie if covering the hand; use DOM click to avoid overlay intercept
+    const dismissOwl = page.locator(
+      '#ollie-owl button[aria-label="Dismiss message"]'
+    );
+    if (await dismissOwl.isVisible().catch(() => false)) {
+      await dismissOwl.click({ force: true });
+    }
+
     const selectable = page.locator('.ramrod-rod-wrapper.selectable');
     if ((await selectable.count()) > 0) {
-      await selectable.first().click({ force: true });
-      await expect(page.locator('.ramrod-rod-wrapper.selected')).toBeVisible();
+      await selectable.first().evaluate((el) => (el as HTMLElement).click());
+      await expect(page.locator('.ramrod-status')).toContainText(/Place rod/i);
 
       const validSlot = page.locator('.ramrod-slot.valid');
       if ((await validSlot.count()) > 0) {
@@ -342,12 +350,9 @@ test.describe('Ramrod — e2e smoke', () => {
     }
 
     await expect(page.locator('.ramrod-board')).toBeVisible();
-    const statusOrHistory = page.locator(
-      '.ramrod-scores, .ramrod-history, .ramrod-controls'
-    );
-    if ((await statusOrHistory.count()) > 0) {
-      await expect(statusOrHistory.first()).toBeVisible();
-    }
+    await expect(
+      page.locator('.ramrod-scores, .ramrod-history, .ramrod-controls').first()
+    ).toBeVisible();
   });
 });
 
@@ -580,9 +585,14 @@ test.describe("Pent'Em In — e2e smoke", () => {
     const piece = page.locator('.pent-piece-option').first();
     await expect(piece).toBeVisible();
     await piece.click({ force: true });
-    await expect(page.locator('.pent-piece-option.selected')).toBeVisible();
+    // Selecting moves into placePiece phase (selector may unmount); status confirms
+    await expect(page.locator('[role="status"], .pent-instructions').first()).toContainText(
+      /Place/i
+    );
 
-    const cell = page.locator('.pent-board .interaction rect, .pent-board rect[data-row]').first();
+    const cell = page
+      .locator('.pent-board .interaction rect, .pent-board rect[data-row]')
+      .first();
     if ((await cell.count()) > 0) {
       await cell.click({ force: true });
     }
