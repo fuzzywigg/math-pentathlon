@@ -1,47 +1,51 @@
 /**
- * Wave 40 — Juggle wrong-phase roll/select no-ops.
- * Tests-only leftover after #178.
+ * Wave 40 — Juggle doRollDice / selectDie / selectShape phase no-ops.
+ * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-
+import { TETROMINOES } from '../../src/core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
   selectDie,
   selectShape,
 } from '../../src/games/juggle/rules';
-import type { PolyominoShape } from '../../src/core/polyomino/types';
 
-describe('Wave 40 juggle — phase roll/select noops', () => {
-  it('doRollDice identity when not rolling', () => {
+describe('Wave 40 juggle — phase roll/select noop', () => {
+  it('doRollDice identity when phase !== rolling', () => {
     const state = {
       ...createInitialState(),
       phase: 'selectingShape' as const,
+      currentDice: [3, 4] as [number, number],
     };
-    expect(doRollDice(state)).toBe(state);
+    const next = doRollDice(state);
+    expect(next).toBe(state);
   });
 
-  it('selectDie identity without dice or wrong phase', () => {
-    const state = createInitialState();
-    expect(selectDie(state, 0)).toBe(state);
-    const rolling = { ...state, phase: 'rolling' as const, currentDice: [3, 4] as [number, number] };
-    expect(selectDie(rolling, 0)).toBe(rolling);
+  it('selectDie identity when phase !== selectingShape', () => {
+    const state = createInitialState(); // phase rolling, currentDice null
+    const next = selectDie(state, 0);
+    expect(next).toBe(state);
   });
 
-  it('selectShape identity without category', () => {
-    const ghostShape = {
-      id: 'ghost',
-      name: 'ghost',
-      cells: [{ row: 0, col: 0 }],
-      canRotate: true,
-      canFlip: true,
-    } as PolyominoShape;
+  it('selectDie identity when currentDice null in selectingShape', () => {
     const state = {
       ...createInitialState(),
       phase: 'selectingShape' as const,
-      currentDice: [2, 5] as [number, number],
+      currentDice: null,
+    };
+    const next = selectDie(state, 1);
+    expect(next).toBe(state);
+  });
+
+  it('selectShape identity without selectedCategory', () => {
+    const state = {
+      ...createInitialState(),
+      phase: 'selectingShape' as const,
+      currentDice: [4, 5] as [number, number],
       selectedCategory: null,
     };
-    expect(selectShape(state, ghostShape)).toBe(state);
+    const next = selectShape(state, TETROMINOES[0]);
+    expect(next).toBe(state);
   });
 });

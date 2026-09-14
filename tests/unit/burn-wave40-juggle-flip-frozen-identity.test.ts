@@ -1,9 +1,9 @@
 /**
- * Wave 40 — Juggle flip-frozen / preview empty / place reject.
- * Tests-only leftover after #178.
+ * Wave 40 — Juggle flipShape canFlip=false + preview/place identity.
+ * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-
+import { TETROMINOES } from '../../src/core/polyomino/types';
 import {
   createInitialState,
   flipShape,
@@ -11,43 +11,46 @@ import {
   getPreviewCells,
   placeShape,
 } from '../../src/games/juggle/rules';
-import type { PolyominoShape } from '../../src/core/polyomino/types';
 
-const frozen: PolyominoShape = {
-  id: 'frozen-monomino',
-  name: 'frozen',
-  cells: [{ row: 0, col: 0 }],
-  canRotate: true,
-  canFlip: false,
-};
+describe('Wave 40 juggle — flip frozen / preview / place identity', () => {
+  it('flipShape identity when canFlip=false; rotateShape still advances', () => {
+    const frozen = TETROMINOES.find((s) => s.canFlip === false && s.canRotate)!;
+    expect(frozen.canFlip).toBe(false);
 
-describe('Wave 40 juggle — flip / preview / place', () => {
-  it('flipShape identity when canFlip false; rotate still advances', () => {
     const state = {
       ...createInitialState(),
       phase: 'placing' as const,
+      currentDice: [4, 4] as [number, number],
+      selectedCategory: 'tetromino' as const,
       selectedShape: frozen,
       selectedRotation: 0 as const,
       selectedFlipped: false,
-      currentDice: [1, 1] as [number, number],
     };
-    expect(flipShape(state)).toBe(state);
+
+    const flipped = flipShape(state);
+    expect(flipped).toBe(state);
+
     const rotated = rotateShape(state);
     expect(rotated).not.toBe(state);
     expect(rotated.selectedRotation).toBe(90);
   });
 
-  it('getPreviewCells empty without shape; placeShape rejects', () => {
+  it('getPreviewCells empty with no selectedShape', () => {
     const state = createInitialState();
+    expect(state.selectedShape).toBeNull();
     expect(getPreviewCells(state, { row: 0, col: 0 })).toEqual([]);
-    expect(placeShape(state, { row: 0, col: 0 })).toBe(state);
+  });
 
-    const placingNoDice = {
-      ...state,
+  it('placeShape identity wrong phase / no shape', () => {
+    const rolling = createInitialState();
+    expect(placeShape(rolling, { row: 0, col: 0 })).toBe(rolling);
+
+    const noShape = {
+      ...createInitialState(),
       phase: 'placing' as const,
-      selectedShape: frozen,
-      currentDice: null,
+      currentDice: [1, 1] as [number, number],
+      selectedShape: null,
     };
-    expect(placeShape(placingNoDice, { row: 0, col: 0 })).toBe(placingNoDice);
+    expect(placeShape(noShape, { row: 0, col: 0 })).toBe(noShape);
   });
 });
