@@ -13,6 +13,7 @@ import {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  vi.clearAllTimers();
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
