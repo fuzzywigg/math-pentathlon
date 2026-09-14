@@ -116,7 +116,9 @@ describe('Wave 27 seat-phase-pass — Contig roll → place/pass restores rollin
     expect(board.querySelector('.contig-roll-btn')).toBeTruthy();
     click(board.querySelector('.contig-roll-btn'));
     expect(
-      board.querySelector('.contig-expressions, .contig-pass-btn, .contig-dice-display')
+      board.querySelector(
+        '.contig-expressions, .contig-pass-btn, .contig-dice-display'
+      )
     ).toBeTruthy();
     expect(status.querySelector('.contig-status')?.textContent).toMatch(
       /turn|Select|Pass|Place|Roll/i
@@ -126,7 +128,9 @@ describe('Wave 27 seat-phase-pass — Contig roll → place/pass restores rollin
     if (valid) {
       click(valid);
       expect(board.querySelector('.contig-roll-btn')).toBeTruthy();
-      expect(status.querySelector('.contig-status')?.textContent).toMatch(/Roll|turn/i);
+      expect(status.querySelector('.contig-status')?.textContent).toMatch(
+        /Roll|turn/i
+      );
     } else {
       const pass = board.querySelector('.contig-pass-btn');
       expect(pass).toBeTruthy();
@@ -170,12 +174,15 @@ describe('Wave 27 seat-phase-pass — Contig roll → place/pass restores rollin
     contigVsHuman();
     click(board.querySelector('.contig-roll-btn'));
     const passOrCell =
-      board.querySelector('.contig-cell-valid') ?? board.querySelector('.contig-pass-btn');
+      board.querySelector('.contig-cell-valid') ??
+      board.querySelector('.contig-pass-btn');
     if (passOrCell) click(passOrCell);
     const rollAgain = board.querySelector('.contig-roll-btn');
     if (rollAgain) {
       click(rollAgain);
-      expect(status.querySelector('.contig-status')?.textContent?.length).toBeGreaterThan(0);
+      expect(
+        status.querySelector('.contig-status')?.textContent?.length
+      ).toBeGreaterThan(0);
     }
   });
 });
@@ -192,7 +199,9 @@ describe('Wave 27 seat-phase-pass — Juggle roll → selectShape phase chrome',
     expect(text.length).toBeGreaterThan(0);
     expect(text).toMatch(/die|shape|Select|Place|Roll|Choose/i);
     expect(
-      board.querySelector('.juggle-die, .juggle-shape-option, .juggle-shapes, .juggle-dice')
+      board.querySelector(
+        '.juggle-die, .juggle-shape-option, .juggle-shapes, .juggle-dice'
+      )
     ).toBeTruthy();
   });
 
@@ -217,7 +226,9 @@ describe('Wave 27 seat-phase-pass — Juggle roll → selectShape phase chrome',
     const rollAgain = board.querySelector('.juggle-roll-btn, .roll-dice-btn');
     if (rollAgain) {
       click(rollAgain);
-      expect(status.querySelector('.juggle-status')?.textContent?.length).toBeGreaterThan(0);
+      expect(
+        status.querySelector('.juggle-status')?.textContent?.length
+      ).toBeGreaterThan(0);
     } else {
       expect(after.length).toBeGreaterThan(0);
     }
@@ -230,9 +241,13 @@ describe('Wave 27 seat-phase-pass — Juggle roll → selectShape phase chrome',
     initJuggle(board, status);
     juggleVsHuman();
     click(board.querySelector('.juggle-roll-btn, .roll-dice-btn'));
-    expect(status.querySelector('.juggle-status')?.textContent?.length).toBeGreaterThan(0);
     expect(
-      board.querySelector('.juggle-die, .juggle-dice, .juggle-shapes, .juggle-shape-option')
+      status.querySelector('.juggle-status')?.textContent?.length
+    ).toBeGreaterThan(0);
+    expect(
+      board.querySelector(
+        '.juggle-die, .juggle-dice, .juggle-shapes, .juggle-shape-option'
+      )
     ).toBeTruthy();
   });
 });
@@ -323,7 +338,9 @@ describe('Wave 27 seat-phase-pass — Prime Gold passTurn / DOM roll', () => {
     );
 
     if (ctrl.state.phase === 'passing') {
-      const pass = container.querySelector('.pg-pass-btn, .prime-pass-btn, button');
+      const pass = container.querySelector(
+        '.pg-pass-btn, .prime-pass-btn, button'
+      );
       const passBtn = [...container.querySelectorAll('button')].find((b) =>
         /pass/i.test(b.textContent ?? '')
       );
@@ -387,7 +404,9 @@ describe('Wave 27 seat-phase-pass — Hex-a-Gone select phase + rules passTurn',
 
     const block =
       board.querySelector('.hex-a-gone-block-btn[data-shape="hexagon"]') ??
-      board.querySelector('.hex-a-gone-block-btn, .hag-block-btn, [data-shape]');
+      board.querySelector(
+        '.hex-a-gone-block-btn, .hag-block-btn, [data-shape]'
+      );
     click(block);
     expect(getHexAGoneState().turnSelection.blocks.length).toBeGreaterThan(0);
 
@@ -396,9 +415,13 @@ describe('Wave 27 seat-phase-pass — Hex-a-Gone select phase + rules passTurn',
     );
     if (confirm && !(confirm as HTMLButtonElement).disabled) {
       click(confirm);
-      expect(['placeBlocks', 'selectBlocks']).toContain(getHexAGoneState().phase);
+      expect(['placeBlocks', 'selectBlocks']).toContain(
+        getHexAGoneState().phase
+      );
     }
-    expect(status.querySelector('.status-turn, .hex-a-gone-status, .hag-status')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .hex-a-gone-status, .hag-status')
+    ).toBeTruthy();
   });
 
   it('rules passTurn with empty selection flips seat (or ends if opponent stuck)', () => {

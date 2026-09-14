@@ -79,7 +79,10 @@ import { makeMove as hexMove } from '../../src/games/hex/rules';
 import { renderStatus as renderHexStatus } from '../../src/games/hex/board-ui';
 
 import { createInitialState as createCalla } from '../../src/games/calla/types';
-import { makeMove as callaMove, getLastMoveInfo } from '../../src/games/calla/rules';
+import {
+  makeMove as callaMove,
+  getLastMoveInfo,
+} from '../../src/games/calla/rules';
 import { renderStatus as renderCallaStatus } from '../../src/games/calla/board-ui';
 
 import { createInitialState as createStar } from '../../src/games/star-track/types';
@@ -130,7 +133,11 @@ describe('Wave 27 history-DOM — Fab formatMove equation appears in render', ()
         for (const op of ops) {
           let confirming = selectOperation(trial, op);
           if (confirming.phase !== 'confirmingMove') continue;
-          const result = calculateResult(bars[i].fraction, bars[j].fraction, op);
+          const result = calculateResult(
+            bars[i].fraction,
+            bars[j].fraction,
+            op
+          );
           if (!result) continue;
           const matches = findMatchingAnswers(confirming, result);
           if (matches.length === 0) continue;
@@ -196,14 +203,18 @@ describe('Wave 27 history-DOM — Ramrod place → formatMove + history chrome',
 
     const hist = renderRamrodHistory(state);
     expect(hist.className).toMatch(/ramrod/);
-    expect(hist.querySelector('.ramrod-history-list, .ramrod-history-move, h3')).toBeTruthy();
+    expect(
+      hist.querySelector('.ramrod-history-list, .ramrod-history-move, h3')
+    ).toBeTruthy();
   });
 });
 
 describe('Wave 27 history-DOM — Kwatro move → formatMove + history chip text', () => {
   it('legal moveChip produces Chip format and history row', () => {
     let state = createKwa();
-    const p1Chips = [...state.chips.values()].filter((c) => c.owner === 'player1');
+    const p1Chips = [...state.chips.values()].filter(
+      (c) => c.owner === 'player1'
+    );
     let moved = false;
     for (const chip of p1Chips) {
       const selected = selectChip(state, chip.id);
@@ -282,9 +293,9 @@ describe('Wave 27 history-DOM — Stars / Prime render after rules place', () =>
     expect(state.moveHistory.length).toBe(1);
 
     const hist = renderStarsHistory(state);
-    expect(hist.querySelector('.stars-move-item, .stars-history-move')?.textContent).toMatch(
-      /\+|\d/
-    );
+    expect(
+      hist.querySelector('.stars-move-item, .stars-history-move')?.textContent
+    ).toMatch(/\+|\d/);
   });
 
   it('Prime placeChip history shows equation fragment when place succeeds', () => {
@@ -382,7 +393,9 @@ describe('Wave 27 status-DOM — Hex/Calla/Star/FIAR after legal move', () => {
     fiarVsHuman();
     click(board.querySelector('[data-node-id]'));
     expect(getFiarState().currentPlayer).toBe('player2');
-    expect(status.querySelector('.fiar-status')?.textContent).toMatch(/Red|Player 2|turn/i);
+    expect(status.querySelector('.fiar-status')?.textContent).toMatch(
+      /Red|Player 2|turn/i
+    );
   });
 });
 
@@ -408,7 +421,9 @@ describe('Wave 27 history-DOM — controller Par/Stars/Prime after legal place',
 
     expect(ctrl.state.moveHistory.length).toBe(1);
     expect(ctrl.state.currentPlayer).toBe('player2');
-    expect(container.querySelector('.par55-history-move')?.textContent).toMatch(/\d|\+/);
+    expect(container.querySelector('.par55-history-move')?.textContent).toMatch(
+      /\d|\+/
+    );
   });
 
   it('Stars controller place paints move item', () => {
@@ -418,12 +433,15 @@ describe('Wave 27 history-DOM — controller Par/Stars/Prime after legal place',
     const hand =
       container.querySelector('.stars-hand-label.player1')?.parentElement ??
       container.querySelector('.stars-hand.player1, .stars-hand-player1');
-    click(hand?.querySelector('.stars-card:not(.disabled), .stars-card') ?? null);
+    click(
+      hand?.querySelector('.stars-card:not(.disabled), .stars-card') ?? null
+    );
     expect(ctrl.state.phase).toBe('placingCard');
     click(container.querySelector('.stars-cell.valid, .stars-cell-valid'));
     expect(ctrl.state.moveHistory.length).toBe(1);
     expect(
-      container.querySelector('.stars-move-item, .stars-history-move')?.textContent
+      container.querySelector('.stars-move-item, .stars-history-move')
+        ?.textContent
     ).toMatch(/\d|\+/);
   });
 

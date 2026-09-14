@@ -68,7 +68,9 @@ describe('Wave 27 roundtrip-matrix — Hex multi-ply seat XOR', () => {
     const { board, status } = mountPair();
     initHex(board, status); // initGame already starts a human game (onGameStart)
     hexVsHuman(); // second start is intentional re-open
-    expect(onStart.mock.calls.filter((c) => c[0] === 'hex').length).toBeGreaterThanOrEqual(1);
+    expect(
+      onStart.mock.calls.filter((c) => c[0] === 'hex').length
+    ).toBeGreaterThanOrEqual(1);
     expect(onStart).toHaveBeenCalledWith('hex');
 
     const cells = [
@@ -81,7 +83,9 @@ describe('Wave 27 roundtrip-matrix — Hex multi-ply seat XOR', () => {
     for (let i = 0; i < cells.length; i++) {
       const [r, c] = cells[i];
       const before = getHexState().moveHistory.length;
-      click(board.querySelector(`.hex-cell-group[data-row="${r}"][data-col="${c}"]`));
+      click(
+        board.querySelector(`.hex-cell-group[data-row="${r}"][data-col="${c}"]`)
+      );
       expect(getHexState().moveHistory.length).toBe(before + 1);
       expect(getHexState().currentPlayer).toBe(expectedSeat(i + 1));
       expect(getHexState().winner).toBeNull();
@@ -108,7 +112,9 @@ describe('Wave 27 roundtrip-matrix — Hex multi-ply seat XOR', () => {
     initHex(board, status);
     hexVsHuman();
     hexVsHuman();
-    expect(onStart.mock.calls.filter((c) => c[0] === 'hex').length).toBeGreaterThanOrEqual(2);
+    expect(
+      onStart.mock.calls.filter((c) => c[0] === 'hex').length
+    ).toBeGreaterThanOrEqual(2);
 
     click(board.querySelector('.hex-cell-group[data-row="2"][data-col="2"]'));
     click(board.querySelector('.hex-cell-group[data-row="2"][data-col="3"]'));
@@ -132,7 +138,9 @@ describe('Wave 27 roundtrip-matrix — Hex multi-ply seat XOR', () => {
     let prev = 0;
     for (let i = 0; i < coords.length; i++) {
       const [r, c] = coords[i];
-      click(board.querySelector(`.hex-cell-group[data-row="${r}"][data-col="${c}"]`));
+      click(
+        board.querySelector(`.hex-cell-group[data-row="${r}"][data-col="${c}"]`)
+      );
       expect(getHexState().moveHistory.length).toBe(prev + 1);
       prev = getHexState().moveHistory.length;
       expect(getHexState().currentPlayer).toBe(expectedSeat(i + 1));
@@ -164,7 +172,9 @@ describe('Wave 27 roundtrip-matrix — Calla legal pits grow history; invalid no
     expect(['player1', 'player2']).toContain(getCallaState().currentPlayer);
     expect(getCallaState().winner).toBeNull();
     expect(onEnd).not.toHaveBeenCalled();
-    expect(status.querySelector('.status-turn, .calla-status, .calla-scores')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .calla-status, .calla-scores')
+    ).toBeTruthy();
 
     const mid = getCallaState().moveHistory.length;
     const invalid = board.querySelector('.calla-pit:not(.calla-pit-valid)');
@@ -215,7 +225,9 @@ describe('Wave 27 roundtrip-matrix — Calla legal pits grow history; invalid no
     callaVsHuman();
     const starts = onStart.mock.calls.filter((c) => c[0] === 'calla').length;
     callaVsHuman();
-    expect(onStart.mock.calls.filter((c) => c[0] === 'calla').length).toBe(starts + 1);
+    expect(onStart.mock.calls.filter((c) => c[0] === 'calla').length).toBe(
+      starts + 1
+    );
     click(board.querySelector('.calla-pit-valid'));
     expect(onEnd).not.toHaveBeenCalled();
   });
@@ -235,7 +247,9 @@ describe('Wave 27 roundtrip-matrix — FIAR multi-ply seat XOR', () => {
 
     const used: Element[] = [];
     for (let i = 0; i < 4; i++) {
-      const next = nodes.find((n) => !used.includes(n) && !n.classList.contains('occupied'));
+      const next = nodes.find(
+        (n) => !used.includes(n) && !n.classList.contains('occupied')
+      );
       expect(next).toBeTruthy();
       click(next!);
       used.push(next!);
@@ -316,7 +330,10 @@ describe('Wave 27 roundtrip-matrix — Star Track draw→chain XOR seats', () =>
     expect(onEnd).not.toHaveBeenCalled();
 
     // Second ply for P2
-    if (getStarState().phase === 'drawChains' || getStarState().winner === null) {
+    if (
+      getStarState().phase === 'drawChains' ||
+      getStarState().winner === null
+    ) {
       const draw = board.querySelector('.star-track-draw-btn');
       if (draw) {
         click(draw);
@@ -328,7 +345,9 @@ describe('Wave 27 roundtrip-matrix — Star Track draw→chain XOR seats', () =>
         }
       }
     }
-    expect(status.querySelector('.status-turn, .star-track-status')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .star-track-status')
+    ).toBeTruthy();
   });
 
   it('owl start once per newGameVsHuman; mid-game end not fired after first chain', () => {
@@ -338,9 +357,9 @@ describe('Wave 27 roundtrip-matrix — Star Track draw→chain XOR seats', () =>
     initStar(board, status);
     starVsHuman();
     starVsHuman();
-    expect(onStart.mock.calls.filter((c) => c[0] === 'star-track').length).toBeGreaterThanOrEqual(
-      2
-    );
+    expect(
+      onStart.mock.calls.filter((c) => c[0] === 'star-track').length
+    ).toBeGreaterThanOrEqual(2);
     click(board.querySelector('.star-track-draw-btn'));
     click(board.querySelector('.star-track-chain-btn'));
     expect(onEnd).not.toHaveBeenCalled();
@@ -358,7 +377,9 @@ describe('Wave 27 roundtrip-matrix — Star Track draw→chain XOR seats', () =>
     } else {
       expect(getStarState().phase).toBe('drawChains');
     }
-    expect(status.querySelector('.status-turn, .star-track-status')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .star-track-status')
+    ).toBeTruthy();
   });
 });
 
@@ -403,12 +424,15 @@ describe('Wave 27 roundtrip-matrix — Kings full-turn XOR seats', () => {
     const afterP1 = getKingsState().moveHistory.length;
     expect(afterP1).toBeGreaterThanOrEqual(2);
     expect(onEnd).not.toHaveBeenCalled();
-    expect(status.querySelector('.status-turn')?.textContent).toMatch(/Player 2/i);
+    expect(status.querySelector('.status-turn')?.textContent).toMatch(
+      /Player 2/i
+    );
 
     // P2 king starts at bottom — typical (8,5) or similar
     const p2King =
-      board.querySelector('.cell.cell-king-player2, .cell[data-row="8"][data-col="5"]') ??
-      board.querySelector('.cell[data-row="9"][data-col="5"]');
+      board.querySelector(
+        '.cell.cell-king-player2, .cell[data-row="8"][data-col="5"]'
+      ) ?? board.querySelector('.cell[data-row="9"][data-col="5"]');
     if (p2King) {
       click(p2King);
       const vm = board.querySelector('.cell-valid-move');
@@ -423,7 +447,9 @@ describe('Wave 27 roundtrip-matrix — Kings full-turn XOR seats', () => {
         }
       }
     }
-    expect(history.querySelector('.move-history-entry, .move-history-list')).toBeTruthy();
+    expect(
+      history.querySelector('.move-history-entry, .move-history-list')
+    ).toBeTruthy();
   });
 
   it('re-click occupied / non-valid mid-select does not finish turn early', () => {

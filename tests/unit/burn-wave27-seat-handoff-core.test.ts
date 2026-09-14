@@ -126,7 +126,9 @@ describe('Wave 27 seat-handoff — Hex legal click flips seat + status', () => {
     click(board.querySelector('.hex-cell-group[data-row="0"][data-col="1"]'));
     expect(getHexState().currentPlayer).toBe('player1');
     expect(getHexState().moveHistory.length).toBe(2);
-    expect(status.querySelector('.status-turn')?.textContent).toMatch(/Blue|Player 1|turn/i);
+    expect(status.querySelector('.status-turn')?.textContent).toMatch(
+      /Blue|Player 1|turn/i
+    );
   });
 });
 
@@ -145,7 +147,9 @@ describe('Wave 27 seat-handoff — Calla valid pit advances history/status', () 
     click(pit);
 
     expect(getCallaState().moveHistory.length).toBeGreaterThan(before);
-    expect(status.querySelector('.status-turn, .calla-status, .calla-scores')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .calla-status, .calla-scores')
+    ).toBeTruthy();
     expect(getCallaState().winner).toBeNull();
     expect(getCallaState().phase).not.toBe('gameOver');
   });
@@ -176,7 +180,9 @@ describe('Wave 27 seat-handoff — FIAR place flips seat; re-click no-op', () =>
     expect(getFiarState().moveHistory.length).toBe(1);
     expect(getFiarState().chipsPlaced.player1).toBe(1);
     expect(getFiarState().currentPlayer).toBe('player2');
-    expect(status.querySelector('.fiar-status')?.textContent).toMatch(/Red|Player 2|turn/i);
+    expect(status.querySelector('.fiar-status')?.textContent).toMatch(
+      /Red|Player 2|turn/i
+    );
 
     click(node);
     expect(getFiarState().moveHistory.length).toBe(1);
@@ -191,7 +197,9 @@ describe('Wave 27 seat-handoff — FIAR place flips seat; re-click no-op', () =>
     expect(nodes.length).toBeGreaterThanOrEqual(2);
     click(nodes[0]);
     expect(getFiarState().currentPlayer).toBe('player2');
-    const next = nodes.find((n) => n !== nodes[0] && !n.classList.contains('occupied'));
+    const next = nodes.find(
+      (n) => n !== nodes[0] && !n.classList.contains('occupied')
+    );
     click(next ?? nodes[1]);
     expect(getFiarState().moveHistory.length).toBe(2);
     expect(getFiarState().currentPlayer).toBe('player1');
@@ -227,7 +235,9 @@ describe('Wave 27 seat-handoff — Kings full turn flips seat', () => {
 
     expect(getKingsState().currentPlayer).toBe('player2');
     expect(getKingsState().turnPhase).toBe('moveKing');
-    expect(status.querySelector('.status-turn')?.textContent).toMatch(/Player 2/i);
+    expect(status.querySelector('.status-turn')?.textContent).toMatch(
+      /Player 2/i
+    );
     expect(getKingsState().moveHistory.length).toBeGreaterThanOrEqual(2);
   });
 });
@@ -248,7 +258,9 @@ describe('Wave 27 seat-handoff — Star Track draw→chain flips seat', () => {
     click(board.querySelector('.star-track-chain-btn'));
     expect(getStarState().moveHistory.length).toBeGreaterThanOrEqual(1);
     expect(getStarState().currentPlayer).toBe('player2');
-    expect(status.querySelector('.status-turn, .star-track-status')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .star-track-status')
+    ).toBeTruthy();
     expect(getStarState().player1Position).toBeGreaterThanOrEqual(0);
   });
 
@@ -271,7 +283,9 @@ describe('Wave 27 seat-handoff — Hex-a-Gone select→confirm enters place', ()
     expect(getHexAGoneState().phase).toBe('selectBlocks');
     const block =
       board.querySelector('.hex-a-gone-block-btn[data-shape="hexagon"]') ??
-      board.querySelector('.hex-a-gone-block-btn, .hag-block-btn, [data-shape]');
+      board.querySelector(
+        '.hex-a-gone-block-btn, .hag-block-btn, [data-shape]'
+      );
     click(block);
     expect(getHexAGoneState().turnSelection.blocks.length).toBeGreaterThan(0);
 
@@ -280,9 +294,13 @@ describe('Wave 27 seat-handoff — Hex-a-Gone select→confirm enters place', ()
     );
     if (confirm && !(confirm as HTMLButtonElement).disabled) {
       click(confirm);
-      expect(['placeBlocks', 'selectBlocks']).toContain(getHexAGoneState().phase);
+      expect(['placeBlocks', 'selectBlocks']).toContain(
+        getHexAGoneState().phase
+      );
     }
-    expect(status.querySelector('.status-turn, .hex-a-gone-status, .hag-status')).toBeTruthy();
+    expect(
+      status.querySelector('.status-turn, .hex-a-gone-status, .hag-status')
+    ).toBeTruthy();
   });
 });
 
@@ -321,16 +339,24 @@ describe('Wave 27 seat-handoff — Contig roll advances chrome', () => {
 
     click(board.querySelector('.contig-roll-btn'));
     expect(
-      board.querySelector('.contig-expressions, .contig-pass-btn, .contig-dice-display')
+      board.querySelector(
+        '.contig-expressions, .contig-pass-btn, .contig-dice-display'
+      )
     ).toBeTruthy();
-    expect(status.querySelector('.contig-status')?.textContent).toMatch(/turn|Select|Pass|Place/i);
+    expect(status.querySelector('.contig-status')?.textContent).toMatch(
+      /turn|Select|Pass|Place/i
+    );
 
     const valid = board.querySelector('.contig-cell-valid');
     if (valid) {
       click(valid);
       expect(board.querySelector('.contig-roll-btn')).toBeTruthy();
-      expect(board.querySelector('.contig-cell-p1, .contig-cell-occupied')).toBeTruthy();
-      expect(status.querySelector('.contig-status')?.textContent).toMatch(/Roll|turn/i);
+      expect(
+        board.querySelector('.contig-cell-p1, .contig-cell-occupied')
+      ).toBeTruthy();
+      expect(status.querySelector('.contig-status')?.textContent).toMatch(
+        /Roll|turn/i
+      );
     } else {
       const pass = board.querySelector('.contig-pass-btn');
       if (pass) {
@@ -352,7 +378,9 @@ describe('Wave 27 seat-handoff — Juggle roll advances status instruction', () 
     expect(text.length).toBeGreaterThan(0);
     expect(text).toMatch(/die|shape|Select|Place|Roll/i);
     expect(
-      board.querySelector('.juggle-die, .juggle-shape-option, .juggle-shapes, .juggle-dice')
+      board.querySelector(
+        '.juggle-die, .juggle-shape-option, .juggle-shapes, .juggle-dice'
+      )
     ).toBeTruthy();
   });
 });
@@ -414,7 +442,9 @@ describe('Wave 27 seat-handoff — Prime Gold roll→place when valid', () => {
       if (cell) click(cell);
       if (ctrl.state.moveHistory.length > before) {
         expect(ctrl.state.currentPlayer).toBe('player2');
-        expect(container.querySelector('.pg-move-item, .pg-history')).toBeTruthy();
+        expect(
+          container.querySelector('.pg-move-item, .pg-history')
+        ).toBeTruthy();
       }
     }
   });
@@ -426,7 +456,9 @@ describe('Wave 27 seat-handoff — Par 55 select→place flips seat', () => {
     const ctrl = parVsHuman(container);
 
     expect(ctrl.state.phase).toBe('selectingBlock');
-    click(container.querySelector('.par55-hand-player1 .par55-hand-block.clickable'));
+    click(
+      container.querySelector('.par55-hand-player1 .par55-hand-block.clickable')
+    );
     expect(ctrl.state.phase).toBe('placingBlock');
     expect(ctrl.state.selectedBlock).toBeTruthy();
 
@@ -435,7 +467,9 @@ describe('Wave 27 seat-handoff — Par 55 select→place flips seat', () => {
     expect(ctrl.state.moveHistory.length).toBe(1);
     expect(ctrl.state.currentPlayer).toBe('player2');
     expect(ctrl.state.scores.player1).toBeGreaterThanOrEqual(0);
-    expect(container.querySelector('.par55-status')?.textContent).toMatch(/Select|turn|Place/i);
+    expect(container.querySelector('.par55-status')?.textContent).toMatch(
+      /Select|turn|Place/i
+    );
     expect(container.querySelector('.par55-history-move')).toBeTruthy();
   });
 });
@@ -453,13 +487,19 @@ describe('Wave 27 seat-handoff — Stars & Bars select→place flips seat', () =
     click(card);
     expect(ctrl.state.phase).toBe('placingCard');
 
-    const cell = container.querySelector('.stars-cell.valid, .stars-cell-valid');
+    const cell = container.querySelector(
+      '.stars-cell.valid, .stars-cell-valid'
+    );
     click(cell);
     expect(ctrl.state.moveHistory.length).toBe(1);
     expect(ctrl.state.currentPlayer).toBe('player2');
     expect(ctrl.state.playerScores.player1).toBeGreaterThanOrEqual(0);
-    expect(container.querySelector('.stars-status')?.textContent).toMatch(/Select|Place|turn/i);
-    expect(container.querySelector('.stars-move-item, .stars-history')).toBeTruthy();
+    expect(container.querySelector('.stars-status')?.textContent).toMatch(
+      /Select|Place|turn/i
+    );
+    expect(
+      container.querySelector('.stars-move-item, .stars-history')
+    ).toBeTruthy();
   });
 });
 
@@ -473,7 +513,9 @@ describe('Wave 27 seat-handoff — Ramrod / Kwatro select advances phase chrome'
       '.ramrod-player-player1 .ramrod-rod-wrapper.selectable, .ramrod-rod-wrapper.selectable, .ramrod-rod-wrapper'
     );
     click(rod);
-    expect(ctrl.state.selectedRod || ctrl.state.phase === 'placingRod').toBeTruthy();
+    expect(
+      ctrl.state.selectedRod || ctrl.state.phase === 'placingRod'
+    ).toBeTruthy();
     expect(container.querySelector('.ramrod-status')?.textContent).toMatch(
       /Select|Place|turn|box|Rod/i
     );
@@ -502,8 +544,9 @@ describe('Wave 27 seat-handoff — Ramrod / Kwatro select advances phase chrome'
     );
     // Prefer the selectable chip circle; fall back to a node group that owns one
     const target =
-      container.querySelector('.kwa-selectable-chip')?.closest('g[data-node-id]') ??
-      chip;
+      container
+        .querySelector('.kwa-selectable-chip')
+        ?.closest('g[data-node-id]') ?? chip;
     click(target);
     expect(
       ctrl.state.selectedChip ||

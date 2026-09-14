@@ -61,7 +61,9 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
     expect(status).toBeTruthy();
     expect(status!.classList.contains('player1')).toBe(true);
     expect(status!.textContent).toMatch(/Blue|turn/i);
-    expect(container.querySelector('.frac-choice-btn, .frac-choices')).toBeTruthy();
+    expect(
+      container.querySelector('.frac-choice-btn, .frac-choices')
+    ).toBeTruthy();
     expect(container.querySelector('.frac-player-score.active')).toBeTruthy();
   });
 
@@ -70,9 +72,9 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
     initFrac(container);
     fracVsHuman('easy');
     expect(getFracState().currentPlayer).toBe('player1');
-    expect(container.querySelector('.frac-status.player1')?.textContent).toMatch(
-      /Blue|turn/i
-    );
+    expect(
+      container.querySelector('.frac-status.player1')?.textContent
+    ).toMatch(/Blue|turn/i);
     expect(getFracState().problemsCompleted).toBe(0);
   });
 
@@ -83,19 +85,24 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
     fracVsHuman('easy');
 
     const beforeScore =
-      container.querySelector('.frac-player-score.player1 .frac-score-value, .frac-score-value')
-        ?.textContent ?? '';
+      container.querySelector(
+        '.frac-player-score.player1 .frac-score-value, .frac-score-value'
+      )?.textContent ?? '';
     const choices = [...container.querySelectorAll('.frac-choice-btn')];
     expect(choices.length).toBeGreaterThan(0);
     click(choices[0]);
 
-    expect(['showingResult', 'playing', 'gameOver']).toContain(getFracState().phase);
+    expect(['showingResult', 'playing', 'gameOver']).toContain(
+      getFracState().phase
+    );
     if (getFracState().phase === 'showingResult') {
-      expect(container.querySelector('.frac-result, .frac-feedback')).toBeTruthy();
+      expect(
+        container.querySelector('.frac-result, .frac-feedback')
+      ).toBeTruthy();
       expect(container.querySelector('.frac-continue-btn')).toBeTruthy();
-      expect(getFracState().isCorrect === true || getFracState().isCorrect === false).toBe(
-        true
-      );
+      expect(
+        getFracState().isCorrect === true || getFracState().isCorrect === false
+      ).toBe(true);
     }
     expect(container.querySelector('.frac-scores')).toBeTruthy();
     // Score chrome still mounted (value may or may not change on wrong answer)
@@ -119,7 +126,9 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
         const status = container.querySelector('.frac-status');
         expect(status?.classList.contains('player2')).toBe(true);
         expect(status?.textContent).toMatch(/Red|turn/i);
-        expect(container.querySelector('.frac-player-score.active')).toBeTruthy();
+        expect(
+          container.querySelector('.frac-player-score.active')
+        ).toBeTruthy();
       }
     }
   });
@@ -139,7 +148,9 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
         click(container.querySelector('.frac-continue-btn'));
       }
     }
-    expect(container.querySelector('.frac-status')?.textContent).toMatch(/turn/i);
+    expect(container.querySelector('.frac-status')?.textContent).toMatch(
+      /turn/i
+    );
   });
 
   it('illegal double-continue without answer does not invent phase', () => {
@@ -165,9 +176,13 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
     expect(status!.classList.contains('player1')).toBe(true);
     expect(status!.textContent).toMatch(/Blue|turn/i);
     expect(
-      container.querySelector('.pinball-choice-btn, .pinball-choices, .pinball-challenge')
+      container.querySelector(
+        '.pinball-choice-btn, .pinball-choices, .pinball-challenge'
+      )
     ).toBeTruthy();
-    expect(container.querySelector('.pinball-player-score.active')).toBeTruthy();
+    expect(
+      container.querySelector('.pinball-player-score.active')
+    ).toBeTruthy();
   });
 
   it('newGameVsHuman resets to answering / player1 chrome', () => {
@@ -175,9 +190,9 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
     initPinball(container);
     pinballVsHuman();
     expect(getPinballState().phase).toBe('answering');
-    expect(container.querySelector('.pinball-status.player1')?.textContent).toMatch(
-      /Blue|turn/i
-    );
+    expect(
+      container.querySelector('.pinball-status.player1')?.textContent
+    ).toMatch(/Blue|turn/i);
   });
 
   it('choice click advances to showResult and keeps score chrome', () => {
@@ -190,9 +205,13 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
     expect(choices.length).toBeGreaterThan(0);
     click(choices[0]);
 
-    expect(['showResult', 'answering', 'gameOver']).toContain(getPinballState().phase);
+    expect(['showResult', 'answering', 'gameOver']).toContain(
+      getPinballState().phase
+    );
     if (getPinballState().phase === 'showResult') {
-      expect(container.querySelector('.pinball-result, .pinball-feedback')).toBeTruthy();
+      expect(
+        container.querySelector('.pinball-result, .pinball-feedback')
+      ).toBeTruthy();
       expect(container.querySelector('.pinball-continue-btn')).toBeTruthy();
     }
     expect(container.querySelector('.pinball-scores')).toBeTruthy();
@@ -226,9 +245,9 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
     for (let i = 0; i < 2; i++) {
       if (getPinballState().phase !== 'answering') break;
       const seat = getPinballState().currentPlayer;
-      expect(container.querySelector(`.pinball-status.${seat}`)?.textContent).toMatch(
-        /turn/i
-      );
+      expect(
+        container.querySelector(`.pinball-status.${seat}`)?.textContent
+      ).toMatch(/turn/i);
       click(container.querySelector('.pinball-choice-btn'));
       if (getPinballState().phase === 'showResult') {
         click(container.querySelector('.pinball-continue-btn'));
@@ -241,11 +260,15 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
     const container = mountContainer();
     initPinball(container);
     pinballVsHuman();
-    expect(container.querySelector('.pinball-balls, .pinball-round')).toBeTruthy();
+    expect(
+      container.querySelector('.pinball-balls, .pinball-round')
+    ).toBeTruthy();
     click(container.querySelector('.pinball-choice-btn'));
     expect(container.querySelector('.pinball-scores')).toBeTruthy();
     expect(
-      container.querySelector('.pinball-balls, .pinball-round, .pinball-feedback')
+      container.querySelector(
+        '.pinball-balls, .pinball-round, .pinball-feedback'
+      )
     ).toBeTruthy();
   });
 });
@@ -261,8 +284,12 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
     expect(status).toBeTruthy();
     expect(status!.classList.contains('player1')).toBe(true);
     expect(status!.textContent).toMatch(/Blue|turn/i);
-    expect(container.querySelector('.remainder-btn-roll, .remainder-btn')).toBeTruthy();
-    expect(container.querySelector('.remainder-player-score.active')).toBeTruthy();
+    expect(
+      container.querySelector('.remainder-btn-roll, .remainder-btn')
+    ).toBeTruthy();
+    expect(
+      container.querySelector('.remainder-player-score.active')
+    ).toBeTruthy();
   });
 
   it('newGameVsHuman resets to rolling / player1', () => {
@@ -270,9 +297,9 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
     initRemainder(container);
     remainderVsHuman();
     expect(getRemainderState().phase).toBe('rolling');
-    expect(container.querySelector('.remainder-status.player1')?.textContent).toMatch(
-      /Blue|turn/i
-    );
+    expect(
+      container.querySelector('.remainder-status.player1')?.textContent
+    ).toMatch(/Blue|turn/i);
   });
 
   it('roll advances to selectIsland and shows instruction chrome', () => {
@@ -282,17 +309,21 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
     remainderVsHuman();
 
     click(container.querySelector('.remainder-btn-roll, .remainder-btn'));
-    expect(['selectIsland', 'rolling', 'gameOver']).toContain(getRemainderState().phase);
+    expect(['selectIsland', 'rolling', 'gameOver']).toContain(
+      getRemainderState().phase
+    );
 
     if (getRemainderState().phase === 'selectIsland') {
-      expect(container.querySelector('.remainder-instruction')?.textContent).toMatch(
-        /Select|island/i
-      );
+      expect(
+        container.querySelector('.remainder-instruction')?.textContent
+      ).toMatch(/Select|island/i);
       expect(getRemainderState().validIslands.length).toBeGreaterThan(0);
-      expect(container.querySelector('.remainder-preview, .division-equation')).toBeTruthy();
-      expect(container.querySelector('.remainder-status.player1')?.textContent).toMatch(
-        /turn/i
-      );
+      expect(
+        container.querySelector('.remainder-preview, .division-equation')
+      ).toBeTruthy();
+      expect(
+        container.querySelector('.remainder-status.player1')?.textContent
+      ).toMatch(/turn/i);
     }
   });
 
@@ -337,7 +368,10 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
     // Click a non-valid island if one exists
     const all = [...container.querySelectorAll('[data-island-id]')];
     const invalid = all.find(
-      (el) => !getRemainderState().validIslands.includes(el.getAttribute('data-island-id')!)
+      (el) =>
+        !getRemainderState().validIslands.includes(
+          el.getAttribute('data-island-id')!
+        )
     );
     if (invalid) {
       click(invalid);
@@ -345,7 +379,9 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
       expect(getRemainderState().phase).toBe('selectIsland');
       expect(getRemainderState().turnsRemaining).toBe(histTurns);
     }
-    expect(container.querySelector('.remainder-status')?.textContent).toMatch(/turn/i);
+    expect(container.querySelector('.remainder-status')?.textContent).toMatch(
+      /turn/i
+    );
   });
 
   it('full P1 roll→island then P2 roll keeps score chrome and status seat sync', () => {
@@ -367,14 +403,16 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
       expect(container.querySelector('.remainder-status.player2')).toBeTruthy();
       click(container.querySelector('.remainder-btn-roll'));
       if (getRemainderState().phase === 'selectIsland') {
-        expect(container.querySelector('.remainder-status.player2')?.textContent).toMatch(
-          /Red|turn/i
-        );
+        expect(
+          container.querySelector('.remainder-status.player2')?.textContent
+        ).toMatch(/Red|turn/i);
         const id = getRemainderState().validIslands[0];
         click(container.querySelector(`[data-island-id="${id}"]`));
         if (getRemainderState().phase === 'rolling') {
           expect(getRemainderState().currentPlayer).toBe('player1');
-          expect(container.querySelector('.remainder-status.player1')).toBeTruthy();
+          expect(
+            container.querySelector('.remainder-status.player1')
+          ).toBeTruthy();
         }
       }
     }
@@ -391,9 +429,15 @@ describe('Wave 27 quiz-seat-chrome — cross-quiz mount isolation', () => {
     initPinball(b);
     initRemainder(c);
 
-    expect(a.querySelector('.frac-status.player1')?.textContent).toMatch(/turn/i);
-    expect(b.querySelector('.pinball-status.player1')?.textContent).toMatch(/turn/i);
-    expect(c.querySelector('.remainder-status.player1')?.textContent).toMatch(/turn/i);
+    expect(a.querySelector('.frac-status.player1')?.textContent).toMatch(
+      /turn/i
+    );
+    expect(b.querySelector('.pinball-status.player1')?.textContent).toMatch(
+      /turn/i
+    );
+    expect(c.querySelector('.remainder-status.player1')?.textContent).toMatch(
+      /turn/i
+    );
 
     expect(a.querySelector('.pinball-status')).toBeNull();
     expect(b.querySelector('.frac-status')).toBeNull();

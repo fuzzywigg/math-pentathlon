@@ -97,7 +97,9 @@ describe('Wave 27 seat-place-select — Par select→place flips seat + history'
     const ctrl = parVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingBlock');
 
-    click(container.querySelector('.par55-hand-player1 .par55-hand-block.clickable'));
+    click(
+      container.querySelector('.par55-hand-player1 .par55-hand-block.clickable')
+    );
     expect(ctrl.state.phase).toBe('placingBlock');
     expect(ctrl.state.selectedBlock).toBeTruthy();
 
@@ -115,9 +117,13 @@ describe('Wave 27 seat-place-select — Par select→place flips seat + history'
     const container = mountContainer();
     const ctrl = parVsHuman(container);
 
-    click(container.querySelector('.par55-hand-player1 .par55-hand-block.clickable'));
     click(
-      container.querySelector('.par55-valid-base')?.closest('g[data-base-id]') ??
+      container.querySelector('.par55-hand-player1 .par55-hand-block.clickable')
+    );
+    click(
+      container
+        .querySelector('.par55-valid-base')
+        ?.closest('g[data-base-id]') ??
         container.querySelector('.par55-valid-base')
     );
     expect(ctrl.state.currentPlayer).toBe('player2');
@@ -170,7 +176,9 @@ describe('Wave 27 seat-place-select — Stars select→place flips seat + histor
     const hand =
       container.querySelector('.stars-hand-label.player1')?.parentElement ??
       container.querySelector('.stars-hand.player1, .stars-hand-player1');
-    click(hand?.querySelector('.stars-card:not(.disabled), .stars-card') ?? null);
+    click(
+      hand?.querySelector('.stars-card:not(.disabled), .stars-card') ?? null
+    );
     expect(ctrl.state.phase).toBe('placingCard');
 
     click(container.querySelector('.stars-cell.valid, .stars-cell-valid'));
@@ -179,7 +187,9 @@ describe('Wave 27 seat-place-select — Stars select→place flips seat + histor
     expect(container.querySelector('.stars-status')?.textContent).toMatch(
       /Select|Place|turn/i
     );
-    expect(container.querySelector('.stars-move-item, .stars-history')).toBeTruthy();
+    expect(
+      container.querySelector('.stars-move-item, .stars-history')
+    ).toBeTruthy();
   });
 
   it('rules clearSelection after selectCard restores selectingCard', () => {
@@ -223,7 +233,9 @@ describe('Wave 27 seat-place-select — Ramrod select→place when slot valid', 
       '.ramrod-player-player1 .ramrod-rod-wrapper.selectable, .ramrod-rod-wrapper.selectable, .ramrod-rod-wrapper'
     );
     click(rod);
-    expect(ctrl.state.selectedRod || ctrl.state.phase === 'placingRod').toBeTruthy();
+    expect(
+      ctrl.state.selectedRod || ctrl.state.phase === 'placingRod'
+    ).toBeTruthy();
     expect(container.querySelector('.ramrod-status')?.textContent).toMatch(
       /Select|Place|turn|box|Rod/i
     );
@@ -238,7 +250,9 @@ describe('Wave 27 seat-place-select — Ramrod select→place when slot valid', 
         if (ctrl.state.moveHistory.length > before) {
           expect(ctrl.state.currentPlayer).toBe('player2');
           expect(
-            container.querySelector('.ramrod-history-move, .ramrod-history, .ramrod-status')
+            container.querySelector(
+              '.ramrod-history-move, .ramrod-history, .ramrod-status'
+            )
           ).toBeTruthy();
         }
       }
@@ -279,7 +293,9 @@ describe('Wave 27 seat-place-select — Kwatro select→move when dest legal', (
     expect(ctrl.state.phase).toBe('selectingChip');
 
     const target =
-      container.querySelector('.kwa-selectable-chip')?.closest('g[data-node-id]') ??
+      container
+        .querySelector('.kwa-selectable-chip')
+        ?.closest('g[data-node-id]') ??
       container.querySelector('.kwa-selectable-chip, g[data-node-id]');
     click(target);
     expect(
@@ -293,14 +309,17 @@ describe('Wave 27 seat-place-select — Kwatro select→move when dest legal', (
 
     if (ctrl.state.phase === 'selectingDest' && ctrl.state.selectedChip) {
       const dest =
-        container.querySelector('.kwa-valid-dest, .kwa-node-valid, [data-valid="true"]') ??
-        container.querySelector('g[data-node-id]:not(.kwa-occupied)');
+        container.querySelector(
+          '.kwa-valid-dest, .kwa-node-valid, [data-valid="true"]'
+        ) ?? container.querySelector('g[data-node-id]:not(.kwa-occupied)');
       if (dest) {
         const before = ctrl.state.moveHistory.length;
         click(dest);
         if (ctrl.state.moveHistory.length > before) {
           expect(ctrl.state.currentPlayer).toBe('player2');
-          expect(container.querySelector('.kwa-history-move, .kwa-history')).toBeTruthy();
+          expect(
+            container.querySelector('.kwa-history-move, .kwa-history')
+          ).toBeTruthy();
         }
       }
     }
@@ -321,7 +340,9 @@ describe('Wave 27 seat-place-select — Kwatro select→move when dest legal', (
 
   it('rules selectChip→moveChip flips seat when dest exists', () => {
     let state = createKwa();
-    const p1Chips = [...state.chips.values()].filter((c) => c.owner === 'player1');
+    const p1Chips = [...state.chips.values()].filter(
+      (c) => c.owner === 'player1'
+    );
     for (const chip of p1Chips) {
       const selected = selectChip(state, chip.id);
       if (selected.phase !== 'selectingDest') continue;
@@ -346,8 +367,12 @@ describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', ()
     expect(container.querySelector('.fab-status')?.textContent).toMatch(
       /turn|Select|fraction|bar/i
     );
-    expect(container.querySelector('.fab-bar-wrapper:not(.fab-bar-disabled)')).toBeTruthy();
-    expect(container.querySelector('.fab-btn, .fab-controls, .fab-scores')).toBeTruthy();
+    expect(
+      container.querySelector('.fab-bar-wrapper:not(.fab-bar-disabled)')
+    ).toBeTruthy();
+    expect(
+      container.querySelector('.fab-btn, .fab-controls, .fab-scores')
+    ).toBeTruthy();
   });
 
   it('two bar clicks advance toward selectingOperation; clear restores bar1', () => {
@@ -364,12 +389,16 @@ describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', ()
     const bars2 = [
       ...container.querySelectorAll('.fab-bar-wrapper:not(.fab-bar-disabled)'),
     ];
-    const second = bars2.find((b) => b !== bars[0] && !b.classList.contains('fab-bar-selected'));
+    const second = bars2.find(
+      (b) => b !== bars[0] && !b.classList.contains('fab-bar-selected')
+    );
     if (second) {
       click(second);
-      expect(['selectingOperation', 'selectingBar2', 'confirmingMove']).toContain(
-        ctrl.state.phase
-      );
+      expect([
+        'selectingOperation',
+        'selectingBar2',
+        'confirmingMove',
+      ]).toContain(ctrl.state.phase);
     }
 
     const clear = [...container.querySelectorAll('.fab-btn')].find((b) =>
@@ -399,7 +428,11 @@ describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', ()
         for (const op of ops) {
           let confirming = selectOperation(trial, op);
           if (confirming.phase !== 'confirmingMove') continue;
-          const result = calculateResult(bars[i].fraction, bars[j].fraction, op);
+          const result = calculateResult(
+            bars[i].fraction,
+            bars[j].fraction,
+            op
+          );
           if (!result) continue;
           const matches = findMatchingAnswers(confirming, result);
           if (matches.length === 0) continue;
@@ -418,7 +451,9 @@ describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', ()
       expect(state.phase).toBe('selectingBar1');
       expect(state.moveHistory.length).toBe(1);
     } else {
-      expect(clearFab(selectBar1(createFab(), bars[0].id)).phase).toBe('selectingBar1');
+      expect(clearFab(selectBar1(createFab(), bars[0].id)).phase).toBe(
+        'selectingBar1'
+      );
     }
   });
 });
@@ -438,8 +473,12 @@ describe('Wave 27 seat-place-select — Pent-em-in select→placePiece + cancel'
     click(piece);
     expect(getPentState().phase).toBe('placePiece');
     expect(getPentState().selectedPiece).toBeTruthy();
-    expect(status.querySelector('.pent-status')?.textContent).toMatch(/Place|turn/i);
-    expect(status.querySelector('.pent-btn-cancel, .pent-controls')).toBeTruthy();
+    expect(status.querySelector('.pent-status')?.textContent).toMatch(
+      /Place|turn/i
+    );
+    expect(
+      status.querySelector('.pent-btn-cancel, .pent-controls')
+    ).toBeTruthy();
   });
 
   it('cancel restores selectPiece without placing', () => {
@@ -472,7 +511,13 @@ describe('Wave 27 seat-place-select — Pent-em-in select→placePiece + cancel'
         if (
           canPlacePiece(state, state.selectedPiece!, { row, col }, 0, false)
         ) {
-          state = pentPlace(state, state.selectedPiece!, { row, col }, 0, false);
+          state = pentPlace(
+            state,
+            state.selectedPiece!,
+            { row, col },
+            0,
+            false
+          );
           placed = true;
         }
       }
@@ -498,10 +543,15 @@ describe('Wave 27 seat-place-select — Pent-em-in select→placePiece + cancel'
       click(cell);
       if (getPentState().currentPlayer !== beforePlayer) {
         expect(getPentState().phase).toBe('selectPiece');
-        expect(status.querySelector('.pent-status')?.textContent).toMatch(/turn|Select/i);
+        expect(status.querySelector('.pent-status')?.textContent).toMatch(
+          /turn|Select/i
+        );
         return;
       }
-      if (getPentState().phase === 'selectPiece' && getPentState().selectedPiece === null) {
+      if (
+        getPentState().phase === 'selectPiece' &&
+        getPentState().selectedPiece === null
+      ) {
         // cancel path accidentally — stop
         break;
       }

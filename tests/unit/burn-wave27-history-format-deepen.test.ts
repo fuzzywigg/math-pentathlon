@@ -89,9 +89,7 @@ function click(el: Element | null): void {
   el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
 
-function claimFabMove(
-  seed = 0.25
-): ReturnType<typeof createFab> | null {
+function claimFabMove(seed = 0.25): ReturnType<typeof createFab> | null {
   vi.spyOn(Math, 'random').mockReturnValue(seed);
   let state = createFab();
   const bars = [...state.fractionBars.values()].filter((b) => !b.used);
@@ -118,7 +116,9 @@ function claimFabMove(
   return null;
 }
 
-function placeParPly(state: ReturnType<typeof createPar>): ReturnType<typeof createPar> {
+function placeParPly(
+  state: ReturnType<typeof createPar>
+): ReturnType<typeof createPar> {
   const hand = state.hands[state.currentPlayer];
   if (hand.length === 0) return state;
   let next = selectBlock(state, hand[0].id);
@@ -131,7 +131,9 @@ describe('Wave 27 history-format-deepen — Fab multi-ply formatMove in DOM', ()
   it('first claim: formatMove = appears in .fab-history-move', () => {
     const state = claimFabMove(0.25);
     if (!state) {
-      expect(renderFabHistory(createFab()).querySelector('.fab-history')).toBeTruthy();
+      expect(
+        renderFabHistory(createFab()).querySelector('.fab-history')
+      ).toBeTruthy();
       return;
     }
     const move = state.moveHistory[0];
@@ -166,7 +168,11 @@ describe('Wave 27 history-format-deepen — Fab multi-ply formatMove in DOM', ()
         for (const op of ops) {
           let confirming = selectOperation(trial, op);
           if (confirming.phase !== 'confirmingMove') continue;
-          const result = calculateResult(bars[i].fraction, bars[j].fraction, op);
+          const result = calculateResult(
+            bars[i].fraction,
+            bars[j].fraction,
+            op
+          );
           if (!result) continue;
           const matches = findMatchingAnswers(confirming, result);
           if (matches.length === 0) continue;
@@ -269,7 +275,9 @@ describe('Wave 27 history-format-deepen — Ramrod formatMove + history chrome',
     expect(fmt).toMatch(/Rod|cm/i);
     const hist = renderRamrodHistory(state);
     expect(hist.className).toMatch(/ramrod/);
-    expect(hist.querySelector('.ramrod-history-list, .ramrod-history-move, h4')).toBeTruthy();
+    expect(
+      hist.querySelector('.ramrod-history-list, .ramrod-history-move, h4')
+    ).toBeTruthy();
 
     const move = state.moveHistory[0];
     if (move.capturedBox) {
@@ -300,7 +308,9 @@ describe('Wave 27 history-format-deepen — Ramrod formatMove + history chrome',
       expect(formatRamrodMove(m)).toMatch(/Rod \d+cm/);
     }
     const hist = renderRamrodHistory(state);
-    expect(hist.querySelectorAll('.ramrod-history-move').length).toBeLessThanOrEqual(
+    expect(
+      hist.querySelectorAll('.ramrod-history-move').length
+    ).toBeLessThanOrEqual(
       state.moveHistory.filter((m) => m.capturedBox).length
     );
   });
@@ -361,8 +371,7 @@ describe('Wave 27 history-format-deepen — Kwatro formatMove Chip in history', 
     if (second) state = second;
 
     expect(state.moveHistory.length).toBe(
-      renderKwaHistory(state).querySelectorAll('.kwa-history-move').length >
-        0
+      renderKwaHistory(state).querySelectorAll('.kwa-history-move').length > 0
         ? state.moveHistory.length
         : state.moveHistory.length
     );
@@ -377,9 +386,7 @@ describe('Wave 27 history-format-deepen — Kwatro formatMove Chip in history', 
 });
 
 describe('Wave 27 history-format-deepen — Sum formatMove [f1|f2] after place', () => {
-  function trySumPlace(
-    seed: number
-  ): ReturnType<typeof createSum> | null {
+  function trySumPlace(seed: number): ReturnType<typeof createSum> | null {
     vi.spyOn(Math, 'random').mockReturnValue(seed);
     let state = createSum();
     state = sumRoll(state);
@@ -437,7 +444,9 @@ describe('Wave 27 history-format-deepen — Stars / Prime history multi-ply', ()
     const firstScore = `+${state.moveHistory[0].score}`;
 
     let hist = renderStarsHistory(state);
-    expect(hist.querySelector('.stars-move-item')?.textContent).toContain(firstScore);
+    expect(hist.querySelector('.stars-move-item')?.textContent).toContain(
+      firstScore
+    );
 
     // Second ply
     const hand2 = state.playerHands[state.currentPlayer];
@@ -450,7 +459,9 @@ describe('Wave 27 history-format-deepen — Stars / Prime history multi-ply', ()
     }
 
     hist = renderStarsHistory(state);
-    expect(hist.querySelectorAll('.stars-move-item').length).toBe(state.moveHistory.length);
+    expect(hist.querySelectorAll('.stars-move-item').length).toBe(
+      state.moveHistory.length
+    );
     expect(hist.textContent).toContain(firstScore);
     const remount = renderStarsHistory(state);
     expect(remount.textContent).toContain(firstScore);
@@ -531,7 +542,8 @@ describe('Wave 27 history-format-deepen — Kings controller history remount', (
     const scratch2 = document.createElement('div');
     renderKingsHistory(getKingsState(), scratch2);
     expect(scratch2.textContent).toContain(
-      scratch.querySelector('.move-history-entry')?.textContent?.slice(0, 8) ?? '→'
+      scratch.querySelector('.move-history-entry')?.textContent?.slice(0, 8) ??
+        '→'
     );
   });
 
@@ -548,7 +560,8 @@ describe('Wave 27 history-format-deepen — Kings controller history remount', (
     click(board.querySelector('.cell[data-row="1"][data-col="5"]'));
     click(board.querySelector('.cell-valid-move'));
     click(
-      board.querySelector('.cell-valid-placement') ?? board.querySelector('.cell-empty')
+      board.querySelector('.cell-valid-placement') ??
+        board.querySelector('.cell-empty')
     );
     const afterP1 = getKingsState().moveHistory.length;
 
