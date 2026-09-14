@@ -60,6 +60,7 @@ class StorageManager {
 
   // Ensure all required fields have values
   private ensureDefaults(data: ProgressData): ProgressData {
+    const owl = data.owlState;
     return {
       version: data.version || CURRENT_DATA_VERSION,
       profile: data.profile || null,
@@ -71,7 +72,23 @@ class StorageManager {
       },
       achievements: data.achievements || [],
       gameStats: data.gameStats || {},
-      owlState: data.owlState || { ...DEFAULT_OWL_STATE },
+      owlState: owl
+        ? {
+            mood: owl.mood ?? DEFAULT_OWL_STATE.mood,
+            lastInteraction:
+              owl.lastInteraction ?? DEFAULT_OWL_STATE.lastInteraction,
+            messagesSeen: [...(owl.messagesSeen ?? [])],
+            tutorialsCompleted: [...(owl.tutorialsCompleted ?? [])],
+            totalMessagesShown:
+              owl.totalMessagesShown ?? DEFAULT_OWL_STATE.totalMessagesShown,
+          }
+        : {
+            mood: DEFAULT_OWL_STATE.mood,
+            lastInteraction: DEFAULT_OWL_STATE.lastInteraction,
+            messagesSeen: [],
+            tutorialsCompleted: [],
+            totalMessagesShown: DEFAULT_OWL_STATE.totalMessagesShown,
+          },
       settings: { ...DEFAULT_SETTINGS, ...data.settings },
     };
   }
@@ -250,7 +267,11 @@ class StorageManager {
 
   // Owl state methods
   public getOwlState(): OwlState {
-    return { ...this.data.owlState };
+    return {
+      ...this.data.owlState,
+      messagesSeen: [...this.data.owlState.messagesSeen],
+      tutorialsCompleted: [...this.data.owlState.tutorialsCompleted],
+    };
   }
 
   public updateOwlMood(mood: OwlState['mood']): void {
