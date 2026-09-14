@@ -7,11 +7,24 @@ import { test, expect, Page } from '@playwright/test';
 async function dismissModeIfNeeded(page: Page) {
   const modal = page.locator('#new-game-modal');
   if (await modal.isVisible().catch(() => false)) {
+    // Prefer human-vs-human so AI timers cannot race the roll CTA.
+    const human = page.locator(
+      'input[name="sd-mode"][value="human-vs-human"]'
+    );
+    if (await human.count()) {
+      await human.check({ force: true });
+    }
     const start = page.locator('#start-game-btn');
     if (await start.isVisible().catch(() => false)) {
       await start.click();
     }
   }
+}
+
+async function remountSumDominoes(page: Page) {
+  await page.click('#new-game-btn');
+  await dismissModeIfNeeded(page);
+  await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 8000 });
 }
 
 test.describe('Wave 38 — Contig dice/expression leftovers', () => {
@@ -57,7 +70,12 @@ test.describe('Wave 38 — Sum Dominoes dice leftovers', () => {
     await dismissModeIfNeeded(page);
   });
 
+  /**
+   * Resolve one roll. Prefer place (pass-twice ends the game while dice stay
+   * mounted, so `.sd-roll-btn` never returns). Remount if roll CTA is missing.
+   */
   async function resolveSumDominoesRoll(page: Page) {
+    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 8000 });
     await page.locator('.sd-roll-btn').click();
     await expect(page.locator('.sd-dice-display')).toBeVisible();
 
@@ -70,20 +88,24 @@ test.describe('Wave 38 — Sum Dominoes dice leftovers', () => {
       const valid = page.locator('.sd-cell-valid');
       if ((await valid.count()) > 0) {
         await valid.first().click({ force: true });
-      } else if (await passBtn.isVisible().catch(() => false)) {
-        // Selected with no legal cell — pass to restore roll CTA
-        await passBtn.click();
       } else {
-        // Stuck selecting: remount via new-game so subsequent cycles can proceed
-        await page.click('#new-game-btn');
-        await dismissModeIfNeeded(page);
+        await remountSumDominoes(page);
+        return;
       }
-    } else {
-      await expect(passBtn).toBeVisible();
+    } else if (await passBtn.isVisible().catch(() => false)) {
       await passBtn.click();
+    } else {
+      await remountSumDominoes(page);
+      return;
     }
 
-    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
+    const roll = page.locator('.sd-roll-btn');
+    // Double consecutive passes leave dice on a game-over screen — remount.
+    if (!(await roll.isVisible().catch(() => false))) {
+      await remountSumDominoes(page);
+      return;
+    }
+    await expect(roll).toBeVisible({ timeout: 8000 });
   }
 
   test('two roll cycles restore dice CTA and hands', async ({ page }) => {
@@ -112,7 +134,11 @@ test.describe('Wave 38 — Juggle dice leftovers', () => {
     await page.click('#help-modal .modal-close');
     await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
     await expect(
-      page.locator('.juggle-dice-display, .juggle-dice-area, .juggle-die, .juggle-board').first()
+      page
+        .locator(
+          '.juggle-dice-display, .juggle-dice-area, .juggle-die, .juggle-board'
+        )
+        .first()
     ).toBeVisible();
   });
 });

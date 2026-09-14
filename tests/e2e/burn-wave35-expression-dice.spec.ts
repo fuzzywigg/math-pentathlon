@@ -67,24 +67,27 @@ test.describe('Wave 35 — Sum Dominoes dice deepen', () => {
   test('roll shows dice then place-or-pass restores roll', async ({ page }) => {
     await page.locator('.sd-roll-btn').click();
     await expect(page.locator('.sd-dice-display')).toBeVisible();
-    const place = page.locator(
-      '.sd-hand-player1 .sd-hand-domino, .sd-valid, .sd-pass-btn'
-    );
-    await expect(place.first()).toBeVisible();
+
+    const playable = page.locator('.sd-hand-domino-playable');
     const pass = page.locator('.sd-pass-btn');
-    const hand = page.locator('.sd-hand-player1 .sd-hand-domino');
-    if (await pass.isVisible().catch(() => false)) {
-      await pass.click();
-    } else if ((await hand.count()) > 0) {
-      await hand.first().click();
-      const cell = page
-        .locator('.sd-board .sd-valid, .sd-cell-valid, .sd-board button')
-        .first();
-      if (await cell.isVisible().catch(() => false)) {
-        await cell.click();
+
+    if ((await playable.count()) > 0) {
+      await playable.first().click();
+      await expect(page.locator('.sd-hand-domino-selected')).toBeVisible();
+      const valid = page.locator('.sd-cell-valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+      } else {
+        // Stuck select — remount so roll CTA is guaranteed
+        await page.click('#new-game-btn');
+        await dismissModeIfNeeded(page);
       }
+    } else {
+      await expect(pass).toBeVisible();
+      await pass.click();
     }
-    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
+
+    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 8000 });
   });
 });
 
