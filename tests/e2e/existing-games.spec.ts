@@ -3792,9 +3792,7 @@ test.describe('Wave 25 — alignment demo hex contiguous regions', () => {
     await expect(page.locator('#hex-reset')).toBeVisible();
   });
 
-  test('placing hex cells updates Blue/Red region counts', async ({
-    page,
-  }) => {
+  test('placing hex cells updates Blue/Red region counts', async ({ page }) => {
     await page.goto('/#/demo/alignment');
     const cells = page.locator('#hex-board .demo-hex-cell');
     await expect(cells.first()).toBeVisible();
@@ -3880,5 +3878,80 @@ test.describe('Wave 25 — alignment demo hex contiguous regions', () => {
     await expect(section.locator('.demo-instructions')).toContainText(
       /Blue connects top-bottom/i
     );
+  });
+});
+
+test.describe('Wave 27 — fractions / expression / dice chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '.mode-option[data-mode="human-vs-ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Frac Fact loads fraction choice chrome', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Frac/i);
+    await expect(
+      page.locator('.frac-choices, .frac-choice, .frac-problem').first()
+    ).toBeVisible();
+  });
+
+  test('Fraction Pinball loads quiz chrome', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await startVsAi(page);
+    await expect(
+      page
+        .locator(
+          '.pinball-board, .pinball-challenge, .pinball-choice-btn, .pinball-scores'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold roll shows pg dice/board chrome', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await startVsAi(page);
+    const roll = page.locator('.pg-roll-btn');
+    if ((await roll.count()) > 0) {
+      await roll.first().click({ force: true });
+    }
+    await expect(
+      page
+        .locator('.pg-board, .pg-dice-area, .pg-expressions, .pg-cell')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Contig roll offers expressions or pass', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    await page.locator('.contig-roll-btn').click();
+    await expect(page.locator('.contig-dice-display')).toBeVisible();
+    await expect(
+      page.locator('.contig-expressions, .contig-pass-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle dice/shape chrome after start', async ({ page }) => {
+    await page.goto('/#/game/juggle');
+    await startVsAi(page);
+    await expect(
+      page
+        .locator(
+          '.juggle-board, .juggle-shapes, .juggle-die, .juggle-dice-display'
+        )
+        .first()
+    ).toBeVisible();
   });
 });
