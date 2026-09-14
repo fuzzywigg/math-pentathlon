@@ -30,16 +30,14 @@ describe('Wave 42 par55 — shuffleArray', () => {
     expect(sortById(shuffled)).toEqual(sortById(blocks));
   });
 
-  it('can reorder when random varies (not identity shuffle)', () => {
-    let call = 0;
-    vi.spyOn(Math, 'random').mockImplementation(() => {
-      call++;
-      return call % 2 === 0 ? 0.99 : 0.01;
-    });
+  it('invokes Math.random once per Fisher-Yates iteration (n-1 times)', () => {
+    const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
     const input = ['a', 'b', 'c', 'd', 'e'];
     const result = shuffleArray(input);
+    expect(randomSpy).toHaveBeenCalledTimes(input.length - 1);
+    expect(result).toHaveLength(input.length);
     expect(result.sort()).toEqual(input.sort());
-    expect(result).not.toEqual(input);
+    expect(input).toEqual(['a', 'b', 'c', 'd', 'e']);
   });
 
   it('handles empty and single-element arrays', () => {

@@ -8,20 +8,39 @@ import {
   selectBlock,
   placeBlock,
   getValidPlacements,
+  calculateScore,
 } from '../../src/games/par-55/rules';
-import { CONFIG, createBaseId, type Par55State } from '../../src/games/par-55/types';
+import {
+  CONFIG,
+  createBaseId,
+  type AttributeBlock,
+  type Par55State,
+} from '../../src/games/par-55/types';
 
 describe('Wave 42 par55 — placeBlock p1 target win', () => {
   it('player1 reaching TARGET_SCORE ends game with player1 winner', () => {
     let state = createInitialState();
-    const block = state.hands.player1[0];
-    state = selectBlock(state, block.id);
+    const centerId = createBaseId(2, 3);
+    const centerBlock = state.bases.get(centerId)!.block!;
+    const matchingBlock: AttributeBlock = {
+      ...centerBlock,
+      id: state.hands.player1[0].id,
+    };
+    state = {
+      ...state,
+      hands: {
+        ...state.hands,
+        player1: [matchingBlock, ...state.hands.player1.slice(1)],
+      },
+    };
+    state = selectBlock(state, matchingBlock.id);
     const baseId = getValidPlacements(state)[0];
+    const preview = calculateScore(state, matchingBlock, baseId);
 
     const primed: Par55State = {
       ...state,
       scores: {
-        player1: CONFIG.TARGET_SCORE - 1,
+        player1: CONFIG.TARGET_SCORE - preview.totalPoints,
         player2: 10,
       },
     };

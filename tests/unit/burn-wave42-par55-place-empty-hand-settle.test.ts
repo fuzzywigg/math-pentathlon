@@ -8,6 +8,7 @@ import {
   selectBlock,
   placeBlock,
   getValidPlacements,
+  calculateScore,
 } from '../../src/games/par-55/rules';
 import { type Par55State } from '../../src/games/par-55/types';
 
@@ -39,6 +40,7 @@ describe('Wave 42 par55 — placeBlock empty-hand settle', () => {
     const lastBlock = state.hands.player1[0];
     state = selectBlock(state, lastBlock.id);
     const baseId = getValidPlacements(state)[0];
+    const preview = calculateScore(state, lastBlock, baseId);
 
     const primed: Par55State = {
       ...state,
@@ -46,11 +48,12 @@ describe('Wave 42 par55 — placeBlock empty-hand settle', () => {
         player1: [lastBlock],
         player2: [],
       },
-      scores: { player1: 20, player2: 20 },
+      scores: { player1: 20 - preview.totalPoints, player2: 20 },
     };
 
     const next = placeBlock(primed, baseId);
     expect(next.hands.player1).toHaveLength(0);
+    expect(next.scores.player1).toBe(next.scores.player2);
     expect(next.phase).toBe('gameOver');
     expect(next.winner).toBeNull();
   });

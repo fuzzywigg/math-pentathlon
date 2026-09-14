@@ -8,8 +8,14 @@ import {
   selectBlock,
   placeBlock,
   getValidPlacements,
+  calculateScore,
 } from '../../src/games/par-55/rules';
-import { CONFIG, type Par55State } from '../../src/games/par-55/types';
+import {
+  CONFIG,
+  createBaseId,
+  type AttributeBlock,
+  type Par55State,
+} from '../../src/games/par-55/types';
 
 describe('Wave 42 par55 — placeBlock p2 target settle', () => {
   function primedP2Turn(state: Par55State): Par55State {
@@ -23,15 +29,27 @@ describe('Wave 42 par55 — placeBlock p2 target settle', () => {
 
   it('player2 surpassing player1 at TARGET_SCORE wins as player2', () => {
     let state = primedP2Turn(createInitialState());
-    const block = state.hands.player2[0];
-    state = selectBlock(state, block.id);
+    const centerBlock = state.bases.get(createBaseId(2, 3))!.block!;
+    const matchingBlock: AttributeBlock = {
+      ...centerBlock,
+      id: state.hands.player2[0].id,
+    };
+    state = {
+      ...state,
+      hands: {
+        ...state.hands,
+        player2: [matchingBlock, ...state.hands.player2.slice(1)],
+      },
+    };
+    state = selectBlock(state, matchingBlock.id);
     const baseId = getValidPlacements(state)[0];
+    const preview = calculateScore(state, matchingBlock, baseId);
 
     const primed: Par55State = {
       ...state,
       scores: {
-        player1: CONFIG.TARGET_SCORE + 3,
-        player2: CONFIG.TARGET_SCORE - 1,
+        player1: CONFIG.TARGET_SCORE + 1,
+        player2: CONFIG.TARGET_SCORE + 2 - preview.totalPoints,
       },
     };
 

@@ -25,10 +25,12 @@ describe('Wave 42 par55 — executeAITurn pass paths', () => {
     expect(next.selectedBlock).toBeNull();
   });
 
-  it('executeAITurn on wrong seat still passes via null move path', () => {
+  it('executeAITurn on wrong seat passes turn because getAIMove is null', () => {
     const state = createInitialState();
+    expect(getAIMove(state, 'player2', 'medium')).toBeNull();
     const next = executeAITurn(state, 'player2', 'medium');
-    expect(next.currentPlayer).toBe('player1');
+    expect(next.currentPlayer).toBe('player2');
+    expect(next.moveHistory).toHaveLength(0);
   });
 
   it('executeAITurn hard advances state with history when moves exist', () => {
