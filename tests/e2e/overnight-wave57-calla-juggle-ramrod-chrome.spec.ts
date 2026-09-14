@@ -28,13 +28,17 @@ test.describe('Wave 57 — calla leftover chrome', () => {
     await dismissModeIfNeeded(page);
     await expect(page.locator('.calla-wrapper')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('#arrowhead-p1')).toBeAttached();
-    await expect(page.locator('.calla-store-label').first()).toContainText('🔵');
+    // P2 store is painted first (left), then P1 — both seat icons must mount
+    await expect(page.locator('.calla-store-label')).toHaveCount(2);
+    await expect(page.locator('.calla-store-label').filter({ hasText: '🔵' })).toHaveCount(1);
+    await expect(page.locator('.calla-store-label').filter({ hasText: '🔴' })).toHaveCount(1);
     await page.click('#help-btn');
     await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
     await page.keyboard.press('Escape');
     await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
     await expect(page.locator('#arrowhead-p1')).toBeAttached();
-    await expect(page.locator('.calla-store-label').first()).toContainText('🔵');
+    await expect(page.locator('.calla-store-label').filter({ hasText: '🔵' })).toHaveCount(1);
+    await expect(page.locator('.calla-store-label').filter({ hasText: '🔴' })).toHaveCount(1);
   });
 });
 
