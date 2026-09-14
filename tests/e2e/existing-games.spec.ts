@@ -3780,3 +3780,105 @@ test.describe('Wave 24 — alignment demo grid-alignment chrome', () => {
     await expect(page).toHaveURL(/#\/?$/);
   });
 });
+
+test.describe('Wave 25 — alignment demo hex contiguous regions', () => {
+  test('hex section shows region info chrome on load', async ({ page }) => {
+    await page.goto('/#/demo/alignment');
+    await expect(page.locator('#hex-board.hex-board')).toBeVisible();
+    await expect(page.locator('#hex-status')).toContainText(/Current player/i);
+    await expect(page.locator('#hex-info')).toContainText(/Blue:/i);
+    await expect(page.locator('#hex-info')).toContainText(/Red:/i);
+    await expect(page.locator('#hex-info')).toContainText(/region/i);
+    await expect(page.locator('#hex-reset')).toBeVisible();
+  });
+
+  test('placing hex cells updates Blue/Red region counts', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const cells = page.locator('#hex-board .demo-hex-cell');
+    await expect(cells.first()).toBeVisible();
+    const count = await cells.count();
+    expect(count).toBeGreaterThan(4);
+
+    await cells.nth(0).click({ force: true });
+    await expect(
+      page.locator('#hex-board .demo-hex-cell.cell-blue').first()
+    ).toBeVisible();
+    await expect(page.locator('#hex-info')).toContainText(/Blue: 1 region/i);
+
+    await cells.nth(1).click({ force: true });
+    await expect(
+      page.locator('#hex-board .demo-hex-cell.cell-red').first()
+    ).toBeVisible();
+    await expect(page.locator('#hex-info')).toContainText(/Red: 1 region/i);
+    await expect(page.locator('#hex-status')).toContainText(/Current player/i);
+  });
+
+  test('hex reset clears pieces and restores Blue to move', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const cells = page.locator('#hex-board .demo-hex-cell');
+    await cells.nth(0).click({ force: true });
+    await cells.nth(2).click({ force: true });
+    await expect(
+      page.locator(
+        '#hex-board .demo-hex-cell.cell-blue, #hex-board .demo-hex-cell.cell-red'
+      )
+    ).not.toHaveCount(0);
+
+    await page.locator('#hex-reset').click();
+    await expect(
+      page.locator(
+        '#hex-board .demo-hex-cell.cell-blue, #hex-board .demo-hex-cell.cell-red'
+      )
+    ).toHaveCount(0);
+    await expect(page.locator('#hex-status')).toContainText(/Blue/i);
+    await expect(page.locator('#hex-info')).toContainText(/Blue: 0 region/i);
+    await expect(page.locator('#hex-info')).toContainText(/Red: 0 region/i);
+  });
+
+  test('occupied hex cell does not overwrite on second click', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const cell = page.locator('#hex-board .demo-hex-cell').nth(3);
+    await cell.click({ force: true });
+    await expect(cell).toHaveClass(/cell-blue/);
+    await cell.click({ force: true });
+    await expect(cell).toHaveClass(/cell-blue/);
+    await expect(cell).not.toHaveClass(/cell-red/);
+    await expect(
+      page.locator('#hex-board .demo-hex-cell.cell-blue')
+    ).toHaveCount(1);
+  });
+
+  test('alternating placements advance status player label', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    await expect(page.locator('#hex-status')).toContainText(/Blue/i);
+    await page.locator('#hex-board .demo-hex-cell').nth(0).click({
+      force: true,
+    });
+    await expect(page.locator('#hex-status')).toContainText(/Red/i);
+    await page.locator('#hex-board .demo-hex-cell').nth(1).click({
+      force: true,
+    });
+    await expect(page.locator('#hex-status')).toContainText(/Blue/i);
+  });
+
+  test('hex section heading and instructions stay mounted', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const section = page.locator('.alignment-demo-section').filter({
+      has: page.locator('#hex-board'),
+    });
+    await expect(section.locator('h3')).toContainText(/Hex/i);
+    await expect(section.locator('.demo-instructions')).toContainText(
+      /Blue connects top-bottom/i
+    );
+  });
+});
