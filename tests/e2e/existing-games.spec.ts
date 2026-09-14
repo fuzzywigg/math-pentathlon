@@ -3780,3 +3780,82 @@ test.describe('Wave 24 — alignment demo grid-alignment chrome', () => {
     await expect(page).toHaveURL(/#\/?$/);
   });
 });
+
+test.describe('Wave 25 — contiguous / fractions / expression chrome', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI"), .mode-option[data-mode="human-vs-ai"]'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('Frac Fact loads fraction choices (arithmetic path)', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/frac-fact');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Frac/i);
+    await expect(
+      page.locator('.frac-choices, .frac-choice, .frac-problem').first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold roll surfaces expression/dice chrome', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await startVsAi(page);
+    const roll = page.locator(
+      '.prime-roll-btn, button:has-text("Roll"), #roll-btn'
+    );
+    if ((await roll.count()) > 0) {
+      await roll.first().click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.prime-dice, .prime-expressions, .prime-board, .expression, .dice'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Contig roll offers expression slots or pass', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    await page.locator('.contig-roll-btn').click();
+    await expect(page.locator('.contig-dice-display')).toBeVisible();
+    await expect(
+      page.locator('.contig-expressions, .contig-pass-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Hex board chrome after start (contiguous win path host)', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Hex/i);
+    await expect(page.locator('.hex-board, svg').first()).toBeVisible();
+  });
+
+  test('Fraction Pinball quiz chrome remains after load', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await startVsAi(page);
+    await expect(page.locator('h1')).toContainText(/Pinball|Fraction/i);
+    await expect(
+      page
+        .locator(
+          '.pinball-board, .fp-board, .frac-choices, .fp-question, .fp-choices'
+        )
+        .first()
+    ).toBeVisible();
+  });
+});
