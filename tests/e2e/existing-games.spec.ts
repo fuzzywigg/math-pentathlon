@@ -3693,3 +3693,90 @@ test.describe('Wave 22 — tutorial runtime / apply-reject chrome', () => {
     await expect(page.locator('h1')).toContainText(/Prime/i);
   });
 });
+
+test.describe('Wave 24 — alignment demo grid-alignment chrome', () => {
+  test('alignment demo loads four-in-a-row / hex / potential sections', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    await expect(page.locator('h1')).toContainText(/Alignment/i);
+    await expect(page.locator('.alignment-demo')).toBeVisible();
+    await expect(page.locator('.alignment-demo-section')).toHaveCount(3);
+    await expect(page.locator('#four-board.four-board')).toBeVisible();
+    await expect(page.locator('#four-board .demo-cell').first()).toBeVisible();
+    await expect(page.locator('#four-status')).toContainText(/Current player/i);
+    await expect(page.locator('#four-reset')).toBeVisible();
+  });
+
+  test('four-in-a-row column drop updates cell and status chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const cell = page.locator('#four-board .demo-cell').first();
+    await expect(cell).toBeVisible();
+    await cell.click();
+    await expect(
+      page
+        .locator('#four-board .demo-cell.cell-x, #four-board .demo-cell.cell-o')
+        .first()
+    ).toBeVisible();
+    await expect(page.locator('#four-status')).toBeVisible();
+    await expect(page.locator('#four-info')).toContainText(/alignments/i);
+  });
+
+  test('four-in-a-row reset clears pieces and restores player status', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    await page.locator('#four-board .demo-cell').nth(3).click();
+    await page.locator('#four-board .demo-cell').nth(10).click();
+    await expect(
+      page.locator(
+        '#four-board .demo-cell.cell-x, #four-board .demo-cell.cell-o'
+      )
+    ).not.toHaveCount(0);
+    await page.locator('#four-reset').click();
+    await expect(
+      page.locator(
+        '#four-board .demo-cell.cell-x, #four-board .demo-cell.cell-o'
+      )
+    ).toHaveCount(0);
+    await expect(page.locator('#four-status')).toContainText(/Current player/i);
+  });
+
+  test('potential demo board cells and select interaction', async ({
+    page,
+  }) => {
+    await page.goto('/#/demo/alignment');
+    const potential = page.locator('.potential-board');
+    await expect(potential).toBeVisible();
+    const cell = potential.locator('.demo-cell').first();
+    await cell.click();
+    await expect(
+      potential
+        .locator('.demo-cell.cell-x, .demo-cell.cell-o, .selected-cell')
+        .first()
+    ).toBeVisible();
+  });
+
+  test('hex connect demo mounts hex cells', async ({ page }) => {
+    await page.goto('/#/demo/alignment');
+    await expect(
+      page.locator('.hex-board, .demo-hex-cell').first()
+    ).toBeVisible();
+    const hex = page.locator('.demo-hex-cell').first();
+    if ((await hex.count()) > 0) {
+      await hex.click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-board, .demo-hex-cell').first()
+    ).toBeVisible();
+  });
+
+  test('back link returns toward home chrome', async ({ page }) => {
+    await page.goto('/#/demo/alignment');
+    await expect(page.locator('.back-link')).toBeVisible();
+    await page.locator('.back-link').click();
+    await expect(page).toHaveURL(/#\/?$/);
+  });
+});
