@@ -12,7 +12,10 @@ async function dismissModeIfNeeded(page: Page) {
       'input[value="human-vs-human"], input[value="vs-human"]'
     );
     if (await human.count()) {
-      await human.first().check({ force: true }).catch(() => undefined);
+      await human
+        .first()
+        .check({ force: true })
+        .catch(() => undefined);
     }
     const start = page.locator('#start-game-btn');
     if (await start.isVisible().catch(() => false)) {

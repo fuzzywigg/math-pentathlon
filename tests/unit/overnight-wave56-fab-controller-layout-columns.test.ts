@@ -16,7 +16,9 @@ describe('Wave 56 fab — layout columns', () => {
     newGameVsHuman(container);
 
     expect(container.querySelector('.fab-game-area')).toBeTruthy();
-    expect(container.querySelector('.fab-left-column .fab-bar-pool')).toBeTruthy();
+    expect(
+      container.querySelector('.fab-left-column .fab-bar-pool')
+    ).toBeTruthy();
     expect(
       container.querySelector('.fab-right-column .fab-answer-board')
     ).toBeTruthy();

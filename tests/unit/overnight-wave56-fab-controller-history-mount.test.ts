@@ -31,10 +31,8 @@ describe('Wave 56 fab — history mount gate', () => {
     ctrl.update();
     expect(container.querySelector('.fab-history')).toBeTruthy();
     expect(
-      container.querySelector('.fab-section-header')?.parentElement?.className
-    ).toMatch(/fab-history/);
-    expect(container.querySelector('.fab-history .fab-section-header')?.textContent).toBe(
-      'Move History'
-    );
+      container.querySelector('.fab-history .fab-section-header')?.textContent
+    ).toBe('Move History');
+    expect(container.querySelector('.fab-history-move')).toBeTruthy();
   });
 });

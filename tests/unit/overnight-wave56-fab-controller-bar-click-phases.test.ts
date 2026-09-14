@@ -24,9 +24,11 @@ describe('Wave 56 fab — bar click phases', () => {
 
     const second = [
       ...container.querySelectorAll('.fab-bar-wrapper:not(.fab-bar-disabled)'),
-    ].find((el) => el !== first && !(el as HTMLElement).classList.contains('fab-bar-selected')) as
-      | HTMLElement
-      | undefined;
+    ].find(
+      (el) =>
+        el !== first &&
+        !(el as HTMLElement).classList.contains('fab-bar-selected')
+    ) as HTMLElement | undefined;
     expect(second).toBeTruthy();
     second!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(ctrl.state.phase).toBe('selectingOperation');
