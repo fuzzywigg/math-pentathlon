@@ -3693,3 +3693,78 @@ test.describe('Wave 22 — tutorial runtime / apply-reject chrome', () => {
     await expect(page.locator('h1')).toContainText(/Prime/i);
   });
 });
+
+test.describe('Wave 25 — shell / home / stats chrome', () => {
+  test('home hero exposes progress link and division tabs', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await expect(page.locator('.game-selector-hero h1')).toContainText(
+      /Math Pentathlon/i
+    );
+    await expect(page.locator('.hero-progress-link')).toBeVisible();
+    await expect(page.locator('.division-tab').first()).toBeVisible();
+    await expect(page.locator('.game-card').first()).toBeVisible();
+  });
+
+  test('Your Progress navigates to stats then back to games', async ({
+    page,
+  }) => {
+    await page.goto('/#/');
+    await page.locator('.hero-progress-link').click();
+    await expect(page).toHaveURL(/#\/stats/);
+    await expect(page.locator('.stats-dashboard h1')).toContainText(
+      /Your Progress/i
+    );
+    await page.locator('#back-btn').click();
+    await expect(page).toHaveURL(/#\/?$/);
+    await expect(page.locator('.game-selector-hero')).toBeVisible();
+  });
+
+  test('division tab opens matching accordion section', async ({ page }) => {
+    await page.goto('/#/');
+    const tabs = page.locator('.division-tab');
+    const count = await tabs.count();
+    if (count < 2) {
+      test.skip();
+      return;
+    }
+    const second = tabs.nth(1);
+    const division = await second.getAttribute('data-division');
+    await second.click();
+    await expect(second).toHaveClass(/active/);
+    await expect(
+      page.locator(
+        `.division-accordion.accordion-open[data-division="${division}"]`
+      )
+    ).toBeVisible();
+  });
+
+  test('Hex shell: help Escape + new-game mode chrome', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await expect(page.locator('#help-btn')).toBeVisible();
+    await page.locator('#help-btn').click();
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+
+    await page.locator('#new-game-btn').click();
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    const vsAi = page.locator('.mode-option[data-mode="human-vs-ai"]');
+    if ((await vsAi.count()) > 0) {
+      await vsAi.click();
+    }
+    await page.locator('#start-game-btn').click();
+    await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
+    await expect(page.locator('h1')).toContainText(/Hex/i);
+  });
+
+  test('available game card from home reaches game title', async ({ page }) => {
+    await page.goto('/#/');
+    const card = page.locator('.game-card:not(.game-card-disabled)').first();
+    await expect(card).toBeVisible();
+    await card.click();
+    await expect(page).toHaveURL(/#\/game\//);
+    await expect(page.locator('.game-header h1, h1').first()).toBeVisible();
+  });
+});
