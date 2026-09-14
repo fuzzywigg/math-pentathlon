@@ -46,7 +46,7 @@ test.describe('Wave 56 leftover — attr tip chrome', () => {
 
 for (const game of [
   { id: 'queens-guards', sel: '.qg-board-container, .qg-status, svg[role]' },
-  { id: 'sum-dominoes', sel: '.sd-board, .sd-hand, .sd-scores' },
+  { id: 'sum-dominoes', sel: '.sd-board, .sd-hand-label, .sd-dice-area' },
   { id: 'pent-em-in', sel: '.pent-board, .pent-piece-selector' },
   { id: 'prime-gold', sel: '.pg-board, .pg-board-container, .pg-move-history' },
 ] as const) {
