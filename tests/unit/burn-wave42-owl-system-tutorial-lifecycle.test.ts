@@ -40,9 +40,9 @@ describe('Wave 42 owl-system — tutorial lifecycle', () => {
   it('onTutorialComplete marks storage and emits complete', () => {
     const types: string[] = [];
     const unsub = owlSystem.getEvents().on('*', (e) => types.push(e.type));
-    expect(storage.isTutorialCompleted(gameId)).toBe(false);
+    expect(storage.hasTutorialCompleted(gameId)).toBe(false);
     owlSystem.onTutorialComplete(gameId);
-    expect(storage.isTutorialCompleted(gameId)).toBe(true);
+    expect(storage.hasTutorialCompleted(gameId)).toBe(true);
     expect(types).toContain('tutorial:complete');
     unsub();
   });
@@ -56,14 +56,21 @@ describe('Wave 42 owl-system — tutorial lifecycle', () => {
   });
 
   it('tutorial start queues a message when enabled', async () => {
+    // speakNow clears stuck isProcessingQueue left by prior fake-timer cases
+    owlSystem.speakNow('w42-queue-reset', 'happy');
+    await vi.advanceTimersByTimeAsync(30_000);
+    owlSystem.dismissMessage();
+    expect(owlSystem.getState().message).toBeNull();
+
     owlSystem.onTutorialStart(gameId);
-    await vi.advanceTimersByTimeAsync(50);
+    await vi.advanceTimersByTimeAsync(0);
     expect(owlSystem.getState().message).toBeTruthy();
+    expect(owlSystem.getState().message?.category).toBe('tutorial:start');
   });
 
   it('tutorial complete is idempotent in storage', () => {
     owlSystem.onTutorialComplete(gameId);
     owlSystem.onTutorialComplete(gameId);
-    expect(storage.isTutorialCompleted(gameId)).toBe(true);
+    expect(storage.hasTutorialCompleted(gameId)).toBe(true);
   });
 });

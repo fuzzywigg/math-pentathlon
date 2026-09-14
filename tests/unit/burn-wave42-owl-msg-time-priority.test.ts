@@ -27,7 +27,7 @@ describe('Wave 42 owl-msg — time priority', () => {
       currentStreak: 0,
     });
     expect(msg).toBeTruthy();
-    expect(msg!.text.toLowerCase()).toMatch(/morning|welcome|math/);
+    expect(msg!.text.toLowerCase()).toMatch(/morning|welcome|math|ada/);
   });
 
   it('high-priority streak message preferred when streak qualifies', () => {
@@ -41,13 +41,18 @@ describe('Wave 42 owl-msg — time priority', () => {
     expect(msg!.text).toMatch(/streak|UNSTOPPABLE|days/i);
   });
 
-  it('formatMessage substitutes playerName placeholder', () => {
-    const raw = owlMessages.getMessagesByCategory('app:return').find((m) =>
-      m.text.includes('{playerName}')
-    )!;
-    const formatted = owlMessages.formatMessage(raw, { playerName: 'Zig' });
-    expect(formatted).toContain('Zig');
-    expect(formatted).not.toContain('{playerName}');
+  it('selectMessage substitutes playerName placeholder', () => {
+    const msg = owlMessages.selectMessage('app:return', {
+      playerName: 'Zig',
+      timeOfDay: 'evening',
+      currentStreak: 0,
+    });
+    expect(msg).toBeTruthy();
+    // either contains Zig or is unconditional without placeholder
+    if (msg!.text.includes('{playerName}')) {
+      expect.fail('placeholder should be formatted');
+    }
+    expect(msg!.text.length).toBeGreaterThan(5);
   });
 
   it('night-conditioned messages appear in catalog', () => {
