@@ -1,6 +1,7 @@
 /**
  * Wave 42 — Fraction Pinball submitAnswer phase / showResult identity.
  * Beyond wave41 gameOver identity. Tests-only.
+ * Mock Math.random only after startGame (hitRandomTarget path).
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/fraction-pinball/types';
@@ -20,8 +21,8 @@ describe('Wave 42 pinball — submit phase leftovers', () => {
   });
 
   it('correct submit sets isCorrect and selectedAnswer', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
     const state = startGame(createInitialState());
+    vi.spyOn(Math, 'random').mockReturnValue(0);
     const ans = state.currentChallenge!.correctAnswer;
     const next = submitAnswer(state, ans);
     expect(next.isCorrect).toBe(true);

@@ -1,15 +1,26 @@
 /**
  * Wave 42 — Fraction Pinball generateChallenge type/id leftovers.
  * Beyond wave41 even/odd type. Tests-only.
+ * Note: Math.random must vary during generateChallenge (wrong-fill loops).
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { generateChallenge } from '../../src/games/fraction-pinball/rules';
 
 afterEach(() => vi.restoreAllMocks());
 
+function varyingRandom() {
+  let i = 0;
+  const seq = [0.12, 0.34, 0.56, 0.78, 0.09, 0.91, 0.23, 0.45, 0.67, 0.89, 0.15, 0.72];
+  vi.spyOn(Math, 'random').mockImplementation(() => {
+    const v = seq[i % seq.length];
+    i++;
+    return v;
+  });
+}
+
 describe('Wave 42 pinball — generateChallenge leftovers', () => {
   it('challenge id embeds the challengeNumber', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.3);
+    varyingRandom();
     for (const n of [1, 4, 10]) {
       const c = generateChallenge(n);
       expect(c.id).toBe(`challenge-${n}`);
@@ -19,7 +30,7 @@ describe('Wave 42 pinball — generateChallenge leftovers', () => {
   });
 
   it('fractionToDecimal correctAnswer is a decimal-looking string', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.15);
+    varyingRandom();
     const c = generateChallenge(4);
     expect(c.type).toBe('fractionToDecimal');
     expect(c.correctAnswer).not.toMatch(/\//);
@@ -27,7 +38,7 @@ describe('Wave 42 pinball — generateChallenge leftovers', () => {
   });
 
   it('decimalToFraction correctAnswer includes slash or integer', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.4);
+    varyingRandom();
     const c = generateChallenge(5);
     expect(c.type).toBe('decimalToFraction');
     expect(c.answerChoices).toContain(c.correctAnswer);

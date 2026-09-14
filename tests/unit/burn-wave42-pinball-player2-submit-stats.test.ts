@@ -1,6 +1,6 @@
 /**
  * Wave 42 — Fraction Pinball player2 submit + getPlayerStats.
- * Tests-only.
+ * Tests-only. Mock Math.random only after startGame.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
@@ -16,12 +16,12 @@ afterEach(() => vi.restoreAllMocks());
 
 describe('Wave 42 pinball — player2 submit stats', () => {
   it('player2 correct bumps only player2 stats', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0);
     let state = startGame(createInitialState());
     state = {
       ...state,
       currentPlayer: 'player2',
     };
+    vi.spyOn(Math, 'random').mockReturnValue(0);
     const ans = state.currentChallenge!.correctAnswer;
     const next = submitAnswer(state, ans);
     expect(getPlayerStats(next, 'player2').correctAnswers).toBe(1);

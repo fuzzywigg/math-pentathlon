@@ -1,8 +1,8 @@
 /**
  * Wave 42 — Fraction Pinball startGame leftovers.
- * Tests-only.
+ * Tests-only. Mock Math.random only after generateChallenge/startGame.
  */
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   createInitialState,
   INITIAL_BALLS,
@@ -10,11 +10,8 @@ import {
 } from '../../src/games/fraction-pinball/types';
 import { startGame, checkAnswer } from '../../src/games/fraction-pinball/rules';
 
-afterEach(() => vi.restoreAllMocks());
-
 describe('Wave 42 pinball — startGame leftovers', () => {
   it('sets answering with challenge-1 type decimalToFraction', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.2);
     const next = startGame(createInitialState());
     expect(next.phase).toBe('answering');
     expect(next.currentChallenge!.id).toBe('challenge-1');
