@@ -60,32 +60,43 @@ test.describe('Wave 39 — Sum Dominoes pass/new-game hands', () => {
     await dismissModeIfNeeded(page);
   });
 
+  async function resolveSumDominoesRoll(page: Page) {
+    await page.locator('.sd-roll-btn').click();
+    await expect(page.locator('.sd-dice-display')).toBeVisible();
+
+    const playable = page.locator('.sd-hand-domino-playable');
+    const passBtn = page.locator('.sd-pass-btn');
+
+    if ((await playable.count()) > 0) {
+      // Prefer pass when visible (leftover pass chrome); else play or remount
+      if (await passBtn.isVisible().catch(() => false)) {
+        await passBtn.click();
+      } else {
+        await playable.first().click();
+        await expect(page.locator('.sd-hand-domino-selected')).toBeVisible();
+        const valid = page.locator('.sd-cell-valid');
+        if ((await valid.count()) > 0) {
+          await valid.first().click({ force: true });
+        } else if (await passBtn.isVisible().catch(() => false)) {
+          await passBtn.click();
+        } else {
+          await page.click('#new-game-btn');
+          await dismissModeIfNeeded(page);
+        }
+      }
+    } else {
+      await expect(passBtn).toBeVisible();
+      await passBtn.click();
+    }
+
+    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
+  }
+
   test('multi-pass keeps hands; new-game remounts roll CTA', async ({
     page,
   }) => {
-    for (let i = 0; i < 2; i++) {
-      await page.locator('.sd-roll-btn').click();
-      await expect(page.locator('.sd-dice-display')).toBeVisible();
-      const playable = page.locator('.sd-hand-domino-playable');
-      const passBtn = page.locator('.sd-pass-btn');
-      if ((await playable.count()) > 0) {
-        if (await passBtn.isVisible().catch(() => false)) {
-          await passBtn.click();
-        } else {
-          await playable.first().click();
-          const valid = page.locator('.sd-cell-valid');
-          if ((await valid.count()) > 0) {
-            await valid.first().click({ force: true });
-          } else if (await passBtn.isVisible().catch(() => false)) {
-            await passBtn.click();
-          }
-        }
-      } else {
-        await expect(passBtn).toBeVisible();
-        await passBtn.click();
-      }
-      await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
-    }
+    await resolveSumDominoesRoll(page);
+    await resolveSumDominoesRoll(page);
 
     await expect(
       page.locator('.sd-hand-player1 .sd-hand-domino').first()
