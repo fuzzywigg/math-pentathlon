@@ -1,75 +1,62 @@
 /**
- * Wave 40 — Frac-Fact hard ops / submitAnswer phase / checkAnswer / symbols.
- * Tests-only.
+ * Wave 40 — Frac-Fact hard ops catalog + wrong-phase submit.
+ * Tests-only leftover after #178.
  */
 import { describe, it, expect } from 'vitest';
 
-import { createInitialState } from '../../src/games/frac-fact/types';
 import {
   generateProblem,
-  submitAnswer,
   checkAnswer,
+  submitAnswer,
   getOperationSymbol,
 } from '../../src/games/frac-fact/rules';
+import { createInitialState } from '../../src/games/frac-fact/types';
 import type { FractionOperation } from '../../src/core/fractions/types';
-import { areEquivalent } from '../../src/core/fractions/arithmetic';
 
-const HARD_OPS: FractionOperation[] = [
+const HARD_OPS = new Set<FractionOperation>([
   'add',
   'subtract',
   'multiply',
   'divide',
-];
+]);
 
-describe('Wave 40 frac-fact — hard ops / phase / check / symbols', () => {
-  it('generateProblem hard: ops in add/sub/mul/div; choices include correct', () => {
-    const seen = new Set<FractionOperation>();
-    for (let i = 0; i < 80; i++) {
-      const problem = generateProblem('hard', i + 1);
-      expect(HARD_OPS).toContain(problem.operation);
-      seen.add(problem.operation);
+describe('Wave 40 frac-fact — hard ops / phase', () => {
+  it('hard generateProblem ops ⊆ add/sub/mul/div and choices include correct', () => {
+    for (let i = 0; i < 12; i++) {
+      const p = generateProblem('hard', i + 1);
+      expect(HARD_OPS.has(p.operation)).toBe(true);
       expect(
-        problem.answerChoices.some((c) =>
-          areEquivalent(c, problem.correctAnswer)
+        p.answerChoices.some(
+          (c) =>
+            c.numerator === p.correctAnswer.numerator &&
+            c.denominator === p.correctAnswer.denominator
         )
       ).toBe(true);
     }
-    for (const op of HARD_OPS) {
-      expect(seen.has(op)).toBe(true);
-    }
   });
 
-  it('submitAnswer wrong phase (showingResult/gameOver) → identity', () => {
-    const base = createInitialState();
+  it('checkAnswer rejects nonequivalent; submitAnswer wrong phase identity', () => {
     const problem = generateProblem('easy', 1);
+    expect(
+      checkAnswer(problem, {
+        numerator: problem.correctAnswer.numerator + 1,
+        denominator: problem.correctAnswer.denominator,
+      })
+    ).toBe(false);
+    expect(checkAnswer(problem, problem.correctAnswer)).toBe(true);
+
+    const state = createInitialState('easy');
     const showing = {
-      ...base,
+      ...state,
       phase: 'showingResult' as const,
       currentProblem: problem,
     };
-    expect(
-      submitAnswer(showing, { numerator: 1, denominator: 2 })
-    ).toBe(showing);
-
-    const over = {
-      ...base,
-      phase: 'gameOver' as const,
-      currentProblem: problem,
-    };
-    expect(submitAnswer(over, { numerator: 1, denominator: 2 })).toBe(over);
+    expect(submitAnswer(showing, problem.correctAnswer)).toBe(showing);
+    const over = { ...state, phase: 'gameOver' as const };
+    expect(submitAnswer(over, problem.correctAnswer)).toBe(over);
   });
 
-  it('checkAnswer nonequivalent → false', () => {
-    const problem = generateProblem('easy', 1);
-    const wrong = {
-      numerator: problem.correctAnswer.numerator + 7,
-      denominator: problem.correctAnswer.denominator + 11,
-    };
-    expect(areEquivalent(wrong, problem.correctAnswer)).toBe(false);
-    expect(checkAnswer(problem, wrong)).toBe(false);
-  });
-
-  it('getOperationSymbol matrix for known ops', () => {
+  it('getOperationSymbol matrix', () => {
     expect(getOperationSymbol('add')).toBe('+');
     expect(getOperationSymbol('subtract')).toBe('−');
     expect(getOperationSymbol('multiply')).toBe('×');

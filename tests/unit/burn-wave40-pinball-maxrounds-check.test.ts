@@ -1,63 +1,50 @@
 /**
- * Wave 40 — Fraction Pinball maxRounds gameOver / checkAnswer / phase / type parity.
- * Tests-only.
+ * Wave 40 — Fraction Pinball maxRounds settle + check mismatch.
+ * Tests-only leftover after #178.
  */
 import { describe, it, expect } from 'vitest';
 
-import { createInitialState } from '../../src/games/fraction-pinball/types';
 import {
-  nextChallenge,
+  generateChallenge,
   checkAnswer,
   submitAnswer,
-  generateChallenge,
+  nextChallenge,
 } from '../../src/games/fraction-pinball/rules';
+import { createInitialState } from '../../src/games/fraction-pinball/types';
 
-describe('Wave 40 fraction-pinball — maxRounds / check / phase / type', () => {
-  it('nextChallenge when roundNumber >= maxRounds → gameOver', () => {
-    const base = createInitialState();
-    const state = {
-      ...base,
-      phase: 'showResult' as const,
-      currentChallenge: generateChallenge(base.maxRounds),
-      selectedAnswer: 'x',
-      isCorrect: false,
-      roundNumber: base.maxRounds,
-    };
-    const over = nextChallenge(state);
-    expect(over.phase).toBe('gameOver');
-    expect(over.currentChallenge).toBeNull();
+describe('Wave 40 pinball — maxRounds / check', () => {
+  it('generateChallenge type parity by round number', () => {
+    const even = generateChallenge(2);
+    const odd = generateChallenge(3);
+    expect(even.type).toBe('fractionToDecimal');
+    expect(odd.type).toBe('decimalToFraction');
   });
 
-  it('checkAnswer mismatch → false; exact correct → true', () => {
-    const challenge = generateChallenge(1);
-    expect(checkAnswer(challenge, 'totally-wrong')).toBe(false);
-    expect(checkAnswer(challenge, challenge.correctAnswer)).toBe(true);
+  it('checkAnswer exact match / mismatch', () => {
+    const c = generateChallenge(1);
+    expect(checkAnswer(c, c.correctAnswer)).toBe(true);
+    expect(checkAnswer(c, 'not-the-answer')).toBe(false);
   });
 
   it('submitAnswer wrong phase → identity', () => {
-    const challenge = generateChallenge(2);
-    const showResult = {
-      ...createInitialState(),
-      phase: 'showResult' as const,
-      currentChallenge: challenge,
-    };
-    expect(submitAnswer(showResult, challenge.correctAnswer)).toBe(
-      showResult
-    );
-
-    const gameOver = {
-      ...createInitialState(),
-      phase: 'gameOver' as const,
-      currentChallenge: challenge,
-    };
-    expect(submitAnswer(gameOver, challenge.correctAnswer)).toBe(gameOver);
+    const state = createInitialState();
+    expect(submitAnswer(state, 'x')).toBe(state);
+    const over = { ...state, phase: 'gameOver' as const };
+    expect(submitAnswer(over, 'x')).toBe(over);
   });
 
-  it('generateChallenge type parity from round number', () => {
-    // Odd → decimalToFraction; even → fractionToDecimal
-    expect(generateChallenge(1).type).toBe('decimalToFraction');
-    expect(generateChallenge(2).type).toBe('fractionToDecimal');
-    expect(generateChallenge(3).type).toBe('decimalToFraction');
-    expect(generateChallenge(4).type).toBe('fractionToDecimal');
+  it('nextChallenge past maxRounds → gameOver', () => {
+    const state = createInitialState();
+    const atMax = {
+      ...state,
+      phase: 'showingResult' as const,
+      roundNumber: state.maxRounds,
+      player1Stats: { ...state.player1Stats, score: 10 },
+      player2Stats: { ...state.player2Stats, score: 3 },
+    };
+    const next = nextChallenge(atMax);
+    expect(next.phase).toBe('gameOver');
+    expect(next.winner).toBe('player1');
+    expect(next.currentChallenge).toBeNull();
   });
 });

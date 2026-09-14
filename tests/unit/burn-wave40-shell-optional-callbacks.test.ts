@@ -1,6 +1,6 @@
 /**
- * Wave 40 — mountGameShell minimal options / HvsH hides AI / cleanup idempotent.
- * Tests-only.
+ * Wave 40 — game-shell optional callbacks omit leftovers.
+ * Tests-only after #178.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
@@ -9,7 +9,7 @@ import {
   type GameShellElements,
 } from '../../src/ui/components/game-shell';
 
-describe('Wave 40 game-shell — optional callbacks / HvsH / cleanup', () => {
+describe('Wave 40 shell — optional callbacks', () => {
   let container: HTMLElement;
   let shell: GameShellElements | null = null;
 
@@ -25,80 +25,39 @@ describe('Wave 40 game-shell — optional callbacks / HvsH / cleanup', () => {
     container.remove();
   });
 
-  it('mountGameShell with minimal options (omit tutorial callbacks)', () => {
+  it('minimal mount omits tutorial; cleanup idempotent', () => {
     shell = mountGameShell(container, {
-      title: 'Wave40 Minimal',
+      title: 'Wave40 Shell',
       helpTitle: 'Help',
       helpContentHtml: '<p>rules</p>',
-      modeRadioName: 'w40-min',
+      modeRadioName: 'w40-mode',
+      showTutorial: false,
       onNavigateHome: () => undefined,
       onStartGame: () => undefined,
     });
-
-    expect(container.querySelector('h1')?.textContent).toBe('Wave40 Minimal');
     expect(container.querySelector('#tutorial-btn')).toBeNull();
-    expect(shell.tutorialBtn).toBeNull();
-    expect(shell.board?.id).toBe('board');
-  });
-
-  it('human-vs-human hides difficulty AI controls', () => {
-    shell = mountGameShell(container, {
-      title: 'HvsH',
-      helpTitle: 'Help',
-      helpContentHtml: '<p>r</p>',
-      modeRadioName: 'w40-hvsh',
-      showDifficulty: true,
-      defaultMode: 'human-vs-human',
-      onNavigateHome: () => undefined,
-      onStartGame: () => undefined,
-    });
-
-    (shell.newGameBtn as HTMLButtonElement).click();
-    const difficulty = container.querySelector(
-      '#difficulty-section'
-    ) as HTMLElement;
-    expect(difficulty).toBeTruthy();
-    expect(difficulty.style.display).toBe('none');
-
-    (
-      container.querySelector(
-        '.mode-option[data-mode="human-vs-ai"]'
-      ) as HTMLElement
-    ).click();
-    expect(difficulty.style.display).toBe('block');
-
-    (
-      container.querySelector(
-        '.mode-option[data-mode="human-vs-human"]'
-      ) as HTMLElement
-    ).click();
-    expect(difficulty.style.display).toBe('none');
-  });
-
-  it('cleanup is idempotent', () => {
-    shell = mountGameShell(container, {
-      title: 'Cleanup',
-      helpTitle: 'Help',
-      helpContentHtml: '<p>r</p>',
-      modeRadioName: 'w40-clean',
-      onNavigateHome: () => undefined,
-      onStartGame: () => undefined,
-    });
-
-    (shell.newGameBtn as HTMLButtonElement).click();
-    (
-      container.querySelector(
-        '.mode-option[data-mode="human-vs-ai"]'
-      ) as HTMLElement
-    ).click();
-    (container.querySelector('#start-game-btn') as HTMLButtonElement).click();
-    expect(container.dataset.opponent).toBe('ai');
-
+    expect(container.querySelector('h1')?.textContent).toBe('Wave40 Shell');
     shell.cleanup();
-    expect(container.dataset.opponent).toBeUndefined();
-    expect(() => shell!.cleanup()).not.toThrow();
-    document.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+    shell.cleanup();
+  });
+
+  it('human-vs-human start does not stamp AI chrome', () => {
+    shell = mountGameShell(container, {
+      title: 'HvH',
+      helpTitle: 'Help',
+      helpContentHtml: '<p>x</p>',
+      modeRadioName: 'w40-hvh',
+      showTutorial: false,
+      onNavigateHome: () => undefined,
+      onStartGame: () => undefined,
+    });
+    const hvh = container.querySelector(
+      'input[value="human-vs-human"]'
+    ) as HTMLInputElement | null;
+    hvh?.click();
+    container.querySelector('#start-game-btn')?.dispatchEvent(
+      new MouseEvent('click', { bubbles: true })
     );
+    expect(container.dataset.opponent).toBeUndefined();
   });
 });

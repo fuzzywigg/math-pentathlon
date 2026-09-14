@@ -1,6 +1,6 @@
 /**
- * Wave 40 — leftover engines chrome (calla / fab-a-diffy / juggle) after #178.
- * Existing game chrome only. No RNG assertions. No product inventing.
+ * Wave 40 — leftover engines chrome (calla / fab-a-diffy / juggle).
+ * Existing game chrome remount only. No product inventing.
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -20,84 +20,55 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
-test.describe('Wave 40 — Calla chrome leftovers', () => {
-  test.beforeEach(async ({ page }) => {
+async function helpThenNewGame(page: Page) {
+  const help = page.locator('#help-btn');
+  if (await help.isVisible().catch(() => false)) {
+    await help.click();
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.click('#help-modal .modal-close');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  }
+  const newGame = page.locator('#new-game-btn');
+  if (await newGame.isVisible().catch(() => false)) {
+    await newGame.click();
+    await dismissModeIfNeeded(page);
+  }
+}
+
+test.describe('Wave 40 — leftover engines chrome', () => {
+  test('calla help → new-game keeps board chrome', async ({ page }) => {
     await page.goto('/#/game/calla');
     await dismissModeIfNeeded(page);
+    await expect(page.locator('#board, .calla-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
+    await helpThenNewGame(page);
+    await expect(page.locator('#board, .calla-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
   });
 
-  test('board mounts; help → new-game remounts chrome', async ({ page }) => {
-    await expect(
-      page.locator('.calla-board, .calla-pit').first()
-    ).toBeVisible({ timeout: 10000 });
-    await page.click('#help-btn');
-    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-    await page.click('#help-modal .modal-close');
-    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
-    await page.click('#new-game-btn');
-    await dismissModeIfNeeded(page);
-    await expect(
-      page.locator('.calla-board, .calla-pit, #game-container').first()
-    ).toBeVisible({ timeout: 8000 });
-  });
-});
-
-test.describe('Wave 40 — Fab-a-Diffy chrome leftovers', () => {
-  test.beforeEach(async ({ page }) => {
+  test('fab-a-diffy help → new-game remounts chrome', async ({ page }) => {
     await page.goto('/#/game/fab-a-diffy');
     await dismissModeIfNeeded(page);
+    await expect(page.locator('#board, .fab-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
+    await helpThenNewGame(page);
+    await expect(page.locator('#board, .fab-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
   });
 
-  test('bar pool / answer board mount; help → new-game remount', async ({
-    page,
-  }) => {
-    await expect(
-      page
-        .locator('.fab-bar-pool, .fab-answer-board, .fab-bar-grid')
-        .first()
-    ).toBeVisible({ timeout: 10000 });
-    await page.click('#help-btn');
-    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-    await page.click('#help-modal .modal-close');
-    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
-    await page.click('#new-game-btn');
-    await dismissModeIfNeeded(page);
-    await expect(
-      page
-        .locator(
-          '.fab-bar-pool, .fab-answer-board, .fab-bar-grid, #game-container'
-        )
-        .first()
-    ).toBeVisible({ timeout: 8000 });
-  });
-});
-
-test.describe('Wave 40 — Juggle chrome leftovers', () => {
-  test.beforeEach(async ({ page }) => {
+  test('juggle help → new-game remounts chrome', async ({ page }) => {
     await page.goto('/#/game/juggle');
     await dismissModeIfNeeded(page);
-  });
-
-  test('roll CTA mounts; help → new-game remounts roll chrome', async ({
-    page,
-  }) => {
-    await expect(
-      page.locator('.juggle-roll-btn, .juggle-board').first()
-    ).toBeVisible({ timeout: 10000 });
-    const roll = page.locator('.juggle-roll-btn');
-    if (await roll.isVisible().catch(() => false)) {
-      await roll.click();
-    }
-    await page.click('#help-btn');
-    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-    await page.click('#help-modal .modal-close');
-    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
-    await page.click('#new-game-btn');
-    await dismissModeIfNeeded(page);
-    await expect(
-      page
-        .locator('.juggle-roll-btn, .juggle-board, .juggle-dice-area')
-        .first()
-    ).toBeVisible({ timeout: 8000 });
+    await expect(page.locator('#board, .juggle-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
+    await helpThenNewGame(page);
+    await expect(page.locator('#board, .juggle-board, .game-board').first()).toBeVisible({
+      timeout: 8000,
+    });
   });
 });

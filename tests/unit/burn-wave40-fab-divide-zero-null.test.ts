@@ -26,7 +26,8 @@ describe('Wave 40 fab — divide-zero / unknown op', () => {
       { numerator: 1, denominator: 3 },
       'add'
     );
-    expect(r).toEqual({ numerator: 5, denominator: 6 });
+    expect(r?.numerator).toBe(5);
+    expect(r?.denominator).toBe(6);
   });
 
   it('calculateResult unknown operation returns null', () => {

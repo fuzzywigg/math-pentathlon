@@ -2,23 +2,31 @@
  * Wave 40 — Owl message compareNumber lt/gt/lte/eq/gte operator matrix.
  * Tests-only leftover after #178. Uses addMessage only (no product inventing).
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { owlMessages } from '../../src/core/owl/owl-messages';
 import type { OwlMessage } from '../../src/core/owl/owl-messages';
+import { storage } from '../../src/core/storage';
 
-const CAT = 'milestone:reached' as const;
+const CAT = 'streak:update' as const;
+/** Library streak:update uses eq 2 / eq 7 — stay far away. */
+const STREAK = 404;
 
-function wipeCategory() {
-  // Manager has no remove; override by adding unique high-priority ids and
-  // selecting with contexts that only match our injected messages.
-}
+beforeEach(() => {
+  localStorage.clear();
+  storage.resetAll();
+  vi.spyOn(Math, 'random').mockReturnValue(0);
+  // Hide unconditional library streak-record so our injects dominate the pool
+  storage.markMessageSeen('streak-record-1');
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+  localStorage.clear();
+  storage.resetAll();
+});
 
 describe('Wave 40 owl — streak operator matrix', () => {
-  beforeEach(() => {
-    wipeCategory();
-  });
-
   it('lt / gt / lte / gte / eq filter streak correctly', () => {
     const stamp = Date.now();
     const msgs: OwlMessage[] = [
@@ -27,35 +35,35 @@ describe('Wave 40 owl — streak operator matrix', () => {
         category: CAT,
         priority: 'high',
         text: 'lt',
-        conditions: [{ type: 'streak', value: 5, operator: 'lt' }],
+        conditions: [{ type: 'streak', value: STREAK, operator: 'lt' }],
       },
       {
         id: `w40-gt-${stamp}`,
         category: CAT,
         priority: 'high',
         text: 'gt',
-        conditions: [{ type: 'streak', value: 5, operator: 'gt' }],
+        conditions: [{ type: 'streak', value: STREAK, operator: 'gt' }],
       },
       {
         id: `w40-lte-${stamp}`,
         category: CAT,
         priority: 'high',
         text: 'lte',
-        conditions: [{ type: 'streak', value: 5, operator: 'lte' }],
+        conditions: [{ type: 'streak', value: STREAK, operator: 'lte' }],
       },
       {
         id: `w40-gte-${stamp}`,
         category: CAT,
         priority: 'high',
         text: 'gte',
-        conditions: [{ type: 'streak', value: 5, operator: 'gte' }],
+        conditions: [{ type: 'streak', value: STREAK, operator: 'gte' }],
       },
       {
         id: `w40-eq-${stamp}`,
         category: CAT,
         priority: 'high',
         text: 'eq',
-        conditions: [{ type: 'streak', value: 5, operator: 'eq' }],
+        conditions: [{ type: 'streak', value: STREAK, operator: 'eq' }],
       },
     ];
     for (const m of msgs) owlMessages.addMessage(m);
@@ -63,37 +71,39 @@ describe('Wave 40 owl — streak operator matrix', () => {
     const pick = (streak: number) =>
       owlMessages.selectMessage(CAT, { currentStreak: streak });
 
-    // streak 3: lt + lte
-    const s3 = pick(3);
-    expect(s3).toBeTruthy();
-    expect(['lt', 'lte']).toContain(s3!.text);
+    const below = pick(STREAK - 1);
+    expect(below).toBeTruthy();
+    expect(['lt', 'lte']).toContain(below!.text);
 
-    // streak 5: lte + gte + eq
-    const s5 = pick(5);
-    expect(s5).toBeTruthy();
-    expect(['lte', 'gte', 'eq']).toContain(s5!.text);
+    const exact = pick(STREAK);
+    expect(exact).toBeTruthy();
+    expect(['lte', 'gte', 'eq']).toContain(exact!.text);
 
-    // streak 8: gt + gte
-    const s8 = pick(8);
-    expect(s8).toBeTruthy();
-    expect(['gt', 'gte']).toContain(s8!.text);
+    const above = pick(STREAK + 1);
+    expect(above).toBeTruthy();
+    expect(['gt', 'gte']).toContain(above!.text);
   });
 
   it('default operator behaves as eq when omitted', () => {
-    const id = `w40-default-eq-${Date.now()}`;
+    const uniqueGames = 888002;
     owlMessages.addMessage({
-      id,
+      id: `w40-default-eq-${Date.now()}`,
       category: CAT,
       priority: 'high',
       text: 'default-eq',
-      conditions: [{ type: 'streak', value: 42 }],
+      conditions: [{ type: 'gamesPlayed', value: uniqueGames }],
     });
-    const hit = owlMessages.selectMessage(CAT, { currentStreak: 42 });
-    expect(hit?.text).toBe('default-eq');
-    const miss = owlMessages.selectMessage(CAT, { currentStreak: 41 });
-    // May pick other milestone messages; just assert default-eq not forced
-    if (miss) {
-      expect(miss.id === id ? miss.text : miss.text).toBeTruthy();
+    // Mark prior streak injects seen so gamesPlayed message is preferred
+    for (const m of owlMessages.getMessagesByCategory(CAT)) {
+      if (m.id.startsWith('w40-') && m.text !== 'default-eq') {
+        storage.markMessageSeen(m.id);
+      }
     }
+    storage.markMessageSeen('streak-record-1');
+    const hit = owlMessages.selectMessage(CAT, {
+      gamesPlayedThisGame: uniqueGames,
+      currentStreak: 0,
+    });
+    expect(hit?.text).toBe('default-eq');
   });
 });

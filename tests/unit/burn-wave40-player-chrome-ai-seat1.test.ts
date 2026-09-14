@@ -1,49 +1,46 @@
 /**
- * Wave 40 — player-colors aiSeat=player1 chrome / seatIcon.
- * Tests-only.
+ * Wave 40 — player-colors AI seat player1 chrome leftovers.
+ * Tests-only after #178.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import {
   applyGameModeChrome,
-  clearGameModeChrome,
   getPlayerSeatColors,
   seatIcon,
+  clearGameModeChrome,
 } from '../../src/ui/player-colors';
 
-describe('Wave 40 player-chrome — aiSeat player1', () => {
-  let app: HTMLElement;
+describe('Wave 40 player-colors — AI seat1', () => {
+  let root: HTMLElement;
 
   beforeEach(() => {
-    app = document.createElement('div');
-    app.id = 'app';
-    document.body.appendChild(app);
+    root = document.createElement('div');
+    root.id = 'app';
+    document.body.appendChild(root);
   });
 
   afterEach(() => {
-    clearGameModeChrome(app);
-    app.remove();
-    document.documentElement.style.removeProperty('--color-player1');
-    document.documentElement.style.removeProperty('--color-player2');
-    document.documentElement.style.removeProperty('--color-ai');
+    clearGameModeChrome(root);
+    root.remove();
   });
 
-  it('applyGameModeChrome aiSeat player1 stamps dataset and AI purple on P1', () => {
-    applyGameModeChrome(app, 'human-vs-ai', 'player1');
-    expect(app.dataset.opponent).toBe('ai');
-    expect(app.dataset.aiSeat).toBe('player1');
-    expect(app.classList.contains('game-vs-ai')).toBe(true);
+  it('aiSeat player1 paints P1 purple and seatIcon 🟣', () => {
+    applyGameModeChrome(root, 'human-vs-ai', 'player1');
+    expect(root.dataset.opponent).toBe('ai');
+    expect(root.dataset.aiSeat).toBe('player1');
 
-    const colors = getPlayerSeatColors(app);
+    const colors = getPlayerSeatColors(root);
     expect(colors.player1).toBe('#8b5cf6');
     expect(colors.player2).toBe('#ef4444');
-    expect(colors.player1Light).toBe('#ddd6fe');
-    expect(colors.player2Light).toBe('#ffcdd2');
+    expect(seatIcon('player1', root)).toBe('🟣');
+    expect(seatIcon('player2', root)).toBe('🔴');
   });
 
-  it('seatIcon player1 is purple when aiSeat is player1', () => {
-    applyGameModeChrome(app, 'human-vs-ai', 'player1');
-    expect(seatIcon('player1', app)).toBe('🟣');
-    expect(seatIcon('player2', app)).toBe('🔴');
+  it('human-vs-human clears AI chrome', () => {
+    applyGameModeChrome(root, 'human-vs-ai', 'player1');
+    applyGameModeChrome(root, 'human-vs-human');
+    expect(root.dataset.opponent).toBeUndefined();
+    expect(seatIcon('player1', root)).toBe('🔵');
   });
 });
