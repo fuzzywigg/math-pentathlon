@@ -5,8 +5,8 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Overnight demos45 — fraction demo interaction', () => {
-  test('segment click + compare chrome on /demo/fraction', async ({ page }) => {
-    await page.goto('/#/demo/fraction');
+  test('segment click + compare chrome on /demo/fractions', async ({ page }) => {
+    await page.goto('/#/demo/fractions');
     await expect(page.locator('h1')).toContainText(/Fraction/i);
     await expect(page.locator('#interactive-bar')).toBeVisible({
       timeout: 8000,
