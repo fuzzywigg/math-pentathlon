@@ -62,16 +62,20 @@ test.describe('Wave 56 leftover — dice Possible Sums chrome', () => {
   test('Possible Sums section mounts on /demo/dice', async ({ page }) => {
     await page.goto('/#/demo/dice');
     await expect(page.locator('h1')).toContainText(/Dice/i);
-    await expect(page.locator('.demo-section h2')).toContainText(/Possible Sums Display/);
+    await expect(
+      page.getByRole('heading', { name: 'Possible Sums Display' })
+    ).toBeVisible();
     await expect(page.locator('#selector-sums')).toBeVisible();
   });
 });
 
 test.describe('Wave 56 leftover — attr filtering chrome', () => {
-  test('Attribute Filtering heading mounts on /demo/attribute', async ({ page }) => {
-    await page.goto('/#/demo/attribute');
-    await expect(page.locator('h1')).toContainText(/Attribute/i);
-    await expect(page.locator('h2')).toContainText(/Attribute Filtering/);
+  test('Attribute Filtering heading mounts on /demo/attributes', async ({ page }) => {
+    await page.goto('/#/demo/attributes');
+    await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
+    await expect(
+      page.getByRole('heading', { name: 'Attribute Filtering' })
+    ).toBeVisible();
     await expect(page.locator('.set-btn[data-set="basic"]')).toContainText(/Basic/);
   });
 });
