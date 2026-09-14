@@ -46,13 +46,15 @@ describe('Wave 41 calla — capture + free turn', () => {
     const state: CallaGameState = {
       ...createInitialState(),
       player1Pits: [0, 0, 0, 1, 0],
-      player2Pits: [0, 0, 0, 0, 0],
+      // Keep p2 non-empty so game does not sweep; opposite of pit 4 is 0
+      player2Pits: [0, 2, 0, 0, 0],
       player1Calla: 0,
       player2Calla: 0,
     };
     const next = makeMove(state, 3);
     expect(next.moveHistory[0].captured).toBe(0);
     expect(next.player1Pits[4]).toBe(1);
+    expect(next.phase).toBe('selectPit');
   });
 
   it('player2 free turn when last sow lands in red calla', () => {
