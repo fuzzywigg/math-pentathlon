@@ -33,8 +33,11 @@ describe('Wave 41 Sum Dominoes — createInitialState invariants', () => {
     const seed = state.board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL];
     expect(seed).not.toBeNull();
     expect(seed!.orientation).toBe('horizontal');
-    // Horizontal seed occupies center and center+1
-    expect(state.board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL + 1]).toBe(seed);
+    expect(seed!.position).toEqual({
+      row: CONFIG.CENTER_ROW,
+      col: CONFIG.CENTER_COL,
+    });
+    // createInitialState only stamps the origin cell (not the second face cell)
     expect(state.board[0][0]).toBeNull();
     expect(state.board[CONFIG.BOARD_SIZE - 1][CONFIG.BOARD_SIZE - 1]).toBeNull();
   });
