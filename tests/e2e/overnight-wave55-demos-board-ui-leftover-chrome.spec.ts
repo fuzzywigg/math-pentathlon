@@ -31,15 +31,18 @@ test.describe('Wave 55 leftover — juggle fill-percent chrome', () => {
   });
 });
 
-test.describe('Wave 55 leftover — ramrod legend chrome', () => {
-  test('Cuisenaire legend stays mounted on /game/ramrod', async ({ page }) => {
+test.describe('Wave 55 leftover — ramrod scores/hand chrome', () => {
+  test('Goal cm scores and in-hand rods stay mounted on /game/ramrod', async ({
+    page,
+  }) => {
     await page.goto('/#/game/ramrod');
     await dismissModeIfNeeded(page);
     await expect(page.locator('.ramrod-board, .ramrod-grid').first()).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.locator('.ramrod-legend')).toContainText(/Cuisenaire/i);
-    await expect(page.locator('.ramrod-legend-item').first()).toBeVisible();
+    await expect(page.locator('.ramrod-scores')).toContainText(/Goal:\s*24cm/);
+    await expect(page.locator('.ramrod-rod.in-hand').first()).toBeVisible();
+    await expect(page.locator('.ramrod-hand-label.player1')).toContainText(/Blue/i);
   });
 });
 
