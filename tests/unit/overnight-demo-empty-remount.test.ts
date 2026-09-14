@@ -2,6 +2,7 @@
  * Overnight demos leftover — empty root / double-mount / wipe identity.
  * Existing demo render APIs only. Tests-only. No product inventing.
  * Distinct from wave25 smoke, timer-penalty (#189), multiplayer (#191), puzzle banks (#192).
+ * Fake timers: dice autoRoll animateRoll must not outlive jsdom teardown.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
@@ -27,9 +28,14 @@ function mount(): HTMLElement {
 beforeEach(() => {
   document.body.innerHTML = '';
   vi.clearAllMocks();
+  // Dice demo mounts DiceSelector with autoRoll:true → animateRoll setTimeout chain.
+  // Fake timers so afterEach can clear before jsdom teardown (avoids document-not-defined).
+  vi.useFakeTimers();
 });
 
 afterEach(() => {
+  vi.clearAllTimers();
+  vi.useRealTimers();
   document.body.innerHTML = '';
   vi.restoreAllMocks();
 });
