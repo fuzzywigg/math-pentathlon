@@ -51,3 +51,26 @@ test.describe('Wave 58 leftover — Sum Dominoes residual chrome', () => {
     await expect(page.locator('.sd-hand-label.player2')).toBeVisible();
   });
 });
+
+test.describe('Wave 59 leftover — Contig roll click chrome', () => {
+  test('roll enables dice display then status stays live', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.contig-roll-btn')).toBeVisible({ timeout: 10000 });
+    await page.locator('.contig-roll-btn').click();
+    await expect(page.locator('.contig-dice-display, .contig-no-moves, .contig-expr-list').first()).toBeVisible();
+    await expect(page.locator('.contig-status, [aria-live]').first()).toBeVisible();
+  });
+});
+
+test.describe('Wave 59 leftover — Sum roll click chrome', () => {
+  test('roll shows dice sum or pass chrome', async ({ page }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 10000 });
+    await page.locator('.sd-roll-btn').click();
+    await expect(
+      page.locator('.sd-dice-display, .sd-pass-btn, .sd-hand-domino-playable').first()
+    ).toBeVisible();
+  });
+});
