@@ -3812,16 +3812,14 @@ test.describe('Wave 25 — contiguous / fractions / expression chrome', () => {
   test('Prime Gold roll surfaces expression/dice chrome', async ({ page }) => {
     await page.goto('/#/game/prime-gold');
     await startVsAi(page);
-    const roll = page.locator(
-      '.prime-roll-btn, button:has-text("Roll"), #roll-btn'
-    );
+    const roll = page.locator('.pg-roll-btn, button:has-text("Roll")');
     if ((await roll.count()) > 0) {
       await roll.first().click({ force: true });
     }
     await expect(
       page
         .locator(
-          '.prime-dice, .prime-expressions, .prime-board, .expression, .dice'
+          '.pg-board, .pg-cell, .pg-dice-area, .pg-expressions, .pg-expr-item, .pg-pass-btn'
         )
         .first()
     ).toBeVisible();
@@ -3853,7 +3851,7 @@ test.describe('Wave 25 — contiguous / fractions / expression chrome', () => {
     await expect(
       page
         .locator(
-          '.pinball-board, .fp-board, .frac-choices, .fp-question, .fp-choices'
+          '.pinball-board, .pinball-challenge, .pinball-choice-btn, .pinball-scores, .pinball-game-container'
         )
         .first()
     ).toBeVisible();
