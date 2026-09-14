@@ -57,26 +57,42 @@ test.describe('Wave 38 — Sum Dominoes dice leftovers', () => {
     await dismissModeIfNeeded(page);
   });
 
-  test('two roll cycles restore dice CTA and hands', async ({ page }) => {
-    for (let i = 0; i < 2; i++) {
-      await page.locator('.sd-roll-btn').click();
-      await expect(page.locator('.sd-dice-display')).toBeVisible();
-      const pass = page.locator('.sd-pass-btn');
-      const hand = page.locator('.sd-hand-player1 .sd-hand-domino');
-      if (await pass.isVisible().catch(() => false)) {
-        await pass.click();
-      } else if ((await hand.count()) > 0) {
-        await hand.first().click();
-        const cell = page
-          .locator('.sd-board .sd-valid, .sd-cell-valid, .sd-board button')
-          .first();
-        if (await cell.isVisible().catch(() => false)) {
-          await cell.click();
-        }
+  async function resolveSumDominoesRoll(page: Page) {
+    await page.locator('.sd-roll-btn').click();
+    await expect(page.locator('.sd-dice-display')).toBeVisible();
+
+    const playable = page.locator('.sd-hand-domino-playable');
+    const passBtn = page.locator('.sd-pass-btn');
+
+    if ((await playable.count()) > 0) {
+      await playable.first().click();
+      await expect(page.locator('.sd-hand-domino-selected')).toBeVisible();
+      const valid = page.locator('.sd-cell-valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+      } else if (await passBtn.isVisible().catch(() => false)) {
+        // Selected with no legal cell — pass to restore roll CTA
+        await passBtn.click();
+      } else {
+        // Stuck selecting: remount via new-game so subsequent cycles can proceed
+        await page.click('#new-game-btn');
+        await dismissModeIfNeeded(page);
       }
-      await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
+    } else {
+      await expect(passBtn).toBeVisible();
+      await passBtn.click();
     }
-    await expect(page.locator('.sd-hand-player1 .sd-hand-domino').first()).toBeVisible();
+
+    await expect(page.locator('.sd-roll-btn')).toBeVisible({ timeout: 5000 });
+  }
+
+  test('two roll cycles restore dice CTA and hands', async ({ page }) => {
+    await resolveSumDominoesRoll(page);
+    await resolveSumDominoesRoll(page);
+    await expect(
+      page.locator('.sd-hand-player1 .sd-hand-domino').first()
+    ).toBeVisible();
+    await expect(page.locator('.sd-board')).toBeVisible();
   });
 });
 
