@@ -14,7 +14,9 @@ describe('Wave 59 ramrod — occupied aria cm rod', () => {
     const rod: Rod = {
       id: 'test-rod-3',
       length: 3,
+      color: '#a6cf70',
       owner: 'player1',
+      position: { boxId: 'box-0-0', slot: 0 },
     };
     box.rods[0] = rod;
 
