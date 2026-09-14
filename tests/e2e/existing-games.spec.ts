@@ -3693,3 +3693,100 @@ test.describe('Wave 22 — tutorial runtime / apply-reject chrome', () => {
     await expect(page.locator('h1')).toContainText(/Prime/i);
   });
 });
+
+test.describe('Wave 24 — shell / a11y chrome for existing games', () => {
+  async function startVsAi(page: Page) {
+    const modal = page.locator('#new-game-modal');
+    if (await modal.isVisible().catch(() => false)) {
+      const vsAi = page.locator(
+        '#mode-ai, [data-mode="ai"], button:has-text("AI"), label:has-text("AI")'
+      );
+      if ((await vsAi.count()) > 0) {
+        await vsAi.first().click({ force: true });
+      }
+      const start = page.locator('#start-game-btn');
+      if (await start.isVisible().catch(() => false)) {
+        await start.click();
+      }
+    }
+  }
+
+  test('home Your Progress link reaches stats dashboard', async ({ page }) => {
+    await page.goto('/#/');
+    const link = page.locator('.hero-progress-link, a[href="#/stats"]').first();
+    await expect(link).toBeVisible();
+    await link.click();
+    await expect(page.locator('h1')).toContainText(/Progress|Stats/i);
+    await expect(
+      page.locator('.stats-dashboard, .stats-dashboard-empty, #back-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Hex shell help Escape closes; new-game reopens', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await startVsAi(page);
+    await page.locator('#help-btn').click();
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+    await page.locator('#new-game-btn').click();
+    await expect(page.locator('#new-game-modal')).not.toHaveClass(/hidden/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Contig board cells expose interactive chrome', async ({ page }) => {
+    await page.goto('/#/game/contig-60');
+    await startVsAi(page);
+    await expect(page.locator('.contig-board')).toBeVisible();
+    await expect(page.locator('.contig-cell').first()).toBeVisible();
+  });
+
+  test('Kings New Game difficulty chrome when vs AI', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await page.locator('#new-game-btn').click();
+    const modal = page.locator('#new-game-modal');
+    await expect(modal).not.toHaveClass(/hidden/);
+    const vsAi = page.locator(
+      '[data-mode="human-vs-ai"], label:has-text("AI"), #mode-ai'
+    );
+    if ((await vsAi.count()) > 0) {
+      await vsAi.first().click({ force: true });
+    }
+    const diff = page.locator(
+      '#difficulty-section, .difficulty-selector, .difficulty-btn'
+    );
+    if ((await diff.count()) > 0) {
+      await expect(diff.first()).toBeVisible();
+    }
+    await expect(page.locator('#start-game-btn')).toBeVisible();
+  });
+
+  test('Calla status or board chrome present', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await startVsAi(page);
+    await expect(
+      page.locator('.calla-board, .calla-status, #status, [role="status"]').first()
+    ).toBeVisible();
+  });
+
+  test('Sum Dominoes help opens and closes via close button', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await startVsAi(page);
+    await page.locator('#help-btn').click();
+    await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
+    await page.locator('#help-modal .modal-close').click();
+    await expect(page.locator('#help-modal')).toHaveClass(/hidden/);
+  });
+
+  test('Star Track back button returns toward games list', async ({ page }) => {
+    await page.goto('/#/game/star-track');
+    await startVsAi(page);
+    await page.locator('#back-btn').click();
+    await expect(
+      page.locator('.game-selector, .hero-progress-link, h1').first()
+    ).toBeVisible();
+  });
+});
