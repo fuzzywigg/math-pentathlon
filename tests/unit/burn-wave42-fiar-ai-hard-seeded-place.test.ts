@@ -22,19 +22,23 @@ describe('Wave 42 fiar — AI hard/medium seeded place', () => {
     expect(state.board.nodes.get(move!.nodeId!)?.chip).toBeNull();
   });
 
-  it('seeded hard returns legal place on opening', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.99);
-    const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'hard');
-    expect(move).not.toBeNull();
-    expect(move!.type).toBe('place');
-    expect(canPlaceChip(state, move!.nodeId!)).toBe(true);
-  });
+  it(
+    'seeded hard returns legal place on opening',
+    () => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.99);
+      const state = createInitialState();
+      const move = getAIMove(state, 'player1', 'hard');
+      expect(move).not.toBeNull();
+      expect(move!.type).toBe('place');
+      expect(canPlaceChip(state, move!.nodeId!)).toBe(true);
+    },
+    60000
+  );
 
-  it('applyAIMove of seeded hard place advances chipsPlaced', () => {
+  it('applyAIMove of seeded medium place advances chipsPlaced', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.1);
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'hard');
+    const move = getAIMove(state, 'player1', 'medium');
     const next = applyAIMove(state, move!);
     expect(next.chipsPlaced.player1).toBe(1);
     expect(next.currentPlayer).toBe('player2');

@@ -57,16 +57,18 @@ describe('Wave 42 fiar — moveChip win settle', () => {
   });
 
   it('non-winning legal move leaves winner null and stays in movement', () => {
+    // Scatter both sides — no pre-existing WIN_LENGTH for either player
     const state = forgeMovement({
       '0-0': 'player1',
       '1-0': 'player1',
       '0-4': 'player1',
-      '1-4': 'player1',
+      '2-4': 'player1',
       '4-0': 'player2',
-      '4-1': 'player2',
       '4-2': 'player2',
-      '4-3': 'player2',
+      '3-4': 'player2',
+      '4-4': 'player2',
     });
+    expect(checkWinner(state)).toBeNull();
     expect(canMove(state, '0-0', '0-1')).toBe(true);
     const next = moveChip(state, '0-0', '0-1');
     expect(next.phase).toBe('movement');
