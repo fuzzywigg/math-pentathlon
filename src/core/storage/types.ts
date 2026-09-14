@@ -102,7 +102,15 @@ export function createDefaultProgress(): ProgressData {
     streak: { ...DEFAULT_STREAK },
     achievements: [],
     gameStats: {},
-    owlState: { ...DEFAULT_OWL_STATE },
+    // Fresh nested arrays — shallow `{ ...DEFAULT_OWL_STATE }` would share
+    // messagesSeen/tutorialsCompleted across resetAll / createDefaultProgress.
+    owlState: {
+      mood: DEFAULT_OWL_STATE.mood,
+      lastInteraction: DEFAULT_OWL_STATE.lastInteraction,
+      messagesSeen: [],
+      tutorialsCompleted: [],
+      totalMessagesShown: DEFAULT_OWL_STATE.totalMessagesShown,
+    },
     settings: { ...DEFAULT_SETTINGS },
   };
 }
