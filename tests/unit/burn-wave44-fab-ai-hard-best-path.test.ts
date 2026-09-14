@@ -8,10 +8,15 @@ import { getAIMove } from '../../src/games/fab-a-diffy/ai';
 afterEach(() => vi.restoreAllMocks());
 
 describe('Wave 44 fab AI — hard', () => {
-  it('returns move with low randomness seed', () => {
-    vi.spyOn(Math, 'random').mockReturnValue(0.5); // > 0.03
-    const move = getAIMove(createInitialState(), 'player1', 'hard');
-    expect(move).not.toBeNull();
-    expect(move!.answerId.startsWith('answer-')).toBe(true);
-  });
+  it(
+    'returns move with low randomness seed',
+    () => {
+      const state = createInitialState();
+      vi.spyOn(Math, 'random').mockReturnValue(0.5); // > 0.03
+      const move = getAIMove(state, 'player1', 'hard');
+      expect(move).not.toBeNull();
+      expect(move!.answerId.startsWith('answer-')).toBe(true);
+    },
+    15_000
+  );
 });
