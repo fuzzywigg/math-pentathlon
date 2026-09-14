@@ -1,5 +1,5 @@
 /**
- * Wave 40 — Star Track drawChains bucket length &lt; 2 settle + select identity.
+ * Wave 40 — Star Track drawChains bucket length < 2 settle + select identity.
  * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
