@@ -2,9 +2,11 @@
  * Wave 53 leftover after #235 — Fab history entry player class. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { createInitialState } from '../../src/games/fab-a-diffy/rules';
+import {
+  createInitialState,
+  getOperationSymbol,
+} from '../../src/games/fab-a-diffy/rules';
 import { renderMoveHistory, getPlayerName } from '../../src/games/fab-a-diffy/board-ui';
-import { getOperationSymbol } from '../../src/games/fab-a-diffy/rules';
 
 describe('Wave 53 fab — history entry', () => {
   it('renders player1 history move with number and op symbol', () => {
