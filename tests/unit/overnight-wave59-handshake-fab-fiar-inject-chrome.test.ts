@@ -29,13 +29,14 @@ describe('Wave 59 handshake — fab × fiar inject chrome', () => {
     document.body.appendChild(fabBox);
     fabHuman(fabBox);
     expect(fabBox.querySelector('.fab-section-header')).toBeTruthy();
-    expect(fabBox.querySelector('.fab-btn-secondary')).toBeTruthy();
+    expect(fabBox.querySelector('.fab-bar-pool')).toBeTruthy();
+    expect(fabBox.querySelector('.fab-answer-board')).toBeTruthy();
 
     const board = document.createElement('div');
     const status = document.createElement('div');
     document.body.append(board, status);
     initFiar(board, status);
     expect(status.querySelector('.fiar-status')).toBeTruthy();
-    expect(board.querySelector('svg')).toBeTruthy();
+    expect(board.querySelector('svg.fiar-board, svg')).toBeTruthy();
   });
 });
