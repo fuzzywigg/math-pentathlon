@@ -1,47 +1,43 @@
 /**
- * Wave 40 — Stars-Bars gameOver / ghost select / occupied place rejects.
- * Tests-only leftover after #178.
+ * Wave 40 — Stars-bars gameOver / ghost select / occupied place identity.
+ * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-
 import {
   createInitialState,
   selectCard,
-  placeCard,
   passTurn,
+  placeCard,
 } from '../../src/games/stars-bars/rules';
 
-describe('Wave 40 stars-bars — gameOver / place rejects', () => {
-  it('gameOver selectCard and passTurn are identity', () => {
+describe('Wave 40 stars — select/pass gameOver + place occupied', () => {
+  it('selectCard / passTurn identity when gameOver', () => {
     const state = {
       ...createInitialState(),
       phase: 'gameOver' as const,
       winner: 'player1' as const,
     };
-    const hand = state.playerHands.player1;
-    expect(selectCard(state, hand[0]?.id ?? 'x')).toBe(state);
+    const cardId = state.playerHands.player1[0].id;
+    expect(selectCard(state, cardId)).toBe(state);
     expect(passTurn(state)).toBe(state);
   });
 
-  it('selectCard ghost id → identity', () => {
+  it('selectCard identity for ghost cardId', () => {
     const state = createInitialState();
-    expect(selectCard(state, 'ghost-card')).toBe(state);
+    expect(selectCard(state, 'no-such-card')).toBe(state);
   });
 
-  it('placeCard on occupied cell → identity', () => {
-    const state = createInitialState();
-    const cardId = state.playerHands.player1[0].id;
-    const selected = selectCard(state, cardId);
-    const placed = placeCard(selected, 0, 0);
-    expect(placed).not.toBe(selected);
+  it('placeCard identity on occupied cell (place once then again)', () => {
+    let state = createInitialState();
+    const first = state.playerHands.player1[0];
+    state = selectCard(state, first.id);
+    state = placeCard(state, 0, 0);
+    expect(state.cells[0][0].card).not.toBeNull();
 
-    // Next player places; re-select and try occupied (0,0)
-    if (placed.phase === 'selectingCard' || placed.phase === 'placingCard') {
-      const nextHand = placed.playerHands[placed.currentPlayer];
-      if (nextHand.length > 0) {
-        const sel2 = selectCard(placed, nextHand[0].id);
-        expect(placeCard(sel2, 0, 0)).toBe(sel2);
-      }
-    }
+    const second = state.playerHands[state.currentPlayer][0];
+    state = selectCard(state, second.id);
+    expect(state.phase).toBe('placingCard');
+    const next = placeCard(state, 0, 0);
+    expect(next).toBe(state);
   });
 });

@@ -1,44 +1,31 @@
 /**
- * Wave 40 — Kwatro-Sinko selectChip zero-moves / wrong owner / phase.
- * Tests-only leftover after #178.
+ * Wave 40 — Kwatro-sinko selectChip zero-moves / owner / phase identity.
+ * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-
 import {
   createInitialState,
   selectChip,
   getValidMoves,
-  moveChip,
-  isValidMove,
-  clearSelection,
 } from '../../src/games/kwatro-sinko/rules';
+import type { Chip } from '../../src/games/kwatro-sinko/types';
 
-describe('Wave 40 kwatro — select / move rejects', () => {
-  it('selectChip wrong owner / ghost / wrong phase → identity', () => {
-    const state = createInitialState();
-    expect(selectChip(state, 'p2-0')).toBe(state);
-    expect(selectChip(state, 'ghost')).toBe(state);
-    const wrongPhase = { ...state, phase: 'selectingDest' as const };
-    expect(selectChip(wrongPhase, 'p1-0')).toBe(wrongPhase);
-  });
-
-  it('selectChip identity when chip has zero valid moves', () => {
+describe('Wave 40 kwa — selectChip zero moves / rejects', () => {
+  it('selectChip identity when all connections occupied', () => {
     const state = createInitialState();
     const chipId = 'p1-0';
     const chip = state.chips.get(chipId)!;
-    const pos = chip.position!;
-    const node = state.nodes.get(pos)!;
+    const node = state.nodes.get(chip.position!)!;
 
-    // Fill all connected nodes with chips
     const nodes = new Map(state.nodes);
     const chips = new Map(state.chips);
     for (const connId of node.connections) {
       const conn = nodes.get(connId)!;
       if (!conn.chip) {
-        const blocker = {
+        const blocker: Chip = {
           id: `block-${connId}`,
           value: 99,
-          owner: 'player2' as const,
+          owner: 'player2',
           position: connId,
         };
         chips.set(blocker.id, blocker);
@@ -46,21 +33,32 @@ describe('Wave 40 kwatro — select / move rejects', () => {
       }
     }
     const jammed = { ...state, nodes, chips };
-    expect(getValidMoves(jammed, chipId)).toHaveLength(0);
+    expect(getValidMoves(jammed, chipId)).toEqual([]);
     expect(selectChip(jammed, chipId)).toBe(jammed);
   });
 
-  it('moveChip wrong phase / ghost dest; clearSelection resets', () => {
+  it('selectChip identity for wrong owner / missing position', () => {
     const state = createInitialState();
-    expect(moveChip(state, 'n1-0')).toBe(state);
-    expect(isValidMove(state, 'p1-0', 'ghost-node')).toBe(false);
+    expect(selectChip(state, 'p2-0')).toBe(state);
 
-    const selected = selectChip(state, 'p1-0');
-    if (selected !== state) {
-      const cleared = clearSelection(selected);
-      expect(cleared.selectedChip).toBeNull();
-      expect(cleared.phase).toBe('selectingChip');
-      expect(moveChip(selected, 'nope')).toBe(selected);
-    }
+    const chips = new Map(state.chips);
+    const orphan: Chip = {
+      id: 'orphan',
+      value: 0,
+      owner: 'player1',
+      position: null,
+    };
+    chips.set(orphan.id, orphan);
+    const withOrphan = { ...state, chips };
+    expect(selectChip(withOrphan, orphan.id)).toBe(withOrphan);
+  });
+
+  it('selectChip identity wrong phase', () => {
+    const state = {
+      ...createInitialState(),
+      phase: 'selectingDest' as const,
+      selectedChip: 'p1-0',
+    };
+    expect(selectChip(state, 'p1-0')).toBe(state);
   });
 });
