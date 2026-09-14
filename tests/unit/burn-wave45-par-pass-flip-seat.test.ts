@@ -6,8 +6,6 @@ import { createInitialState, passTurn, selectBlock } from '../../src/games/par-5
 
 describe('Wave 45 par — pass turn', () => {
   it('passTurn flips seat and clears selection', () => {
-    const state = selectBlock(createInitialState(), createInitialState().hands.player1[0].id);
-    // re-select on fresh
     const s = createInitialState();
     const placing = selectBlock(s, s.hands.player1[0].id);
     const next = passTurn(placing);
