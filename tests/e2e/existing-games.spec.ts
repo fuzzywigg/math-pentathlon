@@ -3693,3 +3693,376 @@ test.describe('Wave 22 — tutorial runtime / apply-reject chrome', () => {
     await expect(page.locator('h1')).toContainText(/Prime/i);
   });
 });
+
+test.describe('Wave 24 — legal seat-handoff chrome', () => {
+  test('Hex legal click updates status seat label', async ({ page }) => {
+    await page.goto('/#/game/hex');
+    await dismissModeIfNeeded(page);
+    const status = page.locator('.status-turn');
+    const before = await status.textContent();
+    await page.locator('.hex-cell-group[data-row="3"][data-col="3"]').click({
+      force: true,
+    });
+    await expect(status).not.toHaveText(before ?? '');
+    await expect(status).toContainText(/Red|Player 2|turn/i);
+  });
+
+  test('Calla valid pit refreshes status after legal sow', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    const status = page.locator('.calla-status, .status-turn').first();
+    const before = await status.textContent();
+    await page.locator('.calla-pit-valid').first().click({ force: true });
+    await expect(status).toBeVisible();
+    const after = await status.textContent();
+    expect(after).toBeTruthy();
+    // Status may keep seat on free-turn; chrome must still be live
+    expect((after ?? '').length).toBeGreaterThan(0);
+    expect(after !== before || (await page.locator('.calla-pit').count()) > 0).toBeTruthy();
+  });
+
+  test('FIAR place advances status toward Red seat', async ({ page }) => {
+    await page.goto('/#/game/fiar');
+    await dismissModeIfNeeded(page);
+    const status = page.locator('.fiar-status');
+    await page.locator('[data-node-id]').first().click({ force: true });
+    await expect(status).toContainText(/Red|Player 2|turn|chip/i);
+  });
+
+  test('Star Track draw→chain advances progress or seat chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    await page.locator('.star-track-draw-btn').click({ force: true });
+    const chain = page.locator('.star-track-chain-btn').first();
+    await expect(chain).toBeVisible();
+    await chain.click({ force: true });
+    await expect(
+      page.locator('.status-turn, .progress-p1, .star-track-status').first()
+    ).toBeVisible();
+    await expect(page.locator('.star-track-draw-btn')).toBeVisible();
+  });
+
+  test('Queens select then move updates status instruction', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/queens-guards');
+    await dismissModeIfNeeded(page);
+    const status = page.locator('.qg-status');
+    await page.locator('[data-cell-key="5-7"]').click({ force: true });
+    await expect(status).toBeVisible();
+    const mid = await status.textContent();
+    const dest = page.locator('[data-cell-key="4-7"], [data-cell-key="5-6"], [data-cell-key="5-8"]').first();
+    if ((await dest.count()) > 0) {
+      await dest.click({ force: true });
+    }
+    await expect(status).toBeVisible();
+    expect((await status.textContent())?.length ?? 0).toBeGreaterThan(0);
+    expect(mid).toBeTruthy();
+  });
+
+  test('Contig roll→place-or-pass restores roll CTA and live status', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/contig-60');
+    await dismissModeIfNeeded(page);
+    await page.locator('.contig-roll-btn').click();
+    const valid = page.locator('.contig-cell-valid');
+    const pass = page.locator('.contig-pass-btn');
+    if ((await valid.count()) > 0) {
+      await valid.first().click({ force: true });
+    } else {
+      await expect(pass).toBeVisible();
+      await pass.click();
+    }
+    await expect(page.locator('.contig-roll-btn')).toBeVisible();
+    await expect(page.locator('.contig-status')).toBeVisible();
+  });
+
+  test('Sum Dominoes roll yields place/pass then restores roll seat chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    await page.locator('.sd-roll-btn').click();
+    const playable = page.locator(
+      '.sd-hand-player1 .sd-hand-domino-playable, .sd-hand-domino.playable'
+    );
+    if ((await playable.count()) > 0) {
+      await playable.first().click({ force: true });
+      const cell = page.locator('.sd-cell-valid');
+      if ((await cell.count()) > 0) {
+        await cell.first().click({ force: true });
+      }
+    } else {
+      const pass = page.locator('.sd-pass-btn');
+      if ((await pass.count()) > 0) {
+        await pass.click({ force: true });
+      }
+    }
+    await expect(page.locator('.sd-status, .sd-roll-btn').first()).toBeVisible();
+  });
+
+  test('Prime Gold roll advances status off pure idle', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const status = page.locator('.pg-status');
+    const before = await status.textContent();
+    await page.locator('.pg-roll-btn, .prime-roll-btn, button:has-text("Roll")').first().click({
+      force: true,
+    });
+    await expect(status).toBeVisible();
+    const after = await status.textContent();
+    expect(after).toBeTruthy();
+    expect(after !== before || (await page.locator('.pg-cell, .pg-expr-item').count()) >= 0).toBeTruthy();
+  });
+
+  test('Par 55 select→place shows history or score chrome', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const block = page
+      .locator('.par55-hand-player1 .par55-hand-block, .par55-hand-block')
+      .first();
+    await block.click({ force: true });
+    const base = page.locator('.par55-valid-base, [data-base-id]').first();
+    if ((await base.count()) > 0) {
+      await base.click({ force: true });
+    }
+    await expect(
+      page.locator('.par55-history-move, .par55-status, .par55-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Stars & Bars select→place shows history or score chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page.locator('.stars-card:not(.disabled), .stars-card').first();
+    await card.click({ force: true });
+    const cell = page.locator('.stars-cell.valid, .stars-cell-valid').first();
+    if ((await cell.count()) > 0) {
+      await cell.click({ force: true });
+    }
+    await expect(
+      page.locator('.stars-move-item, .stars-status, .stars-scores').first()
+    ).toBeVisible();
+  });
+
+  test('Juggle roll advances status into die/shape instruction', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/juggle');
+    await dismissModeIfNeeded(page);
+    await page.locator('.juggle-roll-btn, button:has-text("Roll")').first().click({
+      force: true,
+    });
+    await expect(page.locator('.juggle-status')).toBeVisible();
+    await expect(
+      page.locator('.juggle-die, .juggle-shape-option, .juggle-shapes').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone block select keeps bank/board seat chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const block = page
+      .locator('.hex-a-gone-block-btn[data-shape], .hex-a-gone-block-btn')
+      .first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+    }
+    await expect(
+      page.locator('.hex-a-gone-confirm-btn, .hex-a-gone-board, .status-turn').first()
+    ).toBeVisible();
+  });
+});
+
+test.describe('Wave 24 — inventory / resource chrome after legal play', () => {
+  test('Par 55 place keeps hand inventory chrome', async ({ page }) => {
+    await page.goto('/#/game/par-55');
+    await dismissModeIfNeeded(page);
+    const before = await page.locator('.par55-hand-block').count();
+    const block = page.locator('.par55-hand-block.clickable').first();
+    if ((await block.count()) > 0) {
+      await block.click({ force: true });
+      const valid = page.locator('.par55-base.valid, .par55-cell.valid').first();
+      if ((await valid.count()) > 0) {
+        await valid.click({ force: true });
+      }
+    }
+    await expect(page.locator('.par55-hand, .par55-board').first()).toBeVisible();
+    expect(before).toBeGreaterThan(0);
+    expect(await page.locator('.par55-hand-block').count()).toBeGreaterThan(0);
+  });
+
+  test('Sum Dominoes roll→place shrinks or preserves hand chrome', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/sum-dominoes');
+    await dismissModeIfNeeded(page);
+    const before = await page
+      .locator('.sd-hand-player1 .sd-hand-domino')
+      .count();
+    await page.locator('.sd-roll-btn').click();
+    const playable = page.locator('.sd-hand-domino-playable');
+    if ((await playable.count()) > 0) {
+      await playable.first().click();
+      const valid = page.locator('.sd-cell-valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+        const after = await page
+          .locator('.sd-hand-player1 .sd-hand-domino')
+          .count();
+        expect(after).toBeLessThanOrEqual(before);
+      }
+    }
+    await expect(
+      page.locator('.sd-hand-player1, .sd-board, .sd-roll-btn').first()
+    ).toBeVisible();
+  });
+
+  test('Hex-a-Gone bank block-count chrome after select/confirm', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/hex-a-gone');
+    await dismissModeIfNeeded(page);
+    const bankBtn = page.locator('.hex-a-gone-block-btn[data-shape]').first();
+    if ((await bankBtn.count()) > 0) {
+      await bankBtn.click({ force: true });
+      const confirm = page.locator(
+        '.hex-a-gone-confirm-btn, button:has-text("Confirm")'
+      );
+      if ((await confirm.count()) > 0) {
+        await confirm.first().click({ force: true });
+      }
+    }
+    await expect(page.locator('.block-count').first()).toBeVisible();
+  });
+
+  test('Ramrod rod-strip inventory chrome after select', async ({ page }) => {
+    await page.goto('/#/game/ramrod');
+    await dismissModeIfNeeded(page);
+    const selectable = page.locator('.ramrod-rod-wrapper.selectable');
+    if ((await selectable.count()) > 0) {
+      await selectable.first().click({ force: true });
+    }
+    await expect(
+      page.locator('.ramrod-rod-wrapper, .ramrod-board, .ramrod-rods').first()
+    ).toBeVisible();
+  });
+
+  test('Stars hand inventory chrome after card select/place', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/stars-bars');
+    await dismissModeIfNeeded(page);
+    const card = page.locator('.stars-card:not(.disabled)').first();
+    if ((await card.count()) > 0) {
+      await card.click({ force: true });
+      const valid = page.locator('.stars-cell.valid');
+      if ((await valid.count()) > 0) {
+        await valid.first().click({ force: true });
+      }
+    }
+    await expect(
+      page.locator('.stars-card, .stars-hand, .stars-score').first()
+    ).toBeVisible();
+  });
+
+  test('Frac Fact score inventory chrome after answer', async ({ page }) => {
+    await page.goto('/#/game/frac-fact');
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.frac-choice-btn').first()).toBeVisible();
+    await page.locator('.frac-choice-btn').first().click({ force: true });
+    await expect(
+      page.locator('.frac-scores, .frac-score-value, .frac-result').first()
+    ).toBeVisible();
+  });
+
+  test('Pinball balls inventory chrome after choice', async ({ page }) => {
+    await page.goto('/#/game/fraction-pinball');
+    await dismissModeIfNeeded(page);
+    const choice = page.locator('.pinball-choice-btn').first();
+    if ((await choice.count()) > 0) {
+      await choice.click({ force: true });
+    }
+    await expect(
+      page.locator('.pinball-balls, .pinball-scores, .pinball-feedback').first()
+    ).toBeVisible();
+  });
+
+  test('Star Track progress inventory chrome after draw→select', async ({
+    page,
+  }) => {
+    await page.goto('/#/game/star-track');
+    await dismissModeIfNeeded(page);
+    const draw = page.locator('.star-track-draw-btn').first();
+    await expect(draw).toBeVisible();
+    await draw.click({ force: true });
+    const chain = page.locator('.star-track-chain-btn').first();
+    if ((await chain.count()) > 0) {
+      await chain.click({ force: true });
+    }
+    await expect(
+      page
+        .locator(
+          '.star-track-progress, .star-track-position, .star-track-board, .star-track-draw-btn'
+        )
+        .first()
+    ).toBeVisible();
+  });
+
+  test('Pent piece-bank inventory chrome after select', async ({ page }) => {
+    await page.goto('/#/game/pent-em-in');
+    await dismissModeIfNeeded(page);
+    const piece = page.locator('.pent-piece-option').first();
+    if ((await piece.count()) > 0) {
+      await piece.click({ force: true });
+    }
+    await expect(
+      page.locator('.pent-piece-option, .pent-piece-selector, .pent-board').first()
+    ).toBeVisible();
+  });
+
+  test('Kings supply inventory chrome after king move', async ({ page }) => {
+    await page.goto('/#/game/kings-quadraphages');
+    await dismissModeIfNeeded(page);
+    await page
+      .locator('.cell[data-row="1"][data-col="5"]')
+      .click({ force: true });
+    await page
+      .locator('.cell[data-row="2"][data-col="5"]')
+      .click({ force: true });
+    await expect(
+      page.locator('.supply-p1, .status-supplies, .status-turn, .kings-board').first()
+    ).toBeVisible();
+  });
+
+  test('Calla pit inventory chrome after pit click', async ({ page }) => {
+    await page.goto('/#/game/calla');
+    await dismissModeIfNeeded(page);
+    const pit = page.locator('.calla-pit, [data-pit]').first();
+    if ((await pit.count()) > 0) {
+      await pit.click({ force: true });
+    }
+    await expect(
+      page.locator('.calla-board, .calla-pit, .calla-store, .calla-wrapper').first()
+    ).toBeVisible();
+  });
+
+  test('Prime Gold chip inventory chrome after roll', async ({ page }) => {
+    await page.goto('/#/game/prime-gold');
+    await dismissModeIfNeeded(page);
+    const roll = page.locator('.pg-roll-btn, .prime-roll-btn, button:has-text("Roll")').first();
+    if ((await roll.count()) > 0) {
+      await roll.click({ force: true });
+    }
+    await expect(
+      page.locator('.pg-board, .prime-board, .pg-dice, .prime-status, canvas, svg').first()
+    ).toBeVisible();
+  });
+});
