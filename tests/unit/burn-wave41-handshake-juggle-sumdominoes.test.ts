@@ -25,8 +25,8 @@ describe('Wave 41 handshake — juggle × sum-dominoes openings', () => {
   it('juggle dual boards empty; sum-dominoes hands dealt 7 each', () => {
     const j = juggleInit();
     const s = sumDominoesInit();
-    expect(j.boards.player1.length).toBeGreaterThan(0);
-    expect(j.boards.player2.length).toBeGreaterThan(0);
+    expect(j.boards.player1.rows).toBeGreaterThan(0);
+    expect(j.boards.player2.cols).toBeGreaterThan(0);
     expect(j.currentDice).toBeNull();
     expect(s.hands.player1).toHaveLength(7);
     expect(s.hands.player2).toHaveLength(7);
