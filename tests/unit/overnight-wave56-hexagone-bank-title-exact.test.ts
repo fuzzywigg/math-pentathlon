@@ -1,0 +1,20 @@
+/**
+ * Wave 56 leftover after #256 — Hex-a-Gone bank title exact. Tests-only.
+ */
+import { describe, it, expect, afterEach } from 'vitest';
+import { createInitialState } from '../../src/games/hex-a-gone/types';
+import { renderBoard } from '../../src/games/hex-a-gone/board-ui';
+
+afterEach(() => {
+  document.body.innerHTML = '';
+});
+
+describe('Wave 56 hexagone — bank title', () => {
+  it('Pattern Block Bank exact', () => {
+    const el = document.createElement('div');
+    renderBoard(createInitialState(), el);
+    expect(el.querySelector('.hex-a-gone-bank-title')?.textContent).toBe(
+      'Pattern Block Bank'
+    );
+  });
+});
