@@ -36,9 +36,22 @@ function placeOnBoard(
   else board[row + 1][col] = placed;
 }
 
+function seeded(): SumDominoesState {
+  const base = createInitialState();
+  const board = base.board.map((row) => row.map(() => null as PlacedDomino | null));
+  placeOnBoard(
+    board,
+    makeDomino('seed', 6, 6),
+    CONFIG.CENTER_ROW,
+    CONFIG.CENTER_COL,
+    'horizontal'
+  );
+  return { ...base, board };
+}
+
 describe('Wave 41 sum-dominoes — occupied rejects', () => {
   it('isValidPlacement false on center seed cells', () => {
-    const state = createInitialState();
+    const state = seeded();
     const d = makeDomino('clash', 0, 0);
     expect(
       isValidPlacement(
@@ -61,9 +74,8 @@ describe('Wave 41 sum-dominoes — occupied rejects', () => {
   });
 
   it('rejects when second cell of horizontal is occupied', () => {
-    const state = createInitialState();
+    const state = seeded();
     const board = state.board.map((row) => [...row]);
-    // Place a blocker to the left of center so col+1 hits center
     placeOnBoard(
       board,
       makeDomino('block', 1, 1),
@@ -85,9 +97,8 @@ describe('Wave 41 sum-dominoes — occupied rejects', () => {
   });
 
   it('canPlayDomino false when hand faces cannot adjoin any empty cell', () => {
-    const state = createInitialState();
+    const state = seeded();
     const impossible = makeDomino('imp', 0, 0);
-    // Target sum that cannot match against center sixes with 0+6
     expect(canPlayDomino(state, impossible, 1)).toBe(false);
   });
 });

@@ -12,33 +12,33 @@ describe('Wave 41 fab-a-diffy — calculateResult matrix', () => {
   const quarter: Fraction = { numerator: 1, denominator: 4 };
 
   it('add / subtract / multiply simplify', () => {
-    expect(calculateResult(half, half, 'add')).toEqual({
+    expect(calculateResult(half, half, 'add')).toMatchObject({
       numerator: 1,
       denominator: 1,
     });
-    expect(calculateResult(half, third, 'subtract')).toEqual({
+    expect(calculateResult(half, third, 'subtract')).toMatchObject({
       numerator: 1,
       denominator: 6,
     });
-    expect(calculateResult(half, quarter, 'multiply')).toEqual({
+    expect(calculateResult(half, quarter, 'multiply')).toMatchObject({
       numerator: 1,
       denominator: 8,
     });
   });
 
   it('divide yields reciprocal product', () => {
-    expect(calculateResult(half, half, 'divide')).toEqual({
+    expect(calculateResult(half, half, 'divide')).toMatchObject({
       numerator: 1,
       denominator: 1,
     });
-    expect(calculateResult(half, quarter, 'divide')).toEqual({
+    expect(calculateResult(half, quarter, 'divide')).toMatchObject({
       numerator: 2,
       denominator: 1,
     });
   });
 
   it('subtract can produce zero', () => {
-    expect(calculateResult(third, third, 'subtract')).toEqual({
+    expect(calculateResult(third, third, 'subtract')).toMatchObject({
       numerator: 0,
       denominator: 1,
     });

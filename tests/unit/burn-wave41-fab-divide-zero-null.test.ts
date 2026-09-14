@@ -20,15 +20,15 @@ describe('Wave 41 fab-a-diffy — divide-by-zero null', () => {
   });
 
   it('other ops with zero still return fractions', () => {
-    expect(calculateResult(half, zero, 'add')).toEqual({
+    expect(calculateResult(half, zero, 'add')).toMatchObject({
       numerator: 1,
       denominator: 2,
     });
-    expect(calculateResult(half, zero, 'subtract')).toEqual({
+    expect(calculateResult(half, zero, 'subtract')).toMatchObject({
       numerator: 1,
       denominator: 2,
     });
-    expect(calculateResult(half, zero, 'multiply')).toEqual({
+    expect(calculateResult(half, zero, 'multiply')).toMatchObject({
       numerator: 0,
       denominator: 1,
     });

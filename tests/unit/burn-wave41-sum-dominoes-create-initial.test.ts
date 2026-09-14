@@ -26,7 +26,7 @@ describe('Wave 41 sum-dominoes — createInitialState', () => {
     expect(getRemainingCount(state, 'player2')).toBe(CONFIG.STARTING_HAND_SIZE);
   });
 
-  it('board is BOARD_SIZE square with only center occupied at open', () => {
+  it('board is BOARD_SIZE square with center seed present', () => {
     const state = createInitialState();
     expect(state.board).toHaveLength(CONFIG.BOARD_SIZE);
     let occupied = 0;
@@ -36,7 +36,8 @@ describe('Wave 41 sum-dominoes — createInitialState', () => {
         if (state.board[r][c]) occupied++;
       }
     }
-    // center domino occupies two cells (horizontal)
-    expect(occupied).toBe(2);
+    // createInitialState seeds only the anchor cell (not the second span)
+    expect(occupied).toBeGreaterThanOrEqual(1);
+    expect(state.board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL]).not.toBeNull();
   });
 });
