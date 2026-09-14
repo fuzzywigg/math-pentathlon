@@ -19,7 +19,9 @@ test.describe('Overnight demos46 — expression challenge chrome', () => {
     await expect(page.locator('#active-challenge')).toBeVisible();
     await expect(page.locator('#expression-builder .expression-slot').first()).toBeVisible();
 
-    const clear = page.getByRole('button', { name: /Clear All/i });
+    const clear = page.locator('#expression-builder').getByRole('button', {
+      name: /Clear All/i,
+    });
     await expect(clear).toBeVisible();
     await expect(page.locator('#back-btn')).toBeVisible();
   });
