@@ -1,0 +1,20 @@
+/**
+ * Wave 65 leftover after tip/#315 — Kwatro winning-expr padding exact.
+ * Wave63 locks color/radius; deepen pad leftover. Tests-only.
+ */
+import { describe, it, expect, afterEach } from 'vitest';
+import { injectKwaStyles } from '../../src/games/kwatro-sinko/board-ui';
+
+afterEach(() => {
+  document.getElementById('kwa-styles')?.remove();
+});
+
+describe('Wave 65 kwatro — inject winning-expr pad exact', () => {
+  it('winning-expr uses padding 0.5rem 1rem', () => {
+    injectKwaStyles();
+    const css = document.getElementById('kwa-styles')!.textContent || '';
+    expect(css).toMatch(
+      /\.kwa-winning-expr\s*\{[\s\S]*?padding:\s*0\.5rem 1rem/
+    );
+  });
+});
