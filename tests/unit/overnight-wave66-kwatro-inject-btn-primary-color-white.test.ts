@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject btn-primary color white', () => {
-  it('locks .kwa-btn-primary color:s*white', () => {
+  it('locks scoped btn-primary color white', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-btn-primary\s*\{[\s\S]*?color:\s*white/);

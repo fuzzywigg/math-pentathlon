@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject history border-radius scoped', () => {
-  it('locks .kwa-history border-radius:s*8px', () => {
+  it('locks scoped history border-radius scoped', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-history\s*\{[\s\S]*?border-radius:\s*8px/);

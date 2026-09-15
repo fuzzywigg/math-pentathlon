@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject history-list display flex', () => {
-  it('locks .kwa-history-list display:s*flex', () => {
+  it('locks scoped history-list display flex', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-history-list\s*\{[\s\S]*?display:\s*flex/);

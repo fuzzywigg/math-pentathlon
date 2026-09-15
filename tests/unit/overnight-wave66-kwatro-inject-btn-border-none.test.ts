@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject btn border none', () => {
-  it('locks .kwa-btn border:s*none', () => {
+  it('locks scoped btn border none', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-btn\s*\{[\s\S]*?border:\s*none/);

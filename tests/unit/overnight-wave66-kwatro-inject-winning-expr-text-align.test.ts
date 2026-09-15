@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject winning-expr text-align', () => {
-  it('locks .kwa-winning-expr text-align:s*center', () => {
+  it('locks scoped winning-expr text-align', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-winning-expr\s*\{[\s\S]*?text-align:\s*center/);

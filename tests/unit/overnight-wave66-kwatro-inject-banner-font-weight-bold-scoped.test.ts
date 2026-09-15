@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject banner font-weight bold scoped', () => {
-  it('locks .kwa-winner-banner font-weight:s*bold', () => {
+  it('locks scoped banner font-weight bold scoped', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-winner-banner\s*\{[\s\S]*?font-weight:\s*bold/);

@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject controls display flex', () => {
-  it('locks .kwa-controls display:s*flex', () => {
+  it('locks scoped controls display flex', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-controls\s*\{[\s\S]*?display:\s*flex/);

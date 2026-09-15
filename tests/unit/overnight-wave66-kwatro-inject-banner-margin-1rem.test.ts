@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject banner margin 1rem', () => {
-  it('locks .kwa-winner-banner margin:s*1rem', () => {
+  it('locks scoped banner margin 1rem', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-winner-banner\s*\{[\s\S]*?margin:\s*1rem/);

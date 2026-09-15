@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject chip-info display flex', () => {
-  it('locks .kwa-chip-info display:s*flex', () => {
+  it('locks scoped chip-info display flex', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-chip-info\s*\{[\s\S]*?display:\s*flex/);

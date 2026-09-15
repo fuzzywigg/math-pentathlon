@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject game-area display flex', () => {
-  it('locks .kwa-game-area display:s*flex', () => {
+  it('locks scoped game-area display flex', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-game-area\s*\{[\s\S]*?display:\s*flex/);

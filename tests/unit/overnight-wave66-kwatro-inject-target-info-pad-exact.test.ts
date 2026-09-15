@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject target-info pad exact', () => {
-  it('locks .kwa-target-info padding:s*0.5rem 1rem', () => {
+  it('locks scoped target-info pad exact', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-target-info\s*\{[\s\S]*?padding:\s*0\.5rem 1rem/);

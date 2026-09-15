@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject btn font-weight bold scoped', () => {
-  it('locks .kwa-btn font-weight:s*bold', () => {
+  it('locks scoped btn font-weight bold scoped', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-btn\s*\{[\s\S]*?font-weight:\s*bold/);

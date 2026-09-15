@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject target-info text-align', () => {
-  it('locks .kwa-target-info text-align:s*center', () => {
+  it('locks scoped target-info text-align', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-target-info\s*\{[\s\S]*?text-align:\s*center/);

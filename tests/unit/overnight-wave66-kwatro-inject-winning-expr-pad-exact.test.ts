@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject winning-expr pad exact', () => {
-  it('locks .kwa-winning-expr padding:s*0.5rem 1rem', () => {
+  it('locks scoped winning-expr pad exact', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-winning-expr\s*\{[\s\S]*?padding:\s*0\.5rem 1rem/);

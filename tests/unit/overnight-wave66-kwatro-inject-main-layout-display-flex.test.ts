@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject main-layout display flex', () => {
-  it('locks .kwa-main-layout display:s*flex', () => {
+  it('locks scoped main-layout display flex', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-main-layout\s*\{[\s\S]*?display:\s*flex/);

@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject btn transition scoped', () => {
-  it('locks .kwa-btn transition:s*all 0.2s', () => {
+  it('locks scoped btn transition scoped', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-btn\s*\{[\s\S]*?transition:\s*all 0\.2s/);

@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 66 kwatro — inject banner text-align center', () => {
-  it('locks .kwa-winner-banner text-align:s*center', () => {
+  it('locks scoped banner text-align center', () => {
     injectKwaStyles();
     const css = document.getElementById('kwa-styles')!.textContent || '';
     expect(css).toMatch(/\.kwa-winner-banner\s*\{[\s\S]*?text-align:\s*center/);
