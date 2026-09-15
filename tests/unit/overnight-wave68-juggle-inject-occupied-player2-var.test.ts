@@ -1,0 +1,18 @@
+/**
+ * Wave 68 leftover after tip/#333 — occupied-player2 color var.
+ * Soft inject existed; lock selector-scoped leftover. Tests-only.
+ */
+import { describe, it, expect, beforeEach } from 'vitest';
+import { injectJuggleStyles } from '../../src/games/juggle/board-ui';
+
+describe('Wave 68 juggle — inject occupied player2 var', () => {
+  beforeEach(() => {
+    document.getElementById('juggle-styles')?.remove();
+  });
+
+  it('injects occupied-player2 background var', () => {
+    injectJuggleStyles();
+    const css = document.getElementById('juggle-styles')?.textContent ?? '';
+    expect(css).toMatch(/\.juggle-cell\.occupied-player2\s*\{[^}]*background:\s*var\(--color-player2, #f44336\)/);
+  });
+});
