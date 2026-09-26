@@ -1,0 +1,5 @@
+{
+  "name": "math-pentathlon",
+  "install": "npm ci",
+  "start": "npm run test:unit"
+}
