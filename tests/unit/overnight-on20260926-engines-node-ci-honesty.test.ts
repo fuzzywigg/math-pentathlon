@@ -1,6 +1,7 @@
 /**
  * TOKENMAXX ON-20260926 — engines.node CI honesty (distinct from #346 envjson / #347 unit timeout).
  * Assert package.json engines.node exists and matches workflow setup-node pins.
+ * Residual after #348: lockfile root packages[""].engines must mirror package.json.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -11,6 +12,9 @@ describe('ON-20260926 — engines.node CI honesty', () => {
     const pkg = JSON.parse(
       readFileSync(resolve(process.cwd(), 'package.json'), 'utf8')
     ) as { engines?: { node?: string } };
+    const lock = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'package-lock.json'), 'utf8')
+    ) as { packages?: Record<string, { engines?: { node?: string } }> };
     const ci = readFileSync(
       resolve(process.cwd(), '.github/workflows/ci.yml'),
       'utf8'
@@ -21,6 +25,7 @@ describe('ON-20260926 — engines.node CI honesty', () => {
     );
 
     expect(pkg.engines?.node).toBe('>=20');
+    expect(lock.packages?.['']?.engines?.node).toBe(pkg.engines?.node);
 
     const ciPins = [...ci.matchAll(/node-version:\s*['"]?(\d+)/g)].map(
       (m) => m[1]
