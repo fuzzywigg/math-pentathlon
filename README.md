@@ -54,17 +54,17 @@ npm run test:unit
 npm run test:e2e
 npm run build
 
-`npm test` runs unit then e2e. HEAD has **417 unit tests**.
+`npm test` runs unit then e2e. TOKENMAXX left ~5k Vitest files under `tests/unit`; CI unit p90 is ~30 min (job times out at 45m — see `docs/wiki/development.md`).
 
 ## Branches
 
 - alpha -- trunk. All development merges here.
 - main -- 45 behind / 2 ahead of alpha. Do not target main for new work.
 
-## Status (2026-08-16)
+## Status (2026-09-26)
 
 - Issues #4-#7 merged
-- CI unit passes (job still continue-on-error for tracked alpha gaps)
+- CI unit is required (no `continue-on-error`); long quiet runs are expected, not hung
 - CI e2e failures fail the workflow (see #48)
 
 ## Agent rules
