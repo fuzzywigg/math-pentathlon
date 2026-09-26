@@ -69,8 +69,11 @@ jobs:
           fi
           echo "All JS chunks under ${limit_kb} kB"
 
+  # TOKENMAXX left ~5k unit files; healthy GHA runs take ~25-30 min with little
+  # stdout after npm ci (looks hung). Cap so a true hang does not burn the runner.
   unit:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -78,7 +81,10 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test:unit
+      - name: Run unit tests
+        run: |
+          echo "unit suite: $(find tests/unit -name '*.test.ts' -o -name '*.spec.ts' | wc -l) files (expect ~25-35 min)"
+          npm run test:unit
 
   e2e:
     runs-on: ubuntu-latest
