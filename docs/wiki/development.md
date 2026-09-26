@@ -4,6 +4,7 @@ Public builder notes. Full agent/product guardrails: [`AGENTS.md`](../../AGENTS.
 
 ## Stack
 
+- Node.js **>=20** (`package.json` `engines.node`; CI/deploy pin `node-version: '20'`)
 - TypeScript + Vite
 - Vitest (unit) + Playwright (e2e)
 - Cloudflare Pages deploy from `alpha` (see `.github/workflows/deploy.yml`)
