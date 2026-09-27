@@ -21,6 +21,15 @@ function click(el: Element | null): void {
   el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
 
+/** Activate via board-a11y Enter binding — click target is the inner hit polygon. */
+function activateIsland(container: HTMLElement, islandId: string): void {
+  const group = container.querySelector(`[data-island-id="${islandId}"]`);
+  expect(group).toBeTruthy();
+  group!.dispatchEvent(
+    new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+  );
+}
+
 /** Deterministic rolls that still produce valid islands for AI to pick. */
 function mockRandomCycle(seed = 0.17): void {
   let i = 0;
@@ -49,7 +58,7 @@ describe('Wave 68 remainder — AI turn timer', () => {
     expect(getCurrentState().validIslands.length).toBeGreaterThan(0);
 
     const p1Island = getCurrentState().validIslands[0];
-    click(container.querySelector(`[data-island-id="${p1Island}"]`));
+    activateIsland(container, p1Island);
 
     expect(getCurrentState().phase).toBe('rolling');
     expect(getCurrentState().currentPlayer).toBe('player2');
