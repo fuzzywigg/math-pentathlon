@@ -6,8 +6,12 @@ import { getValidMoves, getSelectableNodes, findPaths } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
-  makeSvgFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -59,6 +63,7 @@ export function renderBoard(
   svg.setAttribute('height', '100%');
   svg.style.maxWidth = `${width}px`;
   svg.style.maxHeight = `${height}px`;
+  markBoardAsGrid(svg);
 
   // Background
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -109,6 +114,9 @@ export function renderBoard(
   for (const [nodeId, node] of state.board.nodes) {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('data-node-id', nodeId);
+    const [rowStr, colStr] = nodeId.split('-');
+    g.setAttribute('data-row', rowStr);
+    g.setAttribute('data-col', colStr);
     g.style.cursor = 'pointer';
 
     // Node circle background
@@ -210,7 +218,7 @@ export function renderBoard(
     const isSelectable =
       selectableNodes.includes(nodeId) ||
       (state.phase === 'placement' && node.chip === null);
-    makeSvgFocusable(
+    makeGridCell(
       g,
       buildCellAriaLabel({
         coord: nodeId.replace('-', ','),
@@ -235,6 +243,8 @@ export function renderBoard(
     svg.appendChild(g);
   }
 
+  bindGridNavigation(svg);
+  applyRovingTabindex(collectGridCells(svg));
   return svg;
 }
 

@@ -16,8 +16,12 @@ import {
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -50,6 +54,7 @@ export function renderFractionBarPool(
 
   const grid = document.createElement('div');
   grid.className = 'fab-bar-grid';
+  markBoardAsGrid(grid);
 
   // Group bars by denominator
   const barsByDenom = new Map<number, FractionBar[]>();
@@ -64,6 +69,7 @@ export function renderFractionBarPool(
   // Sort denominators
   const denoms = Array.from(barsByDenom.keys()).sort((a, b) => a - b);
 
+  let rowIndex = 0;
   for (const denom of denoms) {
     const bars = barsByDenom.get(denom)!;
     // Sort by numerator
@@ -72,14 +78,23 @@ export function renderFractionBarPool(
     const group = document.createElement('div');
     group.className = 'fab-bar-group';
 
-    for (const bar of bars) {
-      const barEl = createFractionBarElement(state, bar, onBarClick);
+    bars.forEach((bar, colIndex) => {
+      const barEl = createFractionBarElement(
+        state,
+        bar,
+        onBarClick,
+        rowIndex,
+        colIndex
+      );
       group.appendChild(barEl);
-    }
+    });
 
     grid.appendChild(group);
+    rowIndex++;
   }
 
+  bindGridNavigation(grid);
+  applyRovingTabindex(collectGridCells(grid));
   container.appendChild(grid);
   return container;
 }
@@ -90,11 +105,15 @@ export function renderFractionBarPool(
 function createFractionBarElement(
   state: FabADiffyState,
   bar: FractionBar,
-  onClick: (barId: string) => void
+  onClick: (barId: string) => void,
+  row: number,
+  col: number
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'fab-bar-wrapper';
   wrapper.dataset.barId = bar.id;
+  wrapper.dataset.row = String(row);
+  wrapper.dataset.col = String(col);
 
   // Determine state
   const isSelected =
@@ -137,7 +156,7 @@ function createFractionBarElement(
     bindCellActivateKeys(wrapper, activate);
   }
 
-  makeCellFocusable(
+  makeGridCell(
     wrapper,
     buildCellAriaLabel({
       coord: formatFraction(simplify(bar.fraction)),
@@ -168,6 +187,7 @@ export function renderAnswerBoard(
 
   const grid = document.createElement('div');
   grid.className = 'fab-answer-grid';
+  markBoardAsGrid(grid);
 
   // Find which answers are currently matchable
   const matchableAnswers = new Set<string>();
@@ -187,15 +207,22 @@ export function renderAnswerBoard(
     }
   }
 
+  const ANSWER_COLS = 4;
+  let answerIndex = 0;
   for (const answer of state.answerBars.values()) {
     const answerEl = createAnswerBarElement(
       answer,
       matchableAnswers.has(answer.id),
-      onAnswerClick
+      onAnswerClick,
+      Math.floor(answerIndex / ANSWER_COLS),
+      answerIndex % ANSWER_COLS
     );
     grid.appendChild(answerEl);
+    answerIndex++;
   }
 
+  bindGridNavigation(grid);
+  applyRovingTabindex(collectGridCells(grid));
   container.appendChild(grid);
   return container;
 }
@@ -206,11 +233,15 @@ export function renderAnswerBoard(
 function createAnswerBarElement(
   answer: AnswerBar,
   isMatchable: boolean,
-  onClick: (answerId: string) => void
+  onClick: (answerId: string) => void,
+  row: number,
+  col: number
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'fab-answer-wrapper';
   wrapper.dataset.answerId = answer.id;
+  wrapper.dataset.row = String(row);
+  wrapper.dataset.col = String(col);
 
   // Determine state
   const isClaimed = answer.claimedBy !== null;
@@ -254,7 +285,7 @@ function createAnswerBarElement(
     bindCellActivateKeys(wrapper, activate);
   }
 
-  makeCellFocusable(
+  makeGridCell(
     wrapper,
     buildCellAriaLabel({
       coord: formatFraction(simplify(answer.fraction)),

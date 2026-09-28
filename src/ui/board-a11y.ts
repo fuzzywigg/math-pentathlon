@@ -226,6 +226,15 @@ export function restoreGridFocus(
   }
 }
 
+/**
+ * True for Enter or Space activation keys.
+ * Accepts `key === ' '` (UI Events) and `code === 'Space'` for broader coverage.
+ * Does not treat legacy `key === 'Spacebar'` as activate (unchanged contract).
+ */
+export function isBoardActivateKey(ke: KeyboardEvent): boolean {
+  return ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space';
+}
+
 /** Enter/Space activation on a single cell (Contig / SD / Prime / SVG pattern). */
 export function bindCellActivateKeys(
   cell: Element,
@@ -233,10 +242,9 @@ export function bindCellActivateKeys(
 ): void {
   cell.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
-    if (ke.key === 'Enter' || ke.key === ' ') {
-      ke.preventDefault();
-      onActivate();
-    }
+    if (!isBoardActivateKey(ke)) return;
+    ke.preventDefault();
+    onActivate();
   });
 }
 
@@ -251,7 +259,7 @@ export function bindBoardCellKeys(
 ): void {
   boardEl.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
-    if (ke.key !== 'Enter' && ke.key !== ' ') return;
+    if (!isBoardActivateKey(ke)) return;
     const target = ke.target;
     if (!isBoardFocusable(target) || !isCell(target)) return;
     ke.preventDefault();

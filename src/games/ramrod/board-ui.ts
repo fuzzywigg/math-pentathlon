@@ -6,8 +6,12 @@ import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Dimensions
@@ -25,6 +29,7 @@ export function renderBoard(
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'ramrod-board';
+  markBoardAsGrid(container);
 
   // Get valid placements for selected rod
   const validPlacements = state.selectedRod
@@ -63,6 +68,8 @@ export function renderBoard(
   }
 
   container.appendChild(grid);
+  bindGridNavigation(container);
+  applyRovingTabindex(collectGridCells(container));
   return container;
 }
 
@@ -117,7 +124,7 @@ function renderSumBox(
       slotEl.appendChild(hint);
     }
 
-    makeCellFocusable(
+    makeGridCell(
       slotEl,
       buildCellAriaLabel({
         coord: `Sum ${box.targetSum} slot ${slot + 1}`,
