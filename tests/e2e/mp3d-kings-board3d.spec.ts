@@ -42,7 +42,9 @@ test.describe('mp3d Kings 3D board', () => {
     await page.addInitScript(() => {
       localStorage.setItem('mp-board3d', '1');
     });
-    await page.goto('/#/game/kings-quadraphages?board3d=1');
+    // Prefer search-param form so the hash path stays a clean route.
+    // Hash query (`#/game/...?board3d=1`) also works after router strip.
+    await page.goto('/?board3d=1#/game/kings-quadraphages');
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="kings"]');
