@@ -17,8 +17,8 @@ import { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
-import { loadKingsBoard3DModule } from './board-3d-loader';
-import type { KingsBoard3D } from '../../ui/three/kings-board-3d';
+import { loadKingsQuadraphagesBoard3DModule } from './board-3d-loader';
+import type { KingsQuadraphagesBoard3D } from '../../ui/three/kings-quadraphages-board-3d';
 
 // Game mode types
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -46,7 +46,7 @@ let historyContainer: HTMLElement | null = null;
 let newGameButton: HTMLElement | null = null;
 
 // Optional Three.js board (only when feature flag is on)
-let board3d: KingsBoard3D | null = null;
+let board3d: KingsQuadraphagesBoard3D | null = null;
 let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 
@@ -61,9 +61,12 @@ function unmountBoard3d(): void {
 
 async function ensureBoard3d(): Promise<void> {
   if (!boardContainer || board3d || !board3dEnabled) return;
-  const mod = await loadKingsBoard3DModule();
+  const mod = await loadKingsQuadraphagesBoard3DModule();
   if (!boardContainer || !board3dEnabled) return;
-  board3d = await mod.createKingsBoard3D(boardContainer, onCellClick);
+  board3d = await mod.createKingsQuadraphagesBoard3D(
+    boardContainer,
+    onCellClick
+  );
 }
 
 // Render the current game state

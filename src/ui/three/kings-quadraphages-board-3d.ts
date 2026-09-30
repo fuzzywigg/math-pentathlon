@@ -8,7 +8,15 @@ import type {
   GameState,
   Position,
 } from '../../games/kings-quadraphages/game-state';
+import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  assembleKingGroup,
+  createChipGeometry,
+  createKingGeometries,
+  disposeKingGeometries,
+  type KingGeometries,
+} from './kings-quadraphages-pieces';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -16,22 +24,32 @@ const BOARD_SIZE = 9;
 const CELL = 1;
 const GAP = 0.06;
 const STEP = CELL + GAP;
+const TILE_TOP_Y = 0.11;
 
 type Three = ThreeModule;
 type Object3D = InstanceType<Three['Object3D']>;
 type Mesh = InstanceType<Three['Mesh']>;
 
-export interface KingsBoard3D {
+export interface KingsQuadraphagesBoard3D {
   update(state: GameState, onCellClick?: CellClickCallback): void;
   unmount(): void;
+  cellToClientPoint(row: number, col: number): { x: number; y: number };
   readonly canvas: HTMLCanvasElement;
 }
 
 interface CellMeshes {
   tile: Mesh;
-  piece: Mesh | null;
+  piece: Object3D | null;
   row: number;
   col: number;
+}
+
+declare global {
+  interface Window {
+    __mp3dKingsQuadraphages?: {
+      cellToClientPoint: (row: number, col: number) => { x: number; y: number };
+    };
+  }
 }
 
 function boardToWorld(row: number, col: number): { x: number; z: number } {
@@ -53,13 +71,13 @@ function isKingMoveTarget(state: GameState, row: number, col: number): boolean {
 }
 
 /**
- * Create and mount a 3D Kings board into `container`.
+ * Create and mount a 3D Kings & Quadraphages board into `container`.
  * Caller must call `unmount()` on route change / destroy.
  */
-export async function createKingsBoard3D(
+export async function createKingsQuadraphagesBoard3D(
   container: HTMLElement,
   onCellClick?: CellClickCallback
-): Promise<KingsBoard3D> {
+): Promise<KingsQuadraphagesBoard3D> {
   const THREE = await loadThree();
 
   container.replaceChildren();
@@ -74,22 +92,26 @@ export async function createKingsBoard3D(
   scene.background = new THREE.Color(0x1a2332);
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-  camera.position.set(0, 14, 12);
+  camera.position.set(0, 10, 11.5);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
-  canvas.setAttribute('data-mp3d', 'kings');
+  canvas.setAttribute('data-mp3d', 'kings-quadraphages');
+  canvas.setAttribute('role', 'img');
+  canvas.setAttribute('aria-label', 'Kings & Quadraphages 3D board (preview)');
   canvas.style.display = 'block';
   canvas.style.width = '100%';
   canvas.style.height = '100%';
   canvas.style.touchAction = 'none';
   container.appendChild(canvas);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.55);
+  const ambient = new THREE.AmbientLight(0xffffff, 0.45);
   scene.add(ambient);
+  const hemi = new THREE.HemisphereLight(0xf0f4ff, 0x3a2a1a, 0.55);
+  scene.add(hemi);
   const key = new THREE.DirectionalLight(0xffffff, 0.85);
   key.position.set(6, 12, 4);
   scene.add(key);
@@ -98,8 +120,13 @@ export async function createKingsBoard3D(
   scene.add(root);
 
   const tileGeo = new THREE.BoxGeometry(CELL, 0.22, CELL);
-  const pieceKingGeo = new THREE.CylinderGeometry(0.28, 0.34, 0.7, 16);
-  const pieceQuadGeo = new THREE.SphereGeometry(0.28, 16, 12);
+  const kingGeos: KingGeometries = createKingGeometries(THREE);
+  const chipGeo = createChipGeometry(THREE);
+  const crestRingGeo = new THREE.RingGeometry(0.3, 0.4, 32);
+
+  const seats = getPlayerSeatColors();
+  const p1Color = new THREE.Color(seats.player1);
+  const p2Color = new THREE.Color(seats.player2);
 
   const mats = {
     light: new THREE.MeshLambertMaterial({ color: 0xe8d5b7 }),
@@ -107,10 +134,20 @@ export async function createKingsBoard3D(
     selected: new THREE.MeshLambertMaterial({ color: 0xf0e68c }),
     valid: new THREE.MeshLambertMaterial({ color: 0x90ee90 }),
     last: new THREE.MeshLambertMaterial({ color: 0x87ceeb }),
-    p1King: new THREE.MeshLambertMaterial({ color: 0x2563eb }),
-    p2King: new THREE.MeshLambertMaterial({ color: 0xdc2626 }),
-    p1Quad: new THREE.MeshLambertMaterial({ color: 0x3b82f6 }),
-    p2Quad: new THREE.MeshLambertMaterial({ color: 0xef4444 }),
+    p1King: new THREE.MeshLambertMaterial({
+      color: p1Color.clone().multiplyScalar(0.85),
+    }),
+    p2King: new THREE.MeshLambertMaterial({
+      color: p2Color.clone().multiplyScalar(0.85),
+    }),
+    p1Quad: new THREE.MeshLambertMaterial({ color: p1Color }),
+    p2Quad: new THREE.MeshLambertMaterial({ color: p2Color }),
+    crest: new THREE.MeshLambertMaterial({
+      color: 0xd4af37,
+      polygonOffset: true,
+      polygonOffsetFactor: -1,
+      polygonOffsetUnits: -1,
+    }),
   };
 
   const cells: CellMeshes[] = [];
@@ -126,11 +163,25 @@ export async function createKingsBoard3D(
     }
   }
 
+  // Crest (throne) rings on E1 and E9 — view-only, never move.
+  for (const [row, col] of [
+    [1, 5],
+    [9, 5],
+  ] as const) {
+    const ring = new THREE.Mesh(crestRingGeo, mats.crest);
+    const { x, z } = boardToWorld(row, col);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(x, 0.112, z);
+    ring.userData = { row, col, kind: 'crest' };
+    root.add(ring);
+  }
+
   let clickHandler: CellClickCallback | undefined = onCellClick;
   let rafId = 0;
   let disposed = false;
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
+  const projectScratch = new THREE.Vector3();
 
   const resize = (): void => {
     if (disposed) return;
@@ -175,6 +226,23 @@ export async function createKingsBoard3D(
   resize();
   animate();
 
+  const cellToClientPoint = (
+    row: number,
+    col: number
+  ): { x: number; y: number } => {
+    const { x, z } = boardToWorld(row, col);
+    projectScratch.set(x, TILE_TOP_Y, z).project(camera);
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: rect.left + ((projectScratch.x + 1) / 2) * rect.width,
+      y: rect.top + ((-projectScratch.y + 1) / 2) * rect.height,
+    };
+  };
+
+  if (import.meta.env.DEV) {
+    window.__mp3dKingsQuadraphages = { cellToClientPoint };
+  }
+
   const clearPiece = (cell: CellMeshes): void => {
     if (!cell.piece) return;
     // Shared geometries/materials — only detach; dispose happens in unmount.
@@ -199,6 +267,19 @@ export async function createKingsBoard3D(
       existingKind === piece.type &&
       existingOwner === piece.owner
     ) {
+      const { x, z } = boardToWorld(row, col);
+      existing.position.set(
+        x,
+        piece.type === 'king' ? TILE_TOP_Y : TILE_TOP_Y + 0.04,
+        z
+      );
+      existing.userData = {
+        ...existing.userData,
+        row,
+        col,
+        kind: piece.type,
+        owner: piece.owner,
+      };
       return;
     }
 
@@ -206,22 +287,25 @@ export async function createKingsBoard3D(
     const { x, z } = boardToWorld(row, col);
 
     if (piece.type === 'king') {
-      const mesh = new THREE.Mesh(
-        pieceKingGeo,
-        piece.owner === 'player1' ? mats.p1King : mats.p2King
+      const group = assembleKingGroup(
+        THREE,
+        kingGeos,
+        piece.owner === 'player1' ? mats.p1King : mats.p2King,
+        row,
+        col,
+        piece.owner
       );
-      mesh.position.set(x, 0.45, z);
-      mesh.userData = { row, col, kind: 'king', owner: piece.owner };
-      root.add(mesh);
-      cell.piece = mesh;
+      group.position.set(x, TILE_TOP_Y, z);
+      root.add(group);
+      cell.piece = group;
       return;
     }
 
     const mesh = new THREE.Mesh(
-      pieceQuadGeo,
+      chipGeo as never,
       piece.owner === 'player1' ? mats.p1Quad : mats.p2Quad
     );
-    mesh.position.set(x, 0.35, z);
+    mesh.position.set(x, TILE_TOP_Y + 0.04, z);
     mesh.userData = { row, col, kind: 'quadraphage', owner: piece.owner };
     root.add(mesh);
     cell.piece = mesh;
@@ -267,18 +351,22 @@ export async function createKingsBoard3D(
     canvas.removeEventListener('pointerup', onPointer);
     window.removeEventListener('resize', onResize);
 
+    if (import.meta.env.DEV && window.__mp3dKingsQuadraphages) {
+      delete window.__mp3dKingsQuadraphages;
+    }
+
     for (const cell of cells) {
       clearPiece(cell);
     }
 
-    // Detach tiles (shared geo/mats disposed below once).
     while (root.children.length > 0) {
       root.remove(root.children[0]!);
     }
     scene.remove(root);
     tileGeo.dispose();
-    pieceKingGeo.dispose();
-    pieceQuadGeo.dispose();
+    disposeKingGeometries(kingGeos);
+    chipGeo.dispose();
+    crestRingGeo.dispose();
     Object.values(mats).forEach((m) => m.dispose());
 
     renderer.dispose();
@@ -291,5 +379,5 @@ export async function createKingsBoard3D(
     container.classList.remove('board-3d-host');
   };
 
-  return { update, unmount, canvas };
+  return { update, unmount, cellToClientPoint, canvas };
 }

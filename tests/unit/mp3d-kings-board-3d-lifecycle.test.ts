@@ -9,18 +9,63 @@ function installThreeMock() {
   class Vector2 {
     x = 0;
     y = 0;
+    constructor(x = 0, y = 0) {
+      this.x = x;
+      this.y = y;
+    }
+  }
+  class Vector3 {
+    x = 0;
+    y = 0;
+    z = 0;
+    set(x: number, y: number, z: number) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      return this;
+    }
+    project(_camera: unknown) {
+      return this;
+    }
+    clone() {
+      return new Vector3().set(this.x, this.y, this.z);
+    }
+    multiplyScalar(s: number) {
+      this.x *= s;
+      this.y *= s;
+      this.z *= s;
+      return this;
+    }
   }
   class Color {
-    constructor(public hex?: number) {}
+    constructor(public hex?: number | string) {}
+    clone() {
+      return new Color(this.hex);
+    }
+    multiplyScalar(_s: number) {
+      return this;
+    }
   }
   class Object3D {
     children: Object3D[] = [];
     parent: Object3D | null = null;
-    position = { set(_x: number, _y: number, _z: number) {} };
+    position = {
+      x: 0,
+      y: 0,
+      z: 0,
+      set(x: number, y: number, z: number) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+      },
+    };
+    rotation = { x: 0, y: 0, z: 0 };
     userData: Record<string, unknown> = {};
-    add(child: Object3D) {
-      child.parent = this;
-      this.children.push(child);
+    add(...kids: Object3D[]) {
+      for (const child of kids) {
+        child.parent = this;
+        this.children.push(child);
+      }
     }
     remove(child: Object3D) {
       this.children = this.children.filter((c) => c !== child);
@@ -59,8 +104,21 @@ function installThreeMock() {
   }
   class AmbientLight extends Light {}
   class DirectionalLight extends Light {}
+  class HemisphereLight extends Light {
+    constructor(
+      public sky?: number,
+      public ground?: number,
+      intensity?: number
+    ) {
+      super(sky, intensity);
+    }
+  }
+  const createdGeos: Array<{ dispose: ReturnType<typeof vi.fn> }> = [];
   class BufferGeometry {
     dispose = vi.fn();
+    constructor() {
+      createdGeos.push(this);
+    }
   }
   class BoxGeometry extends BufferGeometry {
     constructor(
@@ -76,7 +134,15 @@ function installThreeMock() {
       super();
     }
   }
-  class SphereGeometry extends BufferGeometry {
+  class LatheGeometry extends BufferGeometry {
+    constructor(
+      public points: Vector2[],
+      public segments: number
+    ) {
+      super();
+    }
+  }
+  class RingGeometry extends BufferGeometry {
     constructor(..._args: number[]) {
       super();
     }
@@ -119,19 +185,33 @@ function installThreeMock() {
     Mesh,
     BoxGeometry,
     CylinderGeometry,
-    SphereGeometry,
+    LatheGeometry,
+    RingGeometry,
     MeshLambertMaterial,
     AmbientLight,
     DirectionalLight,
+    HemisphereLight,
     Raycaster,
     Vector2,
+    Vector3,
     Color,
     Group,
     Object3D,
+    BufferGeometry,
+    __createdGeos: createdGeos,
   };
 }
 
-describe('mp3d kings board 3d lifecycle', () => {
+vi.mock('../../src/ui/player-colors', () => ({
+  getPlayerSeatColors: () => ({
+    player1: '#2563eb',
+    player2: '#dc2626',
+    player1Light: '#93c5fd',
+    player2Light: '#fca5a5',
+  }),
+}));
+
+describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
   beforeEach(() => {
     vi.resetModules();
     document.body.innerHTML = '';
@@ -143,12 +223,11 @@ describe('mp3d kings board 3d lifecycle', () => {
     vi.unstubAllGlobals();
   });
 
-  it('mounts a canvas and unmount removes it and disposes renderer', async () => {
+  it('mounts a canvas and unmount removes it and disposes shared geos', async () => {
     const threeMock = installThreeMock();
     const loadThree = vi.fn(async () => threeMock);
     vi.doMock('../../src/ui/three/load-three', () => ({ loadThree }));
 
-    // jsdom may lack rAF
     let rafCb: FrameRequestCallback | null = null;
     vi.stubGlobal(
       'requestAnimationFrame',
@@ -160,8 +239,8 @@ describe('mp3d kings board 3d lifecycle', () => {
     const cancelSpy = vi.fn();
     vi.stubGlobal('cancelAnimationFrame', cancelSpy);
 
-    const { createKingsBoard3D } =
-      await import('../../src/ui/three/kings-board-3d');
+    const { createKingsQuadraphagesBoard3D } =
+      await import('../../src/ui/three/kings-quadraphages-board-3d');
 
     const container = document.createElement('div');
     container.style.width = '400px';
@@ -169,24 +248,29 @@ describe('mp3d kings board 3d lifecycle', () => {
     document.body.appendChild(container);
 
     const onClick = vi.fn();
-    const view = await createKingsBoard3D(container, onClick);
+    const view = await createKingsQuadraphagesBoard3D(container, onClick);
 
     expect(loadThree).toHaveBeenCalledTimes(1);
-    expect(container.querySelector('canvas[data-mp3d="kings"]')).toBe(
-      view.canvas
+    expect(
+      container.querySelector('canvas[data-mp3d="kings-quadraphages"]')
+    ).toBe(view.canvas);
+    expect(view.canvas.getAttribute('role')).toBe('img');
+    expect(view.canvas.getAttribute('aria-label')).toContain(
+      'Kings & Quadraphages'
     );
     expect(container.contains(view.canvas)).toBe(true);
 
     const state = createInitialGameState();
     view.update(state, onClick);
     expect(rafCb).not.toBeNull();
+    expect(view.cellToClientPoint(1, 5)).toEqual(
+      expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) })
+    );
 
-    const disposeSpy = threeMock.WebGLRenderer.prototype
-      ? undefined
-      : undefined;
-    // Capture dispose from the instance created during mount
-    const rendererDispose = view.canvas; // keep reference before unmount
-    expect(rendererDispose.parentElement).toBe(container);
+    expect(view.canvas.parentElement).toBe(container);
+
+    const geosBeforeUnmount = threeMock.__createdGeos.length;
+    expect(geosBeforeUnmount).toBeGreaterThan(0);
 
     view.unmount();
 
@@ -194,6 +278,10 @@ describe('mp3d kings board 3d lifecycle', () => {
     expect(container.contains(view.canvas)).toBe(false);
     expect(cancelSpy).toHaveBeenCalled();
     expect(loadThree).toHaveBeenCalledTimes(1);
+    // Shared king lathe/cross, chip, crest ring, and tile geos all dispose once.
+    for (const geo of threeMock.__createdGeos) {
+      expect(geo.dispose).toHaveBeenCalled();
+    }
   });
 
   it('unmount is idempotent', async () => {
@@ -207,11 +295,11 @@ describe('mp3d kings board 3d lifecycle', () => {
     );
     vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
-    const { createKingsBoard3D } =
-      await import('../../src/ui/three/kings-board-3d');
+    const { createKingsQuadraphagesBoard3D } =
+      await import('../../src/ui/three/kings-quadraphages-board-3d');
     const container = document.createElement('div');
     document.body.appendChild(container);
-    const view = await createKingsBoard3D(container);
+    const view = await createKingsQuadraphagesBoard3D(container);
     view.unmount();
     view.unmount();
     expect(container.querySelector('canvas')).toBeNull();
