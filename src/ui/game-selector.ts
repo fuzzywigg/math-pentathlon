@@ -226,7 +226,7 @@ export function renderGameSelector(container: HTMLElement): void {
       <span class="stat-label">Divisions</span>
     </div>
     <div class="stat">
-      <span class="stat-number">K-6</span>
+      <span class="stat-number">K–7</span>
       <span class="stat-label">Grades</span>
     </div>
   `;
