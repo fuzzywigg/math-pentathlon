@@ -92,7 +92,9 @@ export async function createKingsQuadraphagesBoard3D(
   scene.background = new THREE.Color(0x1a2332);
 
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-  camera.position.set(0, 10, 11.5);
+  // ~4% closer than the original (0, 10, 11.5) and a touch steeper, so the
+  // bigger kings read well without hiding the tile behind them.
+  camera.position.set(0, 10.9, 9.8);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });

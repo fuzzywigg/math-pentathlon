@@ -11,7 +11,13 @@ type Group = InstanceType<Three['Group']>;
 type Material = InstanceType<Three['Material']>;
 type DisposableGeo = { dispose: () => void };
 
-/** Lathe profile as [radius, y] in cell units (1 cell = 1.0). */
+/**
+ * Uniform size multiplier for the 3D kings (~30% bigger than the original
+ * 0.34-radius / 0.97-tall silhouette). Max radius 0.442 still fits a 1.0 cell.
+ */
+export const KING_SCALE = 1.3;
+
+/** Lathe profile as [radius, y] in cell units (1 cell = 1.0), before KING_SCALE. */
 export const KING_LATHE_PROFILE: ReadonlyArray<readonly [number, number]> = [
   [0.0, 0.0],
   [0.34, 0.0],
@@ -38,13 +44,14 @@ export interface KingGeometries {
 }
 
 export function createKingGeometries(THREE: Three): KingGeometries {
+  const k = KING_SCALE;
   const points = KING_LATHE_PROFILE.map(
-    ([radius, y]) => new THREE.Vector2(radius, y)
+    ([radius, y]) => new THREE.Vector2(radius * k, y * k)
   );
   return {
     body: new THREE.LatheGeometry(points, 32),
-    crossV: new THREE.BoxGeometry(0.06, 0.18, 0.06),
-    crossH: new THREE.BoxGeometry(0.15, 0.05, 0.06),
+    crossV: new THREE.BoxGeometry(0.06 * k, 0.18 * k, 0.06 * k),
+    crossH: new THREE.BoxGeometry(0.15 * k, 0.05 * k, 0.06 * k),
   };
 }
 
@@ -74,9 +81,9 @@ export function assembleKingGroup(
   // Geometries are created by the matching THREE constructors above.
   const body = new THREE.Mesh(geos.body as never, material);
   const crossV = new THREE.Mesh(geos.crossV as never, material);
-  crossV.position.y = 0.89;
+  crossV.position.y = 0.89 * KING_SCALE;
   const crossH = new THREE.Mesh(geos.crossH as never, material);
-  crossH.position.y = 0.92;
+  crossH.position.y = 0.92 * KING_SCALE;
   group.add(body);
   group.add(crossV);
   group.add(crossH);

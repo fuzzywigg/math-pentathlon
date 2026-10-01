@@ -5,6 +5,7 @@ import {
   disposeKingGeometries,
   assembleKingGroup,
   KING_LATHE_PROFILE,
+  KING_SCALE,
 } from '../../src/ui/three/kings-quadraphages-pieces';
 
 function fakeThree() {
@@ -113,5 +114,19 @@ describe('mp3d Kings & Quadraphages piece geometries', () => {
       kind: 'king',
       owner: 'player1',
     });
+  });
+
+  it('scales the king silhouette ~30% bigger and keeps it inside one cell', () => {
+    const THREE = fakeThree();
+    expect(KING_SCALE).toBeCloseTo(1.3);
+    const geos = createKingGeometries(THREE as never);
+    const pts = (geos.body as InstanceType<typeof THREE.LatheGeometry>).points;
+    const maxR = Math.max(...pts.map((p) => p.x));
+    const maxY = Math.max(...pts.map((p) => p.y));
+    expect(maxR).toBeCloseTo(0.34 * 1.3);
+    expect(maxY).toBeCloseTo(0.8 * 1.3);
+    expect(maxR).toBeLessThan(0.5);
+    const crossV = geos.crossV as InstanceType<typeof THREE.BoxGeometry>;
+    expect(crossV.h).toBeCloseTo(0.18 * 1.3);
   });
 });
