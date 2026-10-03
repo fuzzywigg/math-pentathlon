@@ -110,6 +110,10 @@ function installThreeMock() {
     }
   }
   const createdGeos: Array<{ dispose: ReturnType<typeof vi.fn> }> = [];
+  const createdMats: Array<{
+    opts?: unknown;
+    dispose: ReturnType<typeof vi.fn>;
+  }> = [];
   class BufferGeometry {
     dispose = vi.fn();
     rotateX = vi.fn();
@@ -166,7 +170,9 @@ function installThreeMock() {
   }
   class Material {
     dispose = vi.fn();
-    constructor(public opts?: unknown) {}
+    constructor(public opts?: unknown) {
+      createdMats.push(this);
+    }
   }
   class MeshLambertMaterial extends Material {}
   class Mesh extends Object3D {
@@ -196,6 +202,14 @@ function installThreeMock() {
     }
   }
 
+  class CanvasTexture {
+    wrapS = 0;
+    wrapT = 0;
+    repeat = { set() {} };
+    dispose = vi.fn();
+    constructor(public canvas?: HTMLCanvasElement) {}
+  }
+
   return {
     Scene,
     PerspectiveCamera,
@@ -219,7 +233,10 @@ function installThreeMock() {
     Group,
     Object3D,
     BufferGeometry,
+    CanvasTexture,
+    RepeatWrapping: 1000,
     __createdGeos: createdGeos,
+    __createdMats: createdMats,
   };
 }
 
@@ -305,6 +322,81 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
     for (const geo of threeMock.__createdGeos) {
       expect(geo.dispose).toHaveBeenCalled();
     }
+  });
+
+  it('uses a warm wood tabletop texture, not slate, and never pulses', async () => {
+    const threeMock = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => threeMock,
+    }));
+    const raf = vi.spyOn(window, 'requestAnimationFrame');
+
+    const { createQueensGuardsBoard3D } =
+      await import('../../src/ui/three/queens-guards-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const view = await createQueensGuardsBoard3D(host);
+
+    const woodSlab = threeMock.__createdMats.some((m) => {
+      const opts = m.opts as { color?: number; map?: unknown } | undefined;
+      return opts?.color === 0x8b6239 && opts.map;
+    });
+    expect(woodSlab).toBe(true);
+    expect(
+      threeMock.__createdMats.some(
+        (m) => (m.opts as { color?: number } | undefined)?.color === 0xd4b45a
+      )
+    ).toBe(true);
+    expect(
+      threeMock.__createdMats.some(
+        (m) => (m.opts as { color?: number } | undefined)?.color === 0x1c2a38
+      )
+    ).toBe(false);
+
+    const state = createInitialState();
+    view.update({ ...state, winner: 'player1' });
+    expect(raf).not.toHaveBeenCalled();
+    view.unmount();
+  });
+
+  it('a11y grid labels captured pieces and restore targets', async () => {
+    const threeMock = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => threeMock,
+    }));
+    const { createQueensGuardsBoard3D } =
+      await import('../../src/ui/three/queens-guards-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const view = await createQueensGuardsBoard3D(host);
+
+    const { cellKey } = await import('../../src/games/queens-guards/types');
+    const base = createInitialState();
+    const cells = new Map(base.cells);
+    cells.set(cellKey(2, 0), {
+      ring: 2,
+      position: 0,
+      piece: { id: 'p2-captured-guard', player: 'player2', type: 'guard' },
+    });
+    view.update({
+      ...base,
+      cells,
+      currentPlayer: 'player1',
+      capturedPieces: [{ ring: 2, position: 0 }],
+      selectedPiece: cellKey(2, 0),
+    });
+
+    expect(
+      host
+        .querySelector('.qg-a11y-grid [data-cell-key="2-0"]')
+        ?.getAttribute('aria-label')
+    ).toMatch(/captured/i);
+    expect(
+      host
+        .querySelector('.qg-a11y-grid [data-cell-key="5-0"]')
+        ?.getAttribute('aria-label')
+    ).toMatch(/restore target/i);
+    view.unmount();
   });
 
   it('unmount is idempotent', async () => {

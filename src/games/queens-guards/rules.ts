@@ -274,6 +274,25 @@ function formsLine(a: BoardCoord, b: BoardCoord, c: BoardCoord): boolean {
 }
 
 /**
+ * Empty outer-ring cells a captured piece may be restored to.
+ * Official Queens & Guards / Agon: the capturer relocates the sandwiched
+ * piece to any vacant space on the outermost ring, then the opponent plays.
+ */
+export function getRestoreTargets(state: QueensGuardsState): BoardCoord[] {
+  if (state.capturedPieces.length === 0) return [];
+  const outerRing = CONFIG.NUM_RINGS - 1;
+  const targets: BoardCoord[] = [];
+  const count = cellsInRing(outerRing);
+  for (let pos = 0; pos < count; pos++) {
+    const cell = state.cells.get(cellKey(outerRing, pos));
+    if (cell && !cell.piece) {
+      targets.push({ ring: outerRing, position: pos });
+    }
+  }
+  return targets;
+}
+
+/**
  * Move a captured piece to the outer ring
  */
 export function restoreCapturedPiece(

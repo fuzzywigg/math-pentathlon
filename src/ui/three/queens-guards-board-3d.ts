@@ -22,7 +22,10 @@ import {
   cellsInRing,
   parseKey,
 } from '../../games/queens-guards/types';
-import { getValidMoves } from '../../games/queens-guards/rules';
+import {
+  getValidMoves,
+  getRestoreTargets,
+} from '../../games/queens-guards/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
 import {
@@ -89,6 +92,36 @@ export function ringPosToWorld(
   };
 }
 
+function createWoodGrainTexture(
+  THREE: Three
+): InstanceType<Three['CanvasTexture']> {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  if (!ctx || typeof ctx.fillRect !== 'function') {
+    return new THREE.CanvasTexture(canvas);
+  }
+  ctx.fillStyle = '#6b4f2e';
+  ctx.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 48; i++) {
+    const y = (i / 48) * 256 + Math.sin(i * 0.7) * 4;
+    ctx.strokeStyle = i % 3 === 0 ? '#5a4124' : '#7a5a34';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    for (let x = 0; x <= 256; x += 8) {
+      ctx.lineTo(x, y + Math.sin(x / 18 + i) * 2.5);
+    }
+    ctx.stroke();
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(2, 2);
+  return tex;
+}
+
 function createFlatTopHexShape(
   THREE: Three,
   radius: number
@@ -125,8 +158,8 @@ export async function createQueensGuardsBoard3D(
   container.style.position = 'relative';
 
   const scene = new THREE.Scene();
-  // Warm wood-table atmosphere (original procedural look)
-  scene.background = new THREE.Color(0x1c2430);
+  // Warm wood-table atmosphere (not cool slate)
+  scene.background = new THREE.Color(0x2a2118);
 
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
   // Tilted tabletop — full hex board in frame on phone + tablet
@@ -140,6 +173,8 @@ export async function createQueensGuardsBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
+      // Playwright canvas.screenshot() needs the latest frame.
+      preserveDrawingBuffer: true,
     });
     const gl =
       typeof renderer.getContext === 'function'
@@ -189,7 +224,7 @@ export async function createQueensGuardsBoard3D(
   const root = new THREE.Group();
   scene.add(root);
 
-  // Tabletop slab under the hexes
+  // Warm wood tabletop (procedural grain; not slate)
   const boardRadius = (CONFIG.NUM_RINGS - 1) * RING_STEP + HEX_R + 0.55;
   const slabGeo = new THREE.CylinderGeometry(
     boardRadius,
@@ -197,7 +232,11 @@ export async function createQueensGuardsBoard3D(
     0.22,
     48
   );
-  const slabMat = new THREE.MeshLambertMaterial({ color: 0x6b4f2e });
+  const woodMap = createWoodGrainTexture(THREE);
+  const slabMat = new THREE.MeshLambertMaterial({
+    color: 0x8b6239,
+    map: woodMap,
+  });
   const slab = new THREE.Mesh(slabGeo, slabMat);
   slab.position.y = BOARD_Y - 0.14;
   root.add(slab);
@@ -223,7 +262,8 @@ export async function createQueensGuardsBoard3D(
     capture: new THREE.MeshLambertMaterial({ color: 0xe53935 }),
     last: new THREE.MeshLambertMaterial({ color: 0x64b5f6 }),
     focus: new THREE.MeshLambertMaterial({ color: 0xce93d8 }),
-    winner: new THREE.MeshLambertMaterial({ color: 0xffd700 }),
+    // Subtle gold for the winning formation — static, no pulse
+    winner: new THREE.MeshLambertMaterial({ color: 0xd4b45a }),
     p1: new THREE.MeshLambertMaterial({
       color: p1Color.clone().multiplyScalar(0.9),
     }),
@@ -443,8 +483,13 @@ export async function createQueensGuardsBoard3D(
   };
 
   const applyTileMaterials = (state: QueensGuardsState): void => {
+    const restoring = state.capturedPieces.length > 0;
     const validMoves = new Set<string>();
-    if (state.selectedPiece) {
+    if (restoring) {
+      for (const m of getRestoreTargets(state)) {
+        validMoves.add(cellKey(m.ring, m.position));
+      }
+    } else if (state.selectedPiece) {
       const selectedCoord = parseKey(state.selectedPiece);
       for (const m of getValidMoves(state, selectedCoord)) {
         validMoves.add(cellKey(m.ring, m.position));
@@ -495,13 +540,22 @@ export async function createQueensGuardsBoard3D(
     handler?: CellClickCallback
   ): void => {
     a11y.replaceChildren();
+    const restoring = state.capturedPieces.length > 0;
     const validMoves = new Set<string>();
-    if (state.selectedPiece) {
+    if (restoring) {
+      for (const m of getRestoreTargets(state)) {
+        validMoves.add(cellKey(m.ring, m.position));
+      }
+    } else if (state.selectedPiece) {
       const selectedCoord = parseKey(state.selectedPiece);
       for (const m of getValidMoves(state, selectedCoord)) {
         validMoves.add(cellKey(m.ring, m.position));
       }
     }
+
+    const captured = new Set(
+      state.capturedPieces.map((c) => cellKey(c.ring, c.position))
+    );
 
     for (const cell of cells) {
       const boardCell = state.cells.get(cell.key);
@@ -526,7 +580,10 @@ export async function createQueensGuardsBoard3D(
             : '';
       const extras: string[] = [];
       if (state.selectedPiece === cell.key) extras.push('selected');
-      if (validMoves.has(cell.key)) extras.push('legal move');
+      if (validMoves.has(cell.key)) {
+        extras.push(restoring ? 'restore target' : 'legal move');
+      }
+      if (captured.has(cell.key)) extras.push('captured');
       btn.setAttribute(
         'aria-label',
         `ring ${cell.ring} pos ${cell.position}, ${owner}${
@@ -534,8 +591,9 @@ export async function createQueensGuardsBoard3D(
         }${extras.length ? `, ${extras.join(', ')}` : ''}`
       );
 
-      const selectable =
-        !!piece && piece.player === state.currentPlayer && !state.winner;
+      const selectable = restoring
+        ? captured.has(cell.key)
+        : !!piece && piece.player === state.currentPlayer && !state.winner;
       btn.tabIndex =
         selectable ||
         validMoves.has(cell.key) ||
@@ -613,6 +671,7 @@ export async function createQueensGuardsBoard3D(
     slabGeo.dispose();
     rimGeo.dispose();
     queenGlowGeo.dispose();
+    woodMap.dispose();
     disposeQueensGuardsPieceGeometries(pieceGeos);
     Object.values(mats).forEach((m) => m.dispose());
     slabMat.dispose();

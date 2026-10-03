@@ -10,7 +10,14 @@ import {
   parseKey,
   getOpponent,
 } from './types';
-import { getValidMoves, makeMove, selectPiece, hasValidMoves } from './rules';
+import {
+  getValidMoves,
+  makeMove,
+  selectPiece,
+  hasValidMoves,
+  restoreCapturedPiece,
+  getRestoreTargets,
+} from './rules';
 import { renderBoard, injectQGStyles, getPlayerName } from './board-ui';
 import { getAIMove, applyAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
@@ -29,6 +36,12 @@ declare global {
       getMoveCount: () => number;
       getPieceCount: () => number;
       getSelected: () => string | null;
+      getCapturedCount: () => number;
+      seedCapturedRestore: (opts?: {
+        currentPlayer?: Player;
+        keepVsAI?: boolean;
+      }) => void;
+      seedWinnerFormation: () => void;
     };
   }
 }
@@ -124,8 +137,8 @@ function updateStatus(): void {
     return;
   }
 
-  // Check for stalemate
-  if (!hasValidMoves(gameState)) {
+  // Check for stalemate (not while a capture still needs restoring)
+  if (gameState.capturedPieces.length === 0 && !hasValidMoves(gameState)) {
     const stalematedPlayer = getPlayerName(gameState.currentPlayer);
     const winner = getOpponent(gameState.currentPlayer);
     const winnerName = getPlayerName(winner);
@@ -156,7 +169,8 @@ function updateStatus(): void {
       'Click a highlighted cell to move, or select a different piece';
   }
   if (gameState.capturedPieces.length > 0) {
-    instruction = 'Place captured pieces on the outer ring';
+    instruction =
+      'Click a captured piece, then an empty space on the outer ring';
   }
 
   statusContainer.innerHTML = `
@@ -174,11 +188,73 @@ function updateStatus(): void {
 // Event Handlers
 // =============================================================================
 
+function maybeTriggerAI(): void {
+  if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
+    setTimeout(performAIMove, 500);
+  }
+}
+
+function isCapturedCoord(coord: BoardCoord): boolean {
+  return gameState.capturedPieces.some(
+    (c) => c.ring === coord.ring && c.position === coord.position
+  );
+}
+
+function handleRestoreClick(coord: BoardCoord): void {
+  if (isCapturedCoord(coord)) {
+    gameState = {
+      ...gameState,
+      selectedPiece: cellKey(coord.ring, coord.position),
+    };
+    updateUI();
+    return;
+  }
+
+  const targets = getRestoreTargets(gameState);
+  const isTarget = targets.some(
+    (t) => t.ring === coord.ring && t.position === coord.position
+  );
+  if (!isTarget) return;
+
+  const from = gameState.selectedPiece
+    ? parseKey(gameState.selectedPiece)
+    : gameState.capturedPieces[0]!;
+  if (
+    !gameState.capturedPieces.some(
+      (c) => c.ring === from.ring && c.position === from.position
+    )
+  ) {
+    return;
+  }
+
+  const next = restoreCapturedPiece(gameState, from, coord);
+  if (next === gameState) return;
+  gameState = {
+    ...next,
+    selectedPiece:
+      next.capturedPieces.length > 0
+        ? cellKey(
+            next.capturedPieces[0]!.ring,
+            next.capturedPieces[0]!.position
+          )
+        : null,
+  };
+  moveCount++;
+  updateUI();
+  maybeTriggerAI();
+}
+
 function handleCellClick(coord: BoardCoord): void {
   if (gameState.winner) return;
 
   // If playing vs AI and it's AI's turn, ignore clicks
   if (vsAI && gameState.currentPlayer === aiPlayer) return;
+
+  // Official capture restore must finish before any other move.
+  if (gameState.capturedPieces.length > 0) {
+    handleRestoreClick(coord);
+    return;
+  }
 
   const key = cellKey(coord.ring, coord.position);
   const cell = gameState.cells.get(key);
@@ -192,15 +268,17 @@ function handleCellClick(coord: BoardCoord): void {
     );
 
     if (isValidMove) {
-      // Execute move
       gameState = makeMove(gameState, fromCoord, coord);
       moveCount++;
-      updateUI();
-
-      // Check for AI turn
-      if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-        setTimeout(performAIMove, 500);
+      if (gameState.capturedPieces.length > 0) {
+        const first = gameState.capturedPieces[0]!;
+        gameState = {
+          ...gameState,
+          selectedPiece: cellKey(first.ring, first.position),
+        };
       }
+      updateUI();
+      maybeTriggerAI();
       return;
     }
   }
@@ -227,10 +305,17 @@ function performAIMove(): void {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
-  if (aiMove) {
-    gameState = applyAIMove(gameState, aiMove);
-    moveCount++;
-    updateUI();
+  if (!aiMove) return;
+
+  const next = applyAIMove(gameState, aiMove);
+  if (next === gameState) return;
+  gameState = next;
+  moveCount++;
+  updateUI();
+
+  // Capture keeps the AI seat until restore finishes.
+  if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
+    setTimeout(performAIMove, 400);
   }
 }
 
@@ -276,6 +361,74 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
         return n;
       },
       getSelected: () => gameState.selectedPiece,
+      getCapturedCount: () => gameState.capturedPieces.length,
+      seedCapturedRestore: (opts?: {
+        currentPlayer?: Player;
+        keepVsAI?: boolean;
+      }) => {
+        const base = createInitialState();
+        const cells = new Map(base.cells);
+        const captured: BoardCoord = { ring: 2, position: 0 };
+        cells.set(cellKey(captured.ring, captured.position), {
+          ring: captured.ring,
+          position: captured.position,
+          piece: {
+            id: 'p2-captured-guard',
+            player: 'player2',
+            type: 'guard',
+          },
+        });
+        const seat = opts?.currentPlayer ?? 'player1';
+        gameState = {
+          ...base,
+          cells,
+          currentPlayer: seat,
+          capturedPieces: [captured],
+          selectedPiece: cellKey(captured.ring, captured.position),
+          winner: null,
+          moveHistory: [],
+        };
+        if (!opts?.keepVsAI) vsAI = false;
+        updateUI();
+        maybeTriggerAI();
+      },
+      seedWinnerFormation: () => {
+        const base = createInitialState();
+        const cells = new Map(base.cells);
+        const outerQueen = cells.get(cellKey(5, 7))!;
+        cells.set(cellKey(5, 7), { ...outerQueen, piece: null });
+        cells.set(cellKey(0, 0), {
+          ring: 0,
+          position: 0,
+          piece: {
+            id: 'p1-queen',
+            player: 'player1',
+            type: 'queen',
+          },
+        });
+        const guardPositions = [1, 3, 5, 9, 11, 13];
+        for (let i = 0; i < 6; i++) {
+          const from = cells.get(cellKey(5, guardPositions[i]!))!;
+          cells.set(cellKey(5, guardPositions[i]!), {
+            ...from,
+            piece: null,
+          });
+          cells.set(cellKey(1, i), {
+            ring: 1,
+            position: i,
+            piece: from.piece,
+          });
+        }
+        gameState = {
+          ...base,
+          cells,
+          currentPlayer: 'player1',
+          winner: 'player1',
+          selectedPiece: null,
+          capturedPieces: [],
+        };
+        updateUI();
+      },
     };
   }
 
