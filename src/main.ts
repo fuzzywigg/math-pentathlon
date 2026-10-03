@@ -60,6 +60,7 @@ import {
 } from './games/fiar/game-controller';
 import {
   initGame as initQGGame,
+  destroyGame as destroyQGGame,
   newGameVsHuman as qgNewGameVsHuman,
   newGameVsAI as qgNewGameVsAI,
   startTutorial as startQGTutorial,
@@ -796,7 +797,10 @@ function renderQueensGuards(): void {
     initQGGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyQGGame();
+    shell.cleanup();
+  };
 }
 
 // Render Contig 60
