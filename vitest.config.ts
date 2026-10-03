@@ -8,11 +8,13 @@ const coverage = {
   exclude: ['src/**/*.d.ts'],
 };
 
-/** Handwritten tests that need a fresh module graph (vi.mock / controller singletons). */
+/** Tests that need a fresh module graph (vi.mock / controller singletons). */
 const isolatedFiles = [
   'tests/unit/stats-dashboard.test.ts',
   'tests/unit/existing-games-controllers.test.ts',
   'tests/unit/existing-games-tutorials.test.ts',
+  // MP-3D suites mock feature-flags / three.js and must not leak into 2D controller tests.
+  'tests/unit/mp3d-*.test.ts',
 ];
 
 export default defineConfig({
