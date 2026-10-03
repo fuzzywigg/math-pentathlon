@@ -266,6 +266,66 @@ export function placeChip(
   };
 }
 
+export type VeinCell = { row: number; col: number; value: number };
+
+/**
+ * Diagonal prime-vein segments for a player (view/highlight helper).
+ * Same scoring definition as {@link countPrimeVeins}: consecutive owned primes
+ * on a diagonal with length ≥ CONFIG.MIN_VEIN_LENGTH.
+ */
+export function getPrimeVeinSegments(
+  cells: Map<string, BoardCell>,
+  player: Player
+): VeinCell[][] {
+  const size = CONFIG.BOARD_SIZE;
+  const segments: VeinCell[][] = [];
+
+  const flush = (run: VeinCell[]) => {
+    if (run.length >= CONFIG.MIN_VEIN_LENGTH) {
+      segments.push(run.slice());
+    }
+    run.length = 0;
+  };
+
+  // Top-left to bottom-right diagonals
+  for (let start = -(size - 1); start < size; start++) {
+    const run: VeinCell[] = [];
+    for (let i = 0; i < size; i++) {
+      const row = i;
+      const col = start + i;
+      if (col >= 0 && col < size) {
+        const cell = cells.get(`${row},${col}`);
+        if (cell && cell.isPrime && cell.owner === player) {
+          run.push({ row, col, value: cell.value });
+        } else {
+          flush(run);
+        }
+      }
+    }
+    flush(run);
+  }
+
+  // Top-right to bottom-left diagonals
+  for (let start = 0; start < 2 * size - 1; start++) {
+    const run: VeinCell[] = [];
+    for (let i = 0; i < size; i++) {
+      const row = i;
+      const col = start - i;
+      if (col >= 0 && col < size) {
+        const cell = cells.get(`${row},${col}`);
+        if (cell && cell.isPrime && cell.owner === player) {
+          run.push({ row, col, value: cell.value });
+        } else {
+          flush(run);
+        }
+      }
+    }
+    flush(run);
+  }
+
+  return segments;
+}
+
 /**
  * Count diagonal prime veins for a player
  */
@@ -273,49 +333,7 @@ function countPrimeVeins(
   cells: Map<string, BoardCell>,
   player: Player
 ): number {
-  const size = CONFIG.BOARD_SIZE;
-  let veins = 0;
-
-  // Check all diagonals (both directions)
-  // Top-left to bottom-right diagonals
-  for (let start = -(size - 1); start < size; start++) {
-    let count = 0;
-    for (let i = 0; i < size; i++) {
-      const row = i;
-      const col = start + i;
-      if (col >= 0 && col < size) {
-        const cell = cells.get(`${row},${col}`);
-        if (cell && cell.isPrime && cell.owner === player) {
-          count++;
-        } else {
-          if (count >= CONFIG.MIN_VEIN_LENGTH) veins++;
-          count = 0;
-        }
-      }
-    }
-    if (count >= CONFIG.MIN_VEIN_LENGTH) veins++;
-  }
-
-  // Top-right to bottom-left diagonals
-  for (let start = 0; start < 2 * size - 1; start++) {
-    let count = 0;
-    for (let i = 0; i < size; i++) {
-      const row = i;
-      const col = start - i;
-      if (col >= 0 && col < size) {
-        const cell = cells.get(`${row},${col}`);
-        if (cell && cell.isPrime && cell.owner === player) {
-          count++;
-        } else {
-          if (count >= CONFIG.MIN_VEIN_LENGTH) veins++;
-          count = 0;
-        }
-      }
-    }
-    if (count >= CONFIG.MIN_VEIN_LENGTH) veins++;
-  }
-
-  return veins;
+  return getPrimeVeinSegments(cells, player).length;
 }
 
 // =============================================================================
