@@ -91,13 +91,13 @@ describe('Wave 18 movement — FIAR movement phase', () => {
 
   it('getValidMoves empty outside movement; findPaths / isDraw opening', () => {
     const opening = createFiar();
-    expect(fiarValidMoves(opening, '0-0')).toEqual([]);
+    expect(fiarValidMoves(opening, 'c0r3')).toEqual([]);
     expect(findPaths(opening, 'player1').length).toBeGreaterThanOrEqual(0);
     expect(isDraw(opening)).toBe(false);
     expect(fiarWinner(opening)).toBeNull();
 
     // isPathBlocked requires player seat
-    const blocked = isPathBlocked(opening, ['0-0', '0-1'], 'player1');
+    const blocked = isPathBlocked(opening, ['c0r3', 'c1r3'], 'player1');
     expect(typeof blocked).toBe('boolean');
   });
 });

@@ -147,14 +147,14 @@ describe('Wave 26 path — FIAR placement then movement success', () => {
   it('two opening placeChip plies flip seats and grow history', () => {
     let state = createFiar();
     expect(state.phase).toBe('placement');
-    state = fiarPlace(state, '0-0');
-    expect(state.board.nodes.get('0-0')?.chip).toBe('player1');
+    state = fiarPlace(state, 'c0r3');
+    expect(state.board.nodes.get('c0r3')?.chip).toBe('player1');
     expect(state.chipsPlaced.player1).toBe(1);
     expect(state.moveHistory).toHaveLength(1);
     expect(state.currentPlayer).toBe('player2');
 
-    state = fiarPlace(state, '4-4');
-    expect(state.board.nodes.get('4-4')?.chip).toBe('player2');
+    state = fiarPlace(state, 'c8r3');
+    expect(state.board.nodes.get('c8r3')?.chip).toBe('player2');
     expect(state.chipsPlaced.player2).toBe(1);
     expect(state.moveHistory).toHaveLength(2);
     expect(state.currentPlayer).toBe('player1');
@@ -187,7 +187,7 @@ describe('Wave 26 path — FIAR placement then movement success', () => {
 
   it('four alternating placement plies keep phase placement until supply full', () => {
     let state = createFiar();
-    const sequence = ['0-0', '4-4', '0-1', '4-3'];
+    const sequence = ['c0r3', 'c8r3', 'c3r0', 'c5r6'];
     for (let i = 0; i < sequence.length; i++) {
       state = fiarPlace(state, sequence[i]);
       expect(state.moveHistory).toHaveLength(i + 1);
@@ -487,7 +487,7 @@ describe('Wave 26 quiz — Fraction Pinball correct then nextChallenge', () => {
 describe('Wave 26 path deepen — FIAR six-placement midway', () => {
   it('six alternating places keep placement phase and history length 6', () => {
     let state = createFiar();
-    const nodes = ['0-0', '4-4', '0-1', '4-3', '0-2', '4-2'];
+    const nodes = ['c0r3', 'c8r3', 'c3r0', 'c5r6', 'c1r1', 'c7r5'];
     for (let i = 0; i < nodes.length; i++) {
       state = fiarPlace(state, nodes[i]);
       expect(state.moveHistory).toHaveLength(i + 1);
@@ -500,10 +500,10 @@ describe('Wave 26 path deepen — FIAR six-placement midway', () => {
 
   it('illegal placeChip on occupied node is identity; legal place still works', () => {
     let state = createFiar();
-    state = fiarPlace(state, '0-0');
-    const blocked = fiarPlace(state, '0-0');
+    state = fiarPlace(state, 'c0r3');
+    const blocked = fiarPlace(state, 'c0r3');
     expect(blocked).toBe(state);
-    state = fiarPlace(state, '4-4');
+    state = fiarPlace(state, 'c8r3');
     expect(state.moveHistory).toHaveLength(2);
   });
 });
