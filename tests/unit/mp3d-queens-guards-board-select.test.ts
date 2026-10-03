@@ -5,7 +5,11 @@ import {
   type QueensGuardsState,
   type BoardCoord,
 } from '../../src/games/queens-guards/types';
-import { getValidMoves, makeMove, selectPiece } from '../../src/games/queens-guards/rules';
+import {
+  getValidMoves,
+  makeMove,
+  selectPiece,
+} from '../../src/games/queens-guards/rules';
 import { getAIMove, applyAIMove } from '../../src/games/queens-guards/ai';
 
 const isBoard3dEnabled = vi.fn(() => false);
@@ -143,7 +147,10 @@ describe('mp3d Queens & Guards board view selection', () => {
         >('../../src/games/queens-guards/ai');
         return {
           ...actual,
-          getAIMove: (state: QueensGuardsState, player: 'player1' | 'player2') => {
+          getAIMove: (
+            state: QueensGuardsState,
+            player: 'player1' | 'player2'
+          ) => {
             const keys = [...state.cells.keys()];
             for (const key of keys) {
               const cell = state.cells.get(key)!;

@@ -135,9 +135,9 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
       await expect(canvas).toBeVisible({ timeout: 15000 });
       await expect(page.locator('.qg-board-container svg')).toHaveCount(0);
-      await expect(
-        page.locator('.qg-a11y-grid [role="gridcell"]')
-      ).toHaveCount(91);
+      await expect(page.locator('.qg-a11y-grid [role="gridcell"]')).toHaveCount(
+        91
+      );
       await page.waitForFunction(() => {
         const label = document
           .querySelector('.qg-a11y-grid [data-cell-key="5-7"]')

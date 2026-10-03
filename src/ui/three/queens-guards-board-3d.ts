@@ -294,10 +294,7 @@ export async function createQueensGuardsBoard3D(
   };
 
   /** Prefer raycast; fall back to nearest hex center in screen space (tablet tilt). */
-  const pickCoord = (
-    clientX: number,
-    clientY: number
-  ): BoardCoord | null => {
+  const pickCoord = (clientX: number, clientY: number): BoardCoord | null => {
     const rect = canvas.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return null;
     pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
@@ -308,7 +305,10 @@ export async function createQueensGuardsBoard3D(
       let obj: Object3D | null = hit.object;
       while (obj) {
         const data = obj.userData as { ring?: number; position?: number };
-        if (typeof data.ring === 'number' && typeof data.position === 'number') {
+        if (
+          typeof data.ring === 'number' &&
+          typeof data.position === 'number'
+        ) {
           return { ring: data.ring, position: data.position };
         }
         obj = obj.parent;
@@ -417,7 +417,11 @@ export async function createQueensGuardsBoard3D(
       // Subtle gold base under queen so it reads as royalty on tablet
       const glow = new THREE.Mesh(queenGlowGeo as never, mats.queenGlow);
       glow.position.y = 0.015;
-      glow.userData = { ring: cell.ring, position: cell.position, kind: 'glow' };
+      glow.userData = {
+        ring: cell.ring,
+        position: cell.position,
+        kind: 'glow',
+      };
       group.add(glow);
       group.position.set(x, TILE_TOP_Y, z);
       root.add(group);
@@ -464,8 +468,7 @@ export async function createQueensGuardsBoard3D(
       state.cells.get(cellKey(0, 0))?.piece?.player === state.winner;
 
     for (const cell of cells) {
-      let baseMat: Material =
-        cell.ring % 2 === 0 ? mats.light : mats.dark;
+      let baseMat: Material = cell.ring % 2 === 0 ? mats.light : mats.dark;
       if (cell.ring === 0) baseMat = mats.center;
       else if (cell.ring === 1) baseMat = mats.ring1;
 
@@ -474,7 +477,8 @@ export async function createQueensGuardsBoard3D(
       else if (validMoves.has(cell.key)) tileMat = mats.valid;
       else if (captured.has(cell.key)) tileMat = mats.capture;
       else if (lastWasCapture && lastTo === cell.key) tileMat = mats.capture;
-      else if (lastFrom === cell.key || lastTo === cell.key) tileMat = mats.last;
+      else if (lastFrom === cell.key || lastTo === cell.key)
+        tileMat = mats.last;
       else if (focusedKey === cell.key) tileMat = mats.focus;
 
       if (winnerThrone && (cell.ring === 0 || cell.ring === 1)) {
@@ -533,7 +537,9 @@ export async function createQueensGuardsBoard3D(
       const selectable =
         !!piece && piece.player === state.currentPlayer && !state.winner;
       btn.tabIndex =
-        selectable || validMoves.has(cell.key) || state.selectedPiece === cell.key
+        selectable ||
+        validMoves.has(cell.key) ||
+        state.selectedPiece === cell.key
           ? 0
           : -1;
 

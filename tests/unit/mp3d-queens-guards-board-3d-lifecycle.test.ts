@@ -265,9 +265,9 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
     const view = await createQueensGuardsBoard3D(container, onClick);
 
     expect(loadThree).toHaveBeenCalledTimes(1);
-    expect(
-      container.querySelector('canvas[data-mp3d="queens-guards"]')
-    ).toBe(view.canvas);
+    expect(container.querySelector('canvas[data-mp3d="queens-guards"]')).toBe(
+      view.canvas
+    );
     expect(container.querySelector('.qg-a11y-grid')).toBeTruthy();
     expect(view.canvas.getAttribute('role')).toBe('img');
 
@@ -277,7 +277,12 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
     // Render-on-demand: update triggers paint (renderer.render), no RAF loop.
     expect(threeMock.WebGLRenderer).toBeTruthy();
     const rendererInstance = (
-      threeMock as unknown as { WebGLRenderer: new () => { render: ReturnType<typeof vi.fn>; setPixelRatio: ReturnType<typeof vi.fn> } }
+      threeMock as unknown as {
+        WebGLRenderer: new () => {
+          render: ReturnType<typeof vi.fn>;
+          setPixelRatio: ReturnType<typeof vi.fn>;
+        };
+      }
     ).WebGLRenderer;
     void rendererInstance;
 

@@ -73,7 +73,9 @@ describe('mp3d Queens & Guards pieces', () => {
       GUARD_LATHE_PROFILE,
     } = await import('../../src/ui/three/queens-guards-pieces');
 
-    expect(QUEEN_LATHE_PROFILE.length).toBeGreaterThan(GUARD_LATHE_PROFILE.length);
+    expect(QUEEN_LATHE_PROFILE.length).toBeGreaterThan(
+      GUARD_LATHE_PROFILE.length
+    );
 
     const geos = createQueensGuardsPieceGeometries(THREE as never);
     const mat = new THREE.Material();
