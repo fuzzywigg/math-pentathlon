@@ -69,12 +69,10 @@ jobs:
           fi
           echo "All JS chunks under ${limit_kb} kB"
 
-  # TOKENMAXX left ~5k unit files; healthy GHA p90 is ~30 min with little Vitest
-  # stdout after npm ci (looks hung). Job/step caps fail loudly past budget;
-  # heartbeat notices keep the log from looking stuck during a healthy run.
+  # Unit suite pruned from ~5k TOKENMAXX files; target wall time under ~5 min.
   unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -83,24 +81,12 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Run unit tests
-        timeout-minutes: 40
+        timeout-minutes: 8
         run: |
           set -euo pipefail
-          count="$(find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) | wc -l | tr -d ' ')"
-          echo "unit suite: ${count} files (expected p90 ~30 min; step timeout 40m / job 45m)"
-          (
-            elapsed=0
-            while sleep 300; do
-              elapsed=$((elapsed + 5))
-              echo "::notice::unit suite still running (~${elapsed} min elapsed; expected ~25-35 min, fails at 40m step / 45m job)"
-            done
-          ) &
-          heartbeat_pid=$!
-          cleanup() { kill "${heartbeat_pid}" 2>/dev/null || true; }
-          trap cleanup EXIT
+          count="$(find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) ! -path '*/_tokenmaxx_archive/*' | wc -l | tr -d ' ')"
+          echo "unit suite: ${count} files (budget ~5 min; step timeout 8m / job 10m)"
           npm run test:unit
-          cleanup
-          trap - EXIT
 
   e2e:
     runs-on: ubuntu-latest
