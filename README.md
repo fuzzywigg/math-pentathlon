@@ -54,7 +54,7 @@ npm run test:unit
 npm run test:e2e
 npm run build
 
-`npm test` runs unit then e2e. TOKENMAXX left ~5k Vitest files under `tests/unit`; CI unit p90 is ~30 min (job times out at 45m — see `docs/wiki/development.md`).
+`npm test` runs unit then e2e. The unit suite under `tests/unit` is sized for CI under ~5 minutes (see `docs/wiki/development.md`).
 
 ## Branches
 
@@ -64,7 +64,7 @@ npm run build
 ## Status (2026-09-26)
 
 - Issues #4-#7 merged
-- CI unit is required (no `continue-on-error`); long quiet runs are expected, not hung
+- CI unit is required (no `continue-on-error`)
 - CI e2e failures fail the workflow (see #48)
 
 ## Agent rules

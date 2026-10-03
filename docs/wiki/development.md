@@ -36,13 +36,12 @@ Workflows under `.github/workflows/`:
 - **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
-### Unit job runtime (TOKENMAXX)
+### Unit job runtime
 
-The Vitest unit suite under `tests/unit` is large (~5k files after TOKENMAXX). Healthy GitHub Actions runs take about **25–35 minutes** (p90 ≈ **30 min**) with little Vitest stdout after `npm ci`, which can look hung.
+The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to roughly 2.7k keepers (handwritten + behavioral TOKENMAXX + FIAR leave-alone). Healthy GitHub Actions unit runs should finish in about **under 5 minutes**.
 
-- Job `timeout-minutes: 45` and step `timeout-minutes: 40` so overrun fails loudly instead of burning the runner
-- CI prints file count up front and emits heartbeat notices every 5 minutes while the suite runs
-- Do not “speed up” CI by skipping or sharding unit files unless a human owns that change
+- Job `timeout-minutes: 10` and step `timeout-minutes: 8` so overrun fails loudly
+- CI prints the unit file count up front
 
 README badges link those workflows. License is **ISC** (`package.json`).
 
