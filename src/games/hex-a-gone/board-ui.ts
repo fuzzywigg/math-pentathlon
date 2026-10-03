@@ -155,9 +155,7 @@ export function renderBoard(
   bindGridNavigation(svg);
   wrapper.appendChild(svg);
 
-  wrapper.appendChild(
-    buildSelectionArea(state, onBlockSelect, onConfirm)
-  );
+  wrapper.appendChild(buildSelectionArea(state, onBlockSelect, onConfirm));
   container.appendChild(wrapper);
   restoreGridFocus(container, previousFocus);
 }

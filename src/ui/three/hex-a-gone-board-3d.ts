@@ -474,11 +474,7 @@ export async function createHexAGoneBoard3D(
       } else {
         cm.ring.material = ringMat;
       }
-      cm.ring.position.set(
-        x,
-        BOARD_Y + TILE_H + PIECE_HEIGHT + 0.04,
-        z
-      );
+      cm.ring.position.set(x, BOARD_Y + TILE_H + PIECE_HEIGHT + 0.04, z);
     }
 
     syncGhost(state);
