@@ -45,17 +45,6 @@ declare global {
   }
 }
 
-function webglAvailable(): boolean {
-  try {
-    const canvas = document.createElement('canvas');
-    return !!(
-      canvas.getContext('webgl') || canvas.getContext('experimental-webgl')
-    );
-  } catch {
-    return false;
-  }
-}
-
 /** Layout world coords: col/row → x/z centered on yellow diamond. */
 function nodeToWorld(col: number, row: number): { x: number; z: number } {
   return { x: col - 4, z: row - 3 };
@@ -69,10 +58,6 @@ export async function createFiarBoard3D(
   container: HTMLElement,
   onNodeClick?: FiarNodeClickCallback
 ): Promise<FiarBoard3D> {
-  if (!webglAvailable()) {
-    throw new Error('WebGL unavailable — FIAR 3D board cannot mount');
-  }
-
   const THREE = await loadThree();
 
   container.replaceChildren();
@@ -98,9 +83,25 @@ export async function createFiarBoard3D(
       antialias: false,
       alpha: false,
       powerPreference: 'low-power',
+      failIfMajorPerformanceCaveat: false,
     });
-  } catch {
-    throw new Error('WebGLRenderer failed — FIAR 3D board cannot mount');
+    // Prefer renderer.getContext(); avoid a second getContext on the canvas
+    // (jsdom / test doubles often stub HTMLCanvasElement.prototype).
+    const gl =
+      typeof renderer.getContext === 'function'
+        ? renderer.getContext()
+        : renderer.domElement.getContext('webgl') ||
+          renderer.domElement.getContext('experimental-webgl');
+    if (!gl) {
+      renderer.dispose();
+      throw new Error('WebGL context unavailable');
+    }
+  } catch (err) {
+    throw new Error(
+      `WebGLRenderer failed — FIAR 3D board cannot mount (${
+        err instanceof Error ? err.message : 'unknown'
+      })`
+    );
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   const canvas = renderer.domElement;
@@ -418,16 +419,15 @@ export async function createFiarBoard3D(
     };
   };
 
-  if (import.meta.env.DEV) {
-    window.__mp3dFiar = { nodeToClientPoint };
-  }
+  // Test / e2e hook (also used in DEV tooling)
+  window.__mp3dFiar = { nodeToClientPoint };
 
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
     canvas.removeEventListener('pointerup', onPointer);
     window.removeEventListener('resize', onResize);
-    if (import.meta.env.DEV && window.__mp3dFiar) {
+    if (window.__mp3dFiar) {
       delete window.__mp3dFiar;
     }
     for (const nm of nodeMeshes.values()) clearChip(nm);

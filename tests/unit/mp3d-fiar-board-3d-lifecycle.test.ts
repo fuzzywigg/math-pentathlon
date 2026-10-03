@@ -160,6 +160,7 @@ function installThreeMock() {
     render = vi.fn();
     dispose = vi.fn();
     forceContextLoss = vi.fn();
+    getContext = vi.fn(() => ({}));
   }
 
   return {
@@ -247,11 +248,19 @@ describe('mp3d FIAR board 3D lifecycle', () => {
     expect(host.classList.contains('board-3d-host')).toBe(false);
   });
 
-  it('throws when WebGL is unavailable so controller can keep 2D', async () => {
-    HTMLCanvasElement.prototype.getContext = vi
-      .fn()
-      .mockReturnValue(null) as never;
+  it('throws when WebGL context is unavailable so controller can keep 2D', async () => {
     const three = installThreeMock();
+    three.WebGLRenderer = class {
+      domElement = document.createElement('canvas');
+      setPixelRatio() {}
+      setSize() {}
+      render() {}
+      dispose() {}
+      forceContextLoss() {}
+      getContext() {
+        return null;
+      }
+    } as typeof three.WebGLRenderer;
     vi.doMock('../../src/ui/three/load-three', () => ({
       loadThree: async () => three,
     }));
