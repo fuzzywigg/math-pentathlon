@@ -123,6 +123,7 @@ import {
   newGameVsHuman as pentNewGameVsHuman,
   newGameVsAI as pentNewGameVsAI,
   startTutorial as startPentTutorial,
+  destroyGame as destroyPentEmInGame,
 } from './games/pent-em-in/game-controller';
 import {
   initGame as initFracFactGame,
@@ -1380,7 +1381,10 @@ function renderPentEmIn(): void {
     initPentEmInGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyPentEmInGame();
+    shell.cleanup();
+  };
 }
 
 // Render Frac Fact

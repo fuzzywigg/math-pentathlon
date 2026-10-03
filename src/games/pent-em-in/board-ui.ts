@@ -273,6 +273,7 @@ export function renderPieceSelector(
 
     const pieceEl = document.createElement('div');
     pieceEl.className = `pent-piece-option ${state.selectedPiece === shapeId ? 'selected' : ''}`;
+    pieceEl.setAttribute('data-piece', shapeId);
     pieceEl.style.border =
       state.selectedPiece === shapeId
         ? `2px solid ${playerColor}`
