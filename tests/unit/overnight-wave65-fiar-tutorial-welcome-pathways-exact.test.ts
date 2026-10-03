@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial welcome pathways exact', () => {
   it('welcome includes pathways goal paragraph', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'welcome');
     expect(step?.message).toContain(
-      '<p>Get four of your chips in a row along connected pathways!</p>'
+      '<p>Get four chips of the same color in a row along connected pathways — gaps are OK!</p>'
     );
     expect(step?.message).toContain(
       '<strong>FIAR (Four In A Row)</strong>'

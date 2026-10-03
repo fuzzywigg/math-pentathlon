@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial strategy threats exact', () => {
   it('strategy-tips lists set up multiple winning threats', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'strategy-tips');
     expect(step?.message).toContain(
-      '<li>Set up multiple winning threats</li>'
+      '<li>Set up multiple winning threats (including gapped lines)</li>'
     );
   });
 });

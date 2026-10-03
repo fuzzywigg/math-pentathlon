@@ -14,12 +14,12 @@ describe('Wave 42 FIAR AI — blocked path eval', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     let state = createInitialState();
     // Build a 4-in-a-row for P1 blocked by P2 adjacent, then ask AI for P2 place
-    for (const id of ['0-0', '0-1', '0-2', '0-3']) {
+    for (const id of ['c2r1', 'c3r1', 'c4r1', 'c5r1']) {
       const node = state.board.nodes.get(id)!;
       state.board.nodes.set(id, { ...node, chip: 'player1' });
     }
-    state.board.nodes.set('0-4', {
-      ...state.board.nodes.get('0-4')!,
+    state.board.nodes.set('c6r1', {
+      ...state.board.nodes.get('c6r1')!,
       chip: 'player2',
     });
     state = {

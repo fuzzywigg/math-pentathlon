@@ -33,11 +33,11 @@ describe('Wave 55 fiar — draw and winner banners', () => {
       player2: CONFIG.CHIPS_PER_PLAYER,
     };
     jammed.currentPlayer = 'player1';
-    jammed.selectedNode = '2-2';
+    jammed.selectedNode = 'c3r3';
     jammed.winner = null;
 
     // Re-click selected opponent node → selectChip identity + render → draw banner
-    board.querySelector('[data-node-id="2-2"]')!.dispatchEvent(
+    board.querySelector('[data-node-id="c3r3"]')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true })
     );
     expect(status.textContent).toMatch(/Draw! No valid moves available/);
@@ -48,13 +48,13 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     for (const [id, n] of live.board.nodes) {
       live.board.nodes.set(id, { ...n, chip: null });
     }
-    for (const id of ['0-0', '1-0', '2-0', '4-0']) {
+    for (const id of ['c2r1', 'c2r2', 'c2r3', 'c2r5']) {
       live.board.nodes.set(id, {
         ...live.board.nodes.get(id)!,
         chip: 'player1',
       });
     }
-    for (const id of ['0-4', '1-4', '2-4', '3-4']) {
+    for (const id of ['c6r1', 'c6r2', 'c6r3', 'c6r4']) {
       live.board.nodes.set(id, {
         ...live.board.nodes.get(id)!,
         chip: 'player2',
@@ -69,11 +69,11 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     live.selectedNode = null;
     live.winner = null;
 
-    board.querySelector('[data-node-id="4-0"]')!.dispatchEvent(
+    board.querySelector('[data-node-id="c2r5"]')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true })
     );
-    expect(getCurrentState().selectedNode).toBe('4-0');
-    board.querySelector('[data-node-id="3-0"]')!.dispatchEvent(
+    expect(getCurrentState().selectedNode).toBe('c2r5');
+    board.querySelector('[data-node-id="c2r4"]')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true })
     );
     expect(getCurrentState().winner).toBe('player1');
@@ -86,7 +86,7 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     });
 
     const hist = getCurrentState().moveHistory.length;
-    board.querySelector('[data-node-id="2-2"]')!.dispatchEvent(
+    board.querySelector('[data-node-id="c3r3"]')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true })
     );
     expect(getCurrentState().moveHistory.length).toBe(hist);

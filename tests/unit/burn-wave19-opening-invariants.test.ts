@@ -185,7 +185,7 @@ describe('Wave 19 invariants — Kings / FIAR / Sum Dominoes opening', () => {
 
   it('FIAR chips-per-player and Sum Dominoes set sizes', () => {
     const fiar = createFiar();
-    expect(FIAR_CFG.CHIPS_PER_PLAYER).toBe(4);
+    expect(FIAR_CFG.CHIPS_PER_PLAYER).toBe(7);
     expect(fiar.chipsPlaced.player1).toBe(0);
     expect(fiar.chipsPlaced.player2).toBe(0);
 

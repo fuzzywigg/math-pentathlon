@@ -8,16 +8,16 @@ import { renderBoard } from '../../src/games/fiar/board-ui';
 describe('Wave 54 fiar — aria selected extra', () => {
   it('selected movement chip aria includes selected', () => {
     const base = createInitialState();
-    const n = base.board.nodes.get('0-0')!;
-    base.board.nodes.set('0-0', { ...n, chip: 'player1' });
+    const n = base.board.nodes.get('c2r1')!;
+    base.board.nodes.set('c2r1', { ...n, chip: 'player1' });
     const state = {
       ...base,
       phase: 'movement' as const,
       chipsPlaced: { player1: 4, player2: 4 },
-      selectedNode: '0-0',
+      selectedNode: 'c2r1',
     };
     const svg = renderBoard(state, () => undefined);
-    const label = svg.querySelector('[data-node-id="0-0"]')!.getAttribute('aria-label') || '';
+    const label = svg.querySelector('[data-node-id="c2r1"]')!.getAttribute('aria-label') || '';
     expect(label).toMatch(/selected/);
     expect(label).toMatch(/Blue/);
   });

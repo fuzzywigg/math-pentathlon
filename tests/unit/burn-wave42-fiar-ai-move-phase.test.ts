@@ -3,21 +3,12 @@
  */
 import { describe, it, expect } from 'vitest';
 import { getAIMove, applyAIMove } from '../../src/games/fiar/ai';
-import {
-  placeChip,
-  getValidMoves,
-  getSelectableNodes,
-} from '../../src/games/fiar/rules';
-import {
-  createInitialState,
-  CONFIG,
-  type FiarGameState,
-} from '../../src/games/fiar/types';
+import { getValidMoves, getSelectableNodes } from '../../src/games/fiar/rules';
+import { CONFIG, type FiarGameState } from '../../src/games/fiar/types';
+import { placeToMovement } from './fiar-test-helpers';
 
 function fillPlacement(): FiarGameState {
-  let s = createInitialState();
-  const nodes = ['0-0', '0-1', '0-2', '0-3', '4-0', '4-1', '4-2', '4-3'];
-  for (const id of nodes) s = placeChip(s, id);
+  const s = placeToMovement();
   expect(s.phase).toBe('movement');
   expect(s.chipsPlaced.player1).toBe(CONFIG.CHIPS_PER_PLAYER);
   return s;

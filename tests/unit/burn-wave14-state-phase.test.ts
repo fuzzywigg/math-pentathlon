@@ -171,9 +171,11 @@ describe('Wave 14 — QG move validity / HAG bank / Star progress / Calla empty 
     const board = createFiarBoard();
     const dirs = getDirections();
     const right = dirs.find((d) => d.dx > 0 && d.dy === 0)!;
-    const chain = getNodesInDirection(board, '0-0', right.dx, right.dy);
+    const chain = getNodesInDirection(board, 'c0r3', right.dx, right.dy);
     expect(chain.length).toBeGreaterThanOrEqual(1);
-    expect(chain[0]).toBe('0-1');
+    expect(chain[0]).toBe('c1r3');
+    expect(chain).toContain('c3r3');
+    expect(chain).not.toContain('c5r3');
     expect(getNodesInDirection(board, 'nope', right.dx, right.dy)).toEqual([]);
   });
 

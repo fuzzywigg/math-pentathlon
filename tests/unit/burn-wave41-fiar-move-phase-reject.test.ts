@@ -28,8 +28,8 @@ describe('Wave 41 fiar — move phase rejects', () => {
     const state = createInitialState();
     const id = [...state.board.nodes.keys()][0];
     expect(getValidMoves(state, id)).toEqual([]);
-    expect(canMove(state, id, '0-1')).toBe(false);
-    expect(moveChip(state, id, '0-1')).toBe(state);
+    expect(canMove(state, id, 'c3r1')).toBe(false);
+    expect(moveChip(state, id, 'c3r1')).toBe(state);
   });
 
   it('opponent chip and empty node reject in movement', () => {

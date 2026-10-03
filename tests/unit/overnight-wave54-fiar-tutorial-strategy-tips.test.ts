@@ -10,8 +10,8 @@ describe('Wave 54 fiar — tutorial strategy tips', () => {
     expect(fiarTutorial.name).toBe('Learn FIAR');
     const step = fiarTutorial.steps.find((s) => s.id === 'strategy-tips');
     expect(step?.position).toBe('center');
-    expect(step?.message).toMatch(/Block opponent/);
+    expect(step?.message).toMatch(/Save marked chips|Block opponent/);
     expect(step?.message).toMatch(/multiple winning threats/);
-    expect(step?.message).toMatch(/center of the board/);
+    expect(step?.message).toMatch(/either color|center of the board/);
   });
 });

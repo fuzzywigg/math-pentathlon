@@ -10,7 +10,6 @@ import {
   CONFIG as FIAR_CONFIG,
 } from '../../src/games/fiar/types';
 import {
-  placeChip as fiarPlace,
   getValidMoves as fiarValidMoves,
   canMove,
   moveChip,
@@ -19,6 +18,7 @@ import {
   isDraw,
   checkWinner as fiarWinner,
 } from '../../src/games/fiar/rules';
+import { placeToMovement } from './fiar-test-helpers';
 
 import {
   createInitialState as createQueens,
@@ -59,14 +59,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function placeMany(ids: string[]) {
-  let s = createFiar();
-  for (const id of ids) {
-    s = fiarPlace(s, id);
-  }
-  return s;
-}
-
 function emptyQgCells(): Map<string, HexCell> {
   const cells = new Map<string, HexCell>();
   // Mirror createInitialState cell generation lightly via existing state
@@ -77,22 +69,14 @@ function emptyQgCells(): Map<string, HexCell> {
 }
 
 describe('Wave 18 movement — FIAR movement phase', () => {
-  it('after 8 placements, phase is movement and chips have valid slides', () => {
-    const nodes = [
-      '0-0',
-      '4-4',
-      '0-1',
-      '4-3',
-      '0-2',
-      '4-2',
-      '0-4',
-      '4-1',
-    ];
-    const state = placeMany(nodes);
+  it('after full placement, phase is movement and chips have valid slides', () => {
+    const state = placeToMovement();
     expect(state.phase).toBe('movement');
     expect(state.chipsPlaced.player1).toBe(FIAR_CONFIG.CHIPS_PER_PLAYER);
 
-    const from = '0-0';
+    const from = [...state.board.nodes.entries()].find(
+      ([, n]) => n.chip === 'player1'
+    )![0];
     const moves = fiarValidMoves(state, from);
     expect(moves.length).toBeGreaterThan(0);
     const to = moves[0];
@@ -107,13 +91,13 @@ describe('Wave 18 movement — FIAR movement phase', () => {
 
   it('getValidMoves empty outside movement; findPaths / isDraw opening', () => {
     const opening = createFiar();
-    expect(fiarValidMoves(opening, '0-0')).toEqual([]);
+    expect(fiarValidMoves(opening, 'c0r3')).toEqual([]);
     expect(findPaths(opening, 'player1').length).toBeGreaterThanOrEqual(0);
     expect(isDraw(opening)).toBe(false);
     expect(fiarWinner(opening)).toBeNull();
 
     // isPathBlocked requires player seat
-    const blocked = isPathBlocked(opening, ['0-0', '0-1'], 'player1');
+    const blocked = isPathBlocked(opening, ['c0r3', 'c1r3'], 'player1');
     expect(typeof blocked).toBe('boolean');
   });
 });

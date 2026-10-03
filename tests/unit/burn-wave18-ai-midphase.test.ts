@@ -29,12 +29,10 @@ import {
   getAIPlacement as hagPlacement,
 } from '../../src/games/hex-a-gone/ai';
 
-import {
-  createInitialState as createFiar,
-  CONFIG as FIAR_CONFIG,
-} from '../../src/games/fiar/types';
-import { placeChip as fiarPlace, canMove } from '../../src/games/fiar/rules';
+import { CONFIG as FIAR_CONFIG } from '../../src/games/fiar/types';
+import { canMove } from '../../src/games/fiar/rules';
 import { getAIMove as fiarMove, applyAIMove as fiarApply } from '../../src/games/fiar/ai';
+import { placeToMovement } from './fiar-test-helpers';
 
 import { createInitialState as createQueens } from '../../src/games/queens-guards/types';
 import {
@@ -118,20 +116,7 @@ describe('Wave 18 AI midphase — Hex-a-Gone getAIPlacement after commit', () =>
 describe('Wave 18 AI midphase — FIAR movement getAIMove', () => {
   it('forced movement: getAIMove type move + applyAIMove advances history', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.12);
-    const nodes = [
-      '0-0',
-      '4-4',
-      '0-1',
-      '4-3',
-      '0-2',
-      '4-2',
-      '0-4',
-      '4-1',
-    ];
-    let state = createFiar();
-    for (const id of nodes) {
-      state = fiarPlace(state, id);
-    }
+    const state = placeToMovement();
     expect(state.phase).toBe('movement');
     expect(state.chipsPlaced.player1).toBe(FIAR_CONFIG.CHIPS_PER_PLAYER);
 

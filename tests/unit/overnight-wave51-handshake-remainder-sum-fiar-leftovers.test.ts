@@ -14,7 +14,7 @@ describe('Wave 51 handshake — remainder/sum/fiar leftovers', () => {
   it('mounts leftover chrome and Blue/Red names', () => {
     expect(renderRem(remInit(), () => undefined, () => undefined).querySelectorAll('.island').length).toBeGreaterThan(0);
     expect(renderSum(sumInit(), () => undefined).querySelector('.sd-domino')).toBeTruthy();
-    expect(renderFiar(fiarInit(), () => undefined).querySelectorAll('[data-node-id]').length).toBe(25);
+    expect(renderFiar(fiarInit(), () => undefined).querySelectorAll('[data-node-id]').length).toBe(40);
     for (const getName of [remName, sumName, fiarName]) {
       expect(getName('player1')).toBe('Blue');
       expect(getName('player2')).toBe('Red');

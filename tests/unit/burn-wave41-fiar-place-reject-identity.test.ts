@@ -11,6 +11,7 @@ import {
   createInitialState,
   CONFIG,
 } from '../../src/games/fiar/types';
+import { placeToMovement } from './fiar-test-helpers';
 
 describe('Wave 41 fiar — place reject identity', () => {
   it('unknown node and occupied node reject', () => {
@@ -42,6 +43,10 @@ describe('Wave 41 fiar — place reject identity', () => {
         player1: CONFIG.CHIPS_PER_PLAYER,
         player2: 0,
       },
+      chipInventory: {
+        player1: { plain: 0, marked: 0 },
+        player2: { plain: 5, marked: 2 },
+      },
     };
     const id = [...state.board.nodes.keys()][0];
     expect(canPlaceChip(state, id)).toBe(false);
@@ -49,12 +54,7 @@ describe('Wave 41 fiar — place reject identity', () => {
   });
 
   it('full placement cycle flips phase to movement', () => {
-    let state = createInitialState();
-    const ids = [...state.board.nodes.keys()];
-    for (let i = 0; i < CONFIG.CHIPS_PER_PLAYER * 2; i++) {
-      expect(canPlaceChip(state, ids[i])).toBe(true);
-      state = placeChip(state, ids[i]);
-    }
+    const state = placeToMovement();
     expect(state.phase).toBe('movement');
     expect(state.chipsPlaced.player1).toBe(CONFIG.CHIPS_PER_PLAYER);
     expect(state.chipsPlaced.player2).toBe(CONFIG.CHIPS_PER_PLAYER);

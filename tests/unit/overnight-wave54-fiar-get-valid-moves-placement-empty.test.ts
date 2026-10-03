@@ -8,7 +8,7 @@ import { getValidMoves, canMove } from '../../src/games/fiar/rules';
 describe('Wave 54 fiar — valid moves placement empty', () => {
   it('opening placement yields no movement valids; canMove false', () => {
     const state = createInitialState();
-    expect(getValidMoves(state, '0-0')).toEqual([]);
-    expect(canMove(state, '0-0', '0-1')).toBe(false);
+    expect(getValidMoves(state, 'c2r1')).toEqual([]);
+    expect(canMove(state, 'c2r1', 'c3r1')).toBe(false);
   });
 });

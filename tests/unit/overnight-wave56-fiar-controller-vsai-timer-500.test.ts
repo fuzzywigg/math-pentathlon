@@ -19,9 +19,12 @@ afterEach(() => {
 describe('Wave 56 fiar — vsAI 500ms timer', () => {
   it('after P1 place, AI place runs at 500ms via mocked getAIMove', () => {
     vi.useFakeTimers();
+    // Force human (player1) to start — vsAI now picks starter at random
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
     vi.spyOn(fiarAi, 'getAIMove').mockReturnValue({
       type: 'place',
-      nodeId: '0-0',
+      nodeId: 'c2r1',
+      chipKind: 'plain',
     });
 
     const board = document.createElement('div');
@@ -29,9 +32,10 @@ describe('Wave 56 fiar — vsAI 500ms timer', () => {
     document.body.append(board, status);
     initGame(board, status);
     newGameVsAI('easy');
+    expect(getCurrentState().currentPlayer).toBe('player1');
 
     board
-      .querySelector('[data-node-id="2-2"]')!
+      .querySelector('[data-node-id="c3r3"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().currentPlayer).toBe('player2');
     expect(getCurrentState().chipsPlaced.player1).toBe(1);
@@ -43,7 +47,7 @@ describe('Wave 56 fiar — vsAI 500ms timer', () => {
     vi.advanceTimersByTime(1);
     expect(fiarAi.getAIMove).toHaveBeenCalled();
     expect(getCurrentState().chipsPlaced.player2).toBe(1);
-    expect(getCurrentState().board.nodes.get('0-0')?.chip).toBe('player2');
+    expect(getCurrentState().board.nodes.get('c2r1')?.chip).toBe('player2');
     expect(getCurrentState().currentPlayer).toBe('player1');
   });
 });

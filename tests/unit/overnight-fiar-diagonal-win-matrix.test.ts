@@ -1,9 +1,9 @@
 /**
- * Overnight HEAVY — FIAR findPaths/checkWinner are cardinal-only (slice 0..4).
- * Distinct leftover documenting diagonal-four does NOT win (vs row/col). Tests-only.
+ * Overnight HEAVY — FIAR win scan covers cardinal + diagonal half-dirs.
+ * Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { findPaths, checkWinner } from '../../src/games/fiar/rules';
+import { findPaths, checkWinner, getStraightLines } from '../../src/games/fiar/rules';
 import {
   createInitialState,
   CONFIG,
@@ -32,32 +32,34 @@ function movementBoard(
 }
 
 describe('Overnight fiar — diagonal vs cardinal win scan', () => {
-  it('getDirections exposes diagonals but win scan half is cardinal-only', () => {
+  it('getDirections exposes diagonals; win scan uses one ray per axis', () => {
     const dirs = getDirections();
     expect(dirs).toHaveLength(8);
-    const half = dirs.slice(0, 4);
-    expect(half.every((d) => d.dx === 0 || d.dy === 0)).toBe(true);
-    expect(dirs.slice(4).every((d) => d.dx !== 0 && d.dy !== 0)).toBe(true);
+    const half = [dirs[0]!, dirs[2]!, dirs[4]!, dirs[6]!];
+    expect(half).toHaveLength(4);
+    expect(half.some((d) => d.dx !== 0 && d.dy !== 0)).toBe(true);
+    expect(getStraightLines(createInitialState())).toHaveLength(24);
   });
 
-  it('pure diagonal four does not produce a winner under current rules', () => {
+  it('pure diagonal four wins under official pathway rules', () => {
+    // Spec line: c1r2, c2r3, c3r4, c4r5
     const state = movementBoard([
-      { id: '0-0', chip: 'player1' },
-      { id: '1-1', chip: 'player1' },
-      { id: '2-2', chip: 'player1' },
-      { id: '3-3', chip: 'player1' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c2r3', chip: 'player1' },
+      { id: 'c3r4', chip: 'player1' },
+      { id: 'c4r5', chip: 'player1' },
     ]);
-    expect(checkWinner(state)).toBeNull();
+    expect(checkWinner(state)).toBe('player1');
     const paths = findPaths(state, 'player1');
-    expect(paths.every((p) => p.nodes.length < 4 || p.isBlocked)).toBe(true);
+    expect(paths.some((p) => !p.isBlocked && p.nodes.length >= 4)).toBe(true);
   });
 
   it('horizontal four still wins (cardinal path intact)', () => {
     const state = movementBoard([
-      { id: '2-0', chip: 'player1' },
-      { id: '2-1', chip: 'player1' },
-      { id: '2-2', chip: 'player1' },
-      { id: '2-3', chip: 'player1' },
+      { id: 'c0r3', chip: 'player1' },
+      { id: 'c1r3', chip: 'player1' },
+      { id: 'c2r3', chip: 'player1' },
+      { id: 'c3r3', chip: 'player1' },
     ]);
     expect(checkWinner(state)).toBe('player1');
   });

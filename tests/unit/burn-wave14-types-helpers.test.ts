@@ -265,25 +265,28 @@ describe('Wave 14 — Queens & Guards geometry helpers', () => {
 });
 
 describe('Wave 14 — FIAR board graph helpers', () => {
-  it('createFiarBoard has 25 nodes and 8 directions', () => {
+  it('createFiarBoard has 40 nodes and 8 directions', () => {
     const board = createFiarBoard();
-    expect(board.nodes.size).toBe(25);
+    expect(board.nodes.size).toBe(40);
     expect(getDirections()).toHaveLength(8);
     expect(board.edges.length).toBeGreaterThan(24);
   });
 
   it('areConnected / getConnectedNodes / getNodesInDirection', () => {
     const board = createFiarBoard();
-    expect(areConnected(board, '0-0', '0-1')).toBe(true);
-    expect(areConnected(board, '0-0', '2-2')).toBe(false);
+    expect(areConnected(board, 'c1r2', 'c2r2')).toBe(true);
+    expect(areConnected(board, 'c1r2', 'c3r2')).toBe(false);
+    // Yellow gap: left and right of center are not connected
+    expect(areConnected(board, 'c3r3', 'c5r3')).toBe(false);
 
-    const corner = getConnectedNodes(board, '0-0');
-    expect(corner.length).toBeGreaterThanOrEqual(2);
-    expect(corner).toEqual(expect.arrayContaining(['0-1', '1-0']));
+    const mid = getConnectedNodes(board, 'c3r2');
+    expect(mid.length).toBeGreaterThanOrEqual(4);
+    expect(mid).toEqual(expect.arrayContaining(['c2r2', 'c4r2']));
 
-    const right = getNodesInDirection(board, '2-2', 80, 0);
-    expect(right[0]).toBe('2-3');
-    expect(right).toContain('2-4');
+    const east = getNodesInDirection(board, 'c0r3', 80, 0);
+    expect(east[0]).toBe('c1r3');
+    expect(east).toContain('c3r3');
+    expect(east).not.toContain('c5r3');
     expect(getNodesInDirection(board, 'missing', 80, 0)).toEqual([]);
   });
 });

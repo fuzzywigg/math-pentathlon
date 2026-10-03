@@ -8,10 +8,10 @@ describe('Wave 55 fiar — tutorial welcome phases', () => {
   it('covers FIAR four-in-a-row, 4 chips, movement, and win axes', () => {
     const welcome = fiarTutorial.steps.find((s) => s.id === 'welcome');
     expect(welcome?.message).toMatch(/FIAR \(Four In A Row\)/);
-    expect(welcome?.message).toMatch(/four of your chips in a row/);
+    expect(welcome?.message).toMatch(/four chips of the same color|gaps are OK/);
 
     const phases = fiarTutorial.steps.find((s) => s.id === 'game-phases');
-    expect(phases?.message).toMatch(/4 chips each/);
+    expect(phases?.message).toMatch(/7 chips each/);
     expect(phases?.message).toMatch(/Movement Phase/);
     expect(phases?.highlightSelector).toBe('.fiar-board-container');
 

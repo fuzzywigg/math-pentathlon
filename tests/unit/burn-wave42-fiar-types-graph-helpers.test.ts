@@ -11,36 +11,41 @@ import {
   getNodesInDirection,
   getDirections,
   CONFIG,
+  countConfirmedEdges,
 } from '../../src/games/fiar/types';
 
 describe('Wave 42 fiar — types graph helpers', () => {
   it('CONFIG chips and win length stable', () => {
-    expect(CONFIG.CHIPS_PER_PLAYER).toBe(4);
+    expect(CONFIG.CHIPS_PER_PLAYER).toBe(7);
     expect(CONFIG.WIN_LENGTH).toBe(4);
   });
 
-  it('board is 5x5 with edges; directions cover 8 rays', () => {
+  it('board is verified 40-space with 116 edges; directions cover 8 rays', () => {
     const board = createFiarBoard();
-    expect(board.nodes.size).toBe(25);
-    expect(board.edges.length).toBeGreaterThan(40);
+    expect(board.nodes.size).toBe(40);
+    expect(board.edges.length).toBe(countConfirmedEdges());
+    expect(board.layoutVerified).toBe(true);
     expect(getDirections()).toHaveLength(8);
   });
 
   it('areConnected symmetric for horizontal neighbors', () => {
     const board = createFiarBoard();
-    expect(areConnected(board, '0-0', '0-1')).toBe(true);
-    expect(areConnected(board, '0-1', '0-0')).toBe(true);
-    expect(areConnected(board, '0-0', '0-2')).toBe(false);
+    expect(areConnected(board, 'c1r2', 'c2r2')).toBe(true);
+    expect(areConnected(board, 'c2r2', 'c1r2')).toBe(true);
+    expect(areConnected(board, 'c1r2', 'c3r2')).toBe(false);
+    // Yellow gap: left and right of center are not connected
+    expect(areConnected(board, 'c3r3', 'c5r3')).toBe(false);
   });
 
-  it('getConnectedNodes center has multiple; getNodesInDirection east uses pixel spacing', () => {
+  it('getConnectedNodes mid has multiple; getNodesInDirection east stops at yellow', () => {
     const board = createFiarBoard();
-    const mid = getConnectedNodes(board, '2-2');
+    const mid = getConnectedNodes(board, 'c3r2');
     expect(mid.length).toBeGreaterThanOrEqual(4);
     const spacing = 80;
-    const east = getNodesInDirection(board, '2-0', spacing, 0);
-    expect(east[0]).toBe('2-1');
-    expect(east).toContain('2-4');
+    const east = getNodesInDirection(board, 'c0r3', spacing, 0);
+    expect(east[0]).toBe('c1r3');
+    expect(east).toContain('c3r3');
+    expect(east).not.toContain('c5r3');
   });
 
   it('opponent flip + initial state defaults', () => {

@@ -6,11 +6,12 @@ import { createInitialState } from '../../src/games/fiar/types';
 import { renderBoard } from '../../src/games/fiar/board-ui';
 
 describe('Wave 55 fiar — aria coord comma placement', () => {
-  it('empty placement node aria uses 2,2 and valid placement', () => {
+  it('empty placement node aria uses row,col and valid placement', () => {
     const svg = renderBoard(createInitialState(), () => undefined);
-    const g = svg.querySelector('[data-node-id="2-2"]')!;
+    const g = svg.querySelector('[data-node-id="c3r3"]')!;
     const label = g.getAttribute('aria-label') ?? '';
-    expect(label).toMatch(/2,2/);
+    // data-row / data-col are grid indices; aria coord is "row,col"
+    expect(label).toMatch(/3,3/);
     expect(label).toMatch(/valid placement/);
     expect(label).toMatch(/empty/);
   });

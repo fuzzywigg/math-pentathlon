@@ -261,7 +261,7 @@ describe('Wave 24 conservation — Fab used bars + claimed answers', () => {
 describe('Wave 24 conservation — FIAR chipsPlaced + occupied nodes', () => {
   it('chipsPlaced sum equals occupied board nodes during placement', () => {
     let state = createFiar();
-    const ids = ['0-0', '0-1', '0-2', '1-0', '1-1', '1-2'];
+    const ids = ['c0r3', 'c8r3', 'c3r0', 'c5r6', 'c1r1', 'c7r5'];
     for (const id of ids) {
       if (state.phase !== 'placement') break;
       state = placeFiar(state, id);

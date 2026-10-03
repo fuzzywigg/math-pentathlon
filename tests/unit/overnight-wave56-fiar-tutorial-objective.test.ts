@@ -9,8 +9,8 @@ describe('Wave 56 fiar — tutorial objective', () => {
     expect(fiarTutorial.id).toBe('fiar-basics');
     const step = fiarTutorial.steps.find((s) => s.id === 'objective');
     expect(step?.title).toBe('Objective');
-    expect(step?.message).toMatch(/four of your chips in a row/);
-    expect(step?.message).toMatch(/connected pathways/);
+    expect(step?.message).toMatch(/four \(or more\) chips of the same color|four chips of the same color/);
+    expect(step?.message).toMatch(/connected spaces|connected pathways|yellow center/);
     expect(step?.position).toBe('center');
     expect(step?.highlightSelector).toBeUndefined();
   });

@@ -63,15 +63,14 @@ import { getAIMove as getPentAI } from '../../src/games/pent-em-in/ai';
 import { createInitialState as createPar } from '../../src/games/par-55/rules';
 import { getAIMove as getParAI, executeAITurn as executeParAI } from '../../src/games/par-55/ai';
 
-import { createInitialState as createFiar } from '../../src/games/fiar/types';
 import {
-  placeChip as fiarPlace,
   moveChip,
   canMove,
   isDraw,
   getSelectableNodes,
 } from '../../src/games/fiar/rules';
 import { getAIMove as getFiarAI, applyAIMove } from '../../src/games/fiar/ai';
+import { placeToMovement } from './fiar-test-helpers';
 
 import { createInitialState as createCalla } from '../../src/games/calla/types';
 import { getValidPits, makeMove } from '../../src/games/calla/rules';
@@ -615,32 +614,25 @@ describe('Burn wave 6 — FIAR movement AI + draw', () => {
     'getAIMove returns a legal move after both seats finish placement',
     () => {
       vi.spyOn(Math, 'random').mockReturnValue(0.99);
-      let state = createFiar();
-      const ids = [...state.board.nodes.keys()];
-      for (let i = 0; i < 8; i++) {
-        state = fiarPlace(state, ids[i]);
-      }
+      const state = placeToMovement();
       expect(state.phase).toBe('movement');
 
       // Medium avoids the deepest minimax path while still exercising movement AI
-      const move = getFiarAI(state, 'player1', 'medium');
+      const move = getFiarAI(state, state.currentPlayer, 'medium');
       expect(move).not.toBeNull();
       expect(move!.type).toBe('move');
       expect(canMove(state, move!.from!, move!.to!)).toBe(true);
 
       const next = applyAIMove(state, move!);
       expect(next.moveHistory.length).toBeGreaterThan(state.moveHistory.length);
-      expect(next.board.nodes.get(move!.to!)?.chip).toBe('player1');
+      expect(next.board.nodes.get(move!.to!)?.chip).toBe(state.currentPlayer);
     },
     15000
   );
 
   it('applyAIMove with illegal move object is a no-op', () => {
-    let state = createFiar();
+    const state = placeToMovement();
     const ids = [...state.board.nodes.keys()];
-    for (let i = 0; i < 8; i++) {
-      state = fiarPlace(state, ids[i]);
-    }
     const before = state;
     expect(applyAIMove(state, { type: 'move', from: 'nope', to: 'also-nope' })).toBe(
       before
@@ -650,14 +642,10 @@ describe('Burn wave 6 — FIAR movement AI + draw', () => {
   });
 
   it('isDraw is true when no selectable chips remain in movement', () => {
-    let state = createFiar();
-    const ids = [...state.board.nodes.keys()];
-    for (let i = 0; i < 8; i++) {
-      state = fiarPlace(state, ids[i]);
-    }
+    const state = placeToMovement();
     const nodes = new Map(state.board.nodes);
     for (const [id, n] of nodes) {
-      if (!n.chip) nodes.set(id, { ...n, chip: 'player2' });
+      if (!n.chip) nodes.set(id, { ...n, chip: 'player2', chipKind: 'plain' });
     }
     const jammed = { ...state, board: { ...state.board, nodes } };
     expect(getSelectableNodes(jammed)).toEqual([]);

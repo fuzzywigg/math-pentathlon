@@ -13,7 +13,7 @@ describe('Wave 42 FIAR AI — medium mid placement', () => {
   it('places legally after 3 chips down', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     let state = createInitialState();
-    for (const id of ['0-0', '0-1', '1-0']) {
+    for (const id of ['c2r1', 'c3r1', 'c2r2']) {
       state = placeChip(state, id);
     }
     const move = getAIMove(state, state.currentPlayer, 'medium');

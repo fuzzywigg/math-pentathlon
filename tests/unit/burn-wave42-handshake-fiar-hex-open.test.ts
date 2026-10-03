@@ -11,7 +11,7 @@ describe('Wave 42 handshake — fiar × hex', () => {
   it('fiar can place; hex has size² valids', () => {
     const f = fiarInit();
     const h = hexInit(4);
-    expect(canPlaceChip(f, '2-2')).toBe(true);
+    expect(canPlaceChip(f, 'c3r3')).toBe(true);
     expect(getValidMoves(h)).toHaveLength(16);
     expect(f.winner).toBeNull();
     expect(h.winner).toBeNull();

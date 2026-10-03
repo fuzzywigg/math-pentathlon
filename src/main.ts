@@ -51,6 +51,7 @@ import {
 } from './games/calla/game-controller';
 import {
   initGame as initFiarGame,
+  destroyGame as destroyFiarGame,
   newGameVsHuman as fiarNewGameVsHuman,
   newGameVsAI as fiarNewGameVsAI,
   startTutorial as startFiarTutorial,
@@ -660,11 +661,16 @@ function renderFiar(): void {
     title: 'FIAR (Four In A Row)',
     helpTitle: 'How to Play FIAR',
     helpContentHtml: `<h3>Objective</h3>
-          <p>Get four of your chips in a row along connected pathways!</p>
+          <p>Get four chips of the same color in a row along connected pathways. Gaps between them are OK — just no opposite-color chip in between, and the path cannot cross the yellow center.</p>
+
+          <h3>Materials</h3>
+          <ul>
+            <li>Each player has <strong>7 chips</strong> — <strong>2 marked</strong> Fire Extinguisher blockers and 5 plain</li>
+          </ul>
 
           <h3>Game Phases</h3>
           <ol>
-            <li><strong>Placement Phase:</strong> Take turns placing 4 chips each on any empty node</li>
+            <li><strong>Placement Phase:</strong> Take turns placing 7 chips each on any empty node (choose plain or marked each time). A win can happen during placement!</li>
             <li><strong>Movement Phase:</strong> Take turns moving your chips along pathways</li>
           </ol>
 
@@ -672,22 +678,24 @@ function renderFiar(): void {
           <ul>
             <li>Chips move along the connected pathways (lines)</li>
             <li>Move any distance in a straight line</li>
-            <li>Cannot jump over other chips</li>
+            <li>Cannot jump over other chips or land on an occupied space</li>
+            <li>Cannot move across the yellow center</li>
             <li>Click your chip to select, then click destination</li>
           </ul>
 
           <h3>Winning</h3>
           <ul>
-            <li>Form 4 chips in a row along connected pathways</li>
-            <li>Rows can be horizontal, vertical, or diagonal</li>
-            <li><strong>Blocking:</strong> An opponent chip adjacent to your 4-in-a-row prevents the win!</li>
+            <li>Form 4 (or more) chips of the same color along a straight line of connected spaces</li>
+            <li>Empty spaces between the four are fine; other chips may sit outside the winning four</li>
+            <li>You can win with the opponent's color if your move completes their line</li>
+            <li><strong>Blocking:</strong> Only an opponent's <em>marked</em> Fire Extinguisher chip adjacent to the winning path prevents the win. Your own marked chips can be part of a win.</li>
           </ul>
 
           <h3>Strategy Tips</h3>
           <ul>
-            <li>Block opponent's potential winning paths</li>
-            <li>Set up multiple winning threats</li>
-            <li>Control the center of the board</li>
+            <li>Save marked chips to block opponent paths</li>
+            <li>Set up multiple winning threats (including gapped lines)</li>
+            <li>Watch for wins in either color after every move</li>
           </ul>`,
     gameAreaClass: 'fiar-game-area',
     modeRadioName: 'fiar-mode',
@@ -711,7 +719,10 @@ function renderFiar(): void {
     initFiarGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyFiarGame();
+    shell.cleanup();
+  };
 }
 
 // Render Queens & Guards

@@ -33,10 +33,10 @@ function movementBoard(
 describe('Overnight fiar — down-left diagonal non-win', () => {
   it('player2 down-left diagonal four yields null winner and no length-4 path', () => {
     const state = movementBoard([
-      { id: '0-3', chip: 'player2' },
-      { id: '1-2', chip: 'player2' },
-      { id: '2-1', chip: 'player2' },
-      { id: '3-0', chip: 'player2' },
+      { id: 'c5r1', chip: 'player2' },
+      { id: 'c4r2', chip: 'player2' },
+      { id: 'c3r3', chip: 'player2' },
+      { id: 'c2r4', chip: 'player2' },
     ]);
     expect(checkWinner(state)).toBeNull();
     expect(findPaths(state, 'player2').every((p) => p.nodes.length < 4)).toBe(

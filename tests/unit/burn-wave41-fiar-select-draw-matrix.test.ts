@@ -31,7 +31,7 @@ describe('Wave 41 fiar — select / draw matrix', () => {
     const state = createInitialState();
     expect(getSelectableNodes(state)).toEqual([]);
     expect(isDraw(state)).toBe(false);
-    expect(selectChip(state, '0-0')).toBe(state);
+    expect(selectChip(state, 'c2r1')).toBe(state);
   });
 
   it('movement: selectable ⊆ own chips with moves; toggle select', () => {

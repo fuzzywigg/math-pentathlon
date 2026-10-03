@@ -30,7 +30,7 @@ describe('Wave 42 fiar — AI place + apply', () => {
   it('applyAIMove incomplete place/move identities', () => {
     const state = createInitialState();
     expect(applyAIMove(state, { type: 'place' })).toBe(state);
-    expect(applyAIMove(state, { type: 'move', from: '0-0' })).toBe(state);
+    expect(applyAIMove(state, { type: 'move', from: 'c2r1' })).toBe(state);
   });
 
   it('gameOver phase yields null AI move', () => {
@@ -44,7 +44,7 @@ describe('Wave 42 fiar — AI place + apply', () => {
 
   it('human place then AI place keeps total ≤ chips*2', () => {
     let state = createInitialState();
-    state = placeChip(state, '2-2');
+    state = placeChip(state, 'c3r3');
     const ai = getAIMove(state, 'player2', 'easy')!;
     state = applyAIMove(state, ai);
     expect(state.chipsPlaced.player1 + state.chipsPlaced.player2).toBe(2);

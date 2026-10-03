@@ -51,7 +51,7 @@ describe('MP-FINISH item 2 — FIAR / Queens roving grid', () => {
     expect(svg.getAttribute('role')).toBe('grid');
     expect(
       svg.querySelectorAll('[role="gridcell"][data-row][data-col]').length
-    ).toBe(25);
+    ).toBe(40);
     assertSingleRoving(svg);
     assertArrowMoves(svg);
   });

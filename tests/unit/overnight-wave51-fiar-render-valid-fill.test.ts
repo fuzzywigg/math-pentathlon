@@ -11,16 +11,16 @@ describe('Wave 51 fiar — valid fill', () => {
     const base = createInitialState();
     // Place a chip and select it in movement
     const board = createInitialState().board;
-    const n = board.nodes.get('0-0')!;
-    board.nodes.set('0-0', { ...n, chip: 'player1' });
+    const n = board.nodes.get('c2r1')!;
+    board.nodes.set('c2r1', { ...n, chip: 'player1' });
     const state = {
       ...base,
       phase: 'movement' as const,
       chipsPlaced: { player1: 4, player2: 4 },
-      selectedNode: '0-0',
+      selectedNode: 'c2r1',
       board,
     };
-    const valids = getValidMoves(state, '0-0');
+    const valids = getValidMoves(state, 'c2r1');
     expect(valids.length).toBeGreaterThan(0);
     const svg = renderBoard(state, () => undefined);
     const g = svg.querySelector(`[data-node-id="${valids[0]}"]`)!;

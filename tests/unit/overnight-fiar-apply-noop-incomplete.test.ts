@@ -11,6 +11,6 @@ describe('Overnight fiar — apply noop incomplete', () => {
     const state = createInitialState();
     expect(applyAIMove(state, { type: 'place' })).toBe(state);
     expect(applyAIMove(state, { type: 'move' })).toBe(state);
-    expect(applyAIMove(state, { type: 'move', from: '0-0' })).toBe(state);
+    expect(applyAIMove(state, { type: 'move', from: 'c2r1' })).toBe(state);
   });
 });

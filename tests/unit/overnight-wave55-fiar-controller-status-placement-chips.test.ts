@@ -21,20 +21,20 @@ describe('Wave 55 fiar — placement status chips', () => {
     initGame(board, status);
 
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(
-      /Blue's turn: Place a chip \(4 left\)/
+      /Blue's turn: Place a chip \(7 left\)/
     );
-    expect(status.textContent).toMatch(/Blue: 0\/4/);
-    expect(status.textContent).toMatch(/Red: 0\/4/);
+    expect(status.textContent).toMatch(/Blue: 0\/7/);
+    expect(status.textContent).toMatch(/Red: 0\/7/);
 
-    const node = board.querySelector('[data-node-id="2-2"]');
+    const node = board.querySelector('[data-node-id="c3r3"]');
     expect(node).toBeTruthy();
     node!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(getCurrentState().chipsPlaced.player1).toBe(1);
     expect(getCurrentState().currentPlayer).toBe('player2');
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(
-      /Red's turn: Place a chip \(4 left\)/
+      /Red's turn: Place a chip \(7 left\)/
     );
-    expect(status.textContent).toMatch(/Blue: 1\/4/);
+    expect(status.textContent).toMatch(/Blue: 1\/7/);
   });
 });

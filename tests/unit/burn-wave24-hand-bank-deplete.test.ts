@@ -386,14 +386,23 @@ describe('Wave 24 hand-bank — FIAR chipsPlaced ledger', () => {
   it('placeChip bumps chipsPlaced and never exceeds CHIPS_PER_PLAYER', () => {
     let state = createFiar();
     expect(state.chipsPlaced.player1).toBe(0);
-    expect(FIAR_CFG.CHIPS_PER_PLAYER).toBe(4);
+    expect(FIAR_CFG.CHIPS_PER_PLAYER).toBe(7);
     // Placement phase: any empty node id (getSelectableNodes is movement-only)
-    state = placeFiar(state, '0-0');
+    state = placeFiar(state, 'c0r3');
     expect(state.chipsPlaced.player1).toBe(1);
     expect(state.chipsPlaced.player2).toBe(0);
-    expect(state.board.nodes.get('0-0')?.chip).toBe('player1');
+    expect(state.board.nodes.get('c0r3')?.chip).toBe('player1');
 
-    const nodes = ['0-1', '0-2', '0-3', '1-0', '1-1', '1-2', '1-3', '2-0'];
+    const nodes = [
+      'c8r3',
+      'c3r0',
+      'c5r6',
+      'c1r1',
+      'c7r5',
+      'c1r2',
+      'c7r4',
+      'c6r1',
+    ];
     for (const id of nodes) {
       if (state.phase !== 'placement') break;
       if (
