@@ -51,6 +51,7 @@ import {
 } from './games/calla/game-controller';
 import {
   initGame as initFiarGame,
+  destroyGame as destroyFiarGame,
   newGameVsHuman as fiarNewGameVsHuman,
   newGameVsAI as fiarNewGameVsAI,
   startTutorial as startFiarTutorial,
@@ -664,7 +665,7 @@ function renderFiar(): void {
 
           <h3>Materials</h3>
           <ul>
-            <li>Each player has <strong>7 chips</strong> — <strong>2 marked</strong> with a yellow dot (Fire Extinguisher blockers) and 5 plain</li>
+            <li>Each player has <strong>7 chips</strong> — <strong>2 marked</strong> Fire Extinguisher blockers and 5 plain</li>
           </ul>
 
           <h3>Game Phases</h3>
@@ -687,7 +688,7 @@ function renderFiar(): void {
             <li>Form 4 (or more) chips of the same color along a straight line of connected spaces</li>
             <li>Empty spaces between the four are fine; other chips may sit outside the winning four</li>
             <li>You can win with the opponent's color if your move completes their line</li>
-            <li><strong>Blocking:</strong> Only an opponent's <em>marked</em> (yellow-dot) chip adjacent to the winning path prevents the win. Your own marked chips can be part of a win.</li>
+            <li><strong>Blocking:</strong> Only an opponent's <em>marked</em> Fire Extinguisher chip adjacent to the winning path prevents the win. Your own marked chips can be part of a win.</li>
           </ul>
 
           <h3>Strategy Tips</h3>
@@ -718,7 +719,10 @@ function renderFiar(): void {
     initFiarGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyFiarGame();
+    shell.cleanup();
+  };
 }
 
 // Render Queens & Guards

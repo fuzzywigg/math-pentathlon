@@ -25,6 +25,9 @@ import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadFiarBoard3DModule } from './board-3d-loader';
+import type { FiarBoard3D } from '../../ui/three/fiar-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -43,12 +46,42 @@ let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let showStarterBanner = false;
 
+let board3d: FiarBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!boardContainer || board3d || !board3dEnabled) return;
+  try {
+    const mod = await loadFiarBoard3DModule();
+    if (!boardContainer || !board3dEnabled) return;
+    board3d = await mod.createFiarBoard3D(boardContainer, handleNodeClick);
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+  }
+}
+
 function render(): void {
   if (!boardContainer || !statusContainer) return;
 
-  boardContainer.innerHTML = '';
-  const svg = renderBoard(gameState, handleNodeClick);
-  boardContainer.appendChild(svg);
+  if (board3dEnabled && board3d) {
+    board3d.update(gameState, handleNodeClick);
+  } else if (!board3dEnabled) {
+    boardContainer.innerHTML = '';
+    const svg = renderBoard(gameState, handleNodeClick);
+    boardContainer.appendChild(svg);
+  }
 
   renderStatus();
 }
@@ -75,7 +108,7 @@ function renderChipKindPicker(): string {
       </button>
       <button type="button" class="fiar-chip-kind-btn" data-chip-kind="marked"
         aria-pressed="${markedPressed}" ${inv.marked <= 0 ? 'disabled' : ''}>
-        Marked · yellow dot (${inv.marked} left)
+        Marked · Fire Extinguisher (${inv.marked} left)
       </button>
     </div>
   `;
@@ -255,6 +288,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   injectFiarStyles();
+  unmountBoard3d();
   boardContainer = boardEl;
   statusContainer = statusEl;
   gameState = createInitialState();
@@ -262,7 +296,32 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   aiPlayer = 'player2';
   showStarterBanner = false;
   syncOpponentChrome();
+
+  board3dEnabled = isBoard3dEnabled();
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      render();
+    });
+  }
+
   render();
+}
+
+/** Dispose 3D resources and clear mounts (route change). */
+export function destroyGame(): void {
+  unmountBoard3d();
+  boardContainer = null;
+  statusContainer = null;
+}
+
+/** Whether the live controller is using the 3D board path. */
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+/** Await pending 3D mount (tests / callers that need the canvas ready). */
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
 }
 
 export function newGameVsHuman(): void {
