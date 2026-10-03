@@ -230,7 +230,7 @@ describe('Wave 25 a11y-game-wiring — Kings HTML grid remount', () => {
 });
 
 describe('Wave 25 a11y-game-wiring — button-pattern boards (non-grid)', () => {
-  it('Juggle cells are role=button with coord aria-labels', () => {
+  it('Juggle board is a roving ARIA grid with labeled cells', () => {
     const state = createJuggle();
     const board = renderJuggle(
       state.boards.player1,
@@ -242,21 +242,26 @@ describe('Wave 25 a11y-game-wiring — button-pattern boards (non-grid)', () => 
       () => undefined
     );
     document.body.appendChild(board);
-    const cells = board.querySelectorAll('[role="button"]');
-    expect(cells.length).toBeGreaterThan(10);
+    const grid = board.querySelector('[role="grid"]');
+    expect(grid).toBeTruthy();
+    const cells = board.querySelectorAll(
+      '[role="gridcell"][data-row][data-col]'
+    );
+    expect(cells.length).toBe(81);
+    assertSingleRoving(board);
     const sample = cells[0] as HTMLElement;
     expect(sample.getAttribute('aria-label')).toMatch(/[A-Z]\d/);
-    expect(sample.getAttribute('tabindex')).toBe('0');
   });
 
-  it('Queens & Guards SVG nodes are focusable buttons with labels', () => {
+  it('Queens & Guards SVG is a roving ARIA grid with labeled cells', () => {
     const svg = renderQueens(createQueens(), () => undefined);
     document.body.appendChild(svg);
-    const buttons = svg.querySelectorAll('[role="button"]');
-    expect(buttons.length).toBeGreaterThan(5);
-    for (const el of Array.from(buttons).slice(0, 5)) {
+    expect(svg.getAttribute('role')).toBe('grid');
+    const cells = svg.querySelectorAll('[role="gridcell"][data-row][data-col]');
+    expect(cells.length).toBeGreaterThan(5);
+    assertSingleRoving(svg);
+    for (const el of Array.from(cells).slice(0, 5)) {
       expect(el.getAttribute('aria-label')).toBeTruthy();
-      expect(el.getAttribute('tabindex')).toBe('0');
     }
   });
 

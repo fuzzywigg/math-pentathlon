@@ -24,7 +24,7 @@ import { ramrodTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
-  restoreFocusedCell,
+  restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
@@ -207,7 +207,7 @@ function updateUI(controller: RamrodGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
-  restoreFocusedCell(container, previousFocus);
+  restoreGridFocus(container, previousFocus);
 
   // AI turn
   if (

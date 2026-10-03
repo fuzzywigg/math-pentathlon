@@ -18,8 +18,12 @@ import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import {
   buildCellAriaLabel,
-  makeCellFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -61,6 +65,7 @@ export function renderBoard(
   const grid = document.createElement('div');
   grid.className = 'juggle-grid';
   grid.style.gridTemplateColumns = `repeat(${CONFIG.GRID_SIZE}, 1fr)`;
+  markBoardAsGrid(grid);
 
   // Get preview cells if hovering
   const previewCells: Cell[] =
@@ -95,7 +100,7 @@ export function renderBoard(
       const canPlace =
         isCurrentPlayer && state.phase === 'placing' && !isOccupied;
 
-      makeCellFocusable(
+      makeGridCell(
         cell,
         buildCellAriaLabel({
           coord,
@@ -118,6 +123,8 @@ export function renderBoard(
     }
   }
 
+  bindGridNavigation(grid);
+  applyRovingTabindex(collectGridCells(grid));
   container.appendChild(grid);
 
   return container;

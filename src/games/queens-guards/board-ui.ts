@@ -13,8 +13,12 @@ import { getValidMoves } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
-  makeSvgFocusable,
+  makeGridCell,
+  markBoardAsGrid,
+  bindGridNavigation,
   bindCellActivateKeys,
+  collectGridCells,
+  applyRovingTabindex,
 } from '../../ui/board-a11y';
 
 // Colors
@@ -106,6 +110,7 @@ export function renderBoard(
   svg.setAttribute('height', '100%');
   svg.style.maxWidth = `${size}px`;
   svg.style.maxHeight = `${size}px`;
+  markBoardAsGrid(svg);
 
   // Background
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -130,6 +135,8 @@ export function renderBoard(
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.style.cursor = 'pointer';
     g.dataset.cellKey = key;
+    g.setAttribute('data-row', String(cell.ring));
+    g.setAttribute('data-col', String(cell.position));
 
     // Determine cell color
     let fillColor = cell.ring % 2 === 0 ? COLORS.cellLight : COLORS.cellDark;
@@ -261,7 +268,7 @@ export function renderBoard(
         : cell.piece?.type === 'guard'
           ? 'Guard'
           : undefined;
-    makeSvgFocusable(
+    makeGridCell(
       g,
       buildCellAriaLabel({
         coord: `ring ${cell.ring} pos ${cell.position}`,
@@ -285,6 +292,8 @@ export function renderBoard(
     svg.appendChild(g);
   }
 
+  bindGridNavigation(svg);
+  applyRovingTabindex(collectGridCells(svg));
   return svg;
 }
 

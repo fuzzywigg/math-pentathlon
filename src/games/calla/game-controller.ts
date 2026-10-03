@@ -185,6 +185,14 @@ export function resetGame(): void {
   }
 }
 
+/**
+ * Drop into a fresh interactive practice board (human vs human).
+ * Used after tutorial Finish — same machinery as a normal new game.
+ */
+export function startPracticeGame(): void {
+  newGameVsHuman();
+}
+
 // Start the tutorial
 export function startTutorial(): void {
   newGameVsHuman();
@@ -193,7 +201,8 @@ export function startTutorial(): void {
     if (event.type === 'completed' || event.type === 'exited') {
       unsubscribe();
       if (event.type === 'completed') {
-        newGameVsHuman();
+        // Finish → playable practice board
+        startPracticeGame();
       }
     }
   });
