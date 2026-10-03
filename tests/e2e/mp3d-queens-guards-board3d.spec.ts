@@ -82,6 +82,36 @@ async function getMoveCount(page: Page): Promise<number> {
   });
 }
 
+async function getCapturedCount(page: Page): Promise<number> {
+  return page.evaluate(() => {
+    const ctrl = (
+      window as unknown as {
+        __mp3dQueensGuardsCtrl?: { getCapturedCount: () => number };
+      }
+    ).__mp3dQueensGuardsCtrl;
+    if (!ctrl) throw new Error('__mp3dQueensGuardsCtrl missing (DEV hook)');
+    return ctrl.getCapturedCount();
+  });
+}
+
+async function seedCapturedRestore(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
+      typeof (
+        window as unknown as {
+          __mp3dQueensGuardsCtrl?: { seedCapturedRestore?: unknown };
+        }
+      ).__mp3dQueensGuardsCtrl?.seedCapturedRestore === 'function'
+  );
+  await page.evaluate(() => {
+    (
+      window as unknown as {
+        __mp3dQueensGuardsCtrl: { seedCapturedRestore: () => void };
+      }
+    ).__mp3dQueensGuardsCtrl.seedCapturedRestore();
+  });
+}
+
 const VIEWPORTS = [
   { name: 'phone', width: 390, height: 844 },
   { name: 'tablet-portrait', width: 800, height: 1280 },
@@ -186,9 +216,9 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       await page.evaluate(() => {
         (
           window as unknown as {
-            __mp3dQueensGuardsCtrl: { forceWinner: (w: string) => void };
+            __mp3dQueensGuardsCtrl: { seedWinnerFormation: () => void };
           }
-        ).__mp3dQueensGuardsCtrl.forceWinner('player1');
+        ).__mp3dQueensGuardsCtrl.seedWinnerFormation();
       });
       await expect(page.locator('.qg-winner-banner')).toBeVisible({
         timeout: 5000,
@@ -272,5 +302,77 @@ test.describe('mp3d Queens & Guards 3D board', () => {
 
     const moves = await getMoveCount(page);
     expect(moves).toBeGreaterThan(0);
+  });
+
+  test('human restores a captured piece to the outer ring (3D + 2D)', async ({
+    page,
+  }) => {
+    const outDir = path.resolve('docs/screenshots/mp3d');
+    fs.mkdirSync(outDir, { recursive: true });
+
+    // 3D — phone + tablet
+    for (const vp of [
+      { name: 'phone', width: 390, height: 844 },
+      { name: 'tablet-portrait', width: 800, height: 1280 },
+    ] as const) {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.addInitScript(() => {
+        localStorage.setItem('mp-board3d', '1');
+      });
+      await page.goto(
+        `/?board3d=1&restore=1&vp=${vp.name}&t=${Date.now()}#/game/queens-guards`
+      );
+      await dismissModeIfNeeded(page);
+      const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
+      await expect(canvas).toBeVisible({ timeout: 15000 });
+      await seedCapturedRestore(page);
+      await expect(page.locator('.qg-status')).toContainText(/outer ring/i);
+      expect(await getCapturedCount(page)).toBe(1);
+      await page.waitForTimeout(250);
+      const pendingPath = path.join(
+        outDir,
+        `queens-guards-3d-restore-pending-${vp.name}.png`
+      );
+      await canvas.screenshot({ path: pendingPath });
+      expect(fs.statSync(pendingPath).size).toBeGreaterThan(1000);
+
+      await activateA11yCell(page, 2, 0);
+      await activateA11yCell(page, 5, 0);
+      expect(await getCapturedCount(page)).toBe(0);
+      await expect(
+        page.locator('.qg-a11y-grid [data-cell-key="5-0"]')
+      ).toHaveAttribute('aria-label', /Guard/i);
+      await page.waitForTimeout(200);
+      const donePath = path.join(
+        outDir,
+        `queens-guards-3d-restore-done-${vp.name}.png`
+      );
+      await canvas.screenshot({ path: donePath });
+      expect(fs.statSync(donePath).size).toBeGreaterThan(1000);
+    }
+
+    // 2D SVG fallback path
+    await page.addInitScript(() => {
+      localStorage.removeItem('mp-board3d');
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/?board3d=0&t=${Date.now()}#/game/queens-guards`);
+    await dismissModeIfNeeded(page);
+    await expect(page.locator('.qg-board-container svg').first()).toBeVisible({
+      timeout: 10000,
+    });
+    await seedCapturedRestore(page);
+    expect(await getCapturedCount(page)).toBe(1);
+    await page.locator('[data-cell-key="2-0"]').click();
+    await page.locator('[data-cell-key="5-0"]').click();
+    expect(await getCapturedCount(page)).toBe(0);
+    const svgPath = path.join(
+      outDir,
+      'queens-guards-2d-restore-done-phone.png'
+    );
+    await page.locator('.qg-board-container svg').first().screenshot({
+      path: svgPath,
+    });
+    expect(fs.statSync(svgPath).size).toBeGreaterThan(1000);
   });
 });

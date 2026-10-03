@@ -13,7 +13,13 @@ import {
   cellsInRing,
 } from './types';
 
-import { getValidMoves, makeMove, checkWinner, hasValidMoves } from './rules';
+import {
+  getValidMoves,
+  makeMove,
+  restoreCapturedPiece,
+  checkWinner,
+  hasValidMoves,
+} from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -405,11 +411,16 @@ function getRestoreMove(state: QueensGuardsState): AIMove | null {
 }
 
 /**
- * Apply an AI move to the game state
+ * Apply an AI move to the game state.
+ * Restore uses the official outer-ring relocation path, not makeMove
+ * (normal movement cannot go outward).
  */
 export function applyAIMove(
   state: QueensGuardsState,
   move: AIMove
 ): QueensGuardsState {
+  if (state.capturedPieces.length > 0) {
+    return restoreCapturedPiece(state, move.from, move.to);
+  }
   return makeMove(state, move.from, move.to);
 }

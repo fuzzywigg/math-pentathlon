@@ -9,7 +9,7 @@ import {
   cellsInRing,
   parseKey,
 } from './types';
-import { getValidMoves } from './rules';
+import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
@@ -120,9 +120,14 @@ export function renderBoard(
   bg.setAttribute('rx', '12');
   svg.appendChild(bg);
 
-  // Get valid moves for selected piece
+  // Get valid moves for selected piece (normal play) or restore targets
+  const restoring = state.capturedPieces.length > 0;
   const validMoves: Set<string> = new Set();
-  if (state.selectedPiece) {
+  if (restoring) {
+    getRestoreTargets(state).forEach((m) =>
+      validMoves.add(cellKey(m.ring, m.position))
+    );
+  } else if (state.selectedPiece) {
     const selectedCoord = parseKey(state.selectedPiece);
     const moves = getValidMoves(state, selectedCoord);
     moves.forEach((m) => validMoves.add(cellKey(m.ring, m.position)));
@@ -276,7 +281,14 @@ export function renderBoard(
         owner,
         piece: pieceName,
         validMove: validMoves.has(key),
-        extras: state.selectedPiece === key ? ['selected'] : undefined,
+        extras: [
+          ...(state.selectedPiece === key ? ['selected'] : []),
+          ...(state.capturedPieces.some(
+            (c) => c.ring === cell.ring && c.position === cell.position
+          )
+            ? ['captured']
+            : []),
+        ],
       })
     );
     bindCellActivateKeys(g, activate);
