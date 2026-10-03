@@ -8,10 +8,10 @@ import { renderBoard, getPlayerColor } from '../../src/games/fiar/board-ui';
 describe('Wave 55 fiar — shine offset player2 fill', () => {
   it('shine is offset -4,-4; player2 chip uses seat color', () => {
     const base = createInitialState();
-    const n = base.board.nodes.get('1-1')!;
-    base.board.nodes.set('1-1', { ...n, chip: 'player2' });
+    const n = base.board.nodes.get('c3r2')!;
+    base.board.nodes.set('c3r2', { ...n, chip: 'player2' });
     const svg = renderBoard(base, () => undefined);
-    const g = svg.querySelector('[data-node-id="1-1"]')!;
+    const g = svg.querySelector('[data-node-id="c3r2"]')!;
     const shine = g.querySelector('ellipse')!;
     expect(shine.getAttribute('cx')).toBe(String(n.x - 4));
     expect(shine.getAttribute('cy')).toBe(String(n.y - 4));

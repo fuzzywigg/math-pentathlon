@@ -4,14 +4,14 @@
 import {
   BoardLayout,
   LayoutEdge,
-  YellowCenterEllipse,
-  createUnverifiedProductionLayout,
+  YellowCenterShape,
+  createVerifiedProductionLayout,
   edgeKey,
 } from './layout';
 
 export type Player = 'player1' | 'player2';
 
-/** Plain chip or Fire Extinguisher (yellow-dot marked blocker). */
+/** Plain chip or Fire Extinguisher (marked blocker). Dot color is a theme value. */
 export type ChipKind = 'plain' | 'marked';
 
 export interface BoardNode {
@@ -33,10 +33,15 @@ export interface FiarBoard {
   edges: BoardEdge[];
   /** Quick lookup: undirected edge key → crosses yellow. */
   yellowCrossingKeys: Set<string>;
-  yellowCenter: YellowCenterEllipse | null;
+  yellowCenter: YellowCenterShape | null;
   spacing: number;
   layoutId: string;
   layoutVerified: boolean;
+  /**
+   * Maximal straight lines of length ≥ WIN_LENGTH (layout-static).
+   * Filled lazily by getStraightLines in rules.ts.
+   */
+  straightLinesCache?: string[][];
 }
 
 export type GamePhase = 'placement' | 'movement' | 'gameOver';
@@ -139,19 +144,16 @@ export function createBoardFromLayout(layout: BoardLayout): FiarBoard {
   };
 }
 
-/**
- * Create the FIAR board from the production layout.
- * Layout is currently the unverified legacy 5×5 — see layout.ts.
- */
+/** Create the FIAR board from the verified production layout. */
 export function createFiarBoard(layout?: BoardLayout): FiarBoard {
-  return createBoardFromLayout(layout ?? createUnverifiedProductionLayout());
+  return createBoardFromLayout(layout ?? createVerifiedProductionLayout());
 }
 
 export function createInitialState(
   options: CreateInitialStateOptions = {}
 ): FiarGameState {
   const starter = options.starter ?? 'player1';
-  const layout = options.layout ?? createUnverifiedProductionLayout();
+  const layout = options.layout ?? createVerifiedProductionLayout();
   return {
     board: createBoardFromLayout(layout),
     currentPlayer: starter,
@@ -280,7 +282,17 @@ export function getBoardDirections(board: FiarBoard): {
 
 /** Re-export layout helpers used by tests / 3D. */
 export {
+  createVerifiedProductionLayout,
   createUnverifiedProductionLayout,
   createYellowCenterTestLayout,
+  INCLUDE_DIAMOND_BORDER_EDGES,
+  parseNodeId,
+  nodeId,
+  countConfirmedEdges,
 } from './layout';
-export type { BoardLayout, YellowCenterEllipse } from './layout';
+export type {
+  BoardLayout,
+  YellowCenterEllipse,
+  YellowCenterDiamond,
+  YellowCenterShape,
+} from './layout';

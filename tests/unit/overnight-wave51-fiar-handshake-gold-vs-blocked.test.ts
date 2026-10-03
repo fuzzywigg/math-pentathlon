@@ -8,7 +8,11 @@ import { checkWinner, findPaths } from '../../src/games/fiar/rules';
 import { renderBoard } from '../../src/games/fiar/board-ui';
 
 function movement(
-  placements: Array<{ id: string; chip: 'player1' | 'player2'; kind?: 'plain' | 'marked' }>
+  placements: Array<{
+    id: string;
+    chip: 'player1' | 'player2';
+    kind?: 'plain' | 'marked';
+  }>
 ) {
   const base = createInitialState();
   const nodes = new Map(base.board.nodes);
@@ -35,14 +39,14 @@ function movement(
 describe('Wave 51 fiar — gold vs blocked handshake', () => {
   it('unblocked win uses #ffd700; blocked four uses width-3 #ff9800', () => {
     const win = movement([
-      { id: '2-0', chip: 'player1' },
-      { id: '2-1', chip: 'player1' },
-      { id: '2-2', chip: 'player1' },
-      { id: '2-3', chip: 'player1' },
-      { id: '0-0', chip: 'player2' },
-      { id: '0-1', chip: 'player2' },
-      { id: '0-2', chip: 'player2' },
-      { id: '0-3', chip: 'player2' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c2r2', chip: 'player1' },
+      { id: 'c3r2', chip: 'player1' },
+      { id: 'c4r2', chip: 'player1' },
+      { id: 'c5r3', chip: 'player2' },
+      { id: 'c6r3', chip: 'player2' },
+      { id: 'c7r3', chip: 'player2' },
+      { id: 'c8r3', chip: 'player2' },
     ]);
     expect(checkWinner(win)).toBe('player1');
     const winSvg = renderBoard(win, () => undefined);
@@ -55,14 +59,14 @@ describe('Wave 51 fiar — gold vs blocked handshake', () => {
     ).toBe(true);
 
     const blocked = movement([
-      { id: '2-0', chip: 'player1' },
-      { id: '2-1', chip: 'player1' },
-      { id: '2-2', chip: 'player1' },
-      { id: '2-3', chip: 'player1' },
-      { id: '1-1', chip: 'player2', kind: 'marked' },
-      { id: '0-0', chip: 'player2' },
-      { id: '0-1', chip: 'player2' },
-      { id: '0-2', chip: 'player2' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c2r2', chip: 'player1' },
+      { id: 'c3r2', chip: 'player1' },
+      { id: 'c4r2', chip: 'player1' },
+      { id: 'c1r1', chip: 'player2', kind: 'marked' },
+      { id: 'c5r3', chip: 'player2' },
+      { id: 'c6r3', chip: 'player2' },
+      { id: 'c7r3', chip: 'player2' },
     ]);
     expect(
       findPaths(blocked, 'player1').some(

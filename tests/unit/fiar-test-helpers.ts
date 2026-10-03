@@ -11,23 +11,23 @@ import { placeChip, forceChip } from '../../src/games/fiar/rules';
 
 /**
  * 14 alternating placements that reach movement without an auto-detected win
- * under gapped-line rules (verified against the engine).
+ * under gapped-line rules on the verified 40-space board.
  */
 export const SAFE_PLACEMENT_TO_MOVEMENT = [
-  '2-3',
-  '3-4',
-  '0-0',
-  '2-4',
-  '1-3',
-  '1-2',
-  '3-3',
-  '0-3',
-  '2-0',
-  '4-2',
-  '3-0',
-  '4-1',
-  '3-1',
-  '4-0',
+  'c5r1',
+  'c4r0',
+  'c1r3',
+  'c7r2',
+  'c6r2',
+  'c6r1',
+  'c4r1',
+  'c3r1',
+  'c4r4',
+  'c4r6',
+  'c3r0',
+  'c5r0',
+  'c4r5',
+  'c5r6',
 ] as const;
 
 /** Place using the given kind, or auto-pick plain then marked from inventory. */
@@ -47,7 +47,9 @@ export function placeMany(
   return s;
 }
 
-export function placeToMovement(state: FiarGameState = createInitialState()): FiarGameState {
+export function placeToMovement(
+  state: FiarGameState = createInitialState()
+): FiarGameState {
   return placeMany(state, [...SAFE_PLACEMENT_TO_MOVEMENT]);
 }
 

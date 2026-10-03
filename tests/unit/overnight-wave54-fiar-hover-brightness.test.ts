@@ -8,7 +8,7 @@ import { renderBoard } from '../../src/games/fiar/board-ui';
 describe('Wave 54 fiar — hover brightness', () => {
   it('mouseenter sets brightness filter; mouseleave clears it', () => {
     const svg = renderBoard(createInitialState(), () => undefined);
-    const g = svg.querySelector('[data-node-id="0-0"]')!;
+    const g = svg.querySelector('[data-node-id="c2r1"]')!;
     const circle = g.querySelector('circle')!;
     g.dispatchEvent(new Event('mouseenter'));
     expect(circle.getAttribute('filter')).toBe('brightness(1.1)');

@@ -22,9 +22,9 @@ describe('Wave 42 fiar — place transition', () => {
 
   it('occupied and missing node reject identity', () => {
     let s = createInitialState();
-    s = placeChip(s, '2-2');
-    expect(placeChip(s, '2-2')).toBe(s);
-    expect(canPlaceChip(s, '2-2')).toBe(false);
+    s = placeChip(s, 'c3r3');
+    expect(placeChip(s, 'c3r3')).toBe(s);
+    expect(canPlaceChip(s, 'c3r3')).toBe(false);
     expect(placeChip(s, '99-99')).toBe(s);
     expect(canPlaceChip(s, 'nope')).toBe(false);
   });
@@ -40,7 +40,7 @@ describe('Wave 42 fiar — place transition', () => {
       },
       currentPlayer: 'player1',
     };
-    expect(canPlaceChip(s, '4-4')).toBe(false);
-    expect(placeChip(s, '4-4')).toBe(s);
+    expect(canPlaceChip(s, 'c6r5')).toBe(false);
+    expect(placeChip(s, 'c6r5')).toBe(s);
   });
 });

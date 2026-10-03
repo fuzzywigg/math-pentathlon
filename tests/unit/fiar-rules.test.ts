@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  createInitialState,
-  CONFIG,
-} from '../../src/games/fiar/types';
+import { createInitialState, CONFIG } from '../../src/games/fiar/types';
 import {
   placeChip,
   canPlaceChip,
@@ -26,26 +23,27 @@ describe('FIAR – createInitialState', () => {
     expect(state.chipInventory.player1).toEqual({ plain: 5, marked: 2 });
     expect(state.winner).toBeNull();
     expect(state.selectedNode).toBeNull();
-    expect(state.board.nodes.size).toBe(25);
+    expect(state.board.nodes.size).toBe(40);
   });
 });
 
 describe('FIAR – placement', () => {
   it('canPlaceChip is true on empty nodes during placement', () => {
     const state = createInitialState();
-    expect(canPlaceChip(state, '0-0')).toBe(true);
-    expect(canPlaceChip(state, '2-2')).toBe(true);
+    expect(canPlaceChip(state, 'c0r3')).toBe(true);
+    expect(canPlaceChip(state, 'c4r2')).toBe(true);
+    expect(canPlaceChip(state, 'c4r3')).toBe(false); // yellow center — not a space
   });
 
   it('places chips alternating players', () => {
     let state = createInitialState();
-    state = placeChip(state, '0-0');
-    expect(state.board.nodes.get('0-0')?.chip).toBe('player1');
+    state = placeChip(state, 'c0r3');
+    expect(state.board.nodes.get('c0r3')?.chip).toBe('player1');
     expect(state.currentPlayer).toBe('player2');
     expect(state.chipsPlaced.player1).toBe(1);
 
-    state = placeChip(state, '4-4');
-    expect(state.board.nodes.get('4-4')?.chip).toBe('player2');
+    state = placeChip(state, 'c8r3');
+    expect(state.board.nodes.get('c8r3')?.chip).toBe('player2');
     expect(state.currentPlayer).toBe('player1');
     expect(state.chipsPlaced.player2).toBe(1);
   });
@@ -59,16 +57,16 @@ describe('FIAR – placement', () => {
   });
 
   it('cannot place on occupied node', () => {
-    let state = placeChip(createInitialState(), '0-0');
-    expect(canPlaceChip(state, '0-0')).toBe(false);
+    let state = placeChip(createInitialState(), 'c0r3');
+    expect(canPlaceChip(state, 'c0r3')).toBe(false);
     const before = state;
-    expect(placeChip(state, '0-0')).toBe(before);
+    expect(placeChip(state, 'c0r3')).toBe(before);
   });
 
   it('illegal place returns same ref', () => {
     const state = createInitialState();
     expect(placeChip(state, 'no-such-node')).toBe(state);
-    expect(placeChip(state, '99-99')).toBe(state);
+    expect(placeChip(state, 'c4r3')).toBe(state);
   });
 });
 
@@ -81,7 +79,7 @@ describe('FIAR – movement / win', () => {
     const selectable = getSelectableNodes(state);
     expect(selectable.length).toBeGreaterThan(0);
 
-    const pick = selectable[0];
+    const pick = selectable[0]!;
     const selected = selectChip(state, pick);
     expect(selected.selectedNode).toBe(pick);
 
@@ -100,24 +98,24 @@ describe('FIAR – movement / win', () => {
 
   it('scripts a 4-in-a-row win via move completing a gapped line', () => {
     let state = forgeMovementState([
-      { nodeId: '0-0', player: 'player1' },
-      { nodeId: '0-1', player: 'player1' },
-      { nodeId: '0-2', player: 'player1' },
-      { nodeId: '1-4', player: 'player1' },
-      { nodeId: '4-0', player: 'player2' },
-      { nodeId: '4-2', player: 'player2' },
-      { nodeId: '4-4', player: 'player2' },
+      { nodeId: 'c0r3', player: 'player1' },
+      { nodeId: 'c1r3', player: 'player1' },
+      { nodeId: 'c2r3', player: 'player1' },
+      { nodeId: 'c1r1', player: 'player1' },
+      { nodeId: 'c5r3', player: 'player2' },
+      { nodeId: 'c6r3', player: 'player2' },
+      { nodeId: 'c7r3', player: 'player2' },
     ]);
     expect(checkWinner(state)).toBeNull();
-    state = moveChip(state, '1-4', '0-4');
-    expect(state.board.nodes.get('0-4')?.chip).toBe('player1');
+    state = moveChip(state, 'c1r1', 'c3r3');
+    expect(state.board.nodes.get('c3r3')?.chip).toBe('player1');
     expect(state.winner).toBe('player1');
     expect(state.phase).toBe('gameOver');
   });
 
   it('deselectChip clears selection', () => {
     let state = placeToMovement();
-    const pick = getSelectableNodes(state)[0];
+    const pick = getSelectableNodes(state)[0]!;
     state = selectChip(state, pick);
     expect(state.selectedNode).toBe(pick);
     state = deselectChip(state);
@@ -126,11 +124,11 @@ describe('FIAR – movement / win', () => {
 
   it('canMove false when blocked by intervening chip', () => {
     let state = forgeMovementState([
-      { nodeId: '0-0', player: 'player1' },
-      { nodeId: '0-1', player: 'player2' },
-      { nodeId: '0-4', player: 'player1' },
+      { nodeId: 'c1r2', player: 'player1' },
+      { nodeId: 'c2r2', player: 'player2' },
+      { nodeId: 'c5r2', player: 'player1' },
     ]);
-    expect(canMove(state, '0-0', '0-4')).toBe(false);
+    expect(canMove(state, 'c1r2', 'c5r2')).toBe(false);
   });
 
   it('isDraw false when moves exist', () => {
@@ -140,7 +138,7 @@ describe('FIAR – movement / win', () => {
 
   it('forceChip sets chipKind', () => {
     let state = createInitialState();
-    state = forceChip(state, '2-2', 'player1', 'marked');
-    expect(state.board.nodes.get('2-2')?.chipKind).toBe('marked');
+    state = forceChip(state, 'c4r2', 'player1', 'marked');
+    expect(state.board.nodes.get('c4r2')?.chipKind).toBe('marked');
   });
 });

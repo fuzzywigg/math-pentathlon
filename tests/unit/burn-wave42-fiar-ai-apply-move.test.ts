@@ -28,6 +28,6 @@ describe('Wave 42 FIAR AI — apply move', () => {
   it('applyAIMove identity on incomplete move payload', () => {
     const state = createInitialState();
     expect(applyAIMove(state, { type: 'move' })).toBe(state);
-    expect(applyAIMove(state, { type: 'move', from: '0-0' })).toBe(state);
+    expect(applyAIMove(state, { type: 'move', from: 'c2r1' })).toBe(state);
   });
 });

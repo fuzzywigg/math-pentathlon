@@ -28,12 +28,12 @@ describe('Wave 56 fiar — inject status font + empty node', () => {
     for (const [id, n] of state.board.nodes) {
       state.board.nodes.set(id, { ...n, chip: null });
     }
-    state.board.nodes.set('0-0', {
-      ...state.board.nodes.get('0-0')!,
+    state.board.nodes.set('c2r1', {
+      ...state.board.nodes.get('c2r1')!,
       chip: 'player1',
     });
-    state.board.nodes.set('4-4', {
-      ...state.board.nodes.get('4-4')!,
+    state.board.nodes.set('c6r5', {
+      ...state.board.nodes.get('c6r5')!,
       chip: 'player2',
     });
     state.currentPlayer = 'player1';
@@ -41,7 +41,7 @@ describe('Wave 56 fiar — inject status font + empty node', () => {
 
     const svg = renderBoard(state, () => undefined);
     const empty = svg.querySelector(
-      '[data-node-id="2-2"] circle'
+      '[data-node-id="c3r3"] circle'
     ) as SVGCircleElement | null;
     expect(empty?.getAttribute('fill')).toBe('#dcd0c0');
   });

@@ -20,12 +20,12 @@ function forgeBlockedCenter(): void {
     s.board.nodes.set(id, { ...n, chip: null });
   }
   // P1 at center; ring of blockers on all 8 neighbors → no valid moves
-  s.board.nodes.set('2-2', { ...s.board.nodes.get('2-2')!, chip: 'player1' });
-  for (const id of ['1-1', '1-2', '1-3', '2-1', '2-3', '3-1', '3-2', '3-3']) {
+  s.board.nodes.set('c3r3', { ...s.board.nodes.get('c3r3')!, chip: 'player1' });
+  for (const id of ['c3r2', 'c4r2', 'c5r2', 'c3r3', 'c5r3', 'c3r4', 'c4r4', 'c5r4']) {
     s.board.nodes.set(id, {
       ...s.board.nodes.get(id)!,
       chip:
-        id === '1-1' || id === '1-3' || id === '3-1' ? 'player1' : 'player2',
+        id === 'c3r2' || id === 'c5r2' || id === 'c3r4' ? 'player1' : 'player2',
     });
   }
   s.phase = 'movement';
@@ -46,15 +46,15 @@ describe('Wave 57 fiar — select no valids noop', () => {
     initGame(board, status);
     forgeBlockedCenter();
 
-    expect(getValidMoves(getCurrentState(), '2-2')).toHaveLength(0);
+    expect(getValidMoves(getCurrentState(), 'c3r3')).toHaveLength(0);
 
     // Force a movement-phase render via a mobile own chip, then deselect
     board
-      .querySelector('[data-node-id="1-1"]')!
+      .querySelector('[data-node-id="c3r2"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(getCurrentState().selectedNode).toBe('1-1');
+    expect(getCurrentState().selectedNode).toBe('c3r2');
     board
-      .querySelector('[data-node-id="1-1"]')!
+      .querySelector('[data-node-id="c3r2"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBeNull();
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(
@@ -62,7 +62,7 @@ describe('Wave 57 fiar — select no valids noop', () => {
     );
 
     board
-      .querySelector('[data-node-id="2-2"]')!
+      .querySelector('[data-node-id="c3r3"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBeNull();
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(

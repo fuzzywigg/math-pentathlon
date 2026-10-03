@@ -8,7 +8,7 @@ import { renderBoard } from '../../src/games/fiar/board-ui';
 describe('Wave 54 fiar — node cursor', () => {
   it('node groups use pointer cursor', () => {
     const svg = renderBoard(createInitialState(), () => undefined);
-    const g = svg.querySelector('[data-node-id="0-0"]') as SVGElement;
+    const g = svg.querySelector('[data-node-id="c2r1"]') as SVGElement;
     expect(g.style.cursor).toBe('pointer');
   });
 });

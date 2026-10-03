@@ -31,43 +31,20 @@ describe('FIAR – findPaths / isPathBlocked', () => {
 
   it('findPaths detects a length-4 alignment once crafted', () => {
     let state = createInitialState();
-    const candidates = ['2-0', '2-1', '2-2', '2-3'];
+    const candidates = ['c1r2', 'c2r2', 'c3r2', 'c4r2'];
     const allExist = candidates.every((id) => state.board.nodes.has(id));
-    if (allExist) {
-      for (const id of candidates) {
-        state = forceChip(state, id, 'player1');
-      }
-      const paths = findPaths(state, 'player1');
-      expect(paths.length).toBeGreaterThan(0);
-      expect(paths.some((p) => p.nodes.length >= 4)).toBe(true);
-    } else {
-      state = placeMany(state, [
-        '0-0',
-        '4-0',
-        '0-1',
-        '4-1',
-        '0-2',
-        '4-2',
-        '0-3',
-      ]);
-      if (checkWinner(state) === 'player1') {
-        expect(findPaths(state, 'player1').length).toBeGreaterThan(0);
-      } else {
-        const paths = findPaths(state, 'player1');
-        expect(Array.isArray(paths)).toBe(true);
-      }
+    expect(allExist).toBe(true);
+    for (const id of candidates) {
+      state = forceChip(state, id, 'player1');
     }
+    const paths = findPaths(state, 'player1');
+    expect(paths.length).toBeGreaterThan(0);
+    expect(paths.some((p) => p.nodes.length >= 4)).toBe(true);
   });
 
   it('isPathBlocked is false when no opponent marked neighbors touch the path', () => {
     let state = createInitialState();
-    const path = ['2-0', '2-1', '2-2', '2-3'].filter((id) =>
-      state.board.nodes.has(id)
-    );
-    if (path.length < 4) {
-      expect(isPathBlocked(state, [], 'player1')).toBe(false);
-      return;
-    }
+    const path = ['c1r2', 'c2r2', 'c3r2', 'c4r2'];
     for (const id of path) {
       state = forceChip(state, id, 'player1');
     }
@@ -76,28 +53,33 @@ describe('FIAR – findPaths / isPathBlocked', () => {
 
   it('isPathBlocked false for plain opponent adjacent; true for marked', () => {
     let state = createInitialState();
-    const path = ['2-0', '2-1', '2-2', '2-3'].filter((id) =>
-      state.board.nodes.has(id)
-    );
-    if (path.length < 4) {
-      expect(true).toBe(true);
-      return;
-    }
+    const path = ['c1r2', 'c2r2', 'c3r2', 'c4r2'];
     for (const id of path) {
       state = forceChip(state, id, 'player1');
     }
-    const neighbor = getConnectedNodes(state.board, path[0]).find(
+    const neighbor = getConnectedNodes(state.board, path[0]!).find(
       (id) => !path.includes(id)
     );
-    if (!neighbor) {
-      expect(isPathBlocked(state, path, 'player1')).toBe(false);
-      return;
-    }
-    state = forceChip(state, neighbor, 'player2', 'plain');
+    expect(neighbor).toBeTruthy();
+    state = forceChip(state, neighbor!, 'player2', 'plain');
     expect(isPathBlocked(state, path, 'player1')).toBe(false);
 
-    state = forceChip(state, neighbor, 'player2', 'marked');
+    state = forceChip(state, neighbor!, 'player2', 'marked');
     expect(isPathBlocked(state, path, 'player1')).toBe(true);
+  });
+
+  it('placement win still surfaces paths', () => {
+    const state = placeMany(createInitialState(), [
+      'c0r3',
+      'c5r3',
+      'c1r3',
+      'c6r3',
+      'c2r3',
+      'c7r3',
+      'c3r3',
+    ]);
+    expect(checkWinner(state)).toBe('player1');
+    expect(findPaths(state, 'player1').length).toBeGreaterThan(0);
   });
 });
 
@@ -110,5 +92,4 @@ describe('FIAR – board-ui helpers', () => {
   });
 });
 
-// silence unused Player import if tree-shaken oddly
 void (null as unknown as Player);

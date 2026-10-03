@@ -15,7 +15,11 @@ import {
 } from '../../src/games/fiar/types';
 
 function movementBoard(
-  placements: Array<{ id: string; chip: 'player1' | 'player2'; kind?: 'plain' | 'marked' }>
+  placements: Array<{
+    id: string;
+    chip: 'player1' | 'player2';
+    kind?: 'plain' | 'marked';
+  }>
 ): FiarGameState {
   const state = createInitialState();
   const nodes = new Map(state.board.nodes);
@@ -41,10 +45,10 @@ function movementBoard(
 describe('Wave 42 fiar — row/col win matrix', () => {
   it('horizontal four unblocked wins', () => {
     const state = movementBoard([
-      { id: '1-0', chip: 'player1' },
-      { id: '1-1', chip: 'player1' },
-      { id: '1-2', chip: 'player1' },
-      { id: '1-3', chip: 'player1' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c2r2', chip: 'player1' },
+      { id: 'c3r2', chip: 'player1' },
+      { id: 'c4r2', chip: 'player1' },
     ]);
     expect(checkWinner(state)).toBe('player1');
     const paths = findPaths(state, 'player1');
@@ -53,22 +57,22 @@ describe('Wave 42 fiar — row/col win matrix', () => {
 
   it('vertical four unblocked wins for player2', () => {
     const state = movementBoard([
-      { id: '0-2', chip: 'player2' },
-      { id: '1-2', chip: 'player2' },
-      { id: '2-2', chip: 'player2' },
-      { id: '3-2', chip: 'player2' },
+      { id: 'c2r1', chip: 'player2' },
+      { id: 'c2r2', chip: 'player2' },
+      { id: 'c2r3', chip: 'player2' },
+      { id: 'c2r4', chip: 'player2' },
     ]);
     expect(checkWinner(state)).toBe('player2');
   });
 
   it('row with adjacent opponent blocked', () => {
-    const path = ['2-0', '2-1', '2-2', '2-3'];
+    const path = ['c1r2', 'c2r2', 'c3r2', 'c4r2'];
     const state = movementBoard([
-      { id: '2-0', chip: 'player1' },
-      { id: '2-1', chip: 'player1' },
-      { id: '2-2', chip: 'player1' },
-      { id: '2-3', chip: 'player1' },
-      { id: '1-1', chip: 'player2', kind: 'marked' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c2r2', chip: 'player1' },
+      { id: 'c3r2', chip: 'player1' },
+      { id: 'c4r2', chip: 'player1' },
+      { id: 'c2r1', chip: 'player2', kind: 'marked' },
     ]);
     expect(isPathBlocked(state, path, 'player1')).toBe(true);
     expect(checkWinner(state)).toBeNull();
@@ -76,16 +80,16 @@ describe('Wave 42 fiar — row/col win matrix', () => {
 
   it('column win via moveChip transitions gameOver', () => {
     const state = movementBoard([
-      { id: '0-0', chip: 'player1' },
-      { id: '1-0', chip: 'player1' },
-      { id: '2-0', chip: 'player1' },
-      { id: '4-0', chip: 'player1' },
-      { id: '0-4', chip: 'player2' },
-      { id: '1-4', chip: 'player2' },
-      { id: '2-4', chip: 'player2' },
-      { id: '3-4', chip: 'player2' },
+      { id: 'c2r1', chip: 'player1' },
+      { id: 'c2r2', chip: 'player1' },
+      { id: 'c2r3', chip: 'player1' },
+      { id: 'c2r5', chip: 'player1' },
+      { id: 'c6r1', chip: 'player2' },
+      { id: 'c6r2', chip: 'player2' },
+      { id: 'c6r3', chip: 'player2' },
+      { id: 'c6r4', chip: 'player2' },
     ]);
-    const next = moveChip(state, '4-0', '3-0');
+    const next = moveChip(state, 'c2r5', 'c2r4');
     expect(next.phase).toBe('gameOver');
     expect(next.winner).toBe('player1');
   });

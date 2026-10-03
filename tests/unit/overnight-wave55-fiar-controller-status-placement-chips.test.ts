@@ -26,7 +26,7 @@ describe('Wave 55 fiar — placement status chips', () => {
     expect(status.textContent).toMatch(/Blue: 0\/7/);
     expect(status.textContent).toMatch(/Red: 0\/7/);
 
-    const node = board.querySelector('[data-node-id="2-2"]');
+    const node = board.querySelector('[data-node-id="c3r3"]');
     expect(node).toBeTruthy();
     node!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 

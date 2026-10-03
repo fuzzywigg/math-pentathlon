@@ -9,6 +9,7 @@ import {
   getNodesInDirection,
   getBoardDirections,
   chipsRemaining,
+  parseNodeId,
 } from './types';
 
 import {
@@ -254,14 +255,34 @@ function evaluatePotentialPaths(state: FiarGameState, player: Player): number {
 
 function evaluateCenterControl(state: FiarGameState, player: Player): number {
   let score = 0;
+  // Prefer spaces near the yellow diamond (c4r3) without occupying it.
   for (const [nodeId, node] of state.board.nodes) {
     if (node.chip !== player) continue;
-    const parts = nodeId.split('-').map(Number);
-    if (parts.length === 2 && !Number.isNaN(parts[0])) {
-      const dist = Math.abs(parts[0] - 2) + Math.abs(parts[1] - 2);
-      score += 4 - dist;
-    }
+    const p = parseNodeId(nodeId);
+    if (!p) continue;
+    const dist = Math.abs(p.col - 4) + Math.abs(p.row - 3);
+    score += Math.max(0, 5 - dist);
   }
+  return score;
+}
+
+/** Cheap static placement score used to prune root candidates on the 40-node board. */
+function quickPlaceScore(
+  state: FiarGameState,
+  nodeId: string,
+  aiPlayer: Player
+): number {
+  const p = parseNodeId(nodeId);
+  let score = 0;
+  if (p) {
+    score += Math.max(0, 5 - (Math.abs(p.col - 4) + Math.abs(p.row - 3))) * 3;
+  }
+  // Prefer nodes that sit on longer maximal lines
+  for (const line of state.board.straightLinesCache ?? []) {
+    if (!line.includes(nodeId)) continue;
+    score += line.length;
+  }
+  void aiPlayer;
   return score;
 }
 
@@ -300,17 +321,35 @@ function getBestPlacement(
     if (block) return block;
   }
 
+  // Warm line cache once, then rank empties before expensive search.
+  void findPaths(state, aiPlayer);
+
+  const empties: string[] = [];
+  for (const [nodeId, node] of state.board.nodes) {
+    if (node.chip === null) empties.push(nodeId);
+  }
+  empties.sort(
+    (a, b) =>
+      quickPlaceScore(state, b, aiPlayer) - quickPlaceScore(state, a, aiPlayer)
+  );
+
+  // Easy: heuristic pick only (tablet-friendly). Medium/hard: top candidates.
+  const rootCap = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 14;
+  const candidates = empties.slice(0, Math.max(rootCap, 1));
+
   const placements: { nodeId: string; chipKind: ChipKind; score: number }[] =
     [];
+  const chipsOut = state.chipsPlaced.player1 + state.chipsPlaced.player2;
 
-  for (const [nodeId] of state.board.nodes) {
+  for (const nodeId of candidates) {
     const kind = chooseKindForPlacement(state, nodeId, difficulty);
     if (!kind || !canPlaceChip(state, nodeId, kind)) continue;
 
     const newState = placeChip(state, nodeId, kind);
-    // Avoid handing opponent an instant win
+    // Avoid handing opponent an instant win (skip early-game full scan)
     if (
       difficulty !== 'easy' &&
+      chipsOut >= 4 &&
       newState.winner === null &&
       opponentHasImmediateWin({
         ...newState,
@@ -321,9 +360,18 @@ function getBestPlacement(
       continue;
     }
 
+    if (difficulty === 'easy') {
+      placements.push({
+        nodeId,
+        chipKind: kind,
+        score: quickPlaceScore(state, nodeId, aiPlayer),
+      });
+      continue;
+    }
+
     const score = minimax(
       newState,
-      config.maxDepth - 1,
+      Math.min(config.maxDepth - 1, 1),
       -Infinity,
       Infinity,
       false,
@@ -488,10 +536,10 @@ function minimax(
         }
       }
     }
-    // Cap branching for tablet speed
+    // Cap branching for tablet speed (40-node board)
     const capped =
-      options.length > 18
-        ? options.filter((_, i) => i % Math.ceil(options.length / 18) === 0)
+      options.length > 12
+        ? options.filter((_, i) => i % Math.ceil(options.length / 12) === 0)
         : options;
 
     if (capped.length === 0) return evaluatePosition(state, aiPlayer);

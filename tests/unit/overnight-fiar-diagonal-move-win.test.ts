@@ -47,18 +47,18 @@ describe('Overnight fiar — diagonal move legality', () => {
   it('can slide diagonally onto empty node without creating a 4-path', () => {
     // Only two P1 chips on the diagonal — slide 4-4 → 3-3 keeps length 2
     const state = movementBoard([
-      { id: '4-4', chip: 'player1' },
-      { id: '0-0', chip: 'player1' },
-      { id: '0-4', chip: 'player2' },
-      { id: '1-3', chip: 'player2' },
-      { id: '2-1', chip: 'player2' },
-      { id: '4-0', chip: 'player2' },
+      { id: 'c6r5', chip: 'player1' },
+      { id: 'c2r1', chip: 'player1' },
+      { id: 'c6r1', chip: 'player2' },
+      { id: 'c5r2', chip: 'player2' },
+      { id: 'c3r3', chip: 'player2' },
+      { id: 'c2r5', chip: 'player2' },
     ]);
     expect(checkWinner(state)).toBeNull();
-    expect(canMove(state, '4-4', '3-3')).toBe(true);
-    const next = moveChip(state, '4-4', '3-3');
-    expect(next.board.nodes.get('3-3')!.chip).toBe('player1');
-    expect(next.board.nodes.get('4-4')!.chip).toBeNull();
+    expect(canMove(state, 'c6r5', 'c5r4')).toBe(true);
+    const next = moveChip(state, 'c6r5', 'c5r4');
+    expect(next.board.nodes.get('c5r4')!.chip).toBe('player1');
+    expect(next.board.nodes.get('c6r5')!.chip).toBeNull();
     expect(checkWinner(next)).toBeNull();
     expect(next.phase).toBe('movement');
     expect(next.currentPlayer).toBe('player2');

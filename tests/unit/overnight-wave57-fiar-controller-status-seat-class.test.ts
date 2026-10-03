@@ -23,7 +23,7 @@ describe('Wave 57 fiar — status seat class', () => {
     expect(status.querySelector('.fiar-status.player2')).toBeNull();
 
     board
-      .querySelector('[data-node-id="2-2"]')!
+      .querySelector('[data-node-id="c3r3"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().currentPlayer).toBe('player2');
     expect(status.querySelector('.fiar-status.player2')).toBeTruthy();

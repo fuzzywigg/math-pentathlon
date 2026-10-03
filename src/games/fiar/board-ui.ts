@@ -18,7 +18,8 @@ import {
   applyRovingTabindex,
 } from '../../ui/board-a11y';
 
-const COLORS = {
+/** Theme tokens for the 2D SVG board (marked-dot color matches kit green). */
+export const FIAR_THEME = {
   background: '#f5f0e6',
   edge: '#8b7355',
   edgeYellow: '#c9a227',
@@ -29,8 +30,12 @@ const COLORS = {
   winningPath: '#ffd700',
   blockedPath: '#ff9800',
   yellowCenter: 'rgba(255, 213, 79, 0.55)',
-  yellowDot: '#f9a825',
+  yellowCenterStroke: '#e6b800',
+  /** Marked Fire Extinguisher dot — kit uses green; rules PDFs say yellow. */
+  markedDot: '#2e7d32',
 };
+
+const COLORS = FIAR_THEME;
 
 function playerColors() {
   return getPlayerSeatColors();
@@ -82,22 +87,44 @@ export function renderBoard(
   // Yellow center region (visual; layout may mark edges that cross it)
   if (state.board.yellowCenter) {
     const yc = state.board.yellowCenter;
-    const ellipse = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'ellipse'
-    );
-    ellipse.setAttribute('cx', yc.cx.toString());
-    ellipse.setAttribute('cy', yc.cy.toString());
-    ellipse.setAttribute('rx', yc.rx.toString());
-    ellipse.setAttribute('ry', yc.ry.toString());
-    ellipse.setAttribute('fill', COLORS.yellowCenter);
-    ellipse.setAttribute('stroke', '#e6b800');
-    ellipse.setAttribute('stroke-width', '2');
-    ellipse.setAttribute('data-yellow-center', '1');
-    if (!state.board.layoutVerified) {
-      ellipse.setAttribute('data-layout-unverified', '1');
+    if (yc.kind === 'diamond') {
+      const d = yc.halfDiagonal;
+      const poly = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'polygon'
+      );
+      poly.setAttribute(
+        'points',
+        `${yc.cx},${yc.cy - d} ${yc.cx + d},${yc.cy} ${yc.cx},${yc.cy + d} ${yc.cx - d},${yc.cy}`
+      );
+      poly.setAttribute('fill', COLORS.yellowCenter);
+      poly.setAttribute('stroke', COLORS.yellowCenterStroke);
+      poly.setAttribute('stroke-width', '2');
+      poly.setAttribute('data-yellow-center', '1');
+      poly.setAttribute('data-yellow-shape', 'diamond');
+      if (state.board.layoutVerified) {
+        poly.setAttribute('data-layout-verified', '1');
+      }
+      svg.appendChild(poly);
+    } else {
+      const ellipse = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'ellipse'
+      );
+      ellipse.setAttribute('cx', yc.cx.toString());
+      ellipse.setAttribute('cy', yc.cy.toString());
+      ellipse.setAttribute('rx', yc.rx.toString());
+      ellipse.setAttribute('ry', yc.ry.toString());
+      ellipse.setAttribute('fill', COLORS.yellowCenter);
+      ellipse.setAttribute('stroke', COLORS.yellowCenterStroke);
+      ellipse.setAttribute('stroke-width', '2');
+      ellipse.setAttribute('data-yellow-center', '1');
+      ellipse.setAttribute('data-yellow-shape', 'ellipse');
+      if (!state.board.layoutVerified) {
+        ellipse.setAttribute('data-layout-unverified', '1');
+      }
+      svg.appendChild(ellipse);
     }
-    svg.appendChild(ellipse);
   }
 
   const validMoves = state.selectedNode
@@ -144,9 +171,15 @@ export function renderBoard(
   for (const [nodeId, node] of state.board.nodes) {
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     g.setAttribute('data-node-id', nodeId);
-    const [rowStr, colStr] = nodeId.split('-');
-    g.setAttribute('data-row', rowStr ?? '');
-    g.setAttribute('data-col', colStr ?? '');
+    const parsed = /^c(\d+)r(\d+)$/.exec(nodeId);
+    if (parsed) {
+      g.setAttribute('data-col', parsed[1]!);
+      g.setAttribute('data-row', parsed[2]!);
+    } else {
+      // Synthetic fixture ids (a, b, …) — keep a stable grid cell for a11y.
+      g.setAttribute('data-row', '0');
+      g.setAttribute('data-col', nodeId);
+    }
     g.style.cursor = 'pointer';
 
     const circle = document.createElementNS(
@@ -222,9 +255,11 @@ export function renderBoard(
         dot.setAttribute('cx', (node.x + 6).toString());
         dot.setAttribute('cy', (node.y + 6).toString());
         dot.setAttribute('r', '5');
-        dot.setAttribute('fill', COLORS.yellowDot);
+        dot.setAttribute('fill', COLORS.markedDot);
         dot.setAttribute('stroke', '#fff');
         dot.setAttribute('stroke-width', '1');
+        dot.setAttribute('data-marked-dot', '1');
+        // Legacy alias kept for older chrome tests.
         dot.setAttribute('data-yellow-dot', '1');
         g.appendChild(dot);
       }
@@ -265,10 +300,16 @@ export function renderBoard(
     if (state.selectedNode === nodeId) extras.push('selected');
     if (node.chipKind === 'marked') extras.push('marked blocker');
 
+    const coordLabel = parsed
+      ? `${parsed[2]},${parsed[1]}`
+      : nodeId.includes('-')
+        ? nodeId.replace('-', ',')
+        : nodeId;
+
     makeGridCell(
       g,
       buildCellAriaLabel({
-        coord: nodeId.includes('-') ? nodeId.replace('-', ',') : nodeId,
+        coord: coordLabel,
         empty: node.chip === null,
         owner,
         validMove: isValidMove,
@@ -385,7 +426,7 @@ export function injectFiarStyles(): void {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: #f9a825;
+      background: var(--fiar-marked-dot, #2e7d32);
       border: 1px solid #fff;
     }
 
@@ -447,5 +488,5 @@ export function getPlayerColor(player: Player): string {
 }
 
 export function chipKindLabel(kind: ChipKind): string {
-  return kind === 'marked' ? 'Marked (yellow dot)' : 'Plain';
+  return kind === 'marked' ? 'Marked (Fire Extinguisher)' : 'Plain';
 }

@@ -32,9 +32,9 @@ describe('Wave 42 fiar — select / draw', () => {
 
   it('select unknown node identity; placement phase not draw', () => {
     const open = createInitialState();
-    expect(selectChip(open, '0-0')).toBe(open);
+    expect(selectChip(open, 'c2r1')).toBe(open);
     expect(isDraw(open)).toBe(false);
-    expect(getValidMoves(open, '0-0')).toEqual([]);
+    expect(getValidMoves(open, 'c2r1')).toEqual([]);
   });
 
   it('isDraw true when no selectable in movement', () => {

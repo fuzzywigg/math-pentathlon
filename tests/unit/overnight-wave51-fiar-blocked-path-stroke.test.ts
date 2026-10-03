@@ -11,18 +11,15 @@ describe('Wave 51 fiar — blocked path stroke', () => {
   it('strokes blocked length-4 path with #ff9800 when adjacent opponent blocks', () => {
     const base = createInitialState();
     const nodes = new Map(base.board.nodes);
-    // Horizontal four for p1
-    for (const id of ['2-0', '2-1', '2-2', '2-3']) {
+    for (const id of ['c1r2', 'c2r2', 'c3r2', 'c4r2']) {
       nodes.set(id, { ...nodes.get(id)!, chip: 'player1', chipKind: 'plain' });
     }
-    // Adjacent MARKED blocker on the path side
-    nodes.set('1-1', {
-      ...nodes.get('1-1')!,
+    nodes.set('c1r1', {
+      ...nodes.get('c1r1')!,
       chip: 'player2',
       chipKind: 'marked',
     });
-    // Fill remaining p2 chips for movement phase
-    for (const id of ['0-0', '0-1', '0-2']) {
+    for (const id of ['c5r1', 'c6r1', 'c6r2']) {
       nodes.set(id, { ...nodes.get(id)!, chip: 'player2', chipKind: 'plain' });
     }
     const state = {
@@ -37,10 +34,11 @@ describe('Wave 51 fiar — blocked path stroke', () => {
       selectedNode: null,
     };
     const paths = findPaths(state, 'player1');
-    const blocked = paths.filter((p) => p.isBlocked && p.nodes.length >= CONFIG.WIN_LENGTH);
+    const blocked = paths.filter(
+      (p) => p.isBlocked && p.nodes.length >= CONFIG.WIN_LENGTH
+    );
     expect(blocked.length).toBeGreaterThan(0);
     const svg = renderBoard(state, () => undefined);
-    // blocked uses #ff9800 stroke width 3 (not selected width 4)
     const orange = [...svg.querySelectorAll('circle')].filter(
       (c) =>
         c.getAttribute('stroke') === '#ff9800' &&

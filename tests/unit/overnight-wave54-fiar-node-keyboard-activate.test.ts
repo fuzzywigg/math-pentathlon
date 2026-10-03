@@ -9,10 +9,10 @@ describe('Wave 54 fiar — node keyboard', () => {
   it('Enter/Space invoke onNodeClick', () => {
     const onClick = vi.fn();
     const svg = renderBoard(createInitialState(), onClick);
-    const g = svg.querySelector('[data-node-id="1-1"]')!;
+    const g = svg.querySelector('[data-node-id="c3r2"]')!;
     g.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     g.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-    expect(onClick).toHaveBeenCalledWith('1-1');
+    expect(onClick).toHaveBeenCalledWith('c3r2');
     expect(onClick).toHaveBeenCalledTimes(2);
   });
 });

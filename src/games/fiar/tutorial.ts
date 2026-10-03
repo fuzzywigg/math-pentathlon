@@ -20,7 +20,7 @@ export const fiarTutorial: TutorialConfig = {
       title: 'Objective',
       message: `
         <p>Identify four (or more) chips of the same color along a straight line of connected spaces, with no opposite-color chip between them.</p>
-        <p>Empty spaces between your four are fine. The path cannot cross the yellow center.</p>
+        <p>Empty spaces between your four are fine. The path cannot cross the yellow center diamond.</p>
       `,
       position: 'center',
     },
@@ -29,7 +29,7 @@ export const fiarTutorial: TutorialConfig = {
       title: 'Game Phases',
       message: `
         <ol>
-          <li><strong>Placement Phase:</strong> Take turns placing 7 chips each on any empty node (2 of yours have a yellow-dot mark)</li>
+          <li><strong>Placement Phase:</strong> Take turns placing 7 chips each on any empty node (2 of yours are marked Fire Extinguishers)</li>
           <li><strong>Movement Phase:</strong> Take turns moving your chips along pathways</li>
         </ol>
       `,
@@ -41,7 +41,7 @@ export const fiarTutorial: TutorialConfig = {
       title: 'Marked Chips (Fire Extinguisher)',
       message: `
         <ul>
-          <li>Each player has <strong>2 marked chips</strong> with a yellow dot</li>
+          <li>Each player has <strong>2 marked chips</strong> (Fire Extinguisher blockers)</li>
           <li>Only an opponent's <strong>marked</strong> chip next to a winning path blocks that win</li>
           <li>Your own marked chips can be part of a winning path</li>
           <li>Choose plain or marked before each placement</li>
@@ -73,7 +73,7 @@ export const fiarTutorial: TutorialConfig = {
           <li>Rows can be horizontal, vertical, or diagonal</li>
           <li>You can win during placement or movement</li>
           <li>You can win with the opponent's color if your move completes their line</li>
-          <li><strong>Blocking:</strong> Only an opponent's yellow-dot marked chip adjacent to the path prevents the win</li>
+          <li><strong>Blocking:</strong> Only an opponent's marked Fire Extinguisher chip adjacent to the path prevents the win</li>
         </ul>
       `,
       position: 'center',

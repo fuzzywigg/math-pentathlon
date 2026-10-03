@@ -243,11 +243,19 @@ export function moveChip(
 
 /**
  * Maximal straight lines on the board that do not traverse yellow-crossing edges.
+ * Cached on the board — the graph is layout-static.
  */
 export function getStraightLines(state: FiarGameState): string[][] {
+  if (state.board.straightLinesCache) {
+    return state.board.straightLinesCache;
+  }
+
   const lines: string[][] = [];
   const seen = new Set<string>();
-  const halfDirs = getBoardDirections(state.board).slice(0, 4);
+  // One direction per axis (not the first four of the 8-ray list, which are
+  // only orthogonal — diagonals live at indices 4–7).
+  const allDirs = getBoardDirections(state.board);
+  const halfDirs = [allDirs[0]!, allDirs[2]!, allDirs[4]!, allDirs[6]!];
 
   for (const [startId] of state.board.nodes) {
     for (const dir of halfDirs) {
@@ -269,6 +277,7 @@ export function getStraightLines(state: FiarGameState): string[][] {
     }
   }
 
+  state.board.straightLinesCache = lines;
   return lines;
 }
 

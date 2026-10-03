@@ -18,14 +18,14 @@ function forgeMovement(): void {
   for (const [id, n] of s.board.nodes) {
     s.board.nodes.set(id, { ...n, chip: null });
   }
-  s.board.nodes.set('0-0', { ...s.board.nodes.get('0-0')!, chip: 'player1' });
-  s.board.nodes.set('0-4', { ...s.board.nodes.get('0-4')!, chip: 'player1' });
-  s.board.nodes.set('2-0', { ...s.board.nodes.get('2-0')!, chip: 'player1' });
-  s.board.nodes.set('2-4', { ...s.board.nodes.get('2-4')!, chip: 'player1' });
-  s.board.nodes.set('4-0', { ...s.board.nodes.get('4-0')!, chip: 'player2' });
-  s.board.nodes.set('4-4', { ...s.board.nodes.get('4-4')!, chip: 'player2' });
-  s.board.nodes.set('0-2', { ...s.board.nodes.get('0-2')!, chip: 'player2' });
-  s.board.nodes.set('4-2', { ...s.board.nodes.get('4-2')!, chip: 'player2' });
+  s.board.nodes.set('c2r1', { ...s.board.nodes.get('c2r1')!, chip: 'player1' });
+  s.board.nodes.set('c6r1', { ...s.board.nodes.get('c6r1')!, chip: 'player1' });
+  s.board.nodes.set('c2r3', { ...s.board.nodes.get('c2r3')!, chip: 'player1' });
+  s.board.nodes.set('c6r3', { ...s.board.nodes.get('c6r3')!, chip: 'player1' });
+  s.board.nodes.set('c2r5', { ...s.board.nodes.get('c2r5')!, chip: 'player2' });
+  s.board.nodes.set('c6r5', { ...s.board.nodes.get('c6r5')!, chip: 'player2' });
+  s.board.nodes.set('c4r1', { ...s.board.nodes.get('c4r1')!, chip: 'player2' });
+  s.board.nodes.set('c4r5', { ...s.board.nodes.get('c4r5')!, chip: 'player2' });
   s.phase = 'movement';
   s.chipsPlaced = {
     player1: CONFIG.CHIPS_PER_PLAYER,
@@ -46,20 +46,20 @@ describe('Wave 56 fiar — movement execute', () => {
     forgeMovement();
 
     board
-      .querySelector('[data-node-id="0-0"]')!
+      .querySelector('[data-node-id="c2r1"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(getCurrentState().selectedNode).toBe('0-0');
+    expect(getCurrentState().selectedNode).toBe('c2r1');
 
     board
-      .querySelector('[data-node-id="1-0"]')!
+      .querySelector('[data-node-id="c2r2"]')!
       .dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     const last = getCurrentState().moveHistory.at(-1);
     expect(last?.type).toBe('move');
-    expect(last?.fromNodeId).toBe('0-0');
-    expect(last?.nodeId).toBe('1-0');
-    expect(getCurrentState().board.nodes.get('0-0')?.chip).toBeNull();
-    expect(getCurrentState().board.nodes.get('1-0')?.chip).toBe('player1');
+    expect(last?.fromNodeId).toBe('c2r1');
+    expect(last?.nodeId).toBe('c2r2');
+    expect(getCurrentState().board.nodes.get('c2r1')?.chip).toBeNull();
+    expect(getCurrentState().board.nodes.get('c2r2')?.chip).toBe('player1');
     expect(getCurrentState().currentPlayer).toBe('player2');
     expect(getCurrentState().selectedNode).toBeNull();
   });

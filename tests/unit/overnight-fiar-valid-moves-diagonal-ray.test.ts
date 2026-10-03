@@ -31,18 +31,18 @@ function movementBoard(
 }
 
 describe('Overnight fiar — diagonal valid moves', () => {
-  it('center chip can slide diagonally into empty cells; stops at opponent', () => {
+  it('chip can slide diagonally into empty cells; stops at opponent', () => {
+    // Spec diagonal c1r2–c2r3–c3r4–c4r5–c5r6 (does not use diamond-border edges)
     const state = movementBoard([
-      { id: '2-2', chip: 'player1' },
-      { id: '4-4', chip: 'player2' }, // blocks down-right beyond 3-3
-      { id: '0-4', chip: 'player2' },
-      { id: '1-4', chip: 'player2' },
-      { id: '3-0', chip: 'player2' },
+      { id: 'c1r2', chip: 'player1' },
+      { id: 'c5r6', chip: 'player2' }, // blocks far end
+      { id: 'c6r1', chip: 'player2' },
+      { id: 'c0r3', chip: 'player2' },
     ]);
-    const moves = getValidMoves(state, '2-2');
-    expect(moves).toContain('0-0');
-    expect(moves).toContain('1-1');
-    expect(moves).toContain('3-3');
-    expect(moves).not.toContain('4-4');
+    const moves = getValidMoves(state, 'c1r2');
+    expect(moves).toContain('c2r3');
+    expect(moves).toContain('c3r4');
+    expect(moves).toContain('c4r5');
+    expect(moves).not.toContain('c5r6');
   });
 });

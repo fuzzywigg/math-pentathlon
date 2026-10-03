@@ -15,7 +15,7 @@ function nearlyFullPlacement() {
   let i = 0;
   for (const [id, node] of nodes) {
     // Leave only two empties near center
-    if (id === '2-2' || id === '2-3') continue;
+    if (id === 'c3r3' || id === 'c5r3') continue;
     const owner = i % 2 === 0 ? 'player1' : 'player2';
     nodes.set(id, { ...node, chip: owner as BoardNode['chip'] });
     i++;
@@ -35,7 +35,7 @@ describe('Wave 42 FIAR AI — hard placement', () => {
     const state = nearlyFullPlacement();
     const move = getAIMove(state, 'player1', 'hard');
     expect(move?.type).toBe('place');
-    expect(['2-2', '2-3']).toContain(move!.nodeId);
+    expect(['c3r3', 'c5r3']).toContain(move!.nodeId);
     expect(canPlaceChip(state, move!.nodeId!)).toBe(true);
   });
 

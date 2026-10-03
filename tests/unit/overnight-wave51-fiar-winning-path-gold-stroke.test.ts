@@ -11,11 +11,10 @@ describe('Wave 51 fiar — winning path gold', () => {
   it('strokes unblocked length-4 path nodes with #ffd700', () => {
     const base = createInitialState();
     const nodes = new Map(base.board.nodes);
-    for (const id of ['2-0', '2-1', '2-2', '2-3']) {
+    for (const id of ['c1r2', 'c2r2', 'c3r2', 'c4r2']) {
       nodes.set(id, { ...nodes.get(id)!, chip: 'player1' });
     }
-    // opponent chips elsewhere so movement phase is legal
-    for (const id of ['0-0', '0-1', '0-2', '0-3']) {
+    for (const id of ['c5r3', 'c6r3', 'c7r3', 'c8r3']) {
       nodes.set(id, { ...nodes.get(id)!, chip: 'player2' });
     }
     const state = {

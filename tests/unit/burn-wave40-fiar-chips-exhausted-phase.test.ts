@@ -41,15 +41,15 @@ describe('Wave 40 fiar — chips exhausted phase', () => {
   it('moveChip illegal / !canMove → identity', () => {
     const state = createInitialState();
     // Still placement — canMove is false for any pair
-    expect(canMove(state, '0-0', '0-1')).toBe(false);
-    expect(moveChip(state, '0-0', '0-1')).toBe(state);
+    expect(canMove(state, 'c2r1', 'c3r1')).toBe(false);
+    expect(moveChip(state, 'c2r1', 'c3r1')).toBe(state);
 
     const movement = {
       ...state,
       phase: 'movement' as const,
     };
     // No chips placed → still illegal
-    expect(moveChip(movement, '0-0', '0-1')).toBe(movement);
+    expect(moveChip(movement, 'c2r1', 'c3r1')).toBe(movement);
     expect(moveChip(movement, 'ghost-from', 'ghost-to')).toBe(movement);
   });
 

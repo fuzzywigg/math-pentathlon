@@ -10,18 +10,18 @@ describe('Wave 57 fiar — valid stroke-width 3', () => {
   it('paints stroke-width 3 on valid movement destinations', () => {
     const base = createInitialState();
     const board = createInitialState().board;
-    board.nodes.set('0-0', {
-      ...board.nodes.get('0-0')!,
+    board.nodes.set('c2r1', {
+      ...board.nodes.get('c2r1')!,
       chip: 'player1',
     });
     const state = {
       ...base,
       phase: 'movement' as const,
       chipsPlaced: { player1: 4, player2: 4 },
-      selectedNode: '0-0',
+      selectedNode: 'c2r1',
       board,
     };
-    const valids = getValidMoves(state, '0-0');
+    const valids = getValidMoves(state, 'c2r1');
     expect(valids.length).toBeGreaterThan(0);
     const svg = renderBoard(state, () => undefined);
     const g = svg.querySelector(`[data-node-id="${valids[0]}"]`)!;

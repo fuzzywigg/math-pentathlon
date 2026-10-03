@@ -9,9 +9,9 @@ import { renderBoard } from '../../src/games/fiar/board-ui';
 describe('Wave 54 fiar — NODE_RADIUS chrome', () => {
   it('empty node circle r matches CONFIG.NODE_RADIUS 24', () => {
     expect(CONFIG.NODE_RADIUS).toBe(24);
-    expect(createFiarBoard().nodes.size).toBe(25);
+    expect(createFiarBoard().nodes.size).toBe(40);
     const svg = renderBoard(createInitialState(), () => undefined);
-    const g = svg.querySelector('[data-node-id="2-2"]')!;
+    const g = svg.querySelector('[data-node-id="c3r3"]')!;
     const bg = g.querySelector('circle')!;
     expect(bg.getAttribute('r')).toBe('24');
   });
