@@ -135,6 +135,7 @@ export function renderBoard(
       hex.style.cursor = 'pointer';
       const activate = () => onCellClick!(cell.q, cell.r);
       hex.addEventListener('click', activate);
+      // Enter/Space place on the focused valid cell (same as click)
       bindCellActivateKeys(hex, activate);
     }
 
