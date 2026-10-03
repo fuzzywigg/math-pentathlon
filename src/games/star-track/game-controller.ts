@@ -8,6 +8,9 @@ import { starTrackTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAIChainChoice, AIDifficulty } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadStarTrackBoard3DModule } from './board-3d-loader';
+import type { StarTrackBoard3D } from '../../ui/three/star-track-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -28,12 +31,66 @@ let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 
+let board3d: StarTrackBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+
 const AI_THINKING_DELAY = 600;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+}
+
+function fallbackTo2dBoard(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dEnabled = false;
+  board3dLoading = null;
+  render();
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!boardContainer || board3d || !board3dEnabled) return;
+  try {
+    const mod = await loadStarTrackBoard3DModule();
+    if (!boardContainer || !board3dEnabled) return;
+    board3d = await mod.createStarTrackBoard3D(boardContainer, () => {
+      fallbackTo2dBoard();
+    });
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+  }
+}
+
+function canHumanInteract(): boolean {
+  return (
+    !isAIThinking &&
+    (gameMode === 'human-vs-human' || gameState.currentPlayer === 'player1')
+  );
+}
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
+  unmountBoard3d();
   boardContainer = boardEl;
   statusContainer = statusEl;
+
+  board3dEnabled = isBoard3dEnabled();
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      render();
+    });
+  }
+
   newGameVsHuman();
 }
 
@@ -154,17 +211,22 @@ function triggerAITurn(): void {
 // Render the game
 function render(): void {
   if (boardContainer) {
-    // Only allow interaction if it's human's turn
-    const canInteract =
-      !isAIThinking &&
-      (gameMode === 'human-vs-human' || gameState.currentPlayer === 'player1');
+    const canInteract = canHumanInteract();
 
-    renderBoard(
-      gameState,
-      boardContainer,
-      canInteract ? handleDrawChains : undefined,
-      canInteract ? handleSelectChain : undefined
-    );
+    if (board3dEnabled && board3d) {
+      board3d.update(gameState, {
+        onDrawChains: canInteract ? handleDrawChains : undefined,
+        onSelectChain: canInteract ? handleSelectChain : undefined,
+      });
+    } else if (!board3dEnabled) {
+      renderBoard(
+        gameState,
+        boardContainer,
+        canInteract ? handleDrawChains : undefined,
+        canInteract ? handleSelectChain : undefined
+      );
+    }
+    // If 3D enabled but still loading → skip board paint until ready
   }
 
   if (statusContainer) {
@@ -205,4 +267,21 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Dispose 3D resources and clear mounts (route change). */
+export function destroyGame(): void {
+  unmountBoard3d();
+  boardContainer = null;
+  statusContainer = null;
+}
+
+/** Whether the live controller is using the 3D board path. */
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+/** Await pending 3D mount (tests / callers that need the canvas ready). */
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
 }

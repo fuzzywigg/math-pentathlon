@@ -33,6 +33,7 @@ import {
 } from './games/hex/game-controller';
 import {
   initGame as initStarTrackGame,
+  destroyGame as destroyStarTrackGame,
   newGameVsHuman as starTrackNewGameVsHuman,
   newGameVsAI as starTrackNewGameVsAI,
   startTutorial as startStarTrackTutorial,
@@ -479,7 +480,10 @@ function renderStarTrack(): void {
     initStarTrackGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyStarTrackGame();
+    shell.cleanup();
+  };
 }
 
 // Render Hex-a-Gone
