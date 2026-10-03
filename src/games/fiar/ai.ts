@@ -120,9 +120,7 @@ function chooseKindForPlacement(
   // Use marked if placing it adjacent to an opponent 3+ threat blocks them
   const opp = getOpponent(state.currentPlayer);
   const oppPaths = findPaths(state, opp);
-  const threatens = oppPaths.some(
-    (p) => p.nodes.length >= 3 && !p.isBlocked
-  );
+  const threatens = oppPaths.some((p) => p.nodes.length >= 3 && !p.isBlocked);
   if (threatens) {
     const afterMarked = placeChip(state, nodeId, 'marked');
     if (afterMarked.phase !== 'gameOver') {
@@ -211,7 +209,12 @@ function evaluatePotentialPaths(state: FiarGameState, player: Player): number {
       let emptySpaces = 0;
       let blocked = false;
 
-      for (const id of getNodesInDirection(state.board, nodeId, dir.dx, dir.dy)) {
+      for (const id of getNodesInDirection(
+        state.board,
+        nodeId,
+        dir.dx,
+        dir.dy
+      )) {
         const n = state.board.nodes.get(id);
         if (!n) break;
         if (n.chip === player) lineLength++;
@@ -278,7 +281,15 @@ function getBestPlacement(
   for (const [nodeId] of state.board.nodes) {
     for (const kind of availableKinds(state, aiPlayer)) {
       if (wouldWinAfterPlace(state, nodeId, kind)) {
-        return { nodeId, chipKind: kind === 'marked' && canPlaceChip(state, nodeId, 'plain') && wouldWinAfterPlace(state, nodeId, 'plain') ? 'plain' : kind };
+        return {
+          nodeId,
+          chipKind:
+            kind === 'marked' &&
+            canPlaceChip(state, nodeId, 'plain') &&
+            wouldWinAfterPlace(state, nodeId, 'plain')
+              ? 'plain'
+              : kind,
+        };
       }
     }
   }
@@ -326,7 +337,10 @@ function getBestPlacement(
 
   if (Math.random() < config.randomness && placements.length > 1) {
     const idx = Math.floor(Math.random() * Math.min(3, placements.length));
-    return { nodeId: placements[idx].nodeId, chipKind: placements[idx].chipKind };
+    return {
+      nodeId: placements[idx].nodeId,
+      chipKind: placements[idx].chipKind,
+    };
   }
 
   return {

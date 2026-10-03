@@ -16,6 +16,7 @@ import {
   moveChip,
   checkWinner as fiarWinner,
 } from '../../src/games/fiar/rules';
+import { placeToMovement } from './fiar-test-helpers';
 
 import {
   createInitialState as createHex,
@@ -160,13 +161,14 @@ describe('Wave 26 path — FIAR placement then movement success', () => {
     expect(fiarWinner(state)).toBeNull();
   });
 
-  it('after 8 placements, legal slide advances history and seat', () => {
-    const nodes = ['0-0', '4-4', '0-1', '4-3', '0-2', '4-2', '0-4', '4-1'];
-    let state = placeMany(nodes);
+  it('after full placement, legal slide advances history and seat', () => {
+    let state = placeToMovement();
     expect(state.phase).toBe('movement');
     expect(state.chipsPlaced.player1).toBe(FIAR_CONFIG.CHIPS_PER_PLAYER);
 
-    const from = '0-0';
+    const from = [...state.board.nodes.entries()].find(
+      ([, n]) => n.chip === 'player1'
+    )![0];
     const moves = fiarValidMoves(state, from);
     expect(moves.length).toBeGreaterThan(0);
     const to = moves[0];

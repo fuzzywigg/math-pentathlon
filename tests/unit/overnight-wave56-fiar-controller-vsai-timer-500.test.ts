@@ -19,9 +19,12 @@ afterEach(() => {
 describe('Wave 56 fiar — vsAI 500ms timer', () => {
   it('after P1 place, AI place runs at 500ms via mocked getAIMove', () => {
     vi.useFakeTimers();
+    // Force human (player1) to start — vsAI now picks starter at random
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
     vi.spyOn(fiarAi, 'getAIMove').mockReturnValue({
       type: 'place',
       nodeId: '0-0',
+      chipKind: 'plain',
     });
 
     const board = document.createElement('div');
@@ -29,6 +32,7 @@ describe('Wave 56 fiar — vsAI 500ms timer', () => {
     document.body.append(board, status);
     initGame(board, status);
     newGameVsAI('easy');
+    expect(getCurrentState().currentPlayer).toBe('player1');
 
     board
       .querySelector('[data-node-id="2-2"]')!

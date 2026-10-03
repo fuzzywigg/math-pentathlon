@@ -18,11 +18,7 @@ import {
   setSelectedChipKind,
   normalizeSelectedChipKind,
 } from './rules';
-import {
-  renderBoard,
-  injectFiarStyles,
-  getPlayerName,
-} from './board-ui';
+import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
 import { getAIMove, applyAIMove, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fiarTutorial } from './tutorial';
@@ -87,14 +83,16 @@ function renderChipKindPicker(): string {
 
 function bindChipKindPicker(): void {
   if (!statusContainer) return;
-  statusContainer.querySelectorAll<HTMLButtonElement>('[data-chip-kind]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const kind = btn.getAttribute('data-chip-kind') as ChipKind | null;
-      if (kind !== 'plain' && kind !== 'marked') return;
-      gameState = setSelectedChipKind(gameState, kind);
-      render();
+  statusContainer
+    .querySelectorAll<HTMLButtonElement>('[data-chip-kind]')
+    .forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const kind = btn.getAttribute('data-chip-kind') as ChipKind | null;
+        if (kind !== 'plain' && kind !== 'marked') return;
+        gameState = setSelectedChipKind(gameState, kind);
+        render();
+      });
     });
-  });
 }
 
 function renderStatus(): void {
@@ -129,11 +127,7 @@ function renderStatus(): void {
     showStarterBanner && moveCount === 0
       ? `<div class="fiar-starter-banner" data-starter="${starter}">
           ${getPlayerName(starter)} starts${
-            isAIMode
-              ? starter === aiPlayer
-                ? ' (computer)'
-                : ' (you)'
-              : ''
+            isAIMode ? (starter === aiPlayer ? ' (computer)' : ' (you)') : ''
           }.
         </div>`
       : '';

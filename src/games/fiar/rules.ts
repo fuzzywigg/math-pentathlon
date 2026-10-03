@@ -159,12 +159,7 @@ export function getValidMoves(state: FiarGameState, nodeId: string): string[] {
   const directions = getBoardDirections(state.board);
 
   for (const dir of directions) {
-    const nodesInDir = getNodesInDirection(
-      state.board,
-      nodeId,
-      dir.dx,
-      dir.dy
-    );
+    const nodesInDir = getNodesInDirection(state.board, nodeId, dir.dx, dir.dy);
 
     for (const targetId of nodesInDir) {
       const targetNode = state.board.nodes.get(targetId);
@@ -256,12 +251,7 @@ export function getStraightLines(state: FiarGameState): string[][] {
 
   for (const [startId] of state.board.nodes) {
     for (const dir of halfDirs) {
-      const forward = getNodesInDirection(
-        state.board,
-        startId,
-        dir.dx,
-        dir.dy
-      );
+      const forward = getNodesInDirection(state.board, startId, dir.dx, dir.dy);
       const backward = getNodesInDirection(
         state.board,
         startId,
@@ -375,9 +365,7 @@ export function isPathBlocked(
 }
 
 /** First unblocked winning path in either color, or null. */
-export function findAnyWinningPath(
-  state: FiarGameState
-): PathResult | null {
+export function findAnyWinningPath(state: FiarGameState): PathResult | null {
   for (const player of ['player1', 'player2'] as Player[]) {
     const paths = findPaths(state, player);
     const win = paths.find(
