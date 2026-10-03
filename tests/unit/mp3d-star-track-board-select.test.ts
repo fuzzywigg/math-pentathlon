@@ -100,7 +100,9 @@ describe('mp3d Star Track board view selection', () => {
     isBoard3dEnabled.mockReturnValue(true);
     loadStarTrackBoard3DModule.mockResolvedValue({
       createStarTrackBoard3D: async () => {
-        throw new Error('WebGLRenderer failed — Star Track 3D board cannot mount');
+        throw new Error(
+          'WebGLRenderer failed — Star Track 3D board cannot mount'
+        );
       },
     });
 

@@ -35,14 +35,30 @@ async function dismissOwlIfNeeded(page: Page) {
   const dismiss = page.locator(
     'button:has-text("Dismiss"), button[aria-label="Dismiss message"], .owl-dismiss, #owl-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click().catch(() => undefined);
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click()
+      .catch(() => undefined);
   }
   const minimize = page.locator(
     'button:has-text("Minimize"), button[aria-label="Minimize Ollie"]'
   );
-  if (await minimize.first().isVisible().catch(() => false)) {
-    await minimize.first().click().catch(() => undefined);
+  if (
+    await minimize
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await minimize
+      .first()
+      .click()
+      .catch(() => undefined);
   }
 }
 
@@ -116,10 +132,7 @@ test.describe('mp3d Star Track 3D board', () => {
       await page.waitForTimeout(350);
 
       await assertChainAboveFold(page, vp.height);
-      const startPath = path.join(
-        outDir,
-        `star-track-3d-start-${vp.name}.png`
-      );
+      const startPath = path.join(outDir, `star-track-3d-start-${vp.name}.png`);
       await page.screenshot({ path: startPath, fullPage: true });
       expect(fs.statSync(startPath).size).toBeGreaterThan(1000);
 
@@ -133,12 +146,19 @@ test.describe('mp3d Star Track 3D board', () => {
 
       // Drive to game over (enough turns for TRACK_LENGTH=12)
       for (let i = 0; i < 30; i++) {
-        if (await page.locator('.star-track-winner').isVisible().catch(() => false)) {
+        if (
+          await page
+            .locator('.star-track-winner')
+            .isVisible()
+            .catch(() => false)
+        ) {
           break;
         }
         await playHumanTurns(page, 1);
       }
-      await expect(page.locator('.star-track-winner, .status-winner').first()).toBeVisible({
+      await expect(
+        page.locator('.star-track-winner, .status-winner').first()
+      ).toBeVisible({
         timeout: 15000,
       });
       await assertChainAboveFold(page, vp.height);

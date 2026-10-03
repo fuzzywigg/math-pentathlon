@@ -38,7 +38,10 @@ export interface StarTrackBoard3DCallbacks {
 }
 
 export interface StarTrackBoard3D {
-  update(state: StarTrackGameState, callbacks?: StarTrackBoard3DCallbacks): void;
+  update(
+    state: StarTrackGameState,
+    callbacks?: StarTrackBoard3DCallbacks
+  ): void;
   unmount(): void;
   spaceToClientPoint(
     player: Player,
@@ -58,10 +61,7 @@ declare global {
   }
 }
 
-function spaceToWorld(
-  player: Player,
-  space: number
-): { x: number; z: number } {
+function spaceToWorld(player: Player, space: number): { x: number; z: number } {
   const t = Math.min(Math.max(space, 0), TRACK_LENGTH) / TRACK_LENGTH;
   // P1 from -Z (top) toward center; P2 from +Z (bottom) toward center.
   // Slight X offset so both pieces remain readable when near the goal.
@@ -246,7 +246,12 @@ export async function createStarTrackBoard3D(
   };
 
   const spaceGeo = new THREE.CylinderGeometry(SPACE_R, SPACE_R, 0.08, 16);
-  const pieceGeo = new THREE.CylinderGeometry(PIECE_R, PIECE_R * 0.85, PIECE_H, 20);
+  const pieceGeo = new THREE.CylinderGeometry(
+    PIECE_R,
+    PIECE_R * 0.85,
+    PIECE_H,
+    20
+  );
   const starGeo = new THREE.CylinderGeometry(0.55, 0.55, 0.1, 5);
   const trackGeo = new THREE.BoxGeometry(0.55, 0.06, TRACK_HALF);
 
@@ -326,7 +331,10 @@ export async function createStarTrackBoard3D(
 
     const top = layout.getBoundingClientRect().top;
     const chainBudget = 180; // draw / choose-chain buttons / winner block
-    const available = Math.max(120, window.innerHeight - top - chainBudget - 12);
+    const available = Math.max(
+      120,
+      window.innerHeight - top - chainBudget - 12
+    );
     const side = Math.max(
       140,
       Math.min(window.innerWidth * 0.92, available, 520)
@@ -398,10 +406,7 @@ export async function createStarTrackBoard3D(
           paint();
         });
         btn.addEventListener('blur', () => {
-          if (
-            a11yFocus?.player === player &&
-            a11yFocus.space === space
-          ) {
+          if (a11yFocus?.player === player && a11yFocus.space === space) {
             a11yFocus = null;
             if (latestState) applyHighlights(latestState);
             paint();
@@ -417,11 +422,7 @@ export async function createStarTrackBoard3D(
     const land0 = getChainLandingSpace(state, 0);
     const land1 = getChainLandingSpace(state, 1);
     const focusLand =
-      previewIndex === 0
-        ? land0
-        : previewIndex === 1
-          ? land1
-          : null;
+      previewIndex === 0 ? land0 : previewIndex === 1 ? land1 : null;
     const current = state.currentPlayer;
 
     for (const sm of spaceMeshes) {
@@ -519,9 +520,7 @@ export async function createStarTrackBoard3D(
   ): { x: number; y: number } | null => {
     if (disposed) return null;
     const { x, z } =
-      space >= TRACK_LENGTH
-        ? { x: 0, z: 0 }
-        : spaceToWorld(player, space);
+      space >= TRACK_LENGTH ? { x: 0, z: 0 } : spaceToWorld(player, space);
     projectScratch.set(x, BOARD_Y + 0.2, z).project(camera);
     const rect = canvas.getBoundingClientRect();
     return {

@@ -133,7 +133,9 @@ describe('mp3d Star Track scripted full game vs AI (3D mocked)', () => {
       expect(end.phase).toBe('gameOver');
       // Winner may be null on rare bucket-exhaustion draw; either is a finished game
       expect(['gameOver']).toContain(end.phase);
-      expect(board.querySelector('canvas[data-mp3d="star-track"]')).not.toBeNull();
+      expect(
+        board.querySelector('canvas[data-mp3d="star-track"]')
+      ).not.toBeNull();
     }
   );
 });
