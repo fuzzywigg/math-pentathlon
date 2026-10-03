@@ -324,11 +324,7 @@ export async function createPentEmInBoard3D(
     body.userData = { row, col, kind: 'block' };
     group.add(body);
     const bevel = new THREE.Mesh(bevelGeo, bevelMat);
-    bevel.position.set(
-      x,
-      TILE_H / 2 + BLOCK_H + BEVEL_H / 2 + yLift,
-      z
-    );
+    bevel.position.set(x, TILE_H / 2 + BLOCK_H + BEVEL_H / 2 + yLift, z);
     bevel.userData = { row, col, kind: 'bevel' };
     group.add(bevel);
   };
@@ -450,8 +446,7 @@ export async function createPentEmInBoard3D(
 
     clearGroup(pieceRoot);
     for (const piece of state.placedPieces) {
-      const win =
-        state.phase === 'gameOver' && state.winner === piece.player;
+      const win = state.phase === 'gameOver' && state.winner === piece.player;
       const bodyMat =
         piece.player === 'player1'
           ? win
@@ -467,11 +462,7 @@ export async function createPentEmInBoard3D(
 
     clearGroup(ghostRoot);
     const previewAnchor = state.previewPosition ?? focusedCell;
-    if (
-      state.phase === 'placePiece' &&
-      state.selectedPiece &&
-      previewAnchor
-    ) {
+    if (state.phase === 'placePiece' && state.selectedPiece && previewAnchor) {
       const cells = getPieceCells(
         state.selectedPiece,
         previewAnchor,
