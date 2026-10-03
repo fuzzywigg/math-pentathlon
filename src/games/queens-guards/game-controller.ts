@@ -18,6 +18,20 @@ import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadQueensGuardsBoard3DModule } from './board-3d-loader';
+import type { QueensGuardsBoard3D } from '../../ui/three/queens-guards-board-3d';
+
+declare global {
+  interface Window {
+    __mp3dQueensGuardsCtrl?: {
+      forceWinner: (winner: Player | null) => void;
+      getMoveCount: () => number;
+      getPieceCount: () => number;
+      getSelected: () => string | null;
+    };
+  }
+}
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -38,6 +52,36 @@ let aiDifficulty: AIDifficulty = 'medium';
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 
+// Optional Three.js board (only when feature flag is on)
+let board3d: QueensGuardsBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!boardContainer || board3d || !board3dEnabled) return;
+  try {
+    const mod = await loadQueensGuardsBoard3DModule();
+    if (!boardContainer || !board3dEnabled) return;
+    board3d = await mod.createQueensGuardsBoard3D(
+      boardContainer,
+      handleCellClick
+    );
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+  }
+}
+
 // =============================================================================
 // UI Rendering
 // =============================================================================
@@ -45,12 +89,15 @@ let moveCount = 0;
 function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
-  // Clear and re-render board
-  boardContainer.innerHTML = '';
-  const svg = renderBoard(gameState, handleCellClick);
-  boardContainer.appendChild(svg);
+  if (board3dEnabled && board3d) {
+    board3d.update(gameState, handleCellClick);
+  } else if (!board3dEnabled) {
+    boardContainer.innerHTML = '';
+    const svg = renderBoard(gameState, handleCellClick);
+    boardContainer.appendChild(svg);
+  }
+  // If 3D is enabled but still loading, skip board paint until ready.
 
-  // Update status
   updateStatus();
 }
 
@@ -197,6 +244,8 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 // =============================================================================
 
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
+  unmountBoard3d();
+
   boardContainer = boardEl;
   statusContainer = statusEl;
 
@@ -205,7 +254,56 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   vsAI = false;
   syncOpponentChrome();
 
+  board3dEnabled = isBoard3dEnabled();
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      updateUI();
+    });
+  }
+
+  if (import.meta.env.DEV) {
+    window.__mp3dQueensGuardsCtrl = {
+      forceWinner: (winner: Player | null) => {
+        gameState = { ...gameState, winner };
+        updateUI();
+      },
+      getMoveCount: () => gameState.moveHistory.length,
+      getPieceCount: () => {
+        let n = 0;
+        for (const cell of gameState.cells.values()) {
+          if (cell.piece) n++;
+        }
+        return n;
+      },
+      getSelected: () => gameState.selectedPiece,
+    };
+  }
+
   updateUI();
+}
+
+/** Dispose 3D resources and clear mounts (route change). */
+export function destroyGame(): void {
+  unmountBoard3d();
+  boardContainer = null;
+  statusContainer = null;
+  if (import.meta.env.DEV && window.__mp3dQueensGuardsCtrl) {
+    delete window.__mp3dQueensGuardsCtrl;
+  }
+}
+
+/** Whether the live controller is using the 3D board path. */
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+/** Await pending 3D mount (tests / callers that need the canvas ready). */
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
+}
+
+export function getGameState(): QueensGuardsState {
+  return gameState;
 }
 
 export function newGameVsHuman(): void {
