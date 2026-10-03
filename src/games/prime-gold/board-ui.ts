@@ -111,6 +111,19 @@ export function injectPrimeGoldStyles(): void {
       border-radius: 12px;
     }
 
+    .pg-board-host {
+      width: min(100%, 560px);
+      max-width: 100%;
+      flex: 1 1 280px;
+    }
+
+    .pg-board-host.board-3d-host,
+    .pg-board-3d-host {
+      background: #15202b;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
     .pg-board {
       display: grid;
       grid-template-columns: repeat(${CONFIG.BOARD_SIZE}, 50px);

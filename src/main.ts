@@ -112,6 +112,7 @@ import {
 } from './games/stars-bars/game-controller';
 import {
   initGame as initPrimeGoldGame,
+  destroyGame as destroyPrimeGoldGame,
   newGameVsHuman as primeGoldNewGameVsHuman,
   newGameVsAI as primeGoldNewGameVsAI,
   startTutorial as startPrimeGoldTutorial,
@@ -1311,7 +1312,10 @@ function renderPrimeGold(): void {
     initPrimeGoldGame(shell.board, false);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyPrimeGoldGame();
+    shell.cleanup();
+  };
 }
 
 // Render Pent'Em In

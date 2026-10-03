@@ -27,6 +27,9 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadPrimeGoldBoard3DModule } from './board-3d-loader';
+import type { PrimeGoldBoard3D } from '../../ui/three/prime-gold-board-3d';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -50,6 +53,71 @@ export interface PrimeGoldController {
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
+let activeController: PrimeGoldController | null = null;
+
+// Optional Three.js board (only when feature flag is on)
+let board3d: PrimeGoldBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+/** Persistent host for the 3D canvas across UI rebuilds. */
+let boardHostEl: HTMLElement | null = null;
+/** Single pending AI timer — avoids stacked setTimeouts from every UI rebuild. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAI(controller: PrimeGoldController, delayMs: number): void {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    makeAIMove(controller);
+  }, delayMs);
+}
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+  boardHostEl = null;
+  clearAiTimer();
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!activeController || board3d || !board3dEnabled) return;
+  const host =
+    boardHostEl ??
+    (activeController.container.querySelector(
+      '.pg-board-host'
+    ) as HTMLElement | null);
+  if (!host) return;
+  boardHostEl = host;
+  try {
+    const mod = await loadPrimeGoldBoard3DModule();
+    if (!activeController || !board3dEnabled) return;
+    const liveHost =
+      boardHostEl ??
+      (activeController.container.querySelector(
+        '.pg-board-host'
+      ) as HTMLElement | null);
+    if (!liveHost) return;
+    boardHostEl = liveHost;
+    board3d = await mod.createPrimeGoldBoard3D(liveHost, (value, expr) => {
+      if (activeController) handlePlacement(activeController, value, expr);
+    });
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D board.
+    board3d = null;
+    board3dEnabled = false;
+  }
+}
 
 /**
  * Initialize the game
@@ -59,6 +127,7 @@ export function initGame(
   vsAI: boolean = false,
   difficulty: AIDifficulty = 'medium'
 ): PrimeGoldController {
+  unmountBoard3d();
   injectPrimeGoldStyles();
   activeContainer = container;
 
@@ -72,6 +141,9 @@ export function initGame(
     newGame: () => {},
   };
 
+  activeController = controller;
+  board3dEnabled = isBoard3dEnabled();
+
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
@@ -83,7 +155,31 @@ export function initGame(
   };
 
   syncOpponentChrome(vsAI);
+  // Build chrome + board host first so ensureBoard3d has a mount point.
   controller.update();
+
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      if (activeController) activeController.update();
+    });
+  }
+
+  if (import.meta.env.DEV) {
+    (
+      window as Window & {
+        __mpPrimeGoldTest?: {
+          getState: () => PrimeGoldState;
+          setState: (state: PrimeGoldState) => void;
+        };
+      }
+    ).__mpPrimeGoldTest = {
+      getState: () => controller.state,
+      setState: (state: PrimeGoldState) => {
+        controller.state = state;
+        controller.update();
+      },
+    };
+  }
 
   return controller;
 }
@@ -94,7 +190,17 @@ export function initGame(
 function updateUI(controller: PrimeGoldController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+
+  // Detach persistent 3D host so a chrome rebuild does not dispose WebGL.
+  const existingHost = container.querySelector(
+    '.pg-board-host'
+  ) as HTMLElement | null;
+  if (existingHost) {
+    existingHost.remove();
+    boardHostEl = existingHost;
+  }
+
+  container.replaceChildren();
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -139,12 +245,32 @@ function updateUI(controller: PrimeGoldController): void {
   // Dice area
   mainLayout.appendChild(renderDice(state, () => handleRoll(controller)));
 
-  // Board
-  mainLayout.appendChild(
-    renderBoard(state, (value, expr) =>
-      handlePlacement(controller, value, expr)
-    )
-  );
+  const aiThinking =
+    controller.isAI &&
+    controller.aiPlayer === state.currentPlayer &&
+    state.phase !== 'gameOver';
+  const allowBoardClicks = !aiThinking && state.phase === 'placing';
+
+  if (board3dEnabled) {
+    const host = boardHostEl ?? document.createElement('div');
+    host.className = 'pg-board-host';
+    boardHostEl = host;
+    mainLayout.appendChild(host);
+    if (board3d) {
+      board3d.update(
+        state,
+        allowBoardClicks
+          ? (value, expr) => handlePlacement(controller, value, expr)
+          : undefined
+      );
+    }
+  } else {
+    mainLayout.appendChild(
+      renderBoard(state, (value, expr) =>
+        handlePlacement(controller, value, expr)
+      )
+    );
+  }
 
   // Expressions list (when placing)
   if (state.phase === 'placing') {
@@ -185,12 +311,8 @@ function updateUI(controller: PrimeGoldController): void {
   restoreGridFocus(container, previousFocus);
 
   // AI turn
-  if (
-    controller.isAI &&
-    controller.aiPlayer === state.currentPlayer &&
-    state.phase !== 'gameOver'
-  ) {
-    setTimeout(() => makeAIMove(controller), 800);
+  if (aiThinking) {
+    scheduleAI(controller, 800);
   }
 }
 
@@ -225,12 +347,17 @@ function makeAIMove(controller: PrimeGoldController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.phase === 'gameOver' || !aiPlayer) return;
+  // Guard against stale timers after destroy / new game
+  if (activeController !== controller) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
     controller.state = rollDice(state);
+    // Place on the next tick without going through updateUI's 800ms reschedule.
+    clearAiTimer();
     controller.update();
-    setTimeout(() => makeAIMove(controller), 600);
+    // updateUI schedules 800ms; replace with a shorter post-roll delay.
+    scheduleAI(controller, 600);
     return;
   }
 
@@ -290,4 +417,30 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Dispose 3D resources and clear controller mounts (route change). */
+export function destroyGame(): void {
+  unmountBoard3d();
+  activeController = null;
+  activeContainer = null;
+  if (import.meta.env.DEV) {
+    delete (window as Window & { __mpPrimeGoldTest?: unknown })
+      .__mpPrimeGoldTest;
+  }
+}
+
+/** Whether the live controller is using the 3D board path. */
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+/** Await pending 3D mount (tests / callers that need the canvas ready). */
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
+}
+
+/** Current controller state (tests). */
+export function getGameState(): PrimeGoldState | null {
+  return activeController?.state ?? null;
 }
