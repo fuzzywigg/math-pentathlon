@@ -36,8 +36,12 @@ export function navigate(path: string): void {
 
 // Get current path from hash
 export function getCurrentPath(): string {
-  const hash = window.location.hash.slice(1); // Remove '#'
-  return hash || '/';
+  const raw = window.location.hash.slice(1); // Remove '#'
+  const hash = raw || '/';
+  // Allow feature-flag query strings in the hash (`#/game/foo?board3d=1`)
+  // without breaking route pattern matching.
+  const q = hash.indexOf('?');
+  return q >= 0 ? hash.slice(0, q) : hash;
 }
 
 // Get path parameters (simple extraction)

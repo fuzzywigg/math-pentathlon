@@ -16,6 +16,10 @@ import { getAIMove, AIDifficulty, isAITurn } from './ai';
 import { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadKingsQuadraphagesBoard3DModule } from './board-3d-loader';
+import type { KingsQuadraphagesBoard3D } from '../../ui/three/kings-quadraphages-board-3d';
+
 // Game mode types
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
 
@@ -41,6 +45,30 @@ let statusContainer: HTMLElement | null = null;
 let historyContainer: HTMLElement | null = null;
 let newGameButton: HTMLElement | null = null;
 
+// Optional Three.js board (only when feature flag is on)
+let board3d: KingsQuadraphagesBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!boardContainer || board3d || !board3dEnabled) return;
+  const mod = await loadKingsQuadraphagesBoard3DModule();
+  if (!boardContainer || !board3dEnabled) return;
+  board3d = await mod.createKingsQuadraphagesBoard3D(
+    boardContainer,
+    onCellClick
+  );
+}
+
 // Render the current game state
 function render(): void {
   if (!boardContainer || !statusContainer) {
@@ -50,7 +78,18 @@ function render(): void {
 
   // Disable board interaction during AI turn
   const allowClicks = !isAIThinking && !isAITurn(gameState, aiPlayer, gameMode);
-  renderBoard(gameState, boardContainer, allowClicks ? onCellClick : undefined);
+
+  if (board3dEnabled && board3d) {
+    board3d.update(gameState, allowClicks ? onCellClick : undefined);
+  } else if (!board3dEnabled) {
+    renderBoard(
+      gameState,
+      boardContainer,
+      allowClicks ? onCellClick : undefined
+    );
+  }
+  // If 3D is enabled but still loading, skip board paint until ready.
+
   renderStatus(
     gameState,
     statusContainer,
@@ -315,13 +354,42 @@ export function initGame(
   historyEl?: HTMLElement,
   newGameBtn?: HTMLElement
 ): void {
+  // Tear down any prior 3D view (hot re-init / remount)
+  unmountBoard3d();
+
   boardContainer = boardEl;
   statusContainer = statusEl;
   historyContainer = historyEl || null;
   newGameButton = newGameBtn || null;
 
-  // Initial render
+  board3dEnabled = isBoard3dEnabled();
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      render();
+    });
+  }
+
+  // Initial render (2D immediately; 3D after async mount)
   render();
+}
+
+/** Dispose 3D resources and clear controller mounts (route change). */
+export function destroyGame(): void {
+  unmountBoard3d();
+  boardContainer = null;
+  statusContainer = null;
+  historyContainer = null;
+  newGameButton = null;
+}
+
+/** Whether the live controller is using the 3D board path. */
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled;
+}
+
+/** Await pending 3D mount (tests / callers that need the canvas ready). */
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
 }
 
 // Get current game state (for debugging or testing)
