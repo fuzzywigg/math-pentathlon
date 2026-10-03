@@ -43,6 +43,7 @@ import {
   newGameVsHuman as hexAGoneNewGameVsHuman,
   newGameVsAI as hexAGoneNewGameVsAI,
   startTutorial as startHexAGoneTutorial,
+  destroyGame as destroyHexAGoneGame,
 } from './games/hex-a-gone/game-controller';
 import {
   initGame as initCallaGame,
@@ -596,7 +597,10 @@ function renderHexAGone(): void {
     initHexAGoneGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyHexAGoneGame();
+    shell.cleanup();
+  };
 }
 
 // Render Calla

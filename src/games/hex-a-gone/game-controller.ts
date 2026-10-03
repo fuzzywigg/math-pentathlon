@@ -9,12 +9,15 @@ import {
   placeBlock,
   isGameOver,
 } from './rules';
-import { renderBoard, renderStatus } from './board-ui';
+import { renderBoard, renderStatus, buildSelectionArea } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { hexAGoneTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAISelection, getAIPlacement, AIDifficulty } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadHexAGoneBoard3DModule } from './board-3d-loader';
+import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -35,12 +38,85 @@ let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 
+let board3d: HexAGoneBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+let board3dHost: HTMLElement | null = null;
+let selectionHost: HTMLElement | null = null;
+
 const AI_THINKING_DELAY = 800;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+  board3dHost = null;
+  selectionHost = null;
+}
+
+function fallBackTo2dBoard(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dEnabled = false;
+  board3dHost = null;
+  selectionHost = null;
+  render();
+}
+
+async function ensureBoard3d(): Promise<void> {
+  if (!boardContainer || board3d || !board3dEnabled) return;
+  try {
+    const mod = await loadHexAGoneBoard3DModule();
+    if (!boardContainer || !board3dEnabled) return;
+
+    // Structure: wrapper → 3D host + selection chrome (bank/confirm stay DOM)
+    boardContainer.replaceChildren();
+    const wrapper = document.createElement('div');
+    wrapper.className = 'hex-a-gone-wrapper hex-a-gone-wrapper-3d';
+    board3dHost = document.createElement('div');
+    board3dHost.className = 'hex-a-gone-board-3d-slot';
+    selectionHost = document.createElement('div');
+    selectionHost.className = 'hex-a-gone-selection-host';
+    wrapper.append(board3dHost, selectionHost);
+    boardContainer.appendChild(wrapper);
+
+    board3d = await mod.createHexAGoneBoard3D(
+      board3dHost,
+      handleCellClick,
+      fallBackTo2dBoard
+    );
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+    board3dHost = null;
+    selectionHost = null;
+  }
+}
+
+function canHumanInteract(): boolean {
+  return (
+    !isAIThinking &&
+    (gameMode === 'human-vs-human' || gameState.currentPlayer === 'player1')
+  );
+}
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
+  unmountBoard3d();
   boardContainer = boardEl;
   statusContainer = statusEl;
+  board3dEnabled = isBoard3dEnabled();
+  if (board3dEnabled) {
+    board3dLoading = ensureBoard3d().then(() => {
+      render();
+    });
+  }
   newGameVsHuman();
 }
 
@@ -211,22 +287,39 @@ function triggerAITurn(): void {
 // Render the game
 function render(): void {
   if (boardContainer) {
-    const canInteract =
-      !isAIThinking &&
-      (gameMode === 'human-vs-human' || gameState.currentPlayer === 'player1');
+    const canInteract = canHumanInteract();
+    const onCell = canInteract ? handleCellClick : undefined;
+    const onBlock = canInteract ? handleBlockSelect : undefined;
+    const onConfirm = canInteract ? handleConfirm : undefined;
 
-    renderBoard(
-      gameState,
-      boardContainer,
-      canInteract ? handleCellClick : undefined,
-      canInteract ? handleBlockSelect : undefined,
-      canInteract ? handleConfirm : undefined
-    );
+    if (board3dEnabled && board3d && board3dHost && selectionHost) {
+      board3d.update(gameState, onCell);
+      selectionHost.replaceChildren(
+        buildSelectionArea(gameState, onBlock, onConfirm)
+      );
+    } else if (!board3dEnabled) {
+      renderBoard(gameState, boardContainer, onCell, onBlock, onConfirm);
+    }
+    // If 3D enabled but still loading, skip board paint until ready.
   }
 
   if (statusContainer) {
     renderStatus(gameState, statusContainer, gameMode, isAIThinking);
   }
+}
+
+export function destroyGame(): void {
+  unmountBoard3d();
+  boardContainer = null;
+  statusContainer = null;
+}
+
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
 }
 
 // Get current state

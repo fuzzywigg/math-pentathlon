@@ -155,12 +155,24 @@ export function renderBoard(
   bindGridNavigation(svg);
   wrapper.appendChild(svg);
 
-  // Block selection area
+  wrapper.appendChild(buildSelectionArea(state, onBlockSelect, onConfirm));
+  container.appendChild(wrapper);
+  restoreGridFocus(container, previousFocus);
+}
+
+/**
+ * Bank / confirm / winner chrome shared by 2D SVG and 3D canvas hosts.
+ * Kept in the DOM so select → Confirm → place works with either board view.
+ */
+export function buildSelectionArea(
+  state: HexAGoneGameState,
+  onBlockSelect?: BlockSelectCallback,
+  onConfirm?: ConfirmCallback
+): HTMLElement {
   const selectionArea = document.createElement('div');
   selectionArea.className = 'hex-a-gone-selection-area';
 
   if (state.phase === 'selectBlocks' || state.phase === 'placeBlocks') {
-    // Bank section
     const bankSection = document.createElement('div');
     bankSection.className = 'hex-a-gone-bank';
 
@@ -204,7 +216,6 @@ export function renderBoard(
       if (canSelect && isAvailable && onBlockSelect) {
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
       } else if (state.phase === 'placeBlocks' && isSelected && onBlockSelect) {
-        // Allow switching between selected blocks during placement
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
       }
 
@@ -214,7 +225,6 @@ export function renderBoard(
     bankSection.appendChild(bankBlocks);
     selectionArea.appendChild(bankSection);
 
-    // Selection status
     if (state.phase === 'selectBlocks') {
       const selectionStatus = document.createElement('div');
       selectionStatus.className = 'hex-a-gone-selection-status';
@@ -245,7 +255,6 @@ export function renderBoard(
       selectionArea.appendChild(selectionStatus);
     }
 
-    // Current placement indicator
     if (state.phase === 'placeBlocks' && state.selectedBlockForPlacement) {
       const placingInfo = document.createElement('div');
       placingInfo.className = 'hex-a-gone-placing-info';
@@ -268,9 +277,7 @@ export function renderBoard(
     selectionArea.appendChild(winnerMsg);
   }
 
-  wrapper.appendChild(selectionArea);
-  container.appendChild(wrapper);
-  restoreGridFocus(container, previousFocus);
+  return selectionArea;
 }
 
 // Get icon for shape
