@@ -167,13 +167,31 @@ export function renderBoard(
 
   wrapper.appendChild(svg);
 
-  // Chain selection area
   const chainArea = document.createElement('div');
   chainArea.className = 'star-track-chain-area';
+  fillChainArea(chainArea, state, onDrawChains, onSelectChain);
+  wrapper.appendChild(chainArea);
+  container.appendChild(wrapper);
+}
+
+export type ChainPreviewCallback = (index: 0 | 1 | null) => void;
+
+/**
+ * Fill the draw / choose-chain / winner controls into an existing host.
+ * Used by both the 2D SVG board and the 3D board layout.
+ */
+export function fillChainArea(
+  chainArea: HTMLElement,
+  state: StarTrackGameState,
+  onDrawChains?: DrawChainsCallback,
+  onSelectChain?: SelectChainCallback,
+  onPreviewChain?: ChainPreviewCallback
+): void {
+  chainArea.replaceChildren();
 
   if (state.phase === 'drawChains' && onDrawChains) {
-    // Show draw button
     const drawBtn = document.createElement('button');
+    drawBtn.type = 'button';
     drawBtn.className = 'star-track-draw-btn';
     drawBtn.textContent = '🔗 Draw Chains';
     drawBtn.addEventListener('click', onDrawChains);
@@ -188,7 +206,6 @@ export function renderBoard(
     state.drawnChains &&
     onSelectChain
   ) {
-    // Show chain choices
     const choiceLabel = document.createElement('div');
     choiceLabel.className = 'star-track-choice-label';
     choiceLabel.textContent = 'Choose a chain:';
@@ -199,9 +216,19 @@ export function renderBoard(
 
     state.drawnChains.forEach((chain, index) => {
       const chainBtn = document.createElement('button');
+      chainBtn.type = 'button';
       chainBtn.className = 'star-track-chain-btn';
+      chainBtn.setAttribute('data-chain-index', String(index));
       chainBtn.innerHTML = renderChainLink(chain);
       chainBtn.addEventListener('click', () => onSelectChain(index as 0 | 1));
+      if (onPreviewChain) {
+        const preview = (): void => onPreviewChain(index as 0 | 1);
+        const clear = (): void => onPreviewChain(null);
+        chainBtn.addEventListener('pointerenter', preview);
+        chainBtn.addEventListener('focus', preview);
+        chainBtn.addEventListener('pointerleave', clear);
+        chainBtn.addEventListener('blur', clear);
+      }
       choices.appendChild(chainBtn);
     });
 
@@ -214,9 +241,6 @@ export function renderBoard(
     winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
     chainArea.appendChild(winnerMsg);
   }
-
-  wrapper.appendChild(chainArea);
-  container.appendChild(wrapper);
 }
 
 // Create track spaces from start to end

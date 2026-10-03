@@ -99,6 +99,21 @@ export function isGameOver(state: StarTrackGameState): boolean {
   return state.phase === 'gameOver' || state.winner !== null;
 }
 
+/**
+ * Landing space if the current player used the drawn chain at `chainIndex`.
+ * View layers use this for move-target highlights (no duplicated move math).
+ */
+export function getChainLandingSpace(
+  state: StarTrackGameState,
+  chainIndex: 0 | 1
+): number | null {
+  if (state.phase !== 'selectChain' || !state.drawnChains) return null;
+  const chain = state.drawnChains[chainIndex];
+  if (!chain) return null;
+  const current = getPlayerPosition(state, state.currentPlayer);
+  return Math.min(current + chain.length, TRACK_LENGTH);
+}
+
 // Get the player's progress as a percentage
 export function getProgress(state: StarTrackGameState, player: Player): number {
   const position = getPlayerPosition(state, player);
