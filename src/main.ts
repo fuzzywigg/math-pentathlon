@@ -19,6 +19,7 @@ import {
 import { getGameById } from './core/game-registry';
 import {
   initGame as initKQGame,
+  destroyGame as destroyKQGame,
   newGameVsHuman as kqNewGameVsHuman,
   newGameVsAI as kqNewGameVsAI,
   startTutorial,
@@ -304,7 +305,10 @@ function renderKingsQuadraphages(): void {
     );
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyKQGame();
+    shell.cleanup();
+  };
 }
 
 // Render Hex
