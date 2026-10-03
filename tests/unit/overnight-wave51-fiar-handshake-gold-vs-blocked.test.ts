@@ -8,12 +8,16 @@ import { checkWinner, findPaths } from '../../src/games/fiar/rules';
 import { renderBoard } from '../../src/games/fiar/board-ui';
 
 function movement(
-  placements: Array<{ id: string; chip: 'player1' | 'player2' }>
+  placements: Array<{ id: string; chip: 'player1' | 'player2'; kind?: 'plain' | 'marked' }>
 ) {
   const base = createInitialState();
   const nodes = new Map(base.board.nodes);
   for (const p of placements) {
-    nodes.set(p.id, { ...nodes.get(p.id)!, chip: p.chip });
+    nodes.set(p.id, {
+      ...nodes.get(p.id)!,
+      chip: p.chip,
+      chipKind: p.kind ?? 'plain',
+    });
   }
   return {
     ...base,
@@ -55,7 +59,7 @@ describe('Wave 51 fiar — gold vs blocked handshake', () => {
       { id: '2-1', chip: 'player1' },
       { id: '2-2', chip: 'player1' },
       { id: '2-3', chip: 'player1' },
-      { id: '1-1', chip: 'player2' },
+      { id: '1-1', chip: 'player2', kind: 'marked' },
       { id: '0-0', chip: 'player2' },
       { id: '0-1', chip: 'player2' },
       { id: '0-2', chip: 'player2' },

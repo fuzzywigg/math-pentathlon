@@ -75,9 +75,13 @@ describe('Wave 39 fiar — path block / deselect / selectable leftovers', () => 
     const side = neighbors[1] ?? neighbors[0];
     // Put player1 on path a-b, opponent adjacent
     const nodes = new Map(state.board.nodes);
-    nodes.set(a, { ...nodes.get(a)!, chip: 'player1' });
-    nodes.set(b, { ...nodes.get(b)!, chip: 'player1' });
-    nodes.set(side, { ...nodes.get(side)!, chip: 'player2' });
+    nodes.set(a, { ...nodes.get(a)!, chip: 'player1', chipKind: 'plain' });
+    nodes.set(b, { ...nodes.get(b)!, chip: 'player1', chipKind: 'plain' });
+    nodes.set(side, {
+      ...nodes.get(side)!,
+      chip: 'player2',
+      chipKind: 'marked',
+    });
     state = {
       ...state,
       board: { ...state.board, nodes },

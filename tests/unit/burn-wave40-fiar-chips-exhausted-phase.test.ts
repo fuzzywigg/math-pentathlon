@@ -23,6 +23,10 @@ describe('Wave 40 fiar — chips exhausted phase', () => {
         player1: CONFIG.CHIPS_PER_PLAYER,
         player2: 0,
       },
+      chipInventory: {
+        player1: { plain: 0, marked: 0 },
+        player2: { plain: 5, marked: 2 },
+      },
     };
     expect(canPlaceChip(forged, nodeId)).toBe(false);
   });

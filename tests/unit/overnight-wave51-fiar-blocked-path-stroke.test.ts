@@ -13,13 +13,17 @@ describe('Wave 51 fiar — blocked path stroke', () => {
     const nodes = new Map(base.board.nodes);
     // Horizontal four for p1
     for (const id of ['2-0', '2-1', '2-2', '2-3']) {
-      nodes.set(id, { ...nodes.get(id)!, chip: 'player1' });
+      nodes.set(id, { ...nodes.get(id)!, chip: 'player1', chipKind: 'plain' });
     }
-    // Adjacent blocker on the path side
-    nodes.set('1-1', { ...nodes.get('1-1')!, chip: 'player2' });
+    // Adjacent MARKED blocker on the path side
+    nodes.set('1-1', {
+      ...nodes.get('1-1')!,
+      chip: 'player2',
+      chipKind: 'marked',
+    });
     // Fill remaining p2 chips for movement phase
     for (const id of ['0-0', '0-1', '0-2']) {
-      nodes.set(id, { ...nodes.get(id)!, chip: 'player2' });
+      nodes.set(id, { ...nodes.get(id)!, chip: 'player2', chipKind: 'plain' });
     }
     const state = {
       ...base,

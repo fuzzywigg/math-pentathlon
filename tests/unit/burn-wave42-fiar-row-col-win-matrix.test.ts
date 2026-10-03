@@ -15,12 +15,16 @@ import {
 } from '../../src/games/fiar/types';
 
 function movementBoard(
-  placements: Array<{ id: string; chip: 'player1' | 'player2' }>
+  placements: Array<{ id: string; chip: 'player1' | 'player2'; kind?: 'plain' | 'marked' }>
 ): FiarGameState {
   const state = createInitialState();
   const nodes = new Map(state.board.nodes);
   for (const p of placements) {
-    nodes.set(p.id, { ...nodes.get(p.id)!, chip: p.chip });
+    nodes.set(p.id, {
+      ...nodes.get(p.id)!,
+      chip: p.chip,
+      chipKind: p.kind ?? 'plain',
+    });
   }
   return {
     ...state,
@@ -64,7 +68,7 @@ describe('Wave 42 fiar — row/col win matrix', () => {
       { id: '2-1', chip: 'player1' },
       { id: '2-2', chip: 'player1' },
       { id: '2-3', chip: 'player1' },
-      { id: '1-1', chip: 'player2' },
+      { id: '1-1', chip: 'player2', kind: 'marked' },
     ]);
     expect(isPathBlocked(state, path, 'player1')).toBe(true);
     expect(checkWinner(state)).toBeNull();

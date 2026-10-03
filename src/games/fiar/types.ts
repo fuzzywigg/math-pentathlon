@@ -1,150 +1,184 @@
 // FIAR (Four In A Row) Game Types
-// A network-based alignment game where players place and move chips to form 4 in a row
+// Division II alignment game: place then move chips to form 4 in a row
+
+import {
+  BoardLayout,
+  LayoutEdge,
+  YellowCenterEllipse,
+  createUnverifiedProductionLayout,
+  edgeKey,
+} from './layout';
 
 export type Player = 'player1' | 'player2';
 
-// Node on the game board
+/** Plain chip or Fire Extinguisher (yellow-dot marked blocker). */
+export type ChipKind = 'plain' | 'marked';
+
 export interface BoardNode {
   id: string;
-  x: number; // Visual position
+  x: number;
   y: number;
-  chip: Player | null; // Chip placed on this node
+  chip: Player | null;
+  chipKind: ChipKind | null;
 }
 
-// Edge connecting two nodes (defines valid paths)
 export interface BoardEdge {
   from: string;
   to: string;
+  crossesYellowCenter: boolean;
 }
 
-// The game board is a graph of nodes connected by edges
 export interface FiarBoard {
   nodes: Map<string, BoardNode>;
   edges: BoardEdge[];
+  /** Quick lookup: undirected edge key → crosses yellow. */
+  yellowCrossingKeys: Set<string>;
+  yellowCenter: YellowCenterEllipse | null;
+  spacing: number;
+  layoutId: string;
+  layoutVerified: boolean;
 }
 
-// Game phases
 export type GamePhase = 'placement' | 'movement' | 'gameOver';
 
-// Game state
+export interface ChipInventory {
+  plain: number;
+  marked: number;
+}
+
 export interface FiarGameState {
   board: FiarBoard;
   currentPlayer: Player;
   phase: GamePhase;
+  /** How many chips each seat has placed (plain + marked). */
   chipsPlaced: { player1: number; player2: number };
-  selectedNode: string | null; // For movement phase
+  /** Remaining chips in hand, by kind. */
+  chipInventory: { player1: ChipInventory; player2: ChipInventory };
+  /** Chip kind the current player will place next. */
+  selectedChipKind: ChipKind;
+  selectedNode: string | null;
   winner: Player | null;
+  /** Node ids of the chips that formed the winning path (may include gaps between). */
+  winningPath: string[] | null;
+  /** Color of the chips on the winning path (may differ from winner). */
+  winningPathColor: Player | null;
+  starter: Player;
   moveHistory: FiarMove[];
 }
 
-// A move in the game
 export interface FiarMove {
   player: Player;
   type: 'place' | 'move';
-  nodeId: string; // For placement: where placed; For move: destination
-  fromNodeId?: string; // For moves: origin
+  nodeId: string;
+  fromNodeId?: string;
+  chipKind?: ChipKind;
   moveNumber: number;
 }
 
-// Path result for 4-in-a-row detection
 export interface PathResult {
   nodes: string[];
-  isBlocked: boolean; // If adjacent blocking chip exists
+  isBlocked: boolean;
+  color: Player;
 }
 
-// Configuration
 export const CONFIG = {
-  CHIPS_PER_PLAYER: 4,
-  WIN_LENGTH: 4, // Need 4 in a row to win
+  CHIPS_PER_PLAYER: 7,
+  MARKED_CHIPS_PER_PLAYER: 2,
+  PLAIN_CHIPS_PER_PLAYER: 5,
+  WIN_LENGTH: 4,
   NODE_RADIUS: 24,
   EDGE_STROKE: 3,
 };
 
-// =============================================================================
-// Board Creation - Network Graph Layout
-// =============================================================================
-
-/**
- * Create the FIAR board - a network of connected nodes
- * The board forms a grid-like pattern with diagonal connections
- * Typical layout: 5x5 grid with additional diagonal paths
- */
-export function createFiarBoard(): FiarBoard {
-  const nodes = new Map<string, BoardNode>();
-  const edges: BoardEdge[] = [];
-
-  // Create a 5x5 grid of nodes
-  const gridSize = 5;
-  const spacing = 80;
-  const offsetX = 200;
-  const offsetY = 100;
-
-  // Create nodes
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      const id = `${row}-${col}`;
-      nodes.set(id, {
-        id,
-        x: offsetX + col * spacing,
-        y: offsetY + row * spacing,
-        chip: null,
-      });
-    }
-  }
-
-  // Create edges (horizontal, vertical, and diagonal connections)
-  for (let row = 0; row < gridSize; row++) {
-    for (let col = 0; col < gridSize; col++) {
-      const id = `${row}-${col}`;
-
-      // Horizontal connection (right)
-      if (col < gridSize - 1) {
-        edges.push({ from: id, to: `${row}-${col + 1}` });
-      }
-
-      // Vertical connection (down)
-      if (row < gridSize - 1) {
-        edges.push({ from: id, to: `${row + 1}-${col}` });
-      }
-
-      // Diagonal connections (down-right and down-left)
-      if (row < gridSize - 1 && col < gridSize - 1) {
-        edges.push({ from: id, to: `${row + 1}-${col + 1}` });
-      }
-      if (row < gridSize - 1 && col > 0) {
-        edges.push({ from: id, to: `${row + 1}-${col - 1}` });
-      }
-    }
-  }
-
-  return { nodes, edges };
+export interface CreateInitialStateOptions {
+  starter?: Player;
+  layout?: BoardLayout;
 }
 
-/**
- * Create initial game state
- */
-export function createInitialState(): FiarGameState {
+function inventoryFor(seat: Player): ChipInventory {
+  void seat;
   return {
-    board: createFiarBoard(),
-    currentPlayer: 'player1',
-    phase: 'placement',
-    chipsPlaced: { player1: 0, player2: 0 },
-    selectedNode: null,
-    winner: null,
-    moveHistory: [],
+    plain: CONFIG.PLAIN_CHIPS_PER_PLAYER,
+    marked: CONFIG.MARKED_CHIPS_PER_PLAYER,
+  };
+}
+
+export function createBoardFromLayout(layout: BoardLayout): FiarBoard {
+  const nodes = new Map<string, BoardNode>();
+  for (const n of layout.nodes) {
+    nodes.set(n.id, {
+      id: n.id,
+      x: n.x,
+      y: n.y,
+      chip: null,
+      chipKind: null,
+    });
+  }
+
+  const edges: BoardEdge[] = layout.edges.map((e: LayoutEdge) => ({
+    from: e.from,
+    to: e.to,
+    crossesYellowCenter: e.crossesYellowCenter,
+  }));
+
+  const yellowCrossingKeys = new Set<string>();
+  for (const e of edges) {
+    if (e.crossesYellowCenter) {
+      yellowCrossingKeys.add(edgeKey(e.from, e.to));
+    }
+  }
+
+  return {
+    nodes,
+    edges,
+    yellowCrossingKeys,
+    yellowCenter: layout.yellowCenter,
+    spacing: layout.spacing,
+    layoutId: layout.id,
+    layoutVerified: layout.verified,
   };
 }
 
 /**
- * Get opponent
+ * Create the FIAR board from the production layout.
+ * Layout is currently the unverified legacy 5×5 — see layout.ts.
  */
+export function createFiarBoard(layout?: BoardLayout): FiarBoard {
+  return createBoardFromLayout(layout ?? createUnverifiedProductionLayout());
+}
+
+export function createInitialState(
+  options: CreateInitialStateOptions = {}
+): FiarGameState {
+  const starter = options.starter ?? 'player1';
+  const layout = options.layout ?? createUnverifiedProductionLayout();
+  return {
+    board: createBoardFromLayout(layout),
+    currentPlayer: starter,
+    phase: 'placement',
+    chipsPlaced: { player1: 0, player2: 0 },
+    chipInventory: {
+      player1: inventoryFor('player1'),
+      player2: inventoryFor('player2'),
+    },
+    selectedChipKind: 'plain',
+    selectedNode: null,
+    winner: null,
+    winningPath: null,
+    winningPathColor: null,
+    starter,
+    moveHistory: [],
+  };
+}
+
 export function getOpponent(player: Player): Player {
   return player === 'player1' ? 'player2' : 'player1';
 }
 
-/**
- * Check if two nodes are connected by an edge
- */
+export function chipsRemaining(inv: ChipInventory): number {
+  return inv.plain + inv.marked;
+}
+
 export function areConnected(
   board: FiarBoard,
   nodeA: string,
@@ -157,59 +191,60 @@ export function areConnected(
   );
 }
 
-/**
- * Get all nodes connected to a given node
- */
+export function edgeCrossesYellow(
+  board: FiarBoard,
+  nodeA: string,
+  nodeB: string
+): boolean {
+  return board.yellowCrossingKeys.has(edgeKey(nodeA, nodeB));
+}
+
 export function getConnectedNodes(board: FiarBoard, nodeId: string): string[] {
   const connected: string[] = [];
-
   for (const edge of board.edges) {
-    if (edge.from === nodeId) {
-      connected.push(edge.to);
-    } else if (edge.to === nodeId) {
-      connected.push(edge.from);
-    }
+    if (edge.from === nodeId) connected.push(edge.to);
+    else if (edge.to === nodeId) connected.push(edge.from);
   }
-
   return connected;
 }
 
 /**
- * Get nodes in a specific direction from a given node
- * Returns all nodes in a straight line (following edges) until blocked or edge of board
+ * Nodes in a straight line from start along (dx, dy), following edges.
+ * Stops at board edge, missing connection, or (by default) a yellow-crossing edge.
  */
 export function getNodesInDirection(
   board: FiarBoard,
   startId: string,
   dx: number,
-  dy: number
+  dy: number,
+  options: { allowYellowCrossing?: boolean } = {}
 ): string[] {
   const result: string[] = [];
   const startNode = board.nodes.get(startId);
   if (!startNode) return result;
 
-  // Find nodes along the direction
   let currentX = startNode.x;
   let currentY = startNode.y;
+  const allowYellow = options.allowYellowCrossing === true;
 
   while (true) {
     currentX += dx;
     currentY += dy;
 
-    // Find node at this position
     let found = false;
     for (const [id, node] of board.nodes) {
       if (
         Math.abs(node.x - currentX) < 10 &&
         Math.abs(node.y - currentY) < 10
       ) {
-        // Check if connected to previous node
         const prevId = result.length > 0 ? result[result.length - 1] : startId;
-        if (areConnected(board, prevId, id)) {
-          result.push(id);
-          found = true;
-          break;
+        if (!areConnected(board, prevId, id)) break;
+        if (!allowYellow && edgeCrossesYellow(board, prevId, id)) {
+          return result;
         }
+        result.push(id);
+        found = true;
+        break;
       }
     }
 
@@ -219,19 +254,33 @@ export function getNodesInDirection(
   return result;
 }
 
-/**
- * Get all 8 directions for path checking
- */
-export function getDirections(): { dx: number; dy: number }[] {
-  const spacing = 80; // Must match board spacing
+export function getDirections(
+  spacing: number = CONFIG_SPACING_FALLBACK
+): { dx: number; dy: number }[] {
   return [
-    { dx: spacing, dy: 0 }, // Right
-    { dx: -spacing, dy: 0 }, // Left
-    { dx: 0, dy: spacing }, // Down
-    { dx: 0, dy: -spacing }, // Up
-    { dx: spacing, dy: spacing }, // Down-right
-    { dx: -spacing, dy: -spacing }, // Up-left
-    { dx: spacing, dy: -spacing }, // Up-right
-    { dx: -spacing, dy: spacing }, // Down-left
+    { dx: spacing, dy: 0 },
+    { dx: -spacing, dy: 0 },
+    { dx: 0, dy: spacing },
+    { dx: 0, dy: -spacing },
+    { dx: spacing, dy: spacing },
+    { dx: -spacing, dy: -spacing },
+    { dx: spacing, dy: -spacing },
+    { dx: -spacing, dy: spacing },
   ];
 }
+
+const CONFIG_SPACING_FALLBACK = 80;
+
+export function getBoardDirections(board: FiarBoard): {
+  dx: number;
+  dy: number;
+}[] {
+  return getDirections(board.spacing || CONFIG_SPACING_FALLBACK);
+}
+
+/** Re-export layout helpers used by tests / 3D. */
+export {
+  createUnverifiedProductionLayout,
+  createYellowCenterTestLayout,
+} from './layout';
+export type { BoardLayout, YellowCenterEllipse } from './layout';

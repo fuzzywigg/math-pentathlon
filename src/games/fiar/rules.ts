@@ -1,77 +1,144 @@
-// FIAR Game Rules
-// Logic for placement, movement, win detection, and valid moves
+// FIAR Game Rules — Division II PDF (auto-detect wins; no timer)
 
 import {
   FiarGameState,
   Player,
   FiarMove,
+  ChipKind,
   CONFIG,
   PathResult,
   getOpponent,
   getConnectedNodes,
   getNodesInDirection,
-  getDirections,
+  getBoardDirections,
+  chipsRemaining,
 } from './types';
 
 // =============================================================================
 // Placement Phase
 // =============================================================================
 
-/**
- * Check if a node is valid for chip placement
- */
-export function canPlaceChip(state: FiarGameState, nodeId: string): boolean {
+export function canPlaceChip(
+  state: FiarGameState,
+  nodeId: string,
+  chipKind: ChipKind = state.selectedChipKind
+): boolean {
   if (state.phase !== 'placement') return false;
 
   const node = state.board.nodes.get(nodeId);
-  if (!node) return false;
+  if (!node || node.chip !== null) return false;
 
-  // Can't place on occupied node
-  if (node.chip !== null) return false;
+  const inv = state.chipInventory[state.currentPlayer];
+  if (chipKind === 'plain') return inv.plain > 0;
+  return inv.marked > 0;
+}
 
-  // Check if current player has chips left to place
-  const placed = state.chipsPlaced[state.currentPlayer];
-  return placed < CONFIG.CHIPS_PER_PLAYER;
+export function setSelectedChipKind(
+  state: FiarGameState,
+  kind: ChipKind
+): FiarGameState {
+  const inv = state.chipInventory[state.currentPlayer];
+  if (kind === 'plain' && inv.plain <= 0) return state;
+  if (kind === 'marked' && inv.marked <= 0) return state;
+  if (state.selectedChipKind === kind) return state;
+  return { ...state, selectedChipKind: kind };
 }
 
 /**
- * Place a chip on a node
+ * Ensure selectedChipKind is available for the current player (auto-fallback).
  */
-export function placeChip(state: FiarGameState, nodeId: string): FiarGameState {
-  if (!canPlaceChip(state, nodeId)) return state;
+export function normalizeSelectedChipKind(state: FiarGameState): FiarGameState {
+  const inv = state.chipInventory[state.currentPlayer];
+  if (state.selectedChipKind === 'plain' && inv.plain > 0) return state;
+  if (state.selectedChipKind === 'marked' && inv.marked > 0) return state;
+  if (inv.plain > 0) return { ...state, selectedChipKind: 'plain' };
+  if (inv.marked > 0) return { ...state, selectedChipKind: 'marked' };
+  return state;
+}
 
+export function placeChip(
+  state: FiarGameState,
+  nodeId: string,
+  chipKind: ChipKind = state.selectedChipKind
+): FiarGameState {
+  state = normalizeSelectedChipKind(state);
+  const kind =
+    chipKind === 'plain' || chipKind === 'marked'
+      ? chipKind
+      : state.selectedChipKind;
+  if (!canPlaceChip(state, nodeId, kind)) return state;
+
+  const actingPlayer = state.currentPlayer;
   const newBoard = {
+    ...state.board,
     nodes: new Map(state.board.nodes),
-    edges: state.board.edges,
   };
 
   const node = newBoard.nodes.get(nodeId)!;
-  newBoard.nodes.set(nodeId, { ...node, chip: state.currentPlayer });
+  newBoard.nodes.set(nodeId, {
+    ...node,
+    chip: actingPlayer,
+    chipKind: kind,
+  });
+
+  const prevInv = state.chipInventory[actingPlayer];
+  const newInv = {
+    ...prevInv,
+    [kind]: prevInv[kind] - 1,
+  };
+
+  const newChipInventory = {
+    ...state.chipInventory,
+    [actingPlayer]: newInv,
+  };
 
   const newChipsPlaced = {
     ...state.chipsPlaced,
-    [state.currentPlayer]: state.chipsPlaced[state.currentPlayer] + 1,
+    [actingPlayer]: state.chipsPlaced[actingPlayer] + 1,
   };
 
   const move: FiarMove = {
-    player: state.currentPlayer,
+    player: actingPlayer,
     type: 'place',
     nodeId,
+    chipKind: kind,
     moveNumber: state.moveHistory.length + 1,
   };
 
-  // Check if all chips placed - transition to movement phase
-  const totalPlaced = newChipsPlaced.player1 + newChipsPlaced.player2;
-  const allPlaced = totalPlaced === CONFIG.CHIPS_PER_PLAYER * 2;
-
-  return {
+  let newState: FiarGameState = {
     ...state,
     board: newBoard,
     chipsPlaced: newChipsPlaced,
-    currentPlayer: getOpponent(state.currentPlayer),
-    phase: allPlaced ? 'movement' : 'placement',
+    chipInventory: newChipInventory,
+    selectedNode: null,
     moveHistory: [...state.moveHistory, move],
   };
+
+  // Auto-detect win (including during placement) for either color → actor wins
+  const win = findAnyWinningPath(newState);
+  if (win) {
+    return {
+      ...newState,
+      winner: actingPlayer,
+      winningPath: win.nodes,
+      winningPathColor: win.color,
+      phase: 'gameOver',
+      currentPlayer: actingPlayer,
+    };
+  }
+
+  const allPlaced =
+    chipsRemaining(newChipInventory.player1) === 0 &&
+    chipsRemaining(newChipInventory.player2) === 0;
+
+  const nextPlayer = getOpponent(actingPlayer);
+  newState = {
+    ...newState,
+    currentPlayer: nextPlayer,
+    phase: allPlaced ? 'movement' : 'placement',
+    selectedChipKind: 'plain',
+  };
+  return normalizeSelectedChipKind(newState);
 }
 
 // =============================================================================
@@ -79,9 +146,8 @@ export function placeChip(state: FiarGameState, nodeId: string): FiarGameState {
 // =============================================================================
 
 /**
- * Get valid moves for a chip at a given node
- * Chips can move any distance along a straight path (horizontal, vertical, diagonal)
- * Cannot jump over other chips
+ * Valid destinations: any distance along a straight unoccupied path.
+ * Cannot jump, cannot land on occupied, cannot cross yellow center.
  */
 export function getValidMoves(state: FiarGameState, nodeId: string): string[] {
   if (state.phase !== 'movement') return [];
@@ -90,15 +156,19 @@ export function getValidMoves(state: FiarGameState, nodeId: string): string[] {
   if (!node || node.chip !== state.currentPlayer) return [];
 
   const validMoves: string[] = [];
-  const directions = getDirections();
+  const directions = getBoardDirections(state.board);
 
   for (const dir of directions) {
-    const nodesInDir = getNodesInDirection(state.board, nodeId, dir.dx, dir.dy);
+    const nodesInDir = getNodesInDirection(
+      state.board,
+      nodeId,
+      dir.dx,
+      dir.dy
+    );
 
-    // Can move along path until blocked by another chip
     for (const targetId of nodesInDir) {
       const targetNode = state.board.nodes.get(targetId);
-      if (targetNode?.chip !== null) break; // Blocked by chip
+      if (targetNode?.chip !== null) break;
       validMoves.push(targetId);
     }
   }
@@ -106,21 +176,14 @@ export function getValidMoves(state: FiarGameState, nodeId: string): string[] {
   return validMoves;
 }
 
-/**
- * Check if a move is valid
- */
 export function canMove(
   state: FiarGameState,
   fromId: string,
   toId: string
 ): boolean {
-  const validMoves = getValidMoves(state, fromId);
-  return validMoves.includes(toId);
+  return getValidMoves(state, fromId).includes(toId);
 }
 
-/**
- * Move a chip from one node to another
- */
 export function moveChip(
   state: FiarGameState,
   fromId: string,
@@ -128,126 +191,164 @@ export function moveChip(
 ): FiarGameState {
   if (!canMove(state, fromId, toId)) return state;
 
+  const actingPlayer = state.currentPlayer;
   const newBoard = {
+    ...state.board,
     nodes: new Map(state.board.nodes),
-    edges: state.board.edges,
   };
 
-  // Remove chip from origin
   const fromNode = newBoard.nodes.get(fromId)!;
-  newBoard.nodes.set(fromId, { ...fromNode, chip: null });
+  const chipKind = fromNode.chipKind;
+  newBoard.nodes.set(fromId, { ...fromNode, chip: null, chipKind: null });
 
-  // Place chip at destination
   const toNode = newBoard.nodes.get(toId)!;
-  newBoard.nodes.set(toId, { ...toNode, chip: state.currentPlayer });
+  newBoard.nodes.set(toId, {
+    ...toNode,
+    chip: actingPlayer,
+    chipKind,
+  });
 
   const move: FiarMove = {
-    player: state.currentPlayer,
+    player: actingPlayer,
     type: 'move',
     nodeId: toId,
     fromNodeId: fromId,
+    chipKind: chipKind ?? undefined,
     moveNumber: state.moveHistory.length + 1,
   };
 
-  let newState: FiarGameState = {
+  const newState: FiarGameState = {
     ...state,
     board: newBoard,
     selectedNode: null,
-    currentPlayer: getOpponent(state.currentPlayer),
     moveHistory: [...state.moveHistory, move],
   };
 
-  // Check for winner
-  const winner = checkWinner(newState);
-  if (winner) {
-    newState = {
+  const win = findAnyWinningPath(newState);
+  if (win) {
+    return {
       ...newState,
-      winner,
+      winner: actingPlayer,
+      winningPath: win.nodes,
+      winningPathColor: win.color,
       phase: 'gameOver',
+      currentPlayer: actingPlayer,
     };
   }
 
-  return newState;
+  return {
+    ...newState,
+    currentPlayer: getOpponent(actingPlayer),
+  };
 }
 
 // =============================================================================
-// Win Detection
+// Win Detection (gapped lines, marked-only blocking, either color)
 // =============================================================================
 
 /**
- * Find paths of connected chips of the same color
+ * Maximal straight lines on the board that do not traverse yellow-crossing edges.
+ */
+export function getStraightLines(state: FiarGameState): string[][] {
+  const lines: string[][] = [];
+  const seen = new Set<string>();
+  const halfDirs = getBoardDirections(state.board).slice(0, 4);
+
+  for (const [startId] of state.board.nodes) {
+    for (const dir of halfDirs) {
+      const forward = getNodesInDirection(
+        state.board,
+        startId,
+        dir.dx,
+        dir.dy
+      );
+      const backward = getNodesInDirection(
+        state.board,
+        startId,
+        -dir.dx,
+        -dir.dy
+      );
+      const line = [...backward.reverse(), startId, ...forward];
+      if (line.length < CONFIG.WIN_LENGTH) continue;
+
+      const key = `${dir.dx},${dir.dy}|${line.join('>')}`;
+      const revKey = `${-dir.dx},${-dir.dy}|${[...line].reverse().join('>')}`;
+      if (seen.has(key) || seen.has(revKey)) continue;
+      seen.add(key);
+      lines.push(line);
+    }
+  }
+
+  return lines;
+}
+
+function subsetUnblocked(
+  state: FiarGameState,
+  chipNodes: string[],
+  color: Player
+): string[] | null {
+  if (chipNodes.length < CONFIG.WIN_LENGTH) return null;
+
+  for (let i = 0; i < chipNodes.length; i++) {
+    for (let j = i + CONFIG.WIN_LENGTH - 1; j < chipNodes.length; j++) {
+      const subset = chipNodes.slice(i, j + 1);
+      if (!isPathBlocked(state, subset, color)) {
+        return subset;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Find same-color alignments of 4+ chips along a straight line.
+ * Empty spaces between chips are allowed; opposite-color chips break the segment.
+ * Paths that would require crossing yellow are already excluded by line construction.
  */
 export function findPaths(state: FiarGameState, player: Player): PathResult[] {
   const paths: PathResult[] = [];
-  const checked = new Set<string>();
+  const lines = getStraightLines(state);
 
-  // Check all directions from each of the player's chips
-  for (const [nodeId, node] of state.board.nodes) {
-    if (node.chip !== player) continue;
+  for (const line of lines) {
+    let segmentChips: string[] = [];
 
-    // Check each direction
-    const directions = getDirections();
-    // Only check half the directions to avoid duplicates (the other half is reverse)
-    const halfDirs = directions.slice(0, 4);
-
-    for (const dir of halfDirs) {
-      const pathKey = `${nodeId}-${dir.dx}-${dir.dy}`;
-      if (checked.has(pathKey)) continue;
-      checked.add(pathKey);
-
-      const path = [nodeId];
-
-      // Extend in positive direction
-      let currentId = nodeId;
-      while (true) {
-        const nodesInDir = getNodesInDirection(
-          state.board,
-          currentId,
-          dir.dx,
-          dir.dy
-        );
-        if (nodesInDir.length === 0) break;
-
-        const nextId = nodesInDir[0];
-        const nextNode = state.board.nodes.get(nextId);
-        if (nextNode?.chip !== player) break;
-
-        path.push(nextId);
-        currentId = nextId;
+    const flush = () => {
+      if (segmentChips.length >= CONFIG.WIN_LENGTH) {
+        const unblocked = subsetUnblocked(state, segmentChips, player);
+        if (unblocked) {
+          paths.push({ nodes: unblocked, isBlocked: false, color: player });
+        } else {
+          paths.push({
+            nodes: segmentChips.slice(0, CONFIG.WIN_LENGTH),
+            isBlocked: true,
+            color: player,
+          });
+        }
       }
+      segmentChips = [];
+    };
 
-      // Extend in negative direction
-      currentId = nodeId;
-      while (true) {
-        const nodesInDir = getNodesInDirection(
-          state.board,
-          currentId,
-          -dir.dx,
-          -dir.dy
-        );
-        if (nodesInDir.length === 0) break;
-
-        const nextId = nodesInDir[0];
-        const nextNode = state.board.nodes.get(nextId);
-        if (nextNode?.chip !== player) break;
-
-        path.unshift(nextId);
-        currentId = nextId;
-      }
-
-      if (path.length >= CONFIG.WIN_LENGTH) {
-        // Check if blocked by adjacent opponent chip
-        const isBlocked = isPathBlocked(state, path, player);
-        paths.push({ nodes: path, isBlocked });
+    for (const nodeId of line) {
+      const node = state.board.nodes.get(nodeId);
+      if (!node) continue;
+      if (node.chip === player) {
+        segmentChips.push(nodeId);
+      } else if (node.chip === null) {
+        // Gap allowed — keep segment open
+      } else {
+        // Opposite color intervenes
+        flush();
       }
     }
+    flush();
   }
 
   return paths;
 }
 
 /**
- * Check if a winning path is blocked by an adjacent opponent chip
+ * A path is blocked only by an opponent's MARKED chip adjacent (by an edge)
+ * to one of the winning-path chip spaces.
  */
 export function isPathBlocked(
   state: FiarGameState,
@@ -256,14 +357,16 @@ export function isPathBlocked(
 ): boolean {
   const opponent = getOpponent(player);
 
-  // Check if any node in the path has an adjacent opponent chip
   for (const nodeId of path) {
     const connected = getConnectedNodes(state.board, nodeId);
     for (const connectedId of connected) {
-      if (path.includes(connectedId)) continue; // Skip path nodes
+      if (path.includes(connectedId)) continue;
       const connectedNode = state.board.nodes.get(connectedId);
-      if (connectedNode?.chip === opponent) {
-        return true; // Blocked!
+      if (
+        connectedNode?.chip === opponent &&
+        connectedNode.chipKind === 'marked'
+      ) {
+        return true;
       }
     }
   }
@@ -271,60 +374,47 @@ export function isPathBlocked(
   return false;
 }
 
-/**
- * Check for a winner
- */
-export function checkWinner(state: FiarGameState): Player | null {
-  // Check both players
+/** First unblocked winning path in either color, or null. */
+export function findAnyWinningPath(
+  state: FiarGameState
+): PathResult | null {
   for (const player of ['player1', 'player2'] as Player[]) {
     const paths = findPaths(state, player);
-
-    // Find unblocked winning paths
-    const winningPath = paths.find(
+    const win = paths.find(
       (p) => !p.isBlocked && p.nodes.length >= CONFIG.WIN_LENGTH
     );
-    if (winningPath) {
-      return player;
-    }
+    if (win) return win;
   }
-
   return null;
 }
 
 /**
- * Get all valid nodes for the current player to select/move
+ * Legacy helper: returns the COLOR that has an unblocked path, or null.
+ * Prefer findAnyWinningPath + acting-player credit for game flow.
  */
+export function checkWinner(state: FiarGameState): Player | null {
+  return findAnyWinningPath(state)?.color ?? null;
+}
+
 export function getSelectableNodes(state: FiarGameState): string[] {
   if (state.phase !== 'movement') return [];
 
   const selectable: string[] = [];
-
   for (const [nodeId, node] of state.board.nodes) {
     if (node.chip === state.currentPlayer) {
-      // Check if this chip has any valid moves
-      const moves = getValidMoves(state, nodeId);
-      if (moves.length > 0) {
+      if (getValidMoves(state, nodeId).length > 0) {
         selectable.push(nodeId);
       }
     }
   }
-
   return selectable;
 }
 
-/**
- * Check if the game is in a draw state (no valid moves for current player)
- */
 export function isDraw(state: FiarGameState): boolean {
   if (state.phase !== 'movement') return false;
-
-  const selectable = getSelectableNodes(state);
-  return selectable.length === 0;
+  return getSelectableNodes(state).length === 0;
 }
 
-/**
- * Select a chip for movement
- */
 export function selectChip(
   state: FiarGameState,
   nodeId: string
@@ -338,12 +428,26 @@ export function selectChip(
   };
 }
 
-/**
- * Deselect the current chip
- */
 export function deselectChip(state: FiarGameState): FiarGameState {
   return {
     ...state,
     selectedNode: null,
+  };
+}
+
+/** Forge helper for tests: place a chip ignoring turn inventory. */
+export function forceChip(
+  state: FiarGameState,
+  nodeId: string,
+  player: Player,
+  chipKind: ChipKind = 'plain'
+): FiarGameState {
+  const nodes = new Map(state.board.nodes);
+  const node = nodes.get(nodeId);
+  if (!node) throw new Error(`missing ${nodeId}`);
+  nodes.set(nodeId, { ...node, chip: player, chipKind });
+  return {
+    ...state,
+    board: { ...state.board, nodes },
   };
 }

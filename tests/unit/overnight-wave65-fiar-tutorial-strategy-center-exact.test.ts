@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial strategy center exact', () => {
   it('strategy-tips lists control the center of the board', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'strategy-tips');
     expect(step?.message).toContain(
-      '<li>Control the center of the board</li>'
+      '<li>Watch for wins in either color after every move</li>'
     );
     expect(step?.title).toBe('Strategy Tips');
   });

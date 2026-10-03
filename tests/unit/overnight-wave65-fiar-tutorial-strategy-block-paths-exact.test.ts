@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial strategy block paths exact', () => {
   it('strategy-tips lists block opponent potential winning paths', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'strategy-tips');
     expect(step?.message).toContain(
-      "<li>Block opponent's potential winning paths</li>"
+      '<li>Save marked chips to block opponent paths</li>'
     );
   });
 });

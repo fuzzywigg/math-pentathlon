@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe('Wave 61 fiar — chips-info labels exact', () => {
-  it('opening chip counts are exact Blue/Red 0/N', () => {
+  it('opening chip counts are exact Blue/Red 0/N with inventory', () => {
     const board = document.createElement('div');
     const status = document.createElement('div');
     document.body.append(board, status);
@@ -21,8 +21,8 @@ describe('Wave 61 fiar — chips-info labels exact', () => {
       n.textContent?.replace(/\s+/g, ' ').trim()
     );
     expect(counts).toEqual([
-      `Blue: 0/${CONFIG.CHIPS_PER_PLAYER}`,
-      `Red: 0/${CONFIG.CHIPS_PER_PLAYER}`,
+      `Blue: 0/${CONFIG.CHIPS_PER_PLAYER} (${CONFIG.PLAIN_CHIPS_PER_PLAYER} plain, ${CONFIG.MARKED_CHIPS_PER_PLAYER} marked)`,
+      `Red: 0/${CONFIG.CHIPS_PER_PLAYER} (${CONFIG.PLAIN_CHIPS_PER_PLAYER} plain, ${CONFIG.MARKED_CHIPS_PER_PLAYER} marked)`,
     ]);
   });
 });

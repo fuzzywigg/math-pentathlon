@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial phases placement body exact', () => {
   it('phases Placement body mentions 4 chips on empty nodes', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'game-phases');
     expect(step?.message).toContain(
-      'Take turns placing 4 chips each on any empty node'
+      'Take turns placing 7 chips each on any empty node (2 of yours have a yellow-dot mark)'
     );
     expect(step?.position).toBe('bottom');
   });

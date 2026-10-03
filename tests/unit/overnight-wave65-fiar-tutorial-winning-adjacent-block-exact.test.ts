@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial winning adjacent block exact', () => {
   it('winning Blocking sentence mentions adjacent opponent chip', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'winning');
     expect(step?.message).toContain(
-      "<li><strong>Blocking:</strong> An opponent chip adjacent to your 4-in-a-row prevents the win!</li>"
+      "<li><strong>Blocking:</strong> Only an opponent's yellow-dot marked chip adjacent to the path prevents the win</li>"
     );
     expect(step?.position).toBe('center');
   });

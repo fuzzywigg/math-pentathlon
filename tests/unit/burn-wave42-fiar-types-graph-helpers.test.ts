@@ -15,7 +15,7 @@ import {
 
 describe('Wave 42 fiar — types graph helpers', () => {
   it('CONFIG chips and win length stable', () => {
-    expect(CONFIG.CHIPS_PER_PLAYER).toBe(4);
+    expect(CONFIG.CHIPS_PER_PLAYER).toBe(7);
     expect(CONFIG.WIN_LENGTH).toBe(4);
   });
 

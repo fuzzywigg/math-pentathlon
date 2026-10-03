@@ -24,11 +24,15 @@ function withRow(
   const nodes = new Map(state.board.nodes);
   for (const col of cols) {
     const id = `${row}-${col}`;
-    nodes.set(id, { ...nodes.get(id)!, chip: player });
+    nodes.set(id, { ...nodes.get(id)!, chip: player, chipKind: 'plain' });
   }
   if (blocker) {
     const id = `${blocker.row}-${blocker.col}`;
-    nodes.set(id, { ...nodes.get(id)!, chip: blocker.owner });
+    nodes.set(id, {
+      ...nodes.get(id)!,
+      chip: blocker.owner,
+      chipKind: 'marked',
+    });
   }
   return {
     ...state,
