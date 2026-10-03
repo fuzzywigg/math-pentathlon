@@ -425,9 +425,8 @@ export function destroyGame(): void {
   activeController = null;
   activeContainer = null;
   if (import.meta.env.DEV) {
-    delete (
-      window as Window & { __mpPrimeGoldTest?: unknown }
-    ).__mpPrimeGoldTest;
+    delete (window as Window & { __mpPrimeGoldTest?: unknown })
+      .__mpPrimeGoldTest;
   }
 }
 

@@ -20,10 +20,7 @@ import {
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
 
-export type PrimeGoldCellClickCallback = (
-  value: number,
-  expr: string
-) => void;
+export type PrimeGoldCellClickCallback = (value: number, expr: string) => void;
 
 type Three = ThreeModule;
 type Object3D = InstanceType<Three['Object3D']>;
@@ -68,9 +65,7 @@ declare global {
         row: number,
         col: number
       ) => { x: number; y: number } | null;
-      valueToClientPoint: (
-        value: number
-      ) => { x: number; y: number } | null;
+      valueToClientPoint: (value: number) => { x: number; y: number } | null;
     };
   }
 }
@@ -83,7 +78,10 @@ function boardToWorld(row: number, col: number): { x: number; z: number } {
   };
 }
 
-function parseCssColor(THREE: Three, css: string): InstanceType<Three['Color']> {
+function parseCssColor(
+  THREE: Three,
+  css: string
+): InstanceType<Three['Color']> {
   const c = new THREE.Color();
   try {
     c.set(css);
@@ -409,10 +407,7 @@ export async function createPrimeGoldBoard3D(
             ? 'Red'
             : 'empty';
       const extras = cell.isPrime ? ', prime' : '';
-      btn.setAttribute(
-        'aria-label',
-        `Number ${cell.value}, ${owner}${extras}`
-      );
+      btn.setAttribute('aria-label', `Number ${cell.value}, ${owner}${extras}`);
       btn.tabIndex = -1;
       const expr = validMap.get(cell.value);
       if (expr) {
