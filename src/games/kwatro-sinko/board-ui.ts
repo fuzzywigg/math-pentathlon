@@ -297,14 +297,16 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
   title.textContent = 'Move History';
   container.appendChild(title);
 
-  const list = document.createElement('div');
+  // Use a real list so smoke fingerprint `.kwa-history li` matches (also
+  // keeps `.kwa-history-move` for older selectors).
+  const list = document.createElement('ul');
   list.className = 'kwa-history-list';
 
   // Show last 6 moves
   const recentMoves = state.moveHistory.slice(-6);
 
   for (const move of recentMoves) {
-    const moveEl = document.createElement('div');
+    const moveEl = document.createElement('li');
     moveEl.className = `kwa-history-move ${move.player}`;
 
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
@@ -483,6 +485,9 @@ export function injectKwaStyles(): void {
       flex-direction: column;
       gap: 0.25rem;
       font-size: 0.8rem;
+      list-style: none;
+      margin: 0;
+      padding: 0;
     }
 
     .kwa-history-move {

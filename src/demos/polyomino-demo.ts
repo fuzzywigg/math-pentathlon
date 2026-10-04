@@ -44,6 +44,15 @@ let board: Board = createBoard(10, 10);
 let hoverCell: Cell | null = null;
 
 export function renderPolyominoDemo(container: HTMLElement): void {
+  // Module-level demo state survives across remounts in the same JS realm
+  // (unit workers / SPA revisits). Reset so chrome matches a fresh board.
+  currentShapeSet = TETROMINOES;
+  selectedShape = null;
+  currentRotation = 0;
+  isFlipped = false;
+  board = createBoard(10, 10);
+  hoverCell = null;
+
   injectPolyominoStyles();
 
   container.innerHTML = `

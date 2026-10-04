@@ -1183,6 +1183,7 @@ async function renderRamrod(routeGen: number): Promise<void> {
 async function renderKwatrasinko(routeGen: number): Promise<void> {
   const {
     initGame: initKwaGame,
+    destroyGame: destroyKwaGame,
     newGameVsHuman: kwaNewGameVsHuman,
     newGameVsAI: kwaNewGameVsAI,
     startTutorial: startKwaTutorial,
@@ -1249,7 +1250,10 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     initKwaGame(shell.board, false);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyKwaGame();
+    shell.cleanup();
+  };
 }
 
 // Render Prime Gold
