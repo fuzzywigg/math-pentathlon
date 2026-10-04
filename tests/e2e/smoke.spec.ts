@@ -3,7 +3,33 @@
  * game can complete a human move with a computer reply in vs-AI mode.
  */
 import { test, expect, type Page, type Locator } from '@playwright/test';
+import * as fs from 'fs';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
+
+// #region agent log
+const DEBUG_LOG = '/opt/cursor/logs/debug.log';
+function agentLog(
+  hypothesisId: string,
+  location: string,
+  message: string,
+  data: Record<string, unknown>
+) {
+  try {
+    fs.appendFileSync(
+      DEBUG_LOG,
+      JSON.stringify({
+        hypothesisId,
+        location,
+        message,
+        data,
+        timestamp: Date.now(),
+      }) + '\n'
+    );
+  } catch {
+    /* ignore logging failures */
+  }
+}
+// #endregion
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
@@ -115,17 +141,125 @@ type BoardFingerprint = {
   scores: string;
   boardLen: number;
   thinking: boolean;
+  // #region agent log
+  /** Extra diagnostics for awaitComputerReply debugging (ignored by materialDelta). */
+  _dbg?: {
+    statusSel: string;
+    statusClass: string;
+    roleStatusCount: number;
+    roleStatusTexts: string[];
+    thinkingEl: boolean;
+    thinkingInStatus: boolean;
+    historyHits: Record<string, number>;
+    p2Hits: Record<string, number>;
+    scoresSel: string;
+    scoresPreview: string;
+    playerClassHints: string[];
+  };
+  // #endregion
 };
 
 async function fingerprint(page: Page): Promise<BoardFingerprint> {
   return page.evaluate(() => {
-    const status =
-      document.querySelector(
-        '#status, .status-turn, .qg-status, .fiar-status, .ramrod-status, [role="status"]'
-      )?.textContent ?? '';
+    // Prefer game-specific / live status nodes with real text. The shared shell
+    // always mounts an empty `#status` placeholder that must not win.
+    const statusSelList = [
+      '.status-turn',
+      '.qg-status',
+      '.fiar-status',
+      '.ramrod-status',
+      '.par55-status',
+      '.kwa-status',
+      '.juggle-status',
+      '.contig-status',
+      '.stars-status',
+      '.fab-status',
+      '.pg-status',
+      '.pent-status',
+      '.sd-status',
+      '.remainder-status',
+      '.frac-status',
+      '.pinball-status',
+      '[role="status"]',
+      '#status',
+    ];
+    let statusEl: Element | null = null;
+    let statusSel = '';
+    for (const sel of statusSelList) {
+      const el = document.querySelector(sel);
+      const text = (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
+      if (el && text) {
+        statusEl = el;
+        statusSel = sel;
+        break;
+      }
+    }
+    const status = statusEl?.textContent ?? '';
+
+    const historySels = [
+      '.move-history-entry',
+      '.history-entry',
+      '.kwa-history li',
+      '.kwa-history-move',
+      '.ramrod-history-entry',
+      '.ramrod-history-move',
+      '.sd-history-entry',
+      '.pg-move-item',
+      '.par55-history-move',
+      '.stars-move-item',
+      '.fab-history-move',
+      '.juggle-history-entry',
+      '.contig-history-entry',
+    ];
+    const historyHits: Record<string, number> = {};
+    for (const sel of historySels) {
+      historyHits[sel] = document.querySelectorAll(sel).length;
+    }
     const history = document.querySelectorAll(
-      '.move-history-entry, .history-entry, .kwa-history li, .ramrod-history-entry, .sd-history-entry, .pg-move-item'
+      [
+        '.move-history-entry',
+        '.history-entry',
+        '.kwa-history li',
+        '.kwa-history-move',
+        '.ramrod-history-entry',
+        '.ramrod-history-move',
+        '.sd-history-entry',
+        '.pg-move-item',
+        '.par55-history-move',
+        '.stars-move-item',
+        '.fab-history-move',
+      ].join(', ')
     ).length;
+
+    const p2Sels = [
+      '.cell-p2',
+      '.hex-cell-p2',
+      '.contig-cell-p2',
+      '.star-track-piece-p2',
+      '.juggle-cell.occupied-player2',
+      '.pg-cell.p2',
+      '.pg-cell.player2',
+      '.island.p2',
+      '.stars-cell.p2',
+      '.stars-cell.player2',
+      '.kwa-chip-p2',
+      '.pent-cell-p2',
+      '.fiar-board-container [data-owner="2"]',
+      '.fiar-board-container .chip-p2',
+      '.hex-a-gone-cell-p2',
+      '.par55-base.player2',
+      '.par55-base.occupied-player2',
+      '.ramrod-slot.player2',
+      '.ramrod-rod.player2',
+      '.fab-answer-player2',
+      '.qg-piece.player2',
+      '[data-owner="player2"]',
+      '.player2',
+    ];
+    const p2Hits: Record<string, number> = {};
+    for (const sel of p2Sels) {
+      p2Hits[sel] = document.querySelectorAll(sel).length;
+    }
     const p2 = document.querySelectorAll(
       [
         '.cell-p2',
@@ -134,8 +268,10 @@ async function fingerprint(page: Page): Promise<BoardFingerprint> {
         '.star-track-piece-p2',
         '.juggle-cell.occupied-player2',
         '.pg-cell.p2',
+        '.pg-cell.player2',
         '.island.p2',
         '.stars-cell.p2',
+        '.stars-cell.player2',
         '.kwa-chip-p2',
         '.pent-cell-p2',
         '.fiar-board-container [data-owner="2"]',
@@ -143,26 +279,112 @@ async function fingerprint(page: Page): Promise<BoardFingerprint> {
         '.hex-a-gone-cell-p2',
       ].join(', ')
     ).length;
+
+    const scoresSelList = [
+      '.contig-score-p2',
+      '.sd-score-p2',
+      '.frac-scores',
+      '.pinball-scores',
+      '.pg-scores',
+      '.juggle-scores',
+      '.calla-scores',
+      '.remainder-scores',
+      '.fab-scores',
+      '.par55-scores',
+      '.ramrod-scores',
+      '.kwa-chip-info',
+      '.stars-scores',
+      '.stars-score.player2',
+      '.qg-info',
+      '.juggle-score',
+    ];
+    let scoresEl: Element | null = null;
+    let scoresSel = '';
+    for (const sel of scoresSelList) {
+      const el = document.querySelector(sel);
+      if (el) {
+        scoresEl = el;
+        scoresSel = sel;
+        break;
+      }
+    }
     const scores =
       document.querySelector(
-        '.contig-score-p2, .sd-score-p2, .frac-scores, .pinball-scores, .pg-scores, .juggle-scores, .calla-scores, .remainder-scores, .fab-scores, .par55-scores, .ramrod-scores, .kwa-chip-info'
+        [
+          '.contig-score-p2',
+          '.sd-score-p2',
+          '.frac-scores',
+          '.pinball-scores',
+          '.pg-scores',
+          '.juggle-scores',
+          '.calla-scores',
+          '.remainder-scores',
+          '.fab-scores',
+          '.par55-scores',
+          '.ramrod-scores',
+          '.kwa-chip-info',
+          '.stars-scores',
+          '.qg-info',
+        ].join(', ')
       )?.textContent ?? '';
+
     const boardLen =
       document.querySelector('#board, #game-container, main')?.innerHTML
         .length ?? 0;
-    const thinking =
-      !!document.querySelector('.status-ai-thinking') ||
-      /thinking/i.test(status);
-    return { status, history, p2, scores, boardLen, thinking };
+    const thinkingEl = !!document.querySelector('.status-ai-thinking');
+    const thinkingInStatus = /thinking/i.test(status);
+    const thinking = thinkingEl || thinkingInStatus;
+
+    const roleEls = Array.from(document.querySelectorAll('[role="status"]'));
+    const playerClassHints = Array.from(
+      document.querySelectorAll(
+        '.par55-status, .ramrod-status, .kwa-status, .juggle-status, .contig-status, .stars-status, .fab-status, .qg-status, .pg-status'
+      )
+    ).map((el) => `${el.className}|${(el.textContent ?? '').slice(0, 80)}`);
+
+    return {
+      status,
+      history,
+      p2,
+      scores,
+      boardLen,
+      thinking,
+      _dbg: {
+        statusSel,
+        statusClass: statusEl?.className?.toString?.() ?? '',
+        roleStatusCount: roleEls.length,
+        roleStatusTexts: roleEls.map((el) =>
+          (el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 120)
+        ),
+        thinkingEl,
+        thinkingInStatus,
+        historyHits,
+        p2Hits,
+        scoresSel,
+        scoresPreview: (scoresEl?.textContent ?? '')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 120),
+        playerClassHints,
+      },
+    };
   });
 }
 
+/**
+ * Human (player1) has the turn — not Red/AI phase copy that shares verbs like
+ * "select" / "roll". Empty status (e.g. unused shell `#status`) is not human.
+ */
 function isHumanTurnStatus(status: string): boolean {
-  const s = status.toLowerCase();
-  if (/thinking|ai is|computer/i.test(s)) return false;
-  return /\b(blue|you|your turn|player 1|select|place|roll|draw|choose)\b/i.test(
-    s
-  );
+  const s = status.toLowerCase().replace(/\s+/g, ' ').trim();
+  if (!s) return false;
+  if (/thinking|ai is thinking|\bcomputer\b/i.test(s)) return false;
+  const humanSeat = /\b(blue|you|your turn|player 1)\b/i.test(s);
+  if (!humanSeat) return false;
+  // "Playing vs AI" may appear alongside Blue's turn — only reject when the
+  // active seat line is Red/AI without a human seat marker.
+  if (/\bred\b/i.test(s) && !/\b(blue|you|player 1)\b/i.test(s)) return false;
+  return true;
 }
 
 function isGameOverStatus(status: string): boolean {
@@ -190,32 +412,155 @@ async function awaitComputerReply(page: Page, before: BoardFingerprint) {
   let sawThinking = false;
   /** Board state after the human move applied, before the AI move lands. */
   let postHuman: BoardFingerprint | null = null;
+  // #region agent log
+  let pollCount = 0;
+  const startedAt = Date.now();
+  agentLog('A', 'smoke.spec.ts:awaitComputerReply', 'poll-start', {
+    beforeStatus: before.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+    beforeHistory: before.history,
+    beforeP2: before.p2,
+    beforeScores: before.scores?.replace(/\s+/g, ' ').trim().slice(0, 120),
+    beforeBoardLen: before.boardLen,
+    beforeThinking: before.thinking,
+    beforeDbg: before._dbg ?? null,
+  });
+  // #endregion
 
   await expect
     .poll(
       async () => {
         const now = await fingerprint(page);
+        // #region agent log
+        pollCount += 1;
+        // #endregion
 
         if (now.thinking) {
           sawThinking = true;
           // Human move is applied; computer move is not yet.
           postHuman = now;
+          // #region agent log
+          if (pollCount <= 5 || pollCount % 10 === 0) {
+            agentLog('C', 'smoke.spec.ts:awaitComputerReply', 'thinking-branch', {
+              pollCount,
+              elapsedMs: Date.now() - startedAt,
+              status: now.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+              thinkingEl: now._dbg?.thinkingEl,
+              thinkingInStatus: now._dbg?.thinkingInStatus,
+              history: now.history,
+              p2: now.p2,
+              scores: now.scores?.replace(/\s+/g, ' ').trim().slice(0, 80),
+              boardLen: now.boardLen,
+              statusSel: now._dbg?.statusSel,
+              playerClassHints: now._dbg?.playerClassHints?.slice(0, 3),
+            });
+          }
+          // #endregion
           return false;
         }
 
         if (!postHuman) {
           const humanLanded =
             materialDelta(now, before) || now.status !== before.status;
-          if (!humanLanded) return false;
+          if (!humanLanded) {
+            // #region agent log
+            if (pollCount <= 8 || pollCount % 15 === 0) {
+              agentLog(
+                'D',
+                'smoke.spec.ts:awaitComputerReply',
+                'waiting-human-land',
+                {
+                  pollCount,
+                  elapsedMs: Date.now() - startedAt,
+                  status: now.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+                  statusChanged: now.status !== before.status,
+                  history: now.history,
+                  p2: now.p2,
+                  scores: now.scores?.replace(/\s+/g, ' ').trim().slice(0, 80),
+                  boardLen: now.boardLen,
+                  boardDelta: Math.abs(now.boardLen - before.boardLen),
+                  statusSel: now._dbg?.statusSel,
+                  roleStatusTexts: now._dbg?.roleStatusTexts,
+                  historyHits: now._dbg?.historyHits,
+                  p2Hits: Object.fromEntries(
+                    Object.entries(now._dbg?.p2Hits ?? {}).filter(
+                      ([, n]) => n > 0
+                    )
+                  ),
+                  scoresSel: now._dbg?.scoresSel,
+                  playerClassHints: now._dbg?.playerClassHints?.slice(0, 3),
+                }
+              );
+            }
+            // #endregion
+            return false;
+          }
           // First settled sample may already include a fast AI reply —
           // compare AI effects against the pre-human snapshot in that case.
           postHuman = before;
+          // #region agent log
+          agentLog('D', 'smoke.spec.ts:awaitComputerReply', 'human-landed', {
+            pollCount,
+            elapsedMs: Date.now() - startedAt,
+            status: now.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+            history: now.history,
+            p2: now.p2,
+            scores: now.scores?.replace(/\s+/g, ' ').trim().slice(0, 80),
+            boardLen: now.boardLen,
+            boardDelta: Math.abs(now.boardLen - before.boardLen),
+            statusSel: now._dbg?.statusSel,
+            historyHits: now._dbg?.historyHits,
+            p2Hits: Object.fromEntries(
+              Object.entries(now._dbg?.p2Hits ?? {}).filter(([, n]) => n > 0)
+            ),
+            scoresSel: now._dbg?.scoresSel,
+            scoresPreview: now._dbg?.scoresPreview,
+            playerClassHints: now._dbg?.playerClassHints?.slice(0, 3),
+          });
+          // #endregion
         }
 
         const anchor = sawThinking ? postHuman : before;
         const aiEffect = materialDelta(now, anchor);
-        const controlBack =
-          isHumanTurnStatus(now.status) || isGameOverStatus(now.status);
+        const humanTurn = isHumanTurnStatus(now.status);
+        const gameOver = isGameOverStatus(now.status);
+        const controlBack = humanTurn || gameOver;
+
+        // #region agent log
+        if (pollCount <= 12 || pollCount % 10 === 0 || aiEffect || controlBack) {
+          agentLog('A,B', 'smoke.spec.ts:awaitComputerReply', 'eval', {
+            pollCount,
+            elapsedMs: Date.now() - startedAt,
+            sawThinking,
+            aiEffect,
+            humanTurn,
+            gameOver,
+            controlBack,
+            path: sawThinking ? 'thinking-path' : 'fast-path',
+            wouldPass: sawThinking
+              ? aiEffect || controlBack
+              : aiEffect && controlBack,
+            status: now.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+            statusSel: now._dbg?.statusSel,
+            statusClass: now._dbg?.statusClass,
+            history: now.history,
+            historyDelta: now.history - (anchor?.history ?? 0),
+            p2: now.p2,
+            p2Delta: now.p2 - (anchor?.p2 ?? 0),
+            scores: now.scores?.replace(/\s+/g, ' ').trim().slice(0, 80),
+            scoresChanged: now.scores !== (anchor?.scores ?? ''),
+            boardLen: now.boardLen,
+            boardDelta: Math.abs(now.boardLen - (anchor?.boardLen ?? 0)),
+            historyHits: now._dbg?.historyHits,
+            p2Hits: Object.fromEntries(
+              Object.entries(now._dbg?.p2Hits ?? {}).filter(([, n]) => n > 0)
+            ),
+            scoresSel: now._dbg?.scoresSel,
+            scoresPreview: now._dbg?.scoresPreview,
+            playerClassHints: now._dbg?.playerClassHints?.slice(0, 3),
+            roleStatusTexts: now._dbg?.roleStatusTexts,
+          });
+        }
+        // #endregion
 
         if (sawThinking) {
           // Observed AI search: require a post-thinking board/history/p2/score
@@ -230,11 +575,37 @@ async function awaitComputerReply(page: Page, before: BoardFingerprint) {
       { timeout: 30_000 }
     )
     .toBeTruthy();
+
+  // #region agent log
+  agentLog('A', 'smoke.spec.ts:awaitComputerReply', 'poll-success', {
+    pollCount,
+    elapsedMs: Date.now() - startedAt,
+    sawThinking,
+  });
+  // #endregion
 }
 
 /** Complete one human action path, then wait for the board/status to advance (AI reply). */
 async function playHumanThenAwaitAi(page: Page, gameId: string) {
   const before = await fingerprint(page);
+  // #region agent log
+  agentLog('ALL', 'smoke.spec.ts:playHumanThenAwaitAi', 'before-human-action', {
+    gameId,
+    status: before.status?.replace(/\s+/g, ' ').trim().slice(0, 120),
+    history: before.history,
+    p2: before.p2,
+    scores: before.scores?.replace(/\s+/g, ' ').trim().slice(0, 80),
+    boardLen: before.boardLen,
+    thinking: before.thinking,
+    statusSel: before._dbg?.statusSel,
+    scoresSel: before._dbg?.scoresSel,
+    historyHits: before._dbg?.historyHits,
+    p2Hits: Object.fromEntries(
+      Object.entries(before._dbg?.p2Hits ?? {}).filter(([, n]) => n > 0)
+    ),
+    playerClassHints: before._dbg?.playerClassHints?.slice(0, 3),
+  });
+  // #endregion
 
   switch (gameId) {
     case 'kings-quadraphages': {
