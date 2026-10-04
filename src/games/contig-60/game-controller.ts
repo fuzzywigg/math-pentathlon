@@ -145,9 +145,11 @@ function updateStatus(): void {
 // Event Handlers
 // =============================================================================
 
-function handleRollDice(): void {
+function handleRollDice(fromAI: boolean | Event = false): void {
   if (gameState.phase !== 'rolling') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  // Block human UI clicks during the AI seat; AI schedules rolls with true.
+  // (Click handlers pass an Event as the first arg — only `true` is AI.)
+  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
@@ -173,9 +175,9 @@ function handleSelectPlacement(value: number, expression: string): void {
   gameState = placeChip(gameState, value, expression);
   updateUI();
 
-  // AI turn
+  // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(handleRollDice, 500);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -198,9 +200,9 @@ function handlePass(): void {
   gameState = passTurn(gameState);
   updateUI();
 
-  // AI turn
+  // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(handleRollDice, 500);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -221,7 +223,7 @@ function makeAIMove(): void {
     updateUI();
 
     if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-      setTimeout(handleRollDice, 500);
+      setTimeout(() => handleRollDice(true), 500);
     }
     return;
   }
@@ -231,7 +233,7 @@ function makeAIMove(): void {
 
   // Continue if AI's turn
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(handleRollDice, 500);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 

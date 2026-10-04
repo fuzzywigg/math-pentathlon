@@ -31,6 +31,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function waitFor3dApi(page: Page) {
   await page.waitForFunction(
     () =>
@@ -141,6 +148,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/hex-a-gone');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.hex-a-gone-board').first()).toBeVisible({
       timeout: 10000,
@@ -158,6 +166,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
     });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/?board3d=1#/game/hex-a-gone');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="hex-a-gone"]');
@@ -235,6 +244,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
       } as typeof proto.getContext;
     });
     await page.goto('/?board3d=1#/game/hex-a-gone');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.hex-a-gone-board').first()).toBeVisible({
       timeout: 15000,
@@ -249,6 +259,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/hex-a-gone');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('canvas[data-mp3d="hex-a-gone"]')).toBeVisible({
       timeout: 15000,

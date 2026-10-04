@@ -31,6 +31,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function dismissOwlIfNeeded(page: Page) {
   const dismiss = page.locator(
     'button:has-text("Dismiss"), button[aria-label="Dismiss message"], .owl-dismiss, #owl-dismiss'
@@ -99,6 +106,7 @@ test.describe('mp3d Star Track 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/star-track');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.star-track-board').first()).toBeVisible({
       timeout: 10000,
@@ -121,6 +129,7 @@ test.describe('mp3d Star Track 3D board', () => {
     for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto('/?board3d=1#/game/star-track');
+      await waitForGameReady(page);
       await dismissModeIfNeeded(page);
 
       const canvas = page.locator('canvas[data-mp3d="star-track"]');
@@ -180,6 +189,7 @@ test.describe('mp3d Star Track 3D board', () => {
       } as typeof proto.getContext;
     });
     await page.goto('/?board3d=1#/game/star-track');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.star-track-board').first()).toBeVisible({
       timeout: 15000,
@@ -195,6 +205,7 @@ test.describe('mp3d Star Track 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/star-track');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('canvas[data-mp3d="star-track"]')).toBeVisible({
       timeout: 15000,

@@ -88,9 +88,11 @@ jobs:
           echo "unit suite: ${count} files (budget ~5 min; step timeout 8m / job 10m)"
           npm run test:unit
 
+  # Browser smoke + mp3d board3d guards; pruned TOKENMAXX chrome leftovers.
   e2e:
     runs-on: ubuntu-latest
     needs: build
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -101,7 +103,12 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
       - name: Run e2e tests
-        run: npm run test:e2e -- --project=chromium
+        timeout-minutes: 12
+        run: |
+          set -euo pipefail
+          count="$(find tests/e2e -name '*.spec.ts' | wc -l | tr -d ' ')"
+          echo "e2e suite: ${count} files (smoke + bug-guards + mp3d)"
+          npm run test:e2e -- --project=chromium
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: failure()

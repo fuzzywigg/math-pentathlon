@@ -25,6 +25,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function clickBoardCell(page: Page, ring: number, position: number) {
   await page.waitForFunction(
     () =>
@@ -133,6 +140,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/queens-guards');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.qg-board-container svg').first()).toBeVisible({
       timeout: 10000,
@@ -160,6 +168,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       await page.goto(
         `/?board3d=1&vp=${vp.name}&t=${Date.now()}#/game/queens-guards`
       );
+    await waitForGameReady(page);
       await dismissModeIfNeeded(page);
 
       const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
@@ -259,6 +268,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       } as typeof proto.getContext;
     });
     await page.goto('/?board3d=1#/game/queens-guards');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.qg-board-container svg').first()).toBeVisible({
       timeout: 15000,
@@ -275,6 +285,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/queens-guards');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('canvas[data-mp3d="queens-guards"]')).toBeVisible(
       {
@@ -322,6 +333,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       await page.goto(
         `/?board3d=1&restore=1&vp=${vp.name}&t=${Date.now()}#/game/queens-guards`
       );
+    await waitForGameReady(page);
       await dismissModeIfNeeded(page);
       const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
       await expect(canvas).toBeVisible({ timeout: 15000 });
@@ -357,6 +369,7 @@ test.describe('mp3d Queens & Guards 3D board', () => {
     });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(`/?board3d=0&t=${Date.now()}#/game/queens-guards`);
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.qg-board-container svg').first()).toBeVisible({
       timeout: 10000,

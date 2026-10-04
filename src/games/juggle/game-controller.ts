@@ -165,14 +165,16 @@ function updateStatus(): void {
 // Event Handlers
 // =============================================================================
 
-function handleRollDice(): void {
+function handleRollDice(fromAI: boolean | Event = false): void {
   if (gameState.phase !== 'rolling') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  // Block human UI clicks during the AI seat; AI schedules rolls with true.
+  // (Click handlers pass an Event as the first arg — only `true` is AI.)
+  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
 
   gameState = doRollDice(gameState);
   updateUI();
 
-  // AI takes turn after dice are shown
+  // AI continues after its own roll.
   if (vsAI && gameState.currentPlayer === aiPlayer) {
     setTimeout(makeAIMove, 500);
   }
@@ -212,9 +214,9 @@ function handleCellClick(row: number, col: number, player: Player): void {
   gameState = placeShape(gameState, { row, col });
   updateUI();
 
-  // AI turn
+  // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(handleRollDice, 500);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -277,7 +279,7 @@ function makeAIMove(): void {
 
       // Continue if still AI's turn
       if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-        setTimeout(handleRollDice, 500);
+        setTimeout(() => handleRollDice(true), 500);
       }
       return;
     }
