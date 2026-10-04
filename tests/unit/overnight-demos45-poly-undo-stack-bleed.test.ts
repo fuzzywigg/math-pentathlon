@@ -69,7 +69,7 @@ describe('Overnight demos45 — poly undo stack / bleed', () => {
     expect(emptyCount(root)).toBe(full);
   });
 
-  it('remount without clear retains module board until Clear', () => {
+  it('remount resets module board to a fresh Empty: 100', () => {
     const root = mount();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
@@ -78,14 +78,11 @@ describe('Overnight demos45 — poly undo stack / bleed', () => {
     ).click();
     (root.querySelector('#shape-gallery > *') as HTMLElement).click();
     placeUntilDropped(root, 1);
-    const mid = emptyCount(root);
-    expect(mid).toBeLessThan(100);
+    expect(emptyCount(root)).toBeLessThan(100);
 
     root.innerHTML = '';
     renderPolyominoDemo(root);
-    // module-level board may still show reduced empty count
-    expect(emptyCount(root)).toBeLessThanOrEqual(mid + 0);
-    (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
+    // Remount clears module-level board (no cross-mount bleed).
     expect(emptyCount(root)).toBe(100);
   });
 
