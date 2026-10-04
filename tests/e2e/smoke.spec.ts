@@ -108,37 +108,128 @@ function mountLocator(page: Page, gameId: string): Locator {
   return page.locator(sel).first();
 }
 
-async function fingerprint(page: Page) {
+type BoardFingerprint = {
+  status: string;
+  history: number;
+  p2: number;
+  scores: string;
+  boardLen: number;
+  thinking: boolean;
+};
+
+async function fingerprint(page: Page): Promise<BoardFingerprint> {
   return page.evaluate(() => {
     const status =
       document.querySelector(
         '#status, .status-turn, .qg-status, .fiar-status, .ramrod-status, [role="status"]'
       )?.textContent ?? '';
     const history = document.querySelectorAll(
-      '.move-history-entry, .history-entry, .kwa-history li, .ramrod-history-entry, .sd-history-entry'
+      '.move-history-entry, .history-entry, .kwa-history li, .ramrod-history-entry, .sd-history-entry, .pg-move-item'
     ).length;
     const p2 = document.querySelectorAll(
-      '.cell-p2, .hex-cell-p2, .contig-cell-p2, .star-track-piece-p2, .calla-score-p2, .pg-cell.p2, .island.p2, .juggle-cell.p2, .stars-cell.p2, .fab-score-p2, .par55-score-p2, .kwa-chip-p2, .pent-cell-p2, .fiar-board-container [data-owner="2"], .fiar-board-container .chip-p2'
+      [
+        '.cell-p2',
+        '.hex-cell-p2',
+        '.contig-cell-p2',
+        '.star-track-piece-p2',
+        '.juggle-cell.occupied-player2',
+        '.pg-cell.p2',
+        '.island.p2',
+        '.stars-cell.p2',
+        '.kwa-chip-p2',
+        '.pent-cell-p2',
+        '.fiar-board-container [data-owner="2"]',
+        '.fiar-board-container .chip-p2',
+        '.hex-a-gone-cell-p2',
+      ].join(', ')
     ).length;
     const scores =
       document.querySelector(
-        '.contig-score-p2, .sd-score-p2, .frac-scores, .pinball-scores, .pg-scores, .juggle-scores'
+        '.contig-score-p2, .sd-score-p2, .frac-scores, .pinball-scores, .pg-scores, .juggle-scores, .calla-scores, .remainder-scores, .fab-scores, .par55-scores, .ramrod-scores, .kwa-chip-info'
       )?.textContent ?? '';
     const boardLen =
       document.querySelector('#board, #game-container, main')?.innerHTML
         .length ?? 0;
-    return { status, history, p2, scores, boardLen };
+    const thinking =
+      !!document.querySelector('.status-ai-thinking') ||
+      /thinking/i.test(status);
+    return { status, history, p2, scores, boardLen, thinking };
   });
 }
 
-async function waitForChange(
-  page: Page,
-  before: Awaited<ReturnType<typeof fingerprint>>,
-  timeout = 15000
-) {
+function isHumanTurnStatus(status: string): boolean {
+  const s = status.toLowerCase();
+  if (/thinking|ai is|computer/i.test(s)) return false;
+  return /\b(blue|you|your turn|player 1|select|place|roll|draw|choose)\b/i.test(
+    s
+  );
+}
+
+function isGameOverStatus(status: string): boolean {
+  return /winner|game over|draw|you win|you lose/i.test(status);
+}
+
+function materialDelta(a: BoardFingerprint, b: BoardFingerprint): boolean {
+  return (
+    a.history !== b.history ||
+    a.p2 !== b.p2 ||
+    a.scores !== b.scores ||
+    Math.abs(a.boardLen - b.boardLen) > 40
+  );
+}
+
+/**
+ * Prove the computer finished a reply — not that a "thinking" indicator
+ * appeared. Captures a post-human baseline while AI is searching (or falls
+ * back to the pre-human snapshot for a fast reply), then requires a
+ * board/history/p2/score change from that baseline, or an explicit return
+ * to the human's turn after thinking, or game over. Worker AI is async, so
+ * the poll budget is generous; Easy difficulty keeps wall time low.
+ */
+async function awaitComputerReply(page: Page, before: BoardFingerprint) {
+  let sawThinking = false;
+  /** Board state after the human move applied, before the AI move lands. */
+  let postHuman: BoardFingerprint | null = null;
+
   await expect
-    .poll(async () => fingerprint(page), { timeout })
-    .not.toEqual(before);
+    .poll(
+      async () => {
+        const now = await fingerprint(page);
+
+        if (now.thinking) {
+          sawThinking = true;
+          // Human move is applied; computer move is not yet.
+          postHuman = now;
+          return false;
+        }
+
+        if (!postHuman) {
+          const humanLanded =
+            materialDelta(now, before) || now.status !== before.status;
+          if (!humanLanded) return false;
+          // First settled sample may already include a fast AI reply —
+          // compare AI effects against the pre-human snapshot in that case.
+          postHuman = before;
+        }
+
+        const anchor = sawThinking ? postHuman : before;
+        const aiEffect = materialDelta(now, anchor);
+        const controlBack =
+          isHumanTurnStatus(now.status) || isGameOverStatus(now.status);
+
+        if (sawThinking) {
+          // Observed AI search: require a post-thinking board/history/p2/score
+          // change, or an explicit return to the human's turn / game over.
+          return aiEffect || controlBack;
+        }
+
+        // Fast AI path (never caught "thinking"): human-only deltas must not
+        // pass — demand a material change from pre-human AND control back.
+        return aiEffect && controlBack;
+      },
+      { timeout: 30_000 }
+    )
+    .toBeTruthy();
 }
 
 /** Complete one human action path, then wait for the board/status to advance (AI reply). */
@@ -375,68 +466,7 @@ async function playHumanThenAwaitAi(page: Page, gameId: string) {
       throw new Error(`Missing play path for ${gameId}`);
   }
 
-  // Human action should change something first…
-  await waitForChange(page, before, 10000).catch(() => undefined);
-  const afterHuman = await fingerprint(page);
-
-  // …then AI reply (or quiz advance) should change the fingerprint again,
-  // or return control so the human can act (roll / status).
-  await expect
-    .poll(
-      async () => {
-        const now = await fingerprint(page);
-        const changed =
-          now.history !== afterHuman.history ||
-          now.p2 !== afterHuman.p2 ||
-          now.scores !== afterHuman.scores ||
-          now.status !== afterHuman.status ||
-          Math.abs(now.boardLen - afterHuman.boardLen) > 40;
-        const status = now.status.toLowerCase();
-        const aiMention =
-          status.includes('ai') ||
-          status.includes('red') ||
-          status.includes('thinking') ||
-          status.includes('purple');
-        const humanCanAct = await page
-          .locator(
-            [
-              '.contig-roll-btn',
-              '.sd-roll-btn',
-              '.juggle-roll-btn',
-              '.pg-roll-btn',
-              '.prime-roll-btn',
-              '.star-track-draw-btn',
-              '.remainder-btn-roll',
-              '.frac-choice-btn',
-              '.pinball-choice-btn',
-              '.cell-king.cell-p1',
-              '.hex-cell-group',
-              '.calla-pit-valid',
-              '.kwa-selectable-chip',
-              '.ramrod-rod-wrapper.selectable',
-              '.par55-hand-block.clickable',
-              '.stars-card:not(.disabled)',
-              '.fab-bar-wrapper:not(.fab-bar-disabled)',
-              '.pent-piece-option',
-              '.hex-a-gone-block-btn:not(.empty)',
-              '[data-cell-key="5-7"]',
-              '.fiar-board-container [data-node-id]',
-              '.status-winner, .game-over, .winner',
-              '.juggle-cell.occupied-player2',
-              '.remainder-btn-roll',
-            ].join(', ')
-          )
-          .first()
-          .isVisible()
-          .catch(() => false);
-        // Quiz AI auto-answers: Red/Purple score or round advances.
-        const quizAdvanced =
-          /red|purple/i.test(now.scores) && now.scores !== afterHuman.scores;
-        return changed || humanCanAct || aiMention || quizAdvanced;
-      },
-      { timeout: 15000 }
-    )
-    .toBeTruthy();
+  await awaitComputerReply(page, before);
 
   await expect(mountLocator(page, gameId)).toBeVisible();
 }
@@ -470,7 +500,8 @@ test.describe('Every game opens', () => {
 test.describe('Vs-AI: human move + computer reply', () => {
   for (const game of AVAILABLE_GAMES) {
     test(`${game.id} human acts and AI replies`, async ({ page }) => {
-      test.setTimeout(60_000);
+      // Easy difficulty + async worker AI may need a longer per-test budget.
+      test.setTimeout(90_000);
       await gotoGame(page, game.id);
       await startVsAi(page);
       await expect(mountLocator(page, game.id)).toBeVisible({
