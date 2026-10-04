@@ -12,7 +12,15 @@ const VIEWPORTS = [
   { name: 'tablet-landscape', width: 1024, height: 768 },
 ] as const;
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function startVsHuman(page: Page) {
+  await waitForGameReady(page);
   // Force a fresh human-vs-human game so AI never consumes a turn mid-script.
   const newGame = page.locator('#new-game-btn, button:has-text("New Game")');
   await expect(newGame.first()).toBeVisible({ timeout: 10000 });
@@ -84,6 +92,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/pent-em-in');
+    await waitForGameReady(page);
     await startVsHuman(page);
     await expect(page.locator('svg.pent-board').first()).toBeVisible({
       timeout: 10000,
@@ -106,6 +115,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
     for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       await page.goto('/?board3d=1#/game/pent-em-in');
+      await waitForGameReady(page);
       await startVsHuman(page);
 
       const canvas = page.locator('canvas[data-mp3d="pent-em-in"]');
@@ -150,6 +160,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
     // Game-over evidence at phone size via injected near-end state
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/?board3d=1#/game/pent-em-in');
+    await waitForGameReady(page);
     await startVsHuman(page);
     await expect(page.locator('canvas[data-mp3d="pent-em-in"]')).toBeVisible({
       timeout: 15000,
@@ -269,6 +280,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       } as typeof proto.getContext;
     });
     await page.goto('/?board3d=1#/game/pent-em-in');
+    await waitForGameReady(page);
     await startVsHuman(page);
     await expect(page.locator('svg.pent-board').first()).toBeVisible({
       timeout: 10000,
@@ -281,6 +293,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/pent-em-in');
+    await waitForGameReady(page);
     await startVsHuman(page);
     await expect(page.locator('canvas[data-mp3d="pent-em-in"]')).toBeVisible({
       timeout: 15000,

@@ -25,6 +25,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function clickBoardCell(page: Page, row: number, col: number) {
   await page.waitForFunction(
     () =>
@@ -60,6 +67,7 @@ test.describe('mp3d Kings & Quadraphages 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/kings-quadraphages');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('#board .board .cell').first()).toBeVisible({
       timeout: 10000,
@@ -77,6 +85,7 @@ test.describe('mp3d Kings & Quadraphages 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/kings-quadraphages');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="kings-quadraphages"]');

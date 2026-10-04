@@ -31,6 +31,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function waitForPrimeGold3d(page: Page) {
   await expect(page.locator('canvas[data-mp3d="prime-gold"]')).toBeVisible({
     timeout: 15000,
@@ -113,6 +120,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/prime-gold');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.pg-board .pg-cell').first()).toBeVisible({
       timeout: 10000,
@@ -137,6 +145,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       // Hash-route goto to the same URL does not remount — bounce home first.
       await page.goto('/#/');
       await page.goto(`/?board3d=1&shot=${vp.name}#/game/prime-gold`);
+      await waitForGameReady(page);
       await dismissModeIfNeeded(page);
       await waitForPrimeGold3d(page);
       await expect(page.locator('.pg-board .pg-cell')).toHaveCount(0);
@@ -237,6 +246,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       proto.getContext = () => null;
     });
     await page.goto('/?board3d=1#/game/prime-gold');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.pg-board .pg-cell').first()).toBeVisible({
       timeout: 15000,
@@ -253,6 +263,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/prime-gold');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await waitForPrimeGold3d(page);
 
