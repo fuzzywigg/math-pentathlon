@@ -26,6 +26,9 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import { isBoard3dEnabled } from '../../core/feature-flags';
+import { loadKwatroSinkoBoard3DModule } from './board-3d-loader';
+import type { KwatroSinkoBoard3D } from '../../ui/three/kwatro-sinko-board-3d';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -49,6 +52,42 @@ export interface KwaGameController {
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
+let activeController: KwaGameController | null = null;
+
+// Optional Three.js board (only when feature flag is on)
+let board3d: KwatroSinkoBoard3D | null = null;
+let board3dEnabled = false;
+let board3dLoading: Promise<void> | null = null;
+let board3dHost: HTMLElement | null = null;
+
+function unmountBoard3d(): void {
+  if (board3d) {
+    board3d.unmount();
+    board3d = null;
+  }
+  board3dLoading = null;
+  board3dEnabled = false;
+  board3dHost = null;
+}
+
+async function ensureBoard3d(controller: KwaGameController): Promise<void> {
+  if (!board3dHost || board3d || !board3dEnabled) return;
+  try {
+    const mod = await loadKwatroSinkoBoard3DModule();
+    if (!board3dHost || !board3dEnabled || activeController !== controller)
+      return;
+    board3d = await mod.createKwatroSinkoBoard3D(
+      board3dHost,
+      (nodeId) => handleNodeClick(controller, nodeId),
+      (chipId) => handleChipClick(controller, chipId)
+    );
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+    board3dHost = null;
+  }
+}
 
 /**
  * Initialize the game
@@ -59,6 +98,7 @@ export function initGame(
   difficulty: AIDifficulty = 'medium'
 ): KwaGameController {
   injectKwaStyles();
+  unmountBoard3d();
   activeContainer = container;
 
   const controller: KwaGameController = {
@@ -71,27 +111,46 @@ export function initGame(
     newGame: () => {},
   };
 
+  activeController = controller;
+  board3dEnabled = isBoard3dEnabled();
+
   controller.update = () => updateUI(controller);
-  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+  controller.newGame = (nextVsAI: boolean, diff?: AIDifficulty) => {
     controller.state = createInitialState();
-    controller.isAI = vsAI;
-    controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.isAI = nextVsAI;
+    controller.aiPlayer = nextVsAI ? 'player2' : null;
     controller.aiDifficulty = diff || controller.aiDifficulty;
-    syncOpponentChrome(vsAI);
+    syncOpponentChrome(nextVsAI);
     controller.update();
   };
 
   syncOpponentChrome(vsAI);
-  controller.update();
+
+  if (board3dEnabled) {
+    // Build chrome + stable board host first, then mount Three.js.
+    controller.update();
+    board3dLoading = ensureBoard3d(controller).then(() => {
+      if (activeController === controller) controller.update();
+    });
+  } else {
+    controller.update();
+  }
 
   return controller;
 }
 
 /**
- * Update the UI
+ * Update the UI (2D path preserves exact prior DOM when board3d is off).
  */
 function updateUI(controller: KwaGameController): void {
   const { container, state } = controller;
+
+  if (board3dEnabled) {
+    updateUI3d(controller);
+    maybeRunAI(controller);
+    return;
+  }
+
   const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
 
@@ -192,7 +251,140 @@ function updateUI(controller: KwaGameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn
+  maybeRunAI(controller);
+}
+
+/**
+ * 3D path: rebuild chrome around a preserved board host so WebGL survives.
+ */
+function updateUI3d(controller: KwaGameController): void {
+  const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
+
+  // Detach stable board host (keeps canvas alive across chrome rebuilds)
+  const preservedHost = board3dHost;
+  if (preservedHost?.parentElement) {
+    preservedHost.parentElement.removeChild(preservedHost);
+  }
+
+  container.replaceChildren();
+
+  const gameArea = document.createElement('div');
+  gameArea.className = 'kwa-game-area';
+
+  const status = document.createElement('div');
+  status.className = `kwa-status ${state.currentPlayer}`;
+  markStatusLive(status);
+
+  if (state.winner) {
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
+  } else if (state.phase === 'selectingChip') {
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a chip to move`;
+  } else if (state.phase === 'selectingDest') {
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Click a green space to move`;
+  }
+
+  gameArea.appendChild(status);
+  gameArea.appendChild(renderChipInfo(state));
+
+  const targetInfo = document.createElement('div');
+  targetInfo.className = 'kwa-target-info';
+  targetInfo.innerHTML =
+    'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
+  gameArea.appendChild(targetInfo);
+
+  if (state.winner) {
+    const banner = document.createElement('div');
+    banner.className = 'kwa-winner-banner';
+    banner.textContent = `${getPlayerName(state.winner)} Wins!`;
+    gameArea.appendChild(banner);
+
+    if (state.winningAlignment) {
+      const exprEl = document.createElement('div');
+      exprEl.className = 'kwa-winning-expr';
+      exprEl.textContent = state.winningAlignment.expression;
+      gameArea.appendChild(exprEl);
+    }
+  }
+
+  const mainLayout = document.createElement('div');
+  mainLayout.className = 'kwa-main-layout';
+
+  if (!board3dHost) {
+    board3dHost = document.createElement('div');
+    board3dHost.className = 'kwa-board-3d-slot';
+  }
+  mainLayout.appendChild(board3dHost);
+
+  // If 3D failed / still loading without a mount, show 2D board as fallback.
+  if (!board3dEnabled) {
+    mainLayout.replaceChildren(
+      renderBoard(
+        state,
+        (nodeId) => handleNodeClick(controller, nodeId),
+        (chipId) => handleChipClick(controller, chipId)
+      )
+    );
+  } else if (board3d) {
+    board3d.update(
+      state,
+      (nodeId) => handleNodeClick(controller, nodeId),
+      (chipId) => handleChipClick(controller, chipId)
+    );
+  } else if (!board3dLoading) {
+    // No in-flight mount — paint classic SVG into the slot until/unless 3D mounts.
+    board3dHost.replaceChildren(
+      renderBoard(
+        state,
+        (nodeId) => handleNodeClick(controller, nodeId),
+        (chipId) => handleChipClick(controller, chipId)
+      )
+    );
+  }
+
+  if (state.moveHistory.length > 0) {
+    mainLayout.appendChild(renderMoveHistory(state));
+  }
+
+  gameArea.appendChild(mainLayout);
+
+  const controls = document.createElement('div');
+  controls.className = 'kwa-controls';
+
+  if (state.selectedChip) {
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'kwa-btn kwa-btn-secondary';
+    clearBtn.textContent = 'Clear Selection';
+    clearBtn.addEventListener('click', () => {
+      controller.state = clearSelection(state);
+      controller.update();
+    });
+    controls.appendChild(clearBtn);
+  }
+
+  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+    const passBtn = document.createElement('button');
+    passBtn.className = 'kwa-btn kwa-btn-secondary';
+    passBtn.textContent = 'Pass Turn';
+    passBtn.addEventListener('click', () => {
+      controller.state = passTurn(state);
+      controller.update();
+    });
+    controls.appendChild(passBtn);
+  }
+
+  if (controls.childElementCount > 0) {
+    gameArea.appendChild(controls);
+  }
+  container.appendChild(gameArea);
+  restoreGridFocus(container, previousFocus);
+
+  // Re-attach preserved host reference if we created a fresh one earlier this frame
+  void preservedHost;
+}
+
+function maybeRunAI(controller: KwaGameController): void {
+  const { state } = controller;
   if (
     controller.isAI &&
     controller.aiPlayer === state.currentPlayer &&
@@ -206,6 +398,15 @@ function updateUI(controller: KwaGameController): void {
  * Handle chip click
  */
 function handleChipClick(controller: KwaGameController, chipId: string): void {
+  // Deselect when clicking the already-selected chip
+  if (
+    controller.state.phase === 'selectingDest' &&
+    controller.state.selectedChip === chipId
+  ) {
+    controller.state = clearSelection(controller.state);
+    controller.update();
+    return;
+  }
   controller.state = selectChip(controller.state, chipId);
   controller.update();
 }
@@ -214,6 +415,16 @@ function handleChipClick(controller: KwaGameController, chipId: string): void {
  * Handle node click
  */
 function handleNodeClick(controller: KwaGameController, nodeId: string): void {
+  // If clicking a chip-occupied node during select, treat as chip select
+  const node = controller.state.nodes.get(nodeId);
+  if (
+    node?.chip &&
+    controller.state.phase === 'selectingChip' &&
+    node.chip.owner === controller.state.currentPlayer
+  ) {
+    handleChipClick(controller, node.chip.id);
+    return;
+  }
   controller.state = moveChip(controller.state, nodeId);
   controller.update();
 }
@@ -229,6 +440,7 @@ function makeAIMove(controller: KwaGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.phase === 'gameOver' || !aiPlayer) return;
+  if (activeController !== controller) return;
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -267,6 +479,20 @@ export function newGameVsAI(
   difficulty: AIDifficulty = 'medium'
 ): KwaGameController {
   return initGame(container, true, difficulty);
+}
+
+export function destroyGame(): void {
+  unmountBoard3d();
+  activeContainer = null;
+  activeController = null;
+}
+
+export function isUsingBoard3d(): boolean {
+  return board3dEnabled && board3d !== null;
+}
+
+export function whenBoard3dReady(): Promise<void> {
+  return board3dLoading ?? Promise.resolve();
 }
 
 // Start the tutorial (Next-only; How-to modal remains available)
