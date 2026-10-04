@@ -3,7 +3,8 @@
 import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
-import { getBestMove, AIDifficulty } from './ai';
+import { AIDifficulty } from './ai';
+import { cancelHexAiRequests, getBestMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
@@ -25,6 +26,8 @@ let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let aiDifficulty: AIDifficulty = 'medium';
+/** Invalidates in-flight worker replies after new game. */
+let aiGeneration = 0;
 
 // AI config
 const AI_THINKING_DELAY = 500;
@@ -48,6 +51,8 @@ export function initGame(
 
 // Start a new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  cancelHexAiRequests();
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState(DEFAULT_BOARD_SIZE);
@@ -60,6 +65,8 @@ export function newGameVsHuman(): void {
 
 // Start a new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  cancelHexAiRequests();
   gameMode = 'human-vs-ai';
   aiDifficulty = difficulty;
   syncOpponentChrome();
@@ -108,28 +115,38 @@ function handleCellClick(row: number, col: number): void {
   }
 }
 
-// Trigger AI move using sophisticated AI module
+// Trigger AI move using sophisticated AI module (off main thread via Worker)
 function triggerAIMove(): void {
+  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
   setTimeout(() => {
-    const aiMove = getBestMove(gameState, 'player2', aiDifficulty);
-    if (aiMove) {
-      gameState = makeMove(gameState, aiMove);
-      moveCount++;
-    }
-    isAIThinking = false;
-    render();
+    void (async () => {
+      let aiMove = null;
+      try {
+        aiMove = await getBestMoveAsync(gameState, 'player2', aiDifficulty);
+      } catch {
+        aiMove = null;
+      }
+      if (gen !== aiGeneration) return;
 
-    // Check for game end after AI move
-    if (gameState.winner && !hasNotifiedGameEnd) {
-      hasNotifiedGameEnd = true;
-      owlSystem.onGameEnd('hex', {
-        winner: gameState.winner,
-        moveCount,
-      });
-    }
+      if (aiMove) {
+        gameState = makeMove(gameState, aiMove);
+        moveCount++;
+      }
+      isAIThinking = false;
+      render();
+
+      // Check for game end after AI move
+      if (gameState.winner && !hasNotifiedGameEnd) {
+        hasNotifiedGameEnd = true;
+        owlSystem.onGameEnd('hex', {
+          winner: gameState.winner,
+          moveCount,
+        });
+      }
+    })();
   }, AI_THINKING_DELAY);
 }
 

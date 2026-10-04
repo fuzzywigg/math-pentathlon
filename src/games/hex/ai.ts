@@ -3,8 +3,25 @@
 
 import { HexGameState, HexPosition, Player, getOpponent } from './types';
 import { getNeighbors, makeMove, getValidMoves } from './rules';
+import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
+/** Optional search controls — defaults preserve historical Math.random behavior. */
+export interface AISearchOptions {
+  seed?: number;
+  /**
+   * Soft wall-time budget (ms). When exceeded between root-move evaluations,
+   * return the best move scored so far. Depth is never reduced.
+   */
+  deadlineMs?: number;
+  now?: () => number;
+}
+
+export interface AISearchResult {
+  move: HexPosition | null;
+  truncated: boolean;
+}
 
 // Configuration for different difficulties
 const DIFFICULTY_CONFIG = {
@@ -192,16 +209,28 @@ function minimax(
   }
 }
 
-// Get the best move for the AI
-export function getBestMove(
+/**
+ * Full Hex AI search with optional seed / safety deadline metadata.
+ */
+export function searchBestMove(
   state: HexGameState,
   aiPlayer: Player,
-  difficulty: AIDifficulty = 'medium'
-): HexPosition | null {
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): AISearchResult {
   const config = DIFFICULTY_CONFIG[difficulty];
   const moves = getValidMoves(state);
 
-  if (moves.length === 0) return null;
+  if (moves.length === 0) return { move: null, truncated: false };
+
+  const rng =
+    options.seed === undefined ? Math.random : createSeededRng(options.seed);
+  const now = options.now ?? (() => performance.now());
+  const started = now();
+  const deadline =
+    options.deadlineMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : started + options.deadlineMs;
 
   // First move: play near center
   if (state.moveHistory.length < 2) {
@@ -210,24 +239,37 @@ export function getBestMove(
       (m) => Math.abs(m.row - center) <= 1 && Math.abs(m.col - center) <= 1
     );
     if (centerMoves.length > 0) {
-      return centerMoves[Math.floor(Math.random() * centerMoves.length)];
+      return {
+        move: centerMoves[Math.floor(rng() * centerMoves.length)],
+        truncated: false,
+      };
     }
   }
 
-  // Evaluate all moves
-  const scoredMoves = moves.map((move) => {
+  // Evaluate all moves (same depth; optional soft deadline between roots)
+  const scoredMoves: { move: HexPosition; score: number }[] = [];
+  let truncated = false;
+
+  for (const move of moves) {
+    if (now() >= deadline) {
+      truncated = true;
+      break;
+    }
+
     const newState = makeMove(state, move);
 
     // Check for immediate win
     if (newState.winner === aiPlayer) {
-      return { move, score: Infinity };
+      scoredMoves.push({ move, score: Infinity });
+      continue;
     }
 
     // Check for blocking opponent's immediate win
     const opponentState = { ...state, currentPlayer: getOpponent(aiPlayer) };
     const opponentWithMove = makeMove(opponentState, move);
     if (opponentWithMove.winner === getOpponent(aiPlayer)) {
-      return { move, score: 5000 }; // High priority to block
+      scoredMoves.push({ move, score: 5000 }); // High priority to block
+      continue;
     }
 
     const score = minimax(
@@ -240,16 +282,26 @@ export function getBestMove(
     );
 
     // Add randomness based on difficulty
-    const randomFactor = (Math.random() - 0.5) * config.randomness * 200;
+    const randomFactor = (rng() - 0.5) * config.randomness * 200;
+    scoredMoves.push({ move, score: score + randomFactor });
+  }
 
-    return { move, score: score + randomFactor };
-  });
+  if (scoredMoves.length === 0) return { move: null, truncated };
 
   // Sort by score (highest first)
   scoredMoves.sort((a, b) => b.score - a.score);
 
-  // Return the best move
-  return scoredMoves[0].move;
+  return { move: scoredMoves[0].move, truncated };
+}
+
+// Get the best move for the AI
+export function getBestMove(
+  state: HexGameState,
+  aiPlayer: Player,
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): HexPosition | null {
+  return searchBestMove(state, aiPlayer, difficulty, options).move;
 }
 
 // Get a random valid move (for very easy mode or fallback)

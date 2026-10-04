@@ -19,7 +19,12 @@ import {
   getRestoreTargets,
 } from './rules';
 import { renderBoard, injectQGStyles, getPlayerName } from './board-ui';
-import { getAIMove, applyAIMove, AIDifficulty } from './ai';
+import { applyAIMove, AIDifficulty } from './ai';
+import {
+  cancelQueensAiRequests,
+  disposeQueensAiWorker,
+  getAIMoveAsync,
+} from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
@@ -62,6 +67,9 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
+let isAIThinking = false;
+/** Invalidates in-flight worker replies after new game / leave. */
+let aiGeneration = 0;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 
@@ -172,9 +180,12 @@ function updateStatus(): void {
     instruction =
       'Click a captured piece, then an empty space on the outer ring';
   }
+  if (isAIThinking) {
+    instruction = 'Computer is thinking…';
+  }
 
   statusContainer.innerHTML = `
-    <div class="qg-status ${playerClass}">
+    <div class="qg-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
       ${playerName}'s turn - ${instruction}
     </div>
     <div class="qg-info">
@@ -190,7 +201,10 @@ function updateStatus(): void {
 
 function maybeTriggerAI(): void {
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(performAIMove, 500);
+    // Slight delay so the thinking status can paint before search starts.
+    setTimeout(() => {
+      void performAIMove();
+    }, 500);
   }
 }
 
@@ -301,21 +315,42 @@ function handleCellClick(coord: BoardCoord): void {
 // AI Logic
 // =============================================================================
 
-function performAIMove(): void {
+async function performAIMove(): Promise<void> {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
-  const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
-  if (!aiMove) return;
+  const gen = ++aiGeneration;
+  isAIThinking = true;
+  updateUI();
+
+  let aiMove;
+  try {
+    aiMove = await getAIMoveAsync(gameState, aiPlayer, aiDifficulty);
+  } catch {
+    aiMove = null;
+  }
+
+  if (gen !== aiGeneration) return;
+  isAIThinking = false;
+
+  if (!aiMove) {
+    updateUI();
+    return;
+  }
 
   const next = applyAIMove(gameState, aiMove);
-  if (next === gameState) return;
+  if (next === gameState) {
+    updateUI();
+    return;
+  }
   gameState = next;
   moveCount++;
   updateUI();
 
   // Capture keeps the AI seat until restore finishes.
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(performAIMove, 400);
+    setTimeout(() => {
+      void performAIMove();
+    }, 400);
   }
 }
 
@@ -437,6 +472,10 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
+  cancelQueensAiRequests();
+  disposeQueensAiWorker();
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;
@@ -460,6 +499,9 @@ export function getGameState(): QueensGuardsState {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
+  cancelQueensAiRequests();
   vsAI = false;
   syncOpponentChrome();
   hasNotifiedGameEnd = false;
@@ -470,6 +512,9 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  isAIThinking = false;
+  cancelQueensAiRequests();
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';
