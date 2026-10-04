@@ -119,13 +119,59 @@ type BoardFingerprint = {
 
 async function fingerprint(page: Page): Promise<BoardFingerprint> {
   return page.evaluate(() => {
-    const status =
-      document.querySelector(
-        '#status, .status-turn, .qg-status, .fiar-status, .ramrod-status, [role="status"]'
-      )?.textContent ?? '';
+    // Prefer game-specific status nodes with real text. The shared shell
+    // always mounts an empty `#status` placeholder that must not win.
+    const statusSels = [
+      '.status-turn',
+      '.qg-status',
+      '.fiar-status',
+      '.ramrod-status',
+      '.par55-status',
+      '.kwa-status',
+      '.juggle-status',
+      '.contig-status',
+      '.stars-status',
+      '.fab-status',
+      '.pg-status',
+      '.pent-status',
+      '.sd-status',
+      '.remainder-status',
+      '.frac-status',
+      '.pinball-status',
+      '.hex-status',
+      '.calla-status',
+      '[role="status"]',
+      '#status',
+    ];
+    let status = '';
+    for (const sel of statusSels) {
+      const text = (document.querySelector(sel)?.textContent ?? '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (text) {
+        status = text;
+        break;
+      }
+    }
+
     const history = document.querySelectorAll(
-      '.move-history-entry, .history-entry, .kwa-history li, .ramrod-history-entry, .sd-history-entry, .pg-move-item'
+      [
+        '.move-history-entry',
+        '.history-entry',
+        '.kwa-history li',
+        '.kwa-history-move',
+        '.ramrod-history-entry',
+        '.ramrod-history-move',
+        '.sd-history-entry',
+        '.pg-move-item',
+        '.par55-history-move',
+        '.stars-move-item',
+        '.fab-history-move',
+        '.juggle-history-entry',
+        '.contig-history-entry',
+      ].join(', ')
     ).length;
+
     const p2 = document.querySelectorAll(
       [
         '.cell-p2',
@@ -134,19 +180,43 @@ async function fingerprint(page: Page): Promise<BoardFingerprint> {
         '.star-track-piece-p2',
         '.juggle-cell.occupied-player2',
         '.pg-cell.p2',
+        '.pg-cell.player2',
         '.island.p2',
         '.stars-cell.p2',
+        '.stars-cell.player2',
         '.kwa-chip-p2',
         '.pent-cell-p2',
         '.fiar-board-container [data-owner="2"]',
         '.fiar-board-container .chip-p2',
         '.hex-a-gone-cell-p2',
+        '.par55-base.player2',
+        '.ramrod-slot.player2',
+        '.fab-answer-player2',
+        '.qg-piece.player2',
+        '[data-owner="player2"]',
       ].join(', ')
     ).length;
+
     const scores =
       document.querySelector(
-        '.contig-score-p2, .sd-score-p2, .frac-scores, .pinball-scores, .pg-scores, .juggle-scores, .calla-scores, .remainder-scores, .fab-scores, .par55-scores, .ramrod-scores, .kwa-chip-info'
+        [
+          '.contig-score-p2',
+          '.sd-score-p2',
+          '.frac-scores',
+          '.pinball-scores',
+          '.pg-scores',
+          '.juggle-scores',
+          '.calla-scores',
+          '.remainder-scores',
+          '.fab-scores',
+          '.par55-scores',
+          '.ramrod-scores',
+          '.kwa-chip-info',
+          '.stars-scores',
+          '.qg-info',
+        ].join(', ')
       )?.textContent ?? '';
+
     const boardLen =
       document.querySelector('#board, #game-container, main')?.innerHTML
         .length ?? 0;
@@ -157,12 +227,18 @@ async function fingerprint(page: Page): Promise<BoardFingerprint> {
   });
 }
 
+/**
+ * True when the human seat (Blue / You / Player 1) has the turn.
+ * Does not treat shared phase verbs ("select", "roll") as human control —
+ * Red's "Select a …" must not count. Thinking / computer copy never counts.
+ */
 function isHumanTurnStatus(status: string): boolean {
-  const s = status.toLowerCase();
-  if (/thinking|ai is|computer/i.test(s)) return false;
-  return /\b(blue|you|your turn|player 1|select|place|roll|draw|choose)\b/i.test(
-    s
-  );
+  const s = status.toLowerCase().replace(/\s+/g, ' ').trim();
+  if (!s) return false;
+  if (/thinking|\bcomputer\b/i.test(s)) return false;
+  if (!/\b(blue|you|your turn|player 1)\b/i.test(s)) return false;
+  if (/\bred\b/i.test(s) && !/\b(blue|you|player 1)\b/i.test(s)) return false;
+  return true;
 }
 
 function isGameOverStatus(status: string): boolean {
@@ -183,8 +259,11 @@ function materialDelta(a: BoardFingerprint, b: BoardFingerprint): boolean {
  * appeared. Captures a post-human baseline while AI is searching (or falls
  * back to the pre-human snapshot for a fast reply), then requires a
  * board/history/p2/score change from that baseline, or an explicit return
- * to the human's turn after thinking, or game over. Worker AI is async, so
- * the poll budget is generous; Easy difficulty keeps wall time low.
+ * to the human's turn after thinking, or game over.
+ *
+ * Queens/Hex (and others) may run AI search in a Web Worker and show
+ * "Computer is thinking…" asynchronously — poll budget is generous while
+ * Easy difficulty keeps wall time low (Hard can be very slow).
  */
 async function awaitComputerReply(page: Page, before: BoardFingerprint) {
   let sawThinking = false;
@@ -227,7 +306,7 @@ async function awaitComputerReply(page: Page, before: BoardFingerprint) {
         // pass — demand a material change from pre-human AND control back.
         return aiEffect && controlBack;
       },
-      { timeout: 30_000 }
+      { timeout: 45_000 }
     )
     .toBeTruthy();
 }
