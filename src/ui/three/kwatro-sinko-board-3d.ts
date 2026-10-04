@@ -249,12 +249,27 @@ export async function createKwatroSinkoBoard3D(
   canvas.style.touchAction = 'none';
   container.appendChild(canvas);
 
+  // Full-size opacity-0 hit grid (not 1px-clipped) so smoke selectors
+  // `.kwa-selectable-chip` / `.kwa-valid-node` stay Playwright-visible while
+  // the canvas paints the board. Non-interactive cells let pointer events
+  // fall through to the canvas raycaster.
   const a11y = document.createElement('div');
   a11y.className = 'kwa-a11y-grid';
   markBoardAsGrid(a11y);
   a11y.setAttribute('aria-label', 'Kwatro-Sinko board spaces');
-  a11y.style.cssText =
-    'position:absolute;inset:0;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;white-space:nowrap;';
+  a11y.style.cssText = [
+    'position:absolute',
+    'inset:0',
+    'z-index:2',
+    'opacity:0',
+    'display:grid',
+    `grid-template-columns:repeat(${SIZE},1fr)`,
+    `grid-template-rows:repeat(${SIZE},1fr)`,
+    'pointer-events:none',
+    'margin:0',
+    'padding:0',
+    'border:0',
+  ].join(';');
   container.appendChild(a11y);
   bindGridNavigation(a11y);
 
@@ -556,6 +571,8 @@ export async function createKwatroSinkoBoard3D(
       btn.setAttribute('data-node-id', nm.id);
       btn.setAttribute('data-row', String(nm.row));
       btn.setAttribute('data-col', String(nm.col));
+      btn.style.cssText =
+        'width:100%;height:100%;border:0;padding:0;margin:0;background:transparent;pointer-events:none;';
 
       const isValid = validMoves.has(nm.id) && !node.chip;
       const isWinning = state.winningAlignment?.nodes.includes(nm.id) ?? false;
@@ -563,6 +580,10 @@ export async function createKwatroSinkoBoard3D(
         !!node.chip &&
         state.phase === 'selectingChip' &&
         node.chip.owner === state.currentPlayer;
+
+      if (node.chip?.owner === 'player2') {
+        btn.classList.add('kwa-chip-p2');
+      }
 
       const owner = node.chip
         ? node.chip.owner === 'player1'
@@ -592,9 +613,19 @@ export async function createKwatroSinkoBoard3D(
 
       if (canSelect && node.chip) {
         const chipId = node.chip.id;
-        bindCellActivateKeys(btn, () => chipClickHandler?.(chipId));
+        btn.classList.add('kwa-selectable-chip');
+        btn.style.pointerEvents = 'auto';
+        btn.style.cursor = 'pointer';
+        const activate = (): void => chipClickHandler?.(chipId);
+        bindCellActivateKeys(btn, activate);
+        btn.addEventListener('click', activate);
       } else if (isValid) {
-        bindCellActivateKeys(btn, () => nodeClickHandler?.(nm.id));
+        btn.classList.add('kwa-valid-node');
+        btn.style.pointerEvents = 'auto';
+        btn.style.cursor = 'pointer';
+        const activate = (): void => nodeClickHandler?.(nm.id);
+        bindCellActivateKeys(btn, activate);
+        btn.addEventListener('click', activate);
       }
 
       a11y.appendChild(btn);

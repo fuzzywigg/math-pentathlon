@@ -304,6 +304,44 @@ describe('mp3d Kwatro-Sinko board 3D lifecycle', () => {
     ).rejects.toThrow(/WebGL/);
   });
 
+  it('exposes smoke selectors on the a11y hit grid (selectable + valid)', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createKwatroSinkoBoard3D } =
+      await import('../../src/ui/three/kwatro-sinko-board-3d');
+    const host = document.createElement('div');
+    host.style.width = '400px';
+    host.style.height = '400px';
+    document.body.appendChild(host);
+
+    const onChip = vi.fn();
+    const onNode = vi.fn();
+    const board = await createKwatroSinkoBoard3D(host, onNode, onChip);
+
+    let state = createInitialState();
+    board.update(state, onNode, onChip);
+    const chip = host.querySelector(
+      '.kwa-a11y-grid .kwa-selectable-chip'
+    ) as HTMLButtonElement | null;
+    expect(chip).toBeTruthy();
+    expect(chip!.style.pointerEvents).toBe('auto');
+    chip!.click();
+    expect(onChip).toHaveBeenCalled();
+
+    state = selectChip(state, onChip.mock.calls[0]![0] as string);
+    board.update(state, onNode, onChip);
+    const dest = host.querySelector(
+      '.kwa-a11y-grid .kwa-valid-node'
+    ) as HTMLButtonElement | null;
+    expect(dest).toBeTruthy();
+    dest!.click();
+    expect(onNode).toHaveBeenCalled();
+
+    board.unmount();
+  });
+
   it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
     const three = installThreeMock();
     vi.doMock('../../src/ui/three/load-three', () => ({

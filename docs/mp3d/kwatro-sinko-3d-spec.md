@@ -43,5 +43,8 @@ Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Divi
 
 - Raycast picks pad/chip → chip select or destination move (same callbacks as 2D).
 - Nearest-node screen-space fallback for tablet tilt misses.
-- Visually-hidden `.kwa-a11y-grid` for keyboard/screen reader.
+- Opacity-0 full-size `.kwa-a11y-grid` hit layer for keyboard/screen reader and smoke:
+  - `.kwa-selectable-chip` / `.kwa-valid-node` (pointer-events on interactive cells)
+  - `.kwa-chip-p2` markers for AI-reply fingerprinting
+- Host keeps `.kwa-board`; chrome still mounts `.kwa-history li` beside the 3D slot.
 - Hook: `window.__mp3dKwatroSinko.nodeToClientPoint(nodeId)`.
