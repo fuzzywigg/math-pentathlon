@@ -41,6 +41,14 @@ if (!appContainer) {
 // Store reference to cleanup functions
 let currentCleanup: (() => void) | null = null;
 
+/**
+ * Menu stays top-aligned from first paint (CLS). Game/demo shells opt into
+ * vertical centering so phone “above fold” layouts match existing e2e.
+ */
+function setRouteCentered(centered: boolean): void {
+  document.body.classList.toggle('route-centered', centered);
+}
+
 // Cleanup previous view
 function cleanup(): void {
   if (currentCleanup) {
@@ -53,6 +61,7 @@ function cleanup(): void {
 function renderHome(): void {
   nextRouteGeneration();
   cleanup();
+  setRouteCentered(false);
   document.title = 'Math Pentathlon';
   renderGameSelector(appContainer!);
 }
@@ -61,6 +70,7 @@ function renderHome(): void {
 function renderStats(): void {
   nextRouteGeneration();
   cleanup();
+  setRouteCentered(false);
   document.title = 'Math Pentathlon - Your Progress';
   renderStatsDashboard(appContainer!);
 }
@@ -69,6 +79,7 @@ function renderStats(): void {
 function renderGame(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
 
   const path = getCurrentPath();
   const params = getPathParams('/game/:id', path);
@@ -1690,6 +1701,7 @@ async function renderStarsBars(routeGen: number): Promise<void> {
 function renderDiceDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Dice System Demo';
   renderGameLoading(appContainer!, 'Dice System Demo');
   void (async () => {
@@ -1713,6 +1725,7 @@ function renderDiceDemoPage(): void {
 function renderAlignmentDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Alignment Detection Demo';
   renderGameLoading(appContainer!, 'Alignment Detection Demo');
   void (async () => {
@@ -1736,6 +1749,7 @@ function renderAlignmentDemoPage(): void {
 function renderFractionDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Fraction System Demo';
   renderGameLoading(appContainer!, 'Fraction System Demo');
   void (async () => {
@@ -1759,6 +1773,7 @@ function renderFractionDemoPage(): void {
 function renderPolyominoDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Polyomino System Demo';
   renderGameLoading(appContainer!, 'Polyomino System Demo');
   void (async () => {
@@ -1782,6 +1797,7 @@ function renderPolyominoDemoPage(): void {
 function renderGraphDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Graph/Network System Demo';
   renderGameLoading(appContainer!, 'Graph/Network System Demo');
   void (async () => {
@@ -1805,6 +1821,7 @@ function renderGraphDemoPage(): void {
 function renderAttributeDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Attribute Logic Demo';
   renderGameLoading(appContainer!, 'Attribute Logic Demo');
   void (async () => {
@@ -1828,6 +1845,7 @@ function renderAttributeDemoPage(): void {
 function renderExpressionDemoPage(): void {
   const routeGen = nextRouteGeneration();
   cleanup();
+  setRouteCentered(true);
   document.title = 'Expression Builder Demo';
   renderGameLoading(appContainer!, 'Expression Builder Demo');
   void (async () => {

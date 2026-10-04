@@ -122,11 +122,16 @@ body {
 body {
   margin: 0;
   display: flex;
-  /* Top-align so growing menu content does not re-center (CLS). */
   justify-content: center;
+  /* Top-align from first paint so menu growth does not re-center (CLS).
+     Game/demo routes add `.route-centered` in main.ts for phone fold layouts. */
   align-items: flex-start;
   min-width: 320px;
   min-height: 100vh;
+}
+
+body.route-centered {
+  align-items: center;
 }
 
 /* Skip link: visually hidden until keyboard focus */
@@ -157,6 +162,10 @@ body {
   max-width: 100%;
   /* Reserve first-paint space so empty → menu paint does not shove the shell. */
   min-height: 100vh;
+}
+
+body.route-centered #main-content {
+  min-height: 0;
 }
 
 #app {
