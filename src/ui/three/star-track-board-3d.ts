@@ -89,15 +89,20 @@ export async function createStarTrackBoard3D(
   // Game-local layout styles (avoid editing shared style.css).
   // Landscape short viewports put chain controls beside the canvas so they
   // stay above the fold on phone/tablet sizes from the acceptance matrix.
-  if (!document.getElementById('star-track-3d-layout-css')) {
-    const style = document.createElement('style');
-    style.id = 'star-track-3d-layout-css';
+  {
+    let style = document.getElementById('star-track-3d-layout-css');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'star-track-3d-layout-css';
+      document.head.appendChild(style);
+    }
+    // Always refresh so Vite HMR / remounts do not keep a stale max-height.
     style.textContent = `
       .star-track-3d-layout {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
         width: 100%;
       }
       .star-track-3d-canvas-host {
@@ -126,7 +131,6 @@ export async function createStarTrackBoard3D(
         }
       }
     `;
-    document.head.appendChild(style);
   }
 
   const layout = document.createElement('div');
@@ -330,7 +334,9 @@ export async function createStarTrackBoard3D(
     chainArea.style.maxWidth = '';
 
     const top = layout.getBoundingClientRect().top;
-    const chainBudget = 180; // draw / choose-chain buttons / winner block
+    // Budget for draw / choose-chain / taller game-over winner block under a
+    // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
+    const chainBudget = 230;
     const available = Math.max(
       120,
       window.innerHeight - top - chainBudget - 12
@@ -511,7 +517,8 @@ export async function createStarTrackBoard3D(
       syncA11y();
     }
 
-    paint();
+    // Re-fit after status/chain height changes (e.g. game-over winner block).
+    resize();
   };
 
   const spaceToClientPoint = (
