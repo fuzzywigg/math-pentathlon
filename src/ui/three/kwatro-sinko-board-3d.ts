@@ -2,8 +2,10 @@
  * Three.js tilted-tabletop 3D board for Kwatro-Sinko.
  *
  * Tablet-friendly (aligned with FIAR / Queens & Guards):
- * - antialias off, pixelRatio capped at 1.5
- * - render-on-demand (no continuous RAF)
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - render-on-demand (no continuous RAF); skip paints while document.hidden
+ * - preserveDrawingBuffer gated to Playwright / opt-in
+ * - webglcontextlost → tear down + `mp3d-context-lost` for 2D fallback
  * - full-size host
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
  * - visually-hidden keyboard/a11y grid mirroring engine state
@@ -22,6 +24,12 @@ import {
   markBoardAsGrid,
 } from '../board-a11y';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 
 /** Undirected pathway keys for drawing (handles one-way engine links). */
 export function collectPathwayEdgeKeys(state: KwaState): string[] {
@@ -207,8 +215,10 @@ export async function createKwatroSinkoBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
-      preserveDrawingBuffer: true,
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
+    // Prefer renderer.getContext(); avoid a second getContext on the canvas
+    // (jsdom / test doubles often stub HTMLCanvasElement.prototype).
     const gl =
       typeof renderer.getContext === 'function'
         ? renderer.getContext()
@@ -225,7 +235,9 @@ export async function createKwatroSinkoBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'kwatro-sinko');
@@ -349,7 +361,7 @@ export async function createKwatroSinkoBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -439,8 +451,21 @@ export async function createKwatroSinkoBoard3D(
     nodeClickHandler?.(nodeId);
   };
 
+  let tearDown: (() => void) | null = null;
+
+  const onContextLost = (event: Event): void => {
+    event.preventDefault();
+    if (disposed) return;
+    tearDown?.();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
+  };
+
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointer);
+  canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
   const clearChip = (nm: NodeMeshes): void => {
@@ -645,7 +670,9 @@ export async function createKwatroSinkoBoard3D(
     if (disposed) return;
     disposed = true;
     canvas.removeEventListener('pointerup', onPointer);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
+    unbindVisibility();
     if (window.__mp3dKwatroSinko) {
       delete window.__mp3dKwatroSinko;
     }
@@ -683,6 +710,7 @@ export async function createKwatroSinkoBoard3D(
     );
   };
 
+  tearDown = unmount;
   resize();
 
   return { update, unmount, nodeToClientPoint, canvas };

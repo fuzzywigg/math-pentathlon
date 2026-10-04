@@ -260,9 +260,9 @@ describe('mp3d Kwatro-Sinko board 3D lifecycle', () => {
 
     let state = createInitialState();
     board.update(state);
-    expect(
-      host.querySelectorAll('.kwa-a11y-grid [data-node-id]').length
-    ).toBe(25);
+    expect(host.querySelectorAll('.kwa-a11y-grid [data-node-id]').length).toBe(
+      25
+    );
     expect(board.nodeToClientPoint('n0-0')).toEqual(
       expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) })
     );
@@ -302,5 +302,28 @@ describe('mp3d Kwatro-Sinko board 3D lifecycle', () => {
     await expect(
       createKwatroSinkoBoard3D(document.createElement('div'))
     ).rejects.toThrow(/WebGL/);
+  });
+
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createKwatroSinkoBoard3D } =
+      await import('../../src/ui/three/kwatro-sinko-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const lost = vi.fn();
+    host.addEventListener('mp3d-context-lost', lost);
+
+    const board = await createKwatroSinkoBoard3D(host);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    board.canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
+    expect(host.querySelector('canvas')).toBeNull();
   });
 });

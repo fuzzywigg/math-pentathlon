@@ -74,6 +74,9 @@ function clearAiTimer(): void {
 
 function unmountBoard3d(): void {
   board3dMountGen += 1;
+  if (board3dHost) {
+    board3dHost.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
   if (board3d) {
     board3d.unmount();
     board3d = null;
@@ -81,6 +84,19 @@ function unmountBoard3d(): void {
   board3dLoading = null;
   board3dEnabled = false;
   board3dHost = null;
+}
+
+function onBoard3dContextLost(): void {
+  if (board3dHost) {
+    board3dHost.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
+  // Board already tore itself down via webglcontextlost → tearDown.
+  board3d = null;
+  board3dEnabled = false;
+  board3dLoading = null;
+  if (activeController) {
+    activeController.update();
+  }
 }
 
 async function ensureBoard3d(controller: KwaGameController): Promise<void> {
@@ -111,6 +127,7 @@ async function ensureBoard3d(controller: KwaGameController): Promise<void> {
       return;
     }
     board3d = instance;
+    board3dHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
     if (mountGen === board3dMountGen) {

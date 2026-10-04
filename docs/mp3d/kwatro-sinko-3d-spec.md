@@ -34,8 +34,10 @@ Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Divi
 ## Perf
 
 - Lazy `loadThree()` only when `isBoard3dEnabled()`.
-- `antialias: false`, `pixelRatio ≤ 1.5`, `powerPreference: 'low-power'`.
-- Render-on-demand (no continuous `requestAnimationFrame`).
+- Shared tablet profile via `tablet-gl.ts`: `antialias: false`, `pixelRatio ≤ TABLET_PIXEL_RATIO_CAP` (1.5), `powerPreference: 'low-power'`.
+- Render-on-demand (no continuous `requestAnimationFrame`); skip paints while `document.hidden`, repaint on `visibilitychange`.
+- `preserveDrawingBuffer` gated by `shouldPreserveDrawingBuffer()` (Playwright / opt-in only).
+- `webglcontextlost` tears down the board and dispatches `mp3d-context-lost` so the controller falls back to 2D SVG.
 
 ## Interactions
 
