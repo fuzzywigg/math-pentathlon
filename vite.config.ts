@@ -56,9 +56,8 @@ export default defineConfig({
       },
       workbox: {
         // Precache everything needed for full offline play after first visit.
-        globPatterns: [
-          '**/*.{js,css,html,ico,svg,txt,webmanifest,woff,woff2}',
-        ],
+        // Includes Vite-emitted AI Web Worker chunks (*.js under assets/).
+        globPatterns: ['**/*.{js,css,html,ico,svg,txt,webmanifest,woff,woff2}'],
         // Hash-router SPA: unknown navigations get the shell.
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/health/],
@@ -168,5 +167,3 @@ export default defineConfig({
     },
   },
 });
-
-

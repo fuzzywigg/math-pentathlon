@@ -20,8 +20,27 @@ import {
   checkWinner,
   hasValidMoves,
 } from './rules';
+import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
+/** Optional search controls — defaults preserve historical Math.random behavior. */
+export interface AISearchOptions {
+  /** Deterministic PRNG seed (worker/direct parity tests). */
+  seed?: number;
+  /**
+   * Soft wall-time budget (ms). When exceeded between root-move evaluations,
+   * return the best move scored so far. Depth is never reduced.
+   */
+  deadlineMs?: number;
+  /** Clock override for tests. */
+  now?: () => number;
+}
+
+export interface AISearchResult {
+  move: AIMove | null;
+  truncated: boolean;
+}
 
 const DIFFICULTY_CONFIG = {
   easy: { maxDepth: 2, randomness: 0.4 },
@@ -336,30 +355,46 @@ export interface AIMove {
 }
 
 /**
- * Get the AI's next move
+ * Full AI search with optional seed / safety deadline metadata.
+ * Controllers normally use {@link getAIMove}; workers use this for truncation flags.
  */
-export function getAIMove(
+export function searchAIMove(
   state: QueensGuardsState,
   aiPlayer: Player,
-  difficulty: AIDifficulty = 'medium'
-): AIMove | null {
-  if (state.winner !== null) return null;
-  if (state.currentPlayer !== aiPlayer) return null;
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): AISearchResult {
+  if (state.winner !== null) return { move: null, truncated: false };
+  if (state.currentPlayer !== aiPlayer) return { move: null, truncated: false };
 
   // Handle captured pieces first (must restore to outer ring)
   if (state.capturedPieces.length > 0) {
-    return getRestoreMove(state);
+    return { move: getRestoreMove(state), truncated: false };
   }
 
   const config = DIFFICULTY_CONFIG[difficulty];
   const allMoves = getAllMoves(state);
 
-  if (allMoves.length === 0) return null;
+  if (allMoves.length === 0) return { move: null, truncated: false };
 
-  // Evaluate each move with minimax
+  const rng =
+    options.seed === undefined ? Math.random : createSeededRng(options.seed);
+  const now = options.now ?? (() => performance.now());
+  const started = now();
+  const deadline =
+    options.deadlineMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : started + options.deadlineMs;
+
+  // Evaluate each move with minimax (same order / depth as before)
   const scoredMoves: { move: AIMove; score: number }[] = [];
+  let truncated = false;
 
   for (const move of allMoves) {
+    if (now() >= deadline) {
+      truncated = true;
+      break;
+    }
     const newState = makeMove(state, move.from, move.to);
     const score = minimax(
       newState,
@@ -372,18 +407,30 @@ export function getAIMove(
     scoredMoves.push({ move, score });
   }
 
+  if (scoredMoves.length === 0) return { move: null, truncated };
+
   // Sort by score
   scoredMoves.sort((a, b) => b.score - a.score);
 
   // Add randomness based on difficulty
-  if (Math.random() < config.randomness && scoredMoves.length > 1) {
-    const randomIndex = Math.floor(
-      Math.random() * Math.min(3, scoredMoves.length)
-    );
-    return scoredMoves[randomIndex].move;
+  if (rng() < config.randomness && scoredMoves.length > 1) {
+    const randomIndex = Math.floor(rng() * Math.min(3, scoredMoves.length));
+    return { move: scoredMoves[randomIndex].move, truncated };
   }
 
-  return scoredMoves[0].move;
+  return { move: scoredMoves[0].move, truncated };
+}
+
+/**
+ * Get the AI's next move
+ */
+export function getAIMove(
+  state: QueensGuardsState,
+  aiPlayer: Player,
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): AIMove | null {
+  return searchAIMove(state, aiPlayer, difficulty, options).move;
 }
 
 /**
