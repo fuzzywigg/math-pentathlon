@@ -11,7 +11,16 @@ const VIEWPORTS = [
   { name: 'tablet', width: 768, height: 1024 },
 ] as const;
 
+async function waitForKwatroShell(page: Page) {
+  // After #369 the game chunk loads async — wait past the loading state.
+  await expect(page.getByRole('heading', { name: 'Kwatro-Sinko' })).toBeVisible(
+    { timeout: 15000 }
+  );
+  await expect(page.locator('[data-testid="game-loading"]')).toHaveCount(0);
+}
+
 async function dismissModeIfNeeded(page: Page) {
+  await waitForKwatroShell(page);
   const modal = page.locator('#new-game-modal');
   if (await modal.isVisible().catch(() => false)) {
     const human = page.locator(
