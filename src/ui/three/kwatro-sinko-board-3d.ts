@@ -23,6 +23,19 @@ import {
 } from '../board-a11y';
 import { loadThree, type ThreeModule } from './load-three';
 
+/** Undirected pathway keys for drawing (handles one-way engine links). */
+export function collectPathwayEdgeKeys(state: KwaState): string[] {
+  const seen = new Set<string>();
+  for (const node of state.nodes.values()) {
+    for (const connId of node.connections) {
+      const key =
+        node.id < connId ? `${node.id}|${connId}` : `${connId}|${node.id}`;
+      seen.add(key);
+    }
+  }
+  return [...seen];
+}
+
 export type KwatroNodeClickCallback = (nodeId: string) => void;
 export type KwatroChipClickCallback = (chipId: string) => void;
 
@@ -168,7 +181,8 @@ export async function createKwatroSinkoBoard3D(
   const THREE = await loadThree();
 
   container.replaceChildren();
-  container.classList.add('board-3d-host', 'kwa-board-3d-host');
+  // Keep `.kwa-board` so tutorial highlightSelector works in both views.
+  container.classList.add('board-3d-host', 'kwa-board-3d-host', 'kwa-board');
   container.style.width = '100%';
   container.style.maxWidth = '100%';
   container.style.aspectRatio = '1';
@@ -352,16 +366,15 @@ export async function createKwatroSinkoBoard3D(
   const buildEdgesOnce = (state: KwaState): void => {
     if (edgeLines) return;
     const positions: number[] = [];
-    for (const node of state.nodes.values()) {
-      for (const connId of node.connections) {
-        if (connId <= node.id) continue;
-        const a = parseKwatroNodeId(node.id);
-        const b = parseKwatroNodeId(connId);
-        if (!a || !b) continue;
-        const wa = nodeToWorld(a.row, a.col);
-        const wb = nodeToWorld(b.row, b.col);
-        positions.push(wa.x, BOARD_Y + 0.08, wa.z, wb.x, BOARD_Y + 0.08, wb.z);
-      }
+    for (const key of collectPathwayEdgeKeys(state)) {
+      const [fromId, toId] = key.split('|');
+      if (!fromId || !toId) continue;
+      const a = parseKwatroNodeId(fromId);
+      const b = parseKwatroNodeId(toId);
+      if (!a || !b) continue;
+      const wa = nodeToWorld(a.row, a.col);
+      const wb = nodeToWorld(b.row, b.col);
+      positions.push(wa.x, BOARD_Y + 0.08, wa.z, wb.x, BOARD_Y + 0.08, wb.z);
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute(
@@ -663,7 +676,11 @@ export async function createKwatroSinkoBoard3D(
     renderer.forceContextLoss?.();
     if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
     if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
-    container.classList.remove('board-3d-host', 'kwa-board-3d-host');
+    container.classList.remove(
+      'board-3d-host',
+      'kwa-board-3d-host',
+      'kwa-board'
+    );
   };
 
   resize();

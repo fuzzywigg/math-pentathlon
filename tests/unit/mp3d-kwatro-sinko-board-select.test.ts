@@ -150,5 +150,57 @@ describe('mp3d Kwatro-Sinko board view selection', () => {
     expect(ctrl.aiPlayer).toBe('player2');
     expect(isUsingBoard3d()).toBe(true);
     expect(update).toHaveBeenCalled();
+    // Tutorial highlightSelector `.kwa-board` must still match in 3D.
+    expect(root.querySelector('.kwa-board')).not.toBeNull();
+  });
+
+  it('discards a stale 3D mount that finishes after destroyGame', async () => {
+    isBoard3dEnabled.mockReturnValue(true);
+
+    let resolveCreate!: (value: unknown) => void;
+    const createGate = new Promise((resolve) => {
+      resolveCreate = resolve;
+    });
+    let signalCreateStarted!: () => void;
+    const createStarted = new Promise<void>((resolve) => {
+      signalCreateStarted = resolve;
+    });
+    const unmount = vi.fn();
+
+    loadKwatroSinkoBoard3DModule.mockResolvedValue({
+      createKwatroSinkoBoard3D: async (container: HTMLElement) => {
+        signalCreateStarted();
+        // Pause inside create (after module load) so destroy can race the await.
+        await createGate;
+        const canvas = document.createElement('canvas');
+        canvas.setAttribute('data-mp3d', 'kwatro-sinko');
+        container.replaceChildren(canvas);
+        return {
+          canvas,
+          update: vi.fn(),
+          unmount: () => {
+            unmount();
+            canvas.remove();
+          },
+          nodeToClientPoint: () => ({ x: 0, y: 0 }),
+        };
+      },
+    });
+
+    const { initGame, whenBoard3dReady, destroyGame, isUsingBoard3d } =
+      await import('../../src/games/kwatro-sinko/game-controller');
+
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    initGame(root, false);
+    const pending = whenBoard3dReady();
+    await createStarted;
+    destroyGame();
+    resolveCreate(undefined);
+    await pending;
+
+    expect(isUsingBoard3d()).toBe(false);
+    expect(unmount).toHaveBeenCalledTimes(1);
+    expect(root.querySelector('canvas[data-mp3d="kwatro-sinko"]')).toBeNull();
   });
 });

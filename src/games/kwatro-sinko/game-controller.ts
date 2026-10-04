@@ -59,8 +59,21 @@ let board3d: KwatroSinkoBoard3D | null = null;
 let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 let board3dHost: HTMLElement | null = null;
+/** Bumped to invalidate in-flight 3D mounts after destroy / remount. */
+let board3dMountGen = 0;
+
+/** Single pending AI timer — avoids stacked setTimeouts from UI rebuilds. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 
 function unmountBoard3d(): void {
+  board3dMountGen += 1;
   if (board3d) {
     board3d.unmount();
     board3d = null;
@@ -72,20 +85,39 @@ function unmountBoard3d(): void {
 
 async function ensureBoard3d(controller: KwaGameController): Promise<void> {
   if (!board3dHost || board3d || !board3dEnabled) return;
+  const mountGen = board3dMountGen;
   try {
     const mod = await loadKwatroSinkoBoard3DModule();
-    if (!board3dHost || !board3dEnabled || activeController !== controller)
+    if (
+      mountGen !== board3dMountGen ||
+      !board3dHost ||
+      !board3dEnabled ||
+      activeController !== controller
+    ) {
       return;
-    board3d = await mod.createKwatroSinkoBoard3D(
+    }
+    const instance = await mod.createKwatroSinkoBoard3D(
       board3dHost,
       (nodeId) => handleNodeClick(controller, nodeId),
       (chipId) => handleChipClick(controller, chipId)
     );
+    // Awaited Three.js create — discard if a newer mount/destroy won the race.
+    if (
+      mountGen !== board3dMountGen ||
+      !board3dEnabled ||
+      activeController !== controller
+    ) {
+      instance.unmount();
+      return;
+    }
+    board3d = instance;
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
-    board3d = null;
-    board3dEnabled = false;
-    board3dHost = null;
+    if (mountGen === board3dMountGen) {
+      board3d = null;
+      board3dEnabled = false;
+      board3dHost = null;
+    }
   }
 }
 
@@ -98,6 +130,7 @@ export function initGame(
   difficulty: AIDifficulty = 'medium'
 ): KwaGameController {
   injectKwaStyles();
+  clearAiTimer();
   unmountBoard3d();
   activeContainer = container;
 
@@ -116,6 +149,7 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (nextVsAI: boolean, diff?: AIDifficulty) => {
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = nextVsAI;
     controller.aiPlayer = nextVsAI ? 'player2' : null;
@@ -312,7 +346,8 @@ function updateUI3d(controller: KwaGameController): void {
 
   if (!board3dHost) {
     board3dHost = document.createElement('div');
-    board3dHost.className = 'kwa-board-3d-slot';
+    // Include `.kwa-board` so tutorial highlightSelector keeps working in 3D.
+    board3dHost.className = 'kwa-board kwa-board-3d-slot';
   }
   mainLayout.appendChild(board3dHost);
 
@@ -386,12 +421,21 @@ function updateUI3d(controller: KwaGameController): void {
 function maybeRunAI(controller: KwaGameController): void {
   const { state } = controller;
   if (
-    controller.isAI &&
-    controller.aiPlayer === state.currentPlayer &&
-    state.phase !== 'gameOver'
+    !controller.isAI ||
+    !controller.aiPlayer ||
+    controller.aiPlayer !== state.currentPlayer ||
+    state.phase === 'gameOver'
   ) {
-    setTimeout(() => makeAIMove(controller), 800);
+    return;
   }
+  // Already waiting on a computer turn — do not stack another timeout
+  // (e.g. ensureBoard3d().then → update after a human move already scheduled AI).
+  if (aiTimer !== null) return;
+
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    makeAIMove(controller);
+  }, 800);
 }
 
 /**
@@ -441,6 +485,8 @@ function makeAIMove(controller: KwaGameController): void {
 
   if (state.phase === 'gameOver' || !aiPlayer) return;
   if (activeController !== controller) return;
+  // Stale timer after a prior AI move / human turn — never pass or move for them.
+  if (state.currentPlayer !== aiPlayer) return;
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -482,6 +528,7 @@ export function newGameVsAI(
 }
 
 export function destroyGame(): void {
+  clearAiTimer();
   unmountBoard3d();
   activeContainer = null;
   activeController = null;
