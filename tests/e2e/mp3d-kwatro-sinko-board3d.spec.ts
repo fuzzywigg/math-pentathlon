@@ -87,14 +87,16 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
 
     for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto(`/?board3d=0&vp=${vp.name}&t=${Date.now()}#/game/kwatro-sinko`);
+      await page.goto(
+        `/?board3d=0&vp=${vp.name}&t=${Date.now()}#/game/kwatro-sinko`
+      );
       await dismissModeIfNeeded(page);
       await expect(page.locator('.kwa-board svg').first()).toBeVisible({
         timeout: 10000,
       });
-      await expect(page.locator('canvas[data-mp3d="kwatro-sinko"]')).toHaveCount(
-        0
-      );
+      await expect(
+        page.locator('canvas[data-mp3d="kwatro-sinko"]')
+      ).toHaveCount(0);
       await expect(page.locator('.kwa-board [data-node-id]')).toHaveCount(25);
       await page.waitForTimeout(300);
 
@@ -171,5 +173,50 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
     await page.keyboard.press('Enter');
     await page.waitForTimeout(200);
     await expect(page.locator('.kwa-status')).toContainText(/green space/i);
+  });
+
+  test('smoke selectors drive a human move + AI reply on 3D host', async ({
+    page,
+  }) => {
+    test.setTimeout(90_000);
+    await page.addInitScript(() => {
+      localStorage.setItem('mp-board3d', '1');
+    });
+    await page.goto('/?board3d=1#/game/kwatro-sinko');
+    await waitForKwatroShell(page);
+
+    // Same New Game → vs AI → Easy path as tests/e2e/smoke.spec.ts
+    await page.locator('#new-game-btn').click();
+    const modal = page.locator('#new-game-modal');
+    await expect(modal).toBeVisible({ timeout: 10_000 });
+    await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
+    const easy = page.locator('.difficulty-btn.easy');
+    if (await easy.isVisible().catch(() => false)) {
+      await easy.click();
+    }
+    await page.locator('#start-game-btn').click();
+    await expect(modal).toHaveClass(/hidden/);
+
+    await expect(page.locator('canvas[data-mp3d="kwatro-sinko"]')).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.locator('.kwa-board')).toHaveCount(1);
+    await expect(page.locator('.kwa-board')).toBeVisible();
+    await expect(page.locator('.kwa-board svg')).toHaveCount(0);
+
+    const historyBefore = await page.locator('.kwa-history li').count();
+
+    const chip = page.locator('.kwa-selectable-chip').first();
+    await expect(chip).toBeVisible({ timeout: 5000 });
+    await chip.click({ force: true });
+    const dest = page.locator('.kwa-valid-node').first();
+    await expect(dest).toBeVisible({ timeout: 5000 });
+    await dest.click({ force: true });
+
+    await expect
+      .poll(async () => page.locator('.kwa-history li').count(), {
+        timeout: 45_000,
+      })
+      .toBeGreaterThan(historyBefore);
   });
 });

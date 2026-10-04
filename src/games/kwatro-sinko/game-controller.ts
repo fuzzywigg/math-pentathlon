@@ -179,6 +179,7 @@ export function initGame(
 
   if (board3dEnabled) {
     // Build chrome + stable board host first, then mount Three.js.
+    // While `board3d` is null the host stays empty (no nested 2D `.kwa-board`).
     controller.update();
     board3dLoading = ensureBoard3d(controller).then(() => {
       if (activeController === controller) controller.update();
@@ -368,30 +369,17 @@ function updateUI3d(controller: KwaGameController): void {
   }
   mainLayout.appendChild(board3dHost);
 
-  // If 3D failed / still loading without a mount, show 2D board as fallback.
-  if (!board3dEnabled) {
-    mainLayout.replaceChildren(
-      renderBoard(
-        state,
-        (nodeId) => handleNodeClick(controller, nodeId),
-        (chipId) => handleChipClick(controller, chipId)
-      )
-    );
-  } else if (board3d) {
+  // Match Queens/FIAR: while 3D is enabled, never nest a classic `.kwa-board`
+  // SVG inside the host (duplicate mount locators break smoke). Loading leaves
+  // the host empty; context-loss flips board3dEnabled off and uses the 2D path.
+  if (board3d) {
     board3d.update(
       state,
       (nodeId) => handleNodeClick(controller, nodeId),
       (chipId) => handleChipClick(controller, chipId)
     );
-  } else if (!board3dLoading) {
-    // No in-flight mount — paint classic SVG into the slot until/unless 3D mounts.
-    board3dHost.replaceChildren(
-      renderBoard(
-        state,
-        (nodeId) => handleNodeClick(controller, nodeId),
-        (chipId) => handleChipClick(controller, chipId)
-      )
-    );
+  } else {
+    board3dHost.replaceChildren();
   }
 
   if (state.moveHistory.length > 0) {
