@@ -18,140 +18,11 @@ import {
 } from './ui/components/game-shell';
 import { getGameById } from './core/game-registry';
 import {
-  initGame as initKQGame,
-  destroyGame as destroyKQGame,
-  newGameVsHuman as kqNewGameVsHuman,
-  newGameVsAI as kqNewGameVsAI,
-  startTutorial,
-} from './games/kings-quadraphages/game-controller';
-import { AIDifficulty } from './games/kings-quadraphages/ai';
-import {
-  initGame as initHexGame,
-  newGameVsHuman as hexNewGameVsHuman,
-  newGameVsAI as hexNewGameVsAI,
-  startTutorial as startHexTutorial,
-} from './games/hex/game-controller';
-import {
-  initGame as initStarTrackGame,
-  destroyGame as destroyStarTrackGame,
-  newGameVsHuman as starTrackNewGameVsHuman,
-  newGameVsAI as starTrackNewGameVsAI,
-  startTutorial as startStarTrackTutorial,
-} from './games/star-track/game-controller';
-import {
-  initGame as initHexAGoneGame,
-  newGameVsHuman as hexAGoneNewGameVsHuman,
-  newGameVsAI as hexAGoneNewGameVsAI,
-  startTutorial as startHexAGoneTutorial,
-  destroyGame as destroyHexAGoneGame,
-} from './games/hex-a-gone/game-controller';
-import {
-  initGame as initCallaGame,
-  newGameVsHuman as callaNewGameVsHuman,
-  newGameVsAI as callaNewGameVsAI,
-  startTutorial as startCallaTutorial,
-} from './games/calla/game-controller';
-import {
-  initGame as initFiarGame,
-  destroyGame as destroyFiarGame,
-  newGameVsHuman as fiarNewGameVsHuman,
-  newGameVsAI as fiarNewGameVsAI,
-  startTutorial as startFiarTutorial,
-} from './games/fiar/game-controller';
-import {
-  initGame as initQGGame,
-  destroyGame as destroyQGGame,
-  newGameVsHuman as qgNewGameVsHuman,
-  newGameVsAI as qgNewGameVsAI,
-  startTutorial as startQGTutorial,
-} from './games/queens-guards/game-controller';
-import {
-  initGame as initContigGame,
-  newGameVsHuman as contigNewGameVsHuman,
-  newGameVsAI as contigNewGameVsAI,
-  startTutorial as startContigTutorial,
-} from './games/contig-60/game-controller';
-import {
-  initGame as initJuggleGame,
-  newGameVsHuman as juggleNewGameVsHuman,
-  newGameVsAI as juggleNewGameVsAI,
-  startTutorial as startJuggleTutorial,
-} from './games/juggle/game-controller';
-import {
-  initGame as initFabGame,
-  newGameVsHuman as fabNewGameVsHuman,
-  newGameVsAI as fabNewGameVsAI,
-  startTutorial as startFabTutorial,
-} from './games/fab-a-diffy/game-controller';
-import {
-  initGame as initSDGame,
-  newGameVsHuman as sdNewGameVsHuman,
-  newGameVsAI as sdNewGameVsAI,
-  startTutorial as startSDTutorial,
-} from './games/sum-dominoes/game-controller';
-import {
-  initGame as initPar55Game,
-  newGameVsHuman as par55NewGameVsHuman,
-  newGameVsAI as par55NewGameVsAI,
-  startTutorial as startPar55Tutorial,
-} from './games/par-55/game-controller';
-import {
-  initGame as initRamrodGame,
-  newGameVsHuman as ramrodNewGameVsHuman,
-  newGameVsAI as ramrodNewGameVsAI,
-  startTutorial as startRamrodTutorial,
-} from './games/ramrod/game-controller';
-import {
-  initGame as initKwaGame,
-  newGameVsHuman as kwaNewGameVsHuman,
-  newGameVsAI as kwaNewGameVsAI,
-  startTutorial as startKwaTutorial,
-} from './games/kwatro-sinko/game-controller';
-import {
-  initGame as initStarsGame,
-  newGameVsHuman as starsNewGameVsHuman,
-  newGameVsAI as starsNewGameVsAI,
-  startTutorial as startStarsTutorial,
-} from './games/stars-bars/game-controller';
-import {
-  initGame as initPrimeGoldGame,
-  destroyGame as destroyPrimeGoldGame,
-  newGameVsHuman as primeGoldNewGameVsHuman,
-  newGameVsAI as primeGoldNewGameVsAI,
-  startTutorial as startPrimeGoldTutorial,
-} from './games/prime-gold/game-controller';
-import {
-  initGame as initPentEmInGame,
-  newGameVsHuman as pentNewGameVsHuman,
-  newGameVsAI as pentNewGameVsAI,
-  startTutorial as startPentTutorial,
-  destroyGame as destroyPentEmInGame,
-} from './games/pent-em-in/game-controller';
-import {
-  initGame as initFracFactGame,
-  newGameVsHuman as fracNewGameVsHuman,
-  newGameVsAI as fracNewGameVsAI,
-  startTutorial as startFracTutorial,
-} from './games/frac-fact/game-controller';
-import {
-  initGame as initRemainderGame,
-  newGameVsHuman as remainderNewGameVsHuman,
-  newGameVsAI as remainderNewGameVsAI,
-  startTutorial as startRemainderTutorial,
-} from './games/remainder-islands/game-controller';
-import {
-  initGame as initPinballGame,
-  newGameVsHuman as pinballNewGameVsHuman,
-  newGameVsAI as pinballNewGameVsAI,
-  startTutorial as startPinballTutorial,
-} from './games/fraction-pinball/game-controller';
-import { renderDiceDemo } from './demos/dice-demo';
-import { renderAlignmentDemo } from './demos/alignment-demo';
-import { renderFractionDemo } from './demos/fraction-demo';
-import { renderPolyominoDemo } from './demos/polyomino-demo';
-import { renderGraphDemo } from './demos/graph-demo';
-import { renderAttributeDemo } from './demos/attribute-demo';
-import { renderExpressionDemo } from './demos/expression-demo';
+  isCurrentRouteGeneration,
+  nextRouteGeneration,
+} from './core/route-generation';
+import { renderGameLoadError, renderGameLoading } from './ui/game-loading';
+import { bootstrapPwa } from './pwa/bootstrap';
 
 /** Resolve New Game modal AI difficulty (shell Easy/Medium/Hard). */
 function resolveAIDifficulty(
@@ -180,6 +51,7 @@ function cleanup(): void {
 
 // Render the game selector (home page)
 function renderHome(): void {
+  nextRouteGeneration();
   cleanup();
   document.title = 'Math Pentathlon';
   renderGameSelector(appContainer!);
@@ -187,13 +59,15 @@ function renderHome(): void {
 
 // Read-only progress dashboard (existing storage APIs only)
 function renderStats(): void {
+  nextRouteGeneration();
   cleanup();
   document.title = 'Math Pentathlon - Your Progress';
   renderStatsDashboard(appContainer!);
 }
 
-// Render a specific game
+// Render a specific game (lazy-loads that game's chunk on demand)
 function renderGame(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
 
   const path = getCurrentPath();
@@ -208,53 +82,76 @@ function renderGame(): void {
   }
 
   document.title = `Math Pentathlon - ${gameInfo.name}`;
+  renderGameLoading(appContainer!, gameInfo.name);
 
-  // Render game-specific UI
-  if (gameId === 'kings-quadraphages') {
-    renderKingsQuadraphages();
-  } else if (gameId === 'hex') {
-    renderHex();
-  } else if (gameId === 'star-track') {
-    renderStarTrack();
-  } else if (gameId === 'hex-a-gone') {
-    renderHexAGone();
-  } else if (gameId === 'calla') {
-    renderCalla();
-  } else if (gameId === 'fiar') {
-    renderFiar();
-  } else if (gameId === 'queens-guards') {
-    renderQueensGuards();
-  } else if (gameId === 'contig-60') {
-    renderContig60();
-  } else if (gameId === 'juggle') {
-    renderJuggle();
-  } else if (gameId === 'fab-a-diffy') {
-    renderFabADiffy();
-  } else if (gameId === 'sum-dominoes') {
-    renderSumDominoes();
-  } else if (gameId === 'par-55') {
-    renderPar55();
-  } else if (gameId === 'ramrod') {
-    renderRamrod();
-  } else if (gameId === 'kwatro-sinko') {
-    renderKwatrasinko();
-  } else if (gameId === 'stars-bars') {
-    renderStarsBars();
-  } else if (gameId === 'prime-gold') {
-    renderPrimeGold();
-  } else if (gameId === 'pent-em-in') {
-    renderPentEmIn();
-  } else if (gameId === 'frac-fact') {
-    renderFracFact();
-  } else if (gameId === 'remainder-islands') {
-    renderRemainderIslands();
-  } else if (gameId === 'fraction-pinball') {
-    renderFractionPinball();
-  }
+  const mount = async (): Promise<void> => {
+    try {
+      if (gameId === 'kings-quadraphages') {
+        await renderKingsQuadraphages(routeGen);
+      } else if (gameId === 'hex') {
+        await renderHex(routeGen);
+      } else if (gameId === 'star-track') {
+        await renderStarTrack(routeGen);
+      } else if (gameId === 'hex-a-gone') {
+        await renderHexAGone(routeGen);
+      } else if (gameId === 'calla') {
+        await renderCalla(routeGen);
+      } else if (gameId === 'fiar') {
+        await renderFiar(routeGen);
+      } else if (gameId === 'queens-guards') {
+        await renderQueensGuards(routeGen);
+      } else if (gameId === 'contig-60') {
+        await renderContig60(routeGen);
+      } else if (gameId === 'juggle') {
+        await renderJuggle(routeGen);
+      } else if (gameId === 'fab-a-diffy') {
+        await renderFabADiffy(routeGen);
+      } else if (gameId === 'sum-dominoes') {
+        await renderSumDominoes(routeGen);
+      } else if (gameId === 'par-55') {
+        await renderPar55(routeGen);
+      } else if (gameId === 'ramrod') {
+        await renderRamrod(routeGen);
+      } else if (gameId === 'kwatro-sinko') {
+        await renderKwatrasinko(routeGen);
+      } else if (gameId === 'stars-bars') {
+        await renderStarsBars(routeGen);
+      } else if (gameId === 'prime-gold') {
+        await renderPrimeGold(routeGen);
+      } else if (gameId === 'pent-em-in') {
+        await renderPentEmIn(routeGen);
+      } else if (gameId === 'frac-fact') {
+        await renderFracFact(routeGen);
+      } else if (gameId === 'remainder-islands') {
+        await renderRemainderIslands(routeGen);
+      } else if (gameId === 'fraction-pinball') {
+        await renderFractionPinball(routeGen);
+      }
+    } catch (err) {
+      console.error(`Failed to load game ${gameId}`, err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        gameInfo.name,
+        () => renderGame(),
+        () => navigate('/')
+      );
+    }
+  };
+
+  void mount();
 }
 
 // Render Kings & Quadraphages
-function renderKingsQuadraphages(): void {
+async function renderKingsQuadraphages(routeGen: number): Promise<void> {
+  const {
+    initGame: initKQGame,
+    destroyGame: destroyKQGame,
+    newGameVsHuman: kqNewGameVsHuman,
+    newGameVsAI: kqNewGameVsAI,
+    startTutorial,
+  } = await import('./games/kings-quadraphages/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Kings & Quadraphages',
     helpTitle: 'How to Play Kings & Quadraphages',
@@ -294,7 +191,7 @@ function renderKingsQuadraphages(): void {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        kqNewGameVsAI(resolveAIDifficulty(difficulty) as AIDifficulty, true);
+        kqNewGameVsAI(resolveAIDifficulty(difficulty), true);
       } else {
         kqNewGameVsHuman();
       }
@@ -318,7 +215,14 @@ function renderKingsQuadraphages(): void {
 }
 
 // Render Hex
-function renderHex(): void {
+async function renderHex(routeGen: number): Promise<void> {
+  const {
+    initGame: initHexGame,
+    newGameVsHuman: hexNewGameVsHuman,
+    newGameVsAI: hexNewGameVsAI,
+    startTutorial: startHexTutorial,
+  } = await import('./games/hex/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Hex',
     helpTitle: 'How to Play Hex',
@@ -373,7 +277,15 @@ function renderHex(): void {
 }
 
 // Render Star Track
-function renderStarTrack(): void {
+async function renderStarTrack(routeGen: number): Promise<void> {
+  const {
+    initGame: initStarTrackGame,
+    destroyGame: destroyStarTrackGame,
+    newGameVsHuman: starTrackNewGameVsHuman,
+    newGameVsAI: starTrackNewGameVsAI,
+    startTutorial: startStarTrackTutorial,
+  } = await import('./games/star-track/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Star Track',
     helpTitle: 'How to Play Star Track',
@@ -490,7 +402,15 @@ function renderStarTrack(): void {
 }
 
 // Render Hex-a-Gone
-function renderHexAGone(): void {
+async function renderHexAGone(routeGen: number): Promise<void> {
+  const {
+    initGame: initHexAGoneGame,
+    newGameVsHuman: hexAGoneNewGameVsHuman,
+    newGameVsAI: hexAGoneNewGameVsAI,
+    startTutorial: startHexAGoneTutorial,
+    destroyGame: destroyHexAGoneGame,
+  } = await import('./games/hex-a-gone/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Hex-a-Gone!',
     helpTitle: 'How to Play Hex-a-Gone!',
@@ -605,7 +525,14 @@ function renderHexAGone(): void {
 }
 
 // Render Calla
-function renderCalla(): void {
+async function renderCalla(routeGen: number): Promise<void> {
+  const {
+    initGame: initCallaGame,
+    newGameVsHuman: callaNewGameVsHuman,
+    newGameVsAI: callaNewGameVsAI,
+    startTutorial: startCallaTutorial,
+  } = await import('./games/calla/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Calla',
     helpTitle: 'How to Play Calla',
@@ -667,7 +594,15 @@ function renderCalla(): void {
 }
 
 // Render FIAR
-function renderFiar(): void {
+async function renderFiar(routeGen: number): Promise<void> {
+  const {
+    initGame: initFiarGame,
+    destroyGame: destroyFiarGame,
+    newGameVsHuman: fiarNewGameVsHuman,
+    newGameVsAI: fiarNewGameVsAI,
+    startTutorial: startFiarTutorial,
+  } = await import('./games/fiar/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'FIAR (Four In A Row)',
     helpTitle: 'How to Play FIAR',
@@ -737,7 +672,15 @@ function renderFiar(): void {
 }
 
 // Render Queens & Guards
-function renderQueensGuards(): void {
+async function renderQueensGuards(routeGen: number): Promise<void> {
+  const {
+    initGame: initQGGame,
+    destroyGame: destroyQGGame,
+    newGameVsHuman: qgNewGameVsHuman,
+    newGameVsAI: qgNewGameVsAI,
+    startTutorial: startQGTutorial,
+  } = await import('./games/queens-guards/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Queens & Guards',
     helpTitle: 'How to Play Queens & Guards',
@@ -804,7 +747,14 @@ function renderQueensGuards(): void {
 }
 
 // Render Contig 60
-function renderContig60(): void {
+async function renderContig60(routeGen: number): Promise<void> {
+  const {
+    initGame: initContigGame,
+    newGameVsHuman: contigNewGameVsHuman,
+    newGameVsAI: contigNewGameVsAI,
+    startTutorial: startContigTutorial,
+  } = await import('./games/contig-60/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Contig 60',
     helpTitle: 'How to Play Contig 60',
@@ -870,7 +820,14 @@ function renderContig60(): void {
 }
 
 // Render Juggle
-function renderJuggle(): void {
+async function renderJuggle(routeGen: number): Promise<void> {
+  const {
+    initGame: initJuggleGame,
+    newGameVsHuman: juggleNewGameVsHuman,
+    newGameVsAI: juggleNewGameVsAI,
+    startTutorial: startJuggleTutorial,
+  } = await import('./games/juggle/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Juggle',
     helpTitle: 'How to Play Juggle',
@@ -933,7 +890,14 @@ function renderJuggle(): void {
 }
 
 // Render Fab-a-Diffy
-function renderFabADiffy(): void {
+async function renderFabADiffy(routeGen: number): Promise<void> {
+  const {
+    initGame: initFabGame,
+    newGameVsHuman: fabNewGameVsHuman,
+    newGameVsAI: fabNewGameVsAI,
+    startTutorial: startFabTutorial,
+  } = await import('./games/fab-a-diffy/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Fab-a-Diffy',
     helpTitle: 'How to Play Fab-a-Diffy',
@@ -997,7 +961,14 @@ function renderFabADiffy(): void {
 }
 
 // Render Sum Dominoes
-function renderSumDominoes(): void {
+async function renderSumDominoes(routeGen: number): Promise<void> {
+  const {
+    initGame: initSDGame,
+    newGameVsHuman: sdNewGameVsHuman,
+    newGameVsAI: sdNewGameVsAI,
+    startTutorial: startSDTutorial,
+  } = await import('./games/sum-dominoes/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Sum Dominoes & Dice',
     helpTitle: 'How to Play Sum Dominoes & Dice',
@@ -1064,7 +1035,14 @@ function renderSumDominoes(): void {
 }
 
 // Render Par 55
-function renderPar55(): void {
+async function renderPar55(routeGen: number): Promise<void> {
+  const {
+    initGame: initPar55Game,
+    newGameVsHuman: par55NewGameVsHuman,
+    newGameVsAI: par55NewGameVsAI,
+    startTutorial: startPar55Tutorial,
+  } = await import('./games/par-55/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Par 55',
     helpTitle: 'How to Play Par 55',
@@ -1100,7 +1078,7 @@ function renderPar55(): void {
           <h3>Strategy Tips</h3>
           <ul>
             <li>Place blocks near multiple occupied bases for more points</li>
-            <li>Match as many attributes as possible</li>
+            <li>Match: many attributes: possible</li>
             <li>Watch what blocks your opponent has played</li>
           </ul>`,
     gameAreaClass: 'par55-game-area',
@@ -1129,7 +1107,14 @@ function renderPar55(): void {
 }
 
 // Render Ramrod
-function renderRamrod(): void {
+async function renderRamrod(routeGen: number): Promise<void> {
+  const {
+    initGame: initRamrodGame,
+    newGameVsHuman: ramrodNewGameVsHuman,
+    newGameVsAI: ramrodNewGameVsAI,
+    startTutorial: startRamrodTutorial,
+  } = await import('./games/ramrod/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Ramrod',
     helpTitle: 'How to Play Ramrod',
@@ -1195,7 +1180,14 @@ function renderRamrod(): void {
 }
 
 // Render Kwatro-Sinko
-function renderKwatrasinko(): void {
+async function renderKwatrasinko(routeGen: number): Promise<void> {
+  const {
+    initGame: initKwaGame,
+    newGameVsHuman: kwaNewGameVsHuman,
+    newGameVsAI: kwaNewGameVsAI,
+    startTutorial: startKwaTutorial,
+  } = await import('./games/kwatro-sinko/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Kwatro-Sinko',
     helpTitle: 'How to Play Kwatro-Sinko',
@@ -1261,7 +1253,15 @@ function renderKwatrasinko(): void {
 }
 
 // Render Prime Gold
-function renderPrimeGold(): void {
+async function renderPrimeGold(routeGen: number): Promise<void> {
+  const {
+    initGame: initPrimeGoldGame,
+    destroyGame: destroyPrimeGoldGame,
+    newGameVsHuman: primeGoldNewGameVsHuman,
+    newGameVsAI: primeGoldNewGameVsAI,
+    startTutorial: startPrimeGoldTutorial,
+  } = await import('./games/prime-gold/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Prime Gold',
     helpTitle: 'How to Play Prime Gold',
@@ -1332,7 +1332,15 @@ function renderPrimeGold(): void {
 }
 
 // Render Pent'Em In
-function renderPentEmIn(): void {
+async function renderPentEmIn(routeGen: number): Promise<void> {
+  const {
+    initGame: initPentEmInGame,
+    newGameVsHuman: pentNewGameVsHuman,
+    newGameVsAI: pentNewGameVsAI,
+    startTutorial: startPentTutorial,
+    destroyGame: destroyPentEmInGame,
+  } = await import('./games/pent-em-in/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: "Pent'Em In",
     helpTitle: "How to Play Pent'Em In",
@@ -1396,7 +1404,14 @@ function renderPentEmIn(): void {
 }
 
 // Render Frac Fact
-function renderFracFact(): void {
+async function renderFracFact(routeGen: number): Promise<void> {
+  const {
+    initGame: initFracFactGame,
+    newGameVsHuman: fracNewGameVsHuman,
+    newGameVsAI: fracNewGameVsAI,
+    startTutorial: startFracTutorial,
+  } = await import('./games/frac-fact/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Frac Fact',
     helpTitle: 'How to Play Frac Fact',
@@ -1476,7 +1491,14 @@ function renderFracFact(): void {
 }
 
 // Render Remainder Islands
-function renderRemainderIslands(): void {
+async function renderRemainderIslands(routeGen: number): Promise<void> {
+  const {
+    initGame: initRemainderGame,
+    newGameVsHuman: remainderNewGameVsHuman,
+    newGameVsAI: remainderNewGameVsAI,
+    startTutorial: startRemainderTutorial,
+  } = await import('./games/remainder-islands/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Remainder Islands',
     helpTitle: 'How to Play Remainder Islands',
@@ -1529,7 +1551,14 @@ function renderRemainderIslands(): void {
 }
 
 // Render Fraction Pinball
-function renderFractionPinball(): void {
+async function renderFractionPinball(routeGen: number): Promise<void> {
+  const {
+    initGame: initPinballGame,
+    newGameVsHuman: pinballNewGameVsHuman,
+    newGameVsAI: pinballNewGameVsAI,
+    startTutorial: startPinballTutorial,
+  } = await import('./games/fraction-pinball/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Fraction Pinball',
     helpTitle: 'How to Play Fraction Pinball',
@@ -1583,7 +1612,14 @@ function renderFractionPinball(): void {
 }
 
 // Render Stars & Bars
-function renderStarsBars(): void {
+async function renderStarsBars(routeGen: number): Promise<void> {
+  const {
+    initGame: initStarsGame,
+    newGameVsHuman: starsNewGameVsHuman,
+    newGameVsAI: starsNewGameVsAI,
+    startTutorial: startStarsTutorial,
+  } = await import('./games/stars-bars/game-controller');
+  if (!isCurrentRouteGeneration(routeGen)) return;
   const shell = mountGameShell(appContainer!, {
     title: 'Stars & Bars',
     helpTitle: 'How to Play Stars & Bars',
@@ -1652,51 +1688,164 @@ function renderStarsBars(): void {
 }
 
 function renderDiceDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Dice System Demo';
-  renderDiceDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Dice System Demo');
+  void (async () => {
+    try {
+      const { renderDiceDemo } = await import('./demos/dice-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderDiceDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Dice System Demo',
+        () => renderDiceDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render alignment demo
 function renderAlignmentDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Alignment Detection Demo';
-  renderAlignmentDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Alignment Detection Demo');
+  void (async () => {
+    try {
+      const { renderAlignmentDemo } = await import('./demos/alignment-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderAlignmentDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Alignment Detection Demo',
+        () => renderAlignmentDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render fraction demo
 function renderFractionDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Fraction System Demo';
-  renderFractionDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Fraction System Demo');
+  void (async () => {
+    try {
+      const { renderFractionDemo } = await import('./demos/fraction-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderFractionDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Fraction System Demo',
+        () => renderFractionDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render polyomino demo
 function renderPolyominoDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Polyomino System Demo';
-  renderPolyominoDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Polyomino System Demo');
+  void (async () => {
+    try {
+      const { renderPolyominoDemo } = await import('./demos/polyomino-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderPolyominoDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Polyomino System Demo',
+        () => renderPolyominoDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render graph demo
 function renderGraphDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Graph/Network System Demo';
-  renderGraphDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Graph/Network System Demo');
+  void (async () => {
+    try {
+      const { renderGraphDemo } = await import('./demos/graph-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGraphDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Graph/Network System Demo',
+        () => renderGraphDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render attribute demo
 function renderAttributeDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Attribute Logic Demo';
-  renderAttributeDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Attribute Logic Demo');
+  void (async () => {
+    try {
+      const { renderAttributeDemo } = await import('./demos/attribute-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderAttributeDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Attribute Logic Demo',
+        () => renderAttributeDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
-// Render expression demo
 function renderExpressionDemoPage(): void {
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Expression Builder Demo';
-  renderExpressionDemo(appContainer!);
+  renderGameLoading(appContainer!, 'Expression Builder Demo');
+  void (async () => {
+    try {
+      const { renderExpressionDemo } = await import('./demos/expression-demo');
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderExpressionDemo(appContainer!);
+    } catch (err) {
+      console.error('Failed to load demo', err);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Expression Builder Demo',
+        () => renderExpressionDemoPage(),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
 // Set up routes
@@ -1717,3 +1866,6 @@ initRouter();
 // Initialize Ollie the Owl mascot system
 owlComponent.init();
 owlSystem.initialize();
+
+// Offline shell + background precache of game chunks
+bootstrapPwa();
