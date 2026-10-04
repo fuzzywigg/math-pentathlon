@@ -25,6 +25,13 @@ async function dismissModeIfNeeded(page: Page) {
   }
 }
 
+
+async function waitForGameReady(page: Page) {
+  await expect(page.getByTestId('game-loading')).toBeHidden({
+    timeout: 15_000,
+  });
+}
+
 async function clickBoardNode(page: Page, nodeId: string) {
   await page.waitForFunction(
     () =>
@@ -57,6 +64,7 @@ test.describe('mp3d FIAR 3D board', () => {
       localStorage.removeItem('mp-board3d');
     });
     await page.goto('/#/game/fiar');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.fiar-board-container svg').first()).toBeVisible(
       {
@@ -80,6 +88,7 @@ test.describe('mp3d FIAR 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/fiar');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="fiar"]');
@@ -115,6 +124,7 @@ test.describe('mp3d FIAR 3D board', () => {
       localStorage.setItem('mp-board3d', '1');
     });
     await page.goto('/?board3d=1#/game/fiar');
+    await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('canvas[data-mp3d="fiar"]')).toBeVisible({
       timeout: 15000,
