@@ -1,20 +1,133 @@
 import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 /**
- * Thin build peel for #10: split the monolithic entry so no single JS chunk
- * trips Vite's 500 kB warning. Games stay statically imported from main.ts;
- * Rollup emits separate files without changing load order or game APIs.
+ * Build + PWA for offline play after first visit.
  *
- * Three.js is an optional lazy dependency (board3d flag). It is emitted under
- * `dist/vendor/` so the CI `dist/assets` 250 kB budget still applies to the
- * always-loaded app graph; the lazy three chunk is only fetched when enabled.
+ * Code splitting: games (and demos) are dynamic-imported from main.ts so the
+ * landing/menu does not download every game. manualChunks still emit stable
+ * per-game / core / ui / three files. Three.js stays under dist/vendor/ so the
+ * CI dist/assets 250 kB budget applies to always-loaded app chunks.
+ *
+ * Offline: Workbox precaches the full build (shell + every game/3D chunk) so
+ * after one online visit any game works in airplane mode. Updates use
+ * autoUpdate (skipWaiting + clientsClaim) so a new deploy is not stuck behind
+ * a stale tab forever — see src/pwa/register.ts.
  */
 export default defineConfig({
+  plugins: [
+    VitePWA({
+      registerType: 'autoUpdate',
+      // Manual registration via src/pwa/bootstrap.ts (update + reload policy).
+      injectRegister: false,
+      includeAssets: [
+        'favicon.ico',
+        'favicon.svg',
+        'king.svg',
+        'health.txt',
+        'CNAME',
+      ],
+      // Keep existing index.html link href (/site.webmanifest).
+      manifestFilename: 'site.webmanifest',
+      manifest: {
+        name: 'Math Pentathlon',
+        short_name: 'Math Pentathlon',
+        description:
+          'Educational math strategy games — play offline vs the computer.',
+        theme_color: '#102a43',
+        background_color: '#102a43',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        lang: 'en',
+        icons: [
+          {
+            src: '/favicon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
+          },
+          {
+            src: '/favicon.ico',
+            sizes: '32x32',
+            type: 'image/x-icon',
+          },
+        ],
+      },
+      workbox: {
+        // Precache everything needed for full offline play after first visit.
+        globPatterns: [
+          '**/*.{js,css,html,ico,svg,txt,webmanifest,woff,woff2}',
+        ],
+        // Hash-router SPA: unknown navigations get the shell.
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/health/],
+        // Keep SW install reliable on low-end tablets (three.js ~688 kB).
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        runtimeCaching: [
+          {
+            // Cache Google Fonts CSS after first fetch (iOS/Android offline).
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-stylesheets',
+              expiration: {
+                maxEntries: 8,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: {
+                maxEntries: 16,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+      // Keep playwright/dev lightweight unless explicitly enabled.
+      devOptions: {
+        enabled: process.env.PWA_DEV === '1',
+      },
+    }),
+  ],
   build: {
+    // Menu entry should only preload shell deps (core/ui), not games or 3D.
+    modulePreload: {
+      resolveDependencies(filename, deps) {
+        const isMenuEntry =
+          filename.includes('/index-') || filename.startsWith('index-');
+        if (!isMenuEntry) {
+          return deps;
+        }
+        return deps.filter((dep) => {
+          const name = dep.replace(/\\/g, '/');
+          return (
+            !name.includes('game-') &&
+            !name.includes('demo-') &&
+            !name.includes('vendor/') &&
+            !name.includes('mp3d') &&
+            !name.includes('three')
+          );
+        });
+      },
+    },
     rollupOptions: {
       output: {
         chunkFileNames(chunkInfo) {
-          if (chunkInfo.name === 'three' || chunkInfo.name === 'mp3d') {
+          if (
+            chunkInfo.name === 'three' ||
+            chunkInfo.name === 'mp3d' ||
+            chunkInfo.name === 'vite-preload'
+          ) {
             return 'vendor/[name]-[hash].js';
           }
           return 'assets/[name]-[hash].js';
@@ -22,6 +135,14 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
         manualChunks(id) {
+          // Isolate Vite's dynamic-import preload helper so it never lands
+          // inside a game or mp3d chunk (which would make the menu import it).
+          if (
+            id.includes('preload-helper') ||
+            id.includes('\0vite/preload-helper')
+          ) {
+            return 'vite-preload';
+          }
           if (id.includes('/node_modules/three')) {
             return 'three';
           }
@@ -47,3 +168,5 @@ export default defineConfig({
     },
   },
 });
+
+
