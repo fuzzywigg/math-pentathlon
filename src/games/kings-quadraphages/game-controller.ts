@@ -61,12 +61,32 @@ function unmountBoard3d(): void {
 
 async function ensureBoard3d(): Promise<void> {
   if (!boardContainer || board3d || !board3dEnabled) return;
-  const mod = await loadKingsQuadraphagesBoard3DModule();
-  if (!boardContainer || !board3dEnabled) return;
-  board3d = await mod.createKingsQuadraphagesBoard3D(
-    boardContainer,
-    onCellClick
-  );
+  try {
+    const mod = await loadKingsQuadraphagesBoard3DModule();
+    if (!boardContainer || !board3dEnabled) return;
+    board3d = await mod.createKingsQuadraphagesBoard3D(
+      boardContainer,
+      onCellClick
+    );
+    boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
+  } catch {
+    // WebGL unavailable or renderer failed — stay on 2D SVG.
+    board3d = null;
+    board3dEnabled = false;
+  }
+}
+
+function onBoard3dContextLost(): void {
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
+  board3d = null;
+  board3dEnabled = false;
+  board3dLoading = null;
+  render();
 }
 
 // Render the current game state
@@ -375,6 +395,12 @@ export function initGame(
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

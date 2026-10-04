@@ -173,7 +173,8 @@ function installThreeMock() {
     setPixelRatio = vi.fn();
     setSize = vi.fn();
     render = vi.fn();
-    constructor() {
+    getContext = vi.fn(() => ({}));
+    constructor(_opts?: unknown) {
       this.domElement = document.createElement('canvas');
     }
   }
@@ -223,21 +224,11 @@ describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
     vi.unstubAllGlobals();
   });
 
-  it('mounts a canvas and unmount removes it and disposes shared geos', async () => {
+  it('mounts a canvas, paints on demand, unmounts and disposes shared geos', async () => {
     const threeMock = installThreeMock();
     const loadThree = vi.fn(async () => threeMock);
     vi.doMock('../../src/ui/three/load-three', () => ({ loadThree }));
-
-    let rafCb: FrameRequestCallback | null = null;
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      vi.fn((cb: FrameRequestCallback) => {
-        rafCb = cb;
-        return 1;
-      })
-    );
-    const cancelSpy = vi.fn();
-    vi.stubGlobal('cancelAnimationFrame', cancelSpy);
+    const raf = vi.spyOn(window, 'requestAnimationFrame');
 
     const { createKingsQuadraphagesBoard3D } =
       await import('../../src/ui/three/kings-quadraphages-board-3d');
@@ -262,7 +253,8 @@ describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
 
     const state = createInitialGameState();
     view.update(state, onClick);
-    expect(rafCb).not.toBeNull();
+    // Render-on-demand: no continuous RAF loop.
+    expect(raf).not.toHaveBeenCalled();
     expect(view.cellToClientPoint(1, 5)).toEqual(
       expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) })
     );
@@ -276,7 +268,6 @@ describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
 
     expect(container.querySelector('canvas')).toBeNull();
     expect(container.contains(view.canvas)).toBe(false);
-    expect(cancelSpy).toHaveBeenCalled();
     expect(loadThree).toHaveBeenCalledTimes(1);
     // Shared king lathe/cross, chip, crest ring, and tile geos all dispose once.
     for (const geo of threeMock.__createdGeos) {
@@ -284,16 +275,35 @@ describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
     }
   });
 
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
+    const threeMock = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => threeMock,
+    }));
+
+    const { createKingsQuadraphagesBoard3D } =
+      await import('../../src/ui/three/kings-quadraphages-board-3d');
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const lost = vi.fn();
+    container.addEventListener('mp3d-context-lost', lost);
+
+    const view = await createKingsQuadraphagesBoard3D(container);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    view.canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('canvas')).toBeNull();
+  });
+
   it('unmount is idempotent', async () => {
     const threeMock = installThreeMock();
     vi.doMock('../../src/ui/three/load-three', () => ({
       loadThree: async () => threeMock,
     }));
-    vi.stubGlobal(
-      'requestAnimationFrame',
-      vi.fn(() => 1)
-    );
-    vi.stubGlobal('cancelAnimationFrame', vi.fn());
 
     const { createKingsQuadraphagesBoard3D } =
       await import('../../src/ui/three/kings-quadraphages-board-3d');

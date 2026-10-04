@@ -65,11 +65,25 @@ async function ensureBoard3d(): Promise<void> {
     const mod = await loadFiarBoard3DModule();
     if (!boardContainer || !board3dEnabled) return;
     board3d = await mod.createFiarBoard3D(boardContainer, handleNodeClick);
+    boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
     board3d = null;
     board3dEnabled = false;
   }
+}
+
+function onBoard3dContextLost(): void {
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
+  board3d = null;
+  board3dEnabled = false;
+  board3dLoading = null;
+  render();
 }
 
 function render(): void {
@@ -309,6 +323,12 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

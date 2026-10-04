@@ -17,6 +17,11 @@ import {
 } from '../../games/fiar/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+} from './tablet-gl';
 
 export type FiarNodeClickCallback = (nodeId: string) => void;
 
@@ -103,7 +108,9 @@ export async function createFiarBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'fiar');
@@ -205,7 +212,7 @@ export async function createFiarBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -240,8 +247,21 @@ export async function createFiarBoard3D(
     }
   };
 
+  let tearDown: (() => void) | null = null;
+
+  const onContextLost = (event: Event): void => {
+    event.preventDefault();
+    if (disposed) return;
+    tearDown?.();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
+  };
+
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointer);
+  canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
   const clearChip = (nm: NodeMeshes): void => {
@@ -426,7 +446,9 @@ export async function createFiarBoard3D(
     if (disposed) return;
     disposed = true;
     canvas.removeEventListener('pointerup', onPointer);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
+    unbindVisibility();
     if (window.__mp3dFiar) {
       delete window.__mp3dFiar;
     }
@@ -450,6 +472,7 @@ export async function createFiarBoard3D(
     container.classList.remove('board-3d-host', 'fiar-board-3d-host');
   };
 
+  tearDown = unmount;
   resize();
 
   void CONFIG;

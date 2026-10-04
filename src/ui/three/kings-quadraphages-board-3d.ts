@@ -1,7 +1,12 @@
 /**
- * Three.js 3D board view for Kings & Quadraphages.
- * Mounts a WebGL canvas, renders the current GameState, and forwards cell
- * picks to the existing controller click handler.
+ * Three.js tilted-tabletop 3D board for Kings & Quadraphages.
+ *
+ * Tablet-friendly (aligned with FIAR / Queens / Pent'Em In):
+ * - antialias off, pixelRatio capped at 1.5, low-power preference
+ * - render-on-demand (no continuous RAF)
+ * - pauses paints while the tab is hidden
+ * - webglcontextlost → tear down + `mp3d-context-lost` for 2D fallback
+ * - throws when WebGL is unavailable so the controller can keep 2D SVG
  */
 
 import type {
@@ -17,6 +22,11 @@ import {
   disposeKingGeometries,
   type KingGeometries,
 } from './kings-quadraphages-pieces';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+} from './tablet-gl';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -72,7 +82,7 @@ function isKingMoveTarget(state: GameState, row: number, col: number): boolean {
 
 /**
  * Create and mount a 3D Kings & Quadraphages board into `container`.
- * Caller must call `unmount()` on route change / destroy.
+ * Rejects when WebGL is unavailable so callers can fall back to 2D SVG.
  */
 export async function createKingsQuadraphagesBoard3D(
   container: HTMLElement,
@@ -81,7 +91,7 @@ export async function createKingsQuadraphagesBoard3D(
   const THREE = await loadThree();
 
   container.replaceChildren();
-  container.classList.add('board-3d-host');
+  container.classList.add('board-3d-host', 'kings-board-3d-host');
   container.style.minHeight = container.style.minHeight || 'min(450px, 100vw)';
   container.style.width = container.style.width || 'min(450px, 100%)';
   container.style.aspectRatio = container.style.aspectRatio || '1';
@@ -97,8 +107,33 @@ export async function createKingsQuadraphagesBoard3D(
   camera.position.set(0, 10.9, 9.8);
   camera.lookAt(0, 0, 0);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  let renderer: InstanceType<Three['WebGLRenderer']>;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      antialias: false,
+      alpha: false,
+      powerPreference: 'low-power',
+      failIfMajorPerformanceCaveat: false,
+    });
+    const gl =
+      typeof renderer.getContext === 'function'
+        ? renderer.getContext()
+        : renderer.domElement.getContext('webgl') ||
+          renderer.domElement.getContext('experimental-webgl');
+    if (!gl) {
+      renderer.dispose();
+      throw new Error('WebGL context unavailable');
+    }
+  } catch (err) {
+    throw new Error(
+      `WebGLRenderer failed — Kings & Quadraphages 3D board cannot mount (${
+        err instanceof Error ? err.message : 'unknown'
+      })`
+    );
+  }
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'kings-quadraphages');
@@ -179,11 +214,15 @@ export async function createKingsQuadraphagesBoard3D(
   }
 
   let clickHandler: CellClickCallback | undefined = onCellClick;
-  let rafId = 0;
   let disposed = false;
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
   const projectScratch = new THREE.Vector3();
+
+  const paint = (): void => {
+    if (disposed || !canPaint3d()) return;
+    renderer.render(scene, camera);
+  };
 
   const resize = (): void => {
     if (disposed) return;
@@ -192,12 +231,7 @@ export async function createKingsQuadraphagesBoard3D(
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h, false);
-  };
-
-  const animate = (): void => {
-    if (disposed) return;
-    rafId = requestAnimationFrame(animate);
-    renderer.render(scene, camera);
+    paint();
   };
 
   const onPointer = (event: PointerEvent): void => {
@@ -221,12 +255,24 @@ export async function createKingsQuadraphagesBoard3D(
     }
   };
 
+  let tearDown: (() => void) | null = null;
+
+  const onContextLost = (event: Event): void => {
+    event.preventDefault();
+    if (disposed) return;
+    tearDown?.();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
+  };
+
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    // On-demand boards: nothing to cancel; next update/resize paints when visible.
+    onVisible: () => paint(),
+  });
 
   canvas.addEventListener('pointerup', onPointer);
+  canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
-  resize();
-  animate();
 
   const cellToClientPoint = (
     row: number,
@@ -344,14 +390,16 @@ export async function createKingsQuadraphagesBoard3D(
       cell.tile.material = tileMat;
       syncPiece(cell, state);
     }
+    paint();
   };
 
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
-    cancelAnimationFrame(rafId);
     canvas.removeEventListener('pointerup', onPointer);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
+    unbindVisibility();
 
     if (import.meta.env.DEV && window.__mp3dKingsQuadraphages) {
       delete window.__mp3dKingsQuadraphages;
@@ -378,8 +426,11 @@ export async function createKingsQuadraphagesBoard3D(
     } else if (canvas.parentElement) {
       canvas.parentElement.removeChild(canvas);
     }
-    container.classList.remove('board-3d-host');
+    container.classList.remove('board-3d-host', 'kings-board-3d-host');
   };
+
+  tearDown = unmount;
+  resize();
 
   return { update, unmount, cellToClientPoint, canvas };
 }

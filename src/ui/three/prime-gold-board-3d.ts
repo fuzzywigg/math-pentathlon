@@ -19,6 +19,7 @@ import {
 } from '../../games/prime-gold/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
+import { shouldPreserveDrawingBuffer } from './tablet-gl';
 
 export type PrimeGoldCellClickCallback = (value: number, expr: string) => void;
 
@@ -178,9 +179,8 @@ export async function createPrimeGoldBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
-      // Needed so Playwright canvas.screenshot() sees the latest frame
-      // (default WebGL clears the drawing buffer after composite).
-      preserveDrawingBuffer: true,
+      // Only when Playwright needs canvas.screenshot() / explicit opt-in.
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     const gl =
       typeof renderer.getContext === 'function'

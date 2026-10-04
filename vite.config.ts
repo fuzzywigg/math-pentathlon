@@ -26,6 +26,7 @@ export default defineConfig({
         'king.svg',
         'health.txt',
         'CNAME',
+        'fonts/*.woff2',
       ],
       // Keep existing index.html link href (/site.webmanifest).
       manifestFilename: 'site.webmanifest',
@@ -63,34 +64,8 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//, /^\/health/],
         // Keep SW install reliable on low-end tablets (three.js ~688 kB).
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
-        runtimeCaching: [
-          {
-            // Cache Google Fonts CSS after first fetch (iOS/Android offline).
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-stylesheets',
-              expiration: {
-                maxEntries: 8,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-fonts-webfonts',
-              expiration: {
-                maxEntries: 16,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-        ],
+        // Fonts are self-hosted under /fonts and covered by globPatterns.
+        runtimeCaching: [],
       },
       // Keep playwright/dev lightweight unless explicitly enabled.
       devOptions: {
