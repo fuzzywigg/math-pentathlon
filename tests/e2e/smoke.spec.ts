@@ -23,6 +23,7 @@ function agentLog(
         message,
         data,
         timestamp: Date.now(),
+        runId: 'post-fix',
       }) + '\n'
     );
   } catch {
