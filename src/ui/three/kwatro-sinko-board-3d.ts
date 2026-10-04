@@ -68,7 +68,10 @@ export function parseKwatroNodeId(
 }
 
 /** Layout world coords: col → x, row → z (row 4 nearer the camera). */
-export function nodeToWorld(row: number, col: number): { x: number; z: number } {
+export function nodeToWorld(
+  row: number,
+  col: number
+): { x: number; z: number } {
   const origin = -((SIZE - 1) * STEP) / 2;
   return {
     x: origin + col * STEP,
@@ -357,14 +360,7 @@ export async function createKwatroSinkoBoard3D(
         if (!a || !b) continue;
         const wa = nodeToWorld(a.row, a.col);
         const wb = nodeToWorld(b.row, b.col);
-        positions.push(
-          wa.x,
-          BOARD_Y + 0.08,
-          wa.z,
-          wb.x,
-          BOARD_Y + 0.08,
-          wb.z
-        );
+        positions.push(wa.x, BOARD_Y + 0.08, wa.z, wb.x, BOARD_Y + 0.08, wb.z);
       }
     }
     const geo = new THREE.BufferGeometry();
@@ -524,8 +520,7 @@ export async function createKwatroSinkoBoard3D(
       btn.setAttribute('data-col', String(nm.col));
 
       const isValid = validMoves.has(nm.id) && !node.chip;
-      const isWinning =
-        state.winningAlignment?.nodes.includes(nm.id) ?? false;
+      const isWinning = state.winningAlignment?.nodes.includes(nm.id) ?? false;
       const canSelect =
         !!node.chip &&
         state.phase === 'selectingChip' &&
