@@ -35,6 +35,12 @@ import {
   disposeQueensGuardsPieceGeometries,
   type QueensGuardsPieceGeometries,
 } from './queens-guards-pieces';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 
 export type CellClickCallback = (coord: BoardCoord) => void;
 
@@ -173,8 +179,8 @@ export async function createQueensGuardsBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
-      // Playwright canvas.screenshot() needs the latest frame.
-      preserveDrawingBuffer: true,
+      // Only when Playwright needs canvas.screenshot() / explicit opt-in.
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     const gl =
       typeof renderer.getContext === 'function'
@@ -192,7 +198,9 @@ export async function createQueensGuardsBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'queens-guards');
@@ -319,7 +327,7 @@ export async function createQueensGuardsBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -382,8 +390,21 @@ export async function createQueensGuardsBoard3D(
     if (coord) clickHandler(coord);
   };
 
+  let tearDown: (() => void) | null = null;
+
+  const onContextLost = (event: Event): void => {
+    event.preventDefault();
+    if (disposed) return;
+    tearDown?.();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
+  };
+
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointer);
+  canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
   const onA11yFocusIn = (event: FocusEvent): void => {
@@ -657,7 +678,9 @@ export async function createQueensGuardsBoard3D(
     if (disposed) return;
     disposed = true;
     canvas.removeEventListener('pointerup', onPointer);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
+    unbindVisibility();
     a11y.removeEventListener('focusin', onA11yFocusIn);
     if (window.__mp3dQueensGuards) {
       delete window.__mp3dQueensGuards;
@@ -684,6 +707,7 @@ export async function createQueensGuardsBoard3D(
     container.classList.remove('board-3d-host', 'qg-board-3d-host');
   };
 
+  tearDown = unmount;
   resize();
 
   return { update, unmount, cellToClientPoint, canvas };

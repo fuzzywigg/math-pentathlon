@@ -96,11 +96,25 @@ async function ensureBoard3d(): Promise<void> {
       boardContainer,
       handleCellClick
     );
+    boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
     board3d = null;
     board3dEnabled = false;
   }
+}
+
+function onBoard3dContextLost(): void {
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
+  board3d = null;
+  board3dEnabled = false;
+  board3dLoading = null;
+  updateUI();
 }
 
 // =============================================================================
@@ -476,6 +490,12 @@ export function destroyGame(): void {
   isAIThinking = false;
   cancelQueensAiRequests();
   disposeQueensAiWorker();
+  if (boardContainer) {
+    boardContainer.removeEventListener(
+      'mp3d-context-lost',
+      onBoard3dContextLost
+    );
+  }
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

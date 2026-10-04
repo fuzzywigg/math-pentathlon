@@ -270,4 +270,27 @@ describe('mp3d FIAR board 3D lifecycle', () => {
       createFiarBoard3D(document.createElement('div'))
     ).rejects.toThrow(/WebGL/);
   });
+
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createFiarBoard3D } =
+      await import('../../src/ui/three/fiar-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const lost = vi.fn();
+    host.addEventListener('mp3d-context-lost', lost);
+
+    const board = await createFiarBoard3D(host);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    board.canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
+    expect(host.querySelector('canvas')).toBeNull();
+  });
 });
