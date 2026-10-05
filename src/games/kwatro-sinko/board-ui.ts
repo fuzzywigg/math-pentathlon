@@ -28,10 +28,12 @@ function playerColors() {
 export function renderBoard(
   state: KwaState,
   onNodeClick: (nodeId: string) => void,
-  onChipClick: (chipId: string) => void
+  onChipClick: (chipId: string) => void,
+  options?: { allowInput?: boolean }
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'kwa-board';
+  const allowInput = options?.allowInput !== false;
 
   // Calculate board size
   const svgWidth = 420;
@@ -45,9 +47,10 @@ export function renderBoard(
   markBoardAsGrid(svg);
 
   // Get valid moves for selected chip
-  const validMoves = state.selectedChip
-    ? new Set(getValidMoves(state, state.selectedChip))
-    : new Set<string>();
+  const validMoves =
+    allowInput && state.selectedChip
+      ? new Set(getValidMoves(state, state.selectedChip))
+      : new Set<string>();
 
   // Draw connections first (underneath nodes)
   for (const node of state.nodes.values()) {
@@ -80,7 +83,8 @@ export function renderBoard(
       isValid,
       isWinning,
       onNodeClick,
-      onChipClick
+      onChipClick,
+      allowInput
     );
     svg.appendChild(nodeGroup);
   }
@@ -100,7 +104,8 @@ function renderNode(
   isValid: boolean,
   isWinning: boolean,
   onNodeClick: (nodeId: string) => void,
-  onChipClick: (chipId: string) => void
+  onChipClick: (chipId: string) => void,
+  allowInput: boolean
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   const match = /^n(\d+)-(\d+)$/.exec(node.id);
@@ -147,6 +152,7 @@ function renderNode(
   }
 
   const canSelect =
+    allowInput &&
     !!node.chip &&
     state.phase === 'selectingChip' &&
     node.chip.owner === state.currentPlayer;

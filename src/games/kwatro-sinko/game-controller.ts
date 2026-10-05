@@ -10,7 +10,7 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, AIDifficulty } from './ai';
+import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderChipInfo,
@@ -70,6 +70,15 @@ function clearAiTimer(): void {
     clearTimeout(aiTimer);
     aiTimer = null;
   }
+}
+
+/** True while it is the computer's seat (including the 800ms think pause). */
+function isComputerTurnPending(controller: KwaGameController): boolean {
+  return isAITurn(
+    controller.state,
+    controller.aiPlayer,
+    controller.isAI ? 'human-vs-ai' : 'human-vs-human'
+  );
 }
 
 function unmountBoard3d(): void {
@@ -258,7 +267,8 @@ function updateUI(controller: KwaGameController): void {
   const board = renderBoard(
     state,
     (nodeId) => handleNodeClick(controller, nodeId),
-    (chipId) => handleChipClick(controller, chipId)
+    (chipId) => handleChipClick(controller, chipId),
+    { allowInput: !isComputerTurnPending(controller) }
   );
 
   mainLayout.appendChild(board);
@@ -274,22 +284,28 @@ function updateUI(controller: KwaGameController): void {
   const controls = document.createElement('div');
   controls.className = 'kwa-controls';
 
-  if (state.selectedChip) {
+  if (state.selectedChip && !isComputerTurnPending(controller)) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'kwa-btn kwa-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+  if (
+    !hasValidMoves(state) &&
+    state.phase !== 'gameOver' &&
+    !isComputerTurnPending(controller)
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'kwa-btn kwa-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -373,10 +389,11 @@ function updateUI3d(controller: KwaGameController): void {
   // SVG inside the host (duplicate mount locators break smoke). Loading leaves
   // the host empty; context-loss flips board3dEnabled off and uses the 2D path.
   if (board3d) {
+    const allowInput = !isComputerTurnPending(controller);
     board3d.update(
       state,
-      (nodeId) => handleNodeClick(controller, nodeId),
-      (chipId) => handleChipClick(controller, chipId)
+      allowInput ? (nodeId) => handleNodeClick(controller, nodeId) : undefined,
+      allowInput ? (chipId) => handleChipClick(controller, chipId) : undefined
     );
   } else {
     board3dHost.replaceChildren();
@@ -391,22 +408,28 @@ function updateUI3d(controller: KwaGameController): void {
   const controls = document.createElement('div');
   controls.className = 'kwa-controls';
 
-  if (state.selectedChip) {
+  if (state.selectedChip && !isComputerTurnPending(controller)) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'kwa-btn kwa-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+  if (
+    !hasValidMoves(state) &&
+    state.phase !== 'gameOver' &&
+    !isComputerTurnPending(controller)
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'kwa-btn kwa-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -447,6 +470,8 @@ function maybeRunAI(controller: KwaGameController): void {
  * Handle chip click
  */
 function handleChipClick(controller: KwaGameController, chipId: string): void {
+  if (isComputerTurnPending(controller)) return;
+
   // Deselect when clicking the already-selected chip
   if (
     controller.state.phase === 'selectingDest' &&
@@ -464,6 +489,8 @@ function handleChipClick(controller: KwaGameController, chipId: string): void {
  * Handle node click
  */
 function handleNodeClick(controller: KwaGameController, nodeId: string): void {
+  if (isComputerTurnPending(controller)) return;
+
   // If clicking a chip-occupied node during select, treat as chip select
   const node = controller.state.nodes.get(nodeId);
   if (
