@@ -2,6 +2,7 @@ import QueensAiWorker from './ai.worker.ts?worker';
 import { AiWorkerClient } from '../../core/ai-worker/client';
 import { AI_WORKER_SAFETY_DEADLINE_MS } from '../../core/ai-worker/safety';
 import {
+  AI_PLAY_DEADLINE_MS,
   getAIMove,
   type AIDifficulty,
   type AIMove,
@@ -48,7 +49,10 @@ export async function getAIMoveAsync(
     player: aiPlayer,
     difficulty,
     seed: options.seed,
-    deadlineMs: options.deadlineMs ?? AI_WORKER_SAFETY_DEADLINE_MS,
+    deadlineMs: Math.min(
+      options.deadlineMs ?? AI_PLAY_DEADLINE_MS[difficulty],
+      AI_WORKER_SAFETY_DEADLINE_MS
+    ),
   });
 }
 
