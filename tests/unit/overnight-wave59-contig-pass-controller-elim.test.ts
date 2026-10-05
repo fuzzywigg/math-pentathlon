@@ -2,7 +2,7 @@
  * Wave 59 Contig/SD residual — Contig pass elim via controller. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import { createInitialState, CONFIG } from '../../src/games/contig-60/types';
+import { createInitialState } from '../../src/games/contig-60/types';
 import * as types from '../../src/games/contig-60/types';
 import { initGame } from '../../src/games/contig-60/game-controller';
 
@@ -25,7 +25,7 @@ describe('Wave 59 contig — pass elim controller', () => {
       phase: 'calculating',
       currentDice: [1, 1, 1],
       consecutivePasses: {
-        player1: CONFIG.MAX_CONSECUTIVE_PASSES - 1,
+        player1: 2,
         player2: 0,
       },
     });

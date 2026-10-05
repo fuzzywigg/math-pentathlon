@@ -2,6 +2,7 @@
 // A math strategy game combining dice, expressions, and alignment
 
 export type Player = 'player1' | 'player2';
+export type ContigWinner = Player | 'draw';
 
 // A cell on the Contig board
 export interface ContigCell {
@@ -20,7 +21,7 @@ export interface ContigState {
   currentExpression: string | null; // Expression being built
   scores: { player1: number; player2: number };
   consecutivePasses: { player1: number; player2: number };
-  winner: Player | null;
+  winner: ContigWinner | null;
   moveHistory: ContigMove[];
   phase: 'rolling' | 'calculating' | 'placing' | 'gameOver';
 }
@@ -39,8 +40,9 @@ export interface ContigMove {
 export const CONFIG = {
   GRID_ROWS: 6,
   GRID_COLS: 10,
-  MAX_CONSECUTIVE_PASSES: 3, // Eliminated after 3 passes
-  WIN_BY_ALIGNMENT: 5, // 5 in a row to win (optional)
+  WIN_BY_ALIGNMENT: 5, // 5 in a row wins immediately
+  TIEBREAK_FOUR: 4, // full board / mutual pass: most 4-in-a-rows
+  TIEBREAK_THREE: 3, // then most 3-in-a-rows, else draw
 };
 
 // The Contig 60 board numbers (6x10 grid = 60 cells)

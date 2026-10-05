@@ -4,8 +4,8 @@
 import {
   ContigState,
   Player,
+  ContigWinner,
   createInitialState,
-  getOpponent,
   getValidPlacements,
 } from './types';
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
@@ -94,17 +94,29 @@ function updateUI(): void {
   restoreGridFocus(boardContainer, previousFocus);
 }
 
+function formatEndBanner(winner: ContigWinner | null): string {
+  switch (winner) {
+    case 'player1':
+    case 'player2':
+      return `${seatIcon(winner)} ${getPlayerName(winner)} wins!`;
+    case 'draw':
+    case null:
+      return "It's a draw!";
+    default: {
+      const _exhaustive: never = winner;
+      return _exhaustive;
+    }
+  }
+}
+
 function updateStatus(): void {
   if (!statusContainer) return;
   markStatusLive(statusContainer);
 
-  if (gameState.winner) {
-    const winnerName = getPlayerName(gameState.winner);
-    const winnerScore = gameState.scores[gameState.winner];
-    const loserScore = gameState.scores[getOpponent(gameState.winner)];
+  if (gameState.phase === 'gameOver') {
     statusContainer.innerHTML = `
       <div class="contig-winner-banner game-winner-banner">
-        ${seatIcon(gameState.winner)} ${winnerName} wins! ${winnerScore} - ${loserScore}
+        ${formatEndBanner(gameState.winner)}
       </div>
     `;
     return;
@@ -129,14 +141,15 @@ function updateStatus(): void {
     case 'placing':
       instruction = 'Click a valid cell to place your chip';
       break;
+    default: {
+      const _exhaustive: never = gameState.phase;
+      instruction = _exhaustive;
+    }
   }
-
-  const passes = gameState.consecutivePasses[gameState.currentPlayer];
-  const passWarning = passes > 0 ? ` (${passes}/${3} passes)` : '';
 
   statusContainer.innerHTML = `
     <div class="contig-status ${playerClass}">
-      <strong>${icon} ${playerName}'s turn</strong> - ${instruction}${passWarning}
+      <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
   `;
 }
@@ -163,7 +176,11 @@ function handleRollDice(fromAI: boolean | Event = false): void {
   }
 
   // AI takes over after showing dice
-  if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
+  if (
+    vsAI &&
+    gameState.phase !== 'gameOver' &&
+    gameState.currentPlayer === aiPlayer
+  ) {
     setTimeout(makeAIMove, 1000);
   }
 }
@@ -176,7 +193,11 @@ function handleSelectPlacement(value: number, expression: string): void {
   updateUI();
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
-  if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
+  if (
+    vsAI &&
+    gameState.phase !== 'gameOver' &&
+    gameState.currentPlayer === aiPlayer
+  ) {
     setTimeout(() => handleRollDice(true), 500);
   }
 }
@@ -201,7 +222,11 @@ function handlePass(): void {
   updateUI();
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
-  if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
+  if (
+    vsAI &&
+    gameState.phase !== 'gameOver' &&
+    gameState.currentPlayer === aiPlayer
+  ) {
     setTimeout(() => handleRollDice(true), 500);
   }
 }
@@ -211,7 +236,8 @@ function handlePass(): void {
 // =============================================================================
 
 function makeAIMove(): void {
-  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer)
+    return;
   if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
 
   // Use AI module to get the best placement
@@ -222,7 +248,10 @@ function makeAIMove(): void {
     gameState = passTurn(gameState);
     updateUI();
 
-    if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
+    if (
+      gameState.phase !== 'gameOver' &&
+      gameState.currentPlayer === aiPlayer
+    ) {
       setTimeout(() => handleRollDice(true), 500);
     }
     return;
@@ -232,7 +261,7 @@ function makeAIMove(): void {
   updateUI();
 
   // Continue if AI's turn
-  if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
+  if (gameState.phase !== 'gameOver' && gameState.currentPlayer === aiPlayer) {
     setTimeout(() => handleRollDice(true), 500);
   }
 }

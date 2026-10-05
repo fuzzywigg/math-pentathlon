@@ -5,11 +5,11 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { ContigState, createInitialState } from '../../src/games/contig-60/types';
+import { createInitialState } from '../../src/games/contig-60/types';
 import { checkWinner } from '../../src/games/contig-60/rules';
 
-describe('Wave 45 Contig — fullboard p2 points', () => {
-  it('returns player2 when board full, no five, and p2 score higher', () => {
+describe('Wave 45 Contig — fullboard alignment settle', () => {
+  it('full board result ignores adjacency points', () => {
     const base = createInitialState();
     const cells = new Map(base.cells);
     for (const [v, cell] of base.cells) {
@@ -17,16 +17,9 @@ describe('Wave 45 Contig — fullboard p2 points', () => {
       const owner = idx % 5 === 4 ? 'player2' : 'player1';
       cells.set(v, { ...cell, owner });
     }
-    const aligned = checkWinner({ ...base, cells, scores: { player1: 0, player2: 0 } });
-    if (aligned !== null) {
-      expect(['player1', 'player2']).toContain(aligned);
-      return;
-    }
-    const state: ContigState = {
-      ...base,
-      cells,
-      scores: { player1: 3, player2: 9 },
-    };
-    expect(checkWinner(state)).toBe('player2');
+    const a = checkWinner({ ...base, cells, scores: { player1: 3, player2: 9 } });
+    const b = checkWinner({ ...base, cells, scores: { player1: 9, player2: 3 } });
+    expect(a).not.toBeNull();
+    expect(a).toBe(b);
   });
 });
