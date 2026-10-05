@@ -2,7 +2,7 @@
 
 import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
-import { seatIcon } from '../../ui/player-colors';
+import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -15,6 +15,14 @@ import {
 } from '../../ui/board-a11y';
 
 export type CellClickCallback = (row: number, col: number) => void;
+
+/** True when vs-AI chrome is on and it is the computer's seat to place. */
+function isComputerPlacementTurn(state: HexGameState): boolean {
+  const root = getGameModeChromeRoot();
+  if (root?.dataset.opponent !== 'ai') return false;
+  const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
+  return state.currentPlayer === aiSeat;
+}
 
 // Render the hex board as an SVG
 export function renderBoard(
@@ -257,7 +265,10 @@ export function renderBoard(
             ? 'Red'
             : undefined;
       const isValidPlacement =
-        cellState === null && state.winner === null && !!onCellClick;
+        cellState === null &&
+        state.winner === null &&
+        !!onCellClick &&
+        !isComputerPlacementTurn(state);
 
       makeGridCell(
         cellGroup,
