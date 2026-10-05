@@ -12,7 +12,7 @@ export const contig60Tutorial: TutorialConfig = {
       title: 'Welcome to Contig 60!',
       message: `
         <p>Let's learn how to play <strong>Contig 60</strong>!</p>
-        <p>Score the most points by placing chips on the board adjacent to other chips!</p>
+        <p>Get <strong>5 chips in a row</strong> — or have the most 4-in-a-rows if the game ends without one!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const contig60Tutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Score the most points by placing chips on the board adjacent to other chips!</p>
+        <p>Be first to place <strong>5 chips in a row</strong> (horizontal, vertical, or diagonal).</p>
       `,
       position: 'center',
     },
@@ -73,7 +73,7 @@ export const contig60Tutorial: TutorialConfig = {
       message: `
         <ul>
           <li>If you cannot make any available number, you must pass</li>
-          <li>Three consecutive passes eliminates you from the game</li>
+          <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
         </ul>
       `,
       position: 'center',
@@ -84,7 +84,7 @@ export const contig60Tutorial: TutorialConfig = {
       message: `
         <ul>
           <li><strong>5 in a row:</strong> First to get 5 chips in a line wins!</li>
-          <li><strong>By points:</strong> When board is full, highest score wins</li>
+          <li><strong>Otherwise:</strong> If the board is full or both players pass in a row, most 4-in-a-rows wins, then most 3-in-a-rows; otherwise it is a draw</li>
         </ul>
       `,
       position: 'center',

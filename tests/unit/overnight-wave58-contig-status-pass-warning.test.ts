@@ -24,7 +24,6 @@ describe('Wave 58 contig — pass warning', () => {
     const status = document.createElement('div');
     document.body.append(board, status);
     initGame(board, status);
-    // Source: ` (${passes}/${3} passes)` → "(2/3 passes)"
-    expect(status.textContent).toContain('(2/3 passes)');
+    expect(status.textContent).not.toContain('(2/3 passes)');
   });
 });

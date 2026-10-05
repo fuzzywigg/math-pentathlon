@@ -26,7 +26,10 @@ describe('Wave 58 contig — Red winner banner', () => {
     document.body.append(board, status);
     initGame(board, status);
     expect(status.querySelector('.contig-winner-banner')?.textContent).toMatch(
-      /Red wins! 9 - 2/
+      /Red wins!/
+    );
+    expect(status.querySelector('.contig-winner-banner')?.textContent).not.toMatch(
+      /\d+\s*-\s*\d+/
     );
   });
 });

@@ -759,7 +759,7 @@ async function renderContig60(routeGen: number): Promise<void> {
     title: 'Contig 60',
     helpTitle: 'How to Play Contig 60',
     helpContentHtml: `<h3>Objective</h3>
-          <p>Score the most points by placing chips on the board adjacent to other chips!</p>
+          <p>Be first to place <strong>5 chips in a row</strong> (horizontal, vertical, or diagonal).</p>
 
           <h3>Turn Sequence</h3>
           <ol>
@@ -773,6 +773,7 @@ async function renderContig60(routeGen: number): Promise<void> {
             <li>Score <strong>1 point</strong> for each adjacent chip already on the board</li>
             <li>Adjacent means touching horizontally, vertically, or diagonally</li>
             <li>Maximum 8 points per placement (surrounded on all sides)</li>
+            <li>Points are placement feedback only — they do not decide the winner</li>
           </ul>
 
           <h3>Expression Rules</h3>
@@ -786,13 +787,13 @@ async function renderContig60(routeGen: number): Promise<void> {
           <h3>Passing</h3>
           <ul>
             <li>If you cannot make any available number, you must pass</li>
-            <li>Three consecutive passes eliminates you from the game</li>
+            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
           </ul>
 
           <h3>Winning</h3>
           <ul>
             <li><strong>5 in a row:</strong> First to get 5 chips in a line wins!</li>
-            <li><strong>By points:</strong> When board is full, highest score wins</li>
+            <li><strong>Otherwise:</strong> If the board is full or both players pass in a row, most 4-in-a-rows wins, then most 3-in-a-rows; otherwise it is a draw</li>
           </ul>`,
     gameAreaClass: 'contig-game-area',
     modeRadioName: 'contig-mode',

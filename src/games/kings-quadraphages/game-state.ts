@@ -127,8 +127,15 @@ export function getCurrentPhaseMessage(state: GameState): string {
     case 'placeQuadraphage':
       return `${playerName}: Place a Quadraphage`;
     case 'gameOver': {
+      if (!state.winner) {
+        return 'Game Over! Tie!';
+      }
       const winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
       return `Game Over! ${winnerName} wins!`;
+    }
+    default: {
+      const _exhaustive: never = state.turnPhase;
+      return _exhaustive;
     }
   }
 }
@@ -190,13 +197,21 @@ export function moveKing(state: GameState, destination: Position): GameState {
     to: destination,
   };
 
-  return {
+  const afterMove: GameState = {
     ...state,
     board: newBoard,
     selectedKingPosition: null,
     turnPhase: 'placeQuadraphage',
     moveHistory: [...state.moveHistory, moveEntry],
   };
+
+  // Official rule: a turn is king then chip. With no chips left, skip
+  // placement and settle (win if a king is trapped, otherwise end/tie).
+  if (getSupply(afterMove, afterMove.currentPlayer) <= 0) {
+    return endTurn(afterMove);
+  }
+
+  return afterMove;
 }
 
 // Place a quadraphage at a position
@@ -283,6 +298,18 @@ export function endTurn(state: GameState): GameState {
     };
   }
 
+  // Highlights: the game has ended when a player has no more chips to place
+  // at the beginning of a turn. Incoming player with an empty supply → tie
+  // (trap wins are already handled above).
+  if (getSupply(state, opponent) <= 0) {
+    return {
+      ...state,
+      winner: null,
+      turnPhase: 'gameOver',
+      currentPlayer: opponent,
+    };
+  }
+
   return {
     ...state,
     currentPlayer: opponent,
@@ -311,6 +338,10 @@ export function isValidPlacement(
   position: Position
 ): boolean {
   if (state.turnPhase !== 'placeQuadraphage') {
+    return false;
+  }
+
+  if (getSupply(state, state.currentPlayer) <= 0) {
     return false;
   }
 

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 
 import {
   createInitialState as createContig,
-  CONFIG as CONTIG_CFG,
 } from '../../src/games/contig-60/types';
 import {
   passTurn as passContig,
@@ -250,21 +249,22 @@ function sumBase(overrides: Partial<SumDominoesState> = {}): SumDominoesState {
   };
 }
 
-describe('Burn wave 10 — Contig elimination + wrong-phase no-ops', () => {
-  it('eliminates after MAX_CONSECUTIVE_PASSES; pass/place no-op in rolling', () => {
+describe('Burn wave 10 — Contig pass + wrong-phase no-ops', () => {
+  it('three solo passes do not eliminate; pass/place no-op in rolling', () => {
     let state = createContig();
     state = doRollDice(state);
     expect(state.phase).toBe('calculating');
     state = {
       ...state,
       consecutivePasses: {
-        player1: CONTIG_CFG.MAX_CONSECUTIVE_PASSES - 1,
+        player1: 2,
         player2: 0,
       },
     };
-    const over = passContig(state);
-    expect(over.phase).toBe('gameOver');
-    expect(over.winner).toBe('player2');
+    const after = passContig(state);
+    expect(after.phase).toBe('rolling');
+    expect(after.winner).toBeNull();
+    expect(after.consecutivePasses.player1).toBe(3);
 
     const rolling = createContig();
     expect(passContig(rolling)).toBe(rolling);

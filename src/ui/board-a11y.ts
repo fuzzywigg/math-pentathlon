@@ -31,6 +31,8 @@ export interface CellLabelParts {
   validMove?: boolean;
   /** Announce as a legal placement target. */
   validPlacement?: boolean;
+  /** Announce as a piece the current player can select (movement phase). */
+  selectable?: boolean;
   /** Extra label segments (e.g. "prime"). */
   extras?: string[];
 }
@@ -52,6 +54,7 @@ export function buildCellAriaLabel(parts: CellLabelParts): string {
     }
   }
 
+  if (parts.selectable) segments.push('selectable');
   if (parts.validMove) segments.push('valid move');
   if (parts.validPlacement) segments.push('valid placement');
 

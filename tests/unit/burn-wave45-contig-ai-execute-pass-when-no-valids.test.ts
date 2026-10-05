@@ -21,7 +21,7 @@ describe('Wave 45 Contig AI — execute pass no valids', () => {
     };
     const next = executeAITurn(state, 'player1', 'hard');
     expect(next.consecutivePasses.player1).toBe(1);
-    expect(next.phase).toBe('rolling');
-    expect(next.currentPlayer).toBe('player2');
+    expect(next.phase).toBe('gameOver');
+    expect(next.winner).toBe('player2');
   });
 });

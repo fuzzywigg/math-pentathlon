@@ -5,7 +5,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
-  CONFIG,
   getValidPlacements,
 } from '../../src/games/contig-60/types';
 import {
@@ -58,16 +57,17 @@ describe('Wave 41 Contig — place pass winner', () => {
     expect(placed).toBe(true);
   });
 
-  it('passTurn increments consecutive passes; max eliminates', () => {
+  it('passTurn increments consecutive passes; three solo passes do not eliminate', () => {
     let state = {
       ...createInitialState(),
       phase: 'calculating' as const,
       currentDice: [1, 2, 3] as [number, number, number],
-      consecutivePasses: { player1: CONFIG.MAX_CONSECUTIVE_PASSES - 1, player2: 0 },
+      consecutivePasses: { player1: 2, player2: 0 },
     };
     state = passTurn(state);
-    expect(state.phase).toBe('gameOver');
-    expect(state.winner).toBe('player2');
+    expect(state.phase).toBe('rolling');
+    expect(state.winner).toBeNull();
+    expect(state.consecutivePasses.player1).toBe(3);
   });
 
   it('passTurn mid-level swaps seat', () => {
