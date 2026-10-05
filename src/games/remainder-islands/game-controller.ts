@@ -37,6 +37,17 @@ let aiDifficulty: AIDifficulty = 'medium';
 // Rendering
 // =============================================================================
 
+function isComputerTurn(): boolean {
+  return isAIMode && gameState.currentPlayer === 'player2';
+}
+
+function patchDivisionPreview(): void {
+  if (!gameContainer) return;
+  const existing = gameContainer.querySelector('.remainder-preview');
+  if (!existing) return;
+  existing.replaceWith(renderDivisionPreview(gameState));
+}
+
 function render(): void {
   if (!gameContainer) return;
 
@@ -44,6 +55,7 @@ function render(): void {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'remainder-game-container';
+  const computerTurn = isComputerTurn();
 
   // Scores
   wrapper.appendChild(renderScores(gameState));
@@ -55,7 +67,9 @@ function render(): void {
     // Current player status
     const status = document.createElement('div');
     status.className = `remainder-status ${gameState.currentPlayer}`;
-    status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
+    status.textContent = computerTurn
+      ? `${getPlayerName(gameState.currentPlayer)}'s turn (computer)`
+      : `${getPlayerName(gameState.currentPlayer)}'s turn`;
     markStatusLive(status);
     wrapper.appendChild(status);
 
@@ -67,15 +81,24 @@ function render(): void {
     controls.className = 'remainder-controls';
 
     if (gameState.phase === 'rolling') {
-      const rollBtn = document.createElement('button');
-      rollBtn.className = 'remainder-btn remainder-btn-roll';
-      rollBtn.textContent = '🎲 Roll Dice';
-      rollBtn.addEventListener('click', handleRoll);
-      controls.appendChild(rollBtn);
+      if (computerTurn) {
+        const wait = document.createElement('div');
+        wait.className = 'remainder-instruction';
+        wait.textContent = 'Computer is thinking…';
+        controls.appendChild(wait);
+      } else {
+        const rollBtn = document.createElement('button');
+        rollBtn.className = 'remainder-btn remainder-btn-roll';
+        rollBtn.textContent = '🎲 Roll Dice';
+        rollBtn.addEventListener('click', handleRoll);
+        controls.appendChild(rollBtn);
+      }
     } else if (gameState.phase === 'selectIsland') {
       const instruction = document.createElement('div');
       instruction.className = 'remainder-instruction';
-      instruction.textContent = 'Select an island to land on';
+      instruction.textContent = computerTurn
+        ? 'Computer is choosing an island'
+        : 'Select an island to land on';
       controls.appendChild(instruction);
 
       // Division preview
@@ -86,18 +109,19 @@ function render(): void {
 
     // Board
     wrapper.appendChild(
-      renderBoard(gameState, handleIslandClick, handleIslandHover)
+      renderBoard(
+        gameState,
+        handleIslandClick,
+        handleIslandHover,
+        !computerTurn
+      )
     );
   }
 
   gameContainer.appendChild(wrapper);
 
   // AI turn
-  if (
-    isAIMode &&
-    gameState.phase !== 'gameOver' &&
-    gameState.currentPlayer === 'player2'
-  ) {
+  if (computerTurn && gameState.phase !== 'gameOver') {
     if (gameState.phase === 'rolling') {
       setTimeout(aiRoll, 800);
     } else if (gameState.phase === 'selectIsland') {
@@ -111,12 +135,14 @@ function render(): void {
 // =============================================================================
 
 function handleRoll(): void {
+  if (isComputerTurn()) return;
   if (gameState.phase !== 'rolling') return;
   gameState = performRoll(gameState);
   render();
 }
 
 function handleIslandClick(islandId: string): void {
+  if (isComputerTurn()) return;
   if (gameState.phase !== 'selectIsland') return;
   if (!gameState.validIslands.includes(islandId)) return;
 
@@ -125,10 +151,14 @@ function handleIslandClick(islandId: string): void {
 }
 
 function handleIslandHover(islandId: string | null): void {
+  if (isComputerTurn()) return;
   if (gameState.phase !== 'selectIsland') return;
+  if (gameState.selectedIsland === islandId) return;
 
+  // Update preview state without rebuilding the SVG. A full render() here
+  // replaces the node under the pointer, so mouseup never becomes a click.
   gameState = setSelectedIsland(gameState, islandId);
-  render();
+  patchDivisionPreview();
 }
 
 // =============================================================================
@@ -138,7 +168,8 @@ function handleIslandHover(islandId: string | null): void {
 function aiRoll(): void {
   if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2')
     return;
-  handleRoll();
+  gameState = performRoll(gameState);
+  render();
 }
 
 function aiSelectIsland(): void {

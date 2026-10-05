@@ -4,6 +4,7 @@
 import {
   RemainderIslandsState,
   DiceRoll,
+  Island,
   Player,
   getPlayerScore,
   getPlayerChips,
@@ -50,10 +51,67 @@ function getHexCenter(row: number, col: number): { x: number; y: number } {
 // Board Rendering
 // =============================================================================
 
+function islandFillColor(owner: Island['owner']): string {
+  const seats = playerColors();
+  if (owner === 'player1') return seats.player1;
+  if (owner === 'player2') return seats.player2;
+  return '#8bc34a';
+}
+
+function applyIslandSelectionVisual(
+  group: SVGGElement,
+  island: Island,
+  state: RemainderIslandsState,
+  selected: boolean
+): void {
+  const hex = group.querySelector('polygon');
+  if (!hex) return;
+
+  const isValid = state.validIslands.includes(island.id);
+  const { x, y } = getHexCenter(island.row, island.col);
+
+  if (selected) {
+    group.classList.add('selected');
+    hex.setAttribute('stroke', '#fff');
+    hex.setAttribute('stroke-width', '5');
+
+    if (state.currentRoll && !group.querySelector('.island-r-preview')) {
+      const preview = previewDivision(state, island.id);
+      if (preview) {
+        const previewText = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
+        previewText.setAttribute('class', 'island-r-preview');
+        previewText.setAttribute('x', String(x));
+        previewText.setAttribute('y', String(y + HEX_SIZE * 0.6));
+        previewText.setAttribute('text-anchor', 'middle');
+        previewText.setAttribute('font-size', '14');
+        previewText.setAttribute('fill', '#fff');
+        previewText.setAttribute('font-weight', 'bold');
+        previewText.textContent = `R=${preview.remainder}`;
+        const hitArea = group.querySelector('polygon:last-of-type');
+        if (hitArea && hitArea !== hex) {
+          group.insertBefore(previewText, hitArea);
+        } else {
+          group.appendChild(previewText);
+        }
+      }
+    }
+    return;
+  }
+
+  group.classList.remove('selected');
+  hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
+  hex.setAttribute('stroke-width', isValid ? '4' : '2');
+  group.querySelector('.island-r-preview')?.remove();
+}
+
 export function renderBoard(
   state: RemainderIslandsState,
   onIslandClick: (islandId: string) => void,
-  onIslandHover: (islandId: string | null) => void
+  onIslandHover: (islandId: string | null) => void,
+  interactive = true
 ): SVGElement {
   const maxCol = Math.max(...state.islands.map((i) => i.col));
   const maxRow = Math.max(...state.islands.map((i) => i.row));
@@ -127,21 +185,9 @@ export function renderBoard(
     );
     hex.setAttribute('points', hexPoints(x, y, HEX_SIZE - 2));
 
-    // Color based on ownership
-    let fillColor = '#8bc34a'; // Green for unclaimed
-    const seats = playerColors();
-    if (island.owner === 'player1') fillColor = seats.player1;
-    else if (island.owner === 'player2') fillColor = seats.player2;
-
-    hex.setAttribute('fill', fillColor);
+    hex.setAttribute('fill', islandFillColor(island.owner));
     hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
     hex.setAttribute('stroke-width', isValid ? '4' : '2');
-
-    if (isSelected) {
-      hex.setAttribute('stroke', '#fff');
-      hex.setAttribute('stroke-width', '5');
-    }
-
     group.appendChild(hex);
 
     // Island value (divisor)
@@ -186,23 +232,8 @@ export function renderBoard(
       group.appendChild(chipCount);
     }
 
-    // Preview division result
-    if (isSelected && state.currentRoll) {
-      const preview = previewDivision(state, island.id);
-      if (preview) {
-        const previewText = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'text'
-        );
-        previewText.setAttribute('x', String(x));
-        previewText.setAttribute('y', String(y + HEX_SIZE * 0.6));
-        previewText.setAttribute('text-anchor', 'middle');
-        previewText.setAttribute('font-size', '14');
-        previewText.setAttribute('fill', '#fff');
-        previewText.setAttribute('font-weight', 'bold');
-        previewText.textContent = `R=${preview.remainder}`;
-        group.appendChild(previewText);
-      }
+    if (isSelected) {
+      applyIslandSelectionVisual(group, island, state, true);
     }
 
     const owner =
@@ -226,8 +257,8 @@ export function renderBoard(
       })
     );
 
-    // Interaction layer
-    if (state.phase === 'selectIsland') {
+    // Interaction layer — skip during the computer's turn so taps cannot steal AI moves.
+    if (state.phase === 'selectIsland' && interactive) {
       const hitArea = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'polygon'
@@ -238,9 +269,17 @@ export function renderBoard(
 
       if (isValid) {
         const activate = () => onIslandClick(island.id);
+        // pointerdown survives tablets; click covers existing tests and mouse.
+        hitArea.addEventListener('pointerdown', activate);
         hitArea.addEventListener('click', activate);
-        hitArea.addEventListener('mouseenter', () => onIslandHover(island.id));
-        hitArea.addEventListener('mouseleave', () => onIslandHover(null));
+        hitArea.addEventListener('mouseenter', () => {
+          applyIslandSelectionVisual(group, island, state, true);
+          onIslandHover(island.id);
+        });
+        hitArea.addEventListener('mouseleave', () => {
+          applyIslandSelectionVisual(group, island, state, false);
+          onIslandHover(null);
+        });
         bindCellActivateKeys(group, activate);
       }
 
