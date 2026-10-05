@@ -3,12 +3,13 @@
  * 5-in-a-row, full board, or both players passing in a row;
  * then most 4-in-a-rows, then most 3-in-a-rows, else draw.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   ContigState,
   Player,
   createInitialState,
 } from '../../src/games/contig-60/types';
+import * as types from '../../src/games/contig-60/types';
 import {
   passTurn,
   checkWinner,
@@ -16,6 +17,7 @@ import {
   alignmentTiebreak,
   isBoardFull,
 } from '../../src/games/contig-60/rules';
+import { initGame } from '../../src/games/contig-60/game-controller';
 
 function withDice(
   state: ContigState,
@@ -153,5 +155,44 @@ describe('Contig 60 official end rules', () => {
     });
     expect(ended.phase).toBe('gameOver');
     expect(ended.winner).toBe('player1');
+  });
+});
+
+describe('Contig 60 official end-rule chrome', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    document.getElementById('contig-styles')?.remove();
+    vi.restoreAllMocks();
+  });
+
+  it('draw banner does not use adjacency points', () => {
+    const base = createInitialState();
+    vi.spyOn(types, 'createInitialState').mockReturnValue({
+      ...base,
+      winner: 'draw',
+      scores: { player1: 12, player2: 4 },
+      phase: 'gameOver',
+    });
+    const board = document.createElement('div');
+    const status = document.createElement('div');
+    document.body.append(board, status);
+    initGame(board, status);
+    const banner = status.querySelector('.contig-winner-banner')?.textContent ?? '';
+    expect(banner).toMatch(/It's a draw!/);
+    expect(banner).not.toMatch(/\d+\s*-\s*\d+/);
+  });
+
+  it('status does not show a 3-pass elimination counter', () => {
+    const base = createInitialState();
+    vi.spyOn(types, 'createInitialState').mockReturnValue({
+      ...base,
+      consecutivePasses: { player1: 2, player2: 0 },
+      phase: 'rolling',
+    });
+    const board = document.createElement('div');
+    const status = document.createElement('div');
+    document.body.append(board, status);
+    initGame(board, status);
+    expect(status.textContent).not.toMatch(/\/3 passes/);
   });
 });
