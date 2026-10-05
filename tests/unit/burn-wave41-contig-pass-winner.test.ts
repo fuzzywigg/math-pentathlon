@@ -26,7 +26,7 @@ describe('Wave 41 contig-60 — pass / winner / hasValidMoves', () => {
     }
   });
 
-  it('passTurn flips seat and clears dice; third pass eliminates', () => {
+  it('passTurn flips seat and clears dice; three solo passes do not eliminate', () => {
     const base = {
       ...createInitialState(),
       phase: 'calculating' as const,
@@ -38,16 +38,17 @@ describe('Wave 41 contig-60 — pass / winner / hasValidMoves', () => {
     expect(once.consecutivePasses.player1).toBe(1);
     expect(once.currentDice).toBeNull();
 
-    const nearElim = {
+    const thirdSolo = {
       ...base,
       consecutivePasses: {
-        player1: CONFIG.MAX_CONSECUTIVE_PASSES - 1,
+        player1: 2,
         player2: 0,
       },
     };
-    const elim = passTurn(nearElim);
-    expect(elim.phase).toBe('gameOver');
-    expect(elim.winner).toBe('player2');
+    const afterThird = passTurn(thirdSolo);
+    expect(afterThird.phase).toBe('rolling');
+    expect(afterThird.winner).toBeNull();
+    expect(afterThird.consecutivePasses.player1).toBe(3);
   });
 
   it('hasValidMoves false without dice; true with open board + dice', () => {
@@ -65,7 +66,7 @@ describe('Wave 41 contig-60 — pass / winner / hasValidMoves', () => {
     expect(hasValidMoves(withDice)).toBe(false);
   });
 
-  it('checkWinner null opening; 5-in-a-row wins; full board by score', () => {
+  it('checkWinner null opening; 5-in-a-row wins; full board ignores scores', () => {
     expect(checkWinner(createInitialState())).toBeNull();
 
     const align = createInitialState();
@@ -86,24 +87,20 @@ describe('Wave 41 contig-60 — pass / winner / hasValidMoves', () => {
       ...full,
       scores: { player1: 10, player2: 3 },
     };
-    // If alignment already hit, accept that; else expect score winner
+    const flipped = {
+      ...full,
+      scores: { player1: 3, player2: 10 },
+    };
     const w = checkWinner(scored);
-    if (w === null) {
-      // board full with equal-ish — still may be null on tie scores
-      expect(w).toBeNull();
-    } else {
-      expect(['player1', 'player2']).toContain(w);
-    }
+    expect(w).not.toBeNull();
+    expect(checkWinner(flipped)).toBe(w);
   });
 
-  it('full board unequal scores without long run returns score leader', () => {
+  it('full board unequal scores settle without using the scoreboard', () => {
     const state = createInitialState();
-    // Checkerboard-ish but force no 5 consecutive same owner on any line:
-    // mark all as player2 except leave pattern that won't form 5
     for (const cell of state.cells.values()) {
       cell.owner = 'player2';
     }
-    // Break horizontal/vertical/diagonal runs by flipping every 3rd in row-major
     let n = 0;
     for (let r = 0; r < CONFIG.GRID_ROWS; r++) {
       for (let c = 0; c < CONFIG.GRID_COLS; c++) {
@@ -114,11 +111,15 @@ describe('Wave 41 contig-60 — pass / winner / hasValidMoves', () => {
         n++;
       }
     }
-    const winner = checkWinner({
+    const a = checkWinner({
       ...state,
       scores: { player1: 1, player2: 99 },
     });
-    // Either alignment for player1/2 or score for player2
-    expect(winner === 'player1' || winner === 'player2').toBe(true);
+    const b = checkWinner({
+      ...state,
+      scores: { player1: 99, player2: 1 },
+    });
+    expect(a).not.toBeNull();
+    expect(a).toBe(b);
   });
 });

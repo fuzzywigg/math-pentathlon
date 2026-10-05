@@ -3,10 +3,10 @@
  */
 import { describe, it, expect } from 'vitest';
 import { passTurn } from '../../src/games/contig-60/rules';
-import { createInitialState, CONFIG } from '../../src/games/contig-60/types';
+import { createInitialState } from '../../src/games/contig-60/types';
 
 describe('Wave 43 contig — pass elim ladder', () => {
-  it('wrong phase identity; mid passes flip; max eliminates', () => {
+  it('wrong phase identity; mid passes flip; third solo pass does not eliminate', () => {
     const base = createInitialState();
     expect(passTurn(base)).toBe(base);
 
@@ -24,12 +24,13 @@ describe('Wave 43 contig — pass elim ladder', () => {
     const near = {
       ...calc,
       consecutivePasses: {
-        player1: CONFIG.MAX_CONSECUTIVE_PASSES - 1,
+        player1: 2,
         player2: 0,
       },
     };
     const end = passTurn(near);
-    expect(end.phase).toBe('gameOver');
-    expect(end.winner).toBe('player2');
+    expect(end.phase).toBe('rolling');
+    expect(end.winner).toBeNull();
+    expect(end.consecutivePasses.player1).toBe(3);
   });
 });

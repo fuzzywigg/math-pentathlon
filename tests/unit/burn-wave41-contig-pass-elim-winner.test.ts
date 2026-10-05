@@ -61,9 +61,9 @@ describe('Wave 41 Contig — pass / elim / winner', () => {
   });
 
   it.each([
-    { passes: CONFIG.MAX_CONSECUTIVE_PASSES - 1, seat: 'player1' as const },
-    { passes: CONFIG.MAX_CONSECUTIVE_PASSES - 1, seat: 'player2' as const },
-  ])('MAX passes eliminate $seat → opponent wins', ({ passes, seat }) => {
+    { passes: 2, seat: 'player1' as const },
+    { passes: 2, seat: 'player2' as const },
+  ])('three solo passes do not eliminate $seat', ({ passes, seat }) => {
     const state = withDice([3, 3, 3], {
       currentPlayer: seat,
       consecutivePasses: {
@@ -71,10 +71,10 @@ describe('Wave 41 Contig — pass / elim / winner', () => {
         player2: seat === 'player2' ? passes : 0,
       },
     });
-    const ended = passTurn(state);
-    expect(ended.phase).toBe('gameOver');
-    expect(ended.winner).toBe(seat === 'player1' ? 'player2' : 'player1');
-    expect(ended.consecutivePasses[seat]).toBe(CONFIG.MAX_CONSECUTIVE_PASSES);
+    const next = passTurn(state);
+    expect(next.phase).toBe('rolling');
+    expect(next.winner).toBeNull();
+    expect(next.consecutivePasses[seat]).toBe(3);
   });
 
   it('vertical five-in-row for player2', () => {
@@ -97,7 +97,7 @@ describe('Wave 41 Contig — pass / elim / winner', () => {
     expect(checkWinner({ ...s, cells })).toBe('player1');
   });
 
-  it('full board score compare: higher score wins; equal stays null', () => {
+  it('full board alignment compare: scores do not decide; equal 4s/3s can draw', () => {
     const s = createInitialState();
     const cells = new Map(s.cells);
     // 4-wide column stripes offset by row — avoids 5-in-a-row so score branch runs
@@ -111,27 +111,24 @@ describe('Wave 41 Contig — pass / elim / winner', () => {
         });
       }
     }
-    expect(
-      checkWinner({
-        ...s,
-        cells,
-        scores: { player1: 10, player2: 3 },
-      })
-    ).toBe('player1');
-    expect(
-      checkWinner({
-        ...s,
-        cells,
-        scores: { player1: 3, player2: 10 },
-      })
-    ).toBe('player2');
-    expect(
-      checkWinner({
-        ...s,
-        cells,
-        scores: { player1: 5, player2: 5 },
-      })
-    ).toBeNull();
+    const p1Lead = checkWinner({
+      ...s,
+      cells,
+      scores: { player1: 10, player2: 3 },
+    });
+    const p2Lead = checkWinner({
+      ...s,
+      cells,
+      scores: { player1: 3, player2: 10 },
+    });
+    const tiedScores = checkWinner({
+      ...s,
+      cells,
+      scores: { player1: 5, player2: 5 },
+    });
+    expect(p1Lead).not.toBeNull();
+    expect(p1Lead).toBe(p2Lead);
+    expect(tiedScores).toBe(p1Lead);
   });
 
   it('placeChip that completes five-in-row ends game', () => {

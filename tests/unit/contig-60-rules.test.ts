@@ -7,7 +7,6 @@ import {
   getAllPossibleResults,
   getValidPlacements,
   getAdjacentPositions,
-  CONFIG,
 } from '../../src/games/contig-60/types';
 import {
   doRollDice,
@@ -171,20 +170,20 @@ describe('Contig 60 – passTurn / elimination', () => {
     expect(next.currentDice).toBeNull();
   });
 
-  it('eliminates player after MAX_CONSECUTIVE_PASSES', () => {
+  it('does not eliminate after three solo passes', () => {
     let state = withDice(createInitialState(), [1, 1, 1]);
     state = {
       ...state,
       consecutivePasses: {
-        player1: CONFIG.MAX_CONSECUTIVE_PASSES - 1,
+        player1: 2,
         player2: 0,
       },
     };
 
     const next = passTurn(state);
-    expect(next.phase).toBe('gameOver');
-    expect(next.winner).toBe('player2');
-    expect(next.consecutivePasses.player1).toBe(CONFIG.MAX_CONSECUTIVE_PASSES);
+    expect(next.phase).toBe('rolling');
+    expect(next.winner).toBeNull();
+    expect(next.consecutivePasses.player1).toBe(3);
   });
 
   it('is a no-op outside calculating phase', () => {
@@ -215,18 +214,23 @@ describe('Contig 60 – checkWinner / hasValidMoves', () => {
     expect(checkWinner(state)).toBeNull();
   });
 
-  it('picks higher score when board is full', () => {
+  it('settles a full board by alignment, ignoring adjacency points', () => {
     const { cells, grid } = createBoard();
     for (const cell of cells.values()) {
       cell.owner = cell.row % 2 === 0 ? 'player1' : 'player2';
     }
-    const state: ContigState = {
+    const lowP1: ContigState = {
       ...createInitialState(),
       cells,
       grid,
-      scores: { player1: 12, player2: 7 },
+      scores: { player1: 1, player2: 99 },
     };
-    expect(checkWinner(state)).toBe('player1');
+    const highP1: ContigState = {
+      ...lowP1,
+      scores: { player1: 99, player2: 1 },
+    };
+    expect(checkWinner(lowP1)).not.toBeNull();
+    expect(checkWinner(lowP1)).toBe(checkWinner(highP1));
   });
 
   it('hasValidMoves reflects dice and ownership', () => {
