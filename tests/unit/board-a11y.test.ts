@@ -38,6 +38,14 @@ describe('board-a11y helpers (Wave 1)', () => {
         validPlacement: true,
       })
     ).toBe('A1, empty, valid placement');
+
+    expect(
+      buildCellAriaLabel({
+        coord: '1,2',
+        owner: 'Blue',
+        selectable: true,
+      })
+    ).toBe('1,2, Blue, selectable');
   });
 
   it('buildCellAriaLabel includes owner and piece without color-only gaps', () => {
