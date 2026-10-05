@@ -7,15 +7,41 @@ import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
+/**
+ * Play-facing wall-time budgets (ms). Hard still uses maxDepth when time
+ * remains; iterative deepening keeps a sensible move if the budget expires.
+ */
+export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
+  easy: 600,
+  medium: 1200,
+  hard: 2500,
+};
+
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
   seed?: number;
   /**
-   * Soft wall-time budget (ms). When exceeded between root-move evaluations,
-   * return the best move scored so far. Depth is never reduced.
+   * Soft wall-time budget (ms). When finite, iterative deepening + mid-tree
+   * abort return a move within the budget. Omit for historical single-depth search.
    */
   deadlineMs?: number;
   now?: () => number;
+}
+
+interface SearchClock {
+  now: () => number;
+  deadline: number;
+  aborted: boolean;
+  nodes: number;
+}
+
+function clockTimedOut(clock: SearchClock | null): boolean {
+  if (!clock) return false;
+  clock.nodes += 1;
+  if (clock.now() >= clock.deadline) {
+    clock.aborted = true;
+  }
+  return clock.aborted;
 }
 
 export interface AISearchResult {
@@ -30,78 +56,73 @@ const DIFFICULTY_CONFIG = {
   hard: { maxDepth: 3, randomness: 0.05 },
 };
 
-// Calculate shortest path distance from a player's starting edge to their goal edge
-// Uses Dijkstra's algorithm with distance = 0 for own pieces, 1 for empty, Infinity for opponent
+// Calculate shortest path distance from a player's starting edge to their goal edge.
+// Edge costs are 0 (own stone) or 1 (empty) — 0-1 BFS, same metric as Dijkstra.
 function shortestPathDistance(state: HexGameState, player: Player): number {
   const { board, boardSize } = state;
-  const INF = Infinity;
+  const INF = 1e9;
 
-  // Distance grid
-  const dist: number[][] = Array(boardSize)
-    .fill(null)
-    .map(() => Array(boardSize).fill(INF));
+  const dist: number[][] = Array.from({ length: boardSize }, () =>
+    Array(boardSize).fill(INF)
+  );
 
-  // Priority queue (simple implementation)
-  const pq: { pos: HexPosition; dist: number }[] = [];
+  // Deque for 0-1 BFS (front = cost 0, back = cost 1)
+  const deque: { row: number; col: number; d: number }[] = [];
 
-  const addToPQ = (pos: HexPosition, d: number) => {
-    pq.push({ pos, dist: d });
-    pq.sort((a, b) => a.dist - b.dist);
+  const cellStep = (row: number, col: number): number => {
+    const cell = board[row][col];
+    if (cell === player) return 0;
+    if (cell === null) return 1;
+    return INF;
   };
 
-  // Initialize starting edge
   if (player === 'player1') {
-    // Start from top row
     for (let col = 0; col < boardSize; col++) {
-      const cell = board[0][col];
-      const d = cell === player ? 0 : cell === null ? 1 : INF;
-      if (d < INF) {
-        dist[0][col] = d;
-        addToPQ({ row: 0, col }, d);
+      const step = cellStep(0, col);
+      if (step < INF) {
+        dist[0][col] = step;
+        if (step === 0) deque.unshift({ row: 0, col, d: step });
+        else deque.push({ row: 0, col, d: step });
       }
     }
   } else {
-    // Start from left column
     for (let row = 0; row < boardSize; row++) {
-      const cell = board[row][0];
-      const d = cell === player ? 0 : cell === null ? 1 : INF;
-      if (d < INF) {
-        dist[row][0] = d;
-        addToPQ({ row, col: 0 }, d);
+      const step = cellStep(row, 0);
+      if (step < INF) {
+        dist[row][0] = step;
+        if (step === 0) deque.unshift({ row, col: 0, d: step });
+        else deque.push({ row, col: 0, d: step });
       }
     }
   }
 
-  // Dijkstra's algorithm
-  while (pq.length > 0) {
-    const { pos, dist: currentDist } = pq.shift()!;
+  while (deque.length > 0) {
+    const { row, col, d: currentDist } = deque.shift()!;
+    if (currentDist > dist[row][col]) continue;
 
-    if (currentDist > dist[pos.row][pos.col]) continue;
-
-    // Check if reached goal
-    if (player === 'player1' && pos.row === boardSize - 1) {
+    if (player === 'player1' && row === boardSize - 1) {
       return currentDist;
     }
-    if (player === 'player2' && pos.col === boardSize - 1) {
+    if (player === 'player2' && col === boardSize - 1) {
       return currentDist;
     }
 
-    // Explore neighbors
-    for (const neighbor of getNeighbors(pos, boardSize)) {
-      const cell = board[neighbor.row][neighbor.col];
-      const edgeCost = cell === player ? 0 : cell === null ? 1 : INF;
-
-      if (edgeCost < INF) {
-        const newDist = currentDist + edgeCost;
-        if (newDist < dist[neighbor.row][neighbor.col]) {
-          dist[neighbor.row][neighbor.col] = newDist;
-          addToPQ(neighbor, newDist);
+    for (const neighbor of getNeighbors({ row, col }, boardSize)) {
+      const edgeCost = cellStep(neighbor.row, neighbor.col);
+      if (edgeCost >= INF) continue;
+      const newDist = currentDist + edgeCost;
+      if (newDist < dist[neighbor.row][neighbor.col]) {
+        dist[neighbor.row][neighbor.col] = newDist;
+        if (edgeCost === 0) {
+          deque.unshift({ row: neighbor.row, col: neighbor.col, d: newDist });
+        } else {
+          deque.push({ row: neighbor.row, col: neighbor.col, d: newDist });
         }
       }
     }
   }
 
-  return INF;
+  return Infinity;
 }
 
 // Evaluate board position for the given player
@@ -150,8 +171,13 @@ function minimax(
   alpha: number,
   beta: number,
   maximizingPlayer: boolean,
-  aiPlayer: Player
+  aiPlayer: Player,
+  clock: SearchClock | null
 ): number {
+  if (clockTimedOut(clock)) {
+    return evaluatePosition(state, aiPlayer);
+  }
+
   // Terminal conditions
   if (state.winner === aiPlayer) return 10000 + depth;
   if (state.winner === getOpponent(aiPlayer)) return -10000 - depth;
@@ -175,6 +201,7 @@ function minimax(
   if (maximizingPlayer) {
     let maxEval = -Infinity;
     for (const move of limitedMoves) {
+      if (clockTimedOut(clock)) break;
       const newState = makeMove(state, move);
       const evalScore = minimax(
         newState,
@@ -182,31 +209,34 @@ function minimax(
         alpha,
         beta,
         false,
-        aiPlayer
+        aiPlayer,
+        clock
       );
       maxEval = Math.max(maxEval, evalScore);
       alpha = Math.max(alpha, evalScore);
       if (beta <= alpha) break;
     }
     return maxEval;
-  } else {
-    let minEval = Infinity;
-    for (const move of limitedMoves) {
-      const newState = makeMove(state, move);
-      const evalScore = minimax(
-        newState,
-        depth - 1,
-        alpha,
-        beta,
-        true,
-        aiPlayer
-      );
-      minEval = Math.min(minEval, evalScore);
-      beta = Math.min(beta, evalScore);
-      if (beta <= alpha) break;
-    }
-    return minEval;
   }
+
+  let minEval = Infinity;
+  for (const move of limitedMoves) {
+    if (clockTimedOut(clock)) break;
+    const newState = makeMove(state, move);
+    const evalScore = minimax(
+      newState,
+      depth - 1,
+      alpha,
+      beta,
+      true,
+      aiPlayer,
+      clock
+    );
+    minEval = Math.min(minEval, evalScore);
+    beta = Math.min(beta, evalScore);
+    if (beta <= alpha) break;
+  }
+  return minEval;
 }
 
 /**
@@ -231,6 +261,8 @@ export function searchBestMove(
     options.deadlineMs === undefined
       ? Number.POSITIVE_INFINITY
       : started + options.deadlineMs;
+  const timed = Number.isFinite(deadline);
+  const maxDepth = config.maxDepth;
 
   // First move: play near center
   if (state.moveHistory.length < 2) {
@@ -246,50 +278,90 @@ export function searchBestMove(
     }
   }
 
-  // Evaluate all moves (same depth; optional soft deadline between roots)
-  const scoredMoves: { move: HexPosition; score: number }[] = [];
+  let rootMoves = moves;
+  let bestScored: { move: HexPosition; score: number }[] | null = null;
   let truncated = false;
 
-  for (const move of moves) {
-    if (now() >= deadline) {
+  // Timed: depth-1 standing move, then jump to maxDepth so the budget is
+  // not spent on intermediate ID layers. Unlimited: historical single pass.
+  const depths =
+    timed && maxDepth > 1 ? ([1, maxDepth] as const) : ([maxDepth] as const);
+
+  for (const depth of depths) {
+    if (timed && bestScored && now() >= deadline) {
       truncated = true;
       break;
     }
 
-    const newState = makeMove(state, move);
+    const clock: SearchClock | null = timed
+      ? { now, deadline, aborted: false, nodes: 0 }
+      : null;
+    const scoredMoves: { move: HexPosition; score: number }[] = [];
+    let incomplete = false;
 
-    // Check for immediate win
-    if (newState.winner === aiPlayer) {
-      scoredMoves.push({ move, score: Infinity });
-      continue;
+    for (const move of rootMoves) {
+      if (
+        timed &&
+        now() >= deadline &&
+        (scoredMoves.length > 0 || bestScored)
+      ) {
+        incomplete = true;
+        break;
+      }
+
+      const newState = makeMove(state, move);
+
+      // Check for immediate win
+      if (newState.winner === aiPlayer) {
+        scoredMoves.push({ move, score: Infinity });
+        continue;
+      }
+
+      // Check for blocking opponent's immediate win
+      const opponentState = { ...state, currentPlayer: getOpponent(aiPlayer) };
+      const opponentWithMove = makeMove(opponentState, move);
+      if (opponentWithMove.winner === getOpponent(aiPlayer)) {
+        scoredMoves.push({ move, score: 5000 });
+        continue;
+      }
+
+      const score = minimax(
+        newState,
+        depth,
+        -Infinity,
+        Infinity,
+        false,
+        aiPlayer,
+        clock
+      );
+      if (clock?.aborted) {
+        incomplete = true;
+        break;
+      }
+
+      // Add randomness based on difficulty (once per completed root, historical)
+      const randomFactor = (rng() - 0.5) * config.randomness * 200;
+      scoredMoves.push({ move, score: score + randomFactor });
     }
 
-    // Check for blocking opponent's immediate win
-    const opponentState = { ...state, currentPlayer: getOpponent(aiPlayer) };
-    const opponentWithMove = makeMove(opponentState, move);
-    if (opponentWithMove.winner === getOpponent(aiPlayer)) {
-      scoredMoves.push({ move, score: 5000 }); // High priority to block
-      continue;
+    if (!incomplete && scoredMoves.length === rootMoves.length) {
+      scoredMoves.sort((a, b) => b.score - a.score);
+      bestScored = scoredMoves;
+      rootMoves = scoredMoves.map((s) => s.move);
+    } else {
+      truncated = true;
+      if (!bestScored && scoredMoves.length > 0) {
+        scoredMoves.sort((a, b) => b.score - a.score);
+        bestScored = scoredMoves;
+      }
+      break;
     }
-
-    const score = minimax(
-      newState,
-      config.maxDepth,
-      -Infinity,
-      Infinity,
-      false,
-      aiPlayer
-    );
-
-    // Add randomness based on difficulty
-    const randomFactor = (rng() - 0.5) * config.randomness * 200;
-    scoredMoves.push({ move, score: score + randomFactor });
   }
 
-  if (scoredMoves.length === 0) return { move: null, truncated };
-
-  // Sort by score (highest first)
-  scoredMoves.sort((a, b) => b.score - a.score);
+  const scoredMoves = bestScored;
+  if (!scoredMoves || scoredMoves.length === 0) {
+    return { move: moves[0] ?? null, truncated };
+  }
 
   return { move: scoredMoves[0].move, truncated };
 }
