@@ -4,9 +4,12 @@ import {
   selectKing,
   moveKing,
   placeQuadraphage,
+  endTurn,
   isValidMove,
+  isValidPlacement,
   getCurrentPhaseMessage,
   getKingPosition,
+  getSupply,
 } from './game-state';
 import { getOpponent } from './rules';
 import { seatIcon } from '../../ui/player-colors';
@@ -87,6 +90,11 @@ export function handleCellClick(
 
   // Place Quadraphage phase
   if (state.turnPhase === 'placeQuadraphage') {
+    // Empty supply: cannot place. Settle instead of ignoring clicks forever.
+    if (getSupply(state, state.currentPlayer) <= 0) {
+      return { state: endTurn(state), isInvalidClick: false };
+    }
+
     const clickedCell = state.board[row - 1][col - 1];
 
     // Only place on empty cells
@@ -167,10 +175,9 @@ function syncKingsCell(
     cell.classList.add('cell-valid-move');
   }
 
-  const isValidPlacement =
-    state.turnPhase === 'placeQuadraphage' && piece === null;
+  const isPlacementTarget = isValidPlacement(state, { row, col });
 
-  if (isValidPlacement) {
+  if (isPlacementTarget) {
     cell.classList.add('cell-valid-placement');
   }
 
@@ -182,7 +189,7 @@ function syncKingsCell(
       owner,
       piece: pieceName,
       validMove: isValidMoveTarget,
-      validPlacement: isValidPlacement,
+      validPlacement: isPlacementTarget,
     })
   );
 
@@ -355,21 +362,25 @@ export function renderStatus(
   }
   statusEl.appendChild(turnEl);
 
-  // Winner celebration
-  if (state.winner) {
+  // Winner / tie celebration
+  if (state.turnPhase === 'gameOver') {
     const winnerEl = document.createElement('div');
     winnerEl.className = 'status-winner';
 
-    let winnerName: string;
-    if (gameMode === 'human-vs-ai') {
-      // In AI mode, show "You Win!" or "AI Wins!"
-      // AI is always player2 when human plays first
-      winnerName = state.winner === 'player1' ? 'You' : 'AI';
+    if (!state.winner) {
+      winnerEl.textContent = `🤝 ${seatIcon('player1')} ${seatIcon('player2')} Tie!`;
     } else {
-      winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
+      let winnerName: string;
+      if (gameMode === 'human-vs-ai') {
+        // In AI mode, show "You Win!" or "AI Wins!"
+        // AI is always player2 when human plays first
+        winnerName = state.winner === 'player1' ? 'You' : 'AI';
+      } else {
+        winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
+      }
+      const winnerColor = seatIcon(state.winner);
+      winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Win${winnerName === 'You' ? '' : 's'}! 🎉`;
     }
-    const winnerColor = seatIcon(state.winner);
-    winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Win${winnerName === 'You' ? '' : 's'}! 🎉`;
     statusEl.appendChild(winnerEl);
   }
 
