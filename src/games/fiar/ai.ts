@@ -321,7 +321,10 @@ function getBestPlacement(
   aiPlayer: Player,
   difficulty: AIDifficulty,
   ctx: SearchCtx
-): { place: { nodeId: string; chipKind: ChipKind } | null; truncated: boolean } {
+): {
+  place: { nodeId: string; chipKind: ChipKind } | null;
+  truncated: boolean;
+} {
   const config = DIFFICULTY_CONFIG[difficulty];
   state = normalizeSelectedChipKind(state);
 

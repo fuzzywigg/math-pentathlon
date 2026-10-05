@@ -56,9 +56,9 @@ describe('FIAR movement aria selectable (#384)', () => {
     const svg = renderBoard(state, () => undefined);
     for (const id of selectable) {
       const label =
-        svg.querySelector(`[data-node-id="${id}"]`)!.getAttribute(
-          'aria-label'
-        ) || '';
+        svg
+          .querySelector(`[data-node-id="${id}"]`)!
+          .getAttribute('aria-label') || '';
       expect(label).toMatch(/selectable/);
       expect(label).not.toMatch(/valid move/);
     }
