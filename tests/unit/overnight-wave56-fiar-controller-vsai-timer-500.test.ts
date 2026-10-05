@@ -2,7 +2,7 @@
  * Wave 56 leftover after #255/#256 — FIAR vsAI 500ms place handoff. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import * as fiarAi from '../../src/games/fiar/ai';
+import * as fiarAiClient from '../../src/games/fiar/ai-client';
 import {
   initGame,
   newGameVsAI,
@@ -17,11 +17,11 @@ afterEach(() => {
 });
 
 describe('Wave 56 fiar — vsAI 500ms timer', () => {
-  it('after P1 place, AI place runs at 500ms via mocked getAIMove', () => {
+  it('after P1 place, AI place runs at 500ms via mocked getAIMoveAsync', async () => {
     vi.useFakeTimers();
     // Force human (player1) to start — vsAI now picks starter at random
     vi.spyOn(Math, 'random').mockReturnValue(0.1);
-    vi.spyOn(fiarAi, 'getAIMove').mockReturnValue({
+    vi.spyOn(fiarAiClient, 'getAIMoveAsync').mockResolvedValue({
       type: 'place',
       nodeId: 'c2r1',
       chipKind: 'plain',
@@ -41,11 +41,11 @@ describe('Wave 56 fiar — vsAI 500ms timer', () => {
     expect(getCurrentState().chipsPlaced.player1).toBe(1);
     expect(getCurrentState().chipsPlaced.player2).toBe(0);
 
-    vi.advanceTimersByTime(499);
+    await vi.advanceTimersByTimeAsync(499);
     expect(getCurrentState().chipsPlaced.player2).toBe(0);
 
-    vi.advanceTimersByTime(1);
-    expect(fiarAi.getAIMove).toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(fiarAiClient.getAIMoveAsync).toHaveBeenCalled();
     expect(getCurrentState().chipsPlaced.player2).toBe(1);
     expect(getCurrentState().board.nodes.get('c2r1')?.chip).toBe('player2');
     expect(getCurrentState().currentPlayer).toBe('player1');

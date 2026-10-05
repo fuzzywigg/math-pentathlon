@@ -19,7 +19,12 @@ import {
   normalizeSelectedChipKind,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
-import { getAIMove, applyAIMove, AIDifficulty } from './ai';
+import { applyAIMove, AIDifficulty } from './ai';
+import {
+  cancelFiarAiRequests,
+  disposeFiarAiWorker,
+  getAIMoveAsync,
+} from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
@@ -42,6 +47,8 @@ let isAIMode = false;
 /** Seat controlled by the computer in vs-AI mode. */
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
+/** Invalidates in-flight worker replies after new game / leave. */
+let aiGeneration = 0;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let showStarterBanner = false;
@@ -232,7 +239,9 @@ function scheduleAiIfNeeded(): void {
     !gameState.winner &&
     gameState.phase !== 'gameOver'
   ) {
-    setTimeout(aiTurn, 500);
+    setTimeout(() => {
+      void aiTurn();
+    }, 500);
   }
 }
 
@@ -282,10 +291,20 @@ function handleNodeClick(nodeId: string): void {
   }
 }
 
-function aiTurn(): void {
+async function aiTurn(): Promise<void> {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
-  const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
+  const gen = ++aiGeneration;
+  let aiMove;
+  try {
+    aiMove = await getAIMoveAsync(gameState, aiPlayer, aiDifficulty);
+  } catch {
+    aiMove = null;
+  }
+
+  if (gen !== aiGeneration) return;
+  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+
   if (aiMove) {
     gameState = applyAIMove(gameState, aiMove);
     moveCount++;
@@ -323,6 +342,9 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  cancelFiarAiRequests();
+  disposeFiarAiWorker();
   if (boardContainer) {
     boardContainer.removeEventListener(
       'mp3d-context-lost',
@@ -345,6 +367,8 @@ export function whenBoard3dReady(): Promise<void> {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  cancelFiarAiRequests();
   gameState = createInitialState({ starter: 'player1' });
   isAIMode = false;
   aiPlayer = 'player2';
@@ -361,6 +385,8 @@ export function newGameVsHuman(): void {
  * player1=Blue / player2=Red via getPlayerSeatColors().
  */
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  cancelFiarAiRequests();
   const starter: Player = Math.random() < 0.5 ? 'player1' : 'player2';
   // Human keeps Blue (player1); computer is Red (player2) — random who moves first.
   aiPlayer = 'player2';
@@ -375,7 +401,9 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   owlSystem.onGameStart('fiar');
 
   if (gameState.currentPlayer === aiPlayer) {
-    setTimeout(aiTurn, 500);
+    setTimeout(() => {
+      void aiTurn();
+    }, 500);
   }
 }
 
