@@ -24,7 +24,7 @@ describe('Wave 60 handshake — contig × sum inject/tutorial', () => {
 
     const contigById = Object.fromEntries(contig60Tutorial.steps.map((s) => [s.id, s]));
     const sumById = Object.fromEntries(sumDominoesTutorial.steps.map((s) => [s.id, s]));
-    expect(contigById.winning?.message).toMatch(/By points/);
+    expect(contigById.winning?.message).toMatch(/4-in-a-rows/);
     expect(sumById.passing?.message).toMatch(/both players pass consecutively/);
 
     expect(getGameById('contig-60')?.icon).toBe('🎲');

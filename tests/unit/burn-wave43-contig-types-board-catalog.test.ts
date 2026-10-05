@@ -15,8 +15,9 @@ describe('Wave 43 contig — types/board catalog', () => {
   it('CONFIG and unique 60-cell board', () => {
     expect(CONFIG.GRID_ROWS).toBe(6);
     expect(CONFIG.GRID_COLS).toBe(10);
-    expect(CONFIG.MAX_CONSECUTIVE_PASSES).toBe(3);
     expect(CONFIG.WIN_BY_ALIGNMENT).toBe(5);
+    expect(CONFIG.TIEBREAK_FOUR).toBe(4);
+    expect(CONFIG.TIEBREAK_THREE).toBe(3);
     const flat = BOARD_NUMBERS.flat();
     expect(flat).toHaveLength(60);
     expect(new Set(flat).size).toBe(60);

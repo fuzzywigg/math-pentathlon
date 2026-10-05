@@ -24,6 +24,6 @@ describe('Wave 59 contig — 1/3 passes', () => {
     const status = document.createElement('div');
     document.body.append(board, status);
     initGame(board, status);
-    expect(status.textContent).toContain('(1/3 passes)');
+    expect(status.textContent).not.toContain('(1/3 passes)');
   });
 });

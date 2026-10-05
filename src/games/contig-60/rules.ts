@@ -4,6 +4,7 @@
 import {
   ContigState,
   Player,
+  ContigWinner,
   ContigMove,
   CONFIG,
   getOpponent,
@@ -113,9 +114,8 @@ export function placeChip(
     phase: 'rolling',
   };
 
-  // Check for winner
   const winner = checkWinner(newState);
-  if (winner) {
+  if (winner !== null) {
     newState = { ...newState, winner, phase: 'gameOver' };
   }
 
@@ -133,20 +133,7 @@ export function passTurn(state: ContigState): ContigState {
     [state.currentPlayer]: state.consecutivePasses[state.currentPlayer] + 1,
   };
 
-  // Check if player is eliminated
-  if (
-    newConsecutivePasses[state.currentPlayer] >= CONFIG.MAX_CONSECUTIVE_PASSES
-  ) {
-    // Current player loses
-    return {
-      ...state,
-      consecutivePasses: newConsecutivePasses,
-      winner: getOpponent(state.currentPlayer),
-      phase: 'gameOver',
-    };
-  }
-
-  return {
+  const nextState: ContigState = {
     ...state,
     consecutivePasses: newConsecutivePasses,
     currentPlayer: getOpponent(state.currentPlayer),
@@ -154,84 +141,113 @@ export function passTurn(state: ContigState): ContigState {
     currentExpression: null,
     phase: 'rolling',
   };
+
+  const bothPassedInARow =
+    newConsecutivePasses.player1 > 0 && newConsecutivePasses.player2 > 0;
+  const winner = checkWinner(nextState, { settle: bothPassedInARow });
+  if (winner !== null) {
+    return { ...nextState, winner, phase: 'gameOver' };
+  }
+
+  return nextState;
 }
 
 // =============================================================================
 // Win Detection
 // =============================================================================
 
+const ALIGNMENT_DIRECTIONS: ReadonlyArray<readonly [number, number]> = [
+  [0, 1], // Horizontal
+  [1, 0], // Vertical
+  [1, 1], // Diagonal down-right
+  [1, -1], // Diagonal down-left
+];
+
+function ownerAt(state: ContigState, row: number, col: number): Player | null {
+  if (
+    row < 0 ||
+    row >= CONFIG.GRID_ROWS ||
+    col < 0 ||
+    col >= CONFIG.GRID_COLS
+  ) {
+    return null;
+  }
+  const value = state.grid[row][col];
+  if (value === null) return null;
+  return state.cells.get(value)?.owner ?? null;
+}
+
 /**
- * Check for 5 in a row (optional win condition)
+ * Count n-in-a-row lines (sliding windows of exactly `length`).
  */
-function checkFiveInRow(state: ContigState, player: Player): boolean {
-  const grid = state.grid;
+export function countNInARows(
+  state: ContigState,
+  player: Player,
+  length: number
+): number {
+  let count = 0;
   const rows = CONFIG.GRID_ROWS;
   const cols = CONFIG.GRID_COLS;
 
-  // Check all directions from each cell
-  const directions = [
-    [0, 1], // Horizontal
-    [1, 0], // Vertical
-    [1, 1], // Diagonal down-right
-    [1, -1], // Diagonal down-left
-  ];
-
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
-      const startValue = grid[row][col];
-      if (startValue === null) continue;
+      if (ownerAt(state, row, col) !== player) continue;
 
-      const startCell = state.cells.get(startValue);
-      if (startCell?.owner !== player) continue;
-
-      for (const [dr, dc] of directions) {
-        let count = 1;
-
-        // Count in positive direction
-        let r = row + dr;
-        let c = col + dc;
-        while (r >= 0 && r < rows && c >= 0 && c < cols) {
-          const v = grid[r][c];
-          if (v === null) break;
-          const cell = state.cells.get(v);
-          if (cell?.owner !== player) break;
-          count++;
-          r += dr;
-          c += dc;
+      for (const [dr, dc] of ALIGNMENT_DIRECTIONS) {
+        let complete = true;
+        for (let k = 1; k < length; k++) {
+          if (ownerAt(state, row + dr * k, col + dc * k) !== player) {
+            complete = false;
+            break;
+          }
         }
-
-        if (count >= CONFIG.WIN_BY_ALIGNMENT) {
-          return true;
-        }
+        if (complete) count++;
       }
     }
   }
 
-  return false;
+  return count;
+}
+
+function checkFiveInRow(state: ContigState, player: Player): boolean {
+  return countNInARows(state, player, CONFIG.WIN_BY_ALIGNMENT) > 0;
+}
+
+export function isBoardFull(state: ContigState): boolean {
+  for (const cell of state.cells.values()) {
+    if (cell.owner === null) return false;
+  }
+  return true;
 }
 
 /**
- * Check for a winner
+ * Official tiebreak: most 4-in-a-rows, then most 3-in-a-rows, else draw.
  */
-export function checkWinner(state: ContigState): Player | null {
-  // Check 5 in a row
+export function alignmentTiebreak(state: ContigState): ContigWinner {
+  const four1 = countNInARows(state, 'player1', CONFIG.TIEBREAK_FOUR);
+  const four2 = countNInARows(state, 'player2', CONFIG.TIEBREAK_FOUR);
+  if (four1 !== four2) return four1 > four2 ? 'player1' : 'player2';
+
+  const three1 = countNInARows(state, 'player1', CONFIG.TIEBREAK_THREE);
+  const three2 = countNInARows(state, 'player2', CONFIG.TIEBREAK_THREE);
+  if (three1 !== three2) return three1 > three2 ? 'player1' : 'player2';
+
+  return 'draw';
+}
+
+/**
+ * Check for a winner. 5-in-a-row wins immediately. Full board (or
+ * `settle` after both players passed in a row) uses the alignment tiebreak.
+ */
+export function checkWinner(
+  state: ContigState,
+  options?: { settle?: boolean }
+): ContigWinner | null {
   if (checkFiveInRow(state, 'player1')) return 'player1';
   if (checkFiveInRow(state, 'player2')) return 'player2';
 
-  // Check if board is full
-  let allMarked = true;
-  for (const cell of state.cells.values()) {
-    if (cell.owner === null) {
-      allMarked = false;
-      break;
-    }
-  }
-
-  if (allMarked) {
-    // Winner by points
-    if (state.scores.player1 > state.scores.player2) return 'player1';
-    if (state.scores.player2 > state.scores.player1) return 'player2';
-    // Tie - continue (or could be a draw)
+  if (isBoardFull(state) || options?.settle) {
+    return alignmentTiebreak(state);
   }
 
   return null;

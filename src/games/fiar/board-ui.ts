@@ -313,6 +313,8 @@ export function renderBoard(
         empty: node.chip === null,
         owner,
         validMove: isValidMove,
+        selectable:
+          state.phase === 'movement' && selectableNodes.includes(nodeId),
         validPlacement:
           state.phase === 'placement' && node.chip === null && isSelectable,
         extras: extras.length ? extras : undefined,

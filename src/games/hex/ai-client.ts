@@ -1,7 +1,12 @@
 import HexAiWorker from './ai.worker.ts?worker';
 import { AiWorkerClient } from '../../core/ai-worker/client';
 import { AI_WORKER_SAFETY_DEADLINE_MS } from '../../core/ai-worker/safety';
-import { getBestMove, type AIDifficulty, type AISearchOptions } from './ai';
+import {
+  AI_PLAY_DEADLINE_MS,
+  getBestMove,
+  type AIDifficulty,
+  type AISearchOptions,
+} from './ai';
 import type { HexGameState, HexPosition, Player } from './types';
 
 let client: AiWorkerClient<HexPosition> | null = null;
@@ -41,7 +46,10 @@ export async function getBestMoveAsync(
     player: aiPlayer,
     difficulty,
     seed: options.seed,
-    deadlineMs: options.deadlineMs ?? AI_WORKER_SAFETY_DEADLINE_MS,
+    deadlineMs: Math.min(
+      options.deadlineMs ?? AI_PLAY_DEADLINE_MS[difficulty],
+      AI_WORKER_SAFETY_DEADLINE_MS
+    ),
   });
 }
 

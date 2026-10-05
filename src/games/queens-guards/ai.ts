@@ -24,17 +24,46 @@ import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
+/**
+ * Play-facing wall-time budgets (ms). Hard still searches up to maxDepth when
+ * the machine is fast enough; iterative deepening returns the last finished
+ * depth if the budget runs out. The worker safety cap (180s) is a separate
+ * stall guard, not a play target.
+ */
+export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
+  easy: 800,
+  medium: 1500,
+  hard: 2500,
+};
+
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
   /** Deterministic PRNG seed (worker/direct parity tests). */
   seed?: number;
   /**
-   * Soft wall-time budget (ms). When exceeded between root-move evaluations,
-   * return the best move scored so far. Depth is never reduced.
+   * Soft wall-time budget (ms). When finite, search uses iterative deepening
+   * up to the difficulty maxDepth and aborts mid-tree so a move returns on time.
+   * Omit to keep the historical single-depth search (tests / unlimited).
    */
   deadlineMs?: number;
   /** Clock override for tests. */
   now?: () => number;
+}
+
+interface SearchClock {
+  now: () => number;
+  deadline: number;
+  aborted: boolean;
+  nodes: number;
+}
+
+function clockTimedOut(clock: SearchClock | null): boolean {
+  if (!clock) return false;
+  clock.nodes += 1;
+  if (clock.now() >= clock.deadline) {
+    clock.aborted = true;
+  }
+  return clock.aborted;
 }
 
 export interface AISearchResult {
@@ -232,8 +261,13 @@ function minimax(
   alpha: number,
   beta: number,
   isMaximizing: boolean,
-  aiPlayer: Player
+  aiPlayer: Player,
+  clock: SearchClock | null
 ): number {
+  if (clockTimedOut(clock)) {
+    return evaluatePosition(state, aiPlayer);
+  }
+
   // Terminal conditions
   if (depth === 0 || state.winner !== null) {
     return evaluatePosition(state, aiPlayer);
@@ -256,6 +290,7 @@ function minimax(
   if (isMaximizing) {
     let maxEval = -Infinity;
     for (const move of orderedMoves) {
+      if (clockTimedOut(clock)) break;
       const newState = makeMove(state, move.from, move.to);
       const evalScore = minimax(
         newState,
@@ -263,31 +298,34 @@ function minimax(
         alpha,
         beta,
         false,
-        aiPlayer
+        aiPlayer,
+        clock
       );
       maxEval = Math.max(maxEval, evalScore);
       alpha = Math.max(alpha, evalScore);
       if (beta <= alpha) break;
     }
     return maxEval;
-  } else {
-    let minEval = Infinity;
-    for (const move of orderedMoves) {
-      const newState = makeMove(state, move.from, move.to);
-      const evalScore = minimax(
-        newState,
-        depth - 1,
-        alpha,
-        beta,
-        true,
-        aiPlayer
-      );
-      minEval = Math.min(minEval, evalScore);
-      beta = Math.min(beta, evalScore);
-      if (beta <= alpha) break;
-    }
-    return minEval;
   }
+
+  let minEval = Infinity;
+  for (const move of orderedMoves) {
+    if (clockTimedOut(clock)) break;
+    const newState = makeMove(state, move.from, move.to);
+    const evalScore = minimax(
+      newState,
+      depth - 1,
+      alpha,
+      beta,
+      true,
+      aiPlayer,
+      clock
+    );
+    minEval = Math.min(minEval, evalScore);
+    beta = Math.min(beta, evalScore);
+    if (beta <= alpha) break;
+  }
+  return minEval;
 }
 
 /**
@@ -320,29 +358,25 @@ function orderMoves(
   state: QueensGuardsState,
   moves: { from: BoardCoord; to: BoardCoord }[]
 ): { from: BoardCoord; to: BoardCoord }[] {
-  return moves.sort((a, b) => {
-    const cellA = state.cells.get(cellKey(a.from.ring, a.from.position));
-    const cellB = state.cells.get(cellKey(b.from.ring, b.from.position));
+  const keys = new Map<{ from: BoardCoord; to: BoardCoord }, number>();
+  for (const move of moves) {
+    keys.set(move, moveOrderKey(state, move));
+  }
+  return moves.sort((a, b) => (keys.get(b) ?? 0) - (keys.get(a) ?? 0));
+}
 
-    // Captures first
-    const stateA = makeMove(state, a.from, a.to);
-    const stateB = makeMove(state, b.from, b.to);
-    const captureA =
-      stateA.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
-    const captureB =
-      stateB.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
-    if (captureA !== captureB) return captureB - captureA;
-
-    // Queen moves first
-    const queenA = cellA?.piece?.type === 'queen' ? 1 : 0;
-    const queenB = cellB?.piece?.type === 'queen' ? 1 : 0;
-    if (queenA !== queenB) return queenB - queenA;
-
-    // Moves toward center first
-    const inwardA = a.to.ring < a.from.ring ? 1 : 0;
-    const inwardB = b.to.ring < b.from.ring ? 1 : 0;
-    return inwardB - inwardA;
-  });
+/** Lexicographic: capture, then queen, then inward — one makeMove per candidate. */
+function moveOrderKey(
+  state: QueensGuardsState,
+  move: { from: BoardCoord; to: BoardCoord }
+): number {
+  const next = makeMove(state, move.from, move.to);
+  const capture =
+    next.capturedPieces.length > state.capturedPieces.length ? 1 : 0;
+  const cell = state.cells.get(cellKey(move.from.ring, move.from.position));
+  const queen = cell?.piece?.type === 'queen' ? 1 : 0;
+  const inward = move.to.ring < move.from.ring ? 1 : 0;
+  return capture * 4 + queen * 2 + inward;
 }
 
 // =============================================================================
@@ -385,32 +419,70 @@ export function searchAIMove(
     options.deadlineMs === undefined
       ? Number.POSITIVE_INFINITY
       : started + options.deadlineMs;
+  const timed = Number.isFinite(deadline);
+  const maxDepth = config.maxDepth;
 
-  // Evaluate each move with minimax (same order / depth as before)
-  const scoredMoves: { move: AIMove; score: number }[] = [];
+  let rootMoves = allMoves;
+  let bestScored: { move: AIMove; score: number }[] | null = null;
   let truncated = false;
 
-  for (const move of allMoves) {
-    if (now() >= deadline) {
+  // Unlimited search: one pass at maxDepth (historical). Timed: ID 1..maxDepth.
+  for (let depth = timed ? 1 : maxDepth; depth <= maxDepth; depth++) {
+    if (timed && bestScored && now() >= deadline) {
       truncated = true;
       break;
     }
-    const newState = makeMove(state, move.from, move.to);
-    const score = minimax(
-      newState,
-      config.maxDepth,
-      -Infinity,
-      Infinity,
-      false,
-      aiPlayer
-    );
-    scoredMoves.push({ move, score });
+
+    const clock: SearchClock | null = timed
+      ? { now, deadline, aborted: false, nodes: 0 }
+      : null;
+    const scoredMoves: { move: AIMove; score: number }[] = [];
+    let incomplete = false;
+
+    for (const move of rootMoves) {
+      if (
+        timed &&
+        now() >= deadline &&
+        (scoredMoves.length > 0 || bestScored)
+      ) {
+        incomplete = true;
+        break;
+      }
+      const newState = makeMove(state, move.from, move.to);
+      const score = minimax(
+        newState,
+        depth,
+        -Infinity,
+        Infinity,
+        false,
+        aiPlayer,
+        clock
+      );
+      if (clock?.aborted) {
+        incomplete = true;
+        break;
+      }
+      scoredMoves.push({ move, score });
+    }
+
+    if (!incomplete && scoredMoves.length === rootMoves.length) {
+      scoredMoves.sort((a, b) => b.score - a.score);
+      bestScored = scoredMoves;
+      rootMoves = scoredMoves.map((s) => s.move);
+    } else {
+      truncated = true;
+      if (!bestScored && scoredMoves.length > 0) {
+        scoredMoves.sort((a, b) => b.score - a.score);
+        bestScored = scoredMoves;
+      }
+      break;
+    }
   }
 
-  if (scoredMoves.length === 0) return { move: null, truncated };
-
-  // Sort by score
-  scoredMoves.sort((a, b) => b.score - a.score);
+  const scoredMoves = bestScored;
+  if (!scoredMoves || scoredMoves.length === 0) {
+    return { move: allMoves[0] ?? null, truncated };
+  }
 
   // Add randomness based on difficulty
   if (rng() < config.randomness && scoredMoves.length > 1) {

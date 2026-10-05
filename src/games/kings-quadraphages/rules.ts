@@ -181,6 +181,13 @@ export function isDrawCondition(state: GameState): boolean {
     return true;
   }
 
+  // Official Division I highlights: the game ends when a player has no chips
+  // left to place at the beginning of a turn. If neither King is trapped, that
+  // is a tie. Both supplies at 0 is the usual case after 30 chips each.
+  if (state.player1Supply <= 0 && state.player2Supply <= 0) {
+    return true;
+  }
+
   // Check if board is completely full except Kings and neither is trapped
   const emptyCount = getValidQuadraphagePlacements(state).length;
   if (emptyCount === 0 && player1Moves.length > 0 && player2Moves.length > 0) {

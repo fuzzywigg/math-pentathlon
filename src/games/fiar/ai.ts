@@ -22,14 +22,9 @@ import {
   setSelectedChipKind,
   normalizeSelectedChipKind,
 } from './rules';
+import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
-
-const DIFFICULTY_CONFIG = {
-  easy: { maxDepth: 1, randomness: 0.45, considerMarked: true },
-  medium: { maxDepth: 2, randomness: 0.12, considerMarked: true },
-  hard: { maxDepth: 2, randomness: 0.04, considerMarked: true },
-};
 
 export interface AIMove {
   type: 'place' | 'move';
@@ -38,6 +33,36 @@ export interface AIMove {
   from?: string;
   to?: string;
 }
+
+/** Optional search controls — defaults preserve historical Math.random behavior. */
+export interface AISearchOptions {
+  /** Deterministic PRNG seed (worker/direct parity tests). */
+  seed?: number;
+  /**
+   * Soft wall-time budget (ms). When exceeded between root-move evaluations,
+   * return the best move scored so far. Depth is never reduced.
+   */
+  deadlineMs?: number;
+  /** Clock override for tests. */
+  now?: () => number;
+}
+
+export interface AISearchResult {
+  move: AIMove | null;
+  truncated: boolean;
+}
+
+interface SearchCtx {
+  rng: () => number;
+  now: () => number;
+  deadline: number;
+}
+
+const DIFFICULTY_CONFIG = {
+  easy: { maxDepth: 1, randomness: 0.45, considerMarked: true },
+  medium: { maxDepth: 2, randomness: 0.12, considerMarked: true },
+  hard: { maxDepth: 2, randomness: 0.04, considerMarked: true },
+};
 
 // =============================================================================
 // Threat / win helpers
@@ -102,7 +127,8 @@ function availableKinds(state: FiarGameState, player: Player): ChipKind[] {
 function chooseKindForPlacement(
   state: FiarGameState,
   nodeId: string,
-  difficulty: AIDifficulty
+  difficulty: AIDifficulty,
+  rng: () => number
 ): ChipKind | null {
   const kinds = availableKinds(state, state.currentPlayer);
   if (kinds.length === 0) return null;
@@ -115,7 +141,7 @@ function chooseKindForPlacement(
   if (markedWins) return 'marked';
 
   if (difficulty === 'easy') {
-    return Math.random() < 0.2 ? 'marked' : 'plain';
+    return rng() < 0.2 ? 'marked' : 'plain';
   }
 
   // Use marked if placing it adjacent to an opponent 3+ threat blocks them
@@ -293,8 +319,12 @@ function quickPlaceScore(
 function getBestPlacement(
   state: FiarGameState,
   aiPlayer: Player,
-  difficulty: AIDifficulty
-): { nodeId: string; chipKind: ChipKind } | null {
+  difficulty: AIDifficulty,
+  ctx: SearchCtx
+): {
+  place: { nodeId: string; chipKind: ChipKind } | null;
+  truncated: boolean;
+} {
   const config = DIFFICULTY_CONFIG[difficulty];
   state = normalizeSelectedChipKind(state);
 
@@ -303,22 +333,25 @@ function getBestPlacement(
     for (const kind of availableKinds(state, aiPlayer)) {
       if (wouldWinAfterPlace(state, nodeId, kind)) {
         return {
-          nodeId,
-          chipKind:
-            kind === 'marked' &&
-            canPlaceChip(state, nodeId, 'plain') &&
-            wouldWinAfterPlace(state, nodeId, 'plain')
-              ? 'plain'
-              : kind,
+          place: {
+            nodeId,
+            chipKind:
+              kind === 'marked' &&
+              canPlaceChip(state, nodeId, 'plain') &&
+              wouldWinAfterPlace(state, nodeId, 'plain')
+                ? 'plain'
+                : kind,
+          },
+          truncated: false,
         };
       }
     }
   }
 
   // 2) Block opponent immediate win if possible
-  if (difficulty !== 'easy' || Math.random() > 0.35) {
+  if (difficulty !== 'easy' || ctx.rng() > 0.35) {
     const block = findBlockingPlacement(state, aiPlayer);
-    if (block) return block;
+    if (block) return { place: block, truncated: false };
   }
 
   // Warm line cache once, then rank empties before expensive search.
@@ -341,8 +374,13 @@ function getBestPlacement(
     [];
   const chipsOut = state.chipsPlaced.player1 + state.chipsPlaced.player2;
 
+  let truncated = false;
   for (const nodeId of candidates) {
-    const kind = chooseKindForPlacement(state, nodeId, difficulty);
+    if (ctx.now() >= ctx.deadline) {
+      truncated = true;
+      break;
+    }
+    const kind = chooseKindForPlacement(state, nodeId, difficulty, ctx.rng);
     if (!kind || !canPlaceChip(state, nodeId, kind)) continue;
 
     const newState = placeChip(state, nodeId, kind);
@@ -380,20 +418,26 @@ function getBestPlacement(
     placements.push({ nodeId, chipKind: kind, score });
   }
 
-  if (placements.length === 0) return null;
+  if (placements.length === 0) return { place: null, truncated };
   placements.sort((a, b) => b.score - a.score);
 
-  if (Math.random() < config.randomness && placements.length > 1) {
-    const idx = Math.floor(Math.random() * Math.min(3, placements.length));
+  if (ctx.rng() < config.randomness && placements.length > 1) {
+    const idx = Math.floor(ctx.rng() * Math.min(3, placements.length));
     return {
-      nodeId: placements[idx].nodeId,
-      chipKind: placements[idx].chipKind,
+      place: {
+        nodeId: placements[idx].nodeId,
+        chipKind: placements[idx].chipKind,
+      },
+      truncated,
     };
   }
 
   return {
-    nodeId: placements[0].nodeId,
-    chipKind: placements[0].chipKind,
+    place: {
+      nodeId: placements[0].nodeId,
+      chipKind: placements[0].chipKind,
+    },
+    truncated,
   };
 }
 
@@ -458,8 +502,9 @@ function findBlockingPlacement(
 function getBestMove(
   state: FiarGameState,
   aiPlayer: Player,
-  difficulty: AIDifficulty
-): { from: string; to: string } | null {
+  difficulty: AIDifficulty,
+  ctx: SearchCtx
+): { move: { from: string; to: string } | null; truncated: boolean } {
   const config = DIFFICULTY_CONFIG[difficulty];
   const moves: { from: string; to: string; score: number }[] = [];
 
@@ -468,14 +513,19 @@ function getBestMove(
     if (node.chip !== aiPlayer) continue;
     for (const to of getValidMoves(state, nodeId)) {
       if (wouldWinAfterMove(state, nodeId, to)) {
-        return { from: nodeId, to };
+        return { move: { from: nodeId, to }, truncated: false };
       }
     }
   }
 
-  for (const [nodeId, node] of state.board.nodes) {
+  let truncated = false;
+  outer: for (const [nodeId, node] of state.board.nodes) {
     if (node.chip !== aiPlayer) continue;
     for (const to of getValidMoves(state, nodeId)) {
+      if (ctx.now() >= ctx.deadline) {
+        truncated = true;
+        break outer;
+      }
       const newState = moveChip(state, nodeId, to);
       if (
         difficulty !== 'easy' &&
@@ -500,15 +550,15 @@ function getBestMove(
     }
   }
 
-  if (moves.length === 0) return null;
+  if (moves.length === 0) return { move: null, truncated };
   moves.sort((a, b) => b.score - a.score);
 
-  if (Math.random() < config.randomness && moves.length > 1) {
-    const idx = Math.floor(Math.random() * Math.min(3, moves.length));
-    return { from: moves[idx].from, to: moves[idx].to };
+  if (ctx.rng() < config.randomness && moves.length > 1) {
+    const idx = Math.floor(ctx.rng() * Math.min(3, moves.length));
+    return { move: { from: moves[idx].from, to: moves[idx].to }, truncated };
   }
 
-  return { from: moves[0].from, to: moves[0].to };
+  return { move: { from: moves[0].from, to: moves[0].to }, truncated };
 }
 
 // =============================================================================
@@ -634,32 +684,73 @@ function minimax(
 // Public API
 // =============================================================================
 
+export function searchAIMove(
+  state: FiarGameState,
+  aiPlayer: Player,
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): AISearchResult {
+  if (state.phase === 'gameOver' || state.winner) {
+    return { move: null, truncated: false };
+  }
+  if (state.currentPlayer !== aiPlayer) {
+    return { move: null, truncated: false };
+  }
+
+  const rng =
+    options.seed === undefined ? Math.random : createSeededRng(options.seed);
+  const now = options.now ?? (() => performance.now());
+  const started = now();
+  const deadline =
+    options.deadlineMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : started + options.deadlineMs;
+  const ctx: SearchCtx = { rng, now, deadline };
+
+  if (state.phase === 'placement') {
+    if (chipsRemaining(state.chipInventory[aiPlayer]) === 0) {
+      return { move: null, truncated: false };
+    }
+    const { place, truncated } = getBestPlacement(
+      state,
+      aiPlayer,
+      difficulty,
+      ctx
+    );
+    if (place) {
+      return {
+        move: {
+          type: 'place',
+          nodeId: place.nodeId,
+          chipKind: place.chipKind,
+        },
+        truncated,
+      };
+    }
+    return { move: null, truncated };
+  }
+
+  if (state.phase === 'movement') {
+    const { move, truncated } = getBestMove(state, aiPlayer, difficulty, ctx);
+    if (move) {
+      return {
+        move: { type: 'move', from: move.from, to: move.to },
+        truncated,
+      };
+    }
+    return { move: null, truncated };
+  }
+
+  return { move: null, truncated: false };
+}
+
 export function getAIMove(
   state: FiarGameState,
   aiPlayer: Player,
-  difficulty: AIDifficulty = 'medium'
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
 ): AIMove | null {
-  if (state.phase === 'gameOver' || state.winner) return null;
-  if (state.currentPlayer !== aiPlayer) return null;
-
-  if (state.phase === 'placement') {
-    if (chipsRemaining(state.chipInventory[aiPlayer]) === 0) return null;
-    const place = getBestPlacement(state, aiPlayer, difficulty);
-    if (place) {
-      return {
-        type: 'place',
-        nodeId: place.nodeId,
-        chipKind: place.chipKind,
-      };
-    }
-  } else if (state.phase === 'movement') {
-    const move = getBestMove(state, aiPlayer, difficulty);
-    if (move) {
-      return { type: 'move', from: move.from, to: move.to };
-    }
-  }
-
-  return null;
+  return searchAIMove(state, aiPlayer, difficulty, options).move;
 }
 
 export function applyAIMove(state: FiarGameState, move: AIMove): FiarGameState {

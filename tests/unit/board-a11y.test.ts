@@ -38,6 +38,14 @@ describe('board-a11y helpers (Wave 1)', () => {
         validPlacement: true,
       })
     ).toBe('A1, empty, valid placement');
+
+    expect(
+      buildCellAriaLabel({
+        coord: '1,2',
+        owner: 'Blue',
+        selectable: true,
+      })
+    ).toBe('1,2, Blue, selectable');
   });
 
   it('buildCellAriaLabel includes owner and piece without color-only gaps', () => {
@@ -90,9 +98,15 @@ describe('board-a11y helpers (Wave 1)', () => {
       count += 1;
     });
 
-    cell.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-    cell.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-    cell.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true }));
+    cell.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
+    cell.dispatchEvent(
+      new KeyboardEvent('keydown', { key: ' ', bubbles: true })
+    );
+    cell.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'a', bubbles: true })
+    );
     expect(count).toBe(2);
   });
 
@@ -112,7 +126,9 @@ describe('board-a11y helpers (Wave 1)', () => {
       }
     );
 
-    cell.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    cell.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
     expect(activated).toBe(cell);
   });
 
@@ -154,7 +170,11 @@ describe('board-a11y helpers (Wave 2 grid + roving)', () => {
     document.body.innerHTML = '';
   });
 
-  function makeCell(row: number, col: number, label = `${row},${col}`): HTMLElement {
+  function makeCell(
+    row: number,
+    col: number,
+    label = `${row},${col}`
+  ): HTMLElement {
     const cell = document.createElement('div');
     cell.dataset.row = String(row);
     cell.dataset.col = String(col);
@@ -180,10 +200,18 @@ describe('board-a11y helpers (Wave 2 grid + roving)', () => {
     const cells = [makeCell(0, 0), makeCell(0, 1), makeCell(1, 0)];
     const active = applyRovingTabindex(cells);
     expect(active).toBe(cells[0]);
-    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual(['0', '-1', '-1']);
+    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual([
+      '0',
+      '-1',
+      '-1',
+    ]);
 
     applyRovingTabindex(cells, { row: '0', col: '1' });
-    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual(['-1', '0', '-1']);
+    expect(cells.map((c) => c.getAttribute('tabindex'))).toEqual([
+      '-1',
+      '0',
+      '-1',
+    ]);
   });
 
   it('findGridNeighbor steps over holes', () => {
@@ -205,19 +233,27 @@ describe('board-a11y helpers (Wave 2 grid + roving)', () => {
     bindGridNavigation(board);
     a.focus();
 
-    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    a.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
     expect(document.activeElement).toBe(b);
     expect(b.getAttribute('tabindex')).toBe('0');
     expect(a.getAttribute('tabindex')).toBe('-1');
 
-    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    b.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
     // no (1,1) cell — stays
     expect(document.activeElement).toBe(b);
 
-    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    b.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })
+    );
     expect(document.activeElement).toBe(a);
 
-    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
+    a.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true })
+    );
     expect(document.activeElement).toBe(c);
   });
 
@@ -275,7 +311,9 @@ describe('board-a11y helpers (Wave 3 SVG)', () => {
       count += 1;
     });
 
-    g.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    g.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
+    );
     g.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
     expect(count).toBe(2);
   });
@@ -298,7 +336,9 @@ describe('board-a11y helpers (Wave 3 SVG)', () => {
     bindGridNavigation(svg);
     (a as SVGElement).focus();
 
-    a.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    a.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })
+    );
     expect(document.activeElement).toBe(b);
     expect(b.getAttribute('tabindex')).toBe('0');
     expect(a.getAttribute('tabindex')).toBe('-1');

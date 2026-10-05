@@ -2,7 +2,7 @@
  * Wave 57 leftover after #257 — FIAR movement-phase vsAI 500ms handoff. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import * as fiarAi from '../../src/games/fiar/ai';
+import * as fiarAiClient from '../../src/games/fiar/ai-client';
 import {
   initGame,
   newGameVsAI,
@@ -42,9 +42,9 @@ function forgeMovement(): void {
 }
 
 describe('Wave 57 fiar — movement AI timer 500', () => {
-  it('after P1 move, AI move runs at 500ms via mocked getAIMove', () => {
+  it('after P1 move, AI move runs at 500ms via mocked getAIMoveAsync', async () => {
     vi.useFakeTimers();
-    vi.spyOn(fiarAi, 'getAIMove').mockReturnValue({
+    vi.spyOn(fiarAiClient, 'getAIMoveAsync').mockResolvedValue({
       type: 'move',
       from: 'c2r5',
       to: 'c2r4',
@@ -67,12 +67,12 @@ describe('Wave 57 fiar — movement AI timer 500', () => {
     expect(getCurrentState().board.nodes.get('c2r2')?.chip).toBe('player1');
     expect(getCurrentState().board.nodes.get('c2r5')?.chip).toBe('player2');
 
-    vi.advanceTimersByTime(499);
+    await vi.advanceTimersByTimeAsync(499);
     expect(getCurrentState().board.nodes.get('c2r5')?.chip).toBe('player2');
     expect(getCurrentState().board.nodes.get('c2r4')?.chip).toBeNull();
 
-    vi.advanceTimersByTime(1);
-    expect(fiarAi.getAIMove).toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(fiarAiClient.getAIMoveAsync).toHaveBeenCalled();
     expect(getCurrentState().board.nodes.get('c2r5')?.chip).toBeNull();
     expect(getCurrentState().board.nodes.get('c2r4')?.chip).toBe('player2');
     expect(getCurrentState().currentPlayer).toBe('player1');
