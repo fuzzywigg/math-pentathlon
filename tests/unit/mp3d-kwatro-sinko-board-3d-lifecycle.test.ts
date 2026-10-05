@@ -342,6 +342,22 @@ describe('mp3d Kwatro-Sinko board 3D lifecycle', () => {
     board.unmount();
   });
 
+  it('does not mark chips selectable when chip click handler is omitted', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createKwatroSinkoBoard3D } =
+      await import('../../src/ui/three/kwatro-sinko-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+
+    const board = await createKwatroSinkoBoard3D(host);
+    board.update(createInitialState());
+    expect(host.querySelector('.kwa-a11y-grid .kwa-selectable-chip')).toBeNull();
+    board.unmount();
+  });
+
   it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
     const three = installThreeMock();
     vi.doMock('../../src/ui/three/load-three', () => ({

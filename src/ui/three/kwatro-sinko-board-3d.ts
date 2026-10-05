@@ -577,6 +577,7 @@ export async function createKwatroSinkoBoard3D(
       const isValid = validMoves.has(nm.id) && !node.chip;
       const isWinning = state.winningAlignment?.nodes.includes(nm.id) ?? false;
       const canSelect =
+        !!chipClickHandler &&
         !!node.chip &&
         state.phase === 'selectingChip' &&
         node.chip.owner === state.currentPlayer;
