@@ -210,7 +210,9 @@ export function allChipsOffNumbered(
   chips: Map<string, Chip>,
   player: Player
 ): boolean {
-  const playerChips = Array.from(chips.values()).filter((c) => c.owner === player);
+  const playerChips = Array.from(chips.values()).filter(
+    (c) => c.owner === player
+  );
   if (playerChips.length === 0) return false;
   return playerChips.every((c) => {
     if (!c.position) return false;
@@ -433,7 +435,8 @@ export function checkTrioForWin(
   }
   if (!likes || !opposite) return null;
 
-  const result = likes[0].chip.value + likes[1].chip.value - opposite.chip.value;
+  const result =
+    likes[0].chip.value + likes[1].chip.value - opposite.chip.value;
   if (!isWinningValue(result)) return null;
 
   return {
