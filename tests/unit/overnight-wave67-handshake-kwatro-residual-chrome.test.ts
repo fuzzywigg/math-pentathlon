@@ -33,7 +33,7 @@ describe('Wave 67 handshake — kwatro residual chrome', () => {
     expect(
       kwatroSinkoTutorial.steps.find((s) => s.id === 'winning')?.message
     ).toContain(
-      '<li>The alignment must satisfy: <strong>a + b - c = 4</strong> OR <strong>a + b - c = 5</strong></li>'
+      '<li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>'
     );
   });
 });
