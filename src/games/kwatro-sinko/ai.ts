@@ -12,20 +12,16 @@
 // 4. Even numbers (player 1) can make 4: 0+6-2, 2+4-2, etc.
 // 5. Odd numbers (player 2) can make 5: 1+7-3, 3+9-7, etc.
 
-import {
-  KwaState,
-  Player,
-  Chip,
-  BoardNode,
-  CONFIG,
-  getOpponent,
-} from './types';
+import { KwaState, Player, Chip, BoardNode, getOpponent } from './types';
 import {
   selectChip,
   moveChip,
   getValidMoves,
   hasValidMoves,
   passTurn,
+  allChipsOffNumbered,
+  findWinningAlignment,
+  checkTrioForWin,
 } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
@@ -41,29 +37,26 @@ const DIFFICULTY_CONFIG = {
 // =============================================================================
 
 /**
- * Check if three chips can form a winning equation
+ * Check if three chips can form a winning equation (like + like − opposite).
  */
 function canFormWinningEquation(
-  values: number[]
+  chips: Chip[]
 ): { expression: string; result: number } | null {
-  const [a, b, c] = values;
-
-  const combinations = [
-    { expression: `${a} + ${b} - ${c}`, result: a + b - c },
-    { expression: `${a} - ${b} + ${c}`, result: a - b + c },
-    { expression: `${b} + ${c} - ${a}`, result: b + c - a },
-    { expression: `${a} + ${c} - ${b}`, result: a + c - b },
-    { expression: `${b} - ${a} + ${c}`, result: b - a + c },
-    { expression: `${c} + ${a} - ${b}`, result: c + a - b },
-  ];
-
-  for (const combo of combinations) {
-    if (CONFIG.TARGET_VALUES.includes(combo.result as 4 | 5)) {
-      return combo;
-    }
-  }
-
-  return null;
+  if (chips.length !== 3) return null;
+  // Nodes are unused by checkTrioForWin beyond ids; stub empty pads.
+  const stubNode = (chip: Chip, index: number): BoardNode => ({
+    id: `ai-stub-${index}`,
+    x: 0,
+    y: 0,
+    isNumbered: false,
+    chip,
+    connections: [],
+  });
+  const alignment = checkTrioForWin(
+    chips.map((chip, index) => ({ node: stubNode(chip, index), chip }))
+  );
+  if (!alignment) return null;
+  return { expression: alignment.expression, result: alignment.result };
 }
 
 /**
@@ -124,12 +117,16 @@ function isOnAlignmentPath(
 
     // If we have 3 chips that could form a winning equation
     if (chipsInLine.length >= 3) {
-      const values = chipsInLine.map((c) => c.value);
-      // Check all combinations of 3 from these chips
-      for (let i = 0; i < values.length - 2; i++) {
-        for (let j = i + 1; j < values.length - 1; j++) {
-          for (let k = j + 1; k < values.length; k++) {
-            if (canFormWinningEquation([values[i], values[j], values[k]])) {
+      for (let i = 0; i < chipsInLine.length - 2; i++) {
+        for (let j = i + 1; j < chipsInLine.length - 1; j++) {
+          for (let k = j + 1; k < chipsInLine.length; k++) {
+            if (
+              canFormWinningEquation([
+                chipsInLine[i],
+                chipsInLine[j],
+                chipsInLine[k],
+              ])
+            ) {
               return true;
             }
           }
@@ -142,21 +139,18 @@ function isOnAlignmentPath(
 }
 
 /**
- * Check if a move would create a winning alignment
+ * Check if a move would create a legal win (chips off numbered + alignment).
  */
 function wouldCreateWin(
   state: KwaState,
   chipId: string,
   toNodeId: string
 ): { expression: string; result: number } | null {
-  // Simulate the move
   const chip = state.chips.get(chipId);
   if (!chip) return null;
 
-  // Temporarily place chip at new position
   const newNodes = new Map(state.nodes);
 
-  // Clear old position
   if (chip.position) {
     const oldNode = newNodes.get(chip.position);
     if (oldNode) {
@@ -164,77 +158,22 @@ function wouldCreateWin(
     }
   }
 
-  // Set new position
   const newNode = newNodes.get(toNodeId);
   if (!newNode) return null;
   const movedChip = { ...chip, position: toNodeId };
   newNodes.set(toNodeId, { ...newNode, chip: movedChip });
 
-  // Check for alignment
-  const directions = [
-    [
-      [0, -1],
-      [0, 1],
-    ],
-    [
-      [-1, 0],
-      [1, 0],
-    ],
-    [
-      [-1, -1],
-      [1, 1],
-    ],
-    [
-      [-1, 1],
-      [1, -1],
-    ],
-  ];
+  const newChips = new Map(state.chips);
+  newChips.set(chip.id, movedChip);
 
-  const match = toNodeId.match(/n(\d+)-(\d+)/);
-  if (!match) return null;
-  const row = parseInt(match[1]);
-  const col = parseInt(match[2]);
-
-  for (const [dir1, dir2] of directions) {
-    const lineChips: Chip[] = [movedChip];
-
-    for (const [dr, dc] of [dir1, dir2]) {
-      let r = row + dr;
-      let c = col + dc;
-
-      while (r >= 0 && r < 5 && c >= 0 && c < 5) {
-        const adjId = `n${r}-${c}`;
-        const adjNode = newNodes.get(adjId);
-
-        if (adjNode?.chip) {
-          lineChips.push(adjNode.chip);
-        } else {
-          break;
-        }
-
-        r += dr;
-        c += dc;
-      }
-    }
-
-    if (lineChips.length >= 3) {
-      const values = lineChips.map((c) => c.value);
-      for (let i = 0; i < values.length - 2; i++) {
-        for (let j = i + 1; j < values.length - 1; j++) {
-          for (let k = j + 1; k < values.length; k++) {
-            const result = canFormWinningEquation([
-              values[i],
-              values[j],
-              values[k],
-            ]);
-            if (result) return result;
-          }
-        }
-      }
-    }
+  // Same conjunctive gate as moveChip — alignment alone is not a win.
+  if (!allChipsOffNumbered(newNodes, newChips, chip.owner)) {
+    return null;
   }
 
-  return null;
+  const alignment = findWinningAlignment(newNodes, toNodeId);
+  if (!alignment) return null;
+  return { expression: alignment.expression, result: alignment.result };
 }
 
 // =============================================================================

@@ -198,6 +198,45 @@ export function isValidMove(
 }
 
 // =============================================================================
+// Win conditions (Division II Highlights)
+// =============================================================================
+
+/**
+ * True when every chip owned by `player` sits on a non-numbered space.
+ * Official: a win cannot be declared until ALL 5 chips are off ALL numbered spaces.
+ */
+export function allChipsOffNumbered(
+  nodes: Map<string, BoardNode>,
+  chips: Map<string, Chip>,
+  player: Player
+): boolean {
+  const playerChips = Array.from(chips.values()).filter(
+    (c) => c.owner === player
+  );
+  if (playerChips.length === 0) return false;
+  return playerChips.every((c) => {
+    if (!c.position) return false;
+    const node = nodes.get(c.position);
+    return Boolean(node && !node.isNumbered);
+  });
+}
+
+/**
+ * Scan the board for any winning alignment (used when the last chip leaves
+ * a numbered space and an existing path becomes declarable).
+ */
+function findAnyWinningAlignment(
+  nodes: Map<string, BoardNode>
+): Alignment | null {
+  for (const node of nodes.values()) {
+    if (!node.chip) continue;
+    const alignment = findWinningAlignment(nodes, node.id);
+    if (alignment) return alignment;
+  }
+  return null;
+}
+
+// =============================================================================
 // Move Execution
 // =============================================================================
 
@@ -233,10 +272,20 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
   const newChips = new Map(state.chips);
   newChips.set(chip.id, updatedChip);
 
-  // Check for winning alignment
-  const alignment = findWinningAlignment(newNodes, toNodeId);
+  // Official Div II goal is conjunctive: all 5 chips off numbered spaces AND
+  // a valid 3-chip alignment (2 same color + 1 opposite totaling 4 or 5).
+  const chipsOff = allChipsOffNumbered(newNodes, newChips, state.currentPlayer);
+  let alignment: Alignment | null = null;
+  if (chipsOff) {
+    alignment =
+      findWinningAlignment(newNodes, toNodeId) ??
+      findAnyWinningAlignment(newNodes);
+  }
 
-  // Record move
+  const winner: Player | null = alignment ? state.currentPlayer : null;
+  const phase: KwaState['phase'] = winner ? 'gameOver' : 'selectingChip';
+
+  // Record move (alignment only when it completes a legal win)
   const move: KwaMove = {
     player: state.currentPlayer,
     chip: updatedChip,
@@ -245,32 +294,6 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
     alignment,
     moveNumber: state.moveHistory.length + 1,
   };
-
-  // Check for winner
-  let winner: Player | null = null;
-  let phase: KwaState['phase'] = 'selectingChip';
-
-  if (alignment) {
-    winner = state.currentPlayer;
-    phase = 'gameOver';
-  }
-
-  // Also check if all chips are on non-numbered spaces (alternative win)
-  if (!winner) {
-    const playerChips = Array.from(newChips.values()).filter(
-      (c) => c.owner === state.currentPlayer
-    );
-    const allOnNonNumbered = playerChips.every((c) => {
-      if (!c.position) return false;
-      const node = newNodes.get(c.position);
-      return node && !node.isNumbered;
-    });
-
-    if (allOnNonNumbered) {
-      winner = state.currentPlayer;
-      phase = 'gameOver';
-    }
-  }
 
   return {
     ...state,
@@ -295,7 +318,7 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
 /**
  * Find a winning alignment through a node
  */
-function findWinningAlignment(
+export function findWinningAlignment(
   nodes: Map<string, BoardNode>,
   nodeId: string
 ): Alignment | null {
@@ -366,7 +389,9 @@ function findWinningAlignment(
 }
 
 /**
- * Check a line of chips for a winning combination
+ * Check a line of chips for a winning combination.
+ * Official Div II: exactly 3 chips, two of one color and one of the opposite;
+ * like + like − opposite must equal 4 or 5.
  */
 function checkLineForWin(
   lineChips: { node: BoardNode; chip: Chip }[]
@@ -375,44 +400,51 @@ function checkLineForWin(
   for (let i = 0; i < lineChips.length - 2; i++) {
     for (let j = i + 1; j < lineChips.length - 1; j++) {
       for (let k = j + 1; k < lineChips.length; k++) {
-        const chips = [lineChips[i], lineChips[j], lineChips[k]];
-        const values = chips.map((c) => c.chip.value);
-
-        // Try different combinations: a + b - c, a - b + c, etc.
-        const combinations = [
-          {
-            expr: `${values[0]} + ${values[1]} - ${values[2]}`,
-            result: values[0] + values[1] - values[2],
-          },
-          {
-            expr: `${values[0]} - ${values[1]} + ${values[2]}`,
-            result: values[0] - values[1] + values[2],
-          },
-          {
-            expr: `${values[1]} + ${values[2]} - ${values[0]}`,
-            result: values[1] + values[2] - values[0],
-          },
-          {
-            expr: `${values[0]} + ${values[2]} - ${values[1]}`,
-            result: values[0] + values[2] - values[1],
-          },
-        ];
-
-        for (const combo of combinations) {
-          if (isWinningValue(combo.result)) {
-            return {
-              nodes: chips.map((c) => c.node.id),
-              chips: chips.map((c) => c.chip),
-              expression: `${combo.expr} = ${combo.result}`,
-              result: combo.result,
-            };
-          }
-        }
+        const trio = [lineChips[i], lineChips[j], lineChips[k]];
+        const alignment = checkTrioForWin(trio);
+        if (alignment) return alignment;
       }
     }
   }
 
   return null;
+}
+
+/**
+ * Evaluate one 3-chip set under the like + like − opposite rule.
+ */
+export function checkTrioForWin(
+  trio: { node: BoardNode; chip: Chip }[]
+): Alignment | null {
+  if (trio.length !== 3) return null;
+
+  const byOwner = new Map<Player, { node: BoardNode; chip: Chip }[]>();
+  for (const entry of trio) {
+    const list = byOwner.get(entry.chip.owner) ?? [];
+    list.push(entry);
+    byOwner.set(entry.chip.owner, list);
+  }
+
+  if (byOwner.size !== 2) return null;
+
+  let likes: { node: BoardNode; chip: Chip }[] | null = null;
+  let opposite: { node: BoardNode; chip: Chip } | null = null;
+  for (const group of byOwner.values()) {
+    if (group.length === 2) likes = group;
+    if (group.length === 1) opposite = group[0];
+  }
+  if (!likes || !opposite) return null;
+
+  const result =
+    likes[0].chip.value + likes[1].chip.value - opposite.chip.value;
+  if (!isWinningValue(result)) return null;
+
+  return {
+    nodes: trio.map((c) => c.node.id),
+    chips: trio.map((c) => c.chip),
+    expression: `${likes[0].chip.value} + ${likes[1].chip.value} - ${opposite.chip.value} = ${result}`,
+    result,
+  };
 }
 
 // =============================================================================

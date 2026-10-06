@@ -1,5 +1,6 @@
 /**
- * Wave 47 leftover after #214/#215 — Kwatro-Sinko forged alignment win with result 4 via moveChip. Tests-only.
+ * Wave 47 leftover after #214/#215 — Kwatro-Sinko forged alignment win with result 4 via moveChip.
+ * Updated for #375: win requires all chips off numbered spaces + mixed-color like+like−opposite.
  */
 import { describe, it, expect } from 'vitest';
 
@@ -30,29 +31,33 @@ function placeChip(state: KwaState, chipId: string, nodeId: string): KwaState {
   return { ...state, nodes, chips };
 }
 
-/** 6 - 2 + 0 = 4 along row 2; mover adjacent at n1-2 */
+/** Red: 1 + 9 − 6 = 4 along row 2; all Red chips off numbered rows */
 function forgeFourWinSetup(): KwaState {
   let state = createInitialState();
-  state = placeChip(state, 'p1-3', 'n2-0'); // value 6
-  state = placeChip(state, 'p1-1', 'n2-1'); // value 2
-  state = placeChip(state, 'p1-0', 'n1-2'); // value 0 → n2-2
+  state = { ...state, currentPlayer: 'player2' };
+  state = placeChip(state, 'p2-4', 'n2-0'); // 9
+  state = placeChip(state, 'p1-3', 'n2-1'); // 6
+  state = placeChip(state, 'p2-0', 'n1-2'); // 1 → n2-2
+  state = placeChip(state, 'p2-1', 'n1-0');
+  state = placeChip(state, 'p2-2', 'n1-1');
+  state = placeChip(state, 'p2-3', 'n1-3');
   return state;
 }
 
 describe('Wave 47 kwatro deepen 16 — kwatro-sinko — alignment win four', () => {
-  it('moveChip completes horizontal line and sets winner player1', () => {
+  it('moveChip completes horizontal line and sets winner player2', () => {
     const state = forgeFourWinSetup();
-    const selected = selectChip(state, 'p1-0');
+    const selected = selectChip(state, 'p2-0');
     const result = moveChip(selected, 'n2-2');
 
     expect(result.phase).toBe('gameOver');
-    expect(result.winner).toBe('player1');
-    expect(result.currentPlayer).toBe('player1');
+    expect(result.winner).toBe('player2');
+    expect(result.currentPlayer).toBe('player2');
   });
 
   it('winning alignment expression evaluates to 4', () => {
     const state = forgeFourWinSetup();
-    const result = moveChip(selectChip(state, 'p1-0'), 'n2-2');
+    const result = moveChip(selectChip(state, 'p2-0'), 'n2-2');
 
     expect(result.winningAlignment).not.toBeNull();
     expect(result.winningAlignment?.result).toBe(4);
@@ -62,7 +67,7 @@ describe('Wave 47 kwatro deepen 16 — kwatro-sinko — alignment win four', () 
 
   it('move history records alignment on the winning move', () => {
     const state = forgeFourWinSetup();
-    const result = moveChip(selectChip(state, 'p1-0'), 'n2-2');
+    const result = moveChip(selectChip(state, 'p2-0'), 'n2-2');
 
     expect(result.moveHistory).toHaveLength(1);
     expect(result.moveHistory[0].alignment?.result).toBe(4);
@@ -71,10 +76,10 @@ describe('Wave 47 kwatro deepen 16 — kwatro-sinko — alignment win four', () 
 
   it('chip lands on forged node and clears selection', () => {
     const state = forgeFourWinSetup();
-    const result = moveChip(selectChip(state, 'p1-0'), 'n2-2');
+    const result = moveChip(selectChip(state, 'p2-0'), 'n2-2');
 
     expect(result.selectedChip).toBeNull();
-    expect(result.nodes.get('n2-2')?.chip?.value).toBe(0);
+    expect(result.nodes.get('n2-2')?.chip?.value).toBe(1);
     expect(result.nodes.get('n1-2')?.chip).toBeNull();
   });
 });

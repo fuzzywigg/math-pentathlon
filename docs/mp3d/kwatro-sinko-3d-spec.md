@@ -1,17 +1,16 @@
 # Kwatro-Sinko 3D board (mp3d)
 
-Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Division III), gated by `board3d` (off by default).
+Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Division II), gated by `board3d` (off by default).
 
 ## Rules source
 
-- Official MP Div III Highlights (Kwatro-Sinko), cross-checked in `docs/mp3d-step0-specs` (`spec-kwatro-sinko.md` / `.gemini.md`).
+- Official MP Div II Highlights (Kwatro-Sinko): https://www.mathpentath.org/wp-content/uploads/2026/01/Highlights-Division-2.pdf
 - Repo engine: `src/games/kwatro-sinko/{rules,types,board-ui,game-controller,ai}.ts`.
 
-## Rules judgment calls (this PR)
+## Rules judgment calls
 
-1. **Diagonal connectivity:** Official Highlights say chips may move to any adjacent empty square (horizontally, vertically, or diagonally). The engine (`createBoard`) only adds diagonal links in the central 3×3. This 3D board draws and plays the **engine** graph so 2D/3D stay identical. Changing topology is a scoring/mechanic change and was not done here.
-2. **Win equation order:** Official allows any variable order for `a + b - c = 4 or 5`. The engine already checks the relevant permutations in `checkLineForWin`.
-3. **Alternative win:** Official and engine agree — all five of a player's chips on the three middle (non-numbered) rows wins.
+1. **Diagonal connectivity:** Open for Andrew (#355). The engine (`createBoard`) only adds diagonal links in the central 3×3. This 3D board draws and plays the **engine** graph so 2D/3D stay identical.
+2. **Win condition (conjunctive):** Div II Highlights — all 5 of the player's chips must be on non-numbered spaces **and** the player must identify a straight path of exactly 3 chips (two of one color, one of the opposite) where like + like − opposite totals 4 or 5. A win cannot be declared until all 5 chips are off all numbered spaces. There is no standalone "territory" win.
 
 ## Grid
 

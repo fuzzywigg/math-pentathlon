@@ -1,11 +1,11 @@
 /**
- * Wave 42 — Kwatro-Sinko forged alignment win with result 5 via moveChip. Tests-only.
+ * Wave 42 — Kwatro-Sinko forged alignment win with result 5 via moveChip.
+ * Updated for #375: win requires all chips off numbered spaces + mixed-color like+like−opposite.
  */
 import { describe, it, expect } from 'vitest';
 
 import {
   createInitialState,
-  passTurn,
   selectChip,
   moveChip,
 } from '../../src/games/kwatro-sinko/rules';
@@ -31,43 +31,45 @@ function placeChip(state: KwaState, chipId: string, nodeId: string): KwaState {
   return { ...state, nodes, chips };
 }
 
-/** 3 + 7 - 5 = 5 along row 2; mover adjacent at n1-2 */
+/** Blue: 6 + 2 − 3 = 5 along row 2; all Blue chips off numbered rows */
 function forgeFiveWinSetup(): KwaState {
-  let state = passTurn(createInitialState());
-  expect(state.currentPlayer).toBe('player2');
-  state = placeChip(state, 'p2-1', 'n2-0'); // value 3
-  state = placeChip(state, 'p2-3', 'n2-1'); // value 7
-  state = placeChip(state, 'p2-2', 'n1-2'); // value 5 → n2-2
+  let state = createInitialState();
+  state = placeChip(state, 'p1-3', 'n2-0'); // 6
+  state = placeChip(state, 'p2-1', 'n2-1'); // 3
+  state = placeChip(state, 'p1-1', 'n1-2'); // 2 → n2-2
+  state = placeChip(state, 'p1-0', 'n1-0');
+  state = placeChip(state, 'p1-2', 'n1-1');
+  state = placeChip(state, 'p1-4', 'n1-3');
   return state;
 }
 
 describe('Wave 42 kwatro-sinko — alignment win five', () => {
-  it('player2 moveChip triggers gameOver with winner player2', () => {
+  it('player1 moveChip triggers gameOver with winner player1', () => {
     const state = forgeFiveWinSetup();
-    const result = moveChip(selectChip(state, 'p2-2'), 'n2-2');
+    const result = moveChip(selectChip(state, 'p1-1'), 'n2-2');
 
     expect(result.phase).toBe('gameOver');
-    expect(result.winner).toBe('player2');
+    expect(result.winner).toBe('player1');
   });
 
   it('alignment result is 5 with three chips on the forged line', () => {
-    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p2-2'), 'n2-2');
+    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p1-1'), 'n2-2');
 
     expect(result.winningAlignment?.result).toBe(5);
     expect(result.winningAlignment?.chips.map((c) => c.value).sort()).toEqual([
-      3, 5, 7,
+      2, 3, 6,
     ]);
   });
 
-  it('winning move keeps player2 as currentPlayer when game ends', () => {
-    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p2-2'), 'n2-2');
-    expect(result.currentPlayer).toBe('player2');
+  it('winning move keeps player1 as currentPlayer when game ends', () => {
+    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p1-1'), 'n2-2');
+    expect(result.currentPlayer).toBe('player1');
   });
 
   it('nodes map reflects chip relocation after forged win', () => {
-    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p2-2'), 'n2-2');
+    const result = moveChip(selectChip(forgeFiveWinSetup(), 'p1-1'), 'n2-2');
 
-    expect(result.nodes.get('n2-2')?.chip?.value).toBe(5);
+    expect(result.nodes.get('n2-2')?.chip?.value).toBe(2);
     expect(result.nodes.get('n1-2')?.chip).toBeNull();
   });
 });
