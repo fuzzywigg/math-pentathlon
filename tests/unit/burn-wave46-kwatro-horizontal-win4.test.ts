@@ -1,5 +1,6 @@
 /**
- * Wave 46 — Kwatro horizontal alignment win-4 leftover (vs wave45 vertical). Tests-only.
+ * Wave 46 — Kwatro horizontal alignment win-4 leftover (vs wave45 vertical).
+ * Updated for #375: win requires all chips off numbered spaces + mixed-color like+like−opposite.
  */
 import { describe, it, expect } from 'vitest';
 import { createInitialState, selectChip, moveChip } from '../../src/games/kwatro-sinko/rules';
@@ -21,14 +22,18 @@ function place(state: KwaState, chipId: string, nodeId: string): KwaState {
 }
 
 describe('Wave 46 kwatro — horizontal win 4', () => {
-  it('forged horizontal 0+6-2=4 wins via moveChip', () => {
+  it('forged horizontal 1+9-6=4 wins via moveChip', () => {
     let state = createInitialState();
-    state = place(state, 'p1-0', 'n2-0'); // 0
+    state = { ...state, currentPlayer: 'player2' };
+    state = place(state, 'p2-4', 'n2-0'); // 9
     state = place(state, 'p1-3', 'n2-1'); // 6
-    state = place(state, 'p1-1', 'n1-2'); // 2 → n2-2
-    const result = moveChip(selectChip(state, 'p1-1'), 'n2-2');
+    state = place(state, 'p2-0', 'n1-2'); // 1 → n2-2
+    state = place(state, 'p2-1', 'n1-0');
+    state = place(state, 'p2-2', 'n1-1');
+    state = place(state, 'p2-3', 'n1-3');
+    const result = moveChip(selectChip(state, 'p2-0'), 'n2-2');
     expect(result.phase).toBe('gameOver');
-    expect(result.winner).toBe('player1');
+    expect(result.winner).toBe('player2');
     expect(result.winningAlignment?.result).toBe(4);
   });
 });

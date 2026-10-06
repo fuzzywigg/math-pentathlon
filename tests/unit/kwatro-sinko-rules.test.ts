@@ -152,68 +152,41 @@ describe('Kwatro-Sinko – isValidMove / hasValidMoves / passTurn / formatMove',
 });
 
 describe('Kwatro-Sinko – win paths', () => {
-  it('alignment win: three chips form a+b-c = 4 after moveChip', () => {
+  it('conjunctive win: chips off numbered + like+like−opposite = 5', () => {
     const state = createInitialState();
-    // Clear start rows so crafted mid-board line is free
-    for (const id of [...state.chips.keys()]) {
-      const chip = state.chips.get(id)!;
-      if (chip.position) {
-        const node = state.nodes.get(chip.position)!;
-        state.nodes.set(chip.position, { ...node, chip: null });
-        state.chips.set(id, { ...chip, position: null });
-      }
-    }
-    // p1 values: 0,2,4,6,8 → 0 + 8 - 4 = 4 on horizontal n2-0,n2-1,n2-2
-    putChip(state, 'p1-0', 'n2-0'); // 0
-    putChip(state, 'p1-4', 'n2-1'); // 8
-    putChip(state, 'p1-2', 'n1-2'); // 4 — will slide into n2-2
-    putChip(state, 'p1-1', 'n3-0'); // 2
-    putChip(state, 'p1-3', 'n3-4'); // 6
-    putChip(state, 'p2-0', 'n4-0');
-    putChip(state, 'p2-1', 'n4-1');
-    putChip(state, 'p2-2', 'n4-2');
-    putChip(state, 'p2-3', 'n4-3');
-    putChip(state, 'p2-4', 'n4-4');
+    // Blue: 6 + 2 − 3 = 5; all Blue chips on non-numbered spaces
+    putChip(state, 'p1-3', 'n2-0'); // 6
+    putChip(state, 'p2-1', 'n2-1'); // 3
+    putChip(state, 'p1-1', 'n1-2'); // 2 → n2-2
+    putChip(state, 'p1-0', 'n1-0');
+    putChip(state, 'p1-2', 'n1-1');
+    putChip(state, 'p1-4', 'n1-3');
 
-    expect(isValidMove(state, 'p1-2', 'n2-2')).toBe(true);
-    let next = selectChip(state, 'p1-2');
+    expect(isValidMove(state, 'p1-1', 'n2-2')).toBe(true);
+    let next = selectChip(state, 'p1-1');
     next = moveChip(next, 'n2-2');
 
     expect(next.phase).toBe('gameOver');
     expect(next.winner).toBe('player1');
     expect(next.winningAlignment).not.toBeNull();
-    expect(next.winningAlignment!.result).toBe(4);
+    expect(next.winningAlignment!.result).toBe(5);
     expect(isWinningValue(next.winningAlignment!.result)).toBe(true);
   });
 
-  it('alternative win: all own chips on non-numbered spaces', () => {
+  it('chips-off alone without alignment does not win', () => {
     const state = createInitialState();
-    for (const id of [...state.chips.keys()]) {
-      const chip = state.chips.get(id)!;
-      if (chip.position) {
-        const node = state.nodes.get(chip.position)!;
-        state.nodes.set(chip.position, { ...node, chip: null });
-        state.chips.set(id, { ...chip, position: null });
-      }
-    }
-    // Rows 1–3 are non-numbered; leave one chip on numbered n0-2 to move inward
     putChip(state, 'p1-0', 'n1-0');
     putChip(state, 'p1-1', 'n1-1');
     putChip(state, 'p1-3', 'n1-3');
     putChip(state, 'p1-4', 'n1-4');
     putChip(state, 'p1-2', 'n0-2'); // numbered → move to n1-2
-    putChip(state, 'p2-0', 'n4-0');
-    putChip(state, 'p2-1', 'n4-1');
-    putChip(state, 'p2-2', 'n4-2');
-    putChip(state, 'p2-3', 'n4-3');
-    putChip(state, 'p2-4', 'n4-4');
 
     expect(state.nodes.get('n1-2')!.isNumbered).toBe(false);
     let next = selectChip(state, 'p1-2');
     next = moveChip(next, 'n1-2');
 
-    expect(next.phase).toBe('gameOver');
-    expect(next.winner).toBe('player1');
+    expect(next.phase).toBe('selectingChip');
+    expect(next.winner).toBeNull();
     const p1 = [...next.chips.values()].filter((c) => c.owner === 'player1');
     expect(
       p1.every((c) => c.position && !next.nodes.get(c.position)!.isNumbered)

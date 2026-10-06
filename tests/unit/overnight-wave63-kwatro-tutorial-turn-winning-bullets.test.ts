@@ -19,13 +19,16 @@ describe('Wave 63 kwatro — tutorial turn/winning bullets', () => {
 
     const winning = kwatroSinkoTutorial.steps.find((s) => s.id === 'winning');
     expect(winning?.message).toContain(
-      '<li>Form 3 chips in a line (any direction)</li>'
+      '<li>All 5 of your chips must be off the numbered start rows</li>'
     );
     expect(winning?.message).toContain(
-      '<li>Example: 6 + 3 - 5 = 4 ✓</li>'
+      '<li>Form 3 chips in a line: two of one color and one of the opposite color</li>'
     );
     expect(winning?.message).toContain(
-      '<li>Example: 8 + 1 - 4 = 5 ✓</li>'
+      '<li>Example: 6 + 2 - 3 = 5 ✓</li>'
+    );
+    expect(winning?.message).toContain(
+      '<li>Example: 9 + 1 - 6 = 4 ✓</li>'
     );
   });
 });

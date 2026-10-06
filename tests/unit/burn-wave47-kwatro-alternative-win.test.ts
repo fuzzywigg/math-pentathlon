@@ -1,5 +1,7 @@
 /**
- * Wave 47 leftover after #214/#215 — Kwatro-Sinko alternative win: all chips on non-numbered spaces. Tests-only.
+ * Wave 47 leftover after #214/#215 — Kwatro-Sinko "all chips off numbered" alone.
+ * Updated for #375 / Div II Highlights: chips-off is required but not sufficient;
+ * a mixed-color alignment is also required, so territory-only no longer ends the game.
  */
 import { describe, it, expect } from 'vitest';
 
@@ -7,6 +9,7 @@ import {
   createInitialState,
   selectChip,
   moveChip,
+  allChipsOffNumbered,
 } from '../../src/games/kwatro-sinko/rules';
 import type { Chip, KwaState } from '../../src/games/kwatro-sinko/types';
 
@@ -31,7 +34,7 @@ function placeChip(state: KwaState, chipId: string, nodeId: string): KwaState {
 }
 
 /** Four p1 chips scattered on non-numbered nodes; p1-4 still on n0-4 */
-function forgeAlmostAlternativeWin(): KwaState {
+function forgeAlmostAllOff(): KwaState {
   let state = createInitialState();
   state = placeChip(state, 'p1-0', 'n2-1');
   state = placeChip(state, 'p1-1', 'n3-3');
@@ -41,18 +44,21 @@ function forgeAlmostAlternativeWin(): KwaState {
 }
 
 describe('Wave 47 kwatro deepen 17 — kwatro-sinko — alternative win', () => {
-  it('last chip leaving numbered row ends game without alignment', () => {
-    const state = forgeAlmostAlternativeWin();
+  it('last chip leaving numbered row does not end game without alignment', () => {
+    const state = forgeAlmostAllOff();
     const result = moveChip(selectChip(state, 'p1-4'), 'n1-4');
 
-    expect(result.phase).toBe('gameOver');
-    expect(result.winner).toBe('player1');
+    expect(result.phase).toBe('selectingChip');
+    expect(result.winner).toBeNull();
     expect(result.winningAlignment).toBeNull();
+    expect(allChipsOffNumbered(result.nodes, result.chips, 'player1')).toBe(
+      true
+    );
   });
 
-  it('all player1 chips rest on non-numbered nodes after alternative win', () => {
+  it('all player1 chips rest on non-numbered nodes after the move', () => {
     const result = moveChip(
-      selectChip(forgeAlmostAlternativeWin(), 'p1-4'),
+      selectChip(forgeAlmostAllOff(), 'p1-4'),
       'n1-4'
     );
 
@@ -65,18 +71,19 @@ describe('Wave 47 kwatro deepen 17 — kwatro-sinko — alternative win', () => 
     }
   });
 
-  it('move history records null alignment for territory win', () => {
+  it('move history records null alignment for chips-off-only move', () => {
     const result = moveChip(
-      selectChip(forgeAlmostAlternativeWin(), 'p1-4'),
+      selectChip(forgeAlmostAllOff(), 'p1-4'),
       'n1-4'
     );
 
     expect(result.moveHistory[0].alignment).toBeNull();
     expect(result.moveHistory[0].player).toBe('player1');
+    expect(result.currentPlayer).toBe('player2');
   });
 
-  it('setup has one numbered p1 chip before the clinching move', () => {
-    const state = forgeAlmostAlternativeWin();
+  it('setup has one numbered p1 chip before the move', () => {
+    const state = forgeAlmostAllOff();
     const numbered = [...state.chips.values()]
       .filter((c) => c.owner === 'player1')
       .filter((c) => state.nodes.get(c.position!)?.isNumbered);
