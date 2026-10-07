@@ -18,7 +18,13 @@
     "test:e2e:chromium": "playwright test --project=chromium",
     "test:e2e:cross": "playwright test --project=firefox --project=webkit --project=ipad-webkit",
     "test:e2e:ui": "playwright test --ui",
+<<<<<<< HEAD
     "test": "npm run test:unit && npm run test:e2e:chromium"
+=======
+    "test:visual": "playwright test -c playwright.visual.config.ts",
+    "test:visual:update": "playwright test -c playwright.visual.config.ts --update-snapshots",
+    "test": "npm run test:unit && npm run test:e2e"
+>>>>>>> origin/cursor/visual-regression-suite-f144
   },
   "keywords": [],
   "author": "",

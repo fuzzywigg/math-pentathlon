@@ -18,12 +18,16 @@ npm test             # unit then e2e
 npm run test:unit
 npm run test:e2e:chromium   # required CI path
 npm run test:e2e:cross      # opt-in Firefox + WebKit + iPad WebKit
+npm run test:visual          # opt-in 2D screenshot suite (not in CI)
+npm run test:visual:update   # refresh committed baselines
 npm run build
 npm run lint
 npm run format:check
 ```
 
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
+
+Opt-in visual regression (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
 
 ## Branches
 
