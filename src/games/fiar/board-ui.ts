@@ -446,6 +446,7 @@ export function injectFiarStyles(): void {
       background: #fff;
       border-radius: 8px;
       padding: 0.45rem 0.85rem;
+      min-height: 44px;
       font-size: 0.9rem;
       cursor: pointer;
     }

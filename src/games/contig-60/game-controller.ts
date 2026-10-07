@@ -43,6 +43,10 @@ let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 
+function isComputerTurn(): boolean {
+  return vsAI && gameState.currentPlayer === aiPlayer;
+}
+
 // =============================================================================
 // UI Rendering
 // =============================================================================
@@ -52,6 +56,7 @@ function updateUI(): void {
 
   const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
+  const humanCanAct = !isComputerTurn();
 
   // Render scores
   const scoresDiv = document.createElement('div');
@@ -70,13 +75,16 @@ function updateUI(): void {
   const diceArea = renderDice(
     gameState.currentDice,
     handleRollDice,
-    gameState.phase === 'rolling' &&
-      (!vsAI || gameState.currentPlayer !== aiPlayer)
+    gameState.phase === 'rolling' && humanCanAct
   );
   boardContainer.appendChild(diceArea);
 
-  // Render expression selector if in calculating phase
-  if (gameState.phase === 'calculating' && gameState.currentDice) {
+  // Expression / pass chrome only on the human seat (blocks AI soft-lock taps)
+  if (
+    gameState.phase === 'calculating' &&
+    gameState.currentDice &&
+    humanCanAct
+  ) {
     const exprSelector = renderExpressionSelector(
       gameState,
       handleSelectPlacement,
@@ -85,8 +93,10 @@ function updateUI(): void {
     boardContainer.appendChild(exprSelector);
   }
 
-  // Render board
-  const board = renderBoard(gameState, handleCellClick);
+  // Render board — no placement targets while the computer thinks
+  const board = renderBoard(gameState, handleCellClick, {
+    allowInput: humanCanAct,
+  });
   boardContainer.appendChild(board);
 
   // Update status
@@ -127,28 +137,32 @@ function updateStatus(): void {
   const icon = seatIcon(gameState.currentPlayer);
 
   let instruction = '';
-  switch (gameState.phase) {
-    case 'rolling':
-      instruction = 'Roll the dice to start your turn';
-      break;
-    case 'calculating':
-      if (hasValidMoves(gameState)) {
-        instruction = 'Choose a number to place your chip';
-      } else {
-        instruction = 'No valid moves - you must pass';
+  if (isComputerTurn()) {
+    instruction = 'Computer is thinking…';
+  } else {
+    switch (gameState.phase) {
+      case 'rolling':
+        instruction = 'Roll the dice to start your turn';
+        break;
+      case 'calculating':
+        if (hasValidMoves(gameState)) {
+          instruction = 'Choose a number to place your chip';
+        } else {
+          instruction = 'No valid moves - you must pass';
+        }
+        break;
+      case 'placing':
+        instruction = 'Click a valid cell to place your chip';
+        break;
+      default: {
+        const _exhaustive: never = gameState.phase;
+        instruction = _exhaustive;
       }
-      break;
-    case 'placing':
-      instruction = 'Click a valid cell to place your chip';
-      break;
-    default: {
-      const _exhaustive: never = gameState.phase;
-      instruction = _exhaustive;
     }
   }
 
   statusContainer.innerHTML = `
-    <div class="contig-status ${playerClass}">
+    <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
   `;
@@ -217,6 +231,8 @@ function handleCellClick(value: number): void {
 
 function handlePass(): void {
   if (gameState.phase !== 'calculating') return;
+  // Block human Pass Turn during the AI seat (mirrors place/roll guards).
+  if (vsAI && gameState.currentPlayer === aiPlayer) return;
 
   gameState = passTurn(gameState);
   updateUI();

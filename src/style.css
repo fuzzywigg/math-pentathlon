@@ -3948,6 +3948,7 @@ h1 {
 .contig-roll-btn {
   padding: 10px 20px;
   min-width: 120px;
+  min-height: 44px;
   font-size: 0.9rem;
   font-weight: 600;
   background-color: var(--color-primary);
@@ -3981,6 +3982,7 @@ h1 {
 .contig-pass-btn {
   padding: 10px 20px;
   min-width: 120px;
+  min-height: 44px;
   font-size: 0.9rem;
   font-weight: 600;
   background-color: var(--color-neutral-600);
