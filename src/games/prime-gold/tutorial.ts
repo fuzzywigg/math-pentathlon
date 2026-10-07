@@ -83,7 +83,7 @@ export const primeGoldTutorial: TutorialConfig = {
           <li>Target prime numbers (gold cells)</li>
           <li>Build along diagonal lines</li>
           <li>Block opponent's potential veins</li>
-          <li>Factorials give big numbers: 5!=120</li>
+          <li>Factorials help: 4!=24 (5! is off the 1–49 board)</li>
         </ul>
       `,
       position: 'center',

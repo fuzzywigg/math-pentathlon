@@ -49,6 +49,7 @@ export const contig60Tutorial: TutorialConfig = {
           <li>Score <strong>1 point</strong> for each adjacent chip already on the board</li>
           <li>Adjacent means touching horizontally, vertically, or diagonally</li>
           <li>Maximum 8 points per placement (surrounded on all sides)</li>
+          <li>Points are placement feedback only — they do not decide the winner</li>
         </ul>
       `,
       highlightSelector: '.contig-board',

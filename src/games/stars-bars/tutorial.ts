@@ -71,7 +71,7 @@ export const starsBarsTutorial: TutorialConfig = {
         <ol>
           <li>Select a card from your hand</li>
           <li>Place it on a green (valid) cell</li>
-          <li>Must place adjacent to existing cards</li>
+          <li>First card may go anywhere; later cards must be adjacent to an existing card</li>
         </ol>
       `,
       highlightSelector: '.stars-board',

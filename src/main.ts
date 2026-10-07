@@ -586,7 +586,7 @@ async function renderCalla(routeGen: number): Promise<void> {
           <h3>Special Rules</h3>
           <ul>
             <li><strong>Free Turn:</strong> If your last cube lands in your Calla, take another turn!</li>
-            <li><strong>Capture:</strong> If your last cube lands in an empty shield on your side, capture that cube AND all cubes in the opposite shield!</li>
+            <li><strong>Capture:</strong> If your last cube lands in an empty shield on your side <em>and the opposite shield has cubes</em>, capture your landing cube and those opposite cubes into your Calla!</li>
             <li>You skip your opponent's Calla when sowing</li>
           </ul>
 
@@ -937,7 +937,7 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
 
           <h3>Turn Sequence</h3>
           <ol>
-            <li><strong>Select Bars:</strong> Choose two fraction bars from your pool</li>
+            <li><strong>Select Bars:</strong> Choose two unused fraction bars from the shared pool</li>
             <li><strong>Choose Operation:</strong> Pick +, −, ×, or ÷</li>
             <li><strong>Match Answer:</strong> If the result matches an available answer bar, claim it!</li>
           </ol>
@@ -1247,10 +1247,11 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
 
           <h3>Winning</h3>
           <ul>
-            <li>Form 3 chips in a line (any direction)</li>
-            <li>The alignment must satisfy: <strong>a + b - c = 4</strong> OR <strong>a + b - c = 5</strong></li>
-            <li>Example: 6 + 3 - 5 = 4 ✓</li>
-            <li>Example: 8 + 1 - 4 = 5 ✓</li>
+            <li>All 5 of your chips must be off the numbered start rows</li>
+            <li>Form 3 chips in a line: two of one color and one of the opposite color</li>
+            <li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>
+            <li>Example: 6 + 2 - 3 = 5 ✓</li>
+            <li>Example: 9 + 1 - 6 = 4 ✓</li>
           </ul>
 
           <h3>Strategy Tips</h3>
@@ -1336,7 +1337,7 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
             <li>Target prime numbers (gold cells)</li>
             <li>Build along diagonal lines</li>
             <li>Block opponent's potential veins</li>
-            <li>Factorials give big numbers: 5!=120</li>
+            <li>Factorials help: 4!=24 (5! is off the 1–49 board)</li>
           </ul>`,
     gameAreaClass: 'pg-game-area',
     modeRadioName: 'pg-mode',
@@ -1475,7 +1476,7 @@ async function renderFracFact(routeGen: number): Promise<void> {
           </ul>
 
           <h3>Winning</h3>
-          <p>After 10 problems each, the player with the highest score wins!</p>`,
+          <p>After 10 problems total (players alternate), the player with the highest score wins!</p>`,
     modeRadioName: 'frac-mode',
     vsHumanDescription: 'Take turns solving problems',
     vsAiDescription: 'Compete against the computer',
@@ -1688,7 +1689,7 @@ async function renderStarsBars(routeGen: number): Promise<void> {
           <ol>
             <li>Select a card from your hand</li>
             <li>Place it on a green (valid) cell</li>
-            <li>Must place adjacent to existing cards</li>
+            <li>First card may go anywhere; later cards must be adjacent to an existing card</li>
           </ol>
 
           <h3>Strategy Tips</h3>
