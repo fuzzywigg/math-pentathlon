@@ -25,10 +25,12 @@
     "node": ">=20"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.5",
     "@playwright/test": "^1.63.0",
     "@types/three": "^0.186.0",
     "@vitest/coverage-v8": "^4.1.11",
+    "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "jsdom": "^27.4.0",
