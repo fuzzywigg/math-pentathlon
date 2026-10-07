@@ -3,34 +3,19 @@
  * Captures start + mid-game screenshots for PR evidence.
  */
 import { test, expect, Page } from '@playwright/test';
+import {
+  MP3D_HEAVY_TEST_TIMEOUT_MS,
+  board3dUrl,
+  disableBoard3d,
+  dismissModeIfNeeded,
+  enableBoard3dLowQuality,
+  waitForGameReady,
+  waitForMp3dReady,
+} from './helpers/mp3d';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-async function dismissModeIfNeeded(page: Page) {
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator(
-      'input[value="human-vs-human"], input[value="vs-human"]'
-    );
-    if (await human.count()) {
-      await human
-        .first()
-        .check({ force: true })
-        .catch(() => undefined);
-    }
-    const start = page.locator('#start-game-btn');
-    if (await start.isVisible().catch(() => false)) {
-      await start.click();
-    }
-  }
-}
 
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-}
 
 async function clickBoardCell(page: Page, row: number, col: number) {
   await page.waitForFunction(
@@ -63,9 +48,7 @@ async function clickBoardCell(page: Page, row: number, col: number) {
 
 test.describe('mp3d Kings & Quadraphages 3D board', () => {
   test('flag off keeps classic 2D DOM board', async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.removeItem('mp-board3d');
-    });
+    await disableBoard3d(page);
     await page.goto('/#/game/kings-quadraphages');
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
@@ -81,17 +64,15 @@ test.describe('mp3d Kings & Quadraphages 3D board', () => {
   test('flag on: start + mid-game screenshots via 3D clicks', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
-    await page.goto('/?board3d=1#/game/kings-quadraphages');
+    test.setTimeout(MP3D_HEAVY_TEST_TIMEOUT_MS);
+    await enableBoard3dLowQuality(page);
+    await page.goto(board3dUrl('#/game/kings-quadraphages'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="kings-quadraphages"]');
-    await expect(canvas).toBeVisible({ timeout: 15000 });
+    await waitForMp3dReady(page, 'kings-quadraphages');
     await expect(page.locator('#board .board .cell')).toHaveCount(0);
-    await page.waitForTimeout(500);
 
     const outDir = path.resolve('docs/screenshots/mp3d');
     fs.mkdirSync(outDir, { recursive: true });
@@ -121,8 +102,6 @@ test.describe('mp3d Kings & Quadraphages 3D board', () => {
     await expect(page.locator('.supply-p1')).toContainText('28');
     await expect(page.locator('.supply-p2')).toContainText('28');
     await expect(page.locator('.move-history-entry')).toHaveCount(8);
-
-    await page.waitForTimeout(400);
     const midPath = path.join(outDir, 'kings-quadraphages-3d-midgame.png');
     await canvas.screenshot({ path: midPath });
     expect(fs.statSync(midPath).size).toBeGreaterThan(1000);

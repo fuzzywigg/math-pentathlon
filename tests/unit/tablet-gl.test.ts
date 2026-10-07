@@ -4,6 +4,10 @@ import {
   shouldPreserveDrawingBuffer,
   bindPageVisibility,
   TABLET_PIXEL_RATIO_CAP,
+  BOARD_3D_LQ_PIXEL_RATIO_CAP,
+  isBoard3dLowQuality,
+  resolveBoard3dPixelRatio,
+  markBoard3dCanvasReady,
 } from '../../src/ui/three/tablet-gl';
 
 describe('tablet-gl helpers', () => {
@@ -28,6 +32,7 @@ describe('tablet-gl helpers', () => {
 
   it('caps pixel ratio at 1.5 for the tablet profile', () => {
     expect(TABLET_PIXEL_RATIO_CAP).toBe(1.5);
+    expect(BOARD_3D_LQ_PIXEL_RATIO_CAP).toBe(1);
   });
 
   it('preserves drawing buffer for Playwright webdriver', () => {
@@ -45,6 +50,29 @@ describe('tablet-gl helpers', () => {
     window.history.replaceState({}, '', '/');
     localStorage.setItem('mp-preserve-drawing-buffer', '1');
     expect(shouldPreserveDrawingBuffer()).toBe(true);
+  });
+
+  it('board3dLQ is off by default and opt-in via query or storage', () => {
+    expect(isBoard3dLowQuality()).toBe(false);
+    window.history.replaceState({}, '', '/?board3dLQ=1');
+    expect(isBoard3dLowQuality()).toBe(true);
+    window.history.replaceState({}, '', '/');
+    localStorage.setItem('mp-board3d-lq', '1');
+    expect(isBoard3dLowQuality()).toBe(true);
+  });
+
+  it('resolveBoard3dPixelRatio uses LQ cap when board3dLQ is on', () => {
+    expect(resolveBoard3dPixelRatio(3)).toBe(TABLET_PIXEL_RATIO_CAP);
+    localStorage.setItem('mp-board3d-lq', '1');
+    expect(resolveBoard3dPixelRatio(3)).toBe(BOARD_3D_LQ_PIXEL_RATIO_CAP);
+  });
+
+  it('markBoard3dCanvasReady is idempotent', () => {
+    const canvas = document.createElement('canvas');
+    markBoard3dCanvasReady(canvas);
+    expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
+    markBoard3dCanvasReady(canvas);
+    expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
   });
 
   it('canPaint3d is false while document is hidden', () => {
