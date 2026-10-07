@@ -246,7 +246,7 @@ export function applyRovingTabindex(
           c.getAttribute('data-col') === preferred.col
       ) ?? null;
   }
-  if (!active) active = cells[0];
+  if (!active) active = cells[0] ?? null;
 
   for (const cell of cells) {
     cell.setAttribute('tabindex', cell === active ? '0' : '-1');
