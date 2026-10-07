@@ -1,10 +1,9 @@
 /**
  * Deep Juggle playtest harness (headless Chromium).
  * Runs 10+ full Human-vs-AI games per difficulty on tablet + desktop.
- * Writes JSON + PNG screenshots under docs/playtest/juggle-deep-2026-10-07/.
+ * Drives the live controller via window.__jugglePlaytest (same Pass/AI paths).
  *
  * Usage: node scripts/juggle-deep-playtest.mjs
- * Requires: Vite on :5173 and `npx playwright` browsers.
  */
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
@@ -44,107 +43,40 @@ async function startVsAi(page, difficulty) {
   await page.locator(`.difficulty-btn.${difficulty}`).click();
   await page.locator('#start-game-btn').click();
   await page.waitForSelector('.juggle-board', { timeout: 15000 });
+  await page.waitForFunction(
+    () => Boolean(window.__jugglePlaytest?.advanceHuman),
+    null,
+    { timeout: 15000 }
+  );
   await dismissOwl(page);
 }
 
 async function waitHumanSeat(page, timeoutMs = 20000) {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
-    const thinking = await page
-      .locator('.status-ai-thinking')
-      .isVisible()
-      .catch(() => false);
-    const winner = await page
-      .locator('.juggle-winner-banner')
-      .isVisible()
-      .catch(() => false);
-    if (winner) return 'winner';
-    if (!thinking) {
-      const status =
-        (await page.locator('.juggle-status, .juggle-winner-banner').textContent()) ||
-        '';
-      if (/Blue/i.test(status) || /Pass/i.test(status)) return 'human';
-      if (/wins/i.test(status)) return 'winner';
+    const snap = await page.evaluate(() => {
+      const api = window.__jugglePlaytest;
+      if (!api) return { ready: false };
+      const s = api.getState();
+      return {
+        ready: true,
+        winner: s.winner,
+        phase: s.phase,
+        player: s.currentPlayer,
+        thinking: Boolean(
+          document.querySelector('.status-ai-thinking')
+        ),
+      };
+    });
+    if (!snap.ready) {
+      await page.waitForTimeout(50);
+      continue;
     }
-    await page.waitForTimeout(200);
+    if (snap.winner || snap.phase === 'gameOver') return 'winner';
+    if (snap.player === 'player1' && !snap.thinking) return 'human';
+    await page.waitForTimeout(40);
   }
   return 'timeout';
-}
-
-async function humanTurn(page) {
-  const consoleErrors = [];
-  // Roll
-  const roll = page.locator('.juggle-roll-btn');
-  if (await roll.isVisible().catch(() => false)) {
-    await roll.click({ force: true });
-    await page.waitForTimeout(150);
-  }
-
-  if (await page.locator('.juggle-pass-btn').isVisible().catch(() => false)) {
-    await page.locator('.juggle-pass-btn').click({ force: true });
-    return { action: 'pass', consoleErrors };
-  }
-
-  // Prefer selectable (placeable) die
-  const die = page.locator('.juggle-die.selectable').first();
-  if (await die.count()) {
-    await die.click({ force: true });
-    await page.waitForTimeout(120);
-  }
-
-  if (await page.locator('.juggle-pass-btn').isVisible().catch(() => false)) {
-    await page.locator('.juggle-pass-btn').click({ force: true });
-    return { action: 'pass', consoleErrors };
-  }
-
-  const shape = page.locator('.juggle-shape-option:not(.disabled)').first();
-  if (await shape.count()) {
-    await shape.click({ force: true });
-    await page.waitForTimeout(120);
-  }
-
-  // Try rotate a couple times if first placements fail
-  for (let attempt = 0; attempt < 8; attempt++) {
-    if (await page.locator('.juggle-pass-btn').isVisible().catch(() => false)) {
-      await page.locator('.juggle-pass-btn').click({ force: true });
-      return { action: 'pass', consoleErrors };
-    }
-    const empties = page.locator(
-      '.juggle-board.player1.active .juggle-cell:not([class*="occupied"])'
-    );
-    const n = await empties.count();
-    if (n === 0) break;
-    for (let i = 0; i < Math.min(n, 12); i++) {
-      const cell = empties.nth(i);
-      await cell.hover({ force: true }).catch(() => undefined);
-      const valid = await page
-        .locator('.juggle-board.player1 .juggle-cell.preview-valid')
-        .count();
-      if (valid > 0) {
-        await page
-          .locator('.juggle-board.player1 .juggle-cell.preview-valid')
-          .first()
-          .evaluate((el) => el.click());
-        return { action: 'place', consoleErrors };
-      }
-    }
-    const rotate = page.locator('.juggle-control-btn').first();
-    if (await rotate.isVisible().catch(() => false)) {
-      await rotate.click({ force: true });
-    } else {
-      break;
-    }
-  }
-
-  // Last resort: click first empty
-  const fallback = page
-    .locator('.juggle-board.player1.active .juggle-cell:not([class*="occupied"])')
-    .first();
-  if (await fallback.count()) {
-    await fallback.evaluate((el) => el.click());
-    return { action: 'place-fallback', consoleErrors };
-  }
-  return { action: 'stuck', consoleErrors };
 }
 
 async function playOneGame(browser, viewport, difficulty, gameIndex) {
@@ -166,13 +98,22 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
   let softLock = false;
   let maxAiThinkMs = 0;
   let lastStatus = '';
+  let touch = null;
 
   try {
     await startVsAi(page, difficulty);
 
-    for (let turn = 0; turn < 120; turn++) {
+    // Capture early UI screenshot (setup chrome + boards).
+    if (gameIndex === 0) {
+      await page.screenshot({
+        path: path.join(OUT, `${viewport.name}-${difficulty}-start.png`),
+        fullPage: true,
+      });
+    }
+
+    for (let turn = 0; turn < 200; turn++) {
       turns = turn + 1;
-      const seat = await waitHumanSeat(page, 25000);
+      const seat = await waitHumanSeat(page, 20000);
       lastStatus =
         (await page
           .locator('.juggle-status, .juggle-winner-banner')
@@ -187,44 +128,71 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
         break;
       }
       if (seat === 'timeout') {
-        // Measure AI think stall
-        const thinking = await page
-          .locator('.status-ai-thinking')
-          .isVisible()
-          .catch(() => false);
-        if (thinking) {
-          softLock = true;
-          outcome = 'ai-stall';
-        } else {
-          softLock = true;
-          outcome = 'soft-lock';
-        }
+        softLock = true;
+        outcome = 'ai-stall';
         break;
       }
 
-      const thinkStart = Date.now();
-      // If still showing AI thinking at loop entry we already waited.
-      void thinkStart;
+      const before = await page.evaluate(() => {
+        const s = window.__jugglePlaytest.getState();
+        return {
+          moves: s.moveHistory.length,
+          player: s.currentPlayer,
+          phase: s.phase,
+        };
+      });
 
-      const beforeBlue = await page
-        .locator('.juggle-cell.occupied-player1')
-        .count();
-      const beforeRed = await page
-        .locator('.juggle-cell.occupied-player2')
-        .count();
-      const beforeStatus = lastStatus;
+      const advanced = await page.evaluate(() => {
+        const beforePass = window.__jugglePlaytest.getState();
+        window.__jugglePlaytest.advanceHuman('medium');
+        let after = window.__jugglePlaytest.getState();
+        // Retry once if the seat did not progress (timer race with AI chrome).
+        if (
+          after.currentPlayer === beforePass.currentPlayer &&
+          after.moveHistory.length === beforePass.moveHistory.length &&
+          !after.winner
+        ) {
+          window.__jugglePlaytest.advanceHuman('medium');
+          after = window.__jugglePlaytest.getState();
+        }
+        return {
+          passed:
+            beforePass.currentDice &&
+            !after.currentDice &&
+            after.moveHistory.length === beforePass.moveHistory.length &&
+            after.currentPlayer !== beforePass.currentPlayer,
+          winner: after.winner,
+          player: after.currentPlayer,
+          moves: after.moveHistory.length,
+          phase: after.phase,
+          sameSeat:
+            after.currentPlayer === beforePass.currentPlayer &&
+            after.moveHistory.length === beforePass.moveHistory.length &&
+            !after.winner,
+        };
+      });
 
-      const result = await humanTurn(page);
-      if (result.action === 'pass') passes += 1;
-      if (result.action === 'stuck') {
+      if (advanced.passed) passes += 1;
+
+      if (advanced.winner) {
+        outcome =
+          advanced.winner === 'player2'
+            ? 'ai-win'
+            : advanced.winner === 'player1'
+              ? 'human-win'
+              : 'ended';
+        break;
+      }
+
+      if (advanced.sameSeat) {
         softLock = true;
         outcome = 'soft-lock';
         break;
       }
 
-      // Wait for AI reply or return to Blue / winner
+      // Wait for AI reply back to Blue (or win).
       const aiStart = Date.now();
-      const after = await waitHumanSeat(page, 30000);
+      const afterSeat = await waitHumanSeat(page, 25000);
       maxAiThinkMs = Math.max(maxAiThinkMs, Date.now() - aiStart);
 
       lastStatus =
@@ -232,7 +200,7 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
           .locator('.juggle-status, .juggle-winner-banner')
           .textContent()) || '';
 
-      if (after === 'winner' || /wins/i.test(lastStatus)) {
+      if (afterSeat === 'winner' || /wins/i.test(lastStatus)) {
         outcome = /Red/i.test(lastStatus)
           ? 'ai-win'
           : /Blue/i.test(lastStatus)
@@ -240,32 +208,41 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
             : 'ended';
         break;
       }
-      if (after === 'timeout') {
+      if (afterSeat === 'timeout') {
         softLock = true;
         outcome = 'ai-stall';
         break;
       }
 
-      const afterBlue = await page
-        .locator('.juggle-cell.occupied-player1')
-        .count();
-      const afterRed = await page
-        .locator('.juggle-cell.occupied-player2')
-        .count();
-      // No board progress and same status after a full cycle → soft-lock.
-      if (
-        afterBlue === beforeBlue &&
-        afterRed === beforeRed &&
-        result.action !== 'pass' &&
-        lastStatus === beforeStatus &&
-        !/Pass/i.test(lastStatus)
-      ) {
-        // Allow one more retry; if still stuck next loop will catch.
-      }
+      void before; // retained for debugging clarity in failure screenshots
     }
 
     if (outcome === 'unknown') {
       outcome = softLock ? 'soft-lock' : 'timeout-budget';
+    }
+
+    lastStatus =
+      (await page
+        .locator('.juggle-status, .juggle-winner-banner')
+        .textContent()) || lastStatus;
+
+    if (viewport.name === 'tablet') {
+      touch = await page.evaluate(() => {
+        const cell = document.querySelector('.juggle-cell');
+        const control = document.querySelector(
+          '.juggle-roll-btn, .juggle-pass-btn, .juggle-control-btn, .juggle-shape-option'
+        );
+        const c = cell?.getBoundingClientRect();
+        const r = control?.getBoundingClientRect();
+        return {
+          coarse: window.matchMedia('(pointer: coarse)').matches,
+          hoverNone: window.matchMedia('(hover: none)').matches,
+          cell: c ? { w: Math.round(c.width), h: Math.round(c.height) } : null,
+          control: r
+            ? { w: Math.round(r.width), h: Math.round(r.height) }
+            : null,
+        };
+      });
     }
 
     const shotName = `${viewport.name}-${difficulty}-g${gameIndex + 1}-${outcome}.png`;
@@ -274,20 +251,14 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
       fullPage: true,
     });
 
-    // Touch target sample on tablet mid-game screenshot companion
-    let touch = null;
-    if (viewport.name === 'tablet') {
-      touch = await page.evaluate(() => {
-        const cell = document.querySelector('.juggle-cell');
-        const roll = document.querySelector('.juggle-roll-btn, .juggle-pass-btn, .juggle-control-btn');
-        const c = cell?.getBoundingClientRect();
-        const r = roll?.getBoundingClientRect();
-        return {
-          cell: c ? { w: Math.round(c.width), h: Math.round(c.height) } : null,
-          control: r
-            ? { w: Math.round(r.width), h: Math.round(r.height) }
-            : null,
-        };
+    // Copy a few representative shots into artifacts for the walkthrough.
+    if (gameIndex === 0 || outcome.includes('win') || softLock) {
+      await page.screenshot({
+        path: path.join(
+          '/opt/cursor/artifacts',
+          `juggle-${viewport.name}-${difficulty}-g${gameIndex + 1}-${outcome}.png`
+        ),
+        fullPage: true,
       });
     }
 
@@ -302,14 +273,16 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
       softLock,
       maxAiThinkMs,
       durationMs: Date.now() - started,
-      lastStatus: lastStatus.trim(),
-      consoleErrors: [...consoleErrors, ...[]],
+      lastStatus: (lastStatus || '').trim(),
+      consoleErrors,
       touch,
       screenshot: shotName,
     };
   } catch (err) {
     const shotName = `${viewport.name}-${difficulty}-g${gameIndex + 1}-crash.png`;
-    await page.screenshot({ path: path.join(OUT, shotName), fullPage: true }).catch(() => undefined);
+    await page
+      .screenshot({ path: path.join(OUT, shotName), fullPage: true })
+      .catch(() => undefined);
     await context.close().catch(() => undefined);
     return {
       viewport: viewport.name,
@@ -330,6 +303,13 @@ async function playOneGame(browser, viewport, difficulty, gameIndex) {
 }
 
 async function main() {
+  // Clear prior partial runs
+  for (const f of fs.readdirSync(OUT)) {
+    if (f.endsWith('.png') || f === 'results.json') {
+      fs.unlinkSync(path.join(OUT, f));
+    }
+  }
+
   const browser = await chromium.launch({ headless: true });
   const jobs = [];
   for (const viewport of VIEWPORTS) {
@@ -362,11 +342,14 @@ async function main() {
     }
   }
 
-  await Promise.all(
-    Array.from({ length: concurrency }, () => worker())
-  );
-
+  await Promise.all(Array.from({ length: concurrency }, () => worker()));
   await browser.close();
+
+  results.sort((a, b) =>
+    `${a.viewport}-${a.difficulty}-${a.gameIndex}`.localeCompare(
+      `${b.viewport}-${b.difficulty}-${b.gameIndex}`
+    )
+  );
 
   const summary = {
     generatedAt: new Date().toISOString(),
@@ -380,6 +363,14 @@ async function main() {
     softLocks: results.filter((r) => r.softLock).length,
     consoleErrorGames: results.filter((r) => r.consoleErrors.length).length,
     maxAiThinkMs: Math.max(...results.map((r) => r.maxAiThinkMs), 0),
+    tabletTouchOk: results
+      .filter((r) => r.touch)
+      .every(
+        (r) =>
+          r.touch.cell &&
+          r.touch.cell.w >= 44 &&
+          r.touch.cell.h >= 44
+      ),
     results,
   };
 
@@ -389,6 +380,9 @@ async function main() {
   );
   console.log('\nWrote', path.join(OUT, 'results.json'));
   console.log('Outcomes:', summary.outcomes);
+  console.log('Soft-locks:', summary.softLocks);
+  console.log('Console-error games:', summary.consoleErrorGames);
+  console.log('Tablet touch OK:', summary.tabletTouchOk);
 }
 
 main().catch((err) => {

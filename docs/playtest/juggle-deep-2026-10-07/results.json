@@ -1,0 +1,1246 @@
+{
+  "generatedAt": "2026-10-07T12:35:50.149Z",
+  "base": "http://127.0.0.1:5173",
+  "gamesPerDifficultyPerViewport": 10,
+  "totalGames": 60,
+  "outcomes": {
+    "human-win": 36,
+    "ai-win": 24
+  },
+  "softLocks": 0,
+  "consoleErrorGames": 0,
+  "maxAiThinkMs": 1192,
+  "tabletTouchOk": true,
+  "results": [
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "outcome": "human-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 967,
+      "durationMs": 21603,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g1-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 10,
+      "outcome": "human-win",
+      "turns": 25,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1044,
+      "durationMs": 23030,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g10-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "outcome": "human-win",
+      "turns": 27,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 991,
+      "durationMs": 24655,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g2-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "outcome": "human-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 970,
+      "durationMs": 24353,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g3-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 973,
+      "durationMs": 18691,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g4-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 5,
+      "outcome": "human-win",
+      "turns": 25,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 976,
+      "durationMs": 23103,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g5-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 6,
+      "outcome": "human-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 983,
+      "durationMs": 18158,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g6-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 24,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 976,
+      "durationMs": 22274,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g7-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 8,
+      "outcome": "human-win",
+      "turns": 24,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 995,
+      "durationMs": 22194,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g8-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 9,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 972,
+      "durationMs": 18371,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-easy-g9-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 983,
+      "durationMs": 20391,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g1-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 10,
+      "outcome": "human-win",
+      "turns": 18,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1016,
+      "durationMs": 17483,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g10-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 992,
+      "durationMs": 21433,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g2-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 987,
+      "durationMs": 20083,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g3-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "outcome": "human-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1019,
+      "durationMs": 20582,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g4-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 5,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1002,
+      "durationMs": 19497,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g5-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 6,
+      "outcome": "ai-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1029,
+      "durationMs": 20941,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g6-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 987,
+      "durationMs": 17950,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g7-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 8,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1022,
+      "durationMs": 20379,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g8-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 9,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 989,
+      "durationMs": 20245,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-hard-g9-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "outcome": "ai-win",
+      "turns": 25,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1192,
+      "durationMs": 24393,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g1-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 10,
+      "outcome": "ai-win",
+      "turns": 26,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1006,
+      "durationMs": 23362,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g10-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1118,
+      "durationMs": 20549,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g2-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1136,
+      "durationMs": 20470,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g3-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1048,
+      "durationMs": 22227,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g4-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 5,
+      "outcome": "ai-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1092,
+      "durationMs": 19618,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g5-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 6,
+      "outcome": "ai-win",
+      "turns": 24,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 993,
+      "durationMs": 23141,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g6-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 24,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1035,
+      "durationMs": 21936,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g7-human-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 8,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1039,
+      "durationMs": 19891,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g8-ai-win.png"
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 9,
+      "outcome": "ai-win",
+      "turns": 27,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 992,
+      "durationMs": 27124,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": null,
+      "screenshot": "desktop-medium-g9-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 968,
+      "durationMs": 18600,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": false,
+        "hoverNone": false,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g1-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 10,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 979,
+      "durationMs": 19412,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g10-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "outcome": "ai-win",
+      "turns": 23,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 970,
+      "durationMs": 21996,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g2-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 966,
+      "durationMs": 19476,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g3-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 964,
+      "durationMs": 19950,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g4-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 5,
+      "outcome": "human-win",
+      "turns": 24,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 968,
+      "durationMs": 27176,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g5-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 6,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 982,
+      "durationMs": 19335,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g6-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 965,
+      "durationMs": 20099,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g7-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 8,
+      "outcome": "human-win",
+      "turns": 26,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 995,
+      "durationMs": 23429,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g8-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 9,
+      "outcome": "human-win",
+      "turns": 25,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 977,
+      "durationMs": 25096,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-easy-g9-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1021,
+      "durationMs": 20212,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": false,
+        "hoverNone": false,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g1-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 10,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 984,
+      "durationMs": 22494,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g10-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1024,
+      "durationMs": 21655,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g2-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "outcome": "ai-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1007,
+      "durationMs": 24060,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g3-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "outcome": "human-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1007,
+      "durationMs": 19607,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g4-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 5,
+      "outcome": "ai-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1017,
+      "durationMs": 18954,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g5-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 6,
+      "outcome": "ai-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1011,
+      "durationMs": 19195,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g6-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1005,
+      "durationMs": 18981,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g7-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 8,
+      "outcome": "human-win",
+      "turns": 18,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 981,
+      "durationMs": 17341,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g8-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 9,
+      "outcome": "ai-win",
+      "turns": 18,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 989,
+      "durationMs": 18268,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-hard-g9-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1015,
+      "durationMs": 19670,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": false,
+        "hoverNone": false,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g1-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 10,
+      "outcome": "ai-win",
+      "turns": 21,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1019,
+      "durationMs": 20593,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g10-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "outcome": "human-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 999,
+      "durationMs": 19712,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g2-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "outcome": "human-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1025,
+      "durationMs": 20599,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g3-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1015,
+      "durationMs": 20065,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g4-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 5,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 991,
+      "durationMs": 20286,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g5-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 6,
+      "outcome": "ai-win",
+      "turns": 20,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 992,
+      "durationMs": 20137,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g6-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 7,
+      "outcome": "human-win",
+      "turns": 22,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1027,
+      "durationMs": 20630,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g7-human-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 8,
+      "outcome": "ai-win",
+      "turns": 25,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 997,
+      "durationMs": 23707,
+      "lastStatus": "🟣 Red filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g8-ai-win.png"
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 9,
+      "outcome": "human-win",
+      "turns": 19,
+      "passes": 0,
+      "softLock": false,
+      "maxAiThinkMs": 1023,
+      "durationMs": 18166,
+      "lastStatus": "🔵 Blue filled their board first and wins!",
+      "consoleErrors": [],
+      "touch": {
+        "coarse": true,
+        "hoverNone": true,
+        "cell": {
+          "w": 44,
+          "h": 44
+        },
+        "control": {
+          "w": 150,
+          "h": 55
+        }
+      },
+      "screenshot": "tablet-medium-g9-human-win.png"
+    }
+  ]
+}

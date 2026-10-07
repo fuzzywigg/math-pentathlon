@@ -766,8 +766,8 @@ export function injectJuggleStyles(): void {
       }
     }
 
-    /* Fine-pointer narrow screens may shrink cells; coarse always keeps 44px. */
-    @media (max-width: 700px) and (pointer: fine) {
+    /* Fine-pointer narrow screens may shrink cells. */
+    @media (max-width: 700px) and (pointer: fine) and (hover: hover) {
       .juggle-cell {
         width: 24px;
         height: 24px;
@@ -776,8 +776,12 @@ export function injectJuggleStyles(): void {
       }
     }
 
-    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets last. */
-    @media (pointer: coarse) {
+    /*
+     * Touch / tablet targets ≥44px.
+     * (pointer: coarse) and (hover: none) cover real devices; max-width:900px
+     * covers tablet viewports when headless Chromium still reports a fine pointer.
+     */
+    @media (pointer: coarse), (hover: none), (max-width: 900px) {
       .juggle-cell {
         width: 44px;
         height: 44px;

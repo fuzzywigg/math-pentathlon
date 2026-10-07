@@ -18,6 +18,7 @@ import {
   getAIDieChoice,
   getAIShapeChoice,
   getAIPlacement,
+  executeAITurn,
   AIDifficulty,
 } from './ai';
 import {
@@ -455,3 +456,75 @@ export function __setStateForTests(state: JuggleState): void {
 export function __getStateForTests(): JuggleState {
   return gameState;
 }
+
+/**
+ * Test/playtest-only: advance the current (human) seat with AI proxy logic,
+ * then schedule the computer seat if needed. Keeps win/scoring rules intact.
+ */
+export function __advanceSeatForTests(
+  humanDifficulty: AIDifficulty = 'medium'
+): JuggleState {
+  if (gameState.winner || gameState.phase === 'gameOver') {
+    return gameState;
+  }
+
+  if (gameState.phase === 'rolling') {
+    gameState = doRollDice(gameState);
+  }
+
+  if (shouldOfferPass(gameState)) {
+    gameState = passTurn(gameState);
+    updateUI();
+    if (
+      vsAI &&
+      !gameState.winner &&
+      gameState.currentPlayer === aiPlayer &&
+      gameState.phase === 'rolling'
+    ) {
+      setTimeout(() => handleRollDice(true), 280);
+    }
+    return gameState;
+  }
+
+  // Only proxy the non-AI seat (or either seat in human-vs-human).
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    updateUI();
+    return gameState;
+  }
+
+  gameState = executeAITurn(gameState, gameState.currentPlayer, humanDifficulty);
+  updateUI();
+
+  if (
+    vsAI &&
+    !gameState.winner &&
+    gameState.currentPlayer === aiPlayer &&
+    gameState.phase === 'rolling'
+  ) {
+    setTimeout(() => handleRollDice(true), 280);
+  }
+
+  return gameState;
+}
+
+declare global {
+  interface Window {
+    __jugglePlaytest?: {
+      getState: typeof __getStateForTests;
+      setState: typeof __setStateForTests;
+      advanceHuman: typeof __advanceSeatForTests;
+    };
+  }
+}
+
+function installPlaytestHooks(): void {
+  if (typeof window === 'undefined') return;
+  window.__jugglePlaytest = {
+    getState: __getStateForTests,
+    setState: __setStateForTests,
+    advanceHuman: __advanceSeatForTests,
+  };
+}
+
+// Install once when the module loads (harness + unit DOM tests).
+installPlaytestHooks();

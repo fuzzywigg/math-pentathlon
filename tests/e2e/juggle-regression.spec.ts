@@ -2,7 +2,7 @@
  * Juggle playability regressions: Pass Turn escape, vs-AI progress,
  * tablet coarse touch targets ≥44px.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, devices, type Page } from '@playwright/test';
 
 async function dismissOwl(page: Page) {
   await page.evaluate(() => {
@@ -127,54 +127,39 @@ test.describe('Juggle regressions', () => {
       .toBe(true);
   });
 
-  test('tablet coarse: cell and roll targets meet 44px', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await page.emulateMedia({ media: 'screen' });
-    await page.addInitScript(() => {
-      Object.defineProperty(window, 'matchMedia', {
-        writable: true,
-        value: (query: string) => {
-          const coarse = query.includes('pointer: coarse');
-          const fine = query.includes('pointer: fine');
-          const narrow = query.includes('max-width: 700px');
-          const matches = coarse
-            ? true
-            : fine
-              ? false
-              : narrow
-                ? window.innerWidth <= 700
-                : false;
-          return {
-            matches,
-            media: query,
-            onchange: null,
-            addListener: () => undefined,
-            removeListener: () => undefined,
-            addEventListener: () => undefined,
-            removeEventListener: () => undefined,
-            dispatchEvent: () => false,
-          };
-        },
-      });
+  test('tablet coarse: cell and roll targets meet 44px', async ({
+    browser,
+  }) => {
+    // CSS `(pointer: coarse)` follows the real device profile, not a JS matchMedia mock.
+    const context = await browser.newContext({
+      ...devices['iPad Mini'],
     });
+    const page = await context.newPage();
 
     await page.goto('/#/game/juggle');
     await startVsAi(page, 'medium');
 
     const sizes = await page.evaluate(() => {
       const cell = document.querySelector('.juggle-cell') as HTMLElement | null;
-      const roll = document.querySelector('.juggle-roll-btn') as HTMLElement | null;
+      const roll = document.querySelector(
+        '.juggle-roll-btn'
+      ) as HTMLElement | null;
       const cellBox = cell?.getBoundingClientRect();
       const rollBox = roll?.getBoundingClientRect();
       return {
+        coarse: window.matchMedia('(pointer: coarse)').matches,
+        hoverNone: window.matchMedia('(hover: none)').matches,
         cellW: cellBox?.width ?? 0,
         cellH: cellBox?.height ?? 0,
         rollH: rollBox?.height ?? 0,
       };
     });
 
+    // iPad profile should hit coarse and/or hover:none; either unlocks 44px cells.
+    expect(sizes.coarse || sizes.hoverNone).toBe(true);
     expect(sizes.cellW).toBeGreaterThanOrEqual(44);
     expect(sizes.cellH).toBeGreaterThanOrEqual(44);
     expect(sizes.rollH).toBeGreaterThanOrEqual(44);
+    await context.close();
   });
 });
