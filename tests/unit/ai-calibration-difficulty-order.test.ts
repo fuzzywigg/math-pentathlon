@@ -22,18 +22,10 @@ const SEARCH_BUDGET: Record<string, { games: number; timeout: number; deadlineMs
 
 const DEFAULT = { games: 8, timeout: 30_000, deadlineMs: 0 };
 
-/**
- * Tip AI still inverts Hard vs Easy on these seats (seeded samples).
- * #468 proposed heuristic retunes; left for owner decision (see
- * docs/STANDALONE-TRIAGE-2026-10-07.md). Harness still covers them offline.
- */
-const KNOWN_TIP_INVERSIONS = new Set(['fiar', 'pent-em-in']);
-
 describe('AI calibration — Hard >= Easy win rate vs random', () => {
   for (const adapter of ALL_ADAPTERS) {
     const cfg = SEARCH_BUDGET[adapter.id] ?? DEFAULT;
-    const skipInversion = KNOWN_TIP_INVERSIONS.has(adapter.id);
-    it.skipIf(skipInversion)(
+    it(
       `${adapter.id}: Hard win rate >= Easy on seeded sample`,
       () => {
         const prevWall = process.env.CALIBRATION_WALL_CLOCK;

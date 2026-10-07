@@ -16,6 +16,7 @@ import {
   canPlaceChip,
   placeChip,
   getValidMoves,
+  getSelectableNodes,
   moveChip,
   findPaths,
   findAnyWinningPath,
@@ -59,9 +60,26 @@ interface SearchCtx {
 }
 
 const DIFFICULTY_CONFIG = {
-  easy: { maxDepth: 1, randomness: 0.45, considerMarked: true },
-  medium: { maxDepth: 2, randomness: 0.12, considerMarked: true },
-  hard: { maxDepth: 2, randomness: 0.04, considerMarked: true },
+  // teachingBlunder: ignore search and pick a uniform legal move. Calibrated so
+  // Easy < Hard vs random (depth-1 search was matching/beating Hard's win rate).
+  easy: {
+    maxDepth: 1,
+    randomness: 0.55,
+    considerMarked: true,
+    teachingBlunder: 0.35,
+  },
+  medium: {
+    maxDepth: 2,
+    randomness: 0.12,
+    considerMarked: true,
+    teachingBlunder: 0,
+  },
+  hard: {
+    maxDepth: 3,
+    randomness: 0.02,
+    considerMarked: true,
+    teachingBlunder: 0,
+  },
 };
 
 // =============================================================================
@@ -407,9 +425,14 @@ function getBestPlacement(
       continue;
     }
 
+    // Hard may look 2 plies; Easy/Medium stay at 1 for tablet latency.
+    const placeDepth =
+      difficulty === 'hard'
+        ? Math.min(config.maxDepth - 1, 2)
+        : Math.min(config.maxDepth - 1, 1);
     const score = minimax(
       newState,
-      Math.min(config.maxDepth - 1, 1),
+      placeDepth,
       -Infinity,
       Infinity,
       false,
@@ -706,6 +729,47 @@ export function searchAIMove(
       ? Number.POSITIVE_INFINITY
       : started + options.deadlineMs;
   const ctx: SearchCtx = { rng, now, deadline };
+  const config = DIFFICULTY_CONFIG[difficulty];
+
+  // Easy teaching blunders: uniform legal move (still always legal).
+  if (config.teachingBlunder > 0 && rng() < config.teachingBlunder) {
+    if (state.phase === 'placement') {
+      const kinds: ChipKind[] = [];
+      const inv = state.chipInventory[aiPlayer];
+      if (inv.plain > 0) kinds.push('plain');
+      if (config.considerMarked && inv.marked > 0) kinds.push('marked');
+      const legal: { nodeId: string; chipKind: ChipKind }[] = [];
+      for (const chipKind of kinds) {
+        for (const nodeId of state.board.nodes.keys()) {
+          if (canPlaceChip(state, nodeId, chipKind)) {
+            legal.push({ nodeId, chipKind });
+          }
+        }
+      }
+      if (legal.length > 0) {
+        const pick = legal[Math.floor(rng() * legal.length)];
+        return {
+          move: { type: 'place', nodeId: pick.nodeId, chipKind: pick.chipKind },
+          truncated: false,
+        };
+      }
+    } else if (state.phase === 'movement') {
+      const selectable = getSelectableNodes(state);
+      const legal: { from: string; to: string }[] = [];
+      for (const from of selectable) {
+        for (const to of getValidMoves(state, from)) {
+          legal.push({ from, to });
+        }
+      }
+      if (legal.length > 0) {
+        const pick = legal[Math.floor(rng() * legal.length)];
+        return {
+          move: { type: 'move', from: pick.from, to: pick.to },
+          truncated: false,
+        };
+      }
+    }
+  }
 
   if (state.phase === 'placement') {
     if (chipsRemaining(state.chipInventory[aiPlayer]) === 0) {
