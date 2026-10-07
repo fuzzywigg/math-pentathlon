@@ -446,6 +446,7 @@ export function isTutorialActive(): boolean {
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
+  clearAiTimer();
   unmountBoard3d();
   activeController = null;
   activeContainer = null;

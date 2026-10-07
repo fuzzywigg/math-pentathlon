@@ -31,6 +31,8 @@ let gameMode: GameMode = 'human-vs-human';
 let aiPlayer: PlayerOwner | null = null;
 let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking: boolean = false;
+/** Invalidates in-flight async AI turns after route leave / new game. */
+let aiGeneration = 0;
 
 // AI thinking delay (ms) for better UX
 const AI_THINKING_DELAY = 500;
@@ -238,11 +240,13 @@ function checkAndTriggerAITurn(): void {
 async function executeAITurn(): Promise<void> {
   if (!aiPlayer) return;
 
+  const gen = ++aiGeneration;
   isAIThinking = true;
   render(); // Show "AI is thinking..." status
 
   // Initial thinking delay
   await delay(AI_THINKING_DELAY);
+  if (gen !== aiGeneration) return;
 
   // Get AI's move
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
@@ -251,6 +255,7 @@ async function executeAITurn(): Promise<void> {
     // No legal king move — re-render so game-over / trap chrome can paint.
     // (Rules already end the game when a seat is trapped; this clears the
     // thinking spinner if search returns null for any reason.)
+    if (gen !== aiGeneration) return;
     isAIThinking = false;
     render();
     return;
@@ -266,6 +271,7 @@ async function executeAITurn(): Promise<void> {
 
   // Delay before placing quadraphage
   await delay(AI_MOVE_DELAY);
+  if (gen !== aiGeneration) return;
 
   // Execute quadraphage placement (convert from 0-based to 1-based)
   const quadPos = {
@@ -288,6 +294,7 @@ function delay(ms: number): Promise<void> {
 
 // Start a new game with current settings
 export function newGame(): void {
+  aiGeneration += 1;
   gameState = createInitialGameState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
@@ -403,6 +410,8 @@ export function initGame(
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
   if (boardContainer) {
     boardContainer.removeEventListener(
       'mp3d-context-lost',

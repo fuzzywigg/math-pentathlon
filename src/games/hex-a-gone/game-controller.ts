@@ -39,6 +39,8 @@ let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
 
 let board3d: HexAGoneBoard3D | null = null;
 let board3dEnabled = false;
@@ -124,6 +126,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -136,6 +139,7 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -259,12 +263,15 @@ function settleAIStuck(): void {
 
 // AI turn logic
 function triggerAITurn(): void {
+  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
   setTimeout(() => {
+    if (gen !== aiGeneration) return;
     // AI selects blocks using AI module
     const aiSelectBlocks = (): void => {
+      if (gen !== aiGeneration) return;
       const selection = getAISelection(gameState, 'player2', aiDifficulty);
 
       if (!selection || selection.blocks.length === 0) {
@@ -287,6 +294,7 @@ function triggerAITurn(): void {
 
     // AI places blocks one by one using AI module
     const aiPlaceBlocks = (): void => {
+      if (gen !== aiGeneration) return;
       if (
         gameState.phase !== 'placeBlocks' ||
         !gameState.selectedBlockForPlacement
@@ -359,6 +367,8 @@ function render(): void {
 }
 
 export function destroyGame(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

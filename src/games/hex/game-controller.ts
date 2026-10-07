@@ -199,3 +199,12 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
+
+/** Cancel in-flight AI work and clear mounts (route change). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  cancelHexAiRequests();
+  isAIThinking = false;
+  boardContainer = null;
+  statusContainer = null;
+}

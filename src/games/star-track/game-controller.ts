@@ -30,6 +30,8 @@ let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
 
 let board3d: StarTrackBoard3D | null = null;
 let board3dEnabled = false;
@@ -96,6 +98,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -108,6 +111,7 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -176,16 +180,19 @@ function handleSelectChain(index: 0 | 1): void {
 
 // AI turn
 function triggerAITurn(): void {
+  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
   // AI draws chains
   setTimeout(() => {
+    if (gen !== aiGeneration) return;
     gameState = drawChains(gameState);
     render();
 
     // AI selects chain (after a delay) using AI module
     setTimeout(() => {
+      if (gen !== aiGeneration) return;
       const choice = getAIChainChoice(gameState, 'player2', aiDifficulty);
 
       if (choice) {
@@ -271,6 +278,8 @@ export function isTutorialActive(): boolean {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

@@ -216,3 +216,9 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
+
+/** Invalidate pending AI timers and clear mounts (route change). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  gameContainer = null;
+}
