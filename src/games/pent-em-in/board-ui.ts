@@ -226,9 +226,7 @@ export function renderBoard(
       rect.setAttribute('data-row', String(row));
       rect.setAttribute('data-col', String(col));
       const canPlace =
-        allowInput &&
-        state.phase === 'placePiece' &&
-        !!state.selectedPiece;
+        allowInput && state.phase === 'placePiece' && !!state.selectedPiece;
       rect.style.cursor = canPlace ? 'pointer' : 'default';
 
       const occupant = occupancy.get(`${row},${col}`) ?? null;
