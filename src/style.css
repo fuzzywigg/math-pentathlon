@@ -3033,6 +3033,8 @@ h1 {
 
 .star-track-draw-btn {
   padding: 16px 36px;
+  min-height: 44px;
+  min-width: 44px;
   font-size: 1.2rem;
   font-weight: 600;
   background: linear-gradient(135deg, #48bb78 0%, #38a169 50%, #2f855a 100%);
@@ -3046,14 +3048,21 @@ h1 {
   box-shadow: 0 4px 12px rgba(72, 187, 120, 0.35);
 }
 
-.star-track-draw-btn:hover {
+.star-track-draw-btn:hover:not(:disabled) {
   transform: scale(1.05) translateY(-2px);
   box-shadow: 0 8px 20px rgba(72, 187, 120, 0.45);
 }
 
-.star-track-draw-btn:active {
+.star-track-draw-btn:active:not(:disabled) {
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(72, 187, 120, 0.35);
+}
+
+.star-track-draw-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .star-track-bucket-info {
@@ -3084,18 +3093,31 @@ h1 {
   cursor: pointer;
   transition: all var(--transition-fast);
   min-width: 100px;
+  min-height: 44px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
-.star-track-chain-btn:hover {
+.star-track-chain-btn:hover:not(:disabled) {
   border-color: #48bb78;
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-.star-track-chain-btn:active {
+.star-track-chain-btn:active:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.star-track-chain-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.star-track-ai-hint {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #4a5568;
 }
 
 .star-track-chain-btn .chain-links {
@@ -3206,6 +3228,39 @@ h1 {
     flex: 1 1 0;
     width: auto;
     min-width: 0;
+    min-height: 44px;
+  }
+}
+
+/* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+@media (pointer: coarse) {
+  .star-track-draw-btn,
+  .star-track-chain-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Star Track–local reduced motion (avoid editing the shared global block) */
+@media (prefers-reduced-motion: reduce) {
+  .star-track-goal,
+  .star-track-ray,
+  .star-track-winner {
+    animation: none !important;
+  }
+
+  .star-track-space,
+  .star-track-piece,
+  .star-track-draw-btn,
+  .star-track-chain-btn,
+  .star-track-progress .progress-fill {
+    transition: none !important;
+  }
+
+  .star-track-space:hover,
+  .star-track-draw-btn:hover:not(:disabled),
+  .star-track-chain-btn:hover:not(:disabled) {
+    transform: none;
   }
 }
 
