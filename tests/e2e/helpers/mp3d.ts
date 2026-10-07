@@ -68,6 +68,24 @@ export async function waitForMp3dReady(
 }
 
 /**
+ * Prime Gold 3D a11y cell that can actually place.
+ *
+ * After chrome rebuild, `restoreGridFocus` / `applyRovingTabindex` collapses
+ * `tabindex` to a single gridcell (often [0,0]) that is frequently *not* a
+ * valid placement — so `button[tabindex="0"]` is the wrong activation target.
+ * Valid cells retain their click handlers; match them via the Valid Moves list.
+ */
+export async function primeGoldValidA11yCell(page: Page): Promise<Locator> {
+  const exprValue = page.locator('.pg-expr-item strong').first();
+  await expect(exprValue).toBeAttached({ timeout: 10_000 });
+  const value = (await exprValue.textContent())?.trim();
+  expect(value, 'expected at least one valid Prime Gold expression').toBeTruthy();
+  const cell = page.locator(`.pg-a11y-grid button[data-value="${value}"]`);
+  await expect(cell).toBeAttached({ timeout: 10_000 });
+  return cell;
+}
+
+/**
  * Visually-hidden a11y grids use clip/1px sizing — `toBeVisible` is flaky.
  * Wait for attach, focus, then Enter (button activates via click handler).
  */

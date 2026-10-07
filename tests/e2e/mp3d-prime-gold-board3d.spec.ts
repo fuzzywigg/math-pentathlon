@@ -10,6 +10,7 @@ import {
   dismissModeIfNeeded,
   enableBoard3dLowQuality,
   keyboardActivateA11yCell,
+  primeGoldValidA11yCell,
   waitForGameReady,
   waitForHumanStatus,
   waitForMp3dReady,
@@ -252,7 +253,9 @@ test.describe('mp3d Prime Gold 3D board', () => {
     // Placing phase — do not race fixed sleeps against a11y grid rebuild.
     await waitForHumanStatus(page, '.pg-status', /Select/i);
 
-    const focusable = page.locator('.pg-a11y-grid button[tabindex="0"]').first();
+    // Do not use button[tabindex="0"]: restoreGridFocus often leaves only a
+    // non-valid cell tabbable. Valid a11y buttons still have click handlers.
+    const focusable = await primeGoldValidA11yCell(page);
     await keyboardActivateA11yCell(page, focusable);
 
     // Successful place mounts move history; never union-query with .pg-status

@@ -33,9 +33,12 @@ describe('e2e 3D timeout config', () => {
 
   it('ships keyboard a11y + human-status helpers (no union strict-mode flake)', () => {
     expect(helper).toContain('keyboardActivateA11yCell');
+    expect(helper).toContain('primeGoldValidA11yCell');
     expect(helper).toContain('waitForHumanStatus');
     expect(helper).toContain('toBeAttached');
     expect(helper).toContain('Computer is thinking');
+    // Guard against regressing to tabindex=0 targeting (restoreGridFocus flake).
+    expect(helper).toContain('pg-expr-item strong');
   });
 
   it('exposes test-only board3dLQ pixel-ratio path', () => {
