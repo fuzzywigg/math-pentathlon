@@ -54,7 +54,8 @@ describe('Hex deep playability', () => {
     expect(controllerSrc).toMatch(/AI_THINKING_DELAY\s*=\s*250/);
     expect(ai.AI_PLAY_DEADLINE_MS.easy).toBe(600);
     expect(ai.AI_PLAY_DEADLINE_MS.medium).toBe(1200);
-    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(2500);
+    // Tip fold #472: Hard play deadline 450ms (≤500ms wall think-time).
+    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(450);
   });
 
   it('HvA status uses tap copy and You win! / Computer is thinking…', () => {

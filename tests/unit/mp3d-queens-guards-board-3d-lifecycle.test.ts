@@ -353,8 +353,13 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
       )
     ).toBe(false);
 
+    // Mount schedules a one-shot rAF readiness paint (software GL); not a loop.
+    expect(raf).toHaveBeenCalled();
+    raf.mockClear();
+
     const state = createInitialState();
     view.update({ ...state, winner: 'player1' });
+    // Still render-on-demand: game-over must not start a continuous RAF pulse.
     expect(raf).not.toHaveBeenCalled();
     view.unmount();
   });
