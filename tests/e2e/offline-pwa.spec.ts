@@ -188,6 +188,7 @@ test.describe('offline PWA', () => {
 
   test('menu + Hex computer move offline after first online visit', async ({
     browser,
+    browserName,
   }) => {
     test.setTimeout(120_000);
 
@@ -205,16 +206,41 @@ test.describe('offline PWA', () => {
     });
     await waitForServiceWorkerControl(page);
 
+    // Playwright WebKit's setOffline breaks controlled-page module import for
+    // lazy game chunks across full page.goto — warm Hex online, then soft-nav.
+    const useSoftNav = browserName === 'webkit';
+    if (useSoftNav) {
+      await page.goto(`${baseURL}/#/game/hex`);
+      await waitForGameReady(page);
+      await page.goto(`${baseURL}/#/`);
+      await expect(page.locator('.game-card').first()).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+
     await context.setOffline(true);
 
-    // Offline menu still works from precache.
-    await page.goto(`${baseURL}/#/`);
-    await expect(page.locator('.game-card').first()).toBeVisible({
-      timeout: 15_000,
-    });
+    if (useSoftNav) {
+      await page.evaluate(() => {
+        location.hash = '#/';
+      });
+      await expect(page.locator('.game-card').first()).toBeVisible({
+        timeout: 15_000,
+      });
+      await page.evaluate(() => {
+        location.hash = '#/game/hex';
+      });
+    } else {
+      // Offline menu still works from precache.
+      await page.goto(`${baseURL}/#/`);
+      await expect(page.locator('.game-card').first()).toBeVisible({
+        timeout: 15_000,
+      });
 
-    // Offline Hex mount + Easy vs-AI reply proves the worker chunk is cached.
-    await page.goto(`${baseURL}/#/game/hex`);
+      // Offline Hex mount + Easy vs-AI reply proves the worker chunk is cached.
+      await page.goto(`${baseURL}/#/game/hex`);
+    }
+
     await waitForGameReady(page);
     await expect(page.locator('h1')).toContainText('Hex', { timeout: 15_000 });
     await expect(page.locator('.hex-board, #board').first()).toBeVisible();
