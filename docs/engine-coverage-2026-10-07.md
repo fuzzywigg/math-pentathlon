@@ -40,16 +40,19 @@ kings-quadraphages, calla, fiar.
 
 ## After (post-invariant suite)
 
-_Filled after re-running coverage with the new tests._
-
 | Engine | Branch % before | Branch % after | Δ branches covered |
 | --- | ---: | ---: | ---: |
-| kwatro-sinko | 87.93% | _pending_ | _pending_ |
-| ramrod | 89.15% | _pending_ | _pending_ |
-| par-55 | 90.24% | _pending_ | _pending_ |
-| kings-quadraphages | 92.00% | _pending_ | _pending_ |
-| calla | 92.39% | _pending_ | _pending_ |
-| fiar | 93.45% | _pending_ | _pending_ |
+| kwatro-sinko | 87.93% | 87.93% | +0 (102 / 116) |
+| ramrod | 89.15% | 90.36% | +1 (75 / 83) |
+| par-55 | 90.24% | 91.46% | +1 (75 / 82) |
+| kings-quadraphages | 92.00% | 92.00% | +0 (46 / 50) |
+| calla | 92.39% | 93.47% | +1 (86 / 92) |
+| fiar | 93.45% | 93.45% | +0 (100 / 107) |
+
+Remaining uncovered branches are mostly defensive guards (`if (!node)`, empty-chip
+edges, rare tie / both-out-of-rods arms, `settleNoValidMoves` soft-lock paths,
+and FIAR inventory fallback arms) that random play from a fresh deal rarely hits.
+Closing them would need hand-crafted board fixtures, not rule changes.
 
 ## Invariants asserted
 
