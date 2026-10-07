@@ -42,7 +42,7 @@ export const queensGuardsTutorial: TutorialConfig = {
       title: 'Movement Rules',
       message: `
         <ul>
-          <li>Click a piece to select it, then click a highlighted cell to move</li>
+          <li>Tap a piece to select it, then tap a highlighted cell to move</li>
           <li>Pieces can only move <strong>inward</strong> (toward center) or <strong>sideways</strong> (same ring)</li>
           <li>Pieces cannot move outward (away from center)</li>
           <li>Only the Queen can occupy the center cell (throne)</li>

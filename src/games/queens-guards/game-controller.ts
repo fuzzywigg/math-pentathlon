@@ -192,21 +192,27 @@ function updateStatus(): void {
   const playerClass =
     gameState.currentPlayer === 'player1' ? 'player1' : 'player2';
 
+  // Computer seat: never invite a human tap ("Select a piece…") even during the
+  // short paint delay before isAIThinking flips true.
+  const computerSeat =
+    vsAI && gameState.currentPlayer === aiPlayer && !gameState.winner;
+  const showAiChrome = computerSeat || isAIThinking;
+
   let instruction = 'Select a piece to move';
   if (gameState.selectedPiece) {
     instruction =
-      'Click a highlighted cell to move, or select a different piece';
+      'Tap a highlighted cell to move, or select a different piece';
   }
   if (gameState.capturedPieces.length > 0) {
     instruction =
-      'Click a captured piece, then an empty space on the outer ring';
+      'Tap a captured piece (red outline), then an empty outer ring space';
   }
-  if (isAIThinking) {
+  if (showAiChrome) {
     instruction = 'Computer is thinking…';
   }
 
   statusContainer.innerHTML = `
-    <div class="qg-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
+    <div class="qg-status ${playerClass}${showAiChrome ? ' status-ai-thinking' : ''}">
       ${playerName}'s turn - ${instruction}
     </div>
     <div class="qg-info">
@@ -220,12 +226,17 @@ function updateStatus(): void {
 // Event Handlers
 // =============================================================================
 
+/** Paint delay before AI search — keep short so tablet Hard stays under ~3s. */
+const AI_THINK_PAINT_MS = 250;
+/** Brief pause between capture-restore AI plies. */
+const AI_RESTORE_CHAIN_MS = 280;
+
 function maybeTriggerAI(): void {
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
     // Slight delay so the thinking status can paint before search starts.
     setTimeout(() => {
       void performAIMove();
-    }, 500);
+    }, AI_THINK_PAINT_MS);
   }
 }
 
@@ -384,7 +395,7 @@ async function performAIMove(): Promise<void> {
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
     setTimeout(() => {
       void performAIMove();
-    }, 400);
+    }, AI_RESTORE_CHAIN_MS);
   }
 }
 

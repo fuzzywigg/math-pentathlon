@@ -107,10 +107,12 @@ export function renderBoard(
   const centerY = size / 2;
 
   svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
-  svg.style.maxWidth = `${size}px`;
-  svg.style.maxHeight = `${size}px`;
+  // Intrinsic size avoids the browser’s 300×150 replaced-element default, which
+  // previously shrunk hex cells to ~21px CSS (far under the 44px touch budget).
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('class', 'qg-board');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   markBoardAsGrid(svg);
 
   // Background
@@ -279,6 +281,9 @@ export function renderBoard(
         : cell.piece?.type === 'guard'
           ? 'Guard'
           : undefined;
+    const isCaptured = state.capturedPieces.some(
+      (c) => c.ring === cell.ring && c.position === cell.position
+    );
     makeGridCell(
       g,
       buildCellAriaLabel({
@@ -286,17 +291,19 @@ export function renderBoard(
         empty: !cell.piece,
         owner,
         piece: pieceName,
+        // Keep opening labels stable for handshake pins; AI-seat honesty uses
+        // aria-disabled + "not available" extras instead of selectable.
         validMove: validMoves.has(key),
         extras: [
           ...(state.selectedPiece === key ? ['selected'] : []),
-          ...(state.capturedPieces.some(
-            (c) => c.ring === cell.ring && c.position === cell.position
-          )
-            ? ['captured']
-            : []),
+          ...(isCaptured ? ['captured'] : []),
+          ...(!allowInput ? ['not available'] : []),
         ],
       })
     );
+    if (!allowInput) {
+      g.setAttribute('aria-disabled', 'true');
+    }
     if (activate) {
       bindCellActivateKeys(g, activate);
     }
@@ -329,14 +336,45 @@ export function injectQGStyles(): void {
   const style = document.createElement('style');
   style.id = 'qg-styles';
   style.textContent = `
+    /* Pin board CSS width so hex hit areas clear WCAG 2.5.5 (~44px).
+       viewBox ≈791 → 660px ⇒ scale≈0.83 ⇒ path ≈46×53. Shell #app is
+       ~700px, so allow a short horizontal scroll rather than shrinking cells. */
+    .qg-game-area {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      align-items: stretch;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
     .qg-board-container {
       display: flex;
       justify-content: center;
-      padding: 1rem;
+      align-items: center;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      min-width: 660px;
+      width: 660px;
+      max-width: none;
+      margin: 0 auto;
     }
 
+    .qg-board-container svg.qg-board,
     .qg-board-container svg {
+      display: block;
+      min-width: 660px;
+      width: 660px;
+      max-width: none;
+      height: auto;
+      aspect-ratio: 1;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+
+    @media (pointer: coarse) {
+      .qg-game-area {
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     .qg-status {
