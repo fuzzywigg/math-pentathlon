@@ -126,7 +126,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 
 // Handle draw chains action
 function handleDrawChains(): void {
-  if (isAIThinking) return;
+  if (!canHumanInteract()) return;
   if (gameState.phase !== 'drawChains') return;
 
   if (tutorialManager.getIsActive()) {
@@ -144,7 +144,7 @@ function handleDrawChains(): void {
 
 // Handle chain selection
 function handleSelectChain(index: 0 | 1): void {
-  if (isAIThinking) return;
+  if (!canHumanInteract()) return;
   if (gameState.phase !== 'selectChain') return;
 
   if (tutorialManager.getIsActive()) {
