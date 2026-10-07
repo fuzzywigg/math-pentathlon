@@ -211,10 +211,16 @@ function updateUI(controller: PrimeGoldController): void {
   status.className = `pg-status ${state.currentPlayer}`;
   markStatusLive(status);
 
+  const aiThinking = isComputerTurnPending(controller);
+  const inputOpts = { allowInput: !aiThinking };
+
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.primeVeins[state.winner]} prime veins!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
+  } else if (aiThinking) {
+    status.classList.add('status-ai-thinking');
+    status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'rolling') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
   } else if (state.phase === 'placing') {
@@ -242,13 +248,11 @@ function updateUI(controller: PrimeGoldController): void {
   const mainLayout = document.createElement('div');
   mainLayout.className = 'pg-main-layout';
 
-  // Dice area
-  mainLayout.appendChild(renderDice(state, () => handleRoll(controller)));
+  // Dice area — hide Roll while the computer seat thinks
+  mainLayout.appendChild(
+    renderDice(state, () => handleRoll(controller), inputOpts)
+  );
 
-  const aiThinking =
-    controller.isAI &&
-    controller.aiPlayer === state.currentPlayer &&
-    state.phase !== 'gameOver';
   const allowBoardClicks = !aiThinking && state.phase === 'placing';
 
   if (board3dEnabled) {
@@ -266,17 +270,21 @@ function updateUI(controller: PrimeGoldController): void {
     }
   } else {
     mainLayout.appendChild(
-      renderBoard(state, (value, expr) =>
-        handlePlacement(controller, value, expr)
+      renderBoard(
+        state,
+        (value, expr) => handlePlacement(controller, value, expr),
+        inputOpts
       )
     );
   }
 
-  // Expressions list (when placing)
+  // Expressions list (when placing) — thinking chrome only on AI seat
   if (state.phase === 'placing') {
     mainLayout.appendChild(
-      renderExpressions(state, (value, expr) =>
-        handlePlacement(controller, value, expr)
+      renderExpressions(
+        state,
+        (value, expr) => handlePlacement(controller, value, expr),
+        inputOpts
       )
     );
   }
@@ -292,14 +300,15 @@ function updateUI(controller: PrimeGoldController): void {
   const controls = document.createElement('div');
   controls.className = 'pg-controls';
 
-  if (state.phase === 'placing' && !hasValidMoves(state)) {
+  if (
+    !aiThinking &&
+    state.phase === 'placing' &&
+    !hasValidMoves(state)
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'pg-btn pg-btn-secondary';
     passBtn.textContent = 'Pass Turn';
-    passBtn.addEventListener('click', () => {
-      controller.state = passTurn(state);
-      controller.update();
-    });
+    passBtn.addEventListener('click', () => handlePass(controller));
     controls.appendChild(passBtn);
   }
 
@@ -316,10 +325,19 @@ function updateUI(controller: PrimeGoldController): void {
   }
 }
 
+function isComputerTurnPending(controller: PrimeGoldController): boolean {
+  return (
+    controller.isAI &&
+    controller.aiPlayer === controller.state.currentPlayer &&
+    controller.state.phase !== 'gameOver'
+  );
+}
+
 /**
  * Handle dice roll
  */
 function handleRoll(controller: PrimeGoldController): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = rollDice(controller.state);
   controller.update();
 }
@@ -332,7 +350,18 @@ function handlePlacement(
   value: number,
   expr: string
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = placeChip(controller.state, value, expr);
+  controller.update();
+}
+
+/**
+ * Handle pass when no placements remain (human seat only).
+ */
+function handlePass(controller: PrimeGoldController): void {
+  if (isComputerTurnPending(controller)) return;
+  if (controller.state.phase !== 'placing') return;
+  controller.state = passTurn(controller.state);
   controller.update();
 }
 
