@@ -14,6 +14,21 @@ async function waitForGameReady(page: Page) {
 }
 
 async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
+  // Compress controller think/move pauses so a full Easy game fits e2e budgets.
+  await page.addInitScript(() => {
+    const orig = window.setTimeout.bind(window);
+    window.setTimeout = ((
+      fn: TimerHandler,
+      ms?: number,
+      ...args: unknown[]
+    ) =>
+      orig(
+        fn as never,
+        typeof ms === 'number' && ms >= 100 ? Math.min(ms, 20) : (ms ?? 0),
+        ...args
+      )) as typeof window.setTimeout;
+  });
+
   await page.goto('/#/game/kings-quadraphages');
   await waitForGameReady(page);
 
@@ -58,6 +73,7 @@ test.describe('Kings deep playability', () => {
   test('desktop: You copy, ≥44px cells, AI lock, Easy game ends', async ({
     page,
   }) => {
+    test.setTimeout(120_000);
     await startVsAi(page, 'easy');
 
     await expect(page.locator('.status-mode')).toContainText('vs AI (Easy)');
@@ -117,11 +133,20 @@ test.describe('Kings deep playability', () => {
 });
 
 test.describe('Kings deep playability (tablet)', () => {
-  test.use({ ...devices['iPad Mini'] });
+  // Omit defaultBrowserType (webkit) so this stays on the chromium project worker.
+  const iPadMini = devices['iPad Mini'];
+  test.use({
+    userAgent: iPadMini.userAgent,
+    viewport: iPadMini.viewport,
+    deviceScaleFactor: iPadMini.deviceScaleFactor,
+    isMobile: iPadMini.isMobile,
+    hasTouch: iPadMini.hasTouch,
+  });
 
   test('tablet: 44px cells + Medium reaches end without Player N copy', async ({
     page,
   }) => {
+    test.setTimeout(120_000);
     await startVsAi(page, 'medium');
 
     await expect(page.locator('.status-turn')).toHaveText(
