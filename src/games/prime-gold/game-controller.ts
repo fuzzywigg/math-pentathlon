@@ -192,7 +192,7 @@ export function initGame(
 function applyForcedTurnAdvances(controller: PrimeGoldController): boolean {
   let changed = false;
   for (let guard = 0; guard < 4; guard++) {
-    let { state } = controller;
+    const { state } = controller;
     if (state.phase === 'gameOver') break;
 
     const settled = settleIfExhausted(state);
