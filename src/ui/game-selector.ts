@@ -7,6 +7,8 @@ import {
   getGamesByDivision,
 } from '../core/game-registry';
 import { navigate } from '../core/router';
+import { prefetchGameChunk, prefetchGameChunksIdle } from './game-prefetch';
+import { scrollBehaviorForMotion } from './reduced-motion';
 
 function createGameCard(game: GameInfo): HTMLElement {
   const card = document.createElement('div');
@@ -65,6 +67,13 @@ function createGameCard(game: GameInfo): HTMLElement {
     const handleClick = () => {
       navigate(`/game/${game.id}`);
     };
+
+    // Warm the game chunk on intent (hover / focus) for cheaper tablets.
+    const warm = () => {
+      prefetchGameChunk(game.id);
+    };
+    card.addEventListener('pointerenter', warm, { passive: true });
+    card.addEventListener('focus', warm);
 
     card.addEventListener('click', handleClick);
     card.addEventListener('keydown', (e) => {
@@ -331,7 +340,10 @@ export function renderGameSelector(container: HTMLElement): void {
 
         // Scroll to the section
         setTimeout(() => {
-          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          targetSection.scrollIntoView({
+            behavior: scrollBehaviorForMotion(),
+            block: 'start',
+          });
         }, 50);
 
         // Update active tab
@@ -362,7 +374,10 @@ export function renderGameSelector(container: HTMLElement): void {
 
         // Scroll to header
         setTimeout(() => {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          section.scrollIntoView({
+            behavior: scrollBehaviorForMotion(),
+            block: 'start',
+          });
         }, 50);
       }
 
@@ -373,4 +388,10 @@ export function renderGameSelector(container: HTMLElement): void {
       });
     });
   });
+
+  // Idle-warm the first open division so the first tap is snappier offline-ish.
+  const firstDivisionGames = getGamesByDivision(DIVISIONS[0]?.name ?? '')
+    .filter((g) => g.available)
+    .map((g) => g.id);
+  prefetchGameChunksIdle(firstDivisionGames, { max: 3 });
 }

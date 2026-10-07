@@ -22,6 +22,8 @@ import {
   nextRouteGeneration,
 } from './core/route-generation';
 import { renderGameLoadError, renderGameLoading } from './ui/game-loading';
+import { bindOfflineDocumentFlag, isBrowserOffline } from './ui/offline';
+import { bindReducedMotionPreference } from './ui/reduced-motion';
 import { bootstrapPwa } from './pwa/bootstrap';
 
 /** Resolve New Game modal AI difficulty (shell Easy/Medium/Hard). */
@@ -134,7 +136,8 @@ function renderGame(): void {
         appContainer!,
         gameInfo.name,
         () => renderGame(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   };
@@ -1709,7 +1712,8 @@ function renderDiceDemoPage(): void {
         appContainer!,
         'Dice System Demo',
         () => renderDiceDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1732,7 +1736,8 @@ function renderAlignmentDemoPage(): void {
         appContainer!,
         'Alignment Detection Demo',
         () => renderAlignmentDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1755,7 +1760,8 @@ function renderFractionDemoPage(): void {
         appContainer!,
         'Fraction System Demo',
         () => renderFractionDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1778,7 +1784,8 @@ function renderPolyominoDemoPage(): void {
         appContainer!,
         'Polyomino System Demo',
         () => renderPolyominoDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1801,7 +1808,8 @@ function renderGraphDemoPage(): void {
         appContainer!,
         'Graph/Network System Demo',
         () => renderGraphDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1824,7 +1832,8 @@ function renderAttributeDemoPage(): void {
         appContainer!,
         'Attribute Logic Demo',
         () => renderAttributeDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1847,7 +1856,8 @@ function renderExpressionDemoPage(): void {
         appContainer!,
         'Expression Builder Demo',
         () => renderExpressionDemoPage(),
-        () => navigate('/')
+        () => navigate('/'),
+        { offline: isBrowserOffline() }
       );
     }
   })();
@@ -1874,3 +1884,7 @@ owlSystem.initialize();
 
 // Offline shell + background precache of game chunks
 bootstrapPwa();
+
+// Tablet / a11y: sync reduced-motion + offline flags onto <html>
+bindReducedMotionPreference();
+bindOfflineDocumentFlag();

@@ -9,6 +9,7 @@ import {
   isAtRest,
 } from '../../core/owl';
 import { storage } from '../../core/storage';
+import { prefersReducedMotion } from '../reduced-motion';
 
 /** Pixels of movement before a pointer gesture counts as a drag (not a tap). */
 const DRAG_THRESHOLD_PX = 6;
@@ -340,6 +341,27 @@ export class OwlComponent {
     if (!this.container) return;
     this.stopCoast();
 
+    // Reduced motion: snap to rest without coast animation.
+    if (prefersReducedMotion()) {
+      this.velocityX = 0;
+      this.velocityY = 0;
+      const boxW = this.container.getBoundingClientRect().width || 64;
+      const boxH = this.container.getBoundingClientRect().height || 64;
+      const x = parseFloat(this.container.style.left) || 0;
+      const y = parseFloat(this.container.style.top) || 0;
+      const clamped = clampToViewport(
+        x,
+        y,
+        boxW,
+        boxH,
+        window.innerWidth || 390,
+        window.innerHeight || 844
+      );
+      this.container.style.left = `${clamped.x}px`;
+      this.container.style.top = `${clamped.y}px`;
+      return;
+    }
+
     // Soft-cap release speed so a single large pointermove does not slingshot.
     const maxV = 28;
     this.velocityX = Math.max(-maxV, Math.min(maxV, this.velocityX));
@@ -499,6 +521,7 @@ export class OwlComponent {
   private onOwlClick(): void {
     // Trigger a playful animation
     if (!this.container) return;
+    if (prefersReducedMotion()) return;
 
     this.container.classList.add('owl-clicked');
     setTimeout(() => {
@@ -509,6 +532,7 @@ export class OwlComponent {
   // Eye tracking for fun
   private handleMouseMove = (e: MouseEvent): void => {
     if (!this.container || this.isMinimized || this.isDragging) return;
+    if (prefersReducedMotion()) return;
 
     const pupils = this.container.querySelectorAll('.owl-pupil');
     const owlRect = this.container.getBoundingClientRect();
