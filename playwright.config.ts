@@ -14,8 +14,10 @@ import { defineConfig, devices } from '@playwright/test';
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
  * CI never accidentally pulls in WebKit/Firefox.
  *
- * Visual regression uses a separate config: `playwright.visual.config.ts`
- * (`npm run test:visual`) — not registered here.
+ * Opt-in visual suites:
+ * - `playwright.visual.config.ts` via `npm run test:visual` (separate config)
+ * - `visual-desktop` / `visual-phone` projects via `npm run test:e2e:visual`
+ *   (start + openings baselines; ignored by chromium/firefox/webkit/ipad-webkit)
  */
 
 // Cap parallel browsers: each mp3d spec spins WebGL (often software/ANGLE in CI).
@@ -34,6 +36,9 @@ export default defineConfig({
     timeout: 15_000,
   },
   reporter: 'html',
+  // In-repo PNG baselines (committed). Project keeps desktop/phone apart.
+  snapshotPathTemplate:
+    '{testDir}/visual-baselines/{projectName}/{testFileName}/{arg}{ext}',
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
@@ -41,19 +46,40 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /visual-baseline\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
+      testIgnore: /visual-baseline\.spec\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
+      testIgnore: /visual-baseline\.spec\.ts/,
       use: { ...devices['Desktop Safari'] },
     },
     {
       name: 'ipad-webkit',
+      testIgnore: /visual-baseline\.spec\.ts/,
       use: { ...devices['iPad Pro 11'] },
+    },
+    {
+      name: 'visual-desktop',
+      testMatch: /visual-baseline\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+    {
+      name: 'visual-phone',
+      testMatch: /visual-baseline\.spec\.ts/,
+      use: {
+        // iPhone 12 viewport/UA, but Chromium so CI need not install WebKit.
+        ...devices['iPhone 12'],
+        browserName: 'chromium',
+      },
     },
   ],
   webServer: {
