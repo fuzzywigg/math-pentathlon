@@ -39,7 +39,8 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 describe('Wave 51 demos — expr challenge Correct alert 2*6-2', () => {
