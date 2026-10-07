@@ -80,7 +80,9 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
   }) => {
     const threeRequests: string[] = [];
     page.on('request', (req) => {
-      if (req.url().includes('vendor/three') || req.url().includes('/three')) {
+      // Only the Three.js vendor chunk — not `/src/ui/three/*` helpers
+      // (tablet-gl readiness/fallback is safe to import with board3d off).
+      if (req.url().includes('vendor/three')) {
         threeRequests.push(req.url());
       }
     });
