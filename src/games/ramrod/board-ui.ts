@@ -20,25 +20,33 @@ const BOX_HEIGHT = 80;
 const ROD_HEIGHT = 24;
 const CM_SCALE = 10; // 10 pixels per cm
 
+export interface RamrodBoardRenderOptions {
+  /** When false, suppress placement highlights and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render the game board
  */
 export function renderBoard(
   state: RamrodState,
-  onBoxClick: (boxId: string, slot: number) => void
+  onBoxClick: (boxId: string, slot: number) => void,
+  options: RamrodBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'ramrod-board';
   markBoardAsGrid(container);
 
   // Get valid placements for selected rod
-  const validPlacements = state.selectedRod
-    ? new Set(
-        getValidPlacements(state, state.selectedRod).map(
-          (p) => `${p.boxId}-${p.slot}`
+  const validPlacements =
+    allowInput && state.selectedRod
+      ? new Set(
+          getValidPlacements(state, state.selectedRod).map(
+            (p) => `${p.boxId}-${p.slot}`
+          )
         )
-      )
-    : new Set<string>();
+      : new Set<string>();
 
   // Create grid of boxes
   const grid = document.createElement('div');
@@ -181,14 +189,17 @@ function renderRod(rod: Rod, inHand: boolean): HTMLElement {
 export function renderPlayerRods(
   state: RamrodState,
   player: Player,
-  onRodClick: (rodId: string) => void
+  onRodClick: (rodId: string) => void,
+  options: RamrodBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = `ramrod-player-rods ramrod-player-${player}`;
 
   const rodIds = state.playerRods[player];
   const isCurrentPlayer = state.currentPlayer === player;
-  const canSelect = isCurrentPlayer && state.phase === 'selectingRod';
+  const canSelect =
+    allowInput && isCurrentPlayer && state.phase === 'selectingRod';
 
   for (const rodId of rodIds) {
     const rod = state.rods.get(rodId);

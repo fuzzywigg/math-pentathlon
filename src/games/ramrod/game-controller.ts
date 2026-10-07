@@ -10,7 +10,7 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, AIDifficulty } from './ai';
+import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderPlayerRods,
@@ -32,6 +32,15 @@ function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
   if (!root) return;
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+}
+
+/** True while it is the computer's seat (including the 800ms think pause). */
+function isComputerTurnPending(controller: RamrodGameController): boolean {
+  return isAITurn(
+    controller.state,
+    controller.aiPlayer,
+    controller.isAI ? 'human-vs-ai' : 'human-vs-human'
+  );
 }
 
 // =============================================================================
@@ -105,10 +114,14 @@ function updateUI(controller: RamrodGameController): void {
   status.className = `ramrod-status ${state.currentPlayer}`;
   markStatusLive(status);
 
+  const computerTurn = isComputerTurnPending(controller);
+
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.scores[state.winner]}cm!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
+  } else if (computerTurn) {
+    status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingRod') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a rod`;
   } else if (state.phase === 'placingRod') {
@@ -135,6 +148,7 @@ function updateUI(controller: RamrodGameController): void {
   // Main layout
   const mainLayout = document.createElement('div');
   mainLayout.className = 'ramrod-main-layout';
+  const inputOpts = { allowInput: !computerTurn };
 
   // Player 1 rods
   const p1Container = document.createElement('div');
@@ -143,14 +157,19 @@ function updateUI(controller: RamrodGameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.playerRods.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderPlayerRods(state, 'player1', (rodId) =>
-      handleRodClick(controller, rodId)
+    renderPlayerRods(
+      state,
+      'player1',
+      (rodId) => handleRodClick(controller, rodId),
+      inputOpts
     )
   );
 
   // Board
-  const board = renderBoard(state, (boxId, slot) =>
-    handleBoxClick(controller, boxId, slot)
+  const board = renderBoard(
+    state,
+    (boxId, slot) => handleBoxClick(controller, boxId, slot),
+    inputOpts
   );
 
   // Player 2 rods
@@ -160,8 +179,11 @@ function updateUI(controller: RamrodGameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.playerRods.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderPlayerRods(state, 'player2', (rodId) =>
-      handleRodClick(controller, rodId)
+    renderPlayerRods(
+      state,
+      'player2',
+      (rodId) => handleRodClick(controller, rodId),
+      inputOpts
     )
   );
 
@@ -180,22 +202,28 @@ function updateUI(controller: RamrodGameController): void {
   const controls = document.createElement('div');
   controls.className = 'ramrod-controls';
 
-  if (state.selectedRod) {
+  if (state.selectedRod && !computerTurn) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'ramrod-btn ramrod-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+  if (
+    !hasValidMoves(state) &&
+    state.phase !== 'gameOver' &&
+    !computerTurn
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'ramrod-btn ramrod-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -223,6 +251,7 @@ function updateUI(controller: RamrodGameController): void {
  * Handle rod click
  */
 function handleRodClick(controller: RamrodGameController, rodId: string): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = selectRod(controller.state, rodId);
   controller.update();
 }
@@ -235,6 +264,7 @@ function handleBoxClick(
   boxId: string,
   slot: number
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = placeRod(controller.state, boxId, slot);
   controller.update();
 }
