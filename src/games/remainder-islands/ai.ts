@@ -91,6 +91,9 @@ function evaluateMoves(
       reasons.push('Flexible island');
     }
 
+    // Prefer higher raw remainder when strategic scores are close (hard play).
+    score += remainder;
+
     moves.push({
       islandId,
       score,
@@ -99,7 +102,7 @@ function evaluateMoves(
     });
   }
 
-  moves.sort((a, b) => b.score - a.score);
+  moves.sort((a, b) => b.score - a.score || b.remainder - a.remainder);
   return moves;
 }
 
@@ -149,6 +152,7 @@ export function getAIIslandChoice(
   if (state.phase !== 'selectIsland') return null;
   if (state.currentPlayer !== aiPlayer) return null;
   if (!state.currentRoll) return null;
+  if (state.validIslands.length === 0) return null;
 
   const config = DIFFICULTY_CONFIG[difficulty];
 
@@ -164,7 +168,7 @@ export function getAIIslandChoice(
 
   if (moves.length === 0) return null;
 
-  // Add randomness based on difficulty
+  // Add randomness based on difficulty (hard stays in the top tier).
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
     const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
