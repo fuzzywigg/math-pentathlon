@@ -37,4 +37,18 @@ describe('game-loading UI', () => {
     expect(onRetry).toHaveBeenCalledOnce();
     expect(onHome).toHaveBeenCalledOnce();
   });
+
+  it('shows offline-specific hint when offline option is set', () => {
+    const root = document.createElement('div');
+    renderGameLoadError(root, 'Hex', vi.fn(), vi.fn(), { offline: true });
+    const hint = root.querySelector('[data-testid="game-load-error-hint"]');
+    expect(hint?.textContent).toMatch(/offline/i);
+  });
+
+  it('shows connection hint when online', () => {
+    const root = document.createElement('div');
+    renderGameLoadError(root, 'Hex', vi.fn(), vi.fn(), { offline: false });
+    const hint = root.querySelector('[data-testid="game-load-error-hint"]');
+    expect(hint?.textContent).toMatch(/connection/i);
+  });
 });
