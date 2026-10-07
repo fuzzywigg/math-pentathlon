@@ -17,6 +17,7 @@ import {
   canPlaceChip,
 } from '../../games/fiar/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { prefersReducedMotion } from '../reduced-motion';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -421,8 +422,11 @@ export async function createFiarBoard3D(
         nm.dot = null;
       }
 
-      // Subtle scale pulse for selectable / winning
-      const scale = selectable.includes(nm.id) || winning.has(nm.id) ? 1.08 : 1;
+      // Subtle scale emphasis for selectable / winning (skipped when reduced motion)
+      const emphasize =
+        !prefersReducedMotion() &&
+        (selectable.includes(nm.id) || winning.has(nm.id));
+      const scale = emphasize ? 1.08 : 1;
       nm.chip.scale.set(scale, 1, scale);
     }
 

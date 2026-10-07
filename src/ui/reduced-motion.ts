@@ -101,3 +101,15 @@ export function bindReducedMotionPreference(): () => void {
 export function scrollBehaviorForMotion(): ScrollBehavior {
   return prefersReducedMotion() ? 'auto' : 'smooth';
 }
+
+/**
+ * Duration helper for JS-driven animations / timeouts.
+ * Returns `reducedMs` (default 0) when the user prefers less motion.
+ */
+export function durationMsForMotion(
+  fullMs: number,
+  reducedMs = 0,
+  options: ReducedMotionOptions = {}
+): number {
+  return prefersReducedMotion(options) ? reducedMs : fullMs;
+}

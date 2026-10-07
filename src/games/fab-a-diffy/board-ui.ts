@@ -635,7 +635,7 @@ export function injectFabStyles(): void {
     }
 
     .fab-op-placeholder, .fab-result {
-      color: #999;
+      color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
     }
 
     .fab-equals {

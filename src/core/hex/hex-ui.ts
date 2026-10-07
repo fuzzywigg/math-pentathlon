@@ -49,6 +49,16 @@ export function injectHexStyles(): void {
       user-select: none;
       font-family: sans-serif;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hex-cell.highlighted {
+        animation: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .hex-cell.highlighted {
+      animation: none !important;
+    }
   `;
   document.head.appendChild(style);
 }

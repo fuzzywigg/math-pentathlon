@@ -272,12 +272,12 @@ export function injectStarsStyles(): void {
     }
 
     .stars-btn-primary {
-      background: #4caf50;
+      background: #15803d; /* AA white-on-fill (was #4caf50 ~2.8:1) */
       color: white;
     }
 
     .stars-btn-primary:hover {
-      background: #388e3c;
+      background: #166534;
     }
 
     .stars-btn-secondary {
@@ -356,6 +356,25 @@ export function injectStarsStyles(): void {
         min-width: 132px;
         padding: 0.75rem 1.25rem;
       }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stars-winner-banner {
+        animation: none !important;
+      }
+      .stars-card.selected {
+        transform: none;
+      }
+      .stars-btn {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .stars-winner-banner {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .stars-card.selected {
+      transform: none;
     }
   `;
   document.head.appendChild(style);

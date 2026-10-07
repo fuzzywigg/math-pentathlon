@@ -22,6 +22,7 @@ import {
   type StarTrackGameMode,
 } from '../../games/star-track/board-ui';
 import { getPlayerSeatColors } from '../player-colors';
+import { prefersReducedMotion } from '../reduced-motion';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -510,7 +511,7 @@ export async function createStarTrackBoard3D(
           : spaceToWorld(player, space);
       piece.position.set(x, BOARD_Y + 0.08 + PIECE_H / 2, z);
       piece.material = player === 'player1' ? mats.p1 : mats.p2;
-      const won = state.winner === player;
+      const won = state.winner === player && !prefersReducedMotion();
       piece.scale.set(won ? 1.12 : 1, won ? 1.15 : 1, won ? 1.12 : 1);
     };
 

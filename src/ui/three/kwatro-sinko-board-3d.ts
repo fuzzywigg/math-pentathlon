@@ -14,6 +14,7 @@
 import type { Chip, KwaState, Player } from '../../games/kwatro-sinko/types';
 import { getValidMoves } from '../../games/kwatro-sinko/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { prefersReducedMotion } from '../reduced-motion';
 import {
   applyRovingTabindex,
   bindCellActivateKeys,
@@ -674,7 +675,8 @@ export async function createKwatroSinkoBoard3D(
       if (nm.chipBody) {
         const selected = state.selectedChip === node.chip?.id;
         const win = winning.has(nm.id);
-        const scale = selected || win ? 1.08 : 1;
+        const emphasize = !prefersReducedMotion() && (selected || win);
+        const scale = emphasize ? 1.08 : 1;
         nm.chipBody.scale.set(scale, 1, scale);
         if (nm.chipLabel) nm.chipLabel.scale.set(scale, scale, scale);
       }

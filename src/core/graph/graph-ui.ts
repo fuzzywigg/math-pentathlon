@@ -436,6 +436,24 @@ export function injectGraphStyles(): void {
     .graph-container {
       user-select: none;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .graph-node.highlighted {
+        animation: none !important;
+      }
+      .graph-node,
+      .edges line {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .graph-node.highlighted {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .graph-node,
+    html[data-reduced-motion='true'] .edges line {
+      transition: none !important;
+    }
   `;
 
   document.head.appendChild(style);

@@ -129,12 +129,12 @@ export class DiceSelector {
         }
 
         .dice-btn-success {
-          background: #4caf50;
+          background: #15803d; /* AA white-on-fill (was #4caf50 ~2.8:1) */
           color: white;
         }
 
         .dice-btn-success:hover:not(:disabled) {
-          background: #43a047;
+          background: #166534;
           transform: translateY(-2px);
         }
 
@@ -188,8 +188,23 @@ export class DiceSelector {
         }
 
         .dice-placeholder {
-          color: #999;
+          color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
           font-style: italic;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .dice-btn-primary:hover:not(:disabled),
+          .dice-btn-success:hover:not(:disabled) {
+            transform: none;
+          }
+          .dice-btn {
+            transition: none !important;
+          }
+        }
+
+        html[data-reduced-motion='true'] .dice-btn-primary:hover:not(:disabled),
+        html[data-reduced-motion='true'] .dice-btn-success:hover:not(:disabled) {
+          transform: none;
         }
       `;
       document.head.appendChild(style);

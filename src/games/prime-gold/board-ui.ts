@@ -274,7 +274,7 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-expr-item:hover {
-      background: #4caf50;
+      background: #15803d; /* AA white-on-fill (was #4caf50) */
     }
 
     .pg-expr-item.prime {
@@ -313,12 +313,12 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-btn-primary {
-      background: #4caf50;
+      background: #15803d; /* AA white-on-fill (was #4caf50) */
       color: white;
     }
 
     .pg-btn-primary:hover {
-      background: #388e3c;
+      background: #166534;
     }
 
     .pg-btn-secondary {
