@@ -249,10 +249,3 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
-
-/** Clear pending AI/result timers and mounts (route change). */
-export function destroyGame(): void {
-  clearAiTimer();
-  clearResultTimer();
-  gameContainer = null;
-}
