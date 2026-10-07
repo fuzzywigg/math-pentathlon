@@ -20,6 +20,7 @@ import {
   isBoardFilled,
   canPlaceShape,
   countEmptyCells,
+  findValidPlacements,
 } from '../../core/polyomino/placement';
 import { getCellsAtPosition } from '../../core/polyomino/transform';
 
@@ -87,7 +88,7 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
   // Auto-select first shape if only one option
   const autoShape = shapes.length === 1 ? shapes[0] : null;
 
-  return {
+  const next: JuggleState = {
     ...state,
     selectedCategory: category,
     selectedShape: autoShape,
@@ -95,6 +96,7 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
     selectedFlipped: false,
     phase: autoShape ? 'placing' : 'selectingShape',
   };
+  return autoShape ? orientSelectedShapeToFit(next) : next;
 }
 
 /**
@@ -106,12 +108,71 @@ export function selectShape(
 ): JuggleState {
   if (state.phase !== 'selectingShape' || !state.selectedCategory) return state;
 
-  return {
+  return orientSelectedShapeToFit({
     ...state,
     selectedShape: shape,
     selectedRotation: 0,
     selectedFlipped: false,
     phase: 'placing',
+  });
+}
+
+/**
+ * Prefer an orientation that actually fits (UI only — same legal placements).
+ */
+export function orientSelectedShapeToFit(state: JuggleState): JuggleState {
+  if (state.phase !== 'placing' || !state.selectedShape) return state;
+
+  const board = state.boards[state.currentPlayer];
+  const shape = state.selectedShape;
+  const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+  const flips = shape.canFlip ? [false, true] : [false];
+
+  for (const flipped of flips) {
+    for (const rotation of rotations) {
+      if (findValidPlacements(board, shape, rotation, flipped).length > 0) {
+        return {
+          ...state,
+          selectedRotation: rotation,
+          selectedFlipped: flipped,
+        };
+      }
+    }
+  }
+  return state;
+}
+
+/** True if the selected polyomino fits somewhere in any orientation. */
+export function selectedShapeFitsAnywhere(state: JuggleState): boolean {
+  if (!state.selectedShape) return false;
+  return canPlaceShape(state.boards[state.currentPlayer], state.selectedShape);
+}
+
+/** Legal anchors for the currently selected rotation/flip. */
+export function getCurrentOrientationPlacements(state: JuggleState): Cell[] {
+  if (!state.selectedShape || state.phase !== 'placing') return [];
+  return findValidPlacements(
+    state.boards[state.currentPlayer],
+    state.selectedShape,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+}
+
+/**
+ * Back out of placing so the kid can pick another die/shape.
+ * Does not change boards, dice, or scores.
+ */
+export function abandonPlacement(state: JuggleState): JuggleState {
+  if (state.phase !== 'placing') return state;
+  return {
+    ...state,
+    selectedShape: null,
+    selectedRotation: 0,
+    selectedFlipped: false,
+    hoverPosition: null,
+    selectedCategory: null,
+    phase: 'selectingShape',
   };
 }
 

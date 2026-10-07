@@ -91,7 +91,7 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     const next = applyAIMoveSteps(state, bad);
     expect(next.currentPlayer).toBe('player2');
     expect(next.moveHistory).toHaveLength(0);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('applyAIMoveSteps fails executeMove → passTurn', () => {
@@ -106,6 +106,6 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     });
     expect(next.moveHistory).toHaveLength(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

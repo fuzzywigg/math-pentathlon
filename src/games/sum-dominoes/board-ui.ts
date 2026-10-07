@@ -550,7 +550,8 @@ export function injectSDStyles(): void {
       outline-offset: 2px;
     }
 
-    /* Tablet / coarse pointer: enlarge entire board grid + hand (keep row aligned) */
+    /* Tablet / coarse pointer: enlarge entire board grid + hand (keep row aligned).
+       #421/#415 intent: hand tiles ≥44px — stack keeps fuller board floors. */
     @media (pointer: coarse), (max-width: 900px) {
       .sd-board {
         overflow-x: auto;

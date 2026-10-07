@@ -433,7 +433,7 @@ export function renderStatus(
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!"
+    // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!" (#436; #415 intent)
     const verb = winnerName === 'You' ? 'Win' : 'Wins';
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${verb}! 🎉`;
   } else if (state.phase === 'gameOver') {

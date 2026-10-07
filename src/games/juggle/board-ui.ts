@@ -12,6 +12,8 @@ import {
   getPreviewCells,
   isPlacementValid,
   getBoardFillPercentage,
+  getCurrentOrientationPlacements,
+  selectedShapeFitsAnywhere,
 } from './rules';
 import { Board } from '../../core/polyomino/placement';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
@@ -40,6 +42,8 @@ const COLORS = {
 export interface JuggleBoardRenderOptions {
   /** When false, suppress selectable chrome and activate handlers (AI seat). */
   allowInput?: boolean;
+  /** Human-only: leave placing so they can pick another die/shape. */
+  onAbandonPlacement?: () => void;
 }
 
 /**
@@ -85,6 +89,12 @@ export function renderBoard(
       ? isPlacementValid(state, state.hoverPosition)
       : false;
   const previewSet = new Set(previewCells.map((c) => `${c.row},${c.col}`));
+  const legalAnchors =
+    allowInput && isCurrentPlayer && state.phase === 'placing'
+      ? new Set(
+          getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
+        )
+      : new Set<string>();
 
   for (let row = 0; row < CONFIG.GRID_SIZE; row++) {
     for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
@@ -96,12 +106,15 @@ export function renderBoard(
       const isOccupied = board.cells[row][col];
       const isPreview = previewSet.has(`${row},${col}`);
 
+      const isLegalAnchor = legalAnchors.has(`${row},${col}`);
       if (isOccupied) {
         cell.classList.add(`occupied-${player}`);
       } else if (isPreview) {
         cell.classList.add(
           isPreviewValid ? 'preview-valid' : 'preview-invalid'
         );
+      } else if (isLegalAnchor) {
+        cell.classList.add('juggle-cell-valid');
       }
 
       const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
@@ -117,7 +130,7 @@ export function renderBoard(
           coord,
           empty: !isOccupied,
           owner: isOccupied ? getPlayerName(player) : undefined,
-          validPlacement: canPlace && isPreview && !!isPreviewValid,
+          validPlacement: canPlace && (isLegalAnchor || (isPreview && !!isPreviewValid)),
         })
       );
 
@@ -377,13 +390,24 @@ export function renderShapeControls(
     controls.appendChild(flipBtn);
   }
 
+  const fits = selectedShapeFitsAnywhere(state);
+  if (allowInput && options.onAbandonPlacement) {
+    const otherBtn = document.createElement('button');
+    otherBtn.className = 'juggle-control-btn juggle-choose-other-btn';
+    otherBtn.textContent = fits ? 'Choose another shape' : "Can't fit — choose another";
+    otherBtn.addEventListener('click', options.onAbandonPlacement);
+    controls.appendChild(otherBtn);
+  }
+
   container.appendChild(controls);
 
   const hint = document.createElement('div');
   hint.className = 'juggle-hint';
-  hint.textContent = allowInput
-    ? 'Click on your board to place the shape'
-    : 'Computer is placing…';
+  hint.textContent = !allowInput
+    ? 'Computer is placing…'
+    : fits
+      ? 'Click a highlighted cell to place the shape'
+      : "This shape doesn't fit. Choose another, or rotate/flip.";
   container.appendChild(hint);
 
   return container;
@@ -463,6 +487,10 @@ export function injectJuggleStyles(): void {
     .juggle-cell.occupied-player2 { background: var(--color-player2, #f44336); }
 
     .juggle-cell.preview-valid { background: ${COLORS.previewValid}; }
+    .juggle-cell.juggle-cell-valid {
+      background: rgba(76, 175, 80, 0.22);
+      box-shadow: inset 0 0 0 2px ${COLORS.validPlacement};
+    }
     .juggle-cell.preview-invalid { background: ${COLORS.previewInvalid}; }
 
     .juggle-dice-area {

@@ -315,8 +315,8 @@ function updateUI(controller: PrimeGoldController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn
-  if (aiThinking) {
+  // AI turn — schedule once; re-entry must not reset the think timer forever.
+  if (aiThinking && aiTimer === null) {
     scheduleAI(controller, 800);
   }
 }

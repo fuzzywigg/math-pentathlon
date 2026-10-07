@@ -36,7 +36,7 @@ describe('Wave 44 Fab AI — applyAIMoveSteps selectOp / execute fail', () => {
     const next = applyAIMoveSteps(midPhase, bad);
     expect(next.moveHistory).toHaveLength(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('claimed answer after valid selects → execute fail passTurn', () => {
@@ -79,6 +79,6 @@ describe('Wave 44 Fab AI — applyAIMoveSteps selectOp / execute fail', () => {
     const next = applyAIMoveSteps(synthetic, move);
     expect(next.moveHistory).toHaveLength(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

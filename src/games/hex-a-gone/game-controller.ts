@@ -46,7 +46,8 @@ let board3dLoading: Promise<void> | null = null;
 let board3dHost: HTMLElement | null = null;
 let selectionHost: HTMLElement | null = null;
 
-const AI_THINKING_DELAY = 800;
+/** Keep multi-block AI turns under the ~3s tablet think budget (delay × places). */
+const AI_THINKING_DELAY = 350;
 
 function unmountBoard3d(): void {
   if (board3d) {

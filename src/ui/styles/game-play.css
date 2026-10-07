@@ -764,6 +764,7 @@
   cursor: pointer;
   transition: background-color 0.2s ease;
   min-width: 120px;
+  min-height: 44px;
   box-sizing: border-box;
 }
 
@@ -3649,10 +3650,12 @@
 
 .owl-bubble-dismiss {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
+  top: 4px;
+  right: 4px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
   color: #9ca3af;
@@ -3701,8 +3704,10 @@
 }
 
 .owl-minimize-btn {
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   border: none;
   background: white;

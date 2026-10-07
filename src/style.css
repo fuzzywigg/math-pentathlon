@@ -869,6 +869,7 @@ h1 {
   font-weight: 600;
   color: var(--color-primary-dark);
   box-shadow: var(--shadow-sm);
+  min-height: 44px;
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
