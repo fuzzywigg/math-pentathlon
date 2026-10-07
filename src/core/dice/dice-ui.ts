@@ -6,7 +6,10 @@ import { getUserReducedMotionFlag } from '../settings-flags';
 /** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
 function dicePrefersReducedMotion(): boolean {
   if (getUserReducedMotionFlag()) return true;
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+  if (
+    typeof window === 'undefined' ||
+    typeof window.matchMedia !== 'function'
+  ) {
     return false;
   }
   try {
