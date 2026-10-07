@@ -12,6 +12,10 @@ const mobileCss = readFileSync(
   resolve(__dirname, '../../src/ui/styles/mobile-play-shell.css'),
   'utf8'
 );
+const gamePlayCss = readFileSync(
+  resolve(__dirname, '../../src/ui/styles/game-play.css'),
+  'utf8'
+);
 
 describe('tablet / offline playability CSS', () => {
   it('uses hover:none or pointer:coarse for 44px touch targets', () => {
@@ -55,5 +59,20 @@ describe('tablet / offline playability CSS', () => {
     expect(styleCss).toMatch(/min-height:\s*100dvh/);
     expect(mobileCss).toMatch(/100vh\s*-\s*35rem/);
     expect(mobileCss).toMatch(/100dvh\s*-\s*35rem/);
+  });
+
+  it('keeps move-history collapse toggle ≥44px on phone layouts', () => {
+    // Lazy game-play.css used to set min-height:auto under max-width:560px,
+    // which overrode the coarse 44px floor from style.css.
+    expect(gamePlayCss).toMatch(
+      /@media\s*\(max-width:\s*560px\)[\s\S]*?\.collapse-toggle\s*\{[^}]*min-height:\s*44px/s
+    );
+    expect(gamePlayCss).toMatch(
+      /\.collapse-toggle\s*\{[^}]*touch-action:\s*manipulation/s
+    );
+    expect(styleCss).toMatch(/\.back-button\s*\{[^}]*touch-action:\s*manipulation/s);
+    expect(gamePlayCss).toMatch(
+      /\.modal-close\s*\{[^}]*touch-action:\s*manipulation/s
+    );
   });
 });

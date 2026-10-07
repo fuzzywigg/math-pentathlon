@@ -1001,6 +1001,9 @@ svg [role='gridcell']:focus-visible {
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s ease;
+  /* Drop legacy WebKit 300ms tap delay on phone / iPad. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modal-close:hover {
@@ -1258,10 +1261,12 @@ svg [role='gridcell']:focus-visible {
   .collapse-toggle {
     flex-direction: row;
     width: 100%;
-    min-height: auto;
-    padding: 6px 12px;
+    /* Keep ≥44px floor on phone; do not reset to auto (overrides coarse rule). */
+    min-height: 44px;
+    padding: 10px 12px;
     border-right: none;
     border-bottom: 1px solid #ddd;
+    touch-action: manipulation;
   }
 
   .collapse-label {

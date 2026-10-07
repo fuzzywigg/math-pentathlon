@@ -19,6 +19,7 @@ npm run test:unit
 npm run test:e2e:chromium   # required CI path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross      # Firefox + WebKit + iPad WebKit
+npm run test:e2e:mobile     # phone + tablet touch smoke (report-only)
 npm run test:visual          # opt-in 2D screenshot suite (separate config)
 npm run test:visual:update   # refresh separate-config baselines
 npm run test:e2e:visual         # start + openings baselines (desktop + phone)
@@ -29,6 +30,7 @@ npm run format:check
 ```
 
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
+Mobile touch notes: [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md).
 
 Opt-in visual regression via separate config (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
 
@@ -74,7 +76,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e; report-only `e2e-cross-browser` (Firefox + WebKit full suite, `continue-on-error`) and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
