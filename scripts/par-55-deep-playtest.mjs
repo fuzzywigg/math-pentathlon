@@ -24,6 +24,14 @@ const STALL_MS = 15_000;
 fs.mkdirSync(OUT, { recursive: true });
 fs.mkdirSync(ART, { recursive: true });
 
+function copyArt(src, destName) {
+  try {
+    fs.copyFileSync(src, path.join(ART, destName));
+  } catch (err) {
+    console.warn('artifact copy skipped:', destName, String(err?.message || err));
+  }
+}
+
 const DIFFS = ['easy', 'medium', 'hard'];
 const VIEWPORTS = [
   {
@@ -310,10 +318,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     if (gameIndex === 0) {
       const shot = path.join(OUT, `${viewport.name}-${difficulty}-start.png`);
       await page.screenshot({ path: shot, fullPage: false });
-      fs.copyFileSync(
-        shot,
-        path.join(ART, `par55-${viewport.name}-${difficulty}-start.png`)
-      );
+      copyArt(shot, `par55-${viewport.name}-${difficulty}-start.png`);
     }
 
     for (turns = 0; turns < MAX_HUMAN_TURNS; turns++) {
@@ -335,10 +340,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       if (turns === 1 && gameIndex === 0) {
         const shot = path.join(OUT, `${viewport.name}-${difficulty}-mid.png`);
         await page.screenshot({ path: shot, fullPage: false });
-        fs.copyFileSync(
-          shot,
-          path.join(ART, `par55-${viewport.name}-${difficulty}-mid.png`)
-        );
+        copyArt(shot, `par55-${viewport.name}-${difficulty}-mid.png`);
         measures = {
           ...measures,
           mid: await measureTargets(page),
@@ -453,10 +455,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     if (gameIndex === 0) {
       const shot = path.join(OUT, `${viewport.name}-${difficulty}-end.png`);
       await page.screenshot({ path: shot, fullPage: false });
-      fs.copyFileSync(
-        shot,
-        path.join(ART, `par55-${viewport.name}-${difficulty}-end.png`)
-      );
+      copyArt(shot, `par55-${viewport.name}-${difficulty}-end.png`);
     }
     measures = { ...measures, end: await measureTargets(page) };
   } catch (err) {
@@ -513,14 +512,7 @@ async function main() {
     if (race.ok || race.after) {
       const shot = path.join(OUT, 'tablet-medium-new-game-race.png');
       await page.screenshot({ path: shot, fullPage: false }).catch(() => {});
-      try {
-        fs.copyFileSync(
-          shot,
-          path.join(ART, 'par55-tablet-medium-new-game-race.png')
-        );
-      } catch {
-        /* missing shot */
-      }
+      copyArt(shot, 'par55-tablet-medium-new-game-race.png');
     }
     await context.close();
   }
