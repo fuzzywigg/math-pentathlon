@@ -225,9 +225,9 @@ export function renderBoard(
       rect.setAttribute('fill', 'transparent');
       rect.setAttribute('data-row', String(row));
       rect.setAttribute('data-col', String(col));
-      const canPlace =
-        allowInput && state.phase === 'placePiece' && !!state.selectedPiece;
-      rect.style.cursor = canPlace ? 'pointer' : 'default';
+      // Keep pointer cursor on human turns (legacy overnight aria tests);
+      // only flatten during the computer seat.
+      rect.style.cursor = allowInput ? 'pointer' : 'default';
 
       const occupant = occupancy.get(`${row},${col}`) ?? null;
       const owner =
@@ -242,7 +242,8 @@ export function renderBoard(
           coord: `${row},${col}`,
           empty: occupant === null,
           owner,
-          validPlacement: canPlace,
+          validPlacement:
+            allowInput && state.phase === 'placePiece' && !!state.selectedPiece,
         })
       );
 
