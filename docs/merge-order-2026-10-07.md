@@ -11,8 +11,8 @@ Docs-only map of **open draft PRs** (`#355`, `#392`–`#458`) against `alpha`, f
 | **Tip branch** | `cursor/integration-fold-wave4-tip-36e4` |
 | **Preferred base for new folds** | this tip (draft PR targeting `#466` / `cursor/overnight-fold-coverage-tip-460a`) |
 | **Builds on** | `#466` fold-coverage tip (`cursor/overnight-fold-coverage-tip-460a` on `#454`) |
-| **Folds (this tip)** | `#466` contents + wave4 `#464` + `#465` + `#467` |
-| **Preserved intent** | CI e2e = chromium + mobile-iphone-se + mobile-pixel-7; `size:check` non-blocking; visual-baseline report-only; tip playwright timeouts/cross-browser; prime-gold keyboard a11y helpers; destroyGame / error-boundary cleanup; state round-trip fuzz |
+| **Folds (this tip)** | `#466` contents + `#464` + `#465` + `#467` + `#469` + `#472` + `#473` |
+| **Preserved intent** | CI e2e = chromium + mobile-iphone-se + mobile-pixel-7; `size:check` non-blocking; visual-baseline + a11y-axe report-only; tip playwright timeouts/cross-browser; prime-gold keyboard a11y helpers; destroyGame / error-boundary cleanup; state round-trip fuzz; Hard AI time-box bench; undo/move-log audit |
 | **Not in tip** | rules/scoring changes; held-outs `#393`/`#394`/`#418`/`#419`/`#428`/`#429` |
 
 Historical tables below still describe the 14:37 UTC inventory; tip pointers are updated to this branch.
@@ -28,9 +28,9 @@ Historical tables below still describe the 14:37 UTC inventory; tip pointers are
 | Step | Merge into `alpha` | Why |
 |------|--------------------|-----|
 | **1** | **#435** `ci: run lint/tsc/unit/e2e for PRs targeting cursor/**` | Unblocks real CI on every stacked draft still targeting `cursor/**`. Independent of game code. **Do this first.** |
-| **2** | **Tip branch → `alpha` in one PR** | **Current tip:** `cursor/integration-fold-wave4-tip-36e4` (on `#466` fold-coverage + wave4 `#464`/`#465`/`#467`). Open **one** tip→`alpha` PR (or retarget tip — human only; this inventory does not retarget). Older layer `#449` / `#451` / `#450` / `#454` / `#466` content is already in tip lineage. |
+| **2** | **Tip branch → `alpha` in one PR** | **Current tip:** `cursor/integration-fold-wave4-tip-36e4` (on `#466` + `#464`/`#465`/`#467`/`#469`/`#472`/`#473`). Open **one** tip→`alpha` PR (or retarget tip — human only; this inventory does not retarget). Older layer `#449` / `#451` / `#450` / `#454` / `#466` content is already in tip lineage. |
 | **3** | **Held-out rules-adjacent (Andrew)** | After tip: land **exactly one** of **#393 XOR #394**, then **#418**, **#419**, **#428**, **#429** (order flexible; all merge-tree CLEAN vs tip today). |
-| **4** | **Docs / side tracks** | **#355**, **#414**, **#420**, **#441** (and any leftover docs not already in tip). `#442` / `#452` / `#455`–`#458` / `#464` / `#465` / `#467` content is in the current tip. |
+| **4** | **Docs / side tracks** | **#355**, **#414**, **#420**, **#441** (and any leftover docs not already in tip). `#442` / `#452` / `#455`–`#458` / `#464` / `#465` / `#467` / `#469` / `#472` / `#473` content is in the current tip. |
 
 **Merge count (Path A):** **2** into `alpha` for CI + full playability/test/a11y tip (steps 1–2), then **~5–11** more for held-outs and docs depending how many Andrew approves and whether side tracks are batched.
 
@@ -46,7 +46,7 @@ After **#435**:
 6. **#449** → `alpha`
 7. **#454** → `alpha` (flake-engine: #450+#451+#452)
 8. **#466** → `alpha` (fold-wave2 + next5) — or skip if tip already includes it
-9. tip `cursor/integration-fold-wave4-tip-36e4` → `alpha` (wave4 `#464`+`#465`+`#467` on `#466`)
+9. tip `cursor/integration-fold-wave4-tip-36e4` → `alpha` (`#464`+`#465`+`#467`+`#469`+`#472`+`#473` on `#466`)
 
 **Merge count (Path B):** **1 (#435) + 7–8 stack layers** — same end state as Path A, more review surface.
 
@@ -71,8 +71,9 @@ alpha
         │                       │                 └── #466  fold-coverage tip
         │                       │                       (fold-wave2 #442+#455–#458
         │                       │                        + engine-coverage-next5)
-        │                       │                       └── wave4 tip   ← CURRENT TIP
-        │                       │                             (#464+#465+#467)
+        │                       │                       └── wave4+ tip   ← CURRENT TIP
+        │                       │                             (#464+#465+#467
+        │                       │                              +#469+#472+#473)
         │                       └── #450  ramrod-deep e2e flake (folded via #454)
         └── (many leaves still based on #413 — see tables)
 ```
@@ -88,7 +89,7 @@ alpha
 | **#451** | `cursor/prime-gold-keyboard-e2e-flake-2c2b` | 143 | Flake fix on top of #449 |
 | **#454** | `cursor/overnight-flake-engine-stack-737e` | ~152 | **#450**, **#451**, **#452** onto #449 lineage |
 | **#466** | `cursor/overnight-fold-coverage-tip-460a` | ~170 | **#454** + fold-wave2 (**#442**, **#455–#458**) + engine-coverage-next5 |
-| **tip** | `cursor/integration-fold-wave4-tip-36e4` | ~180+ | **#466** + wave4 (**#464**, **#465**, **#467**) |
+| **tip** | `cursor/integration-fold-wave4-tip-36e4` | ~190+ | **#466** + **#464**, **#465**, **#467**, **#469**, **#472**, **#473** |
 
 **#393 note:** #413 history briefly merged then **reverted** #393 (`55b4212` Revert …). Tip **tree** matches contiguous path-scan (same as `alpha`); do **not** treat #393 as folded.
 
@@ -198,7 +199,10 @@ All of the above: GitHub **MERGEABLE / CLEAN** vs declared base; **NO_CI** (empt
 | **#454** | #449 | Yes → #466 → tip | Flake-engine stack |
 | **#466** | #454 | Yes → tip | fold-coverage (`#442`+`#455`–`#458` + next5) |
 | #464 / #465 / #467 | (various) | Yes → tip | wave4 cleanup / state fuzz / visual baselines |
-| tip | #466 | **Current tip** | `cursor/integration-fold-wave4-tip-36e4` (#464+#465+#467 on #466) |
+| #469 | polish | Yes → tip | axe a11y harness (report-only) + contrast/ARIA |
+| #472 | polish | Yes → tip | Hard AI move-time bench + hex/queens time-box |
+| #473 | alpha/polish | Yes → tip | undo/move-log audit + Juggle chosenDie log |
+| tip | #466 | **Current tip** | `cursor/integration-fold-wave4-tip-36e4` (#464+#465+#467+#469+#472+#473 on #466) |
 
 ---
 
@@ -212,7 +216,7 @@ After Path A step 2 (tip branch on `alpha`), these drafts’ **content is alread
 
 ### Intermediate integration PRs (if tip landed as one unit)
 
-`#413`, `#438`, `#440`, `#444`, `#447`, `#449`, `#451`, `#450`, `#454`, `#466` (plus leaf `#442`, `#452`, `#455`–`#458`, `#464`, `#465`, `#467` if closed as folded into tip)
+`#413`, `#438`, `#440`, `#444`, `#447`, `#449`, `#451`, `#450`, `#454`, `#466` (plus leaf `#442`, `#452`, `#455`–`#458`, `#464`, `#465`, `#467`, `#469`, `#472`, `#473` if closed as folded into tip)
 
 **Count:** ~**40+** leaf + **~8** stack/integration PRs closable as superseded once tip is on `alpha`.
 
@@ -229,7 +233,7 @@ After Path A step 2 (tip branch on `alpha`), these drafts’ **content is alread
 | #441 | Rules-questions checklist |
 | #442 | Content folded into tip — closable as superseded after tip→α |
 | #450 / #452 / #455–#458 | Content folded into tip — closable as superseded after tip→α |
-| #464 / #465 / #466 / #467 | Content folded into tip — closable as superseded after tip→α |
+| #464 / #465 / #466 / #467 / #469 / #472 / #473 | Content folded into tip — closable as superseded after tip→α |
 | #470 | Prior wave4 draft on `#454` only — superseded by this tip (human close) |
 
 ---
@@ -280,12 +284,12 @@ Local verification claimed on integration PR bodies (#413 / #438 / #440 / #444 /
 ## 9. Operator checklist (human)
 
 1. Merge **#435** → `alpha`; confirm a stacked draft re-runs lint/unit/e2e.
-2. Treat **`cursor/integration-fold-wave4-tip-36e4`** as the tip (folds `#466` fold-coverage + wave4 `#464`/`#465`/`#467`; `#466` already folds `#450`/`#451`/`#452` via `#454`, plus `#442`/`#455`–`#458` and engine-coverage-next5).
+2. Treat **`cursor/integration-fold-wave4-tip-36e4`** as the tip (folds `#466` fold-coverage + `#464`/`#465`/`#467`/`#469`/`#472`/`#473`; `#466` already folds `#450`/`#451`/`#452` via `#454`, plus `#442`/`#455`–`#458` and engine-coverage-next5).
 3. Land tip → `alpha` via Path A (one tip PR) or Path B (layer merges through `#454` / `#466` + tip).
-4. Close superseded drafts listed in §5 (including `#442`, `#450`, `#452`, `#454`, `#455`–`#458`, `#464`–`#467`, `#466`, `#470` once tip is on `alpha`).
+4. Close superseded drafts listed in §5 (including `#442`, `#450`, `#452`, `#454`, `#455`–`#458`, `#464`–`#467`, `#466`, `#469`, `#472`, `#473`, `#470` once tip is on `alpha`).
 5. Andrew: answer **#441** / **#355**; choose **#393 XOR #394**; then schedule **#418 / #419 / #428 / #429**.
 6. Land remaining docs side tracks (#414 after unit flake understood, #420).
 
 ---
 
-*Generated for draft PR inventory only. Tip pointer refreshed when wave4 `#464`/`#465`/`#467` were folded onto `#466` fold-coverage tip. No merges, closes, retargets, or pushes to source PR branches were performed while writing this document.*
+*Generated for draft PR inventory only. Tip pointer refreshed when `#464`/`#465`/`#467`/`#469`/`#472`/`#473` were folded onto `#466` fold-coverage tip. No merges, closes, retargets, or pushes to source PR branches were performed while writing this document.*
