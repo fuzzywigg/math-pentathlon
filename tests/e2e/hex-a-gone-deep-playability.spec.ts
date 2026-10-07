@@ -105,7 +105,7 @@ test.describe('Hex-a-Gone deep playability', () => {
     expect(maxThink).toBeLessThan(3000);
   });
 
-  test('tablet viewport: bank/confirm/cells meet 44px floor', async ({
+  test('tablet viewport: bank/confirm/cells meet 44px floor; Confirm in view', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 768, height: 1024 });
@@ -114,6 +114,11 @@ test.describe('Hex-a-Gone deep playability', () => {
     await page
       .locator('.hex-a-gone-block-btn[data-shape="triangle"]:not(.empty)')
       .click();
+
+    const confirm = page.locator('.hex-a-gone-confirm-btn');
+    await expect(confirm).toBeVisible({ timeout: 5_000 });
+    // Production scrolls Confirm into view after select (tablet fold).
+    await expect(confirm).toBeInViewport({ timeout: 5_000 });
 
     const sizes = await page.evaluate(() => {
       const box = (sel: string) => {

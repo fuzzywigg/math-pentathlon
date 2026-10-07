@@ -281,6 +281,15 @@ export function buildSelectionArea(
           confirmBtn.textContent = `Confirm (${state.turnSelection.blocks.length} block${state.turnSelection.blocks.length > 1 ? 's' : ''})`;
           confirmBtn.addEventListener('click', onConfirm);
           selectionStatus.appendChild(confirmBtn);
+          // Tablet: bank+board can push Confirm past the fold — bring it into view.
+          queueMicrotask(() => {
+            if (typeof confirmBtn.scrollIntoView === 'function') {
+              confirmBtn.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          });
         }
       } else {
         selectionStatus.textContent =
@@ -318,11 +327,11 @@ export function buildSelectionArea(
       : state.winner === 'player1'
         ? 'Blue'
         : 'Red';
-    // Match status chrome: HvA human → "You win!"; others keep "X wins!"
+    // Match status chrome: HvA human → "You win!"; others keep "X Wins!"
     winnerMsg.textContent =
       winnerName === 'You'
         ? '🎉 You win! 🎉'
-        : `🎉 ${winnerName} wins! 🎉`;
+        : `🎉 ${winnerName} Wins! 🎉`;
     selectionArea.appendChild(winnerMsg);
   }
 

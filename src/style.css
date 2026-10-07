@@ -3697,7 +3697,15 @@ h1 {
   }
 
   .hex-a-gone-board {
-    width: min(420px, 96vw);
+    /* Keep cells ≥44px without pushing Confirm below the fold on iPad Mini */
+    width: min(390px, 92vw);
+  }
+
+  .hex-a-gone-selection-status {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
   }
 
   .hex-a-gone-block-btn:disabled,

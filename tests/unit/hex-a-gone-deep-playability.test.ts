@@ -143,6 +143,9 @@ describe('Hex-a-Gone deep playability', () => {
     const svg = el.querySelector('.hex-a-gone-board');
     expect(svg?.getAttribute('viewBox')).toBe('-195 -205 390 410');
     expect(styleCss).toContain('width: min(380px, 100%)');
-    expect(styleCss).toContain('width: min(420px, 96vw)');
+    expect(styleCss).toContain('width: min(390px, 92vw)');
+    expect(styleCss).toMatch(
+      /\.hex-a-gone-selection-status\s*\{[^}]*position:\s*sticky/s
+    );
   });
 });
