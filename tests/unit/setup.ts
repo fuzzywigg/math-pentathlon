@@ -76,6 +76,13 @@ afterEach(() => {
   owlInternal.messages.push(...stockOwlMessages);
   vi.clearAllMocks();
   vi.unstubAllGlobals();
+  // Drop pending fake timers before reverting — bare setTimeout AI handoffs
+  // (e.g. FIAR 500ms) otherwise leak into the next file under maxWorkers=1.
+  try {
+    vi.clearAllTimers();
+  } catch {
+    // ignore when timers are already real
+  }
   vi.useRealTimers();
   restorePerformanceNow();
   restoreWindowAlert();
