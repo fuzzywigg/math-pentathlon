@@ -156,13 +156,20 @@ export function renderProblem(state: FracFactState): HTMLElement {
 // Answer Choices
 // =============================================================================
 
+export interface FracFactBoardRenderOptions {
+  /** When false, suppress selectable answer chrome and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render answer choice buttons
  */
 export function renderAnswerChoices(
   state: FracFactState,
-  onSelect: (answer: Fraction) => void
+  onSelect: (answer: Fraction) => void,
+  options: FracFactBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'frac-choices';
 
@@ -180,7 +187,13 @@ export function renderAnswerChoices(
     );
     button.appendChild(createFractionSVG(choice, 'medium'));
 
-    button.addEventListener('click', () => onSelect(choice));
+    if (allowInput) {
+      button.addEventListener('click', () => onSelect(choice));
+    } else {
+      button.classList.add('disabled');
+      button.disabled = true;
+      button.setAttribute('aria-disabled', 'true');
+    }
     container.appendChild(button);
   }
 
@@ -429,11 +442,17 @@ export function injectFracFactStyles(): void {
       transition: all 0.2s;
     }
 
-    .frac-choice-btn:hover {
+    .frac-choice-btn:hover:not(:disabled):not(.disabled) {
       border-color: #2196F3;
       background: #e3f2fd;
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .frac-choice-btn:disabled,
+    .frac-choice-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .frac-result {
