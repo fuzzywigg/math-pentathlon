@@ -258,12 +258,15 @@ export function buildSelectionArea(
     if (state.phase === 'placeBlocks' && state.selectedBlockForPlacement) {
       const placingInfo = document.createElement('div');
       placingInfo.className = 'hex-a-gone-placing-info';
+      const hint = onBlockSelect
+        ? 'Click an empty cell to place'
+        : 'Computer is placing…';
       placingInfo.innerHTML = `
         <strong>Placing:</strong>
         <span class="placing-shape" style="background-color: ${BLOCK_COLORS[state.selectedBlockForPlacement]}">
           ${getShapeIcon(state.selectedBlockForPlacement)} ${state.selectedBlockForPlacement}
         </span>
-        <span class="placing-hint">Click an empty cell to place</span>
+        <span class="placing-hint">${hint}</span>
       `;
       selectionArea.appendChild(placingInfo);
     }

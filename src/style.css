@@ -3217,6 +3217,8 @@ h1 {
   background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
   cursor: pointer;
   min-width: 70px;
+  /* WCAG 2.5.5 / tablet: ≥44×44 hit target */
+  min-height: 44px;
   transition:
     border-color var(--transition-fast),
     background var(--transition-fast),
@@ -3345,6 +3347,7 @@ h1 {
   border: none;
   border-radius: 10px;
   cursor: pointer;
+  min-height: 44px;
   transition:
     transform var(--transition-fast),
     box-shadow var(--transition-fast);
@@ -3469,6 +3472,7 @@ h1 {
 
   .hex-a-gone-block-btn {
     min-width: 55px;
+    min-height: 44px;
     padding: 0.35rem;
   }
 
@@ -3480,6 +3484,19 @@ h1 {
 
   .block-name {
     font-size: 0.6rem;
+  }
+}
+
+/* Coarse pointers: keep Hex-a-Gone bank/confirm at 44px tap size */
+@media (pointer: coarse) {
+  .hex-a-gone-block-btn {
+    min-width: 64px;
+    min-height: 44px;
+  }
+
+  .hex-a-gone-confirm-btn {
+    min-height: 44px;
+    padding: 0.7rem 1.75rem;
   }
 }
 
@@ -4623,15 +4640,30 @@ h1 {
   .cell-king,
   .cell-selected,
   .cell-valid-move::after,
+  .cell-trapped,
+  .cell-invalid,
   #new-game-btn.game-over-active,
   .status-winner,
+  .status-ai-thinking::after,
   .star-track-winner,
   .hex-a-gone-winner,
+  .hex-a-gone-cell-valid,
+  .hex-a-gone-cell-filled,
+  .hex-a-gone-block-btn.placing,
+  .hex-a-gone-placing-info,
   .game-winner-banner,
   .sd-winner-banner,
-  .contig-winner-banner {
+  .contig-winner-banner,
+  .qg-winner-banner {
     animation: none !important;
     transition: opacity 0.2s ease !important;
+  }
+
+  .hex-a-gone-cell:hover,
+  .hex-a-gone-cell-valid:hover,
+  .hex-a-gone-block-btn:hover:not(.empty),
+  .hex-a-gone-confirm-btn:hover {
+    transform: none;
   }
 
   .sd-roll-btn:hover:not(:disabled),
