@@ -43,7 +43,7 @@ export const primeGoldTutorial: TutorialConfig = {
       message: `
         <ol>
           <li><strong>Roll Dice:</strong> Roll 3 dice (d6, d8, d10)</li>
-          <li><strong>Create Expression:</strong> Combine dice using +, -, *, /, ^, !</li>
+          <li><strong>Create Expression:</strong> Combine dice using +, −, ×, ÷, ^, !</li>
           <li><strong>Place Chip:</strong> Put chip on the matching number</li>
         </ol>
       `,
@@ -67,7 +67,7 @@ export const primeGoldTutorial: TutorialConfig = {
       title: 'Prime Veins',
       message: `
         <ul>
-          <li>A vein = 4+ chips in a diagonal line</li>
+          <li>A vein is at least 4 of your chips in a diagonal row</li>
           <li>Chips must be on prime numbers</li>
           <li>First to 4 veins wins!</li>
         </ul>
@@ -83,7 +83,7 @@ export const primeGoldTutorial: TutorialConfig = {
           <li>Target prime numbers (gold cells)</li>
           <li>Build along diagonal lines</li>
           <li>Block opponent's potential veins</li>
-          <li>Factorials give big numbers: 5!=120</li>
+          <li>Factorials give big numbers: 5! = 120</li>
         </ul>
       `,
       position: 'center',

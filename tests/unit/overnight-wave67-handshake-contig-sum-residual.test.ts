@@ -21,7 +21,7 @@ describe('Wave 67 handshake — contig × sum residual', () => {
     const contigStep = contig60Tutorial.steps.find((s) => s.id === 'expression-rules');
     const sumStep = sumDominoesTutorial.steps.find((s) => s.id === 'setup');
     expect(contigStep?.message).toContain(
-      'You can use <strong>any two operations</strong> (can repeat)'
+      'You can use <strong>any two math signs</strong> (they can be the same)'
     );
     expect(sumStep?.message).toContain(
       'A starting domino is placed in the center of the board'

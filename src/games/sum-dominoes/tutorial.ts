@@ -59,8 +59,8 @@ export const sumDominoesTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Your domino must connect to an existing domino on the board</li>
-          <li>The face touching must create the rolled sum</li>
-          <li>Example: You rolled 8. Place [3|5] next to a [5|2] so 3+5=8</li>
+          <li>A number on your tile plus a touching number on the board must equal the dice total</li>
+          <li>Example: You rolled 8. Your tile has a 3. Put that 3 next to a 5 on the board, because 3 + 5 = 8</li>
         </ul>
       `,
       highlightSelector: '.sd-board',
@@ -73,7 +73,7 @@ export const sumDominoesTutorial: TutorialConfig = {
         <ul>
           <li>If you cannot play any domino, you must pass</li>
           <li>If both players pass consecutively, the game ends</li>
-          <li>Player with fewer total pips on remaining dominoes wins</li>
+          <li>The player with fewer dots left on the tiles still in hand wins</li>
         </ul>
       `,
       position: 'center',
@@ -83,8 +83,8 @@ export const sumDominoesTutorial: TutorialConfig = {
       title: 'Strategy Tips',
       message: `
         <ul>
-          <li>Try to play high-pip dominoes first</li>
-          <li>Watch which sums are likely based on dice probabilities</li>
+          <li>Try to play tiles with lots of dots first</li>
+          <li>Watch which sums the dice often make</li>
           <li>7 is the most common dice sum</li>
         </ul>
       `,

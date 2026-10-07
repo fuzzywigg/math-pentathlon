@@ -11,10 +11,10 @@ describe('Wave 60 kwatro — tutorial movement highlight bullets', () => {
     expect(move?.highlightSelector).toBe('.kwa-board');
     expect(move?.position).toBe('top');
     expect(move?.message).toContain(
-      '<li>Chips move along the pathway connections</li>'
+      '<li>Chips move along the lines that connect spaces</li>'
     );
     expect(move?.message).toContain(
-      '<li>You can only move to empty adjacent spaces</li>'
+      '<li>You can only move to empty spaces next to you</li>'
     );
   });
 });

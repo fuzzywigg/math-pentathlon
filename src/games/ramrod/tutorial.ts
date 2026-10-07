@@ -28,13 +28,13 @@ export const ramrodTutorial: TutorialConfig = {
       id: 'cuisenaire-rods',
       title: 'Cuisenaire Rods',
       message: `
-        <p>Each rod has a color and length (1-10 cm):</p>
+        <p>Each rod has a color and length (1–10 cm):</p>
         <ul>
-          <li><strong>White</strong> = 1cm, <strong>Red</strong> = 2cm</li>
-          <li><strong>Light Green</strong> = 3cm, <strong>Purple</strong> = 4cm</li>
-          <li><strong>Yellow</strong> = 5cm, <strong>Dark Green</strong> = 6cm</li>
-          <li><strong>Black</strong> = 7cm, <strong>Brown</strong> = 8cm</li>
-          <li><strong>Blue</strong> = 9cm, <strong>Orange</strong> = 10cm</li>
+          <li><strong>White</strong> = 1 cm, <strong>Red</strong> = 2 cm</li>
+          <li><strong>Light Green</strong> = 3 cm, <strong>Purple</strong> = 4 cm</li>
+          <li><strong>Yellow</strong> = 5 cm, <strong>Dark Green</strong> = 6 cm</li>
+          <li><strong>Black</strong> = 7 cm, <strong>Brown</strong> = 8 cm</li>
+          <li><strong>Blue</strong> = 9 cm, <strong>Orange</strong> = 10 cm</li>
         </ul>
       `,
       highlightSelector: '.ramrod-player-rods',
@@ -46,7 +46,7 @@ export const ramrodTutorial: TutorialConfig = {
       message: `
         <ol>
           <li><strong>Select Rod:</strong> Choose a rod from your collection</li>
-          <li><strong>Place Rod:</strong> Put it in an empty slot on a sum box</li>
+          <li><strong>Place Rod:</strong> Put it in an empty slot of a sum box</li>
           <li><strong>Capture:</strong> When two rods in a box equal the target sum, you capture it!</li>
         </ol>
       `,
@@ -82,7 +82,7 @@ export const ramrodTutorial: TutorialConfig = {
         <ul>
           <li>Set up captures for yourself</li>
           <li>Block opponent's potential captures</li>
-          <li>Higher value boxes are worth more!</li>
+          <li>Boxes with bigger target numbers give more centimeters!</li>
         </ul>
       `,
       position: 'center',

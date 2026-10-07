@@ -64,8 +64,8 @@ export const hexTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>Create an unbroken path of your pieces connecting your two edges.
-        Hex is a solved game - there are no draws possible!</p>
+        <p>Make an unbroken path of your pieces from one of your sides to the other.</p>
+        <p>Someone always wins — this game cannot end in a tie!</p>
       `,
       position: 'center',
     },
@@ -75,7 +75,7 @@ export const hexTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Control the center of the board</li>
-          <li>Create "bridges" - two pieces that can connect via two paths</li>
+          <li>Leave two ways to connect your pieces later</li>
           <li>Block your opponent while building your own path</li>
         </ul>
       `,

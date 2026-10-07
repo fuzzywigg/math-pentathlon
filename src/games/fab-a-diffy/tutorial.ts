@@ -31,7 +31,7 @@ export const fabADiffyTutorial: TutorialConfig = {
         <ol>
           <li><strong>Select Bars:</strong> Choose two fraction bars from your pool</li>
           <li><strong>Choose Operation:</strong> Pick +, −, ×, or ÷</li>
-          <li><strong>Match Answer:</strong> If the result matches an available answer bar, claim it!</li>
+          <li><strong>Match Answer:</strong> If your answer matches a free answer bar, claim it!</li>
         </ol>
       `,
       highlightSelector: '.fab-bar-pool',
@@ -78,8 +78,8 @@ export const fabADiffyTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Plan combinations that match multiple possible answers</li>
-          <li>Block opponent's potential matches</li>
-          <li>Save versatile fractions for later</li>
+          <li>Block your opponent's matches</li>
+          <li>Save useful fractions for later</li>
         </ul>
       `,
       position: 'center',

@@ -31,7 +31,7 @@ describe('Wave 63 handshake — kings/hex leftovers', () => {
       kingsQuadraphagesTutorial.steps.find((s) => s.id === 'welcome')?.title
     ).toBe('Welcome to Kings & Quadraphages!');
     expect(hexTutorial.steps.find((s) => s.id === 'winning')?.message).toMatch(
-      /no draws possible/
+      /cannot end in a tie/
     );
     expect(
       hexAGoneTutorial.steps.find((s) => s.id === 'select-shapes')?.title

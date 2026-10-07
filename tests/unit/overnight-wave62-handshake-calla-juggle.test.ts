@@ -87,6 +87,6 @@ describe('Wave 62 handshake — calla × juggle leftovers', () => {
     );
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
-    ).toContain('fit entirely within your 9x9 grid');
+    ).toContain('fit entirely inside your 9×9 board');
   });
 });

@@ -9,7 +9,7 @@ describe('Wave 55 kings — tutorial catalog copy', () => {
     const t = kingsQuadraphagesTutorial;
     expect(t.steps.find((s) => s.id === 'supplies')?.message).toMatch(/30 Quadraphages/);
     const winning = t.steps.find((s) => s.id === 'winning');
-    expect(winning?.message).toMatch(/no valid moves/);
+    expect(winning?.message).toMatch(/nowhere safe to move/);
     expect(winning?.message).toMatch(/8 squares/);
     expect(t.steps.find((s) => s.id === 'strategy-tips')?.message).toMatch(/corner or edge/);
     expect(t.steps.find((s) => s.id === 'place-quadraphage-intro')?.message).toMatch(

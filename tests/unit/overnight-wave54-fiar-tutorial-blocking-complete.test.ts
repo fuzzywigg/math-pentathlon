@@ -11,7 +11,7 @@ describe('Wave 54 fiar — tutorial blocking / complete', () => {
     expect(win?.message).toMatch(/adjacent/);
     expect(win?.message).toMatch(/prevents the win/);
     const move = fiarTutorial.steps.find((s) => s.id === 'movement-rules');
-    expect(move?.message).toMatch(/Cannot jump over other chips/);
+    expect(move?.message).toMatch(/You cannot jump over other chips/);
     const complete = fiarTutorial.steps.find((s) => s.id === 'complete');
     expect(complete?.title).toMatch(/Ready to Play/);
     expect(complete?.message).toMatch(/Finish/);

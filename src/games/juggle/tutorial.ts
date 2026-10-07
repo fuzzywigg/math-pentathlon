@@ -12,7 +12,7 @@ export const juggleTutorial: TutorialConfig = {
       title: 'Welcome to Juggle!',
       message: `
         <p>Let's learn how to play <strong>Juggle</strong>!</p>
-        <p>Be the first player to completely fill your 9x9 grid with polyomino shapes!</p>
+        <p>Be first to fill every square on your 9×9 board with shapes!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const juggleTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Be the first player to completely fill your 9x9 grid with polyomino shapes!</p>
+        <p>Be first to fill every square on your 9×9 board with shapes!</p>
       `,
       position: 'center',
     },
@@ -30,9 +30,9 @@ export const juggleTutorial: TutorialConfig = {
       message: `
         <ol>
           <li><strong>Roll:</strong> Roll two dice</li>
-          <li><strong>Choose:</strong> Pick one die - its value determines your shape category</li>
-          <li><strong>Select:</strong> Choose a specific shape from that category</li>
-          <li><strong>Place:</strong> Position and place the shape on your board</li>
+          <li><strong>Choose:</strong> Pick one die — the number tells you what size shape you may use</li>
+          <li><strong>Select:</strong> Choose one shape of that size</li>
+          <li><strong>Place:</strong> Put the shape on your board</li>
         </ol>
       `,
       highlightSelector: '.juggle-dice-area',
@@ -43,11 +43,11 @@ export const juggleTutorial: TutorialConfig = {
       title: 'Dice Values',
       message: `
         <ul>
-          <li><strong>1</strong> = Monomino (1 cell)</li>
-          <li><strong>2</strong> = Domino (2 cells)</li>
-          <li><strong>3</strong> = Tromino (3 cells)</li>
-          <li><strong>4</strong> = Tetromino (4 cells)</li>
-          <li><strong>5-6</strong> = Pentomino (5 cells)</li>
+          <li><strong>1</strong> = one square</li>
+          <li><strong>2</strong> = two squares</li>
+          <li><strong>3</strong> = three squares</li>
+          <li><strong>4</strong> = four squares</li>
+          <li><strong>5–6</strong> = five squares</li>
         </ul>
       `,
       position: 'center',
@@ -58,8 +58,8 @@ export const juggleTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Shapes can be rotated and flipped</li>
-          <li>Shapes must fit entirely within your 9x9 grid</li>
-          <li>Shapes cannot overlap with previously placed shapes</li>
+          <li>Shapes must fit entirely inside your 9×9 board</li>
+          <li>Shapes cannot overlap shapes you already placed</li>
         </ul>
       `,
       highlightSelector: '.juggle-boards',
