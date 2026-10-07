@@ -669,6 +669,7 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
 async function renderContig60(routeGen: number): Promise<void> {
   const {
     initGame: initContigGame,
+    destroyGame: destroyContigGame,
     newGameVsHuman: contigNewGameVsHuman,
     newGameVsAI: contigNewGameVsAI,
     startTutorial: startContigTutorial,
@@ -736,13 +737,17 @@ async function renderContig60(routeGen: number): Promise<void> {
     initContigGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyContigGame();
+    shell.cleanup();
+  });
 }
 
 // Render Juggle
 async function renderJuggle(routeGen: number): Promise<void> {
   const {
     initGame: initJuggleGame,
+    destroyGame: destroyJuggleGame,
     newGameVsHuman: juggleNewGameVsHuman,
     newGameVsAI: juggleNewGameVsAI,
     startTutorial: startJuggleTutorial,
@@ -806,7 +811,10 @@ async function renderJuggle(routeGen: number): Promise<void> {
     initJuggleGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyJuggleGame();
+    shell.cleanup();
+  });
 }
 
 // Render Fab-a-Diffy
@@ -888,6 +896,7 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
 async function renderSumDominoes(routeGen: number): Promise<void> {
   const {
     initGame: initSDGame,
+    destroyGame: destroySDGame,
     newGameVsHuman: sdNewGameVsHuman,
     newGameVsAI: sdNewGameVsAI,
     startTutorial: startSDTutorial,
@@ -955,13 +964,17 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     initSDGame(shell.board, false);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroySDGame();
+    shell.cleanup();
+  });
 }
 
 // Render Par 55
 async function renderPar55(routeGen: number): Promise<void> {
   const {
     initGame: initPar55Game,
+    destroyGame: destroyPar55Game,
     newGameVsHuman: par55NewGameVsHuman,
     newGameVsAI: par55NewGameVsAI,
     startTutorial: startPar55Tutorial,
@@ -1027,13 +1040,17 @@ async function renderPar55(routeGen: number): Promise<void> {
     initPar55Game(shell.board, false);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyPar55Game();
+    shell.cleanup();
+  });
 }
 
 // Render Ramrod
 async function renderRamrod(routeGen: number): Promise<void> {
   const {
     initGame: initRamrodGame,
+    destroyGame: destroyRamrodGame,
     newGameVsHuman: ramrodNewGameVsHuman,
     newGameVsAI: ramrodNewGameVsAI,
     startTutorial: startRamrodTutorial,
@@ -1100,7 +1117,10 @@ async function renderRamrod(routeGen: number): Promise<void> {
     initRamrodGame(shell.board, false);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyRamrodGame();
+    shell.cleanup();
+  });
 }
 
 // Render Kwatro-Sinko
@@ -1426,6 +1446,7 @@ async function renderFracFact(routeGen: number): Promise<void> {
 async function renderRemainderIslands(routeGen: number): Promise<void> {
   const {
     initGame: initRemainderGame,
+    destroyGame: destroyRemainderGame,
     newGameVsHuman: remainderNewGameVsHuman,
     newGameVsAI: remainderNewGameVsAI,
     startTutorial: startRemainderTutorial,
@@ -1479,7 +1500,10 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     initRemainderGame(shell.board);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyRemainderGame();
+    shell.cleanup();
+  });
 }
 
 // Render Fraction Pinball
@@ -1551,6 +1575,7 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
 async function renderStarsBars(routeGen: number): Promise<void> {
   const {
     initGame: initStarsGame,
+    destroyGame: destroyStarsGame,
     newGameVsHuman: starsNewGameVsHuman,
     newGameVsAI: starsNewGameVsAI,
     startTutorial: startStarsTutorial,
@@ -1620,10 +1645,11 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     initStarsGame(shell.board, false);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyStarsGame();
+    shell.cleanup();
+  });
 }
-
-
 
 /** Mount the requested game (already validated by the router). */
 export async function mountGameById(

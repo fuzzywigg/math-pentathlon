@@ -34,6 +34,17 @@ let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Live-status flash when a roll finds no open islands (soft-lock UX). */
 let skipNotice: string | null = null;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  const gen = aiGeneration;
+  setTimeout(() => {
+    if (gen !== aiGeneration) return;
+    fn();
+  }, delayMs);
+}
 
 // =============================================================================
 // Rendering
@@ -129,9 +140,9 @@ function render(): void {
   // AI turn
   if (computerTurn && gameState.phase !== 'gameOver') {
     if (gameState.phase === 'rolling') {
-      setTimeout(aiRoll, 800);
+      scheduleAI(aiRoll, 800);
     } else if (gameState.phase === 'selectIsland') {
-      setTimeout(aiSelectIsland, 800);
+      scheduleAI(aiSelectIsland, 800);
     }
   }
 }
@@ -221,6 +232,7 @@ function aiSelectIsland(): void {
 export function initGame(containerEl: HTMLElement): void {
   injectRemainderIslandsStyles();
   gameContainer = containerEl;
+  aiGeneration += 1;
   gameState = createInitialState();
   isAIMode = false;
   syncOpponentChrome();
@@ -228,6 +240,7 @@ export function initGame(containerEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
   gameState = createInitialState();
   isAIMode = false;
   skipNotice = null;
@@ -236,6 +249,7 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
   gameState = createInitialState();
   isAIMode = true;
   skipNotice = null;
@@ -267,4 +281,10 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  gameContainer = null;
 }
