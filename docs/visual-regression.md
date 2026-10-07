@@ -2,7 +2,9 @@
 
 Playwright screenshot baselines for the **landing page** and each available game's **2D start/board** screen.
 
-This suite is **opt-in**. It is **not** a required CI check and is **not** invoked by `npm test` or `.github/workflows/ci.yml`.
+This suite is **opt-in** (`npm run test:visual`, via `playwright.visual.config.ts`). It is **not** a required CI check and is **not** invoked by `npm test` or `.github/workflows/ci.yml`.
+
+A separate e2e visual suite (`npm run test:e2e:visual`, projects `visual-desktop` / `visual-phone`) **is** run in CI as report-only job `visual-baseline`. See [docs/wiki/development.md](./wiki/development.md#visual-regression-baselines).
 
 ## What it covers
 

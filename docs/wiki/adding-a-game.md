@@ -43,7 +43,7 @@ In `src/ui/game-route-mounts.ts`:
 | Unit | State + rules under `tests/unit/` (Vitest + jsdom) |
 | E2E smoke | Card appears; game route loads (see `tests/e2e/smoke.spec.ts`) |
 | Axe | Shell New Game modal is covered automatically once the game is `available` (`tests/e2e/a11y-sweep.spec.ts`) |
-| Visual | Opt-in baselines pick up available games (`npm run test:visual` / e2e visual suite when present) |
+| Visual | Opt-in `npm run test:visual`; e2e openings via `npm run test:e2e:visual` (CI report-only) |
 | Round-trip / undo | Prefer adding harness coverage when the game has serialize or move-log APIs — see [testing layers](./development.md#testing-layers) |
 
 ## 5. Manual smoke

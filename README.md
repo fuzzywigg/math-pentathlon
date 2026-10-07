@@ -80,14 +80,21 @@ See also [docs/gallery/README.md](./docs/gallery/README.md).
 
 ## Development
 
-npm install
-npm run dev
-npm test             # unit + e2e
+```bash
+npm install                 # Node.js >= 20
+npm run dev                 # Vite → http://localhost:5173
+npm test                    # unit then Chromium e2e (CI required pair)
 npm run test:unit
-npm run test:e2e
+npm run test:e2e:chromium   # required CI e2e path
+npm run lint
+npm run format:check
 npm run build
+npm run preview             # serve dist/ after build
+```
 
-`npm test` runs unit then e2e. The unit suite under `tests/unit` is sized for CI under ~5 minutes (see `docs/wiki/development.md`).
+`npm test` runs `test:unit` then `test:e2e:chromium`. Prefer `test:e2e:chromium` over bare `npm run test:e2e` (the latter runs every Playwright project). The unit suite under `tests/unit` is sized for CI under ~8 minutes (see `docs/wiki/development.md`).
+
+Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (coverage, visual, mobile, size budgets, perf audits): [docs/wiki/development.md](./docs/wiki/development.md).
 
 ## Branches
 
@@ -97,9 +104,9 @@ npm run build
 ## Status (2026-10-07)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: 3051 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + Playwright under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
-- CI (`ci.yml` on alpha): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ 250 kB JS chunk budget), unit (required), Chromium e2e (required), visual-baseline (**report-only**; see `docs/wiki/development.md`)
-- Latest alpha tip `eec2b32` (2026-10-07) includes overnight polish (#413) + tablet playtest docs (#414)
+- Tests: 3053 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + 33 Playwright specs under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
+- CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, and `visual-baseline` (see `docs/wiki/development.md`)
+- `origin/alpha` tip `eec2b32` (2026-10-07) includes overnight polish (#413) + tablet playtest docs (#414). Integration tip trees may be ahead of alpha.
 
 ## Agent rules
 

@@ -16,11 +16,13 @@ Key files and patterns to inspect
 
 Developer workflows (commands)
 - Start dev server: `npm run dev` (Vite, serves on `http://localhost:5173`).
-- Build: `npm run build` (runs `tsc` then `vite build`).
+- Build: `npm run build` (runs `tsc` then `vite build`); preview with `npm run preview`.
 - Unit tests: `npm run test:unit` (or `npm run test:unit:watch`).
 - Coverage: `npm run test:unit:coverage`.
-- E2E tests: `npm run test:e2e` (Playwright launches browsers). Playwright config starts a web server with `npm run dev` and uses `http://localhost:5173` as `baseURL`.
-- Lint: `npm run lint`; format: `npm run format`.
+- E2E (required CI path): `npm run test:e2e:chromium`. Bare `npm run test:e2e` runs **every** Playwright project — prefer an explicit script. Playwright config starts a web server with `npm run dev` and uses `http://localhost:5173` as `baseURL`.
+- Full verify shortcut: `npm test` (= unit then Chromium e2e).
+- Lint: `npm run lint`; format write: `npm run format`; CI format gate: `npm run format:check`.
+- Full script list: `docs/wiki/development.md` and `CONTRIBUTING.md`.
 
 Project-specific conventions and notes
 - Positions: game board positions are 1-based in public APIs (rows/cols 1..9) — internal board arrays are 0-based. Use `toIndex`/`toPosition` helpers in `game-state.ts` when interacting with rules code.
@@ -56,6 +58,6 @@ New features (recently added)
 Notes for the AI agent
 - Prefer changing core logic in small, focused commits; follow existing immutable-state patterns.
 - Avoid introducing DOM calls into `src/core` or `src/games/*/rules.ts` — keep those files side-effect free.
-- If you update tests or configs, run `npm run test:unit` and `npm run test:e2e` locally to validate (Playwright may require a GUI environment).
+- If you update tests or configs, run `npm run test:unit` and `npm run test:e2e:chromium` locally to validate (Playwright may require a GUI environment).
 
 If anything in this guidance is unclear or you want more detail (specific file examples, additional patterns, or automated PR templates), tell me which area to expand.
