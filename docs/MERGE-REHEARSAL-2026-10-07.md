@@ -56,8 +56,8 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 |-------|--------|
 | `npm run lint` | **pass** |
 | `npx tsc --noEmit` | **pass** |
-| `npm run test:unit` | **11007 passed** / 5 skipped (3051 files). Hex Hard `AI_PLAY_DEADLINE_MS` assert is **450** (aligned with #472; tip wins over #489/#476 stale 2500). |
-| Chromium e2e (required) | **198 passed** (incl. 30 mp3d board3d cases + offline/SW; **0** canvas-ready timeouts after `#490`; `mobile-touch-smoke` excluded) |
+| `npm run test:unit` | **11008 passed** / 18 skipped (3051 files + 2 skipped files). Hex Hard `AI_PLAY_DEADLINE_MS` assert is **450**. |
+| Chromium e2e (required) | **202 passed** (7.0m; incl. `#491` keyboard a11y + menu axe clean after tablist roles; mp3d/offline) |
 | Firefox + WebKit / mobile-touch / `check:perf` | report-only paths (`continue-on-error` / exit 0) |
 
 ---
