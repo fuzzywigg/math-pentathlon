@@ -17,10 +17,14 @@ npm run dev
 npm test             # unit then e2e
 npm run test:unit
 npm run test:e2e
+npm run test:visual          # opt-in 2D screenshot suite (not in CI)
+npm run test:visual:update   # refresh committed baselines
 npm run build
 npm run lint
 npm run format:check
 ```
+
+Opt-in visual regression (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
 
 ## Branches
 
