@@ -92,6 +92,8 @@ export const CONFIG = {
   PLAIN_CHIPS_PER_PLAYER: 5,
   WIN_LENGTH: 4,
   NODE_RADIUS: 24,
+  /** Transparent tap target — diameter 56 user units so tablet CSS ≥44px. */
+  NODE_HIT_RADIUS: 28,
   EDGE_STROKE: 3,
 };
 

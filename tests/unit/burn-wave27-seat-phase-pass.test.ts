@@ -377,8 +377,8 @@ describe('Wave 27 seat-phase-pass — Prime Gold passTurn / DOM roll', () => {
     };
     expect(primeHasMoves(blocked)).toBe(false);
     const next = primePass(blocked);
-    expect(next.currentPlayer).toBe('player2');
-    expect(next.phase).toBe('rolling');
+    // Full board settles (vein compare) — no infinite Roll/Pass soft-lock.
+    expect(next.phase).toBe('gameOver');
     expect(next.diceRoll).toBeNull();
   });
 

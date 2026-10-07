@@ -12,7 +12,11 @@ describe('Wave 54 fiar — NODE_RADIUS chrome', () => {
     expect(createFiarBoard().nodes.size).toBe(40);
     const svg = renderBoard(createInitialState(), () => undefined);
     const g = svg.querySelector('[data-node-id="c3r3"]')!;
-    const bg = g.querySelector('circle')!;
+    const bg = g.querySelector('circle[data-node-visual="1"]')!;
     expect(bg.getAttribute('r')).toBe('24');
+    // Transparent hit disc is larger for tablet (≥44px CSS after scale).
+    expect(g.querySelector('[data-hit-target="1"]')?.getAttribute('r')).toBe(
+      String(CONFIG.NODE_HIT_RADIUS)
+    );
   });
 });

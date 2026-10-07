@@ -187,6 +187,42 @@ export function hasValidMoves(state: PrimeGoldState): boolean {
 // Chip Placement
 // =============================================================================
 
+/** Empty board cells (no owner). */
+export function countEmptyCells(cells: Map<string, BoardCell>): number {
+  let empty = 0;
+  for (const cell of cells.values()) {
+    if (cell.owner === null) empty++;
+  }
+  return empty;
+}
+
+/**
+ * End the game when both seats are out of chips or the board has no empty cells.
+ * Vein comparison matches the existing chip-exhaustion settle (no scoring change).
+ */
+export function settleIfExhausted(state: PrimeGoldState): PrimeGoldState {
+  if (state.phase === 'gameOver') return state;
+
+  const bothOut =
+    state.playerChips.player1 <= 0 && state.playerChips.player2 <= 0;
+  const boardFull = countEmptyCells(state.cells) === 0;
+  if (!bothOut && !boardFull) return state;
+
+  const p1Veins = countPrimeVeins(state.cells, 'player1');
+  const p2Veins = countPrimeVeins(state.cells, 'player2');
+  let winner: Player | null = null;
+  if (p1Veins > p2Veins) winner = 'player1';
+  else if (p2Veins > p1Veins) winner = 'player2';
+
+  return {
+    ...state,
+    diceRoll: null,
+    phase: 'gameOver',
+    winner,
+    primeVeins: { player1: p1Veins, player2: p2Veins },
+  };
+}
+
 /**
  * Place a chip on a cell
  */
@@ -196,6 +232,9 @@ export function placeChip(
   expression: string
 ): PrimeGoldState {
   if (state.phase !== 'placing' || !state.diceRoll) return state;
+  // Enforce STARTING_CHIPS supply — placing with 0 chips left caused negative
+  // counts, so the === 0 settle check never fired and mid-game Roll stalled.
+  if (state.playerChips[state.currentPlayer] <= 0) return state;
 
   const cell = findCellByValue(state, value);
   if (!cell || cell.owner !== null) return state;
@@ -238,8 +277,15 @@ export function placeChip(
   if (newVeins >= CONFIG.VEINS_TO_WIN) {
     winner = state.currentPlayer;
     phase = 'gameOver';
-  } else if (newChipCount.player1 === 0 && newChipCount.player2 === 0) {
+  } else if (newChipCount.player1 <= 0 && newChipCount.player2 <= 0) {
     // All chips placed - most veins wins
+    const p1Veins = countPrimeVeins(newCells, 'player1');
+    const p2Veins = countPrimeVeins(newCells, 'player2');
+    phase = 'gameOver';
+    if (p1Veins > p2Veins) winner = 'player1';
+    else if (p2Veins > p1Veins) winner = 'player2';
+  } else if (countEmptyCells(newCells) === 0) {
+    // Board full with chips still in hand — settle by veins (soft-lock escape).
     const p1Veins = countPrimeVeins(newCells, 'player1');
     const p2Veins = countPrimeVeins(newCells, 'player2');
     phase = 'gameOver';
@@ -349,10 +395,13 @@ export function passTurn(state: PrimeGoldState): PrimeGoldState {
   const nextPlayer: Player =
     state.currentPlayer === 'player1' ? 'player2' : 'player1';
 
-  return {
+  const next: PrimeGoldState = {
     ...state,
     currentPlayer: nextPlayer,
     diceRoll: null,
     phase: 'rolling',
   };
+
+  // Board-full / both-out after a pass must settle — otherwise Roll loops forever.
+  return settleIfExhausted(next);
 }

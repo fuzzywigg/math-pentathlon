@@ -326,6 +326,13 @@ export function executeAITurn(
 ): PrimeGoldState {
   let currentState = state;
 
+  if (currentState.phase === 'gameOver') return currentState;
+
+  // Seat with no chips left must pass (matches controller soft-lock escape).
+  if (currentState.playerChips[aiPlayer] <= 0) {
+    return passTurn(currentState);
+  }
+
   // Roll dice if needed
   if (currentState.phase === 'rolling') {
     currentState = rollDice(currentState);

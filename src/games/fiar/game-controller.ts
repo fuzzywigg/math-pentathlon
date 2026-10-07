@@ -191,6 +191,7 @@ function renderStatus(): void {
   let statusText = '';
   const playerClass = currentPlayer;
   const name = getPlayerName(currentPlayer);
+  let phaseBanner = '';
 
   if (isAIThinking) {
     statusText = `${name}'s turn: Computer is thinking…`;
@@ -198,16 +199,19 @@ function renderStatus(): void {
     const inv = gameState.chipInventory[currentPlayer];
     const remaining = chipsRemaining(inv);
     statusText = `${name}'s turn: Place a chip (${remaining} left)`;
+    phaseBanner = `<div class="fiar-phase-banner" data-phase="placement">Placement phase</div>`;
   } else if (phase === 'movement') {
+    phaseBanner = `<div class="fiar-phase-banner" data-phase="movement">Move phase</div>`;
     if (selectedNode) {
-      statusText = `${name}'s turn: Click a green node to move, or click chip again to deselect`;
+      statusText = `${name}'s turn: Move phase — Click a green node to move, or click chip again to deselect`;
     } else {
-      statusText = `${name}'s turn: Select a chip to move`;
+      statusText = `${name}'s turn: Move phase — Select a chip to move`;
     }
   }
 
   statusContainer.innerHTML = `
     ${starterBanner}
+    ${phaseBanner}
     <div class="fiar-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
       ${statusText}
     </div>

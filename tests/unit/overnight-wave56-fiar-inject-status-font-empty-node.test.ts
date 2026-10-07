@@ -41,7 +41,7 @@ describe('Wave 56 fiar — inject status font + empty node', () => {
 
     const svg = renderBoard(state, () => undefined);
     const empty = svg.querySelector(
-      '[data-node-id="c3r3"] circle'
+      '[data-node-id="c3r3"] circle[data-node-visual="1"]'
     ) as SVGCircleElement | null;
     expect(empty?.getAttribute('fill')).toBe('#dcd0c0');
   });
