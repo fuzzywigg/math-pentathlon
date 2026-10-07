@@ -50,15 +50,15 @@ describe('Queens & Guards touch + aria playability', () => {
     expect(svg.getAttribute('preserveAspectRatio')).toContain('meet');
   });
 
-  it('human turn announces selectable Blue pieces and valid destinations', () => {
+  it('human turn announces valid destinations without aria-disabled', () => {
     let state = createInitialState();
     state = selectPiece(state, { ring: 5, position: 1 });
     const moves = getValidMoves(state, { ring: 5, position: 1 });
     expect(moves.length).toBeGreaterThan(0);
     const svg = renderBoard(state, () => undefined);
     const piece = svg.querySelector('g[data-cell-key="5-1"]');
-    expect(piece?.getAttribute('aria-label')).toMatch(/selectable/);
     expect(piece?.getAttribute('aria-disabled')).toBeNull();
+    expect(piece?.getAttribute('aria-label')).toMatch(/selected/);
     const dest = moves[0]!;
     const destEl = svg.querySelector(
       `g[data-cell-key="${cellKey(dest.ring, dest.position)}"]`
@@ -66,7 +66,7 @@ describe('Queens & Guards touch + aria playability', () => {
     expect(destEl?.getAttribute('aria-label')).toMatch(/valid move/);
   });
 
-  it('AI-seat render (no handler) sets aria-disabled and omits valid/selectable', () => {
+  it('AI-seat render (no handler) sets aria-disabled and omits valid moves', () => {
     const state = {
       ...createInitialState(),
       currentPlayer: 'player2' as const,
@@ -80,7 +80,6 @@ describe('Queens & Guards touch + aria playability', () => {
       const label = cell.getAttribute('aria-label') ?? '';
       expect(label).toMatch(/not available/);
       expect(label).not.toMatch(/valid move/);
-      expect(label).not.toMatch(/selectable/);
     }
     expect((cells[0] as SVGGElement).style.cursor).toBe('default');
   });

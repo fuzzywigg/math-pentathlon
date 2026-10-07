@@ -205,7 +205,7 @@ function updateStatus(): void {
   }
   if (gameState.capturedPieces.length > 0) {
     instruction =
-      'Tap a captured piece (red outline), then an empty outer-ring space';
+      'Tap a captured piece (red outline), then an empty outer ring space';
   }
   if (showAiChrome) {
     instruction = 'Computer is thinking…';

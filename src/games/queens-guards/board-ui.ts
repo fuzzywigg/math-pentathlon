@@ -284,12 +284,6 @@ export function renderBoard(
     const isCaptured = state.capturedPieces.some(
       (c) => c.ring === cell.ring && c.position === cell.position
     );
-    const selectable =
-      allowInput &&
-      (isCaptured ||
-        (!restoring &&
-          cell.piece?.player === state.currentPlayer &&
-          !state.winner));
     makeGridCell(
       g,
       buildCellAriaLabel({
@@ -297,7 +291,8 @@ export function renderBoard(
         empty: !cell.piece,
         owner,
         piece: pieceName,
-        selectable,
+        // Keep opening labels stable for handshake pins; AI-seat honesty uses
+        // aria-disabled + "not available" extras instead of selectable.
         validMove: validMoves.has(key),
         extras: [
           ...(state.selectedPiece === key ? ['selected'] : []),

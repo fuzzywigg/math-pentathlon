@@ -47,7 +47,7 @@ During the paint delay before `isAIThinking`, status showed **“Red’s turn �
 
 ### 3. Medium — AI-seat aria honesty (FIXED)
 
-While Red thinks, cells now set `aria-disabled="true"`, append `not available`, and omit `selectable` / `valid move`. Human turn announces `selectable` on Blue pieces.
+While Red thinks, cells now set `aria-disabled="true"`, append `not available`, and omit `valid move` highlights.
 
 ### 4. Medium — restore / move copy (FIXED)
 

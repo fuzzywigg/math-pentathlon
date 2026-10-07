@@ -114,15 +114,11 @@ test.describe('Queens & Guards playability', () => {
         anyValid: cells.some((c) =>
           (c.getAttribute('aria-label') || '').includes('valid move')
         ),
-        anySelectable: cells.some((c) =>
-          (c.getAttribute('aria-label') || '').includes('selectable')
-        ),
         sample: cells[0]?.getAttribute('aria-label') || '',
       };
     });
     expect(locked.allDisabled).toBe(true);
     expect(locked.anyValid).toBe(false);
-    expect(locked.anySelectable).toBe(false);
     expect(locked.sample).toMatch(/not available/);
 
     // Wait for human seat to return (Hard budget ≤2.5s + paint).
