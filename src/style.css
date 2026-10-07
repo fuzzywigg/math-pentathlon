@@ -3280,7 +3280,8 @@ h1 {
 }
 
 .hex-a-gone-board {
-  width: min(350px, 100%);
+  /* Wider default so HEX_SIZE=32 cells clear the 44px touch floor */
+  width: min(380px, 100%);
   height: auto;
   aspect-ratio: 1;
   max-width: 100%;
@@ -3467,6 +3468,12 @@ h1 {
   opacity: 0.4;
   cursor: not-allowed;
   filter: grayscale(0.5);
+}
+
+.hex-a-gone-block-btn:disabled,
+.hex-a-gone-block-btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 .block-icon {
@@ -3677,7 +3684,7 @@ h1 {
   }
 }
 
-/* Coarse pointers: keep Hex-a-Gone bank/confirm at 44px tap size */
+/* Coarse pointers: keep Hex-a-Gone bank/confirm/cells at 44px tap size */
 @media (pointer: coarse) {
   .hex-a-gone-block-btn {
     min-width: 64px;
@@ -3687,6 +3694,16 @@ h1 {
   .hex-a-gone-confirm-btn {
     min-height: 44px;
     padding: 0.7rem 1.75rem;
+  }
+
+  .hex-a-gone-board {
+    width: min(420px, 96vw);
+  }
+
+  .hex-a-gone-block-btn:disabled,
+  .hex-a-gone-block-btn[aria-disabled='true'] {
+    cursor: not-allowed;
+    opacity: 0.55;
   }
 }
 

@@ -72,14 +72,20 @@ interface SelectionOption {
 function evaluateSelections(
   state: HexAGoneGameState,
   _aiPlayer: Player,
-  _difficulty: AIDifficulty
+  difficulty: AIDifficulty
 ): SelectionOption[] {
   const availableShapes = getAvailableShapes(state);
   const emptyCells = countEmptyCells(state);
   const options: SelectionOption[] = [];
+  const config = DIFFICULTY_CONFIG[difficulty];
 
-  // Don't select more blocks than we can place
-  const maxBlocks = Math.min(3, emptyCells, availableShapes.length);
+  // Cap selection size by difficulty lookahead (Easy=1 … Hard=3) and board space
+  const maxBlocks = Math.min(
+    config.maxSelectionLookahead,
+    3,
+    emptyCells,
+    availableShapes.length
+  );
 
   if (maxBlocks === 0) {
     return [{ blocks: [], score: -1000, reasoning: 'No blocks can be placed' }];

@@ -46,7 +46,8 @@ let board3dLoading: Promise<void> | null = null;
 let board3dHost: HTMLElement | null = null;
 let selectionHost: HTMLElement | null = null;
 
-const AI_THINKING_DELAY = 800;
+/** Keep multi-block AI turns under the ~3s tablet think budget (delay × places). */
+const AI_THINKING_DELAY = 350;
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -154,7 +155,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 
 // Handle block selection from bank
 function handleBlockSelect(shape: BlockShape): void {
-  if (isAIThinking) return;
+  if (!canHumanInteract()) return;
 
   if (gameState.phase === 'selectBlocks') {
     // Toggle selection
@@ -173,7 +174,7 @@ function handleBlockSelect(shape: BlockShape): void {
 
 // Handle confirm selection
 function handleConfirm(): void {
-  if (isAIThinking) return;
+  if (!canHumanInteract()) return;
   if (gameState.phase !== 'selectBlocks') return;
 
   gameState = commitSelection(gameState);
@@ -182,7 +183,7 @@ function handleConfirm(): void {
 
 // Handle cell click for placement
 function handleCellClick(q: number, r: number): void {
-  if (isAIThinking) return;
+  if (!canHumanInteract()) return;
   if (gameState.phase !== 'placeBlocks') return;
 
   const prevPlayer = gameState.currentPlayer;
