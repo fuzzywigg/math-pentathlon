@@ -54,7 +54,7 @@ export function renderFractionBarPool(
   const container = document.createElement('div');
   container.className = 'fab-bar-pool';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Fraction Bars';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -197,7 +197,7 @@ export function renderAnswerBoard(
   const container = document.createElement('div');
   container.className = 'fab-answer-board';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Answer Bars';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -437,7 +437,7 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
   const container = document.createElement('div');
   container.className = 'fab-history';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Move History';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -712,12 +712,12 @@ export function injectFabStyles(): void {
 
     .fab-score-p1 {
       background: #bbdefb;
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .fab-score-p2 {
       background: #ffcdd2;
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .fab-score-p2 {
@@ -791,11 +791,11 @@ export function injectFabStyles(): void {
     }
 
     .fab-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .fab-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .fab-winner-banner {

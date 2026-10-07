@@ -394,13 +394,13 @@
 }
 
 .supply-p1 {
-  color: #1976d2;
+  color: var(--color-player1-text);
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(25, 118, 210, 0.2);
 }
 
 .supply-p2 {
-  color: #d32f2f;
+  color: var(--color-player2-text);
   font-weight: 600;
   text-shadow: 0 1px 2px rgba(211, 47, 47, 0.2);
 }
@@ -723,18 +723,23 @@
   outline-offset: 2px;
 }
 
-/* New Game button */
+/* New Game button — strong blue for white-text AA contrast */
 #new-game-btn {
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-strong);
 }
 
 #new-game-btn:hover {
-  background-color: var(--color-primary-dark);
+  background-color: #1e40af;
 }
 
 #new-game-btn:active {
-  background-color: var(--color-primary-dark);
+  background-color: #1e40af;
   filter: brightness(0.92);
+}
+
+/* ARIA grid row wrappers: keep CSS grid/flex cell layout intact */
+.aria-grid-row {
+  display: contents;
 }
 
 /* Game area layout */
@@ -817,15 +822,15 @@ svg [role='gridcell']:focus-visible {
 }
 
 #help-btn {
-  background-color: var(--color-success);
+  background-color: var(--color-success-strong);
 }
 
 #help-btn:hover {
-  background-color: var(--color-success-dark);
+  background-color: #065f46;
 }
 
 #help-btn:active {
-  background-color: var(--color-success-dark);
+  background-color: #065f46;
   filter: brightness(0.92);
 }
 
@@ -922,7 +927,7 @@ svg [role='gridcell']:focus-visible {
 }
 
 .move-history-empty {
-  color: #888;
+  color: var(--color-neutral-600);
   font-style: italic;
   font-size: 8pt;
 }
@@ -1664,17 +1669,17 @@ svg [role='gridcell']:focus-visible {
   background: #f57c00;
 }
 
-/* Tutorial button — system teal (not Ollie / --color-secondary purple) */
+/* Tutorial button — system teal (not Ollie / --color-secondary purple); dark fill for AA */
 #tutorial-btn {
-  background-color: var(--color-system);
+  background-color: var(--color-system-dark);
 }
 
 #tutorial-btn:hover {
-  background-color: var(--color-system-dark);
+  background-color: #115e59;
 }
 
 #tutorial-btn:active {
-  background-color: var(--color-system-dark);
+  background-color: #115e59;
   filter: brightness(0.92);
 }
 
@@ -3113,7 +3118,7 @@ svg [role='gridcell']:focus-visible {
   min-width: 120px;
   font-size: 0.9rem;
   font-weight: 600;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-strong);
   color: white;
   border: none;
   border-radius: 6px;
@@ -3188,11 +3193,11 @@ svg [role='gridcell']:focus-visible {
 }
 
 .sd-status.player1 {
-  color: var(--color-player1);
+  color: var(--color-player1-text);
 }
 
 .sd-status.player2 {
-  color: var(--color-player2);
+  color: var(--color-player2-text);
 }
 
 .sd-hands-container {
@@ -3207,11 +3212,11 @@ svg [role='gridcell']:focus-visible {
 }
 
 .sd-hand-label.player1 {
-  color: var(--color-player1);
+  color: var(--color-player1-text);
 }
 
 .sd-hand-label.player2 {
-  color: var(--color-player2);
+  color: var(--color-player2-text);
 }
 
 .sd-pass-btn {
@@ -3283,7 +3288,7 @@ svg [role='gridcell']:focus-visible {
   min-height: 44px;
   font-size: 0.9rem;
   font-weight: 600;
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-strong);
   color: white;
   border: none;
   border-radius: 6px;
@@ -3341,11 +3346,11 @@ svg [role='gridcell']:focus-visible {
 }
 
 .contig-status.player1 {
-  color: var(--color-player1);
+  color: var(--color-player1-text);
 }
 
 .contig-status.player2 {
-  color: var(--color-player2);
+  color: var(--color-player2-text);
 }
 
 .contig-scores {
@@ -3363,12 +3368,12 @@ svg [role='gridcell']:focus-visible {
 
 .contig-score-p1 {
   background: #bbdefb;
-  color: var(--color-player1);
+  color: var(--color-player1-text);
 }
 
 .contig-score-p2 {
   background: #ffcdd2;
-  color: var(--color-player2);
+  color: var(--color-player2-text);
 }
 
 /* Responsive */

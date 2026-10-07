@@ -42,12 +42,12 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .pg-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .pg-status.player2 {
@@ -75,12 +75,12 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .pg-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .pg-score.player2 {
@@ -132,6 +132,7 @@ export function injectPrimeGoldStyles(): void {
       width: 50px;
       height: 50px;
       background: #3d3d3d;
+      color: #e2e8f0;
       border-radius: 6px;
       display: flex;
       align-items: center;
@@ -181,9 +182,14 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-dice-area {
       background: #2d2d2d;
+      color: #e2e8f0;
       padding: 1rem;
       border-radius: 12px;
       text-align: center;
+    }
+
+    .pg-dice-area strong {
+      color: #e2e8f0;
     }
 
     .pg-dice-container {
@@ -218,7 +224,7 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-roll-btn {
       padding: 0.75rem 2rem;
-      background: #4caf50;
+      background: #2e7d32;
       color: white;
       border: none;
       border-radius: 8px;
@@ -228,7 +234,7 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-roll-btn:hover {
-      background: #388e3c;
+      background: #1b5e20;
     }
 
     .pg-roll-btn:disabled {
@@ -248,13 +254,19 @@ export function injectPrimeGoldStyles(): void {
     .pg-expressions h3 {
       margin: 0 0 0.5rem 0;
       font-size: 1rem;
-      color: #aaa;
+      color: #e2e8f0;
+    }
+
+    .pg-expressions,
+    .pg-expressions strong {
+      color: #e2e8f0;
     }
 
     .pg-expr-item {
       padding: 6px 10px;
       margin: 4px 0;
       background: #3d3d3d;
+      color: #e2e8f0;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -374,8 +386,8 @@ export function injectPrimeGoldStyles(): void {
       border-bottom: none;
     }
 
-    .pg-move-item.player1 { color: var(--color-player1, #64b5f6); }
-    .pg-move-item.player2 { color: var(--color-player2, #ef9a9a); }
+    .pg-move-item.player1 { color: var(--color-player1-text, #1d4ed8); }
+    .pg-move-item.player2 { color: var(--color-player2-text, #b91c1c); }
 
     /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
     @media (pointer: coarse) {

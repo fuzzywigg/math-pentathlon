@@ -17,8 +17,8 @@ describe('Wave 60 kwatro — inject status type / seat vars', () => {
     expect(css).toContain('font-size: 1.2rem');
     expect(css).toContain('font-weight: 500');
     expect(css).toContain('.kwa-status.player1');
-    expect(css).toContain('color: var(--color-player1, #2196f3)');
+    expect(css).toContain('color: var(--color-player1-text, #1d4ed8)');
     expect(css).toContain('.kwa-status.player2');
-    expect(css).toContain('color: var(--color-player2, #f44336)');
+    expect(css).toContain('color: var(--color-player2-text, #b91c1c)');
   });
 });

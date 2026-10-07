@@ -614,7 +614,7 @@ export function injectFractionPinballStyles(): void {
 
     .pinball-round-label {
       font-size: 12px;
-      color: #999;
+      color: #475569;
       text-transform: uppercase;
     }
 

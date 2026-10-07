@@ -514,11 +514,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-score.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .ramrod-score.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-on-dark, #f87171);
     }
 
     .ramrod-score .value {
@@ -526,7 +526,7 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-target {
-      color: #999;
+      color: #cbd5e1;
       font-size: 0.9rem;
     }
 
@@ -538,11 +538,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .ramrod-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .ramrod-status.ramrod-computer-thinking {
@@ -668,11 +668,11 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-hand-label.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .ramrod-hand-label.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .ramrod-legend {

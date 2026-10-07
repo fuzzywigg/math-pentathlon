@@ -538,8 +538,8 @@ export function injectFracFactStyles(): void {
       text-transform: uppercase;
     }
 
-    .frac-player-name.player1 { color: var(--color-player1, #1565c0); }
-    .frac-player-name.player2 { color: var(--color-player2, #c62828); }
+    .frac-player-name.player1 { color: var(--color-player1-text, #1d4ed8); }
+    .frac-player-name.player2 { color: var(--color-player2-text, #b91c1c); }
 
     .frac-score-value {
       font-size: 32px;
@@ -634,12 +634,12 @@ export function injectFracFactStyles(): void {
 
     .frac-status.player1 {
       background: #e3f2fd;
-      color: var(--color-player1, #1565c0);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .frac-status.player2 {
       background: #ffebee;
-      color: var(--color-player2, #c62828);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .frac-status.player2 {

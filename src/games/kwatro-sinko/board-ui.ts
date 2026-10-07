@@ -391,11 +391,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-player-info.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .kwa-player-info.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-on-dark, #f87171);
     }
 
     .kwa-status {
@@ -406,11 +406,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .kwa-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .kwa-winner-banner {

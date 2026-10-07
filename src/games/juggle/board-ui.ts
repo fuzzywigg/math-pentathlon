@@ -450,8 +450,8 @@ export function injectJuggleStyles(): void {
       border-color: #ffc107;
     }
 
-    .juggle-board.player1 .juggle-board-header { color: var(--color-player1, #2196f3); }
-    .juggle-board.player2 .juggle-board-header { color: var(--color-player2, #f44336); }
+    .juggle-board.player1 .juggle-board-header { color: var(--color-player1-text, #1d4ed8); }
+    .juggle-board.player2 .juggle-board-header { color: var(--color-player2-text, #b91c1c); }
 
     .juggle-board-header {
       display: flex;
@@ -463,7 +463,8 @@ export function injectJuggleStyles(): void {
 
     .fill-percent {
       font-size: 0.9rem;
-      opacity: 0.8;
+      /* Keep solid color (no opacity) so inherited seat text stays AA. */
+      color: inherit;
     }
 
     .juggle-grid {
@@ -664,8 +665,8 @@ export function injectJuggleStyles(): void {
       padding: 1rem;
     }
 
-    .juggle-status.player1 { color: var(--color-player1, #2196f3); }
-    .juggle-status.player2 { color: var(--color-player2, #f44336); }
+    .juggle-status.player1 { color: var(--color-player1-text, #1d4ed8); }
+    .juggle-status.player2 { color: var(--color-player2-text, #b91c1c); }
 
     .juggle-status.status-ai-thinking {
       font-style: italic;
