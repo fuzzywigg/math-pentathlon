@@ -26,13 +26,11 @@ import {
 // Style Injection
 // =============================================================================
 
-let stylesInjected = false;
-
 export function injectStarsStyles(): void {
-  if (stylesInjected) return;
-  stylesInjected = true;
+  if (document.getElementById('stars-styles')) return;
 
   const style = document.createElement('style');
+  style.id = 'stars-styles';
   style.textContent = `
     .stars-game-area {
       display: flex;
@@ -48,6 +46,10 @@ export function injectStarsStyles(): void {
       padding: 0.5rem 1rem;
       border-radius: 8px;
       text-align: center;
+    }
+
+    .stars-status.status-ai-thinking {
+      font-style: italic;
     }
 
     .stars-status.player1 {
@@ -210,6 +212,8 @@ export function injectStarsStyles(): void {
     .stars-card {
       width: 60px;
       height: 60px;
+      min-width: 44px;
+      min-height: 44px;
       background: #4d4d4d;
       border-radius: 8px;
       display: flex;
@@ -257,11 +261,13 @@ export function injectStarsStyles(): void {
     }
 
     .stars-btn {
-      padding: 0.5rem 1rem;
+      padding: 0.65rem 1.1rem;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      min-height: 44px;
+      min-width: 44px;
       transition: all 0.2s;
     }
 
@@ -322,6 +328,35 @@ export function injectStarsStyles(): void {
       pointer-events: none;
       white-space: nowrap;
     }
+
+    /* Tablet / touch: keep cells, hand cards, and controls ≥44px */
+    @media (pointer: coarse), (max-width: 900px) {
+      .stars-board {
+        grid-template-columns: repeat(${CONFIG.BOARD_SIZE}, minmax(44px, 70px));
+        gap: 4px;
+      }
+
+      .stars-cell {
+        width: auto;
+        height: auto;
+        min-width: 44px;
+        min-height: 44px;
+        aspect-ratio: 1;
+      }
+
+      .stars-card {
+        width: 56px;
+        height: 56px;
+        min-width: 48px;
+        min-height: 48px;
+      }
+
+      .stars-btn {
+        min-height: 48px;
+        min-width: 132px;
+        padding: 0.75rem 1.25rem;
+      }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -330,7 +365,13 @@ export function injectStarsStyles(): void {
 // Player Names
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
+/**
+ * Seat label for chrome. In human-vs-AI, player1 is "You" and player2 is "Computer".
+ */
+export function getPlayerName(player: Player, vsAI: boolean = false): string {
+  if (vsAI) {
+    return player === 'player1' ? 'You' : 'Computer';
+  }
   return player === 'player1' ? 'Blue' : 'Red';
 }
 
@@ -425,6 +466,8 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
 export interface StarsBoardRenderOptions {
   /** When false, suppress placement highlights and activate handlers (AI seat). */
   allowInput?: boolean;
+  /** Human-vs-AI seat labels (You / Computer). */
+  vsAI?: boolean;
 }
 
 /**
@@ -491,7 +534,9 @@ export function renderBoard(
         cellEl.appendChild(cardSvg);
       }
 
-      const owner = cell.owner ? getPlayerName(cell.owner) : undefined;
+      const owner = cell.owner
+        ? getPlayerName(cell.owner, options.vsAI === true)
+        : undefined;
       const piece = cell.card
         ? `${cell.card.size} ${cell.card.thickness} ${cell.card.color} ${cell.card.shape}`
         : undefined;
@@ -578,9 +623,14 @@ export function renderPlayerHand(
   const container = document.createElement('div');
   container.className = 'stars-hand-container';
 
+  const vsAI = options.vsAI === true;
   const label = document.createElement('div');
   label.className = `stars-hand-label ${player}`;
-  label.textContent = `${seatIcon(player)} ${getPlayerName(player)}'s Hand`;
+  const name = getPlayerName(player, vsAI);
+  label.textContent =
+    vsAI && player === 'player1'
+      ? `${seatIcon(player)} Your Hand`
+      : `${seatIcon(player)} ${name}'s Hand`;
   container.appendChild(label);
 
   const hand = document.createElement('div');
@@ -645,17 +695,21 @@ export function renderPlayerHand(
 /**
  * Render scores
  */
-export function renderScores(state: StarsState): HTMLElement {
+export function renderScores(
+  state: StarsState,
+  options: StarsBoardRenderOptions = {}
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'stars-scores';
+  const vsAI = options.vsAI === true;
 
   const p1Score = document.createElement('div');
   p1Score.className = 'stars-score player1';
-  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
+  p1Score.textContent = `${seatIcon('player1')} ${getPlayerName('player1', vsAI)}: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
 
   const p2Score = document.createElement('div');
   p2Score.className = 'stars-score player2';
-  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
+  p2Score.textContent = `${seatIcon('player2')} ${getPlayerName('player2', vsAI)}: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
 
   container.appendChild(p1Score);
   container.appendChild(p2Score);
@@ -670,9 +724,13 @@ export function renderScores(state: StarsState): HTMLElement {
 /**
  * Render move history
  */
-export function renderMoveHistory(state: StarsState): HTMLElement {
+export function renderMoveHistory(
+  state: StarsState,
+  options: StarsBoardRenderOptions = {}
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'stars-move-history';
+  const vsAI = options.vsAI === true;
 
   const title = document.createElement('h3');
   title.textContent = 'Move History';
@@ -684,7 +742,7 @@ export function renderMoveHistory(state: StarsState): HTMLElement {
     moveEl.className = `stars-move-item ${move.player}`;
 
     const posStr = `(${move.row + 1},${String.fromCharCode(65 + move.col)})`;
-    moveEl.textContent = `${getPlayerName(move.player)}: ${move.card.shape} at ${posStr} = +${move.score}`;
+    moveEl.textContent = `${getPlayerName(move.player, vsAI)}: ${move.card.shape} at ${posStr} = +${move.score}`;
 
     container.appendChild(moveEl);
   }

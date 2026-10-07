@@ -46,7 +46,7 @@ describe('Stars & Bars AI-turn input guard', () => {
     expect(el.querySelector('[aria-disabled="true"]')).toBeTruthy();
   });
 
-  it('blocks selecting a Red card during the 800ms AI pause', async () => {
+  it('blocks selecting a Computer card during the AI think pause', async () => {
     const { newGameVsAI } =
       await import('../../src/games/stars-bars/game-controller');
 
