@@ -317,7 +317,9 @@ class StorageManager {
 
   public updateSettings(settings: Partial<UserSettings>): void {
     this.data.settings = { ...this.data.settings, ...settings };
-    this.save();
+    // Flush immediately so menu reduced-motion (localStorage peek, no storage
+    // import) sees the new flag without waiting for the debounced save.
+    this.saveNow();
   }
 
   // Aggregate statistics
