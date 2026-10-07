@@ -155,9 +155,7 @@ export function renderBoard(
   const legalAnchors =
     allowInput && state.phase === 'placePiece' && state.selectedPiece
       ? new Set(
-          getCurrentOrientationPlacements(state).map(
-            (c) => `${c.row},${c.col}`
-          )
+          getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
         )
       : new Set<string>();
 
@@ -413,11 +411,7 @@ export function renderPlaceControls(
   const container = document.createElement('div');
   container.className = 'pent-place-controls';
 
-  if (
-    !allowInput ||
-    state.phase !== 'placePiece' ||
-    !state.selectedPiece
-  ) {
+  if (!allowInput || state.phase !== 'placePiece' || !state.selectedPiece) {
     return container;
   }
 
@@ -503,8 +497,7 @@ export function renderPlaceControls(
   const hint = document.createElement('div');
   hint.className = 'pent-instructions pent-place-hint';
   if (!fitsAnywhere) {
-    hint.textContent =
-      "This piece doesn't fit anywhere. Choose another piece.";
+    hint.textContent = "This piece doesn't fit anywhere. Choose another piece.";
   } else if (!currentFits) {
     hint.textContent =
       'No green cells at this angle — rotate or flip, or choose another piece.';

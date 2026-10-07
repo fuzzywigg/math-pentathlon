@@ -1,11 +1,7 @@
 // Pent'Em In Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  PentEmInState,
-  createInitialState,
-  getPlayerPieces,
-} from './types';
+import { PentEmInState, createInitialState, getPlayerPieces } from './types';
 import {
   selectPiece,
   rotateSelectedPiece,

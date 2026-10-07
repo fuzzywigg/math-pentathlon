@@ -28,10 +28,7 @@ function hashQueryParams(): URLSearchParams {
   return new URLSearchParams(hash.slice(q + 1));
 }
 
-function readFlag(
-  param: string,
-  storageKey: string
-): boolean | null {
+function readFlag(param: string, storageKey: string): boolean | null {
   if (typeof window === 'undefined') return null;
 
   try {

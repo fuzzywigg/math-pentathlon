@@ -361,7 +361,6 @@ function renderExpressionDemoPage(): void {
   })();
 }
 
-
 // Set up routes
 addRoute('/', renderHome);
 addRoute('/stats', renderStats);

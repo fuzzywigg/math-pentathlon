@@ -130,7 +130,8 @@ export function renderBoard(
           coord,
           empty: !isOccupied,
           owner: isOccupied ? getPlayerName(player) : undefined,
-          validPlacement: canPlace && (isLegalAnchor || (isPreview && !!isPreviewValid)),
+          validPlacement:
+            canPlace && (isLegalAnchor || (isPreview && !!isPreviewValid)),
         })
       );
 
@@ -394,7 +395,9 @@ export function renderShapeControls(
   if (allowInput && options.onAbandonPlacement) {
     const otherBtn = document.createElement('button');
     otherBtn.className = 'juggle-control-btn juggle-choose-other-btn';
-    otherBtn.textContent = fits ? 'Choose another shape' : "Can't fit — choose another";
+    otherBtn.textContent = fits
+      ? 'Choose another shape'
+      : "Can't fit — choose another";
     otherBtn.addEventListener('click', options.onAbandonPlacement);
     controls.appendChild(otherBtn);
   }

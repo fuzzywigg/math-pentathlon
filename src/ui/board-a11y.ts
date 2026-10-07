@@ -212,7 +212,10 @@ function ensureRowgroupAncestors(from: Element, grid: Element): void {
   if (node !== grid || chain.length === 0) return;
 
   const top = chain[chain.length - 1]!;
-  if (top.getAttribute('role') !== 'row' && top.getAttribute('role') !== 'grid') {
+  if (
+    top.getAttribute('role') !== 'row' &&
+    top.getAttribute('role') !== 'grid'
+  ) {
     top.setAttribute('role', 'rowgroup');
   }
   for (let i = 0; i < chain.length - 1; i++) {

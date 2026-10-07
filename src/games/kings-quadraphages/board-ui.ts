@@ -487,22 +487,14 @@ export function renderStatus(
   const supply1El = document.createElement('span');
   supply1El.className = 'supply-p1';
   const p1Label =
-    gameMode === 'human-vs-ai'
-      ? aiSeat === 'player1'
-        ? 'AI'
-        : 'You'
-      : 'P1';
+    gameMode === 'human-vs-ai' ? (aiSeat === 'player1' ? 'AI' : 'You') : 'P1';
   supply1El.textContent = `${seatIcon('player1')} ${p1Label}: ${state.player1Supply}`;
   suppliesEl.appendChild(supply1El);
 
   const supply2El = document.createElement('span');
   supply2El.className = 'supply-p2';
   const p2Label =
-    gameMode === 'human-vs-ai'
-      ? aiSeat === 'player2'
-        ? 'AI'
-        : 'You'
-      : 'P2';
+    gameMode === 'human-vs-ai' ? (aiSeat === 'player2' ? 'AI' : 'You') : 'P2';
   supply2El.textContent = `${seatIcon('player2')} ${p2Label}: ${state.player2Supply}`;
   suppliesEl.appendChild(supply2El);
 

@@ -259,12 +259,7 @@ function evaluateMoves(
 
     // Factor 7 (Hard): avoid leaving an open 5-in-a-row threat for opponent
     if (useLookahead) {
-      const threats = countOpenWinThreatsFor(
-        state,
-        result,
-        aiPlayer,
-        opponent
-      );
+      const threats = countOpenWinThreatsFor(state, result, aiPlayer, opponent);
       if (threats > 0) {
         score -= threats * 4000;
         reasons.push(

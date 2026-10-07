@@ -190,8 +190,7 @@ export function renderExpressionSelector(
 
   const header = document.createElement('div');
   header.className = 'contig-expr-header';
-  header.textContent =
-    'Or pick an expression (same as tapping a green cell):';
+  header.textContent = 'Or pick an expression (same as tapping a green cell):';
   container.appendChild(header);
 
   const list = document.createElement('div');

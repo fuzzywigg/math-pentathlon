@@ -188,7 +188,6 @@ h1 {
   color: #1a1a2e;
 }
 
-
 /* =====================================================
    GAME SELECTOR / LANDING PAGE STYLES
    ===================================================== */
@@ -991,7 +990,6 @@ h1 {
     align-self: flex-start;
   }
 }
-
 
 /* Ensure touch targets are large enough on mobile / iPad.
    `(hover: none)` covers iPads that report pointer:fine with Apple Pencil.

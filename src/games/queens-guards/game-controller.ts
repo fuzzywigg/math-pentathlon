@@ -200,8 +200,7 @@ function updateStatus(): void {
 
   let instruction = 'Select a piece to move';
   if (gameState.selectedPiece) {
-    instruction =
-      'Tap a highlighted cell to move, or select a different piece';
+    instruction = 'Tap a highlighted cell to move, or select a different piece';
   }
   if (gameState.capturedPieces.length > 0) {
     instruction =

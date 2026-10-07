@@ -77,9 +77,7 @@ function statusForTurn(): string {
         ? 'Computer hit! Next challenge…'
         : 'Computer missed. Next challenge…';
     }
-    return gameState.isCorrect
-      ? 'HIT! Tap Continue.'
-      : 'Miss! Tap Continue.';
+    return gameState.isCorrect ? 'HIT! Tap Continue.' : 'Miss! Tap Continue.';
   }
   if (isAIMode) {
     if (gameState.currentPlayer === 'player1') {

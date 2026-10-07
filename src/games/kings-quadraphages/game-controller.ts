@@ -42,7 +42,10 @@ const AI_THINKING_DELAY_COARSE = 350;
 const AI_MOVE_DELAY = 300;
 
 function aiThinkingDelayMs(): number {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+  if (
+    typeof window === 'undefined' ||
+    typeof window.matchMedia !== 'function'
+  ) {
     return AI_THINKING_DELAY_DESKTOP;
   }
   try {

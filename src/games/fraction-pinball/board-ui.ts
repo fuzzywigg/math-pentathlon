@@ -115,8 +115,7 @@ export function renderResult(
 
   if (state.isCorrect) {
     // Default copy preserves overnight exact-match leftovers when points omitted.
-    const hitText =
-      pointsAwarded > 0 ? 'HIT!' : 'HIT! Points scored!';
+    const hitText = pointsAwarded > 0 ? 'HIT!' : 'HIT! Points scored!';
     const pointsLine =
       pointsAwarded > 0
         ? `<div class="pinball-points">+${pointsAwarded} points</div>`
@@ -348,8 +347,7 @@ export function renderGameOver(
 
   let winnerText: string;
   if (state.winner === 'player1') {
-    winnerText =
-      gameMode === 'human-vs-ai' ? 'You win! 🏆' : 'Blue Wins! 🏆';
+    winnerText = gameMode === 'human-vs-ai' ? 'You win! 🏆' : 'Blue Wins! 🏆';
   } else if (state.winner === 'player2') {
     winnerText =
       gameMode === 'human-vs-ai' ? 'Computer wins! 🏆' : 'Red Wins! 🏆';

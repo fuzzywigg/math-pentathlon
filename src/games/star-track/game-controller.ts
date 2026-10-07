@@ -243,10 +243,7 @@ function triggerAITurn(): void {
       if (choice) {
         gameState = selectChain(gameState, choice.chainIndex);
         moveCount++;
-      } else if (
-        gameState.phase === 'selectChain' &&
-        gameState.drawnChains
-      ) {
+      } else if (gameState.phase === 'selectChain' && gameState.drawnChains) {
         // Soft-lock guard: never leave Red on selectChain with no pick.
         gameState = selectChain(gameState, 0);
         moveCount++;

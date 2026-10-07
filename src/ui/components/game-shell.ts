@@ -444,8 +444,7 @@ export function mountGameShell(
     }
 
     if (e.key !== 'Escape') return;
-    const helpWasOpen =
-      !!helpModal && !helpModal.classList.contains('hidden');
+    const helpWasOpen = !!helpModal && !helpModal.classList.contains('hidden');
     const newGameWasOpen =
       !!newGameModal && !newGameModal.classList.contains('hidden');
     if (!helpWasOpen && !newGameWasOpen) return;
@@ -467,8 +466,7 @@ export function mountGameShell(
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () =>
-      openShellModal(helpModal, helpFocus, helpBtn);
+    const openHelpModal = () => openShellModal(helpModal, helpFocus, helpBtn);
     const closeHelpModal = () => closeShellModal(helpModal, helpFocus);
 
     helpBtn.addEventListener('click', openHelpModal);
