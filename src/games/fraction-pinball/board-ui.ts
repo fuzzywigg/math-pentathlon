@@ -61,6 +61,7 @@ export function renderChallenge(
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'pinball-choice-btn';
+      btn.type = 'button';
       btn.textContent = choice;
       btn.setAttribute('aria-label', `Answer ${choice}`);
       if (allowInput) {

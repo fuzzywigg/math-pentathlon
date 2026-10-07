@@ -50,6 +50,12 @@ describe('Shell/menu a11y keepers — focus-visible on primary nav/menu', () => 
     expect(styleCss).toMatch(/\.modal-close:focus-visible\s*\{/);
     expect(styleCss).toMatch(/\.collapse-toggle:focus-visible\s*\{/);
   });
+
+  it('declares board/in-game :focus-visible rings for gridcells and role=button', () => {
+    expect(styleCss).toMatch(/\[role=['"]gridcell['"]\]:focus-visible/);
+    expect(styleCss).toMatch(/#board \[role=['"]button['"]\]:focus-visible/);
+    expect(styleCss).toMatch(/svg \[role=['"]gridcell['"]\]:focus-visible/);
+  });
 });
 
 describe('Shell/menu a11y keepers — reduced motion for menu chrome', () => {

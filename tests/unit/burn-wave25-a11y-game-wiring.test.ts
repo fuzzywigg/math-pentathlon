@@ -302,11 +302,20 @@ describe('Wave 25 a11y-game-wiring — button-pattern boards (non-grid)', () => 
     const container = document.createElement('div');
     document.body.appendChild(container);
     renderCalla(createCalla(), container, () => undefined);
+    // Only valid (current-player) pits are keyboard buttons; others stay labeled.
     const buttons = container.querySelectorAll('[role="button"]');
-    expect(buttons.length).toBeGreaterThan(5);
-    for (const el of Array.from(buttons).slice(0, 4)) {
-      expect(el.getAttribute('aria-label')).toBeTruthy();
+    expect(buttons.length).toBe(5);
+    for (const el of Array.from(buttons)) {
+      expect(el.getAttribute('aria-label')).toMatch(/valid move/i);
       expect(el.getAttribute('tabindex')).toBe('0');
+    }
+    const inert = container.querySelectorAll(
+      '.calla-pit:not([role="button"])'
+    );
+    expect(inert.length).toBe(5);
+    for (const el of Array.from(inert)) {
+      expect(el.getAttribute('aria-label')).toBeTruthy();
+      expect(el.getAttribute('tabindex')).toBeNull();
     }
   });
 });

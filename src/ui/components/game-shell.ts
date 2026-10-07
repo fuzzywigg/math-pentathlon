@@ -68,6 +68,105 @@ function escapeAttr(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
+/** True when the element (and ancestors up to `root`) are not display:none / hidden. */
+function isDisplayedWithin(el: HTMLElement, root: HTMLElement): boolean {
+  let cur: HTMLElement | null = el;
+  while (cur && cur !== root) {
+    if (cur.classList.contains('hidden') || cur.hasAttribute('hidden')) {
+      return false;
+    }
+    if (cur.style.display === 'none') return false;
+    cur = cur.parentElement;
+  }
+  return true;
+}
+
+/** Focusable controls inside an open modal (jsdom-safe; skips nested hidden). */
+function getModalFocusables(modal: HTMLElement): HTMLElement[] {
+  const selector =
+    'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  return Array.from(modal.querySelectorAll<HTMLElement>(selector)).filter(
+    (el) => {
+      if (el.getAttribute('aria-disabled') === 'true') return false;
+      return isDisplayedWithin(el, modal);
+    }
+  );
+}
+
+function ensureModalDialogSemantics(modal: HTMLElement): void {
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  const title = modal.querySelector('h2');
+  if (title) {
+    if (!title.id) {
+      title.id = `${modal.id || 'game-modal'}-title`;
+    }
+    modal.setAttribute('aria-labelledby', title.id);
+  }
+}
+
+type ModalFocusState = {
+  restoreEl: HTMLElement | null;
+};
+
+function openShellModal(
+  modal: HTMLElement,
+  state: ModalFocusState,
+  opener: HTMLElement | null
+): void {
+  ensureModalDialogSemantics(modal);
+  state.restoreEl =
+    opener ??
+    (document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null);
+  modal.classList.remove('hidden');
+  const focusables = getModalFocusables(modal);
+  // Prefer primary action when present; otherwise first control (often Close).
+  const startBtn = modal.querySelector<HTMLElement>('#start-game-btn');
+  const target =
+    (startBtn && isDisplayedWithin(startBtn, modal) ? startBtn : null) ??
+    focusables[0] ??
+    modal;
+  if (target === modal && !modal.hasAttribute('tabindex')) {
+    modal.setAttribute('tabindex', '-1');
+  }
+  target.focus();
+}
+
+function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
+  if (modal.classList.contains('hidden')) return;
+  modal.classList.add('hidden');
+  const restore = state.restoreEl;
+  state.restoreEl = null;
+  if (restore && document.contains(restore)) {
+    restore.focus();
+  }
+}
+
+/** Keep Tab / Shift+Tab inside an open modal (focus trap). */
+function trapModalTabKey(e: KeyboardEvent, modal: HTMLElement): void {
+  if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
+  const focusables = getModalFocusables(modal);
+  if (focusables.length === 0) {
+    e.preventDefault();
+    modal.focus();
+    return;
+  }
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+  const active = document.activeElement;
+  if (e.shiftKey) {
+    if (active === first || !modal.contains(active)) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else if (active === last || !modal.contains(active)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 function buildModeOption(
   mode: GameMode,
   radioName: string,
@@ -241,28 +340,18 @@ export function mountGameShell(
     });
   }
 
-  const closeNewGameModal = () => {
-    if (!newGameModal || newGameModal.classList.contains('hidden')) return;
-    newGameModal.classList.add('hidden');
-    newGameBtn?.focus();
-  };
+  const newGameFocus: ModalFocusState = { restoreEl: null };
+  const helpFocus: ModalFocusState = { restoreEl: null };
 
-  const closeHelpModal = () => {
-    if (!helpModal || helpModal.classList.contains('hidden')) return;
-    helpModal.classList.add('hidden');
-    helpBtn?.focus();
-  };
+  // Pre-declare dialog semantics so closed modals still expose roles to AT trees.
+  // Markup also ships role/aria from #437; ensureModalDialogSemantics is idempotent.
+  if (newGameModal) ensureModalDialogSemantics(newGameModal);
+  if (helpModal) ensureModalDialogSemantics(helpModal);
 
-  // New Game open — move focus into the dialog for keyboard / SR order
+  // New Game open — focus trap + restore (#448)
   if (newGameBtn && newGameModal) {
     newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-      const focusTarget =
-        (newGameModal.querySelector('.modal-close') as HTMLElement | null) ??
-        (newGameModal.querySelector(
-          '#new-game-modal-title'
-        ) as HTMLElement | null);
-      focusTarget?.focus();
+      openShellModal(newGameModal, newGameFocus, newGameBtn);
     });
   }
 
@@ -287,6 +376,10 @@ export function mountGameShell(
       difficultySection.style.display =
         selectedMode === 'human-vs-ai' ? 'block' : 'none';
     }
+
+    const closeNewGameModal = () => {
+      closeShellModal(newGameModal, newGameFocus);
+    };
 
     modeOptions.forEach((option) => {
       option.addEventListener('click', () => {
@@ -342,17 +435,29 @@ export function mountGameShell(
     });
   }
 
-  // Help modal + Escape — close every open shell dialog, then focus an opener
-  const escapeHandler = (e: KeyboardEvent) => {
+  // Tab trap (#448) + Escape closes every open shell dialog (#437)
+  const keydownHandler = (e: KeyboardEvent) => {
+    if (helpModal && !helpModal.classList.contains('hidden')) {
+      trapModalTabKey(e, helpModal);
+    } else if (newGameModal && !newGameModal.classList.contains('hidden')) {
+      trapModalTabKey(e, newGameModal);
+    }
+
     if (e.key !== 'Escape') return;
     const helpWasOpen =
       !!helpModal && !helpModal.classList.contains('hidden');
     const newGameWasOpen =
       !!newGameModal && !newGameModal.classList.contains('hidden');
     if (!helpWasOpen && !newGameWasOpen) return;
-    // Hide without per-modal focus restore; pick one opener below.
-    if (helpWasOpen) helpModal!.classList.add('hidden');
-    if (newGameWasOpen) newGameModal!.classList.add('hidden');
+    // Hide without per-modal focus restore; pick one opener below (#437).
+    if (helpWasOpen) {
+      helpModal!.classList.add('hidden');
+      helpFocus.restoreEl = null;
+    }
+    if (newGameWasOpen) {
+      newGameModal!.classList.add('hidden');
+      newGameFocus.restoreEl = null;
+    }
     if (helpWasOpen) {
       helpBtn?.focus();
     } else {
@@ -362,13 +467,9 @@ export function mountGameShell(
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () => {
-      helpModal.classList.remove('hidden');
-      const focusTarget =
-        (modalClose as HTMLElement | null) ??
-        (helpModal.querySelector('#help-modal-title') as HTMLElement | null);
-      focusTarget?.focus();
-    };
+    const openHelpModal = () =>
+      openShellModal(helpModal, helpFocus, helpBtn);
+    const closeHelpModal = () => closeShellModal(helpModal, helpFocus);
 
     helpBtn.addEventListener('click', openHelpModal);
     modalClose?.addEventListener('click', closeHelpModal);
@@ -379,10 +480,10 @@ export function mountGameShell(
     });
   }
 
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', keydownHandler);
 
   const cleanup = () => {
-    document.removeEventListener('keydown', escapeHandler);
+    document.removeEventListener('keydown', keydownHandler);
     clearGameModeChrome(container);
   };
 
