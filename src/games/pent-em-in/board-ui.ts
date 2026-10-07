@@ -490,7 +490,8 @@ export function renderPlaceControls(
 
   const otherBtn = document.createElement('button');
   otherBtn.type = 'button';
-  otherBtn.className = 'pent-btn pent-btn-choose-other';
+  // Keep .pent-btn-cancel for legacy overnight selectors; choose-other is the UX label.
+  otherBtn.className = 'pent-btn pent-btn-cancel pent-btn-choose-other';
   otherBtn.textContent = fitsAnywhere
     ? 'Choose another piece'
     : "Can't fit — choose another";

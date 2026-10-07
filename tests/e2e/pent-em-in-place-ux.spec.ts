@@ -2,9 +2,7 @@
  * Tablet place-piece UX: legal highlights + choose-another escape
  * for the playtest "Place the … piece" dead-end.
  */
-import { test, expect, devices, type Page } from '@playwright/test';
-
-const iPad = devices['iPad Mini'];
+import { test, expect, type Page } from '@playwright/test';
 
 async function dismissOwlIfNeeded(page: Page) {
   const dismiss = page.locator(
@@ -20,17 +18,11 @@ async function dismissOwlIfNeeded(page: Page) {
 }
 
 test.describe("Pent'Em In place UX (tablet)", () => {
-  test.use({
-    ...iPad,
-    viewport: { width: 768, height: 1024 },
-    deviceScaleFactor: 2,
-    hasTouch: true,
-    isMobile: true,
-  });
-
   test('crowded place step shows green anchors and choose-another escape', async ({
     page,
   }) => {
+    // iPad Mini–sized touch profile without forcing a new Playwright worker
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto('/#/game/pent-em-in');
     await expect(page.getByTestId('game-loading')).toBeHidden({
       timeout: 15_000,
