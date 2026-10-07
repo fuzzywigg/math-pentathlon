@@ -422,13 +422,20 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
 // Board Rendering
 // =============================================================================
 
+export interface StarsBoardRenderOptions {
+  /** When false, suppress placement highlights and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render the game board
  */
 export function renderBoard(
   state: StarsState,
-  onCellClick: (row: number, col: number) => void
+  onCellClick: (row: number, col: number) => void,
+  options: StarsBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'stars-board-container';
 
@@ -437,7 +444,9 @@ export function renderBoard(
   markBoardAsGrid(board);
 
   const validPlacements =
-    state.phase === 'placingCard' ? getValidPlacements(state) : [];
+    allowInput && state.phase === 'placingCard'
+      ? getValidPlacements(state)
+      : [];
   const validSet = new Set(validPlacements.map((p) => `${p.row},${p.col}`));
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
@@ -562,8 +571,10 @@ function calculatePreviewScore(
 export function renderPlayerHand(
   state: StarsState,
   player: Player,
-  onCardClick: (cardId: string) => void
+  onCardClick: (cardId: string) => void,
+  options: StarsBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'stars-hand-container';
 
@@ -582,7 +593,7 @@ export function renderPlayerHand(
     const cardEl = document.createElement('div');
     cardEl.className = 'stars-card';
 
-    if (!isCurrentPlayer || state.phase === 'gameOver') {
+    if (!isCurrentPlayer || state.phase === 'gameOver' || !allowInput) {
       cardEl.classList.add('disabled');
     }
 
@@ -597,7 +608,8 @@ export function renderPlayerHand(
     const attrs = `${card.size} ${card.thickness} ${card.color} ${card.shape}`;
     cardEl.title = attrs;
 
-    const canSelect = isCurrentPlayer && state.phase !== 'gameOver';
+    const canSelect =
+      allowInput && isCurrentPlayer && state.phase !== 'gameOver';
     if (canSelect) {
       const activate = () => onCardClick(card.id);
       cardEl.addEventListener('click', activate);

@@ -10,7 +10,7 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, AIDifficulty } from './ai';
+import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderPlayerHand,
@@ -32,6 +32,15 @@ function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
   if (!root) return;
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+}
+
+/** True while it is the computer's seat (including the 800ms think pause). */
+function isComputerTurnPending(controller: StarsGameController): boolean {
+  return isAITurn(
+    controller.state,
+    controller.aiPlayer,
+    controller.isAI ? 'human-vs-ai' : 'human-vs-human'
+  );
 }
 
 // =============================================================================
@@ -105,10 +114,14 @@ function updateUI(controller: StarsGameController): void {
   status.className = `stars-status ${state.currentPlayer}`;
   markStatusLive(status);
 
+  const computerTurn = isComputerTurnPending(controller);
+
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.playerScores[state.winner]} points!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
+  } else if (computerTurn) {
+    status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingCard') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a card`;
   } else if (state.phase === 'placingCard') {
@@ -135,23 +148,34 @@ function updateUI(controller: StarsGameController): void {
   // Main layout
   const mainLayout = document.createElement('div');
   mainLayout.className = 'stars-main-layout';
+  const inputOpts = { allowInput: !computerTurn };
 
   // Player 1 hand
   mainLayout.appendChild(
-    renderPlayerHand(state, 'player1', (cardId) =>
-      handleCardClick(controller, cardId)
+    renderPlayerHand(
+      state,
+      'player1',
+      (cardId) => handleCardClick(controller, cardId),
+      inputOpts
     )
   );
 
   // Board
   mainLayout.appendChild(
-    renderBoard(state, (row, col) => handleCellClick(controller, row, col))
+    renderBoard(
+      state,
+      (row, col) => handleCellClick(controller, row, col),
+      inputOpts
+    )
   );
 
   // Player 2 hand
   mainLayout.appendChild(
-    renderPlayerHand(state, 'player2', (cardId) =>
-      handleCardClick(controller, cardId)
+    renderPlayerHand(
+      state,
+      'player2',
+      (cardId) => handleCardClick(controller, cardId),
+      inputOpts
     )
   );
 
@@ -166,22 +190,28 @@ function updateUI(controller: StarsGameController): void {
   const controls = document.createElement('div');
   controls.className = 'stars-controls';
 
-  if (state.selectedCard) {
+  if (state.selectedCard && !computerTurn) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'stars-btn stars-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+  if (
+    !hasValidMoves(state) &&
+    state.phase !== 'gameOver' &&
+    !computerTurn
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'stars-btn stars-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -212,6 +242,7 @@ function handleCardClick(
   controller: StarsGameController,
   cardId: string
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = selectCard(controller.state, cardId);
   controller.update();
 }
@@ -224,6 +255,7 @@ function handleCellClick(
   row: number,
   col: number
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = placeCard(controller.state, row, col);
   controller.update();
 }
