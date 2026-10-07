@@ -217,6 +217,7 @@ All of the above: GitHub **MERGEABLE / CLEAN** vs declared base; **NO_CI** (empt
 | #484 | #476 | Yes → tip | merge rehearsal (docs; path = wave5 tip alone → α) |
 | #435 | alpha | Yes → tip | CI `cursor/**` PR triggers + checkout hardening |
 | #485 | #476 | Yes → tip | standalone triage (#355 partial/#414/#420/#459/#468 harness/#481); no #468 AI retunes |
+| #481 | polish | Yes → tip | unit flake hunt final head (FIAR timers + setup owl reset; via #485 then tip sync) |
 | tip | #466 | **Current tip** | `cursor/integration-fold-wave5-tip-4af0` |
 
 ---
