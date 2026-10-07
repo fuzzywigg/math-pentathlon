@@ -8,6 +8,78 @@ import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
 export type AIDifficultyLevel = 'easy' | 'medium' | 'hard';
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+/** True when the element is not inside a hidden/inert/display:none ancestor. */
+export function isKeyboardReachable(el: Element): boolean {
+  let node: Element | null = el;
+  while (node && node !== document.documentElement) {
+    if (node instanceof HTMLElement) {
+      if (node.hasAttribute('hidden') || node.hasAttribute('inert')) {
+        return false;
+      }
+      if (node.classList.contains('hidden')) return false;
+      const { display, visibility } = node.style;
+      if (display === 'none' || visibility === 'hidden') return false;
+    }
+    node = node.parentElement;
+  }
+  return true;
+}
+
+/** Focusable controls inside a dialog (skips hidden difficulty section, etc.). */
+export function getFocusableWithin(root: Element): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  ).filter((el) => isKeyboardReachable(el));
+}
+
+function focusFirstIn(root: HTMLElement): void {
+  const items = getFocusableWithin(root);
+  const target = items[0] ?? root;
+  if (typeof target.focus === 'function') {
+    target.focus();
+  }
+}
+
+function restoreFocus(trigger: HTMLElement | null): void {
+  if (!trigger || typeof trigger.focus !== 'function') return;
+  // Defer so display:none on the modal settles before moving focus.
+  queueMicrotask(() => {
+    if (document.contains(trigger)) {
+      trigger.focus();
+    }
+  });
+}
+
+/** Keep Tab cycling inside an open dialog. */
+export function trapTabKey(modal: HTMLElement, e: KeyboardEvent): void {
+  if (e.key !== 'Tab') return;
+  const items = getFocusableWithin(modal);
+  if (items.length === 0) return;
+
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+
+  if (e.shiftKey) {
+    if (active === first || !modal.contains(active)) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else if (active === last || !modal.contains(active)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
 export interface GameShellOptions {
   title: string;
   helpTitle: string;
@@ -177,10 +249,10 @@ function buildShellHtml(options: GameShellOptions): string {
       <button id="help-btn" type="button">How to Play</button>
     </nav>${statusBlock}
     ${gameAreaBlock}
-    <div id="new-game-modal" class="modal hidden">
+    <div id="new-game-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="new-game-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>New Game</h2>
+        <h2 id="new-game-modal-title">New Game</h2>
         <div class="mode-selector">
           <h3>Choose Game Mode</h3>
           <div class="mode-options">
@@ -190,10 +262,10 @@ ${modeOptionsHtml}
         </div>
       </div>
     </div>
-    <div id="help-modal" class="modal hidden">
+    <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>${escapeAttr(options.helpTitle)}</h2>
+        <h2 id="help-modal-title">${escapeAttr(options.helpTitle)}</h2>
         <div class="rules-content">
           ${options.helpContentHtml}
         </div>
@@ -227,6 +299,8 @@ export function mountGameShell(
   let selectedMode: GameMode = options.defaultMode ?? 'human-vs-human';
   let selectedDifficulty: AIDifficultyLevel =
     options.defaultDifficulty ?? 'medium';
+  /** Last control that opened a shell dialog (for focus restore on close). */
+  let lastModalTrigger: HTMLElement | null = null;
 
   // Mode chrome for CSS / board-ui branching (vs-AI purple vs 2P red/blue).
   // defaultMode only selects the modal radio — games init as human until Start.
@@ -241,12 +315,29 @@ export function mountGameShell(
     });
   }
 
-  // New Game open
-  if (newGameBtn && newGameModal) {
-    newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
-    });
-  }
+  const isModalOpen = (modal: HTMLElement | null): boolean =>
+    !!modal && !modal.classList.contains('hidden');
+
+  const openModal = (modal: HTMLElement, trigger: HTMLElement | null) => {
+    lastModalTrigger =
+      trigger ??
+      (document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null);
+    modal.classList.remove('hidden');
+    queueMicrotask(() => focusFirstIn(modal));
+  };
+
+  const closeModal = (modal: HTMLElement | null, restore = true) => {
+    if (!isModalOpen(modal) || !modal) return;
+    modal.classList.add('hidden');
+    if (!restore) return;
+    // Only restore when no other shell dialog remains open.
+    if (isModalOpen(helpModal) || isModalOpen(newGameModal)) return;
+    const trigger = lastModalTrigger;
+    lastModalTrigger = null;
+    restoreFocus(trigger);
+  };
 
   // New Game modal wiring
   if (newGameModal) {
@@ -270,9 +361,11 @@ export function mountGameShell(
         selectedMode === 'human-vs-ai' ? 'block' : 'none';
     }
 
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
+    if (newGameBtn) {
+      newGameBtn.addEventListener('click', () => {
+        openModal(newGameModal, newGameBtn);
+      });
+    }
 
     modeOptions.forEach((option) => {
       option.addEventListener('click', () => {
@@ -298,7 +391,7 @@ export function mountGameShell(
     });
 
     startGameBtn?.addEventListener('click', () => {
-      closeNewGameModal();
+      closeModal(newGameModal, true);
       applyGameModeChrome(container, selectedMode);
       options.onStartGame(
         selectedMode,
@@ -306,11 +399,14 @@ export function mountGameShell(
       );
     });
 
-    modalClose?.addEventListener('click', closeNewGameModal);
+    modalClose?.addEventListener('click', () => closeModal(newGameModal, true));
     newGameModal.addEventListener('click', (e) => {
       if (e.target === newGameModal) {
-        closeNewGameModal();
+        closeModal(newGameModal, true);
       }
+    });
+    newGameModal.addEventListener('keydown', (e) => {
+      trapTabKey(newGameModal, e as KeyboardEvent);
     });
   }
 
@@ -328,21 +424,24 @@ export function mountGameShell(
     });
   }
 
-  // Help modal + Escape
+  // Help modal + Escape (closes any open shell dialogs, restores trigger focus)
   const escapeHandler = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
-    if (helpModal && !helpModal.classList.contains('hidden')) {
-      helpModal.classList.add('hidden');
-    }
-    if (newGameModal && !newGameModal.classList.contains('hidden')) {
-      newGameModal.classList.add('hidden');
-    }
+    const helpOpen = isModalOpen(helpModal);
+    const newOpen = isModalOpen(newGameModal);
+    if (!helpOpen && !newOpen) return;
+    e.preventDefault();
+    if (helpOpen && helpModal) helpModal.classList.add('hidden');
+    if (newOpen && newGameModal) newGameModal.classList.add('hidden');
+    const trigger = lastModalTrigger;
+    lastModalTrigger = null;
+    restoreFocus(trigger);
   };
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () => helpModal.classList.remove('hidden');
-    const closeHelpModal = () => helpModal.classList.add('hidden');
+    const openHelpModal = () => openModal(helpModal, helpBtn);
+    const closeHelpModal = () => closeModal(helpModal, true);
 
     helpBtn.addEventListener('click', openHelpModal);
     modalClose?.addEventListener('click', closeHelpModal);
@@ -350,6 +449,9 @@ export function mountGameShell(
       if (e.target === helpModal) {
         closeHelpModal();
       }
+    });
+    helpModal.addEventListener('keydown', (e) => {
+      trapTabKey(helpModal, e as KeyboardEvent);
     });
   }
 

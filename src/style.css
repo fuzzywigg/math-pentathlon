@@ -947,7 +947,12 @@ h1 {
 .back-button:focus-visible,
 #new-game-btn:focus-visible,
 #help-btn:focus-visible,
-#tutorial-btn:focus-visible {
+#tutorial-btn:focus-visible,
+.modal-close:focus-visible,
+.difficulty-btn:focus-visible,
+.start-game-btn:focus-visible,
+.collapse-toggle:focus-visible,
+.mode-option:focus-within {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -1670,6 +1675,10 @@ h1 {
   border-color: var(--color-primary-light);
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
+}
+
+.division-tab:focus {
+  outline: none;
 }
 
 .division-tab:focus-visible {
