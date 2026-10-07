@@ -23,10 +23,10 @@ import {
   injectPentEmInStyles,
 } from './board-ui';
 import { Cell } from '../../core/polyomino/types';
-import { getAIMove, AIDifficulty } from './ai';
+import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadPentEmInBoard3DModule } from './board-3d-loader';
@@ -36,6 +36,11 @@ function syncOpponentChrome(): void {
   const root = document.getElementById('app');
   if (!root) return;
   applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
+
+/** True while it is the computer's seat (including the think pause). */
+function isComputerTurnPending(): boolean {
+  return isAITurn(gameState, isAIMode ? 'player2' : null);
 }
 
 // =============================================================================
@@ -107,11 +112,18 @@ function onBoard3dContextLost(): void {
 function render(): void {
   if (!boardContainer || !statusContainer) return;
 
+  const inputOpts = { allowInput: !isComputerTurnPending() };
+
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
     boardContainer.innerHTML = '';
-    const svg = renderBoard(gameState, handleCellClick, handleCellHover);
+    const svg = renderBoard(
+      gameState,
+      handleCellClick,
+      handleCellHover,
+      inputOpts
+    );
     boardContainer.appendChild(svg);
   }
   // If 3D is enabled but still loading, skip board paint until ready.
@@ -121,11 +133,17 @@ function render(): void {
 
 function renderBoardOnly(): void {
   if (!boardContainer) return;
+  const inputOpts = { allowInput: !isComputerTurnPending() };
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
     boardContainer.innerHTML = '';
-    const svg = renderBoard(gameState, handleCellClick, handleCellHover);
+    const svg = renderBoard(
+      gameState,
+      handleCellClick,
+      handleCellHover,
+      inputOpts
+    );
     boardContainer.appendChild(svg);
   }
 }
@@ -144,25 +162,35 @@ function renderStatusAndControls(): void {
     return;
   }
 
+  const computerTurn = isComputerTurnPending();
+
   // Current player status
   const status = document.createElement('div');
   status.className = `pent-status ${gameState.currentPlayer}`;
 
-  if (gameState.phase === 'selectPiece') {
+  if (computerTurn) {
+    status.textContent = `${seatIcon(gameState.currentPlayer)} Computer is thinking…`;
+  } else if (gameState.phase === 'selectPiece') {
     status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Select a piece`;
   } else if (gameState.phase === 'placePiece') {
     status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Place the ${gameState.selectedPiece} piece`;
   }
   statusContainer.appendChild(status);
 
-  // Piece selector (in select phase)
+  // Piece selector (in select phase) — disabled chrome during computer seat
   if (gameState.phase === 'selectPiece') {
-    const selector = renderPieceSelector(gameState, handlePieceSelect);
+    const selector = renderPieceSelector(gameState, handlePieceSelect, {
+      allowInput: !computerTurn,
+    });
     statusContainer.appendChild(selector);
   }
 
-  // Controls (in place phase)
-  if (gameState.phase === 'placePiece' && gameState.selectedPiece) {
+  // Controls (in place phase) — hide while computer thinks
+  if (
+    !computerTurn &&
+    gameState.phase === 'placePiece' &&
+    gameState.selectedPiece
+  ) {
     const controls = document.createElement('div');
     controls.className = 'pent-controls';
 
@@ -216,27 +244,32 @@ function renderStatusAndControls(): void {
 // =============================================================================
 
 function handlePieceSelect(shapeId: string): void {
+  if (isComputerTurnPending()) return;
   if (gameState.phase !== 'selectPiece') return;
   gameState = selectPiece(gameState, shapeId);
   render();
 }
 
 function handleRotate(): void {
+  if (isComputerTurnPending()) return;
   gameState = rotateSelectedPiece(gameState);
   render();
 }
 
 function handleFlip(): void {
+  if (isComputerTurnPending()) return;
   gameState = flipSelectedPiece(gameState);
   render();
 }
 
 function handleCancel(): void {
+  if (isComputerTurnPending()) return;
   gameState = cancelSelection(gameState);
   render();
 }
 
 function handleCellClick(cell: Cell): void {
+  if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placePiece' || !gameState.selectedPiece) return;
 
   if (
@@ -270,6 +303,7 @@ function handleCellClick(cell: Cell): void {
 }
 
 function handleCellHover(cell: Cell | null): void {
+  if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placePiece') return;
   const prev = gameState.previewPosition;
   if (
