@@ -23,7 +23,7 @@ export function pickIndex(rng: () => number, length: number): number {
 }
 
 export function pickOne<T>(rng: () => number, items: T[]): T {
-  return items[pickIndex(rng, items.length)];
+  return items[pickIndex(rng, items.length)] as T;
 }
 
 /** Temporarily replace Math.random; always restore in finally. */

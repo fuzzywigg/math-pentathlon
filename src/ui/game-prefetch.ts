@@ -88,6 +88,7 @@ export function prefetchGameChunk(gameId: string): void {
   started.add(gameId);
   if (!shouldExecutePrefetchImport()) return;
   const load = loaders[gameId];
+  if (!load) return;
   void load().catch(() => {
     started.delete(gameId);
   });

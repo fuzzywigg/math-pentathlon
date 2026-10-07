@@ -20,7 +20,7 @@ describe('Wave 56 workflow — CI unit job', () => {
     expect(yml).toMatch(/^\s+e2e:\s*$/m);
     expect(yml).toMatch(/npm run test:unit/);
     expect(yml).toMatch(/npm run test:e2e/);
-    expect(yml).toMatch(/npx tsc --noEmit/);
+    expect(yml).toMatch(/npm run typecheck/);
     // Slice modules remain in-tree under CI's unit gate
     expect(yml).not.toMatch(/skip.*test:unit/i);
   });

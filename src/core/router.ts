@@ -62,7 +62,10 @@ export function getPathParams(
 
   const params: Record<string, string> = {};
   paramNames.forEach((name, index) => {
-    params[name] = match[index + 1];
+    const value = match[index + 1];
+    if (value !== undefined) {
+      params[name] = value;
+    }
   });
 
   return params;

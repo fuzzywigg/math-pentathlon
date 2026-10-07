@@ -383,8 +383,8 @@ export function animateRoll(
     if (elapsed < motionDuration) {
       // Update each die with random value
       dieElements.forEach((wrapper, index) => {
-        const die = finalResult.rolls[index];
-        const config = DICE_CONFIGS[die.diceType];
+        const die = finalResult.rolls[index]!;
+        const config = DICE_CONFIGS[die.diceType]!;
         const randomValue = Math.ceil(Math.random() * config.faces);
         const tempDie: DieRoll = { ...die, value: randomValue };
 
@@ -394,6 +394,7 @@ export function animateRoll(
 
       setTimeout(animate, interval);
     } else {
+      // Prefer shared finish() so reduced-motion + rolling cleanup stay consistent (#495).
       finish();
     }
   };

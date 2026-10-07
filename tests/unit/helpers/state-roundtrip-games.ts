@@ -1144,4 +1144,4 @@ export const ALL_GAME_ADAPTERS: GameFuzzAdapter[] = [
   starTrack,
   starsBars,
   sumDominoes,
-];
+] as GameFuzzAdapter[];

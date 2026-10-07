@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "vite.shell-chunks.ts",
+    "tests/helpers/**/*.ts",
+    "tests/unit/helpers/**/*.ts",
+    "tests/e2e/helpers/**/*.ts",
+    "tests/visual/helpers.ts",
+    "tests/unit/ai-determinism-helpers.ts",
+    "tests/unit/engine-invariants-helpers.ts",
+    "tests/unit/undo-audit-helpers.ts",
+    "tests/unit/fiar-test-helpers.ts"
+  ]
+}

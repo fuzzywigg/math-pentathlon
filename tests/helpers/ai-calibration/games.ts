@@ -19,13 +19,15 @@ const MAX_PLIES = 400;
  * - Default: seeded only (no deadline) — full search, slower but ordered.
  */
 function searchOptions(seed: number, ply: number) {
-  const wall = process.env.CALIBRATION_WALL_CLOCK === '1';
+  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } })
+    .process?.env;
+  const wall = env?.CALIBRATION_WALL_CLOCK === '1';
   if (!wall) {
     return { seed: plySeed(seed, ply) };
   }
   return {
     seed: plySeed(seed, ply),
-    deadlineMs: Number(process.env.CALIBRATION_DEADLINE_MS ?? 300),
+    deadlineMs: Number(env?.CALIBRATION_DEADLINE_MS ?? 300),
   };
 }
 
@@ -406,7 +408,7 @@ const queens: GameAdapter = {
         const policy = seat === 'player1' ? p1 : p2;
         if (policy === 'random') {
           if (state.capturedPieces.length > 0) {
-            const from = state.capturedPieces[0];
+            const from = state.capturedPieces[0]!;
             const outer = queensConfig.NUM_RINGS - 1;
             const options: { ring: number; position: number }[] = [];
             for (let pos = 0; pos < cellsInRing(outer); pos++) {
@@ -437,7 +439,7 @@ const queens: GameAdapter = {
           if (!move) {
             // Deadline miss — legal random fallback (same as random policy path)
             if (state.capturedPieces.length > 0) {
-              const from = state.capturedPieces[0];
+              const from = state.capturedPieces[0]!;
               const outer = queensConfig.NUM_RINGS - 1;
               const options: { ring: number; position: number }[] = [];
               for (let pos = 0; pos < cellsInRing(outer); pos++) {
@@ -465,7 +467,7 @@ const queens: GameAdapter = {
               move = pickRandom(legal);
             }
           }
-          state = queensApply(state, move);
+          state = queensApply(state, move!);
         }
         length += 1;
       }
@@ -578,7 +580,7 @@ import {
   getPlayerPieces,
   getPentominoShape,
 } from '../../../src/games/pent-em-in/types';
-import type { Rotation } from '../../../src/games/pent-em-in/types';
+type Rotation = 0 | 90 | 180 | 270;
 
 const pent: GameAdapter = {
   id: 'pent-em-in',

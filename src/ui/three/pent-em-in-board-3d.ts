@@ -384,15 +384,14 @@ export async function createPentEmInBoard3D(
         btn.setAttribute('data-row', String(row));
         btn.setAttribute('data-col', String(col));
         const occupant = occupancy.get(`${row},${col}`) ?? null;
-        makeGridCell(
-          btn,
-          buildCellAriaLabel({
-            coord: `${row},${col}`,
-            empty: occupant === null,
-            owner: ownerLabel(occupant),
-            validPlacement: legalAnchors.has(`${row},${col}`),
-          })
-        );
+        const labelParts: Parameters<typeof buildCellAriaLabel>[0] = {
+          coord: `${row},${col}`,
+          empty: occupant === null,
+          validPlacement: legalAnchors.has(`${row},${col}`),
+        };
+        const owner = ownerLabel(occupant);
+        if (owner !== undefined) labelParts.owner = owner;
+        makeGridCell(btn, buildCellAriaLabel(labelParts));
         const activate = (): void => handler?.({ row, col });
         btn.addEventListener('click', activate);
         bindCellActivateKeys(btn, activate);

@@ -173,15 +173,15 @@ export function parseTime(str: string): number {
   const parts = str.split(':');
   if (parts.length === 3) {
     // HH:MM:SS
-    const h = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10);
-    const s = parseInt(parts[2], 10);
+    const h = parseInt(parts[0]!, 10);
+    const m = parseInt(parts[1]!, 10);
+    const s = parseInt(parts[2]!, 10);
     return (h * 3600 + m * 60 + s) * 1000;
   }
   // MM:SS or MM:SS.cs
-  const m = parseInt(parts[0], 10);
-  const secParts = parts[1].split('.');
-  const s = parseInt(secParts[0], 10);
+  const m = parseInt(parts[0]!, 10);
+  const secParts = parts[1]!.split('.');
+  const s = parseInt(secParts[0]!, 10);
   const cs = secParts[1]
     ? parseInt(secParts[1].padEnd(2, '0').slice(0, 2), 10)
     : 0;
@@ -334,7 +334,11 @@ export function addScore(
         total: newTotal,
         entries: [
           ...p.entries,
-          { amount: effective, reason, timestamp: Date.now() },
+          {
+            amount: effective,
+            ...(reason !== undefined ? { reason } : {}),
+            timestamp: Date.now(),
+          },
         ],
       };
     }),
@@ -417,7 +421,7 @@ export function getLeaderboard(
 export function getLeader(state: ScoringState): PlayerData | null {
   if (state.players.length === 0) return null;
   const lb = getLeaderboard(state);
-  return state.players.find((p) => p.playerId === lb[0].playerId) ?? null;
+  return state.players.find((p) => p.playerId === lb[0]?.playerId) ?? null;
 }
 
 /**
@@ -512,7 +516,8 @@ export function calculateGameResult(
     };
   }
 
-  const topScore = lb[0].total;
+  const top = lb[0]!;
+  const topScore = top.total;
   const tied = lb.filter((e) => e.total === topScore);
 
   if (tied.length > 1) {
@@ -527,8 +532,8 @@ export function calculateGameResult(
   }
 
   return {
-    winnerId: lb[0].playerId,
-    winnerName: lb[0].playerName,
+    winnerId: top.playerId,
+    winnerName: top.playerName,
     isTie: false,
     tiedPlayerIds: [],
     totalDuration,
@@ -540,7 +545,7 @@ export function calculateGameResult(
 export function getPointValue(state: ScoringState, key: string): number {
   const pv = state.config.pointValues;
   if (!pv) return 0;
-  if (key in pv) return pv[key];
+  if (key in pv) return pv[key] ?? 0;
   return pv['default'] ?? 0;
 }
 

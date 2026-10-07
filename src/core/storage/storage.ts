@@ -283,13 +283,13 @@ class StorageManager {
   }
 
   private getTodayString(): string {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split('T')[0] ?? '';
   }
 
   private getYesterdayString(): string {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split('T')[0];
+    return yesterday.toISOString().split('T')[0] ?? '';
   }
 
   // Achievement methods

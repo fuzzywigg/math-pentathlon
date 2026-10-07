@@ -195,7 +195,7 @@ export function generateAllPieces(
       return;
     }
 
-    const attr = attributes[index];
+    const attr = attributes[index]!;
     for (const value of attr.possibleValues) {
       current[attr.name] = value;
       generate(index + 1, current);

@@ -208,7 +208,7 @@ export function areCellsEquivalent(a: Cell[], b: Cell[]): boolean {
 export function nextRotation(current: Rotation): Rotation {
   const rotations: Rotation[] = [0, 90, 180, 270];
   const index = rotations.indexOf(current);
-  return rotations[(index + 1) % 4];
+  return rotations[(index + 1) % 4]!;
 }
 
 /**
@@ -217,7 +217,7 @@ export function nextRotation(current: Rotation): Rotation {
 export function prevRotation(current: Rotation): Rotation {
   const rotations: Rotation[] = [0, 90, 180, 270];
   const index = rotations.indexOf(current);
-  return rotations[(index + 3) % 4];
+  return rotations[(index + 3) % 4]!;
 }
 
 /**
@@ -297,7 +297,7 @@ export function areCellsConnected(cells: Cell[]): boolean {
 
   const cellSet = new Set(cells.map((c) => `${c.row},${c.col}`));
   const visited = new Set<string>();
-  const queue: Cell[] = [cells[0]];
+  const queue: Cell[] = [cells[0]!];
 
   while (queue.length > 0) {
     const current = queue.shift()!;

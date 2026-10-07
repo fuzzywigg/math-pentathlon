@@ -353,8 +353,15 @@ export function animateMove(
         return;
       }
 
-      const fromNode = graph.nodes.get(path[currentStep]);
-      const toNode = graph.nodes.get(path[currentStep + 1]);
+      const fromId = path[currentStep];
+      const toId = path[currentStep + 1];
+      if (fromId === undefined || toId === undefined) {
+        currentStep++;
+        animateStep();
+        return;
+      }
+      const fromNode = graph.nodes.get(fromId);
+      const toNode = graph.nodes.get(toId);
 
       if (!fromNode || !toNode) {
         currentStep++;
