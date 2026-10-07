@@ -50,11 +50,12 @@ function clickEmpty(board: HTMLElement, row = 5, col = 5): void {
 }
 
 describe('Hex deep playability', () => {
-  it('AI_THINKING_DELAY is 250ms (paint only; search budgets unchanged)', () => {
+  it('AI_THINKING_DELAY is 250ms (paint only; Hard deadline 450ms)', () => {
     expect(controllerSrc).toMatch(/AI_THINKING_DELAY\s*=\s*250/);
     expect(ai.AI_PLAY_DEADLINE_MS.easy).toBe(600);
     expect(ai.AI_PLAY_DEADLINE_MS.medium).toBe(1200);
-    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(2500);
+    // Hard wall-time box from ai-move-time audit (≤500ms think target).
+    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(450);
   });
 
   it('HvA status uses tap copy and You win! / Computer is thinking…', () => {
