@@ -38,18 +38,42 @@ export function performRoll(
   const roll = rollDice();
   const validIslands = findValidIslands(state, roll.total);
 
+  if (validIslands.length > 0) {
+    return {
+      ...state,
+      currentRoll: roll,
+      validIslands,
+      phase: 'selectIsland',
+      selectedIsland: null,
+    };
+  }
+
+  // No open islands — burn the turn. If that exhausts the match, end cleanly
+  // (previously turns could hit 0 via skips without ever reaching gameOver).
+  const turnsRemaining = state.turnsRemaining - 1;
+  if (turnsRemaining <= 0) {
+    let winner: Player | null = null;
+    if (state.player1Score > state.player2Score) winner = 'player1';
+    else if (state.player2Score > state.player1Score) winner = 'player2';
+    return {
+      ...state,
+      currentRoll: roll,
+      validIslands: [],
+      selectedIsland: null,
+      turnsRemaining: 0,
+      phase: 'gameOver',
+      winner,
+    };
+  }
+
   return {
     ...state,
     currentRoll: roll,
-    validIslands,
-    phase: validIslands.length > 0 ? 'selectIsland' : 'rolling',
-    // If no valid islands, automatically skip to next player
-    currentPlayer:
-      validIslands.length > 0
-        ? state.currentPlayer
-        : getOpponent(state.currentPlayer),
-    turnsRemaining:
-      validIslands.length > 0 ? state.turnsRemaining : state.turnsRemaining - 1,
+    validIslands: [],
+    selectedIsland: null,
+    phase: 'rolling',
+    currentPlayer: getOpponent(state.currentPlayer),
+    turnsRemaining,
   };
 }
 

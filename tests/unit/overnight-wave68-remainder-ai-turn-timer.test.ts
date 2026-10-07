@@ -63,7 +63,7 @@ describe('Wave 68 remainder — AI turn timer', () => {
     expect(getCurrentState().phase).toBe('rolling');
     expect(getCurrentState().currentPlayer).toBe('player2');
 
-    vi.advanceTimersByTime(800);
+    vi.advanceTimersByTime(450);
     expect(['selectIsland', 'rolling', 'gameOver']).toContain(
       getCurrentState().phase
     );
@@ -71,7 +71,7 @@ describe('Wave 68 remainder — AI turn timer', () => {
     if (getCurrentState().phase === 'selectIsland') {
       expect(getCurrentState().currentPlayer).toBe('player2');
       expect(getCurrentState().validIslands.length).toBeGreaterThan(0);
-      vi.advanceTimersByTime(800);
+      vi.advanceTimersByTime(550);
     }
 
     expect(['rolling', 'gameOver']).toContain(getCurrentState().phase);

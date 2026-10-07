@@ -34,6 +34,31 @@ let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Live-status flash when a roll finds no open islands (soft-lock UX). */
 let skipNotice: string | null = null;
+/** Pending AI think timers — cleared on remount / new game to avoid ghost moves. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+/** Bumps on every new game so stale AI callbacks cannot mutate a fresh match. */
+let aiGeneration = 0;
+
+/** Keep AI pacing snappy for full matches without feeling instant. */
+const AI_ROLL_DELAY_MS = 450;
+const AI_SELECT_DELAY_MS = 550;
+
+function clearAITimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAI(delayMs: number, action: () => void): void {
+  clearAITimer();
+  const gen = aiGeneration;
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    if (gen !== aiGeneration) return;
+    action();
+  }, delayMs);
+}
 
 // =============================================================================
 // Rendering
@@ -104,7 +129,7 @@ function render(): void {
       instruction.className = 'remainder-instruction';
       instruction.textContent = computerTurn
         ? 'Computer is choosing an island'
-        : 'Select an island to land on';
+        : 'Tap a highlighted island — remainder = your points';
       controls.appendChild(instruction);
 
       // Division preview
@@ -126,12 +151,12 @@ function render(): void {
 
   gameContainer.appendChild(wrapper);
 
-  // AI turn
+  // AI turn (single pending timer; generation-guarded against New Game races)
   if (computerTurn && gameState.phase !== 'gameOver') {
     if (gameState.phase === 'rolling') {
-      setTimeout(aiRoll, 800);
+      scheduleAI(AI_ROLL_DELAY_MS, aiRoll);
     } else if (gameState.phase === 'selectIsland') {
-      setTimeout(aiSelectIsland, 800);
+      scheduleAI(AI_SELECT_DELAY_MS, aiSelectIsland);
     }
   }
 }
@@ -204,14 +229,24 @@ function aiSelectIsland(): void {
   )
     return;
 
-  // Use AI module to get choice
+  // Prefer scored AI choice; fall back to the first island that still exists on the board.
   const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);
+  const islandId =
+    choice?.islandId ??
+    gameState.validIslands.find((id) =>
+      gameState.islands.some((island) => island.id === id)
+    );
+  if (!islandId) return;
 
-  if (choice) {
-    skipNotice = null;
-    gameState = selectIsland(gameState, choice.islandId);
-    render();
+  const before = gameState;
+  skipNotice = null;
+  gameState = selectIsland(gameState, islandId);
+  // Guard against a no-op select (ghost ids) re-scheduling forever.
+  if (gameState === before || gameState.phase === before.phase) {
+    gameState = before;
+    return;
   }
+  render();
 }
 
 // =============================================================================
@@ -219,15 +254,20 @@ function aiSelectIsland(): void {
 // =============================================================================
 
 export function initGame(containerEl: HTMLElement): void {
+  clearAITimer();
+  aiGeneration += 1;
   injectRemainderIslandsStyles();
   gameContainer = containerEl;
   gameState = createInitialState();
   isAIMode = false;
+  skipNotice = null;
   syncOpponentChrome();
   render();
 }
 
 export function newGameVsHuman(): void {
+  clearAITimer();
+  aiGeneration += 1;
   gameState = createInitialState();
   isAIMode = false;
   skipNotice = null;
@@ -236,12 +276,19 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  clearAITimer();
+  aiGeneration += 1;
   gameState = createInitialState();
   isAIMode = true;
   skipNotice = null;
   syncOpponentChrome();
   aiDifficulty = difficulty;
   render();
+}
+
+/** Test/helper: AI think delays used by the controller orchestration. */
+export function getAIThinkDelays(): { rollMs: number; selectMs: number } {
+  return { rollMs: AI_ROLL_DELAY_MS, selectMs: AI_SELECT_DELAY_MS };
 }
 
 export function getCurrentState(): RemainderIslandsState {

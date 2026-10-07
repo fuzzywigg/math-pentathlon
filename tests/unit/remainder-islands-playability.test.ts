@@ -7,6 +7,7 @@ import {
   newGameVsAI,
   newGameVsHuman,
   getCurrentState,
+  getAIThinkDelays,
 } from '../../src/games/remainder-islands/game-controller';
 import { createInitialState } from '../../src/games/remainder-islands/types';
 import { renderBoard } from '../../src/games/remainder-islands/board-ui';
@@ -115,7 +116,7 @@ describe('Remainder Islands playability — no human input on AI turn (#374)', (
     const p2Score = getCurrentState().player2Score;
     const historyLen = getCurrentState().moveHistory.length;
 
-    vi.advanceTimersByTime(800);
+    vi.advanceTimersByTime(getAIThinkDelays().rollMs);
     if (getCurrentState().phase === 'selectIsland') {
       expect(getCurrentState().currentPlayer).toBe('player2');
       expect(container.querySelector('.remainder-btn-roll')).toBeNull();
