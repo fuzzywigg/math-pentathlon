@@ -11,11 +11,14 @@ import {
   rotateShape,
   flipShape,
   placeShape,
+  passTurn,
+  shouldOfferPass,
 } from './rules';
 import {
   getAIDieChoice,
   getAIShapeChoice,
   getAIPlacement,
+  executeAITurn,
   AIDifficulty,
 } from './ai';
 import {
@@ -23,6 +26,7 @@ import {
   renderDice,
   renderShapeSelector,
   renderShapeControls,
+  renderPassControls,
   injectJuggleStyles,
   getPlayerName,
 } from './board-ui';
@@ -72,7 +76,7 @@ function updateUI(): void {
   boardContainer.innerHTML = '';
 
   const allowInput = !isComputerTurnPending();
-  const inputOpts = { allowInput };
+  const inputOpts = { allowInput, state: gameState };
 
   // Render dice area — hide Roll / selectable dice while the computer seat thinks
   const diceArea = renderDice(
@@ -85,8 +89,10 @@ function updateUI(): void {
   );
   boardContainer.appendChild(diceArea);
 
-  // Render shape selector or controls
-  if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
+  // Jammed roll — Pass Turn escape (human seat only; AI auto-passes).
+  if (allowInput && shouldOfferPass(gameState)) {
+    boardContainer.appendChild(renderPassControls(handlePass));
+  } else if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
     const shapeSelector = renderShapeSelector(
       gameState,
       handleSelectShape,
@@ -166,20 +172,32 @@ function updateStatus(): void {
   }
 
   let instruction = '';
-  switch (gameState.phase) {
-    case 'rolling':
-      instruction = 'Roll the dice';
-      break;
-    case 'selectingShape':
-      if (gameState.selectedCategory) {
-        instruction = 'Choose a shape';
-      } else {
-        instruction = 'Click a die to choose shape category';
+  if (shouldOfferPass(gameState)) {
+    instruction = 'No shape fits these dice — Pass Turn';
+  } else {
+    switch (gameState.phase) {
+      case 'rolling':
+        instruction = 'Roll the dice';
+        break;
+      case 'selectingShape':
+        if (gameState.selectedCategory) {
+          instruction = 'Choose a shape';
+        } else {
+          instruction = 'Click a die to choose shape category';
+        }
+        break;
+      case 'placing':
+        instruction = 'Place the shape on your board';
+        break;
+      case 'gameOver':
+        instruction = '';
+        break;
+      default: {
+        const _exhaustive: never = gameState.phase;
+        void _exhaustive;
+        instruction = '';
       }
-      break;
-    case 'placing':
-      instruction = 'Place the shape on your board';
-      break;
+    }
   }
 
   statusContainer.innerHTML = `
@@ -202,9 +220,36 @@ function handleRollDice(fromAI: boolean | Event = false): void {
   gameState = doRollDice(gameState);
   updateUI();
 
-  // AI continues after its own roll.
+  // AI continues after its own roll (or auto-passes if the roll is jammed).
   if (vsAI && gameState.currentPlayer === aiPlayer) {
-    setTimeout(makeAIMove, 500);
+    setTimeout(makeAIMove, 280);
+  }
+}
+
+function handlePass(): void {
+  if (!shouldOfferPass(gameState)) return;
+  if (isComputerTurnPending()) return;
+
+  gameState = passTurn(gameState);
+  updateUI();
+
+  if (
+    vsAI &&
+    !gameState.winner &&
+    gameState.currentPlayer === aiPlayer &&
+    gameState.phase === 'rolling'
+  ) {
+    setTimeout(() => handleRollDice(true), 280);
+  }
+}
+
+function scheduleAfterAISeatFlip(): void {
+  if (gameState.winner || gameState.phase === 'gameOver') return;
+  if (gameState.currentPlayer !== aiPlayer) return;
+  if (gameState.phase === 'rolling') {
+    setTimeout(() => handleRollDice(true), 280);
+  } else {
+    setTimeout(makeAIMove, 180);
   }
 }
 
@@ -246,7 +291,7 @@ function handleCellClick(row: number, col: number, player: Player): void {
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => handleRollDice(true), 500);
+    setTimeout(() => handleRollDice(true), 280);
   }
 }
 
@@ -271,14 +316,27 @@ function handleCellLeave(): void {
 function makeAIMove(): void {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
+  // Jammed dice — auto-pass so the computer seat never soft-locks.
+  if (shouldOfferPass(gameState)) {
+    gameState = passTurn(gameState);
+    updateUI();
+    scheduleAfterAISeatFlip();
+    return;
+  }
+
   // Handle each phase using the AI module
   if (gameState.phase === 'selectingShape' && !gameState.selectedCategory) {
     const dieChoice = getAIDieChoice(gameState, aiPlayer, aiDifficulty);
     if (dieChoice) {
       gameState = selectDie(gameState, dieChoice.index);
-      setTimeout(makeAIMove, 300);
+      setTimeout(makeAIMove, 180);
       updateUI();
       return;
+    }
+    if (shouldOfferPass(gameState)) {
+      gameState = passTurn(gameState);
+      updateUI();
+      scheduleAfterAISeatFlip();
     }
     return;
   }
@@ -287,9 +345,14 @@ function makeAIMove(): void {
     const shapeChoice = getAIShapeChoice(gameState, aiPlayer, aiDifficulty);
     if (shapeChoice) {
       gameState = selectShape(gameState, shapeChoice.shape);
-      setTimeout(makeAIMove, 300);
+      setTimeout(makeAIMove, 180);
       updateUI();
       return;
+    }
+    if (shouldOfferPass(gameState)) {
+      gameState = passTurn(gameState);
+      updateUI();
+      scheduleAfterAISeatFlip();
     }
     return;
   }
@@ -311,8 +374,14 @@ function makeAIMove(): void {
 
       // Continue if still AI's turn
       if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-        setTimeout(() => handleRollDice(true), 500);
+        setTimeout(() => handleRollDice(true), 280);
       }
+      return;
+    }
+    if (shouldOfferPass(gameState)) {
+      gameState = passTurn(gameState);
+      updateUI();
+      scheduleAfterAISeatFlip();
       return;
     }
   }
@@ -387,3 +456,75 @@ export function __setStateForTests(state: JuggleState): void {
 export function __getStateForTests(): JuggleState {
   return gameState;
 }
+
+/**
+ * Test/playtest-only: advance the current (human) seat with AI proxy logic,
+ * then schedule the computer seat if needed. Keeps win/scoring rules intact.
+ */
+export function __advanceSeatForTests(
+  humanDifficulty: AIDifficulty = 'medium'
+): JuggleState {
+  if (gameState.winner || gameState.phase === 'gameOver') {
+    return gameState;
+  }
+
+  if (gameState.phase === 'rolling') {
+    gameState = doRollDice(gameState);
+  }
+
+  if (shouldOfferPass(gameState)) {
+    gameState = passTurn(gameState);
+    updateUI();
+    if (
+      vsAI &&
+      !gameState.winner &&
+      gameState.currentPlayer === aiPlayer &&
+      gameState.phase === 'rolling'
+    ) {
+      setTimeout(() => handleRollDice(true), 280);
+    }
+    return gameState;
+  }
+
+  // Only proxy the non-AI seat (or either seat in human-vs-human).
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    updateUI();
+    return gameState;
+  }
+
+  gameState = executeAITurn(gameState, gameState.currentPlayer, humanDifficulty);
+  updateUI();
+
+  if (
+    vsAI &&
+    !gameState.winner &&
+    gameState.currentPlayer === aiPlayer &&
+    gameState.phase === 'rolling'
+  ) {
+    setTimeout(() => handleRollDice(true), 280);
+  }
+
+  return gameState;
+}
+
+declare global {
+  interface Window {
+    __jugglePlaytest?: {
+      getState: typeof __getStateForTests;
+      setState: typeof __setStateForTests;
+      advanceHuman: typeof __advanceSeatForTests;
+    };
+  }
+}
+
+function installPlaytestHooks(): void {
+  if (typeof window === 'undefined') return;
+  window.__jugglePlaytest = {
+    getState: __getStateForTests,
+    setState: __setStateForTests,
+    advanceHuman: __advanceSeatForTests,
+  };
+}
+
+// Install once when the module loads (harness + unit DOM tests).
+installPlaytestHooks();
