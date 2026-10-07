@@ -2,7 +2,8 @@
  * MP-3D — Queens & Guards Three.js board behind board3d flag.
  * Captures start / mid-game / game-over screenshots at phone + tablet sizes.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -302,17 +303,16 @@ test.describe('mp3d Queens & Guards 3D board', () => {
     const queenCell = page.locator('.qg-a11y-grid [data-cell-key="5-7"]');
     await queenCell.focus();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(150);
 
     const legal = page.locator(
       '.qg-a11y-grid button[tabindex="0"][aria-label*="legal move"]'
     );
-    await expect(legal.first()).toBeVisible({ timeout: 5000 });
+    await expect(legal.first()).toBeVisible({ timeout: 8_000 });
     await legal.first().evaluate((el) => (el as HTMLButtonElement).click());
-    await page.waitForTimeout(200);
 
-    const moves = await getMoveCount(page);
-    expect(moves).toBeGreaterThan(0);
+    await expect
+      .poll(async () => getMoveCount(page), { timeout: 8_000 })
+      .toBeGreaterThan(0);
   });
 
   test('human restores a captured piece to the outer ring (3D + 2D)', async ({

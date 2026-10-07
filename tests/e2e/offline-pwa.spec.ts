@@ -6,11 +6,13 @@
  * Self-hosts `vite preview` so the generated service worker is active.
  * Does not modify the shared Playwright webServer (dev) used by other specs.
  */
-import { expect, test, type Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, type Page } from '@playwright/test';
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { installE2eStability } from './helpers/stability';
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -174,6 +176,8 @@ test.describe('offline PWA', () => {
         cwd: ROOT,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: process.env,
+        // Own process group so afterAll can SIGTERM/KILL the whole tree.
+        detached: true,
       }
     );
 
@@ -181,8 +185,22 @@ test.describe('offline PWA', () => {
   });
 
   test.afterAll(async () => {
-    if (preview && !preview.killed) {
-      preview.kill('SIGTERM');
+    if (!preview) return;
+    const pid = preview.pid;
+    if (pid && !preview.killed) {
+      // SIGTERM the whole process group if we started detached; else the child.
+      try {
+        process.kill(-pid, 'SIGTERM');
+      } catch {
+        preview.kill('SIGTERM');
+      }
+      // Hard stop if the preview ignores SIGTERM (keeps ports/files open).
+      await new Promise((r) => setTimeout(r, 500));
+      try {
+        process.kill(-pid, 'SIGKILL');
+      } catch {
+        if (!preview.killed) preview.kill('SIGKILL');
+      }
     }
   });
 
@@ -195,8 +213,9 @@ test.describe('offline PWA', () => {
     expect(swRes.ok).toBeTruthy();
     expect(await swRes.text()).toMatch(/precache|workbox/i);
 
-    const context = await browser.newContext();
+    const context = await browser.newContext({ reducedMotion: 'reduce' });
     const page = await context.newPage();
+    await installE2eStability(page);
 
     // One online visit so Workbox precaches shell + game + AI worker chunks.
     await page.goto(`${baseURL}/`);

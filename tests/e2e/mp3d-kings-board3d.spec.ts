@@ -2,7 +2,8 @@
  * MP-3D — Kings & Quadraphages Three.js board behind board3d flag.
  * Captures start + mid-game screenshots for PR evidence.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 

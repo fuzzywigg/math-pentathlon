@@ -2,7 +2,8 @@
  * High-value e2e smoke: menu loads, every available game opens, and each
  * game can complete a human move with a computer reply in vs-AI mode.
  */
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, type Page, type Locator } from '@playwright/test';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);

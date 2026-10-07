@@ -2,7 +2,8 @@
  * MP-3D — Kwatro-Sinko Three.js board behind board3d flag.
  * Captures before (2D) + after (3D) screenshots for PR evidence.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -171,8 +172,9 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
     const cell = page.locator('.kwa-a11y-grid [data-node-id="n0-0"]');
     await cell.focus();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(200);
-    await expect(page.locator('.kwa-status')).toContainText(/green space/i);
+    await expect(page.locator('.kwa-status')).toContainText(/green space/i, {
+      timeout: 8_000,
+    });
   });
 
   test('smoke selectors drive a human move + AI reply on 3D host', async ({
