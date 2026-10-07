@@ -34,7 +34,9 @@ let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let currentHint: string | null = null;
 
-const AI_THINKING_DELAY = 800;
+const AI_THINKING_DELAY = 600;
+/** Faster cadence for AI free-turn chains so multi-sow bursts don't feel stuck. */
+const AI_FREE_TURN_DELAY = 250;
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
@@ -79,14 +81,36 @@ export function getCurrentHint(): string | null {
   return currentHint;
 }
 
+/** Soft-lock recovery: empty valids mid-game → existing end collection. */
+function recoverIfNoValidMoves(): boolean {
+  if (isGameOver(gameState)) return false;
+  if (getValidPits(gameState).length > 0) return false;
+  gameState = settleNoValidMoves(gameState);
+  return true;
+}
+
 // Handle pit click
 function handlePitClick(pitIndex: number): void {
   if (isAIThinking) return;
   if (isGameOver(gameState)) return;
 
+  // Human seat with no legal pits (defensive) — settle instead of stalling.
+  if (recoverIfNoValidMoves()) {
+    render();
+    notifyCallaEndIfNeeded();
+    return;
+  }
+
   const prevPlayer = gameState.currentPlayer;
   gameState = makeMove(gameState, pitIndex);
   moveCount++;
+  // Fresh human sow clears the prior Easy teaching tip.
+  currentHint = null;
+  if (recoverIfNoValidMoves()) {
+    render();
+    notifyCallaEndIfNeeded();
+    return;
+  }
   render();
 
   notifyCallaEndIfNeeded();
@@ -134,14 +158,17 @@ function triggerAITurn(): void {
 
     gameState = makeMove(gameState, aiMove.pit);
     moveCount++;
-    isAIThinking = false;
-    render();
 
     notifyCallaEndIfNeeded();
 
-    // Check if AI gets another turn (free turn from landing in Calla)
+    // Keep thinking chrome through free-turn chains so the board never shows
+    // "AI's turn / 0 valid pits" in the gap before the next sow.
     if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
-      setTimeout(triggerAITurn, AI_THINKING_DELAY);
+      render();
+      setTimeout(triggerAITurn, AI_FREE_TURN_DELAY);
+    } else {
+      isAIThinking = false;
+      render();
     }
   }, AI_THINKING_DELAY);
 }
@@ -159,6 +186,12 @@ function notifyCallaEndIfNeeded(): void {
 
 // Render the game
 function render(): void {
+  // Defensive: never paint a live board with zero legal pits for the seat.
+  if (!isAIThinking && recoverIfNoValidMoves()) {
+    // Settled during paint — still notify owl/stats once.
+    notifyCallaEndIfNeeded();
+  }
+
   if (boardContainer) {
     const canInteract =
       !isAIThinking &&
@@ -168,12 +201,19 @@ function render(): void {
     renderBoard(
       gameState,
       boardContainer,
-      canInteract ? handlePitClick : undefined
+      canInteract ? handlePitClick : undefined,
+      gameMode
     );
   }
 
   if (statusContainer) {
-    renderStatus(gameState, statusContainer, gameMode, isAIThinking);
+    renderStatus(
+      gameState,
+      statusContainer,
+      gameMode,
+      isAIThinking,
+      currentHint
+    );
   }
 }
 
@@ -182,10 +222,10 @@ export function getGameState(): CallaGameState {
   return gameState;
 }
 
-// Reset game
+// Reset game (preserve AI difficulty — do not silently drop Hard → Medium)
 export function resetGame(): void {
   if (gameMode === 'human-vs-ai') {
-    newGameVsAI();
+    newGameVsAI(aiDifficulty);
   } else {
     newGameVsHuman();
   }

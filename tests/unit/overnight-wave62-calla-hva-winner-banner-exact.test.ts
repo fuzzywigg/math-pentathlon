@@ -7,7 +7,7 @@ import { createInitialState } from '../../src/games/calla/types';
 import { renderStatus } from '../../src/games/calla/board-ui';
 
 describe('Wave 62 calla — hva winner banner exact', () => {
-  it('renders You Wins / AI Wins banners with seat icons', () => {
+  it('renders You Win / AI Wins banners with seat icons', () => {
     const el = document.createElement('div');
     renderStatus(
       {
@@ -19,7 +19,7 @@ describe('Wave 62 calla — hva winner banner exact', () => {
       'human-vs-ai'
     );
     expect(el.querySelector('.status-winner')?.textContent).toBe(
-      '🎉 🔵 You Wins! 🎉'
+      '🎉 🔵 You Win! 🎉'
     );
 
     renderStatus(

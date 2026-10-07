@@ -25,7 +25,8 @@ const PIT_SPACING =
 export function renderBoard(
   state: CallaGameState,
   container: HTMLElement,
-  onPitClick?: PitClickCallback
+  onPitClick?: PitClickCallback,
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human'
 ): void {
   container.innerHTML = '';
 
@@ -206,11 +207,12 @@ export function renderBoard(
 
   wrapper.appendChild(svg);
 
-  // Last move info
-  const lastMoveInfo = getLastMoveInfo(state);
+  // Last move info (You/AI labels in vs-AI mode)
+  const lastMoveInfo = getLastMoveInfo(state, gameMode);
   if (lastMoveInfo) {
     const infoEl = document.createElement('div');
     infoEl.className = 'calla-last-move';
+    infoEl.setAttribute('data-testid', 'calla-last-move');
     infoEl.textContent = lastMoveInfo;
     wrapper.appendChild(infoEl);
   }
@@ -237,11 +239,12 @@ function createPit(
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
-  // Invisible hit target (~44px CSS at typical board widths) under the visual pit
+  // Invisible hit target — sized so CSS diameter stays ≥44px on tablet boards
+  // (viewBox 500 → ~768px tablet width ≈ r≥14.3; we use r=40 for headroom).
   const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   hit.setAttribute('cx', String(cx));
   hit.setAttribute('cy', String(cy));
-  hit.setAttribute('r', String(PIT_RADIUS + 4));
+  hit.setAttribute('r', String(PIT_RADIUS + 8));
   hit.setAttribute('fill', 'transparent');
   hit.setAttribute('class', 'calla-pit-hit');
   group.appendChild(hit);
@@ -374,7 +377,8 @@ export function renderStatus(
   state: CallaGameState,
   container: HTMLElement,
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
-  isAIThinking: boolean = false
+  isAIThinking: boolean = false,
+  teachingHint: string | null = null
 ): void {
   markStatusLive(container);
   container.innerHTML = '';
@@ -399,16 +403,33 @@ export function renderStatus(
           : state.winner === 'player1'
             ? 'Blue'
             : 'Red';
-      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+      // Grammar: "You Win!" vs "Blue Wins!" / "AI Wins!"
+      const winVerb = winnerName === 'You' ? 'Win' : 'Wins';
+      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${winVerb}! 🎉`;
     }
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
     turnEl.classList.add('status-ai-thinking');
   } else {
-    turnEl.textContent = getPhaseMessage(state);
+    turnEl.textContent = getPhaseMessage(state, gameMode);
   }
 
   statusEl.appendChild(turnEl);
+
+  // Easy-mode teaching hint from AI (shown on the human's next turn)
+  if (
+    teachingHint &&
+    !state.winner &&
+    !isAIThinking &&
+    gameMode === 'human-vs-ai'
+  ) {
+    const hintEl = document.createElement('div');
+    hintEl.className = 'calla-teaching-hint';
+    hintEl.setAttribute('data-testid', 'calla-teaching-hint');
+    hintEl.setAttribute('role', 'status');
+    hintEl.textContent = teachingHint;
+    statusEl.appendChild(hintEl);
+  }
 
   // Score display
   const scoreEl = document.createElement('div');

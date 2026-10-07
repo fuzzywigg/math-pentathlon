@@ -50,7 +50,7 @@ describe('Wave 62 handshake — calla × juggle leftovers', () => {
       'human-vs-ai'
     );
     expect(status.querySelector('.status-winner')?.textContent).toBe(
-      '🎉 🔵 You Wins! 🎉'
+      '🎉 🔵 You Win! 🎉'
     );
     expect(
       analyzeMoves(
