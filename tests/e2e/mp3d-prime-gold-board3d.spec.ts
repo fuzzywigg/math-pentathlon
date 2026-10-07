@@ -276,8 +276,10 @@ test.describe('mp3d Prime Gold 3D board', () => {
     await page.keyboard.press('Enter');
     await page.waitForTimeout(250);
 
-    await expect(page.locator('.pg-move-history, .pg-status')).toBeVisible();
+    await expect(page.locator('.pg-status').first()).toBeVisible();
     // After a successful place, phase returns to rolling for the other player
-    await expect(page.locator('.pg-status')).toContainText(/turn|Roll|Select/i);
+    await expect(page.locator('.pg-status').first()).toContainText(
+      /turn|Roll|Select/i
+    );
   });
 });

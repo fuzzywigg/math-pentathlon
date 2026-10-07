@@ -65,7 +65,9 @@ No mouse-only drag/drop game mechanics were found that block completing a turn o
 
 ## Smoke e2e
 
-`tests/e2e/mobile-viewport-smoke.spec.ts` — for each available game, on iPhone SE and Pixel 7 projects:
+`tests/e2e/mobile-viewport-smoke.spec.ts` via Playwright projects `mobile-iphone-se` and `mobile-pixel-7` (Chromium + device emulation; see `playwright.config.ts`). CI runs both alongside `chromium`.
+
+For each available game:
 
 1. Load `/#/game/<id>`
 2. Start human mode if the modal is open
