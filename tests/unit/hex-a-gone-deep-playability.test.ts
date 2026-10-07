@@ -84,8 +84,9 @@ describe('Hex-a-Gone deep playability', () => {
     expect(hard!.blocks.length).toBeLessThanOrEqual(3);
   });
 
-  it('HvA human win copy is “You win!” (not “You Wins!”)', () => {
+  it('HvA human win copy is “You win!” (not “You Wins!”) in status + banner', () => {
     const status = document.createElement('div');
+    const board = document.createElement('div');
     const state = {
       ...createInitialState(),
       phase: 'gameOver' as const,
@@ -94,6 +95,15 @@ describe('Hex-a-Gone deep playability', () => {
     renderStatus(state, status, 'human-vs-ai', false);
     expect(status.textContent).toMatch(/You win!/);
     expect(status.textContent).not.toMatch(/You Wins!/);
+    renderBoard(state, board, undefined, undefined, undefined, {
+      gameMode: 'human-vs-ai',
+    });
+    expect(board.querySelector('.hex-a-gone-winner')?.textContent).toMatch(
+      /You win!/
+    );
+    expect(board.querySelector('.hex-a-gone-winner')?.textContent).not.toMatch(
+      /Blue wins/
+    );
   });
 
   it('HvA phase copy uses Your turn / AI instead of Blue/Red', () => {

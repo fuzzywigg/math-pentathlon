@@ -21,6 +21,8 @@ export type ConfirmCallback = () => void;
 export interface SelectionAreaOptions {
   /** When false, show AI-seat copy (no “click to place” affordance). */
   interactive?: boolean;
+  /** When human-vs-ai, winner banner uses You/AI instead of Blue/Red. */
+  gameMode?: 'human-vs-human' | 'human-vs-ai';
 }
 
 // Hex dimensions — sized so rendered cells stay ≥44 CSS px at default board width
@@ -59,6 +61,7 @@ export function renderBoard(
   // Static/test callers omit options → keep human placing copy.
   const selectionOptions: SelectionAreaOptions = {
     interactive: options.interactive !== false,
+    gameMode: options.gameMode,
   };
 
   const wrapper = document.createElement('div');
@@ -307,8 +310,19 @@ export function buildSelectionArea(
   if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
     winnerMsg.className = 'hex-a-gone-winner game-winner-banner';
-    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-    winnerMsg.textContent = `🎉 ${winnerName} wins! 🎉`;
+    const hvA = options.gameMode === 'human-vs-ai';
+    const winnerName = hvA
+      ? state.winner === 'player1'
+        ? 'You'
+        : 'AI'
+      : state.winner === 'player1'
+        ? 'Blue'
+        : 'Red';
+    // Match status chrome: HvA human → "You win!"; others keep "X wins!"
+    winnerMsg.textContent =
+      winnerName === 'You'
+        ? '🎉 You win! 🎉'
+        : `🎉 ${winnerName} wins! 🎉`;
     selectionArea.appendChild(winnerMsg);
   }
 

@@ -344,11 +344,13 @@ function render(): void {
       selectionHost.replaceChildren(
         buildSelectionArea(gameState, onBlock, onConfirm, {
           interactive: canInteract,
+          gameMode,
         })
       );
     } else if (!board3dEnabled) {
       renderBoard(gameState, boardContainer, onCell, onBlock, onConfirm, {
         interactive: canInteract,
+        gameMode,
       });
     }
     // If 3D enabled but still loading, skip board paint until ready.

@@ -29,12 +29,19 @@ async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
   await dismissOwl(page);
 }
 
-async function playHumanTriangleTurn(page: Page) {
-  const tri = page.locator(
-    '.hex-a-gone-block-btn[data-shape="triangle"]:not(.empty)'
-  );
-  await expect(tri).toBeVisible({ timeout: 10_000 });
-  await tri.click();
+async function playHumanTurn(page: Page) {
+  const shapes = ['triangle', 'square', 'rhombus', 'trapezoid', 'hexagon'];
+  let clicked = false;
+  for (const shape of shapes) {
+    const btn = page.locator(
+      `.hex-a-gone-block-btn[data-shape="${shape}"]:not(.empty):not([disabled])`
+    );
+    if ((await btn.count()) === 0) continue;
+    await btn.click();
+    clicked = true;
+    break;
+  }
+  expect(clicked).toBe(true);
   await page.locator('.hex-a-gone-confirm-btn').click();
   const valid = page.locator('.hex-a-gone-cell-valid').first();
   await expect(valid).toBeVisible({ timeout: 5_000 });
@@ -54,12 +61,22 @@ test.describe('Hex-a-Gone deep playability', () => {
     );
 
     let maxThink = 0;
-    for (let turn = 0; turn < 30; turn++) {
+    for (let turn = 0; turn < 40; turn++) {
       const status = page.locator('.hex-a-gone-status .status-turn');
       const text = await status.innerText();
       if (/win/i.test(text)) break;
+      if ((await page.locator('.status-winner, .hex-a-gone-winner').count()) > 0) {
+        break;
+      }
 
-      await playHumanTriangleTurn(page);
+      // Wait until human bank is enabled (AI seat disables buttons)
+      await expect(
+        page.locator(
+          '.hex-a-gone-block-btn:not(.empty):not([disabled])'
+        ).first()
+      ).toBeVisible({ timeout: 10_000 });
+
+      await playHumanTurn(page);
 
       const thinking = page.locator('.status-ai-thinking');
       const saw = await thinking
@@ -74,10 +91,16 @@ test.describe('Hex-a-Gone deep playability', () => {
 
       const after = await status.innerText();
       if (/win/i.test(after)) break;
+      if ((await page.locator('.status-winner, .hex-a-gone-winner').count()) > 0) {
+        break;
+      }
     }
 
-    await expect(page.locator('.status-winner, .hex-a-gone-winner')).toBeVisible(
-      { timeout: 15_000 }
+    await expect(page.locator('.status-winner').first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.locator('.status-winner').first()).toContainText(
+      /You win!|AI Wins!/i
     );
     expect(maxThink).toBeLessThan(3000);
   });
