@@ -68,7 +68,7 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#413` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484`
+`#392` `#395`–`#413` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485`
 
 Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**, **#466**, **#449**, **#447**, **#444**, **#440**, **#438**, **#413**.
 
@@ -78,11 +78,12 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 |----|-------|
 | **#393** / **#394** | Rules XOR (Andrew pick) |
 | **#418** / **#419** / **#428** / **#429** | Held rules-adjacent deep playtests |
-| **#355** / **#441** | Docs / open rules questions |
-| **#414** / **#420** | Docs / gallery side tracks |
+| **#441** | Docs / open rules questions (#355 Contig/FIAR/Hex Step-0 folded via #485) |
+| **#414** / **#420** | Folded via #485 — close as superseded |
 | **#451** | Prime-gold keyboard flake (if not fully in tip tree) |
 | **#453** | Older inventory; tip has newer merge-order |
-| **#459** / **#468** / **#481** | Coverage / calibration / flake side tracks — review separately |
+| **#459** / **#481** | Folded via #485 — close as superseded |
+| **#468** AI retunes | **Needs owner decision** — harness folded; FIAR/Pent AI retunes NOT in tip |
 
 ---
 

@@ -11,7 +11,7 @@ Docs-only map of **open draft PRs** (`#355`, `#392`–`#458`) against `alpha`, f
 | **Tip branch** | `cursor/integration-fold-wave5-tip-4af0` |
 | **Preferred base for new folds** | this tip (draft PR targeting `#466` / `cursor/overnight-fold-coverage-tip-460a`) |
 | **Builds on** | wave4 tip `#476` (`cursor/integration-fold-wave4-tip-36e4` on `#466`) |
-| **Folds (this tip)** | wave4 + `#474`/`#475`/`#471`/`#478`/`#479`/`#480`/`#482`/`#483`/`#484`/`#435` (`#469` already contained — skipped) |
+| **Folds (this tip)** | wave4 + `#474`/`#475`/`#471`/`#478`/`#479`/`#480`/`#482`/`#483`/`#484`/`#435`/`#485` (`#469` already contained — skipped) |
 | **Preserved intent** | CI e2e = chromium + mobile-iphone-se + mobile-pixel-7; `size:check` non-blocking; visual-baseline + a11y-axe + e2e-cross-browser (firefox/webkit) report-only; tip playwright timeouts/cross-browser; prime-gold keyboard a11y helpers; destroyGame / error-boundary / memory-leak cleanup; state round-trip fuzz; Hard AI time-box bench; undo/move-log audit; Chromium flake-hunt fixtures/seeds/reduced-motion; wiki architecture/registry/testing docs; AI seed determinism audit; WebKit offline idle-warm route mounts |
 | **Not in tip** | rules/scoring changes; held-outs `#393`/`#394`/`#418`/`#419`/`#428`/`#429` |
 
@@ -216,6 +216,7 @@ All of the above: GitHub **MERGEABLE / CLEAN** vs declared base; **NO_CI** (empt
 | #483 | #476 | Yes → tip | owner rules-decision checklist (docs) |
 | #484 | #476 | Yes → tip | merge rehearsal (docs; path = wave5 tip alone → α) |
 | #435 | alpha | Yes → tip | CI `cursor/**` PR triggers + checkout hardening |
+| #485 | #476 | Yes → tip | standalone triage (#355 partial/#414/#420/#459/#468 harness/#481); no #468 AI retunes |
 | tip | #466 | **Current tip** | `cursor/integration-fold-wave5-tip-4af0` |
 
 ---
@@ -247,7 +248,7 @@ After Path A step 2 (tip branch on `alpha`), these drafts’ **content is alread
 | #441 | Rules-questions checklist |
 | #442 | Content folded into tip — closable as superseded after tip→α |
 | #450 / #452 / #455–#458 | Content folded into tip — closable as superseded after tip→α |
-| #435 / #464 / #465 / #466 / #467 / #469 / #471 / #472 / #473 / #474 / #475 / #478 / #479 / #480 / #482 / #483 / #484 | Content folded into tip — closable as superseded after tip→α |
+| #435 / #464 / #465 / #466 / #467 / #469 / #471 / #472 / #473 / #474 / #475 / #478 / #479 / #480 / #482 / #483 / #484 / #485 | Content folded into tip — closable as superseded after tip→α |
 | #470 | Prior wave4 draft on `#454` only — superseded by tip (human close) |
 | #476 | Prior wave4 tip — superseded by wave5 tip (human close) |
 
