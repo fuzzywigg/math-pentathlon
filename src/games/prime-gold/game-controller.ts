@@ -300,11 +300,7 @@ function updateUI(controller: PrimeGoldController): void {
   const controls = document.createElement('div');
   controls.className = 'pg-controls';
 
-  if (
-    !aiThinking &&
-    state.phase === 'placing' &&
-    !hasValidMoves(state)
-  ) {
+  if (!aiThinking && state.phase === 'placing' && !hasValidMoves(state)) {
     const passBtn = document.createElement('button');
     passBtn.className = 'pg-btn pg-btn-secondary';
     passBtn.textContent = 'Pass Turn';
