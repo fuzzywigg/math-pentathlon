@@ -2,8 +2,6 @@
  * Contig 60 deep-playtest UX guards (2026-10-07):
  * touch targets, board-before-expressions, Hard lookahead wiring, status copy.
  */
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   ContigState,
@@ -15,6 +13,7 @@ import {
   newGameVsAI,
 } from '../../src/games/contig-60/game-controller';
 import { injectContigStyles } from '../../src/games/contig-60/board-ui';
+import { readAppCss } from './_app-css';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -46,7 +45,8 @@ describe('Contig 60 deep playtest UX', () => {
   });
 
   it('roll/pass chrome stay ≥44px in shared stylesheet', () => {
-    const css = readFileSync(join(process.cwd(), 'src/style.css'), 'utf8');
+    // Contig chrome lives in game-play.css after the #423 menu/play CSS split.
+    const css = readAppCss();
     expect(css).toMatch(/\.contig-roll-btn\s*\{[\s\S]*?min-height:\s*44px/);
     expect(css).toMatch(/\.contig-pass-btn\s*\{[\s\S]*?min-height:\s*44px/);
   });

@@ -144,11 +144,16 @@ describe('Burn wave 10 — Fab pool + operation selector', () => {
     };
     const opEl = renderOperationSelector(advanced, (op) => ops.push(op));
     document.body.appendChild(opEl);
-    const btn = opEl.querySelector('button, .fab-op-btn') as HTMLElement | null;
+    // #422 disables ops with no matchable answer — click a valid/enabled op.
+    const btn = opEl.querySelector(
+      '.fab-op-btn.fab-op-valid:not(:disabled), .fab-op-btn:not(:disabled)'
+    ) as HTMLElement | null;
     if (btn) {
       btn.click();
       expect(ops.length).toBe(1);
     } else {
+      // Shuffle may yield two bars with no claimable op; chrome still renders.
+      expect(opEl.querySelectorAll('.fab-op-btn').length).toBeGreaterThan(0);
       expect(opEl.textContent?.length).toBeGreaterThan(0);
     }
   });
