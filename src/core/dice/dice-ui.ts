@@ -321,6 +321,9 @@ export function animateRoll(
   container.className = 'dice-roll-result';
 
   const finish = (): void => {
+    container.className = 'dice-roll-result';
+    container.innerHTML = '';
+
     const diceContainer = document.createElement('div');
     diceContainer.className = 'dice-container';
     for (const die of finalResult.rolls) {
@@ -391,7 +394,6 @@ export function animateRoll(
 
       setTimeout(animate, interval);
     } else {
-      container.innerHTML = '';
       finish();
     }
   };
