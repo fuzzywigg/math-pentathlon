@@ -15,8 +15,8 @@ const BASE_SEED = 20261007;
 const SEARCH_BUDGET: Record<string, { games: number; timeout: number; deadlineMs: number }> = {
   'queens-guards': { games: 4, timeout: 90_000, deadlineMs: 120 },
   hex: { games: 4, timeout: 60_000, deadlineMs: 200 },
-  fiar: { games: 6, timeout: 120_000, deadlineMs: 1500 },
-  'fab-a-diffy': { games: 16, timeout: 90_000, deadlineMs: 0 },
+  fiar: { games: 12, timeout: 180_000, deadlineMs: 300 },
+  'fab-a-diffy': { games: 16, timeout: 180_000, deadlineMs: 0 },
   calla: { games: 4, timeout: 45_000, deadlineMs: 0 },
 };
 

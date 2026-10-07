@@ -66,7 +66,8 @@ const DIFFICULTY_CONFIG = {
     maxDepth: 1,
     randomness: 0.55,
     considerMarked: true,
-    teachingBlunder: 0.35,
+    // Tip-safe Easy weaken: Hard maxDepth stays 2 (depth 3 breaks HARD_FLAG_MS).
+    teachingBlunder: 0.5,
   },
   medium: {
     maxDepth: 2,
@@ -74,8 +75,10 @@ const DIFFICULTY_CONFIG = {
     considerMarked: true,
     teachingBlunder: 0,
   },
+  // maxDepth stays 2 on tip — Hard movement at depth 3 exceeds HARD_FLAG_MS (500)
+  // in the mid-game time bench when uncapped; Easy teachingBlunder restores order.
   hard: {
-    maxDepth: 3,
+    maxDepth: 2,
     randomness: 0.02,
     considerMarked: true,
     teachingBlunder: 0,
@@ -425,14 +428,9 @@ function getBestPlacement(
       continue;
     }
 
-    // Hard may look 2 plies; Easy/Medium stay at 1 for tablet latency.
-    const placeDepth =
-      difficulty === 'hard'
-        ? Math.min(config.maxDepth - 1, 2)
-        : Math.min(config.maxDepth - 1, 1);
     const score = minimax(
       newState,
-      placeDepth,
+      Math.min(config.maxDepth - 1, 1),
       -Infinity,
       Infinity,
       false,
