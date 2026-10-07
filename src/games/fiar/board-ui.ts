@@ -7,7 +7,10 @@ import {
   findPaths,
   canPlaceChip,
 } from './rules';
-import { getPlayerSeatColors } from '../../ui/player-colors';
+import {
+  getGameModeChromeRoot,
+  getPlayerSeatColors,
+} from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -39,6 +42,14 @@ const COLORS = FIAR_THEME;
 
 function playerColors() {
   return getPlayerSeatColors();
+}
+
+/** True when vs-AI chrome is on and it is the computer's seat to act. */
+function isComputerSeatTurn(state: FiarGameState): boolean {
+  const root = getGameModeChromeRoot();
+  if (root?.dataset.opponent !== 'ai') return false;
+  const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
+  return state.currentPlayer === aiSeat;
 }
 
 /**
@@ -127,10 +138,13 @@ export function renderBoard(
     }
   }
 
-  const validMoves = state.selectedNode
-    ? getValidMoves(state, state.selectedNode)
-    : [];
-  const selectableNodes = getSelectableNodes(state);
+  // Hex #383 / Kings pattern: omit actionable chrome on the AI seat.
+  const announceTargets = !isComputerSeatTurn(state);
+  const validMoves =
+    announceTargets && state.selectedNode
+      ? getValidMoves(state, state.selectedNode)
+      : [];
+  const selectableNodes = announceTargets ? getSelectableNodes(state) : [];
 
   const winningNodes = new Set<string>(state.winningPath ?? []);
   const blockedNodes = new Set<string>();
@@ -180,7 +194,9 @@ export function renderBoard(
       g.setAttribute('data-row', '0');
       g.setAttribute('data-col', nodeId);
     }
-    g.style.cursor = 'pointer';
+    if (announceTargets) {
+      g.style.cursor = 'pointer';
+    }
 
     const circle = document.createElementNS(
       'http://www.w3.org/2000/svg',
@@ -206,7 +222,11 @@ export function renderBoard(
     } else if (blockedNodes.has(nodeId)) {
       strokeColor = COLORS.blockedPath;
       strokeWidth = 3;
-    } else if (state.phase === 'placement' && node.chip === null) {
+    } else if (
+      announceTargets &&
+      state.phase === 'placement' &&
+      node.chip === null
+    ) {
       fill = COLORS.nodeHover;
     }
 
@@ -281,9 +301,6 @@ export function renderBoard(
       }
     }
 
-    const activate = () => onNodeClick(nodeId);
-    g.addEventListener('click', activate);
-
     const owner =
       node.chip === 'player1'
         ? 'Blue'
@@ -291,11 +308,11 @@ export function renderBoard(
           ? 'Red'
           : undefined;
     const isValidMove = validMoves.includes(nodeId);
-    const isSelectable =
-      selectableNodes.includes(nodeId) ||
-      (state.phase === 'placement' &&
-        node.chip === null &&
-        canPlaceChip(state, nodeId));
+    const isPlaceable =
+      announceTargets &&
+      state.phase === 'placement' &&
+      node.chip === null &&
+      canPlaceChip(state, nodeId);
     const extras: string[] = [];
     if (state.selectedNode === nodeId) extras.push('selected');
     if (node.chipKind === 'marked') extras.push('marked blocker');
@@ -315,19 +332,23 @@ export function renderBoard(
         validMove: isValidMove,
         selectable:
           state.phase === 'movement' && selectableNodes.includes(nodeId),
-        validPlacement:
-          state.phase === 'placement' && node.chip === null && isSelectable,
+        validPlacement: isPlaceable,
         extras: extras.length ? extras : undefined,
       })
     );
-    bindCellActivateKeys(g, activate);
 
-    g.addEventListener('mouseenter', () => {
-      circle.setAttribute('filter', 'brightness(1.1)');
-    });
-    g.addEventListener('mouseleave', () => {
-      circle.removeAttribute('filter');
-    });
+    if (announceTargets) {
+      const activate = () => onNodeClick(nodeId);
+      g.addEventListener('click', activate);
+      bindCellActivateKeys(g, activate);
+
+      g.addEventListener('mouseenter', () => {
+        circle.setAttribute('filter', 'brightness(1.1)');
+      });
+      g.addEventListener('mouseleave', () => {
+        circle.removeAttribute('filter');
+      });
+    }
 
     svg.appendChild(g);
   }
@@ -361,6 +382,13 @@ export function injectFiarStyles(): void {
     @keyframes fiar-pulse {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pulse-highlight,
+      .fiar-winner-banner {
+        animation: none !important;
+      }
     }
 
     .fiar-status {
