@@ -418,3 +418,9 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
+
+/** Cancel pending AI timer and drop mounts (route change / error boundary). */
+export function destroyGame(): void {
+  clearAiTimer();
+  activeContainer = null;
+}

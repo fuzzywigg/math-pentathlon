@@ -4,7 +4,11 @@ import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { AIDifficulty, getRandomMove } from './ai';
-import { cancelHexAiRequests, getBestMoveAsync } from './ai-client';
+import {
+  cancelHexAiRequests,
+  disposeHexAiWorker,
+  getBestMoveAsync,
+} from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
@@ -179,6 +183,7 @@ export function getGameState(): HexGameState {
 export function destroyGame(): void {
   aiGeneration += 1;
   cancelHexAiRequests();
+  disposeHexAiWorker();
   isAIThinking = false;
   boardContainer = null;
   statusContainer = null;

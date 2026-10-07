@@ -24,6 +24,7 @@
     "test:e2e:visual": "playwright test --project=visual-desktop --project=visual-phone",
     "test:e2e:visual:update": "playwright test --project=visual-desktop --project=visual-phone --update-snapshots",
     "perf:runtime": "node scripts/runtime-perf.mjs",
+    "audit:memory": "node scripts/memory-leak-audit.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium"
   },
   "keywords": [],
