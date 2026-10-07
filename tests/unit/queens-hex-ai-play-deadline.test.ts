@@ -1,5 +1,6 @@
 /**
  * Play-budget iterative deepening for Queens (#377) and Hex (#382).
+ * Hard budgets are asserted with an injected clock (not wall-clock).
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { createInitialState as createQueensState } from '../../src/games/queens-guards/types';
@@ -18,6 +19,21 @@ import {
   makeMove as makeHexMove,
 } from '../../src/games/hex/rules';
 
+/** Clock that reads 0 once (search start), then jumps past the deadline. */
+function expireAfterStart(deadlineMs: number): () => number {
+  let ticks = 0;
+  return () => (ticks++ === 0 ? 0 : deadlineMs + 1);
+}
+
+function hexMidgame() {
+  let state = createHexState(11);
+  state = makeHexMove(state, { row: 5, col: 5 });
+  state = makeHexMove(state, { row: 5, col: 6 });
+  state = makeHexMove(state, { row: 4, col: 5 });
+  state = makeHexMove(state, { row: 6, col: 5 });
+  return state;
+}
+
 afterEach(() => {
   document.body.innerHTML = '';
 });
@@ -30,11 +46,10 @@ describe('Queens play-budget search', () => {
 
   it('deadline 0 still truncates on a full opening', () => {
     const state = createQueensState();
-    let ticks = 0;
     const result = searchAIMove(state, 'player1', 'easy', {
       seed: 1,
       deadlineMs: 0,
-      now: () => (ticks++ === 0 ? 0 : 1),
+      now: expireAfterStart(0),
     });
     expect(result.truncated).toBe(true);
   });
@@ -56,18 +71,25 @@ describe('Queens play-budget search', () => {
     ).toBe(true);
   });
 
-  it('Hard opening stays near the play budget', () => {
+  it('Hard opening truncates when fake clock exceeds play budget (#382)', () => {
     const state = createQueensState();
     const budget = QUEENS_PLAY_MS.hard;
-    const t0 = performance.now();
     const result = searchAIMove(state, 'player1', 'hard', {
       seed: 1,
       deadlineMs: budget,
+      now: expireAfterStart(budget),
     });
-    const elapsed = performance.now() - t0;
     expect(result.move).not.toBeNull();
-    expect(elapsed).toBeLessThan(budget + 750);
-  }, 10_000);
+    expect(result.truncated).toBe(true);
+    const legal = getQueensMoves(state, result.move!.from);
+    expect(
+      legal.some(
+        (t) =>
+          t.ring === result.move!.to.ring &&
+          t.position === result.move!.to.position
+      )
+    ).toBe(true);
+  });
 });
 
 describe('Hex play-budget search', () => {
@@ -76,12 +98,19 @@ describe('Hex play-budget search', () => {
     expect(HEX_PLAY_MS.hard).toBeGreaterThan(0);
   });
 
+  it('deadline 0 still truncates on midgame', () => {
+    const state = hexMidgame();
+    const result = searchBestMove(state, 'player1', 'hard', {
+      seed: 4,
+      deadlineMs: 0,
+      now: expireAfterStart(0),
+    });
+    expect(result.move).not.toBeNull();
+    expect(result.truncated).toBe(true);
+  });
+
   it('tight budget midgame returns a legal empty cell', () => {
-    let state = createHexState(11);
-    state = makeHexMove(state, { row: 5, col: 5 });
-    state = makeHexMove(state, { row: 5, col: 6 });
-    state = makeHexMove(state, { row: 4, col: 5 });
-    state = makeHexMove(state, { row: 6, col: 5 });
+    const state = hexMidgame();
     const result = searchBestMove(state, 'player1', 'hard', {
       seed: 9,
       deadlineMs: 25,
@@ -94,29 +123,25 @@ describe('Hex play-budget search', () => {
     ).toBe(true);
   });
 
-  it('Hard midgame stays near the play budget', () => {
-    let state = createHexState(11);
-    state = makeHexMove(state, { row: 5, col: 5 });
-    state = makeHexMove(state, { row: 5, col: 6 });
-    state = makeHexMove(state, { row: 4, col: 5 });
-    state = makeHexMove(state, { row: 6, col: 5 });
+  it('Hard midgame truncates when fake clock exceeds play budget (#382)', () => {
+    const state = hexMidgame();
     const budget = HEX_PLAY_MS.hard;
-    const t0 = performance.now();
     const result = searchBestMove(state, 'player1', 'hard', {
       seed: 4,
       deadlineMs: budget,
+      now: expireAfterStart(budget),
     });
-    const elapsed = performance.now() - t0;
     expect(result.move).not.toBeNull();
-    expect(elapsed).toBeLessThan(budget + 750);
-  }, 10_000);
+    expect(result.truncated).toBe(true);
+    expect(
+      getHexMoves(state).some(
+        (m) => m.row === result.move!.row && m.col === result.move!.col
+      )
+    ).toBe(true);
+  });
 
   it('unlimited Hard midgame still completes maxDepth without truncation', () => {
-    let state = createHexState(11);
-    state = makeHexMove(state, { row: 5, col: 5 });
-    state = makeHexMove(state, { row: 5, col: 6 });
-    state = makeHexMove(state, { row: 4, col: 5 });
-    state = makeHexMove(state, { row: 6, col: 5 });
+    const state = hexMidgame();
     const result = searchBestMove(state, 'player1', 'hard', { seed: 4 });
     expect(result.move).not.toBeNull();
     expect(result.truncated).toBe(false);
