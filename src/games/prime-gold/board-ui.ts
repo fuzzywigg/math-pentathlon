@@ -18,13 +18,11 @@ import { seatIcon } from '../../ui/player-colors';
 // Style Injection
 // =============================================================================
 
-let stylesInjected = false;
-
 export function injectPrimeGoldStyles(): void {
-  if (stylesInjected) return;
-  stylesInjected = true;
+  if (document.getElementById('prime-gold-styles')) return;
 
   const style = document.createElement('style');
+  style.id = 'prime-gold-styles';
   style.textContent = `
     .pg-game-area {
       display: flex;
@@ -158,6 +156,12 @@ export function injectPrimeGoldStyles(): void {
     .pg-cell.valid:hover {
       background: rgba(76, 175, 80, 0.3);
       transform: scale(1.05);
+    }
+
+    .pg-roll-btn,
+    .pg-btn,
+    .pg-expr-item {
+      min-height: 44px;
     }
 
     .pg-cell.player1 {
@@ -372,8 +376,58 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-move-item.player1 { color: var(--color-player1, #64b5f6); }
     .pg-move-item.player2 { color: var(--color-player2, #ef9a9a); }
+
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+    @media (pointer: coarse) {
+      .pg-cell {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .pg-board {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+      }
+
+      .pg-roll-btn,
+      .pg-btn,
+      .pg-expr-item {
+        min-height: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pg-cell,
+      .pg-roll-btn,
+      .pg-expr-item,
+      .pg-btn,
+      .pg-winner-banner {
+        transition: none;
+        animation: none !important;
+      }
+
+      .pg-cell.valid:hover,
+      .pg-roll-btn:hover,
+      .pg-expr-item:hover,
+      .pg-btn-primary:hover,
+      .pg-btn-secondary:hover {
+        transform: none;
+      }
+
+      .pg-die.rolling {
+        animation: none;
+      }
+    }
   `;
   document.head.appendChild(style);
+}
+
+export interface PrimeGoldBoardRenderOptions {
+  /** When false, suppress placement highlights and activate handlers (AI seat). */
+  allowInput?: boolean;
 }
 
 // =============================================================================
@@ -393,8 +447,10 @@ export function getPlayerName(player: Player): string {
  */
 export function renderBoard(
   state: PrimeGoldState,
-  onCellClick: (value: number, expr: string) => void
+  onCellClick: (value: number, expr: string) => void,
+  options: PrimeGoldBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'pg-board-container';
 
@@ -402,7 +458,7 @@ export function renderBoard(
   board.className = 'pg-board';
   markBoardAsGrid(board);
 
-  const validPlacements = getValidPlacements(state);
+  const validPlacements = allowInput ? getValidPlacements(state) : [];
   const validMap = new Map(validPlacements.map((p) => [p.value, p.expr]));
 
   // Create cells in grid order
@@ -424,9 +480,9 @@ export function renderBoard(
         if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
 
         const expr = validMap.get(cell.value);
-        const isValid = !!expr;
+        const isValid = allowInput && !!expr;
 
-        if (expr) {
+        if (isValid && expr) {
           cellEl.classList.add('valid');
           const activate = () => onCellClick(cell.value, expr);
           cellEl.addEventListener('click', activate);
@@ -485,8 +541,10 @@ export function renderBoard(
  */
 export function renderDice(
   state: PrimeGoldState,
-  onRoll: () => void
+  onRoll: () => void,
+  options: PrimeGoldBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'pg-dice-area';
 
@@ -524,7 +582,7 @@ export function renderDice(
 
   container.appendChild(diceContainer);
 
-  if (state.phase === 'rolling') {
+  if (state.phase === 'rolling' && allowInput) {
     const rollBtn = document.createElement('button');
     rollBtn.className = 'pg-roll-btn';
     rollBtn.textContent = 'Roll Dice';
@@ -544,14 +602,25 @@ export function renderDice(
  */
 export function renderExpressions(
   state: PrimeGoldState,
-  onSelect: (value: number, expr: string) => void
+  onSelect: (value: number, expr: string) => void,
+  options: PrimeGoldBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'pg-expressions';
 
   const title = document.createElement('h3');
   title.textContent = 'Valid Moves';
   container.appendChild(title);
+
+  if (!allowInput) {
+    const wait = document.createElement('div');
+    wait.className = 'pg-computer-thinking';
+    wait.style.color = '#888';
+    wait.textContent = 'Computer is thinking…';
+    container.appendChild(wait);
+    return container;
+  }
 
   const placements = getValidPlacements(state);
 
@@ -566,7 +635,15 @@ export function renderExpressions(
       item.className = 'pg-expr-item';
       if (isPrime(value)) item.classList.add('prime');
       item.innerHTML = `<strong>${value}</strong> = ${expr}`;
-      item.addEventListener('click', () => onSelect(value, expr));
+      item.setAttribute('role', 'button');
+      item.tabIndex = 0;
+      item.setAttribute(
+        'aria-label',
+        `${value} equals ${expr}${isPrime(value) ? ', prime' : ''}, valid placement`
+      );
+      const activate = () => onSelect(value, expr);
+      item.addEventListener('click', activate);
+      bindCellActivateKeys(item, activate);
       container.appendChild(item);
     }
   }
