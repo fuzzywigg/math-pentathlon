@@ -107,9 +107,15 @@
   --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Smooth scrolling */
+/* Smooth scrolling — honor reduced motion (shell / menu keepers) */
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Better text rendering */
@@ -776,6 +782,11 @@ h1 {
   background: #e8e8e8;
 }
 
+.mode-option:focus-within {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .mode-option.selected {
   border-color: #1976d2;
   background: #e3f2fd;
@@ -840,6 +851,11 @@ h1 {
   border-color: #1976d2;
 }
 
+.difficulty-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .difficulty-btn.selected {
   border-color: #1976d2;
   background: #1976d2;
@@ -876,6 +892,11 @@ h1 {
 
 .start-game-btn:hover {
   background: #1565c0;
+}
+
+.start-game-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* New Game button */
@@ -976,6 +997,11 @@ h1 {
 
 .collapse-toggle:hover {
   background: #e8e8e8;
+}
+
+.collapse-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .collapse-icon {
@@ -1108,6 +1134,11 @@ h1 {
 
 .modal-close:hover {
   background-color: #f0f0f0;
+}
+
+.modal-close:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .rules-content {
@@ -1617,6 +1648,11 @@ h1 {
   box-shadow: var(--shadow-sm);
 }
 
+.division-tab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .division-tab.active {
   background: linear-gradient(135deg, #1e3a8a, #3b82f6);
   border-color: transparent;
@@ -1679,6 +1715,10 @@ h1 {
 }
 
 .accordion-header:focus {
+  outline: none;
+}
+
+.accordion-header:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 3px rgba(59, 130, 246, 0.4);
 }
@@ -1784,6 +1824,10 @@ h1 {
 }
 
 .game-card:focus {
+  outline: none;
+}
+
+.game-card:focus-visible {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
@@ -1925,6 +1969,33 @@ h1 {
   font-size: 0.8rem;
   color: #94a3b8;
   line-height: 1.5;
+}
+
+/* Shell / menu reduced motion — accordion + tab/card chrome only.
+   Kept near menu styles (not the EOF game-animation block) to avoid
+   colliding with in-flight tablet/game reduced-motion PRs. */
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+
+  .division-tab,
+  .division-accordion,
+  .accordion-header,
+  .accordion-chevron,
+  .accordion-panel,
+  .game-card,
+  .game-card-icon {
+    transition: none !important;
+  }
+
+  .division-tab:hover,
+  .division-tab.active,
+  .game-card:hover,
+  .game-card:hover .game-card-icon,
+  .game-card:active {
+    transform: none;
+  }
 }
 
 /* Responsive adjustments for game selector */
