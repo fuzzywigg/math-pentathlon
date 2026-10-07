@@ -1,0 +1,579 @@
+{
+  "base": "http://127.0.0.1:5173",
+  "gamesPer": 10,
+  "note": "tablet/easy uses rerun after claim-search + confirmingMove UX fixes",
+  "results": [
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1807,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1314,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1300,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1305,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1304,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1300,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1817,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1301,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1302,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1303,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1803,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1298,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1301,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1309,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1304,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1299,
+      "errors": 0
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1817,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1296,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1296,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1298,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1304,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1309,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1799,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1808,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1298,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1299,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1293,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 1,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1298,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 2,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1295,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 3,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 4,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1300,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 5,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1296,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 6,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1294,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 7,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 8,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1299,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 9,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1296,
+      "errors": 0
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "game": 10,
+      "ok": true,
+      "history": 10,
+      "maxAiThink": 1297,
+      "errors": 0
+    }
+  ],
+  "totals": {
+    "games": 60,
+    "passed": 60,
+    "failed": 0,
+    "avgMaxAiThink": 1349,
+    "byCombo": {
+      "desktop/easy": {
+        "passed": 10,
+        "failed": 0
+      },
+      "desktop/hard": {
+        "passed": 10,
+        "failed": 0
+      },
+      "desktop/medium": {
+        "passed": 10,
+        "failed": 0
+      },
+      "tablet/easy": {
+        "passed": 10,
+        "failed": 0
+      },
+      "tablet/hard": {
+        "passed": 10,
+        "failed": 0
+      },
+      "tablet/medium": {
+        "passed": 10,
+        "failed": 0
+      }
+    }
+  }
+}
