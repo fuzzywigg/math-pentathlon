@@ -15,6 +15,12 @@ const isolatedFiles = [
   'tests/unit/existing-games-tutorials.test.ts',
   // MP-3D suites mock feature-flags / three.js and must not leak into 2D controller tests.
   'tests/unit/mp3d-*.test.ts',
+  // Hoisted router.navigate mock must not share a graph with files that call
+  // restoreAllMocks under isolate:false shuffle.
+  'tests/unit/burn-wave24-stats-selector-ui.test.ts',
+  // Module-level bench accumulator + summarize it() is order-dependent under
+  // --sequence.shuffle; isolate + afterAll summary keeps it deterministic.
+  'tests/unit/tablet-ai-hard-latency.bench.test.ts',
 ];
 
 export default defineConfig({

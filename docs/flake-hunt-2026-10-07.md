@@ -9,11 +9,11 @@
 
 ## Method
 
-| Mode | Runs | Seeds / notes |
+| Mode | Runs | Notes |
 | --- | --- | --- |
-| Default order | 6+ re-verify | Stable baseline + intermittent catch |
-| Shuffle | 8+ then more | Seeds include `101–808`, `909`, `2002`, … |
-| Solo / stress | yes | Kwatro Hard AI 50–80×; Calla hint alone |
+| Default order | 6+ | Baseline |
+| Shuffle | 14+ seeds | Includes previously failing `404/505/606/909/1111/2002/3333` |
+| Solo / stress | yes | Kwatro Hard AI 50–80×; Calla hint; bench shuffle |
 | Causal repro | yes | Leaked `performance.now` / fake timers; Calla hint module leak |
 
 ```bash
@@ -21,48 +21,61 @@ npm run test:unit
 npx vitest run --sequence.shuffle --sequence.seed=<N>
 ```
 
-Artifacts: `/opt/cursor/artifacts/flake-hunt/` (`summary.tsv`, `postfix*-summary.tsv`, per-run logs).
+Artifacts: `/opt/cursor/artifacts/flake-hunt/`.
 
-## Flakes found
+## Flakes found and fixed
 
 ### 1. Graph `animateMove` wall-clock hang (shuffle)
 
 - **File:** `tests/unit/burn-wave40-graph-ui-legend-valids-animate.test.ts`
-- **Case:** `showValidMoves marks neighbors; animateMove settles short path`
-- **Symptom:** `Test timed out in 30000ms` on shuffle seeds `404` / `505` / `606`; passes alone.
-- **Root cause:** `animateMove` uses RAF + `performance.now()`. Under `isolate: false`, a prior file can leave fake timers or a `performance.now` spy ahead of RAF timestamps → infinite/non-advancing animation. Shared setup cleared timers but not globals stubs / `performance.now` spies (`clearAllMocks` does not remove implementations).
-- **Fix:** Deterministic `stubRafClock()` (same pattern as Wave 33 / 57); setup `unstubAllGlobals` + `performance.now` mockRestore; `sequence.hooks: 'stack'`.
+- **Symptom:** `Test timed out in 30000ms` (seeds `404/505/606`); passes alone.
+- **Root cause:** RAF + `performance.now` await under leaked fake timers / stuck `performance.now` spy (`isolate: false`). Setup cleared timers but not globals stubs / spy implementations.
+- **Fix:** Deterministic `stubRafClock()`; setup `unstubAllGlobals` + `performance.now` mockRestore; `sequence.hooks: 'stack'`.
 
-### 2. Kwatro Hard AI chip identity (randomness) — the suite intermittent
+### 2. Kwatro Hard AI chip identity (randomness)
 
 - **File:** `tests/unit/kwatro-sinko-end-rules-375.test.ts`
 - **Case:** `vs computer: Hard AI can convert a forced legal win`
-- **Symptom:** `expected 'p1-4' to be 'p1-1'` (also fails alone ~2/50 without a seed).
-- **Root cause:** Hard AI `DIFFICULTY_CONFIG.hard.randomness = 0.03` sometimes picks among the top scored moves (`Math.random`). Not contiguous-scoring / rules — test asserted a single chip without seeding RNG.
-- **Fix (tests only):** `vi.spyOn(Math, 'random').mockReturnValue(0.99)` for that case; targeted `mockRestore` in `afterEach` (no `restoreAllMocks`).
+- **Symptom:** `expected 'p1-4' to be 'p1-1'` (~2/50 alone without seed; also in full default runs).
+- **Root cause:** Hard AI `randomness: 0.03` occasionally picks among top scored moves. Test asserted a single chip without seeding RNG. **Not** contiguous-scoring / rules.
+- **Fix:** `Math.random` → `0.99` for that case; targeted `mockRestore` only.
 
 ### 3. Calla `currentHint` module leak (shuffle)
 
-- **File:** `tests/unit/burn-wave19-controller-persist.test.ts` (polluter: `overnight-wave50-calla-controller-ai-timer.test.ts`)
-- **Symptom:** `expected 'Look carefully! There is a capture.' to be null` after `initCalla`.
-- **Root cause:** Wave 50 AI-timer test sets module-level `currentHint` via mocked `getAIMove`. `newGameVsHuman` / `initGame` do **not** clear it; only `newGameVsAI` does. Shared DOM cleanup does not reset that singleton.
-- **Fix:** Wave 50 `afterEach` remounts and calls `newGameVsAI` to clear hint; Wave 19 asserts hint null **after** `callaVsAI` (the public clear path). Spy cleanup is targeted (`mockRestore` on `getAIMove` only).
+- **Files:** polluter `overnight-wave50-calla-controller-ai-timer.test.ts` → victim `burn-wave19-controller-persist.test.ts`
+- **Symptom:** hint expected `null`, got `"Look carefully! There is a capture."`
+- **Root cause:** Module-level `currentHint` set by mocked AI; `init` / `newGameVsHuman` do not clear it (only `newGameVsAI` does).
+- **Fix:** Wave 50 `afterEach` calls `newGameVsAI` to clear; Wave 19 asserts after `callaVsAI`.
 
-### 4. Game-selector `navigate` mock torn down (`restoreAllMocks`)
+### 4. Game-selector `navigate` mock (shuffle)
 
-- **File:** `tests/unit/burn-wave24-stats-selector-ui.test.ts` (also aggravated by other files’ `restoreAllMocks`)
-- **Symptom:** `navigate` expected called with `/game/…` but **0 calls** under shuffle seed `2002`.
-- **Root cause:** Under `isolate: false`, `vi.restoreAllMocks()` in file `afterEach` (and sibling graph RAF suites) tears down hoisted `vi.mock('../../src/core/router')` factories. Setup intentionally avoids `restoreAllMocks` for this reason.
-- **Fix:** Replace `restoreAllMocks` with targeted restores in Wave 24 selector UI, Wave 33/34/40/57 graph animate suites, Wave 50 Calla timer, and the Kwatro #375 suite.
+- **File:** `tests/unit/burn-wave24-stats-selector-ui.test.ts`
+- **Symptom:** `navigate` expected `/game/kings-quadraphages` but **0 calls** (seed `909`).
+- **Root cause:** Under `isolate: false`, sibling `vi.restoreAllMocks()` tears down hoisted `vi.mock(router)`.
+- **Fix:** Targeted restores in graph/Calla/Kwatro suites; move this file into `unit-isolated`.
 
-## Post-fix verification
+### 5. Tablet Hard AI bench summary order (shuffle)
 
-- Solo + stress: Kwatro forced-win **0 fails / 50–80**.
-- Previously failing shuffle seeds `404`, `505`, `606`, `2002` re-run green after fixes.
-- Additional default + shuffle loops recorded in `postfix3-summary.tsv`.
+- **File:** `tests/unit/tablet-ai-hard-latency.bench.test.ts`
+- **Symptom:** `expected 0 to be greater than 0` on summarize (seeds `1111/3333`).
+- **Root cause:** Module-level `rows` filled by sibling `it()`s; `--sequence.shuffle` can run summarize first.
+- **Fix:** Move summary assertions to `afterAll`; isolate the file in `unit-isolated`.
+
+## Setup / config changes
+
+- `tests/unit/setup.ts` — `unstubAllGlobals()`, restore `performance.now` spies (still **no** `restoreAllMocks`).
+- `vitest.config.ts` — `sequence.hooks: 'stack'`; isolate Wave 24 selector + tablet bench.
+
+## Verification (post-fix)
+
+| Check | Result |
+| --- | --- |
+| Kwatro forced-win stress | 0 fails / 50–80 |
+| Seeds `404/505/606/2002/909/1111/3333` | green after fixes |
+| Default-order postfix runs | green |
 
 ## Out of scope / not changed
 
 - Kwatro rules, contiguous scoring, AI evaluation weights (#393 / #394).
-- Production controllers beyond test cleanup calling existing public APIs (`newGameVsAI`).
+- Production controllers beyond calling existing public APIs from tests (`newGameVsAI`).
 - Migrating all of `unit-shared` to `isolate: true`.
