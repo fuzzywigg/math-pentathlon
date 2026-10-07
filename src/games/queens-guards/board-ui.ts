@@ -348,7 +348,9 @@ export function injectQGStyles(): void {
       padding-right: 0.5rem;
     }
 
-    .qg-board-container {
+    /* 2D SVG only — do not pin width on .board-3d-host / .qg-board-3d-host
+       or canvas ray-picks (cellToClientPoint) drift under overflow-x. */
+    .qg-board-container:not(.board-3d-host) {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -360,8 +362,8 @@ export function injectQGStyles(): void {
       margin: 0 auto;
     }
 
-    .qg-board-container svg.qg-board,
-    .qg-board-container svg {
+    .qg-board-container:not(.board-3d-host) svg.qg-board,
+    .qg-board-container:not(.board-3d-host) svg {
       display: block;
       min-width: 660px;
       width: 660px;
