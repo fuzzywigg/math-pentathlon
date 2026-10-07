@@ -10,6 +10,7 @@ import {
   dismissModeIfNeeded,
   enableBoard3dLowQuality,
   keyboardActivateA11yCell,
+  primeGoldValidA11yCell,
   waitForGameReady,
   waitForHumanStatus,
   waitForMp3dReady,
@@ -260,8 +261,6 @@ test.describe('mp3d Prime Gold 3D board', () => {
       const allBtns = Array.from(
         document.querySelectorAll('.pg-a11y-grid button')
       );
-      // Heuristic: valid targets are the ones syncA11y wired before restoreGridFocus
-      // may have collapsed tabindex — compare expr list values vs tabindex=0.
       const exprTexts = Array.from(
         document.querySelectorAll('.pg-expr-item')
       ).map((el) => el.textContent?.trim() ?? '');
@@ -295,11 +294,14 @@ test.describe('mp3d Prime Gold 3D board', () => {
         data: placeProbe,
         timestamp: Date.now(),
         hypothesisId: 'A,B',
+        runId: 'post-fix',
       }) + '\n'
     );
     // #endregion
 
-    const focusable = page.locator('.pg-a11y-grid button[tabindex="0"]').first();
+    // Do not use button[tabindex="0"]: restoreGridFocus often leaves only a
+    // non-valid cell tabbable. Valid a11y buttons still have click handlers.
+    const focusable = await primeGoldValidA11yCell(page);
     await keyboardActivateA11yCell(page, focusable);
 
     // Successful place mounts move history; never union-query with .pg-status

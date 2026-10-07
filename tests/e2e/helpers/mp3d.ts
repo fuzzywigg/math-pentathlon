@@ -69,6 +69,37 @@ export async function waitForMp3dReady(
 }
 
 /**
+ * Prime Gold 3D a11y cell that can actually place.
+ *
+ * After chrome rebuild, `restoreGridFocus` / `applyRovingTabindex` collapses
+ * `tabindex` to a single gridcell (often [0,0]) that is frequently *not* a
+ * valid placement — so `button[tabindex="0"]` is the wrong activation target.
+ * Valid cells retain their click handlers; match them via the Valid Moves list.
+ */
+export async function primeGoldValidA11yCell(page: Page): Promise<Locator> {
+  const exprValue = page.locator('.pg-expr-item strong').first();
+  await expect(exprValue).toBeAttached({ timeout: 10_000 });
+  const value = (await exprValue.textContent())?.trim();
+  expect(value, 'expected at least one valid Prime Gold expression').toBeTruthy();
+  const cell = page.locator(`.pg-a11y-grid button[data-value="${value}"]`);
+  await expect(cell).toBeAttached({ timeout: 10_000 });
+  // #region agent log
+  fs.appendFileSync(
+    '/opt/cursor/logs/debug.log',
+    JSON.stringify({
+      location: 'mp3d.ts:primeGoldValidA11yCell',
+      message: 'resolved valid a11y placement cell',
+      data: { value },
+      timestamp: Date.now(),
+      hypothesisId: 'A',
+      runId: 'post-fix',
+    }) + '\n'
+  );
+  // #endregion
+  return cell;
+}
+
+/**
  * Visually-hidden a11y grids use clip/1px sizing — `toBeVisible` is flaky.
  * Wait for attach, focus, then Enter (button activates via click handler).
  */
@@ -95,6 +126,7 @@ export async function keyboardActivateA11yCell(
       data: preFocus,
       timestamp: Date.now(),
       hypothesisId: 'A',
+      runId: 'post-fix',
     }) + '\n'
   );
   // #endregion
@@ -135,7 +167,8 @@ export async function keyboardActivateA11yCell(
       activeRow: active?.getAttribute?.('data-row'),
       activeCol: active?.getAttribute?.('data-col'),
       activeTabIndex: active?.tabIndex,
-      focusedIsValidPlacement: !!activeValue && validValues.includes(activeValue),
+      focusedIsValidPlacement:
+        !!activeValue && validValues.includes(activeValue),
       validValuesSample: validValues.slice(0, 12),
       tabindex0Count: zeros.length,
       tabindex0Cells: zeros.slice(0, 8),
@@ -156,6 +189,7 @@ export async function keyboardActivateA11yCell(
       data: preEnter,
       timestamp: Date.now(),
       hypothesisId: 'A,B,C',
+      runId: 'post-fix',
     }) + '\n'
   );
   // #endregion
@@ -193,6 +227,7 @@ export async function keyboardActivateA11yCell(
       data: postEnter,
       timestamp: Date.now(),
       hypothesisId: 'A,D,E',
+      runId: 'post-fix',
     }) + '\n'
   );
   // #endregion
