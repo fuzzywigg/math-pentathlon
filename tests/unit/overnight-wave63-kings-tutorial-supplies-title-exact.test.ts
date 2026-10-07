@@ -8,7 +8,7 @@ describe('Wave 63 kings — tutorial supplies title', () => {
   it('supplies title; place one each turn; status-supplies highlight', () => {
     const supplies = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'supplies');
     expect(supplies?.title).toBe('Quadraphage Supplies');
-    expect(supplies?.message).toMatch(/place one each turn/);
+    expect(supplies?.message).toMatch(/place one each turn while/);
     expect(supplies?.highlightSelector).toBe('.status-supplies');
   });
 });

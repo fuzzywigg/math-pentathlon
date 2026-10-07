@@ -21,7 +21,8 @@ export const callaTutorial: TutorialConfig = {
       title: 'How to Win',
       message: `
         <p>The goal is to get the <strong>most cubes in your Calla</strong> (your big cup)!</p>
-        <p>The game ends when all cubes are collected.</p>
+        <p>The game ends when one side has no cubes left in its pits;
+        leftover cubes on the other side go into that player's Calla.</p>
       `,
       position: 'center',
     },
@@ -30,9 +31,9 @@ export const callaTutorial: TutorialConfig = {
       title: 'The Game Board',
       message: `
         <p>The board has two rows of pits (cups).</p>
-        <p><span style="color: #2196F3">Blue's pits</span> are on top.</p>
-        <p><span style="color: #e53935">Red's pits</span> are on the bottom.</p>
-        <p>Each player has a <strong>Calla</strong> (big cup) on their right side!</p>
+        <p><span style="color: #e53935">Red's pits</span> are on top.</p>
+        <p><span style="color: #2196F3">Blue's pits</span> are on the bottom.</p>
+        <p>Blue's <strong>Calla</strong> is on the right; Red's is on the left!</p>
       `,
       highlightSelector: '.calla-board',
       position: 'bottom',
@@ -88,7 +89,7 @@ export const callaTutorial: TutorialConfig = {
         <p><strong>Another special rule:</strong></p>
         <p>If your last cube lands in an <strong>empty pit on YOUR side</strong>,
         AND the pit across from it has cubes...</p>
-        <p>You capture ALL those cubes into your Calla!</p>
+        <p>You capture your landing cube and ALL those cubes from the opposite pit into your Calla!</p>
       `,
       position: 'center',
     },

@@ -66,7 +66,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
           <li><strong>Move your King</strong> - one square in any direction</li>
           <li><strong>Place a Quadraphage</strong> - a blocker on any empty square</li>
         </ol>
-        <p>You must complete both actions every turn!</p>
+        <p>Move your King every turn, then place a Quadraphage if you still have one!</p>
       `,
       position: 'center',
     },
@@ -149,8 +149,10 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       title: 'Quadraphage Supplies',
       message: `
         <p>Each player starts with <strong>30 Quadraphages</strong>.</p>
-        <p>The supply counts are shown here. You place one each turn,
-        so plan your strategy carefully!</p>
+        <p>The supply counts are shown here. You place one each turn while
+        you still have chips, so plan your strategy carefully!</p>
+        <p>If neither King is trapped and a player has no chips left at the
+        start of their turn, the game ends in a tie.</p>
       `,
       highlightSelector: '.status-supplies',
       position: 'bottom',
@@ -160,7 +162,8 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       title: 'How to Win',
       message: `
         <p>You win when your opponent's King has <strong>no valid moves</strong>
-        at the start of their turn.</p>
+        at the start of their turn (or the game may end in a tie if chips run out
+        with neither King trapped).</p>
         <p>This happens when all 8 squares around their King are either:</p>
         <ul>
           <li>Off the board (edge/corner)</li>

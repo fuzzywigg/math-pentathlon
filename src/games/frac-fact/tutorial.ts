@@ -66,7 +66,7 @@ export const fracFactTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>After 10 problems each, the player with the highest score wins!</p>
+        <p>After 10 problems total (players alternate), the player with the highest score wins!</p>
       `,
       position: 'center',
     },

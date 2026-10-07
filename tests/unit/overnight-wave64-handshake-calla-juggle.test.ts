@@ -30,7 +30,9 @@ describe('Wave 64 handshake — calla × juggle leftovers', () => {
     ).toContain("Red's pits");
     expect(
       callaTutorial.steps.find((s) => s.id === 'capture')?.message
-    ).toContain('You capture ALL those cubes into your Calla');
+    ).toContain(
+      'You capture your landing cube and ALL those cubes from the opposite pit into your Calla'
+    );
     expect(
       callaTutorial.steps.find((s) => s.id === 'complete')?.message
     ).toContain('Now you know how to play Calla!');

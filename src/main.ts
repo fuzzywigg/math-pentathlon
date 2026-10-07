@@ -205,11 +205,12 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
             <li>Kings can move one cell in any direction (like chess)</li>
             <li>Kings cannot move onto Quadraphages or the other King</li>
             <li>Quadraphages stay where placed for the entire game</li>
-            <li>You must complete both actions each turn</li>
+            <li>Each turn: move your King, then place a Quadraphage if you still have one</li>
           </ul>
 
           <h3>Winning</h3>
-          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>`,
+          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>
+          <p>If neither King is trapped and a player has no Quadraphages left to place at the start of their turn, the game ends in a tie.</p>`
     gameAreaClass: 'game-area',
     modeRadioName: 'game-mode',
     vsHumanDescription: 'Pass & play with a friend',
@@ -330,7 +331,7 @@ async function renderStarTrack(routeGen: number): Promise<void> {
 
           <h3>Gameplay</h3>
           <ol>
-            <li><strong>Draw Chains:</strong> Tap <em>Draw Chains</em> once. You get <em>two chain options</em> (two different lengths) — not two moves.</li>
+            <li><strong>Draw Chains:</strong> Tap <em>Draw Chains</em> once. You get <em>two chain options</em> (lengths 1–6; they might match) — not two moves.</li>
             <li><strong>Choose:</strong> Tap <em>one</em> of the two chains to use.</li>
             <li><strong>Move:</strong> Your piece advances by that chain's length. The unused chain goes back in the bucket.</li>
           </ol>
@@ -586,12 +587,12 @@ async function renderCalla(routeGen: number): Promise<void> {
           <h3>Special Rules</h3>
           <ul>
             <li><strong>Free Turn:</strong> If your last cube lands in your Calla, take another turn!</li>
-            <li><strong>Capture:</strong> If your last cube lands in an empty shield on your side, capture that cube AND all cubes in the opposite shield!</li>
+            <li><strong>Capture:</strong> If your last cube lands in an empty shield on your side <em>and the opposite shield has cubes</em>, capture your landing cube and those opposite cubes into your Calla!</li>
             <li>You skip your opponent's Calla when sowing</li>
           </ul>
 
           <h3>Game End</h3>
-          <p>The game ends when one side has no cubes. Remaining cubes go to that side's player. Most cubes in Calla wins!</p>
+          <p>The game ends when one side has no cubes. Remaining cubes go to that side's player. Most cubes in Calla wins; equal Callas is a tie.</p>
 
           <h3>Strategy Tips</h3>
           <ul>
@@ -817,7 +818,7 @@ async function renderContig60(routeGen: number): Promise<void> {
           <h3>Passing</h3>
           <ul>
             <li>If you cannot make any available number, you must pass</li>
-            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
+            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner (or a draw)</li>
           </ul>
 
           <h3>Winning</h3>
@@ -884,7 +885,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
 
           <h3>Placement Rules</h3>
           <ul>
-            <li>Shapes can be rotated and flipped</li>
+            <li>Shapes can be rotated and/or flipped when that shape allows it</li>
             <li>Shapes must fit entirely within your 9x9 grid</li>
             <li>Shapes cannot overlap with previously placed shapes</li>
           </ul>
@@ -937,7 +938,7 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
 
           <h3>Turn Sequence</h3>
           <ol>
-            <li><strong>Select Bars:</strong> Choose two fraction bars from your pool</li>
+            <li><strong>Select Bars:</strong> Choose two unused fraction bars from the shared pool</li>
             <li><strong>Choose Operation:</strong> Pick +, −, ×, or ÷</li>
             <li><strong>Match Answer:</strong> If the result matches an available answer bar, claim it!</li>
           </ol>
@@ -1030,7 +1031,7 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
           <ul>
             <li>If you cannot play any domino, you must pass</li>
             <li>If both players pass consecutively, the game ends</li>
-            <li>Player with fewer total pips on remaining dominoes wins</li>
+            <li>Player with fewer total pips on remaining dominoes wins; equal pips is a draw</li>
           </ul>
 
           <h3>Strategy Tips</h3>
@@ -1247,10 +1248,11 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
 
           <h3>Winning</h3>
           <ul>
-            <li>Form 3 chips in a line (any direction)</li>
-            <li>The alignment must satisfy: <strong>a + b - c = 4</strong> OR <strong>a + b - c = 5</strong></li>
-            <li>Example: 6 + 3 - 5 = 4 ✓</li>
-            <li>Example: 8 + 1 - 4 = 5 ✓</li>
+            <li>All 5 of your chips must be off the numbered start rows</li>
+            <li>Form 3 chips in a line: two of one color and one of the opposite color</li>
+            <li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>
+            <li>Example: 6 + 2 - 3 = 5 ✓</li>
+            <li>Example: 9 + 1 - 6 = 4 ✓</li>
           </ul>
 
           <h3>Strategy Tips</h3>
@@ -1336,7 +1338,7 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
             <li>Target prime numbers (gold cells)</li>
             <li>Build along diagonal lines</li>
             <li>Block opponent's potential veins</li>
-            <li>Factorials give big numbers: 5!=120</li>
+            <li>Factorials help: 4!=24 (5! is off the 1–49 board)</li>
           </ul>`,
     gameAreaClass: 'pg-game-area',
     modeRadioName: 'pg-mode',
@@ -1475,7 +1477,7 @@ async function renderFracFact(routeGen: number): Promise<void> {
           </ul>
 
           <h3>Winning</h3>
-          <p>After 10 problems each, the player with the highest score wins!</p>`,
+          <p>After 10 problems total (players alternate), the player with the highest score wins!</p>`,
     modeRadioName: 'frac-mode',
     vsHumanDescription: 'Take turns solving problems',
     vsAiDescription: 'Compete against the computer',
@@ -1688,7 +1690,7 @@ async function renderStarsBars(routeGen: number): Promise<void> {
           <ol>
             <li>Select a card from your hand</li>
             <li>Place it on a green (valid) cell</li>
-            <li>Must place adjacent to existing cards</li>
+            <li>First card may go anywhere; later cards must be adjacent to an existing card</li>
           </ol>
 
           <h3>Strategy Tips</h3>

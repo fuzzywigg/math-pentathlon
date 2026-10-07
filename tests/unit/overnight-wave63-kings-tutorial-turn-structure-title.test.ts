@@ -8,7 +8,9 @@ describe('Wave 63 kings — tutorial turn-structure title', () => {
   it('turn-structure title; You must complete both actions', () => {
     const turn = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'turn-structure');
     expect(turn?.title).toBe('Turn Structure');
-    expect(turn?.message).toMatch(/You must complete both actions every turn/);
+    expect(turn?.message).toMatch(
+      /place a Quadraphage if you still have one/
+    );
     expect(turn?.position).toBe('center');
   });
 });

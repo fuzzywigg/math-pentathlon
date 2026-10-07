@@ -29,7 +29,7 @@ export const fabADiffyTutorial: TutorialConfig = {
       title: 'Turn Sequence',
       message: `
         <ol>
-          <li><strong>Select Bars:</strong> Choose two fraction bars from your pool</li>
+          <li><strong>Select Bars:</strong> Choose two unused fraction bars from the shared pool</li>
           <li><strong>Choose Operation:</strong> Pick +, −, ×, or ÷</li>
           <li><strong>Match Answer:</strong> If the result matches an available answer bar, claim it!</li>
         </ol>
