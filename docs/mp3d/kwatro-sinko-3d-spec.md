@@ -9,10 +9,8 @@ Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Divi
 
 ## Rules judgment calls
 
-1. **Diagonal connectivity:** Still open for Andrew (#355). Div II Highlights do not specify which spaces have diagonal movement links. The engine (`createBoard`) only adds diagonal links in the central 3×3. The kit photo / product copy say chips move on horizontal, vertical, **and diagonal** pathways on an 8-point star board — not a 5×5 lattice — so expanding diagonals here would be a board-model change, not a Highlights polish. This 3D board draws and plays the **engine** graph so 2D/3D stay identical.
+1. **Diagonal connectivity:** Open for Andrew (#355). The engine (`createBoard`) only adds diagonal links in the central 3×3. This 3D board draws and plays the **engine** graph so 2D/3D stay identical.
 2. **Win condition (conjunctive):** Div II Highlights — all 5 of the player's chips must be on non-numbered spaces **and** the player must identify a straight path of exactly 3 chips (two of one color, one of the opposite) where like + like − opposite totals 4 or 5. A win cannot be declared until all 5 chips are off all numbered spaces. There is no standalone "territory" win.
-3. **Non-contiguous winning paths (implemented):** Div II GOAL quote — *“The path of 3 chips does not need to be contiguous but cannot cross the middle (yellow) area of the board.”* Engine win detection now allows empty gaps along a straight geometric line (same walk the Hard AI heuristic already used). Contiguous wins still count.
-4. **Yellow middle (open):** The official kit is an 8-point star with a yellow/orange center; the digital board is a playable 5×5 with no non-playable yellow cell. **Yes/no for Andrew:** should the 5×5 model add a yellow-crossing ban (and if so, which edges/cells map to “middle yellow”), or keep gaps-only until a star-board rebuild?
 
 ## Grid
 

@@ -316,13 +316,7 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
 // =============================================================================
 
 /**
- * Find a winning alignment through a node.
- *
- * Div II Highlights GOAL: the path of exactly 3 chips “does not need to be
- * contiguous but cannot cross the middle (yellow) area of the board.”
- * Empty gaps along a straight geometric line are therefore allowed. The 5×5
- * digital board does not yet model a non-playable yellow center (open for
- * Andrew — see docs/mp3d/kwatro-sinko-3d-spec.md).
+ * Find a winning alignment through a node
  */
 export function findWinningAlignment(
   nodes: Map<string, BoardNode>,
@@ -364,7 +358,7 @@ export function findWinningAlignment(
     // Add current node
     lineChips.push({ node, chip: node.chip });
 
-    // Go in both directions — empty cells are gaps, not blockers
+    // Go in both directions
     for (const [dr, dc] of [dir1, dir2]) {
       let r = row + dr;
       let c = col + dc;
@@ -375,6 +369,8 @@ export function findWinningAlignment(
 
         if (adjNode?.chip) {
           lineChips.push({ node: adjNode, chip: adjNode.chip });
+        } else {
+          break; // Stop at empty node
         }
 
         r += dr;
