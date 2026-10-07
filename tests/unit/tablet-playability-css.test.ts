@@ -37,7 +37,15 @@ describe('tablet / offline playability CSS', () => {
   });
 
   it('applies safe-area insets on the mobile play shell', () => {
+    expect(mobileCss).toContain('safe-area-inset-top');
     expect(mobileCss).toContain('safe-area-inset-left');
     expect(mobileCss).toContain('safe-area-inset-bottom');
+  });
+
+  it('pairs 100vh fallbacks with 100dvh for dynamic viewport engines', () => {
+    expect(styleCss).toMatch(/min-height:\s*100vh/);
+    expect(styleCss).toMatch(/min-height:\s*100dvh/);
+    expect(mobileCss).toMatch(/100vh\s*-\s*35rem/);
+    expect(mobileCss).toMatch(/100dvh\s*-\s*35rem/);
   });
 });

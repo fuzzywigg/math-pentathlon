@@ -16,11 +16,14 @@ npm install
 npm run dev
 npm test             # unit then e2e
 npm run test:unit
-npm run test:e2e
+npm run test:e2e:chromium   # required CI path
+npm run test:e2e:cross      # opt-in Firefox + WebKit + iPad WebKit
 npm run build
 npm run lint
 npm run format:check
 ```
+
+Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 
 ## Branches
 
