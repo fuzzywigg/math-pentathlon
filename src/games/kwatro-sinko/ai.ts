@@ -188,19 +188,79 @@ interface MoveOption {
 }
 
 /**
- * Evaluate all possible moves
+ * Simulate moving `chipId` to `toNodeId` (board + chip map only).
+ */
+function simulateMove(
+  state: KwaState,
+  chipId: string,
+  toNodeId: string
+): { nodes: Map<string, BoardNode>; chips: Map<string, Chip> } | null {
+  const chip = state.chips.get(chipId);
+  if (!chip) return null;
+
+  const nodes = new Map(state.nodes);
+  if (chip.position) {
+    const oldNode = nodes.get(chip.position);
+    if (oldNode) {
+      nodes.set(chip.position, { ...oldNode, chip: null });
+    }
+  }
+  const dest = nodes.get(toNodeId);
+  if (!dest) return null;
+  const moved = { ...chip, position: toNodeId };
+  nodes.set(toNodeId, { ...dest, chip: moved });
+  const chips = new Map(state.chips);
+  chips.set(chip.id, moved);
+  return { nodes, chips };
+}
+
+/**
+ * True if `player` has any immediate winning move on the simulated board.
+ */
+function playerHasWinningMove(
+  nodes: Map<string, BoardNode>,
+  chips: Map<string, Chip>,
+  player: Player
+): boolean {
+  const probe: KwaState = {
+    nodes,
+    chips,
+    currentPlayer: player,
+    phase: 'selectingChip',
+    selectedChip: null,
+    winner: null,
+    moveHistory: [],
+    winningAlignment: null,
+  };
+  for (const chip of chips.values()) {
+    if (chip.owner !== player) continue;
+    for (const to of getValidMoves(probe, chip.id)) {
+      if (wouldCreateWin(probe, chip.id, to)) return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Evaluate all possible moves.
+ * Medium/Hard apply a 1-ply opponent-reply penalty (uses DIFFICULTY depth ≥ 2)
+ * so greedy center/alignment chasing does not hang the seat.
  */
 function evaluateMoves(
   state: KwaState,
   player: Player,
-  _difficulty: AIDifficulty
+  difficulty: AIDifficulty
 ): MoveOption[] {
   const moves: MoveOption[] = [];
   const opponent = getOpponent(player);
+  const depth = DIFFICULTY_CONFIG[difficulty].depth;
 
   for (const chip of state.chips.values()) {
     if (chip.owner !== player) continue;
 
+    const fromNumbered = chip.position
+      ? Boolean(state.nodes.get(chip.position)?.isNumbered)
+      : false;
     const validMoves = getValidMoves(state, chip.id);
 
     for (const nodeId of validMoves) {
@@ -217,8 +277,7 @@ function evaluateMoves(
         reasons.push(`Creates winning alignment: ${winResult.expression}`);
       }
 
-      // Factor 2: Block opponent's win
-      // Check if opponent could win by moving to this space
+      // Factor 2: Block opponent's win (occupy a square they could win on)
       for (const oppChip of state.chips.values()) {
         if (oppChip.owner !== opponent) continue;
         const oppMoves = getValidMoves(state, oppChip.id);
@@ -231,20 +290,25 @@ function evaluateMoves(
         }
       }
 
-      // Factor 3: Prefer non-numbered spaces (goal condition)
-      if (!node.isNumbered) {
-        score += 200;
+      // Factor 3: Clear numbered pads (required before a legal win)
+      if (fromNumbered && !node.isNumbered) {
+        score += 350;
+        reasons.push('Leaves numbered space');
+      } else if (!node.isNumbered) {
+        score += 120;
         reasons.push('Non-numbered space');
+      } else if (fromNumbered && node.isNumbered) {
+        score -= 80;
+        reasons.push('Stays on numbered');
       }
 
-      // Factor 4: Center control
+      // Factor 4: Mild center preference (downgraded — was over-weighted)
       const match = nodeId.match(/n(\d+)-(\d+)/);
       if (match) {
         const row = parseInt(match[1]);
         const col = parseInt(match[2]);
         const centerDist = Math.abs(row - 2) + Math.abs(col - 2);
-        const centerBonus = (4 - centerDist) * 30;
-        score += centerBonus;
+        score += (4 - centerDist) * 12;
         if (centerDist <= 1) {
           reasons.push('Central position');
         }
@@ -252,12 +316,21 @@ function evaluateMoves(
 
       // Factor 5: Alignment potential
       if (isOnAlignmentPath(state.nodes, nodeId, chip)) {
-        score += 100;
+        score += 60;
         reasons.push('Building toward alignment');
       }
 
-      // Factor 6: More connections = more mobility
-      score += node.connections.length * 10;
+      // Factor 6: Mobility
+      score += node.connections.length * 6;
+
+      // Factor 7 (depth ≥ 2): reject moves that hand the opponent an instant win
+      if (depth >= 2 && !winResult) {
+        const sim = simulateMove(state, chip.id, nodeId);
+        if (sim && playerHasWinningMove(sim.nodes, sim.chips, opponent)) {
+          score -= 8000;
+          reasons.push('Hangs opponent win');
+        }
+      }
 
       moves.push({
         chipId: chip.id,

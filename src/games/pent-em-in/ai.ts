@@ -20,8 +20,9 @@ import {
   getPentominoShape,
   BOARD_SIZE,
 } from './types';
-import { placePiece, getValidPlacements } from './rules';
+import { placePiece, getValidPlacements, canPlayerMove } from './rules';
 import { Cell, Rotation } from '../../core/polyomino/types';
+import { getOpponent } from './types';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -125,18 +126,28 @@ function evaluateMove(
     reasons.push('Losing move');
   }
 
-  // Factor 4: Space fragmentation - prefer moves that don't create tiny isolated regions
-  // (Simple heuristic - check area near placement)
+  // Factor 4: Entrapment — shrink the largest open region (was inverted: "preserve open space")
   const nearbyEmpty = countReachableEmpty(tempState, {
     row: Math.min(BOARD_SIZE - 1, position.row + 2),
     col: Math.min(BOARD_SIZE - 1, position.col + 2),
   });
-  if (nearbyEmpty > 20) {
-    score += 10;
-    reasons.push('Preserves open space');
+  if (nearbyEmpty < 12) {
+    score += 18;
+    reasons.push('Tightens space');
+  } else if (nearbyEmpty > 25) {
+    score -= 4;
   }
 
-  // Factor 5: Piece flexibility - save flexible pieces for later
+  // Factor 5: Explicit trap check (mirrors placePiece winner assignment)
+  if (
+    tempState.phase !== 'gameOver' &&
+    !canPlayerMove(tempState, getOpponent(player))
+  ) {
+    score += 10000;
+    reasons.push('Traps opponent');
+  }
+
+  // Factor 6: Piece flexibility - save flexible pieces for later
   const piecePriority: Record<string, number> = {
     X: -5, // Very symmetric, save for tight spots
     I: -3, // Long, good for blocking
