@@ -342,15 +342,21 @@ export function mountGameShell(
     });
   }
 
-  // Help modal + Escape — restore focus to the opener for keyboard order
+  // Help modal + Escape — close every open shell dialog, then focus an opener
   const escapeHandler = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
-    if (helpModal && !helpModal.classList.contains('hidden')) {
-      closeHelpModal();
-      return;
-    }
-    if (newGameModal && !newGameModal.classList.contains('hidden')) {
-      closeNewGameModal();
+    const helpWasOpen =
+      !!helpModal && !helpModal.classList.contains('hidden');
+    const newGameWasOpen =
+      !!newGameModal && !newGameModal.classList.contains('hidden');
+    if (!helpWasOpen && !newGameWasOpen) return;
+    // Hide without per-modal focus restore; pick one opener below.
+    if (helpWasOpen) helpModal!.classList.add('hidden');
+    if (newGameWasOpen) newGameModal!.classList.add('hidden');
+    if (helpWasOpen) {
+      helpBtn?.focus();
+    } else {
+      newGameBtn?.focus();
     }
   };
 
