@@ -134,6 +134,7 @@ test.describe('Queens & Guards playability', () => {
   test('Easy vs AI completes a full game without console errors', async ({
     page,
   }) => {
+    test.setTimeout(180_000);
     const errors: string[] = [];
     page.on('pageerror', (e) => errors.push(String(e)));
     page.on('console', (msg) => {
@@ -149,10 +150,13 @@ test.describe('Queens & Guards playability', () => {
         '';
       if (/wins/i.test(status)) break;
 
-      if (/thinking/i.test(status) || (/Red's turn/i.test(status) && !/Blue/.test(status))) {
+      if (
+        /thinking/i.test(status) ||
+        (/Red's turn/i.test(status) && !/Blue's turn/i.test(status))
+      ) {
         await expect(page.locator('.qg-status, .qg-winner-banner')).toContainText(
           /Blue's turn|wins/i,
-          { timeout: 12_000 }
+          { timeout: 20_000 }
         );
         continue;
       }

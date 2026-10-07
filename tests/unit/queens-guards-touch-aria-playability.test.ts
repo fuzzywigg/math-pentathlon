@@ -121,9 +121,14 @@ describe('Queens & Guards touch + aria playability', () => {
       break;
     }
 
+    // Immediately after the human ply (before paint-delay timer fires) the
+    // computer seat must already show thinking chrome — never "Select a piece".
+    expect(status.textContent).toMatch(/Computer is thinking/i);
+    expect(status.textContent).not.toMatch(/Select a piece/i);
+    expect(status.querySelector('.status-ai-thinking')).toBeTruthy();
+
     await vi.advanceTimersByTimeAsync(300);
     expect(status.textContent).toMatch(/Computer is thinking/i);
-    expect(status.querySelector('.status-ai-thinking')).toBeTruthy();
     // Board locked: no click handlers while thinking.
     const locked = renderBoard(getGameState(), undefined);
     expect(

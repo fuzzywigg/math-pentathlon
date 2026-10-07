@@ -192,6 +192,12 @@ function updateStatus(): void {
   const playerClass =
     gameState.currentPlayer === 'player1' ? 'player1' : 'player2';
 
+  // Computer seat: never invite a human tap ("Select a piece…") even during the
+  // short paint delay before isAIThinking flips true.
+  const computerSeat =
+    vsAI && gameState.currentPlayer === aiPlayer && !gameState.winner;
+  const showAiChrome = computerSeat || isAIThinking;
+
   let instruction = 'Select a piece to move';
   if (gameState.selectedPiece) {
     instruction =
@@ -201,12 +207,12 @@ function updateStatus(): void {
     instruction =
       'Tap a captured piece (red outline), then an empty outer-ring space';
   }
-  if (isAIThinking) {
+  if (showAiChrome) {
     instruction = 'Computer is thinking…';
   }
 
   statusContainer.innerHTML = `
-    <div class="qg-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
+    <div class="qg-status ${playerClass}${showAiChrome ? ' status-ai-thinking' : ''}">
       ${playerName}'s turn - ${instruction}
     </div>
     <div class="qg-info">
