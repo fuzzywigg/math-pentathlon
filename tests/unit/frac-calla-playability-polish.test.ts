@@ -45,9 +45,11 @@ describe('Calla playability polish', () => {
     for (const label of labels) {
       expect(label || '').not.toMatch(/valid move/i);
     }
-    expect(el.querySelector('.calla-pit')?.getAttribute('aria-disabled')).toBe(
-      'true'
-    );
+    // AI / non-interactive seat: pits stay labeled but are not tab stops.
+    const firstPit = el.querySelector('.calla-pit');
+    expect(firstPit?.getAttribute('aria-label')).toBeTruthy();
+    expect(firstPit?.getAttribute('role')).toBeNull();
+    expect(firstPit?.getAttribute('tabindex')).toBeNull();
   });
 
   it('settleNoValidMoves ends via existing Calla collection rules', () => {
@@ -104,6 +106,7 @@ describe('Fraction Pinball playability polish', () => {
     for (const btn of buttons) {
       expect(btn.disabled).toBe(true);
       expect(btn.getAttribute('aria-disabled')).toBe('true');
+      expect(btn.getAttribute('aria-label')).toMatch(/^Answer /);
     }
   });
 

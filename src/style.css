@@ -952,6 +952,42 @@ h1 {
   outline-offset: 2px;
 }
 
+/*
+ * Board / in-game keyboard focus rings (2D).
+ * Covers ARIA gridcells + role=button board targets and common game controls.
+ * Menu tiles (.game-card) keep their own box-shadow ring (higher-specificity).
+ */
+[role='gridcell']:focus-visible,
+#board [role='button']:focus-visible,
+.game-area [role='button']:focus-visible,
+svg [role='button']:focus-visible,
+svg [role='gridcell']:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.star-track-draw-btn:focus-visible,
+.star-track-chain-btn:focus-visible,
+.juggle-roll-btn:focus-visible,
+.pg-roll-btn:focus-visible,
+.prime-roll-btn:focus-visible,
+.remainder-btn-roll:focus-visible,
+.hex-a-gone-block-btn:focus-visible,
+.hex-a-gone-confirm-btn:focus-visible,
+.frac-choice-btn:focus-visible,
+.frac-continue-btn:focus-visible,
+.pinball-choice-btn:focus-visible,
+.pinball-continue-btn:focus-visible,
+.pent-piece-option:focus-visible,
+.fab-op-btn:focus-visible,
+.fab-bar-wrapper:focus-visible,
+.stars-card:focus-visible,
+.par55-hand-block:focus-visible,
+.ramrod-rod-wrapper:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 #help-btn {
   background-color: var(--color-success);
 }

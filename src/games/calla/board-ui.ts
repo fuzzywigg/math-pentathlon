@@ -296,26 +296,25 @@ function createPit(
   }
 
   const owner = player === 'player1' ? 'Blue' : 'Red';
-  makeSvgFocusable(
-    group,
-    buildCellAriaLabel({
-      coord: `${owner} pit ${index + 1}`,
-      owner,
-      extras: [`${cubes} cube${cubes === 1 ? '' : 's'}`],
-      validMove: isValid,
-    })
-  );
-  if (!isValid) {
-    group.setAttribute('aria-disabled', 'true');
-  } else {
-    group.removeAttribute('aria-disabled');
-  }
+  const ariaLabel = buildCellAriaLabel({
+    coord: `${owner} pit ${index + 1}`,
+    owner,
+    extras: [`${cubes} cube${cubes === 1 ? '' : 's'}`],
+    validMove: isValid,
+  });
 
-  // Click / keyboard handler
-  if (onClick) {
+  // Only activatable pits are keyboard buttons; others stay announced (no tab stop).
+  if (isValid && onClick) {
+    makeSvgFocusable(group, ariaLabel);
+    group.removeAttribute('aria-disabled');
     group.style.cursor = 'pointer';
     group.addEventListener('click', onClick);
     bindCellActivateKeys(group, onClick);
+  } else {
+    group.setAttribute('aria-label', ariaLabel);
+    group.removeAttribute('role');
+    group.removeAttribute('tabindex');
+    group.removeAttribute('aria-disabled');
   }
 
   return group;

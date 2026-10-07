@@ -25,6 +25,9 @@ describe('Overnight wave50 calla — pit aria/click', () => {
     const p2 = el.querySelector('.calla-pit[data-side="player2"]');
     expect(p2?.classList.contains('calla-pit-valid')).toBe(false);
     expect(p2?.getAttribute('aria-label')).toMatch(/Red pit/);
+    // Invalid pits are announced but not keyboard buttons (no focus trap clutter).
+    expect(p2?.getAttribute('role')).toBeNull();
+    expect(p2?.getAttribute('tabindex')).toBeNull();
 
     const pit0 = el.querySelector(
       '.calla-pit[data-side="player1"][data-pit-index="0"]'
