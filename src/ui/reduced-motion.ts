@@ -4,25 +4,47 @@
  * Combines OS `prefers-reduced-motion` with the stored user setting so kids
  * who enable reduced motion in-app get the same CSS + scroll behavior even
  * when the OS preference is unset.
+ *
+ * Intentionally does **not** import `core/storage` — that pulls the full
+ * progress store onto the menu critical path. Menu only needs one boolean.
  */
-
-import { storage } from '../core/storage';
 
 export const REDUCED_MOTION_ATTR = 'data-reduced-motion';
 
+/**
+ * Must match `STORAGE_KEY` in `src/core/storage/storage.ts`.
+ * Duplicated so the menu never static-imports the storage module.
+ */
+const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';
+
 export type ReducedMotionOptions = {
-  /** Injected for tests; defaults to storage.getSettings().reducedMotion. */
+  /** Injected for tests; defaults to stored settings.reducedMotion. */
   userPrefersReducedMotion?: boolean;
   /** Injected for tests; defaults to matchMedia('(prefers-reduced-motion: reduce)'). */
   osPrefersReducedMotion?: boolean;
 };
+
+/** Peek only `settings.reducedMotion` without loading the storage module. */
+function readUserReducedMotionSetting(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as {
+      settings?: { reducedMotion?: boolean };
+    };
+    return parsed?.settings?.reducedMotion === true;
+  } catch {
+    return false;
+  }
+}
 
 /** True when OS and/or user settings ask for less motion. */
 export function prefersReducedMotion(
   options: ReducedMotionOptions = {}
 ): boolean {
   const userPref =
-    options.userPrefersReducedMotion ?? storage.getSettings().reducedMotion;
+    options.userPrefersReducedMotion ?? readUserReducedMotionSetting();
   if (userPref) return true;
 
   if (typeof options.osPrefersReducedMotion === 'boolean') {
