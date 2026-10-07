@@ -17,10 +17,43 @@ npm run dev
 npm test             # unit then e2e
 npm run test:unit
 npm run test:e2e
+npm run test:e2e:visual         # screenshot baselines (desktop + phone)
+npm run test:e2e:visual:update  # rewrite committed PNG baselines
 npm run build
 npm run lint
 npm run format:check
 ```
+
+## Visual regression baselines
+
+Playwright `toHaveScreenshot` covers the **start screen** and the **opening position** of every available game at two viewports:
+
+| Project | Viewport |
+| ------- | -------- |
+| `visual-desktop` | 1280×720 Desktop Chrome |
+| `visual-phone` | iPhone 12 size (Chromium; WebKit not required) |
+
+Baselines live in-repo under `tests/e2e/visual-baselines/{project}/visual-baseline.spec.ts/`. Stability knobs (no production behavior change):
+
+- Deterministic `Math.random` via Mulberry32 seed `0xC0FFEE` (init script)
+- `prefers-reduced-motion: reduce` + CSS animation/transition zeroing
+- Local storage: owl off, reduced motion on (avoids idle mascot paint)
+
+### Updating baselines
+
+Run on **Linux** (matches CI / Cloud Agent) so PNG pixels align:
+
+```bash
+npm run test:e2e:visual:update
+```
+
+Or: `npx playwright test --project=visual-desktop --project=visual-phone --update-snapshots`
+
+Commit the changed PNGs under `tests/e2e/visual-baselines/`. Do not commit `test-results/` or `playwright-report/`.
+
+### CI posture
+
+Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continue-on-error: true`). Diffs upload as the `visual-baseline-report` artifact but do not fail the workflow until the job is promoted to required.
 
 ## Branches
 
@@ -33,7 +66,7 @@ npm run format:check
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e, visual-baseline (**report-only**)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
