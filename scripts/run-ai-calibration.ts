@@ -71,10 +71,14 @@ for (const adapter of ALL_ADAPTERS) {
 
   const vsRandom = {} as Record<Difficulty, MatchupStats>;
   for (const m of aiVsRandomMatchups()) {
+    const t0 = Date.now();
     const stats = runMatchup(adapter, m.p1, m.p2, GAMES, BASE_SEED);
     vsRandom[m.p1 as Difficulty] = stats;
     lines.push(
       `| ${m.label} | ${(stats.p1WinRate * 100).toFixed(1)}% | ${(stats.p2WinRate * 100).toFixed(1)}% | ${(stats.drawRate * 100).toFixed(1)}% | ${stats.avgLength.toFixed(1)} | ${stats.games} |`
+    );
+    console.log(
+      `[calibration] ${adapter.id} ${m.label} (${((Date.now() - t0) / 1000).toFixed(1)}s) ${formatStats(stats)}`
     );
   }
   lines.push('');
@@ -85,6 +89,7 @@ for (const adapter of ALL_ADAPTERS) {
   lines.push('|---|---:|---:|---:|---:|---:|');
 
   for (const m of aiVsAiMatchups()) {
+    const t0 = Date.now();
     const stats = runMatchup(
       adapter,
       m.p1,
@@ -94,6 +99,9 @@ for (const adapter of ALL_ADAPTERS) {
     );
     lines.push(
       `| ${m.label} | ${(stats.p1WinRate * 100).toFixed(1)}% | ${(stats.p2WinRate * 100).toFixed(1)}% | ${(stats.drawRate * 100).toFixed(1)}% | ${stats.avgLength.toFixed(1)} | ${stats.games} |`
+    );
+    console.log(
+      `[calibration] ${adapter.id} ${m.label} (${((Date.now() - t0) / 1000).toFixed(1)}s) ${formatStats(stats)}`
     );
   }
   lines.push('');
@@ -116,8 +124,12 @@ for (const adapter of ALL_ADAPTERS) {
     lines.push('');
   }
 
+  // Incremental save so long runs are not lost
+  mkdirSync(dirname(OUT), { recursive: true });
+  writeFileSync(OUT, lines.join('\n') + '\n', 'utf8');
+
   console.log(
-    `[calibration] ${adapter.id} (${((Date.now() - gameStart) / 1000).toFixed(1)}s) easy=${formatStats(vsRandom.easy)} hard=${formatStats(vsRandom.hard)}`
+    `[calibration] ${adapter.id} DONE (${((Date.now() - gameStart) / 1000).toFixed(1)}s) easy=${formatStats(vsRandom.easy)} hard=${formatStats(vsRandom.hard)}`
   );
 }
 
