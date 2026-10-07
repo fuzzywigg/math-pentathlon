@@ -33,6 +33,8 @@ let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let currentHint: string | null = null;
+/** Invalidates pending AI timeouts after new game / destroy. */
+let aiGeneration = 0;
 
 const AI_THINKING_DELAY = 600;
 /** Faster cadence for AI free-turn chains so multi-sow bursts don't feel stuck. */
@@ -47,6 +49,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -59,6 +62,7 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -132,10 +136,13 @@ function triggerAITurn(): void {
   if (isGameOver(gameState)) return;
   if (gameState.currentPlayer !== 'player2') return;
 
+  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
   setTimeout(() => {
+    if (gen !== aiGeneration) return;
+
     // Use the AI module to get the best move
     let aiMove = getAIMove(gameState, 'player2', aiDifficulty);
 
@@ -220,6 +227,14 @@ function render(): void {
 // Get current state
 export function getGameState(): CallaGameState {
   return gameState;
+}
+
+/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  isAIThinking = false;
+  boardContainer = null;
+  statusContainer = null;
 }
 
 // Reset game (preserve AI difficulty — do not silently drop Hard → Medium)
