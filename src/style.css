@@ -3516,6 +3516,10 @@ h1 {
 }
 
 /* Pit styles */
+.calla-pit-hit {
+  pointer-events: all;
+}
+
 .calla-pit-circle {
   fill: url(#calla-pit-gradient);
   stroke: #2d1a0a;
@@ -3729,6 +3733,13 @@ h1 {
   .calla-scores {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+/* Coarse pointers: enlarge board so SVG pits clear ~44px CSS tap targets */
+@media (pointer: coarse) {
+  .calla-board {
+    min-height: 240px;
   }
 }
 
@@ -4629,13 +4640,17 @@ h1 {
   .hex-a-gone-winner,
   .game-winner-banner,
   .sd-winner-banner,
-  .contig-winner-banner {
+  .contig-winner-banner,
+  .calla-pit-valid .calla-pit-circle,
+  .status-ai-thinking::after {
     animation: none !important;
     transition: opacity 0.2s ease !important;
   }
 
   .sd-roll-btn:hover:not(:disabled),
-  .contig-roll-btn:hover:not(:disabled) {
+  .contig-roll-btn:hover:not(:disabled),
+  .calla-pit-valid:hover .calla-pit-circle,
+  .calla-score.active {
     transform: none;
   }
 }
