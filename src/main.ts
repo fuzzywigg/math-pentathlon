@@ -1,6 +1,5 @@
 import './style.css';
 import './ui/styles/mobile-play-shell.css';
-import './ui/styles/stats-dashboard.css';
 import {
   addRoute,
   initRouter,
@@ -8,13 +7,11 @@ import {
   getPathParams,
   navigate,
 } from './core/router';
-import { owlSystem } from './core/owl';
-import { owlComponent } from './ui/owl';
 import { renderGameSelector } from './ui/game-selector';
-import { renderStatsDashboard } from './ui/stats-dashboard';
-import {
-  mountGameShell,
-  type AIDifficultyLevel,
+import type {
+  AIDifficultyLevel,
+  GameShellElements,
+  GameShellOptions,
 } from './ui/components/game-shell';
 import { getGameById } from './core/game-registry';
 import {
@@ -23,12 +20,23 @@ import {
 } from './core/route-generation';
 import { renderGameLoadError, renderGameLoading } from './ui/game-loading';
 import { bootstrapPwa } from './pwa/bootstrap';
+import { bootstrapOwl } from './pwa/bootstrap-owl';
+import { scheduleIdleGameWarm } from './pwa/idle-warm';
 
 /** Resolve New Game modal AI difficulty (shell Easy/Medium/Hard). */
 function resolveAIDifficulty(
   difficulty?: AIDifficultyLevel
 ): AIDifficultyLevel {
   return difficulty ?? 'medium';
+}
+
+/** Lazy game-shell — keeps player-color chrome off the menu critical path. */
+async function mountGameShell(
+  container: HTMLElement,
+  options: GameShellOptions
+): Promise<GameShellElements> {
+  const { mountGameShell: mount } = await import('./ui/components/game-shell');
+  return mount(container, options);
 }
 
 // Get the app container
@@ -59,10 +67,29 @@ function renderHome(): void {
 
 // Read-only progress dashboard (existing storage APIs only)
 function renderStats(): void {
-  nextRouteGeneration();
+  const routeGen = nextRouteGeneration();
   cleanup();
   document.title = 'Math Pentathlon - Your Progress';
-  renderStatsDashboard(appContainer!);
+  renderGameLoading(appContainer!, 'Your Progress');
+
+  void (async () => {
+    try {
+      const [{ renderStatsDashboard }] = await Promise.all([
+        import('./ui/stats-dashboard'),
+        import('./ui/styles/stats-dashboard.css'),
+      ]);
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderStatsDashboard(appContainer!);
+    } catch {
+      if (!isCurrentRouteGeneration(routeGen)) return;
+      renderGameLoadError(
+        appContainer!,
+        'Your Progress',
+        () => navigate('/stats'),
+        () => navigate('/')
+      );
+    }
+  })();
 }
 
 // Render a specific game (lazy-loads that game's chunk on demand)
@@ -152,7 +179,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     startTutorial,
   } = await import('./games/kings-quadraphages/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Kings & Quadraphages',
     helpTitle: 'How to Play Kings & Quadraphages',
     helpContentHtml: `<h3>Objective</h3>
@@ -223,7 +250,7 @@ async function renderHex(routeGen: number): Promise<void> {
     startTutorial: startHexTutorial,
   } = await import('./games/hex/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Hex',
     helpTitle: 'How to Play Hex',
     helpContentHtml: `<h3>Objective</h3>
@@ -286,7 +313,7 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     startTutorial: startStarTrackTutorial,
   } = await import('./games/star-track/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Star Track',
     helpTitle: 'How to Play Star Track',
     helpContentHtml: `<h3>Objective</h3>
@@ -411,7 +438,7 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     destroyGame: destroyHexAGoneGame,
   } = await import('./games/hex-a-gone/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Hex-a-Gone!',
     helpTitle: 'How to Play Hex-a-Gone!',
     helpContentHtml: `<h3>Objective</h3>
@@ -533,7 +560,7 @@ async function renderCalla(routeGen: number): Promise<void> {
     startTutorial: startCallaTutorial,
   } = await import('./games/calla/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Calla',
     helpTitle: 'How to Play Calla',
     helpContentHtml: `<h3>Objective</h3>
@@ -603,7 +630,7 @@ async function renderFiar(routeGen: number): Promise<void> {
     startTutorial: startFiarTutorial,
   } = await import('./games/fiar/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'FIAR (Four In A Row)',
     helpTitle: 'How to Play FIAR',
     helpContentHtml: `<h3>Objective</h3>
@@ -681,7 +708,7 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     startTutorial: startQGTutorial,
   } = await import('./games/queens-guards/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Queens & Guards',
     helpTitle: 'How to Play Queens & Guards',
     helpContentHtml: `<h3>Objective</h3>
@@ -755,7 +782,7 @@ async function renderContig60(routeGen: number): Promise<void> {
     startTutorial: startContigTutorial,
   } = await import('./games/contig-60/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Contig 60',
     helpTitle: 'How to Play Contig 60',
     helpContentHtml: `<h3>Objective</h3>
@@ -829,7 +856,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
     startTutorial: startJuggleTutorial,
   } = await import('./games/juggle/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Juggle',
     helpTitle: 'How to Play Juggle',
     helpContentHtml: `<h3>Objective</h3>
@@ -899,7 +926,7 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     startTutorial: startFabTutorial,
   } = await import('./games/fab-a-diffy/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Fab-a-Diffy',
     helpTitle: 'How to Play Fab-a-Diffy',
     helpContentHtml: `<h3>Objective</h3>
@@ -970,7 +997,7 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     startTutorial: startSDTutorial,
   } = await import('./games/sum-dominoes/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Sum Dominoes & Dice',
     helpTitle: 'How to Play Sum Dominoes & Dice',
     helpContentHtml: `<h3>Objective</h3>
@@ -1044,7 +1071,7 @@ async function renderPar55(routeGen: number): Promise<void> {
     startTutorial: startPar55Tutorial,
   } = await import('./games/par-55/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Par 55',
     helpTitle: 'How to Play Par 55',
     helpContentHtml: `<h3>Objective</h3>
@@ -1116,7 +1143,7 @@ async function renderRamrod(routeGen: number): Promise<void> {
     startTutorial: startRamrodTutorial,
   } = await import('./games/ramrod/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Ramrod',
     helpTitle: 'How to Play Ramrod',
     helpContentHtml: `<h3>Objective</h3>
@@ -1190,7 +1217,7 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     startTutorial: startKwaTutorial,
   } = await import('./games/kwatro-sinko/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Kwatro-Sinko',
     helpTitle: 'How to Play Kwatro-Sinko',
     helpContentHtml: `<h3>Objective</h3>
@@ -1267,7 +1294,7 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     startTutorial: startPrimeGoldTutorial,
   } = await import('./games/prime-gold/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Prime Gold',
     helpTitle: 'How to Play Prime Gold',
     helpContentHtml: `<h3>Objective</h3>
@@ -1346,7 +1373,7 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     destroyGame: destroyPentEmInGame,
   } = await import('./games/pent-em-in/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: "Pent'Em In",
     helpTitle: "How to Play Pent'Em In",
     helpContentHtml: `<h3>Objective</h3>
@@ -1417,7 +1444,7 @@ async function renderFracFact(routeGen: number): Promise<void> {
     startTutorial: startFracTutorial,
   } = await import('./games/frac-fact/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Frac Fact',
     helpTitle: 'How to Play Frac Fact',
     helpContentHtml: `<h3>Objective</h3>
@@ -1504,7 +1531,7 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     startTutorial: startRemainderTutorial,
   } = await import('./games/remainder-islands/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Remainder Islands',
     helpTitle: 'How to Play Remainder Islands',
     helpContentHtml: `<h3>Objective</h3>
@@ -1564,7 +1591,7 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     startTutorial: startPinballTutorial,
   } = await import('./games/fraction-pinball/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Fraction Pinball',
     helpTitle: 'How to Play Fraction Pinball',
     helpContentHtml: `<h3>Objective</h3>
@@ -1625,7 +1652,7 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     startTutorial: startStarsTutorial,
   } = await import('./games/stars-bars/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = mountGameShell(appContainer!, {
+  const shell = await mountGameShell(appContainer!, {
     title: 'Stars & Bars',
     helpTitle: 'How to Play Stars & Bars',
     helpContentHtml: `<h3>Objective</h3>
@@ -1868,9 +1895,9 @@ addRoute('/demo/expressions', renderExpressionDemoPage);
 // Initialize router
 initRouter();
 
-// Initialize Ollie the Owl mascot system
-owlComponent.init();
-owlSystem.initialize();
-
 // Offline shell + background precache of game chunks
 bootstrapPwa();
+
+// Defer mascot + popular game warm-imports until after first paint
+bootstrapOwl();
+scheduleIdleGameWarm();
