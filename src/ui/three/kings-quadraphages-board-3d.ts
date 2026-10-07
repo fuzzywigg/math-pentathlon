@@ -23,7 +23,8 @@ import {
   type KingGeometries,
 } from './kings-quadraphages-pieces';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  markBoard3dCanvasReady,
   bindPageVisibility,
   canPaint3d,
 } from './tablet-gl';
@@ -131,9 +132,7 @@ export async function createKingsQuadraphagesBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'kings-quadraphages');
@@ -222,6 +221,7 @@ export async function createKingsQuadraphagesBoard3D(
   const paint = (): void => {
     if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
+    markBoard3dCanvasReady(canvas);
   };
 
   const resize = (): void => {

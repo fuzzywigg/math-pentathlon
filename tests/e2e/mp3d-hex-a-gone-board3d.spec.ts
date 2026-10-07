@@ -3,6 +3,15 @@
  * Screenshots at phone / tablet portrait / tablet landscape for PR evidence.
  */
 import { test, expect, Page } from '@playwright/test';
+import {
+  MP3D_HEAVY_TEST_TIMEOUT_MS,
+  board3dUrl,
+  disableBoard3d,
+  dismissModeIfNeeded,
+  enableBoard3dLowQuality,
+  waitForGameReady,
+  waitForMp3dReady,
+} from './helpers/mp3d';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -12,31 +21,7 @@ const VIEWPORTS = [
   { name: 'tablet-landscape', width: 1024, height: 768 },
 ] as const;
 
-async function dismissModeIfNeeded(page: Page) {
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator(
-      'input[value="human-vs-human"], input[value="vs-human"]'
-    );
-    if (await human.count()) {
-      await human
-        .first()
-        .check({ force: true })
-        .catch(() => undefined);
-    }
-    const start = page.locator('#start-game-btn');
-    if (await start.isVisible().catch(() => false)) {
-      await start.click();
-    }
-  }
-}
 
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-}
 
 async function waitFor3dApi(page: Page) {
   await page.waitForFunction(
@@ -144,9 +129,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
       if (req.url().includes('vendor/three')) threeRequests.push(req.url());
     });
 
-    await page.addInitScript(() => {
-      localStorage.removeItem('mp-board3d');
-    });
+    await disableBoard3d(page);
     await page.goto('/#/game/hex-a-gone');
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
@@ -154,28 +137,25 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
       timeout: 10000,
     });
     await expect(page.locator('canvas[data-mp3d="hex-a-gone"]')).toHaveCount(0);
-    await page.waitForTimeout(400);
     expect(threeRequests).toEqual([]);
   });
 
   test('flag on: start / mid / game-over screenshots at three viewports', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
+    test.setTimeout(MP3D_HEAVY_TEST_TIMEOUT_MS);
+    await enableBoard3dLowQuality(page);
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/?board3d=1#/game/hex-a-gone');
+    await page.goto(board3dUrl('#/game/hex-a-gone'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="hex-a-gone"]');
-    await expect(canvas).toBeVisible({ timeout: 15000 });
+    await waitForMp3dReady(page, 'hex-a-gone');
     await expect(page.locator('.hex-a-gone-board')).toHaveCount(0);
     await expect(
       page.locator('.hex-a-gone-a11y-grid [role="gridcell"]')
     ).toHaveCount(37);
-    await page.waitForTimeout(400);
 
     const outDir = path.resolve('docs/screenshots/mp3d');
     fs.mkdirSync(outDir, { recursive: true });
@@ -243,7 +223,7 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
         return original.call(this, type as '2d', attrs as never);
       } as typeof proto.getContext;
     });
-    await page.goto('/?board3d=1#/game/hex-a-gone');
+    await page.goto(board3dUrl('#/game/hex-a-gone'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.hex-a-gone-board').first()).toBeVisible({
@@ -255,15 +235,11 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
   test('keyboard a11y grid places with Enter while 3D is on', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
-    await page.goto('/?board3d=1#/game/hex-a-gone');
+    await enableBoard3dLowQuality(page);
+    await page.goto(board3dUrl('#/game/hex-a-gone'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await expect(page.locator('canvas[data-mp3d="hex-a-gone"]')).toBeVisible({
-      timeout: 15000,
-    });
+    await waitForMp3dReady(page, 'hex-a-gone');
 
     await selectAndConfirm(page, 'triangle');
     const cell = page.locator(

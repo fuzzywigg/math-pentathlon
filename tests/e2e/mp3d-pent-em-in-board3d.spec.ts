@@ -3,6 +3,15 @@
  * Captures start / mid / game-over screenshots at phone + tablet sizes.
  */
 import { test, expect, Page } from '@playwright/test';
+import {
+  MP3D_HEAVY_TEST_TIMEOUT_MS,
+  board3dUrl,
+  disableBoard3d,
+  dismissModeIfNeeded,
+  enableBoard3dLowQuality,
+  waitForGameReady,
+  waitForMp3dReady,
+} from './helpers/mp3d';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -13,11 +22,6 @@ const VIEWPORTS = [
 ] as const;
 
 
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-}
 
 async function startVsHuman(page: Page) {
   await waitForGameReady(page);
@@ -88,9 +92,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       if (req.url().includes('vendor/three')) threeRequests.push(req.url());
     });
 
-    await page.addInitScript(() => {
-      localStorage.removeItem('mp-board3d');
-    });
+    await disableBoard3d(page);
     await page.goto('/#/game/pent-em-in');
     await waitForGameReady(page);
     await startVsHuman(page);
@@ -104,22 +106,20 @@ test.describe("mp3d Pent'Em In 3D board", () => {
   test('flag on: start / mid / game-over screenshots at 3 viewports', async ({
     page,
   }) => {
-    test.setTimeout(120_000);
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
+    test.setTimeout(MP3D_HEAVY_TEST_TIMEOUT_MS);
+    await enableBoard3dLowQuality(page);
 
     const outDir = path.resolve('docs/screenshots/mp3d');
     fs.mkdirSync(outDir, { recursive: true });
 
     for (const vp of VIEWPORTS) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
-      await page.goto('/?board3d=1#/game/pent-em-in');
+      await page.goto(board3dUrl('#/game/pent-em-in'));
       await waitForGameReady(page);
       await startVsHuman(page);
 
       const canvas = page.locator('canvas[data-mp3d="pent-em-in"]');
-      await expect(canvas).toBeVisible({ timeout: 15000 });
+      await waitForMp3dReady(page, 'pent-em-in');
       await expect(page.locator('svg.pent-board')).toHaveCount(0);
       await expect(
         page.locator('.pent-a11y-grid [role="gridcell"]')
@@ -130,8 +130,6 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       expect(box).toBeTruthy();
       expect(box!.y).toBeLessThan(vp.height);
       expect(box!.y + Math.min(box!.height, 80)).toBeLessThan(vp.height);
-
-      await page.waitForTimeout(350);
       const startPath = path.join(
         outDir,
         `pent-em-in-3d-start-${vp.name}.png`
@@ -159,12 +157,10 @@ test.describe("mp3d Pent'Em In 3D board", () => {
 
     // Game-over evidence at phone size via injected near-end state
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/?board3d=1#/game/pent-em-in');
+    await page.goto(board3dUrl('#/game/pent-em-in'));
     await waitForGameReady(page);
     await startVsHuman(page);
-    await expect(page.locator('canvas[data-mp3d="pent-em-in"]')).toBeVisible({
-      timeout: 15000,
-    });
+    await waitForMp3dReady(page, 'pent-em-in');
 
     await page.waitForFunction(
       () =>
@@ -279,7 +275,7 @@ test.describe("mp3d Pent'Em In 3D board", () => {
         return original.call(this, type as '2d', attrs as never);
       } as typeof proto.getContext;
     });
-    await page.goto('/?board3d=1#/game/pent-em-in');
+    await page.goto(board3dUrl('#/game/pent-em-in'));
     await waitForGameReady(page);
     await startVsHuman(page);
     await expect(page.locator('svg.pent-board').first()).toBeVisible({
@@ -289,15 +285,11 @@ test.describe("mp3d Pent'Em In 3D board", () => {
   });
 
   test('keyboard a11y grid places a piece with 3D on', async ({ page }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
-    await page.goto('/?board3d=1#/game/pent-em-in');
+    await enableBoard3dLowQuality(page);
+    await page.goto(board3dUrl('#/game/pent-em-in'));
     await waitForGameReady(page);
     await startVsHuman(page);
-    await expect(page.locator('canvas[data-mp3d="pent-em-in"]')).toBeVisible({
-      timeout: 15000,
-    });
+    await waitForMp3dReady(page, 'pent-em-in');
 
     await selectPiece(page, 'X');
     const cell = page.locator(

@@ -3,6 +3,15 @@
  * Captures start / mid-game / game-over screenshots at phone + tablet sizes.
  */
 import { test, expect, Page } from '@playwright/test';
+import {
+  MP3D_HEAVY_TEST_TIMEOUT_MS,
+  board3dUrl,
+  disableBoard3d,
+  dismissModeIfNeeded,
+  enableBoard3dLowQuality,
+  waitForGameReady,
+  waitForMp3dReady,
+} from './helpers/mp3d';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -12,36 +21,10 @@ const VIEWPORTS = [
   { name: 'tablet-landscape', width: 1024, height: 768 },
 ] as const;
 
-async function dismissModeIfNeeded(page: Page) {
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator(
-      'input[value="human-vs-human"], input[value="vs-human"]'
-    );
-    if (await human.count()) {
-      await human
-        .first()
-        .check({ force: true })
-        .catch(() => undefined);
-    }
-    const start = page.locator('#start-game-btn');
-    if (await start.isVisible().catch(() => false)) {
-      await start.click();
-    }
-  }
-}
 
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-}
 
 async function waitForPrimeGold3d(page: Page) {
-  await expect(page.locator('canvas[data-mp3d="prime-gold"]')).toBeVisible({
-    timeout: 15000,
-  });
+  await waitForMp3dReady(page, 'prime-gold');
   await page.waitForFunction(
     () =>
       typeof (
@@ -116,9 +99,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       if (req.url().includes('vendor/three')) threeRequests.push(req.url());
     });
 
-    await page.addInitScript(() => {
-      localStorage.removeItem('mp-board3d');
-    });
+    await disableBoard3d(page);
     await page.goto('/#/game/prime-gold');
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
@@ -126,16 +107,14 @@ test.describe('mp3d Prime Gold 3D board', () => {
       timeout: 10000,
     });
     await expect(page.locator('canvas[data-mp3d="prime-gold"]')).toHaveCount(0);
-    await page.waitForTimeout(400);
     expect(threeRequests).toEqual([]);
   });
 
   test('flag on: start / mid / game-over screenshots at three viewports', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
+    test.setTimeout(MP3D_HEAVY_TEST_TIMEOUT_MS);
+    await enableBoard3dLowQuality(page);
 
     const outDir = path.resolve('docs/screenshots/mp3d');
     fs.mkdirSync(outDir, { recursive: true });
@@ -144,7 +123,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       // Hash-route goto to the same URL does not remount — bounce home first.
       await page.goto('/#/');
-      await page.goto(`/?board3d=1&shot=${vp.name}#/game/prime-gold`);
+      await page.goto(`/?board3d=1&board3dLQ=1&shot=${vp.name}#/game/prime-gold`);
       await waitForGameReady(page);
       await dismissModeIfNeeded(page);
       await waitForPrimeGold3d(page);
@@ -152,7 +131,6 @@ test.describe('mp3d Prime Gold 3D board', () => {
       await expect(page.locator('.pg-a11y-grid [role="gridcell"]')).toHaveCount(
         49
       );
-      await page.waitForTimeout(350);
       // Ensure layout + an on-demand paint after viewport settle.
       await page.evaluate(() => window.dispatchEvent(new Event('resize')));
       await page.waitForTimeout(200);
@@ -245,7 +223,7 @@ test.describe('mp3d Prime Gold 3D board', () => {
       const proto = HTMLCanvasElement.prototype;
       proto.getContext = () => null;
     });
-    await page.goto('/?board3d=1#/game/prime-gold');
+    await page.goto(board3dUrl('#/game/prime-gold'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await expect(page.locator('.pg-board .pg-cell').first()).toBeVisible({
@@ -259,10 +237,8 @@ test.describe('mp3d Prime Gold 3D board', () => {
   test('keyboard a11y grid activates placement with 3D on', async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      localStorage.setItem('mp-board3d', '1');
-    });
-    await page.goto('/?board3d=1#/game/prime-gold');
+    await enableBoard3dLowQuality(page);
+    await page.goto(board3dUrl('#/game/prime-gold'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await waitForPrimeGold3d(page);
