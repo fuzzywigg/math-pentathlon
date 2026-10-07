@@ -8,7 +8,7 @@ Headless AI-vs-AI and AI-vs-random matrices across every game with an AI opponen
 - Games per matchup: **50**
 - Fixed base seed: `20261007` (match *i* uses seed `base + i * 1009`)
 - RNG: mulberry32 via `createSeededRng` installed as `Math.random` for each game
-- Search games (hex, queens-guards, fiar, fab-a-diffy): `deadlineMs=300` per decision (uncapped retry on null)
+- Search games (hex, queens-guards, fiar, fab-a-diffy): `deadlineMs=150` per decision (`CALIBRATION_WALL_CLOCK=1`)
 - Random opponent: uniform legal move where enumerated; else Easy policy as legal baseline
 - Seat: policy under test is **player1**; opponent is **player2**
 - Rules / scoring / end conditions: **unchanged**
