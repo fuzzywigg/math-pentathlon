@@ -177,10 +177,10 @@ function buildShellHtml(options: GameShellOptions): string {
       <button id="help-btn" type="button">How to Play</button>
     </nav>${statusBlock}
     ${gameAreaBlock}
-    <div id="new-game-modal" class="modal hidden">
+    <div id="new-game-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="new-game-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>New Game</h2>
+        <h2 id="new-game-modal-title">New Game</h2>
         <div class="mode-selector">
           <h3>Choose Game Mode</h3>
           <div class="mode-options">
@@ -190,10 +190,10 @@ ${modeOptionsHtml}
         </div>
       </div>
     </div>
-    <div id="help-modal" class="modal hidden">
+    <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>${escapeAttr(options.helpTitle)}</h2>
+        <h2 id="help-modal-title">${escapeAttr(options.helpTitle)}</h2>
         <div class="rules-content">
           ${options.helpContentHtml}
         </div>
@@ -241,10 +241,28 @@ export function mountGameShell(
     });
   }
 
-  // New Game open
+  const closeNewGameModal = () => {
+    if (!newGameModal || newGameModal.classList.contains('hidden')) return;
+    newGameModal.classList.add('hidden');
+    newGameBtn?.focus();
+  };
+
+  const closeHelpModal = () => {
+    if (!helpModal || helpModal.classList.contains('hidden')) return;
+    helpModal.classList.add('hidden');
+    helpBtn?.focus();
+  };
+
+  // New Game open — move focus into the dialog for keyboard / SR order
   if (newGameBtn && newGameModal) {
     newGameBtn.addEventListener('click', () => {
       newGameModal.classList.remove('hidden');
+      const focusTarget =
+        (newGameModal.querySelector('.modal-close') as HTMLElement | null) ??
+        (newGameModal.querySelector(
+          '#new-game-modal-title'
+        ) as HTMLElement | null);
+      focusTarget?.focus();
     });
   }
 
@@ -269,10 +287,6 @@ export function mountGameShell(
       difficultySection.style.display =
         selectedMode === 'human-vs-ai' ? 'block' : 'none';
     }
-
-    const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
-    };
 
     modeOptions.forEach((option) => {
       option.addEventListener('click', () => {
@@ -328,21 +342,27 @@ export function mountGameShell(
     });
   }
 
-  // Help modal + Escape
+  // Help modal + Escape — restore focus to the opener for keyboard order
   const escapeHandler = (e: KeyboardEvent) => {
     if (e.key !== 'Escape') return;
     if (helpModal && !helpModal.classList.contains('hidden')) {
-      helpModal.classList.add('hidden');
+      closeHelpModal();
+      return;
     }
     if (newGameModal && !newGameModal.classList.contains('hidden')) {
-      newGameModal.classList.add('hidden');
+      closeNewGameModal();
     }
   };
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () => helpModal.classList.remove('hidden');
-    const closeHelpModal = () => helpModal.classList.add('hidden');
+    const openHelpModal = () => {
+      helpModal.classList.remove('hidden');
+      const focusTarget =
+        (modalClose as HTMLElement | null) ??
+        (helpModal.querySelector('#help-modal-title') as HTMLElement | null);
+      focusTarget?.focus();
+    };
 
     helpBtn.addEventListener('click', openHelpModal);
     modalClose?.addEventListener('click', closeHelpModal);

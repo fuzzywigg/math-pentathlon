@@ -1497,17 +1497,10 @@ h1 {
   padding: 0;
   /* Reserve space so accordion/grid paint does not grow the shell upward. */
   min-height: min(720px, calc(100vh - 4rem));
-  /* Opacity-only: avoid layout-affecting motion on first paint. */
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  /*
+   * Do not animate opacity on this landmark container — mid-fade text fails
+   * WCAG AA contrast (axe color-contrast) even when resting colors pass.
+   */
 }
 
 /* Hero Section */
@@ -1678,7 +1671,8 @@ h1 {
 }
 
 .division-tab.active {
-  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  /* Keep the light end dark enough for white labels (≥4.5:1). */
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
   border-color: transparent;
   color: white;
   box-shadow: var(--shadow-md);
@@ -1693,8 +1687,13 @@ h1 {
 
 .tab-grade {
   font-size: 0.8rem;
-  opacity: 0.7;
+  /* Solid muted color (not opacity) so contrast stays AA on tab backgrounds. */
+  color: #334155;
   font-weight: 500;
+}
+
+.division-tab.active .tab-grade {
+  color: #ffffff;
 }
 
 /* Accordion Container */
