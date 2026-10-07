@@ -44,7 +44,7 @@ describe('Par 55 AI-turn input guard', () => {
     expect(el.querySelector('[aria-disabled="true"]')).toBeTruthy();
   });
 
-  it('blocks selecting a Red block during the 800ms AI pause', async () => {
+  it('blocks selecting a Red block during the AI think pause', async () => {
     const { newGameVsAI } =
       await import('../../src/games/par-55/game-controller');
 
@@ -71,7 +71,7 @@ describe('Par 55 AI-turn input guard', () => {
     expect(ctrl.state.currentPlayer).toBe('player2');
     expect(ctrl.state.moveHistory).toHaveLength(1);
 
-    await vi.advanceTimersByTimeAsync(800);
+    await vi.advanceTimersByTimeAsync(450);
     expect(ctrl.state.currentPlayer).toBe('player1');
     expect(ctrl.state.moveHistory.length).toBeGreaterThanOrEqual(2);
     expect(ctrl.state.moveHistory[1]?.player).toBe('player2');
