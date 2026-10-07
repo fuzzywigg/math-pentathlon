@@ -81,6 +81,10 @@ describe('tablet-gl helpers', () => {
   });
 
   it('paintBoard3dAndMarkReady marks after a successful render', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
     const canvas = document.createElement('canvas');
     const render = vi.fn();
     paintBoard3dAndMarkReady(canvas, render);
@@ -89,6 +93,10 @@ describe('tablet-gl helpers', () => {
   });
 
   it('paintBoard3dAndMarkReady retries once via rAF when render throws', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
     vi.useFakeTimers({ toFake: ['requestAnimationFrame'] });
     const canvas = document.createElement('canvas');
     const render = vi
@@ -103,6 +111,18 @@ describe('tablet-gl helpers', () => {
     expect(render).toHaveBeenCalledTimes(2);
     expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
     vi.useRealTimers();
+  });
+
+  it('paintBoard3dAndMarkReady skips while the document is hidden', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => true,
+    });
+    const canvas = document.createElement('canvas');
+    const render = vi.fn();
+    paintBoard3dAndMarkReady(canvas, render);
+    expect(render).not.toHaveBeenCalled();
+    expect(canvas.getAttribute('data-mp3d-ready')).toBeNull();
   });
 
   it('scheduleBoard3dMountPaint runs after double rAF', () => {
