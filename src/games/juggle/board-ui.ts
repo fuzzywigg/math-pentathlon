@@ -37,6 +37,11 @@ const COLORS = {
   previewInvalid: 'rgba(239, 83, 80, 0.5)',
 };
 
+export interface JuggleBoardRenderOptions {
+  /** When false, suppress selectable chrome and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render a game board grid
  */
@@ -47,8 +52,10 @@ export function renderBoard(
   state: JuggleState,
   onCellClick: (row: number, col: number) => void,
   onCellHover: (row: number, col: number) => void,
-  onCellLeave: () => void
+  onCellLeave: () => void,
+  options: JuggleBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = `juggle-board ${player} ${isCurrentPlayer ? 'active' : ''}`;
 
@@ -67,13 +74,14 @@ export function renderBoard(
   grid.style.gridTemplateColumns = `repeat(${CONFIG.GRID_SIZE}, 1fr)`;
   markBoardAsGrid(grid);
 
-  // Get preview cells if hovering
+  // Preview only while the human seat may place
+  const showPreview = allowInput && isCurrentPlayer;
   const previewCells: Cell[] =
-    state.hoverPosition && isCurrentPlayer
+    state.hoverPosition && showPreview
       ? getPreviewCells(state, state.hoverPosition)
       : [];
   const isPreviewValid =
-    state.hoverPosition && isCurrentPlayer
+    state.hoverPosition && showPreview
       ? isPlacementValid(state, state.hoverPosition)
       : false;
   const previewSet = new Set(previewCells.map((c) => `${c.row},${c.col}`));
@@ -98,7 +106,10 @@ export function renderBoard(
 
       const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
       const canPlace =
-        isCurrentPlayer && state.phase === 'placing' && !isOccupied;
+        allowInput &&
+        isCurrentPlayer &&
+        state.phase === 'placing' &&
+        !isOccupied;
 
       makeGridCell(
         cell,
@@ -138,8 +149,10 @@ export function renderDice(
   onRoll: () => void,
   onSelectDie: (index: 0 | 1) => void,
   canRoll: boolean,
-  phase: string
+  phase: string,
+  options: JuggleBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'juggle-dice-area';
 
@@ -148,8 +161,10 @@ export function renderDice(
     const rollBtn = document.createElement('button');
     rollBtn.className = 'juggle-roll-btn';
     rollBtn.textContent = 'Roll Dice';
-    rollBtn.disabled = !canRoll;
-    rollBtn.addEventListener('click', onRoll);
+    rollBtn.disabled = !canRoll || !allowInput;
+    if (allowInput) {
+      rollBtn.addEventListener('click', onRoll);
+    }
     container.appendChild(rollBtn);
   } else {
     const diceDisplay = document.createElement('div');
@@ -168,9 +183,23 @@ export function renderDice(
       label.className = 'juggle-die-label';
       label.textContent = getCategoryName(category);
 
-      if (phase === 'selectingShape') {
+      if (phase === 'selectingShape' && allowInput) {
         die.classList.add('selectable');
-        die.addEventListener('click', () => onSelectDie(i as 0 | 1));
+        die.setAttribute('role', 'button');
+        die.tabIndex = 0;
+        die.setAttribute(
+          'aria-label',
+          `${getCategoryName(category)} die, selectable`
+        );
+        const activate = () => onSelectDie(i as 0 | 1);
+        die.addEventListener('click', activate);
+        bindCellActivateKeys(die, activate);
+      } else if (phase === 'selectingShape') {
+        die.setAttribute('aria-disabled', 'true');
+        die.setAttribute(
+          'aria-label',
+          `${getCategoryName(category)} die, not selectable`
+        );
       }
 
       dieContainer.appendChild(die);
@@ -183,7 +212,9 @@ export function renderDice(
     if (phase === 'selectingShape') {
       const hint = document.createElement('div');
       hint.className = 'juggle-hint';
-      hint.textContent = 'Click a die to choose that shape category';
+      hint.textContent = allowInput
+        ? 'Click a die to choose that shape category'
+        : 'Computer is thinking…';
       container.appendChild(hint);
     }
   }
@@ -196,8 +227,10 @@ export function renderDice(
  */
 export function renderShapeSelector(
   state: JuggleState,
-  onSelectShape: (shape: PolyominoShape) => void
+  onSelectShape: (shape: PolyominoShape) => void,
+  options: JuggleBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'juggle-shape-selector';
 
@@ -213,7 +246,9 @@ export function renderShapeSelector(
 
   const header = document.createElement('div');
   header.className = 'juggle-shape-header';
-  header.textContent = `Choose a ${state.selectedCategory}:`;
+  header.textContent = allowInput
+    ? `Choose a ${state.selectedCategory}:`
+    : 'Computer is choosing a shape…';
   container.appendChild(header);
 
   const list = document.createElement('div');
@@ -229,7 +264,18 @@ export function renderShapeSelector(
     name.textContent = shape.name;
     option.appendChild(name);
 
-    option.addEventListener('click', () => onSelectShape(shape));
+    if (allowInput) {
+      option.setAttribute('role', 'button');
+      option.tabIndex = 0;
+      option.setAttribute('aria-label', `${shape.name}, selectable`);
+      const activate = () => onSelectShape(shape);
+      option.addEventListener('click', activate);
+      bindCellActivateKeys(option, activate);
+    } else {
+      option.classList.add('disabled');
+      option.setAttribute('aria-disabled', 'true');
+      option.setAttribute('aria-label', `${shape.name}, not selectable`);
+    }
     list.appendChild(option);
   }
 
@@ -283,8 +329,10 @@ function renderShapePreview(
 export function renderShapeControls(
   state: JuggleState,
   onRotate: () => void,
-  onFlip: () => void
+  onFlip: () => void,
+  options: JuggleBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'juggle-shape-controls';
 
@@ -311,7 +359,10 @@ export function renderShapeControls(
     const rotateBtn = document.createElement('button');
     rotateBtn.className = 'juggle-control-btn';
     rotateBtn.textContent = '↻ Rotate';
-    rotateBtn.addEventListener('click', onRotate);
+    rotateBtn.disabled = !allowInput;
+    if (allowInput) {
+      rotateBtn.addEventListener('click', onRotate);
+    }
     controls.appendChild(rotateBtn);
   }
 
@@ -319,7 +370,10 @@ export function renderShapeControls(
     const flipBtn = document.createElement('button');
     flipBtn.className = 'juggle-control-btn';
     flipBtn.textContent = '↔ Flip';
-    flipBtn.addEventListener('click', onFlip);
+    flipBtn.disabled = !allowInput;
+    if (allowInput) {
+      flipBtn.addEventListener('click', onFlip);
+    }
     controls.appendChild(flipBtn);
   }
 
@@ -327,7 +381,9 @@ export function renderShapeControls(
 
   const hint = document.createElement('div');
   hint.className = 'juggle-hint';
-  hint.textContent = 'Click on your board to place the shape';
+  hint.textContent = allowInput
+    ? 'Click on your board to place the shape'
+    : 'Computer is placing…';
   container.appendChild(hint);
 
   return container;
@@ -397,6 +453,8 @@ export function injectJuggleStyles(): void {
     .juggle-cell {
       width: 28px;
       height: 28px;
+      min-width: 28px;
+      min-height: 28px;
       background: ${COLORS.cellEmpty};
       transition: background 0.1s;
     }
@@ -417,6 +475,7 @@ export function injectJuggleStyles(): void {
 
     .juggle-roll-btn {
       padding: 1rem 2rem;
+      min-height: 44px;
       font-size: 1.25rem;
       font-weight: bold;
       background: linear-gradient(135deg, #ff9800, #f57c00);
@@ -508,6 +567,8 @@ export function injectJuggleStyles(): void {
       align-items: center;
       gap: 0.25rem;
       padding: 0.5rem;
+      min-height: 44px;
+      min-width: 44px;
       background: white;
       border: 2px solid #ddd;
       border-radius: 8px;
@@ -515,9 +576,14 @@ export function injectJuggleStyles(): void {
       transition: all 0.15s;
     }
 
-    .juggle-shape-option:hover {
+    .juggle-shape-option:hover:not(.disabled) {
       border-color: ${COLORS.validPlacement};
       background: #e8f5e9;
+    }
+
+    .juggle-shape-option.disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
     }
 
     .shape-name {
@@ -547,6 +613,7 @@ export function injectJuggleStyles(): void {
 
     .juggle-control-btn {
       padding: 0.5rem 1rem;
+      min-height: 44px;
       background: #e0e0e0;
       border: none;
       border-radius: 6px;
@@ -555,8 +622,13 @@ export function injectJuggleStyles(): void {
       transition: background 0.15s;
     }
 
-    .juggle-control-btn:hover {
+    .juggle-control-btn:hover:not(:disabled) {
       background: #bdbdbd;
+    }
+
+    .juggle-control-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .juggle-status {
@@ -566,6 +638,11 @@ export function injectJuggleStyles(): void {
 
     .juggle-status.player1 { color: var(--color-player1, #2196f3); }
     .juggle-status.player2 { color: var(--color-player2, #f44336); }
+
+    .juggle-status.status-ai-thinking {
+      font-style: italic;
+      opacity: 0.9;
+    }
 
     .juggle-winner-banner {
       text-align: center;
@@ -583,6 +660,53 @@ export function injectJuggleStyles(): void {
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+    @media (pointer: coarse) {
+      .juggle-cell {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .juggle-grid {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+      }
+
+      .juggle-roll-btn,
+      .juggle-control-btn,
+      .juggle-shape-option {
+        min-height: 44px;
+      }
+
+      .juggle-die {
+        width: 60px;
+        height: 60px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .juggle-board,
+      .juggle-cell,
+      .juggle-die,
+      .juggle-roll-btn,
+      .juggle-shape-option,
+      .juggle-control-btn,
+      .juggle-winner-banner {
+        transition: none;
+        animation: none !important;
+      }
+
+      .juggle-roll-btn:hover:not(:disabled),
+      .juggle-die.selectable:hover {
+        transform: none;
+      }
+    }
+
     @media (max-width: 700px) {
       .juggle-boards {
         flex-direction: column;
@@ -592,6 +716,17 @@ export function injectJuggleStyles(): void {
       .juggle-cell {
         width: 24px;
         height: 24px;
+        min-width: 24px;
+        min-height: 24px;
+      }
+    }
+
+    @media (max-width: 700px) and (pointer: coarse) {
+      .juggle-cell {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
       }
     }
   `;
