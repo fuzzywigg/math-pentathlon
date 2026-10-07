@@ -30,13 +30,13 @@ function over(winner: 'player1' | 'player2' | null) {
 describe('Wave 50 frac — game over', () => {
   it('Blue / Red / Draw banners + final score chrome', () => {
     expect(renderGameOver(over('player1')).querySelector('.frac-winner-banner')?.textContent).toMatch(
-      /Blue Wins/
+      /Blue wins/
     );
     expect(renderGameOver(over('player2')).querySelector('.frac-winner-banner')?.textContent).toMatch(
-      /Red Wins/
+      /Red wins/
     );
     expect(renderGameOver(over(null)).querySelector('.frac-winner-banner')?.textContent).toMatch(
-      /It's a Draw!/
+      /It's a tie!/
     );
     const el = renderGameOver(over('player1'));
     expect(el.querySelector('.frac-final-score.player1')?.textContent).toMatch(/40 points/);

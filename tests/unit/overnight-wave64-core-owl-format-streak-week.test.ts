@@ -30,7 +30,7 @@ describe('Wave 64 core owl — format streak-week-1', () => {
     });
     expect(msg!.id).toBe('streak-week-1');
     expect(msg!.text).toBe(
-      'ONE WEEK STREAK! 7 days of math practice! Incredible dedication!'
+      'One-week streak! 7 days of math practice — awesome!'
     );
   });
 

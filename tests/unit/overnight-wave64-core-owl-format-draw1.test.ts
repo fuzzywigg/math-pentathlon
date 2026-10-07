@@ -28,7 +28,7 @@ describe('Wave 64 core owl — format draw-1', () => {
     const msg = owlMessages.selectMessage('game:end', {});
     expect(msg!.id).toBe('draw-1');
     expect(msg!.text).toBe(
-      'A draw! Both players matched wits perfectly. Impressive!'
+      "It's a tie! You both played really well!"
     );
   });
 

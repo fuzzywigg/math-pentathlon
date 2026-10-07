@@ -209,7 +209,7 @@ describe('Burn wave 9 — Remainder Islands dice / preview / gameOver', () => {
     const scores = renderRemainderScores(createRemainder());
     document.body.appendChild(el);
     document.body.appendChild(scores);
-    expect(el.textContent).toMatch(/Draw/i);
+    expect(el.textContent).toMatch(/tie/i);
     expect(scores.classList.contains('remainder-scores')).toBe(true);
     expect(remainderName('player1')).toBe('Blue');
   });

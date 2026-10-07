@@ -18,7 +18,7 @@ describe('Wave 57 par55 — tie banner', () => {
     ctrl.update();
     expect(root.querySelector('.par55-status')?.textContent).toBe("It's a tie!");
     expect(root.querySelector('.par55-winner-banner')?.textContent).toBe(
-      "It's a Tie! 🤝"
+      "It's a tie!"
     );
   });
 });

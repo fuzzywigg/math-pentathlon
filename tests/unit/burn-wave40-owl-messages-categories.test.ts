@@ -55,7 +55,7 @@ describe('Wave 40 owl-messages — categories + fallbacks', () => {
     expect(msg).toBeTruthy();
     expect(msg!.text.length).toBeGreaterThan(5);
     // Should not be the big streak line
-    expect(msg!.text).not.toMatch(/UNSTOPPABLE/);
+    expect(msg!.text).not.toMatch(/Keep it up/);
   });
 
   it('draw end can select unconditional draw catalog entries', () => {

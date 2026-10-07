@@ -28,7 +28,7 @@ describe('Wave 63 core owl — format return-generic-1', () => {
     });
     expect(msg!.id).toBe('return-generic-1');
     expect(msg!.text).toBe(
-      'Welcome back, Ada! Which game shall we tackle today?'
+      'Welcome back, Ada! Which game do you want to play?'
     );
   });
 });

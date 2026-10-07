@@ -166,7 +166,7 @@ function updateStatus(): void {
     const winnerName = getPlayerName(winner);
     statusContainer.innerHTML = `
       <div class="qg-winner-banner">
-        ${stalematedPlayer} cannot move - ${winnerName} wins!
+        ${stalematedPlayer} cannot move — ${winnerName} wins!
       </div>
     `;
 
@@ -204,7 +204,7 @@ function updateStatus(): void {
     </div>
     <div class="qg-info">
       <span>Move ${Math.floor(gameState.moveHistory.length / 2) + 1}</span>
-      ${vsAI ? `<span>Playing vs AI</span>` : ''}
+      ${vsAI ? `<span>Playing vs Computer</span>` : ''}
     </div>
   `;
 }

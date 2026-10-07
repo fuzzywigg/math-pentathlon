@@ -8,11 +8,11 @@ import {
 } from '../../src/games/kings-quadraphages/game-state';
 
 describe('Wave 55 kings — P2 phase messages', () => {
-  it('Player 2 templates and Player 1 wins game-over', () => {
+  it('Red templates and Blue wins game-over', () => {
     const s = createInitialGameState();
     expect(
       getCurrentPhaseMessage({ ...s, currentPlayer: 'player2', turnPhase: 'moveKing' })
-    ).toBe('Player 2: Click your King to select it');
+    ).toBe('Red: Click your King to select it');
     expect(
       getCurrentPhaseMessage({
         ...s,
@@ -20,20 +20,20 @@ describe('Wave 55 kings — P2 phase messages', () => {
         turnPhase: 'moveKing',
         selectedKingPosition: { row: 9, col: 5 },
       })
-    ).toBe('Player 2: Click a green square to move');
+    ).toBe('Red: Click a green square to move');
     expect(
       getCurrentPhaseMessage({
         ...s,
         currentPlayer: 'player2',
         turnPhase: 'placeQuadraphage',
       })
-    ).toBe('Player 2: Place a Quadraphage');
+    ).toBe('Red: Place a Quadraphage');
     expect(
       getCurrentPhaseMessage({
         ...s,
         turnPhase: 'gameOver',
         winner: 'player1',
       })
-    ).toBe('Game Over! Player 1 wins!');
+    ).toBe('Blue wins!');
   });
 });

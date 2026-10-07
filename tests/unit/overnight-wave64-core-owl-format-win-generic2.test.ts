@@ -32,7 +32,7 @@ describe('Wave 64 core owl — format win-generic-2', () => {
     });
     expect(msg!.id).toBe('win-generic-2');
     expect(msg!.text).toBe(
-      'Hoot hoot! Winner winner! That was some impressive play!'
+      'Hoot hoot! Great win! That was some impressive play!'
     );
   });
 

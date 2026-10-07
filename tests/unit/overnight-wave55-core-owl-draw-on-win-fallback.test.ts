@@ -31,6 +31,6 @@ describe('Wave 55 core owl — draw copy on win fallback', () => {
     });
     expect(msg).not.toBeNull();
     expect(msg!.id.startsWith('draw-')).toBe(true);
-    expect(msg!.text.toLowerCase()).toMatch(/draw|tied/);
+    expect(msg!.text.toLowerCase()).toMatch(/tie|tied/);
   });
 });

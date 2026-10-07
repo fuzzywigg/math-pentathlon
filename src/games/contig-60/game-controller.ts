@@ -101,7 +101,7 @@ function formatEndBanner(winner: ContigWinner | null): string {
       return `${seatIcon(winner)} ${getPlayerName(winner)} wins!`;
     case 'draw':
     case null:
-      return "It's a draw!";
+      return "It's a tie!";
     default: {
       const _exhaustive: never = winner;
       return _exhaustive;
@@ -135,7 +135,7 @@ function updateStatus(): void {
       if (hasValidMoves(gameState)) {
         instruction = 'Choose a number to place your chip';
       } else {
-        instruction = 'No valid moves - you must pass';
+        instruction = 'No valid moves — you must pass';
       }
       break;
     case 'placing':

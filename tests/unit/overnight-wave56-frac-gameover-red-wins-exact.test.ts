@@ -7,7 +7,7 @@ import { createInitialState } from '../../src/games/frac-fact/types';
 import { renderGameOver } from '../../src/games/frac-fact/board-ui';
 
 describe('Wave 56 frac board — red banner', () => {
-  it('uses Red Wins! 🎉 leftover with Best streak copy', () => {
+  it('uses Red wins! leftover with Best streak copy', () => {
     const el = renderGameOver({
       ...createInitialState('medium'),
       phase: 'gameOver',
@@ -21,7 +21,7 @@ describe('Wave 56 frac board — red banner', () => {
       },
     });
     expect(el.querySelector('.frac-winner-banner')?.textContent).toBe(
-      'Red Wins! 🎉'
+      'Red wins!'
     );
     expect(
       el.querySelector('.frac-final-score.player2 .frac-final-value')?.textContent

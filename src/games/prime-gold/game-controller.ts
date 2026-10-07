@@ -212,13 +212,13 @@ function updateUI(controller: PrimeGoldController): void {
   markStatusLive(status);
 
   if (state.winner) {
-    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.primeVeins[state.winner]} prime veins!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.primeVeins[state.winner]} prime lines!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (state.phase === 'rolling') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn — Roll the dice`;
   } else if (state.phase === 'placing') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Select a number to place`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} — Choose a number to place`;
   }
 
   gameArea.appendChild(status);
@@ -231,9 +231,9 @@ function updateUI(controller: PrimeGoldController): void {
     const banner = document.createElement('div');
     banner.className = 'pg-winner-banner';
     if (state.winner) {
-      banner.textContent = `${getPlayerName(state.winner)} Wins!`;
+      banner.textContent = `${getPlayerName(state.winner)} wins!`;
     } else {
-      banner.textContent = "It's a Tie!";
+      banner.textContent = "It's a tie!";
     }
     gameArea.appendChild(banner);
   }

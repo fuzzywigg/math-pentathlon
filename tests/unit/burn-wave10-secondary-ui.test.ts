@@ -101,7 +101,7 @@ describe('Burn wave 10 — Frac / Pinball winner gameOver banners', () => {
     const el = renderFracOver(state);
     document.body.appendChild(el);
     expect(el.classList.contains('frac-game-over')).toBe(true);
-    expect(el.textContent).toMatch(/Blue Wins/i);
+    expect(el.textContent).toMatch(/Blue wins/i);
     expect(fracName('player1')).toBe('Blue');
     expect(fracName('player2')).toBe('Red');
   });

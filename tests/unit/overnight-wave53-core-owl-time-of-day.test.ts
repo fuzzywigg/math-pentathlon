@@ -40,7 +40,7 @@ describe('Wave 53 core owl — time of day buckets', () => {
   it.each([
     { hour: 6, hint: /good morning/i },
     { hour: 13, hint: /good afternoon/i },
-    { hour: 18, hint: /evening owl/i },
+    { hour: 18, hint: /good evening/i },
     { hour: 22, hint: /night owl|late night/i },
   ])('local hour $hour selects matching return line', async ({ hour, hint }) => {
     vi.setSystemTime(new Date(2026, 8, 14, hour, 0, 0));

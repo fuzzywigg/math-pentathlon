@@ -161,7 +161,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
           <h3>Game Setup</h3>
           <ul>
             <li>Each player has 1 King and 30 Quadraphages</li>
-            <li>Player 1 (Blue) starts at the top, Player 2 (Red) at the bottom</li>
+            <li>Blue starts at the top, Red at the bottom</li>
           </ul>
 
           <h3>Turn Sequence</h3>
@@ -183,7 +183,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     gameAreaClass: 'game-area',
     modeRadioName: 'game-mode',
     vsHumanDescription: 'Pass & play with a friend',
-    vsAiDescription: 'Challenge the computer opponent',
+    vsAiDescription: 'Challenge the computer',
     showTutorial: true,
     showMoveHistory: true,
     showDifficulty: true,
@@ -244,7 +244,7 @@ async function renderHex(routeGen: number): Promise<void> {
 
           <h3>Winning</h3>
           <p>Create an unbroken path of your pieces connecting your two edges.
-          Hex is a solved game - there are no draws possible!</p>
+          Someone always wins in Hex — there are no ties!</p>
 
           <h3>Strategy Tips</h3>
           <ul>
@@ -255,7 +255,7 @@ async function renderHex(routeGen: number): Promise<void> {
     gameAreaClass: 'hex-game-area',
     modeRadioName: 'hex-game-mode',
     vsHumanDescription: 'Pass & play with a friend',
-    vsAiDescription: 'Challenge the computer (basic)',
+    vsAiDescription: 'Challenge the computer',
     showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
@@ -377,7 +377,7 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     gameAreaClass: 'star-track-game-area',
     modeRadioName: 'star-track-mode',
     vsHumanDescription: 'Pass & play with a friend',
-    vsAiDescription: 'Race against the computer',
+    vsAiDescription: 'Challenge the computer',
     showTutorial: true,
     showDifficulty: true,
     onNavigateHome: () => navigate('/'),
@@ -541,27 +541,27 @@ async function renderCalla(routeGen: number): Promise<void> {
 
           <h3>Setup</h3>
           <ul>
-            <li>Each player has 5 shields (pits) and 1 Calla (store)</li>
+            <li>Each player has 5 pits and 1 Calla (store)</li>
             <li>Blue's Calla is on the right, Red's on the left</li>
-            <li>Each shield starts with 3 cubes</li>
+            <li>Each pit starts with 3 cubes</li>
           </ul>
 
           <h3>Turn Sequence</h3>
           <ol>
-            <li>Click one of your shields that has cubes</li>
-            <li>All cubes are picked up and "sown" one by one counter-clockwise</li>
-            <li>Cubes are dropped into each pit/Calla along the way</li>
+            <li>Click one of your pits that has cubes</li>
+            <li>Pick up all the cubes and drop them one by one, going around the board</li>
+            <li>Drop one cube in each pit and your Calla as you go</li>
           </ol>
 
           <h3>Special Rules</h3>
           <ul>
             <li><strong>Free Turn:</strong> If your last cube lands in your Calla, take another turn!</li>
-            <li><strong>Capture:</strong> If your last cube lands in an empty shield on your side, capture that cube AND all cubes in the opposite shield!</li>
-            <li>You skip your opponent's Calla when sowing</li>
+            <li><strong>Capture:</strong> If your last cube lands in an empty pit on your side, take that cube AND all cubes in the pit across from it!</li>
+            <li>Skip the other player's Calla when you drop cubes</li>
           </ul>
 
           <h3>Game End</h3>
-          <p>The game ends when one side has no cubes. Remaining cubes go to that side's player. Most cubes in Calla wins!</p>
+          <p>The game ends when one side has no cubes left. Leftover cubes go into that player's Calla. Whoever has more cubes in their Calla wins!</p>
 
           <h3>Strategy Tips</h3>
           <ul>
@@ -611,7 +611,7 @@ async function renderFiar(routeGen: number): Promise<void> {
 
           <h3>Materials</h3>
           <ul>
-            <li>Each player has <strong>7 chips</strong> — <strong>2 marked</strong> Fire Extinguisher blockers and 5 plain</li>
+            <li>Each player has <strong>7 chips</strong> — <strong>2 marked blockers</strong> (Fire Extinguishers) and 5 plain chips</li>
           </ul>
 
           <h3>Game Phases</h3>
@@ -633,8 +633,8 @@ async function renderFiar(routeGen: number): Promise<void> {
           <ul>
             <li>Form 4 (or more) chips of the same color along a straight line of connected spaces</li>
             <li>Empty spaces between the four are fine; other chips may sit outside the winning four</li>
-            <li>You can win with the opponent's color if your move completes their line</li>
-            <li><strong>Blocking:</strong> Only an opponent's <em>marked</em> Fire Extinguisher chip adjacent to the winning path prevents the win. Your own marked chips can be part of a win.</li>
+            <li>You can even win with the other player's color if your move finishes their line</li>
+            <li><strong>Blocking:</strong> Only the other player's <em>marked blocker</em> (Fire Extinguisher) next to the winning path stops the win. Your own marked chips can be part of a win.</li>
           </ul>
 
           <h3>Strategy Tips</h3>
@@ -787,13 +787,13 @@ async function renderContig60(routeGen: number): Promise<void> {
           <h3>Passing</h3>
           <ul>
             <li>If you cannot make any available number, you must pass</li>
-            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
+            <li>If both players pass in a row, the game ends and longer lines on the board decide who wins</li>
           </ul>
 
           <h3>Winning</h3>
           <ul>
             <li><strong>5 in a row:</strong> First to get 5 chips in a line wins!</li>
-            <li><strong>Otherwise:</strong> If the board is full or both players pass in a row, most 4-in-a-rows wins, then most 3-in-a-rows; otherwise it is a draw</li>
+            <li><strong>Otherwise:</strong> If the board is full or both players pass in a row, most 4-in-a-rows wins, then most 3-in-a-rows; otherwise it is a tie</li>
           </ul>`,
     gameAreaClass: 'contig-game-area',
     modeRadioName: 'contig-mode',
@@ -833,7 +833,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
     title: 'Juggle',
     helpTitle: 'How to Play Juggle',
     helpContentHtml: `<h3>Objective</h3>
-          <p>Be the first player to completely fill your 9x9 grid with polyomino shapes!</p>
+          <p>Be the first player to completely fill your 9×9 board with shapes!</p>
 
           <h3>Turn Sequence</h3>
           <ol>
@@ -1000,13 +1000,13 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
           <ul>
             <li>If you cannot play any domino, you must pass</li>
             <li>If both players pass consecutively, the game ends</li>
-            <li>Player with fewer total pips on remaining dominoes wins</li>
+            <li>Whoever has fewer dots left on their dominoes wins</li>
           </ul>
 
           <h3>Strategy Tips</h3>
           <ul>
-            <li>Try to play high-pip dominoes first</li>
-            <li>Watch which sums are likely based on dice probabilities</li>
+            <li>Try to play high-number dominoes first</li>
+            <li>Watch which sums come up often</li>
             <li>7 is the most common dice sum</li>
           </ul>`,
     gameAreaClass: 'sd-game-area',
@@ -1079,7 +1079,7 @@ async function renderPar55(routeGen: number): Promise<void> {
           <h3>Strategy Tips</h3>
           <ul>
             <li>Place blocks near multiple occupied bases for more points</li>
-            <li>Match: many attributes: possible</li>
+            <li>Match as many attributes as you can</li>
             <li>Watch what blocks your opponent has played</li>
           </ul>`,
     gameAreaClass: 'par55-game-area',
@@ -1122,8 +1122,8 @@ async function renderRamrod(routeGen: number): Promise<void> {
     helpContentHtml: `<h3>Objective</h3>
           <p>Be the first player to capture 24 cm worth of sum boxes!</p>
 
-          <h3>Cuisenaire Rods</h3>
-          <p>Each rod has a color and length (1-10 cm):</p>
+          <h3>Number Rods</h3>
+          <p>Each rod has a color and length (1–10 cm). These are also called Cuisenaire rods:</p>
           <ul>
             <li><strong>White</strong> = 1cm, <strong>Red</strong> = 2cm</li>
             <li><strong>Light Green</strong> = 3cm, <strong>Purple</strong> = 4cm</li>
@@ -1271,42 +1271,42 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     title: 'Prime Gold',
     helpTitle: 'How to Play Prime Gold',
     helpContentHtml: `<h3>Objective</h3>
-          <p>Form 4 diagonal veins of prime numbers to win!</p>
+          <p>Make 4 diagonal prime lines (also called veins) to win!</p>
 
           <h3>The Board</h3>
           <ul>
-            <li>7x7 grid with numbers spiraling from center</li>
+            <li>7×7 grid with numbers spiraling from the center</li>
             <li>Gold cells are prime numbers</li>
-            <li>Primes naturally occur along diagonals</li>
+            <li>Primes often line up on diagonals</li>
           </ul>
 
           <h3>Turn Sequence</h3>
           <ol>
             <li><strong>Roll Dice:</strong> Roll 3 dice (d6, d8, d10)</li>
-            <li><strong>Create Expression:</strong> Combine dice using +, -, *, /, ^, !</li>
-            <li><strong>Place Chip:</strong> Put chip on the matching number</li>
+            <li><strong>Make a Number:</strong> Combine the dice with +, −, ×, ÷, ^, or !</li>
+            <li><strong>Place Chip:</strong> Put a chip on that number</li>
           </ol>
 
           <h3>Operations</h3>
           <ul>
-            <li><strong>Basic:</strong> +, -, ×, ÷</li>
-            <li><strong>Exponents:</strong> a^b (e.g., 2^3 = 8)</li>
-            <li><strong>Factorials:</strong> n! (e.g., 4! = 24)</li>
+            <li><strong>Basic:</strong> +, −, ×, ÷</li>
+            <li><strong>Powers:</strong> a^b (for example, 2^3 = 8)</li>
+            <li><strong>Factorials:</strong> n! (for example, 4! = 24)</li>
           </ul>
 
-          <h3>Prime Veins</h3>
+          <h3>Prime Lines</h3>
           <ul>
-            <li>A vein = 4+ chips in a diagonal line</li>
-            <li>Chips must be on prime numbers</li>
-            <li>First to 4 veins wins!</li>
+            <li>A prime line = 4 or more chips on a diagonal</li>
+            <li>Those chips must sit on prime numbers</li>
+            <li>First to 4 prime lines wins!</li>
           </ul>
 
           <h3>Strategy Tips</h3>
           <ul>
-            <li>Target prime numbers (gold cells)</li>
+            <li>Aim for prime numbers (gold cells)</li>
             <li>Build along diagonal lines</li>
-            <li>Block opponent's potential veins</li>
-            <li>Factorials give big numbers: 5!=120</li>
+            <li>Block the other player's prime lines</li>
+            <li>Factorials make big numbers: 5! = 120</li>
           </ul>`,
     gameAreaClass: 'pg-game-area',
     modeRadioName: 'pg-mode',
@@ -1355,7 +1355,7 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
           <h3>Setup</h3>
           <ul>
             <li>10x10 grid board</li>
-            <li>Each player has 12 pentomino pieces (5-cell shapes)</li>
+            <li>Each player has 12 pieces made of 5 squares each (pentominoes)</li>
           </ul>
 
           <h3>Turn Sequence</h3>
@@ -1447,8 +1447,8 @@ async function renderFracFact(routeGen: number): Promise<void> {
           <h3>Winning</h3>
           <p>After 10 problems each, the player with the highest score wins!</p>`,
     modeRadioName: 'frac-mode',
-    vsHumanDescription: 'Take turns solving problems',
-    vsAiDescription: 'Compete against the computer',
+    vsHumanDescription: 'Pass & play with a friend',
+    vsAiDescription: 'Challenge the computer',
     showStatus: false,
     showTutorial: true,
     showDifficulty: true,
@@ -1591,7 +1591,7 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
           <h3>Winning</h3>
           <p>Player with the most points after all rounds wins!</p>`,
     modeRadioName: 'pinball-mode',
-    vsHumanDescription: 'Take turns converting',
+    vsHumanDescription: 'Pass & play with a friend',
     vsAiDescription: 'Challenge the computer',
     showStatus: false,
     showTutorial: true,

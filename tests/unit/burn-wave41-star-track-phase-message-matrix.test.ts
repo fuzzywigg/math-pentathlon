@@ -21,7 +21,7 @@ import { executeAITurn, isAITurn } from '../../src/games/star-track/ai';
 describe('Wave 41 star-track — phase matrix leftovers', () => {
   it('getPhaseMessage draw/select/moving matrix', () => {
     const base = createInitialState();
-    expect(getPhaseMessage({ ...base, phase: 'drawChains' })).toMatch(/Draw chains/);
+    expect(getPhaseMessage({ ...base, phase: 'drawChains' })).toMatch(/draw chains/);
     expect(getPhaseMessage({ ...base, phase: 'selectChain' })).toMatch(/Choose a chain/);
     expect(getPhaseMessage({ ...base, phase: 'moving' as 'drawChains' })).toBe('');
   });

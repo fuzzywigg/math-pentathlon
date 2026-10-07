@@ -25,25 +25,25 @@ export const DIVISIONS: DivisionInfo[] = [
     id: 'division-1',
     name: 'Division I',
     gradeRange: 'Grades K-1',
-    description: 'Foundation games for early learners',
+    description: 'Fun starter games for the youngest players',
   },
   {
     id: 'division-2',
     name: 'Division II',
     gradeRange: 'Grades 2-3',
-    description: 'Building computational and strategic thinking',
+    description: 'Games that build counting, matching, and planning skills',
   },
   {
     id: 'division-3',
     name: 'Division III',
     gradeRange: 'Grades 4-5',
-    description: 'Advanced geometry and fraction concepts',
+    description: 'Games with shapes, fractions, and clever board moves',
   },
   {
     id: 'division-4',
     name: 'Division IV',
     gradeRange: 'Grades 6-7',
-    description: 'Complex operations and algebraic thinking',
+    description: 'Trickier number games for bigger challenges',
   },
 ];
 
@@ -58,7 +58,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division I',
     gradeRange: 'Grades K-1',
     description:
-      "Trap your opponent's King using strategic placement of Quadraphages.",
+      "Move your King, place blockers, and trap the other player's King.",
     playerCount: '2 Players',
     difficulty: 'beginner',
     icon: '♚',
@@ -69,7 +69,8 @@ export const GAMES: GameInfo[] = [
     name: 'Hex',
     division: 'Division I',
     gradeRange: 'Grades K-1',
-    description: 'Connect opposite sides of the board with an unbroken chain.',
+    description:
+      'Connect your two sides of the board with a path of your pieces.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⬡',
@@ -81,7 +82,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division I',
     gradeRange: 'Grades K-1',
     description:
-      'Select chain links of various lengths to move across the star-shaped board.',
+      'Pick a chain length and race your piece to the center star.',
     playerCount: '2 Players',
     difficulty: 'beginner',
     icon: '★',
@@ -93,7 +94,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division I',
     gradeRange: 'Grades K-1',
     description:
-      'Cover hexagonal spaces with pattern blocks - last player to place wins!',
+      'Cover the hex board with pattern blocks. Last player who can place wins!',
     playerCount: '2 Players',
     difficulty: 'beginner',
     icon: '⬢',
@@ -105,7 +106,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division I',
     gradeRange: 'Grades K-1',
     description:
-      'Distribute cubes strategically to capture and earn free turns.',
+      "Drop cubes around the board, capture the other player's cubes, and fill your Calla.",
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🎯',
@@ -120,8 +121,7 @@ export const GAMES: GameInfo[] = [
     name: 'Sum Dominoes & Dice',
     division: 'Division II',
     gradeRange: 'Grades 2-3',
-    description:
-      'Match domino faces to dice sums. Develops subtraction and algebraic thinking.',
+    description: 'Roll the dice, then play a domino that matches the sum.',
     playerCount: '2-4 Players',
     difficulty: 'beginner',
     icon: '🁣',
@@ -133,7 +133,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division II',
     gradeRange: 'Grades 2-3',
     description:
-      'Use attribute logic blocks on pentagon bases to score points.',
+      'Place attribute blocks next to matching ones and race to 55 points.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⬠',
@@ -144,8 +144,7 @@ export const GAMES: GameInfo[] = [
     name: 'Ramrod',
     division: 'Division II',
     gradeRange: 'Grades 2-3',
-    description:
-      'Network addend combinations with Cuisenaire rods to complete sum boxes.',
+    description: 'Fill sum boxes with number rods that add up to the target.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '▭',
@@ -156,8 +155,7 @@ export const GAMES: GameInfo[] = [
     name: 'Kwatro-Sinko',
     division: 'Division II',
     gradeRange: 'Grades 2-3',
-    description:
-      'Move chips along pathways to create alignments totaling four or five.',
+    description: 'Move number chips so a line adds up to 4 or 5.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '◈',
@@ -169,7 +167,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division II',
     gradeRange: 'Grades 2-3',
     description:
-      'Four In A Row - place and move chips along pathways to form winning alignments.',
+      'Four In A Row — place and move chips to make a line of four.',
     playerCount: '2 Players',
     difficulty: 'beginner',
     icon: '◇',
@@ -185,7 +183,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division III',
     gradeRange: 'Grades 4-5',
     description:
-      'Juggle polyominoes to complete your 9x9 grid. Area and transformations.',
+      'Roll for shapes and fill your 9×9 board before your opponent does.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⊞',
@@ -197,7 +195,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division III',
     gradeRange: 'Grades 4-5',
     description:
-      'Form number sentences from dice rolls. Four operations strategy game.',
+      'Use three dice and math to place chips. First to five in a row wins.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🎲',
@@ -208,8 +206,7 @@ export const GAMES: GameInfo[] = [
     name: 'Stars & Bars',
     division: 'Division III',
     gradeRange: 'Grades 4-5',
-    description:
-      'Multiple classification logic with geometric attribute cards.',
+    description: 'Sort shape cards by matching attributes and score points.',
     playerCount: '2 Players',
     difficulty: 'advanced',
     icon: '✦',
@@ -220,8 +217,7 @@ export const GAMES: GameInfo[] = [
     name: 'Fab-a-Diffy',
     division: 'Division III',
     gradeRange: 'Grades 4-5',
-    description:
-      'Fraction bars game developing equivalence and operations understanding.',
+    description: 'Match fraction bars that are equal in value.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '½',
@@ -233,7 +229,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division III',
     gradeRange: 'Grades 4-5',
     description:
-      'Hexagonal strategy game combining Checkers simplicity with Chess complexity.',
+      'Move Queens and Guards on a hex board and trap the other side.',
     playerCount: '2 Players',
     difficulty: 'advanced',
     icon: '♛',
@@ -249,7 +245,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
     description:
-      'Exponents, factorials, and primes in a diagonal alignment strategy game.',
+      'Make number sentences from dice, then build diagonal lines of primes.',
     playerCount: '2 Players',
     difficulty: 'advanced',
     icon: '🔢',
@@ -261,7 +257,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
     description:
-      'Division game with hexagonal islands. Strategic placement using remainders.',
+      'Divide, find the remainder, and place chips on the matching islands.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🏝️',
@@ -273,7 +269,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
     description:
-      'Use pentominoes to entrap opponents. Transformational geometry strategy.',
+      'Place pentomino pieces to block your opponent from fitting any more.',
     playerCount: '2 Players',
     difficulty: 'advanced',
     icon: '⊟',
@@ -284,7 +280,8 @@ export const GAMES: GameInfo[] = [
     name: 'Frac Fact',
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
-    description: 'Combine fraction bars with operations to match answer bars.',
+    description:
+      'Solve fraction problems and earn more points than your opponent.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⅔',
@@ -296,7 +293,7 @@ export const GAMES: GameInfo[] = [
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
     description:
-      'Fraction-decimal conversion game simulating pinball mechanics.',
+      'Match fractions with their decimal partners, pinball-style.',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '🎰',

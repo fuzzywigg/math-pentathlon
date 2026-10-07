@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 57 sum — status select domino', () => {
-  it('placing with no selection shows Select a domino to play', () => {
+  it('placing with no selection shows Choose a domino to play', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
     const ctrl = newGameVsHuman(root);
@@ -22,7 +22,7 @@ describe('Wave 57 sum — status select domino', () => {
     };
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /Select a domino to play/
+      /Choose a domino to play/
     );
   });
 });

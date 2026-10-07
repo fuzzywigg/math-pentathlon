@@ -156,7 +156,7 @@ describe('Hex-a-Gone – deselect / multi-select / placements / messages', () =>
 
   it('getPhaseMessage covers select, place, and game-over', () => {
     const fresh = createInitialState();
-    expect(getPhaseMessage(fresh)).toMatch(/Select 1-3/);
+    expect(getPhaseMessage(fresh)).toMatch(/pick 1 to 3/);
 
     const selected = selectBlock(fresh, 'triangle');
     expect(getPhaseMessage(selected)).toMatch(/1 block/);

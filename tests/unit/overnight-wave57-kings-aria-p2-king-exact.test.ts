@@ -15,6 +15,6 @@ describe('Wave 57 kings — P2 king aria', () => {
     renderBoard(createInitialGameState(), el);
     expect(
       el.querySelector('.cell[data-row="9"][data-col="5"]')?.getAttribute('aria-label')
-    ).toBe('E9, Player 2 King');
+    ).toBe('E9, Red King');
   });
 });

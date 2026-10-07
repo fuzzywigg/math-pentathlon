@@ -13,6 +13,6 @@ describe('Wave 49 kings — You Win exact', () => {
     document.body.appendChild(el);
     const state = { ...createInitialGameState(), turnPhase: 'gameOver' as const, winner: 'player1' as const };
     renderStatus(state, el, 'human-vs-ai', 'medium', false);
-    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You Win!/);
+    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You win!/);
   });
 });

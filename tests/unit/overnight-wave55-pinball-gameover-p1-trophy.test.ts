@@ -20,7 +20,7 @@ describe('Wave 55 pinball board — p1 trophy', () => {
       },
     });
     expect(el.querySelector('.pinball-winner-banner')?.textContent).toBe(
-      'Blue Wins! 🏆'
+      'Blue wins!'
     );
     expect(
       el.querySelector('.pinball-final-score.player1 .pinball-final-value')?.textContent

@@ -13,6 +13,6 @@ describe('Wave 49 kings — You/AI supply', () => {
     document.body.appendChild(el);
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'medium', false);
     expect(el.querySelector('.supply-p1')?.textContent).toMatch(/You: 30/);
-    expect(el.querySelector('.supply-p2')?.textContent).toMatch(/AI: 30/);
+    expect(el.querySelector('.supply-p2')?.textContent).toMatch(/Computer: 30/);
   });
 });

@@ -12,7 +12,7 @@ import {
 describe('Wave 42 kings — phase messages', () => {
   it('message matrix across phases', () => {
     let s = createInitialGameState();
-    expect(getCurrentPhaseMessage(s)).toContain('Player 1');
+    expect(getCurrentPhaseMessage(s)).toContain('Blue: Click your King to select it');
     s = selectKing(s);
     expect(getCurrentPhaseMessage(s)).toMatch(/green/);
     s = moveKing(s, { row: 2, col: 4 });
@@ -22,7 +22,7 @@ describe('Wave 42 kings — phase messages', () => {
       turnPhase: 'gameOver' as const,
       winner: 'player2' as const,
     };
-    expect(getCurrentPhaseMessage(over)).toMatch(/Player 2 wins/);
+    expect(getCurrentPhaseMessage(over)).toMatch(/Red wins/);
   });
 
   it('selectKing noop outside moveKing; player2 select after flip', () => {

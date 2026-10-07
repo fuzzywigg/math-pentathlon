@@ -18,7 +18,7 @@ describe('Wave 58 sum — Red winner banner', () => {
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(/Red wins!/);
     expect(root.querySelector('.sd-winner-banner')?.textContent).toMatch(
-      /Red Wins! 🎉/
+      /Red wins!/
     );
   });
 });

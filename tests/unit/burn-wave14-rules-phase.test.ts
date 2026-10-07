@@ -221,7 +221,7 @@ describe('Wave 14 rules-phase — Hex-a-Gone empty / wrong-phase guards', () => 
     let state = selectHag(createHag(), 'triangle');
     state = selectHag(state, 'rhombus');
     state = commitSelection(state);
-    expect(hagPhaseMsg(state)).toMatch(/2 remaining/);
+    expect(hagPhaseMsg(state)).toMatch(/2 blocks left/);
   });
 
   it('canPlayerMove is false when bank is empty or board is full', () => {
@@ -480,7 +480,7 @@ describe('Wave 14 rules-phase — Calla animating/gameOver pit gates', () => {
     expect(getLastMoveInfo(withMany)).toMatch(/captured 2/);
 
     expect(callaPhaseMsg({ ...createCalla(), phase: 'animating' })).toMatch(
-      /distributing/
+      /dropping cubes/
     );
   });
 });
@@ -513,7 +513,7 @@ describe('Wave 14 rules-phase — Star Track draw/select identity + progress', (
         phase: 'gameOver',
         winner: null,
       })
-    ).toMatch(/draw/i);
+    ).toMatch(/tie/i);
   });
 
   it('drawChains with fewer than 2 chains ends game by position', () => {

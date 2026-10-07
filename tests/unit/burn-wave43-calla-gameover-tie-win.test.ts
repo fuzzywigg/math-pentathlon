@@ -43,8 +43,8 @@ describe('Wave 43 calla — gameOver tie/win', () => {
   });
 
   it('getPhaseMessage covers select/animating/tie/win', () => {
-    expect(getPhaseMessage(createInitialState())).toMatch(/Select/);
-    expect(getPhaseMessage(base({ phase: 'animating' }))).toMatch(/distributing/);
+    expect(getPhaseMessage(createInitialState())).toMatch(/pick/);
+    expect(getPhaseMessage(base({ phase: 'animating' }))).toMatch(/dropping/);
     expect(getPhaseMessage(base({ phase: 'gameOver', winner: 'tie' }))).toMatch(/tie/i);
     expect(getPhaseMessage(base({ phase: 'gameOver', winner: 'player1' }))).toMatch(/wins/);
   });

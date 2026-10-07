@@ -26,7 +26,7 @@ describe('Wave 60 core owl — format default this game', () => {
     const msg = owlMessages.selectMessage('tutorial:start', {});
     expect(msg!.id).toBe('tutorial-start-2');
     expect(msg!.text).toBe(
-      "Learning mode activated! Let's discover how to play this game together!"
+      "Tutorial time! Let's learn how to play this game together!"
     );
   });
 });

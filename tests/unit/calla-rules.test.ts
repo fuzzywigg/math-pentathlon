@@ -146,7 +146,7 @@ describe('Calla – capture / tie / last-move info / phases', () => {
       ...createInitialState(),
       phase: 'animating',
     };
-    expect(getPhaseMessage(animating)).toMatch(/distributing/i);
+    expect(getPhaseMessage(animating)).toMatch(/dropping cubes/i);
 
     const tie: CallaGameState = {
       ...createInitialState(),

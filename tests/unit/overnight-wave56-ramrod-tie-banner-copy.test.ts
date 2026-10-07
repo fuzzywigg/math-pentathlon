@@ -26,7 +26,7 @@ describe('Wave 56 ramrod — tie banner copy', () => {
       "It's a tie!"
     );
     expect(root.querySelector('.ramrod-winner-banner')?.textContent).toBe(
-      "It's a Tie! 🤝"
+      "It's a tie!"
     );
   });
 });

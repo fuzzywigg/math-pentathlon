@@ -29,6 +29,6 @@ describe('Wave 57 kings — P2 quad aria', () => {
     renderBoard(s, el);
     expect(
       el.querySelector('.cell[data-row="8"][data-col="3"]')?.getAttribute('aria-label')
-    ).toBe('C8, Player 2 Quadraphage');
+    ).toBe('C8, Red Quadraphage');
   });
 });

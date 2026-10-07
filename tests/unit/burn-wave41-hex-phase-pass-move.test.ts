@@ -19,17 +19,17 @@ import {
 describe('Wave 41 hex-a-gone — phase msg / pass / canMove', () => {
   it('getPhaseMessage matrix across phases', () => {
     const open = createInitialState();
-    expect(getPhaseMessage(open)).toMatch(/Blue.*Select 1-3/i);
+    expect(getPhaseMessage(open)).toMatch(/Blue.*pick 1 to 3/i);
 
     const one = selectBlock(open, 'triangle');
-    expect(getPhaseMessage(one)).toMatch(/1 block\(s\) selected/i);
+    expect(getPhaseMessage(one)).toMatch(/1 block selected/i);
 
     const placing: HexAGoneGameState = {
       ...one,
       phase: 'placeBlocks',
       turnSelection: { blocks: ['triangle', 'square'], committed: true },
     };
-    expect(getPhaseMessage(placing)).toMatch(/Place your blocks.*2 remaining/i);
+    expect(getPhaseMessage(placing)).toMatch(/Place your blocks.*2 blocks left/i);
 
     expect(
       getPhaseMessage({

@@ -30,7 +30,7 @@ describe('Wave 63 core owl — format win-generic-3', () => {
     });
     expect(msg!.id).toBe('win-generic-3');
     expect(msg!.text).toBe(
-      'Amazing! Your math brain is really showing off today!'
+      'Amazing! Your math skills are really showing today!'
     );
   });
 });

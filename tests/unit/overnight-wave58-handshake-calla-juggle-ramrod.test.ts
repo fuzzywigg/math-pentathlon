@@ -63,7 +63,7 @@ describe('Wave 58 handshake — calla/juggle/ramrod leftovers', () => {
       { ...callaInit(), phase: 'animating', currentPlayer: 'player1' },
       status
     );
-    expect(status.textContent).toContain('Blue is distributing cubes...');
+    expect(status.textContent).toContain('Blue is dropping cubes…');
 
     const j = juggleInit();
     expect(

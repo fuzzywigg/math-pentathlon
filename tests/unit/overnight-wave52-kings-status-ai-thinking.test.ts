@@ -10,11 +10,11 @@ afterEach(() => {
 });
 
 describe('Wave 52 kings — AI thinking', () => {
-  it('shows AI is thinking with status-ai-thinking class', () => {
+  it('shows Computer is thinking with status-ai-thinking class', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'medium', true);
     const turn = el.querySelector('.status-turn.status-ai-thinking');
-    expect(turn?.textContent).toMatch(/AI is thinking/);
+    expect(turn?.textContent).toMatch(/Computer is thinking/);
   });
 });

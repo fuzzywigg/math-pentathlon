@@ -210,9 +210,9 @@ export function getPhaseMessage(state: CallaGameState): string {
 
   switch (state.phase) {
     case 'selectPit':
-      return `${playerName}'s turn - Select a shield to distribute`;
+      return `${playerName}'s turn — pick a pit with cubes`;
     case 'animating':
-      return `${playerName} is distributing cubes...`;
+      return `${playerName} is dropping cubes…`;
     case 'gameOver': {
       if (state.winner === 'tie') {
         return "It's a tie!";

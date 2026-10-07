@@ -24,9 +24,9 @@ describe('Overnight wave50 calla — status scores/thinking', () => {
     const thinking = document.createElement('div');
     renderStatus(createInitialState(), thinking, 'human-vs-ai', true);
     expect(thinking.querySelector('.status-turn')?.textContent).toBe(
-      '🤖 AI is thinking...'
+      'Computer is thinking…'
     );
     expect(thinking.querySelector('.status-ai-thinking')).toBeTruthy();
-    expect(thinking.textContent).not.toMatch(/Select a shield/);
+    expect(thinking.textContent).not.toMatch(/pick a pit with cubes/);
   });
 });

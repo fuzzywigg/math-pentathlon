@@ -22,7 +22,7 @@ describe('Wave 57 sum — status passing copy', () => {
     };
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /cannot play - must pass/
+      /cannot play — you must pass/
     );
     expect(root.querySelector('.sd-pass-btn')?.textContent).toBe('Pass Turn');
   });

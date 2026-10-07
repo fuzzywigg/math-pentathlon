@@ -15,8 +15,8 @@ describe('Wave 50 prime — scores', () => {
     const el = renderScores(state);
     expect(el.classList.contains('pg-scores')).toBe(true);
     expect(el.querySelector('.pg-score.player1')?.textContent).toMatch(/Blue: 17 chips/);
-    expect(el.querySelector('.pg-score.player1')?.textContent).toMatch(/2 veins/);
+    expect(el.querySelector('.pg-score.player1')?.textContent).toMatch(/2 prime lines/);
     expect(el.querySelector('.pg-score.player2')?.textContent).toMatch(/Red: 19 chips/);
-    expect(el.querySelector('.pg-score.player2')?.textContent).toMatch(/1 veins/);
+    expect(el.querySelector('.pg-score.player2')?.textContent).toMatch(/1 prime lines/);
   });
 });

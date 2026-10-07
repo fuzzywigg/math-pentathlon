@@ -1,6 +1,6 @@
 /**
  * Wave 58 leftover after #262 (retry #273 RED) — Calla human-vs-human winner banner.
- * Distinct from tie exact + AI You/AI labels. Tests-only.
+ * Distinct from tie exact + AI You/Computer labels. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../../src/games/calla/types';
@@ -16,7 +16,7 @@ describe('Wave 58 calla — winner banner exact', () => {
     const el = document.createElement('div');
     renderStatus(state, el, 'human-vs-human');
     expect(el.querySelector('.status-winner')?.textContent).toBe(
-      '🎉 🔵 Blue Wins! 🎉'
+      '🔵 Blue wins!'
     );
   });
 
@@ -29,7 +29,7 @@ describe('Wave 58 calla — winner banner exact', () => {
     const el = document.createElement('div');
     renderStatus(state, el, 'human-vs-human');
     expect(el.querySelector('.status-winner')?.textContent).toBe(
-      '🎉 🔴 Red Wins! 🎉'
+      '🔴 Red wins!'
     );
   });
 });

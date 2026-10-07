@@ -10,14 +10,14 @@ afterEach(() => {
 });
 
 describe('Wave 52 kings — Easy/Medium mode', () => {
-  it('shows vs AI (Easy) and vs AI (Medium)', () => {
+  it('shows vs Computer (Easy) and vs Computer (Medium)', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'easy', false);
-    expect(el.querySelector('.status-mode')?.textContent).toBe('vs AI (Easy)');
+    expect(el.querySelector('.status-mode')?.textContent).toBe('vs Computer (Easy)');
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'medium', false);
     expect(el.querySelector('.status-mode')?.textContent).toBe(
-      'vs AI (Medium)'
+      'vs Computer (Medium)'
     );
   });
 });

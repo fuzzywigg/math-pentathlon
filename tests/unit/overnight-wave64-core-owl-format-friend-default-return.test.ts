@@ -28,7 +28,7 @@ describe('Wave 64 core owl — format return-generic-2 unchanged', () => {
     const msg = owlMessages.selectMessage('app:return', {});
     expect(msg!.id).toBe('return-generic-2');
     expect(msg!.text).toBe(
-      'Great to see you again! Your math skills have been missed!'
+      'Great to see you again! Ready for another game?'
     );
   });
 

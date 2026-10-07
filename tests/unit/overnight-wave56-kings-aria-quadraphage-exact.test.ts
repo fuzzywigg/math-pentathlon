@@ -22,6 +22,6 @@ describe('Wave 56 kings — quad aria', () => {
     renderBoard(placed, el);
     expect(
       el.querySelector('.cell[data-row="2"][data-col="2"]')?.getAttribute('aria-label')
-    ).toBe('B2, Player 1 Quadraphage');
+    ).toBe('B2, Blue Quadraphage');
   });
 });

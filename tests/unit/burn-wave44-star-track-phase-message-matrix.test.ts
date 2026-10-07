@@ -9,10 +9,10 @@ import { getPhaseMessage, isGameOver } from '../../src/games/star-track/rules';
 describe('Wave 44 Star Track — phase message matrix', () => {
   it('messages cover draw/select/win/draw-settle; isGameOver gates', () => {
     const s = createInitialState();
-    expect(getPhaseMessage(s)).toMatch(/Draw chains/i);
+    expect(getPhaseMessage(s)).toMatch(/draw chains/i);
     expect(getPhaseMessage({ ...s, phase: 'selectChain' })).toMatch(/Choose/i);
     expect(getPhaseMessage({ ...s, phase: 'gameOver', winner: 'player1' })).toMatch(/wins/i);
-    expect(getPhaseMessage({ ...s, phase: 'gameOver', winner: null })).toMatch(/draw/i);
+    expect(getPhaseMessage({ ...s, phase: 'gameOver', winner: null })).toMatch(/tie/i);
     expect(isGameOver(s)).toBe(false);
     expect(isGameOver({ ...s, phase: 'gameOver', winner: 'player2' })).toBe(true);
   });

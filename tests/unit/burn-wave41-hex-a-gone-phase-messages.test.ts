@@ -18,18 +18,18 @@ import {
 describe('Wave 41 hex-a-gone — phase messages / colors / gameOver', () => {
   it('getPhaseMessage covers select empty, select with count, place, and gameOver', () => {
     const open = createInitialState();
-    expect(getPhaseMessage(open)).toContain('Select 1-3 blocks');
+    expect(getPhaseMessage(open)).toContain('pick 1 to 3 blocks');
     expect(getPhaseMessage(open)).toContain('Blue');
 
     let state = selectBlock(open, 'hexagon');
-    expect(getPhaseMessage(state)).toContain('1 block(s) selected');
+    expect(getPhaseMessage(state)).toContain('1 block selected');
 
     state = selectBlock(state, 'triangle');
-    expect(getPhaseMessage(state)).toContain('2 block(s) selected');
+    expect(getPhaseMessage(state)).toContain('2 blocks selected');
 
     state = commitSelection(state);
     expect(getPhaseMessage(state)).toContain('Place your blocks');
-    expect(getPhaseMessage(state)).toContain('2 remaining');
+    expect(getPhaseMessage(state)).toContain('2 blocks left');
 
     const over = {
       ...createInitialState(),

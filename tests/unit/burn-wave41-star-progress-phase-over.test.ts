@@ -45,7 +45,7 @@ describe('Wave 41 Star Track — progress / phase / over', () => {
 
   it('getPhaseMessage covers draw / select / over / draw text', () => {
     const draw = createInitialState();
-    expect(getPhaseMessage(draw)).toContain('Draw chains');
+    expect(getPhaseMessage(draw)).toContain("Blue's turn — draw chains");
     expect(getPhaseMessage(draw)).toContain('Blue');
 
     const select = drawChains(draw);
@@ -71,7 +71,7 @@ describe('Wave 41 Star Track — progress / phase / over', () => {
       phase: 'gameOver' as const,
       winner: null,
     };
-    expect(getPhaseMessage(tie)).toContain('draw');
+    expect(getPhaseMessage(tie)).toContain('tie');
 
     const unknown = {
       ...draw,

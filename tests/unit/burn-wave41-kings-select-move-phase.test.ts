@@ -55,7 +55,7 @@ describe('Wave 41 kings — select/move phase gates', () => {
       turnPhase: 'gameOver' as const,
       winner: 'player2' as const,
     };
-    expect(getCurrentPhaseMessage(over)).toContain('Player 2 wins');
+    expect(getCurrentPhaseMessage(over)).toContain('Red wins!');
     expect(resetGame().currentPlayer).toBe('player1');
     expect(resetGame().player1Supply).toBe(30);
   });

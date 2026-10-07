@@ -31,10 +31,10 @@ describe('Wave 59 prime — legend scores dice composite', () => {
 
     const scores = renderScores(createInitialState());
     expect(scores.querySelector('.pg-score.player1')?.textContent ?? '').toMatch(
-      /Blue:\s*\d+\s*chips\s*\|\s*\d+\s*veins/
+      /Blue:\s*\d+\s*chips\s*\|\s*\d+\s*prime lines/
     );
     expect(scores.querySelector('.pg-score.player2')?.textContent ?? '').toMatch(
-      /Red:\s*\d+\s*chips\s*\|\s*\d+\s*veins/
+      /Red:\s*\d+\s*chips\s*\|\s*\d+\s*prime lines/
     );
 
     expect(renderExpressions(createInitialState(), () => undefined).querySelector('h3')?.textContent).toBe(
@@ -58,6 +58,6 @@ describe('Wave 59 prime — legend scores dice composite', () => {
     const line = [...el.querySelectorAll('div')].find((d) =>
       (d.textContent ?? '').includes('No valid moves')
     );
-    expect(line?.textContent).toBe('No valid moves - pass turn');
+    expect(line?.textContent).toBe('No valid moves — you must pass');
   });
 });

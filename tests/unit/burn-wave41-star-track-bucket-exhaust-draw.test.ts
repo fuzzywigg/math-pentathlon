@@ -32,7 +32,7 @@ describe('Wave 41 Star Track — bucket exhaust draw', () => {
     expect(next.phase).toBe('gameOver');
     expect(next.winner).toBeNull();
     expect(isGameOver(next)).toBe(true);
-    expect(getPhaseMessage(next)).toMatch(/draw/i);
+    expect(getPhaseMessage(next)).toMatch(/tie/i);
   });
 
   it('bucket length 1 ends game; leading position wins', () => {

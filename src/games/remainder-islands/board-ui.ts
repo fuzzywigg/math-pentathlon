@@ -407,11 +407,11 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
 
   let winnerText: string;
   if (state.winner === 'player1') {
-    winnerText = 'Blue Wins! 🎉';
+    winnerText = 'Blue wins!';
   } else if (state.winner === 'player2') {
-    winnerText = 'Red Wins! 🎉';
+    winnerText = 'Red wins!';
   } else {
-    winnerText = "It's a Draw!";
+    winnerText = "It's a tie!";
   }
 
   container.innerHTML = `

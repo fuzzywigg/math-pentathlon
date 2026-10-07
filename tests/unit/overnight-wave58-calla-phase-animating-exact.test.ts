@@ -8,26 +8,26 @@ import { getPhaseMessage } from '../../src/games/calla/rules';
 import { renderStatus } from '../../src/games/calla/board-ui';
 
 describe('Wave 58 calla — phase animating exact', () => {
-  it('says Blue is distributing cubes during animating', () => {
+  it('says Blue is dropping cubes during animating', () => {
     const state = {
       ...createInitialState(),
       phase: 'animating' as const,
       currentPlayer: 'player1' as const,
     };
-    expect(getPhaseMessage(state)).toBe('Blue is distributing cubes...');
+    expect(getPhaseMessage(state)).toBe('Blue is dropping cubes…');
     const el = document.createElement('div');
     renderStatus(state, el);
     expect(el.querySelector('.status-turn')?.textContent).toBe(
-      'Blue is distributing cubes...'
+      'Blue is dropping cubes…'
     );
   });
 
-  it('says Red is distributing cubes for player2', () => {
+  it('says Red is dropping cubes for player2', () => {
     const state = {
       ...createInitialState(),
       phase: 'animating' as const,
       currentPlayer: 'player2' as const,
     };
-    expect(getPhaseMessage(state)).toBe('Red is distributing cubes...');
+    expect(getPhaseMessage(state)).toBe('Red is dropping cubes…');
   });
 });

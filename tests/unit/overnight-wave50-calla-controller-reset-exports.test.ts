@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 describe('Overnight wave50 calla — controller reset / exports', () => {
-  it('reset after vs-AI keeps You/AI labels and zeros history', () => {
+  it('reset after vs-AI keeps You/Computer labels and zeros history', () => {
     const onStart = vi.spyOn(owlSystem, 'onGameStart');
     const board = document.createElement('div');
     const status = document.createElement('div');
@@ -40,7 +40,7 @@ describe('Overnight wave50 calla — controller reset / exports', () => {
     expect(getGameState().player1Calla).toBe(0);
     expect(getCurrentHint()).toBeNull();
     expect(status.textContent).toMatch(/You/);
-    expect(status.textContent).toMatch(/AI/);
+    expect(status.textContent).toMatch(/Computer/);
     expect(onStart).toHaveBeenCalledWith('calla');
 
     newGameVsHuman();

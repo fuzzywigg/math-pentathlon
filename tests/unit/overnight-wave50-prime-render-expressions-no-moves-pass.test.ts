@@ -20,7 +20,7 @@ describe('Wave 50 prime — expressions no moves', () => {
       diceRoll: { die1: 1, die2: 1, die3: 1 },
     };
     const el = renderExpressions(state, () => undefined);
-    expect(el.textContent).toMatch(/No valid moves - pass turn/);
+    expect(el.textContent).toMatch(/No valid moves — you must pass/);
     expect(el.querySelectorAll('.pg-expr-item').length).toBe(0);
   });
 });

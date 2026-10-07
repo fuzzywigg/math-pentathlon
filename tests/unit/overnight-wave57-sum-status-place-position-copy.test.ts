@@ -23,7 +23,7 @@ describe('Wave 57 sum — status place position', () => {
     };
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /Click a valid position to place/
+      /Click a green spot to place/
     );
   });
 });

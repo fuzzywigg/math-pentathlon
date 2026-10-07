@@ -279,7 +279,7 @@ export function renderRodLegend(): HTMLElement {
   container.className = 'ramrod-legend';
 
   const title = document.createElement('h4');
-  title.textContent = 'Cuisenaire Rods';
+  title.textContent = 'Number Rods';
   container.appendChild(title);
 
   const legendGrid = document.createElement('div');

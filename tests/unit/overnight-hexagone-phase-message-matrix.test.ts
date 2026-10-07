@@ -8,7 +8,7 @@ import { getPhaseMessage, selectBlock, commitSelection, passTurn } from '../../s
 describe('Overnight hex-a-gone — phase messages', () => {
   it('select/place/gameOver messages are nonempty', () => {
     const s = createInitialState();
-    expect(getPhaseMessage(s)).toMatch(/Select/i);
+    expect(getPhaseMessage(s)).toMatch(/pick/i);
     const placing = commitSelection(selectBlock(s, 'triangle'));
     expect(getPhaseMessage(placing)).toMatch(/Place/i);
     const over = { ...s, phase: 'gameOver' as const, winner: 'player1' as const };
