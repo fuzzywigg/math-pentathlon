@@ -68,6 +68,8 @@ export class TutorialManager {
   private tooltipElement: HTMLElement | null = null;
   private hitProxyElement: HTMLButtonElement | null = null;
   private tapCueElement: HTMLElement | null = null;
+  /** Control that started the tutorial (usually #tutorial-btn) for focus restore. */
+  private returnFocusEl: HTMLElement | null = null;
 
   // Start a tutorial
   start(config: TutorialConfig): void {
@@ -75,11 +77,33 @@ export class TutorialManager {
     if (this.overlayElement || this.tooltipElement) {
       this.removeOverlay();
     }
+    this.returnFocusEl =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     this.config = config;
     this.currentStepIndex = 0;
     this.isActive = true;
     this.createOverlay();
     this.showCurrentStep();
+    // Move keyboard focus into the tutorial dialog chrome.
+    queueMicrotask(() => {
+      const next = this.tooltipElement?.querySelector(
+        '.tutorial-next-btn, .tutorial-exit-btn'
+      ) as HTMLElement | null;
+      next?.focus();
+    });
+  }
+
+  private restoreReturnFocus(): void {
+    const trigger = this.returnFocusEl;
+    this.returnFocusEl = null;
+    if (!trigger) return;
+    queueMicrotask(() => {
+      if (document.contains(trigger)) {
+        trigger.focus();
+      }
+    });
   }
 
   // Get current step
@@ -151,6 +175,7 @@ export class TutorialManager {
     this.removeOverlay();
     this.emit({ type: 'completed' });
     this.config = null;
+    this.restoreReturnFocus();
   }
 
   // Exit the tutorial early
@@ -159,6 +184,7 @@ export class TutorialManager {
     this.removeOverlay();
     this.emit({ type: 'exited' });
     this.config = null;
+    this.restoreReturnFocus();
   }
 
   // Handle an action (e.g., cell click) to check if it completes the current step
@@ -214,16 +240,19 @@ export class TutorialManager {
     // Create tooltip
     this.tooltipElement = document.createElement('div');
     this.tooltipElement.className = 'tutorial-tooltip';
+    this.tooltipElement.setAttribute('role', 'dialog');
+    this.tooltipElement.setAttribute('aria-modal', 'true');
+    this.tooltipElement.setAttribute('aria-labelledby', 'tutorial-tooltip-title');
     this.tooltipElement.innerHTML = `
       <div class="tutorial-tooltip-header">
         <span class="tutorial-step-counter"></span>
-        <button class="tutorial-exit-btn" aria-label="Exit tutorial">&times;</button>
+        <button class="tutorial-exit-btn" type="button" aria-label="Exit tutorial">&times;</button>
       </div>
-      <h3 class="tutorial-tooltip-title"></h3>
+      <h3 id="tutorial-tooltip-title" class="tutorial-tooltip-title"></h3>
       <p class="tutorial-tooltip-message"></p>
       <div class="tutorial-tooltip-actions">
-        <button class="tutorial-prev-btn">Back</button>
-        <button class="tutorial-next-btn">Next</button>
+        <button class="tutorial-prev-btn" type="button">Back</button>
+        <button class="tutorial-next-btn" type="button">Next</button>
       </div>
     `;
 

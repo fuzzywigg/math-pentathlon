@@ -68,11 +68,41 @@ function escapeAttr(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
-/** True when the element (and ancestors up to `root`) are not display:none / hidden. */
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+/** True when the element is not inside a hidden/inert/display:none ancestor. */
+export function isKeyboardReachable(el: Element): boolean {
+  let node: Element | null = el;
+  while (node && node !== document.documentElement) {
+    if (node instanceof HTMLElement) {
+      if (node.hasAttribute('hidden') || node.hasAttribute('inert')) {
+        return false;
+      }
+      if (node.classList.contains('hidden')) return false;
+      const { display, visibility } = node.style;
+      if (display === 'none' || visibility === 'hidden') return false;
+    }
+    node = node.parentElement;
+  }
+  return true;
+}
+
+/** True when the element (and ancestors up to `root`) are not display:none / hidden / inert. */
 function isDisplayedWithin(el: HTMLElement, root: HTMLElement): boolean {
   let cur: HTMLElement | null = el;
   while (cur && cur !== root) {
-    if (cur.classList.contains('hidden') || cur.hasAttribute('hidden')) {
+    if (
+      cur.classList.contains('hidden') ||
+      cur.hasAttribute('hidden') ||
+      cur.hasAttribute('inert')
+    ) {
       return false;
     }
     if (cur.style.display === 'none') return false;
@@ -81,15 +111,20 @@ function isDisplayedWithin(el: HTMLElement, root: HTMLElement): boolean {
   return true;
 }
 
+/** Focusable controls inside a dialog (skips hidden difficulty section, inert, etc.). */
+export function getFocusableWithin(root: Element): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  ).filter((el) => {
+    if (el.getAttribute('aria-disabled') === 'true') return false;
+    return isKeyboardReachable(el);
+  });
+}
+
 /** Focusable controls inside an open modal (jsdom-safe; skips nested hidden). */
 function getModalFocusables(modal: HTMLElement): HTMLElement[] {
-  const selector =
-    'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-  return Array.from(modal.querySelectorAll<HTMLElement>(selector)).filter(
-    (el) => {
-      if (el.getAttribute('aria-disabled') === 'true') return false;
-      return isDisplayedWithin(el, modal);
-    }
+  return getFocusableWithin(modal).filter((el) =>
+    isDisplayedWithin(el, modal)
   );
 }
 
@@ -139,8 +174,32 @@ function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
   modal.classList.add('hidden');
   const restore = state.restoreEl;
   state.restoreEl = null;
-  if (restore && document.contains(restore)) {
-    restore.focus();
+  // Defer so display:none on the modal settles before moving focus (#491).
+  queueMicrotask(() => {
+    if (restore && document.contains(restore)) {
+      restore.focus();
+    }
+  });
+}
+
+/** Keep Tab cycling inside an open dialog (#491 API; used by unit tests). */
+export function trapTabKey(modal: HTMLElement, e: KeyboardEvent): void {
+  if (e.key !== 'Tab') return;
+  const items = getFocusableWithin(modal);
+  if (items.length === 0) return;
+
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+
+  if (e.shiftKey) {
+    if (active === first || !modal.contains(active)) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else if (active === last || !modal.contains(active)) {
+    e.preventDefault();
+    first.focus();
   }
 }
 
@@ -153,18 +212,7 @@ function trapModalTabKey(e: KeyboardEvent, modal: HTMLElement): void {
     modal.focus();
     return;
   }
-  const first = focusables[0];
-  const last = focusables[focusables.length - 1];
-  const active = document.activeElement;
-  if (e.shiftKey) {
-    if (active === first || !modal.contains(active)) {
-      e.preventDefault();
-      last.focus();
-    }
-  } else if (active === last || !modal.contains(active)) {
-    e.preventDefault();
-    first.focus();
-  }
+  trapTabKey(modal, e);
 }
 
 function buildModeOption(

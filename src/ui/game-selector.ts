@@ -171,6 +171,17 @@ function createDivisionAccordion(
   return section;
 }
 
+function setPanelKeyboardAccess(panel: HTMLElement, open: boolean): void {
+  // Closed panels stay in the DOM for animation, but must leave the tab order.
+  if (open) {
+    panel.removeAttribute('inert');
+    panel.setAttribute('aria-hidden', 'false');
+  } else {
+    panel.setAttribute('inert', '');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+}
+
 function toggleAccordion(section: HTMLElement, open: boolean): void {
   const header = section.querySelector(
     '.accordion-header'
@@ -183,11 +194,13 @@ function toggleAccordion(section: HTMLElement, open: boolean): void {
   if (open) {
     section.classList.add('accordion-open');
     header.setAttribute('aria-expanded', 'true');
+    setPanelKeyboardAccess(panel, true);
     // Set max-height to scrollHeight for smooth animation
     panel.style.maxHeight = panel.scrollHeight + 'px';
   } else {
     section.classList.remove('accordion-open');
     header.setAttribute('aria-expanded', 'false');
+    setPanelKeyboardAccess(panel, false);
     panel.style.maxHeight = '0px';
   }
 }
@@ -267,8 +280,10 @@ export function renderGameSelector(container: HTMLElement): void {
 
   DIVISIONS.forEach((div, index) => {
     const tab = document.createElement('button');
+    tab.type = 'button';
     tab.className = `division-tab ${index === 0 ? 'active' : ''}`;
     tab.setAttribute('data-division', div.name);
+    tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
     tab.innerHTML = `
       <span class="tab-name">${div.name}</span>
       <span class="tab-grade">${div.gradeRange}</span>
@@ -310,16 +325,27 @@ export function renderGameSelector(container: HTMLElement): void {
 
   container.appendChild(wrapper);
 
-  // Initialize accordion heights for open sections
+  // Initialize accordion heights + keyboard reachability for open sections
   const allSections = wrapper.querySelectorAll('.division-accordion');
   allSections.forEach((section) => {
     const panel = section.querySelector('.accordion-panel') as HTMLElement;
-    if (section.classList.contains('accordion-open')) {
+    const open = section.classList.contains('accordion-open');
+    setPanelKeyboardAccess(panel, open);
+    if (open) {
       panel.style.maxHeight = panel.scrollHeight + 'px';
     } else {
       panel.style.maxHeight = '0px';
     }
   });
+
+  const syncActiveTab = (divisionName: string | null, active: boolean) => {
+    tabNav.querySelectorAll('.division-tab').forEach((tab) => {
+      const isActive =
+        active && tab.getAttribute('data-division') === divisionName;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  };
 
   // Tab click handlers - open accordion and scroll
   tabNav.querySelectorAll('.division-tab').forEach((tab) => {
@@ -347,11 +373,7 @@ export function renderGameSelector(container: HTMLElement): void {
           });
         }, 50);
 
-        // Update active tab
-        tabNav
-          .querySelectorAll('.division-tab')
-          .forEach((t) => t.classList.remove('active'));
-        tab.classList.add('active');
+        syncActiveTab(divisionName, true);
       }
     });
   });
@@ -382,11 +404,7 @@ export function renderGameSelector(container: HTMLElement): void {
         }, 50);
       }
 
-      // Update active tab
-      tabNav.querySelectorAll('.division-tab').forEach((tab) => {
-        const tabDivision = tab.getAttribute('data-division');
-        tab.classList.toggle('active', !isOpen && tabDivision === divisionName);
-      });
+      syncActiveTab(divisionName, !isOpen);
     });
   });
 
