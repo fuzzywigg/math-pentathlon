@@ -170,7 +170,14 @@ export function renderBoard(
 
   const chainArea = document.createElement('div');
   chainArea.className = 'star-track-chain-area';
-  fillChainArea(chainArea, state, onDrawChains, onSelectChain, undefined, options);
+  fillChainArea(
+    chainArea,
+    state,
+    onDrawChains,
+    onSelectChain,
+    undefined,
+    options
+  );
   wrapper.appendChild(chainArea);
   container.appendChild(wrapper);
 }
