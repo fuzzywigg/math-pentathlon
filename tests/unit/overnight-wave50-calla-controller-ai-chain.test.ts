@@ -43,7 +43,7 @@ describe('Overnight wave50 calla — controller AI chain / null', () => {
     expect(getGameState().moveHistory.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('clears thinking chrome when getAIMove returns null', () => {
+  it('recovers from null getAIMove via first valid pit (no soft-lock)', () => {
     vi.useFakeTimers();
     vi.spyOn(callaAi, 'getAIMove').mockReturnValue(null);
     const board = document.createElement('div');
@@ -55,7 +55,8 @@ describe('Overnight wave50 calla — controller AI chain / null', () => {
       .querySelector('.calla-pit[data-side="player1"][data-pit-index="0"]')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     vi.advanceTimersByTime(800);
-    expect(getGameState().moveHistory).toHaveLength(1);
+    // Soft-lock recovery: first valid Red pit is played so the human seat can continue.
+    expect(getGameState().moveHistory.length).toBeGreaterThanOrEqual(2);
     expect(status.textContent).not.toMatch(/thinking/i);
   });
 });

@@ -52,8 +52,9 @@ export function renderBoard(
   boardBg.setAttribute('class', 'calla-board-bg');
   svg.appendChild(boardBg);
 
-  // Get valid pits for highlighting
-  const validPits = getValidPits(state);
+  // Valid highlights only while a human click handler is armed (AI seat honesty).
+  const allowInput = typeof onPitClick === 'function';
+  const validPits = allowInput ? getValidPits(state) : [];
 
   // Player 2's Calla (left side)
   const p2CallaX = 10;
@@ -90,7 +91,9 @@ export function renderBoard(
     const displayIndex = PITS_PER_SIDE - 1 - i; // Reverse for display
     const x = pitsStartX + PIT_SPACING * (i + 0.5);
     const isValid =
-      state.currentPlayer === 'player2' && validPits.includes(displayIndex);
+      allowInput &&
+      state.currentPlayer === 'player2' &&
+      validPits.includes(displayIndex);
     const isLastSown =
       state.lastSownPit?.side === 'player2' &&
       state.lastSownPit?.index === displayIndex;
@@ -112,7 +115,8 @@ export function renderBoard(
   const p1Y = BOARD_HEIGHT * 0.72;
   for (let i = 0; i < PITS_PER_SIDE; i++) {
     const x = pitsStartX + PIT_SPACING * (i + 0.5);
-    const isValid = state.currentPlayer === 'player1' && validPits.includes(i);
+    const isValid =
+      allowInput && state.currentPlayer === 'player1' && validPits.includes(i);
     const isLastSown =
       state.lastSownPit?.side === 'player1' && state.lastSownPit?.index === i;
 
@@ -233,6 +237,15 @@ function createPit(
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
+  // Invisible hit target (~44px CSS at typical board widths) under the visual pit
+  const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  hit.setAttribute('cx', String(cx));
+  hit.setAttribute('cy', String(cy));
+  hit.setAttribute('r', String(PIT_RADIUS + 4));
+  hit.setAttribute('fill', 'transparent');
+  hit.setAttribute('class', 'calla-pit-hit');
+  group.appendChild(hit);
+
   // Pit circle
   const circle = document.createElementNS(
     'http://www.w3.org/2000/svg',
@@ -292,6 +305,11 @@ function createPit(
       validMove: isValid,
     })
   );
+  if (!isValid) {
+    group.setAttribute('aria-disabled', 'true');
+  } else {
+    group.removeAttribute('aria-disabled');
+  }
 
   // Click / keyboard handler
   if (onClick) {

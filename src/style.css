@@ -3557,6 +3557,10 @@ h1 {
 }
 
 /* Pit styles */
+.calla-pit-hit {
+  pointer-events: all;
+}
+
 .calla-pit-circle {
   fill: url(#calla-pit-gradient);
   stroke: #2d1a0a;
@@ -3770,6 +3774,13 @@ h1 {
   .calla-scores {
     flex-direction: column;
     gap: 0.5rem;
+  }
+}
+
+/* Coarse pointers: enlarge board so SVG pits clear ~44px CSS tap targets */
+@media (pointer: coarse) {
+  .calla-board {
+    min-height: 240px;
   }
 }
 
@@ -4701,6 +4712,7 @@ html[data-reduced-motion='true'] {
   .sd-winner-banner,
   .contig-winner-banner,
   .qg-winner-banner,
+  .calla-pit-valid .calla-pit-circle,
   .tutorial-highlight,
   .tutorial-action-target,
   .hero-logo .logo-icon {
@@ -4711,7 +4723,9 @@ html[data-reduced-motion='true'] {
   .hex-a-gone-cell:hover,
   .hex-a-gone-cell-valid:hover,
   .hex-a-gone-block-btn:hover:not(.empty),
-  .hex-a-gone-confirm-btn:hover {
+  .hex-a-gone-confirm-btn:hover,
+  .calla-pit-valid:hover .calla-pit-circle,
+  .calla-score.active {
     transform: none;
   }
 

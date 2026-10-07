@@ -9,13 +9,20 @@ import { seatIcon } from '../../ui/player-colors';
 // Challenge Display
 // =============================================================================
 
+export interface PinballChallengeOptions {
+  /** When false, disable choice buttons (computer answering). */
+  allowInput?: boolean;
+}
+
 /**
  * Render the conversion challenge
  */
 export function renderChallenge(
   state: FractionPinballState,
-  onAnswerSelect: (answer: string) => void
+  onAnswerSelect: (answer: string) => void,
+  options: PinballChallengeOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'pinball-challenge';
 
@@ -54,7 +61,12 @@ export function renderChallenge(
       const btn = document.createElement('button');
       btn.className = 'pinball-choice-btn';
       btn.textContent = choice;
-      btn.addEventListener('click', () => onAnswerSelect(choice));
+      if (allowInput) {
+        btn.addEventListener('click', () => onAnswerSelect(choice));
+      } else {
+        btn.disabled = true;
+        btn.setAttribute('aria-disabled', 'true');
+      }
       choices.appendChild(btn);
     }
 
@@ -394,6 +406,8 @@ export function injectFractionPinballStyles(): void {
 
     .pinball-choice-btn {
       padding: 16px 24px;
+      min-height: 44px;
+      min-width: 44px;
       font-size: 20px;
       font-weight: 600;
       border: 2px solid #ddd;
@@ -403,10 +417,15 @@ export function injectFractionPinballStyles(): void {
       transition: all 0.2s;
     }
 
-    .pinball-choice-btn:hover {
+    .pinball-choice-btn:hover:not(:disabled) {
       border-color: #2196F3;
       background: #e3f2fd;
       transform: translateY(-2px);
+    }
+
+    .pinball-choice-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
     }
 
     .pinball-result {
@@ -456,6 +475,7 @@ export function injectFractionPinballStyles(): void {
 
     .pinball-continue-btn {
       padding: 12px 32px;
+      min-height: 44px;
       font-size: 18px;
       font-weight: 600;
       background: #2196F3;
@@ -589,6 +609,25 @@ export function injectFractionPinballStyles(): void {
       font-size: 14px;
       color: #666;
       margin-top: 8px;
+    }
+
+    @media (pointer: coarse) {
+      .pinball-choice-btn,
+      .pinball-continue-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pinball-animation {
+        animation: none !important;
+      }
+
+      .pinball-choice-btn:hover:not(:disabled),
+      .pinball-player-score.active {
+        transform: none;
+      }
     }
   `;
   document.head.appendChild(style);
