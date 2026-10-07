@@ -40,6 +40,8 @@ All 20 registered games:
 `star-track`, `stars-bars`, `sum-dominoes`.
 
 Each game runs two play seeds (`FUZZ_PLAY_SEED` and a second derived seed).
+AI parity is sampled every 5th move plus a final checkpoint (keeps Queens /
+FIAR / Hex AI search cost bounded in the full suite).
 
 ## Findings
 
