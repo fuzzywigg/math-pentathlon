@@ -1,2 +1,2 @@
 // Owl UI module exports
-export { owlComponent } from './owl-component';
+export { owlComponent, OwlComponent } from './owl-component';

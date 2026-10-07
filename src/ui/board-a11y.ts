@@ -370,7 +370,7 @@ export function restoreGridFocus(
  * Accepts `key === ' '` (UI Events) and `code === 'Space'` for broader coverage.
  * Does not treat legacy `key === 'Spacebar'` as activate (unchanged contract).
  */
-function isBoardActivateKey(ke: KeyboardEvent): boolean {
+export function isBoardActivateKey(ke: KeyboardEvent): boolean {
   return ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space';
 }
 

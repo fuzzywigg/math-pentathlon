@@ -78,7 +78,7 @@ const FOCUSABLE_SELECTOR = [
 ].join(', ');
 
 /** True when the element is not inside a hidden/inert/display:none ancestor. */
-function isKeyboardReachable(el: Element): boolean {
+export function isKeyboardReachable(el: Element): boolean {
   let node: Element | null = el;
   while (node && node !== document.documentElement) {
     if (node instanceof HTMLElement) {

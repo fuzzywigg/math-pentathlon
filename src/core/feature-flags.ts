@@ -3,7 +3,7 @@
  * unless explicitly enabled via URL or localStorage.
  */
 
-const BOARD_3D_PARAM = 'board3d';
+export const BOARD_3D_PARAM = 'board3d';
 export const BOARD_3D_STORAGE_KEY = 'mp-board3d';
 
 type StorageLike = Pick<Storage, 'getItem'>;
