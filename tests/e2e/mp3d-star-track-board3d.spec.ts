@@ -2,7 +2,8 @@
  * MP-3D — Star Track Three.js board behind board3d flag.
  * Captures start / mid-game / game-over screenshots at three viewports.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
@@ -14,6 +15,7 @@ import {
   waitForGameReady,
   waitForMp3dReady,
 } from './helpers/mp3d';
+import { softWaitVisible } from './helpers/stability';
 
 const VIEWPORTS = [
   { name: 'phone', width: 390, height: 844 },
@@ -76,21 +78,17 @@ async function playHumanTurns(page: Page, turns: number) {
     if (await draw.isVisible().catch(() => false)) {
       await draw.click();
       // Draw → choose-chain; tolerate slow DOM refresh under software GL.
-      await page
-        .locator('.star-track-chain-btn')
-        .first()
-        .waitFor({ state: 'visible', timeout: 8_000 })
-        .catch(() => undefined);
+      await softWaitVisible(page, '.star-track-chain-btn', 8_000);
     }
     const chain = page.locator('.star-track-chain-btn').first();
     if (await chain.isVisible().catch(() => false)) {
       await chain.click();
-      // Next draw OR game-over — do not require draw if someone just won.
-      await page
-        .locator('.star-track-draw-btn, .star-track-winner, .status-winner')
-        .first()
-        .waitFor({ state: 'visible', timeout: 8_000 })
-        .catch(() => undefined);
+      // Next draw OR game-over — do not hard-require draw if someone just won.
+      await softWaitVisible(
+        page,
+        '.star-track-draw-btn, .star-track-winner, .status-winner',
+        8_000
+      );
     }
   }
 }
@@ -214,9 +212,13 @@ test.describe('mp3d Star Track 3D board', () => {
     await chain.focus();
     await page.keyboard.press('Enter');
 
-    // After a move, back to draw phase for the other player
-    await expect(page.locator('.star-track-draw-btn')).toBeVisible({
-      timeout: 5000,
+    // After a move: draw for the other seat, or (rare) immediate game-over.
+    await expect(
+      page
+        .locator('.star-track-draw-btn, .star-track-winner, .status-winner')
+        .first()
+    ).toBeVisible({
+      timeout: 8_000,
     });
   });
 });

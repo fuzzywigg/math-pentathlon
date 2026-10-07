@@ -2,7 +2,8 @@
  * MP-3D — Hex-a-Gone! Three.js board behind board3d flag.
  * Screenshots at phone / tablet portrait / tablet landscape for PR evidence.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import {
   MP3D_HEAVY_TEST_TIMEOUT_MS,
   board3dUrl,
@@ -247,7 +248,8 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
     );
     await cell.focus();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(200);
-    await expect(page.locator('.hex-a-gone-coverage')).toContainText('1/37');
+    await expect(page.locator('.hex-a-gone-coverage')).toContainText('1/37', {
+      timeout: 8_000,
+    });
   });
 });

@@ -2,7 +2,8 @@
  * MP-3D — FIAR Three.js board behind board3d flag.
  * Captures start + mid-game screenshots for PR evidence.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import {
   MP3D_HEAVY_TEST_TIMEOUT_MS,
   board3dUrl,
@@ -109,9 +110,9 @@ test.describe('mp3d FIAR 3D board', () => {
     const cell = page.locator('.fiar-a11y-grid [data-node-id="c4r2"]');
     await cell.focus();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(200);
-    // Status should reflect a placement happened (chips placed or turn change)
-    const status = page.locator('#status, .fiar-status, .fiar-chips-info');
-    await expect(status.first()).toBeVisible();
+    // Placement updates the a11y label from empty → Blue (or Red).
+    await expect(cell).toHaveAttribute('aria-label', /Blue|Red/i, {
+      timeout: 8_000,
+    });
   });
 });

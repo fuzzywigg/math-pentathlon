@@ -2,7 +2,8 @@
  * MP-3D — Pent'Em In Three.js board behind board3d flag.
  * Captures start / mid / game-over screenshots at phone + tablet sizes.
  */
-import { test, expect, Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, Page } from '@playwright/test';
 import {
   MP3D_HEAVY_TEST_TIMEOUT_MS,
   board3dUrl,
@@ -297,9 +298,12 @@ test.describe("mp3d Pent'Em In 3D board", () => {
     );
     await cell.focus();
     await page.keyboard.press('Enter');
-    await page.waitForTimeout(250);
-    await expect(page.locator('.pent-status')).toContainText(/turn/i);
+    await expect(page.locator('.pent-status')).toContainText(/turn/i, {
+      timeout: 8_000,
+    });
     // After a successful place, phase returns to select for the other player
-    await expect(page.locator('.pent-piece-option').first()).toBeVisible();
+    await expect(page.locator('.pent-piece-option').first()).toBeVisible({
+      timeout: 8_000,
+    });
   });
 });

@@ -2,7 +2,8 @@
  * Compact UI bug-guards that unit tests do not cover (illegal click no-ops,
  * selection integrity). Kept after the e2e smoke prune.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, type Page } from '@playwright/test';
 
 async function waitForGameReady(page: Page) {
   await expect(page.getByTestId('game-loading')).toBeHidden({
