@@ -1,5 +1,6 @@
 // Storage System - LocalStorage wrapper with versioning and type safety
 
+import { setUserReducedMotionFlag } from '../settings-flags';
 import {
   ProgressData,
   PlayerProfile,
@@ -25,6 +26,7 @@ class StorageManager {
 
   constructor() {
     this.data = this.load();
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
   }
 
   // Load data from localStorage
@@ -317,6 +319,7 @@ class StorageManager {
 
   public updateSettings(settings: Partial<UserSettings>): void {
     this.data.settings = { ...this.data.settings, ...settings };
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
     this.save();
   }
 
@@ -350,6 +353,7 @@ class StorageManager {
   // Reset all data
   public resetAll(): void {
     this.data = createDefaultProgress();
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
     this.saveNow();
   }
 
@@ -362,6 +366,7 @@ class StorageManager {
     try {
       const imported = JSON.parse(json) as ProgressData;
       this.data = this.ensureDefaults(imported);
+      setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
       this.saveNow();
       return true;
     } catch {

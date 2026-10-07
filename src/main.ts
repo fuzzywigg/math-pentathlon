@@ -377,7 +377,7 @@ addRoute('/demo/expressions', renderExpressionDemoPage);
 // Initialize router
 initRouter();
 
-// Offline shell + background precache of game chunks
+// Offline shell + background precache — idle-deferred so first paint wins radio
 bootstrapPwa();
 
 // Tablet / a11y: sync reduced-motion + offline flags onto <html>
