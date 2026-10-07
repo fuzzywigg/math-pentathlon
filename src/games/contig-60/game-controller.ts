@@ -42,9 +42,29 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
+/** Bumped on init / New Game so pending AI setTimeouts cannot mutate a fresh match. */
+let aiGeneration = 0;
+
+/** Pause before the computer rolls (keeps “thinking…” readable without dragging turns). */
+const AI_ROLL_DELAY_MS = 350;
+/** Pause after the computer rolls before placing / passing. */
+const AI_PLACE_DELAY_MS = 450;
 
 function isComputerTurn(): boolean {
   return vsAI && gameState.currentPlayer === aiPlayer;
+}
+
+function bumpAIGeneration(): void {
+  aiGeneration += 1;
+}
+
+/** Schedule AI work; no-ops if New Game / mode change invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  const gen = aiGeneration;
+  setTimeout(() => {
+    if (gen !== aiGeneration) return;
+    fn();
+  }, delayMs);
 }
 
 // =============================================================================
@@ -79,6 +99,12 @@ function updateUI(): void {
   );
   boardContainer.appendChild(diceArea);
 
+  // Board before expression list so green targets stay above the fold on tablets
+  const board = renderBoard(gameState, handleCellClick, {
+    allowInput: humanCanAct,
+  });
+  boardContainer.appendChild(board);
+
   // Expression / pass chrome only on the human seat (blocks AI soft-lock taps)
   if (
     gameState.phase === 'calculating' &&
@@ -92,12 +118,6 @@ function updateUI(): void {
     );
     boardContainer.appendChild(exprSelector);
   }
-
-  // Render board — no placement targets while the computer thinks
-  const board = renderBoard(gameState, handleCellClick, {
-    allowInput: humanCanAct,
-  });
-  boardContainer.appendChild(board);
 
   // Update status
   updateStatus();
@@ -146,13 +166,15 @@ function updateStatus(): void {
         break;
       case 'calculating':
         if (hasValidMoves(gameState)) {
-          instruction = 'Choose a number to place your chip';
+          instruction =
+            'Tap a green number on the board, or pick an expression below';
         } else {
-          instruction = 'No valid moves - you must pass';
+          instruction = 'No valid moves — tap Pass Turn';
         }
         break;
       case 'placing':
-        instruction = 'Click a valid cell to place your chip';
+        // Phase retained for typing exhaustiveness; placement resolves in calculating.
+        instruction = 'Select a green number to place your chip';
         break;
       default: {
         const _exhaustive: never = gameState.phase;
@@ -177,6 +199,10 @@ function handleRollDice(fromAI: boolean | Event = false): void {
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
   if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
+  // Stale timers after New Game must not roll for the human seat.
+  if (fromAI === true && (!vsAI || gameState.currentPlayer !== aiPlayer)) {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
@@ -195,7 +221,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(makeAIMove, 1000);
+    scheduleAI(makeAIMove, AI_PLACE_DELAY_MS);
   }
 }
 
@@ -212,7 +238,7 @@ function handleSelectPlacement(value: number, expression: string): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
   }
 }
 
@@ -243,7 +269,7 @@ function handlePass(): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
   }
 }
 
@@ -268,7 +294,7 @@ function makeAIMove(): void {
       gameState.phase !== 'gameOver' &&
       gameState.currentPlayer === aiPlayer
     ) {
-      setTimeout(() => handleRollDice(true), 500);
+      scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
     }
     return;
   }
@@ -278,7 +304,7 @@ function makeAIMove(): void {
 
   // Continue if AI's turn
   if (gameState.phase !== 'gameOver' && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
   }
 }
 
@@ -291,6 +317,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   statusContainer = statusEl;
 
   injectContigStyles();
+  bumpAIGeneration();
   gameState = createInitialState();
   vsAI = false;
   syncOpponentChrome();
@@ -299,6 +326,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  bumpAIGeneration();
   vsAI = false;
   syncOpponentChrome();
   gameState = createInitialState();
@@ -306,6 +334,7 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  bumpAIGeneration();
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';

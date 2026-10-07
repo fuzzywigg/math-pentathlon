@@ -190,7 +190,8 @@ export function renderExpressionSelector(
 
   const header = document.createElement('div');
   header.className = 'contig-expr-header';
-  header.textContent = 'Choose a number to place:';
+  header.textContent =
+    'Or pick an expression (same as tapping a green cell):';
   container.appendChild(header);
 
   const list = document.createElement('div');
@@ -411,11 +412,12 @@ export function injectContigStyles(): void {
         max-width: 100%;
       }
 
+      /* Keep ≥44px even on narrow fine-pointer windows (not only coarse). */
       .contig-cell {
-        width: 40px;
-        height: 40px;
-        min-width: 40px;
-        min-height: 40px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
       }
 
       .contig-cell-value {

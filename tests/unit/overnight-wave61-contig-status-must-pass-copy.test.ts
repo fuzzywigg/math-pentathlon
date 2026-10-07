@@ -29,6 +29,6 @@ describe('Wave 61 contig — must-pass status', () => {
     const status = document.createElement('div');
     document.body.append(board, status);
     initGame(board, status);
-    expect(status.textContent).toContain('No valid moves - you must pass');
+    expect(status.textContent).toContain('No valid moves — tap Pass Turn');
   });
 });
