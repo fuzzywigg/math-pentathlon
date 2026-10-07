@@ -14,7 +14,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 | [Game registry](./game-registry.md) | `GameInfo` shape, divisions, menu/route wiring |
 | [How to add a game](./adding-a-game.md) | Module, registry, mount, and test checklist |
 | [Big Toads](./big-toads.md) | Shared core systems under `src/core/` |
-| [Development](./development.md) | Install, CI, and testing layers (axe, visual, fuzz, undo) |
+| [Development](./development.md) | Install, CI, and testing layers (axe, visual, fuzz, undo) — also [CONTRIBUTING.md](../../CONTRIBUTING.md) |
 | [Accessibility](./accessibility.md) | Public a11y posture and shared helpers |
 | [Roadmap](./roadmap.md) | Where to read deeper planning docs |
 

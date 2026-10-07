@@ -12,25 +12,38 @@ Public builder notes. Full agent/product guardrails: [`AGENTS.md`](../../AGENTS.
 ## Commands
 
 ```bash
-npm install
-npm run dev
-npm test             # unit then e2e
+npm install                      # Node.js >= 20
+npm run dev                      # Vite → http://localhost:5173
+npm test                         # unit then Chromium e2e (CI required pair)
 npm run test:unit
-npm run test:e2e:chromium   # required CI path
+npm run test:unit:watch
+npm run test:unit:coverage
+npm run test:e2e:chromium        # required CI e2e path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
-npm run test:e2e:cross      # Firefox + WebKit + iPad WebKit
-npm run test:e2e:mobile     # phone + tablet touch smoke (report-only)
-npm run test:visual          # opt-in 2D screenshot suite (separate config)
-npm run test:visual:update   # refresh separate-config baselines
-npm run test:e2e:visual         # start + openings baselines (desktop + phone)
-npm run test:e2e:visual:update  # rewrite committed PNG baselines
+npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
+npm run test:e2e:mobile          # phone + tablet touch smoke (report-only)
+npm run test:e2e:ui              # Playwright UI mode
+npm run test:visual              # opt-in 2D suite (playwright.visual.config.ts; not CI)
+npm run test:visual:update       # refresh separate-config baselines
+npm run test:e2e:visual          # start + openings baselines (CI report-only)
+npm run test:e2e:visual:update   # rewrite committed e2e visual PNG baselines
 npm run build
+npm run preview                  # serve dist/ after build
 npm run lint
+npm run lint:fix
+npm run format                   # Prettier write under src/
 npm run format:check
+npm run size:check               # gzip budgets (needs dist/; report-only, exit 0)
+npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
+npm run perf:runtime             # runtime AI/move timing probe
+npm run audit:memory             # heap / detach probe across game mounts
 ```
+
+`npm test` = `test:unit` && `test:e2e:chromium`. Bare `npm run test:e2e` (no `--project`) runs **every** Playwright project — prefer an explicit script.
 
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 Mobile touch notes: [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md).
+Bundle budgets: [`docs/bundle-budget.md`](../bundle-budget.md). Perf: [`docs/perf-2026-10-07.md`](../perf-2026-10-07.md).
 
 Opt-in visual regression via separate config (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
 
@@ -76,7 +89,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
@@ -109,12 +122,14 @@ Stack of checks builders should know. Required CI paths stay green on Chromium u
 | Layer | Runner | What it covers | Command / entry |
 | ----- | ------ | -------------- | --------------- |
 | Unit | Vitest + jsdom | Pure rules/state, shell helpers | `npm run test:unit` |
-| E2E smoke / play | Playwright Chromium (+ mobile projects on tip) | Menu, game mounts, playability | `npm run test:e2e:chromium` |
-| Cross-browser | Playwright Firefox / WebKit / iPad | Opt-in shell smoke | `npm run test:e2e:cross` — [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md) |
-| **Axe a11y sweep** | `@axe-core/playwright` | Menu, progress, Help, every available New Game modal — serious/critical only | On tip: `tests/e2e/a11y-sweep.spec.ts`. Run: `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
-| **Visual baseline** | Playwright screenshots | Landing + each available game 2D start/board (seeded, motion off) | On tip: `npm run test:visual` / `test:visual:update` (`tests/visual/`) — [`docs/visual-regression.md`](../visual-regression.md). Related fold may also add report-only `test:e2e:visual` + CI job. |
-| **Round-trip fuzz** | Vitest property tests | Random legal play → serialize/deserialize → equal state, legal moves, seeded AI | Suite documented in [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md) (PR `#465`); harness `tests/unit/state-roundtrip-fuzz.test.ts` lands via related folds. |
-| **Undo / move-log audit** | Vitest property tests | Undo stacks / history-complete replay vs applied moves | Suite documented in [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md) (PR `#473`); harness `tests/unit/undo-audit-*.test.ts` lands via related folds. |
+| E2E smoke / play | Playwright Chromium | Menu, game mounts, playability | `npm run test:e2e:chromium` |
+| Mobile touch | Playwright Chromium device profiles | Phone + tablet touch smoke (report-only CI) | `npm run test:e2e:mobile` — [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md) |
+| Cross-browser | Playwright Firefox / WebKit / iPad | Full suite or smoke (report-only CI for firefox+webkit) | `npm run test:e2e:cross` — [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md) |
+| **Axe a11y sweep** | `@axe-core/playwright` | Menu, progress, Help, every available New Game modal — serious/critical only | `tests/e2e/a11y-sweep.spec.ts`. Run: `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
+| **Visual (opt-in config)** | Playwright screenshots | Landing + each available game 2D start/board (seeded, motion off) | `npm run test:visual` / `test:visual:update` (`tests/visual/`, **not** CI) — [`docs/visual-regression.md`](../visual-regression.md) |
+| **Visual baseline (e2e)** | Playwright screenshots | Start screen + each game opening @ desktop + phone | `npm run test:e2e:visual` / `test:e2e:visual:update` — CI job `visual-baseline` is **report-only** |
+| **Round-trip fuzz** | Vitest property tests | Random legal play → serialize/deserialize → equal state, legal moves, seeded AI | [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md); harness `tests/unit/state-roundtrip-fuzz.test.ts` |
+| **Undo / move-log audit** | Vitest property tests | Undo stacks / history-complete replay vs applied moves | [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md); harness `tests/unit/undo-audit-*.test.ts` |
 
 ### Axe (shell)
 
@@ -122,7 +137,10 @@ Automated sweep over shared chrome only; board interiors stay with per-game play
 
 ### Visual baseline
 
-Deterministic Chromium captures with Mulberry32 seed, reduced motion, owl hidden, `board3d=0`. **Not** a required CI gate on this tip (`npm run test:visual` is opt-in). Related fold work may add a report-only `visual-baseline` CI job and `test:e2e:visual` scripts — prefer the scripts present in `package.json` on your branch.
+Two suites share the same determinism knobs (Mulberry32 seed, reduced motion, owl hidden, `board3d=0`):
+
+- **Opt-in** `npm run test:visual` — separate `playwright.visual.config.ts`, baselines in `tests/visual/__screenshots__/`. Not wired into CI.
+- **E2E projects** `npm run test:e2e:visual` — `visual-desktop` / `visual-phone` in `playwright.config.ts`, baselines under `tests/e2e/visual-baselines/`. CI job `visual-baseline` is **report-only** (`continue-on-error`).
 
 ### Round-trip fuzz
 

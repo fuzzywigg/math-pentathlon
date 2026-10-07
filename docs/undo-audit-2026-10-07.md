@@ -46,8 +46,10 @@ Shared harness: `tests/unit/undo-audit-helpers.ts`.
 ## How to run
 
 ```bash
-npx vitest run tests/unit/undo-audit-helpers.ts \
+npx vitest run \
   tests/unit/undo-audit-polyomino-props.test.ts \
   tests/unit/undo-audit-core-games-props.test.ts \
   tests/unit/undo-audit-log-games-props.test.ts
 ```
+
+(`tests/unit/undo-audit-helpers.ts` is a helper module, not a Vitest test file.)

@@ -12,10 +12,11 @@ Suite: full `tests/e2e` on Playwright `firefox` + `webkit` (mobile viewport smok
 
 ## How to run
 
-Required CI path stays Chromium (+ phone viewport projects):
+Required CI path stays Chromium. Mobile touch smoke is a separate report-only job (`npm run test:e2e:mobile` → `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`):
 
 ```bash
-npm run test:e2e -- --project=chromium --project=mobile-iphone-se --project=mobile-pixel-7
+npm run test:e2e:chromium
+npm run test:e2e:mobile
 ```
 
 Full Firefox + WebKit suite (local or CI report-only job):
@@ -54,7 +55,7 @@ No rules/scoring/controller changes. No clear shared CSS/JS product fixes were r
 
 ### Skips
 
-38 skips are intentional (viewport/project filters and existing `test.skip` / conditional skips). Mobile viewport smoke is Chromium-emulation only (`mobile-iphone-se` / `mobile-pixel-7`).
+38 skips are intentional (viewport/project filters and existing `test.skip` / conditional skips). Mobile touch smoke is Chromium-emulation only (`mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`).
 
 ## WebKit offline PWA keeper (follow-up)
 
