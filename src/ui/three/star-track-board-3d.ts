@@ -2,7 +2,8 @@
  * Three.js tilted-tabletop 3D board for Star Track.
  *
  * Tablet-friendly (vs Kings #352 weak spots; patterns from FIAR draft #359):
- * - antialias off, pixelRatio capped at 1.5
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - preserveDrawingBuffer gated; pause paints while the tab is hidden
  * - render-on-demand (no continuous RAF)
  * - full-size host (no fixed 450px cap)
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
@@ -21,6 +22,12 @@ import {
 } from '../../games/star-track/board-ui';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 
 type Three = ThreeModule;
 type Mesh = InstanceType<Three['Mesh']>;
@@ -160,6 +167,7 @@ export async function createStarTrackBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     const gl =
       typeof renderer.getContext === 'function'
@@ -177,7 +185,9 @@ export async function createStarTrackBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'star-track');
@@ -320,7 +330,7 @@ export async function createStarTrackBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -362,6 +372,9 @@ export async function createStarTrackBoard3D(
   };
 
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   window.addEventListener('resize', onResize);
 
   const onLost = (event: Event): void => {
@@ -541,6 +554,7 @@ export async function createStarTrackBoard3D(
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    unbindVisibility();
     window.removeEventListener('resize', onResize);
     canvas.removeEventListener('webglcontextlost', onLost);
     if (window.__mp3dStarTrack) {

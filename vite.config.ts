@@ -1,13 +1,19 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import {
+  coreManualChunkName,
+  shouldPreloadMenuDependency,
+  uiManualChunkName,
+} from './vite.shell-chunks';
 
 /**
  * Build + PWA for offline play after first visit.
  *
  * Code splitting: games (and demos) are dynamic-imported from main.ts so the
- * landing/menu does not download every game. manualChunks still emit stable
- * per-game / core / ui / three files. Three.js stays under dist/vendor/ so the
- * CI dist/assets 250 kB budget applies to always-loaded app chunks.
+ * landing/menu does not download every game. manualChunks emit stable
+ * per-game / shell-core / deferred-core / ui / three files. Three.js stays
+ * under dist/vendor/ so the CI dist/assets 250 kB budget applies to
+ * always-loaded app chunks.
  *
  * Offline: Workbox precaches the full build (shell + every game/3D chunk) so
  * after one online visit any game works in airplane mode. Updates use
@@ -82,16 +88,7 @@ export default defineConfig({
         if (!isMenuEntry) {
           return deps;
         }
-        return deps.filter((dep) => {
-          const name = dep.replace(/\\/g, '/');
-          return (
-            !name.includes('game-') &&
-            !name.includes('demo-') &&
-            !name.includes('vendor/') &&
-            !name.includes('mp3d') &&
-            !name.includes('three')
-          );
-        });
+        return deps.filter((dep) => shouldPreloadMenuDependency(dep));
       },
     },
     rollupOptions: {
@@ -120,21 +117,16 @@ export default defineConfig({
           if (id.includes('/node_modules/three')) {
             return 'three';
           }
-          if (id.includes('/src/ui/three/')) {
-            return 'mp3d';
-          }
           if (id.includes('/node_modules/')) {
             return 'vendor';
           }
+          const uiChunk = uiManualChunkName(id);
+          if (uiChunk) return uiChunk;
+          const coreChunk = coreManualChunkName(id);
+          if (coreChunk) return coreChunk;
           if (id.includes('/src/games/')) {
             const match = id.match(/\/src\/games\/([^/]+)/);
             return match ? `game-${match[1]}` : 'games';
-          }
-          if (id.includes('/src/core/')) {
-            return 'core';
-          }
-          if (id.includes('/src/ui/')) {
-            return 'ui';
           }
           return undefined;
         },
