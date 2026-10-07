@@ -271,13 +271,15 @@ function getMediumMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   // Sort by score (descending)
   scoredPlacements.sort((a, b) => b.score - a.score);
 
-  // Pick from top 5 placements with some randomness
-  const topPlacements = scoredPlacements.slice(
-    0,
-    Math.min(5, scoredPlacements.length)
-  );
+  // Never dilute a forced win into the random top-N pool (score ≥ 10000).
+  const bestPlacementScore = scoredPlacements[0]?.score ?? -Infinity;
+  const winningPlacements = scoredPlacements.filter((p) => p.score >= 10000);
+  const pool =
+    bestPlacementScore >= 10000 && winningPlacements.length > 0
+      ? winningPlacements
+      : scoredPlacements.slice(0, Math.min(5, scoredPlacements.length));
   const quadraphagePlacement =
-    topPlacements[Math.floor(Math.random() * topPlacements.length)].placement;
+    pool[Math.floor(Math.random() * pool.length)].placement;
 
   return { kingMove, quadraphagePlacement };
 }
@@ -290,7 +292,9 @@ function getHardMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
   let bestMove: AIMove | null = null;
   let bestScore = -Infinity;
 
-  // Evaluate all combinations of king move + quadraphage placement
+  // Evaluate all combinations of king move + quadraphage placement.
+  // Early-exit on a forced win (≥ 10000 placement bonus) to keep Hard snappy
+  // on crowded mid-game boards without changing the win preference.
   for (const kingMove of validKingMoves) {
     const kingScore = scoreKingMove(state, aiPlayer, kingMove, 'hard');
     const tempState = simulateKingMove(state, aiPlayer, kingMove);
@@ -309,6 +313,9 @@ function getHardMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
       if (totalScore > bestScore) {
         bestScore = totalScore;
         bestMove = { kingMove, quadraphagePlacement: placement };
+        if (placementScore >= 10000) {
+          return bestMove;
+        }
       }
     }
   }
