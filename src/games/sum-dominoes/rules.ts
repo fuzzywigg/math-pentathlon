@@ -333,6 +333,14 @@ export function selectDomino(
   const sum = getDiceSum(state.currentDice);
   if (!canPlayDomino(state, domino, sum)) return state;
 
+  // Tap selected tile again to clear selection (escape without rule change)
+  if (state.selectedDomino === dominoId) {
+    return {
+      ...state,
+      selectedDomino: null,
+    };
+  }
+
   return {
     ...state,
     selectedDomino: dominoId,

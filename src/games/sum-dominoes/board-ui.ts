@@ -39,10 +39,10 @@ const COLORS = {
   selected: '#ff9800',
 };
 
-// Domino dimensions
-const DOMINO_WIDTH = 40;
-const DOMINO_HEIGHT = 20;
-const CELL_SIZE = 22;
+// Domino dimensions (coarse-pointer media queries enlarge hit targets)
+const DOMINO_WIDTH = 48;
+const DOMINO_HEIGHT = 28;
+const CELL_SIZE = 28;
 
 /**
  * Render the game board
@@ -121,7 +121,7 @@ export function renderBoard(
           cell.classList.add('sd-cell-valid');
 
           const activate = () => {
-            // Prefer horizontal, but use vertical if only that works
+            // Prefer horizontal; use vertical when that is the only legal span.
             const orientation = isValidH ? 'horizontal' : 'vertical';
             onCellClick({ row, col }, orientation);
           };
@@ -410,17 +410,43 @@ export function injectSDStyles(): void {
     .sd-cell {
       width: ${CELL_SIZE}px;
       height: ${CELL_SIZE}px;
+      min-width: ${CELL_SIZE}px;
+      min-height: ${CELL_SIZE}px;
       background: ${COLORS.boardCell};
       border: 1px solid ${COLORS.boardBorder};
+      box-sizing: border-box;
     }
 
     .sd-cell-valid {
       background: ${COLORS.validLight};
       cursor: pointer;
+      outline: 2px solid ${COLORS.valid};
+      outline-offset: -2px;
+      z-index: 1;
     }
 
-    .sd-cell-valid:hover {
+    .sd-cell-valid:hover,
+    .sd-cell-valid:focus-visible {
       background: ${COLORS.valid};
+    }
+
+    .sd-turn-hint {
+      text-align: center;
+      font-size: 0.95rem;
+      color: var(--color-neutral-600, #475569);
+      max-width: 36rem;
+      margin: 0 auto;
+      line-height: 1.35;
+    }
+
+    /* Enlarge in-game Roll / Pass beyond shared chrome defaults (44px floor) */
+    .sd-roll-btn,
+    .sd-pass-btn {
+      min-height: 44px;
+      min-width: 132px;
+      padding: 12px 22px;
+      font-size: 1rem;
+      touch-action: manipulation;
     }
 
     .sd-domino {
@@ -493,11 +519,15 @@ export function injectSDStyles(): void {
       background: ${COLORS.domino};
       border: 2px solid ${COLORS.dominoBorder};
       border-radius: 6px;
-      padding: 2px;
+      padding: 4px;
       cursor: default;
       transition: all 0.15s ease;
       width: ${DOMINO_WIDTH}px;
       height: ${DOMINO_HEIGHT}px;
+      min-width: 44px;
+      min-height: 44px;
+      box-sizing: border-box;
+      touch-action: manipulation;
     }
 
     .sd-hand-domino-playable {
@@ -520,19 +550,51 @@ export function injectSDStyles(): void {
       outline-offset: 2px;
     }
 
-    /* Tablet / coarse pointer: enlarge hand hit targets (WCAG 2.5.5 floor) */
-    @media (pointer: coarse) {
-      .sd-hand-domino {
-        width: 72px;
-        height: 36px;
+    /* Tablet / coarse pointer: enlarge entire board grid + hand (keep row aligned) */
+    @media (pointer: coarse), (max-width: 900px) {
+      .sd-board {
+        overflow-x: auto;
+        max-width: 100%;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .sd-cell {
+        width: 44px;
+        height: 44px;
         min-width: 44px;
-        min-height: 36px;
-        padding: 4px;
+        min-height: 44px;
+      }
+
+      .sd-domino-horizontal {
+        width: 88px;
+        height: 44px;
+      }
+
+      .sd-domino-vertical {
+        width: 44px;
+        height: 88px;
+      }
+
+      .sd-pip {
+        width: 6px;
+        height: 6px;
+      }
+
+      .sd-hand-domino {
+        width: 88px;
+        height: 48px;
+        min-width: 44px;
+        min-height: 44px;
+        padding: 6px;
       }
 
       .sd-hand-domino-playable {
-        min-height: 44px;
-        height: 44px;
+        min-height: 48px;
+        height: 48px;
+      }
+
+      .sd-hand {
+        max-width: 100%;
       }
     }
 

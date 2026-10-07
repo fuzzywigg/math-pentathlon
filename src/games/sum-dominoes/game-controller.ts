@@ -1,13 +1,19 @@
 // Sum Dominoes & Dice Game Controller
 // Manages game flow, AI, and UI updates
 
-import { SumDominoesState, Player, BoardPosition } from './types';
+import {
+  SumDominoesState,
+  Player,
+  BoardPosition,
+  getDiceSum,
+} from './types';
 import {
   createInitialState,
   doRollDice,
   selectDomino,
   placeDomino,
   passTurn,
+  getValidPlacements,
 } from './rules';
 import { getAIMove, AIDifficulty } from './ai';
 import {
@@ -60,6 +66,27 @@ export interface SDGameController {
 let activeContainer: HTMLElement | null = null;
 
 /**
+ * Single pending AI timer — avoids stacked setTimeouts from every UI rebuild
+ * (a stale timer historically rolled Blue's dice after Red finished).
+ */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAI(controller: SDGameController, delayMs: number): void {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    makeAIMove(controller);
+  }, delayMs);
+}
+
+/**
  * Initialize the game
  */
 export function initGame(
@@ -69,6 +96,7 @@ export function initGame(
 ): SDGameController {
   injectSDStyles();
   activeContainer = container;
+  clearAiTimer();
 
   const controller: SDGameController = {
     state: createInitialState(),
@@ -82,6 +110,7 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -131,6 +160,25 @@ function updateUI(controller: SDGameController): void {
   }
 
   gameArea.appendChild(status);
+
+  // Secondary hint (keeps primary status copy stable for locked tests)
+  if (!state.winner && !computerTurn) {
+    const hint = document.createElement('div');
+    hint.className = 'sd-turn-hint';
+    hint.setAttribute('aria-hidden', 'true');
+    if (state.phase === 'placing' && state.selectedDomino) {
+      hint.textContent =
+        'Green cells are legal. Tap one to place, or tap another playable domino.';
+      gameArea.appendChild(hint);
+    } else if (state.phase === 'placing') {
+      hint.textContent =
+        'Highlighted dominoes match this dice sum. Pick one, then a green cell.';
+      gameArea.appendChild(hint);
+    } else if (state.phase === 'passing') {
+      hint.textContent = 'No tile fits this roll — tap Pass Turn to continue.';
+      gameArea.appendChild(hint);
+    }
+  }
 
   // Winner banner
   if (state.winner) {
@@ -216,9 +264,11 @@ function updateUI(controller: SDGameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn
+  // AI turn — single scheduled timer (clears prior) so rebuilds cannot stack
   if (computerTurn) {
-    setTimeout(() => makeAIMove(controller), 800);
+    scheduleAI(controller, 800);
+  } else {
+    clearAiTimer();
   }
 }
 
@@ -285,12 +335,16 @@ function makeAIMove(controller: SDGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.winner || !aiPlayer) return;
+  // Hard seat guard — refuse to act on the human seat (stale timer safety net)
+  if (!isComputerTurnPending(controller)) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
     controller.state = doRollDice(state);
     controller.update();
-    setTimeout(() => makeAIMove(controller), 600);
+    if (isComputerTurnPending(controller)) {
+      scheduleAI(controller, 600);
+    }
     return;
   }
 
@@ -303,14 +357,37 @@ function makeAIMove(controller: SDGameController): void {
 
   // Get AI move from the module
   if (state.phase === 'placing' && state.currentDice) {
-    const move = getAIMove(state, aiPlayer, aiDifficulty);
+    let move = getAIMove(state, aiPlayer, aiDifficulty);
+
+    // Fallback: if the scorer returns null but a legal placement exists,
+    // play the first valid tile so the AI seat never soft-locks.
+    if (!move) {
+      const sum = getDiceSum(state.currentDice);
+      const hand = state.hands[aiPlayer];
+      for (const domino of hand) {
+        const placements = getValidPlacements(state, domino, sum);
+        if (placements.length > 0) {
+          move = {
+            dominoId: domino.id,
+            position: placements[0].position,
+            orientation: placements[0].orientation,
+          };
+          break;
+        }
+      }
+    }
 
     if (move) {
       let newState = selectDomino(state, move.dominoId);
       newState = placeDomino(newState, move.position, move.orientation);
       controller.state = newState;
       controller.update();
+      return;
     }
+
+    // Truly no legal placement (state desync) — escape via pass phase
+    controller.state = passTurn({ ...state, phase: 'passing' });
+    controller.update();
   }
 }
 
