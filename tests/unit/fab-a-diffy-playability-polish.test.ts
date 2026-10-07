@@ -136,6 +136,34 @@ describe('Fab-a-Diffy playability polish', () => {
     expect(container.textContent).not.toMatch(/Computer is thinking/i);
   });
 
+  it('confirm status names the target fraction when bars resolve', () => {
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const ctrl = fabVsHuman(container);
+    const ids = [...ctrl.state.fractionBars.keys()];
+    // 1/2 and 1/3 → add → 5/6 is a standard answer
+    const half = [...ctrl.state.fractionBars.values()].find(
+      (b) => b.fraction.numerator === 1 && b.fraction.denominator === 2
+    );
+    const third = [...ctrl.state.fractionBars.values()].find(
+      (b) => b.fraction.numerator === 1 && b.fraction.denominator === 3
+    );
+    expect(half && third).toBeTruthy();
+    ctrl.state = {
+      ...ctrl.state,
+      phase: 'confirmingMove',
+      selectedBar1: half!.id,
+      selectedBar2: third!.id,
+      selectedOperation: 'add',
+    };
+    ctrl.update();
+    expect(container.querySelector('.fab-status')?.textContent).toMatch(
+      /Select matching answer \(5\/6\)/
+    );
+    expect(container.querySelector('.fab-answer-matchable')).toBeTruthy();
+    expect(ids.length).toBeGreaterThan(0);
+  });
+
   it('cancels stacked AI timeouts after newGame', async () => {
     vi.useFakeTimers();
     const moveSpy = vi

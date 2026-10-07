@@ -3,7 +3,7 @@
  * Runs ≥10 full games per difficulty × (desktop, tablet).
  * Writes JSON summary + screenshots under docs/playtest/.
  *
- * Usage: node scripts/fab-a-diffy-deep-playtest.mjs
+ * Usage: node tests/playtest/fab-a-diffy-deep.mjs
  * Requires: npm run dev on :5173 (or PLAYTEST_BASE_URL).
  */
 import { chromium } from '@playwright/test';
@@ -16,12 +16,17 @@ const OUT_DIR = path.resolve('docs/playtest');
 const SHOT_DIR = path.join(OUT_DIR, 'fab-a-diffy-deep-2026-10-07');
 const ART_DIR = '/opt/cursor/artifacts/fab-a-diffy-playtest';
 
-const VIEWPORTS = {
+const ALL_VIEWPORTS = {
   desktop: { width: 1280, height: 800 },
   tablet: { width: 768, height: 1024 },
 };
+const ONLY_VP = process.env.PLAYTEST_ONLY_VP;
+const ONLY_DIFF = process.env.PLAYTEST_ONLY_DIFF;
+const VIEWPORTS = ONLY_VP
+  ? { [ONLY_VP]: ALL_VIEWPORTS[ONLY_VP] }
+  : ALL_VIEWPORTS;
 
-const DIFFICULTIES = ['easy', 'medium', 'hard'];
+const DIFFICULTIES = ONLY_DIFF ? [ONLY_DIFF] : ['easy', 'medium', 'hard'];
 
 async function dismissOwl(page) {
   await page.evaluate(() => {
@@ -68,8 +73,8 @@ async function humanClaim(page) {
   );
   if (ids.length < 2) return 'stuck';
 
-  for (let i = 0; i < Math.min(ids.length, 10); i++) {
-    for (let j = 0; j < Math.min(ids.length, 10); j++) {
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = 0; j < ids.length; j++) {
       if (i === j) continue;
       await waitNotThinking(page);
       if (await page.locator('.fab-winner-banner').isVisible().catch(() => false)) {
@@ -97,17 +102,24 @@ async function humanClaim(page) {
       }
       await validOp.click({ force: true });
       const match = page.locator('.fab-answer-matchable').first();
-      if (!(await match.isVisible().catch(() => false))) {
+      try {
+        await match.waitFor({ state: 'attached', timeout: 2_000 });
+        await match.scrollIntoViewIfNeeded();
+        await match.click({ force: true });
+        return 'claim';
+      } catch {
         if (await clear.isVisible().catch(() => false)) await clear.click({ force: true });
         continue;
       }
-      await match.click({ force: true });
-      return 'claim';
     }
   }
   if (await passBtn.isVisible().catch(() => false)) {
     await passBtn.click({ force: true });
     return 'pass';
+  }
+  // Recover soft-stuck confirmingMove before reporting stall
+  if (await clear.isVisible().catch(() => false)) {
+    await clear.click({ force: true });
   }
   return 'stuck';
 }
@@ -274,7 +286,7 @@ async function main() {
   }
 
   // Dedicated thinking / human-turn screenshots
-  {
+  if (!process.env.PLAYTEST_SKIP_EXTRA_SHOTS) {
     const context = await browser.newContext({ viewport: VIEWPORTS.desktop });
     const page = await context.newPage();
     await startVsAi(page, 'medium');
@@ -340,9 +352,16 @@ async function main() {
     ),
   };
 
-  const jsonPath = path.join(SHOT_DIR, 'summary.json');
+  const suffix =
+    ONLY_VP || ONLY_DIFF
+      ? `-${ONLY_VP || 'all'}-${ONLY_DIFF || 'all'}`
+      : '';
+  const jsonPath = path.join(SHOT_DIR, `summary${suffix}.json`);
   fs.writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
-  fs.copyFileSync(jsonPath, path.join(ART_DIR, 'summary.json'));
+  fs.copyFileSync(jsonPath, path.join(ART_DIR, path.basename(jsonPath)));
+  if (!suffix) {
+    fs.copyFileSync(jsonPath, path.join(ART_DIR, 'summary.json'));
+  }
   console.log('SUMMARY', JSON.stringify(summary.totals, null, 2));
   await browser.close();
   if (failed > 0) process.exitCode = 1;

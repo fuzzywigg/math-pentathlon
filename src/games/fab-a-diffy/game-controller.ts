@@ -12,6 +12,7 @@ import {
   clearSelection,
   passTurn,
   hasAnyValidMove,
+  calculateResult,
 } from './rules';
 import {
   renderFractionBarPool,
@@ -28,6 +29,7 @@ import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -136,7 +138,10 @@ function updateUI(controller: FabGameController): void {
   } else if (state.phase === 'selectingOperation') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Choose an operation`;
   } else if (state.phase === 'confirmingMove') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select matching answer`;
+    const targetHint = confirmingTargetLabel(state);
+    status.textContent = targetHint
+      ? `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select matching answer (${targetHint})`
+      : `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select matching answer`;
   }
 
   gameArea.appendChild(status);
@@ -152,9 +157,9 @@ function updateUI(controller: FabGameController): void {
     gameArea.appendChild(banner);
   }
 
-  // Main layout
+  // Main layout (phase class drives tablet column order while claiming)
   const mainLayout = document.createElement('div');
-  mainLayout.className = 'fab-main-layout';
+  mainLayout.className = `fab-main-layout fab-phase-${state.phase}`;
 
   // Left side: fraction bars and operations
   const leftColumn = document.createElement('div');
@@ -233,6 +238,18 @@ function updateUI(controller: FabGameController): void {
   }
   container.appendChild(gameArea);
 
+  // Narrow layouts put answers below a long bar pool — bring matchables on-screen.
+  if (humanCanAct && state.phase === 'confirmingMove') {
+    requestAnimationFrame(() => {
+      const match = container.querySelector(
+        '.fab-answer-matchable'
+      ) as HTMLElement | null;
+      if (match && typeof match.scrollIntoView === 'function') {
+        match.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+  }
+
   // AI turn — generation token cancels stacked timeouts from remounts
   if (isComputerSeat(controller)) {
     const gen = ++aiGeneration;
@@ -241,6 +258,23 @@ function updateUI(controller: FabGameController): void {
       makeAIMove(controller, gen);
     }, 800);
   }
+}
+
+/** Fraction label for the pending claim, when bars + op are set. */
+function confirmingTargetLabel(state: FabADiffyState): string | null {
+  if (!state.selectedBar1 || !state.selectedBar2 || !state.selectedOperation) {
+    return null;
+  }
+  const bar1 = state.fractionBars.get(state.selectedBar1);
+  const bar2 = state.fractionBars.get(state.selectedBar2);
+  if (!bar1 || !bar2) return null;
+  const result = calculateResult(
+    bar1.fraction,
+    bar2.fraction,
+    state.selectedOperation
+  );
+  if (!result) return null;
+  return formatFraction(simplify(result));
 }
 
 /**

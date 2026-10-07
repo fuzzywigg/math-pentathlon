@@ -581,6 +581,7 @@ export function injectFabStyles(): void {
 
     .fab-answer-matchable {
       background: ${COLORS.validLight};
+      box-shadow: 0 0 0 3px ${COLORS.valid};
       animation: fab-pulse 1s ease-in-out infinite;
     }
 
@@ -853,8 +854,21 @@ export function injectFabStyles(): void {
         grid-template-columns: 1fr;
       }
 
+      /* While claiming, float answers above the long bar pool. */
+      .fab-main-layout.fab-phase-confirmingMove .fab-left-column {
+        order: 2;
+      }
+
+      .fab-main-layout.fab-phase-confirmingMove .fab-right-column {
+        order: 1;
+      }
+
       .fab-operation-preview {
         font-size: 1.2rem;
+      }
+
+      .fab-operation-buttons {
+        flex-wrap: wrap;
       }
     }
 

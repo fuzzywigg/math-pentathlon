@@ -112,7 +112,8 @@ async function tryHumanClaim(page: Page): Promise<boolean> {
       }
       await validOp.click({ force: true });
       const match = page.locator('.fab-answer-matchable').first();
-      await expect(match).toBeVisible({ timeout: 5_000 });
+      await expect(match).toBeAttached({ timeout: 5_000 });
+      await match.scrollIntoViewIfNeeded();
       await match.click({ force: true });
       return true;
     }
