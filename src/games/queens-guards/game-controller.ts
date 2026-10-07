@@ -17,9 +17,10 @@ import {
   hasValidMoves,
   restoreCapturedPiece,
   getRestoreTargets,
+  checkWinner,
 } from './rules';
 import { renderBoard, injectQGStyles, getPlayerName } from './board-ui';
-import { applyAIMove, AIDifficulty } from './ai';
+import { applyAIMove, getAIMove, AIDifficulty } from './ai';
 import {
   cancelQueensAiRequests,
   disposeQueensAiWorker,
@@ -121,14 +122,34 @@ function onBoard3dContextLost(): void {
 // UI Rendering
 // =============================================================================
 
+function humanCanAct(): boolean {
+  return !isAIThinking && !(vsAI && gameState.currentPlayer === aiPlayer);
+}
+
+/** Persist stalemate into state.winner (display already treated it as a win). */
+function settleStalemateIfNeeded(): void {
+  if (gameState.winner) return;
+  if (gameState.capturedPieces.length > 0) return;
+  if (hasValidMoves(gameState)) return;
+  gameState = {
+    ...gameState,
+    winner: getOpponent(gameState.currentPlayer),
+    selectedPiece: null,
+  };
+}
+
 function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
+  settleStalemateIfNeeded();
+
+  const onCell = humanCanAct() ? handleCellClick : undefined;
+
   if (board3dEnabled && board3d) {
-    board3d.update(gameState, handleCellClick);
+    board3d.update(gameState, onCell);
   } else if (!board3dEnabled) {
     boardContainer.innerHTML = '';
-    const svg = renderBoard(gameState, handleCellClick);
+    const svg = renderBoard(gameState, onCell);
     boardContainer.appendChild(svg);
   }
   // If 3D is enabled but still loading, skip board paint until ready.
@@ -142,9 +163,17 @@ function updateStatus(): void {
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);
-    statusContainer.innerHTML = `
+    // Formation win vs stalemate (no queen+guards ring) — keep prior copy.
+    const isFormationWin = checkWinner(gameState) === gameState.winner;
+    statusContainer.innerHTML = isFormationWin
+      ? `
       <div class="qg-winner-banner">
         ${winnerName} wins! 👑
+      </div>
+    `
+      : `
+      <div class="qg-winner-banner">
+        ${getPlayerName(gameState.currentPlayer)} cannot move - ${winnerName} wins!
       </div>
     `;
 
@@ -152,28 +181,6 @@ function updateStatus(): void {
       hasNotifiedGameEnd = true;
       owlSystem.onGameEnd('queens-guards', {
         winner: gameState.winner,
-        moveCount,
-      });
-    }
-
-    return;
-  }
-
-  // Check for stalemate (not while a capture still needs restoring)
-  if (gameState.capturedPieces.length === 0 && !hasValidMoves(gameState)) {
-    const stalematedPlayer = getPlayerName(gameState.currentPlayer);
-    const winner = getOpponent(gameState.currentPlayer);
-    const winnerName = getPlayerName(winner);
-    statusContainer.innerHTML = `
-      <div class="qg-winner-banner">
-        ${stalematedPlayer} cannot move - ${winnerName} wins!
-      </div>
-    `;
-
-    if (!hasNotifiedGameEnd) {
-      hasNotifiedGameEnd = true;
-      owlSystem.onGameEnd('queens-guards', {
-        winner: winner,
         moveCount,
       });
     }
@@ -274,6 +281,7 @@ function handleRestoreClick(coord: BoardCoord): void {
 
 function handleCellClick(coord: BoardCoord): void {
   if (gameState.winner) return;
+  if (isAIThinking) return;
 
   // If playing vs AI and it's AI's turn, ignore clicks
   if (vsAI && gameState.currentPlayer === aiPlayer) return;
@@ -343,16 +351,28 @@ async function performAIMove(): Promise<void> {
     aiMove = null;
   }
 
+  // Worker cancel / rare failure: sync search so the human seat is never soft-locked.
+  if (!aiMove && gen === aiGeneration) {
+    try {
+      aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
+    } catch {
+      aiMove = null;
+    }
+  }
+
   if (gen !== aiGeneration) return;
   isAIThinking = false;
 
   if (!aiMove) {
+    // No legal move (stalemate) or search exhausted — settle winner chrome.
+    settleStalemateIfNeeded();
     updateUI();
     return;
   }
 
   const next = applyAIMove(gameState, aiMove);
   if (next === gameState) {
+    settleStalemateIfNeeded();
     updateUI();
     return;
   }

@@ -3,7 +3,10 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { createInitialState, getRemainingCount } from '../../src/games/sum-dominoes/rules';
+import {
+  createInitialState,
+  getRemainingCount,
+} from '../../src/games/sum-dominoes/rules';
 import { CONFIG } from '../../src/games/sum-dominoes/types';
 
 describe('Wave 47 sum deepen 1 — sum-dominoes — createInitialState', () => {
@@ -36,8 +39,11 @@ describe('Wave 47 sum deepen 1 — sum-dominoes — createInitialState', () => {
         if (state.board[r][c]) occupied++;
       }
     }
-    // createInitialState seeds only the anchor cell (not the second span)
-    expect(occupied).toBeGreaterThanOrEqual(1);
+    // Horizontal seed occupies both span cells (anchor + CENTER_COL+1)
+    expect(occupied).toBeGreaterThanOrEqual(2);
     expect(state.board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL]).not.toBeNull();
+    expect(
+      state.board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL + 1]
+    ).not.toBeNull();
   });
 });

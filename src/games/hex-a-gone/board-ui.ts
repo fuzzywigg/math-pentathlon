@@ -18,6 +18,11 @@ export type CellClickCallback = (q: number, r: number) => void;
 export type BlockSelectCallback = (shape: BlockShape) => void;
 export type ConfirmCallback = () => void;
 
+export interface SelectionAreaOptions {
+  /** When false, show AI-seat copy (no “click to place” affordance). */
+  interactive?: boolean;
+}
+
 // Hex dimensions
 const HEX_SIZE = 30;
 
@@ -46,10 +51,15 @@ export function renderBoard(
   container: HTMLElement,
   onCellClick?: CellClickCallback,
   onBlockSelect?: BlockSelectCallback,
-  onConfirm?: ConfirmCallback
+  onConfirm?: ConfirmCallback,
+  options: SelectionAreaOptions = {}
 ): void {
   const previousFocus = captureFocusedCell(container);
   container.innerHTML = '';
+  // Static/test callers omit options → keep human placing copy.
+  const selectionOptions: SelectionAreaOptions = {
+    interactive: options.interactive !== false,
+  };
 
   const wrapper = document.createElement('div');
   wrapper.className = 'hex-a-gone-wrapper';
@@ -155,7 +165,9 @@ export function renderBoard(
   bindGridNavigation(svg);
   wrapper.appendChild(svg);
 
-  wrapper.appendChild(buildSelectionArea(state, onBlockSelect, onConfirm));
+  wrapper.appendChild(
+    buildSelectionArea(state, onBlockSelect, onConfirm, selectionOptions)
+  );
   container.appendChild(wrapper);
   restoreGridFocus(container, previousFocus);
 }
@@ -167,8 +179,10 @@ export function renderBoard(
 export function buildSelectionArea(
   state: HexAGoneGameState,
   onBlockSelect?: BlockSelectCallback,
-  onConfirm?: ConfirmCallback
+  onConfirm?: ConfirmCallback,
+  options: SelectionAreaOptions = {}
 ): HTMLElement {
+  const interactive = options.interactive !== false;
   const selectionArea = document.createElement('div');
   selectionArea.className = 'hex-a-gone-selection-area';
 
@@ -258,12 +272,15 @@ export function buildSelectionArea(
     if (state.phase === 'placeBlocks' && state.selectedBlockForPlacement) {
       const placingInfo = document.createElement('div');
       placingInfo.className = 'hex-a-gone-placing-info';
+      const hint = interactive
+        ? 'Click an empty cell to place'
+        : 'Computer is placing…';
       placingInfo.innerHTML = `
         <strong>Placing:</strong>
         <span class="placing-shape" style="background-color: ${BLOCK_COLORS[state.selectedBlockForPlacement]}">
           ${getShapeIcon(state.selectedBlockForPlacement)} ${state.selectedBlockForPlacement}
         </span>
-        <span class="placing-hint">Click an empty cell to place</span>
+        <span class="placing-hint">${hint}</span>
       `;
       selectionArea.appendChild(placingInfo);
     }

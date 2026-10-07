@@ -13,12 +13,18 @@ import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
   makeGridCell,
+  makeCellFocusable,
   markBoardAsGrid,
   bindGridNavigation,
   bindCellActivateKeys,
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+
+export interface SDBoardRenderOptions {
+  /** When false, skip placement / hand activation (AI seat pending). */
+  allowInput?: boolean;
+}
 
 // Colors
 const COLORS = {
@@ -46,15 +52,17 @@ export function renderBoard(
   onCellClick: (
     pos: BoardPosition,
     orientation: 'horizontal' | 'vertical'
-  ) => void
+  ) => void,
+  options: SDBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'sd-board';
   markBoardAsGrid(container);
 
   // Get valid placements for selected domino
   const validPlacements = new Set<string>();
-  if (state.selectedDomino && state.currentDice) {
+  if (allowInput && state.selectedDomino && state.currentDice) {
     const domino = state.hands[state.currentPlayer].find(
       (d) => d.id === state.selectedDomino
     );
@@ -109,7 +117,7 @@ export function renderBoard(
         const isValidV = validPlacements.has(`${row}-${col}-vertical`);
         const isValid = isValidH || isValidV;
 
-        if (isValid) {
+        if (isValid && allowInput) {
           cell.classList.add('sd-cell-valid');
 
           const activate = () => {
@@ -233,31 +241,41 @@ function getPipPositions(value: number): [number, number][] {
 export function renderHand(
   state: SumDominoesState,
   player: 'player1' | 'player2',
-  onDominoClick: (dominoId: string) => void
+  onDominoClick: (dominoId: string) => void,
+  options: SDBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = `sd-hand sd-hand-${player}`;
+  container.setAttribute('role', 'list');
+  container.setAttribute(
+    'aria-label',
+    `${player === 'player1' ? 'Blue' : 'Red'} hand`
+  );
 
   const hand = state.hands[player];
   const isCurrentPlayer = state.currentPlayer === player;
   const canSelect =
-    isCurrentPlayer && state.phase === 'placing' && state.currentDice;
+    allowInput &&
+    isCurrentPlayer &&
+    state.phase === 'placing' &&
+    !!state.currentDice;
 
   for (const domino of hand) {
-    const dominoEl = createHandDomino(
-      domino,
-      state.selectedDomino === domino.id,
-      canSelect
-        ? (() => {
-            const sum = getDiceSum(state.currentDice!);
-            const placements = getValidPlacements(state, domino, sum);
-            return placements.length > 0;
-          })()
-        : false
-    );
+    const isPlayable = canSelect
+      ? (() => {
+          const sum = getDiceSum(state.currentDice!);
+          const placements = getValidPlacements(state, domino, sum);
+          return placements.length > 0;
+        })()
+      : false;
+    const isSelected = state.selectedDomino === domino.id;
+    const dominoEl = createHandDomino(domino, isSelected, isPlayable);
 
-    if (canSelect) {
-      dominoEl.addEventListener('click', () => onDominoClick(domino.id));
+    if (isPlayable) {
+      const activate = () => onDominoClick(domino.id);
+      dominoEl.addEventListener('click', activate);
+      bindCellActivateKeys(dominoEl, activate);
     }
 
     container.appendChild(dominoEl);
@@ -276,9 +294,22 @@ function createHandDomino(
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'sd-hand-domino';
+  wrapper.setAttribute('role', 'listitem');
+  wrapper.dataset.dominoId = domino.id;
 
   if (isSelected) wrapper.classList.add('sd-hand-domino-selected');
   if (isPlayable) wrapper.classList.add('sd-hand-domino-playable');
+
+  const label = `Domino ${domino.face1}-${domino.face2}${
+    isPlayable ? ', playable' : ''
+  }${isSelected ? ', selected' : ''}`;
+
+  if (isPlayable) {
+    makeCellFocusable(wrapper, label);
+    wrapper.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+  } else {
+    wrapper.setAttribute('aria-label', label);
+  }
 
   // Face 1
   const face1 = createDominoFace(domino.face1);
@@ -482,6 +513,40 @@ export function injectSDStyles(): void {
     .sd-hand-domino-selected {
       box-shadow: 0 0 0 3px ${COLORS.selected} !important;
       transform: translateY(-4px);
+    }
+
+    .sd-hand-domino-playable:focus-visible {
+      outline: 2px solid ${COLORS.selected};
+      outline-offset: 2px;
+    }
+
+    /* Tablet / coarse pointer: enlarge hand hit targets (WCAG 2.5.5 floor) */
+    @media (pointer: coarse) {
+      .sd-hand-domino {
+        width: 72px;
+        height: 36px;
+        min-width: 44px;
+        min-height: 36px;
+        padding: 4px;
+      }
+
+      .sd-hand-domino-playable {
+        min-height: 44px;
+        height: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sd-hand-domino,
+      .sd-hand-domino-playable:hover,
+      .sd-hand-domino-selected {
+        transition: none;
+        transform: none;
+      }
+
+      .sd-cell-valid:hover {
+        background: ${COLORS.validLight};
+      }
     }
 
     /* Chrome (.sd-game-area / controls / dice / status / winner) lives in style.css */

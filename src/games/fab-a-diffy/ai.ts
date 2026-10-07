@@ -17,6 +17,7 @@ import { FabADiffyState, Player, FractionBar } from './types';
 
 import { FractionOperation } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
+import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
 import {
   selectBar1,
@@ -29,6 +30,42 @@ import {
 } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
+/**
+ * Play-facing wall-time budgets (ms). Hard still enumerates the full move
+ * list when the machine is fast enough; a soft deadline returns the best
+ * scored move found so far (evaluation scoring unchanged).
+ */
+export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
+  easy: 800,
+  medium: 1500,
+  hard: 2500,
+};
+
+/** Optional search controls — defaults preserve historical Math.random behavior. */
+export interface AISearchOptions {
+  /** Deterministic PRNG seed (worker/direct parity tests). */
+  seed?: number;
+  /**
+   * Soft wall-time budget (ms). When finite, enumeration aborts between
+   * candidates and returns the best move scored so far. Omit for historical
+   * full enumeration (tests / unlimited).
+   */
+  deadlineMs?: number;
+  /** Clock override for tests. */
+  now?: () => number;
+}
+
+export interface AISearchResult {
+  move: AIMove | null;
+  truncated: boolean;
+}
+
+interface SearchClock {
+  now: () => number;
+  deadline: number;
+  aborted: boolean;
+}
 
 const DIFFICULTY_CONFIG = {
   easy: { randomness: 0.5, teachingMode: true },
@@ -50,11 +87,16 @@ interface ValidMove {
 }
 
 /**
- * Find all valid moves for the current player.
+ * Find valid moves for the current player.
  * Uses ordered bar pairs so subtract/divide match executeMove(bar1 op bar2).
+ * Optional clock aborts between candidates without changing score formulas.
  */
-function findAllValidMoves(state: FabADiffyState): ValidMove[] {
+function findAllValidMoves(
+  state: FabADiffyState,
+  clock: SearchClock | null = null
+): { moves: ValidMove[]; truncated: boolean } {
   const moves: ValidMove[] = [];
+  let truncated = false;
 
   const availableBars = Array.from(state.fractionBars.values()).filter(
     (b) => !b.used
@@ -63,7 +105,7 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
     (a) => !a.claimedBy
   );
 
-  if (availableBars.length < 2) return moves;
+  if (availableBars.length < 2) return { moves, truncated };
 
   const operations: FractionOperation[] = [
     'add',
@@ -80,7 +122,7 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
     }
   }
 
-  for (const [bar1, bar2] of orderedPairs) {
+  outer: for (const [bar1, bar2] of orderedPairs) {
     for (const operation of operations) {
       // Skip duplicate commutative ops (add/multiply) for reverse order
       if (
@@ -88,6 +130,12 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
         bar1.id > bar2.id
       ) {
         continue;
+      }
+
+      if (clock && clock.now() >= clock.deadline && moves.length > 0) {
+        clock.aborted = true;
+        truncated = true;
+        break outer;
       }
 
       const result = calculateResult(bar1.fraction, bar2.fraction, operation);
@@ -98,6 +146,12 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
       );
 
       for (const answer of matchingAnswers) {
+        if (clock && clock.now() >= clock.deadline && moves.length > 0) {
+          clock.aborted = true;
+          truncated = true;
+          break outer;
+        }
+
         let score = 10;
         const reasons: string[] = [];
 
@@ -159,7 +213,7 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
 
   moves.sort((a, b) => b.score - a.score);
 
-  return moves;
+  return { moves, truncated };
 }
 
 // =============================================================================
@@ -169,20 +223,27 @@ function findAllValidMoves(state: FabADiffyState): ValidMove[] {
 /**
  * In easy mode, occasionally make suboptimal moves
  */
-function getTeachingMove(state: FabADiffyState): ValidMove | null {
-  const moves = findAllValidMoves(state);
+function getTeachingMove(
+  state: FabADiffyState,
+  rng: () => number,
+  clock: SearchClock | null
+): { move: ValidMove | null; truncated: boolean } {
+  const { moves, truncated } = findAllValidMoves(state, clock);
 
-  if (moves.length === 0) return null;
+  if (moves.length === 0) return { move: null, truncated };
 
   // 40% chance to pick a lower-scoring move
-  if (Math.random() < 0.4 && moves.length > 1) {
+  if (rng() < 0.4 && moves.length > 1) {
     const suboptimal = moves.slice(1);
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      return {
+        move: suboptimal[Math.floor(rng() * suboptimal.length)],
+        truncated,
+      };
     }
   }
 
-  return moves[0];
+  return { move: moves[0], truncated };
 }
 
 // =============================================================================
@@ -198,53 +259,86 @@ export interface AIMove {
 }
 
 /**
+ * Full Fab AI search with optional seed / play-budget deadline.
+ */
+export function searchAIMove(
+  state: FabADiffyState,
+  aiPlayer: Player,
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
+): AISearchResult {
+  if (state.phase === 'gameOver') return { move: null, truncated: false };
+  if (state.currentPlayer !== aiPlayer) return { move: null, truncated: false };
+
+  const config = DIFFICULTY_CONFIG[difficulty];
+  const rng =
+    options.seed === undefined ? Math.random : createSeededRng(options.seed);
+  const now = options.now ?? (() => performance.now());
+  const started = now();
+  const deadline =
+    options.deadlineMs === undefined
+      ? Number.POSITIVE_INFINITY
+      : started + options.deadlineMs;
+  const clock: SearchClock | null = Number.isFinite(deadline)
+    ? { now, deadline, aborted: false }
+    : null;
+
+  // Teaching mode for easy difficulty
+  if (config.teachingMode) {
+    const result = getTeachingMove(state, rng, clock);
+    if (result.move) {
+      return {
+        move: {
+          bar1Id: result.move.bar1Id,
+          bar2Id: result.move.bar2Id,
+          operation: result.move.operation,
+          answerId: result.move.answerId,
+        },
+        truncated: result.truncated,
+      };
+    }
+  }
+
+  const { moves, truncated } = findAllValidMoves(state, clock);
+
+  if (moves.length === 0) return { move: null, truncated };
+
+  // Add randomness based on difficulty
+  if (rng() < config.randomness && moves.length > 1) {
+    const topMoves = moves.slice(0, 3);
+    const chosen = topMoves[Math.floor(rng() * topMoves.length)];
+    return {
+      move: {
+        bar1Id: chosen.bar1Id,
+        bar2Id: chosen.bar2Id,
+        operation: chosen.operation,
+        answerId: chosen.answerId,
+      },
+      truncated,
+    };
+  }
+
+  return {
+    move: {
+      bar1Id: moves[0].bar1Id,
+      bar2Id: moves[0].bar2Id,
+      operation: moves[0].operation,
+      answerId: moves[0].answerId,
+    },
+    truncated,
+  };
+}
+
+/**
  * Get AI's move decision
  */
 export function getAIMove(
   state: FabADiffyState,
   aiPlayer: Player,
-  difficulty: AIDifficulty = 'medium'
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
 ): AIMove | null {
-  if (state.phase === 'gameOver') return null;
-  if (state.currentPlayer !== aiPlayer) return null;
-
-  const config = DIFFICULTY_CONFIG[difficulty];
-
-  // Teaching mode for easy difficulty
-  if (config.teachingMode) {
-    const result = getTeachingMove(state);
-    if (result) {
-      return {
-        bar1Id: result.bar1Id,
-        bar2Id: result.bar2Id,
-        operation: result.operation,
-        answerId: result.answerId,
-      };
-    }
-  }
-
-  const moves = findAllValidMoves(state);
-
-  if (moves.length === 0) return null;
-
-  // Add randomness based on difficulty
-  if (Math.random() < config.randomness && moves.length > 1) {
-    const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
-    return {
-      bar1Id: chosen.bar1Id,
-      bar2Id: chosen.bar2Id,
-      operation: chosen.operation,
-      answerId: chosen.answerId,
-    };
-  }
-
-  return {
-    bar1Id: moves[0].bar1Id,
-    bar2Id: moves[0].bar2Id,
-    operation: moves[0].operation,
-    answerId: moves[0].answerId,
-  };
+  return searchAIMove(state, aiPlayer, difficulty, options).move;
 }
 
 /**
@@ -309,9 +403,10 @@ export function applyAIMoveSteps(
 export function executeAITurn(
   state: FabADiffyState,
   aiPlayer: Player,
-  difficulty: AIDifficulty = 'medium'
+  difficulty: AIDifficulty = 'medium',
+  options: AISearchOptions = {}
 ): FabADiffyState {
-  const move = getAIMove(state, aiPlayer, difficulty);
+  const move = getAIMove(state, aiPlayer, difficulty, options);
 
   if (!move) {
     return passTurn(state);

@@ -10,7 +10,7 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, AIDifficulty } from './ai';
+import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import {
   renderBoard,
   renderHand,
@@ -32,6 +32,15 @@ function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
   if (!root) return;
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+}
+
+/** True while it is the computer's seat (including the 800ms think pause). */
+function isComputerTurnPending(controller: Par55GameController): boolean {
+  return isAITurn(
+    controller.state,
+    controller.aiPlayer,
+    controller.isAI ? 'human-vs-ai' : 'human-vs-human'
+  );
 }
 
 // =============================================================================
@@ -105,10 +114,14 @@ function updateUI(controller: Par55GameController): void {
   status.className = `par55-status ${state.currentPlayer}`;
   markStatusLive(status);
 
+  const computerTurn = isComputerTurnPending(controller);
+
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
+  } else if (computerTurn) {
+    status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingBlock') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
   } else if (state.phase === 'placingBlock') {
@@ -135,6 +148,7 @@ function updateUI(controller: Par55GameController): void {
   // Main layout
   const mainLayout = document.createElement('div');
   mainLayout.className = 'par55-main-layout';
+  const inputOpts = { allowInput: !computerTurn };
 
   // Player 1 hand
   const p1Container = document.createElement('div');
@@ -143,14 +157,19 @@ function updateUI(controller: Par55GameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length})`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderHand(state, 'player1', (blockId) =>
-      handleBlockClick(controller, blockId)
+    renderHand(
+      state,
+      'player1',
+      (blockId) => handleBlockClick(controller, blockId),
+      inputOpts
     )
   );
 
   // Board
-  const board = renderBoard(state, (baseId) =>
-    handleBaseClick(controller, baseId)
+  const board = renderBoard(
+    state,
+    (baseId) => handleBaseClick(controller, baseId),
+    inputOpts
   );
 
   // Player 2 hand
@@ -160,8 +179,11 @@ function updateUI(controller: Par55GameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length})`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderHand(state, 'player2', (blockId) =>
-      handleBlockClick(controller, blockId)
+    renderHand(
+      state,
+      'player2',
+      (blockId) => handleBlockClick(controller, blockId),
+      inputOpts
     )
   );
 
@@ -180,22 +202,24 @@ function updateUI(controller: Par55GameController): void {
   const controls = document.createElement('div');
   controls.className = 'par55-controls';
 
-  if (state.selectedBlock) {
+  if (state.selectedBlock && !computerTurn) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'par55-btn par55-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver') {
+  if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
     const passBtn = document.createElement('button');
     passBtn.className = 'par55-btn par55-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
+      if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -226,6 +250,7 @@ function handleBlockClick(
   controller: Par55GameController,
   blockId: string
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = selectBlock(controller.state, blockId);
   controller.update();
 }
@@ -237,6 +262,7 @@ function handleBaseClick(
   controller: Par55GameController,
   baseId: string
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = placeBlock(controller.state, baseId);
   controller.update();
 }

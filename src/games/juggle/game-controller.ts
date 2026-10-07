@@ -52,6 +52,15 @@ let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 
+function isComputerTurnPending(): boolean {
+  return (
+    vsAI &&
+    gameState.currentPlayer === aiPlayer &&
+    !gameState.winner &&
+    gameState.phase !== 'gameOver'
+  );
+}
+
 // =============================================================================
 // UI Rendering
 // =============================================================================
@@ -62,26 +71,34 @@ function updateUI(): void {
   const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
 
-  // Render dice area
+  const allowInput = !isComputerTurnPending();
+  const inputOpts = { allowInput };
+
+  // Render dice area — hide Roll / selectable dice while the computer seat thinks
   const diceArea = renderDice(
     gameState.currentDice,
     handleRollDice,
     handleSelectDie,
-    gameState.phase === 'rolling' &&
-      (!vsAI || gameState.currentPlayer !== aiPlayer),
-    gameState.phase
+    allowInput && gameState.phase === 'rolling',
+    gameState.phase,
+    inputOpts
   );
   boardContainer.appendChild(diceArea);
 
   // Render shape selector or controls
   if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
-    const shapeSelector = renderShapeSelector(gameState, handleSelectShape);
+    const shapeSelector = renderShapeSelector(
+      gameState,
+      handleSelectShape,
+      inputOpts
+    );
     boardContainer.appendChild(shapeSelector);
   } else if (gameState.phase === 'placing') {
     const shapeControls = renderShapeControls(
       gameState,
       handleRotate,
-      handleFlip
+      handleFlip,
+      inputOpts
     );
     boardContainer.appendChild(shapeControls);
   }
@@ -97,7 +114,8 @@ function updateUI(): void {
     gameState,
     (row, col) => handleCellClick(row, col, 'player1'),
     (row, col) => handleCellHover(row, col),
-    handleCellLeave
+    handleCellLeave,
+    inputOpts
   );
   boardsContainer.appendChild(p1Board);
 
@@ -108,7 +126,8 @@ function updateUI(): void {
     gameState,
     (row, col) => handleCellClick(row, col, 'player2'),
     (row, col) => handleCellHover(row, col),
-    handleCellLeave
+    handleCellLeave,
+    inputOpts
   );
   boardsContainer.appendChild(p2Board);
 
@@ -136,6 +155,15 @@ function updateStatus(): void {
   const playerName = getPlayerName(gameState.currentPlayer);
   const playerClass = gameState.currentPlayer;
   const icon = seatIcon(gameState.currentPlayer);
+
+  if (isComputerTurnPending()) {
+    statusContainer.innerHTML = `
+      <div class="juggle-status ${playerClass} status-ai-thinking">
+        <strong>${icon} ${playerName}'s turn</strong> - Computer is thinking…
+      </div>
+    `;
+    return;
+  }
 
   let instruction = '';
   switch (gameState.phase) {
@@ -169,7 +197,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
   if (gameState.phase !== 'rolling') return;
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
-  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (fromAI !== true && isComputerTurnPending()) return;
 
   gameState = doRollDice(gameState);
   updateUI();
@@ -182,7 +210,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
 
 function handleSelectDie(index: 0 | 1): void {
   if (gameState.phase !== 'selectingShape') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (isComputerTurnPending()) return;
 
   gameState = selectDie(gameState, index);
   updateUI();
@@ -190,18 +218,20 @@ function handleSelectDie(index: 0 | 1): void {
 
 function handleSelectShape(shape: PolyominoShape): void {
   if (gameState.phase !== 'selectingShape') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (isComputerTurnPending()) return;
 
   gameState = selectShape(gameState, shape);
   updateUI();
 }
 
 function handleRotate(): void {
+  if (isComputerTurnPending()) return;
   gameState = rotateShape(gameState);
   updateUI();
 }
 
 function handleFlip(): void {
+  if (isComputerTurnPending()) return;
   gameState = flipShape(gameState);
   updateUI();
 }
@@ -209,7 +239,7 @@ function handleFlip(): void {
 function handleCellClick(row: number, col: number, player: Player): void {
   if (player !== gameState.currentPlayer) return;
   if (gameState.phase !== 'placing') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (isComputerTurnPending()) return;
 
   gameState = placeShape(gameState, { row, col });
   updateUI();
@@ -221,6 +251,7 @@ function handleCellClick(row: number, col: number, player: Player): void {
 }
 
 function handleCellHover(row: number, col: number): void {
+  if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placing') return;
 
   gameState = { ...gameState, hoverPosition: { row, col } };
@@ -228,6 +259,7 @@ function handleCellHover(row: number, col: number): void {
 }
 
 function handleCellLeave(): void {
+  if (isComputerTurnPending()) return;
   gameState = { ...gameState, hoverPosition: null };
   updateUI();
 }
@@ -343,4 +375,15 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Test-only: replace state and re-render (AI-seat chrome guards). */
+export function __setStateForTests(state: JuggleState): void {
+  gameState = state;
+  updateUI();
+}
+
+/** Test-only: read current controller state. */
+export function __getStateForTests(): JuggleState {
+  return gameState;
 }

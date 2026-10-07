@@ -2,7 +2,8 @@
  * Three.js tilted-tabletop 3D board for FIAR.
  *
  * Tablet-friendly vs Kings #352:
- * - antialias off, pixelRatio capped at 1.5
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - preserveDrawingBuffer gated; pause paints while the tab is hidden
  * - render-on-demand (no continuous RAF)
  * - full-size host
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
@@ -21,6 +22,7 @@ import {
   TABLET_PIXEL_RATIO_CAP,
   bindPageVisibility,
   canPaint3d,
+  shouldPreserveDrawingBuffer,
 } from './tablet-gl';
 
 export type FiarNodeClickCallback = (nodeId: string) => void;
@@ -89,6 +91,7 @@ export async function createFiarBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     // Prefer renderer.getContext(); avoid a second getContext on the canvas
     // (jsdom / test doubles often stub HTMLCanvasElement.prototype).

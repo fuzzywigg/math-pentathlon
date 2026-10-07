@@ -265,16 +265,37 @@ describe('Wave 25 a11y-game-wiring — button-pattern boards (non-grid)', () => 
     }
   });
 
-  it('Remainder Islands SVG islands are focusable with labels', () => {
-    const svg = renderRemainder(
-      createRemainder(),
+  it('Remainder Islands SVG islands are labeled; buttons only when activatable', () => {
+    const base = createRemainder();
+    // Rolling / non-select: announce islands without making inert buttons.
+    const rollingSvg = renderRemainder(
+      base,
       () => undefined,
       () => undefined
     );
-    document.body.appendChild(svg);
-    const buttons = svg.querySelectorAll('[role="button"]');
-    expect(buttons.length).toBeGreaterThan(3);
+    document.body.appendChild(rollingSvg);
+    const rollingIslands = rollingSvg.querySelectorAll('[data-island-id]');
+    expect(rollingIslands.length).toBeGreaterThan(3);
+    expect(rollingSvg.querySelectorAll('[role="button"]').length).toBe(0);
+    expect(rollingIslands[0].getAttribute('aria-label')).toBeTruthy();
+
+    // Select phase: only valid islands are keyboard buttons.
+    const validIds = base.islands.slice(0, 4).map((i) => i.id);
+    const selectSvg = renderRemainder(
+      {
+        ...base,
+        phase: 'selectIsland',
+        currentRoll: { die1: 2, die2: 3, total: 5 },
+        validIslands: validIds,
+      },
+      () => undefined,
+      () => undefined
+    );
+    document.body.appendChild(selectSvg);
+    const buttons = selectSvg.querySelectorAll('[role="button"]');
+    expect(buttons.length).toBe(validIds.length);
     expect(buttons[0].getAttribute('aria-label')).toBeTruthy();
+    expect(buttons[0].getAttribute('tabindex')).toBe('0');
   });
 
   it('Calla pits are SVG focusables with aria-labels', () => {

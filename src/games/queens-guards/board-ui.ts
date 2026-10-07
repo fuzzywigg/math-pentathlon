@@ -97,9 +97,10 @@ function hexPath(cx: number, cy: number, size: number): string {
  */
 export function renderBoard(
   state: QueensGuardsState,
-  onCellClick: (coord: BoardCoord) => void
+  onCellClick?: (coord: BoardCoord) => void
 ): SVGSVGElement {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const allowInput = typeof onCellClick === 'function';
 
   const size = CONFIG.NUM_RINGS * CONFIG.HEX_SIZE * 1.8 * 2 + 100;
   const centerX = size / 2;
@@ -121,13 +122,14 @@ export function renderBoard(
   svg.appendChild(bg);
 
   // Get valid moves for selected piece (normal play) or restore targets
-  const restoring = state.capturedPieces.length > 0;
+  // Suppress targets while the computer seat thinks (no click handler).
+  const restoring = allowInput && state.capturedPieces.length > 0;
   const validMoves: Set<string> = new Set();
   if (restoring) {
     getRestoreTargets(state).forEach((m) =>
       validMoves.add(cellKey(m.ring, m.position))
     );
-  } else if (state.selectedPiece) {
+  } else if (allowInput && state.selectedPiece) {
     const selectedCoord = parseKey(state.selectedPiece);
     const moves = getValidMoves(state, selectedCoord);
     moves.forEach((m) => validMoves.add(cellKey(m.ring, m.position)));
@@ -138,7 +140,7 @@ export function renderBoard(
     const { x, y } = ringPosToPixel(cell.ring, cell.position, centerX, centerY);
 
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.style.cursor = 'pointer';
+    g.style.cursor = allowInput ? 'pointer' : 'default';
     g.dataset.cellKey = key;
     g.setAttribute('data-row', String(cell.ring));
     g.setAttribute('data-col', String(cell.position));
@@ -255,11 +257,15 @@ export function renderBoard(
       }
     }
 
-    // Click / keyboard handler
-    const activate = () => {
-      onCellClick({ ring: cell.ring, position: cell.position });
-    };
-    g.addEventListener('click', activate);
+    // Click / keyboard handler (omitted on AI seat)
+    const activate = allowInput
+      ? () => {
+          onCellClick!({ ring: cell.ring, position: cell.position });
+        }
+      : undefined;
+    if (activate) {
+      g.addEventListener('click', activate);
+    }
 
     const owner =
       cell.piece?.player === 'player1'
@@ -291,15 +297,19 @@ export function renderBoard(
         ],
       })
     );
-    bindCellActivateKeys(g, activate);
+    if (activate) {
+      bindCellActivateKeys(g, activate);
+    }
 
     // Hover effect
-    g.addEventListener('mouseenter', () => {
-      hex.setAttribute('filter', 'brightness(1.1)');
-    });
-    g.addEventListener('mouseleave', () => {
-      hex.removeAttribute('filter');
-    });
+    if (allowInput) {
+      g.addEventListener('mouseenter', () => {
+        hex.setAttribute('filter', 'brightness(1.1)');
+      });
+      g.addEventListener('mouseleave', () => {
+        hex.removeAttribute('filter');
+      });
+    }
 
     svg.appendChild(g);
   }
@@ -366,6 +376,12 @@ export function injectQGStyles(): void {
     @keyframes qg-glow {
       from { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .qg-winner-banner {
+        animation: none !important;
+      }
     }
   `;
   document.head.appendChild(style);

@@ -22,7 +22,8 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
-import { executeAITurn, AIDifficulty } from './ai';
+import { applyAIMoveSteps, AIDifficulty } from './ai';
+import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
@@ -50,6 +51,8 @@ export interface FabGameController {
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
+/** Invalidates in-flight worker replies after new game. */
+let aiGeneration = 0;
 
 /**
  * Initialize the game
@@ -61,6 +64,7 @@ export function initGame(
 ): FabGameController {
   injectFabStyles();
   activeContainer = container;
+  disposeFabAiWorker();
 
   const controller: FabGameController = {
     state: createInitialState(),
@@ -74,6 +78,8 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+    disposeFabAiWorker();
+    aiGeneration += 1;
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -256,15 +262,29 @@ function handleAnswerClick(
 // =============================================================================
 
 /**
- * Make an AI move via validated executeAITurn (#12).
+ * Make an AI move via worker search + validated applyAIMoveSteps (#12).
+ * Async so Hard enumeration stays off the UI thread when Workers exist.
  */
 function makeAIMove(controller: FabGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.winner || !aiPlayer) return;
 
-  controller.state = executeAITurn(state, aiPlayer, aiDifficulty);
-  controller.update();
+  const gen = ++aiGeneration;
+  void (async () => {
+    let move;
+    try {
+      move = await getAIMoveAsync(state, aiPlayer, aiDifficulty);
+    } catch {
+      move = null;
+    }
+
+    if (gen !== aiGeneration) return;
+    if (controller.state !== state) return;
+
+    controller.state = move ? applyAIMoveSteps(state, move) : passTurn(state);
+    controller.update();
+  })();
 }
 
 // =============================================================================
