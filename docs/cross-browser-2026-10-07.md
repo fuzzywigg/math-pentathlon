@@ -56,32 +56,20 @@ No rules/scoring/controller changes. No clear shared CSS/JS product fixes were r
 
 38 skips are intentional (viewport/project filters and existing `test.skip` / conditional skips). Mobile viewport smoke is Chromium-emulation only (`mobile-iphone-se` / `mobile-pixel-7`).
 
-## Unfixed — WebKit offline PWA keeper
+## WebKit offline PWA keeper (follow-up)
 
-| Spec | Project | Failure |
-| ---- | ------- | ------- |
-| `tests/e2e/offline-pwa.spec.ts` → `menu + Hex computer move offline after first online visit` | `webkit` only | After online visit + SW control, `context.setOffline(true)` then open Hex shows `game-load-error` (“Could not load Hex… offline”) |
+| Spec | Project | Status |
+| ---- | ------- | ------ |
+| `tests/e2e/offline-pwa.spec.ts` → `menu + Hex computer move offline after first online visit` | `webkit` | Mitigated in `cursor/webkit-offline-pwa-2f20` — see `docs/webkit-offline-pwa-2026-10-07.md` |
 
-**Triage (reproduced):**
+**Triage (still true for SW fetch):**
 
-1. Workbox precache **does** include `game-hex-*.js` on WebKit by the time `navigator.serviceWorker.controller` is set (same ~65 precache entries as Firefox).
-2. `caches.match` for the Hex chunk succeeds while offline.
-3. Network/`import()` of that same URL fails on Playwright WebKit with `WebKit encountered an internal error` / `TypeError: Load failed` / `Importing a module script failed`.
-4. Soft hash navigation (`location.hash = '#/game/hex'`) fails the same way; Firefox passes soft-nav, offline `goto`, and the keeper.
+1. Workbox precache **does** include `game-hex-*.js` on WebKit (~65–68 entries).
+2. `caches.match` succeeds offline; controlled-page `fetch()` / cold `import()` fail under Playwright `setOffline`.
+3. Explicit `/assets/*.js` CacheFirst does **not** help (precache already serves those URLs).
+4. Mitigation: idle-warm `game-route-mounts` + `game-play.css` + Hex/Kings; WebKit keeper uses SPA soft-nav after `data-mp-idle-warm=done`. Chromium/Firefox keep offline `page.goto`.
 
-**Classification:** Playwright WebKit offline emulation + service-worker module load bug (or WebKit-specific SW fetch stack under `setOffline`), **not** a missing precache entry and **not** a clear shared CSS/app JS compatibility bug we can safely patch without changing PWA architecture or weakening the Chromium offline guarantee.
-
-**Why not “fixed” here:**
-
-- Changing Workbox / injectManifest / navigation fallback is out of “clear CSS/JS compat” scope and risks Chromium/Firefox offline behavior.
-- Softening or skipping the assertion would hide a real Safari QA signal once Playwright WebKit offline improves.
-- Report-only CI already surfaces the failure without blocking merges.
-
-**Follow-ups (human / later PR):**
-
-- Re-check on a real iPad/Safari airplane-mode after first visit (product path).
-- Track Playwright/WebKit `setOffline` + SW module import issues; re-run this keeper when upgraded.
-- Optional: quarantine with `test.fix`/`testInfo.annotations` on `webkit` only once product Safari is verified green.
+**Still open:** Playwright WebKit offline `page.goto` / reload can throw `WebKit encountered an internal error`. Device Safari airplane-mode QA still recommended.
 
 ## Shared shell / CSS (unchanged this pass)
 
