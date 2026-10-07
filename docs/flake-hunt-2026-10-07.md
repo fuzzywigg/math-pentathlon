@@ -72,7 +72,7 @@ Artifacts: `/opt/cursor/artifacts/flake-hunt/`.
 | --- | --- |
 | Kwatro forced-win stress | 0 fails / 50–80 |
 | Seeds `404/505/606/2002/909/1111/3333` | green after fixes |
-| Default-order postfix runs | green |
+| Final loop (`postfix5-summary.tsv`) | **15/15 green** (10 shuffle incl. prior bad seeds + 5 default) |
 
 ## Out of scope / not changed
 
