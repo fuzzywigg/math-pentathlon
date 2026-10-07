@@ -9,7 +9,9 @@ import {
   disableBoard3d,
   dismissModeIfNeeded,
   enableBoard3dLowQuality,
+  keyboardActivateA11yCell,
   waitForGameReady,
+  waitForHumanStatus,
   waitForMp3dReady,
 } from './helpers/mp3d';
 import * as fs from 'node:fs';
@@ -242,18 +244,22 @@ test.describe('mp3d Prime Gold 3D board', () => {
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
     await waitForPrimeGold3d(page);
+    await waitForHumanStatus(page, '.pg-status', /Roll/i);
 
-    await page.locator('.pg-roll-btn').click();
-    await page.waitForTimeout(200);
+    const roll = page.locator('.pg-roll-btn');
+    await expect(roll).toBeVisible();
+    await roll.click();
+    // Placing phase — do not race fixed sleeps against a11y grid rebuild.
+    await waitForHumanStatus(page, '.pg-status', /Select/i);
 
     const focusable = page.locator('.pg-a11y-grid button[tabindex="0"]').first();
-    await expect(focusable).toBeVisible({ timeout: 5000 });
-    await focusable.focus();
-    await page.keyboard.press('Enter');
-    await page.waitForTimeout(250);
+    await keyboardActivateA11yCell(page, focusable);
 
-    await expect(page.locator('.pg-move-history, .pg-status')).toBeVisible();
-    // After a successful place, phase returns to rolling for the other player
-    await expect(page.locator('.pg-status')).toContainText(/turn|Roll|Select/i);
+    // Successful place mounts move history; never union-query with .pg-status
+    // (strict-mode flake once both exist).
+    await expect(page.locator('.pg-move-history')).toBeVisible({
+      timeout: 10_000,
+    });
+    await waitForHumanStatus(page, '.pg-status', /turn|Roll/i);
   });
 });
