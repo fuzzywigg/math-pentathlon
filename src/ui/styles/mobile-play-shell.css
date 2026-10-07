@@ -167,10 +167,7 @@ body {
   .star-track-board {
     /* 35rem ≈ header + buttons + status + chain + gutters at kids-phone size.
        vh first (Firefox ESR / older WebKit), dvh overrides when supported. */
-    width: min(
-      calc(100vw - 2 * var(--play-shell-gutter)),
-      calc(100vh - 35rem)
-    );
+    width: min(calc(100vw - 2 * var(--play-shell-gutter)), calc(100vh - 35rem));
     width: min(
       calc(100vw - 2 * var(--play-shell-gutter)),
       calc(100dvh - 35rem)
