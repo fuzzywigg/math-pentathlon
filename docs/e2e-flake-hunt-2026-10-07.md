@@ -61,9 +61,9 @@ Scope: tests/setup only (waits, deterministic seeds, animation disabling).
 
 | Metric | Rate |
 | --- | --- |
-| Full Chromium suite ×8 | _(filled after verification)_ |
-| Full suite `--repeat-each=3` | _(filled after verification)_ |
-| CPU-stressed excl. PG keyboard ×3 | _(filled after verification)_ |
+| Full Chromium suite ×8 | **8/8** suite runs (**608/608** test results) — **100%** |
+| Full suite `--repeat-each=3` | **228/228** — **100%** |
+| CPU-stressed excl. PG keyboard ×3 | **3/3** — **100%** |
 | Spot: changed mp3d keyboard/flag specs | **18/18** |
 
 ## Explicitly not changed
