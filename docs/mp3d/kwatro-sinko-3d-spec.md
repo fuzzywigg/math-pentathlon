@@ -9,8 +9,10 @@ Optional Three.js tilted-tabletop view of **Kwatro-Sinko** (Math Pentathlon Divi
 
 ## Rules judgment calls
 
-1. **Diagonal connectivity:** Open for Andrew (#355). The engine (`createBoard`) only adds diagonal links in the central 3×3. This 3D board draws and plays the **engine** graph so 2D/3D stay identical.
-2. **Win condition (conjunctive):** Div II Highlights — all 5 of the player's chips must be on non-numbered spaces **and** the player must identify a straight path of exactly 3 chips (two of one color, one of the opposite) where like + like − opposite totals 4 or 5. A win cannot be declared until all 5 chips are off all numbered spaces. There is no standalone "territory" win.
+1. **Diagonal connectivity:** Open for Andrew (#355). Div II Highlights PDF does **not** specify movement diagonals. The engine (`createBoard`) only adds diagonal links from the central 3×3 (rim↔interior diagonals are one-way from the interior). Tutorial/help copy now matches that graph. This 3D board draws and plays the **engine** graph so 2D/3D stay identical.
+2. **Win condition (conjunctive):** Div II Highlights — all 5 of the player's chips must be on non-numbered spaces **and** the player must identify a straight path of exactly 3 chips (two of one color, one of the opposite) where like + like − opposite totals 4 or 5. A win cannot be declared until all 5 chips are off all numbered spaces. There is no standalone "territory" win. Locked by `#375` / `#391` and `tests/unit/kwatro-sinko-end-rules-375.test.ts`.
+3. **Contiguous vs non-contiguous + yellow middle:** Official GOAL (quoted): *"The path of 3 chips does not need to be contiguous but cannot cross the middle (yellow) area of the board."* Live engine walks contiguous grid lines only (stops at empty) and has **no** yellow-center filter on the 5×5 model. Locked by `tests/unit/kwatro-sinko-rules-lock-div2.test.ts`. Needs Andrew: allow gapped paths? What maps to "yellow" on this simplified board?
+4. **"Only 3 chips on the winning path":** Engine currently accepts a winning trio that is a subset of a longer contiguous occupied run. Confirm whether longer runs should invalidate the path.
 
 ## Grid
 

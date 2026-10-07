@@ -55,7 +55,7 @@ export const kwatroSinkoTutorial: TutorialConfig = {
         <ul>
           <li>Chips move along the pathway connections</li>
           <li>You can only move to empty adjacent spaces</li>
-          <li>Diagonal connections exist on numbered spaces</li>
+          <li>Diagonal connections exist in the center 3×3 (including toward numbered spaces)</li>
         </ul>
       `,
       highlightSelector: '.kwa-board',
