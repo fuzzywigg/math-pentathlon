@@ -308,6 +308,13 @@ export function newGameVsAI(
   return initGame(container, true, difficulty);
 }
 
+/** Cancel in-flight AI worker work and drop the active mount. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  disposeFabAiWorker();
+  activeContainer = null;
+}
+
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
   if (!activeContainer) return;

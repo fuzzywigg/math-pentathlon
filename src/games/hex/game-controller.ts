@@ -170,6 +170,15 @@ export function getGameState(): HexGameState {
   return gameState;
 }
 
+/** Cancel in-flight AI and drop mounts (route change / error boundary). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  cancelHexAiRequests();
+  isAIThinking = false;
+  boardContainer = null;
+  statusContainer = null;
+}
+
 // Reset game
 export function resetGame(): void {
   if (gameMode === 'human-vs-ai') {

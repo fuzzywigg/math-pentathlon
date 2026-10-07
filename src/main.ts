@@ -19,6 +19,10 @@ import {
   nextRouteGeneration,
 } from './core/route-generation';
 import { renderGameLoadError, renderGameLoading } from './ui/game-loading';
+import {
+  installGameErrorBoundary,
+  type GameErrorBoundaryHandle,
+} from './ui/game-error-boundary';
 import { bindOfflineDocumentFlag, isBrowserOffline } from './ui/offline';
 import { bindReducedMotionPreference } from './ui/reduced-motion';
 import { bootstrapPwa } from './pwa/bootstrap';
@@ -50,6 +54,8 @@ if (!appContainer) {
 
 // Store reference to cleanup functions
 let currentCleanup: (() => void) | null = null;
+/** Active game-route error boundary (window error / rejection → friendly reset). */
+let activeGameBoundary: GameErrorBoundaryHandle | null = null;
 
 // Cleanup previous view
 function cleanup(): void {
@@ -57,6 +63,30 @@ function cleanup(): void {
     currentCleanup();
     currentCleanup = null;
   }
+  if (activeGameBoundary) {
+    activeGameBoundary.dispose();
+    activeGameBoundary = null;
+  }
+}
+
+/** Install (or replace) the per-game error boundary for the current route. */
+function bindGameErrorBoundary(gameName: string): void {
+  if (activeGameBoundary) {
+    activeGameBoundary.dispose();
+    activeGameBoundary = null;
+  }
+  activeGameBoundary = installGameErrorBoundary({
+    gameName,
+    container: appContainer!,
+    onReset: () => renderGame(),
+    onHome: () => navigate('/'),
+    onBeforeShow: () => {
+      if (currentCleanup) {
+        currentCleanup();
+        currentCleanup = null;
+      }
+    },
+  });
 }
 
 // Render the game selector (home page)
@@ -112,6 +142,8 @@ function renderGame(): void {
 
   document.title = `Math Pentathlon - ${gameInfo.name}`;
   renderGameLoading(appContainer!, gameInfo.name);
+  // Every game route gets a friendly reset boundary before the chunk mounts.
+  bindGameErrorBoundary(gameInfo.name);
 
   const mount = async (): Promise<void> => {
     try {
@@ -159,6 +191,11 @@ function renderGame(): void {
     } catch (err) {
       console.error(`Failed to load game ${gameId}`, err);
       if (!isCurrentRouteGeneration(routeGen)) return;
+      // Load failures use the dedicated load-error UI; drop the runtime boundary.
+      if (activeGameBoundary) {
+        activeGameBoundary.dispose();
+        activeGameBoundary = null;
+      }
       renderGameLoadError(
         appContainer!,
         gameInfo.name,
@@ -248,6 +285,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
 async function renderHex(routeGen: number): Promise<void> {
   const {
     initGame: initHexGame,
+    destroyGame: destroyHexGame,
     newGameVsHuman: hexNewGameVsHuman,
     newGameVsAI: hexNewGameVsAI,
     startTutorial: startHexTutorial,
@@ -303,7 +341,10 @@ async function renderHex(routeGen: number): Promise<void> {
     initHexGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyHexGame();
+    shell.cleanup();
+  };
 }
 
 // Render Star Track
@@ -558,6 +599,7 @@ async function renderHexAGone(routeGen: number): Promise<void> {
 async function renderCalla(routeGen: number): Promise<void> {
   const {
     initGame: initCallaGame,
+    destroyGame: destroyCallaGame,
     newGameVsHuman: callaNewGameVsHuman,
     newGameVsAI: callaNewGameVsAI,
     startTutorial: startCallaTutorial,
@@ -620,7 +662,10 @@ async function renderCalla(routeGen: number): Promise<void> {
     initCallaGame(shell.board, shell.status);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyCallaGame();
+    shell.cleanup();
+  };
 }
 
 // Render FIAR
@@ -924,6 +969,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
 async function renderFabADiffy(routeGen: number): Promise<void> {
   const {
     initGame: initFabGame,
+    destroyGame: destroyFabGame,
     newGameVsHuman: fabNewGameVsHuman,
     newGameVsAI: fabNewGameVsAI,
     startTutorial: startFabTutorial,
@@ -988,7 +1034,10 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     initFabGame(shell.board, false);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyFabGame();
+    shell.cleanup();
+  };
 }
 
 // Render Sum Dominoes
@@ -1442,6 +1491,7 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
 async function renderFracFact(routeGen: number): Promise<void> {
   const {
     initGame: initFracFactGame,
+    destroyGame: destroyFracFactGame,
     newGameVsHuman: fracNewGameVsHuman,
     newGameVsAI: fracNewGameVsAI,
     startTutorial: startFracTutorial,
@@ -1522,7 +1572,10 @@ async function renderFracFact(routeGen: number): Promise<void> {
     initFracFactGame(shell.board);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyFracFactGame();
+    shell.cleanup();
+  };
 }
 
 // Render Remainder Islands
@@ -1589,6 +1642,7 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
 async function renderFractionPinball(routeGen: number): Promise<void> {
   const {
     initGame: initPinballGame,
+    destroyGame: destroyPinballGame,
     newGameVsHuman: pinballNewGameVsHuman,
     newGameVsAI: pinballNewGameVsAI,
     startTutorial: startPinballTutorial,
@@ -1643,7 +1697,10 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     initPinballGame(shell.board);
   }
 
-  currentCleanup = shell.cleanup;
+  currentCleanup = () => {
+    destroyPinballGame();
+    shell.cleanup();
+  };
 }
 
 // Render Stars & Bars
