@@ -1,6 +1,6 @@
 /** Shared request/response shapes for game AI Web Workers. */
 
-export type AiWorkerGameId = 'queens-guards' | 'hex' | 'fiar';
+export type AiWorkerGameId = 'queens-guards' | 'hex' | 'fiar' | 'fab-a-diffy';
 
 export interface AiWorkerRequestBase {
   /** Correlates request/response; client ignores stale ids after cancel. */
