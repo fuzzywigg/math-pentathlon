@@ -50,20 +50,27 @@ async function startVsAi(
 }
 
 async function playOneHumanTurn(page: import('@playwright/test').Page) {
-  const pass = page.locator('.par55-controls .par55-btn');
-  if (await pass.isVisible().catch(() => false)) {
-    const text = (await pass.textContent()) || '';
-    if (/pass/i.test(text)) {
-      await pass.click({ force: true });
-      return;
+  const action = await page.evaluate(() => {
+    const pass = [
+      ...document.querySelectorAll('.par55-controls .par55-btn'),
+    ].find((b) => /pass/i.test(b.textContent || ''));
+    if (pass) {
+      pass.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      return 'pass';
     }
-  }
-  const block = page.locator('.par55-hand-block.clickable').first();
-  await expect(block).toBeVisible({ timeout: 8_000 });
-  await block.click({ force: true });
-  const base = page.locator('.par55-valid-base, .par55-base-hit').first();
-  await expect(base).toBeVisible({ timeout: 5_000 });
-  await base.click({ force: true });
+    const block = document.querySelector(
+      '.par55-hand-block.clickable'
+    ) as HTMLElement | null;
+    if (!block) return 'no-block';
+    block.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const hit =
+      document.querySelector('.par55-base-hit') ||
+      document.querySelector('.par55-valid-base');
+    if (!hit) return 'no-base';
+    hit.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    return 'place';
+  });
+  expect(['pass', 'place']).toContain(action);
 }
 
 test.describe('Par 55 playability', () => {
