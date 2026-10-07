@@ -15,6 +15,8 @@ beforeEach(() => {
   storage.resetAll();
   owlSystem.dismissMessage();
   owlSystem.hide();
+  // Never-started clock contract: private stamp must be 0 (shared isolate:false).
+  (owlSystem as unknown as { gameStartTime: number }).gameStartTime = 0;
   storage.updateSettings({ owlEnabled: true });
   owlSystem.speakNow('flush-wave55', 'happy');
   owlSystem.dismissMessage();
@@ -27,7 +29,9 @@ afterEach(() => {
   storage.resetAll();
   owlSystem.dismissMessage();
   owlSystem.hide();
-  vi.restoreAllMocks();
+  (owlSystem as unknown as { gameStartTime: number }).gameStartTime = 0;
+  // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+  vi.clearAllMocks();
 });
 
 describe('Wave 55 core owl — end without start', () => {

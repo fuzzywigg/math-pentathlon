@@ -73,7 +73,8 @@ describe('Burn Wave 2 — #11 Kings incremental DOM', () => {
 
 describe('Burn Wave 2 — #12 Fab-a-Diffy AI step validation', () => {
   afterEach(() => {
-    vi.restoreAllMocks();
+    // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+    vi.clearAllMocks();
   });
 
   it('executeAITurn completes a valid move without stalling', () => {

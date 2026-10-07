@@ -37,7 +37,8 @@ afterEach(() => {
   vi.clearAllTimers();
   vi.useRealTimers();
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 const RENDERERS: Array<{

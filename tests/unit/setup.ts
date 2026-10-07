@@ -10,7 +10,8 @@ import { storage } from '../../src/core/storage';
  * the stock catalog once and restore after every test.
  *
  * Do not call vi.restoreAllMocks() here — it tears down hoisted vi.mock factories
- * (e.g. router.navigate) across the shared module graph.
+ * (e.g. router.navigate) across the shared module graph. Under --maxWorkers=1 /
+ * shuffle that shows up as burn-wave24 game-selector navigate call-count flakes.
  *
  * Do call vi.unstubAllGlobals() — stubGlobal('requestAnimationFrame') / matchMedia
  * leaks otherwise, and animateMove / dice RAF tests hang under shuffle.
@@ -18,19 +19,35 @@ import { storage } from '../../src/core/storage';
  * Also restore performance.now when a prior file left a spy (clearAllMocks does
  * not remove mock implementations; a stuck now ahead of RAF timestamps infinite-
  * loops animateMove).
+ *
+ * Reset owlSystem.gameStartTime — a prior onGameStart under fake/system timers
+ * leaves a future stamp; onGameEnd-without-start then emits negative duration.
  */
 type MutableOwl = { messages: unknown[] };
+type MutableOwlSystem = { gameStartTime: number };
 
 const owlInternal = owlMessages as unknown as MutableOwl;
+const owlSystemInternal = owlSystem as unknown as MutableOwlSystem;
 const stockOwlMessages = owlInternal.messages.slice();
 
-function restorePerformanceNow(): void {
-  const nowFn = performance.now as unknown as {
-    mockRestore?: () => void;
-  };
-  if (typeof nowFn.mockRestore === 'function') {
-    nowFn.mockRestore();
+function restoreIfMocked(fn: unknown): void {
+  const mocked = fn as { mockRestore?: () => void };
+  if (typeof mocked.mockRestore === 'function') {
+    mocked.mockRestore();
   }
+}
+
+function restorePerformanceNow(): void {
+  restoreIfMocked(performance.now);
+}
+
+function restoreWindowAlert(): void {
+  restoreIfMocked(window.alert);
+}
+
+function restoreMathRandom(): void {
+  // clearAllMocks keeps mockImplementations; a stuck Math.random breaks AI/deal tests.
+  restoreIfMocked(Math.random);
 }
 
 afterEach(() => {
@@ -54,10 +71,13 @@ afterEach(() => {
   } catch {
     // ignore
   }
+  owlSystemInternal.gameStartTime = 0;
   owlInternal.messages.length = 0;
   owlInternal.messages.push(...stockOwlMessages);
   vi.clearAllMocks();
   vi.unstubAllGlobals();
   vi.useRealTimers();
   restorePerformanceNow();
+  restoreWindowAlert();
+  restoreMathRandom();
 });
