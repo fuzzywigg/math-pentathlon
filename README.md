@@ -104,7 +104,7 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 ## Status (2026-10-07)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: 3053 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + 33 Playwright specs under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
+- Tests: 3054 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + 33 Playwright specs under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
 - CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, and `visual-baseline` (see `docs/wiki/development.md`)
 - `origin/alpha` tip `eec2b32` (2026-10-07) includes overnight polish (#413) + tablet playtest docs (#414). Integration tip trees may be ahead of alpha.
 
