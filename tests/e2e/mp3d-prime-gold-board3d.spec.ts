@@ -253,52 +253,6 @@ test.describe('mp3d Prime Gold 3D board', () => {
     // Placing phase — do not race fixed sleeps against a11y grid rebuild.
     await waitForHumanStatus(page, '.pg-status', /Select/i);
 
-    // #region agent log
-    const placeProbe = await page.evaluate(() => {
-      const zeros = Array.from(
-        document.querySelectorAll('.pg-a11y-grid button[tabindex="0"]')
-      );
-      const allBtns = Array.from(
-        document.querySelectorAll('.pg-a11y-grid button')
-      );
-      const exprTexts = Array.from(
-        document.querySelectorAll('.pg-expr-item')
-      ).map((el) => el.textContent?.trim() ?? '');
-      return {
-        tabindex0Count: zeros.length,
-        tabindex0: zeros.map((b) => ({
-          value: b.getAttribute('data-value'),
-          row: b.getAttribute('data-row'),
-          col: b.getAttribute('data-col'),
-          aria: b.getAttribute('aria-label'),
-        })),
-        firstCell: allBtns[0]
-          ? {
-              value: allBtns[0].getAttribute('data-value'),
-              row: allBtns[0].getAttribute('data-row'),
-              col: allBtns[0].getAttribute('data-col'),
-              tabIndex: (allBtns[0] as HTMLButtonElement).tabIndex,
-            }
-          : null,
-        exprItemCount: exprTexts.length,
-        exprTextsSample: exprTexts.slice(0, 8),
-        status:
-          document.querySelector('.pg-status')?.textContent?.trim() ?? null,
-      };
-    });
-    fs.appendFileSync(
-      '/opt/cursor/logs/debug.log',
-      JSON.stringify({
-        location: 'mp3d-prime-gold-board3d.spec.ts:keyboard-a11y',
-        message: 'post-Select pre-activate probe',
-        data: placeProbe,
-        timestamp: Date.now(),
-        hypothesisId: 'A,B',
-        runId: 'post-fix',
-      }) + '\n'
-    );
-    // #endregion
-
     // Do not use button[tabindex="0"]: restoreGridFocus often leaves only a
     // non-valid cell tabbable. Valid a11y buttons still have click handlers.
     const focusable = await primeGoldValidA11yCell(page);
