@@ -24,9 +24,9 @@ import {
 } from './kings-quadraphages-pieces';
 import {
   resolveBoard3dPixelRatio,
-  markBoard3dCanvasReady,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
 } from './tablet-gl';
 
 export type CellClickCallback = (row: number, col: number) => void;
@@ -219,9 +219,11 @@ export async function createKingsQuadraphagesBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
-    markBoard3dCanvasReady(canvas);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
@@ -431,6 +433,7 @@ export async function createKingsQuadraphagesBoard3D(
 
   tearDown = unmount;
   resize();
+  scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

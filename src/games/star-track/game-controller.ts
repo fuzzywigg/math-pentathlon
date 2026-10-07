@@ -9,6 +9,10 @@ import { owlSystem } from '../../core/owl';
 import { getAIChainChoice, AIDifficulty } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadStarTrackBoard3DModule } from './board-3d-loader';
 import type { StarTrackBoard3D } from '../../ui/three/star-track-board-3d';
 
@@ -78,6 +82,7 @@ function fallbackTo2dBoard(): void {
     board3d.unmount();
     board3d = null;
   }
+  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();
@@ -91,8 +96,10 @@ async function ensureBoard3d(): Promise<void> {
     board3d = await mod.createStarTrackBoard3D(boardContainer, () => {
       fallbackTo2dBoard();
     });
+    clearBoard3dWebGlFallback(boardContainer);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }

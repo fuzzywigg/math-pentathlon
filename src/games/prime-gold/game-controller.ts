@@ -28,6 +28,10 @@ import {
   markStatusLive,
 } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadPrimeGoldBoard3DModule } from './board-3d-loader';
 import type { PrimeGoldBoard3D } from '../../ui/three/prime-gold-board-3d';
 
@@ -112,8 +116,10 @@ async function ensureBoard3d(): Promise<void> {
     board3d = await mod.createPrimeGoldBoard3D(liveHost, (value, expr) => {
       if (activeController) handlePlacement(activeController, value, expr);
     });
+    clearBoard3dWebGlFallback(liveHost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D board.
+    markBoard3dWebGlFallback(boardHostEl, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }

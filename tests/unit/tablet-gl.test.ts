@@ -8,6 +8,11 @@ import {
   isBoard3dLowQuality,
   resolveBoard3dPixelRatio,
   markBoard3dCanvasReady,
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
+  MP3D_FALLBACK_ATTR,
 } from '../../src/ui/three/tablet-gl';
 
 describe('tablet-gl helpers', () => {
@@ -73,6 +78,69 @@ describe('tablet-gl helpers', () => {
     expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
     markBoard3dCanvasReady(canvas);
     expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
+  });
+
+  it('paintBoard3dAndMarkReady marks after a successful render', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
+    const canvas = document.createElement('canvas');
+    const render = vi.fn();
+    paintBoard3dAndMarkReady(canvas, render);
+    expect(render).toHaveBeenCalledTimes(1);
+    expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
+  });
+
+  it('paintBoard3dAndMarkReady retries once via rAF when render throws', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame'] });
+    const canvas = document.createElement('canvas');
+    const render = vi
+      .fn()
+      .mockImplementationOnce(() => {
+        throw new Error('transient GL');
+      })
+      .mockImplementationOnce(() => undefined);
+    paintBoard3dAndMarkReady(canvas, render);
+    expect(canvas.getAttribute('data-mp3d-ready')).toBeNull();
+    vi.runAllTimers();
+    expect(render).toHaveBeenCalledTimes(2);
+    expect(canvas.getAttribute('data-mp3d-ready')).toBe('1');
+    vi.useRealTimers();
+  });
+
+  it('paintBoard3dAndMarkReady skips while the document is hidden', () => {
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => true,
+    });
+    const canvas = document.createElement('canvas');
+    const render = vi.fn();
+    paintBoard3dAndMarkReady(canvas, render);
+    expect(render).not.toHaveBeenCalled();
+    expect(canvas.getAttribute('data-mp3d-ready')).toBeNull();
+  });
+
+  it('scheduleBoard3dMountPaint runs after double rAF', () => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame'] });
+    const paint = vi.fn();
+    scheduleBoard3dMountPaint(paint);
+    expect(paint).not.toHaveBeenCalled();
+    vi.runAllTimers();
+    expect(paint).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+
+  it('markBoard3dWebGlFallback / clearBoard3dWebGlFallback toggle host attr', () => {
+    const host = document.createElement('div');
+    markBoard3dWebGlFallback(host, 'webgl-unavailable');
+    expect(host.getAttribute(MP3D_FALLBACK_ATTR)).toBe('webgl-unavailable');
+    clearBoard3dWebGlFallback(host);
+    expect(host.getAttribute(MP3D_FALLBACK_ATTR)).toBeNull();
   });
 
   it('canPaint3d is false while document is hidden', () => {

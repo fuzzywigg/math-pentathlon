@@ -5,6 +5,7 @@
  * - Gate preserveDrawingBuffer to Playwright / explicit opt-in
  * - Pause paints while the document is hidden
  * - Optional test-only low-quality render path (board3dLQ) for CI e2e
+ * - Reliable first-paint readiness signal for software GL (SwiftShader)
  */
 
 const PRESERVE_PARAM = 'preserveDrawingBuffer';
@@ -19,6 +20,15 @@ export const TABLET_PIXEL_RATIO_CAP = 1.5;
 
 /** Cap used when `board3dLQ` is enabled (software GL / parallel e2e). */
 export const BOARD_3D_LQ_PIXEL_RATIO_CAP = 1;
+
+/** Set on the canvas after the first successful `renderer.render`. */
+export const MP3D_READY_ATTR = 'data-mp3d-ready';
+
+/**
+ * Set on the board host when WebGL mount fails or context is permanently lost
+ * so e2e can fail fast instead of waiting for a canvas that will never appear.
+ */
+export const MP3D_FALLBACK_ATTR = 'data-mp3d-fallback';
 
 function hashQueryParams(): URLSearchParams {
   if (typeof window === 'undefined') return new URLSearchParams();
@@ -82,8 +92,73 @@ export function resolveBoard3dPixelRatio(
 
 /** Mark canvas after first successful paint so e2e can wait on scene readiness. */
 export function markBoard3dCanvasReady(canvas: HTMLCanvasElement): void {
-  if (canvas.getAttribute('data-mp3d-ready') === '1') return;
-  canvas.setAttribute('data-mp3d-ready', '1');
+  if (canvas.getAttribute(MP3D_READY_ATTR) === '1') return;
+  canvas.setAttribute(MP3D_READY_ATTR, '1');
+  canvas.dispatchEvent(
+    new CustomEvent('mp3d-ready', { bubbles: true, detail: { ready: true } })
+  );
+}
+
+/** Controllers call this when WebGL mount fails so e2e can fail fast. */
+export function markBoard3dWebGlFallback(
+  host: HTMLElement | null | undefined,
+  reason: string
+): void {
+  if (!host) return;
+  host.setAttribute(MP3D_FALLBACK_ATTR, reason || 'webgl');
+}
+
+export function clearBoard3dWebGlFallback(
+  host: HTMLElement | null | undefined
+): void {
+  if (!host) return;
+  host.removeAttribute(MP3D_FALLBACK_ATTR);
+}
+
+/**
+ * Run one on-demand paint and mark the canvas ready on success.
+ * Under software GL the first `render()` can throw transiently — retry once
+ * on the next animation frame. Skips while the tab is hidden (`canPaint3d`).
+ */
+export function paintBoard3dAndMarkReady(
+  canvas: HTMLCanvasElement,
+  render: () => void,
+  isDisposed: () => boolean = () => false
+): void {
+  if (isDisposed()) return;
+  if (!canPaint3d()) return;
+  try {
+    render();
+    markBoard3dCanvasReady(canvas);
+  } catch {
+    if (typeof requestAnimationFrame !== 'function') return;
+    requestAnimationFrame(() => {
+      if (isDisposed() || !canPaint3d()) return;
+      try {
+        render();
+        markBoard3dCanvasReady(canvas);
+      } catch {
+        // Leave unmarked; a later update()/resize()/visibility paint retries.
+      }
+    });
+  }
+}
+
+/**
+ * After mount + sync resize, schedule one more paint once layout has settled.
+ * Software GL (SwiftShader) often needs a post-layout frame before the first
+ * real paint succeeds and the ready attribute can be set.
+ */
+export function scheduleBoard3dMountPaint(paint: () => void): void {
+  if (typeof requestAnimationFrame !== 'function') {
+    paint();
+    return;
+  }
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      paint();
+    });
+  });
 }
 
 /** Skip on-demand paints while the tab is backgrounded. */

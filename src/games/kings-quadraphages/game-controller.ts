@@ -17,6 +17,10 @@ import { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadKingsQuadraphagesBoard3DModule } from './board-3d-loader';
 import type { KingsQuadraphagesBoard3D } from '../../ui/three/kings-quadraphages-board-3d';
 
@@ -90,9 +94,11 @@ async function ensureBoard3d(): Promise<void> {
       boardContainer,
       onCellClick
     );
+    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -106,6 +112,7 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
+  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();

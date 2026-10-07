@@ -68,7 +68,7 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#413` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489`
+`#392` `#395`–`#413` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490`
 
 Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**, **#466**, **#449**, **#447**, **#444**, **#440**, **#438**, **#413**.
 
@@ -89,5 +89,5 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 
 ## What this agent did / did not do
 
-- Did: fold wave-5 candidates onto tip (including `#486` mobile-touch + `#489` load-perf), resolve CI/`hex` overlaps conservatively (kept tip security settings + hex Hard **450ms**), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/chromium e2e (incl. offline/SW).
+- Did: fold wave-5 candidates onto tip (including `#486` mobile-touch + `#489` load-perf + `#490` mp3d canvas-ready), resolve CI/`hex` overlaps conservatively (kept tip security settings + hex Hard **450ms**), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/chromium e2e (incl. mp3d).
 - Did **not**: merge/close/retarget any existing PR from the agent; change game rules or scoring; commit secrets.

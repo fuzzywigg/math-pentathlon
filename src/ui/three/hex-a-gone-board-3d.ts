@@ -20,9 +20,9 @@ import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
-  markBoard3dCanvasReady,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
 } from './tablet-gl';
 import {
@@ -231,9 +231,11 @@ export async function createHexAGoneBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
-    markBoard3dCanvasReady(canvas);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
@@ -554,6 +556,7 @@ export async function createHexAGoneBoard3D(
   };
 
   resize();
+  scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

@@ -18,6 +18,10 @@ import { owlSystem } from '../../core/owl';
 import { getAISelection, getAIPlacement, AIDifficulty } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadHexAGoneBoard3DModule } from './board-3d-loader';
 import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
 
@@ -67,6 +71,7 @@ function fallBackTo2dBoard(): void {
     board3d.unmount();
     board3d = null;
   }
+  markBoard3dWebGlFallback(boardContainer ?? board3dHost, 'context-lost');
   board3dEnabled = false;
   board3dHost = null;
   selectionHost = null;
@@ -95,8 +100,10 @@ async function ensureBoard3d(): Promise<void> {
       handleCellClick,
       fallBackTo2dBoard
     );
+    clearBoard3dWebGlFallback(board3dHost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(board3dHost, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
     board3dHost = null;
