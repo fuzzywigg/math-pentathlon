@@ -36,6 +36,8 @@ describe('Wave 67 handshake — calla × juggle residual', () => {
     ).toContain('<li><strong>1</strong> = Monomino (1 cell)</li>');
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
-    ).toContain('<li>Shapes can be rotated and flipped</li>');
+    ).toContain(
+      '<li>Shapes can be rotated and/or flipped when that shape allows it</li>'
+    );
   });
 });

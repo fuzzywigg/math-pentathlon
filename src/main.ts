@@ -205,11 +205,12 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
             <li>Kings can move one cell in any direction (like chess)</li>
             <li>Kings cannot move onto Quadraphages or the other King</li>
             <li>Quadraphages stay where placed for the entire game</li>
-            <li>You must complete both actions each turn</li>
+            <li>Each turn: move your King, then place a Quadraphage if you still have one</li>
           </ul>
 
           <h3>Winning</h3>
-          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>`,
+          <p>You win when your opponent's King has no valid moves at the start of their turn!</p>
+          <p>If neither King is trapped and a player has no Quadraphages left to place at the start of their turn, the game ends in a tie.</p>`
     gameAreaClass: 'game-area',
     modeRadioName: 'game-mode',
     vsHumanDescription: 'Pass & play with a friend',
@@ -330,7 +331,7 @@ async function renderStarTrack(routeGen: number): Promise<void> {
 
           <h3>Gameplay</h3>
           <ol>
-            <li><strong>Draw Chains:</strong> Tap <em>Draw Chains</em> once. You get <em>two chain options</em> (two different lengths) — not two moves.</li>
+            <li><strong>Draw Chains:</strong> Tap <em>Draw Chains</em> once. You get <em>two chain options</em> (lengths 1–6; they might match) — not two moves.</li>
             <li><strong>Choose:</strong> Tap <em>one</em> of the two chains to use.</li>
             <li><strong>Move:</strong> Your piece advances by that chain's length. The unused chain goes back in the bucket.</li>
           </ol>
@@ -591,7 +592,7 @@ async function renderCalla(routeGen: number): Promise<void> {
           </ul>
 
           <h3>Game End</h3>
-          <p>The game ends when one side has no cubes. Remaining cubes go to that side's player. Most cubes in Calla wins!</p>
+          <p>The game ends when one side has no cubes. Remaining cubes go to that side's player. Most cubes in Calla wins; equal Callas is a tie.</p>
 
           <h3>Strategy Tips</h3>
           <ul>
@@ -817,7 +818,7 @@ async function renderContig60(routeGen: number): Promise<void> {
           <h3>Passing</h3>
           <ul>
             <li>If you cannot make any available number, you must pass</li>
-            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
+            <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner (or a draw)</li>
           </ul>
 
           <h3>Winning</h3>
@@ -884,7 +885,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
 
           <h3>Placement Rules</h3>
           <ul>
-            <li>Shapes can be rotated and flipped</li>
+            <li>Shapes can be rotated and/or flipped when that shape allows it</li>
             <li>Shapes must fit entirely within your 9x9 grid</li>
             <li>Shapes cannot overlap with previously placed shapes</li>
           </ul>
@@ -1030,7 +1031,7 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
           <ul>
             <li>If you cannot play any domino, you must pass</li>
             <li>If both players pass consecutively, the game ends</li>
-            <li>Player with fewer total pips on remaining dominoes wins</li>
+            <li>Player with fewer total pips on remaining dominoes wins; equal pips is a draw</li>
           </ul>
 
           <h3>Strategy Tips</h3>

@@ -41,7 +41,7 @@ There is **no Math Relay** in this tree.
 | Prime Gold | Exponents, factorials, primes, alignment |
 | Remainder Islands | Division and remainders on hex islands |
 | Pent'Em In | Pentominoes and transformational geometry |
-| Frac Fact | Fraction bars matched to answer bars |
+| Frac Fact | Fraction arithmetic multiple-choice (streak scoring) |
 | Fraction Pinball | Fraction–decimal conversion |
 
 ## Implementation map

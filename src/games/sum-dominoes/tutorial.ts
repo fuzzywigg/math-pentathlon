@@ -73,7 +73,7 @@ export const sumDominoesTutorial: TutorialConfig = {
         <ul>
           <li>If you cannot play any domino, you must pass</li>
           <li>If both players pass consecutively, the game ends</li>
-          <li>Player with fewer total pips on remaining dominoes wins</li>
+          <li>Player with fewer total pips on remaining dominoes wins; equal pips is a draw</li>
         </ul>
       `,
       position: 'center',

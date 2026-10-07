@@ -74,7 +74,7 @@ export const contig60Tutorial: TutorialConfig = {
       message: `
         <ul>
           <li>If you cannot make any available number, you must pass</li>
-          <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
+          <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner (or a draw)</li>
         </ul>
       `,
       position: 'center',

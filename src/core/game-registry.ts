@@ -284,7 +284,8 @@ export const GAMES: GameInfo[] = [
     name: 'Frac Fact',
     division: 'Division IV',
     gradeRange: 'Grades 6-7',
-    description: 'Combine fraction bars with operations to match answer bars.',
+    description:
+      'Solve fraction arithmetic problems with streak scoring (multiple choice).',
     playerCount: '2 Players',
     difficulty: 'intermediate',
     icon: '⅔',

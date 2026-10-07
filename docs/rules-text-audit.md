@@ -1,6 +1,8 @@
 # Rules text vs engine audit
 
-Docs-and-tests-only audit of in-game **How to Play** (`src/main.ts` `helpContentHtml`), per-game **tutorials** (`src/games/*/tutorial.ts`), and light wiki/mp3d rule notes against what `src/games/*/rules.ts` (and related types) actually enforce.
+Docs-and-tests-only audit of in-game **How to Play** (`src/main.ts` `helpContentHtml`), per-game **tutorials** (`src/games/*/tutorial.ts`), wiki/registry blurbs, and light mp3d rule notes against what `src/games/*/rules.ts` (and related types) actually enforce.
+
+Informed by Division I–IV explore passes ([Audit Div I rules text](bc-eb18bb0e-2b28-5e09-b3d4-b96d3070855d), [Audit Div II rules text](bc-34747cc6-ac60-5fb4-bf50-237035ef6eeb), [Audit Div III rules text](bc-85d21248-cc19-5290-ac59-47af05c3bcfb), [Audit Div IV rules text](bc-05ee283c-4d2c-5e23-8384-95428ad7869e)).
 
 **Scope:** factual rule claims (board, pieces, movement, scoring, win/draw). No timer/clock claims. Engine and AI behavior were **not** changed.
 
@@ -16,54 +18,78 @@ Docs-and-tests-only audit of in-game **How to Play** (`src/main.ts` `helpContent
 
 | # | Text location | What it says | What the engine does | Suggested wording | Status |
 |---|---------------|--------------|----------------------|-------------------|--------|
-| 1 | `src/main.ts` Kwatro help · Winning; examples | Any 3 chips with `a + b - c = 4 or 5`; examples `6 + 3 - 5 = 4`, `8 + 1 - 4 = 5`; omits “all chips off numbered rows” | Win is conjunctive: all 5 of the mover’s chips off numbered starts **and** a line of 3 with **two same-owner + one opposite** where like+like−opposite ∈ {4,5} (`allChipsOffNumbered`, `checkTrioForWin`). Help examples evaluate to 2 / 11 under that rule. | Match tutorial `winning` step: all 5 off numbered rows; like+like−opposite; examples `6 + 2 - 3 = 5`, `9 + 1 - 6 = 4`. | Fixed (help) |
-| 2 | `kwatro-sinko/tutorial.ts` welcome + objective; controller `kwa-target-info` | Simplified “`a + b - c = 4 or 5`” with no ownership / all-off | Same conjunctive engine rule as row 1 | Keep short HUD or expand to full conjunctive rule? | Open |
-| 3 | `frac-fact` help + tutorial `winning` | “After **10 problems each**…” | `DEFAULT_MAX_PROBLEMS = 10` is **total** problems; seats alternate (`nextProblem`) | “After **10 problems total** (players alternate)…” | Fixed |
-| 4 | `prime-gold` help + tutorial strategy tip | “Factorials give big numbers: **5!=120**” | Expressions only place when `1 ≤ value ≤ 49`; AI comment notes 5! is too big | “Factorials help: **4!=24** (5! is off the 1–49 board)” | Fixed |
-| 5 | `stars-bars` help + tutorial turn sequence | “Must place adjacent to existing cards” (no exception) | Empty board: any cell valid; afterward adjacency required (`getValidPlacements`) | “First card anywhere; later cards must be adjacent to an existing card” | Fixed |
-| 6 | `calla` help · Capture | Lands in empty own shield → capture that cube **and** opposite (no “opposite nonempty”) | Capture only if opposite pit `> 0`; takes opposite cubes + landing cube (`makeMove`) | “If last cube lands in an empty own shield **and the opposite shield has cubes**, capture your landing cube and those opposite cubes into your Calla” | Fixed |
-| 7 | `fab-a-diffy` help + tutorial turn sequence | “Choose two fraction bars from **your** pool” | Single shared `fractionBars` map for both players | “Choose two unused bars from the **shared** pool” | Fixed |
-| 8 | `contig-60` tutorial `scoring` | Lists adjacency points; omits that points do not decide the winner | Points update `scores` but win is 5-in-a-row or alignment tiebreak (`checkWinner` / `alignmentTiebreak`); help already says feedback-only | Add the help line: points are placement feedback only | Fixed |
-| 9 | `kings-quadraphages` help / tutorial | Win when opponent’s King has no moves; no mention of empty supply | `endTurn`: trap win via `checkWinCondition`; incoming seat with supply ≤ 0 → **tie** (official Div I note in code) | Document supply-exhaustion tie in How to Play? | Open |
-| 10 | `star-track` help / tutorial | First to reach/pass space 12 wins only | Also ends when bucket has `< 2` chains: farther position wins or draw (`drawChains` / `determineWinnerByPosition`) | Mention bucket-exhaustion end | Open |
-| 11 | `juggle` help / tutorial | First to fill 9×9 wins; tip “avoid getting stuck” | `checkWinner` only when a board is filled; `canMakeAnyMove` unused for end — stuck can soft-lock | Pass / concede / opponent wins when you cannot place? | Open |
-| 12 | `par-55` help + tutorial winning | “In a tie, the player who reaches 55 **first** wins” | Equal scores both ≥ 55 can leave `winner: null` / continue (`placeBlock` tie branches) | Clarify official tie-break vs current engine | Open |
-| 13 | `fab-a-diffy` help winning | “When **all bars are used**” | Ends when all answers claimed **or** `usedBars >= fractionBars.size - 1`; equal answer claims when all claimed currently pick player2 (`checkWinner`) | Confirm end conditions and intentional tie handling | Open |
-| 14 | `prime-gold` help | Omits chip stock and chip-exhaustion | `STARTING_CHIPS: 20`; when both at 0 chips, most veins wins (`placeChip`) | Mention 20 chips and exhaustion vein compare | Open |
-| 15 | `fraction-pinball` help + tutorial | “Most points after all rounds” | Also ends when **both** `ballsRemaining ≤ 0` (`nextChallenge`) | Mention early end when both are out of balls | Open |
-| 16 | `queens-guards` help + tutorial capture | “Captured pieces must be relocated to the outer ring” (who?) | **Capturer** relocates to vacant outer ring, then opponent plays (`restoreCapturedPiece` / comments) | “The capturer relocates…” | Open (wording OK if intentional vagueness) |
-| 17 | `remainder-islands` help + tutorial | Scoring via remainders; no turn budget | `TOTAL_TURNS = 24` (12 each); also ends when both chip stocks empty | Mention turns remaining | Open |
-| 18 | `docs/wiki/overview.md` | Practice edition is not a substitute for official tournament rules | N/A (meta) | Keep; this audit is engine-vs-in-app-text only | Recorded |
+| 1 | Kwatro help · Winning | Bare `a+b-c`; bad examples; no all-off | Conjunctive: all 5 off numbered **and** like+like−opposite ∈ {4,5} | Match tutorial `winning` | Fixed (help) |
+| 2 | Kwatro welcome/objective + HUD | Short `a + b - c = 4 or 5` | Same conjunctive rule | Expand everywhere or keep slogan? | Open |
+| 3 | Kwatro help+tutorial movement | “Diagonal connections exist on numbered spaces” | Diagonals only for interior `row/col ∈ 1..3` (open #355) | Describe center diagonals, or change graph | Open |
+| 4 | Frac Fact help+tutorial winning | “10 problems **each**” | `maxProblems=10` **total**, seats alternate | “10 problems total (players alternate)” | Fixed |
+| 5 | Frac Fact scoring | “+5 per consecutive correct” | Bonus = `streak_before × 5` (0,5,10,…) | Clarify formula vs flat +5 | Open |
+| 6 | Wiki + `game-registry` Frac Fact | “Fraction bars matched to answer bars” | Multiple-choice arithmetic (bars are Fab-a-Diffy) | Multiple-choice / streak scoring | Fixed |
+| 7 | Prime Gold strategy tip | `5!=120` | Results capped `≤49` | `4!=24` (5! off board) | Fixed |
+| 8 | Prime Gold win copy | First to 4 veins only | Also chip-exhaustion → most veins (`STARTING_CHIPS=20`) | Mention chips + exhaustion | Open |
+| 9 | Prime Gold turn “Create Expression” | Implies free-form ops | Player picks from enumerated `generateExpressions` list | “Choose a listed valid number sentence” | Open |
+| 10 | Stars & Bars turn sequence | Always “adjacent to existing” | Empty board: any cell | First card anywhere; then adjacent | Fixed |
+| 11 | Calla help capture | No “opposite nonempty” | Requires opposite `> 0`; takes landing + opposite | Require nonempty opposite | Fixed |
+| 12 | Calla tutorial board-intro | Blue top / Red bottom; Callas “on right” | Red top, Blue bottom; Blue Calla right, Red left | Match `board-ui.ts` seating | Fixed |
+| 13 | Calla tutorial goal | “when all cubes are collected” | Ends when one side’s pits empty; sweep other side | Match help/engine end | Fixed |
+| 14 | Calla tutorial capture | “ALL those cubes” (opposite only) | Landing cube + opposite | Include landing cube | Fixed |
+| 15 | Calla help Game End | “Most cubes wins” (no tie) | Equal Callas → `winner: 'tie'` | “…equal Callas is a tie” | Fixed |
+| 16 | Fab-a-Diffy turn | “your pool” | Shared `fractionBars` | “shared pool” | Fixed |
+| 17 | Fab-a-Diffy winning | “when all bars are used” | Answers all claimed **or** `usedBars ≥ size−1`; pass stalemate; equal claims on all-answers → player2 | Confirm end/tie policy | Open |
+| 18 | Contig tutorial scoring | Omitted feedback-only | Points don’t decide winner | Add feedback-only line | Fixed |
+| 19 | Contig help+tutorial Passing | Tiebreak “decides the winner” | Tiebreak may return draw | “…winner (or a draw)” | Fixed |
+| 20 | Kings help+tutorial | Always both actions; trap-only win | Skip place if supply 0; supply-empty start → tie | Place if you have chips; document tie | Fixed |
+| 21 | Star Track help Gameplay | “two **different** lengths” | Same length allowed | “might match” | Fixed |
+| 22 | Star Track win copy | Race to 12 only | Bucket `<2` → position compare / draw | Document bucket end | Open |
+| 23 | Hex-a-Gone tutorial | Select then place (no Confirm) | Must `commitSelection` before place | Select → Confirm → place | Fixed |
+| 24 | Hex-a-Gone help example SVG | Multi-cell footprints | Each shape fills one hex (`getShapeCells` stub) | One cell per block, or implement footprints | Open |
+| 25 | Juggle placement | “rotated and flipped” always | Per-shape `canRotate` / `canFlip` | “when that shape allows it” | Fixed |
+| 26 | Juggle stuck | Tip only; no end rule | Fill-only win; `canMakeAnyMove` unused for end | Pass / concede / opponent wins? | Open |
+| 27 | Sum Dominoes Passing | Fewer pips wins (no draw) | Equal pips → `winner: null` | “…equal pips is a draw” | Fixed |
+| 28 | Par 55 winning | First-to-55 on tie | Equal ≥55 can continue / null winner | Official tie-break? | Open |
+| 29 | Par 55 “hand (5 blocks)” | Implies constant hand of 5 | Deal 5; no refill after place | “Start with 5” vs refill | Open |
+| 30 | Fraction Pinball | After all rounds / wrong loses ball | Early end if both out of balls; play continues if one at 0 | Document both-out early end | Open |
+| 31 | Queens capture | “must be relocated” (who?) | Capturer relocates then opponent plays | “The capturer relocates…” | Open |
+| 32 | Remainder Islands | No turn budget in help | `TOTAL_TURNS=24` | Mention turns | Open |
+| 33 | `docs/wiki/overview.md` | Not a substitute for official rules | Meta | Keep | Recorded |
+
+**Mismatch count:** 33 rows (16 Fixed, 16 Open, 1 Recorded).
 
 ## Open decisions for the owner
 
-1. **Kwatro-Sinko short copy** — Tutorial welcome/objective and in-game target chrome still say bare `a + b - c = 4 or 5` while the engine (and tutorial `winning` / fixed help) require all chips off numbered rows plus like+like−opposite. Expand everywhere or keep a short slogan?
-2. **Kings & Quadraphages** — Should How to Play document the official supply-exhaustion **tie** already enforced in `endTurn`?
-3. **Star Track** — Document bucket-exhaustion race/draw?
-4. **Juggle** — What happens when a player cannot place any rolled shape?
-5. **Par 55** — Official tie-break when both reach/exceed 55 vs current nullable winner?
-6. **Fab-a-Diffy** — End when one fraction bar remains? Equal claims → who wins / draw?
-7. **Prime Gold** — Surface 20-chip stock and post-exhaustion vein compare in help?
-8. **Fraction Pinball** — Document both-out-of-balls early end?
-9. **Queens & Guards** — Explicitly name the capturer as the relocator?
-10. **Remainder Islands** — Document the 24-turn budget in help/tutorial?
+1. Kwatro short `a+b-c` slogan vs full conjunctive copy (welcome/HUD).
+2. Kwatro diagonal connectivity on numbered spaces vs center-only engine (#355).
+3. Frac Fact streak bonus wording vs `streak_before × 5` formula.
+4. Prime Gold: document 20 chips + exhaustion vein compare; free-form vs listed expressions.
+5. Fab-a-Diffy end conditions and equal-claims winner.
+6. Star Track bucket-exhaustion end in help/tutorial.
+7. Hex-a-Gone: keep one-cell placement or restore multi-cell pattern footprints.
+8. Juggle: stuck / cannot-place resolution.
+9. Par 55: tie-break when both ≥55; hand refill or “start with 5” only.
+10. Fraction Pinball: both-out-of-balls early end + continue-with-one-at-0.
+11. Queens: name capturer as relocator in help.
+12. Remainder Islands: document 24-turn budget.
 
-## Fixed in this change (wording only)
+## Fixed in this PR (wording only)
 
-- Kwatro How to Play winning section + examples (aligned with engine / tutorial `winning`).
-- Frac Fact “10 problems each” → total alternating problems.
-- Prime Gold strategy tip `5!=120` → `4!=24` with off-board note.
-- Stars & Bars first-card adjacency exception.
-- Calla help capture (requires nonempty opposite; landing cube included).
-- Fab-a-Diffy “your pool” → “shared pool”.
-- Contig 60 tutorial scoring feedback-only line.
+- Kwatro How to Play winning + examples.
+- Frac Fact problem count; wiki/registry Frac Fact blurb.
+- Prime Gold `5!=120` tip.
+- Stars & Bars first-card adjacency.
+- Calla capture/help tie/tutorial seating/goal/capture landing cube.
+- Fab shared pool.
+- Contig feedback-only + pass tiebreak draw.
+- Kings place-if-supply + supply-exhaustion tie.
+- Star Track “different lengths” overclaim.
+- Hex-a-Gone tutorial Confirm step.
+- Juggle rotate/flip “when allowed”.
+- Sum Dominoes equal-pips draw.
 
 ## Tests
 
-- `tests/unit/rules-text-audit.test.ts` — asserts fixed copy stays aligned with engine constants / helpers; `it.skip` characterization cases for open decisions.
+- `tests/unit/rules-text-audit.test.ts` — fixed-copy assertions + `it.skip` open decisions.
+- Golden tutorial copy tests updated where wording changed.
 
 ## Method notes
 
-- Primary sources: `helpContentHtml` in `src/main.ts`, `src/games/*/tutorial.ts`, `src/games/*/rules.ts` + `types.ts`.
-- Wiki game list has no detailed rule prose; mp3d Kwatro/Queens specs already note official conjunctive / capture-restore judgments.
-- No engine, scoring, or AI logic was modified.
+- Primary sources: `helpContentHtml`, tutorials, `rules.ts`/`types.ts`, wiki/registry.
+- No engine, scoring, or AI logic modified.

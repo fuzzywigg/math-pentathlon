@@ -57,6 +57,7 @@ export const hexAGoneTutorial: TutorialConfig = {
         <p>On your turn:</p>
         <ol>
           <li><strong>Pick 1 to 3 shapes</strong> (they must be different!)</li>
+          <li><strong>Confirm</strong> your selection</li>
           <li><strong>Place them</strong> on the board</li>
         </ol>
         <p>More shapes = Riskier but fills the board faster!</p>
@@ -77,8 +78,8 @@ export const hexAGoneTutorial: TutorialConfig = {
       id: 'place-shapes',
       title: 'Placing Shapes',
       message: `
-        <p>After selecting, click on the board to place each shape.</p>
-        <p>Shapes must fit in empty spaces!</p>
+        <p>After you <strong>Confirm</strong>, click on the board to place each shape.</p>
+        <p>Each block fills one empty hex cell!</p>
       `,
       highlightSelector: '.hex-a-gone-board',
       position: 'bottom',

@@ -24,6 +24,7 @@ import { starsBarsTutorial } from '../../src/games/stars-bars/tutorial';
 import { fabADiffyTutorial } from '../../src/games/fab-a-diffy/tutorial';
 import { contig60Tutorial } from '../../src/games/contig-60/tutorial';
 import { kwatroSinkoTutorial } from '../../src/games/kwatro-sinko/tutorial';
+import { callaTutorial } from '../../src/games/calla/tutorial';
 
 const root = join(import.meta.dirname, '../..');
 const mainTs = readFileSync(join(root, 'src/main.ts'), 'utf8');
@@ -153,30 +154,71 @@ describe('Rules-text audit — fixed wording aligns with engine', () => {
   });
 });
 
+describe('Rules-text audit — follow-up fixed wording', () => {
+  it('Kings help documents place-if-supply and exhaustion tie', () => {
+    const help = helpSection('How to Play Kings & Quadraphages');
+    expect(help).toMatch(/if you still have one/i);
+    expect(help).toMatch(/ends in a tie/i);
+  });
+
+  it('Star Track help does not claim two different lengths', () => {
+    expect(helpSection('How to Play Star Track')).toMatch(/might match/i);
+    expect(helpSection('How to Play Star Track')).not.toMatch(
+      /two different lengths/
+    );
+  });
+
+  it('Sum Dominoes and Contig mention draw on mutual-pass settlement', () => {
+    expect(helpSection('How to Play Sum Dominoes & Dice')).toMatch(
+      /equal pips is a draw/i
+    );
+    expect(helpSection('How to Play Contig 60')).toMatch(/or a draw/i);
+  });
+
+  it('Calla help mentions tie; tutorial seating matches Red-top board', () => {
+    expect(helpSection('How to Play Calla')).toMatch(/equal Callas is a tie/i);
+    const intro = callaTutorial.steps.find((s) => s.id === 'board-intro');
+    expect(intro?.message).toMatch(/Red's pits[\s\S]*on top/i);
+    expect(intro?.message).toMatch(/Blue's pits[\s\S]*on the bottom/i);
+  });
+
+  it('Juggle placement notes rotate/flip when shape allows', () => {
+    expect(helpSection('How to Play Juggle')).toMatch(/when that shape allows/i);
+  });
+});
+
 describe('Rules-text audit — open decisions (skipped until owner decides)', () => {
   it.skip('OPEN: Kwatro welcome/objective still use bare a+b-c slogan vs conjunctive engine', () => {
     const welcome = kwatroSinkoTutorial.steps.find((s) => s.id === 'welcome');
     expect(welcome?.message).not.toMatch(/a \+ b - c = 4 or 5/);
   });
 
-  it.skip('OPEN: Kings help should document supply-exhaustion tie', () => {
-    expect(helpSection('How to Play Kings & Quadraphages')).toMatch(
-      /supply|no chips|tie/i
+  it.skip('OPEN: Kwatro diagonal-on-numbered claim vs center-only engine graph', () => {
+    expect(helpSection('How to Play Kwatro-Sinko')).not.toMatch(
+      /Diagonal connections exist on numbered/
     );
   });
 
   it.skip('OPEN: Star Track help should document bucket-exhaustion end', () => {
-    expect(helpSection('How to Play Star Track')).toMatch(/bucket|exhaust/i);
+    expect(helpSection('How to Play Star Track')).toMatch(
+      /fewer than two chains|bucket/i
+    );
   });
 
   it.skip('OPEN: Juggle stuck / cannot-place end rule undecided', () => {
-    expect(helpSection('How to Play Juggle')).toMatch(/cannot place|pass|stuck/i);
+    expect(helpSection('How to Play Juggle')).toMatch(
+      /cannot place|must pass|opponent wins/i
+    );
   });
 
   it.skip('OPEN: Par 55 help tie-break vs engine nullable winner', () => {
     expect(helpSection('How to Play Par 55')).not.toMatch(
       /reaches 55 first wins/i
     );
+  });
+
+  it.skip('OPEN: Par 55 hand refill vs start-with-5-only', () => {
+    expect(helpSection('How to Play Par 55')).toMatch(/start with 5|draw back/i);
   });
 
   it.skip('OPEN: Fab-a-Diffy end / equal-claims handling', () => {
@@ -193,5 +235,15 @@ describe('Rules-text audit — open decisions (skipped until owner decides)', ()
     expect(helpSection('How to Play Fraction Pinball')).toMatch(
       /balls remaining|out of balls/i
     );
+  });
+
+  it.skip('OPEN: Hex-a-Gone multi-cell help art vs one-cell engine footprints', () => {
+    expect(helpSection('How to Play Hex-a-Gone')).toMatch(
+      /one empty hex cell/i
+    );
+  });
+
+  it.skip('OPEN: Frac Fact streak bonus flat +5 vs streak_before × 5', () => {
+    expect(helpSection('How to Play Frac Fact')).toMatch(/streak before|× your/i);
   });
 });

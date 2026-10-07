@@ -57,7 +57,7 @@ export const juggleTutorial: TutorialConfig = {
       title: 'Placement Rules',
       message: `
         <ul>
-          <li>Shapes can be rotated and flipped</li>
+          <li>Shapes can be rotated and/or flipped when that shape allows it</li>
           <li>Shapes must fit entirely within your 9x9 grid</li>
           <li>Shapes cannot overlap with previously placed shapes</li>
         </ul>
