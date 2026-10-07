@@ -1,6 +1,6 @@
 /**
- * Hex leftover polish after #383/#404 AI-seat locks:
- * coarse-pointer ≥44px cell targets + prefers-reduced-motion for board glow.
+ * Hex leftover polish after #383/#404 AI-seat locks + 2026-10-07 deep playtest:
+ * ≥44px cell targets (flat + pointy) + prefers-reduced-motion for board glow.
  * (Hex has no invalid-move shake; win pulse / place animations are the motion.)
  */
 import { readFileSync } from 'node:fs';
@@ -24,17 +24,21 @@ function hexStyleSection(): string {
 }
 
 describe('Hex touch targets + reduced-motion', () => {
-  it('board-ui hexRadius 22 yields 44 SVG-unit cell height (44px design intent)', () => {
-    expect(boardUi).toMatch(/hexRadius\s*=\s*22/);
+  it('board-ui hexRadius 26 yields flat≥44 and pointy 52 SVG-unit cells', () => {
+    expect(boardUi).toMatch(/hexRadius\s*=\s*26/);
+    // Intrinsic width/height attributes prevent 300px replaced-element collapse.
+    expect(boardUi).toMatch(/setAttribute\(\s*['"]width['"]/);
+    expect(boardUi).toMatch(/setAttribute\(\s*['"]height['"]/);
   });
 
-  it('coarse-pointer media pins Hex board width so cells stay ≥44 CSS px', () => {
+  it('pins Hex board width so cells stay ≥44 CSS px on all pointers', () => {
     const hexCss = hexStyleSection();
-    expect(hexCss).toContain('@media (pointer: coarse)');
     expect(hexCss).toContain('.hex-game-area');
     expect(hexCss).toContain('overflow-x: auto');
-    expect(hexCss).toContain('min-width: 690px');
+    expect(hexCss).toContain('min-width: 801px');
+    expect(hexCss).toContain('width: 801px');
     expect(hexCss).toContain('.hex-board');
+    expect(hexCss).toContain('@media (pointer: coarse)');
   });
 
   it('prefers-reduced-motion disables Hex win glow and place animations', () => {

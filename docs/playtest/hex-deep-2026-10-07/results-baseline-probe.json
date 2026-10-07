@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-10-07T12:48:07.681Z",
+  "probe": true,
+  "results": [
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 11,
+      "thinkCount": 11,
+      "thinkMedianMs": 787,
+      "thinkMaxMs": 789,
+      "thinkMinMs": 785,
+      "cellW": 38.1,
+      "cellH": 44,
+      "svgW": 690,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 9281
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 11,
+      "thinkCount": 11,
+      "thinkMedianMs": 788,
+      "thinkMaxMs": 1292,
+      "thinkMinMs": 785,
+      "cellW": 38.1,
+      "cellH": 44,
+      "svgW": 690,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 11774
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 11,
+      "thinkCount": 11,
+      "thinkMedianMs": 2296,
+      "thinkMaxMs": 3309,
+      "thinkMinMs": 788,
+      "cellW": 38.1,
+      "cellH": 44,
+      "svgW": 690,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 25324
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 12,
+      "thinkCount": 12,
+      "thinkMedianMs": 787,
+      "thinkMaxMs": 790,
+      "thinkMinMs": 786,
+      "cellW": 16.6,
+      "cellH": 19.1,
+      "svgW": 300,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 9973
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 12,
+      "thinkCount": 12,
+      "thinkMedianMs": 788,
+      "thinkMaxMs": 1291,
+      "thinkMinMs": 786,
+      "cellW": 16.6,
+      "cellH": 19.1,
+      "svgW": 300,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 11042
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "outcome": "ai-win",
+      "humanTurns": 11,
+      "thinkCount": 11,
+      "thinkMedianMs": 2297,
+      "thinkMaxMs": 2803,
+      "thinkMinMs": 782,
+      "cellW": 16.6,
+      "cellH": 19.1,
+      "svgW": 300,
+      "statusOpen": "Your turn - Click to place",
+      "errors": [],
+      "elapsedMs": 24298
+    }
+  ],
+  "summary": {
+    "tablet/easy": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 787,
+      "thinkGlobalMax": 789,
+      "cellMinPx": 38.1,
+      "cellSample": "38.1×44",
+      "consoleErrors": 0
+    },
+    "tablet/medium": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 788,
+      "thinkGlobalMax": 1292,
+      "cellMinPx": 38.1,
+      "cellSample": "38.1×44",
+      "consoleErrors": 0
+    },
+    "tablet/hard": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 2296,
+      "thinkGlobalMax": 3309,
+      "cellMinPx": 38.1,
+      "cellSample": "38.1×44",
+      "consoleErrors": 0
+    },
+    "desktop/easy": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 787,
+      "thinkGlobalMax": 790,
+      "cellMinPx": 16.6,
+      "cellSample": "16.6×19.1",
+      "consoleErrors": 0
+    },
+    "desktop/medium": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 788,
+      "thinkGlobalMax": 1291,
+      "cellMinPx": 16.6,
+      "cellSample": "16.6×19.1",
+      "consoleErrors": 0
+    },
+    "desktop/hard": {
+      "games": 1,
+      "outcomes": {
+        "ai-win": 1
+      },
+      "thinkMedianOfMedians": 2297,
+      "thinkGlobalMax": 2803,
+      "cellMinPx": 16.6,
+      "cellSample": "16.6×19.1",
+      "consoleErrors": 0
+    }
+  }
+}

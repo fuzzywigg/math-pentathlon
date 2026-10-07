@@ -1,0 +1,69 @@
+{
+  "tablet/easy": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 10
+    },
+    "thinkMedianOfMedians": 792,
+    "thinkGlobalMax": 856,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  },
+  "tablet/medium": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 10
+    },
+    "thinkMedianOfMedians": 786,
+    "thinkGlobalMax": 1335,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  },
+  "tablet/hard": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 10
+    },
+    "thinkMedianOfMedians": 1801,
+    "thinkGlobalMax": 2805,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  },
+  "desktop/easy": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 10
+    },
+    "thinkMedianOfMedians": 784,
+    "thinkGlobalMax": 798,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  },
+  "desktop/medium": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 10
+    },
+    "thinkMedianOfMedians": 785,
+    "thinkGlobalMax": 1290,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  },
+  "desktop/hard": {
+    "games": 10,
+    "outcomes": {
+      "ai-win": 9,
+      "game-timeout": 1
+    },
+    "thinkMedianOfMedians": 2298,
+    "thinkGlobalMax": 310346,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
+    "consoleErrors": 0
+  }
+}

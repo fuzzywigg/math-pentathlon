@@ -53,7 +53,7 @@ export const hexTutorial: TutorialConfig = {
       message: `
         <ol>
           <li>Blue goes first</li>
-          <li>On your turn, click any empty hex to place your piece</li>
+          <li>On your turn, tap any empty hex to place your piece</li>
           <li>Pieces cannot be moved once placed</li>
         </ol>
       `,
