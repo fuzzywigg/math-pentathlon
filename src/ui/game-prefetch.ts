@@ -32,10 +32,32 @@ const loaders: Record<string, () => Promise<unknown>> = {
 };
 
 const started = new Set<string>();
+let idleHandle: { kind: 'idle' | 'timeout'; id: number } | null = null;
+
+/**
+ * Real dynamic imports must not run under Vitest. `renderGameSelector` schedules
+ * idle prefetch; when that fires after a jsdom env tears down, Vitest throws
+ * EnvironmentTeardownError (seen on CI with game-selector → kings/star-track).
+ */
+function shouldExecutePrefetchImport(): boolean {
+  return import.meta.env.MODE !== 'test';
+}
 
 /** Reset between tests. */
 export function resetGamePrefetchForTests(): void {
   started.clear();
+  const w = typeof window === 'undefined' ? null : window;
+  if (w && idleHandle) {
+    if (
+      idleHandle.kind === 'idle' &&
+      typeof w.cancelIdleCallback === 'function'
+    ) {
+      w.cancelIdleCallback(idleHandle.id);
+    } else if (idleHandle.kind === 'timeout') {
+      w.clearTimeout(idleHandle.id);
+    }
+  }
+  idleHandle = null;
 }
 
 export function isGamePrefetchStarted(gameId: string): boolean {
@@ -52,6 +74,7 @@ export function canPrefetchGame(gameId: string): boolean {
 export function prefetchGameChunk(gameId: string): void {
   if (!canPrefetchGame(gameId) || started.has(gameId)) return;
   started.add(gameId);
+  if (!shouldExecutePrefetchImport()) return;
   const load = loaders[gameId];
   void load().catch(() => {
     started.delete(gameId);
@@ -70,19 +93,30 @@ export function prefetchGameChunksIdle(
   const queue = gameIds.filter((id) => canPrefetchGame(id)).slice(0, max);
 
   const run = (): void => {
+    idleHandle = null;
     for (const id of queue) {
       prefetchGameChunk(id);
     }
   };
 
+  // Under Vitest, mark immediately — never leave idle/timeout callbacks that
+  // import game controllers after the jsdom environment is gone.
+  if (!shouldExecutePrefetchImport()) {
+    run();
+    return;
+  }
+
   const w = typeof window === 'undefined' ? null : window;
   if (w && typeof w.requestIdleCallback === 'function') {
-    w.requestIdleCallback(run, { timeout: 2500 });
+    idleHandle = {
+      kind: 'idle',
+      id: w.requestIdleCallback(run, { timeout: 2500 }),
+    };
     return;
   }
 
   if (w) {
-    w.setTimeout(run, 200);
+    idleHandle = { kind: 'timeout', id: w.setTimeout(run, 200) };
     return;
   }
 

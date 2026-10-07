@@ -27,15 +27,10 @@ describe('game-prefetch', () => {
     expect(isGamePrefetchStarted('hex')).toBe(true);
   });
 
-  it('idle prefetch caps the queue and schedules work', () => {
-    vi.useFakeTimers();
-    const idleSpy = vi.fn((cb: IdleRequestCallback) => {
-      cb({
-        didTimeout: false,
-        timeRemaining: () => 50,
-      } as IdleDeadline);
-      return 1;
-    });
+  it('idle prefetch caps the queue (sync under Vitest — no deferred imports)', () => {
+    // Under MODE=test, idle work runs immediately so game-selector renders
+    // cannot leave requestIdleCallback/setTimeout imports after jsdom teardown.
+    const idleSpy = vi.fn();
     Object.defineProperty(window, 'requestIdleCallback', {
       configurable: true,
       value: idleSpy,
@@ -45,10 +40,17 @@ describe('game-prefetch', () => {
       max: 2,
     });
 
-    expect(idleSpy).toHaveBeenCalledOnce();
+    expect(idleSpy).not.toHaveBeenCalled();
     expect(isGamePrefetchStarted('hex')).toBe(true);
     expect(isGamePrefetchStarted('calla')).toBe(true);
     expect(isGamePrefetchStarted('fiar')).toBe(false);
     expect(isGamePrefetchStarted('bogus')).toBe(false);
+  });
+
+  it('reset clears started marks without leaving deferred idle work', () => {
+    prefetchGameChunksIdle(['hex', 'calla'], { max: 2 });
+    expect(isGamePrefetchStarted('hex')).toBe(true);
+    resetGamePrefetchForTests();
+    expect(isGamePrefetchStarted('hex')).toBe(false);
   });
 });
