@@ -13,7 +13,9 @@ afterEach(() => {
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Targeted only — restoreAllMocks breaks hoisted vi.mock on isolate:false.
+  const nowFn = performance.now as unknown as { mockRestore?: () => void };
+  nowFn.mockRestore?.();
 });
 
 function stubRafClock(): void {

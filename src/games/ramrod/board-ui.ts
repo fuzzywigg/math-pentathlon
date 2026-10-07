@@ -748,6 +748,40 @@ export function injectRamrodStyles(): void {
         min-height: 110px;
       }
     }
+
+    /* Touch: pad rod wrappers / slots to the 44px floor without changing rod math */
+    @media (pointer: coarse) {
+      .ramrod-rod-wrapper {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 10px 6px;
+      }
+
+      .ramrod-slot {
+        min-height: 44px;
+        height: auto;
+        padding: 8px 2px;
+      }
+
+      .ramrod-btn {
+        min-height: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .ramrod-rod-wrapper,
+      .ramrod-btn,
+      .ramrod-winner-banner {
+        transition: none;
+        animation: none !important;
+      }
+
+      .ramrod-btn-primary:hover,
+      .ramrod-rod-wrapper.selectable:hover {
+        transform: none;
+      }
+    }
   `;
   document.head.appendChild(style);
 }

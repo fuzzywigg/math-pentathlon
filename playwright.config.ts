@@ -3,9 +3,10 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Projects:
  * - `chromium` — default / required CI path (`npm run test:e2e:chromium`)
+ * - `mobile-iphone-se`, `mobile-pixel-7` — phone viewport smoke (Chromium emulation)
  * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
  *
- * Opt in locally or in CI:
+ * CI e2e runs chromium + both mobile projects. Opt in cross-browser locally or in CI:
  *   npm run test:e2e:cross
  *   npm run test:e2e -- --project=webkit --project=firefox --project=ipad-webkit
  *   CROSS_BROWSER=1 npm run test:e2e:cross   # same; env documented for CI matrices
@@ -41,19 +42,42 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Safari'] },
     },
     {
       name: 'ipad-webkit',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['iPad Pro 11'] },
+    },
+    {
+      name: 'mobile-iphone-se',
+      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      use: {
+        ...devices['iPhone SE'],
+        // CI installs Chromium only; keep emulation on Chromium.
+        defaultBrowserType: 'chromium',
+        viewport: { width: 375, height: 667 },
+      },
+    },
+    {
+      name: 'mobile-pixel-7',
+      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      use: {
+        ...devices['Pixel 7'],
+        defaultBrowserType: 'chromium',
+        viewport: { width: 412, height: 915 },
+      },
     },
   ],
   webServer: {

@@ -239,8 +239,8 @@ function createPit(
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
-  // Invisible hit target — sized so CSS diameter stays ≥44px on tablet boards
-  // (viewBox 500 → ~768px tablet width ≈ r≥14.3; we use r=40 for headroom).
+  // Invisible hit target — sized so CSS diameter stays ≥44px on phones/tablets
+  // (viewBox 500 → ~375px phone ≈ r≥16.5; ~768px tablet ≈ r≥14.3; we use r=40).
   const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   hit.setAttribute('cx', String(cx));
   hit.setAttribute('cy', String(cy));

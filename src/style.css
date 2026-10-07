@@ -241,6 +241,49 @@ h1 {
   z-index: 1;
 }
 
+/* Home “Your Progress” CTA — lives on the landing hero (not only /stats).
+   Styles previously lived only in lazy-loaded stats-dashboard.css, so the
+   link rendered as bare inline text with a ~20px tap height on first paint. */
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.hero-progress-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.hero-progress-link:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+.hero-progress-link:focus {
+  outline: none;
+}
+
+.hero-progress-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+
 .hero-logo {
   display: flex;
   align-items: center;
@@ -957,6 +1000,20 @@ h1 {
 
   .collapse-toggle {
     min-width: 44px;
+    min-height: 44px;
+  }
+
+  .owl-bubble-dismiss,
+  .owl-minimize-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Hover-reveal minimize is unusable on touch — keep it visible. */
+  .owl-minimize-btn {
+    opacity: 1;
   }
 
   .game-loading-actions .btn {

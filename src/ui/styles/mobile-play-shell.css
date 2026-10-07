@@ -325,6 +325,22 @@ body {
     top: 0;
     right: -4px;
   }
+
+  /*
+   * Dock uses transform: scale(0.85). Enlarge chrome hit boxes so the
+   * post-scale layout box still meets the 44px floor (44 / 0.85 ≈ 52).
+   */
+  .owl-bubble-dismiss,
+  .owl-minimize-btn {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+  }
+
+  .owl-minimize-btn {
+    opacity: 1;
+  }
 }
 
 /* Touch devices: don't let cell min-size blow out the Kings board */

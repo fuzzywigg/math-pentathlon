@@ -20,6 +20,16 @@ describe('tablet / offline playability CSS', () => {
     );
     expect(styleCss).toMatch(/min-height:\s*44px/);
     expect(styleCss).toMatch(/\.difficulty-btn\s*\{[^}]*min-width:\s*44px/s);
+    expect(styleCss).toMatch(
+      /\.owl-bubble-dismiss,\s*\n\s*\.owl-minimize-btn\s*\{[^}]*min-height:\s*44px/s
+    );
+    expect(styleCss).toMatch(/\.hero-progress-link\s*\{[^}]*min-height:\s*44px/s);
+  });
+
+  it('keeps Ollie minimize visible on touch (no hover-only reveal)', () => {
+    expect(styleCss).toMatch(
+      /@media\s*\(hover:\s*none\)\s*,\s*\(pointer:\s*coarse\)[\s\S]*?\.owl-minimize-btn\s*\{[^}]*opacity:\s*1/s
+    );
   });
 
   it('mirrors reduced-motion onto html[data-reduced-motion]', () => {

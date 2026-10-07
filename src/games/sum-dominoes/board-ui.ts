@@ -597,6 +597,10 @@ export function injectSDStyles(): void {
       .sd-hand {
         max-width: 100%;
       }
+
+      .sd-hand {
+        max-width: 100%;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {

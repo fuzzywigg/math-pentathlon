@@ -19,7 +19,7 @@ afterEach(() => {
   document.body.innerHTML = '';
   document.getElementById('graph-styles')?.remove();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Avoid restoreAllMocks — breaks hoisted vi.mock on isolate:false.
 });
 
 describe('Wave 40 graph-ui — animate duration0 + legend + styles', () => {

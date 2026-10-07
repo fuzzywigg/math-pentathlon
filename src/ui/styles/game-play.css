@@ -3766,7 +3766,8 @@ svg [role='gridcell']:focus-visible {
   opacity: 0;
 }
 
-.owl-expanded:hover .owl-minimize-btn {
+.owl-expanded:hover .owl-minimize-btn,
+.owl-expanded:focus-within .owl-minimize-btn {
   opacity: 1;
 }
 

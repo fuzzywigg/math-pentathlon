@@ -32,6 +32,16 @@ function resolveAIDifficulty(
   return difficulty ?? 'medium';
 }
 
+/**
+ * Retry a failed dynamic import by reloading the page.
+ * Browsers cache rejected module fetches in the module map, so calling the
+ * same `import()` again (e.g. re-entering `renderGame`) cannot recover without
+ * a full navigation. Reload keeps the hash route so the game remounts.
+ */
+function retryLazyChunkLoad(): void {
+  window.location.reload();
+}
+
 /** Lazy game-shell — keeps player-color chrome off the menu critical path. */
 async function mountGameShell(
   container: HTMLElement,
@@ -87,7 +97,7 @@ function renderStats(): void {
       renderGameLoadError(
         appContainer!,
         'Your Progress',
-        () => navigate('/stats'),
+        retryLazyChunkLoad,
         () => navigate('/')
       );
     }
@@ -136,7 +146,7 @@ function renderGame(): void {
       renderGameLoadError(
         appContainer!,
         gameInfo.name,
-        () => renderGame(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -162,7 +172,7 @@ function renderDiceDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Dice System Demo',
-        () => renderDiceDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -186,7 +196,7 @@ function renderAlignmentDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Alignment Detection Demo',
-        () => renderAlignmentDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -210,7 +220,7 @@ function renderFractionDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Fraction System Demo',
-        () => renderFractionDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -234,7 +244,7 @@ function renderPolyominoDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Polyomino System Demo',
-        () => renderPolyominoDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -258,7 +268,7 @@ function renderGraphDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Graph/Network System Demo',
-        () => renderGraphDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -282,7 +292,7 @@ function renderAttributeDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Attribute Logic Demo',
-        () => renderAttributeDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );
@@ -306,7 +316,7 @@ function renderExpressionDemoPage(): void {
       renderGameLoadError(
         appContainer!,
         'Expression Builder Demo',
-        () => renderExpressionDemoPage(),
+        retryLazyChunkLoad,
         () => navigate('/'),
         { offline: isBrowserOffline() }
       );

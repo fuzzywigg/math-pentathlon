@@ -75,6 +75,9 @@ jobs:
             exit 1
           fi
           echo "All JS chunks under ${limit_kb} kB"
+      - name: Report gzip bundle budgets (non-blocking)
+        continue-on-error: true
+        run: npm run size:check
 
   # Unit suite pruned from ~5k TOKENMAXX files; target wall time under ~5 min.
   unit:
@@ -115,7 +118,7 @@ jobs:
           set -euo pipefail
           count="$(find tests/e2e -name '*.spec.ts' | wc -l | tr -d ' ')"
           echo "e2e suite: ${count} files (smoke + bug-guards + mp3d)"
-          npm run test:e2e:chromium
+          npm run test:e2e -- --project=chromium --project=mobile-iphone-se --project=mobile-pixel-7
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: failure()
