@@ -148,13 +148,13 @@ function syncKingsCell(
     cell.classList.add('cell-king');
     cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
     cell.textContent = '♚';
-    owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+    owner = piece.owner === 'player1' ? 'Blue' : 'Red';
     pieceName = 'King';
   } else if (piece.type === 'quadraphage') {
     cell.classList.add('cell-quad');
     cell.classList.add(piece.owner === 'player1' ? 'cell-p1' : 'cell-p2');
     cell.textContent = '●';
-    owner = piece.owner === 'player1' ? 'Player 1' : 'Player 2';
+    owner = piece.owner === 'player1' ? 'Blue' : 'Red';
     pieceName = 'Quadraphage';
   }
 
@@ -346,7 +346,7 @@ export function renderStatus(
     modeEl.className = 'status-mode';
     const difficultyLabel =
       aiDifficulty.charAt(0).toUpperCase() + aiDifficulty.slice(1);
-    modeEl.textContent = `vs AI (${difficultyLabel})`;
+    modeEl.textContent = `vs Computer (${difficultyLabel})`;
     statusEl.appendChild(modeEl);
   }
 
@@ -355,7 +355,7 @@ export function renderStatus(
   turnEl.className = 'status-turn';
 
   if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     turnEl.textContent = getCurrentPhaseMessage(state);
@@ -368,18 +368,18 @@ export function renderStatus(
     winnerEl.className = 'status-winner';
 
     if (!state.winner) {
-      winnerEl.textContent = `🤝 ${seatIcon('player1')} ${seatIcon('player2')} Tie!`;
+      winnerEl.textContent = `${seatIcon('player1')} ${seatIcon('player2')} It's a tie!`;
     } else {
       let winnerName: string;
       if (gameMode === 'human-vs-ai') {
-        // In AI mode, show "You Win!" or "AI Wins!"
         // AI is always player2 when human plays first
-        winnerName = state.winner === 'player1' ? 'You' : 'AI';
+        winnerName = state.winner === 'player1' ? 'You' : 'Computer';
       } else {
-        winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
+        winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
       }
       const winnerColor = seatIcon(state.winner);
-      winnerEl.textContent = `🎉 ${winnerColor} ${winnerName} Win${winnerName === 'You' ? '' : 's'}! 🎉`;
+      const winVerb = winnerName === 'You' ? 'win' : 'wins';
+      winnerEl.textContent = `${winnerColor} ${winnerName} ${winVerb}!`;
     }
     statusEl.appendChild(winnerEl);
   }
@@ -390,13 +390,13 @@ export function renderStatus(
 
   const supply1El = document.createElement('span');
   supply1El.className = 'supply-p1';
-  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'P1';
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
   supply1El.textContent = `${seatIcon('player1')} ${p1Label}: ${state.player1Supply}`;
   suppliesEl.appendChild(supply1El);
 
   const supply2El = document.createElement('span');
   supply2El.className = 'supply-p2';
-  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'P2';
+  const p2Label = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
   supply2El.textContent = `${seatIcon('player2')} ${p2Label}: ${state.player2Supply}`;
   suppliesEl.appendChild(supply2El);
 

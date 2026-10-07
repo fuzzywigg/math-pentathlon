@@ -1,5 +1,5 @@
 /**
- * Wave 52 — Kings HvH Player 2 Wins leftover. Tests-only.
+ * Wave 52 — Kings HvH Red wins leftover. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { createInitialGameState } from '../../src/games/kings-quadraphages/game-state';
@@ -9,8 +9,8 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('Wave 52 kings — Player 2 Wins', () => {
-  it('shows Player 2 Wins in human-vs-human', () => {
+describe('Wave 52 kings — Red wins', () => {
+  it('shows Red wins in human-vs-human', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(
@@ -19,7 +19,7 @@ describe('Wave 52 kings — Player 2 Wins', () => {
       'human-vs-human'
     );
     expect(el.querySelector('.status-winner')?.textContent).toMatch(
-      /Player 2 Wins!/
+      /Red wins!/
     );
   });
 });

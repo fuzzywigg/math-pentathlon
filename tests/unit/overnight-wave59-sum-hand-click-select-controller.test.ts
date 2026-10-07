@@ -48,7 +48,7 @@ describe('Wave 59 sum — hand click select', () => {
     tile.click();
     expect(ctrl.state.selectedDomino).toBe(playable.id);
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /Click a valid position/
+      /Click a green spot/
     );
   });
 });

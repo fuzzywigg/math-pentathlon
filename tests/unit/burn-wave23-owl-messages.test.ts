@@ -73,7 +73,7 @@ describe('Wave 23 owl-messages — conditions + formatting', () => {
     // High-priority streak messages when streak >= 2/7
     expect(msg!.priority).toBe('high');
     expect(msg!.text).toMatch(/7/);
-    expect(msg!.text).toMatch(/Casey|UNSTOPPABLE|streak/i);
+    expect(msg!.text).toMatch(/Casey|Keep it up|streak/i);
   });
 
   it('game:start firstTime vs return; game:end playerWon', () => {

@@ -74,7 +74,7 @@ describe('Burn wave 7 — Star Track renderStatus', () => {
     expect(container.querySelector('.progress-p2')).toBeTruthy();
   });
 
-  it('shows winner chrome with You/AI labels in human-vs-ai mode', () => {
+  it('shows winner chrome with You/Computer labels in human-vs-ai mode', () => {
     const container = document.createElement('div');
     document.body.appendChild(container);
     renderStarStatus(
@@ -103,7 +103,7 @@ describe('Burn wave 7 — Star Track renderStatus', () => {
       container
     );
     expect(container.querySelector('.status-winner')).toBeNull();
-    expect(container.textContent).toMatch(/draw/i);
+    expect(container.textContent).toMatch(/tie/i);
   });
 
   it('marks AI thinking state', () => {
@@ -314,22 +314,22 @@ describe('Burn wave 7 — quiz gameOver tie branches', () => {
       phase: 'gameOver',
       winner: null,
     });
-    expect(frac.textContent).toMatch(/Draw/i);
-    expect(frac.textContent).not.toMatch(/Blue Wins/i);
+    expect(frac.textContent).toMatch(/tie/i);
+    expect(frac.textContent).not.toMatch(/Blue wins/i);
 
     const pinball = renderPinballGameOver({
       ...createPinball(),
       phase: 'gameOver',
       winner: null,
     });
-    expect(pinball.textContent).toMatch(/Draw/i);
+    expect(pinball.textContent).toMatch(/tie/i);
 
     const remainder = renderRemainderGameOver({
       ...createRemainder(),
       phase: 'gameOver',
       winner: null,
     });
-    expect(remainder.textContent).toMatch(/Draw/i);
+    expect(remainder.textContent).toMatch(/tie/i);
   });
 });
 

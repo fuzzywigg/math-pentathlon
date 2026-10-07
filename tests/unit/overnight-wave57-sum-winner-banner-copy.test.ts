@@ -22,7 +22,7 @@ describe('Wave 57 sum — winner banner copy', () => {
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(/Blue wins!/);
     expect(root.querySelector('.sd-winner-banner')?.textContent).toMatch(
-      /Blue Wins! 🎉/
+      /Blue wins!/
     );
     expect(root.querySelector('.sd-winner-banner')?.classList.contains('game-winner-banner')).toBe(
       true

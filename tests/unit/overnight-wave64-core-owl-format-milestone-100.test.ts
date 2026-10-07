@@ -27,7 +27,7 @@ describe('Wave 64 core owl — format milestone-games-100', () => {
     }
     const msg = owlMessages.selectMessage('milestone:reached', {});
     expect(msg!.id).toBe('milestone-games-100');
-    expect(msg!.text).toBe('100 GAMES! You are a Math Pentathlon LEGEND!');
+    expect(msg!.text).toBe('100 games! You are a Math Pentathlon legend!');
   });
 
 });

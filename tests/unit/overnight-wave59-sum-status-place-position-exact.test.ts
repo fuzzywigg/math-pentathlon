@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 59 sum — place position status', () => {
-  it('placing with selection shows Click a valid position', () => {
+  it('placing with selection shows Click a green spot', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
     const ctrl = newGameVsHuman(root);
@@ -24,7 +24,7 @@ describe('Wave 59 sum — place position status', () => {
     };
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /Blue - Click a valid position to place/
+      /Blue — Click a green spot to place/
     );
   });
 });

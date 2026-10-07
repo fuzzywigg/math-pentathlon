@@ -86,8 +86,8 @@ describe('Wave 14 — Kings endTurn / phase / board coords / updateBoard', () =>
       turnPhase: 'gameOver' as const,
       winner: 'player1' as const,
     };
-    expect(getCurrentPhaseMessage(over)).toContain('Game Over');
-    expect(getCurrentPhaseMessage(over)).toContain('Player 1');
+    expect(getCurrentPhaseMessage(over)).toMatch(/wins!|tie!/i);
+    expect(getCurrentPhaseMessage(over)).toContain('Blue');
   });
 
   it('hasSupply / getSupply / 1-based position round-trip', () => {

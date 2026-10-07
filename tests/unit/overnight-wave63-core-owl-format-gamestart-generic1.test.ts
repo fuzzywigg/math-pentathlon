@@ -29,7 +29,7 @@ describe('Wave 63 core owl — format game-start-generic-1', () => {
     });
     expect(msg!.id).toBe('game-start-generic-1');
     expect(msg!.text).toBe(
-      'Hex - excellent choice! Show me what you can do!'
+      'Hex — nice choice! Show me what you can do!'
     );
   });
 });

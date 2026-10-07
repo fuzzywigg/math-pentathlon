@@ -21,7 +21,7 @@ describe('Wave 55 frac board — p1 banner', () => {
       },
     });
     expect(el.querySelector('.frac-winner-banner')?.textContent).toBe(
-      'Blue Wins! 🎉'
+      'Blue wins!'
     );
     expect(el.querySelector('.frac-final-score.player1 .frac-final-value')?.textContent).toBe(
       '55 points'

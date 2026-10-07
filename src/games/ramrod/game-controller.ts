@@ -127,7 +127,7 @@ function updateUI(controller: RamrodGameController): void {
     if (state.winner) {
       banner.textContent = `${getPlayerName(state.winner)} Wins! 🎉`;
     } else {
-      banner.textContent = "It's a Tie! 🤝";
+      banner.textContent = "It's a tie!";
     }
     gameArea.appendChild(banner);
   }

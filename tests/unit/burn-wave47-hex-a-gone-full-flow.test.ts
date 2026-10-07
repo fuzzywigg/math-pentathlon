@@ -19,7 +19,7 @@ describe('Wave 47 hex-a-gone deepen 2 — hex-a-gone — full select→commit→
   it('full turn: select → commit → place all → turnComplete for opponent', () => {
     let state = createInitialState();
     expect(canPlayerMove(state)).toBe(true);
-    expect(getPhaseMessage(state)).toMatch(/Select 1-3/);
+    expect(getPhaseMessage(state)).toMatch(/pick 1 to 3/);
 
     state = selectBlock(state, 'hexagon');
     state = selectBlock(state, 'rhombus');

@@ -8,8 +8,8 @@ import { getPhaseMessage, getLastMoveInfo, makeMove } from '../../src/games/call
 describe('Overnight calla — phase/last-move', () => {
   it('opening Select; gameOver names winner/tie', () => {
     const s = createInitialState();
-    expect(getPhaseMessage(s)).toMatch(/Select/i);
-    expect(getPhaseMessage({ ...s, phase: 'animating' })).toMatch(/distribut/i);
+    expect(getPhaseMessage(s)).toMatch(/pick/i);
+    expect(getPhaseMessage({ ...s, phase: 'animating' })).toMatch(/dropping/i);
     expect(getPhaseMessage({ ...s, phase: 'gameOver', winner: 'player1' })).toMatch(/wins/i);
     expect(getPhaseMessage({ ...s, phase: 'gameOver', winner: 'tie' })).toMatch(/tie/i);
   });

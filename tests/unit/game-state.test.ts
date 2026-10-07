@@ -277,23 +277,23 @@ describe('Game State', () => {
 
       // moveKing phase for Player 1 (no king selected)
       expect(getCurrentPhaseMessage(state)).toBe(
-        'Player 1: Click your King to select it'
+        'Blue: Click your King to select it'
       );
 
       // moveKing phase with king selected
       state = selectKing(state);
       expect(getCurrentPhaseMessage(state)).toBe(
-        'Player 1: Click a green square to move'
+        'Blue: Click a green square to move'
       );
 
       // placeQuadraphage phase for Player 1
       state = moveKing(state, { row: 2, col: 5 });
-      expect(getCurrentPhaseMessage(state)).toBe('Player 1: Place a Quadraphage');
+      expect(getCurrentPhaseMessage(state)).toBe('Blue: Place a Quadraphage');
 
       // moveKing phase for Player 2
       state = placeQuadraphage(state, { row: 5, col: 5 });
       expect(getCurrentPhaseMessage(state)).toBe(
-        'Player 2: Click your King to select it'
+        'Red: Click your King to select it'
       );
     });
 
@@ -302,10 +302,10 @@ describe('Game State', () => {
       state.turnPhase = 'gameOver';
       state.winner = 'player1';
 
-      expect(getCurrentPhaseMessage(state)).toBe('Game Over! Player 1 wins!');
+      expect(getCurrentPhaseMessage(state)).toBe('Blue wins!');
 
       state.winner = 'player2';
-      expect(getCurrentPhaseMessage(state)).toBe('Game Over! Player 2 wins!');
+      expect(getCurrentPhaseMessage(state)).toBe('Red wins!');
     });
   });
 

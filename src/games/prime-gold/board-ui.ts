@@ -558,7 +558,7 @@ export function renderExpressions(
   if (placements.length === 0 && state.phase === 'placing') {
     const noMoves = document.createElement('div');
     noMoves.style.color = '#888';
-    noMoves.textContent = 'No valid moves - pass turn';
+    noMoves.textContent = 'No valid moves — you must pass';
     container.appendChild(noMoves);
   } else {
     for (const { value, expr } of placements) {
@@ -587,11 +587,11 @@ export function renderScores(state: PrimeGoldState): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'pg-score player1';
-  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerChips.player1} chips | ${state.primeVeins.player1} veins`;
+  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerChips.player1} chips | ${state.primeVeins.player1} prime lines`;
 
   const p2Score = document.createElement('div');
   p2Score.className = 'pg-score player2';
-  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerChips.player2} chips | ${state.primeVeins.player2} veins`;
+  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerChips.player2} chips | ${state.primeVeins.player2} prime lines`;
 
   container.appendChild(p1Score);
   container.appendChild(p2Score);

@@ -10,7 +10,7 @@ afterEach(() => {
 });
 
 describe('Wave 52 star-track — You/AI Wins', () => {
-  it('labels winners You and AI in human-vs-ai', () => {
+  it('labels winners You and Computer in human-vs-ai', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(
@@ -23,7 +23,7 @@ describe('Wave 52 star-track — You/AI Wins', () => {
       el,
       'human-vs-ai'
     );
-    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You Wins!/);
+    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You win!/);
 
     renderStatus(
       {
@@ -35,6 +35,6 @@ describe('Wave 52 star-track — You/AI Wins', () => {
       el,
       'human-vs-ai'
     );
-    expect(el.querySelector('.status-winner')?.textContent).toMatch(/AI Wins!/);
+    expect(el.querySelector('.status-winner')?.textContent).toMatch(/Computer wins!/);
   });
 });

@@ -127,7 +127,7 @@ function updateStatus(): void {
     const winnerName = getPlayerName(gameState.winner);
     statusContainer.innerHTML = `
       <div class="juggle-winner-banner">
-        ${seatIcon(gameState.winner)} ${winnerName} filled their board first and wins!
+        ${seatIcon(gameState.winner)} ${winnerName} filled the board and wins!
       </div>
     `;
     return;

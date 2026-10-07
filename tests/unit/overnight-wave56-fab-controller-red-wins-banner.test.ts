@@ -20,7 +20,7 @@ describe('Wave 56 fab — red winner banner', () => {
       /Red Wins!/
     );
     expect(container.querySelector('.fab-status')?.textContent).toMatch(
-      /Red wins!/
+      /Red wins!/i
     );
   });
 });

@@ -40,7 +40,7 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     board.querySelector('[data-node-id="c3r3"]')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true })
     );
-    expect(status.textContent).toMatch(/Draw! No valid moves available/);
+    expect(status.textContent).toMatch(/It's a tie! No more moves left/);
 
     initGame(board, status);
     const owl = vi.spyOn(owlSystem, 'onGameEnd');

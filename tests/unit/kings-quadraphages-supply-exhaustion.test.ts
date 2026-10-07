@@ -68,7 +68,7 @@ describe('Kings & Quadraphages — supply exhaustion (#376)', () => {
     expect(state.player2Supply).toBe(0);
     expect(state.turnPhase).toBe('gameOver');
     expect(state.winner).toBeNull();
-    expect(getCurrentPhaseMessage(state)).toBe('Game Over! Tie!');
+    expect(getCurrentPhaseMessage(state)).toBe("It's a tie!");
   });
 
   it('endTurn after a placement that leaves the next player with 0 chips is a tie', () => {
@@ -108,7 +108,7 @@ describe('Kings & Quadraphages — supply exhaustion (#376)', () => {
     const ended = endTurn(trapped);
     expect(ended.turnPhase).toBe('gameOver');
     expect(ended.winner).toBe('player1');
-    expect(getCurrentPhaseMessage(ended)).toBe('Game Over! Player 1 wins!');
+    expect(getCurrentPhaseMessage(ended)).toBe('Blue wins!');
   });
 
   it('handleCellClick in place phase with 0 supply ends the game (no freeze)', () => {
@@ -153,12 +153,12 @@ describe('Kings & Quadraphages — supply exhaustion (#376)', () => {
       'human-vs-human'
     );
     const winnerText = el.querySelector('.status-winner')?.textContent ?? '';
-    expect(winnerText).toMatch(/Tie!/);
+    expect(winnerText).toMatch(/It's a tie!/);
     expect(winnerText).toContain('🔵');
     expect(winnerText).toContain('🔴');
     expect(winnerText).not.toMatch(/wins!/i);
     expect(el.querySelector('.status-turn')?.textContent).toBe(
-      'Game Over! Tie!'
+      "It's a tie!"
     );
   });
 });

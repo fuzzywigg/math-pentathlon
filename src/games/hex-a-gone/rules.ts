@@ -227,13 +227,15 @@ export function getPhaseMessage(state: HexAGoneGameState): string {
     case 'selectBlocks': {
       const count = state.turnSelection.blocks.length;
       if (count === 0) {
-        return `${playerName}'s turn - Select 1-3 blocks from the bank`;
+        return `${playerName}'s turn — pick 1 to 3 blocks from the bank`;
       }
-      return `${playerName}: ${count} block(s) selected. Select more or confirm.`;
+      const noun = count === 1 ? 'block' : 'blocks';
+      return `${playerName}: ${count} ${noun} selected. Pick more or confirm.`;
     }
     case 'placeBlocks': {
       const remaining = state.turnSelection.blocks.length;
-      return `${playerName}: Place your blocks (${remaining} remaining)`;
+      const noun = remaining === 1 ? 'block' : 'blocks';
+      return `${playerName}: Place your blocks (${remaining} ${noun} left)`;
     }
     case 'gameOver': {
       const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';

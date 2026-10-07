@@ -37,11 +37,11 @@ describe('Wave 57 handshake — leftover engines', () => {
     renderKings(kingsInit(), kingsEl);
     expect(
       kingsEl.querySelector('.cell[data-row="9"][data-col="5"]')?.getAttribute('aria-label')
-    ).toBe('E9, Player 2 King');
+    ).toBe('E9, Red King');
 
     const hexStat = document.createElement('div');
     hexStatus({ ...hexInit(5), winner: 'player2' }, hexStat, 'human-vs-human');
-    expect(hexStat.querySelector('.status-winner')?.textContent).toBe('🔴 Red Wins!');
+    expect(hexStat.querySelector('.status-winner')?.textContent).toBe('🔴 Red wins!');
 
     const goneEl = document.createElement('div');
     renderHexagone(hexagoneInit(), goneEl);
@@ -55,7 +55,7 @@ describe('Wave 57 handshake — leftover engines', () => {
     const goneStat = document.createElement('div');
     hexagoneStatus(hexagoneInit(), goneStat, 'human-vs-ai', true);
     expect(goneStat.querySelector('.status-turn')?.textContent).toBe(
-      '🤖 AI is thinking...'
+      'Computer is thinking…'
     );
 
     const parRoot = document.createElement('div');

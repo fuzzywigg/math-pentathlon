@@ -59,7 +59,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'welcome-3',
     category: 'app:start',
     priority: 'high',
-    text: "Hello, young mathematician! I'm Ollie the Owl. Together we'll conquer 20 amazing math games!",
+    text: "Hi! I'm Ollie the Owl. Let's play some Math Pentathlon games together!",
     conditions: [{ type: 'firstTime', value: true }],
   },
 
@@ -70,7 +70,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'return-morning-1',
     category: 'app:return',
     priority: 'normal',
-    text: 'Good morning, {playerName}! Ready for some brain-boosting math fun?',
+    text: 'Good morning, {playerName}! Ready for some math games?',
     conditions: [{ type: 'timeOfDay', value: 'morning' }],
   },
   {
@@ -84,14 +84,14 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'return-evening-1',
     category: 'app:return',
     priority: 'normal',
-    text: 'Evening owl hours! The best time for strategic thinking. Ready to play?',
+    text: 'Good evening! Great time for a thoughtful game. Ready to play?',
     conditions: [{ type: 'timeOfDay', value: 'evening' }],
   },
   {
     id: 'return-night-1',
     category: 'app:return',
     priority: 'normal',
-    text: "Late night math session? I'm a night owl too! Let's do this!",
+    text: "Playing late? I'm a night owl too! Let's play!",
     conditions: [{ type: 'timeOfDay', value: 'night' }],
   },
   {
@@ -105,26 +105,26 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'return-streak-big-1',
     category: 'app:return',
     priority: 'high',
-    text: 'WOW! {currentStreak} days in a row! You are UNSTOPPABLE!',
+    text: 'Wow! {currentStreak} days in a row! Keep it up!',
     conditions: [{ type: 'streak', value: 7, operator: 'gte' }],
   },
   {
     id: 'return-generic-1',
     category: 'app:return',
     priority: 'normal',
-    text: 'Welcome back, {playerName}! Which game shall we tackle today?',
+    text: 'Welcome back, {playerName}! Which game do you want to play?',
   },
   {
     id: 'return-generic-2',
     category: 'app:return',
     priority: 'normal',
-    text: 'Great to see you again! Your math skills have been missed!',
+    text: 'Great to see you again! Ready for another game?',
   },
   {
     id: 'return-generic-3',
     category: 'app:return',
     priority: 'normal',
-    text: "Hoot! You're back! Let's make some mathematical magic happen!",
+    text: "Hoot! You're back! Let's play some math games!",
   },
 
   // =====================
@@ -141,7 +141,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'game-start-first-2',
     category: 'game:start',
     priority: 'high',
-    text: "Ooh, {gameName}! This is a great one. Don't worry about winning - just explore!",
+    text: "Ooh, {gameName}! This is a great one. Take your time and explore!",
     conditions: [{ type: 'firstTime', value: true }],
   },
   {
@@ -162,7 +162,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'game-start-generic-1',
     category: 'game:start',
     priority: 'normal',
-    text: '{gameName} - excellent choice! Show me what you can do!',
+    text: '{gameName} — nice choice! Show me what you can do!',
   },
   {
     id: 'game-start-generic-2',
@@ -180,7 +180,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'game-start-generic-4',
     category: 'game:start',
     priority: 'normal',
-    text: 'Game time! Remember: mathematicians make mistakes, then learn from them!',
+    text: 'Game time! Mistakes help you learn — try a smart move!',
   },
 
   // =====================
@@ -190,7 +190,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'win-first-1',
     category: 'game:end',
     priority: 'high',
-    text: 'YOU WON YOUR FIRST {gameName} GAME! This calls for a celebration!',
+    text: 'You won your first {gameName} game! Way to go!',
     conditions: [
       { type: 'playerWon', value: true },
       { type: 'gamesPlayed', value: 1 },
@@ -210,21 +210,21 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'win-generic-1',
     category: 'game:end',
     priority: 'normal',
-    text: 'VICTORY! Your strategic thinking really paid off!',
+    text: 'You win! Your careful thinking really paid off!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
     id: 'win-generic-2',
     category: 'game:end',
     priority: 'normal',
-    text: 'Hoot hoot! Winner winner! That was some impressive play!',
+    text: 'Hoot hoot! Great win! That was some impressive play!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
     id: 'win-generic-3',
     category: 'game:end',
     priority: 'normal',
-    text: 'Amazing! Your math brain is really showing off today!',
+    text: 'Amazing! Your math skills are really showing today!',
     conditions: [{ type: 'playerWon', value: true }],
   },
   {
@@ -263,7 +263,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'loss-encouraging-3',
     category: 'game:end',
     priority: 'normal',
-    text: "The best mathematicians learn the most from challenges. You've got this!",
+    text: "Challenges help you get better. You've got this!",
     conditions: [{ type: 'playerWon', value: false }],
   },
   {
@@ -288,13 +288,13 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'draw-1',
     category: 'game:end',
     priority: 'normal',
-    text: 'A draw! Both players matched wits perfectly. Impressive!',
+      text: "It's a tie! You both played really well!",
   },
   {
     id: 'draw-2',
     category: 'game:end',
     priority: 'normal',
-    text: 'Tied game! That means you were evenly matched. Great job!',
+    text: 'Tied game! You were evenly matched. Great job!',
   },
 
   // =====================
@@ -310,7 +310,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'tutorial-start-2',
     category: 'tutorial:start',
     priority: 'high',
-    text: "Learning mode activated! Let's discover how to play {gameName} together!",
+    text: "Tutorial time! Let's learn how to play {gameName} together!",
   },
 
   // =====================
@@ -336,7 +336,7 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'achievement-unlock-1',
     category: 'achievement:unlock',
     priority: 'high',
-    text: 'ACHIEVEMENT UNLOCKED! {achievementName}! You earned it!',
+    text: 'New badge! {achievementName}! You earned it!',
   },
 
   // =====================
@@ -353,14 +353,14 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'streak-week-1',
     category: 'streak:update',
     priority: 'high',
-    text: 'ONE WEEK STREAK! 7 days of math practice! Incredible dedication!',
+    text: 'One-week streak! 7 days of math practice — awesome!',
     conditions: [{ type: 'streak', value: 7, operator: 'eq' }],
   },
   {
     id: 'streak-record-1',
     category: 'streak:update',
     priority: 'high',
-    text: "NEW PERSONAL RECORD! {currentStreak} days! You've never gone this long before!",
+    text: "New personal record! {currentStreak} days! You've never gone this long before!",
   },
 
   // =====================
@@ -392,13 +392,13 @@ const MESSAGE_LIBRARY: OwlMessage[] = [
     id: 'milestone-games-50',
     category: 'milestone:reached',
     priority: 'high',
-    text: '50 games! You are officially a Math Pentathlon enthusiast!',
+    text: '50 games! You are a Math Pentathlon pro!',
   },
   {
     id: 'milestone-games-100',
     category: 'milestone:reached',
     priority: 'high',
-    text: '100 GAMES! You are a Math Pentathlon LEGEND!',
+    text: '100 games! You are a Math Pentathlon legend!',
   },
 ];
 

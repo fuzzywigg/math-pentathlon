@@ -106,15 +106,15 @@ function updateUI(controller: SDGameController): void {
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   } else if (state.phase === 'rolling') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn — Roll the dice`;
   } else if (state.phase === 'placing') {
     if (state.selectedDomino) {
-      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Click a valid position to place`;
+      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} — Click a green spot to place`;
     } else {
-      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Select a domino to play`;
+      status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} — Choose a domino to play`;
     }
   } else if (state.phase === 'passing') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} cannot play - must pass`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} cannot play — you must pass`;
   }
 
   gameArea.appendChild(status);
@@ -123,7 +123,7 @@ function updateUI(controller: SDGameController): void {
   if (state.winner) {
     const banner = document.createElement('div');
     banner.className = 'sd-winner-banner game-winner-banner';
-    banner.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} Wins! 🎉`;
+    banner.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
     gameArea.appendChild(banner);
   }
 

@@ -37,7 +37,7 @@ describe('Wave 47 star-track deepen 3 — Star Track — progress phase matrix',
 
   it('getPhaseMessage draw / select / win matrix', () => {
     const draw = createInitialState();
-    expect(getPhaseMessage(draw)).toMatch(/Draw chains/);
+    expect(getPhaseMessage(draw)).toMatch(/draw chains/);
     const select = drawChains(draw);
     expect(getPhaseMessage(select)).toMatch(/Choose a chain/);
     const over = {

@@ -397,7 +397,7 @@ describe('Burn wave 10 — Hex-a-Gone commit/place guards + AI', () => {
     const fresh = createHexAGone();
     expect(commitSelection(fresh)).toBe(fresh);
     expect(placeHag(fresh, 0, 0)).toBe(fresh);
-    expect(hagPhaseMsg(fresh)).toMatch(/Select/i);
+    expect(hagPhaseMsg(fresh)).toMatch(/pick/i);
 
     const withSel = selectHag(fresh, 'triangle');
     expect(withSel.turnSelection.blocks).toContain('triangle');

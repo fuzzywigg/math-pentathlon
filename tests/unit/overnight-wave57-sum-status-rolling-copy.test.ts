@@ -10,12 +10,12 @@ afterEach(() => {
 });
 
 describe('Wave 57 sum — status rolling copy', () => {
-  it('opening status is Blue turn - Roll the dice', () => {
+  it('opening status is Blue turn — Roll the dice', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
     newGameVsHuman(root);
     expect(root.querySelector('.sd-status.player1')?.textContent).toMatch(
-      /Blue's turn - Roll the dice/
+      /Blue's turn — Roll the dice/
     );
   });
 });

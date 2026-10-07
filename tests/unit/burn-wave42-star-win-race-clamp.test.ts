@@ -56,6 +56,6 @@ describe('Wave 42 star-track — win race clamp', () => {
     };
     const over = drawChains(s);
     expect(over.winner).toBeNull();
-    expect(getPhaseMessage(over)).toMatch(/draw/i);
+    expect(getPhaseMessage(over)).toMatch(/tie/i);
   });
 });

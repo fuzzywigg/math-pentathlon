@@ -490,5 +490,5 @@ export function getPlayerColor(player: Player): string {
 }
 
 export function chipKindLabel(kind: ChipKind): string {
-  return kind === 'marked' ? 'Marked (Fire Extinguisher)' : 'Plain';
+  return kind === 'marked' ? 'Marked blocker (Fire Extinguisher)' : 'Plain';
 }

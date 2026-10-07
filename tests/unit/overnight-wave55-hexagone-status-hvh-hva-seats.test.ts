@@ -10,17 +10,23 @@ afterEach(() => {
 });
 
 describe('Wave 55 hexagone — status seats', () => {
-  it('Blue Player / Red Player vs You / AI', () => {
+  it('Blue / Red vs You / Computer', () => {
     const s = createInitialState();
     const hvh = document.createElement('div');
     renderStatus(s, hvh);
-    expect(hvh.textContent).toMatch(/Blue Player/);
-    expect(hvh.textContent).toMatch(/Red Player/);
+    const hvhSeats = [...hvh.querySelectorAll('.player-indicator')].map(
+      (el) => el.textContent ?? ''
+    );
+    expect(hvhSeats.join(' ')).toMatch(/Blue/);
+    expect(hvhSeats.join(' ')).toMatch(/Red/);
     expect(hvh.querySelector('.player-indicator.active')).toBeTruthy();
     const hva = document.createElement('div');
     renderStatus(s, hva, 'human-vs-ai', false);
-    expect(hva.textContent).toMatch(/You/);
-    expect(hva.textContent).toMatch(/AI/);
-    expect(hva.textContent).not.toMatch(/Blue Player/);
+    const seatLabels = [...hva.querySelectorAll('.player-indicator')].map(
+      (el) => el.textContent ?? ''
+    );
+    expect(seatLabels.join(' ')).toMatch(/You/);
+    expect(seatLabels.join(' ')).toMatch(/Computer/);
+    expect(seatLabels.join(' ')).not.toMatch(/Blue/);
   });
 });

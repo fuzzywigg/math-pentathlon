@@ -355,7 +355,7 @@ export function renderStatus(
   if (gameMode === 'human-vs-ai') {
     const modeEl = document.createElement('div');
     modeEl.className = 'status-mode';
-    modeEl.textContent = 'vs AI';
+    modeEl.textContent = 'vs Computer';
     statusEl.appendChild(modeEl);
   }
 
@@ -369,25 +369,26 @@ export function renderStatus(
       gameMode === 'human-vs-ai'
         ? state.winner === 'player1'
           ? 'You'
-          : 'AI'
+          : 'Computer'
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
     const winnerIcon = seatIcon(state.winner);
-    turnEl.textContent = `${winnerIcon} ${winnerName} Win${winnerName === 'You' ? '' : 's'}!`;
+    const winVerb = winnerName === 'You' ? 'win' : 'wins';
+    turnEl.textContent = `${winnerIcon} ${winnerName} ${winVerb}!`;
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     const playerName =
       gameMode === 'human-vs-ai'
         ? state.currentPlayer === 'player1'
           ? 'Your'
-          : "AI's"
+          : "Computer's"
         : state.currentPlayer === 'player1'
           ? "Blue's"
           : "Red's";
-    turnEl.textContent = `${playerName} turn - Click to place`;
+    turnEl.textContent = `${playerName} turn — Click to place`;
   }
 
   statusEl.appendChild(turnEl);
@@ -407,7 +408,7 @@ export function renderStatus(
       : `${seatIcon('player1')} Blue: Top ↔ Bottom`;
   const p2Legend =
     gameMode === 'human-vs-ai'
-      ? `${seatIcon('player2')} AI: Left ↔ Right`
+      ? `${seatIcon('player2')} Computer: Left ↔ Right`
       : `${seatIcon('player2')} Red: Left ↔ Right`;
   legendEl.innerHTML = `
     <span class="hex-legend-item hex-legend-p1">${p1Legend}</span>

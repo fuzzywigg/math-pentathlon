@@ -100,7 +100,7 @@ afterEach(() => {
 describe('Wave 14b — Hex-a-Gone / Calla / Star phase messages', () => {
   it('hagMsg covers empty select, selected count, and getBlockColor', () => {
     const fresh = createHag();
-    expect(hagMsg(fresh)).toMatch(/Select 1-3/);
+    expect(hagMsg(fresh)).toMatch(/pick 1 to 3/);
     const one = selectHag(fresh, 'triangle');
     expect(hagMsg(one)).toMatch(/1 block/);
     const two = selectHag(one, 'rhombus');
@@ -109,7 +109,7 @@ describe('Wave 14b — Hex-a-Gone / Calla / Star phase messages', () => {
   });
 
   it('callaMsg selectPit / gameOver win+tie; isGameOver', () => {
-    expect(callaMsg(createCalla())).toMatch(/Select a shield/);
+    expect(callaMsg(createCalla())).toMatch(/pick a pit with cubes/);
     expect(
       callaMsg({
         ...createCalla(),
@@ -129,7 +129,7 @@ describe('Wave 14b — Hex-a-Gone / Calla / Star phase messages', () => {
   it('starMsg draw→select→win; isGameOver after finish', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.4);
     const fresh = createStar();
-    expect(starMsg(fresh)).toMatch(/Draw chains/);
+    expect(starMsg(fresh)).toMatch(/draw chains/);
     let state = drawChains(fresh);
     expect(starMsg(state)).toMatch(/Choose a chain/);
     // Force near-finish then select longest available

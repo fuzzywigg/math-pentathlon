@@ -6,11 +6,11 @@ import { createInitialGameState } from '../../src/games/kings-quadraphages/game-
 import { renderStatus } from '../../src/games/kings-quadraphages/board-ui';
 
 describe('Wave 49 kings — status AI mode', () => {
-  it('shows vs AI difficulty and You/AI supply labels', () => {
+  it('shows vs Computer difficulty and You/Computer supply labels', () => {
     const container = document.createElement('div');
     renderStatus(createInitialGameState(), container, 'human-vs-ai', 'hard');
-    expect(container.querySelector('.status-mode')?.textContent).toMatch(/vs AI \(Hard\)/);
+    expect(container.querySelector('.status-mode')?.textContent).toMatch(/vs Computer \(Hard\)/);
     expect(container.textContent).toMatch(/You/);
-    expect(container.textContent).toMatch(/AI/);
+    expect(container.textContent).toMatch(/Computer/);
   });
 });

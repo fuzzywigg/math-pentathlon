@@ -42,7 +42,7 @@ describe('Wave 60 handshake — calla/juggle/ramrod leftovers', () => {
     ).toBe('50');
     expect(callaEl.querySelector('.calla-cube')?.getAttribute('r')).toBe('4');
     expect(getPhaseMessage(callaInit())).toBe(
-      "Blue's turn - Select a shield to distribute"
+      "Blue's turn — pick a pit with cubes"
     );
     expect(
       analyzeMoves(callaInit(), 'player1').find((a) => a.pit === 0)?.reasoning
@@ -57,8 +57,8 @@ describe('Wave 60 handshake — calla/juggle/ramrod leftovers', () => {
     expect(jCss).toMatch(/\.juggle-board\s*\{[^}]*background:\s*#f5f5f5/);
     expect(jCss).toMatch(/animation:\s*juggle-glow/);
     expect(
-      `${seatIcon('player1')} ${juggleName('player1')}'s turn - Roll the dice`
-    ).toBe("🔵 Blue's turn - Roll the dice");
+      `${seatIcon('player1')} ${juggleName('player1')}'s turn — Roll the dice`
+    ).toBe("🔵 Blue's turn — Roll the dice");
     expect(
       juggleTutorial.steps.find((s) => s.id === 'dice-values')?.message
     ).toContain('1</strong> = Monomino');
@@ -73,7 +73,7 @@ describe('Wave 60 handshake — calla/juggle/ramrod leftovers', () => {
       /\.ramrod-winner-banner\s*\{[^}]*animation:\s*ramrod-glow/
     );
     expect(renderRodLegend().querySelector('h4')?.textContent).toBe(
-      'Cuisenaire Rods'
+      'Number Rods'
     );
     expect(
       ramrodTutorial.steps.find((s) => s.id === 'strategy-tips')?.message

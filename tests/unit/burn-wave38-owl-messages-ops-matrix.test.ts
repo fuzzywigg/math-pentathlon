@@ -75,7 +75,7 @@ describe('Wave 38 owl-messages — streak / win / firstTime matrix', () => {
       expect(msg!.text.length).toBeGreaterThan(5);
       if (streak >= 7) {
         expect(msg!.priority).toBe('high');
-        expect(msg!.text).toMatch(/Pat|7|14|30|streak|UNSTOPPABLE|days/i);
+        expect(msg!.text).toMatch(/Pat|7|14|30|streak|Keep it up|days/i);
       }
     }
   });

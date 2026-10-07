@@ -32,7 +32,7 @@ describe('Wave 64 core owl — format win-first-1', () => {
     });
     expect(msg!.id).toBe('win-first-1');
     expect(msg!.text).toBe(
-      'YOU WON YOUR FIRST Hex GAME! This calls for a celebration!'
+      'You won your first Hex game! Way to go!'
     );
   });
 

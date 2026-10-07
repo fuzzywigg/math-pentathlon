@@ -18,7 +18,7 @@ describe('Wave 55 kings — aria labels', () => {
     renderBoard(createInitialGameState(), el);
     expect(
       el.querySelector('.cell[data-row="1"][data-col="5"]')?.getAttribute('aria-label')
-    ).toBe('E1, Player 1 King');
+    ).toBe('E1, Blue King');
     expect(
       el.querySelector('.cell[data-row="1"][data-col="1"]')?.getAttribute('aria-label')
     ).toBe('A1, empty');

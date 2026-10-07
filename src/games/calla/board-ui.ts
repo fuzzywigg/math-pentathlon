@@ -371,20 +371,21 @@ export function renderStatus(
   if (state.winner) {
     turnEl.classList.add('status-winner');
     if (state.winner === 'tie') {
-      turnEl.textContent = "🤝 It's a Tie! 🤝";
+      turnEl.textContent = "It's a tie!";
     } else {
       const winnerName =
         gameMode === 'human-vs-ai'
           ? state.winner === 'player1'
             ? 'You'
-            : 'AI'
+            : 'Computer'
           : state.winner === 'player1'
             ? 'Blue'
             : 'Red';
-      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+      const winVerb = winnerName === 'You' ? 'win' : 'wins';
+      turnEl.textContent = `${seatIcon(state.winner)} ${winnerName} ${winVerb}!`;
     }
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     turnEl.textContent = getPhaseMessage(state);
@@ -397,7 +398,7 @@ export function renderStatus(
   scoreEl.className = 'calla-scores';
 
   const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
-  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red';
+  const p2Label = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
 
   const p1Score = document.createElement('div');
   p1Score.className = `calla-score calla-score-p1 ${state.currentPlayer === 'player1' ? 'active' : ''}`;

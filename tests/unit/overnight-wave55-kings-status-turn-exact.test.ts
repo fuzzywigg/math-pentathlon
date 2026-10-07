@@ -14,9 +14,9 @@ describe('Wave 55 kings — exact status turn', () => {
     const el = document.createElement('div');
     renderStatus(createInitialGameState(), el, 'human-vs-human');
     expect(el.querySelector('.status-turn')?.textContent).toBe(
-      'Player 1: Click your King to select it'
+      'Blue: Click your King to select it'
     );
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'easy', true);
-    expect(el.querySelector('.status-turn')?.textContent).toBe('🤖 AI is thinking...');
+    expect(el.querySelector('.status-turn')?.textContent).toBe('Computer is thinking…');
   });
 });

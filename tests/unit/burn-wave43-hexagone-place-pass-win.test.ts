@@ -62,7 +62,7 @@ describe('Wave 43 hex-a-gone — place/pass/win', () => {
   });
 
   it('getPhaseMessage + getBlockColor cover phases/shapes', () => {
-    expect(getPhaseMessage(createInitialState())).toMatch(/Select/);
+    expect(getPhaseMessage(createInitialState())).toMatch(/pick/);
     const sel = selectBlock(createInitialState(), 'hexagon');
     expect(getPhaseMessage(sel)).toMatch(/selected/);
     const place = commitSelection(sel);

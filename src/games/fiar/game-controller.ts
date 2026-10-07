@@ -129,7 +129,7 @@ function renderChipKindPicker(): string {
       </button>
       <button type="button" class="fiar-chip-kind-btn" data-chip-kind="marked"
         aria-pressed="${markedPressed}" ${inv.marked <= 0 ? 'disabled' : ''}>
-        Marked · Fire Extinguisher (${inv.marked} left)
+        Marked blocker (${inv.marked} left)
       </button>
     </div>
   `;
@@ -171,7 +171,7 @@ function renderStatus(): void {
   if (isDraw(gameState)) {
     statusContainer.innerHTML = `
       <div class="fiar-status">
-        Draw! No valid moves available.
+        It's a tie! No more moves left.
       </div>
     `;
     return;

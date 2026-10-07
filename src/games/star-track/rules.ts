@@ -126,11 +126,11 @@ export function getPhaseMessage(state: StarTrackGameState): string {
 
   switch (state.phase) {
     case 'drawChains':
-      return `${playerName}'s turn - Draw chains from the bucket`;
+      return `${playerName}'s turn — draw chains`;
     case 'selectChain':
       return `${playerName}: Choose a chain to move`;
     case 'gameOver': {
-      if (!state.winner) return `It's a draw! All chains exhausted.`;
+      if (!state.winner) return `It's a tie! No chains left.`;
       const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
       return `${winnerName} wins!`;
     }

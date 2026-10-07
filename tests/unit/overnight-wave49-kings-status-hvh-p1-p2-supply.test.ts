@@ -12,8 +12,8 @@ describe('Wave 49 kings — HvH supplies', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(createInitialGameState(), el, 'human-vs-human');
-    expect(el.querySelector('.supply-p1')?.textContent).toMatch(/P1: 30/);
-    expect(el.querySelector('.supply-p2')?.textContent).toMatch(/P2: 30/);
+    expect(el.querySelector('.supply-p1')?.textContent).toMatch(/Blue: 30/);
+    expect(el.querySelector('.supply-p2')?.textContent).toMatch(/Red: 30/);
     expect(el.querySelector('.status-mode')).toBeNull();
   });
 });

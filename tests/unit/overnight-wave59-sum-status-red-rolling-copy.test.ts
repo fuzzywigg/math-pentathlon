@@ -21,7 +21,7 @@ describe('Wave 59 sum — Red rolling status', () => {
     };
     ctrl.update();
     expect(root.querySelector('.sd-status')?.textContent).toMatch(
-      /Red's turn - Roll the dice/
+      /Red's turn — Roll the dice/
     );
   });
 });

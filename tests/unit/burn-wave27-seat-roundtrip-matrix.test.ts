@@ -425,7 +425,7 @@ describe('Wave 27 roundtrip-matrix — Kings full-turn XOR seats', () => {
     expect(afterP1).toBeGreaterThanOrEqual(2);
     expect(onEnd).not.toHaveBeenCalled();
     expect(status.querySelector('.status-turn')?.textContent).toMatch(
-      /Player 2/i
+      /Red/i
     );
 
     // P2 king starts at bottom — typical (8,5) or similar

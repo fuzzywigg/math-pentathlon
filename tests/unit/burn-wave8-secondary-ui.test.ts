@@ -339,7 +339,7 @@ describe('Burn wave 8 — Hex / Calla / Star human-vs-human winner labels', () =
       'human-vs-human'
     );
     expect(container.textContent).toMatch(/Red|Wins|Player/i);
-    expect(container.textContent).not.toMatch(/\bAI\b/);
+    expect(container.textContent).not.toMatch(/Computer/);
   });
 
   it('Star Track hvh winner shows progress without You label', () => {

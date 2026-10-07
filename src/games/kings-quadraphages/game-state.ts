@@ -115,8 +115,7 @@ export function getSupply(state: GameState, player: PlayerOwner): number {
 
 // Get current phase message
 export function getCurrentPhaseMessage(state: GameState): string {
-  const playerName =
-    state.currentPlayer === 'player1' ? 'Player 1' : 'Player 2';
+  const playerName = state.currentPlayer === 'player1' ? 'Blue' : 'Red';
 
   switch (state.turnPhase) {
     case 'moveKing':
@@ -128,10 +127,10 @@ export function getCurrentPhaseMessage(state: GameState): string {
       return `${playerName}: Place a Quadraphage`;
     case 'gameOver': {
       if (!state.winner) {
-        return 'Game Over! Tie!';
+        return "It's a tie!";
       }
-      const winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
-      return `Game Over! ${winnerName} wins!`;
+      const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
+      return `${winnerName} wins!`;
     }
     default: {
       const _exhaustive: never = state.turnPhase;

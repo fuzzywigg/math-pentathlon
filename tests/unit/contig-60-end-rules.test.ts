@@ -178,7 +178,7 @@ describe('Contig 60 official end-rule chrome', () => {
     document.body.append(board, status);
     initGame(board, status);
     const banner = status.querySelector('.contig-winner-banner')?.textContent ?? '';
-    expect(banner).toMatch(/It's a draw!/);
+    expect(banner).toMatch(/It's a tie!/);
     expect(banner).not.toMatch(/\d+\s*-\s*\d+/);
   });
 

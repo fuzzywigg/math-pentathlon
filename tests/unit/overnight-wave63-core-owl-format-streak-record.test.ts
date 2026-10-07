@@ -29,7 +29,7 @@ describe('Wave 63 core owl — format streak-record-1', () => {
     });
     expect(msg!.id).toBe('streak-record-1');
     expect(msg!.text).toBe(
-      "NEW PERSONAL RECORD! 11 days! You've never gone this long before!"
+      "New personal record! 11 days! You've never gone this long before!"
     );
   });
 });

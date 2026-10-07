@@ -28,7 +28,7 @@ describe('Wave 64 core owl — format zero streak default', () => {
     const msg = owlMessages.selectMessage('streak:update', {});
     expect(msg!.id).toBe('streak-record-1');
     expect(msg!.text).toBe(
-      "NEW PERSONAL RECORD! 0 days! You've never gone this long before!"
+      "New personal record! 0 days! You've never gone this long before!"
     );
   });
 

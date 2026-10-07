@@ -37,16 +37,16 @@ describe('Wave 63 handshake — owl MESSAGE_LIBRARY residual', () => {
       owlMessages
         .getMessagesByCategory('achievement:unlock')
         .find((m) => m.id === 'achievement-unlock-1')!.text
-    ).toMatch(/ACHIEVEMENT UNLOCKED/);
+    ).toMatch(/New badge!/);
     expect(
       owlMessages
         .getMessagesByCategory('streak:update')
         .find((m) => m.id === 'streak-record-1')!.text
-    ).toMatch(/PERSONAL RECORD/);
+    ).toMatch(/personal record/i);
     expect(
       owlMessages
         .getMessagesByCategory('app:return')
         .find((m) => m.id === 'return-streak-big-1')!.text
-    ).toMatch(/UNSTOPPABLE/);
+    ).toMatch(/Keep it up/);
   });
 });

@@ -22,7 +22,7 @@ describe('Wave 40 star-track — bucket settle / phase', () => {
     const next = drawChains(state);
     expect(next.phase).toBe('gameOver');
     expect(next.winner).toBeNull();
-    expect(getPhaseMessage(next)).toMatch(/draw/i);
+    expect(getPhaseMessage(next)).toMatch(/tie/i);
   });
 
   it('drawChains with one chain settles by position', () => {

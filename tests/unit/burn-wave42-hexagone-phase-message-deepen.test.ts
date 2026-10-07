@@ -12,7 +12,9 @@ import {
 describe('Wave 42 D hexagone — getPhaseMessage deepen', () => {
   it('selectBlocks empty vs selected count messaging', () => {
     let state = createInitialState();
-    expect(getPhaseMessage(state)).toContain('Select 1-3');
+    expect(getPhaseMessage(state)).toContain(
+      "Blue's turn — pick 1 to 3 blocks from the bank"
+    );
     state = selectBlock(state, 'triangle');
     expect(getPhaseMessage(state)).toContain('1 block');
     state = selectBlock(state, 'hexagon');
@@ -24,7 +26,7 @@ describe('Wave 42 D hexagone — getPhaseMessage deepen', () => {
     state = selectBlock(state, 'square');
     state = commitSelection(state);
     expect(getPhaseMessage(state)).toContain('Place your blocks');
-    expect(getPhaseMessage(state)).toContain('1 remaining');
+    expect(getPhaseMessage(state)).toContain('Blue: Place your blocks (1 block left)');
 
     const p1Win = {
       ...createInitialState(),

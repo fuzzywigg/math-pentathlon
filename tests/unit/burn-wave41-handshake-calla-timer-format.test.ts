@@ -16,7 +16,7 @@ describe('Wave 41 handshake — calla × timer formatTime', () => {
     expect(isGameOver(state)).toBe(false);
     const msg = getPhaseMessage(state);
     expect(msg).toContain('Blue');
-    expect(msg).toContain('Select a shield');
+    expect(msg).toContain('pick a pit with cubes');
     expect(formatTime(0)).toBe('00:00');
     expect(formatTime(65_000)).toBe('01:05');
   });

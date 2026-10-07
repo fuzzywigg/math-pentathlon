@@ -21,7 +21,7 @@ describe('Wave 42 star-track — recycle unused', () => {
 
   it('phase messages for draw/select', () => {
     const open = createInitialState();
-    expect(getPhaseMessage(open)).toMatch(/Draw chains/);
+    expect(getPhaseMessage(open)).toMatch(/draw chains/);
     const drawn = drawChains(open);
     expect(getPhaseMessage(drawn)).toMatch(/Choose a chain/);
   });

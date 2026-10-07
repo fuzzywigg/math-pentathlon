@@ -76,7 +76,7 @@ function buildModeOption(
   vsAiDescription: string
 ): string {
   const isAi = mode === 'human-vs-ai';
-  const title = isAi ? 'Play vs AI' : '2 Player';
+  const title = isAi ? 'Play vs Computer' : '2 Players';
   const desc = isAi ? vsAiDescription : vsHumanDescription;
   const selectedClass = selected ? ' selected' : '';
   const checked = selected ? ' checked' : '';
@@ -102,7 +102,7 @@ function buildDifficultySection(defaultDifficulty: AIDifficultyLevel): string {
 
   return `
           <div id="difficulty-section" class="difficulty-selector">
-            <h4>AI Difficulty</h4>
+            <h4>Computer Difficulty</h4>
             <div class="difficulty-options">
               ${buttons}
             </div>

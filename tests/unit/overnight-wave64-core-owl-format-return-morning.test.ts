@@ -32,7 +32,7 @@ describe('Wave 64 core owl — format return-morning-1', () => {
     });
     expect(msg!.id).toBe('return-morning-1');
     expect(msg!.text).toBe(
-      'Good morning, Casey! Ready for some brain-boosting math fun?'
+      'Good morning, Casey! Ready for some math games?'
     );
   });
 

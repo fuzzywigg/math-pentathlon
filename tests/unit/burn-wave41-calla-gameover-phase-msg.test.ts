@@ -38,16 +38,16 @@ describe('Wave 41 calla — gameOver / phase msg / empty history', () => {
   });
 
   it('getPhaseMessage matrix for select / animating / over', () => {
-    expect(getPhaseMessage(createInitialState())).toMatch(/Blue.*Select/i);
+    expect(getPhaseMessage(createInitialState())).toMatch(/Blue.*pick/i);
     expect(
       getPhaseMessage({
         ...createInitialState(),
         currentPlayer: 'player2',
       })
-    ).toMatch(/Red.*Select/i);
+    ).toMatch(/Red.*pick/i);
     expect(
       getPhaseMessage({ ...createInitialState(), phase: 'animating' })
-    ).toMatch(/distributing/i);
+    ).toMatch(/dropping cubes/i);
     expect(
       getPhaseMessage({
         ...createInitialState(),

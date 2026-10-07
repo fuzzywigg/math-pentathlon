@@ -8,10 +8,10 @@ import { renderStatus } from '../../src/games/kings-quadraphages/board-ui';
 afterEach(() => { document.body.innerHTML = ''; });
 
 describe('Wave 49 kings — status mode hard', () => {
-  it('renders exact vs AI (Hard) mode chrome', () => {
+  it('renders exact vs Computer (Hard) mode chrome', () => {
     const el = document.createElement('div');
     document.body.appendChild(el);
     renderStatus(createInitialGameState(), el, 'human-vs-ai', 'hard', false);
-    expect(el.querySelector('.status-mode')?.textContent).toBe('vs AI (Hard)');
+    expect(el.querySelector('.status-mode')?.textContent).toBe('vs Computer (Hard)');
   });
 });

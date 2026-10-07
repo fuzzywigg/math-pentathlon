@@ -209,7 +209,7 @@ export function renderGameSelector(container: HTMLElement): void {
   const heroDescription = document.createElement('p');
   heroDescription.className = 'hero-description';
   heroDescription.textContent =
-    'Master mathematical thinking through strategic gameplay. Practice your favorite Math Pentathlon games at home!';
+    'Play Math Pentathlon games at home. Practice moves, learn the rules, and have fun with math!';
   heroContent.appendChild(heroDescription);
 
   // Stats row - simplified since all games are complete

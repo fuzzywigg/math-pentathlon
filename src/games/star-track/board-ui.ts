@@ -199,7 +199,7 @@ export function fillChainArea(
 
     const bucketInfo = document.createElement('div');
     bucketInfo.className = 'star-track-bucket-info';
-    bucketInfo.textContent = `${state.chainBucket.length} chains in bucket`;
+    bucketInfo.textContent = `${state.chainBucket.length} chains left`;
     chainArea.appendChild(bucketInfo);
   } else if (
     state.phase === 'selectChain' &&
@@ -353,13 +353,14 @@ export function renderStatus(
       gameMode === 'human-vs-ai'
         ? state.winner === 'player1'
           ? 'You'
-          : 'AI'
+          : 'Computer'
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+    const winVerb = winnerName === 'You' ? 'win' : 'wins';
+    turnEl.textContent = `${seatIcon(state.winner)} ${winnerName} ${winVerb}!`;
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     turnEl.textContent = getPhaseMessage(state);
@@ -372,7 +373,7 @@ export function renderStatus(
   progressEl.className = 'star-track-progress';
 
   const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
-  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red';
+  const p2Label = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
 
   const p1Progress = document.createElement('div');
   p1Progress.className = 'progress-bar progress-p1';

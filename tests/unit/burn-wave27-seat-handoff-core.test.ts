@@ -236,7 +236,7 @@ describe('Wave 27 seat-handoff — Kings full turn flips seat', () => {
     expect(getKingsState().currentPlayer).toBe('player2');
     expect(getKingsState().turnPhase).toBe('moveKing');
     expect(status.querySelector('.status-turn')?.textContent).toMatch(
-      /Player 2/i
+      /Red/i
     );
     expect(getKingsState().moveHistory.length).toBeGreaterThanOrEqual(2);
   });

@@ -29,7 +29,7 @@ describe('Wave 51 frac residual — gameover zero stats', () => {
     };
     const el = renderGameOver(state);
     expect(el.querySelector('.frac-winner-banner')?.textContent).toMatch(
-      /It's a Draw!/
+      /It's a tie!/
     );
     expect(el.querySelector('.frac-final-score.player1')?.textContent ?? '').toMatch(
       /0\/0 correct/

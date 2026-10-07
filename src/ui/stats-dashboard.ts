@@ -147,7 +147,7 @@ function buildEmptyState(): string {
       <h2>No recorded games yet</h2>
       <p>
         Progress appears here after a game finishes and is saved.
-        Some games may not record results yet — this list only shows what is already stored.
+        Play a few games and your results will show up here.
       </p>
       <button type="button" class="stats-dashboard-cta" data-action="home">
         Pick a game to play

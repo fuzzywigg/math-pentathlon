@@ -215,7 +215,7 @@ describe('Star Track – getProgress', () => {
 describe('Star Track – getPhaseMessage', () => {
   it('returns draw message when game ends with null winner', () => {
     const state = stateWithBucket([], { phase: 'gameOver', winner: null });
-    expect(getPhaseMessage(state)).toContain('draw');
+    expect(getPhaseMessage(state)).toContain('tie');
   });
 
   it('returns winner message when game ends with a winner', () => {

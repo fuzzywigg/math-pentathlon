@@ -321,13 +321,14 @@ export function renderStatus(
       gameMode === 'human-vs-ai'
         ? state.winner === 'player1'
           ? 'You'
-          : 'AI'
+          : 'Computer'
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+    const winVerb = winnerName === 'You' ? 'win' : 'wins';
+    turnEl.textContent = `${seatIcon(state.winner)} ${winnerName} ${winVerb}!`;
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     turnEl.textContent = getPhaseMessage(state);
@@ -339,8 +340,8 @@ export function renderStatus(
   const playersEl = document.createElement('div');
   playersEl.className = 'hex-a-gone-players';
 
-  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue Player';
-  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'Red Player';
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
+  const p2Label = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
 
   const p1El = document.createElement('div');
   p1El.className = `player-indicator ${state.currentPlayer === 'player1' ? 'active' : ''}`;

@@ -14,7 +14,7 @@ import { formatTime } from '../../src/core/timer-scoring';
 describe('Wave 41 handshake — kings × timer formatTime', () => {
   it('opening / selected / place / over messages pair with clocks', () => {
     const open = createInitialGameState();
-    expect(getCurrentPhaseMessage(open)).toContain('Player 1');
+    expect(getCurrentPhaseMessage(open)).toContain('Blue: Click your King to select it');
     expect(getCurrentPhaseMessage(open)).toContain('King');
     expect(formatTime(0)).toBe('00:00');
 
@@ -35,7 +35,7 @@ describe('Wave 41 handshake — kings × timer formatTime', () => {
       turnPhase: 'gameOver' as const,
       winner: 'player2' as const,
     };
-    expect(getCurrentPhaseMessage(over)).toContain('Player 2 wins');
+    expect(getCurrentPhaseMessage(over)).toContain('Red wins');
     expect(formatTime(3661_000)).toMatch(/61:01|01:01:01/);
   });
 });

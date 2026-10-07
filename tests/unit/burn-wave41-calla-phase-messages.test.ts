@@ -18,9 +18,9 @@ import {
 describe('Wave 41 Calla — phase / lastMoveInfo', () => {
   it('selectPit messages name Blue then Red by seat', () => {
     const p1 = createInitialState();
-    expect(getPhaseMessage(p1)).toMatch(/Blue.*Select a shield/);
+    expect(getPhaseMessage(p1)).toMatch(/Blue.*pick a pit with cubes/);
     const p2: CallaGameState = { ...p1, currentPlayer: 'player2' };
-    expect(getPhaseMessage(p2)).toMatch(/Red.*Select a shield/);
+    expect(getPhaseMessage(p2)).toMatch(/Red.*pick a pit with cubes/);
   });
 
   it('animating phase message names current seat', () => {
@@ -29,7 +29,7 @@ describe('Wave 41 Calla — phase / lastMoveInfo', () => {
       phase: 'animating',
       currentPlayer: 'player2',
     };
-    expect(getPhaseMessage(state)).toMatch(/Red is distributing/);
+    expect(getPhaseMessage(state)).toMatch(/Red is dropping cubes/);
   });
 
   it('getLastMoveInfo singular cube wording without free turn', () => {
