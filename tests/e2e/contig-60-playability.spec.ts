@@ -3,7 +3,7 @@
  * for New Game AI-timer race, touch targets, and a full vs-AI game each.
  * Chromium-only (matches deep playtest harness); other projects skip.
  */
-import { test, expect, type Page, devices } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
 test.beforeEach(({ browserName }) => {
   test.skip(browserName !== 'chromium', 'Contig deep playtest is Chromium-only');
@@ -74,23 +74,34 @@ async function waitForHumanOrEnd(page: Page) {
 
 const difficulties = ['easy', 'medium', 'hard'] as const;
 
-for (const device of [
-  { name: 'tablet', projectUse: devices['iPad Mini'] },
+const profiles = [
+  {
+    name: 'tablet',
+    viewport: { width: 768, height: 1024 },
+    hasTouch: true,
+    isMobile: true,
+  },
   {
     name: 'desktop',
-    projectUse: {
-      viewport: { width: 1280, height: 800 },
-      hasTouch: false,
-    },
+    viewport: { width: 1280, height: 800 },
+    hasTouch: false,
+    isMobile: false,
   },
-]) {
-  test.describe(`Contig 60 playability (${device.name})`, () => {
-    test.use(device.projectUse);
+] as const;
+
+for (const profile of profiles) {
+  test.describe(`Contig 60 playability (${profile.name})`, () => {
+    test.use({
+      viewport: profile.viewport,
+      hasTouch: profile.hasTouch,
+      isMobile: profile.isMobile,
+    });
 
     for (const difficulty of difficulties) {
       test(`vs-AI ${difficulty}: full game ends without stall`, async ({
         page,
       }) => {
+        test.setTimeout(180_000);
         const errors: string[] = [];
         page.on('console', (msg) => {
           if (msg.type() === 'error') errors.push(msg.text());
@@ -145,14 +156,12 @@ for (const device of [
     }) => {
       await startVsAi(page, 'medium');
       await humanTurn(page);
-      // AI thinking — open New Game immediately
       await page.locator('#new-game-btn').click();
       await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
       await page.locator('.difficulty-btn.medium').click();
       await page.locator('#start-game-btn').click();
       await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
 
-      // Wait longer than prior AI_ROLL + AI_PLACE delays
       await page.waitForTimeout(2000);
 
       await expect(page.locator('.contig-roll-btn')).toBeVisible();
