@@ -90,6 +90,6 @@ describe('Wave 59 handshake — calla/juggle/ramrod leftovers', () => {
     );
     expect(
       ramrodTutorial.steps.find((s) => s.id === 'strategy-tips')?.message
-    ).toContain('Higher value boxes');
+    ).toContain('Boxes with bigger target numbers');
   });
 });

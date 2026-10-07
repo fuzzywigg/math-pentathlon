@@ -21,7 +21,7 @@ describe('Wave 66 handshake — contig × sum residual', () => {
     const sumStep = sumDominoesTutorial.steps.find((s) => s.id === 'matching-rules');
     expect(contigStep?.message).toContain('<strong>Contig 60</strong>');
     expect(sumStep?.message).toContain(
-      'Example: You rolled 8. Place [3|5] next to a [5|2] so 3+5=8'
+      'Your tile has a 3'
     );
 
     injectContigStyles();

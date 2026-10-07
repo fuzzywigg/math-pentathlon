@@ -25,7 +25,7 @@ describe('Wave 67 handshake — calla × juggle residual', () => {
     );
     expect(
       callaTutorial.steps.find((s) => s.id === 'strategy-tip')?.message
-    ).toContain('<li>Look for capture opportunities</li>');
+    ).toContain('<li>Look for ways to capture</li>');
 
     injectJuggleStyles();
     const jCss = document.getElementById('juggle-styles')?.textContent ?? '';
@@ -33,7 +33,7 @@ describe('Wave 67 handshake — calla × juggle residual', () => {
     expect(jCss).toMatch(/\.juggle-boards\s*\{[^}]*justify-content:\s*center/);
     expect(
       juggleTutorial.steps.find((s) => s.id === 'dice-values')?.message
-    ).toContain('<li><strong>1</strong> = Monomino (1 cell)</li>');
+    ).toContain('<li><strong>1</strong> = one square</li>');
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
     ).toContain('<li>Shapes can be rotated and flipped</li>');
