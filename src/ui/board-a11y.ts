@@ -120,11 +120,16 @@ export function applyRovingTabindex(
   return active;
 }
 
-/** Collect gridcells that carry data-row / data-col. */
+/**
+ * Collect gridcells that carry data-row / data-col.
+ * Skip visually-hidden MP-3D a11y mirrors (`*-a11y-grid`): those mark every
+ * legal target tabindex=0, and restoreGridFocus/applyRovingTabindex must not
+ * collapse them to a single roving stop (Prime Gold 3D keyboard flake).
+ */
 export function collectGridCells(root: Element): Element[] {
   return Array.from(
     root.querySelectorAll('[role="gridcell"][data-row][data-col]')
-  );
+  ).filter((el) => !el.closest('[class*="-a11y-grid"]'));
 }
 
 /**
