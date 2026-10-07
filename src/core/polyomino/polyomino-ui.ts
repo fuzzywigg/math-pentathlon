@@ -498,6 +498,24 @@ export function injectPolyominoStyles(): void {
     .placement-preview.invalid rect {
       animation: pulse-invalid 0.5s ease-in-out infinite;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .placement-preview.valid rect,
+      .placement-preview.invalid rect {
+        animation: none !important;
+      }
+      .rotation-controls button:active {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .placement-preview.valid rect,
+    html[data-reduced-motion='true'] .placement-preview.invalid rect {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .rotation-controls button:active {
+      transform: none;
+    }
   `;
 
   document.head.appendChild(style);

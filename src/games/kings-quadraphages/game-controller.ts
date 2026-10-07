@@ -16,6 +16,7 @@ import { getAIMove, AIDifficulty, isAITurn } from './ai';
 import { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { prefersReducedMotion } from '../../ui/reduced-motion';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
   markBoard3dWebGlFallback,
@@ -185,10 +186,7 @@ function render(): void {
 // Trigger invalid click animation on a cell (skipped when reduced motion)
 function triggerInvalidAnimation(row: number, col: number): void {
   if (!boardContainer) return;
-  if (
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
+  if (prefersReducedMotion()) {
     return;
   }
 

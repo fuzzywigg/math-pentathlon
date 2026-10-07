@@ -110,6 +110,32 @@ export function getHighlightStyles(): string {
         stroke-dashoffset: 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .highlight-winning,
+      .highlight-threat,
+      .highlight-line.animated {
+        animation: none !important;
+      }
+      .highlight-line.animated {
+        stroke-dashoffset: 0;
+      }
+      .alignment-highlight {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .highlight-winning,
+    html[data-reduced-motion='true'] .highlight-threat,
+    html[data-reduced-motion='true'] .highlight-line.animated {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .highlight-line.animated {
+      stroke-dashoffset: 0;
+    }
+    html[data-reduced-motion='true'] .alignment-highlight {
+      transition: none !important;
+    }
   `;
 }
 

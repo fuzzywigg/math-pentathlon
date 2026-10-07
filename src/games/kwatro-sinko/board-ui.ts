@@ -528,6 +528,19 @@ export function injectKwaStyles(): void {
         align-items: center;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .kwa-winner-banner {
+        animation: none !important;
+      }
+      .kwa-btn {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .kwa-winner-banner {
+      animation: none !important;
+    }
   `;
   document.head.appendChild(style);
 }

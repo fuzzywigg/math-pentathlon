@@ -594,7 +594,7 @@ export function injectRemainderIslandsStyles(): void {
       font-weight: bold;
     }
     .division-equation .r-label {
-      color: #999;
+      color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
       font-size: 18px;
     }
 

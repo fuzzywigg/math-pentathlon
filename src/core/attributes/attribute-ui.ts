@@ -511,6 +511,22 @@ export function injectAttributeStyles(): void {
     .piece-wrapper.highlight .attribute-piece {
       animation: highlight-piece 0.5s ease-in-out;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .piece-wrapper.highlight .attribute-piece {
+        animation: none !important;
+      }
+      .piece-wrapper:hover .attribute-piece {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .piece-wrapper.highlight .attribute-piece {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .piece-wrapper:hover .attribute-piece {
+      transform: none;
+    }
   `;
 
   document.head.appendChild(style);

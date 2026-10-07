@@ -533,9 +533,10 @@ h1 {
 .division-game-count {
   font-size: 0.8rem;
   color: white;
+  /* AA white-on-fill: primary-strong (≥4.5:1), not primary alone (~3.7:1) */
   background: linear-gradient(
     135deg,
-    var(--color-primary),
+    var(--color-primary-strong),
     var(--color-primary-dark)
   );
   padding: 0.3rem 0.85rem;
@@ -665,7 +666,7 @@ h1 {
 
 .game-card-division {
   font-size: 0.75rem;
-  color: #94a3b8;
+  color: #475569; /* was #94a3b8 (~2.6:1); AA ≥4.5:1 on white */
   text-transform: uppercase;
   letter-spacing: 0.75px;
   margin-bottom: 0.5rem;
@@ -720,7 +721,8 @@ h1 {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  /* AA white-on-fill: avoid #9ca3af start (~2.5:1) */
+  background: linear-gradient(135deg, #6b7280 0%, #475569 100%);
   color: white;
   font-size: 0.65rem;
   padding: 0.35rem 0.65rem;
@@ -745,7 +747,7 @@ h1 {
 
 .footer-note {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: #475569; /* was #94a3b8 (~2.5:1 on #f1f5f9); AA ≥4.5:1 */
   line-height: 1.5;
 }
 
@@ -774,6 +776,29 @@ h1 {
   .game-card:active {
     transform: none;
   }
+}
+
+/* In-app reduced-motion setting (mirrors OS media query above) */
+html[data-reduced-motion='true'] .skip-link {
+  transition: none;
+}
+
+html[data-reduced-motion='true'] .division-tab,
+html[data-reduced-motion='true'] .division-accordion,
+html[data-reduced-motion='true'] .accordion-header,
+html[data-reduced-motion='true'] .accordion-chevron,
+html[data-reduced-motion='true'] .accordion-panel,
+html[data-reduced-motion='true'] .game-card,
+html[data-reduced-motion='true'] .game-card-icon {
+  transition: none !important;
+}
+
+html[data-reduced-motion='true'] .division-tab:hover,
+html[data-reduced-motion='true'] .division-tab.active,
+html[data-reduced-motion='true'] .game-card:hover,
+html[data-reduced-motion='true'] .game-card:hover .game-card-icon,
+html[data-reduced-motion='true'] .game-card:active {
+  transform: none;
 }
 
 /* Responsive adjustments for game selector */
