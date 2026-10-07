@@ -178,48 +178,58 @@ async function waitForHumanOrEnd(page, deadline) {
 }
 
 async function playHumanTurn(page) {
-  const pass = page.locator('.par55-controls .par55-btn');
-  if (await pass.isVisible().catch(() => false)) {
-    const text = (await pass.textContent().catch(() => '')) || '';
-    if (/pass/i.test(text)) {
-      await pass.click({ force: true });
+  // Prefer DOM activation so harness still works if a shell overlay steals
+  // Playwright's hit-test — mirrors real click handlers on the nodes.
+  const result = await page.evaluate(() => {
+    const pass = [...document.querySelectorAll('.par55-controls .par55-btn')].find(
+      (b) => /pass/i.test(b.textContent || '')
+    );
+    if (pass) {
+      pass.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       return 'pass';
     }
-  }
 
-  const clickable = page.locator('.par55-hand-block.clickable');
-  const n = await clickable.count();
-  if (n === 0) {
-    // Maybe already placing (selection persisted?) — try valid base
-    const valid = page.locator('.par55-valid-base');
-    if ((await valid.count()) > 0) {
-      await valid.first().click({ force: true });
-      return 'place-only';
+    const clickables = [
+      ...document.querySelectorAll('.par55-hand-block.clickable'),
+    ];
+    if (clickables.length === 0) {
+      const valid =
+        document.querySelector('.par55-base-hit') ||
+        document.querySelector('.par55-valid-base');
+      if (valid) {
+        valid.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        return 'place-only';
+      }
+      return 'no-move';
     }
-    if (await pass.isVisible().catch(() => false)) {
-      await pass.click({ force: true });
-      return 'pass';
-    }
-    return 'no-move';
-  }
 
-  const idx = n > 2 && Math.random() < 0.3 ? 1 : 0;
-  await clickable.nth(idx).click({ force: true });
-  await page.waitForTimeout(60);
+    const idx =
+      clickables.length > 2 && Math.random() < 0.3 ? 1 : 0;
+    clickables[idx].dispatchEvent(
+      new MouseEvent('click', { bubbles: true })
+    );
 
-  const valid = page.locator('.par55-valid-base');
-  const vc = await valid.count();
-  if (vc === 0) {
-    // Clear and try another block
-    const clear = page.locator('.par55-controls .par55-btn');
-    if (await clear.isVisible().catch(() => false)) {
-      await clear.click({ force: true }).catch(() => {});
+    const valids = [
+      ...document.querySelectorAll('.par55-base-hit, .par55-valid-base'),
+    ];
+    // Prefer hit circles (unique bases) over duplicate polygon+hit pairs
+    const hits = [...document.querySelectorAll('.par55-base-hit')];
+    const targets = hits.length > 0 ? hits : valids;
+    if (targets.length === 0) {
+      const clear = [
+        ...document.querySelectorAll('.par55-controls .par55-btn'),
+      ].find((b) => /clear/i.test(b.textContent || ''));
+      clear?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      return 'no-valid';
     }
-    return 'no-valid';
-  }
-  const vIdx = vc > 2 && Math.random() < 0.35 ? Math.min(2, vc - 1) : 0;
-  await valid.nth(vIdx).click({ force: true });
-  return 'place';
+    const vIdx =
+      targets.length > 2 && Math.random() < 0.35
+        ? Math.min(2, targets.length - 1)
+        : 0;
+    targets[vIdx].dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    return 'place';
+  });
+  return result;
 }
 
 async function probeNewGameRace(page, difficulty) {

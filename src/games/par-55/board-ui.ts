@@ -502,18 +502,30 @@ export function injectPar55Styles(): void {
   const style = document.createElement('style');
   style.id = 'par55-styles';
   style.textContent = `
+    /* Shell #app is max-width 700px with overflow-x clip — widen when Par 55
+       is mounted so the side-hand layout stays hittable on desktop. */
+    #app:has(.par55-board),
+    #app:has(.par55-game-area) {
+      max-width: min(1100px, 100%);
+      overflow-x: visible;
+    }
+
     .par55-game-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       padding: 1rem;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .par55-main-layout {
       display: flex;
-      gap: 2rem;
+      gap: 1.25rem;
       align-items: flex-start;
+      justify-content: center;
+      max-width: 100%;
     }
 
     .par55-board {

@@ -30,6 +30,32 @@ describe('Par 55 deep playtest UX', () => {
     expect(css).toMatch(/\.par55-hand-block\s*\{[^}]*min-height:\s*44px/s);
     expect(css).toMatch(/@media\s*\(pointer:\s*coarse\)/);
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
+    expect(css).toMatch(/#app:has\(\.par55-board\)/);
+    expect(css).toMatch(/overflow-x:\s*visible/);
+  });
+
+  it('desktop side-hands remain hittable inside widened #app', () => {
+    injectPar55Styles();
+    const app = document.createElement('div');
+    app.id = 'app';
+    // Mimic shell clip + narrow column that previously ate left-hand hits.
+    app.style.maxWidth = '700px';
+    app.style.overflowX = 'clip';
+    app.style.margin = '0 auto';
+    document.body.appendChild(app);
+    const root = document.createElement('div');
+    app.appendChild(root);
+    newGameVsHuman(root);
+
+    const hand = root.querySelector(
+      '.par55-hand-block.clickable'
+    ) as HTMLElement;
+    expect(hand).toBeTruthy();
+    hand.click();
+    expect(root.querySelector('.par55-status')?.textContent).toMatch(
+      /Tap a green base to place/
+    );
+    expect(root.querySelectorAll('.par55-valid-base').length).toBeGreaterThan(0);
   });
 
   it('valid bases include a 44px hit circle', () => {
