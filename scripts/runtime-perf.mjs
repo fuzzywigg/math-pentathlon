@@ -88,9 +88,11 @@ async function waitReady(page) {
   await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 20_000 });
 }
 
-async function gotoGame(page, gameId, board3d) {
+async function gotoGame(page, baseURL, gameId, board3d) {
   const q = board3d ? '?board3d=1' : '';
-  await page.goto(`/${q}#/game/${gameId}`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${baseURL}/${q}#/game/${gameId}`, {
+    waitUntil: 'domcontentloaded',
+  });
   await waitReady(page);
   await dismissOwl(page);
 }
@@ -405,7 +407,7 @@ function suspectLeaks(gameId, heapGrowthBytes, board3d) {
 
 async function measureGame(browser, baseURL, gameId) {
   const board3d = BOARD3D_GAMES.has(gameId);
-  const context = await browser.newContext();
+  const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send('Performance.enable').catch(() => {});
@@ -423,7 +425,7 @@ async function measureGame(browser, baseURL, gameId) {
   };
 
   try {
-    await gotoGame(page, gameId, board3d);
+    await gotoGame(page, baseURL, gameId, board3d);
     await startHuman(page);
     await installObservers(page);
 
@@ -470,9 +472,9 @@ async function measureGame(browser, baseURL, gameId) {
 
     // Navigate away / back cycles
     for (let i = 1; i <= NAV_CYCLES; i++) {
-      await page.goto('/#/', { waitUntil: 'domcontentloaded' });
+      await page.goto(`${baseURL}/#/`, { waitUntil: 'domcontentloaded' });
       await page.waitForTimeout(200);
-      await gotoGame(page, gameId, board3d);
+      await gotoGame(page, baseURL, gameId, board3d);
       await startHuman(page);
       await page.waitForTimeout(300);
       const h = await heapUsed(cdp);
@@ -582,11 +584,13 @@ async function main() {
   if (!baseURL) {
     server = await createServer({
       root: ROOT,
-      server: { port: 5179, strictPort: true },
+      server: { host: '127.0.0.1', port: 5179, strictPort: true },
       logLevel: 'error',
     });
     await server.listen();
-    baseURL = 'http://127.0.0.1:5179';
+    const addr = server.httpServer?.address();
+    const port = typeof addr === 'object' && addr ? addr.port : 5179;
+    baseURL = `http://127.0.0.1:${port}`;
   }
 
   const browser = await chromium.launch({
