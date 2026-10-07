@@ -172,10 +172,10 @@ function buildShellHtml(options: GameShellOptions): string {
       <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
       <h1>${escapeAttr(options.title)}</h1>
     </header>
-    <div class="button-row">
+    <nav class="button-row" aria-label="Game actions">
       <button id="new-game-btn" type="button">New Game</button>${tutorialBtn}
       <button id="help-btn" type="button">How to Play</button>
-    </div>${statusBlock}
+    </nav>${statusBlock}
     ${gameAreaBlock}
     <div id="new-game-modal" class="modal hidden">
       <div class="modal-content">
