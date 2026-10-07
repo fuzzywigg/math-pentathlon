@@ -8,6 +8,25 @@ import { markStatusLive } from '../../ui/board-a11y';
 export type DrawChainsCallback = () => void;
 export type SelectChainCallback = (index: 0 | 1) => void;
 
+export type StarTrackGameMode = 'human-vs-human' | 'human-vs-ai';
+
+/** Mode-aware phase copy for the live status line (rules still use Blue/Red). */
+export function formatPhaseStatusMessage(
+  state: StarTrackGameState,
+  gameMode: StarTrackGameMode
+): string {
+  const raw = getPhaseMessage(state);
+  if (gameMode !== 'human-vs-ai') return raw;
+
+  return raw
+    .replace(/^Blue's turn/, 'Your turn')
+    .replace(/^Blue:/, 'You:')
+    .replace(/^Red's turn/, "Computer's turn")
+    .replace(/^Red:/, 'Computer:')
+    .replace(/^Blue wins!/, 'You win!')
+    .replace(/^Red wins!/, 'AI wins!');
+}
+
 // Render the star track board
 export function renderBoard(
   state: StarTrackGameState,
@@ -187,6 +206,8 @@ export type ChainPreviewCallback = (index: 0 | 1 | null) => void;
 /** When false, suppress selectable chrome and click handlers (AI seat). */
 export interface StarTrackChainRenderOptions {
   allowInput?: boolean;
+  /** Affects winner-banner seat labels (You/AI vs Blue/Red). */
+  gameMode?: StarTrackGameMode;
 }
 
 /**
@@ -279,9 +300,21 @@ export function fillChainArea(
   } else if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
     winnerMsg.className = 'star-track-winner game-winner-banner';
-    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-    // Board banner uses generic Blue/Red; status panel uses mode-aware labels
-    winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
+    const mode = options.gameMode ?? 'human-vs-human';
+    let winnerName: string;
+    if (!state.winner) {
+      winnerName = 'Nobody';
+      winnerMsg.textContent = `🤝 It's a draw — chains exhausted!`;
+    } else if (mode === 'human-vs-ai') {
+      winnerName = state.winner === 'player1' ? 'You' : 'AI';
+      winnerMsg.textContent =
+        winnerName === 'You'
+          ? `🎉 You reach the star! 🎉`
+          : `🎉 AI reaches the star! 🎉`;
+    } else {
+      winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
+      winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
+    }
     chainArea.appendChild(winnerMsg);
   }
 }
@@ -377,7 +410,7 @@ function renderChainLink(chain: ChainLink): string {
 export function renderStatus(
   state: StarTrackGameState,
   container: HTMLElement,
-  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
+  gameMode: StarTrackGameMode = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
   container.innerHTML = '';
@@ -400,12 +433,17 @@ export function renderStatus(
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+    // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!"
+    const verb = winnerName === 'You' ? 'Win' : 'Wins';
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${verb}! 🎉`;
+  } else if (state.phase === 'gameOver') {
+    // Draw / exhaust — keep without status-winner (burn-wave7 contract).
+    turnEl.textContent = formatPhaseStatusMessage(state, gameMode);
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
-    turnEl.textContent = getPhaseMessage(state);
+    turnEl.textContent = formatPhaseStatusMessage(state, gameMode);
   }
 
   statusEl.appendChild(turnEl);
