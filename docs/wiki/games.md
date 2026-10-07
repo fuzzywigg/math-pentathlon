@@ -46,4 +46,6 @@ There is **no Math Relay** in this tree.
 
 ## Implementation map
 
-Each game lives under `src/games/<id>/` (typically `game-state.ts`, `rules.ts`, `board-ui.ts`, `game-controller.ts`). Shared systems are documented in [Big Toads](./big-toads.md).
+Each game lives under `src/games/<id>/` (typically `game-state.ts`, `rules.ts`, `board-ui.ts`, `game-controller.ts`). Shared systems are documented in [Big Toads](./big-toads.md). Registry ids and mount wiring: [Game registry](./game-registry.md). Adding a module: [How to add a game](./adding-a-game.md).
+
+![Registry menu — Division I cards](./images/landing.png)

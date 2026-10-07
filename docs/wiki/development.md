@@ -97,6 +97,49 @@ README badges link those workflows. License is **ISC** (`package.json`).
 - Domain logic: `src/core`, `src/games/*/game-state.ts`, `src/games/*/rules.ts` (no DOM)
 - UI wiring: `src/games/*/board-ui.ts`, `src/games/*/game-controller.ts`, `src/ui`
 - Tests: `tests/unit` (Vitest + jsdom), `tests/e2e` (Playwright)
+- Architecture map: [Architecture](./architecture.md) · registry: [Game registry](./game-registry.md) · new modules: [How to add a game](./adding-a-game.md)
+
+## Testing layers
+
+Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
+
+| Layer | Runner | What it covers | Command / entry |
+| ----- | ------ | -------------- | --------------- |
+| Unit | Vitest + jsdom | Pure rules/state, shell helpers | `npm run test:unit` |
+| E2E smoke / play | Playwright Chromium (+ mobile projects on tip) | Menu, game mounts, playability | `npm run test:e2e:chromium` |
+| Cross-browser | Playwright Firefox / WebKit / iPad | Opt-in shell smoke | `npm run test:e2e:cross` — [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md) |
+| **Axe a11y sweep** | `@axe-core/playwright` | Menu, progress, Help, every available New Game modal — serious/critical only | On tip: `tests/e2e/a11y-sweep.spec.ts`. Run: `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
+| **Visual baseline** | Playwright screenshots | Landing + each available game 2D start/board (seeded, motion off) | On tip: `npm run test:visual` / `test:visual:update` (`tests/visual/`) — [`docs/visual-regression.md`](../visual-regression.md). Related fold may also add report-only `test:e2e:visual` + CI job. |
+| **Round-trip fuzz** | Vitest property tests | Random legal play → serialize/deserialize → equal state, legal moves, seeded AI | Suite documented in [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md) (PR `#465`); harness `tests/unit/state-roundtrip-fuzz.test.ts` lands via related folds. |
+| **Undo / move-log audit** | Vitest property tests | Undo stacks / history-complete replay vs applied moves | Suite documented in [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md) (PR `#473`); harness `tests/unit/undo-audit-*.test.ts` lands via related folds. |
+
+### Axe (shell)
+
+Automated sweep over shared chrome only; board interiors stay with per-game playtests. Findings and shell fixes are recorded in the a11y sweep doc. Public posture: [Accessibility](./accessibility.md).
+
+### Visual baseline
+
+Deterministic Chromium captures with Mulberry32 seed, reduced motion, owl hidden, `board3d=0`. **Not** a required CI gate on this tip (`npm run test:visual` is opt-in). Related fold work may add a report-only `visual-baseline` CI job and `test:e2e:visual` scripts — prefer the scripts present in `package.json` on your branch.
+
+### Round-trip fuzz
+
+Plays capped random legal moves for every registered game, then checks:
+
+1. Dedicated Kings codec **or** Map/Set-aware JSON revive (mid-game save stand-in)
+2. `structuredClone` spot-check
+3. Identical legal-move sets and seeded AI choice
+
+On-device storage today persists stats/profile, not in-progress boards — see the findings doc.
+
+### Undo / move-log audit
+
+Property coverage for surfaces with undo or a move log. Most games have **no** player-facing undo UI; tests treat undo/redo as deterministic reapply of the recorded action prefix/suffix. Ambiguities (unlogged passes, truncated hex-a-gone selections, etc.) stay in the audit doc.
+
+Live captures used in the wiki (local Vite):
+
+![Landing menu under test](./images/landing.png)
+
+![Shared shell + Hex board](./images/hex-board.png)
 
 ## Escalations
 

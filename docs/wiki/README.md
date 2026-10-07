@@ -9,11 +9,26 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 | Page | Audience |
 |------|----------|
 | [Overview](./overview.md) | What the product is |
+| [Architecture](./architecture.md) | Mermaid map + live screenshots of shell/routes |
 | [Games](./games.md) | The 20 registered games by division |
+| [Game registry](./game-registry.md) | `GameInfo` shape, divisions, menu/route wiring |
+| [How to add a game](./adding-a-game.md) | Module, registry, mount, and test checklist |
 | [Big Toads](./big-toads.md) | Shared core systems under `src/core/` |
-| [Development](./development.md) | Install, test, branch, and deploy posture |
+| [Development](./development.md) | Install, CI, and testing layers (axe, visual, fuzz, undo) |
 | [Accessibility](./accessibility.md) | Public a11y posture and shared helpers |
 | [Roadmap](./roadmap.md) | Where to read deeper planning docs |
+
+## Screenshots in this wiki
+
+Captured from the running Vite app (`npm run dev`) on the docs tip. Files live under [`images/`](./images/).
+
+| Image | Surface |
+| ----- | ------- |
+| `landing.png` / `landing-full.png` | Home / registry menu |
+| `hex-shell.png` / `hex-board.png` | Hex shared shell + opening board |
+| `hex-new-game-modal.png` | New Game dialog (axe surface) |
+| `kings-board.png` | Kings & Quadraphages board chrome |
+| `stats-progress.png` | `/#/stats` progress dashboard |
 
 ## Conventions
 
