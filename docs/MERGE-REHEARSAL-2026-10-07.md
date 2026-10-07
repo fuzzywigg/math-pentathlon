@@ -2,7 +2,7 @@
 
 Docs-only rehearsal note. **No merges, closes, retargets, or pushes to existing PR branches from this inventory agent.** Confirmed tip: **#477** (`cursor/integration-fold-wave5-tip-4af0`).
 
-Snapshot: 2026-10-07 later UTC · `alpha` @ `593270b` · tip = wave5 · open drafts classified below.
+Snapshot: 2026-10-07 later UTC · `alpha` @ `eec2b32` (`#413`+`#414` merged) · tip = wave5 (synced + `#491`) · open drafts classified below.
 
 ---
 
@@ -44,7 +44,7 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 | Scenario | Conflicts | Notes |
 |----------|-----------|-------|
-| wave-5 tip → `alpha` | none expected | tip contains `alpha` lineage |
+| wave-5 tip → `alpha` | none expected | tip merged `origin/alpha` @ `eec2b32`; merge-tree CLEAN |
 | Historical: #435 then #476 | `.github/workflows/ci.yml` only | Already resolved inside tip |
 | Held-outs vs tip | semantic / file conflicts vary | Do not auto-land |
 
@@ -68,9 +68,11 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#413` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490`
+`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491`
 
-Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**, **#466**, **#449**, **#447**, **#444**, **#440**, **#438**, **#413**.
+Already on `alpha` (close as merged/superseded): **#413**, **#414**.
+
+Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**, **#466**, **#449**, **#447**, **#444**, **#440**, **#438**.
 
 ### Standalone / held-out (do **not** auto-land with tip)
 
@@ -79,7 +81,7 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 | **#393** / **#394** | Rules XOR (Andrew pick) |
 | **#418** / **#419** / **#428** / **#429** | Held rules-adjacent deep playtests |
 | **#441** | Docs / open rules questions (#355 Contig/FIAR/Hex Step-0 folded via #485) |
-| **#414** / **#420** | Folded via #485 — close as superseded |
+| **#420** | Folded via #485 — close as superseded (`#414` already on `alpha`) |
 | **#451** | Prime-gold keyboard flake (if not fully in tip tree) |
 | **#453** | Older inventory; tip has newer merge-order |
 | **#459** / **#481** | Folded via #485 — close as superseded |
@@ -89,5 +91,5 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 
 ## What this agent did / did not do
 
-- Did: fold wave-5 candidates onto tip (including `#486` mobile-touch + `#489` load-perf + `#490` mp3d canvas-ready), resolve CI/`hex` overlaps conservatively (kept tip security settings + hex Hard **450ms**), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/chromium e2e (incl. mp3d).
+- Did: fold wave-5 candidates onto tip (including `#486` mobile-touch + `#489` load-perf + `#490` mp3d canvas-ready + `#491` keyboard a11y), merge `origin/alpha` after `#413`+`#414` landed (prefer tip folds; keep hex Hard **450ms** + CI security), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/Playwright e2e.
 - Did **not**: merge/close/retarget any existing PR from the agent; change game rules or scoring; commit secrets.

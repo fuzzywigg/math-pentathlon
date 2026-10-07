@@ -2,7 +2,7 @@
 
 Docs-only map of **open draft PRs** (`#355`, `#392`–`#458`) against `alpha`, focused on the stacked playability / test-infra chain and what can close as superseded after the tip lands.
 
-**Snapshot:** 2026-10-07 ~14:37 UTC (inventory) · **tip refresh** 2026-10-07 later UTC (wave5) · `alpha` @ `593270b` · **this agent does not merge, close, retarget, or push to any existing PR.**
+**Snapshot:** 2026-10-07 ~14:37 UTC (inventory) · **tip refresh** 2026-10-07 later UTC (wave5 + alpha sync + `#491`) · `alpha` @ `eec2b32` (`#413`+`#414` merged) · **this agent does not merge, close, retarget, or push to any existing PR.**
 
 ### Current tip (refresh)
 
@@ -11,8 +11,8 @@ Docs-only map of **open draft PRs** (`#355`, `#392`–`#458`) against `alpha`, f
 | **Tip branch** | `cursor/integration-fold-wave5-tip-4af0` |
 | **Preferred base for new folds** | this tip (draft PR targeting `#466` / `cursor/overnight-fold-coverage-tip-460a`) |
 | **Builds on** | wave4 tip `#476` (`cursor/integration-fold-wave4-tip-36e4` on `#466`) |
-| **Folds (this tip)** | wave4 + `#474`/`#475`/`#471`/`#478`/`#479`/`#480`/`#482`/`#483`/`#484`/`#435`/`#485`/`#486`/`#489`/`#490` (`#469` already contained — skipped) |
-| **Preserved intent** | CI required e2e = chromium only; report-only `mobile-touch` (iPhone 13 / Pixel 7 / iPad) + visual-baseline + a11y-axe + e2e-cross-browser (firefox/webkit); `size:check` + `check:perf` non-blocking; tip playwright timeouts/cross-browser; prime-gold keyboard a11y helpers; destroyGame / error-boundary / memory-leak cleanup; state round-trip fuzz; Hard AI time-box bench (hex Hard **450ms**); undo/move-log audit; Chromium flake-hunt fixtures/seeds/reduced-motion; wiki architecture/registry/testing docs; AI seed determinism audit; WebKit offline idle-warm route mounts; 44px/touch-action mobile fixes; lazy game-shell + deferred core-storage/settings-flags + idle-deferred SW; mp3d canvas-ready + SwiftShader launch args + CI 60s ready wait; CI `permissions: contents: read` + `persist-credentials: false` |
+| **Folds (this tip)** | wave4 + `#474`/`#475`/`#471`/`#478`/`#479`/`#480`/`#482`/`#483`/`#484`/`#435`/`#485`/`#486`/`#489`/`#490`/`#491` (`#469` already contained — skipped); tip merged `origin/alpha` @ `eec2b32` (`#413`+`#414`) |
+| **Preserved intent** | CI required e2e = chromium only; report-only `mobile-touch` (iPhone 13 / Pixel 7 / iPad) + visual-baseline + a11y-axe + e2e-cross-browser (firefox/webkit); `size:check` + `check:perf` non-blocking; tip playwright timeouts/cross-browser; prime-gold keyboard a11y helpers; destroyGame / error-boundary / memory-leak cleanup; state round-trip fuzz; Hard AI time-box bench (hex Hard **450ms**); undo/move-log audit; Chromium flake-hunt fixtures/seeds/reduced-motion; wiki architecture/registry/testing docs; AI seed determinism audit; WebKit offline idle-warm route mounts; 44px/touch-action mobile fixes; lazy game-shell + deferred core-storage/settings-flags + idle-deferred SW; mp3d canvas-ready + SwiftShader launch args + CI 60s ready wait; keyboard a11y (dialog/focus-trap/inert/focus-visible); CI `permissions: contents: read` + `persist-credentials: false` |
 | **Not in tip** | rules/scoring changes; held-outs `#393`/`#394`/`#418`/`#419`/`#428`/`#429` |
 
 Historical tables below still describe the 14:37 UTC inventory; tip pointers are updated to this branch.
@@ -29,7 +29,7 @@ Historical tables below still describe the 14:37 UTC inventory; tip pointers are
 |------|--------------------|-----|
 | **1** | **Tip branch → `alpha` in one PR** | **Current tip:** `cursor/integration-fold-wave5-tip-4af0` (includes `#435` CI `cursor/**` triggers). Open **one** tip→`alpha` PR (human only). |
 | **2** | **Held-out rules-adjacent (Andrew)** | After tip: land **exactly one** of **#393 XOR #394**, then **#418**, **#419**, **#428**, **#429**. |
-| **3** | **Docs / side tracks** | **#355**, **#414**, **#420**, **#441** (and leftovers). `#435`/`#442`/`#452`/`#455`–`#458`/`#464`–`#467`/`#469`/`#471`–`#480`/`#482`–`#486`/`#489`/`#490`/`#476` content is in the tip. |
+| **3** | **Docs / side tracks** | **#355**, **#420**, **#441** (and leftovers). **#414** already on `alpha`. `#435`/`#442`/`#452`/`#455`–`#458`/`#464`–`#467`/`#469`/`#471`–`#480`/`#482`–`#486`/`#489`–`#491`/`#476` content is in the tip. |
 
 **Merge count (Path A):** **1** into `alpha` for the full tip (step 1), then held-outs/docs as Andrew approves.
 
@@ -45,7 +45,7 @@ After **#435**:
 6. **#449** → `alpha`
 7. **#454** → `alpha` (flake-engine: #450+#451+#452)
 8. **#466** → `alpha` (fold-wave2 + next5) — or skip if tip already includes it
-9. tip `cursor/integration-fold-wave5-tip-4af0` → `alpha` (wave4 + wave5 folds including `#435`/`#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`/`#489`/`#490`)
+9. tip `cursor/integration-fold-wave5-tip-4af0` → `alpha` (wave4 + wave5 folds including `#435`/`#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`/`#489`–`#491`; `#413`/`#414` already on `alpha`)
 
 **Merge count (Path B):** **1 (#435) + 7–8 stack layers** — same end state as Path A, more review surface.
 
@@ -75,7 +75,8 @@ alpha
         │                       │                              +#469+#472+#473)
         │                       │                       └── wave5 tip   ← CURRENT TIP
         │                       │                             (+#474+#475+#471+#478
-        │                       │                              +#479+#480+#486+#489+#490)
+        │                       │                              +#479+#480+#486+#489+#490+#491
+        │                       │                              +merged alpha #413+#414)
         │                       └── #450  ramrod-deep e2e flake (folded via #454)
         └── (many leaves still based on #413 — see tables)
 ```
@@ -92,7 +93,7 @@ alpha
 | **#454** | `cursor/overnight-flake-engine-stack-737e` | ~152 | **#450**, **#451**, **#452** onto #449 lineage |
 | **#466** | `cursor/overnight-fold-coverage-tip-460a` | ~170 | **#454** + fold-wave2 (**#442**, **#455–#458**) + engine-coverage-next5 |
 | **#476** | `cursor/integration-fold-wave4-tip-36e4` | ~190+ | **#466** + **#464**, **#465**, **#467**, **#469**, **#472**, **#473** |
-| **tip** | `cursor/integration-fold-wave5-tip-4af0` | ~220+ | **#476** + **#474**, **#475**, **#471**, **#478**, **#479**, **#480**, **#486**, **#489**, **#490** (`#469` already contained) |
+| **tip** | `cursor/integration-fold-wave5-tip-4af0` | ~260+ | **#476** + **#474**, **#475**, **#471**, **#478**, **#479**, **#480**, **#486**, **#489**, **#490**, **#491** (`#469` already contained; tip contains `alpha` @ `eec2b32` incl. `#413`+`#414`) |
 
 **#393 note:** #413 history briefly merged then **reverted** #393 (`55b4212` Revert …). Tip **tree** matches contiguous path-scan (same as `alpha`); do **not** treat #393 as folded.
 
