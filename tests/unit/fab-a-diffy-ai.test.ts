@@ -17,7 +17,8 @@ import {
 } from '../../src/games/fab-a-diffy/board-ui';
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+  vi.clearAllMocks();
   document.body.innerHTML = '';
 });
 
