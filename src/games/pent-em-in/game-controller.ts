@@ -5,7 +5,6 @@ import {
   PentEmInState,
   createInitialState,
   getPlayerPieces,
-  getPentominoShape,
 } from './types';
 import {
   selectPiece,
@@ -15,10 +14,13 @@ import {
   setPreviewPosition,
   placePiece,
   canPlacePiece,
+  selectedPieceFitsAnywhere,
+  getCurrentOrientationPlacements,
 } from './rules';
 import {
   renderBoard,
   renderPieceSelector,
+  renderPlaceControls,
   getPlayerName,
   injectPentEmInStyles,
 } from './board-ui';
@@ -173,7 +175,15 @@ function renderStatusAndControls(): void {
   } else if (gameState.phase === 'selectPiece') {
     status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Select a piece`;
   } else if (gameState.phase === 'placePiece') {
-    status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Place the ${gameState.selectedPiece} piece`;
+    const fitsAnywhere = selectedPieceFitsAnywhere(gameState);
+    const currentFits = getCurrentOrientationPlacements(gameState).length > 0;
+    if (!fitsAnywhere) {
+      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - ${gameState.selectedPiece} won't fit — choose another`;
+    } else if (!currentFits) {
+      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Rotate or flip ${gameState.selectedPiece} to fit`;
+    } else {
+      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Place the ${gameState.selectedPiece} piece`;
+    }
   }
   statusContainer.appendChild(status);
 
@@ -191,44 +201,17 @@ function renderStatusAndControls(): void {
     gameState.phase === 'placePiece' &&
     gameState.selectedPiece
   ) {
-    const controls = document.createElement('div');
-    controls.className = 'pent-controls';
-
-    const shape = getPentominoShape(gameState.selectedPiece);
-
-    // Rotate button
-    if (shape?.canRotate) {
-      const rotateBtn = document.createElement('button');
-      rotateBtn.className = 'pent-btn pent-btn-rotate';
-      rotateBtn.textContent = `Rotate (${gameState.selectedRotation}°)`;
-      rotateBtn.addEventListener('click', handleRotate);
-      controls.appendChild(rotateBtn);
-    }
-
-    // Flip button
-    if (shape?.canFlip) {
-      const flipBtn = document.createElement('button');
-      flipBtn.className = 'pent-btn pent-btn-flip';
-      flipBtn.textContent = gameState.selectedFlipped ? 'Flipped ↔' : 'Flip ↔';
-      flipBtn.addEventListener('click', handleFlip);
-      controls.appendChild(flipBtn);
-    }
-
-    // Cancel button
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'pent-btn pent-btn-cancel';
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.addEventListener('click', handleCancel);
-    controls.appendChild(cancelBtn);
-
-    statusContainer.appendChild(controls);
-
-    // Instructions
-    const instructions = document.createElement('div');
-    instructions.className = 'pent-instructions';
-    instructions.textContent =
-      'Click on the board to place your piece. The preview shows where it will go.';
-    statusContainer.appendChild(instructions);
+    statusContainer.appendChild(
+      renderPlaceControls(
+        gameState,
+        {
+          onRotate: handleRotate,
+          onFlip: handleFlip,
+          onCancel: handleCancel,
+        },
+        { allowInput: true }
+      )
+    );
   }
 
   // Pieces remaining count
@@ -305,17 +288,20 @@ function handleCellClick(cell: Cell): void {
 function handleCellHover(cell: Cell | null): void {
   if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placePiece') return;
+  // Leaving a cell: keep a legal ghost so tablets aren't left blank.
+  const nextCell =
+    cell ?? getCurrentOrientationPlacements(gameState)[0] ?? null;
   const prev = gameState.previewPosition;
   if (
-    (prev === null && cell === null) ||
+    (prev === null && nextCell === null) ||
     (prev !== null &&
-      cell !== null &&
-      prev.row === cell.row &&
-      prev.col === cell.col)
+      nextCell !== null &&
+      prev.row === nextCell.row &&
+      prev.col === nextCell.col)
   ) {
     return;
   }
-  gameState = setPreviewPosition(gameState, cell);
+  gameState = setPreviewPosition(gameState, nextCell);
   // Preview-only: refresh board (3D paint-on-demand) without rebuilding controls.
   renderBoardOnly();
 }
