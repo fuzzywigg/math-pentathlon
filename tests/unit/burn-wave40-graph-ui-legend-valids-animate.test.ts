@@ -24,7 +24,10 @@ afterEach(() => {
   document.getElementById('graph-styles')?.remove();
   vi.unstubAllGlobals();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Targeted restore only — restoreAllMocks tears down hoisted vi.mock
+  // factories (e.g. router.navigate) across the shared isolate:false graph.
+  const nowFn = performance.now as unknown as { mockRestore?: () => void };
+  nowFn.mockRestore?.();
 });
 
 function stubRafClock(): void {

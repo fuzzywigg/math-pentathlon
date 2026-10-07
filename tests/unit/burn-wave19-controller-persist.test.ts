@@ -147,8 +147,11 @@ describe('Wave 19 controller-persist — Calla hint + remount', () => {
   it('hint stays null; AI→human remount keeps pits inventory', () => {
     const { board, status } = mountPair();
     initCalla(board, status);
-    expect(getCurrentHint()).toBeNull();
+    // newGameVsAI is the public path that clears module-level currentHint
+    // (init/newGameVsHuman do not). Assert after vs-AI so a prior AI-timer
+    // suite cannot leak "Look carefully!…" under isolate:false shuffle.
     callaVsAI('hard');
+    expect(getCurrentHint()).toBeNull();
     setCallaAI('easy');
     expect(getCallaState().player1Pits).toHaveLength(5);
     expect(isCallaTutorial()).toBe(false);
