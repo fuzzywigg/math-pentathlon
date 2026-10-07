@@ -17,7 +17,8 @@ npm run dev
 npm test             # unit then e2e
 npm run test:unit
 npm run test:e2e:chromium   # required CI path
-npm run test:e2e:cross      # opt-in Firefox + WebKit + iPad WebKit
+npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
+npm run test:e2e:cross      # Firefox + WebKit + iPad WebKit
 npm run test:visual          # opt-in 2D screenshot suite (separate config)
 npm run test:visual:update   # refresh separate-config baselines
 npm run test:e2e:visual         # start + openings baselines (desktop + phone)
@@ -73,7 +74,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e, visual-baseline (**report-only**); optional `e2e-cross-browser` via workflow_dispatch or `CROSS_BROWSER_E2E`
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e; report-only `e2e-cross-browser` (Firefox + WebKit full suite, `continue-on-error`) and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes

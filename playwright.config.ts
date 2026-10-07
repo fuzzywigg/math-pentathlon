@@ -4,13 +4,13 @@ import { defineConfig, devices } from '@playwright/test';
  * Projects:
  * - `chromium` — default / required CI path (`npm run test:e2e:chromium`)
  * - `mobile-iphone-se`, `mobile-pixel-7` — phone viewport smoke (Chromium emulation)
- * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
+ * - `firefox`, `webkit`, `ipad-webkit` — cross-browser (CI report-only: firefox+webkit)
  * - `visual-desktop`, `visual-phone` — start + openings baselines (`npm run test:e2e:visual`)
  *
- * CI e2e runs chromium + both mobile projects. Opt in cross-browser locally or in CI:
- *   npm run test:e2e:cross
- *   npm run test:e2e -- --project=webkit --project=firefox --project=ipad-webkit
- *   CROSS_BROWSER=1 npm run test:e2e:cross   # same; env documented for CI matrices
+ * CI required e2e: chromium + both mobile projects. Cross-browser (report-only in CI):
+ *   npm run test:e2e -- --project=firefox --project=webkit
+ *   npm run test:e2e:cross   # firefox + webkit + ipad-webkit
+ *   CROSS_BROWSER=1 …        # env documented for CI matrices
  *
  * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
