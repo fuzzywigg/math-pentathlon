@@ -68,6 +68,9 @@ jobs:
             exit 1
           fi
           echo "All JS chunks under ${limit_kb} kB"
+      - name: Report gzip bundle budgets (non-blocking)
+        continue-on-error: true
+        run: npm run size:check
 
   # Unit suite pruned from ~5k TOKENMAXX files; target wall time under ~5 min.
   unit:
