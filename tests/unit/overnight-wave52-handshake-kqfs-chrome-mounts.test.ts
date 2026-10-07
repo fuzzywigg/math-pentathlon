@@ -41,7 +41,9 @@ describe('Wave 52 handshake — kqfs chrome', () => {
 
     const fSvg = renderFiar(createFiar(), () => undefined);
     expect(
-      fSvg.querySelector('[data-node-id] > circle')?.getAttribute('fill')
+      fSvg
+        .querySelector('[data-node-id] > circle[data-node-visual="1"]')
+        ?.getAttribute('fill')
     ).toBe('#c9baa0');
 
     renderStar(createStar(), starEl, () => undefined);

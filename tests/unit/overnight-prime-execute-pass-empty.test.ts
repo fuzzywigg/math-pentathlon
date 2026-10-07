@@ -22,8 +22,14 @@ describe('Overnight prime — execute pass empty', () => {
     }
     state = { ...state, cells };
     const next = executeAITurn(state, 'player1', 'hard');
-    expect(next.phase).toBe('rolling'); // passTurn flips seat + rolling
-    expect(next.currentPlayer).toBe('player2');
-    expect(getValidPlacements({ ...next, phase: 'placing', diceRoll: next.diceRoll })).toEqual([]);
+    // Full board settles instead of flipping into an endless Roll/Pass loop.
+    expect(next.phase).toBe('gameOver');
+    expect(
+      getValidPlacements({
+        ...next,
+        phase: 'placing',
+        diceRoll: { die1: 1, die2: 1, die3: 1 },
+      })
+    ).toEqual([]);
   });
 });

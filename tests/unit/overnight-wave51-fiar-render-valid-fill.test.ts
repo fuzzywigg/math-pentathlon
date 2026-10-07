@@ -24,9 +24,7 @@ describe('Wave 51 fiar — valid fill', () => {
     expect(valids.length).toBeGreaterThan(0);
     const svg = renderBoard(state, () => undefined);
     const g = svg.querySelector(`[data-node-id="${valids[0]}"]`)!;
-    const bg = [...g.querySelectorAll('circle')].find(
-      (c) => !c.classList.contains('pulse-highlight')
-    )!;
+    const bg = g.querySelector('circle[data-node-visual="1"]')!;
     expect(bg.getAttribute('fill')).toBe('#4caf50');
   });
 });

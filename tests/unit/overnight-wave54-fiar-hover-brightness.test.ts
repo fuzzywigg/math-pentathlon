@@ -9,7 +9,7 @@ describe('Wave 54 fiar — hover brightness', () => {
   it('mouseenter sets brightness filter; mouseleave clears it', () => {
     const svg = renderBoard(createInitialState(), () => undefined);
     const g = svg.querySelector('[data-node-id="c2r1"]')!;
-    const circle = g.querySelector('circle')!;
+    const circle = g.querySelector('circle[data-node-visual="1"]')!;
     g.dispatchEvent(new Event('mouseenter'));
     expect(circle.getAttribute('filter')).toBe('brightness(1.1)');
     g.dispatchEvent(new Event('mouseleave'));

@@ -309,8 +309,8 @@ describe('Burn wave 8 — Prime Gold hard AI + pass / rolling null', () => {
     };
     expect(primeHasMoves(blocked)).toBe(false);
     const next = passPrime(blocked);
-    expect(next.currentPlayer).toBe('player2');
-    expect(next.phase).toBe('rolling');
+    // Full board settles (vein compare) — no infinite Roll/Pass soft-lock.
+    expect(next.phase).toBe('gameOver');
     expect(next.diceRoll).toBeNull();
   });
 
