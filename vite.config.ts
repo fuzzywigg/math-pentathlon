@@ -92,10 +92,9 @@ const plugins: PluginOption[] = [
       globPatterns: [
         '**/*.{js,css,html,ico,svg,png,txt,webmanifest,woff,woff2}',
       ],
-      // Skip unused king art + heavier Inter weights from first SW install
-      // so cheap tablets finish precache sooner; weights cache on first use.
+      // Skip heavier Inter weights from first SW install so cheap tablets
+      // finish precache sooner; weights cache on first use.
       globIgnores: [
-        '**/king.svg',
         '**/inter-latin-500-normal.woff2',
         '**/inter-latin-600-normal.woff2',
         '**/inter-latin-700-normal.woff2',

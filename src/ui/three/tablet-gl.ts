@@ -12,8 +12,8 @@ const PRESERVE_PARAM = 'preserveDrawingBuffer';
 const PRESERVE_STORAGE_KEY = 'mp-preserve-drawing-buffer';
 
 /** Opt-in low-quality 3D path for Playwright / CI (not a player-facing setting). */
-export const BOARD_3D_LQ_PARAM = 'board3dLQ';
-export const BOARD_3D_LQ_STORAGE_KEY = 'mp-board3d-lq';
+const BOARD_3D_LQ_PARAM = 'board3dLQ';
+const BOARD_3D_LQ_STORAGE_KEY = 'mp-board3d-lq';
 
 /** Match FIAR / Queens / Pent'Em In tablet profile. */
 export const TABLET_PIXEL_RATIO_CAP = 1.5;
@@ -22,7 +22,7 @@ export const TABLET_PIXEL_RATIO_CAP = 1.5;
 export const BOARD_3D_LQ_PIXEL_RATIO_CAP = 1;
 
 /** Set on the canvas after the first successful `renderer.render`. */
-export const MP3D_READY_ATTR = 'data-mp3d-ready';
+const MP3D_READY_ATTR = 'data-mp3d-ready';
 
 /**
  * Set on the board host when WebGL mount fails or context is permanently lost

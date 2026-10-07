@@ -1,6 +1,6 @@
 // FIAR Board UI — SVG rendering (marked chips, yellow center, gapped wins)
 
-import { FiarGameState, CONFIG, Player, ChipKind } from './types';
+import { FiarGameState, CONFIG, Player } from './types';
 import {
   getValidMoves,
   getSelectableNodes,
@@ -22,7 +22,7 @@ import {
 } from '../../ui/board-a11y';
 
 /** Theme tokens for the 2D SVG board (marked-dot color matches kit green). */
-export const FIAR_THEME = {
+const FIAR_THEME = {
   background: '#f5f0e6',
   edge: '#8b7355',
   edgeYellow: '#c9a227',
@@ -516,8 +516,4 @@ export function getPlayerName(player: Player): string {
 export function getPlayerColor(player: Player): string {
   const colors = playerColors();
   return player === 'player1' ? colors.player1 : colors.player2;
-}
-
-export function chipKindLabel(kind: ChipKind): string {
-  return kind === 'marked' ? 'Marked (Fire Extinguisher)' : 'Plain';
 }
