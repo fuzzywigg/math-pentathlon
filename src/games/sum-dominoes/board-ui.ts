@@ -523,16 +523,20 @@ export function injectSDStyles(): void {
     /* Tablet / coarse pointer: enlarge hand hit targets (WCAG 2.5.5 floor) */
     @media (pointer: coarse) {
       .sd-hand-domino {
-        width: 72px;
-        height: 36px;
+        width: 88px;
+        height: 44px;
         min-width: 44px;
-        min-height: 36px;
+        min-height: 44px;
         padding: 4px;
       }
 
       .sd-hand-domino-playable {
         min-height: 44px;
         height: 44px;
+      }
+
+      .sd-hand {
+        max-width: 100%;
       }
     }
 
