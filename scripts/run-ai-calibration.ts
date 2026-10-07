@@ -48,7 +48,7 @@ lines.push(
   '- RNG: mulberry32 via `createSeededRng` installed as `Math.random` for each game'
 );
 lines.push(
-  '- Search games (hex, queens-guards, fiar, fab-a-diffy): `deadlineMs=300` per decision (uncapped retry on null)'
+  `- Search games (hex, queens-guards, fiar, fab-a-diffy): \`deadlineMs=${process.env.CALIBRATION_DEADLINE_MS ?? 300}\` per decision when \`CALIBRATION_WALL_CLOCK=1\``
 );
 lines.push(
   '- Random opponent: uniform legal move where enumerated; else Easy policy as legal baseline'
