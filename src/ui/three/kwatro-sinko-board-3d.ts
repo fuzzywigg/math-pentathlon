@@ -26,9 +26,9 @@ import {
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
-  markBoard3dCanvasReady,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
 } from './tablet-gl';
 
@@ -375,9 +375,11 @@ export async function createKwatroSinkoBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
-    markBoard3dCanvasReady(canvas);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
@@ -744,6 +746,7 @@ export async function createKwatroSinkoBoard3D(
 
   tearDown = unmount;
   resize();
+  scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, nodeToClientPoint, canvas };
 }

@@ -31,6 +31,10 @@ import { pentEmInTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadPentEmInBoard3DModule } from './board-3d-loader';
 import type { PentEmInBoard3D } from '../../ui/three/pent-em-in-board-3d';
 
@@ -86,9 +90,11 @@ async function ensureBoard3d(): Promise<void> {
       handleCellClick,
       handleCellHover
     );
+    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -102,6 +108,7 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
+  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();

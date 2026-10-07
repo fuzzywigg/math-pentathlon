@@ -27,6 +27,10 @@ import {
   markStatusLive,
 } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadKwatroSinkoBoard3DModule } from './board-3d-loader';
 import type { KwatroSinkoBoard3D } from '../../ui/three/kwatro-sinko-board-3d';
 
@@ -101,6 +105,7 @@ function onBoard3dContextLost(): void {
   }
   // Board already tore itself down via webglcontextlost → tearDown.
   board3d = null;
+  markBoard3dWebGlFallback(board3dHost, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   if (activeController) {
@@ -136,9 +141,11 @@ async function ensureBoard3d(controller: KwaGameController): Promise<void> {
       return;
     }
     board3d = instance;
+    clearBoard3dWebGlFallback(board3dHost);
     board3dHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(board3dHost, 'webgl-unavailable');
     if (mountGen === board3dMountGen) {
       board3d = null;
       board3dEnabled = false;

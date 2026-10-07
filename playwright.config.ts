@@ -53,7 +53,19 @@ export default defineConfig({
     {
       name: 'chromium',
       testIgnore: nonDefaultSpecs,
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        // CI-like VMs often have no GPU. Chrome 127+ requires an explicit
+        // SwiftShader opt-in for reliable WebGL; without it mp3d boards
+        // silently fall back to 2D and `waitForMp3dReady` times out.
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
+      },
     },
     {
       name: 'firefox',

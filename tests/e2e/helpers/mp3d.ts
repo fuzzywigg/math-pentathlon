@@ -7,8 +7,11 @@ import { expect, type Locator, type Page } from '@playwright/test';
 /** Heavy multi-viewport / play-through 3D specs. */
 export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
 
-/** Canvas / scene mount under software WebGL. */
-export const MP3D_READY_TIMEOUT_MS = 30_000;
+/**
+ * Canvas / scene mount under software WebGL (SwiftShader / ANGLE).
+ * CI VMs need more headroom than local GPU; 30s was the historical flake budget.
+ */
+export const MP3D_READY_TIMEOUT_MS = process.env.CI ? 60_000 : 45_000;
 
 export async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({
@@ -54,17 +57,52 @@ export async function disableBoard3d(page: Page): Promise<void> {
 
 /**
  * Wait until the named 3D canvas has completed at least one paint
- * (`data-mp3d-ready="1"` set by tablet-gl after render).
+ * (`data-mp3d-ready="1"` set by tablet-gl after a successful render).
+ *
+ * Software-GL aware:
+ * - Longer default timeout under `CI`
+ * - Fail fast when the controller sets `data-mp3d-fallback` (WebGL never mounted)
+ * - Wait on the ready attribute (not only visibility) so a painted but
+ *   zero-opacity frame still counts once the attribute is present
  */
 export async function waitForMp3dReady(
   page: Page,
   gameId: string,
   timeoutMs: number = MP3D_READY_TIMEOUT_MS
 ): Promise<void> {
-  const canvas = page.locator(
-    `canvas[data-mp3d="${gameId}"][data-mp3d-ready="1"]`
+  const readySelector = `canvas[data-mp3d="${gameId}"][data-mp3d-ready="1"]`;
+
+  const status = await page.waitForFunction(
+    (id: string) => {
+      const fallback = document.querySelector('[data-mp3d-fallback]');
+      if (fallback) {
+        return {
+          state: 'fallback' as const,
+          reason: fallback.getAttribute('data-mp3d-fallback') ?? 'webgl',
+        };
+      }
+      const ready = document.querySelector(
+        `canvas[data-mp3d="${id}"][data-mp3d-ready="1"]`
+      );
+      if (ready) return { state: 'ready' as const, reason: null };
+      return false;
+    },
+    gameId,
+    { timeout: timeoutMs }
   );
-  await expect(canvas).toBeVisible({ timeout: timeoutMs });
+
+  const result = await status.jsonValue();
+  if (result.state === 'fallback') {
+    throw new Error(
+      `mp3d "${gameId}" never became canvas-ready — WebGL fallback (${result.reason}). ` +
+        'Under software GL this usually means context creation failed or was lost before first paint.'
+    );
+  }
+
+  const canvas = page.locator(readySelector);
+  await expect(canvas).toBeAttached({ timeout: 5_000 });
+  // Interaction / screenshots need a laid-out canvas, not just the attribute.
+  await expect(canvas).toBeVisible({ timeout: 10_000 });
 }
 
 /**
