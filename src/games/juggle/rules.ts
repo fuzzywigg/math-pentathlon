@@ -123,7 +123,7 @@ export function selectShape(
 /**
  * Prefer an orientation that actually fits (UI only — same legal placements).
  */
-export function orientSelectedShapeToFit(state: JuggleState): JuggleState {
+function orientSelectedShapeToFit(state: JuggleState): JuggleState {
   if (state.phase !== 'placing' || !state.selectedShape) return state;
 
   const board = state.boards[state.currentPlayer];

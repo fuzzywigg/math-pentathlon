@@ -38,8 +38,3 @@ export function getUserReducedMotionFlag(): boolean {
 export function setUserReducedMotionFlag(value: boolean): void {
   userReducedMotion = value;
 }
-
-/** Test helper — clear the in-memory cache. */
-export function resetSettingsFlagsForTests(): void {
-  userReducedMotion = null;
-}

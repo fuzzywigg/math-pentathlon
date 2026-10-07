@@ -193,7 +193,7 @@ export function areConnected(
   );
 }
 
-export function edgeCrossesYellow(
+function edgeCrossesYellow(
   board: FiarBoard,
   nodeA: string,
   nodeB: string
@@ -283,7 +283,6 @@ export function getBoardDirections(board: FiarBoard): {
 /** Re-export layout helpers used by tests / 3D. */
 export {
   createVerifiedProductionLayout,
-  createUnverifiedProductionLayout,
   createYellowCenterTestLayout,
   INCLUDE_DIAMOND_BORDER_EDGES,
   parseNodeId,

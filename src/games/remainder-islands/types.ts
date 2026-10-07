@@ -85,8 +85,8 @@ export const INITIAL_CHIPS_PER_PLAYER = 12;
 export const TOTAL_TURNS = 24; // 12 turns each player
 
 // Hexagonal grid configuration
-export const GRID_ROWS = 5;
-export const GRID_COLS = 7;
+const GRID_ROWS = 5;
+const GRID_COLS = 7;
 
 // Create initial island grid
 function createIslands(): Island[] {
