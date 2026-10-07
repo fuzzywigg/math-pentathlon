@@ -20,6 +20,11 @@ import {
 const STORAGE_KEY = 'math-pentathlon-progress';
 const MAX_MESSAGES_HISTORY = 50; // Prevent unbounded growth
 
+/** True for non-null, non-array objects (the only valid progress root / maps). */
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 class StorageManager {
   private data: ProgressData;
   private saveDebounceTimer: number | null = null;
@@ -37,15 +42,29 @@ class StorageManager {
         return createDefaultProgress();
       }
 
-      const parsed = JSON.parse(stored) as ProgressData;
+      const parsed: unknown = JSON.parse(stored);
+
+      // Primitives / arrays / null are corrupt — never hand them to ensureDefaults.
+      if (!isPlainObject(parsed)) {
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          new TypeError('Progress root must be a plain object')
+        );
+        return createDefaultProgress();
+      }
+
+      const progress = parsed as unknown as ProgressData;
 
       // Handle version migrations
-      if (parsed.version < CURRENT_DATA_VERSION) {
-        return this.migrate(parsed);
+      if (
+        typeof progress.version === 'number' &&
+        progress.version < CURRENT_DATA_VERSION
+      ) {
+        return this.migrate(progress);
       }
 
       // Ensure all required fields exist (defensive)
-      return this.ensureDefaults(parsed);
+      return this.ensureDefaults(progress);
     } catch (error) {
       console.warn('Failed to load progress data, starting fresh:', error);
       return createDefaultProgress();
@@ -62,25 +81,55 @@ class StorageManager {
 
   // Ensure all required fields have values
   private ensureDefaults(data: ProgressData): ProgressData {
-    const owl = data.owlState;
+    // importData relies on a throw here for JSON null / non-objects so the
+    // previous in-memory session is preserved (returns false).
+    if (!isPlainObject(data)) {
+      throw new TypeError('Progress data must be a plain object');
+    }
+
+    const owl = isPlainObject(data.owlState)
+      ? (data.owlState as OwlState)
+      : null;
+    const streak = isPlainObject(data.streak)
+      ? (data.streak as StreakData)
+      : null;
+    const settings = isPlainObject(data.settings)
+      ? (data.settings as Partial<UserSettings>)
+      : null;
+    const profile = isPlainObject(data.profile)
+      ? (data.profile as PlayerProfile)
+      : null;
+    const achievements = Array.isArray(data.achievements)
+      ? data.achievements
+      : [];
+    const gameStats = isPlainObject(data.gameStats)
+      ? (data.gameStats as Record<string, GameStats>)
+      : {};
+
     return {
       version: data.version || CURRENT_DATA_VERSION,
-      profile: data.profile || null,
-      streak: data.streak || {
+      profile,
+      streak: streak || {
         currentStreak: 0,
         bestStreak: 0,
         lastPlayDate: '',
         streakStartDate: '',
       },
-      achievements: data.achievements || [],
-      gameStats: data.gameStats || {},
+      achievements,
+      gameStats,
       owlState: owl
         ? {
             mood: owl.mood ?? DEFAULT_OWL_STATE.mood,
             lastInteraction:
               owl.lastInteraction ?? DEFAULT_OWL_STATE.lastInteraction,
-            messagesSeen: [...(owl.messagesSeen ?? [])],
-            tutorialsCompleted: [...(owl.tutorialsCompleted ?? [])],
+            messagesSeen: [
+              ...(Array.isArray(owl.messagesSeen) ? owl.messagesSeen : []),
+            ],
+            tutorialsCompleted: [
+              ...(Array.isArray(owl.tutorialsCompleted)
+                ? owl.tutorialsCompleted
+                : []),
+            ],
             totalMessagesShown:
               owl.totalMessagesShown ?? DEFAULT_OWL_STATE.totalMessagesShown,
           }
@@ -91,7 +140,7 @@ class StorageManager {
             tutorialsCompleted: [],
             totalMessagesShown: DEFAULT_OWL_STATE.totalMessagesShown,
           },
-      settings: { ...DEFAULT_SETTINGS, ...data.settings },
+      settings: { ...DEFAULT_SETTINGS, ...settings },
     };
   }
 

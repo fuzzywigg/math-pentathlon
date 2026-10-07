@@ -22,6 +22,8 @@ const isolatedFiles = [
   // Module-level bench accumulator + summarize it() is order-dependent under
   // --sequence.shuffle; isolate + afterAll summary keeps it deterministic.
   'tests/unit/tablet-ai-hard-latency.bench.test.ts',
+  // Re-imports StorageManager via vi.resetModules to exercise constructor load().
+  'tests/unit/durable-progress-persistence.test.ts',
 ];
 
 export default defineConfig({
