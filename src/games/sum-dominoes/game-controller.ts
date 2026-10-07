@@ -1,7 +1,12 @@
 // Sum Dominoes & Dice Game Controller
 // Manages game flow, AI, and UI updates
 
-import { SumDominoesState, Player, BoardPosition } from './types';
+import {
+  SumDominoesState,
+  Player,
+  BoardPosition,
+  getDiceSum,
+} from './types';
 import {
   createInitialState,
   doRollDice,
@@ -11,7 +16,6 @@ import {
   getValidPlacements,
 } from './rules';
 import { getAIMove, AIDifficulty } from './ai';
-import { getDiceSum } from './types';
 import {
   renderBoard,
   renderHand,
