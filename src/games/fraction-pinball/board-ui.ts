@@ -59,8 +59,10 @@ export function renderChallenge(
 
     for (const choice of challenge.answerChoices) {
       const btn = document.createElement('button');
+      btn.type = 'button';
       btn.className = 'pinball-choice-btn';
       btn.textContent = choice;
+      btn.setAttribute('aria-label', `Answer ${choice}`);
       if (allowInput) {
         btn.addEventListener('click', () => onAnswerSelect(choice));
       } else {
@@ -80,12 +82,22 @@ export function renderChallenge(
 // Result Display
 // =============================================================================
 
+export interface PinballResultOptions {
+  /** Points just awarded on a hit (display-only; 0 on miss). */
+  pointsAwarded?: number;
+  /**
+   * When false, omit Continue (AI auto-advances). Defaults to true.
+   */
+  showContinue?: boolean;
+}
+
 /**
  * Render result after answering
  */
 export function renderResult(
   state: FractionPinballState,
-  onContinue: () => void
+  onContinue: () => void,
+  options: PinballResultOptions = {}
 ): HTMLElement {
   const container = document.createElement('div');
   container.className = 'pinball-result';
@@ -94,13 +106,24 @@ export function renderResult(
     return container;
   }
 
+  const pointsAwarded = options.pointsAwarded ?? 0;
+  const showContinue = options.showContinue !== false;
+
   const feedback = document.createElement('div');
   feedback.className = `pinball-feedback ${state.isCorrect ? 'correct' : 'incorrect'}`;
 
   if (state.isCorrect) {
+    // Default copy preserves overnight exact-match leftovers when points omitted.
+    const hitText =
+      pointsAwarded > 0 ? 'HIT!' : 'HIT! Points scored!';
+    const pointsLine =
+      pointsAwarded > 0
+        ? `<div class="pinball-points">+${pointsAwarded} points</div>`
+        : '';
     feedback.innerHTML = `
       <div class="pinball-feedback-icon">🎯</div>
-      <div class="pinball-feedback-text">HIT! Points scored!</div>
+      <div class="pinball-feedback-text">${hitText}</div>
+      ${pointsLine}
       <div class="pinball-animation">★ ★ ★</div>
     `;
   } else {
@@ -113,12 +136,20 @@ export function renderResult(
 
   container.appendChild(feedback);
 
-  // Continue button
-  const continueBtn = document.createElement('button');
-  continueBtn.className = 'pinball-continue-btn';
-  continueBtn.textContent = 'Continue';
-  continueBtn.addEventListener('click', onContinue);
-  container.appendChild(continueBtn);
+  if (showContinue) {
+    const continueBtn = document.createElement('button');
+    continueBtn.className = 'pinball-continue-btn';
+    continueBtn.type = 'button';
+    continueBtn.textContent = 'Continue';
+    continueBtn.setAttribute('aria-label', 'Continue to next challenge');
+    continueBtn.addEventListener('click', onContinue);
+    container.appendChild(continueBtn);
+  } else {
+    const auto = document.createElement('div');
+    auto.className = 'pinball-auto-advance';
+    auto.textContent = 'Next challenge…';
+    container.appendChild(auto);
+  }
 
   return container;
 }
@@ -128,7 +159,7 @@ export function renderResult(
 // =============================================================================
 
 /**
- * Render decorative pinball board
+ * Render decorative pinball board (non-interactive atmosphere).
  */
 export function renderPinballBoard(_state: FractionPinballState): SVGElement {
   const width = 300;
@@ -139,6 +170,10 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
   svg.setAttribute('height', String(height));
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
   svg.classList.add('pinball-board');
+  svg.setAttribute('role', 'img');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  svg.style.pointerEvents = 'none';
 
   // Board background
   const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -252,30 +287,39 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
 // Score Display
 // =============================================================================
 
+export type PinballGameMode = 'human-vs-human' | 'human-vs-ai';
+
 /**
  * Render player scores
  */
-export function renderScores(state: FractionPinballState): HTMLElement {
+export function renderScores(
+  state: FractionPinballState,
+  gameMode: PinballGameMode = 'human-vs-human'
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'pinball-scores';
 
   const p1Stats = getPlayerStats(state, 'player1');
   const p2Stats = getPlayerStats(state, 'player2');
+  const p1Name = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
+  const p2Name = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
+  const p1Balls = Math.max(0, p1Stats.ballsRemaining);
+  const p2Balls = Math.max(0, p2Stats.ballsRemaining);
 
   container.innerHTML = `
     <div class="pinball-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1">
-      <div class="pinball-player-name">Blue</div>
+      <div class="pinball-player-name">${p1Name}</div>
       <div class="pinball-score-value">${p1Stats.score}</div>
-      <div class="pinball-balls">${seatIcon('player1').repeat(p1Stats.ballsRemaining)}</div>
+      <div class="pinball-balls" aria-label="${p1Balls} balls remaining">${seatIcon('player1').repeat(p1Balls)}</div>
     </div>
     <div class="pinball-round">
       <div class="pinball-round-label">Round</div>
       <div class="pinball-round-value">${state.roundNumber}/${state.maxRounds}</div>
     </div>
     <div class="pinball-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2">
-      <div class="pinball-player-name">Red</div>
+      <div class="pinball-player-name">${p2Name}</div>
       <div class="pinball-score-value">${p2Stats.score}</div>
-      <div class="pinball-balls">${seatIcon('player2').repeat(p2Stats.ballsRemaining)}</div>
+      <div class="pinball-balls" aria-label="${p2Balls} balls remaining">${seatIcon('player2').repeat(p2Balls)}</div>
     </div>
   `;
 
@@ -289,18 +333,25 @@ export function renderScores(state: FractionPinballState): HTMLElement {
 /**
  * Render game over screen
  */
-export function renderGameOver(state: FractionPinballState): HTMLElement {
+export function renderGameOver(
+  state: FractionPinballState,
+  gameMode: PinballGameMode = 'human-vs-human'
+): HTMLElement {
   const container = document.createElement('div');
   container.className = 'pinball-game-over';
 
   const p1Stats = getPlayerStats(state, 'player1');
   const p2Stats = getPlayerStats(state, 'player2');
+  const p1Name = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
+  const p2Name = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
 
   let winnerText: string;
   if (state.winner === 'player1') {
-    winnerText = 'Blue Wins! 🏆';
+    winnerText =
+      gameMode === 'human-vs-ai' ? 'You win! 🏆' : 'Blue Wins! 🏆';
   } else if (state.winner === 'player2') {
-    winnerText = 'Red Wins! 🏆';
+    winnerText =
+      gameMode === 'human-vs-ai' ? 'Computer wins! 🏆' : 'Red Wins! 🏆';
   } else {
     winnerText = "It's a Draw!";
   }
@@ -309,14 +360,14 @@ export function renderGameOver(state: FractionPinballState): HTMLElement {
     <div class="pinball-winner-banner">${winnerText}</div>
     <div class="pinball-final-scores">
       <div class="pinball-final-score player1">
-        <div class="pinball-final-name">Blue</div>
+        <div class="pinball-final-name">${p1Name}</div>
         <div class="pinball-final-value">${p1Stats.score} pts</div>
         <div class="pinball-final-stats">
           ${p1Stats.correctAnswers} hits
         </div>
       </div>
       <div class="pinball-final-score player2">
-        <div class="pinball-final-name">Red</div>
+        <div class="pinball-final-name">${p2Name}</div>
         <div class="pinball-final-value">${p2Stats.score} pts</div>
         <div class="pinball-final-stats">
           ${p2Stats.correctAnswers} hits
@@ -364,9 +415,18 @@ export function injectFractionPinballStyles(): void {
       justify-content: center;
     }
 
+    /* Challenge first in reading/tab order; decorative board secondary. */
+    .pinball-challenge,
+    .pinball-result {
+      order: 1;
+    }
+
     .pinball-board {
+      order: 2;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-width: 100%;
+      height: auto;
     }
 
     .pinball-challenge {
@@ -374,7 +434,8 @@ export function injectFractionPinballStyles(): void {
       border-radius: 12px;
       padding: 24px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      min-width: 300px;
+      min-width: min(300px, 100%);
+      flex: 1 1 280px;
     }
 
     .pinball-question {
@@ -406,8 +467,8 @@ export function injectFractionPinballStyles(): void {
 
     .pinball-choice-btn {
       padding: 16px 24px;
-      min-height: 44px;
-      min-width: 44px;
+      min-height: 48px;
+      min-width: 48px;
       font-size: 20px;
       font-weight: 600;
       border: 2px solid #ddd;
@@ -415,6 +476,7 @@ export function injectFractionPinballStyles(): void {
       background: white;
       cursor: pointer;
       transition: all 0.2s;
+      touch-action: manipulation;
     }
 
     .pinball-choice-btn:hover:not(:disabled) {
@@ -458,6 +520,18 @@ export function injectFractionPinballStyles(): void {
       font-weight: bold;
     }
 
+    .pinball-points {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    .pinball-auto-advance {
+      font-size: 16px;
+      color: #666;
+      margin-top: 8px;
+    }
+
     .pinball-animation {
       font-size: 24px;
       animation: pulse 0.5s ease-in-out infinite alternate;
@@ -475,7 +549,8 @@ export function injectFractionPinballStyles(): void {
 
     .pinball-continue-btn {
       padding: 12px 32px;
-      min-height: 44px;
+      min-height: 48px;
+      min-width: 48px;
       font-size: 18px;
       font-weight: 600;
       background: #2196F3;
@@ -484,6 +559,7 @@ export function injectFractionPinballStyles(): void {
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
+      touch-action: manipulation;
     }
 
     .pinball-continue-btn:hover {
@@ -614,8 +690,35 @@ export function injectFractionPinballStyles(): void {
     @media (pointer: coarse) {
       .pinball-choice-btn,
       .pinball-continue-btn {
-        min-height: 44px;
-        min-width: 44px;
+        min-height: 48px;
+        min-width: 48px;
+      }
+
+      .pinball-choices {
+        gap: 14px;
+      }
+
+      /* Shrink decorative board so the challenge stays in the first viewport. */
+      .pinball-board {
+        width: min(220px, 42vw);
+        height: auto;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .pinball-main {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .pinball-board {
+        width: min(240px, 70vw);
+        height: auto;
+      }
+
+      .pinball-challenge {
+        width: 100%;
+        min-width: 0;
       }
     }
 

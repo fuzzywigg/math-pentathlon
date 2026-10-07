@@ -1,7 +1,11 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { FractionPinballState, createInitialState } from './types';
+import {
+  FractionPinballState,
+  createInitialState,
+  getPlayerStats,
+} from './types';
 import { submitAnswer, nextChallenge, startGame } from './rules';
 import {
   renderChallenge,
@@ -11,6 +15,7 @@ import {
   renderGameOver,
   getPlayerName,
   injectFractionPinballStyles,
+  type PinballGameMode,
 } from './board-ui';
 import { getAIAnswer, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
@@ -18,10 +23,19 @@ import { fractionPinballTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 
+/** Think pause before computer selects an answer (snappier than 1s). */
+const AI_THINK_MS = 650;
+/** Auto-advance after computer result (human still reads HIT/Miss). */
+const AI_RESULT_MS = 900;
+
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
   if (!root) return;
   applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+}
+
+function gameMode(): PinballGameMode {
+  return isAIMode ? 'human-vs-ai' : 'human-vs-human';
 }
 
 // =============================================================================
@@ -34,6 +48,8 @@ let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Bumped to cancel in-flight AI timeouts after new game. */
 let aiGeneration = 0;
+/** Display-only: points from the most recent hit (not part of rules state). */
+let lastPointsAwarded = 0;
 
 function isComputerAnswering(): boolean {
   return (
@@ -41,6 +57,37 @@ function isComputerAnswering(): boolean {
     gameState.phase === 'answering' &&
     gameState.currentPlayer === 'player2'
   );
+}
+
+function isComputerShowingResult(): boolean {
+  return (
+    isAIMode &&
+    gameState.phase === 'showResult' &&
+    gameState.currentPlayer === 'player2'
+  );
+}
+
+function statusForTurn(): string {
+  if (isComputerAnswering()) {
+    return 'Computer is thinking…';
+  }
+  if (gameState.phase === 'showResult') {
+    if (isComputerShowingResult()) {
+      return gameState.isCorrect
+        ? 'Computer hit! Next challenge…'
+        : 'Computer missed. Next challenge…';
+    }
+    return gameState.isCorrect
+      ? 'HIT! Tap Continue.'
+      : 'Miss! Tap Continue.';
+  }
+  if (isAIMode) {
+    if (gameState.currentPlayer === 'player1') {
+      return `${seatIcon('player1')} Your turn`;
+    }
+    return `${seatIcon('player2')} Computer's turn`;
+  }
+  return `${seatIcon(gameState.currentPlayer)} ${getPlayerName(gameState.currentPlayer)}'s turn`;
 }
 
 // =============================================================================
@@ -56,34 +103,33 @@ function render(): void {
   wrapper.className = 'pinball-game-container';
 
   // Scores
-  wrapper.appendChild(renderScores(gameState));
+  wrapper.appendChild(renderScores(gameState, gameMode()));
 
   // Game over or active game
   if (gameState.phase === 'gameOver') {
-    wrapper.appendChild(renderGameOver(gameState));
+    wrapper.appendChild(renderGameOver(gameState, gameMode()));
   } else {
     // Current player status
     const status = document.createElement('div');
     status.className = `pinball-status ${gameState.currentPlayer}`;
     markStatusLive(status);
+    status.textContent = statusForTurn();
     if (isComputerAnswering()) {
-      status.textContent = 'Computer is thinking…';
       status.classList.add('status-ai-thinking');
-    } else {
-      status.textContent = `${seatIcon(gameState.currentPlayer)} ${getPlayerName(gameState.currentPlayer)}'s turn`;
     }
     wrapper.appendChild(status);
 
-    // Main game area
+    // Main game area — challenge first in DOM for tablet focus
     const main = document.createElement('div');
     main.className = 'pinball-main';
 
-    // Pinball board visual
-    main.appendChild(renderPinballBoard(gameState));
-
-    // Challenge or result
     if (gameState.phase === 'showResult') {
-      main.appendChild(renderResult(gameState, handleContinue));
+      main.appendChild(
+        renderResult(gameState, handleContinue, {
+          pointsAwarded: lastPointsAwarded,
+          showContinue: !isComputerShowingResult(),
+        })
+      );
     } else {
       main.appendChild(
         renderChallenge(gameState, handleAnswerSelect, {
@@ -91,6 +137,9 @@ function render(): void {
         })
       );
     }
+
+    // Decorative board (non-interactive)
+    main.appendChild(renderPinballBoard(gameState));
 
     wrapper.appendChild(main);
   }
@@ -103,7 +152,7 @@ function render(): void {
     setTimeout(() => {
       if (gen !== aiGeneration) return;
       aiTurn();
-    }, 1000);
+    }, AI_THINK_MS);
   }
 }
 
@@ -115,7 +164,10 @@ function handleAnswerSelect(answer: string): void {
   if (gameState.phase !== 'answering') return;
   if (isComputerAnswering()) return;
 
+  const before = getPlayerStats(gameState, gameState.currentPlayer).score;
   gameState = submitAnswer(gameState, answer);
+  const after = getPlayerStats(gameState, gameState.currentPlayer).score;
+  lastPointsAwarded = Math.max(0, after - before);
   render();
 }
 
@@ -123,6 +175,7 @@ function handleContinue(): void {
   if (gameState.phase !== 'showResult') return;
 
   gameState = nextChallenge(gameState);
+  lastPointsAwarded = 0;
   render();
 }
 
@@ -145,7 +198,10 @@ function aiTurn(): void {
 
   if (!selectedAnswer) return;
 
+  const before = getPlayerStats(gameState, 'player2').score;
   gameState = submitAnswer(gameState, selectedAnswer);
+  const after = getPlayerStats(gameState, 'player2').score;
+  lastPointsAwarded = Math.max(0, after - before);
   render();
 
   // Auto-continue after showing result
@@ -155,7 +211,7 @@ function aiTurn(): void {
     if (gameState.phase === 'showResult') {
       handleContinue();
     }
-  }, 1500);
+  }, AI_RESULT_MS);
 }
 
 // =============================================================================
@@ -166,6 +222,7 @@ export function initGame(containerEl: HTMLElement): void {
   injectFractionPinballStyles();
   gameContainer = containerEl;
   aiGeneration += 1;
+  lastPointsAwarded = 0;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
@@ -175,6 +232,7 @@ export function initGame(containerEl: HTMLElement): void {
 
 export function newGameVsHuman(): void {
   aiGeneration += 1;
+  lastPointsAwarded = 0;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
@@ -184,6 +242,7 @@ export function newGameVsHuman(): void {
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   aiGeneration += 1;
+  lastPointsAwarded = 0;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = true;
