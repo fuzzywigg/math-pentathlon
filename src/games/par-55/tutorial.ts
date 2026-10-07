@@ -12,7 +12,7 @@ export const par55Tutorial: TutorialConfig = {
       title: 'Welcome to Par 55!',
       message: `
         <p>Let's learn how to play <strong>Par 55</strong>!</p>
-        <p>Be the first player to score 55 points by matching attributes on the board!</p>
+        <p>Be the first player to score 55 points by matching features (shape, color, size, or thickness)!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const par55Tutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Be the first player to score 55 points by matching attributes on the board!</p>
+        <p>Be the first player to score 55 points by matching features (shape, color, size, or thickness)!</p>
       `,
       position: 'center',
     },
@@ -45,8 +45,8 @@ export const par55Tutorial: TutorialConfig = {
       message: `
         <ol>
           <li><strong>Select Block:</strong> Choose a block from your hand (5 blocks)</li>
-          <li><strong>Place Block:</strong> Put it on an empty base adjacent to occupied bases</li>
-          <li><strong>Score Points:</strong> Earn 1 point for each matching attribute with adjacent blocks</li>
+          <li><strong>Place Block:</strong> Put it on an empty pentagon next to one that already has a block</li>
+          <li><strong>Score Points:</strong> Earn 1 point for each matching feature with neighboring blocks</li>
         </ol>
       `,
       highlightSelector: '.par55-board',
@@ -58,8 +58,8 @@ export const par55Tutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Compare your placed block to each adjacent block</li>
-          <li>Score 1 point per matching attribute (max 4 per connection)</li>
-          <li>Multiple adjacent blocks = multiple scoring opportunities!</li>
+          <li>Score 1 point per matching feature (up to 4 points for each neighbor you touch)</li>
+          <li>More neighbors mean more chances to score!</li>
         </ul>
       `,
       highlightSelector: '.par55-scores',

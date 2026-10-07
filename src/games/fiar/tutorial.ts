@@ -19,7 +19,8 @@ export const fiarTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Identify four (or more) chips of the same color along a straight line of connected spaces, with no opposite-color chip between them.</p>
+        <p>Find four (or more) chips of the same color on a straight line of connected spaces.</p>
+        <p>No chip of the other color can sit between them.</p>
         <p>Empty spaces between your four are fine. The path cannot cross the yellow center diamond.</p>
       `,
       position: 'center',
@@ -29,7 +30,7 @@ export const fiarTutorial: TutorialConfig = {
       title: 'Game Phases',
       message: `
         <ol>
-          <li><strong>Placement Phase:</strong> Take turns placing 7 chips each on any empty node (2 of yours are marked Fire Extinguishers)</li>
+          <li><strong>Placement Phase:</strong> Take turns placing 7 chips each on any empty space (2 of your 7 chips are marked Fire Extinguishers)</li>
           <li><strong>Movement Phase:</strong> Take turns moving your chips along pathways</li>
         </ol>
       `,
@@ -56,7 +57,7 @@ export const fiarTutorial: TutorialConfig = {
         <ul>
           <li>Chips move along the connected pathways (lines)</li>
           <li>Move any distance in a straight line</li>
-          <li>Cannot jump over other chips</li>
+          <li>You cannot jump over other chips</li>
           <li>Cannot move across the yellow center</li>
           <li>Click your chip to select, then click destination</li>
         </ul>
