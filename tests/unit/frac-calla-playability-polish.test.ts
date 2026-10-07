@@ -127,7 +127,7 @@ describe('Fraction Pinball playability polish', () => {
     expect(getPinballState().currentPlayer).toBe('player2');
     expect(root.textContent).toMatch(/Computer is thinking/i);
 
-    vi.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(650);
     // Soft-lock recovery submitted an answer (result or next challenge)
     expect(['showResult', 'answering', 'gameOver']).toContain(
       getPinballState().phase
@@ -135,11 +135,11 @@ describe('Fraction Pinball playability polish', () => {
     expect(getPinballState().phase).not.toBe('answering');
   });
 
-  it('injects reduced-motion and 44px choice targets', () => {
+  it('injects reduced-motion and ≥44px choice targets', () => {
     injectFractionPinballStyles();
     const css =
       document.getElementById('fraction-pinball-styles')?.textContent || '';
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
-    expect(css).toMatch(/\.pinball-choice-btn[\s\S]*min-height:\s*44px/);
+    expect(css).toMatch(/\.pinball-choice-btn[\s\S]*min-height:\s*4[4-9]px/);
   });
 });

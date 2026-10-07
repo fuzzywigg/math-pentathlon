@@ -301,7 +301,8 @@ export function submitAnswer(
     newStats = {
       ...currentStats,
       wrongAnswers: currentStats.wrongAnswers + 1,
-      ballsRemaining: currentStats.ballsRemaining - 1,
+      // Floor at 0 so icon render never String.repeat(negative).
+      ballsRemaining: Math.max(0, currentStats.ballsRemaining - 1),
     };
   }
 
