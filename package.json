@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "size:check": "node scripts/check-bundle-budgets.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",

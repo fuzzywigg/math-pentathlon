@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "unit": "gzip-bytes",
+  "headroom": 0.1,
+  "description": "Gzip size budgets for the menu critical path (index.html JS/CSS) and each game lazy chunk. Budgets were set at measured size + 10%. Report-only — see docs/bundle-budget.md.",
+  "menuCriticalPath": 46822,
+  "games": {
+    "calla": 6967,
+    "contig-60": 7372,
+    "fab-a-diffy": 8411,
+    "fiar": 12156,
+    "frac-fact": 6350,
+    "fraction-pinball": 6177,
+    "hex": 6056,
+    "hex-a-gone": 7387,
+    "juggle": 8181,
+    "kings-quadraphages": 7903,
+    "kwatro-sinko": 8576,
+    "par-55": 7929,
+    "pent-em-in": 7284,
+    "prime-gold": 8686,
+    "queens-guards": 8628,
+    "ramrod": 7261,
+    "remainder-islands": 6878,
+    "star-track": 6035,
+    "stars-bars": 7418,
+    "sum-dominoes": 7013
+  }
+}
