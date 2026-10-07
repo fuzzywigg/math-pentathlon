@@ -340,20 +340,32 @@ export function injectRamrodStyles(): void {
       flex-direction: column;
       align-items: center;
       gap: 1rem;
-      padding: 1rem;
+      padding: 0.5rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
+    /*
+     * Stack hands + board (never a wide 3-column row). #app is max-width 700px with
+     * overflow clip — a side-by-side layout painted outside that box and ate clicks.
+     */
     .ramrod-main-layout {
       display: flex;
-      gap: 2rem;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
     }
 
     .ramrod-board {
       background: #e8d4b8;
-      padding: 1rem;
+      padding: 0.75rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .ramrod-grid {
@@ -368,7 +380,8 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-box {
-      width: ${BOX_WIDTH}px;
+      width: min(${BOX_WIDTH}px, 22vw);
+      min-width: 72px;
       min-height: ${BOX_HEIGHT}px;
       background: #f5f0e8;
       border: 2px solid #c9b89b;
@@ -377,6 +390,7 @@ export function injectRamrodStyles(): void {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      box-sizing: border-box;
     }
 
     .ramrod-box.completed.player1 {
@@ -443,12 +457,16 @@ export function injectRamrodStyles(): void {
 
     .ramrod-player-rods {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 0.5rem;
-      padding: 1rem;
+      padding: 0.75rem;
       background: rgba(255,255,255,0.9);
       border-radius: 8px;
       min-width: 120px;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .ramrod-player-player1 {
@@ -539,6 +557,11 @@ export function injectRamrodStyles(): void {
       margin-top: -0.5rem;
       max-width: 28rem;
       line-height: 1.35;
+    }
+
+    .ramrod-turn-hint.ramrod-deadlock-hint {
+      color: #8a4b08;
+      font-weight: 600;
     }
 
     .ramrod-winner-banner {
@@ -680,19 +703,6 @@ export function injectRamrodStyles(): void {
     .ramrod-legend-color {
       height: 12px;
       border-radius: 2px;
-    }
-
-    @media (max-width: 768px) {
-      .ramrod-main-layout {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .ramrod-player-rods {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
     }
 
     /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */

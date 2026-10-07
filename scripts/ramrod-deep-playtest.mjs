@@ -117,54 +117,132 @@ async function measureTargets(page) {
   });
 }
 
-async function playHumanTurn(page) {
-  const pass = page.locator('.ramrod-btn-secondary', { hasText: 'Pass Turn' });
-  if (await pass.isVisible().catch(() => false)) {
-    await pass.click({ force: true });
-    return 'pass';
+/** Click via DOM dispatch — survives shell overflow-clip quirks. */
+async function tap(page, selector, index = 0) {
+  const ok = await page.evaluate(
+    ({ selector, index }) => {
+      const el = document.querySelectorAll(selector)[index];
+      if (!el) return false;
+      el.dispatchEvent(
+        new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+      );
+      return true;
+    },
+    { selector, index }
+  );
+  if (!ok) {
+    await page.locator(selector).nth(index).click({ force: true }).catch(() => {});
   }
+}
 
-  const selectable = page.locator('.ramrod-rod-wrapper.selectable');
-  const n = await selectable.count();
-  if (n === 0) {
+async function playHumanTurn(page) {
+  const deadlock = await page.locator('.ramrod-deadlock-hint').count();
+  if (deadlock > 0) return 'deadlock';
+
+  const didPass = await page.evaluate(() => {
+    const btn = [...document.querySelectorAll('.ramrod-btn-secondary')].find(
+      (b) => b.textContent?.includes('Pass Turn')
+    );
+    if (!btn) return false;
+    btn.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+    );
+    return true;
+  });
+  if (didPass) return 'pass';
+
+  // Prefer a rod that completes a box (has a "Need:" complementary slot), else first
+  const choice = await page.evaluate(() => {
+    const rods = [
+      ...document.querySelectorAll(
+        '.ramrod-player-player1 .ramrod-rod-wrapper.selectable'
+      ),
+    ];
+    if (rods.length === 0) return null;
+    // Try each rod via temporary click simulation is hard; pick index by label length
+    // Prefer mid-length rods (3–7) which complete more often in practice
+    let best = 0;
+    let bestScore = -1;
+    rods.forEach((el, i) => {
+      const label = el.querySelector('.ramrod-rod-label')?.textContent ?? '0';
+      const len = Number(label);
+      const score = len >= 3 && len <= 7 ? 10 + len : len;
+      if (score > bestScore) {
+        bestScore = score;
+        best = i;
+      }
+    });
+    return { index: best, count: rods.length };
+  });
+
+  if (!choice) {
     await page.waitForTimeout(200);
-    if (await pass.isVisible().catch(() => false)) {
-      await pass.click({ force: true });
-      return 'pass';
-    }
     return 'no-move';
   }
 
-  const idx = n > 2 && Math.random() < 0.3 ? 1 : 0;
-  await selectable.nth(idx).click({ force: true });
-  await page.waitForTimeout(80);
+  await tap(
+    page,
+    '.ramrod-player-player1 .ramrod-rod-wrapper.selectable',
+    choice.index
+  );
+  await page.waitForTimeout(60);
 
-  const valid = page.locator('.ramrod-slot.valid');
-  const vc = await valid.count();
+  let vc = await page.locator('.ramrod-slot.valid').count();
   if (vc === 0) {
-    // Rod has no fit — clear and try another rod once
-    const clear = page.locator('.ramrod-btn-secondary', {
-      hasText: 'Clear Selection',
-    });
-    if (await clear.isVisible().catch(() => false)) {
-      await clear.click({ force: true });
-      await page.waitForTimeout(60);
-      const again = page.locator('.ramrod-rod-wrapper.selectable');
-      const n2 = await again.count();
-      if (n2 > 0) {
-        await again.nth(Math.min(1, n2 - 1)).click({ force: true });
-        await page.waitForTimeout(60);
-        const valid2 = page.locator('.ramrod-slot.valid');
-        if ((await valid2.count()) > 0) {
-          await valid2.first().click({ force: true });
-          return 'place-retry';
-        }
-      }
+    // Try other rods
+    for (let i = 0; i < choice.count; i++) {
+      if (i === choice.index) continue;
+      await page.evaluate(() => {
+        const selected = document.querySelector(
+          '.ramrod-rod-wrapper.selected.selectable'
+        );
+        selected?.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+      });
+      await page.waitForTimeout(40);
+      await tap(
+        page,
+        '.ramrod-player-player1 .ramrod-rod-wrapper.selectable',
+        0
+      );
+      // After deselect, selectable list resets — click i-th among p1
+      await page.evaluate((idx) => {
+        const rods = [
+          ...document.querySelectorAll(
+            '.ramrod-player-player1 .ramrod-rod-wrapper.selectable'
+          ),
+        ];
+        const el = rods[idx];
+        el?.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+      }, i);
+      await page.waitForTimeout(40);
+      vc = await page.locator('.ramrod-slot.valid').count();
+      if (vc > 0) break;
     }
-    return 'no-valid-slot';
   }
-  const vIdx = vc > 1 && Math.random() < 0.4 ? Math.min(1, vc - 1) : 0;
-  await valid.nth(vIdx).click({ force: true });
+
+  if (vc === 0) return 'no-valid-slot';
+
+  // Prefer a slot that shows "Need:" (completing) when available
+  const slotIdx = await page.evaluate(() => {
+    const valids = [...document.querySelectorAll('.ramrod-slot.valid')];
+    const complete = valids.findIndex((s) =>
+      s.parentElement?.textContent?.includes('Need:')
+    );
+    return complete >= 0 ? complete : 0;
+  });
+  await tap(page, '.ramrod-slot.valid', slotIdx);
   return 'place';
 }
 
@@ -296,9 +374,17 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       }
 
       const action = await playHumanTurn(page);
+      if (action === 'deadlock') {
+        outcome = 'deadlock';
+        break;
+      }
       if (action === 'no-move' || action === 'no-valid-slot') {
         await page.waitForTimeout(400);
         const again = await playHumanTurn(page);
+        if (again === 'deadlock') {
+          outcome = 'deadlock';
+          break;
+        }
         if (again === 'no-move' || again === 'no-valid-slot') {
           const after = await page.evaluate(() => ({
             status:

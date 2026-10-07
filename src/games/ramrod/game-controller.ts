@@ -1,7 +1,7 @@
 // Ramrod Game Controller
 // Manages game flow, AI, and UI updates
 
-import { RamrodState, Player } from './types';
+import { RamrodState, Player, getOpponent } from './types';
 import {
   createInitialState,
   selectRod,
@@ -159,8 +159,20 @@ function updateUI(controller: RamrodGameController): void {
   if (!state.winner && state.phase !== 'gameOver' && !computerTurn) {
     const hint = document.createElement('div');
     hint.className = 'ramrod-turn-hint';
-    if (state.phase === 'selectingRod') {
-      if (!hasValidMoves(state)) {
+    const selfStuck = !hasValidMoves(state);
+    const oppProbe: RamrodState = {
+      ...state,
+      currentPlayer: getOpponent(state.currentPlayer),
+      selectedRod: null,
+      phase: 'selectingRod',
+    };
+    const bothStuck = selfStuck && !hasValidMoves(oppProbe);
+    if (bothStuck) {
+      hint.classList.add('ramrod-deadlock-hint');
+      hint.textContent =
+        'Neither player can place a rod — use New Game (scoring unchanged until then)';
+    } else if (state.phase === 'selectingRod') {
+      if (selfStuck) {
         hint.textContent = 'No rod fits a box — tap Pass Turn';
       } else {
         hint.textContent = controller.isAI

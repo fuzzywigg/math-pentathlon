@@ -60,13 +60,15 @@ describe('Ramrod deep playability', () => {
     expect(ctrl.state.selectedRod).toBeNull();
   });
 
-  it('injected CSS includes 44px coarse touch floors', () => {
+  it('injected CSS includes 44px coarse touch floors and stacked layout', () => {
     injectRamrodStyles();
     const css = document.getElementById('ramrod-styles')?.textContent ?? '';
     expect(css).toMatch(/pointer:\s*coarse/);
     expect(css).toMatch(/min-height:\s*44px/);
     expect(css).toMatch(/ramrod-turn-hint/);
     expect(css).toMatch(/prefers-reduced-motion/);
+    expect(css).toMatch(/flex-direction:\s*column/);
+    expect(css).toMatch(/max-width:\s*100%/);
   });
 
   it.each(['easy', 'medium', 'hard'] as AIDifficulty[])(
