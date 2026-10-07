@@ -2,7 +2,7 @@
  * Shared helpers for MP-3D Playwright specs.
  * Prefer ready-signal waits over fixed sleep; opt into board3dLQ for CI GL load.
  */
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /** Heavy multi-viewport / play-through 3D specs. */
 export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
@@ -18,21 +18,23 @@ export async function waitForGameReady(page: Page): Promise<void> {
 
 export async function dismissModeIfNeeded(page: Page): Promise<void> {
   const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator(
-      'input[value="human-vs-human"], input[value="vs-human"]'
-    );
-    if (await human.count()) {
-      await human
-        .first()
-        .check({ force: true })
-        .catch(() => undefined);
-    }
-    const start = page.locator('#start-game-btn');
-    if (await start.isVisible().catch(() => false)) {
-      await start.click();
-    }
+  if (!(await modal.isVisible().catch(() => false))) return;
+
+  const human = page.locator(
+    'input[value="human-vs-human"], input[value="vs-human"]'
+  );
+  if (await human.count()) {
+    await human
+      .first()
+      .check({ force: true })
+      .catch(() => undefined);
   }
+  const start = page.locator('#start-game-btn');
+  if (await start.isVisible().catch(() => false)) {
+    await start.click();
+  }
+  // Overlay must be gone before board/keyboard interaction (focus + AI-turn races).
+  await expect(modal).toBeHidden({ timeout: 10_000 });
 }
 
 /** Enable 3D + test-only low-quality render before navigation. */
@@ -63,6 +65,39 @@ export async function waitForMp3dReady(
     `canvas[data-mp3d="${gameId}"][data-mp3d-ready="1"]`
   );
   await expect(canvas).toBeVisible({ timeout: timeoutMs });
+}
+
+/**
+ * Visually-hidden a11y grids use clip/1px sizing — `toBeVisible` is flaky.
+ * Wait for attach, focus, then Enter (button activates via click handler).
+ */
+export async function keyboardActivateA11yCell(
+  page: Page,
+  cell: Locator
+): Promise<void> {
+  await expect(cell).toBeAttached({ timeout: 10_000 });
+  await cell.focus();
+  await expect(cell).toBeFocused({ timeout: 5_000 });
+  await page.keyboard.press('Enter');
+}
+
+/**
+ * Wait until status shows a human-actionable prompt (not AI thinking).
+ * Use a single status selector — union locators flake under strict mode once
+ * sibling panels (e.g. move history) mount after a successful move.
+ */
+export async function waitForHumanStatus(
+  page: Page,
+  statusSelector: string,
+  pattern: RegExp,
+  timeoutMs: number = 15_000
+): Promise<void> {
+  const status = page.locator(statusSelector);
+  await expect(status).toBeVisible({ timeout: timeoutMs });
+  await expect(status).not.toContainText(/Computer is thinking/i, {
+    timeout: timeoutMs,
+  });
+  await expect(status).toContainText(pattern, { timeout: timeoutMs });
 }
 
 /** board3d URL with LQ flag for e2e. */

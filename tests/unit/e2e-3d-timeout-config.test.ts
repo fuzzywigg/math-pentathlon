@@ -31,6 +31,13 @@ describe('e2e 3D timeout config', () => {
     expect(helper).toContain('data-mp3d-ready');
   });
 
+  it('ships keyboard a11y + human-status helpers (no union strict-mode flake)', () => {
+    expect(helper).toContain('keyboardActivateA11yCell');
+    expect(helper).toContain('waitForHumanStatus');
+    expect(helper).toContain('toBeAttached');
+    expect(helper).toContain('Computer is thinking');
+  });
+
   it('exposes test-only board3dLQ pixel-ratio path', () => {
     expect(tablet).toContain('BOARD_3D_LQ_PARAM');
     expect(tablet).toContain('resolveBoard3dPixelRatio');
