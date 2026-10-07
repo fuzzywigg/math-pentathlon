@@ -400,7 +400,10 @@ export function renderStatus(
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+    // HvA: "You win!" (not "You Wins!") for early readers; others keep "X Wins!"
+    const winPhrase =
+      winnerName === 'You' ? 'You win!' : `${winnerName} Wins!`;
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winPhrase} 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');

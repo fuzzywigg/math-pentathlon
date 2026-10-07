@@ -30,7 +30,7 @@ describe('Wave 58 juggle — place hint exact', () => {
       () => undefined
     );
     expect(el.querySelector('.juggle-hint')?.textContent).toBe(
-      'Click on your board to place the shape'
+      'Click a highlighted cell to place the shape'
     );
   });
 });

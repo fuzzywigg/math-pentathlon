@@ -23,7 +23,7 @@ describe('Wave 52 star-track — You/AI Wins', () => {
       el,
       'human-vs-ai'
     );
-    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You Wins!/);
+    expect(el.querySelector('.status-winner')?.textContent).toMatch(/You win!/);
 
     renderStatus(
       {

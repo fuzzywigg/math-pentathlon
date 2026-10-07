@@ -11,6 +11,8 @@ import {
   rotateShape,
   flipShape,
   placeShape,
+  abandonPlacement,
+  selectedShapeFitsAnywhere,
 } from './rules';
 import {
   getAIDieChoice,
@@ -98,7 +100,10 @@ function updateUI(): void {
       gameState,
       handleRotate,
       handleFlip,
-      inputOpts
+      {
+        ...inputOpts,
+        onAbandonPlacement: allowInput ? handleAbandonPlacement : undefined,
+      }
     );
     boardContainer.appendChild(shapeControls);
   }
@@ -178,7 +183,9 @@ function updateStatus(): void {
       }
       break;
     case 'placing':
-      instruction = 'Place the shape on your board';
+      instruction = selectedShapeFitsAnywhere(gameState)
+        ? 'Place the shape on your board'
+        : "Shape won't fit — choose another";
       break;
   }
 
@@ -233,6 +240,13 @@ function handleRotate(): void {
 function handleFlip(): void {
   if (isComputerTurnPending()) return;
   gameState = flipShape(gameState);
+  updateUI();
+}
+
+function handleAbandonPlacement(): void {
+  if (isComputerTurnPending()) return;
+  if (gameState.phase !== 'placing') return;
+  gameState = abandonPlacement(gameState);
   updateUI();
 }
 

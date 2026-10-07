@@ -102,7 +102,7 @@ describe('Fab-a-Diffy AI', () => {
     expect(next.currentPlayer).toBe('player2');
     expect(next.phase).toBe('selectingBar1');
     expect(next.moveHistory.length).toBe(0);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });
 

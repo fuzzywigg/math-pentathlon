@@ -366,31 +366,22 @@ export function applyAIMoveSteps(
 ): FabADiffyState {
   let currentState = selectBar1(state, move.bar1Id);
   if (currentState.phase !== 'selectingBar2') {
-    console.error('AI: selectBar1 failed', { move, phase: currentState.phase });
+    // Stale / illegal AI plan — pass rather than soft-lock (no console spam).
     return passTurn(state);
   }
 
   currentState = selectBar2(currentState, move.bar2Id);
   if (currentState.phase !== 'selectingOperation') {
-    console.error('AI: selectBar2 failed', { move, phase: currentState.phase });
     return passTurn(state);
   }
 
   currentState = selectOperation(currentState, move.operation);
   if (currentState.phase !== 'confirmingMove') {
-    console.error('AI: selectOperation failed', {
-      move,
-      phase: currentState.phase,
-    });
     return passTurn(state);
   }
 
   currentState = executeMove(currentState, move.answerId);
   if (currentState.phase === 'confirmingMove') {
-    console.error('AI: executeMove failed', {
-      move,
-      phase: currentState.phase,
-    });
     return passTurn(state);
   }
 

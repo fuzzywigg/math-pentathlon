@@ -328,4 +328,9 @@ body {
     min-width: 0;
     min-height: 0;
   }
+
+  /* Tablet: enlarge Kings grid so cells approach ≥44 CSS px (9×44 ≈ 396) */
+  .board {
+    width: min(420px, calc(100vw - 2 * var(--play-shell-gutter)));
+  }
 }

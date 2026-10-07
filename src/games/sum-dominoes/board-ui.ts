@@ -524,9 +524,9 @@ export function injectSDStyles(): void {
     @media (pointer: coarse) {
       .sd-hand-domino {
         width: 72px;
-        height: 36px;
+        height: 44px;
         min-width: 44px;
-        min-height: 36px;
+        min-height: 44px;
         padding: 4px;
       }
 
