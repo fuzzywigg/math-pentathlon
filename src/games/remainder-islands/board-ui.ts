@@ -242,20 +242,17 @@ export function renderBoard(
         : island.owner === 'player2'
           ? 'Red'
           : undefined;
-    makeSvgFocusable(
-      group,
-      buildCellAriaLabel({
-        coord: `${island.row},${island.col}`,
-        empty: !island.owner,
-        owner,
-        validMove: isValid,
-        extras: [
-          `value ${island.value}`,
-          ...(island.chips > 0 ? [`${island.chips} chips`] : []),
-          ...(isSelected ? ['selected'] : []),
-        ],
-      })
-    );
+    const ariaLabel = buildCellAriaLabel({
+      coord: `${island.row},${island.col}`,
+      empty: !island.owner,
+      owner,
+      validMove: isValid,
+      extras: [
+        `value ${island.value}`,
+        ...(island.chips > 0 ? [`${island.chips} chips`] : []),
+        ...(isSelected ? ['selected'] : []),
+      ],
+    });
 
     // Interaction layer — skip during the computer's turn so taps cannot steal AI moves.
     if (state.phase === 'selectIsland' && interactive) {
@@ -268,8 +265,16 @@ export function renderBoard(
       hitArea.style.cursor = isValid ? 'pointer' : 'not-allowed';
 
       if (isValid) {
-        const activate = () => onIslandClick(island.id);
-        // pointerdown survives tablets; click covers existing tests and mouse.
+        // Only activatable islands are keyboard buttons; others stay announced.
+        makeSvgFocusable(group, ariaLabel);
+        let claimed = false;
+        const activate = () => {
+          // pointerdown + click can both fire on tablets — claim once.
+          if (claimed) return;
+          claimed = true;
+          onIslandClick(island.id);
+        };
+        // pointerdown survives tablets; click covers mouse / existing tests.
         hitArea.addEventListener('pointerdown', activate);
         hitArea.addEventListener('click', activate);
         hitArea.addEventListener('mouseenter', () => {
@@ -281,9 +286,13 @@ export function renderBoard(
           onIslandHover(null);
         });
         bindCellActivateKeys(group, activate);
+      } else {
+        group.setAttribute('aria-label', ariaLabel);
       }
 
       group.appendChild(hitArea);
+    } else {
+      group.setAttribute('aria-label', ariaLabel);
     }
 
     svg.appendChild(group);
@@ -698,6 +707,27 @@ export function injectRemainderIslandsStyles(): void {
       flex-direction: column;
       align-items: center;
       gap: 12px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .island.valid polygon:first-child,
+      .island.selected polygon:first-child {
+        filter: none;
+      }
+
+      .remainder-player-score {
+        transition: none;
+      }
+
+      .remainder-player-score.active {
+        transform: none;
+      }
+
+      .remainder-btn,
+      .remainder-btn-roll:hover {
+        transition: none;
+        transform: none;
+      }
     }
   `;
   document.head.appendChild(style);

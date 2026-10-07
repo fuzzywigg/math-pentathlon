@@ -3817,6 +3817,14 @@ h1 {
   cursor: not-allowed;
 }
 
+.sd-computer-thinking {
+  text-align: center;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-neutral-600, #475569);
+}
+
 .sd-dice-display {
   display: flex;
   align-items: center;
@@ -4635,7 +4643,8 @@ h1 {
   }
 
   .sd-roll-btn:hover:not(:disabled),
-  .contig-roll-btn:hover:not(:disabled) {
+  .contig-roll-btn:hover:not(:disabled),
+  .sd-pass-btn:hover {
     transform: none;
   }
 }

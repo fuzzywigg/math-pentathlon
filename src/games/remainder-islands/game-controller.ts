@@ -32,6 +32,8 @@ let gameState: RemainderIslandsState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
+/** Live-status flash when a roll finds no open islands (soft-lock UX). */
+let skipNotice: string | null = null;
 
 // =============================================================================
 // Rendering
@@ -67,9 +69,13 @@ function render(): void {
     // Current player status
     const status = document.createElement('div');
     status.className = `remainder-status ${gameState.currentPlayer}`;
-    status.textContent = computerTurn
-      ? `${getPlayerName(gameState.currentPlayer)}'s turn (computer)`
-      : `${getPlayerName(gameState.currentPlayer)}'s turn`;
+    if (skipNotice) {
+      status.textContent = skipNotice;
+    } else if (computerTurn) {
+      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn (computer)`;
+    } else {
+      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
+    }
     markStatusLive(status);
     wrapper.appendChild(status);
 
@@ -134,10 +140,24 @@ function render(): void {
 // Event Handlers
 // =============================================================================
 
+function noteEmptyValidSkip(beforePlayer: RemainderIslandsState['currentPlayer']): void {
+  if (
+    gameState.phase === 'rolling' &&
+    gameState.currentPlayer !== beforePlayer &&
+    gameState.validIslands.length === 0
+  ) {
+    skipNotice = 'No open islands — turn skipped';
+  } else {
+    skipNotice = null;
+  }
+}
+
 function handleRoll(): void {
   if (isComputerTurn()) return;
   if (gameState.phase !== 'rolling') return;
+  const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
+  noteEmptyValidSkip(beforePlayer);
   render();
 }
 
@@ -146,6 +166,7 @@ function handleIslandClick(islandId: string): void {
   if (gameState.phase !== 'selectIsland') return;
   if (!gameState.validIslands.includes(islandId)) return;
 
+  skipNotice = null;
   gameState = selectIsland(gameState, islandId);
   render();
 }
@@ -168,7 +189,9 @@ function handleIslandHover(islandId: string | null): void {
 function aiRoll(): void {
   if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2')
     return;
+  const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
+  noteEmptyValidSkip(beforePlayer);
   render();
 }
 
@@ -183,6 +206,7 @@ function aiSelectIsland(): void {
   const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);
 
   if (choice) {
+    skipNotice = null;
     gameState = selectIsland(gameState, choice.islandId);
     render();
   }
@@ -204,6 +228,7 @@ export function initGame(containerEl: HTMLElement): void {
 export function newGameVsHuman(): void {
   gameState = createInitialState();
   isAIMode = false;
+  skipNotice = null;
   syncOpponentChrome();
   render();
 }
@@ -211,6 +236,7 @@ export function newGameVsHuman(): void {
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   gameState = createInitialState();
   isAIMode = true;
+  skipNotice = null;
   syncOpponentChrome();
   aiDifficulty = difficulty;
   render();
