@@ -1,6 +1,7 @@
 /**
- * Playability polish — Fraction Pinball, Fab-a-Diffy, Calla.
+ * Playability polish — Fraction Pinball and Calla.
  * Touch / reduced-motion CSS, AI-seat input lock, aria honesty, soft-lock recovery.
+ * Fab-a-Diffy left to draft PR #402 (worker / deadline) — do not touch here.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
@@ -11,15 +12,6 @@ import {
 import { createInitialState as createCalla } from '../../src/games/calla/types';
 import { renderBoard as renderCallaBoard } from '../../src/games/calla/board-ui';
 import { settleNoValidMoves, getValidPits } from '../../src/games/calla/rules';
-import {
-  newGameVsAI as fabVsAI,
-  newGameVsHuman as fabVsHuman,
-} from '../../src/games/fab-a-diffy/game-controller';
-import {
-  injectFabStyles,
-  renderFractionBarPool,
-} from '../../src/games/fab-a-diffy/board-ui';
-import { createInitialState as createFab } from '../../src/games/fab-a-diffy/rules';
 import {
   initGame as initPinball,
   newGameVsAI as pinballVsAI,
@@ -37,7 +29,6 @@ afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
-  document.getElementById('fab-styles')?.remove();
   document.getElementById('fraction-pinball-styles')?.remove();
 });
 
@@ -53,10 +44,10 @@ describe('Calla playability polish', () => {
     );
     for (const label of labels) {
       expect(label || '').not.toMatch(/valid move/i);
-      expect(el.querySelector('.calla-pit')?.getAttribute('aria-disabled')).toBe(
-        'true'
-      );
     }
+    expect(el.querySelector('.calla-pit')?.getAttribute('aria-disabled')).toBe(
+      'true'
+    );
   });
 
   it('settleNoValidMoves ends via existing Calla collection rules', () => {
@@ -100,78 +91,8 @@ describe('Calla playability polish', () => {
   });
 });
 
-describe('Fab-a-Diffy playability polish', () => {
-  it('shows thinking status and disables bar selection on AI seat', () => {
-    vi.useFakeTimers();
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    const ctrl = fabVsAI(container, 'easy');
-    ctrl.state = { ...ctrl.state, currentPlayer: 'player2' };
-    ctrl.update();
-
-    expect(container.textContent).toMatch(/Computer is thinking/i);
-    expect(container.querySelector('.status-ai-thinking')).toBeTruthy();
-    expect(container.querySelectorAll('.fab-bar-disabled').length).toBeGreaterThan(
-      0
-    );
-    // No selectable bars while Red (computer) acts
-    const selectable = [...container.querySelectorAll('.fab-bar-wrapper')].filter(
-      (el) => !el.classList.contains('fab-bar-disabled')
-    );
-    expect(selectable.length).toBe(0);
-
-    // Clicking a bar must not change phase
-    const phase = ctrl.state.phase;
-    container
-      .querySelector('.fab-bar-wrapper')
-      ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    expect(ctrl.state.phase).toBe(phase);
-  });
-
-  it('allowInput:false omits selectable aria on bar pool', () => {
-    const el = renderFractionBarPool(createFab(), () => undefined, {
-      allowInput: false,
-    });
-    const labels = [...el.querySelectorAll('.fab-bar-wrapper')].map(
-      (n) => n.getAttribute('aria-label') || ''
-    );
-    expect(labels.some((l) => /selectable/i.test(l))).toBe(false);
-    expect(
-      el.querySelector('.fab-bar-wrapper')?.getAttribute('aria-disabled')
-    ).toBe('true');
-  });
-
-  it('injects reduced-motion and 44px touch floors', () => {
-    injectFabStyles();
-    const css = document.getElementById('fab-styles')?.textContent || '';
-    expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
-    expect(css).toMatch(/min-height:\s*44px/);
-    expect(css).toMatch(/pointer:\s*coarse/);
-  });
-
-  it('human vs human still wires selectable bars', () => {
-    const container = document.createElement('div');
-    document.body.appendChild(container);
-    fabVsHuman(container);
-    const enabled = [...container.querySelectorAll('.fab-bar-wrapper')].filter(
-      (el) => !el.classList.contains('fab-bar-disabled')
-    );
-    expect(enabled.length).toBeGreaterThan(0);
-  });
-});
-
 describe('Fraction Pinball playability polish', () => {
   it('disables choice buttons while computer answers', () => {
-    vi.useFakeTimers();
-    const root = document.createElement('div');
-    document.body.appendChild(root);
-    initPinball(root);
-    pinballVsAI('hard');
-
-    // Force computer seat on an answering challenge
-    const state = getPinballState();
-    // Human answers first choice then we advance — simpler: stub state via AI path
-    // by flipping seat after mounting a challenge directly on the board.
     const playing = startGame(createPinball());
     const challengeEl = renderChallenge(playing, () => undefined, {
       allowInput: false,
@@ -184,8 +105,6 @@ describe('Fraction Pinball playability polish', () => {
       expect(btn.disabled).toBe(true);
       expect(btn.getAttribute('aria-disabled')).toBe('true');
     }
-    // silence unused
-    expect(state.phase).toBe('answering');
   });
 
   it('recovers when getAIAnswer returns null', () => {

@@ -44,22 +44,12 @@ export interface FabGameController {
   isAI: boolean;
   aiPlayer: Player | null;
   aiDifficulty: AIDifficulty;
-  /** Bumped to cancel in-flight AI timeouts after new game / remount. */
-  aiGeneration: number;
   update: () => void;
   newGame: (vsAI: boolean, difficulty?: AIDifficulty) => void;
 }
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
-
-function isComputerSeat(controller: FabGameController): boolean {
-  return (
-    controller.isAI &&
-    controller.aiPlayer === controller.state.currentPlayer &&
-    !controller.state.winner
-  );
-}
 
 /**
  * Initialize the game
@@ -78,14 +68,12 @@ export function initGame(
     isAI: vsAI,
     aiPlayer: vsAI ? 'player2' : null,
     aiDifficulty: difficulty,
-    aiGeneration: 0,
     update: () => {},
     newGame: () => {},
   };
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    controller.aiGeneration += 1;
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -107,8 +95,6 @@ function updateUI(controller: FabGameController): void {
   const { container, state } = controller;
   container.innerHTML = '';
 
-  const humanCanAct = !isComputerSeat(controller);
-
   // Main game area
   const gameArea = document.createElement('div');
   gameArea.className = 'fab-game-area';
@@ -120,9 +106,6 @@ function updateUI(controller: FabGameController): void {
 
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
-  } else if (isComputerSeat(controller)) {
-    status.textContent = 'Computer is thinking…';
-    status.classList.add('status-ai-thinking');
   } else if (state.phase === 'selectingBar1') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select first fraction bar`;
   } else if (state.phase === 'selectingBar2') {
@@ -154,20 +137,16 @@ function updateUI(controller: FabGameController): void {
   const leftColumn = document.createElement('div');
   leftColumn.className = 'fab-left-column';
 
-  // Fraction bar pool — no selectable chrome while the computer seat acts
+  // Fraction bar pool
   leftColumn.appendChild(
-    renderFractionBarPool(state, (barId) => handleBarClick(controller, barId), {
-      allowInput: humanCanAct,
-    })
+    renderFractionBarPool(state, (barId) => handleBarClick(controller, barId))
   );
 
   // Operation selector (when two bars selected)
   if (state.selectedBar1 && state.selectedBar2) {
     leftColumn.appendChild(
-      renderOperationSelector(
-        state,
-        (op) => handleOperationSelect(controller, op),
-        { allowInput: humanCanAct }
+      renderOperationSelector(state, (op) =>
+        handleOperationSelect(controller, op)
       )
     );
   }
@@ -179,10 +158,8 @@ function updateUI(controller: FabGameController): void {
   rightColumn.className = 'fab-right-column';
 
   rightColumn.appendChild(
-    renderAnswerBoard(
-      state,
-      (answerId) => handleAnswerClick(controller, answerId),
-      { allowInput: humanCanAct }
+    renderAnswerBoard(state, (answerId) =>
+      handleAnswerClick(controller, answerId)
     )
   );
 
@@ -193,28 +170,26 @@ function updateUI(controller: FabGameController): void {
   mainLayout.appendChild(rightColumn);
   gameArea.appendChild(mainLayout);
 
-  // Controls (human seat only — Clear / Pass must not steal the AI turn)
+  // Controls
   const controls = document.createElement('div');
   controls.className = 'fab-controls';
 
-  if (humanCanAct && (state.selectedBar1 || state.selectedBar2)) {
+  if (state.selectedBar1 || state.selectedBar2) {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'fab-btn fab-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
-      if (isComputerSeat(controller)) return;
       controller.state = clearSelection(state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (humanCanAct && !hasAnyValidMove(state) && !state.winner) {
+  if (!hasAnyValidMove(state) && !state.winner) {
     const passBtn = document.createElement('button');
     passBtn.className = 'fab-btn fab-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
-      if (isComputerSeat(controller)) return;
       controller.state = passTurn(state);
       controller.update();
     });
@@ -227,13 +202,13 @@ function updateUI(controller: FabGameController): void {
   }
   container.appendChild(gameArea);
 
-  // AI turn — generation token cancels stacked timeouts from remounts
-  if (isComputerSeat(controller)) {
-    const gen = ++controller.aiGeneration;
-    setTimeout(() => {
-      if (gen !== controller.aiGeneration) return;
-      makeAIMove(controller);
-    }, 800);
+  // AI turn
+  if (
+    controller.isAI &&
+    controller.aiPlayer === state.currentPlayer &&
+    !state.winner
+  ) {
+    setTimeout(() => makeAIMove(controller), 800);
   }
 }
 
@@ -241,7 +216,6 @@ function updateUI(controller: FabGameController): void {
  * Handle bar click
  */
 function handleBarClick(controller: FabGameController, barId: string): void {
-  if (isComputerSeat(controller)) return;
   const { state } = controller;
 
   if (state.phase === 'selectingBar1') {
@@ -260,7 +234,6 @@ function handleOperationSelect(
   controller: FabGameController,
   operation: FractionOperation
 ): void {
-  if (isComputerSeat(controller)) return;
   controller.state = selectOperation(controller.state, operation);
   controller.update();
 }
@@ -272,7 +245,6 @@ function handleAnswerClick(
   controller: FabGameController,
   answerId: string
 ): void {
-  if (isComputerSeat(controller)) return;
   if (controller.state.phase !== 'confirmingMove') return;
 
   controller.state = executeMove(controller.state, answerId);
@@ -290,7 +262,6 @@ function makeAIMove(controller: FabGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.winner || !aiPlayer) return;
-  if (controller.aiPlayer !== state.currentPlayer) return;
 
   controller.state = executeAITurn(state, aiPlayer, aiDifficulty);
   controller.update();

@@ -37,20 +37,13 @@ function playerColors() {
   return getPlayerSeatColors();
 }
 
-export interface FabBoardRenderOptions {
-  /** When false, suppress selectable/matchable chrome and click handlers (AI seat). */
-  allowInput?: boolean;
-}
-
 /**
  * Render the fraction bar pool
  */
 export function renderFractionBarPool(
   state: FabADiffyState,
-  onBarClick: (barId: string) => void,
-  options: FabBoardRenderOptions = {}
+  onBarClick: (barId: string) => void
 ): HTMLElement {
-  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-bar-pool';
 
@@ -91,8 +84,7 @@ export function renderFractionBarPool(
         bar,
         onBarClick,
         rowIndex,
-        colIndex,
-        allowInput
+        colIndex
       );
       group.appendChild(barEl);
     });
@@ -115,8 +107,7 @@ function createFractionBarElement(
   bar: FractionBar,
   onClick: (barId: string) => void,
   row: number,
-  col: number,
-  allowInput: boolean = true
+  col: number
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'fab-bar-wrapper';
@@ -126,11 +117,9 @@ function createFractionBarElement(
 
   // Determine state
   const isSelected =
-    allowInput &&
-    (state.selectedBar1 === bar.id || state.selectedBar2 === bar.id);
+    state.selectedBar1 === bar.id || state.selectedBar2 === bar.id;
   const isUsed = bar.used;
   const isSelectable =
-    allowInput &&
     !isUsed &&
     (state.phase === 'selectingBar1' ||
       (state.phase === 'selectingBar2' && state.selectedBar1 !== bar.id));
@@ -172,15 +161,11 @@ function createFractionBarElement(
     buildCellAriaLabel({
       coord: formatFraction(simplify(bar.fraction)),
       empty: !isUsed && !isSelected,
-      selectable: isSelectable,
       extras: [isSelected ? 'selected' : '', isUsed ? 'used' : ''].filter(
         Boolean
       ),
     })
   );
-  if (!isSelectable) {
-    wrapper.setAttribute('aria-disabled', 'true');
-  }
 
   return wrapper;
 }
@@ -190,10 +175,8 @@ function createFractionBarElement(
  */
 export function renderAnswerBoard(
   state: FabADiffyState,
-  onAnswerClick: (answerId: string) => void,
-  options: FabBoardRenderOptions = {}
+  onAnswerClick: (answerId: string) => void
 ): HTMLElement {
-  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-answer-board';
 
@@ -206,14 +189,9 @@ export function renderAnswerBoard(
   grid.className = 'fab-answer-grid';
   markBoardAsGrid(grid);
 
-  // Find which answers are currently matchable (suppressed while AI thinks)
+  // Find which answers are currently matchable
   const matchableAnswers = new Set<string>();
-  if (
-    allowInput &&
-    state.selectedBar1 &&
-    state.selectedBar2 &&
-    state.selectedOperation
-  ) {
+  if (state.selectedBar1 && state.selectedBar2 && state.selectedOperation) {
     const bar1 = state.fractionBars.get(state.selectedBar1);
     const bar2 = state.fractionBars.get(state.selectedBar2);
     if (bar1 && bar2) {
@@ -305,8 +283,6 @@ function createAnswerBarElement(
     const activate = () => onClick(answer.id);
     wrapper.addEventListener('click', activate);
     bindCellActivateKeys(wrapper, activate);
-  } else if (!isClaimed) {
-    wrapper.setAttribute('aria-disabled', 'true');
   }
 
   makeGridCell(
@@ -330,10 +306,8 @@ function createAnswerBarElement(
  */
 export function renderOperationSelector(
   state: FabADiffyState,
-  onSelect: (op: FractionOperation) => void,
-  options: FabBoardRenderOptions = {}
+  onSelect: (op: FractionOperation) => void
 ): HTMLElement {
-  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-operation-selector';
 
@@ -370,14 +344,13 @@ export function renderOperationSelector(
 
   for (const op of operations) {
     const result = calculateResult(bar1.fraction, bar2.fraction, op);
-    const hasMatch =
-      allowInput && result
-        ? findMatchingAnswers(state, result).length > 0
-        : false;
+    const hasMatch = result
+      ? findMatchingAnswers(state, result).length > 0
+      : false;
 
     const btn = document.createElement('button');
     btn.className = 'fab-op-btn';
-    if (allowInput && state.selectedOperation === op) {
+    if (state.selectedOperation === op) {
       btn.classList.add('fab-op-selected');
     }
     if (hasMatch) {
@@ -392,12 +365,11 @@ export function renderOperationSelector(
       <span class="fab-op-result">${resultStr}</span>
     `;
 
-    if (allowInput && result && result.numerator >= 0) {
+    if (result && result.numerator >= 0) {
       btn.addEventListener('click', () => onSelect(op));
     } else {
       btn.disabled = true;
       btn.classList.add('fab-op-disabled');
-      btn.setAttribute('aria-disabled', 'true');
     }
 
     buttons.appendChild(btn);
@@ -527,11 +499,6 @@ export function injectFabStyles(): void {
     .fab-bar-wrapper {
       padding: 4px;
       border-radius: 6px;
-      min-height: 44px;
-      min-width: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       transition: all 0.15s ease;
     }
 
@@ -569,11 +536,6 @@ export function injectFabStyles(): void {
     .fab-answer-wrapper {
       padding: 4px;
       border-radius: 6px;
-      min-height: 44px;
-      min-width: 44px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
       transition: all 0.15s ease;
     }
 
@@ -650,8 +612,6 @@ export function injectFabStyles(): void {
       flex-direction: column;
       align-items: center;
       padding: 0.75rem 1.25rem;
-      min-height: 44px;
-      min-width: 44px;
       border: 2px solid #ddd;
       border-radius: 8px;
       background: white;
@@ -820,7 +780,6 @@ export function injectFabStyles(): void {
 
     .fab-btn {
       padding: 0.5rem 1rem;
-      min-height: 44px;
       border: none;
       border-radius: 6px;
       font-weight: 500;
@@ -853,30 +812,6 @@ export function injectFabStyles(): void {
 
       .fab-operation-preview {
         font-size: 1.2rem;
-      }
-    }
-
-    @media (pointer: coarse) {
-      .fab-bar-wrapper,
-      .fab-answer-wrapper,
-      .fab-op-btn,
-      .fab-btn {
-        min-height: 44px;
-        min-width: 44px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .fab-answer-matchable,
-      .fab-winner-banner {
-        animation: none !important;
-      }
-
-      .fab-bar-wrapper:not(.fab-bar-disabled):hover,
-      .fab-answer-wrapper:hover,
-      .fab-op-btn:hover:not(:disabled),
-      .fab-btn:hover {
-        transform: none;
       }
     }
   `;
