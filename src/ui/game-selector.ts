@@ -273,15 +273,17 @@ export function renderGameSelector(container: HTMLElement): void {
   hero.appendChild(heroContent);
   wrapper.appendChild(hero);
 
-  // Division tabs for quick nav
+  // Division tabs for quick nav (tablist + tab so aria-selected is valid for axe)
   const tabNav = document.createElement('nav');
   tabNav.className = 'division-tabs';
+  tabNav.setAttribute('role', 'tablist');
   tabNav.setAttribute('aria-label', 'Division navigation');
 
   DIVISIONS.forEach((div, index) => {
     const tab = document.createElement('button');
     tab.type = 'button';
     tab.className = `division-tab ${index === 0 ? 'active' : ''}`;
+    tab.setAttribute('role', 'tab');
     tab.setAttribute('data-division', div.name);
     tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
     tab.innerHTML = `

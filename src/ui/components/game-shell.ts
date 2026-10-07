@@ -123,9 +123,7 @@ export function getFocusableWithin(root: Element): HTMLElement[] {
 
 /** Focusable controls inside an open modal (jsdom-safe; skips nested hidden). */
 function getModalFocusables(modal: HTMLElement): HTMLElement[] {
-  return getFocusableWithin(modal).filter((el) =>
-    isDisplayedWithin(el, modal)
-  );
+  return getFocusableWithin(modal).filter((el) => isDisplayedWithin(el, modal));
 }
 
 function ensureModalDialogSemantics(modal: HTMLElement): void {

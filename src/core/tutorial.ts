@@ -242,7 +242,10 @@ export class TutorialManager {
     this.tooltipElement.className = 'tutorial-tooltip';
     this.tooltipElement.setAttribute('role', 'dialog');
     this.tooltipElement.setAttribute('aria-modal', 'true');
-    this.tooltipElement.setAttribute('aria-labelledby', 'tutorial-tooltip-title');
+    this.tooltipElement.setAttribute(
+      'aria-labelledby',
+      'tutorial-tooltip-title'
+    );
     this.tooltipElement.innerHTML = `
       <div class="tutorial-tooltip-header">
         <span class="tutorial-step-counter"></span>
