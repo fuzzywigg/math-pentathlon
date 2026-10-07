@@ -11,10 +11,8 @@ export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
  * Canvas / scene mount under software WebGL (SwiftShader / ANGLE).
  * CI VMs need more headroom than local GPU; 30s was the historical flake budget.
  */
-const nodeProcess = (
-  globalThis as { process?: { env?: Record<string, string | undefined> } }
-).process;
-export const MP3D_READY_TIMEOUT_MS = nodeProcess?.env?.CI ? 60_000 : 45_000;
+declare const process: { env: Record<string, string | undefined> };
+export const MP3D_READY_TIMEOUT_MS = process.env.CI ? 60_000 : 45_000;
 
 export async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({

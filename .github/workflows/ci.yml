@@ -33,7 +33,9 @@ jobs:
       - name: Check formatting
         run: npm run format:check
       - name: TypeScript type checking
-        run: npx tsc --noEmit
+        run: npm run typecheck
+      - name: TypeScript type ratchet (ui/core/helpers)
+        run: npm run typecheck:ratchet
 
   audit:
     runs-on: ubuntu-latest

@@ -504,7 +504,8 @@ export function renderCardTray(
       selected?: boolean;
     } = { selected: card.id === options?.selectedId };
     if (options?.onClick) cardOpts.onClick = options.onClick;
-    if (options?.draggable !== undefined) cardOpts.draggable = options.draggable;
+    if (options?.draggable !== undefined)
+      cardOpts.draggable = options.draggable;
     tray.appendChild(renderCard(card, cardOpts));
   }
 

@@ -403,12 +403,11 @@ export function createMathPiece(n: number): AttributePiece {
 export function groupByAttribute(
   pieces: AttributePiece[],
   attribute: string
-): Map<AttributeValue, AttributePiece[]> {
-  const groups = new Map<AttributeValue, AttributePiece[]>();
+): Map<AttributeValue | undefined, AttributePiece[]> {
+  const groups = new Map<AttributeValue | undefined, AttributePiece[]>();
 
   for (const piece of pieces) {
     const value = piece.attributes[attribute];
-    if (value === undefined) continue;
     if (!groups.has(value)) {
       groups.set(value, []);
     }
@@ -424,13 +423,10 @@ export function groupByAttribute(
 export function getUniqueValues(
   pieces: AttributePiece[],
   attribute: string
-): AttributeValue[] {
-  const values = new Set<AttributeValue>();
+): Array<AttributeValue | undefined> {
+  const values = new Set<AttributeValue | undefined>();
   for (const piece of pieces) {
-    const value = piece.attributes[attribute];
-    if (value !== undefined) {
-      values.add(value);
-    }
+    values.add(piece.attributes[attribute]);
   }
   return Array.from(values);
 }
