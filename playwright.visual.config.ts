@@ -9,7 +9,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  workers: process.env.CI ? 1 : undefined,
+  // Single worker keeps Vite + seeded boards quieter across local/CI runs.
+  workers: 1,
   reporter: [['list'], ['html', { open: 'never' }]],
   timeout: 60_000,
   expect: {

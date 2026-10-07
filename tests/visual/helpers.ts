@@ -32,25 +32,66 @@ export const MOUNT: Record<string, string> = {
     '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
 };
 
+declare global {
+  interface Window {
+    __mpVisualReseed?: (seed?: number) => void;
+  }
+}
+
 /**
  * Install deterministic Math.random, force 2D boards, and disable motion
  * before any app script runs.
  */
 export async function installVisualDeterminism(page: Page): Promise<void> {
   await page.addInitScript((seed: number) => {
-    // Mulberry32 — compact, deterministic PRNG.
-    let s = seed >>> 0 || 1;
-    Math.random = () => {
-      s |= 0;
-      s = (s + 0x6d2b79f5) | 0;
-      let t = Math.imul(s ^ (s >>> 15), 1 | s);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    // Mulberry32 — compact, deterministic PRNG. Exposed so tests can re-seed
+    // immediately before New Game start (owl / idle code may burn entropy).
+    const install = (nextSeed: number) => {
+      let s = nextSeed >>> 0 || 1;
+      Math.random = () => {
+        s |= 0;
+        s = (s + 0x6d2b79f5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     };
+    install(seed);
+    (
+      window as Window & { __mpVisualReseed?: (s?: number) => void }
+    ).__mpVisualReseed = (s?: number) => install(s ?? seed);
 
     try {
-      // Classic 2D only — never enable the optional Three.js board.
       localStorage.removeItem('mp-board3d');
+      // Disable owl so message picks cannot race board shuffles.
+      localStorage.setItem(
+        'math-pentathlon-progress',
+        JSON.stringify({
+          version: 1,
+          profile: null,
+          streak: {
+            currentStreak: 0,
+            bestStreak: 0,
+            lastPlayDate: '',
+            streakStartDate: '',
+          },
+          achievements: [],
+          gameStats: {},
+          owlState: {
+            mood: 'happy',
+            lastInteraction: 0,
+            messagesSeen: [],
+            tutorialsCompleted: [],
+            totalMessagesShown: 0,
+          },
+          settings: {
+            owlEnabled: false,
+            soundEnabled: false,
+            reducedMotion: true,
+            owlFrequency: 'quiet',
+          },
+        })
+      );
     } catch {
       // ignore quota / private-mode failures
     }
@@ -67,6 +108,7 @@ export async function installVisualDeterminism(page: Page): Promise<void> {
         caret-color: transparent !important;
       }
       html { scroll-behavior: auto !important; }
+      #ollie-owl { visibility: hidden !important; pointer-events: none !important; }
     `;
     const attach = () => {
       if (document.documentElement) {
@@ -89,7 +131,7 @@ export async function waitForGameReady(page: Page): Promise<void> {
   });
 }
 
-/** Hide Ollie so the mascot never intercepts or animates into snapshots. */
+/** Hide Ollie and wait for fonts before capturing. */
 export async function stabilizeChrome(page: Page): Promise<void> {
   await page.evaluate(() => {
     const owl = document.getElementById('ollie-owl');
@@ -105,28 +147,46 @@ export async function stabilizeChrome(page: Page): Promise<void> {
   });
 }
 
+/** Re-seed Math.random so the next createInitialState() is deterministic. */
+export async function reseedVisualRng(page: Page): Promise<void> {
+  await page.evaluate((seed) => {
+    window.__mpVisualReseed?.(seed);
+  }, VISUAL_SEED);
+}
+
 /**
- * Start a human-vs-human game so the 2D board (not the mode modal) is visible.
- * No-ops when the modal is already closed after lazy mount.
+ * Always open New Game → human-vs-human → reseed → Start so shuffled boards
+ * (rods, dice, hands) do not depend on how many Math.random calls happened
+ * during mount / owl / idle warm.
  */
 export async function startHumanBoard(page: Page): Promise<void> {
   await waitForGameReady(page);
+  await stabilizeChrome(page);
+
   const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
+  const alreadyOpen = await modal.isVisible().catch(() => false);
+  if (!alreadyOpen) {
+    await page.locator('#new-game-btn').click();
   }
+  await expect(modal).toBeVisible({ timeout: 10_000 });
+
+  const human = page.locator('.mode-option[data-mode="human-vs-human"]');
+  if (await human.isVisible().catch(() => false)) {
+    await human.click();
+  }
+
+  await reseedVisualRng(page);
+  await page.locator('#start-game-btn').click();
+  await expect(modal).toHaveClass(/hidden/);
   await stabilizeChrome(page);
 }
 
 export async function gotoLanding(page: Page): Promise<void> {
   await installVisualDeterminism(page);
   await page.goto('/?board3d=0#/');
-  await expect(page.locator('.game-card, .division-section, h1').first()).toBeVisible({
+  await expect(
+    page.locator('.game-card, .division-section, h1').first()
+  ).toBeVisible({
     timeout: 15_000,
   });
   await stabilizeChrome(page);

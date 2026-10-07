@@ -17,10 +17,11 @@ Configured in `playwright.visual.config.ts` and `tests/visual/helpers.ts`:
 
 - **Browser:** Chromium only
 - **Viewport:** fixed `1280×720`, `deviceScaleFactor: 1`
-- **Seed:** `Math.random` replaced with Mulberry32 (`VISUAL_SEED`) before app scripts run
+- **Seed:** `Math.random` replaced with Mulberry32 (`VISUAL_SEED`) before app scripts run, then **re-seeded immediately before Start Game** so owl/idle entropy cannot skew shuffles
 - **Animations:** `reducedMotion: 'reduce'`, CSS kill-switch, Playwright `animations: 'disabled'`, caret hidden
 - **3D off:** `localStorage` clears `mp-board3d` and URLs use `?board3d=0`
-- **Ollie:** hidden so the mascot does not animate into snapshots
+- **Ollie:** disabled in stored settings and hidden in CSS so the mascot does not animate into snapshots
+- **Fresh start:** each game capture opens New Game → human-vs-human → Start (not the leftover mount board)
 
 Baselines live in `tests/visual/__screenshots__/` (committed).
 
