@@ -19,6 +19,12 @@ Helpers include `buildCellAriaLabel`, `makeCellFocusable`, grid/roving helpers, 
 
 Catalog practice boards wire the shared helpers for keyboard activation, named labels, and polite live status. Decorative track SVGs (Star Track path) and quiz-style answer UIs rely on native `<button>` controls plus live status rather than grid cells. Treat unit tests under `tests/unit/*a11y*` and a live Tab/arrow smoke as the checkable surface.
 
+## Automated shell sweep (axe)
+
+Chromium e2e `tests/e2e/a11y-sweep.spec.ts` runs `@axe-core/playwright` over the menu, progress dashboard, Help modal, and every available game’s New Game modal (serious/critical only). Board interiors are excluded. Details: [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md). Testing stack: [Development](./development.md#testing-layers).
+
+![New Game modal — shared dialog covered by the axe sweep](./images/hex-new-game-modal.png)
+
 ## Reviewer checklist (public)
 
 1. Open a game at [https://math.pappas.work](https://math.pappas.work).
