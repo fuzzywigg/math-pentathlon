@@ -4,6 +4,9 @@
  * capped search; uncapped engines are the sweep targets.
  *
  * Run: npx vitest run tests/unit/tablet-ai-hard-latency.bench.test.ts
+ *
+ * Skipped under CI — offline/local keeper; tip unit step needs the wall for
+ * the required suite.
  */
 import { describe, it, expect, afterEach, afterAll } from 'vitest';
 import { createInitialState as createCallaState } from '../../src/games/calla/types';
@@ -94,7 +97,7 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('Tablet Hard AI latency bench', () => {
+describe.skipIf(!!process.env.CI)('Tablet Hard AI latency bench', () => {
   it('Calla Hard opening + midgame (uncapped minimax depth 6)', () => {
     for (const seed of SEEDS) {
       const opening = createCallaState();

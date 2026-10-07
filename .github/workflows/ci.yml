@@ -89,10 +89,11 @@ jobs:
         continue-on-error: true
         run: npm run size:check
 
-  # Unit suite pruned from ~5k TOKENMAXX files; target wall time under ~5 min.
+  # Unit suite pruned from ~5k TOKENMAXX files; tip fold suite targets ~8 min
+  # on GHA (AI benches skipped under CI; see *.bench.test.ts skipIf).
   unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@v7
         with:
@@ -103,11 +104,11 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - name: Run unit tests
-        timeout-minutes: 8
+        timeout-minutes: 12
         run: |
           set -euo pipefail
           count="$(find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) ! -path '*/_tokenmaxx_archive/*' | wc -l | tr -d ' ')"
-          echo "unit suite: ${count} files (budget ~5 min; step timeout 8m / job 10m)"
+          echo "unit suite: ${count} files (budget ~8 min; step timeout 12m / job 14m)"
           npm run test:unit
 
   # Browser smoke + mp3d board3d guards; pruned TOKENMAXX chrome leftovers.

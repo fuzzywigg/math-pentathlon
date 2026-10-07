@@ -88,9 +88,9 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to roughly 2.7k keepers (handwritten + behavioral TOKENMAXX + FIAR leave-alone). Healthy GitHub Actions unit runs should finish in about **under 5 minutes**.
+The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to roughly 3k keepers (handwritten + behavioral TOKENMAXX + FIAR leave-alone). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
 
-- Job `timeout-minutes: 10` and step `timeout-minutes: 8` so overrun fails loudly
+- Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
 
 README badges link those workflows. License is **ISC** (`package.json`).
