@@ -23,11 +23,7 @@ import {
   getPlayerName,
 } from './board-ui';
 import { applyAIMoveSteps, AIDifficulty } from './ai';
-import {
-  cancelFabAiRequests,
-  disposeFabAiWorker,
-  getAIMoveAsync,
-} from './ai-client';
+import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
@@ -68,7 +64,7 @@ export function initGame(
 ): FabGameController {
   injectFabStyles();
   activeContainer = container;
-  cancelFabAiRequests();
+  disposeFabAiWorker();
 
   const controller: FabGameController = {
     state: createInitialState(),
@@ -82,7 +78,7 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    cancelFabAiRequests();
+    disposeFabAiWorker();
     aiGeneration += 1;
     controller.state = createInitialState();
     controller.isAI = vsAI;
