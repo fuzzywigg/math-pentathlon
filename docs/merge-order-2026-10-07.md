@@ -302,12 +302,12 @@ Local verification claimed on integration PR bodies (#413 / #438 / #440 / #444 /
 
 ## 9. Operator checklist (human)
 
-1. Treat **`cursor/integration-fold-wave5-tip-4af0`** as the tip (includes `#435` CI triggers + wave4 `#476` + `#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`; `#469` already contained).
+1. Treat **`cursor/integration-fold-wave5-tip-4af0`** as the tip (includes `#435` CI triggers + wave4 `#476` + `#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`/`#489`; `#469` already contained).
 2. Land tip → `alpha` alone (Path A — one tip PR).
-3. Close superseded drafts listed in §5 (including `#435`, `#442`, `#450`, `#452`, `#454`, `#455`–`#458`, `#464`–`#467`, `#466`, `#469`, `#471`–`#480`, `#482`–`#486`, `#470`, `#476`, `#477` once tip is on `alpha`).
+3. Close superseded drafts listed in §5 (including `#435`, `#442`, `#450`, `#452`, `#454`, `#455`–`#458`, `#464`–`#467`, `#466`, `#469`, `#471`–`#480`, `#482`–`#486`, `#489`, `#470`, `#476`, `#477` once tip is on `alpha`).
 5. Andrew: answer **#441** / **#355**; choose **#393 XOR #394**; then schedule **#418 / #419 / #428 / #429**.
 6. Land remaining docs side tracks (#414 after unit flake understood, #420).
 
 ---
 
-*Generated for draft PR inventory only. Tip pointer refreshed for wave5 including `#435`/`#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`. `#469` was already contained. Recommended land path: wave5 tip alone → `alpha`. Cross-browser/visual/axe/`mobile-touch` remain report-only. No merges/closes/retargets of source PRs were performed while writing this document.*
+*Generated for draft PR inventory only. Tip pointer refreshed for wave5 including `#435`/`#474`/`#475`/`#471`/`#478`–`#480`/`#482`–`#486`/`#489`. `#469` was already contained. Recommended land path: wave5 tip alone → `alpha`. Cross-browser/visual/axe/`mobile-touch`/`check:perf` remain report-only. No merges/closes/retargets of source PRs were performed while writing this document.*
