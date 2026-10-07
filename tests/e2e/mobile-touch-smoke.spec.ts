@@ -513,7 +513,13 @@ function rewriteSummaryMd() {
           ? 'none'
           : report.issues
               .slice(0, 4)
-              .map((i) => `${i.kind}: ${i.detail}`)
+              .map(
+                (i) =>
+                  `${i.kind}: ${i.detail
+                    .replace(/\u001b\[[0-9;]*m/g, '')
+                    .replace(/\s+/g, ' ')
+                    .slice(0, 80)}`
+              )
               .join('; ')
               .replace(/\|/g, '/');
       lines.push(
@@ -537,6 +543,23 @@ function rewriteSummaryMd() {
   fs.writeFileSync(path.join(REPORT_ROOT, 'summary.md'), lines.join('\n'));
 }
 
+/** Close a shell modal via real tap (no force — force skips hit-testing and
+ *  can miss the × control on phone emulation). Escape is the fallback. */
+async function closeShellModal(page: Page, modalSel: string): Promise<void> {
+  const modal = page.locator(modalSel);
+  if (await modal.evaluate((el) => el.classList.contains('hidden'))) return;
+  const close = page.locator(`${modalSel} .modal-close`);
+  try {
+    await close.tap({ timeout: 3_000 });
+  } catch {
+    // ignore — Escape below
+  }
+  if (!(await modal.evaluate((el) => el.classList.contains('hidden')))) {
+    await page.keyboard.press('Escape');
+  }
+  await expect(modal).toHaveClass(/hidden/, { timeout: 5_000 });
+}
+
 async function openCloseMenus(page: Page): Promise<{
   newGame: boolean;
   help: boolean;
@@ -548,44 +571,38 @@ async function openCloseMenus(page: Page): Promise<{
   let help = false;
   let moveLog: boolean | 'absent' = 'absent';
 
-  // New Game modal
+  // New Game modal — real tap (force:true on × drops events in Chromium touch)
   try {
-    await page.locator('#new-game-btn').tap({ force: true });
+    await page.locator('#new-game-btn').tap();
     const modal = page.locator('#new-game-modal');
     await expect(modal).toBeVisible({ timeout: 5_000 });
-    await page
-      .locator('#new-game-modal .modal-close')
-      .tap({ force: true })
-      .catch(async () => {
-        await page.keyboard.press('Escape');
-      });
-    await expect(modal).toHaveClass(/hidden/, { timeout: 5_000 });
+    await closeShellModal(page, '#new-game-modal');
     newGame = true;
   } catch (err) {
     issues.push({
       kind: 'interaction',
-      detail: `new-game menu: ${String((err as Error).message ?? err).slice(0, 160)}`,
+      detail: `new-game menu: ${String((err as Error).message ?? err)
+        .replace(/\u001b\[[0-9;]*m/g, '')
+        .slice(0, 160)}`,
     });
+    await page.keyboard.press('Escape').catch(() => {});
   }
 
   // Help modal
   try {
-    await page.locator('#help-btn').tap({ force: true });
+    await page.locator('#help-btn').tap();
     const modal = page.locator('#help-modal');
     await expect(modal).toBeVisible({ timeout: 5_000 });
-    await page
-      .locator('#help-modal .modal-close')
-      .tap({ force: true })
-      .catch(async () => {
-        await page.keyboard.press('Escape');
-      });
-    await expect(modal).toHaveClass(/hidden/, { timeout: 5_000 });
+    await closeShellModal(page, '#help-modal');
     help = true;
   } catch (err) {
     issues.push({
       kind: 'interaction',
-      detail: `help menu: ${String((err as Error).message ?? err).slice(0, 160)}`,
+      detail: `help menu: ${String((err as Error).message ?? err)
+        .replace(/\u001b\[[0-9;]*m/g, '')
+        .slice(0, 160)}`,
     });
+    await page.keyboard.press('Escape').catch(() => {});
   }
 
   // Move-log badge (shared shell collapse toggle — Kings today)
@@ -593,16 +610,18 @@ async function openCloseMenus(page: Page): Promise<{
   if ((await toggle.count()) > 0) {
     try {
       const panel = page.locator('#move-history, .move-history').first();
-      await toggle.first().tap({ force: true });
+      await toggle.first().tap();
       await expect(panel).toHaveClass(/collapsed/, { timeout: 3_000 });
-      await toggle.first().tap({ force: true });
+      await toggle.first().tap();
       await expect(panel).not.toHaveClass(/collapsed/, { timeout: 3_000 });
       moveLog = true;
     } catch (err) {
       moveLog = false;
       issues.push({
         kind: 'interaction',
-        detail: `move-log badge: ${String((err as Error).message ?? err).slice(0, 160)}`,
+        detail: `move-log badge: ${String((err as Error).message ?? err)
+          .replace(/\u001b\[[0-9;]*m/g, '')
+          .slice(0, 160)}`,
       });
     }
   }
@@ -647,27 +666,31 @@ test.describe('Mobile touch smoke (report-only)', () => {
           });
         }
         for (const t of audit.smallChrome) {
+          const label = t.id ?? (t.className || t.sel);
           issues.push({
             kind: 'tap-target',
-            detail: `${t.id ?? t.className || t.sel} ${t.w}×${t.h}`,
+            detail: `${label} ${t.w}×${t.h}`,
           });
         }
         for (const t of audit.offScreenChrome) {
+          const label = t.id ?? (t.className || t.sel);
           issues.push({
             kind: 'off-screen',
-            detail: `${t.id ?? t.className || t.sel} box=(${t.left},${t.top})-(${t.right},${t.bottom})`,
+            detail: `${label} box=(${t.left},${t.top})-(${t.right},${t.bottom})`,
           });
         }
         for (const t of audit.missingTouchAction) {
+          const label = t.id ?? (t.className || t.sel);
           issues.push({
             kind: 'touch-action',
-            detail: `${t.id ?? t.className || t.sel} touch-action=${t.touchAction}`,
+            detail: `${label} touch-action=${t.touchAction}`,
           });
         }
         for (const t of audit.hoverOnly) {
+          const label = t.id ?? (t.className || t.sel);
           issues.push({
             kind: 'hover-only',
-            detail: `${t.id ?? t.className || t.sel} opacity=${t.opacity}`,
+            detail: `${label} opacity=${t.opacity}`,
           });
         }
 
@@ -687,9 +710,13 @@ test.describe('Mobile touch smoke (report-only)', () => {
         };
         issues.push(...menuResult.issues);
 
-        await page.locator('#back-btn').tap({ force: true }).catch(async () => {
+        // Prefer a real tap; force click is the fallback if the control is
+        // momentarily covered (owl is pointer-events:none already).
+        try {
+          await page.locator('#back-btn').tap({ timeout: 5_000 });
+        } catch {
           await page.locator('#back-btn').click({ force: true });
-        });
+        }
         await expect(
           page.locator('.game-selector, .game-card').first()
         ).toBeVisible({ timeout: 10_000 });

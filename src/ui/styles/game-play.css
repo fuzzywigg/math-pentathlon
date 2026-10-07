@@ -1001,6 +1001,9 @@ svg [role='gridcell']:focus-visible {
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s ease;
+  /* Drop legacy WebKit 300ms tap delay on phone / iPad. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .modal-close:hover {

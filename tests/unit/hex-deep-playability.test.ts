@@ -54,7 +54,8 @@ describe('Hex deep playability', () => {
     expect(controllerSrc).toMatch(/AI_THINKING_DELAY\s*=\s*250/);
     expect(ai.AI_PLAY_DEADLINE_MS.easy).toBe(600);
     expect(ai.AI_PLAY_DEADLINE_MS.medium).toBe(1200);
-    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(2500);
+    // Hard time-box from AI move-time bench fold (#472 / tip #476).
+    expect(ai.AI_PLAY_DEADLINE_MS.hard).toBe(450);
   });
 
   it('HvA status uses tap copy and You win! / Computer is thinking…', () => {

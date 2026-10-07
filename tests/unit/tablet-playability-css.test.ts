@@ -71,5 +71,8 @@ describe('tablet / offline playability CSS', () => {
       /\.collapse-toggle\s*\{[^}]*touch-action:\s*manipulation/s
     );
     expect(styleCss).toMatch(/\.back-button\s*\{[^}]*touch-action:\s*manipulation/s);
+    expect(gamePlayCss).toMatch(
+      /\.modal-close\s*\{[^}]*touch-action:\s*manipulation/s
+    );
   });
 });
