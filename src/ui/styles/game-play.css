@@ -1278,40 +1278,6 @@
   }
 }
 
-/* Ensure touch targets are large enough on mobile / iPad.
-   `(hover: none)` covers iPads that report pointer:fine with Apple Pencil.
-   Kings cells size from the board grid — do not set min-width on
-   .cell (it forces horizontal overflow on ~390px viewports). */
-@media (hover: none), (pointer: coarse) {
-  button,
-  .back-button,
-  .difficulty-btn,
-  .start-game-btn,
-  .mode-option,
-  .accordion-header,
-  .division-tab,
-  .hero-progress-link,
-  .game-card[role='button'] {
-    min-height: 44px;
-  }
-
-  .difficulty-btn {
-    min-width: 44px;
-    padding: 10px 18px;
-  }
-
-  .collapse-toggle {
-    min-width: 44px;
-  }
-
-  .game-loading-actions .btn {
-    min-height: 44px;
-    min-width: 44px;
-    padding: 10px 18px;
-  }
-}
-
-
 /* =====================================================
    TUTORIAL SYSTEM STYLES
    ===================================================== */

@@ -3,6 +3,7 @@
  * Mount unsaturated tutorial exacts + inject/style pins (no fab/fiar). Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { contig60Tutorial } from '../../src/games/contig-60/tutorial';
@@ -31,7 +32,7 @@ describe('Wave 66 handshake — contig × sum residual', () => {
     expect(contigCss).toContain('rgba(0,0,0,0.15)');
     expect(sumCss).toContain('rgba(0,0,0,0.3)');
 
-    const style = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+    const style = readAppCss();
     expect(style).toMatch(/\.contig-game-area/);
     expect(style).toMatch(/\.sd-hands-container/);
   });

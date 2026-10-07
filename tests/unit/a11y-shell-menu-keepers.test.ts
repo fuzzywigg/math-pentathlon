@@ -3,6 +3,7 @@
  * Does not touch src/games/* boards. Complements a11y-shell.test.ts.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderGameSelector } from '../../src/ui/game-selector';
@@ -12,7 +13,7 @@ vi.mock('../../src/core/router', () => ({
   navigate: vi.fn(),
 }));
 
-const styleCss = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+const styleCss = readAppCss();
 const indexHtml = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
 
 describe('Shell/menu a11y keepers — skip-link + document landmarks', () => {

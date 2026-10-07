@@ -3,6 +3,7 @@
  * Distinct from wave64 capture/roll-disabled; deepen style + strong labels. Tests-only.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { callaTutorial } from '../../src/games/calla/tutorial';
@@ -15,10 +16,7 @@ describe('Wave 66 handshake — calla × juggle residual', () => {
   });
 
   it('mounts calla style pulse + juggle dice-area + strong labels', () => {
-    const callaCss = readFileSync(
-      resolve(process.cwd(), 'src/style.css'),
-      'utf8'
-    );
+    const callaCss = readAppCss();
     expect(callaCss).toContain('@keyframes callaPitPulse');
     expect(callaCss).toContain('stroke: #48bb78');
     expect(

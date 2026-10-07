@@ -3,6 +3,7 @@
  * Distinct from open #302 wave63 (welcome title / no draws / Selecting Shapes). Tests-only.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tutorial';
 import { hexTutorial } from '../../src/games/hex/tutorial';
 import { hexAGoneTutorial } from '../../src/games/hex-a-gone/tutorial';
@@ -46,7 +47,7 @@ describe('Wave 64 handshake — kings/hex leftovers', () => {
       'Pattern Block Bank'
     );
 
-    const css = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+    const css = readAppCss();
     expect(css).toContain('animation: hexWinPulse 1s ease-in-out infinite');
     expect(css).toContain('.hex-a-gone-confirm-btn:hover');
     expect(css).toContain('box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4)');

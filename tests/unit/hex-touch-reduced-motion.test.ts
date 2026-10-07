@@ -6,8 +6,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
+import { readAppCss } from './_app-css';
 
-const styleCss = readFileSync(join(process.cwd(), 'src/style.css'), 'utf8');
+const styleCss = readAppCss();
 const boardUi = readFileSync(
   join(process.cwd(), 'src/games/hex/board-ui.ts'),
   'utf8'
