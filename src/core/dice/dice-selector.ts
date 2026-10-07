@@ -49,7 +49,7 @@ export class DiceSelector {
   constructor(container: HTMLElement, options: DiceSelectorOptions = {}) {
     this.container = container;
     this.options = {
-      diceSet: options.diceSet || COMMON_DICE_SETS.standard,
+      diceSet: options.diceSet || COMMON_DICE_SETS.standard!,
       customDice: options.customDice || [],
       multiSelect: options.multiSelect ?? true,
       showPossibleSums: options.showPossibleSums ?? false,

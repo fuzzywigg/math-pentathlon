@@ -11,7 +11,10 @@ export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
  * Canvas / scene mount under software WebGL (SwiftShader / ANGLE).
  * CI VMs need more headroom than local GPU; 30s was the historical flake budget.
  */
-export const MP3D_READY_TIMEOUT_MS = process.env.CI ? 60_000 : 45_000;
+const nodeProcess = (
+  globalThis as { process?: { env?: Record<string, string | undefined> } }
+).process;
+export const MP3D_READY_TIMEOUT_MS = nodeProcess?.env?.CI ? 60_000 : 45_000;
 
 export async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({
@@ -91,8 +94,11 @@ export async function waitForMp3dReady(
     { timeout: timeoutMs }
   );
 
-  const result = await status.jsonValue();
-  if (result.state === 'fallback') {
+  const result = await status.jsonValue() as
+    | false
+    | { state: 'fallback'; reason: string }
+    | { state: 'ready'; reason: null };
+  if (result && result.state === 'fallback') {
     throw new Error(
       `mp3d "${gameId}" never became canvas-ready — WebGL fallback (${result.reason}). ` +
         'Under software GL this usually means context creation failed or was lost before first paint.'

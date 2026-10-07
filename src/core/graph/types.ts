@@ -247,7 +247,10 @@ export function createHexLatticeGraph(rings: number, size: number = 40): Graph {
 
   // Create edges between adjacent hexes
   nodes.forEach((_, id) => {
-    const [q, r] = id.split(',').map(Number);
+    const parts = id.split(',').map(Number);
+    const q = parts[0];
+    const r = parts[1];
+    if (q === undefined || r === undefined) return;
 
     for (const dir of directions) {
       const neighborId = `${q + dir.q},${r + dir.r}`;
@@ -295,7 +298,11 @@ export function createCompleteGraph(n: number, radius: number = 150): Graph {
     for (let j = i + 2; j < nodeIds.length; j++) {
       // Skip adjacent (already connected by circular)
       if (!(i === 0 && j === nodeIds.length - 1)) {
-        base.edges.push({ from: nodeIds[i], to: nodeIds[j] });
+        const from = nodeIds[i];
+        const to = nodeIds[j];
+        if (from !== undefined && to !== undefined) {
+          base.edges.push({ from, to });
+        }
       }
     }
   }

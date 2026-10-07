@@ -403,7 +403,8 @@ export function createInteractiveFractionBar(
     segment.addEventListener('mouseenter', () => {
       // Highlight potential selection
       for (let j = 0; j <= i; j++) {
-        segments[j].style.opacity = '0.8';
+        const seg = segments[j];
+        if (seg) seg.style.opacity = '0.8';
       }
     });
 

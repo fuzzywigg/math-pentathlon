@@ -304,7 +304,7 @@ export function findAllValidSets(
     }
 
     for (let i = start; i < pieces.length; i++) {
-      current.push(pieces[i]);
+      current.push(pieces[i]!);
       findSets(i + 1, current);
       current.pop();
     }
@@ -408,6 +408,7 @@ export function groupByAttribute(
 
   for (const piece of pieces) {
     const value = piece.attributes[attribute];
+    if (value === undefined) continue;
     if (!groups.has(value)) {
       groups.set(value, []);
     }
@@ -426,7 +427,10 @@ export function getUniqueValues(
 ): AttributeValue[] {
   const values = new Set<AttributeValue>();
   for (const piece of pieces) {
-    values.add(piece.attributes[attribute]);
+    const value = piece.attributes[attribute];
+    if (value !== undefined) {
+      values.add(value);
+    }
   }
   return Array.from(values);
 }

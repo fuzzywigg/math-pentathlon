@@ -157,7 +157,7 @@ export function getAllPossibleSums(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) sum += values[i];
+      if (mask & (1 << i)) sum += values[i]!;
     }
     sums.add(sum);
   }
@@ -171,7 +171,7 @@ export function getAllPossibleProducts(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let product = 1;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) product *= values[i];
+      if (mask & (1 << i)) product *= values[i]!;
     }
     products.add(product);
   }

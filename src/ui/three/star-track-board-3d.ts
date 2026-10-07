@@ -529,7 +529,11 @@ export async function createStarTrackBoard3D(
         applyHighlights(state);
         paint();
       },
-      { gameMode: callbacks?.gameMode }
+      {
+        ...(callbacks?.gameMode !== undefined
+          ? { gameMode: callbacks.gameMode }
+          : {}),
+      }
     );
 
     if (a11y.childElementCount === 0) {

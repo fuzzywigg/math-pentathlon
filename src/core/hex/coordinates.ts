@@ -200,7 +200,7 @@ export function getNeighbors(coord: AxialCoord): AxialCoord[] {
  * Get a specific neighbor by direction index (0-5)
  */
 export function getNeighbor(coord: AxialCoord, direction: number): AxialCoord {
-  const dir = AXIAL_DIRECTIONS[direction % 6];
+  const dir = AXIAL_DIRECTIONS[direction % 6]!;
   return createAxial(coord.q + dir.q, coord.r + dir.r);
 }
 
@@ -272,9 +272,10 @@ export function hexRing(center: AxialCoord, radius: number): AxialCoord[] {
   if (radius === 0) return [center];
 
   const results: AxialCoord[] = [];
+  const dir4 = AXIAL_DIRECTIONS[4]!;
   let current = createAxial(
-    center.q + AXIAL_DIRECTIONS[4].q * radius,
-    center.r + AXIAL_DIRECTIONS[4].r * radius
+    center.q + dir4.q * radius,
+    center.r + dir4.r * radius
   );
 
   for (let i = 0; i < 6; i++) {

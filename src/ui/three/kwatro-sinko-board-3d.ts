@@ -595,24 +595,22 @@ export async function createKwatroSinkoBoard3D(
         : undefined;
       const piece = node.chip ? `chip ${node.chip.value}` : undefined;
 
-      makeGridCell(
-        btn,
-        buildCellAriaLabel({
-          coord: `${nm.row},${nm.col}`,
-          empty: !node.chip,
-          owner,
-          piece,
-          validMove: isValid,
-          extras: [
-            node.isNumbered ? 'numbered' : '',
-            state.selectedChip && node.chip?.id === state.selectedChip
-              ? 'selected'
-              : '',
-            canSelect ? 'selectable' : '',
-            isWinning ? 'winning' : '',
-          ].filter(Boolean),
-        })
-      );
+      const labelParts: Parameters<typeof buildCellAriaLabel>[0] = {
+        coord: `${nm.row},${nm.col}`,
+        empty: !node.chip,
+        validMove: isValid,
+        extras: [
+          node.isNumbered ? 'numbered' : '',
+          state.selectedChip && node.chip?.id === state.selectedChip
+            ? 'selected'
+            : '',
+          canSelect ? 'selectable' : '',
+          isWinning ? 'winning' : '',
+        ].filter(Boolean),
+      };
+      if (owner !== undefined) labelParts.owner = owner;
+      if (piece !== undefined) labelParts.piece = piece;
+      makeGridCell(btn, buildCellAriaLabel(labelParts));
 
       if (canSelect && node.chip) {
         const chipId = node.chip.id;

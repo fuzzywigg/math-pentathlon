@@ -344,12 +344,13 @@ export function createInteractiveHexGrid(
 
     const wrappedGetCellOptions = (coord: AxialCoord): HexRenderOptions => {
       const baseOptions = currentGetCellOptions?.(coord) ?? {};
+      const onClick = options.onCellClick
+        ? () => options.onCellClick!(coord)
+        : baseOptions.onClick;
 
       return {
         ...baseOptions,
-        onClick: options.onCellClick
-          ? () => options.onCellClick!(coord)
-          : baseOptions.onClick,
+        ...(onClick !== undefined ? { onClick } : {}),
         onHover: (c, entering) => {
           hoveredCell = entering ? c : null;
           options.onCellHover?.(hoveredCell);
@@ -394,8 +395,8 @@ export function getHexTriangles(
 
   // Each triangle is formed by center + two adjacent corners
   for (let i = 0; i < 6; i++) {
-    const c1 = corners[i];
-    const c2 = corners[(i + 1) % 6];
+    const c1 = corners[i]!;
+    const c2 = corners[(i + 1) % 6]!;
     // Triangle centroid
     triangles.push({
       x: (center.x + c1.x + c2.x) / 3,
@@ -429,8 +430,8 @@ export function renderHexWithTriangles(
 
   // Draw each triangle
   for (let i = 0; i < 6; i++) {
-    const c1 = corners[i];
-    const c2 = corners[(i + 1) % 6];
+    const c1 = corners[i]!;
+    const c2 = corners[(i + 1) % 6]!;
 
     const options = getTriangleOptions?.(coord, i) ?? {};
 

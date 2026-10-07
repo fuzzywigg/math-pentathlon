@@ -28,5 +28,5 @@ export function plySeed(gameSeed: number, ply: number): number {
 }
 
 export function pickRandom<T>(items: T[], rng: () => number = Math.random): T {
-  return items[Math.floor(rng() * items.length)];
+  return items[Math.floor(rng() * items.length)] as T;
 }

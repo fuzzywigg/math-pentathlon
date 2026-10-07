@@ -338,8 +338,8 @@ export function animateRoll(
     if (elapsed < duration) {
       // Update each die with random value
       dieElements.forEach((wrapper, index) => {
-        const die = finalResult.rolls[index];
-        const config = DICE_CONFIGS[die.diceType];
+        const die = finalResult.rolls[index]!;
+        const config = DICE_CONFIGS[die.diceType]!;
         const randomValue = Math.ceil(Math.random() * config.faces);
         const tempDie: DieRoll = { ...die, value: randomValue };
 
@@ -355,7 +355,7 @@ export function animateRoll(
         wrapper.classList.remove('rolling');
         wrapper.classList.add('settled');
         wrapper.innerHTML = '';
-        wrapper.appendChild(renderDie(finalResult.rolls[index], dieSize));
+        wrapper.appendChild(renderDie(finalResult.rolls[index]!, dieSize));
       });
 
       // Add total

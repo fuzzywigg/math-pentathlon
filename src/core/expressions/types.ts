@@ -224,7 +224,7 @@ export function createSlot(
     id: `slot-${index}`,
     index,
     card: card ?? null,
-    locked,
+    ...(locked !== undefined ? { locked } : {}),
   };
 }
 

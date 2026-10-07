@@ -109,7 +109,7 @@ export function renderBoard(
       rect.setAttribute('y', String(y));
       rect.setAttribute('width', String(cfg.cellSize));
       rect.setAttribute('height', String(cfg.cellSize));
-      rect.setAttribute('fill', board.cells[r][c] ? '#e0e0e0' : '#fff');
+      rect.setAttribute('fill', board.cells[r]?.[c] ? '#e0e0e0' : '#fff');
       rect.setAttribute('stroke', '#ccc');
       rect.setAttribute('stroke-width', '1');
       rect.dataset.row = String(r);

@@ -46,6 +46,7 @@ export function renderAttributePiece(
 
   for (const def of definitions) {
     const value = piece.attributes[def.name];
+    if (value === undefined) continue;
     const color = getAttributeColor(definitions, def.name, value);
     if (color) {
       if (def.name === 'color' || def.name.includes('color')) {

@@ -604,9 +604,9 @@ export function parseFraction(str: string): Fraction | null {
   // Try mixed number format "1 1/2"
   const mixedMatch = str.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);
   if (mixedMatch) {
-    const whole = parseInt(mixedMatch[1], 10);
-    const numer = parseInt(mixedMatch[2], 10);
-    const denom = parseInt(mixedMatch[3], 10);
+    const whole = parseInt(mixedMatch[1]!, 10);
+    const numer = parseInt(mixedMatch[2]!, 10);
+    const denom = parseInt(mixedMatch[3]!, 10);
     if (denom === 0) return null;
     return fromMixedNumber(whole, numer, denom);
   }
@@ -614,8 +614,8 @@ export function parseFraction(str: string): Fraction | null {
   // Try simple fraction "3/4"
   const fractionMatch = str.match(/^(-?\d+)\/(\d+)$/);
   if (fractionMatch) {
-    const numer = parseInt(fractionMatch[1], 10);
-    const denom = parseInt(fractionMatch[2], 10);
+    const numer = parseInt(fractionMatch[1]!, 10);
+    const denom = parseInt(fractionMatch[2]!, 10);
     if (denom === 0) return null;
     return { numerator: numer, denominator: denom };
   }
