@@ -32,9 +32,26 @@ let aiPlayer: PlayerOwner | null = null;
 let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking: boolean = false;
 
-// AI thinking delay (ms) for better UX
-const AI_THINKING_DELAY = 500;
+// AI thinking delay (ms) for better UX.
+// Coarse pointers (tablets) use a slightly shorter pause so turns feel responsive
+// without removing the "thinking" affordance.
+const AI_THINKING_DELAY_DESKTOP = 500;
+const AI_THINKING_DELAY_COARSE = 350;
 const AI_MOVE_DELAY = 300;
+
+function aiThinkingDelayMs(): number {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return AI_THINKING_DELAY_DESKTOP;
+  }
+  try {
+    if (window.matchMedia('(pointer: coarse), (hover: none)').matches) {
+      return AI_THINKING_DELAY_COARSE;
+    }
+  } catch {
+    // jsdom / odd hosts without full matchMedia — keep desktop delay
+  }
+  return AI_THINKING_DELAY_DESKTOP;
+}
 
 // Track if game has ended (to prevent multiple owl notifications)
 let hasNotifiedGameEnd = false;
@@ -242,7 +259,7 @@ async function executeAITurn(): Promise<void> {
   render(); // Show "AI is thinking..." status
 
   // Initial thinking delay
-  await delay(AI_THINKING_DELAY);
+  await delay(aiThinkingDelayMs());
 
   // Get AI's move
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
