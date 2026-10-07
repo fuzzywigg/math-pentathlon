@@ -2637,8 +2637,12 @@ h1 {
    ===================================================== */
 
 .hex-board {
-  max-width: 600px;
-  max-height: 500px;
+  /* Intrinsic SVG size ≈801×522 (hexRadius 26); pin CSS so cells stay ≥44px. */
+  width: 801px;
+  min-width: 801px;
+  max-width: none;
+  height: auto;
+  max-height: none;
   margin: 0 auto;
   display: block;
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
@@ -2798,22 +2802,20 @@ h1 {
   border-left: 3px solid #ef5350;
 }
 
-/* Hex game area layout */
+/* Hex game area layout — allow horizontal scroll when the 801px board is wider than the viewport */
 .hex-game-area {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
   padding: 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 /* Responsive hex board */
 @media (max-width: 600px) {
-  .hex-board {
-    max-width: 95vw;
-    max-height: 80vw;
-  }
-
   .hex-legend {
     flex-direction: column;
     gap: 8px;
@@ -2821,24 +2823,17 @@ h1 {
 }
 
 /*
- * Coarse pointers: keep Hex cells ≥44 CSS px.
- * board-ui hexRadius=22 → pointy-top height 44 SVG units; viewBox ~690×454.
- * Pin display width so scale≈1 and allow horizontal scroll on narrow viewports.
+ * Coarse pointers: keep the same ≥44 CSS px pin (hexRadius 26 → flat ≈45 / pointy 52).
+ * viewBox ~801×522; width pinned on .hex-board for all pointers (see above).
  */
 @media (pointer: coarse) {
   .hex-game-area {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    max-width: 100%;
     align-items: stretch;
   }
 
   .hex-board {
-    min-width: 690px;
-    width: 690px;
-    max-width: none;
-    max-height: none;
-    height: auto;
+    min-width: 801px;
+    width: 801px;
   }
 }
 

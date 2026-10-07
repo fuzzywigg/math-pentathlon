@@ -36,8 +36,9 @@ export function renderBoard(
   const size = state.boardSize;
 
   // Calculate SVG dimensions
-  // Hex dimensions (pointy-top hexagons)
-  const hexRadius = 22; // Size of each hex
+  // Hex dimensions (pointy-top hexagons).
+  // Radius 26 → flat-to-flat ≈45.0 and point-to-point 52 (≥44 CSS px at scale 1).
+  const hexRadius = 26;
   const hexWidth = hexRadius * Math.sqrt(3);
   const hexHeight = hexRadius * 2;
   const vertSpacing = hexHeight * 0.75;
@@ -55,8 +56,9 @@ export function renderBoard(
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'hex-board');
   svg.setAttribute('viewBox', `0 0 ${boardWidth} ${boardHeight}`);
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
+  // Intrinsic size so the board does not collapse to the 300×150 replaced-element default.
+  svg.setAttribute('width', String(Math.round(boardWidth)));
+  svg.setAttribute('height', String(Math.round(boardHeight)));
   markBoardAsGrid(svg);
 
   // Create defs for hex shape
@@ -363,31 +365,36 @@ export function renderStatus(
   const turnEl = document.createElement('div');
   turnEl.className = 'status-turn';
 
+  const aiSeatTurn =
+    gameMode === 'human-vs-ai' &&
+    !state.winner &&
+    (isAIThinking || isComputerPlacementTurn(state));
+
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName =
-      gameMode === 'human-vs-ai'
-        ? state.winner === 'player1'
-          ? 'You'
-          : 'AI'
-        : state.winner === 'player1'
-          ? 'Blue'
-          : 'Red';
-    const winnerIcon = seatIcon(state.winner);
-    turnEl.textContent = `${winnerIcon} ${winnerName} Win${winnerName === 'You' ? '' : 's'}!`;
-  } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    if (gameMode === 'human-vs-ai' && state.winner === 'player1') {
+      turnEl.textContent = `${seatIcon(state.winner)} You win!`;
+    } else {
+      const winnerName =
+        gameMode === 'human-vs-ai'
+          ? 'AI'
+          : state.winner === 'player1'
+            ? 'Blue'
+            : 'Red';
+      turnEl.textContent = `${seatIcon(state.winner)} ${winnerName} Wins!`;
+    }
+  } else if (aiSeatTurn) {
+    // Always show thinking chrome on the computer seat (incl. pre-worker paint).
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     const playerName =
       gameMode === 'human-vs-ai'
-        ? state.currentPlayer === 'player1'
-          ? 'Your'
-          : "AI's"
+        ? 'Your'
         : state.currentPlayer === 'player1'
           ? "Blue's"
           : "Red's";
-    turnEl.textContent = `${playerName} turn - Click to place`;
+    turnEl.textContent = `${playerName} turn — Tap an empty hex`;
   }
 
   statusEl.appendChild(turnEl);

@@ -3,7 +3,7 @@
 import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
-import { AIDifficulty } from './ai';
+import { AIDifficulty, getRandomMove } from './ai';
 import { cancelHexAiRequests, getBestMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
@@ -29,8 +29,8 @@ let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game. */
 let aiGeneration = 0;
 
-// AI config
-const AI_THINKING_DELAY = 500;
+// AI paint delay before worker search (search budgets are separate).
+const AI_THINKING_DELAY = 250;
 
 // Track game end for owl notifications
 let hasNotifiedGameEnd = false;
@@ -130,6 +130,11 @@ function triggerAIMove(): void {
         aiMove = null;
       }
       if (gen !== aiGeneration) return;
+
+      // Worker cancel / failure must not soft-lock the AI seat.
+      if (!aiMove && !gameState.winner) {
+        aiMove = getRandomMove(gameState);
+      }
 
       if (aiMove) {
         gameState = makeMove(gameState, aiMove);
