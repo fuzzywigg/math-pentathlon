@@ -363,6 +363,18 @@ export async function createPentEmInBoard3D(
       }
     }
 
+    const legalAnchors = new Set<string>();
+    if (state.phase === 'placePiece' && state.selectedPiece) {
+      for (const pos of getValidPlacements(
+        state,
+        state.selectedPiece,
+        state.selectedRotation,
+        state.selectedFlipped
+      )) {
+        legalAnchors.add(`${pos.row},${pos.col}`);
+      }
+    }
+
     for (let row = 0; row < BOARD_SIZE; row++) {
       for (let col = 0; col < BOARD_SIZE; col++) {
         const btn = document.createElement('button');
@@ -376,8 +388,7 @@ export async function createPentEmInBoard3D(
             coord: `${row},${col}`,
             empty: occupant === null,
             owner: ownerLabel(occupant),
-            validPlacement:
-              state.phase === 'placePiece' && !!state.selectedPiece,
+            validPlacement: legalAnchors.has(`${row},${col}`),
           })
         );
         const activate = (): void => handler?.({ row, col });

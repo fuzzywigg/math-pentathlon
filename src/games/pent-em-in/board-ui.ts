@@ -7,7 +7,12 @@ import {
   getPlayerPieces,
   getPentominoShape,
 } from './types';
-import { getPieceCells, canPlacePiece } from './rules';
+import {
+  getPieceCells,
+  canPlacePiece,
+  getCurrentOrientationPlacements,
+  selectedPieceFitsAnywhere,
+} from './rules';
 import { Cell } from '../../core/polyomino/types';
 import { normalizeCells } from '../../core/polyomino/transform';
 import { getPlayerSeatColors } from '../../ui/player-colors';
@@ -24,6 +29,8 @@ import {
 const CELL_SIZE = 36;
 const PREVIEW_CELL_SIZE = 16;
 const BOARD_PADDING = 20;
+const VALID_FILL = 'rgba(76, 175, 80, 0.28)';
+const VALID_STROKE = '#4caf50';
 
 function playerColors() {
   return getPlayerSeatColors();
@@ -145,6 +152,42 @@ export function renderBoard(
   }
   svg.appendChild(piecesGroup);
 
+  const legalAnchors =
+    allowInput && state.phase === 'placePiece' && state.selectedPiece
+      ? new Set(
+          getCurrentOrientationPlacements(state).map(
+            (c) => `${c.row},${c.col}`
+          )
+        )
+      : new Set<string>();
+
+  // Legal placement highlights (visible without hover — critical on tablet)
+  if (legalAnchors.size > 0) {
+    const validGroup = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
+    validGroup.classList.add('pent-valid-cells');
+    for (const key of legalAnchors) {
+      const [r, c] = key.split(',').map(Number);
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
+      rect.setAttribute('x', String(BOARD_PADDING + c * CELL_SIZE + 1));
+      rect.setAttribute('y', String(BOARD_PADDING + r * CELL_SIZE + 1));
+      rect.setAttribute('width', String(CELL_SIZE - 2));
+      rect.setAttribute('height', String(CELL_SIZE - 2));
+      rect.setAttribute('fill', VALID_FILL);
+      rect.setAttribute('stroke', VALID_STROKE);
+      rect.setAttribute('stroke-width', '2');
+      rect.setAttribute('rx', '3');
+      rect.classList.add('pent-cell-valid');
+      validGroup.appendChild(rect);
+    }
+    svg.appendChild(validGroup);
+  }
+
   // Preview (if placing) — suppress during computer seat
   if (allowInput && state.selectedPiece && state.previewPosition) {
     const previewCells = getPieceCells(
@@ -236,14 +279,14 @@ export function renderBoard(
           : occupant === 'player2'
             ? 'Red'
             : undefined;
+      const isLegalAnchor = legalAnchors.has(`${row},${col}`);
       makeGridCell(
         rect,
         buildCellAriaLabel({
           coord: `${row},${col}`,
           empty: occupant === null,
           owner,
-          validPlacement:
-            allowInput && state.phase === 'placePiece' && !!state.selectedPiece,
+          validPlacement: isLegalAnchor,
         })
       );
 
@@ -352,6 +395,127 @@ export function renderPieceSelector(
 // Status and Controls
 // =============================================================================
 
+export interface PentEmInPlaceControlHandlers {
+  onRotate: () => void;
+  onFlip: () => void;
+  onCancel: () => void;
+}
+
+/**
+ * Rotate / flip / choose-another controls for the placePiece phase.
+ */
+export function renderPlaceControls(
+  state: PentEmInState,
+  handlers: PentEmInPlaceControlHandlers,
+  options: PentEmInBoardRenderOptions = {}
+): HTMLElement {
+  const allowInput = options.allowInput !== false;
+  const container = document.createElement('div');
+  container.className = 'pent-place-controls';
+
+  if (
+    !allowInput ||
+    state.phase !== 'placePiece' ||
+    !state.selectedPiece
+  ) {
+    return container;
+  }
+
+  const shape = getPentominoShape(state.selectedPiece);
+  const fitsAnywhere = selectedPieceFitsAnywhere(state);
+  const currentFits = getCurrentOrientationPlacements(state).length > 0;
+
+  // Orientation preview so rotate/flip is visible without board hover
+  if (shape) {
+    const previewWrap = document.createElement('div');
+    previewWrap.className = 'pent-current-piece';
+    const used = normalizeCells(
+      getPieceCells(
+        state.selectedPiece,
+        { row: 0, col: 0 },
+        state.selectedRotation,
+        state.selectedFlipped
+      )
+    );
+    const maxRow = Math.max(...used.map((c) => c.row), 0) + 1;
+    const maxCol = Math.max(...used.map((c) => c.col), 0) + 1;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute(
+      'width',
+      String(Math.max(maxCol * PREVIEW_CELL_SIZE + 4, 40))
+    );
+    svg.setAttribute(
+      'height',
+      String(Math.max(maxRow * PREVIEW_CELL_SIZE + 4, 40))
+    );
+    svg.setAttribute('aria-hidden', 'true');
+    const color = playerColors()[state.currentPlayer];
+    for (const cell of used) {
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
+      rect.setAttribute('x', String(2 + cell.col * PREVIEW_CELL_SIZE));
+      rect.setAttribute('y', String(2 + cell.row * PREVIEW_CELL_SIZE));
+      rect.setAttribute('width', String(PREVIEW_CELL_SIZE - 1));
+      rect.setAttribute('height', String(PREVIEW_CELL_SIZE - 1));
+      rect.setAttribute('fill', color);
+      rect.setAttribute('rx', '2');
+      svg.appendChild(rect);
+    }
+    previewWrap.appendChild(svg);
+    container.appendChild(previewWrap);
+  }
+
+  const controls = document.createElement('div');
+  controls.className = 'pent-controls';
+
+  if (shape?.canRotate) {
+    const rotateBtn = document.createElement('button');
+    rotateBtn.type = 'button';
+    rotateBtn.className = 'pent-btn pent-btn-rotate';
+    rotateBtn.textContent = `Rotate (${state.selectedRotation}°)`;
+    rotateBtn.addEventListener('click', handlers.onRotate);
+    controls.appendChild(rotateBtn);
+  }
+
+  if (shape?.canFlip) {
+    const flipBtn = document.createElement('button');
+    flipBtn.type = 'button';
+    flipBtn.className = 'pent-btn pent-btn-flip';
+    flipBtn.textContent = state.selectedFlipped ? 'Flipped' : 'Flip';
+    flipBtn.addEventListener('click', handlers.onFlip);
+    controls.appendChild(flipBtn);
+  }
+
+  const otherBtn = document.createElement('button');
+  otherBtn.type = 'button';
+  otherBtn.className = 'pent-btn pent-btn-choose-other';
+  otherBtn.textContent = fitsAnywhere
+    ? 'Choose another piece'
+    : "Can't fit — choose another";
+  otherBtn.addEventListener('click', handlers.onCancel);
+  controls.appendChild(otherBtn);
+
+  container.appendChild(controls);
+
+  const hint = document.createElement('div');
+  hint.className = 'pent-instructions pent-place-hint';
+  if (!fitsAnywhere) {
+    hint.textContent =
+      "This piece doesn't fit anywhere. Choose another piece.";
+  } else if (!currentFits) {
+    hint.textContent =
+      'No green cells at this angle — rotate or flip, or choose another piece.';
+  } else {
+    hint.textContent =
+      'Tap a green cell to place. Rotate or flip to try other angles.';
+  }
+  container.appendChild(hint);
+
+  return container;
+}
+
 export function getPlayerName(player: 'player1' | 'player2'): string {
   return player === 'player1' ? 'Blue' : 'Red';
 }
@@ -458,6 +622,23 @@ export function injectPentEmInStyles(): void {
       text-align: center;
     }
 
+    .pent-place-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pent-current-piece {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 10px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+
     .pent-controls {
       display: flex;
       gap: 8px;
@@ -466,7 +647,9 @@ export function injectPentEmInStyles(): void {
     }
 
     .pent-btn {
-      padding: 8px 16px;
+      padding: 10px 16px;
+      min-height: 44px;
+      min-width: 44px;
       font-size: 14px;
       border: none;
       border-radius: 6px;
@@ -484,8 +667,9 @@ export function injectPentEmInStyles(): void {
       color: white;
     }
 
-    .pent-btn-cancel {
-      background: #9e9e9e;
+    .pent-btn-cancel,
+    .pent-btn-choose-other {
+      background: #546e7a;
       color: white;
     }
 
@@ -504,6 +688,22 @@ export function injectPentEmInStyles(): void {
       color: #666;
       text-align: center;
       max-width: 400px;
+    }
+
+    .pent-place-hint {
+      font-weight: 500;
+      color: #37474f;
+    }
+
+    .pent-cell-valid {
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pent-btn:hover,
+      .pent-piece-option:hover:not(.disabled) {
+        transform: none;
+      }
     }
   `;
   document.head.appendChild(style);
