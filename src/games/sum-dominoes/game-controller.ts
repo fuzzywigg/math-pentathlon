@@ -167,12 +167,9 @@ function updateUI(controller: SDGameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length} left)`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderHand(
-      state,
-      'player1',
-      (id) => handleDominoClick(controller, id),
-      { allowInput: !computerTurn }
-    )
+    renderHand(state, 'player1', (id) => handleDominoClick(controller, id), {
+      allowInput: !computerTurn,
+    })
   );
 
   // Board
@@ -189,12 +186,9 @@ function updateUI(controller: SDGameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length} left)`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderHand(
-      state,
-      'player2',
-      (id) => handleDominoClick(controller, id),
-      { allowInput: !computerTurn }
-    )
+    renderHand(state, 'player2', (id) => handleDominoClick(controller, id), {
+      allowInput: !computerTurn,
+    })
   );
 
   mainLayout.appendChild(p1Container);

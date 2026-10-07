@@ -77,9 +77,11 @@ describe('Sum Dominoes playability — no human input on AI turn', () => {
 
     vi.advanceTimersByTime(800);
     // AI should have rolled (or moved toward a decision) without human help.
-    expect(ctrl.state.currentPlayer === 'player2' || ctrl.state.currentDice !== null || ctrl.state.phase !== 'rolling').toBe(
-      true
-    );
+    expect(
+      ctrl.state.currentPlayer === 'player2' ||
+        ctrl.state.currentDice !== null ||
+        ctrl.state.phase !== 'rolling'
+    ).toBe(true);
   });
 
   it('hides Pass Turn while the computer seat is pending', () => {

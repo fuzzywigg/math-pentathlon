@@ -268,7 +268,11 @@ describe('Wave 25 a11y-game-wiring — button-pattern boards (non-grid)', () => 
   it('Remainder Islands SVG islands are labeled; buttons only when activatable', () => {
     const base = createRemainder();
     // Rolling / non-select: announce islands without making inert buttons.
-    const rollingSvg = renderRemainder(base, () => undefined, () => undefined);
+    const rollingSvg = renderRemainder(
+      base,
+      () => undefined,
+      () => undefined
+    );
     document.body.appendChild(rollingSvg);
     const rollingIslands = rollingSvg.querySelectorAll('[data-island-id]');
     expect(rollingIslands.length).toBeGreaterThan(3);

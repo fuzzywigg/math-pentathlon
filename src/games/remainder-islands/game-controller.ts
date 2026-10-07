@@ -140,7 +140,9 @@ function render(): void {
 // Event Handlers
 // =============================================================================
 
-function noteEmptyValidSkip(beforePlayer: RemainderIslandsState['currentPlayer']): void {
+function noteEmptyValidSkip(
+  beforePlayer: RemainderIslandsState['currentPlayer']
+): void {
   if (
     gameState.phase === 'rolling' &&
     gameState.currentPlayer !== beforePlayer &&

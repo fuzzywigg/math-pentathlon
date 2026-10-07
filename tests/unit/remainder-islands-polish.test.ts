@@ -29,7 +29,10 @@ function mount(): HTMLElement {
   return container;
 }
 
-function hitPolygon(container: HTMLElement, islandId: string): SVGPolygonElement {
+function hitPolygon(
+  container: HTMLElement,
+  islandId: string
+): SVGPolygonElement {
   const polys = container.querySelectorAll(
     `[data-island-id="${islandId}"] polygon`
   );
