@@ -55,7 +55,7 @@ describe('Wave 57 handshake — leftover engines', () => {
     const goneStat = document.createElement('div');
     hexagoneStatus(hexagoneInit(), goneStat, 'human-vs-ai', true);
     expect(goneStat.querySelector('.status-turn')?.textContent).toBe(
-      '🤖 AI is thinking...'
+      'Computer is thinking…'
     );
 
     const parRoot = document.createElement('div');

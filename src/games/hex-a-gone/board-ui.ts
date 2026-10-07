@@ -21,10 +21,12 @@ export type ConfirmCallback = () => void;
 export interface SelectionAreaOptions {
   /** When false, show AI-seat copy (no “click to place” affordance). */
   interactive?: boolean;
+  /** When human-vs-ai, winner banner uses You/AI instead of Blue/Red. */
+  gameMode?: 'human-vs-human' | 'human-vs-ai';
 }
 
-// Hex dimensions
-const HEX_SIZE = 30;
+// Hex dimensions — sized so rendered cells stay ≥44 CSS px at default board width
+const HEX_SIZE = 32;
 
 // Convert axial coordinates to pixel coordinates
 function axialToPixel(q: number, r: number): { x: number; y: number } {
@@ -59,6 +61,7 @@ export function renderBoard(
   // Static/test callers omit options → keep human placing copy.
   const selectionOptions: SelectionAreaOptions = {
     interactive: options.interactive !== false,
+    gameMode: options.gameMode,
   };
 
   const wrapper = document.createElement('div');
@@ -67,8 +70,8 @@ export function renderBoard(
   // Create SVG for the board
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('class', 'hex-a-gone-board');
-  // Radius-3 hexes with HEX_SIZE=30 extend past ±150; pad viewBox so edges aren't clipped
-  svg.setAttribute('viewBox', '-185 -195 370 390');
+  // Radius-3 hexes with HEX_SIZE=32; pad viewBox so edges aren't clipped
+  svg.setAttribute('viewBox', '-195 -205 390 410');
   svg.setAttribute('width', '100%');
   svg.setAttribute('height', '100%');
   svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
@@ -210,12 +213,18 @@ export function buildSelectionArea(
       const blockBtn = document.createElement('button');
       blockBtn.className = 'hex-a-gone-block-btn';
       blockBtn.setAttribute('data-shape', shape);
+      blockBtn.type = 'button';
 
       const isSelected = state.turnSelection.blocks.includes(shape);
       const isCurrentPlacement = state.selectedBlockForPlacement === shape;
       const isAvailable = state.bank[shape] > 0;
       const canSelect =
         state.phase === 'selectBlocks' && !state.turnSelection.committed;
+      const canPlaceSwitch =
+        state.phase === 'placeBlocks' && isSelected && !!onBlockSelect;
+      const selectable =
+        interactive &&
+        ((canSelect && isAvailable && !!onBlockSelect) || canPlaceSwitch);
 
       if (isSelected) blockBtn.classList.add('selected');
       if (isCurrentPlacement) blockBtn.classList.add('placing');
@@ -227,10 +236,21 @@ export function buildSelectionArea(
         <div class="block-count">${state.bank[shape]} left</div>
       `;
 
-      if (canSelect && isAvailable && onBlockSelect) {
+      if (selectable && onBlockSelect) {
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
-      } else if (state.phase === 'placeBlocks' && isSelected && onBlockSelect) {
-        blockBtn.addEventListener('click', () => onBlockSelect(shape));
+        blockBtn.setAttribute(
+          'aria-label',
+          `${shape}, ${state.bank[shape]} left`
+        );
+      } else {
+        blockBtn.disabled = true;
+        blockBtn.setAttribute('aria-disabled', 'true');
+        const why = !interactive
+          ? 'not available during computer turn'
+          : !isAvailable
+            ? 'none left'
+            : 'not selectable';
+        blockBtn.setAttribute('aria-label', `${shape}, ${why}`);
       }
 
       bankBlocks.appendChild(blockBtn);
@@ -254,12 +274,22 @@ export function buildSelectionArea(
           .join(' ')}`;
         selectionStatus.appendChild(selectedList);
 
-        if (onConfirm) {
+        if (onConfirm && interactive) {
           const confirmBtn = document.createElement('button');
           confirmBtn.className = 'hex-a-gone-confirm-btn';
+          confirmBtn.type = 'button';
           confirmBtn.textContent = `Confirm (${state.turnSelection.blocks.length} block${state.turnSelection.blocks.length > 1 ? 's' : ''})`;
           confirmBtn.addEventListener('click', onConfirm);
           selectionStatus.appendChild(confirmBtn);
+          // Tablet: bank+board can push Confirm past the fold — bring it into view.
+          queueMicrotask(() => {
+            if (typeof confirmBtn.scrollIntoView === 'function') {
+              confirmBtn.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          });
         }
       } else {
         selectionStatus.textContent =
@@ -289,8 +319,19 @@ export function buildSelectionArea(
   if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
     winnerMsg.className = 'hex-a-gone-winner game-winner-banner';
-    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-    winnerMsg.textContent = `🎉 ${winnerName} wins! 🎉`;
+    const hvA = options.gameMode === 'human-vs-ai';
+    const winnerName = hvA
+      ? state.winner === 'player1'
+        ? 'You'
+        : 'AI'
+      : state.winner === 'player1'
+        ? 'Blue'
+        : 'Red';
+    // Match status chrome: HvA human → "You win!"; others keep "X Wins!"
+    winnerMsg.textContent =
+      winnerName === 'You'
+        ? '🎉 You win! 🎉'
+        : `🎉 ${winnerName} Wins! 🎉`;
     selectionArea.appendChild(winnerMsg);
   }
 
@@ -342,12 +383,24 @@ export function renderStatus(
         : state.winner === 'player1'
           ? 'Blue'
           : 'Red';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
+    // HvA: "You win!" (not "You Wins!") for early readers; others keep "X Wins!"
+    const winPhrase =
+      winnerName === 'You' ? 'You win!' : `${winnerName} Wins!`;
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winPhrase} 🎉`;
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = 'Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
-    turnEl.textContent = getPhaseMessage(state);
+    let phaseMsg = getPhaseMessage(state);
+    // Vs AI: seat chrome says You/AI — keep phase copy aligned (not Blue/Red).
+    if (gameMode === 'human-vs-ai') {
+      phaseMsg = phaseMsg
+        .replace(/^Blue's turn/, 'Your turn')
+        .replace(/^Blue:/, 'You:')
+        .replace(/^Red's turn/, "AI's turn")
+        .replace(/^Red:/, 'AI:');
+    }
+    turnEl.textContent = phaseMsg;
   }
 
   statusEl.appendChild(turnEl);

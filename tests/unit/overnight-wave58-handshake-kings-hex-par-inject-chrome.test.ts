@@ -30,6 +30,6 @@ describe('Wave 58 handshake — kings hex par inject chrome', () => {
     const styleCss = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
     expect(styleCss).toContain('@keyframes hexWinPulse');
     expect(styleCss).toContain('@keyframes hexValidPulse');
-    expect(styleCss).toContain('width: min(350px, 100%)');
+    expect(styleCss).toContain('width: min(380px, 100%)');
   });
 });
