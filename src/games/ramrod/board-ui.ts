@@ -705,6 +705,18 @@ export function injectRamrodStyles(): void {
       border-radius: 2px;
     }
 
+    @media (max-width: 768px) {
+      .ramrod-game-area {
+        padding: 0.25rem;
+        gap: 0.75rem;
+      }
+
+      .ramrod-scores {
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+      }
+    }
+
     /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
     @media (pointer: coarse), (max-width: 900px) {
       .ramrod-slot {

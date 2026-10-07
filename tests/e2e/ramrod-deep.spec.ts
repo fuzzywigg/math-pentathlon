@@ -43,34 +43,44 @@ async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
 }
 
 async function playHumanTurn(page: Page) {
-  const pass = page.locator('.ramrod-btn-secondary', { hasText: 'Pass Turn' });
-  if (await pass.isVisible().catch(() => false)) {
-    await pass.click({ force: true });
-    return;
-  }
-  const selectable = page.locator('.ramrod-rod-wrapper.selectable');
-  if ((await selectable.count()) > 0) {
-    await selectable.first().click({ force: true });
-    const valid = page.locator('.ramrod-slot.valid');
-    if ((await valid.count()) > 0) {
-      await valid.first().click({ force: true });
+  await page.evaluate(() => {
+    const click = (el: Element | null | undefined) => {
+      el?.dispatchEvent(
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+        })
+      );
+    };
+    const pass = [...document.querySelectorAll('.ramrod-btn-secondary')].find(
+      (b) => b.textContent?.includes('Pass Turn')
+    );
+    if (pass) {
+      click(pass);
       return;
     }
-    const clear = page.locator('.ramrod-btn-secondary', {
-      hasText: 'Clear Selection',
-    });
-    if (await clear.isVisible().catch(() => false)) {
-      await clear.click({ force: true });
-      const again = page.locator('.ramrod-rod-wrapper.selectable');
-      if ((await again.count()) > 1) {
-        await again.nth(1).click({ force: true });
-        const valid2 = page.locator('.ramrod-slot.valid');
-        if ((await valid2.count()) > 0) {
-          await valid2.first().click({ force: true });
-        }
-      }
+    const rod = document.querySelector(
+      '.ramrod-player-player1 .ramrod-rod-wrapper.selectable'
+    );
+    click(rod);
+    const valid = document.querySelector('.ramrod-slot.valid');
+    if (valid) {
+      click(valid);
+      return;
     }
-  }
+    const clear = [...document.querySelectorAll('.ramrod-btn-secondary')].find(
+      (b) => b.textContent?.includes('Clear Selection')
+    );
+    click(clear);
+    const rods = [
+      ...document.querySelectorAll(
+        '.ramrod-player-player1 .ramrod-rod-wrapper.selectable'
+      ),
+    ];
+    click(rods[1] ?? rods[0]);
+    click(document.querySelector('.ramrod-slot.valid'));
+  });
 }
 
 async function waitHumanOrEnd(page: Page) {

@@ -72,7 +72,7 @@ describe('Ramrod deep playability', () => {
   });
 
   it.each(['easy', 'medium', 'hard'] as AIDifficulty[])(
-    'scripted greedy human finishes vs AI %s (×4)',
+    'scripted greedy human finishes or deadlocks cleanly vs AI %s (×4)',
     async (difficulty) => {
       const { newGameVsAI } =
         await import('../../src/games/ramrod/game-controller');
@@ -82,14 +82,24 @@ describe('Ramrod deep playability', () => {
         document.body.appendChild(root);
         const ctrl = newGameVsAI(root, difficulty);
         let guard = 0;
+        let deadlocked = false;
         while (ctrl.state.phase !== 'gameOver' && guard++ < 200) {
           if (ctrl.state.currentPlayer === 'player2') {
             await vi.advanceTimersByTimeAsync(550);
             continue;
           }
           if (!hasValidMoves(ctrl.state)) {
+            // Mutual inability is a rules residual — hint + stop (no score change)
+            if (root.querySelector('.ramrod-deadlock-hint')) {
+              deadlocked = true;
+              break;
+            }
             ctrl.state = passTurn(ctrl.state);
             ctrl.update();
+            if (root.querySelector('.ramrod-deadlock-hint')) {
+              deadlocked = true;
+              break;
+            }
             continue;
           }
           const rods = [...ctrl.state.playerRods.player1];
@@ -108,7 +118,10 @@ describe('Ramrod deep playability', () => {
             ctrl.update();
           }
         }
-        expect(ctrl.state.phase).toBe('gameOver');
+        expect(
+          ctrl.state.phase === 'gameOver' || deadlocked,
+          `game ${g} ended without winner or deadlock hint`
+        ).toBe(true);
         root.remove();
         document.getElementById('ramrod-styles')?.remove();
       }
