@@ -58,11 +58,15 @@ export function createInitialState(): SumDominoesState {
   }
 
   if (startingDomino) {
-    board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL] = {
+    // Horizontal seed must occupy both span cells (same as placeDomino) so
+    // the second cell cannot accept an overlapping soft-lock placement.
+    const placedSeed: PlacedDomino = {
       domino: { ...startingDomino, orientation: 'horizontal' },
       position: { row: CONFIG.CENTER_ROW, col: CONFIG.CENTER_COL },
       orientation: 'horizontal',
     };
+    board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL] = placedSeed;
+    board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL + 1] = placedSeed;
   }
 
   return {

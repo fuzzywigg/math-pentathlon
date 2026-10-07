@@ -32,6 +32,16 @@ function syncOpponentChrome(isAI: boolean): void {
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
+/** True while it is the computer's seat (including the think pause). */
+function isComputerTurnPending(controller: SDGameController): boolean {
+  return (
+    controller.isAI &&
+    controller.aiPlayer !== null &&
+    controller.aiPlayer === controller.state.currentPlayer &&
+    !controller.state.winner
+  );
+}
+
 // =============================================================================
 // Game Controller
 // =============================================================================
@@ -92,6 +102,7 @@ export function initGame(
 function updateUI(controller: SDGameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
+  const computerTurn = isComputerTurnPending(controller);
   container.innerHTML = '';
 
   // Main game area
@@ -105,6 +116,8 @@ function updateUI(controller: SDGameController): void {
 
   if (state.winner) {
     status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
+  } else if (computerTurn) {
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} (computer) is thinking…`;
   } else if (state.phase === 'rolling') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Roll the dice`;
   } else if (state.phase === 'placing') {
@@ -127,14 +140,21 @@ function updateUI(controller: SDGameController): void {
     gameArea.appendChild(banner);
   }
 
-  // Dice area
-  gameArea.appendChild(
-    renderDice(
-      state.currentDice,
-      () => handleRoll(controller),
-      state.phase === 'rolling' && !state.winner
-    )
-  );
+  // Dice area — hide human Roll while the computer seat is pending
+  if (computerTurn && state.phase === 'rolling' && !state.currentDice) {
+    const wait = document.createElement('div');
+    wait.className = 'sd-computer-thinking';
+    wait.textContent = 'Computer is thinking…';
+    gameArea.appendChild(wait);
+  } else {
+    gameArea.appendChild(
+      renderDice(
+        state.currentDice,
+        () => handleRoll(controller),
+        state.phase === 'rolling' && !state.winner && !computerTurn
+      )
+    );
+  }
 
   // Main layout
   const mainLayout = document.createElement('div');
@@ -147,12 +167,16 @@ function updateUI(controller: SDGameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length} left)`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderHand(state, 'player1', (id) => handleDominoClick(controller, id))
+    renderHand(state, 'player1', (id) => handleDominoClick(controller, id), {
+      allowInput: !computerTurn,
+    })
   );
 
   // Board
-  const board = renderBoard(state, (pos, orientation) =>
-    handleCellClick(controller, pos, orientation)
+  const board = renderBoard(
+    state,
+    (pos, orientation) => handleCellClick(controller, pos, orientation),
+    { allowInput: !computerTurn }
   );
 
   // Player 2 hand
@@ -162,7 +186,9 @@ function updateUI(controller: SDGameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length} left)`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderHand(state, 'player2', (id) => handleDominoClick(controller, id))
+    renderHand(state, 'player2', (id) => handleDominoClick(controller, id), {
+      allowInput: !computerTurn,
+    })
   );
 
   mainLayout.appendChild(p1Container);
@@ -175,7 +201,7 @@ function updateUI(controller: SDGameController): void {
   const controls = document.createElement('div');
   controls.className = 'sd-controls';
 
-  if (state.phase === 'passing') {
+  if (state.phase === 'passing' && !computerTurn) {
     const passBtn = document.createElement('button');
     passBtn.className = 'sd-pass-btn';
     passBtn.textContent = 'Pass Turn';
@@ -191,11 +217,7 @@ function updateUI(controller: SDGameController): void {
   restoreGridFocus(container, previousFocus);
 
   // AI turn
-  if (
-    controller.isAI &&
-    controller.aiPlayer === state.currentPlayer &&
-    !state.winner
-  ) {
+  if (computerTurn) {
     setTimeout(() => makeAIMove(controller), 800);
   }
 }
@@ -204,6 +226,8 @@ function updateUI(controller: SDGameController): void {
  * Handle dice roll
  */
 function handleRoll(controller: SDGameController): void {
+  if (isComputerTurnPending(controller)) return;
+
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.sd-roll-btn' });
   }
@@ -223,6 +247,7 @@ function handleDominoClick(
   controller: SDGameController,
   dominoId: string
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = selectDomino(controller.state, dominoId);
   controller.update();
 }
@@ -235,6 +260,7 @@ function handleCellClick(
   position: BoardPosition,
   orientation: 'horizontal' | 'vertical'
 ): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = placeDomino(controller.state, position, orientation);
   controller.update();
 }
@@ -243,6 +269,7 @@ function handleCellClick(
  * Handle pass
  */
 function handlePass(controller: SDGameController): void {
+  if (isComputerTurnPending(controller)) return;
   controller.state = passTurn(controller.state);
   controller.update();
 }
