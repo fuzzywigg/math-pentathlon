@@ -23,13 +23,10 @@ No engine code, rules, or scoring changes.
 | --- | --- | --- | --- |
 | `src/games/ramrod/rules.ts` | 74/83 (**89.15%**) | 81/83 (**97.59%**) | +7 |
 | `src/games/queens-guards/types.ts` | 36/40 (**90.00%**) | 36/40 (**90.00%**) | 0 (remaining unreachable) |
-| `src/games/par-55/rules.ts` | 74/82 (**90.24%**) | 75/82 (**91.46%**) | +1* |
+| `src/games/par-55/rules.ts` | 74/82 (**90.24%**) | 77/82 (**93.90%**) | +3 |
 | `src/games/calla/rules.ts` | 85/92 (**92.39%**) | 91/92 (**98.91%**) | +6 |
 | `src/games/fraction-pinball/rules.ts` | 50/53 (**94.33%**) | 50/53 (**94.33%**) | 0 (RNG private fill) |
-| **Combined (these files)** | **319/350 (91.14%)** | **333/350 (95.14%)** | **+14** |
-
-\*Par-55 after-table reflects the suite before the final empty-hand / tie-continue
-refinements; re-run coverage after those commits for the latest per-file %.
+| **Combined (these files)** | **319/350 (91.14%)** | **335/350 (95.71%)** | **+16** |
 
 ## Branches newly covered (by theme)
 
