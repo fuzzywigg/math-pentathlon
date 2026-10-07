@@ -29,6 +29,7 @@ export default defineConfig({
       includeAssets: [
         'favicon.ico',
         'favicon.svg',
+        'icons/*.png',
         'king.svg',
         'health.txt',
         'CNAME',
@@ -49,6 +50,24 @@ export default defineConfig({
         lang: 'en',
         icons: [
           {
+            src: '/icons/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/icons/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/icons/icon-512-maskable.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+          {
             src: '/favicon.svg',
             sizes: 'any',
             type: 'image/svg+xml',
@@ -64,7 +83,10 @@ export default defineConfig({
       workbox: {
         // Precache everything needed for full offline play after first visit.
         // Includes Vite-emitted AI Web Worker chunks (*.js under assets/).
-        globPatterns: ['**/*.{js,css,html,ico,svg,txt,webmanifest,woff,woff2}'],
+        // png: tablet install icons under /icons (Add to Home Screen).
+        globPatterns: [
+          '**/*.{js,css,html,ico,svg,png,txt,webmanifest,woff,woff2}',
+        ],
         // Hash-router SPA: unknown navigations get the shell.
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/health/],
