@@ -3,18 +3,22 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * Projects:
  * - `chromium` — default / required CI path (`npm run test:e2e:chromium`)
- * - `mobile-iphone-se`, `mobile-pixel-7` — phone viewport smoke (Chromium emulation)
+ * - `mobile-iphone-13`, `mobile-pixel-7`, `mobile-ipad` — touch smoke
+ *   (Chromium device emulation; report-only CI via `npm run test:e2e:mobile`)
  * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
  * - `visual-desktop`, `visual-phone` — start + openings baselines (`npm run test:e2e:visual`)
  *
- * CI e2e runs chromium + both mobile projects. Opt in cross-browser locally or in CI:
+ * CI required e2e runs chromium only. Opt in cross-browser locally or in CI:
  *   npm run test:e2e:cross
  *   npm run test:e2e -- --project=webkit --project=firefox --project=ipad-webkit
  *   CROSS_BROWSER=1 npm run test:e2e:cross   # same; env documented for CI matrices
  *
+ * Mobile touch smoke (phone + tablet, report-only):
+ *   npm run test:e2e:mobile
+ *
  * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
- * CI never accidentally pulls in WebKit/Firefox.
+ * CI never accidentally pulls in WebKit/Firefox/mobile.
  *
  * Opt-in visual suites:
  * - `playwright.visual.config.ts` via `npm run test:visual` (separate config)
@@ -28,7 +32,7 @@ const workerLimit = process.env.CI ? 1 : 2;
 
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =
-  /mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
+  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -71,22 +75,34 @@ export default defineConfig({
       use: { ...devices['iPad Pro 11'] },
     },
     {
-      name: 'mobile-iphone-se',
-      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      name: 'mobile-iphone-13',
+      testMatch: /mobile-touch-smoke\.spec\.ts/,
       use: {
-        ...devices['iPhone SE'],
+        ...devices['iPhone 13'],
         // CI installs Chromium only; keep emulation on Chromium.
         defaultBrowserType: 'chromium',
-        viewport: { width: 375, height: 667 },
+        hasTouch: true,
+        isMobile: true,
       },
     },
     {
       name: 'mobile-pixel-7',
-      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      testMatch: /mobile-touch-smoke\.spec\.ts/,
       use: {
         ...devices['Pixel 7'],
         defaultBrowserType: 'chromium',
-        viewport: { width: 412, height: 915 },
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    {
+      name: 'mobile-ipad',
+      testMatch: /mobile-touch-smoke\.spec\.ts/,
+      use: {
+        ...devices['iPad Pro 11'],
+        defaultBrowserType: 'chromium',
+        hasTouch: true,
+        isMobile: true,
       },
     },
     {
