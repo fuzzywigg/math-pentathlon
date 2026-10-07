@@ -612,10 +612,13 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-preview {
       text-align: center;
-      padding: 12px;
+      padding: 12px 16px;
       background: #fff3e0;
       border-radius: 8px;
-      min-height: 60px;
+    }
+
+    .remainder-preview:empty {
+      display: none;
     }
 
     .division-equation {

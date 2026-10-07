@@ -1,0 +1,20 @@
+{
+  "easy": {
+    "wins": 6,
+    "losses": 3,
+    "draws": 1,
+    "errors": []
+  },
+  "medium": {
+    "wins": 5,
+    "losses": 4,
+    "draws": 1,
+    "errors": []
+  },
+  "hard": {
+    "wins": 8,
+    "losses": 0,
+    "draws": 2,
+    "errors": []
+  }
+}

@@ -216,6 +216,34 @@ describe('Remainder Islands deep — touch UX remainder hints', () => {
     expect(css).toMatch(/min-height:\s*48px/);
     expect(css).toMatch(/\.remainder-board[\s\S]*max-width:\s*100%/);
     expect(css).toMatch(/touch-action:\s*manipulation/);
+    expect(css).toMatch(/\.remainder-preview:empty/);
+  });
+
+  it('does not mount an empty division preview before an island is selected', () => {
+    mockRandomCycle(0.19);
+    const container = mount();
+    initGame(container);
+    newGameVsHuman();
+    click(container.querySelector('.remainder-btn-roll'));
+    expect(getCurrentState().phase).toBe('selectIsland');
+    expect(getCurrentState().selectedIsland).toBeNull();
+    expect(container.querySelector('.remainder-preview')).toBeNull();
+    expect(container.textContent).toMatch(/Tap a highlighted island/i);
+  });
+
+  it('hover still injects the division equation when preview was absent', () => {
+    mockRandomCycle(0.27);
+    const container = mount();
+    initGame(container);
+    newGameVsHuman();
+    click(container.querySelector('.remainder-btn-roll'));
+    const islandId = getCurrentState().validIslands[0];
+    hitPolygon(container, islandId).dispatchEvent(
+      new MouseEvent('mouseenter', { bubbles: true })
+    );
+    expect(getCurrentState().selectedIsland).toBe(islandId);
+    expect(container.querySelector('.remainder-preview .divisor')).toBeTruthy();
+    expect(container.querySelector('.remainder-preview .remainder')).toBeTruthy();
   });
 });
 

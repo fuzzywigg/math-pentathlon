@@ -71,8 +71,27 @@ function isComputerTurn(): boolean {
 function patchDivisionPreview(): void {
   if (!gameContainer) return;
   const existing = gameContainer.querySelector('.remainder-preview');
-  if (!existing) return;
-  existing.replaceWith(renderDivisionPreview(gameState));
+  const next = gameState.selectedIsland
+    ? renderDivisionPreview(gameState)
+    : null;
+
+  if (existing && next) {
+    existing.replaceWith(next);
+    return;
+  }
+  if (existing && !next) {
+    existing.remove();
+    return;
+  }
+  if (!existing && next) {
+    // Insert ahead of controls / board so the equation stays near the dice.
+    const controls = gameContainer.querySelector('.remainder-controls');
+    if (controls) {
+      controls.before(next);
+    } else {
+      gameContainer.querySelector('.remainder-game-container')?.appendChild(next);
+    }
+  }
 }
 
 function render(): void {
@@ -132,8 +151,10 @@ function render(): void {
         : 'Tap a highlighted island — remainder = your points';
       controls.appendChild(instruction);
 
-      // Division preview
-      wrapper.appendChild(renderDivisionPreview(gameState));
+      // Division preview only when an island is hovered/selected (avoid empty 60px gap).
+      if (gameState.selectedIsland) {
+        wrapper.appendChild(renderDivisionPreview(gameState));
+      }
     }
 
     wrapper.appendChild(controls);
