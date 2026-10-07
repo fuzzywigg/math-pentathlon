@@ -150,7 +150,7 @@ describe('Wave 25 a11y-grid-nav — collectGridCells filter', () => {
     expect(collectGridCells(board)).toHaveLength(2);
   });
 
-  it('skips MP-3D visually-hidden *-a11y-grid mirrors (roving must not collapse them)', () => {
+  it('skips MP-3D *-a11y-grid mirrors when searching a parent container', () => {
     const root = document.createElement('div');
     const playBoard = document.createElement('div');
     markBoardAsGrid(playBoard);
@@ -179,9 +179,17 @@ describe('Wave 25 a11y-grid-nav — collectGridCells filter', () => {
     expect(cells).toHaveLength(2);
     expect(cells.every((c) => !c.closest('.pg-a11y-grid'))).toBe(true);
     // Mirrors keep multi-tab0 legal targets
-    expect(
-      a11y.querySelectorAll('button[tabindex="0"]')
-    ).toHaveLength(2);
+    expect(a11y.querySelectorAll('button[tabindex="0"]')).toHaveLength(2);
+  });
+
+  it('keeps cells when root itself is an *-a11y-grid mirror', () => {
+    const a11y = document.createElement('div');
+    a11y.className = 'pent-a11y-grid';
+    markBoardAsGrid(a11y);
+    a11y.append(makeCell(4, 4), makeCell(4, 5));
+    document.body.appendChild(a11y);
+
+    expect(collectGridCells(a11y)).toHaveLength(2);
   });
 });
 

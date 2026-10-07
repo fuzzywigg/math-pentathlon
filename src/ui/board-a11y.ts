@@ -122,14 +122,19 @@ export function applyRovingTabindex(
 
 /**
  * Collect gridcells that carry data-row / data-col.
- * Skip visually-hidden MP-3D a11y mirrors (`*-a11y-grid`): those mark every
- * legal target tabindex=0, and restoreGridFocus/applyRovingTabindex must not
- * collapse them to a single roving stop (Prime Gold 3D keyboard flake).
+ * When searching a game container, skip visually-hidden MP-3D a11y mirrors
+ * (`*-a11y-grid`): those may mark every legal target tabindex=0, and a parent
+ * restoreGridFocus must not collapse them (Prime Gold 3D keyboard flake).
+ * When `root` itself is an a11y mirror, keep its cells (Pent'Em In / others
+ * call collectGridCells/restoreGridFocus on the mirror).
  */
 export function collectGridCells(root: Element): Element[] {
   return Array.from(
     root.querySelectorAll('[role="gridcell"][data-row][data-col]')
-  ).filter((el) => !el.closest('[class*="-a11y-grid"]'));
+  ).filter((el) => {
+    const mirror = el.closest('[class*="-a11y-grid"]');
+    return !mirror || mirror === root;
+  });
 }
 
 /**
