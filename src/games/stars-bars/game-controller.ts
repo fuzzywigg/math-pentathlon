@@ -202,11 +202,7 @@ function updateUI(controller: StarsGameController): void {
     controls.appendChild(clearBtn);
   }
 
-  if (
-    !hasValidMoves(state) &&
-    state.phase !== 'gameOver' &&
-    !computerTurn
-  ) {
+  if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
     const passBtn = document.createElement('button');
     passBtn.className = 'stars-btn stars-btn-secondary';
     passBtn.textContent = 'Pass Turn';

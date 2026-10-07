@@ -214,11 +214,7 @@ function updateUI(controller: RamrodGameController): void {
     controls.appendChild(clearBtn);
   }
 
-  if (
-    !hasValidMoves(state) &&
-    state.phase !== 'gameOver' &&
-    !computerTurn
-  ) {
+  if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
     const passBtn = document.createElement('button');
     passBtn.className = 'ramrod-btn ramrod-btn-secondary';
     passBtn.textContent = 'Pass Turn';
