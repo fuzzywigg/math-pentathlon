@@ -45,7 +45,7 @@ describe('Ramrod AI-turn input guard', () => {
     );
   });
 
-  it('blocks selecting a Red rod during the 800ms AI pause', async () => {
+  it('blocks selecting a Red rod during the AI think pause', async () => {
     const { newGameVsAI } =
       await import('../../src/games/ramrod/game-controller');
 
@@ -64,6 +64,9 @@ describe('Ramrod AI-turn input guard', () => {
     expect(ctrl.state.moveHistory).toHaveLength(1);
     expect(root.querySelectorAll('.ramrod-slot.valid')).toHaveLength(0);
     expect(root.querySelector('.ramrod-rod-wrapper.selectable')).toBeNull();
+    expect(
+      root.querySelector('.ramrod-status.ramrod-computer-thinking')
+    ).toBeTruthy();
 
     const redHand = root.querySelector('.ramrod-player-player2');
     const redRod = redHand?.querySelector('.ramrod-rod-wrapper');
@@ -72,7 +75,7 @@ describe('Ramrod AI-turn input guard', () => {
     expect(ctrl.state.currentPlayer).toBe('player2');
     expect(ctrl.state.moveHistory).toHaveLength(1);
 
-    await vi.advanceTimersByTimeAsync(800);
+    await vi.advanceTimersByTimeAsync(550);
     expect(ctrl.state.currentPlayer).toBe('player1');
     expect(ctrl.state.moveHistory.length).toBeGreaterThanOrEqual(2);
     expect(ctrl.state.moveHistory[1]?.player).toBe('player2');

@@ -200,6 +200,11 @@ export function renderPlayerRods(
   const isCurrentPlayer = state.currentPlayer === player;
   const canSelect =
     allowInput && isCurrentPlayer && state.phase === 'selectingRod';
+  const canDeselect =
+    allowInput &&
+    isCurrentPlayer &&
+    state.phase === 'placingRod' &&
+    state.selectedRod !== null;
 
   for (const rodId of rodIds) {
     const rod = state.rods.get(rodId);
@@ -210,7 +215,7 @@ export function renderPlayerRods(
     if (state.selectedRod === rodId) {
       wrapper.classList.add('selected');
     }
-    if (canSelect) {
+    if (canSelect || (canDeselect && state.selectedRod === rodId)) {
       wrapper.classList.add('selectable');
       wrapper.addEventListener('click', () => onRodClick(rodId));
     }
@@ -335,20 +340,32 @@ export function injectRamrodStyles(): void {
       flex-direction: column;
       align-items: center;
       gap: 1rem;
-      padding: 1rem;
+      padding: 0.5rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
+    /*
+     * Stack hands + board (never a wide 3-column row). #app is max-width 700px with
+     * overflow clip — a side-by-side layout painted outside that box and ate clicks.
+     */
     .ramrod-main-layout {
       display: flex;
-      gap: 2rem;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      width: 100%;
+      max-width: 100%;
     }
 
     .ramrod-board {
       background: #e8d4b8;
-      padding: 1rem;
+      padding: 0.75rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .ramrod-grid {
@@ -363,7 +380,8 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-box {
-      width: ${BOX_WIDTH}px;
+      width: min(${BOX_WIDTH}px, 22vw);
+      min-width: 72px;
       min-height: ${BOX_HEIGHT}px;
       background: #f5f0e8;
       border: 2px solid #c9b89b;
@@ -372,6 +390,7 @@ export function injectRamrodStyles(): void {
       display: flex;
       flex-direction: column;
       gap: 4px;
+      box-sizing: border-box;
     }
 
     .ramrod-box.completed.player1 {
@@ -392,6 +411,7 @@ export function injectRamrodStyles(): void {
     }
 
     .ramrod-slot {
+      min-height: ${ROD_HEIGHT + 8}px;
       height: ${ROD_HEIGHT + 8}px;
       background: rgba(0,0,0,0.05);
       border-radius: 4px;
@@ -405,6 +425,8 @@ export function injectRamrodStyles(): void {
       background: rgba(76, 175, 80, 0.2);
       cursor: pointer;
       box-shadow: 0 0 0 2px #4caf50;
+      outline: 2px solid #4caf50;
+      outline-offset: 1px;
     }
 
     .ramrod-slot.valid:hover {
@@ -435,12 +457,16 @@ export function injectRamrodStyles(): void {
 
     .ramrod-player-rods {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 0.5rem;
-      padding: 1rem;
+      padding: 0.75rem;
       background: rgba(255,255,255,0.9);
       border-radius: 8px;
       min-width: 120px;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .ramrod-player-player1 {
@@ -454,7 +480,10 @@ export function injectRamrodStyles(): void {
     .ramrod-rod-wrapper {
       padding: 4px;
       border-radius: 6px;
-      transition: all 0.15s;
+      transition: background-color 0.15s, box-shadow 0.15s;
+      min-height: 32px;
+      display: flex;
+      align-items: center;
     }
 
     .ramrod-rod-wrapper.selectable {
@@ -516,6 +545,25 @@ export function injectRamrodStyles(): void {
       color: var(--color-player2, #f44336);
     }
 
+    .ramrod-status.ramrod-computer-thinking {
+      font-style: italic;
+      opacity: 0.95;
+    }
+
+    .ramrod-turn-hint {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: -0.5rem;
+      max-width: 28rem;
+      line-height: 1.35;
+    }
+
+    .ramrod-turn-hint.ramrod-deadlock-hint {
+      color: #8a4b08;
+      font-weight: 600;
+    }
+
     .ramrod-winner-banner {
       text-align: center;
       padding: 1.5rem;
@@ -532,6 +580,18 @@ export function injectRamrodStyles(): void {
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .ramrod-winner-banner {
+        animation: none;
+      }
+      .ramrod-rod-wrapper {
+        transition: none;
+      }
+      .ramrod-btn {
+        transition: none;
+      }
+    }
+
     .ramrod-controls {
       display: flex;
       gap: 1rem;
@@ -544,7 +604,9 @@ export function injectRamrodStyles(): void {
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      min-height: 44px;
+      min-width: 44px;
     }
 
     .ramrod-btn-primary {
@@ -644,15 +706,46 @@ export function injectRamrodStyles(): void {
     }
 
     @media (max-width: 768px) {
-      .ramrod-main-layout {
-        flex-direction: column;
-        align-items: center;
+      .ramrod-game-area {
+        padding: 0.25rem;
+        gap: 0.75rem;
       }
 
-      .ramrod-player-rods {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
+      .ramrod-scores {
+        gap: 1rem;
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+    @media (pointer: coarse), (max-width: 900px) {
+      .ramrod-slot {
+        min-height: 44px;
+        height: 44px;
+      }
+
+      .ramrod-slot.valid {
+        box-shadow: 0 0 0 2px #4caf50;
+      }
+
+      .ramrod-rod-wrapper {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 8px;
+      }
+
+      .ramrod-rod.in-hand {
+        min-height: 28px;
+      }
+
+      .ramrod-btn {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.85rem 1.5rem;
+      }
+
+      .ramrod-box {
+        min-height: 110px;
       }
     }
   `;
