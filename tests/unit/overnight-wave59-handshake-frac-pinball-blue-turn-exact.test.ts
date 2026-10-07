@@ -47,7 +47,7 @@ describe('Wave 59 handshake — frac/pinball blue turn', () => {
     expect(
       fractionPinballTutorial.steps.find((s) => s.id === 'welcome')?.message
     ).toContain(
-      'Score points by correctly converting between fractions and decimals!'
+      'Get points by matching fractions and decimals'
     );
   });
 });

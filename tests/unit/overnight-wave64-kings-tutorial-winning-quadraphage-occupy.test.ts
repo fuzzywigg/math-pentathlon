@@ -8,7 +8,7 @@ describe('Wave 64 kings — tutorial winning quadraphage occupy', () => {
   it('Occupied by a Quadraphage + no valid moves', () => {
     const winning = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'winning');
     expect(winning?.message).toMatch(/Occupied by a Quadraphage/);
-    expect(winning?.message).toMatch(/no valid moves/);
+    expect(winning?.message).toMatch(/nowhere safe to move/);
     expect(winning?.title).toBe('How to Win');
   });
 });

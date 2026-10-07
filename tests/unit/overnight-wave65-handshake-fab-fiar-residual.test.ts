@@ -34,7 +34,7 @@ describe('Wave 65 handshake — fab × fiar residual', () => {
     expect(
       fiarTutorial.steps.find((s) => s.id === 'objective')?.message
     ).toContain(
-      'Identify four (or more) chips of the same color along a straight line'
+      'Find four (or more) chips of the same color on a straight line of connected spaces'
     );
   });
 });

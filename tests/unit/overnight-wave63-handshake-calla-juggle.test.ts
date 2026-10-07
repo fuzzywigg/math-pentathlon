@@ -46,7 +46,7 @@ describe('Wave 63 handshake — calla × juggle leftovers', () => {
     expect(
       juggleTutorial.steps.find((s) => s.id === 'welcome')?.message
     ).toContain(
-      'Be the first player to completely fill your 9x9 grid with polyomino shapes!'
+      'Be first to fill every square on your 9×9 board with shapes!'
     );
   });
 });

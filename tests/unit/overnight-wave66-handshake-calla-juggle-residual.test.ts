@@ -35,7 +35,7 @@ describe('Wave 66 handshake — calla × juggle residual', () => {
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
     ).toContain(
-      '<li>Shapes cannot overlap with previously placed shapes</li>'
+      '<li>Shapes cannot overlap shapes you already placed</li>'
     );
   });
 });

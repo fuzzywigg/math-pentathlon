@@ -30,7 +30,7 @@ describe('Wave 54 frac tutorial — copy catalog', () => {
     expect(byId.scoring.position).toBe('bottom');
     expect(byId.gameplay.highlightSelector).toBe('.frac-problem');
     expect(byId.gameplay.position).toBe('bottom');
-    expect(byId.gameplay.message).toMatch(/4 options/);
+    expect(byId.gameplay.message).toMatch(/4 choices/);
     expect(byId['difficulty-levels'].message).toMatch(/Addition and subtraction/);
     expect(byId['difficulty-levels'].message).toMatch(/multiplication/i);
     expect(byId['difficulty-levels'].message).toMatch(/division/i);

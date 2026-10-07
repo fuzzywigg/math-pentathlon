@@ -8,6 +8,6 @@ describe('Wave 64 kings — tutorial valid green cells', () => {
   it('green highlighted cells + horizontally/vertically/diagonally', () => {
     const valid = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'valid-moves');
     expect(valid?.message).toMatch(/green highlighted cells/);
-    expect(valid?.message).toMatch(/horizontally, vertically, or diagonally/);
+    expect(valid?.message).toMatch(/across, up and down, or diagonally/);
   });
 });
