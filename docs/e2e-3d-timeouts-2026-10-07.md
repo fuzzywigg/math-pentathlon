@@ -11,8 +11,10 @@ Full Chromium e2e (`npm run test:e2e -- --project=chromium`) was run repeatedly 
 | 1 | `CI=1`, workers=1, full suite | 76 passed (~1.6m) |
 | 2 | workers=4, full suite | 76 passed (~29s wall) |
 | 3–5 | mp3d specs only, workers=4, repeated | 30/30 × 3 passed |
+| Post-fix | `CI=1` full suite after ready/LQ changes | Star Track heavy spec failed 3×: hard `expect(draw)` after chain click when game-over/transition omitted draw — fixed by soft wait on draw **or** winner |
+| Post-fix 2 | Star Track spec alone | 4/4 passed |
 
-Local hardware did not flake within five full/partial passes. Historical CI artifacts still show real failures on the same specs when GL/init is slower.
+Historical CI artifacts and the post-fix Star Track failure confirm the fragile surface is real; ready-waits + soft turn helpers + timeouts address it.
 
 ## Specs that have timed out / failed in CI artifacts
 
