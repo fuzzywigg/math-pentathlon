@@ -125,12 +125,18 @@ export async function keyboardActivateA11yCell(
     const exprItems = Array.from(
       document.querySelectorAll('.pg-expr-item')
     ).map((el) => el.textContent?.trim() ?? '');
+    const validValues = Array.from(
+      document.querySelectorAll('.pg-expr-item strong')
+    ).map((el) => el.textContent?.trim() ?? '');
+    const activeValue = active?.getAttribute?.('data-value');
     return {
       activeTag: active?.tagName,
-      activeValue: active?.getAttribute?.('data-value'),
+      activeValue,
       activeRow: active?.getAttribute?.('data-row'),
       activeCol: active?.getAttribute?.('data-col'),
       activeTabIndex: active?.tabIndex,
+      focusedIsValidPlacement: !!activeValue && validValues.includes(activeValue),
+      validValuesSample: validValues.slice(0, 12),
       tabindex0Count: zeros.length,
       tabindex0Cells: zeros.slice(0, 8),
       phase: state?.phase ?? null,
