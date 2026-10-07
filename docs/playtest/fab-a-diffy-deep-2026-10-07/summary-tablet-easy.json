@@ -1,0 +1,229 @@
+{
+  "base": "http://localhost:5173",
+  "gamesPer": 10,
+  "startedAt": "2026-10-07T12:31:31.936Z",
+  "results": [
+    {
+      "difficulty": "easy",
+      "durationMs": 24893,
+      "claims": 10,
+      "passes": 0,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "9"
+      ],
+      "winnerVisible": true,
+      "status": "🔵 Blue wins!",
+      "aiThinkMs": 12936,
+      "maxAiThink": 1298,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 1
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 24489,
+      "claims": 10,
+      "passes": 0,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "9"
+      ],
+      "winnerVisible": true,
+      "status": "🔵 Blue wins!",
+      "aiThinkMs": 12932,
+      "maxAiThink": 1295,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 2
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 22446,
+      "claims": 10,
+      "passes": 0,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "9"
+      ],
+      "winnerVisible": true,
+      "status": "🔵 Blue wins!",
+      "aiThinkMs": 12913,
+      "maxAiThink": 1294,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 3
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 73349,
+      "claims": 9,
+      "passes": 41,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "9",
+        "9"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64612,
+      "maxAiThink": 1300,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 4
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 77412,
+      "claims": 10,
+      "passes": 40,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "10"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64086,
+      "maxAiThink": 1296,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 5
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 22703,
+      "claims": 10,
+      "passes": 0,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "9"
+      ],
+      "winnerVisible": true,
+      "status": "🔵 Blue wins!",
+      "aiThinkMs": 12925,
+      "maxAiThink": 1294,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 6
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 75984,
+      "claims": 10,
+      "passes": 40,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "10"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64089,
+      "maxAiThink": 1297,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 7
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 75622,
+      "claims": 10,
+      "passes": 40,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "10"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64616,
+      "maxAiThink": 1299,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 8
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 73248,
+      "claims": 10,
+      "passes": 40,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "10",
+        "10"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64552,
+      "maxAiThink": 1296,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 9
+    },
+    {
+      "difficulty": "easy",
+      "durationMs": 73512,
+      "claims": 9,
+      "passes": 41,
+      "stalls": 0,
+      "history": 10,
+      "scores": [
+        "9",
+        "9"
+      ],
+      "winnerVisible": false,
+      "status": "",
+      "aiThinkMs": 64593,
+      "maxAiThink": 1297,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "ok": true,
+      "viewport": "tablet",
+      "gameIndex": 10
+    }
+  ],
+  "screenshots": [
+    "fab-tablet-easy-g1.png"
+  ],
+  "finishedAt": "2026-10-07T12:40:36.624Z",
+  "totals": {
+    "games": 10,
+    "passed": 10,
+    "failed": 0,
+    "consoleErrorGames": 0,
+    "stallGames": 0,
+    "avgMaxAiThink": 1297
+  }
+}
