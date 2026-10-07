@@ -19,6 +19,7 @@ import {
   fillChainArea,
   type DrawChainsCallback,
   type SelectChainCallback,
+  type StarTrackGameMode,
 } from '../../games/star-track/board-ui';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
@@ -42,6 +43,8 @@ const BOARD_Y = 0;
 export interface StarTrackBoard3DCallbacks {
   onDrawChains?: DrawChainsCallback;
   onSelectChain?: SelectChainCallback;
+  /** Winner-banner labels (You/AI vs Blue/Red). */
+  gameMode?: StarTrackGameMode;
 }
 
 export interface StarTrackBoard3D {
@@ -523,7 +526,8 @@ export async function createStarTrackBoard3D(
         previewIndex = index;
         applyHighlights(state);
         paint();
-      }
+      },
+      { gameMode: callbacks?.gameMode }
     );
 
     if (a11y.childElementCount === 0) {

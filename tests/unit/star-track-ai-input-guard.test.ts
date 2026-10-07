@@ -155,7 +155,12 @@ describe('Star Track AI-turn input guard', () => {
     expect(getGameState().currentPlayer).toBe('player2');
     expect(getGameState().player2Position).toBe(posBefore);
 
-    await vi.advanceTimersByTimeAsync(600);
+    const {
+      AI_DRAW_DELAY_MS,
+      AI_SELECT_DELAY_MS,
+    } = await import('../../src/games/star-track/game-controller');
+
+    await vi.advanceTimersByTimeAsync(AI_DRAW_DELAY_MS);
     expect(getGameState().phase).toBe('selectChain');
     const lockedChains = [
       ...board.querySelectorAll('.star-track-chain-btn'),
@@ -171,7 +176,7 @@ describe('Star Track AI-turn input guard', () => {
     expect(getGameState().phase).toBe('selectChain');
     expect(getGameState().currentPlayer).toBe('player2');
 
-    await vi.advanceTimersByTimeAsync(600);
+    await vi.advanceTimersByTimeAsync(AI_SELECT_DELAY_MS);
     expect(getGameState().currentPlayer).toBe('player1');
     expect(getGameState().phase).toBe('drawChains');
     expect(

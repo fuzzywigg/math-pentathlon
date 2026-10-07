@@ -35,7 +35,34 @@ let board3d: StarTrackBoard3D | null = null;
 let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 
-const AI_THINKING_DELAY = 600;
+/**
+ * Per-phase AI pauses. Nested draw→select used to total 1200ms and felt sluggish;
+ * keep a visible think beat without stretching the human wait.
+ */
+export const AI_DRAW_DELAY_MS = 400;
+export const AI_SELECT_DELAY_MS = 350;
+
+let aiDrawTimer: ReturnType<typeof setTimeout> | null = null;
+let aiSelectTimer: ReturnType<typeof setTimeout> | null = null;
+/** Bumps on every new game / destroy so in-flight AI timeouts become no-ops. */
+let aiTurnGeneration = 0;
+
+function clearAiTimers(): void {
+  if (aiDrawTimer !== null) {
+    clearTimeout(aiDrawTimer);
+    aiDrawTimer = null;
+  }
+  if (aiSelectTimer !== null) {
+    clearTimeout(aiSelectTimer);
+    aiSelectTimer = null;
+  }
+}
+
+function cancelAiTurn(): void {
+  clearAiTimers();
+  aiTurnGeneration += 1;
+  isAIThinking = false;
+}
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -96,10 +123,10 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  cancelAiTurn();
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
-  isAIThinking = false;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   render();
@@ -108,11 +135,11 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  cancelAiTurn();
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
   gameState = createInitialState();
-  isAIThinking = false;
   hasNotifiedGameEnd = false;
   moveCount = 0;
   render();
@@ -174,22 +201,54 @@ function handleSelectChain(index: 0 | 1): void {
   }
 }
 
+function aiTurnStillValid(generation: number): boolean {
+  return (
+    generation === aiTurnGeneration &&
+    gameMode === 'human-vs-ai' &&
+    !isGameOver(gameState) &&
+    gameState.currentPlayer === 'player2'
+  );
+}
+
 // AI turn
 function triggerAITurn(): void {
+  clearAiTimers();
+  const generation = aiTurnGeneration;
   isAIThinking = true;
   render();
 
   // AI draws chains
-  setTimeout(() => {
+  aiDrawTimer = setTimeout(() => {
+    aiDrawTimer = null;
+    if (!aiTurnStillValid(generation)) {
+      isAIThinking = false;
+      render();
+      return;
+    }
+
     gameState = drawChains(gameState);
     render();
 
     // AI selects chain (after a delay) using AI module
-    setTimeout(() => {
+    aiSelectTimer = setTimeout(() => {
+      aiSelectTimer = null;
+      if (!aiTurnStillValid(generation)) {
+        isAIThinking = false;
+        render();
+        return;
+      }
+
       const choice = getAIChainChoice(gameState, 'player2', aiDifficulty);
 
       if (choice) {
         gameState = selectChain(gameState, choice.chainIndex);
+        moveCount++;
+      } else if (
+        gameState.phase === 'selectChain' &&
+        gameState.drawnChains
+      ) {
+        // Soft-lock guard: never leave Red on selectChain with no pick.
+        gameState = selectChain(gameState, 0);
         moveCount++;
       }
 
@@ -204,8 +263,8 @@ function triggerAITurn(): void {
           moveCount,
         });
       }
-    }, AI_THINKING_DELAY);
-  }, AI_THINKING_DELAY);
+    }, AI_SELECT_DELAY_MS);
+  }, AI_DRAW_DELAY_MS);
 }
 
 // Render the game
@@ -217,13 +276,15 @@ function render(): void {
       board3d.update(gameState, {
         onDrawChains: canInteract ? handleDrawChains : undefined,
         onSelectChain: canInteract ? handleSelectChain : undefined,
+        gameMode,
       });
     } else if (!board3dEnabled) {
       renderBoard(
         gameState,
         boardContainer,
         canInteract ? handleDrawChains : undefined,
-        canInteract ? handleSelectChain : undefined
+        canInteract ? handleSelectChain : undefined,
+        { gameMode }
       );
     }
     // If 3D enabled but still loading → skip board paint until ready
@@ -271,6 +332,7 @@ export function isTutorialActive(): boolean {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  cancelAiTurn();
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

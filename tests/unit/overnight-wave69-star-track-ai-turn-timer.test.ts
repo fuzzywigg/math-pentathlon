@@ -8,6 +8,8 @@ import {
   initGame,
   newGameVsAI,
   getGameState,
+  AI_DRAW_DELAY_MS,
+  AI_SELECT_DELAY_MS,
 } from '../../src/games/star-track/game-controller';
 
 afterEach(() => {
@@ -45,16 +47,49 @@ describe('Wave 69 star-track — AI turn timer', () => {
     expect(getGameState().phase).toBe('drawChains');
     expect(status.querySelector('.status-ai-thinking')).toBeTruthy();
 
-    vi.advanceTimersByTime(600);
+    vi.advanceTimersByTime(AI_DRAW_DELAY_MS);
     expect(getGameState().phase).toBe('selectChain');
     expect(getGameState().currentPlayer).toBe('player2');
     expect(getGameState().drawnChains.length).toBe(2);
 
-    vi.advanceTimersByTime(600);
+    vi.advanceTimersByTime(AI_SELECT_DELAY_MS);
     expect(getGameState().currentPlayer).toBe('player1');
     expect(getGameState().phase).toBe('drawChains');
     expect(board.querySelector('.star-track-draw-btn')).toBeTruthy();
     expect(status.querySelector('.status-ai-thinking')).toBeFalsy();
     expect(app.dataset.opponent).toBe('ai');
+  });
+
+  it('newGameVsAI cancels in-flight AI timers (no stale draw/select)', () => {
+    vi.useFakeTimers();
+
+    const app = document.createElement('div');
+    app.id = 'app';
+    document.body.appendChild(app);
+    const board = document.createElement('div');
+    const status = document.createElement('div');
+    app.appendChild(board);
+    app.appendChild(status);
+
+    initGame(board, status);
+    newGameVsAI('medium');
+
+    click(board.querySelector('.star-track-draw-btn'));
+    click(board.querySelectorAll('.star-track-chain-btn')[0] ?? null);
+    expect(status.querySelector('.status-ai-thinking')).toBeTruthy();
+
+    // Mid-draw pause: start a fresh game before timers fire.
+    newGameVsAI('hard');
+    expect(getGameState().currentPlayer).toBe('player1');
+    expect(getGameState().phase).toBe('drawChains');
+    expect(getGameState().player1Position).toBe(0);
+    expect(getGameState().player2Position).toBe(0);
+
+    vi.advanceTimersByTime(AI_DRAW_DELAY_MS + AI_SELECT_DELAY_MS + 100);
+    expect(getGameState().currentPlayer).toBe('player1');
+    expect(getGameState().phase).toBe('drawChains');
+    expect(getGameState().player2Position).toBe(0);
+    expect(status.querySelector('.status-ai-thinking')).toBeFalsy();
+    expect(board.querySelector('.star-track-draw-btn')).toBeTruthy();
   });
 });
