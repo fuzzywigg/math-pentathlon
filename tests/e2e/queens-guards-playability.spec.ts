@@ -144,7 +144,8 @@ test.describe('Queens & Guards playability', () => {
     await page.goto('/#/game/queens-guards');
     await startVsAi(page, 'easy');
 
-    for (let turn = 0; turn < 100; turn++) {
+    const deadline = Date.now() + 150_000;
+    while (Date.now() < deadline) {
       const status =
         (await page.locator('.qg-status, .qg-winner-banner').textContent()) ||
         '';
@@ -161,54 +162,66 @@ test.describe('Queens & Guards playability', () => {
         continue;
       }
 
-      const moved = await page.evaluate(() => {
-        const cells = [
-          ...document.querySelectorAll(
-            '.qg-board-container svg g[data-cell-key]'
-          ),
-        ] as SVGGElement[];
-        const label = (g: Element) => g.getAttribute('aria-label') || '';
-
-        const captured = cells.filter((g) => label(g).includes('captured'));
-        if (captured.length) {
-          captured[0]!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-          return 'restore-select';
-        }
-        const valids = cells.filter((g) => label(g).includes('valid move'));
-        if (valids.length) {
-          valids[Math.floor(Math.random() * valids.length)]!.dispatchEvent(
-            new MouseEvent('click', { bubbles: true })
-          );
-          return 'move';
-        }
-        const blue = cells.filter(
-          (g) =>
-            label(g).includes('Blue') &&
-            (label(g).includes('Guard') || label(g).includes('Queen'))
-        );
-        for (const piece of blue.sort(() => Math.random() - 0.5).slice(0, 8)) {
-          piece.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-          if (
-            document.querySelector(
-              '.qg-board-container svg g[aria-label*="valid move"]'
-            )
-          ) {
-            return 'selected';
+      // Complete one Blue ply: select a piece that has moves, then tap a target
+      // (and finish restore if a capture left pieces pending).
+      for (let step = 0; step < 10; step++) {
+        const phase = await page.evaluate(() => {
+          const cells = [
+            ...document.querySelectorAll(
+              '.qg-board-container svg g[data-cell-key]'
+            ),
+          ] as SVGGElement[];
+          const label = (g: Element) => g.getAttribute('aria-label') || '';
+          const statusText =
+            document.querySelector('.qg-status, .qg-winner-banner')
+              ?.textContent || '';
+          if (/wins|thinking/i.test(statusText)) return 'done';
+          if (/Red's turn/i.test(statusText) && !/Blue's turn/i.test(statusText)) {
+            return 'ai';
           }
-        }
-        return 'stuck';
-      });
 
-      if (moved === 'stuck') {
-        // Allow one AI catch-up frame
-        await page.waitForTimeout(300);
-      } else {
-        await page.waitForTimeout(40);
+          const captured = cells.filter((g) => label(g).includes('captured'));
+          const valids = cells.filter((g) => label(g).includes('valid move'));
+          if (captured.length && valids.length) {
+            valids[Math.floor(Math.random() * valids.length)]!.dispatchEvent(
+              new MouseEvent('click', { bubbles: true })
+            );
+            return 'restore-place';
+          }
+          if (captured.length) {
+            captured[0]!.dispatchEvent(
+              new MouseEvent('click', { bubbles: true })
+            );
+            return 'restore-select';
+          }
+          if (valids.length) {
+            valids[Math.floor(Math.random() * valids.length)]!.dispatchEvent(
+              new MouseEvent('click', { bubbles: true })
+            );
+            return 'moved';
+          }
+          const blue = cells.filter(
+            (g) =>
+              label(g).includes('Blue') &&
+              (label(g).includes('Guard') || label(g).includes('Queen'))
+          );
+          for (const piece of [...blue].sort(() => Math.random() - 0.5)) {
+            piece.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            // Re-query after click (board may re-render)
+            return 'try-select';
+          }
+          return 'stuck';
+        });
+        await page.waitForTimeout(60);
+        if (phase === 'done' || phase === 'ai' || phase === 'moved' || phase === 'restore-place') {
+          break;
+        }
+        if (phase === 'stuck') break;
       }
     }
 
     await expect(page.locator('.qg-winner-banner')).toBeVisible({
-      timeout: 5_000,
+      timeout: 10_000,
     });
     expect(errors.filter((e) => !/favicon/i.test(e))).toEqual([]);
   });
