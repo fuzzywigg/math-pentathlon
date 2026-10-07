@@ -48,7 +48,11 @@ describe('Wave 61 fiar — status deselect exact', () => {
       new MouseEvent('click', { bubbles: true })
     );
     expect(status.querySelector('.fiar-status')?.textContent?.trim()).toBe(
-      "Blue's turn: Click a green node to move, or click chip again to deselect"
+      "Blue's turn: Move phase — Click a green node to move, or click chip again to deselect"
     );
+    expect(
+      status.querySelector('.fiar-phase-banner[data-phase="movement"]')
+        ?.textContent?.trim()
+    ).toBe('Move phase');
   });
 });

@@ -8,6 +8,7 @@ import {
   placeChip,
   passTurn,
   hasValidMoves,
+  settleIfExhausted,
 } from './rules';
 import { getAIPlacement, AIDifficulty } from './ai';
 import {
@@ -185,9 +186,45 @@ export function initGame(
 }
 
 /**
+ * Skip seats that are out of chips, and settle board-full / both-out soft-locks.
+ * Returns true when state changed (caller should re-enter updateUI once).
+ */
+function applyForcedTurnAdvances(controller: PrimeGoldController): boolean {
+  let changed = false;
+  for (let guard = 0; guard < 4; guard++) {
+    let { state } = controller;
+    if (state.phase === 'gameOver') break;
+
+    const settled = settleIfExhausted(state);
+    if (settled !== state) {
+      controller.state = settled;
+      changed = true;
+      break;
+    }
+
+    if (
+      (state.phase === 'rolling' || state.phase === 'placing') &&
+      state.playerChips[state.currentPlayer] <= 0
+    ) {
+      controller.state = passTurn(state);
+      changed = true;
+      continue;
+    }
+    break;
+  }
+  return changed;
+}
+
+/**
  * Update the UI
  */
 function updateUI(controller: PrimeGoldController): void {
+  // Out-of-chips seats must not sit on "Roll the dice" forever.
+  if (applyForcedTurnAdvances(controller)) {
+    updateUI(controller);
+    return;
+  }
+
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
 
@@ -369,15 +406,21 @@ function handlePass(controller: PrimeGoldController): void {
  * Make an AI move using the AI module
  */
 function makeAIMove(controller: PrimeGoldController): void {
-  const { state, aiPlayer, aiDifficulty } = controller;
+  const { aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver' || !aiPlayer) return;
+  if (controller.state.phase === 'gameOver' || !aiPlayer) return;
   // Guard against stale timers after destroy / new game
   if (activeController !== controller) return;
 
+  // Out of chips or board already settled — advance without rolling forever.
+  if (applyForcedTurnAdvances(controller)) {
+    controller.update();
+    return;
+  }
+
   // Roll dice if needed
-  if (state.phase === 'rolling') {
-    controller.state = rollDice(state);
+  if (controller.state.phase === 'rolling') {
+    controller.state = rollDice(controller.state);
     // Place on the next tick without going through updateUI's 800ms reschedule.
     clearAiTimer();
     controller.update();
@@ -387,16 +430,24 @@ function makeAIMove(controller: PrimeGoldController): void {
   }
 
   // Find best placement using AI module
-  if (state.phase === 'placing') {
-    const placement = getAIPlacement(state, aiPlayer, aiDifficulty);
+  if (controller.state.phase === 'placing') {
+    const placement = getAIPlacement(
+      controller.state,
+      aiPlayer,
+      aiDifficulty
+    );
 
     if (!placement) {
-      controller.state = passTurn(state);
+      controller.state = passTurn(controller.state);
       controller.update();
       return;
     }
 
-    controller.state = placeChip(state, placement.value, placement.expression);
+    controller.state = placeChip(
+      controller.state,
+      placement.value,
+      placement.expression
+    );
     controller.update();
   }
 }

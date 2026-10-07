@@ -198,6 +198,22 @@ export function renderBoard(
       g.style.cursor = 'pointer';
     }
 
+    // Invisible hit disc first so tablet taps clear ≥44px CSS even when the
+    // painted node is smaller after SVG scaling.
+    if (announceTargets) {
+      const hit = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
+      hit.setAttribute('cx', node.x.toString());
+      hit.setAttribute('cy', node.y.toString());
+      hit.setAttribute('r', CONFIG.NODE_HIT_RADIUS.toString());
+      hit.setAttribute('fill', 'transparent');
+      hit.setAttribute('stroke', 'none');
+      hit.setAttribute('data-hit-target', '1');
+      g.appendChild(hit);
+    }
+
     const circle = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'circle'
@@ -205,6 +221,7 @@ export function renderBoard(
     circle.setAttribute('cx', node.x.toString());
     circle.setAttribute('cy', node.y.toString());
     circle.setAttribute('r', CONFIG.NODE_RADIUS.toString());
+    circle.setAttribute('data-node-visual', '1');
 
     let fill = COLORS.node;
     let strokeColor = COLORS.edge;
@@ -386,7 +403,8 @@ export function injectFiarStyles(): void {
 
     @media (prefers-reduced-motion: reduce) {
       .pulse-highlight,
-      .fiar-winner-banner {
+      .fiar-winner-banner,
+      .fiar-phase-banner[data-phase="movement"] {
         animation: none !important;
       }
     }
@@ -406,6 +424,36 @@ export function injectFiarStyles(): void {
       color: var(--color-player2, #f44336);
     }
 
+    .fiar-phase-banner {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      padding: 0.5rem 0.85rem;
+      margin: 0.35rem auto 0.15rem;
+      max-width: 28rem;
+      border-radius: 8px;
+      border: 2px solid transparent;
+    }
+
+    .fiar-phase-banner[data-phase="placement"] {
+      background: rgba(33, 150, 243, 0.12);
+      border-color: rgba(33, 150, 243, 0.45);
+      color: var(--color-player1, #1565c0);
+    }
+
+    .fiar-phase-banner[data-phase="movement"] {
+      background: rgba(255, 152, 0, 0.18);
+      border-color: rgba(255, 152, 0, 0.65);
+      color: #e65100;
+      animation: fiar-phase-enter 0.45s ease-out;
+    }
+
+    @keyframes fiar-phase-enter {
+      from { transform: translateY(-6px); opacity: 0.35; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     .fiar-starter-banner {
       text-align: center;
       font-size: 0.95rem;
@@ -414,6 +462,19 @@ export function injectFiarStyles(): void {
       max-width: 28rem;
       border-radius: 6px;
       background: rgba(0,0,0,0.06);
+    }
+
+    .fiar-board-container svg [data-hit-target] {
+      pointer-events: all;
+    }
+
+    /* Coarse pointers: enlarge SVG so hit discs (r=28) paint ≥44px CSS. */
+    @media (pointer: coarse) {
+      .fiar-board-container svg {
+        width: min(100%, 840px);
+        max-width: none;
+        min-height: 520px;
+      }
     }
 
     .fiar-chips-info {
