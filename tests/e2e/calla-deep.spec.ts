@@ -111,7 +111,7 @@ for (const viewport of [
       expect(end).toMatch(/win|tie/i);
     });
 
-    test('vs-AI Hard finishes; AI think stays under 3s samples', async ({
+    test('vs-AI Hard finishes; AI think chrome stays under 5s samples', async ({
       page,
     }) => {
       await startCallaVsAi(page, 'hard');
