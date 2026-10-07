@@ -30,7 +30,8 @@ describe('Overnight wave50 calla — status winners', () => {
       hvaYou,
       'human-vs-ai'
     );
-    expect(hvaYou.textContent).toMatch(/You Wins/i);
+    expect(hvaYou.textContent).toMatch(/You Win!/i);
+    expect(hvaYou.textContent).not.toMatch(/You Wins/i);
 
     const hvaAi = document.createElement('div');
     renderStatus(
