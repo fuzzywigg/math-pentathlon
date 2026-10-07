@@ -589,11 +589,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-score.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .par55-score.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-on-dark, #f87171);
     }
 
     .par55-score .value {
@@ -601,7 +601,7 @@ export function injectPar55Styles(): void {
     }
 
     .par55-target {
-      color: #999;
+      color: #cbd5e1;
       font-size: 0.9rem;
     }
 
@@ -613,11 +613,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .par55-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .par55-winner-banner {
@@ -710,11 +710,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-hand-label.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .par55-hand-label.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     @media (max-width: 768px) {

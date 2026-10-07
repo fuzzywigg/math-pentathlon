@@ -28,7 +28,8 @@ function createGameCard(game: GameInfo): HTMLElement {
   const content = document.createElement('div');
   content.className = 'game-card-content';
 
-  const title = document.createElement('h3');
+  // h2 keeps heading order under page h1 (avoid skipping to h3).
+  const title = document.createElement('h2');
   title.className = 'game-card-title';
   title.textContent = game.name;
   content.appendChild(title);

@@ -52,12 +52,12 @@ export function injectStarsStyles(): void {
 
     .stars-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .stars-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .stars-status.player2 {
@@ -86,12 +86,12 @@ export function injectStarsStyles(): void {
 
     .stars-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .stars-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .stars-score.player2 {
@@ -198,8 +198,8 @@ export function injectStarsStyles(): void {
       text-align: center;
     }
 
-    .stars-hand-label.player1 { color: var(--color-player1, #1976d2); }
-    .stars-hand-label.player2 { color: var(--color-player2, #e53935); }
+    .stars-hand-label.player1 { color: var(--color-player1-on-dark, #60a5fa); }
+    .stars-hand-label.player2 { color: #fca5a5; }
 
     .stars-hand {
       display: flex;
@@ -308,8 +308,8 @@ export function injectStarsStyles(): void {
       border-bottom: none;
     }
 
-    .stars-move-item.player1 { color: var(--color-player1, #64b5f6); }
-    .stars-move-item.player2 { color: var(--color-player2, #ef9a9a); }
+    .stars-move-item.player1 { color: var(--color-player1-text, #1d4ed8); }
+    .stars-move-item.player2 { color: var(--color-player2-text, #b91c1c); }
 
     .stars-tooltip {
       position: absolute;

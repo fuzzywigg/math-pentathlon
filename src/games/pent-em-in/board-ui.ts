@@ -428,12 +428,12 @@ export function injectPentEmInStyles(): void {
 
     .pent-status.player1 {
       background: #e3f2fd;
-      color: var(--color-player1, #1565c0);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .pent-status.player2 {
       background: #ffebee;
-      color: var(--color-player2, #c62828);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .pent-status.player2 {

@@ -222,7 +222,7 @@ function ensureKingsBoard(container: HTMLElement): {
     ':scope > .board'
   ) as HTMLElement | null;
   const cells = boardEl
-    ? (Array.from(boardEl.querySelectorAll(':scope > .cell')) as HTMLElement[])
+    ? (Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[])
     : [];
 
   if (boardEl && cells.length === KINGS_CELL_COUNT) {
@@ -307,9 +307,7 @@ export function renderBoard(
   boardEl.className = 'board';
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  const cells = Array.from(
-    boardEl.querySelectorAll(':scope > .cell')
-  ) as HTMLElement[];
+  const cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {

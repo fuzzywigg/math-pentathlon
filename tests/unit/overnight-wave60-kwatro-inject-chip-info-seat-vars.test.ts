@@ -16,8 +16,8 @@ describe('Wave 60 kwatro — inject chip-info seat vars', () => {
     expect(css).toContain('.kwa-chip-info');
     expect(css).toContain('background: #333');
     expect(css).toContain('.kwa-player-info.player1');
-    expect(css).toContain('color: var(--color-player1, #2196f3)');
+    expect(css).toContain('color: var(--color-player1-on-dark, #60a5fa)');
     expect(css).toContain('.kwa-player-info.player2');
-    expect(css).toContain('color: var(--color-player2, #f44336)');
+    expect(css).toContain('color: var(--color-player2-on-dark, #f87171)');
   });
 });

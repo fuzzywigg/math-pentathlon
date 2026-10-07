@@ -78,6 +78,8 @@ export function makeSvgFocusable(el: Element, ariaLabel: string): void {
   el.setAttribute('aria-label', ariaLabel);
 }
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
 /** Mark a board root as an ARIA grid (Wave 2). */
 export function markBoardAsGrid(boardEl: Element): void {
   boardEl.setAttribute('role', 'grid');
@@ -91,6 +93,135 @@ export function makeGridCell(cell: Element, ariaLabel: string): void {
   cell.setAttribute('role', 'gridcell');
   cell.setAttribute('tabindex', '-1');
   cell.setAttribute('aria-label', ariaLabel);
+}
+
+/**
+ * Ensure ARIA grid structure: every gridcell sits in a row, and decorative
+ * siblings of rows are role=presentation so axe `aria-required-*` passes.
+ *
+ * HTML row wrappers use class `aria-grid-row` (`display: contents`) so CSS
+ * grid / flex layouts that expect direct cell children keep working.
+ * Safe to call repeatedly after board rebuilds.
+ */
+export function ensureAriaGridRows(root: Element): void {
+  const grids =
+    root.getAttribute('role') === 'grid'
+      ? [root]
+      : Array.from(root.querySelectorAll('[role="grid"]'));
+
+  for (const grid of grids) {
+    wrapGridCellsInRows(grid);
+  }
+}
+
+function wrapGridCellsInRows(grid: Element): void {
+  const orphanCells = Array.from(
+    grid.querySelectorAll('[role="gridcell"]')
+  ).filter((cell) => {
+    const row = cell.parentElement;
+    return !row || row.getAttribute('role') !== 'row';
+  });
+
+  if (orphanCells.length > 0) {
+    // Group by parent node + data-row so mixed SVG/HTML boards stay intact.
+    const groups = new Map<Element, Map<string, Element[]>>();
+    for (const cell of orphanCells) {
+      const parent = cell.parentElement;
+      if (!parent) continue;
+      let byRow = groups.get(parent);
+      if (!byRow) {
+        byRow = new Map();
+        groups.set(parent, byRow);
+      }
+      const rowKey = cell.getAttribute('data-row') ?? '_';
+      const list = byRow.get(rowKey) ?? [];
+      list.push(cell);
+      byRow.set(rowKey, list);
+    }
+
+    for (const [parent, byRow] of groups) {
+      const isSvg =
+        parent.namespaceURI === SVG_NS || parent instanceof SVGElement;
+      const canPromoteParent =
+        byRow.size === 1 && parent !== grid && !parentHasForeignRole(parent);
+
+      if (canPromoteParent) {
+        // Nested boards (e.g. Ramrod boxes): parent becomes the row so
+        // ancestors can be valid rowgroups without an extra wrapper.
+        parent.setAttribute('role', 'row');
+        ensureRowgroupAncestors(parent, grid);
+        continue;
+      }
+
+      for (const [, rowCells] of byRow) {
+        if (rowCells.length === 0) continue;
+        const first = rowCells[0]!;
+        const row = isSvg
+          ? document.createElementNS(SVG_NS, 'g')
+          : document.createElement('div');
+        row.setAttribute('role', 'row');
+        if (!isSvg) {
+          (row as HTMLElement).className = 'aria-grid-row';
+        }
+        parent.insertBefore(row, first);
+        for (const cell of rowCells) {
+          row.appendChild(cell);
+        }
+      }
+      // Only walk ancestors when rows live under a nested parent (not the grid).
+      if (parent !== grid) {
+        ensureRowgroupAncestors(parent, grid);
+      }
+    }
+  }
+
+  // Decorative non-row children under the grid (SVG chrome, labels, defs).
+  for (const child of Array.from(grid.children)) {
+    const role = child.getAttribute('role');
+    if (role === 'row' || role === 'rowgroup' || role === 'gridcell') continue;
+    if (child.querySelector('[role="row"], [role="gridcell"]')) {
+      if (role !== 'rowgroup' && role !== 'grid' && role !== 'row') {
+        child.setAttribute('role', 'rowgroup');
+      }
+      continue;
+    }
+    if (!role) {
+      child.setAttribute('role', 'presentation');
+    }
+  }
+}
+
+function parentHasForeignRole(el: Element): boolean {
+  const role = el.getAttribute('role');
+  return !!role && role !== 'presentation' && role !== 'none';
+}
+
+/**
+ * Ensure a valid grid → rowgroup → (presentation*) → row chain.
+ * Only the direct child of the grid is a rowgroup; nested layout wrappers
+ * use presentation so we never nest rowgroups (invalid per ARIA).
+ */
+function ensureRowgroupAncestors(from: Element, grid: Element): void {
+  if (from === grid || !grid.contains(from)) return;
+  const chain: Element[] = [];
+  let node = from.parentElement;
+  while (node && node !== grid) {
+    chain.push(node);
+    node = node.parentElement;
+  }
+  if (node !== grid || chain.length === 0) return;
+
+  const top = chain[chain.length - 1]!;
+  if (top.getAttribute('role') !== 'row' && top.getAttribute('role') !== 'grid') {
+    top.setAttribute('role', 'rowgroup');
+  }
+  for (let i = 0; i < chain.length - 1; i++) {
+    const el = chain[i]!;
+    const role = el.getAttribute('role');
+    if (!role || role === 'rowgroup') {
+      el.setAttribute('role', 'presentation');
+    }
+  }
 }
 
 /**
@@ -187,6 +318,7 @@ const ARROW_DELTA: Record<string, { dRow: number; dCol: number }> = {
 };
 
 export function bindGridNavigation(boardEl: Element): void {
+  ensureAriaGridRows(boardEl);
   boardEl.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
     const delta = ARROW_DELTA[ke.key];
@@ -222,6 +354,7 @@ export function restoreGridFocus(
   container: Element,
   focus: FocusedCellCoords | null
 ): void {
+  ensureAriaGridRows(container);
   const cells = collectGridCells(container);
   const active = applyRovingTabindex(cells, focus);
   if (focus && active) {

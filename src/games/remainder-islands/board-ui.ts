@@ -537,8 +537,8 @@ export function injectRemainderIslandsStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .remainder-player-score.player1 .remainder-player-name { color: var(--color-player1, #1565c0); }
-    .remainder-player-score.player2 .remainder-player-name { color: var(--color-player2, #c62828); }
+    .remainder-player-score.player1 .remainder-player-name { color: var(--color-player1-text, #1d4ed8); }
+    .remainder-player-score.player2 .remainder-player-name { color: var(--color-player2-text, #b91c1c); }
 
     .remainder-player-name {
       font-size: 14px;
@@ -563,7 +563,7 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-turns-label {
       font-size: 12px;
-      color: #999;
+      color: #475569;
       text-transform: uppercase;
     }
 
@@ -614,12 +614,12 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-status.player1 {
       background: #e3f2fd;
-      color: var(--color-player1, #1565c0);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .remainder-status.player2 {
       background: #ffebee;
-      color: var(--color-player2, #c62828);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .remainder-status.player2 {

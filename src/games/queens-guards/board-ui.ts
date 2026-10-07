@@ -347,11 +347,11 @@ export function injectQGStyles(): void {
     }
 
     .qg-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .qg-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .qg-info {
