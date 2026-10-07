@@ -24,6 +24,8 @@ describe('Wave 61 contig — placing status', () => {
     const status = document.createElement('div');
     document.body.append(board, status);
     initGame(board, status);
-    expect(status.textContent).toContain('Click a valid cell to place your chip');
+    expect(status.textContent).toContain(
+      'Select a green number to place your chip'
+    );
   });
 });

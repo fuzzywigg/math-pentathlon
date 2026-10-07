@@ -26,6 +26,8 @@ describe('Wave 57 contig — status calculating copy', () => {
     initGame(board, status);
     (board.querySelector('.contig-roll-btn') as HTMLButtonElement).click();
     const text = status.querySelector('.contig-status')?.textContent ?? '';
-    expect(text).toContain('Choose a number to place your chip');
+    expect(text).toContain(
+      'Tap a green number on the board, or pick an expression below'
+    );
   });
 });
