@@ -119,4 +119,14 @@ describe('Hex deep playability', () => {
     expect(getGameState().moveHistory.length).toBe(2);
     expect(status.querySelector('.status-ai-thinking')).toBeFalsy();
   });
+
+  it('ai-client watchdog is play-budget + 1500ms and falls back to sync search', () => {
+    const clientSrc = readFileSync(
+      join(process.cwd(), 'src/games/hex/ai-client.ts'),
+      'utf8'
+    );
+    expect(clientSrc).toMatch(/watchdogMs\s*=\s*deadlineMs\s*\+\s*1500/);
+    expect(clientSrc).toMatch(/Promise\.race/);
+    expect(clientSrc).toMatch(/disposeHexAiWorker/);
+  });
 });

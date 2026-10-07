@@ -165,7 +165,7 @@ async function playOneGame(browser, viewportName, difficulty, gameIndex, shotFla
           shotFlags.thinking = false;
         }
         const thinkStart = Date.now();
-        await thinking.waitFor({ state: 'hidden', timeout: 20_000 }).catch(() => {
+        await thinking.waitFor({ state: 'hidden', timeout: 8_000 }).catch(() => {
           stallReason = 'ai-think-timeout';
         });
         if (stallReason) break;

@@ -1,68 +1,69 @@
 {
   "tablet/easy": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 10
     },
-    "thinkMedianOfMedians": 787,
-    "thinkGlobalMax": 789,
-    "cellMinPx": 38.1,
-    "cellSample": "38.1×44",
+    "thinkMedianOfMedians": 792,
+    "thinkGlobalMax": 856,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   },
   "tablet/medium": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 10
     },
-    "thinkMedianOfMedians": 788,
-    "thinkGlobalMax": 1292,
-    "cellMinPx": 38.1,
-    "cellSample": "38.1×44",
+    "thinkMedianOfMedians": 786,
+    "thinkGlobalMax": 1335,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   },
   "tablet/hard": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 10
     },
-    "thinkMedianOfMedians": 2296,
-    "thinkGlobalMax": 3309,
-    "cellMinPx": 38.1,
-    "cellSample": "38.1×44",
+    "thinkMedianOfMedians": 1801,
+    "thinkGlobalMax": 2805,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   },
   "desktop/easy": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 10
     },
-    "thinkMedianOfMedians": 787,
-    "thinkGlobalMax": 790,
-    "cellMinPx": 16.6,
-    "cellSample": "16.6×19.1",
+    "thinkMedianOfMedians": 784,
+    "thinkGlobalMax": 798,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   },
   "desktop/medium": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 10
     },
-    "thinkMedianOfMedians": 788,
-    "thinkGlobalMax": 1291,
-    "cellMinPx": 16.6,
-    "cellSample": "16.6×19.1",
+    "thinkMedianOfMedians": 785,
+    "thinkGlobalMax": 1290,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   },
   "desktop/hard": {
-    "games": 1,
+    "games": 10,
     "outcomes": {
-      "ai-win": 1
+      "ai-win": 9,
+      "game-timeout": 1
     },
-    "thinkMedianOfMedians": 2297,
-    "thinkGlobalMax": 2803,
-    "cellMinPx": 16.6,
-    "cellSample": "16.6×19.1",
+    "thinkMedianOfMedians": 2298,
+    "thinkGlobalMax": 310346,
+    "cellMinPx": 45,
+    "cellSample": "45×52",
     "consoleErrors": 0
   }
 }
