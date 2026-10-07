@@ -156,12 +156,8 @@ describe('FIAR AI-turn input guard', () => {
       chipKind: 'plain',
     });
 
-    const {
-      initGame,
-      newGameVsAI,
-      getCurrentState,
-      destroyGame,
-    } = await import('../../src/games/fiar/game-controller');
+    const { initGame, newGameVsAI, getCurrentState, destroyGame } =
+      await import('../../src/games/fiar/game-controller');
 
     const app = document.createElement('div');
     app.id = 'app';
@@ -199,9 +195,7 @@ describe('FIAR touch + reduced-motion keepers', () => {
   it('chip-kind buttons meet 44px min-height; pulse respects reduced-motion', () => {
     injectFiarStyles();
     const css = document.getElementById('fiar-styles')!.textContent || '';
-    expect(css).toMatch(
-      /\.fiar-chip-kind-btn\s*\{[\s\S]*?min-height:\s*44px/
-    );
+    expect(css).toMatch(/\.fiar-chip-kind-btn\s*\{[\s\S]*?min-height:\s*44px/);
     expect(css).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.pulse-highlight/
     );
