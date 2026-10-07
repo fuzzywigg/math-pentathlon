@@ -11,7 +11,7 @@ Existing drafts are left open (not merged, closed, or retargeted).
 | [#414](https://github.com/fuzzywigg/math-pentathlon/pull/414) | **folded** | Merge tablet playtest report + screenshots; still the only full Easy/Med/Hard tablet pass on record. |
 | [#420](https://github.com/fuzzywigg/math-pentathlon/pull/420) | **folded** | Merge gallery capture script + committed start/mid PNGs + README Gallery table. |
 | [#459](https://github.com/fuzzywigg/math-pentathlon/pull/459) | **folded** | Merge hex-a-gone targeted branch-coverage tests + remaining-coverage note (tests/docs only). |
-| [#468](https://github.com/fuzzywigg/math-pentathlon/pull/468) | **folded** (harness only) + **needs-owner-decision** (AI tunes) | Keep tip AI (esp. kwatro tablet think-budget); fold calibration harness/guards; decide separately whether FIAR/Pent/Kwatro heuristic retunes are wanted. |
+| [#468](https://github.com/fuzzywigg/math-pentathlon/pull/468) | **folded** (harness only) + **needs-owner-decision** (AI tunes) | Keep tip AI (esp. kwatro); fold harness; **yes** apply FIAR/Pent retunes in a follow-up (Easy still beats Hard on tip); **no** for kwatro overwrite. |
 | [#481](https://github.com/fuzzywigg/math-pentathlon/pull/481) | **folded** | Merge unit-suite flake hardening (`setup.ts` owl/`Math.random`/`alert` restore + polluter `clearAllMocks`). |
 
 ## Per-PR detail
@@ -50,8 +50,12 @@ Existing drafts are left open (not merged, closed, or retargeted).
 - **What it does:** Calibration harness (`tests/helpers/ai-calibration/`, `scripts/run-ai-calibration.ts`), seeded Hard≥Easy unit guard, and heuristic retunes in FIAR / Kwatro-Sinko / Pent'Em In AI.
 - **vs tip:** Tip kwatro AI already has tablet think-budget (`AI_THINK_BUDGET_MS`), evacuation weighting, and opponent-threat gating — **prefer tip**. #468’s kwatro rewrite conflicts and is not a pure bugfix on tip. FIAR `teachingBlunder` / Hard place-depth and Pent entrapment retunes change AI behavior without tip conflict but are out of fold scope (no rules/scoring, still student-facing difficulty).
 - **Rules/scoring?** Harness: no. AI heuristic files: behavior change (not folded).
-- **Folded:** harness + unit guard only; **no** `src/games/*/ai.ts`.
-- **Needs-owner-decision:** Apply #468 AI tunes on tip in a dedicated PR? Recommended: **no for kwatro** (tip ahead); **maybe for FIAR/Pent** if calibration matrices still show Easy≥Hard after tip AI.
+- **Folded:** harness + unit guard only; **no** `src/games/*/ai.ts`. FIAR/Pent Hard≥Easy cases are `it.skipIf` on tip (seeded Easy still beats Hard without #468 tunes).
+- **Needs-owner-decision:** Apply #468 AI tunes on tip in a dedicated PR? Recommended: **no for kwatro** (tip ahead); **yes for FIAR/Pent** (confirmed Easy≥Hard on tip samples) then unskip those guards.
+
+### Tip hygiene (not a standalone PR)
+
+- `tests/unit/hex-deep-playability.test.ts` still expected Hard `AI_PLAY_DEADLINE_MS=2500` while tip `#472/#476` sets `450`. Assertion updated to match tip (tests only; no AI behavior change).
 
 ### #481 — fix(test): unit suite flake hunt
 
