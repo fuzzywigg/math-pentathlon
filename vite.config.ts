@@ -101,6 +101,12 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//, /^\/health/],
         // Keep SW install reliable on low-end tablets (three.js ~688 kB).
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // Fonts: CacheFirst for non-precached Inter weights.
+        // Do NOT add a redundant CacheFirst for /assets/*.js — Workbox
+        // precacheAndRoute already serves those. A second route does not fix
+        // Playwright WebKit setOffline (controlled fetch() fails despite
+        // caches.match); see docs/webkit-offline-pwa-2026-10-07.md. Menu
+        // idle-warm covers the SPA soft-nav path instead.
         runtimeCaching: [
           {
             urlPattern: /\/fonts\/inter-latin-(500|600|700)-normal\.woff2$/i,

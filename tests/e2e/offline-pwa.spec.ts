@@ -1,10 +1,16 @@
 /**
  * Offline PWA keeper (smoke lineage from #370): after one online visit against
  * a production build, airplane mode still loads the menu, opens Hex, and gets
- * a computer move — proving the Hex AI worker chunk was precached.
+ * a computer move — proving popular game chunks were warmed/precached.
  *
  * Self-hosts `vite preview` so the generated service worker is active.
  * Does not modify the shared Playwright webServer (dev) used by other specs.
+ *
+ * Navigation strategy:
+ * - Chromium / Firefox: full `page.goto` offline (SW serves shell + chunks).
+ * - WebKit: SPA soft-nav after idle-warm. Playwright WebKit `setOffline`
+ *   breaks controlled-page fetch()/module import of precached URLs (and can
+ *   throw on offline goto); see docs/webkit-offline-pwa-2026-10-07.md.
  */
 import { expect, test, type Page } from '@playwright/test';
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process';
@@ -73,6 +79,15 @@ async function waitForServiceWorkerControl(page: Page): Promise<void> {
   );
 }
 
+async function waitForIdleWarm(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () =>
+      document.documentElement.getAttribute('data-mp-idle-warm') === 'done',
+    null,
+    { timeout: 30_000 }
+  );
+}
+
 async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({
     timeout: 15_000,
@@ -120,7 +135,7 @@ async function startHexVsAiEasy(page: Page): Promise<void> {
 
 /**
  * Hex-only: human places center stone, then computer must place a p2 stone.
- * If the AI worker chunk is missing offline, this poll times out.
+ * If the AI path is missing offline, this poll times out (worker or sync fallback).
  */
 async function playHexHumanThenAwaitComputer(page: Page): Promise<void> {
   const beforeP2 = await page.locator('.hex-cell-p2').count();
@@ -133,6 +148,32 @@ async function playHexHumanThenAwaitComputer(page: Page): Promise<void> {
       timeout: 45_000,
     })
     .toBeGreaterThan(beforeP2);
+}
+
+async function offlineOpenMenuAndHex(
+  page: Page,
+  baseURL: string,
+  browserName: string
+): Promise<void> {
+  if (browserName === 'webkit') {
+    // Soft hash nav keeps the warmed module map (product SPA path).
+    await page.evaluate(() => {
+      location.hash = '#/';
+    });
+    await expect(page.locator('.game-card').first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await page.evaluate(() => {
+      location.hash = '#/game/hex';
+    });
+    return;
+  }
+
+  await page.goto(`${baseURL}/#/`);
+  await expect(page.locator('.game-card').first()).toBeVisible({
+    timeout: 15_000,
+  });
+  await page.goto(`${baseURL}/#/game/hex`);
 }
 
 test.describe('offline PWA', () => {
@@ -188,6 +229,7 @@ test.describe('offline PWA', () => {
 
   test('menu + Hex computer move offline after first online visit', async ({
     browser,
+    browserName,
   }) => {
     test.setTimeout(120_000);
 
@@ -198,23 +240,18 @@ test.describe('offline PWA', () => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    // One online visit so Workbox precaches shell + game + AI worker chunks.
+    // One online visit so Workbox precaches shell + game + AI worker chunks
+    // and idle-warm pulls route-mount / play CSS / Hex into the module map.
     await page.goto(`${baseURL}/`);
     await expect(page.locator('.game-card').first()).toBeVisible({
       timeout: 15_000,
     });
     await waitForServiceWorkerControl(page);
+    await waitForIdleWarm(page);
 
     await context.setOffline(true);
 
-    // Offline menu still works from precache.
-    await page.goto(`${baseURL}/#/`);
-    await expect(page.locator('.game-card').first()).toBeVisible({
-      timeout: 15_000,
-    });
-
-    // Offline Hex mount + Easy vs-AI reply proves the worker chunk is cached.
-    await page.goto(`${baseURL}/#/game/hex`);
+    await offlineOpenMenuAndHex(page, baseURL, browserName);
     await waitForGameReady(page);
     await expect(page.locator('h1')).toContainText('Hex', { timeout: 15_000 });
     await expect(page.locator('.hex-board, #board').first()).toBeVisible();
