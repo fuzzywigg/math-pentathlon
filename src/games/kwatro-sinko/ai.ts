@@ -11,6 +11,12 @@
 // 3. Block opponent alignments by occupying key spaces
 // 4. Even numbers (player 1) can make 4: 0+6-2, 2+4-2, etc.
 // 5. Odd numbers (player 2) can make 5: 1+7-3, 3+9-7, etc.
+//
+// Performance notes (tablet):
+// - Search is 1-ply heuristic only (depth knobs below are for priority / randomness,
+//   not full minimax — mid-range tablets must stay well under ~1.5s per think).
+// - Opponent-win blocking is skipped when the opponent still has ≥2 chips on
+//   numbered spaces (they cannot win on their next move).
 
 import { KwaState, Player, Chip, BoardNode, getOpponent } from './types';
 import {
@@ -26,10 +32,14 @@ import {
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
+/** Soft tablet think budget for AI decision work (excludes UI pause). */
+export const AI_THINK_BUDGET_MS = 50;
+
 const DIFFICULTY_CONFIG = {
-  easy: { randomness: 0.5, teachingMode: true, depth: 1 },
-  medium: { randomness: 0.15, teachingMode: false, depth: 2 },
-  hard: { randomness: 0.03, teachingMode: false, depth: 3 },
+  // depth = how aggressively we prioritize evacuation / win setup vs noise
+  easy: { randomness: 0.35, teachingMode: true, depth: 1 },
+  medium: { randomness: 0.12, teachingMode: false, depth: 2 },
+  hard: { randomness: 0.02, teachingMode: false, depth: 3 },
 };
 
 // =============================================================================
@@ -139,6 +149,23 @@ function isOnAlignmentPath(
 }
 
 /**
+ * Count chips owned by `player` that still sit on numbered (home) spaces.
+ */
+function countOnNumbered(
+  nodes: Map<string, BoardNode>,
+  chips: Map<string, Chip>,
+  player: Player
+): number {
+  let n = 0;
+  for (const chip of chips.values()) {
+    if (chip.owner !== player || !chip.position) continue;
+    const node = nodes.get(chip.position);
+    if (node?.isNumbered) n += 1;
+  }
+  return n;
+}
+
+/**
  * Check if a move would create a legal win (chips off numbered + alignment).
  */
 function wouldCreateWin(
@@ -193,14 +220,29 @@ interface MoveOption {
 function evaluateMoves(
   state: KwaState,
   player: Player,
-  _difficulty: AIDifficulty
+  difficulty: AIDifficulty
 ): MoveOption[] {
   const moves: MoveOption[] = [];
   const opponent = getOpponent(player);
+  const config = DIFFICULTY_CONFIG[difficulty];
+  const ownOnNumbered = countOnNumbered(state.nodes, state.chips, player);
+  const oppOnNumbered = countOnNumbered(state.nodes, state.chips, opponent);
+  // Opponent can only win next turn if ≤1 chip remains on numbered spaces
+  // (a single move can clear at most one chip off a numbered space).
+  const oppCanThreatenWin = oppOnNumbered <= 1;
+  const lastOwnMove = [...state.moveHistory]
+    .reverse()
+    .find((m) => m.player === player);
+
+  // Stronger evacuation weight on harder difficulties (depth knob).
+  const evacuateWeight = 600 + config.depth * 250;
+  const allOffBonus = 1500 + config.depth * 500;
 
   for (const chip of state.chips.values()) {
     if (chip.owner !== player) continue;
 
+    const fromNode = chip.position ? state.nodes.get(chip.position) : null;
+    const chipOnNumbered = Boolean(fromNode?.isNumbered);
     const validMoves = getValidMoves(state, chip.id);
 
     for (const nodeId of validMoves) {
@@ -217,47 +259,96 @@ function evaluateMoves(
         reasons.push(`Creates winning alignment: ${winResult.expression}`);
       }
 
-      // Factor 2: Block opponent's win
-      // Check if opponent could win by moving to this space
-      for (const oppChip of state.chips.values()) {
-        if (oppChip.owner !== opponent) continue;
-        const oppMoves = getValidMoves(state, oppChip.id);
-        if (oppMoves.includes(nodeId)) {
-          const oppWin = wouldCreateWin(state, oppChip.id, nodeId);
-          if (oppWin) {
-            score += 5000;
-            reasons.push('Blocks opponent win');
+      // Factor 2: Block opponent's win (only when a win is still possible)
+      if (oppCanThreatenWin) {
+        for (const oppChip of state.chips.values()) {
+          if (oppChip.owner !== opponent) continue;
+          // If opp still has exactly one numbered chip, only that chip can
+          // complete the all-off gate — skip others.
+          if (oppOnNumbered === 1) {
+            const oppFrom = oppChip.position
+              ? state.nodes.get(oppChip.position)
+              : null;
+            if (!oppFrom?.isNumbered) continue;
+          }
+          const oppMoves = getValidMoves(state, oppChip.id);
+          if (oppMoves.includes(nodeId)) {
+            const oppWin = wouldCreateWin(state, oppChip.id, nodeId);
+            if (oppWin) {
+              score += 5000;
+              reasons.push('Blocks opponent win');
+            }
           }
         }
       }
 
-      // Factor 3: Prefer non-numbered spaces (goal condition)
-      if (!node.isNumbered) {
-        score += 200;
+      // Factor 3: Evacuate numbered home rows (required before any win)
+      if (chipOnNumbered && !node.isNumbered) {
+        // Bigger bonus as fewer chips remain on numbered spaces.
+        const urgency = (5 - ownOnNumbered + 1) * evacuateWeight;
+        score += urgency;
+        reasons.push('Leaves numbered space');
+        if (ownOnNumbered === 1) {
+          score += allOffBonus;
+          reasons.push('Clears last numbered chip');
+        }
+      } else if (!chipOnNumbered && node.isNumbered) {
+        // Never retreat onto a numbered space unless nothing else exists.
+        score -= 2000;
+        reasons.push('Retreats to numbered space');
+      } else if (chipOnNumbered && node.isNumbered) {
+        // Lateral shuffle along the home row does not progress the goal.
+        score -= 400;
+        reasons.push('Stays on numbered row');
+      } else if (!node.isNumbered) {
+        score += 120;
         reasons.push('Non-numbered space');
       }
 
-      // Factor 4: Center control
+      // Factor 4: Anti-cycle — penalize immediately undoing our last move
+      if (
+        lastOwnMove &&
+        lastOwnMove.toNode === chip.position &&
+        lastOwnMove.fromNode === nodeId
+      ) {
+        score -= 800;
+        reasons.push('Avoids undo cycle');
+      }
+
+      // Factor 5: Prefer moving chips that are still stuck on numbered spaces
+      // when any remain — progress the conjunctive win gate.
+      if (ownOnNumbered > 0 && chipOnNumbered) {
+        score += 150 * config.depth;
+      } else if (ownOnNumbered > 0 && !chipOnNumbered) {
+        // Soft penalty for fiddling with already-evacuated chips.
+        score -= 80 * config.depth;
+      }
+
+      // Factor 6: Center control (weaker than evacuation)
       const match = nodeId.match(/n(\d+)-(\d+)/);
       if (match) {
         const row = parseInt(match[1]);
         const col = parseInt(match[2]);
         const centerDist = Math.abs(row - 2) + Math.abs(col - 2);
-        const centerBonus = (4 - centerDist) * 30;
+        const centerBonus = (4 - centerDist) * 20;
         score += centerBonus;
         if (centerDist <= 1) {
           reasons.push('Central position');
         }
       }
 
-      // Factor 5: Alignment potential
-      if (isOnAlignmentPath(state.nodes, nodeId, chip)) {
-        score += 100;
+      // Factor 7: Alignment potential (after chips are mostly off)
+      if (ownOnNumbered <= 2 && isOnAlignmentPath(state.nodes, nodeId, chip)) {
+        score += 180 + config.depth * 40;
         reasons.push('Building toward alignment');
       }
 
-      // Factor 6: More connections = more mobility
-      score += node.connections.length * 10;
+      // Factor 8: More connections = more mobility
+      score += node.connections.length * 8;
+
+      // Stable tie-break so equal scores do not oscillate seat-to-seat.
+      score += (chip.id.charCodeAt(chip.id.length - 1) % 7) * 0.01;
+      score += (nodeId.charCodeAt(nodeId.length - 1) % 5) * 0.001;
 
       moves.push({
         chipId: chip.id,
@@ -284,11 +375,13 @@ function getTeachingMove(state: KwaState, player: Player): MoveOption | null {
 
   if (moves.length === 0) return null;
 
-  // 40% chance to pick a suboptimal move
+  // Prefer still-progressing alternatives: only sample from the top half so
+  // teaching noise does not resurrect full home-row thrashing.
   if (Math.random() < 0.4 && moves.length > 1) {
-    const suboptimal = moves.slice(1);
-    if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+    const poolSize = Math.max(2, Math.ceil(moves.length / 2));
+    const pool = moves.slice(0, poolSize);
+    if (pool.length > 1) {
+      return pool[1 + Math.floor(Math.random() * (pool.length - 1))];
     }
   }
 
@@ -322,6 +415,7 @@ export function getAIMove(
   }
 
   const config = DIFFICULTY_CONFIG[difficulty];
+  const started = performance.now();
 
   // Teaching mode for easy difficulty
   if (config.teachingMode) {
@@ -335,9 +429,15 @@ export function getAIMove(
 
   if (moves.length === 0) return null;
 
-  // Add randomness based on difficulty
+  // Soft budget guard: if evaluation already burned the tablet slice (rare),
+  // take the top move immediately without extra randomness sampling.
+  if (performance.now() - started > AI_THINK_BUDGET_MS) {
+    return { chipId: moves[0].chipId, nodeId: moves[0].nodeId };
+  }
+
+  // Add randomness based on difficulty (only among top progressive moves)
   if (Math.random() < config.randomness && moves.length > 1) {
-    const topMoves = moves.slice(0, 3);
+    const topMoves = moves.slice(0, Math.min(3, moves.length));
     const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
     return { chipId: chosen.chipId, nodeId: chosen.nodeId };
   }
