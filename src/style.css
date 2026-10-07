@@ -1387,8 +1387,8 @@ h1 {
   .collapse-toggle {
     flex-direction: row;
     width: 100%;
-    min-height: auto;
-    padding: 6px 12px;
+    min-height: 44px;
+    padding: 10px 12px;
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
@@ -1478,6 +1478,20 @@ h1 {
 
   .collapse-toggle {
     min-width: 44px;
+    min-height: 44px;
+  }
+
+  .owl-bubble-dismiss,
+  .owl-minimize-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Hover-reveal minimize is unusable on touch — keep it visible. */
+  .owl-minimize-btn {
+    opacity: 1;
   }
 
   .game-loading-actions .btn {
@@ -1552,6 +1566,49 @@ h1 {
   margin: 0 auto;
   position: relative;
   z-index: 1;
+}
+
+/* Home “Your Progress” CTA — lives on the landing hero (not only /stats).
+   Styles previously lived only in lazy-loaded stats-dashboard.css, so the
+   link rendered as bare inline text with a ~20px tap height on first paint. */
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.hero-progress-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  min-height: 44px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.hero-progress-link:hover {
+  background: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+.hero-progress-link:focus {
+  outline: none;
+}
+
+.hero-progress-link:focus-visible {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
 }
 
 .hero-logo {
@@ -4587,10 +4644,12 @@ h1 {
 
 .owl-bubble-dismiss {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 4px;
+  right: 4px;
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  min-height: 24px;
   border: none;
   background: transparent;
   color: #9ca3af;
@@ -4641,6 +4700,8 @@ h1 {
 .owl-minimize-btn {
   width: 24px;
   height: 24px;
+  min-width: 24px;
+  min-height: 24px;
   border-radius: 50%;
   border: none;
   background: white;
@@ -4656,7 +4717,8 @@ h1 {
   opacity: 0;
 }
 
-.owl-expanded:hover .owl-minimize-btn {
+.owl-expanded:hover .owl-minimize-btn,
+.owl-expanded:focus-within .owl-minimize-btn {
   opacity: 1;
 }
 

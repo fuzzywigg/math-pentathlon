@@ -237,11 +237,11 @@ function createPit(
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
-  // Invisible hit target (~44px CSS at typical board widths) under the visual pit
+  // Invisible hit target (≥44px CSS on ~375px phones) under the visual pit
   const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   hit.setAttribute('cx', String(cx));
   hit.setAttribute('cy', String(cy));
-  hit.setAttribute('r', String(PIT_RADIUS + 4));
+  hit.setAttribute('r', String(PIT_RADIUS + 8));
   hit.setAttribute('fill', 'transparent');
   hit.setAttribute('class', 'calla-pit-hit');
   group.appendChild(hit);

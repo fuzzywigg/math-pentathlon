@@ -14,15 +14,37 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
+      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'mobile-iphone-se',
+      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      use: {
+        ...devices['iPhone SE'],
+        // CI installs Chromium only; keep emulation on Chromium.
+        defaultBrowserType: 'chromium',
+        viewport: { width: 375, height: 667 },
+      },
+    },
+    {
+      name: 'mobile-pixel-7',
+      testMatch: /mobile-viewport-smoke\.spec\.ts/,
+      use: {
+        ...devices['Pixel 7'],
+        defaultBrowserType: 'chromium',
+        viewport: { width: 412, height: 915 },
+      },
     },
   ],
   webServer: {
