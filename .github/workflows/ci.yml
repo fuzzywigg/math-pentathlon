@@ -157,3 +157,41 @@ jobs:
           name: playwright-report-cross-browser
           path: playwright-report/
           retention-days: 30
+
+  # Visual baselines (start screen + each game opening @ desktop + phone).
+  # Report-only for now: failures upload artifacts but do not fail the workflow.
+  visual-baseline:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Run visual regression (report-only)
+        id: visual
+        continue-on-error: true
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          echo "visual-baseline: report-only — see docs/wiki/development.md#visual-regression-baselines"
+          npm run test:e2e:visual
+      - name: Upload visual diff artifacts
+        uses: actions/upload-artifact@v7
+        if: failure() || steps.visual.outcome == 'failure'
+        with:
+          name: visual-baseline-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.visual.outcome == 'failure'
+        run: |
+          echo "::warning::visual-baseline diffs detected (report-only; workflow stays green)"
+          exit 0

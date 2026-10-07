@@ -255,6 +255,12 @@ export function getCurrentState(): FractionPinballState {
   return gameState;
 }
 
+/** Invalidate pending AI timeouts and drop the mount (route change). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  gameContainer = null;
+}
+
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
   newGameVsHuman();

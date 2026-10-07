@@ -19,6 +19,10 @@ import {
   nextRouteGeneration,
 } from './core/route-generation';
 import { renderGameLoadError, renderGameLoading } from './ui/game-loading';
+import {
+  installGameErrorBoundary,
+  type GameErrorBoundaryHandle,
+} from './ui/game-error-boundary';
 import { bindOfflineDocumentFlag, isBrowserOffline } from './ui/offline';
 import { bindReducedMotionPreference } from './ui/reduced-motion';
 import { bootstrapPwa } from './pwa/bootstrap';
@@ -60,6 +64,8 @@ if (!appContainer) {
 
 // Store reference to cleanup functions
 let currentCleanup: (() => void) | null = null;
+/** Active game-route error boundary (window error / rejection → friendly reset). */
+let activeGameBoundary: GameErrorBoundaryHandle | null = null;
 
 // Cleanup previous view
 function cleanup(): void {
@@ -67,6 +73,30 @@ function cleanup(): void {
     currentCleanup();
     currentCleanup = null;
   }
+  if (activeGameBoundary) {
+    activeGameBoundary.dispose();
+    activeGameBoundary = null;
+  }
+}
+
+/** Install (or replace) the per-game error boundary for the current route. */
+function bindGameErrorBoundary(gameName: string): void {
+  if (activeGameBoundary) {
+    activeGameBoundary.dispose();
+    activeGameBoundary = null;
+  }
+  activeGameBoundary = installGameErrorBoundary({
+    gameName,
+    container: appContainer!,
+    onReset: () => renderGame(),
+    onHome: () => navigate('/'),
+    onBeforeShow: () => {
+      if (currentCleanup) {
+        currentCleanup();
+        currentCleanup = null;
+      }
+    },
+  });
 }
 
 // Render the game selector (home page)
@@ -122,6 +152,8 @@ function renderGame(): void {
 
   document.title = `Math Pentathlon - ${gameInfo.name}`;
   renderGameLoading(appContainer!, gameInfo.name);
+  // Every game route gets a friendly reset boundary before the chunk mounts.
+  bindGameErrorBoundary(gameInfo.name);
 
   const mount = async (): Promise<void> => {
     try {
@@ -143,6 +175,11 @@ function renderGame(): void {
     } catch (err) {
       console.error(`Failed to load game ${gameId}`, err);
       if (!isCurrentRouteGeneration(routeGen)) return;
+      // Load failures use the dedicated load-error UI; drop the runtime boundary.
+      if (activeGameBoundary) {
+        activeGameBoundary.dispose();
+        activeGameBoundary = null;
+      }
       renderGameLoadError(
         appContainer!,
         gameInfo.name,

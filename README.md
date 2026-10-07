@@ -64,8 +64,8 @@ npm run build
 ## Status (2026-10-07)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: 2974 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`); 11 Playwright specs under `tests/e2e`
-- CI (`ci.yml` on alpha): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ 250 kB JS chunk budget), unit (required; no `continue-on-error`), Chromium e2e (failures fail the workflow)
+- Tests: Vitest under `tests/unit` + Playwright under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
+- CI (`ci.yml` on alpha): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ 250 kB JS chunk budget), unit (required), Chromium e2e (required), visual-baseline (**report-only**; see `docs/wiki/development.md`)
 - Latest alpha CI green at `593270b` (2026-10-06)
 
 ## Agent rules

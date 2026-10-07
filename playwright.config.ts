@@ -5,6 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
  * - `chromium` — default / required CI path (`npm run test:e2e:chromium`)
  * - `mobile-iphone-se`, `mobile-pixel-7` — phone viewport smoke (Chromium emulation)
  * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
+ * - `visual-desktop`, `visual-phone` — start + openings baselines (`npm run test:e2e:visual`)
  *
  * CI e2e runs chromium + both mobile projects. Opt in cross-browser locally or in CI:
  *   npm run test:e2e:cross
@@ -15,13 +16,19 @@ import { defineConfig, devices } from '@playwright/test';
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
  * CI never accidentally pulls in WebKit/Firefox.
  *
- * Visual regression uses a separate config: `playwright.visual.config.ts`
- * (`npm run test:visual`) — not registered here.
+ * Opt-in visual suites:
+ * - `playwright.visual.config.ts` via `npm run test:visual` (separate config)
+ * - `visual-desktop` / `visual-phone` projects via `npm run test:e2e:visual`
+ *   (ignored by chromium/firefox/webkit/ipad-webkit/mobile projects)
  */
 
 // Cap parallel browsers: each mp3d spec spins WebGL (often software/ANGLE in CI).
 // CI stays single-worker; local caps at 2 to avoid GL thrash on shared runners.
 const workerLimit = process.env.CI ? 1 : 2;
+
+/** Specs that belong only to dedicated projects (not chromium/cross-browser). */
+const nonDefaultSpecs =
+  /mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -35,6 +42,9 @@ export default defineConfig({
     timeout: 15_000,
   },
   reporter: 'html',
+  // In-repo PNG baselines (committed). Project keeps desktop/phone apart.
+  snapshotPathTemplate:
+    '{testDir}/visual-baselines/{projectName}/{testFileName}/{arg}{ext}',
   use: {
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
@@ -42,22 +52,22 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
+      testIgnore: nonDefaultSpecs,
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'firefox',
-      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
+      testIgnore: nonDefaultSpecs,
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
+      testIgnore: nonDefaultSpecs,
       use: { ...devices['Desktop Safari'] },
     },
     {
       name: 'ipad-webkit',
-      testIgnore: /mobile-viewport-smoke\.spec\.ts/,
+      testIgnore: nonDefaultSpecs,
       use: { ...devices['iPad Pro 11'] },
     },
     {
@@ -77,6 +87,23 @@ export default defineConfig({
         ...devices['Pixel 7'],
         defaultBrowserType: 'chromium',
         viewport: { width: 412, height: 915 },
+      },
+    },
+    {
+      name: 'visual-desktop',
+      testMatch: /visual-baseline\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+    },
+    {
+      name: 'visual-phone',
+      testMatch: /visual-baseline\.spec\.ts/,
+      use: {
+        // iPhone 12 viewport/UA, but Chromium so CI need not install WebKit.
+        ...devices['iPhone 12'],
+        browserName: 'chromium',
       },
     },
   ],

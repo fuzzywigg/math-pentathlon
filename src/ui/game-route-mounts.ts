@@ -129,6 +129,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
 async function renderHex(routeGen: number): Promise<void> {
   const {
     initGame: initHexGame,
+    destroyGame: destroyHexGame,
     newGameVsHuman: hexNewGameVsHuman,
     newGameVsAI: hexNewGameVsAI,
     startTutorial: startHexTutorial,
@@ -184,7 +185,10 @@ async function renderHex(routeGen: number): Promise<void> {
     initHexGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyHexGame();
+    shell.cleanup();
+  });
 }
 
 // Render Star Track
@@ -439,6 +443,7 @@ async function renderHexAGone(routeGen: number): Promise<void> {
 async function renderCalla(routeGen: number): Promise<void> {
   const {
     initGame: initCallaGame,
+    destroyGame: destroyCallaGame,
     newGameVsHuman: callaNewGameVsHuman,
     newGameVsAI: callaNewGameVsAI,
     startTutorial: startCallaTutorial,
@@ -501,7 +506,10 @@ async function renderCalla(routeGen: number): Promise<void> {
     initCallaGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyCallaGame();
+    shell.cleanup();
+  });
 }
 
 // Render FIAR
@@ -805,6 +813,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
 async function renderFabADiffy(routeGen: number): Promise<void> {
   const {
     initGame: initFabGame,
+    destroyGame: destroyFabGame,
     newGameVsHuman: fabNewGameVsHuman,
     newGameVsAI: fabNewGameVsAI,
     startTutorial: startFabTutorial,
@@ -869,7 +878,10 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     initFabGame(shell.board, false);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyFabGame();
+    shell.cleanup();
+  });
 }
 
 // Render Sum Dominoes
@@ -1323,6 +1335,7 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
 async function renderFracFact(routeGen: number): Promise<void> {
   const {
     initGame: initFracFactGame,
+    destroyGame: destroyFracFactGame,
     newGameVsHuman: fracNewGameVsHuman,
     newGameVsAI: fracNewGameVsAI,
     startTutorial: startFracTutorial,
@@ -1403,7 +1416,10 @@ async function renderFracFact(routeGen: number): Promise<void> {
     initFracFactGame(shell.board);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyFracFactGame();
+    shell.cleanup();
+  });
 }
 
 // Render Remainder Islands
@@ -1470,6 +1486,7 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
 async function renderFractionPinball(routeGen: number): Promise<void> {
   const {
     initGame: initPinballGame,
+    destroyGame: destroyPinballGame,
     newGameVsHuman: pinballNewGameVsHuman,
     newGameVsAI: pinballNewGameVsAI,
     startTutorial: startPinballTutorial,
@@ -1524,7 +1541,10 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     initPinballGame(shell.board);
   }
 
-  setCurrentCleanup(shell.cleanup);
+  setCurrentCleanup(() => {
+    destroyPinballGame();
+    shell.cleanup();
+  });
 }
 
 // Render Stars & Bars

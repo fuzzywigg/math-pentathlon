@@ -21,6 +21,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:visual": "playwright test -c playwright.visual.config.ts",
     "test:visual:update": "playwright test -c playwright.visual.config.ts --update-snapshots",
+    "test:e2e:visual": "playwright test --project=visual-desktop --project=visual-phone",
+    "test:e2e:visual:update": "playwright test --project=visual-desktop --project=visual-phone --update-snapshots",
+    "perf:runtime": "node scripts/runtime-perf.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium"
   },
   "keywords": [],

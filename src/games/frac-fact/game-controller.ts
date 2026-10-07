@@ -216,6 +216,13 @@ export function getCurrentState(): FracFactState {
   return gameState;
 }
 
+/** Clear pending AI/result timers and drop the mount (route change). */
+export function destroyGame(): void {
+  clearAiTimer();
+  clearResultTimer();
+  gameContainer = null;
+}
+
 /** Test helper: inject state and re-render. */
 export function __setStateForTests(state: FracFactState): void {
   gameState = state;
