@@ -2,7 +2,7 @@
 // Rendering the game boards, shapes, and controls
 
 import {
-  JuggleState,
+  type JuggleState,
   CONFIG,
   getCategoryFromDie,
   getShapesForDie,
@@ -12,8 +12,9 @@ import {
   getPreviewCells,
   isPlacementValid,
   getBoardFillPercentage,
+  canPlaceAnyShapeForDie,
 } from './rules';
-import { Board } from '../../core/polyomino/placement';
+import { Board, canPlaceShape } from '../../core/polyomino/placement';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import {
@@ -40,6 +41,8 @@ const COLORS = {
 export interface JuggleBoardRenderOptions {
   /** When false, suppress selectable chrome and activate handlers (AI seat). */
   allowInput?: boolean;
+  /** Live game state — used to grey out dice/shapes that cannot fit. */
+  state?: JuggleState;
 }
 
 /**
@@ -183,7 +186,10 @@ export function renderDice(
       label.className = 'juggle-die-label';
       label.textContent = getCategoryName(category);
 
-      if (phase === 'selectingShape' && allowInput) {
+      const placeable =
+        !options.state || canPlaceAnyShapeForDie(options.state, dice[i]);
+
+      if (phase === 'selectingShape' && allowInput && placeable) {
         die.classList.add('selectable');
         die.setAttribute('role', 'button');
         die.tabIndex = 0;
@@ -195,10 +201,15 @@ export function renderDice(
         die.addEventListener('click', activate);
         bindCellActivateKeys(die, activate);
       } else if (phase === 'selectingShape') {
+        if (!placeable) {
+          die.classList.add('disabled');
+        }
         die.setAttribute('aria-disabled', 'true');
         die.setAttribute(
           'aria-label',
-          `${getCategoryName(category)} die, not selectable`
+          placeable
+            ? `${getCategoryName(category)} die, not selectable`
+            : `${getCategoryName(category)} die, no fit on your board`
         );
       }
 
@@ -218,6 +229,28 @@ export function renderDice(
       container.appendChild(hint);
     }
   }
+
+  return container;
+}
+
+/**
+ * Pass Turn control when the current roll cannot be placed.
+ */
+export function renderPassControls(onPass: () => void): HTMLElement {
+  const container = document.createElement('div');
+  container.className = 'juggle-pass-area';
+
+  const message = document.createElement('div');
+  message.className = 'juggle-no-moves';
+  message.textContent = 'No shape from these dice fits your board.';
+  container.appendChild(message);
+
+  const passBtn = document.createElement('button');
+  passBtn.className = 'juggle-pass-btn';
+  passBtn.type = 'button';
+  passBtn.textContent = 'Pass Turn';
+  passBtn.addEventListener('click', onPass);
+  container.appendChild(passBtn);
 
   return container;
 }
@@ -254,9 +287,15 @@ export function renderShapeSelector(
   const list = document.createElement('div');
   list.className = 'juggle-shape-list';
 
+  const board = state.boards[state.currentPlayer];
+
   for (const shape of shapes) {
+    const fits = canPlaceShape(board, shape);
     const option = document.createElement('div');
     option.className = 'juggle-shape-option';
+    if (!fits) {
+      option.classList.add('disabled');
+    }
     option.appendChild(renderShapePreview(shape, 0, false));
 
     const name = document.createElement('span');
@@ -264,7 +303,7 @@ export function renderShapeSelector(
     name.textContent = shape.name;
     option.appendChild(name);
 
-    if (allowInput) {
+    if (allowInput && fits) {
       option.setAttribute('role', 'button');
       option.tabIndex = 0;
       option.setAttribute('aria-label', `${shape.name}, selectable`);
@@ -274,7 +313,10 @@ export function renderShapeSelector(
     } else {
       option.classList.add('disabled');
       option.setAttribute('aria-disabled', 'true');
-      option.setAttribute('aria-label', `${shape.name}, not selectable`);
+      option.setAttribute(
+        'aria-label',
+        fits ? `${shape.name}, not selectable` : `${shape.name}, will not fit`
+      );
     }
     list.appendChild(option);
   }
@@ -529,6 +571,44 @@ export function injectJuggleStyles(): void {
       box-shadow: 0 4px 12px rgba(245, 124, 0, 0.4);
     }
 
+    .juggle-die.disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.4);
+    }
+
+    .juggle-pass-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem;
+    }
+
+    .juggle-no-moves {
+      text-align: center;
+      color: #666;
+      font-size: 0.95rem;
+      max-width: 28rem;
+    }
+
+    .juggle-pass-btn {
+      padding: 0.75rem 1.5rem;
+      min-height: 44px;
+      min-width: 44px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      background: #607d8b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .juggle-pass-btn:hover {
+      background: #546e7a;
+    }
+
     .juggle-die-label {
       font-size: 0.75rem;
       color: #666;
@@ -660,35 +740,6 @@ export function injectJuggleStyles(): void {
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
-    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
-    @media (pointer: coarse) {
-      .juggle-cell {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-      }
-
-      .juggle-grid {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        max-width: 100%;
-      }
-
-      .juggle-roll-btn,
-      .juggle-control-btn,
-      .juggle-shape-option {
-        min-height: 44px;
-      }
-
-      .juggle-die {
-        width: 60px;
-        height: 60px;
-        min-width: 44px;
-        min-height: 44px;
-      }
-    }
-
     @media (prefers-reduced-motion: reduce) {
       .juggle-board,
       .juggle-cell,
@@ -696,6 +747,7 @@ export function injectJuggleStyles(): void {
       .juggle-roll-btn,
       .juggle-shape-option,
       .juggle-control-btn,
+      .juggle-pass-btn,
       .juggle-winner-banner {
         transition: none;
         animation: none !important;
@@ -712,7 +764,10 @@ export function injectJuggleStyles(): void {
         flex-direction: column;
         align-items: center;
       }
+    }
 
+    /* Fine-pointer narrow screens may shrink cells; coarse always keeps 44px. */
+    @media (max-width: 700px) and (pointer: fine) {
       .juggle-cell {
         width: 24px;
         height: 24px;
@@ -721,12 +776,33 @@ export function injectJuggleStyles(): void {
       }
     }
 
-    @media (max-width: 700px) and (pointer: coarse) {
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets last. */
+    @media (pointer: coarse) {
       .juggle-cell {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        min-height: 36px;
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .juggle-grid {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+      }
+
+      .juggle-roll-btn,
+      .juggle-control-btn,
+      .juggle-shape-option,
+      .juggle-pass-btn {
+        min-height: 44px;
+      }
+
+      .juggle-die {
+        width: 60px;
+        height: 60px;
+        min-width: 44px;
+        min-height: 44px;
       }
     }
   `;

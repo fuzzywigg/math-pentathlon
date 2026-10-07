@@ -83,9 +83,11 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
   const dieValue = state.currentDice[dieIndex];
   const category = getCategoryFromDie(dieValue);
   const shapes = getShapesForDie(dieValue);
+  const board = state.boards[state.currentPlayer];
 
-  // Auto-select first shape if only one option
-  const autoShape = shapes.length === 1 ? shapes[0] : null;
+  // Auto-select only when the single option actually fits (avoids place soft-lock).
+  const autoShape =
+    shapes.length === 1 && canPlaceShape(board, shapes[0]) ? shapes[0] : null;
 
   return {
     ...state,
@@ -105,6 +107,11 @@ export function selectShape(
   shape: PolyominoShape
 ): JuggleState {
   if (state.phase !== 'selectingShape' || !state.selectedCategory) return state;
+
+  // Refuse shapes that cannot fit in any orientation (soft-lock guard).
+  if (!canPlaceShape(state.boards[state.currentPlayer], shape)) {
+    return state;
+  }
 
   return {
     ...state,
@@ -209,11 +216,17 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
     state.currentPlayer === 'player1' ? 1 : 2
   );
 
+  // Record the die that matches the selected category (prefer first match).
+  const chosenDie =
+    state.currentDice.find(
+      (d) => getCategoryFromDie(d) === state.selectedCategory
+    ) ?? state.currentDice[0];
+
   // Record the move
   const move: JuggleMove = {
     player: state.currentPlayer,
     dice: state.currentDice,
-    chosenDie: state.currentDice[0], // Simplified
+    chosenDie,
     shapeId: state.selectedShape.id,
     position,
     rotation: state.selectedRotation,
@@ -283,6 +296,77 @@ export function canMakeAnyMove(state: JuggleState): boolean {
   }
 
   return false;
+}
+
+/**
+ * True when any orientation of the currently selected shape fits the board.
+ */
+export function canPlaceSelectedShape(state: JuggleState): boolean {
+  if (!state.selectedShape || state.phase !== 'placing') return false;
+  return canPlaceShape(state.boards[state.currentPlayer], state.selectedShape);
+}
+
+/**
+ * True when at least one shape for this die value fits the current player's board.
+ */
+export function canPlaceAnyShapeForDie(
+  state: JuggleState,
+  dieValue: number
+): boolean {
+  const board = state.boards[state.currentPlayer];
+  for (const shape of getShapesForDie(dieValue)) {
+    if (canPlaceShape(board, shape)) return true;
+  }
+  return false;
+}
+
+/**
+ * True when the human/AI seat should be offered Pass (or auto-pass).
+ * Does not invent a new win condition — only detects an unplaceable roll.
+ */
+export function shouldOfferPass(state: JuggleState): boolean {
+  if (state.phase === 'gameOver' || state.winner) return false;
+  if (state.phase === 'rolling' || !state.currentDice) return false;
+  return !canMakeAnyMove(state);
+}
+
+/**
+ * Pass the turn when the current dice cannot be placed on this seat's board.
+ * Does not change win/scoring rules — only recovers from a jammed seat.
+ */
+export function passTurn(state: JuggleState): JuggleState {
+  if (!shouldOfferPass(state)) return state;
+
+  return {
+    ...state,
+    currentPlayer: getOpponent(state.currentPlayer),
+    currentDice: null,
+    selectedCategory: null,
+    selectedShape: null,
+    selectedRotation: 0,
+    selectedFlipped: false,
+    hoverPosition: null,
+    phase: 'rolling',
+  };
+}
+
+/**
+ * Return from placing to shape select when the selected piece will not fit
+ * but another shape in the same category might (escape without forfeiting).
+ */
+export function clearSelectedShape(state: JuggleState): JuggleState {
+  if (state.phase !== 'placing' || !state.selectedCategory) return state;
+  if (!state.selectedShape) return state;
+  if (canPlaceSelectedShape(state)) return state;
+
+  return {
+    ...state,
+    selectedShape: null,
+    selectedRotation: 0,
+    selectedFlipped: false,
+    hoverPosition: null,
+    phase: 'selectingShape',
+  };
 }
 
 /**

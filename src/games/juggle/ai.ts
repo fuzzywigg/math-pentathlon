@@ -33,6 +33,8 @@ import {
   rotateShape,
   flipShape,
   placeShape,
+  passTurn,
+  shouldOfferPass,
 } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
@@ -245,8 +247,8 @@ function evaluateDiceOptions(
     }
 
     if (!canPlace) {
-      score -= 1000; // Can't place any shape from this category
-      reasons.push('No valid placements available');
+      // Skip unplaceable dice entirely so die choice can return null when jammed.
+      continue;
     }
 
     // Factor 3: Late game - prefer smaller shapes if board is nearly full
@@ -603,6 +605,11 @@ export function executeAITurn(
 ): JuggleState {
   let currentState = state;
 
+  // Jammed roll — pass rather than soft-lock.
+  if (shouldOfferPass(currentState)) {
+    return passTurn(currentState);
+  }
+
   // Phase 1: Select die (if needed)
   if (
     currentState.phase === 'selectingShape' &&
@@ -612,7 +619,9 @@ export function executeAITurn(
     if (dieChoice) {
       currentState = selectDie(currentState, dieChoice.index);
     } else {
-      return currentState; // Can't proceed
+      return shouldOfferPass(currentState)
+        ? passTurn(currentState)
+        : currentState;
     }
   }
 
@@ -625,7 +634,9 @@ export function executeAITurn(
     if (shapeChoice) {
       currentState = selectShape(currentState, shapeChoice.shape);
     } else {
-      return currentState; // Can't proceed
+      return shouldOfferPass(currentState)
+        ? passTurn(currentState)
+        : currentState;
     }
   }
 
@@ -642,6 +653,8 @@ export function executeAITurn(
       }
 
       currentState = placeShape(currentState, placement.position);
+    } else if (shouldOfferPass(currentState)) {
+      return passTurn(currentState);
     }
   }
 
