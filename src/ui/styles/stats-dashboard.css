@@ -165,7 +165,8 @@
   appearance: none;
   border: none;
   border-radius: var(--radius-md);
-  background: var(--color-primary);
+  /* primary-dark (#2563eb) keeps white label ≥4.5:1; plain primary is ~3.7:1 */
+  background: var(--color-primary-dark);
   color: #fff;
   font-weight: 600;
   font-size: 0.95rem;
@@ -178,7 +179,7 @@
 }
 
 .stats-dashboard-cta:hover {
-  background: var(--color-primary-dark);
+  background: #1d4ed8;
   box-shadow: var(--shadow-md);
 }
 
