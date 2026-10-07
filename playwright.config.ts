@@ -1,5 +1,19 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/**
+ * Projects:
+ * - `chromium` — default / required CI path (`npm run test:e2e -- --project=chromium`)
+ * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
+ *
+ * Opt in locally or in CI:
+ *   npm run test:e2e:cross
+ *   npm run test:e2e -- --project=webkit --project=firefox --project=ipad-webkit
+ *   CROSS_BROWSER=1 npm run test:e2e:cross   # same; env documented for CI matrices
+ *
+ * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
+ * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
+ * CI never accidentally pulls in WebKit/Firefox.
+ */
 export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
@@ -23,6 +37,10 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'ipad-webkit',
+      use: { ...devices['iPad Pro 11'] },
     },
   ],
   webServer: {
