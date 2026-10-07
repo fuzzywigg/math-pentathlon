@@ -19,7 +19,7 @@ import {
   normalizeSelectedChipKind,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
-import { applyAIMove, AIDifficulty } from './ai';
+import { applyAIMove, getAIMove, AIDifficulty } from './ai';
 import {
   cancelFiarAiRequests,
   disposeFiarAiWorker,
@@ -49,6 +49,8 @@ let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
+/** True while a worker/sync AI search is in flight — blocks human taps. */
+let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let showStarterBanner = false;
@@ -190,7 +192,9 @@ function renderStatus(): void {
   const playerClass = currentPlayer;
   const name = getPlayerName(currentPlayer);
 
-  if (phase === 'placement') {
+  if (isAIThinking) {
+    statusText = `${name}'s turn: Computer is thinking…`;
+  } else if (phase === 'placement') {
     const inv = gameState.chipInventory[currentPlayer];
     const remaining = chipsRemaining(inv);
     statusText = `${name}'s turn: Place a chip (${remaining} left)`;
@@ -204,7 +208,7 @@ function renderStatus(): void {
 
   statusContainer.innerHTML = `
     ${starterBanner}
-    <div class="fiar-status ${playerClass}">
+    <div class="fiar-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
       ${statusText}
     </div>
     ${renderChipKindPicker()}
@@ -247,6 +251,7 @@ function scheduleAiIfNeeded(): void {
 
 function handleNodeClick(nodeId: string): void {
   if (gameState.winner) return;
+  if (isAIThinking) return;
   if (isAIMode && gameState.currentPlayer === aiPlayer) return;
 
   const { phase, selectedNode } = gameState;
@@ -294,7 +299,17 @@ function handleNodeClick(nodeId: string): void {
 async function aiTurn(): Promise<void> {
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
 
+  // Movement jam: surface Draw immediately — do not leave the seat spinning.
+  if (isDraw(gameState)) {
+    isAIThinking = false;
+    render();
+    return;
+  }
+
   const gen = ++aiGeneration;
+  isAIThinking = true;
+  render();
+
   let aiMove;
   try {
     aiMove = await getAIMoveAsync(gameState, aiPlayer, aiDifficulty);
@@ -302,8 +317,21 @@ async function aiTurn(): Promise<void> {
     aiMove = null;
   }
 
+  // Worker cancel / rare failure: sync search so the human seat is never soft-locked.
+  if (!aiMove && gen === aiGeneration) {
+    try {
+      aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
+    } catch {
+      aiMove = null;
+    }
+  }
+
   if (gen !== aiGeneration) return;
-  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+  isAIThinking = false;
+  if (gameState.winner || gameState.currentPlayer !== aiPlayer) {
+    render();
+    return;
+  }
 
   if (aiMove) {
     gameState = applyAIMove(gameState, aiMove);
@@ -312,6 +340,9 @@ async function aiTurn(): Promise<void> {
     render();
     notifyGameEndIfNeeded();
     // Human's turn next (or game over)
+  } else {
+    // No legal move (draw) or search exhausted — re-render so Draw chrome appears.
+    render();
   }
 }
 
@@ -343,6 +374,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  isAIThinking = false;
   cancelFiarAiRequests();
   disposeFiarAiWorker();
   if (boardContainer) {
@@ -368,6 +400,7 @@ export function whenBoard3dReady(): Promise<void> {
 
 export function newGameVsHuman(): void {
   aiGeneration += 1;
+  isAIThinking = false;
   cancelFiarAiRequests();
   gameState = createInitialState({ starter: 'player1' });
   isAIMode = false;
@@ -386,6 +419,7 @@ export function newGameVsHuman(): void {
  */
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   aiGeneration += 1;
+  isAIThinking = false;
   cancelFiarAiRequests();
   const starter: Player = Math.random() < 0.5 ? 'player1' : 'player2';
   // Human keeps Blue (player1); computer is Red (player2) — random who moves first.

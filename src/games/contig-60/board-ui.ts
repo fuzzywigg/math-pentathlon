@@ -29,13 +29,20 @@ const COLORS = {
   diceBorder: '#f57c00',
 };
 
+export interface ContigBoardRenderOptions {
+  /** When false, suppress placement highlights and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render the game board
  */
 export function renderBoard(
   state: ContigState,
-  onCellClick: (value: number) => void
+  onCellClick: (value: number) => void,
+  options: ContigBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'contig-board';
   markBoardAsGrid(container);
@@ -61,14 +68,16 @@ export function renderBoard(
       cellEl.dataset.col = String(col);
 
       const isValid =
-        validPlacements.has(value) && state.phase === 'calculating';
+        allowInput &&
+        validPlacements.has(value) &&
+        state.phase === 'calculating';
 
       // Apply owner color
       if (cell?.owner === 'player1') {
         cellEl.classList.add('contig-cell-p1');
       } else if (cell?.owner === 'player2') {
         cellEl.classList.add('contig-cell-p2');
-      } else if (validPlacements.has(value)) {
+      } else if (isValid) {
         cellEl.classList.add('contig-cell-valid');
 
         // Show potential points on hover
@@ -351,6 +360,7 @@ export function injectContigStyles(): void {
       flex-direction: column;
       align-items: center;
       padding: 0.75rem;
+      min-height: 44px;
       background: white;
       border: 2px solid #ddd;
       border-radius: 8px;
@@ -395,9 +405,17 @@ export function injectContigStyles(): void {
     }
 
     @media (max-width: 600px) {
+      .contig-board {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+      }
+
       .contig-cell {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
       }
 
       .contig-cell-value {
@@ -412,6 +430,22 @@ export function injectContigStyles(): void {
 
       .contig-expr-list {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      }
+    }
+
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+    @media (pointer: coarse) {
+      .contig-cell {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .contig-board {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
       }
     }
   `;
