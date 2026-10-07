@@ -436,8 +436,8 @@ export function renderStatus(
     // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!"
     const verb = winnerName === 'You' ? 'Win' : 'Wins';
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${verb}! 🎉`;
-  } else if (!state.winner && state.phase === 'gameOver') {
-    turnEl.classList.add('status-winner');
+  } else if (state.phase === 'gameOver') {
+    // Draw / exhaust — keep without status-winner (burn-wave7 contract).
     turnEl.textContent = formatPhaseStatusMessage(state, gameMode);
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 Computer is thinking…';

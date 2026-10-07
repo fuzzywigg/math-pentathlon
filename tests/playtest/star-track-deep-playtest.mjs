@@ -127,8 +127,9 @@ async function playOneGame(page, { viewport, difficulty, index, consoleErrors })
       };
     });
 
+    // Note: do not use a trailing \b after "Win!" — "!" is already non-word.
     if (
-      /\b(You Win!|AI Wins!|Blue Wins!|Red Wins!)\b/i.test(snap.status) ||
+      /(You Win!|AI Wins!|Blue Wins!|Red Wins!)/i.test(snap.status) ||
       /It's a draw!/i.test(snap.status) ||
       /reaches the star/i.test(snap.winner) ||
       /draw — chains exhausted/i.test(snap.winner)
