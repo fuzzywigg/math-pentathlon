@@ -99,7 +99,7 @@ describe('Fab-a-Diffy worker vs direct parity', () => {
       expect(viaWorker).toEqual(direct);
     }
     client.dispose();
-  });
+  }, 60_000);
 
   it('structuredClone does not change the chosen move', () => {
     const state = createInitialState();

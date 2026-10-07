@@ -18,6 +18,7 @@ const isolatedFiles = [
   // Hoisted router.navigate mock must not share a graph with files that call
   // restoreAllMocks under isolate:false shuffle.
   'tests/unit/burn-wave24-stats-selector-ui.test.ts',
+  'tests/unit/keyboard-a11y-game-selector.test.ts',
   // Module-level bench accumulator + summarize it() is order-dependent under
   // --sequence.shuffle; isolate + afterAll summary keeps it deterministic.
   'tests/unit/tablet-ai-hard-latency.bench.test.ts',
