@@ -2,7 +2,7 @@
 
 Docs-only rehearsal note. **No merges, closes, retargets, or pushes to existing PR branches from this inventory agent.** Confirmed tip: **#477** (`cursor/integration-fold-wave5-tip-4af0`).
 
-Snapshot: 2026-10-07 later UTC · `alpha` @ `eec2b32` (`#413`+`#414` merged) · tip = wave5 (synced + `#491`) · open drafts classified below.
+Snapshot: 2026-10-07 later UTC · `alpha` @ `eec2b32` (`#413`+`#414` merged) · tip = wave5 (synced + `#491`–`#498` queue) · open drafts classified below.
 
 ---
 
@@ -68,7 +68,7 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491`
+`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491` `#493` `#494` `#495` `#496` `#497` `#498`
 
 Already on `alpha` (close as merged/superseded): **#413**, **#414**.
 
@@ -91,5 +91,5 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 
 ## What this agent did / did not do
 
-- Did: fold wave-5 candidates onto tip (including `#486` mobile-touch + `#489` load-perf + `#490` mp3d canvas-ready + `#491` keyboard a11y), merge `origin/alpha` after `#413`+`#414` landed (prefer tip folds; keep hex Hard **450ms** + CI security), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/Playwright e2e.
+- Did: fold wave-5 candidates onto tip (including `#486`/`#489`/`#490`/`#491`/`#494`/`#495`/`#493`/`#496`/`#498`/`#497`), merge `origin/alpha` after `#413`+`#414` landed (prefer tip folds; keep hex Hard **450ms** + CI security), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/Playwright e2e.
 - Did **not**: merge/close/retarget any existing PR from the agent; change game rules or scoring; commit secrets.
