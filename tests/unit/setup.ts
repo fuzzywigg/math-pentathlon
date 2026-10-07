@@ -11,11 +11,27 @@ import { storage } from '../../src/core/storage';
  *
  * Do not call vi.restoreAllMocks() here — it tears down hoisted vi.mock factories
  * (e.g. router.navigate) across the shared module graph.
+ *
+ * Do call vi.unstubAllGlobals() — stubGlobal('requestAnimationFrame') / matchMedia
+ * leaks otherwise, and animateMove / dice RAF tests hang under shuffle.
+ *
+ * Also restore performance.now when a prior file left a spy (clearAllMocks does
+ * not remove mock implementations; a stuck now ahead of RAF timestamps infinite-
+ * loops animateMove).
  */
 type MutableOwl = { messages: unknown[] };
 
 const owlInternal = owlMessages as unknown as MutableOwl;
 const stockOwlMessages = owlInternal.messages.slice();
+
+function restorePerformanceNow(): void {
+  const nowFn = performance.now as unknown as {
+    mockRestore?: () => void;
+  };
+  if (typeof nowFn.mockRestore === 'function') {
+    nowFn.mockRestore();
+  }
+}
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -41,5 +57,7 @@ afterEach(() => {
   owlInternal.messages.length = 0;
   owlInternal.messages.push(...stockOwlMessages);
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
   vi.useRealTimers();
+  restorePerformanceNow();
 });

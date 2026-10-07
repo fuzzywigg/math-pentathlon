@@ -20,6 +20,9 @@ const isolatedFiles = [
 export default defineConfig({
   test: {
     coverage,
+    // stack: file afterEach runs before setupFiles afterEach, so shared cleanup
+    // is the last safety net for timers / stubs under isolate:false shuffle.
+    sequence: { hooks: 'stack' },
     projects: [
       {
         test: {

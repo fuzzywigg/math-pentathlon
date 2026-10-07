@@ -1,8 +1,13 @@
 /**
  * Wave 40 — graph UI legend / valid moves / animate leftovers after #176.
  * Tests-only.
+ *
+ * animateMove is RAF + performance.now driven. Under isolate:false shuffle,
+ * a prior file can leave fake timers or a performance.now spy that makes
+ * wall-clock awaits hang until testTimeout. Drive the clock deterministically
+ * (same pattern as burn-wave33 / overnight-wave57 graph animate tests).
  */
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import {
   createCircularGraph,
@@ -14,10 +19,30 @@ import {
 } from '../../src/core/graph';
 import type { GraphBoard } from '../../src/core/graph';
 
+afterEach(() => {
+  document.body.innerHTML = '';
+  document.getElementById('graph-styles')?.remove();
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+});
+
+function stubRafClock(): void {
+  vi.useFakeTimers();
+  let now = 0;
+  vi.spyOn(performance, 'now').mockImplementation(() => now);
+  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+    return setTimeout(() => {
+      now += 16;
+      cb(now);
+    }, 16) as unknown as number;
+  });
+}
+
 describe('Wave 40 graph UI — legend / valids / animate', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
-    document.head.innerHTML = '';
+    document.getElementById('graph-styles')?.remove();
   });
 
   it('createGraphLegend has empty + player labels', () => {
@@ -29,6 +54,7 @@ describe('Wave 40 graph UI — legend / valids / animate', () => {
   });
 
   it('showValidMoves marks neighbors; animateMove settles short path', async () => {
+    stubRafClock();
     injectGraphStyles();
     const graph = createCircularGraph(4, 40);
     const svg = renderGraph(graph);
@@ -39,6 +65,9 @@ describe('Wave 40 graph UI — legend / valids / animate', () => {
       svg.querySelectorAll('circle[data-node-id]')
     ).filter((el) => el.getAttribute('stroke-dasharray'));
     expect(stroked.length).toBeGreaterThan(0);
-    await animateMove(svg, ['n0', 'n1'], graph, 20);
+    const done = animateMove(svg, ['n0', 'n1'], graph, 20);
+    await vi.advanceTimersByTimeAsync(500);
+    await expect(done).resolves.toBeUndefined();
+    expect(svg.querySelectorAll('circle[fill="#ff9800"]')).toHaveLength(0);
   });
 });
