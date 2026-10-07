@@ -153,9 +153,15 @@ function render(): void {
   }
 }
 
-// Trigger invalid click animation on a cell
+// Trigger invalid click animation on a cell (skipped when reduced motion)
 function triggerInvalidAnimation(row: number, col: number): void {
   if (!boardContainer) return;
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    return;
+  }
 
   const cell = boardContainer.querySelector(
     `.cell[data-row="${row}"][data-col="${col}"]`
@@ -242,7 +248,9 @@ async function executeAITurn(): Promise<void> {
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
 
   if (!aiMove) {
-    // AI has no valid moves (shouldn't happen if game logic is correct)
+    // No legal king move — re-render so game-over / trap chrome can paint.
+    // (Rules already end the game when a seat is trapped; this clears the
+    // thinking spinner if search returns null for any reason.)
     isAIThinking = false;
     render();
     return;
