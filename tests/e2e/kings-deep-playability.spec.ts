@@ -92,15 +92,14 @@ test.describe('Kings deep playability', () => {
     await expect(page.locator('.status-ai-thinking')).toBeVisible({
       timeout: 2000,
     });
-    // AI think delays are compressed in this harness — the AI may finish between
-    // histBefore and the lock assert. Only require history freeze while thinking
-    // is still visible (human clicks must not append entries under the lock).
-    const histBefore = await page.locator('.move-history-entry').count();
+    // Input lock: human clicks during AI think must not append 🔵 entries.
+    // AI may still append 🟣 history while the thinking chrome is up (especially
+    // with compressed setTimeout in this harness), so do not freeze total count.
+    const humanHist = page.locator('.move-history-entry').filter({ hasText: '🔵' });
+    const humanBefore = await humanHist.count();
     await page.locator('.cell').nth(4).click({ force: true });
     await page.locator('.cell-king.cell-p1').click({ force: true }).catch(() => {});
-    if (await page.locator('.status-ai-thinking').isVisible()) {
-      expect(await page.locator('.move-history-entry').count()).toBe(histBefore);
-    }
+    expect(await humanHist.count()).toBe(humanBefore);
 
     await expect(page.locator('.status-ai-thinking')).toBeHidden({
       timeout: 10_000,
