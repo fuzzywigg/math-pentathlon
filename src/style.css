@@ -2820,6 +2820,46 @@ h1 {
   }
 }
 
+/*
+ * Coarse pointers: keep Hex cells ≥44 CSS px.
+ * board-ui hexRadius=22 → pointy-top height 44 SVG units; viewBox ~690×454.
+ * Pin display width so scale≈1 and allow horizontal scroll on narrow viewports.
+ */
+@media (pointer: coarse) {
+  .hex-game-area {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    align-items: stretch;
+  }
+
+  .hex-board {
+    min-width: 690px;
+    width: 690px;
+    max-width: none;
+    max-height: none;
+    height: auto;
+  }
+}
+
+/* Hex board glow / place motion — local block (avoids shared EOF RM edits) */
+@media (prefers-reduced-motion: reduce) {
+  .hex-cell-p1,
+  .hex-cell-p2,
+  .hex-cell-winning {
+    animation: none !important;
+  }
+
+  .hex-cell-empty:hover {
+    transform: none;
+  }
+
+  .hex-cell-winning {
+    /* Keep a static gold highlight; skip the pulsing glow */
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+  }
+}
+
 /* =====================================================
    STAR TRACK GAME STYLES
    ===================================================== */
