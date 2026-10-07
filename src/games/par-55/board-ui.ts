@@ -517,6 +517,7 @@ export function injectPar55Styles(): void {
       gap: 1rem;
       padding: 1rem;
       width: 100%;
+      max-width: 100%;
       box-sizing: border-box;
     }
 
@@ -533,10 +534,14 @@ export function injectPar55Styles(): void {
       padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .par55-svg {
       display: block;
+      max-width: 100%;
+      height: auto;
     }
 
     .par55-valid-base {
@@ -773,15 +778,35 @@ export function injectPar55Styles(): void {
     }
 
     @media (max-width: 768px) {
+      /* Keep fold-wave2 phone smoke: no document horizontal scroll.
+         Desktop still uses the widen/visible rule above. */
+      #app:has(.par55-board),
+      #app:has(.par55-game-area) {
+        max-width: 100%;
+        overflow-x: clip;
+      }
+
       .par55-main-layout {
         flex-direction: column;
         align-items: center;
+        width: 100%;
       }
 
       .par55-hand {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .par55-scores {
+        max-width: 100%;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
       }
     }
 
