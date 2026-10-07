@@ -36,18 +36,25 @@ const BLOCK_COLORS: Record<BlockColor, string> = {
 const BASE_SIZE = 50; // Size of each pentagon base
 const BLOCK_SIZE = 36; // Size of block shape
 
+export interface Par55BoardRenderOptions {
+  /** When false, suppress placement highlights and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 /**
  * Render the game board
  */
 export function renderBoard(
   state: Par55State,
-  onBaseClick: (baseId: string) => void
+  onBaseClick: (baseId: string) => void,
+  options: Par55BoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'par55-board';
 
   const validPlacements =
-    state.phase === 'placingBlock'
+    allowInput && state.phase === 'placingBlock'
       ? new Set(getValidPlacements(state))
       : new Set<string>();
 
@@ -321,14 +328,17 @@ function renderBlock(
 export function renderHand(
   state: Par55State,
   player: Player,
-  onBlockClick: (blockId: string) => void
+  onBlockClick: (blockId: string) => void,
+  options: Par55BoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = `par55-hand par55-hand-${player}`;
 
   const hand = state.hands[player];
   const isCurrentPlayer = state.currentPlayer === player;
-  const canSelect = isCurrentPlayer && state.phase === 'selectingBlock';
+  const canSelect =
+    allowInput && isCurrentPlayer && state.phase === 'selectingBlock';
 
   for (const block of hand) {
     const blockEl = renderHandBlock(

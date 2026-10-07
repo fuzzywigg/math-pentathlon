@@ -12,7 +12,7 @@ import {
   getSupply,
 } from './game-state';
 import { getOpponent } from './rules';
-import { seatIcon } from '../../ui/player-colors';
+import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -24,6 +24,14 @@ import {
   markStatusLive,
   type BoardFocusable,
 } from '../../ui/board-a11y';
+
+/** True when vs-AI chrome is on and it is the computer's seat to act. */
+function isComputerSeatTurn(state: GameState): boolean {
+  const root = getGameModeChromeRoot();
+  if (root?.dataset.opponent !== 'ai') return false;
+  const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
+  return state.currentPlayer === aiSeat;
+}
 
 // Click handler callback type
 export type CellClickCallback = (row: number, col: number) => void;
@@ -166,7 +174,11 @@ function syncKingsCell(
     cell.classList.add('cell-selected');
   }
 
+  // Omit actionable targets on the AI seat (Hex #383 / aria honesty).
+  const announceTargets = !isComputerSeatTurn(state);
+
   const isValidMoveTarget =
+    announceTargets &&
     !!state.selectedKingPosition &&
     state.turnPhase === 'moveKing' &&
     isValidMove(state, { row, col });
@@ -175,7 +187,8 @@ function syncKingsCell(
     cell.classList.add('cell-valid-move');
   }
 
-  const isPlacementTarget = isValidPlacement(state, { row, col });
+  const isPlacementTarget =
+    announceTargets && isValidPlacement(state, { row, col });
 
   if (isPlacementTarget) {
     cell.classList.add('cell-valid-placement');

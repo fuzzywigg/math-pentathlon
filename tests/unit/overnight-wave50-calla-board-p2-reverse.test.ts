@@ -8,13 +8,15 @@ import { renderBoard } from '../../src/games/calla/board-ui';
 describe('Overnight wave50 calla — p2 reverse indices', () => {
   it('DOM-orders P2 pits as 4,3,2,1,0 and P1 as 0..4', () => {
     const el = document.createElement('div');
+    // Pass a handler so valid-move chrome is armed (omitted handler = AI-seat honesty).
     renderBoard(
       {
         ...createInitialState(),
         currentPlayer: 'player2',
         player2Pits: [1, 2, 3, 4, 5],
       },
-      el
+      el,
+      () => undefined
     );
     const p2 = [
       ...el.querySelectorAll('.calla-pit[data-side="player2"]'),

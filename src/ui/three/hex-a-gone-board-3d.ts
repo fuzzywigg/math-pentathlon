@@ -2,7 +2,8 @@
  * Three.js tilted-tabletop 3D board for Hex-a-Gone!
  *
  * Tablet-friendly vs Kings #352:
- * - antialias off, pixelRatio capped at 1.5
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - preserveDrawingBuffer gated; pause paints while the tab is hidden
  * - render-on-demand (no continuous RAF)
  * - full-size host
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
@@ -17,6 +18,12 @@ import { BLOCK_COLORS } from '../../games/hex-a-gone/types';
 import { getValidPlacements } from '../../games/hex-a-gone/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 import {
   createHexAGonePieceGeometries,
   disposeHexAGonePieceGeometries,
@@ -104,6 +111,7 @@ export async function createHexAGoneBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     const gl =
       typeof renderer.getContext === 'function'
@@ -121,7 +129,9 @@ export async function createHexAGoneBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'hex-a-gone');
@@ -222,7 +232,7 @@ export async function createHexAGoneBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -315,6 +325,9 @@ export async function createHexAGoneBoard3D(
   };
 
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
@@ -510,6 +523,7 @@ export async function createHexAGoneBoard3D(
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    unbindVisibility();
     canvas.removeEventListener('pointerup', onPointerUp);
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);

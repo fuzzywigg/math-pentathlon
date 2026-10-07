@@ -12,7 +12,7 @@ afterEach(() => {
 });
 
 describe('Wave 55 fab — vsAI timer', () => {
-  it('schedules AI turn after 800ms when seat is player2', () => {
+  it('schedules AI turn after 800ms when seat is player2', async () => {
     vi.useFakeTimers();
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const container = document.createElement('div');
@@ -26,7 +26,10 @@ describe('Wave 55 fab — vsAI timer', () => {
     const beforeSeat = ctrl.state.currentPlayer;
     ctrl.update();
 
-    vi.advanceTimersByTime(800);
+    await vi.advanceTimersByTimeAsync(800);
+    // Worker path resolves on microtasks; sync fallback still needs a flush.
+    await Promise.resolve();
+    await Promise.resolve();
     // AI either claims (history grows / seat flips) or passes (seat flips)
     expect(
       ctrl.state.moveHistory.length > beforeHistory ||

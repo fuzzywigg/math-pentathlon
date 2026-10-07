@@ -8,6 +8,8 @@ import {
   selectBlockForPlacement,
   placeBlock,
   isGameOver,
+  passTurn,
+  getValidPlacements,
 } from './rules';
 import { renderBoard, renderStatus, buildSelectionArea } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
@@ -208,6 +210,53 @@ function handleCellClick(q: number, r: number): void {
   }
 }
 
+function notifyHexAGoneEndIfNeeded(): void {
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    owlSystem.onGameEnd('hex-a-gone', {
+      winner: gameState.winner,
+      moveCount,
+    });
+  }
+}
+
+/**
+ * When the AI seat cannot select or place, settle with existing pass / end
+ * rules so vs-AI never soft-locks on player2.
+ */
+function settleAIStuck(): void {
+  const boardFull = !gameState.board.some((cell) => !cell.filled);
+
+  if (gameState.phase === 'placeBlocks' && boardFull) {
+    // Same outcome as placeBlock when the opponent cannot move after a fill.
+    gameState = {
+      ...gameState,
+      phase: 'gameOver',
+      winner: gameState.currentPlayer,
+      turnSelection: { blocks: [], committed: false },
+      selectedBlockForPlacement: null,
+    };
+  } else {
+    // Clear any leftover selection so passTurn can flip / mutual-stuck settle.
+    if (
+      gameState.phase === 'placeBlocks' ||
+      gameState.turnSelection.blocks.length > 0
+    ) {
+      gameState = {
+        ...gameState,
+        phase: 'selectBlocks',
+        turnSelection: { blocks: [], committed: false },
+        selectedBlockForPlacement: null,
+      };
+    }
+    gameState = passTurn(gameState);
+  }
+
+  notifyHexAGoneEndIfNeeded();
+  isAIThinking = false;
+  render();
+}
+
 // AI turn logic
 function triggerAITurn(): void {
   isAIThinking = true;
@@ -219,8 +268,8 @@ function triggerAITurn(): void {
       const selection = getAISelection(gameState, 'player2', aiDifficulty);
 
       if (!selection || selection.blocks.length === 0) {
-        isAIThinking = false;
-        render();
+        // Empty bank / no legal selection — pass so human is not soft-locked.
+        settleAIStuck();
         return;
       }
 
@@ -247,26 +296,23 @@ function triggerAITurn(): void {
         return;
       }
 
-      const placement = getAIPlacement(gameState, 'player2', aiDifficulty);
+      let placement = getAIPlacement(gameState, 'player2', aiDifficulty);
 
+      // Defensive: if search returns null but cells remain, place the first valid.
       if (!placement) {
-        isAIThinking = false;
-        render();
-        return;
+        const valids = getValidPlacements(gameState);
+        if (valids.length > 0) {
+          placement = valids[0]!;
+        } else {
+          settleAIStuck();
+          return;
+        }
       }
 
       gameState = placeBlock(gameState, placement.q, placement.r);
       moveCount++;
       render();
-
-      // Check for game end
-      if (gameState.winner && !hasNotifiedGameEnd) {
-        hasNotifiedGameEnd = true;
-        owlSystem.onGameEnd('hex-a-gone', {
-          winner: gameState.winner,
-          moveCount,
-        });
-      }
+      notifyHexAGoneEndIfNeeded();
 
       // Continue placing if more blocks to place
       if (
@@ -295,10 +341,14 @@ function render(): void {
     if (board3dEnabled && board3d && board3dHost && selectionHost) {
       board3d.update(gameState, onCell);
       selectionHost.replaceChildren(
-        buildSelectionArea(gameState, onBlock, onConfirm)
+        buildSelectionArea(gameState, onBlock, onConfirm, {
+          interactive: canInteract,
+        })
       );
     } else if (!board3dEnabled) {
-      renderBoard(gameState, boardContainer, onCell, onBlock, onConfirm);
+      renderBoard(gameState, boardContainer, onCell, onBlock, onConfirm, {
+        interactive: canInteract,
+      });
     }
     // If 3D enabled but still loading, skip board paint until ready.
   }

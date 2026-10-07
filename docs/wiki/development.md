@@ -36,6 +36,13 @@ Workflows under `.github/workflows/`:
 - **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
+### Menu shell / offline load notes
+
+- Games and demos are dynamic-imported; Three.js stays under `dist/vendor/`.
+- `vite.shell-chunks.ts` keeps game-only core (dice/fractions/…) and owl off the menu `modulepreload` graph so cheap tablets download less before first paint.
+- PWA Workbox still precaches the full build after the first online visit (`src/pwa/register.ts`).
+- After first paint, `bootstrapOwl` + `scheduleIdleGameWarm` warm the mascot and a couple of popular game chunks on idle (skipped when Save-Data / hidden).
+
 ### Unit job runtime
 
 The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to roughly 2.7k keepers (handwritten + behavioral TOKENMAXX + FIAR leave-alone). Healthy GitHub Actions unit runs should finish in about **under 5 minutes**.

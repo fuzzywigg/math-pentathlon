@@ -1,5 +1,7 @@
 /** Small loading / error UI shown while a game chunk is fetched. */
 
+import { gameLoadErrorHint } from './offline';
+
 export function renderGameLoading(
   container: HTMLElement,
   gameName: string
@@ -16,12 +18,14 @@ export function renderGameLoadError(
   container: HTMLElement,
   gameName: string,
   onRetry: () => void,
-  onHome: () => void
+  onHome: () => void,
+  options: { offline?: boolean } = {}
 ): void {
+  const hint = gameLoadErrorHint(options.offline);
   container.innerHTML = `
     <div class="game-loading game-loading-error" role="alert" data-testid="game-load-error">
       <p class="game-loading-text">Could not load ${escapeHtml(gameName)}.</p>
-      <p class="game-loading-hint">Check your connection, then try again.</p>
+      <p class="game-loading-hint" data-testid="game-load-error-hint">${escapeHtml(hint)}</p>
       <div class="game-loading-actions">
         <button type="button" class="btn btn-primary" data-action="retry">Try again</button>
         <button type="button" class="btn btn-secondary" data-action="home">Back to games</button>

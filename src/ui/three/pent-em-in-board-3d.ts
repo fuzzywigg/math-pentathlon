@@ -2,7 +2,8 @@
  * Three.js tilted-tabletop 3D board for Pent'Em In.
  *
  * Tablet-friendly vs Kings #352 (aligned with FIAR draft patterns):
- * - antialias off, pixelRatio capped at 1.5
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - preserveDrawingBuffer gated; pause paints while the tab is hidden
  * - render-on-demand (no continuous RAF)
  * - full-size host (no fixed 450px cap)
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
@@ -30,6 +31,12 @@ import {
   restoreGridFocus,
 } from '../board-a11y';
 import { loadThree, type ThreeModule } from './load-three';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 
 export type CellClickCallback = (cell: Cell) => void;
 export type CellHoverCallback = (cell: Cell | null) => void;
@@ -117,6 +124,7 @@ export async function createPentEmInBoard3D(
       alpha: false,
       powerPreference: 'low-power',
       failIfMajorPerformanceCaveat: false,
+      preserveDrawingBuffer: shouldPreserveDrawingBuffer(),
     });
     const gl =
       typeof renderer.getContext === 'function'
@@ -134,7 +142,9 @@ export async function createPentEmInBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'pent-em-in');
@@ -237,7 +247,7 @@ export async function createPentEmInBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -298,6 +308,9 @@ export async function createPentEmInBoard3D(
   };
 
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
@@ -512,6 +525,7 @@ export async function createPentEmInBoard3D(
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    unbindVisibility();
     canvas.removeEventListener('pointerup', onPointerUp);
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);

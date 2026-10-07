@@ -2,7 +2,8 @@
  * Three.js tilted-tabletop 3D board for Prime Gold.
  *
  * Tablet-friendly (vs Kings #352 weak spots; FIAR #359 patterns as reference):
- * - antialias off, pixelRatio capped at 1.5
+ * - antialias off, pixelRatio capped at TABLET_PIXEL_RATIO_CAP
+ * - preserveDrawingBuffer gated; pause paints while the tab is hidden
  * - render-on-demand (no continuous RAF)
  * - size to available width/height
  * - throws when WebGL is unavailable so the controller can keep 2D
@@ -19,7 +20,12 @@ import {
 } from '../../games/prime-gold/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { loadThree, type ThreeModule } from './load-three';
-import { shouldPreserveDrawingBuffer } from './tablet-gl';
+import {
+  TABLET_PIXEL_RATIO_CAP,
+  bindPageVisibility,
+  canPaint3d,
+  shouldPreserveDrawingBuffer,
+} from './tablet-gl';
 
 export type PrimeGoldCellClickCallback = (value: number, expr: string) => void;
 
@@ -199,7 +205,9 @@ export async function createPrimeGoldBoard3D(
     );
   }
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(
+    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
+  );
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'prime-gold');
@@ -294,7 +302,7 @@ export async function createPrimeGoldBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed) return;
+    if (disposed || !canPaint3d()) return;
     renderer.render(scene, camera);
   };
 
@@ -561,6 +569,9 @@ export async function createPrimeGoldBoard3D(
   };
 
   const onResize = (): void => resize();
+  const unbindVisibility = bindPageVisibility({
+    onVisible: () => paint(),
+  });
   canvas.addEventListener('pointerup', onPointer);
   canvas.addEventListener('webglcontextlost', onContextLost, false);
   window.addEventListener('resize', onResize);
@@ -609,6 +620,7 @@ export async function createPrimeGoldBoard3D(
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    unbindVisibility();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);

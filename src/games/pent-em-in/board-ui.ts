@@ -33,11 +33,18 @@ function playerColors() {
 // Board Rendering
 // =============================================================================
 
+export interface PentEmInBoardRenderOptions {
+  /** When false, suppress placement/selectable chrome and activate handlers (AI seat). */
+  allowInput?: boolean;
+}
+
 export function renderBoard(
   state: PentEmInState,
   onCellClick: (cell: Cell) => void,
-  onCellHover: (cell: Cell | null) => void
+  onCellHover: (cell: Cell | null) => void,
+  options: PentEmInBoardRenderOptions = {}
 ): SVGElement {
+  const allowInput = options.allowInput !== false;
   const width = BOARD_SIZE * CELL_SIZE + BOARD_PADDING * 2;
   const height = BOARD_SIZE * CELL_SIZE + BOARD_PADDING * 2;
 
@@ -138,8 +145,8 @@ export function renderBoard(
   }
   svg.appendChild(piecesGroup);
 
-  // Preview (if placing)
-  if (state.selectedPiece && state.previewPosition) {
+  // Preview (if placing) — suppress during computer seat
+  if (allowInput && state.selectedPiece && state.previewPosition) {
     const previewCells = getPieceCells(
       state.selectedPiece,
       state.previewPosition,
@@ -218,7 +225,9 @@ export function renderBoard(
       rect.setAttribute('fill', 'transparent');
       rect.setAttribute('data-row', String(row));
       rect.setAttribute('data-col', String(col));
-      rect.style.cursor = 'pointer';
+      // Keep pointer cursor on human turns (legacy overnight aria tests);
+      // only flatten during the computer seat.
+      rect.style.cursor = allowInput ? 'pointer' : 'default';
 
       const occupant = occupancy.get(`${row},${col}`) ?? null;
       const owner =
@@ -233,15 +242,18 @@ export function renderBoard(
           coord: `${row},${col}`,
           empty: occupant === null,
           owner,
-          validPlacement: state.phase === 'placePiece' && !!state.selectedPiece,
+          validPlacement:
+            allowInput && state.phase === 'placePiece' && !!state.selectedPiece,
         })
       );
 
-      const activate = () => onCellClick({ row, col });
-      rect.addEventListener('click', activate);
-      bindCellActivateKeys(rect, activate);
-      rect.addEventListener('mouseenter', () => onCellHover({ row, col }));
-      rect.addEventListener('mouseleave', () => onCellHover(null));
+      if (allowInput) {
+        const activate = () => onCellClick({ row, col });
+        rect.addEventListener('click', activate);
+        bindCellActivateKeys(rect, activate);
+        rect.addEventListener('mouseenter', () => onCellHover({ row, col }));
+        rect.addEventListener('mouseleave', () => onCellHover(null));
+      }
 
       interactionGroup.appendChild(rect);
     }
@@ -259,8 +271,10 @@ export function renderBoard(
 
 export function renderPieceSelector(
   state: PentEmInState,
-  onPieceSelect: (shapeId: string) => void
+  onPieceSelect: (shapeId: string) => void,
+  options: PentEmInBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'pent-piece-selector';
 
@@ -272,12 +286,18 @@ export function renderPieceSelector(
     if (!shape) continue;
 
     const pieceEl = document.createElement('div');
-    pieceEl.className = `pent-piece-option ${state.selectedPiece === shapeId ? 'selected' : ''}`;
+    const selected = state.selectedPiece === shapeId;
+    pieceEl.className = [
+      'pent-piece-option',
+      selected ? 'selected' : '',
+      !allowInput ? 'disabled' : '',
+    ]
+      .filter(Boolean)
+      .join(' ');
     pieceEl.setAttribute('data-piece', shapeId);
-    pieceEl.style.border =
-      state.selectedPiece === shapeId
-        ? `2px solid ${playerColor}`
-        : '2px solid #ddd';
+    pieceEl.style.border = selected
+      ? `2px solid ${playerColor}`
+      : '2px solid #ddd';
 
     // Mini SVG preview
     const cells = normalizeCells(shape.cells);
@@ -313,7 +333,15 @@ export function renderPieceSelector(
     label.textContent = shapeId;
     pieceEl.appendChild(label);
 
-    pieceEl.addEventListener('click', () => onPieceSelect(shapeId));
+    if (allowInput) {
+      pieceEl.addEventListener('click', () => onPieceSelect(shapeId));
+      pieceEl.setAttribute('role', 'button');
+      pieceEl.setAttribute('tabindex', '0');
+      pieceEl.setAttribute('aria-label', `Select ${shapeId} piece`);
+    } else {
+      pieceEl.setAttribute('aria-disabled', 'true');
+      pieceEl.setAttribute('aria-label', `${shapeId} piece`);
+    }
     container.appendChild(pieceEl);
   }
 
@@ -370,13 +398,18 @@ export function injectPentEmInStyles(): void {
       transition: all 0.2s;
     }
 
-    .pent-piece-option:hover {
+    .pent-piece-option:hover:not(.disabled) {
       transform: scale(1.05);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
     .pent-piece-option.selected {
       background: #e3f2fd;
+    }
+
+    .pent-piece-option.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .pent-piece-label {

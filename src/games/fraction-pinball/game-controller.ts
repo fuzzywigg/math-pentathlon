@@ -32,6 +32,16 @@ let gameState: FractionPinballState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
+/** Bumped to cancel in-flight AI timeouts after new game. */
+let aiGeneration = 0;
+
+function isComputerAnswering(): boolean {
+  return (
+    isAIMode &&
+    gameState.phase === 'answering' &&
+    gameState.currentPlayer === 'player2'
+  );
+}
 
 // =============================================================================
 // Rendering
@@ -56,7 +66,12 @@ function render(): void {
     const status = document.createElement('div');
     status.className = `pinball-status ${gameState.currentPlayer}`;
     markStatusLive(status);
-    status.textContent = `${seatIcon(gameState.currentPlayer)} ${getPlayerName(gameState.currentPlayer)}'s turn`;
+    if (isComputerAnswering()) {
+      status.textContent = 'Computer is thinking…';
+      status.classList.add('status-ai-thinking');
+    } else {
+      status.textContent = `${seatIcon(gameState.currentPlayer)} ${getPlayerName(gameState.currentPlayer)}'s turn`;
+    }
     wrapper.appendChild(status);
 
     // Main game area
@@ -70,7 +85,11 @@ function render(): void {
     if (gameState.phase === 'showResult') {
       main.appendChild(renderResult(gameState, handleContinue));
     } else {
-      main.appendChild(renderChallenge(gameState, handleAnswerSelect));
+      main.appendChild(
+        renderChallenge(gameState, handleAnswerSelect, {
+          allowInput: !isComputerAnswering(),
+        })
+      );
     }
 
     wrapper.appendChild(main);
@@ -78,13 +97,13 @@ function render(): void {
 
   gameContainer.appendChild(wrapper);
 
-  // AI turn
-  if (
-    isAIMode &&
-    gameState.phase === 'answering' &&
-    gameState.currentPlayer === 'player2'
-  ) {
-    setTimeout(aiTurn, 1000);
+  // AI turn — generation token cancels stacked timeouts
+  if (isComputerAnswering()) {
+    const gen = ++aiGeneration;
+    setTimeout(() => {
+      if (gen !== aiGeneration) return;
+      aiTurn();
+    }, 1000);
   }
 }
 
@@ -94,6 +113,7 @@ function render(): void {
 
 function handleAnswerSelect(answer: string): void {
   if (gameState.phase !== 'answering') return;
+  if (isComputerAnswering()) return;
 
   gameState = submitAnswer(gameState, answer);
   render();
@@ -115,20 +135,27 @@ function aiTurn(): void {
     return;
   if (!gameState.currentChallenge) return;
 
-  // Use AI module to get answer
-  const selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);
-
-  if (selectedAnswer) {
-    gameState = submitAnswer(gameState, selectedAnswer);
-    render();
-
-    // Auto-continue after showing result
-    setTimeout(() => {
-      if (gameState.phase === 'showResult') {
-        handleContinue();
-      }
-    }, 1500);
+  // Use AI module to get answer; fall back so vs-AI never soft-locks on null.
+  let selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);
+  if (!selectedAnswer) {
+    const choices = gameState.currentChallenge.answerChoices;
+    selectedAnswer =
+      choices[0] ?? gameState.currentChallenge.correctAnswer ?? null;
   }
+
+  if (!selectedAnswer) return;
+
+  gameState = submitAnswer(gameState, selectedAnswer);
+  render();
+
+  // Auto-continue after showing result
+  const gen = aiGeneration;
+  setTimeout(() => {
+    if (gen !== aiGeneration) return;
+    if (gameState.phase === 'showResult') {
+      handleContinue();
+    }
+  }, 1500);
 }
 
 // =============================================================================
@@ -138,6 +165,7 @@ function aiTurn(): void {
 export function initGame(containerEl: HTMLElement): void {
   injectFractionPinballStyles();
   gameContainer = containerEl;
+  aiGeneration += 1;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
@@ -146,6 +174,7 @@ export function initGame(containerEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = false;
@@ -154,6 +183,7 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
   gameState = createInitialState();
   gameState = startGame(gameState);
   isAIMode = true;

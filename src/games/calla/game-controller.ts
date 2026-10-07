@@ -1,7 +1,12 @@
 // Calla Game Controller
 
 import { CallaGameState, createInitialState } from './types';
-import { makeMove, isGameOver } from './rules';
+import {
+  makeMove,
+  isGameOver,
+  getValidPits,
+  settleNoValidMoves,
+} from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { callaTutorial } from './tutorial';
@@ -84,16 +89,7 @@ function handlePitClick(pitIndex: number): void {
   moveCount++;
   render();
 
-  // Check for game end
-  if (gameState.winner && !hasNotifiedGameEnd) {
-    hasNotifiedGameEnd = true;
-    // Map 'tie' to 'draw' for OWL system compatibility
-    const owlWinner = gameState.winner === 'tie' ? 'draw' : gameState.winner;
-    owlSystem.onGameEnd('calla', {
-      winner: owlWinner,
-      moveCount,
-    });
-  }
+  notifyCallaEndIfNeeded();
 
   // Check if turn switched to AI
   if (
@@ -117,12 +113,20 @@ function triggerAITurn(): void {
 
   setTimeout(() => {
     // Use the AI module to get the best move
-    const aiMove = getAIMove(gameState, 'player2', aiDifficulty);
+    let aiMove = getAIMove(gameState, 'player2', aiDifficulty);
 
+    // Soft-lock recovery: null search with legal pits → first valid; empty → end settle.
     if (!aiMove) {
-      isAIThinking = false;
-      render();
-      return;
+      const valids = getValidPits(gameState);
+      if (valids.length > 0) {
+        aiMove = { pit: valids[0]! };
+      } else {
+        gameState = settleNoValidMoves(gameState);
+        isAIThinking = false;
+        render();
+        notifyCallaEndIfNeeded();
+        return;
+      }
     }
 
     // Store hint for teaching mode (easy difficulty)
@@ -133,22 +137,24 @@ function triggerAITurn(): void {
     isAIThinking = false;
     render();
 
-    // Check for game end
-    if (gameState.winner && !hasNotifiedGameEnd) {
-      hasNotifiedGameEnd = true;
-      // Map 'tie' to 'draw' for OWL system compatibility
-      const owlWinner = gameState.winner === 'tie' ? 'draw' : gameState.winner;
-      owlSystem.onGameEnd('calla', {
-        winner: owlWinner,
-        moveCount,
-      });
-    }
+    notifyCallaEndIfNeeded();
 
     // Check if AI gets another turn (free turn from landing in Calla)
     if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
       setTimeout(triggerAITurn, AI_THINKING_DELAY);
     }
   }, AI_THINKING_DELAY);
+}
+
+function notifyCallaEndIfNeeded(): void {
+  if (gameState.winner && !hasNotifiedGameEnd) {
+    hasNotifiedGameEnd = true;
+    const owlWinner = gameState.winner === 'tie' ? 'draw' : gameState.winner;
+    owlSystem.onGameEnd('calla', {
+      winner: owlWinner,
+      moveCount,
+    });
+  }
 }
 
 // Render the game

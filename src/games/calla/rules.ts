@@ -204,6 +204,52 @@ export function isGameOver(state: CallaGameState): boolean {
   return state.phase === 'gameOver' || state.winner !== null;
 }
 
+/**
+ * Soft-lock recovery when the current seat has no selectable pits.
+ * Same end settlement as makeMove (remaining cubes → owning Calla; compare stores).
+ * Does not alter scoring or win conditions — only applies the existing end path.
+ */
+export function settleNoValidMoves(state: CallaGameState): CallaGameState {
+  if (isGameOver(state)) return state;
+  if (getValidPits(state).length > 0) return state;
+
+  const newP1Pits = [...state.player1Pits];
+  const newP2Pits = [...state.player2Pits];
+  let newP1Calla = state.player1Calla;
+  let newP2Calla = state.player2Calla;
+
+  // Same collection as makeMove end: remaining cubes go to that side's Calla.
+  const p1Empty = newP1Pits.every((c) => c === 0);
+  const p2Empty = newP2Pits.every((c) => c === 0);
+  if (!p1Empty) {
+    newP1Calla += newP1Pits.reduce((a, b) => a + b, 0);
+    newP1Pits.fill(0);
+  }
+  if (!p2Empty) {
+    newP2Calla += newP2Pits.reduce((a, b) => a + b, 0);
+    newP2Pits.fill(0);
+  }
+
+  let winner: Player | 'tie';
+  if (newP1Calla > newP2Calla) {
+    winner = 'player1';
+  } else if (newP2Calla > newP1Calla) {
+    winner = 'player2';
+  } else {
+    winner = 'tie';
+  }
+
+  return {
+    ...state,
+    player1Pits: newP1Pits,
+    player2Pits: newP2Pits,
+    player1Calla: newP1Calla,
+    player2Calla: newP2Calla,
+    phase: 'gameOver',
+    winner,
+  };
+}
+
 // Get phase message
 export function getPhaseMessage(state: CallaGameState): string {
   const playerName = state.currentPlayer === 'player1' ? 'Blue' : 'Red';

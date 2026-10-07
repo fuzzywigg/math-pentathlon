@@ -13,7 +13,8 @@ export function renderBoard(
   state: StarTrackGameState,
   container: HTMLElement,
   onDrawChains?: DrawChainsCallback,
-  onSelectChain?: SelectChainCallback
+  onSelectChain?: SelectChainCallback,
+  options: StarTrackChainRenderOptions = {}
 ): void {
   container.innerHTML = '';
 
@@ -169,12 +170,24 @@ export function renderBoard(
 
   const chainArea = document.createElement('div');
   chainArea.className = 'star-track-chain-area';
-  fillChainArea(chainArea, state, onDrawChains, onSelectChain);
+  fillChainArea(
+    chainArea,
+    state,
+    onDrawChains,
+    onSelectChain,
+    undefined,
+    options
+  );
   wrapper.appendChild(chainArea);
   container.appendChild(wrapper);
 }
 
 export type ChainPreviewCallback = (index: 0 | 1 | null) => void;
+
+/** When false, suppress selectable chrome and click handlers (AI seat). */
+export interface StarTrackChainRenderOptions {
+  allowInput?: boolean;
+}
 
 /**
  * Fill the draw / choose-chain / winner controls into an existing host.
@@ -185,30 +198,46 @@ export function fillChainArea(
   state: StarTrackGameState,
   onDrawChains?: DrawChainsCallback,
   onSelectChain?: SelectChainCallback,
-  onPreviewChain?: ChainPreviewCallback
+  onPreviewChain?: ChainPreviewCallback,
+  options: StarTrackChainRenderOptions = {}
 ): void {
   chainArea.replaceChildren();
+  const allowInput = options.allowInput !== false;
 
-  if (state.phase === 'drawChains' && onDrawChains) {
+  if (state.phase === 'drawChains') {
+    const interactive = allowInput && !!onDrawChains;
     const drawBtn = document.createElement('button');
     drawBtn.type = 'button';
     drawBtn.className = 'star-track-draw-btn';
     drawBtn.textContent = '🔗 Draw Chains';
-    drawBtn.addEventListener('click', onDrawChains);
+    if (interactive && onDrawChains) {
+      drawBtn.setAttribute('aria-label', 'Draw chains');
+      drawBtn.addEventListener('click', onDrawChains);
+    } else {
+      drawBtn.disabled = true;
+      drawBtn.setAttribute('aria-disabled', 'true');
+      drawBtn.setAttribute('aria-label', 'Draw chains, not available');
+    }
     chainArea.appendChild(drawBtn);
 
     const bucketInfo = document.createElement('div');
     bucketInfo.className = 'star-track-bucket-info';
     bucketInfo.textContent = `${state.chainBucket.length} chains in bucket`;
     chainArea.appendChild(bucketInfo);
-  } else if (
-    state.phase === 'selectChain' &&
-    state.drawnChains &&
-    onSelectChain
-  ) {
+
+    if (!interactive) {
+      const hint = document.createElement('div');
+      hint.className = 'star-track-ai-hint';
+      hint.textContent = 'Computer is thinking…';
+      chainArea.appendChild(hint);
+    }
+  } else if (state.phase === 'selectChain' && state.drawnChains) {
+    const interactive = allowInput && !!onSelectChain;
     const choiceLabel = document.createElement('div');
     choiceLabel.className = 'star-track-choice-label';
-    choiceLabel.textContent = 'Choose a chain:';
+    choiceLabel.textContent = interactive
+      ? 'Choose a chain:'
+      : 'Computer is choosing a chain…';
     chainArea.appendChild(choiceLabel);
 
     const choices = document.createElement('div');
@@ -220,14 +249,28 @@ export function fillChainArea(
       chainBtn.className = 'star-track-chain-btn';
       chainBtn.setAttribute('data-chain-index', String(index));
       chainBtn.innerHTML = renderChainLink(chain);
-      chainBtn.addEventListener('click', () => onSelectChain(index as 0 | 1));
-      if (onPreviewChain) {
-        const preview = (): void => onPreviewChain(index as 0 | 1);
-        const clear = (): void => onPreviewChain(null);
-        chainBtn.addEventListener('pointerenter', preview);
-        chainBtn.addEventListener('focus', preview);
-        chainBtn.addEventListener('pointerleave', clear);
-        chainBtn.addEventListener('blur', clear);
+      if (interactive && onSelectChain) {
+        const select = onSelectChain;
+        chainBtn.setAttribute(
+          'aria-label',
+          `Chain of length ${chain.length}, selectable`
+        );
+        chainBtn.addEventListener('click', () => select(index as 0 | 1));
+        if (onPreviewChain) {
+          const preview = (): void => onPreviewChain(index as 0 | 1);
+          const clear = (): void => onPreviewChain(null);
+          chainBtn.addEventListener('pointerenter', preview);
+          chainBtn.addEventListener('focus', preview);
+          chainBtn.addEventListener('pointerleave', clear);
+          chainBtn.addEventListener('blur', clear);
+        }
+      } else {
+        chainBtn.disabled = true;
+        chainBtn.setAttribute('aria-disabled', 'true');
+        chainBtn.setAttribute(
+          'aria-label',
+          `Chain of length ${chain.length}, not selectable`
+        );
       }
       choices.appendChild(chainBtn);
     });
@@ -359,7 +402,7 @@ export function renderStatus(
           : 'Red';
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
-    turnEl.textContent = '🤖 AI is thinking...';
+    turnEl.textContent = '🤖 Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
     turnEl.textContent = getPhaseMessage(state);
