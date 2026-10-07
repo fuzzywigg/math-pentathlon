@@ -47,6 +47,8 @@ export interface JuggleState {
   currentPlayer: Player;
   currentDice: [number, number] | null;
   selectedCategory: ShapeCategory | null;
+  /** Face value of the die chosen via selectDie (for accurate move-log chosenDie). */
+  selectedDieValue: number | null;
   selectedShape: PolyominoShape | null;
   selectedRotation: 0 | 90 | 180 | 270;
   selectedFlipped: boolean;

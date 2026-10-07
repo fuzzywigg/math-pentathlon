@@ -40,6 +40,7 @@ export function createInitialState(): JuggleState {
     currentPlayer: 'player1',
     currentDice: null,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     selectedRotation: 0,
     selectedFlipped: false,
@@ -66,6 +67,7 @@ export function doRollDice(state: JuggleState): JuggleState {
     ...state,
     currentDice: dice,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     phase: 'selectingShape',
   };
@@ -91,6 +93,7 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
   const next: JuggleState = {
     ...state,
     selectedCategory: category,
+    selectedDieValue: dieValue,
     selectedShape: autoShape,
     selectedRotation: 0,
     selectedFlipped: false,
@@ -270,11 +273,11 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
     state.currentPlayer === 'player1' ? 1 : 2
   );
 
-  // Record the move
+  // Record the move — chosenDie must be the die face actually selected
   const move: JuggleMove = {
     player: state.currentPlayer,
     dice: state.currentDice,
-    chosenDie: state.currentDice[0], // Simplified
+    chosenDie: state.selectedDieValue ?? state.currentDice[0],
     shapeId: state.selectedShape.id,
     position,
     rotation: state.selectedRotation,
@@ -298,6 +301,7 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
       : getOpponent(state.currentPlayer),
     currentDice: null,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     selectedRotation: 0,
     selectedFlipped: false,
