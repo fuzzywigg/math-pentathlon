@@ -16,11 +16,14 @@ npm install
 npm run dev
 npm test             # unit then e2e
 npm run test:unit
-npm run test:e2e
+npm run test:e2e:chromium   # required CI path
+npm run test:e2e:cross      # opt-in Firefox + WebKit + iPad WebKit
 npm run build
 npm run lint
 npm run format:check
 ```
+
+Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 
 ## Branches
 
@@ -33,7 +36,7 @@ npm run format:check
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (JS chunk budget 250 kB), unit, Chromium e2e; optional `e2e-cross-browser` via workflow_dispatch or `CROSS_BROWSER_E2E`
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes

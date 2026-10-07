@@ -15,8 +15,10 @@
     "test:unit:watch": "vitest",
     "test:unit:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:chromium": "playwright test --project=chromium",
+    "test:e2e:cross": "playwright test --project=firefox --project=webkit --project=ipad-webkit",
     "test:e2e:ui": "playwright test --ui",
-    "test": "npm run test:unit && npm run test:e2e"
+    "test": "npm run test:unit && npm run test:e2e:chromium"
   },
   "keywords": [],
   "author": "",

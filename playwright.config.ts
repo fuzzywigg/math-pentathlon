@@ -1,5 +1,23 @@
 import { defineConfig, devices } from '@playwright/test';
 
+/**
+ * Projects:
+ * - `chromium` — default / required CI path (`npm run test:e2e:chromium`)
+ * - `firefox`, `webkit`, `ipad-webkit` — opt-in cross-browser smoke
+ *
+ * Opt in locally or in CI:
+ *   npm run test:e2e:cross
+ *   npm run test:e2e -- --project=webkit --project=firefox --project=ipad-webkit
+ *   CROSS_BROWSER=1 npm run test:e2e:cross   # same; env documented for CI matrices
+ *
+ * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
+ * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
+ * CI never accidentally pulls in WebKit/Firefox.
+ *
+ * Visual regression uses a separate config: `playwright.visual.config.ts`
+ * (`npm run test:visual`) — not registered here.
+ */
+
 // Cap parallel browsers: each mp3d spec spins WebGL (often software/ANGLE in CI).
 // CI stays single-worker; local caps at 2 to avoid GL thrash on shared runners.
 const workerLimit = process.env.CI ? 1 : 2;
@@ -32,6 +50,10 @@ export default defineConfig({
     {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'ipad-webkit',
+      use: { ...devices['iPad Pro 11'] },
     },
   ],
   webServer: {

@@ -5,6 +5,13 @@ on:
     branches: [main, development, alpha]
   pull_request:
     branches: [main, development, alpha]
+  workflow_dispatch:
+    inputs:
+      cross_browser:
+        description: 'Run opt-in WebKit / Firefox / iPad WebKit e2e smoke'
+        type: boolean
+        default: false
+        required: false
 
 jobs:
   lint:
@@ -108,11 +115,42 @@ jobs:
           set -euo pipefail
           count="$(find tests/e2e -name '*.spec.ts' | wc -l | tr -d ' ')"
           echo "e2e suite: ${count} files (smoke + bug-guards + mp3d)"
-          npm run test:e2e -- --project=chromium
+          npm run test:e2e:chromium
       - name: Upload Playwright report
         uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Opt-in WebKit / Firefox / iPad WebKit smoke. Not required on PRs.
+  # Enable via repo variable CROSS_BROWSER_E2E=true, or workflow_dispatch input.
+  e2e-cross-browser:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.cross_browser == true || vars.CROSS_BROWSER_E2E == 'true' }}
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers (firefox + webkit)
+        run: npx playwright install --with-deps firefox webkit
+      - name: Run cross-browser e2e smoke
+        timeout-minutes: 40
+        env:
+          CROSS_BROWSER: '1'
+        run: |
+          set -euo pipefail
+          npm run test:e2e:cross -- tests/e2e/smoke.spec.ts
+      - name: Upload cross-browser Playwright report
+        uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report-cross-browser
           path: playwright-report/
           retention-days: 30

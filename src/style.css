@@ -132,7 +132,9 @@ body {
   /* Top-align from first paint so menu growth does not re-center (CLS). */
   align-items: flex-start;
   min-width: 320px;
+  /* 100vh fallback for engines without dvh; dvh avoids iOS/iPad URL-bar jump. */
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Skip link: visually hidden until keyboard focus */
@@ -185,8 +187,10 @@ h1 {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0;
-  /* Reserve space so accordion/grid paint does not grow the shell upward. */
+  /* Reserve space so accordion/grid paint does not grow the shell upward.
+     Dual vh/dvh: Firefox/Chromium/WebKit all accept dvh; vh is the fallback. */
   min-height: min(720px, calc(100vh - 4rem));
+  min-height: min(720px, calc(100dvh - 4rem));
   /*
    * Do not animate opacity on this landmark container — mid-fade text fails
    * WCAG AA contrast (axe color-contrast) even when resting colors pass.
