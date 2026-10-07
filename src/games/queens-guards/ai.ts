@@ -28,12 +28,14 @@ export type AIDifficulty = 'easy' | 'medium' | 'hard';
  * Play-facing wall-time budgets (ms). Hard still searches up to maxDepth when
  * the machine is fast enough; iterative deepening returns the last finished
  * depth if the budget runs out. The worker safety cap (180s) is a separate
- * stall guard, not a play target.
+ * stall guard, not a play target. Hard is time-boxed to 500ms; hand-built
+ * mid-game Hard benches keep the same chosen move as unlimited search.
+ * Hard deadline is 450ms so observed wall p95 stays ≤500ms after abort slack.
  */
 export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
   easy: 800,
   medium: 1500,
-  hard: 2500,
+  hard: 450,
 };
 
 /** Optional search controls — defaults preserve historical Math.random behavior. */
