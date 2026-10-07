@@ -3,6 +3,7 @@
  * Distinct from wave66 pulse/dice-area; deepen AI violet + die border leftovers. Tests-only.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { callaTutorial } from '../../src/games/calla/tutorial';
@@ -15,10 +16,7 @@ describe('Wave 67 handshake — calla × juggle residual', () => {
   });
 
   it('mounts calla AI violet + juggle die border + exact labels', () => {
-    const callaCss = readFileSync(
-      resolve(process.cwd(), 'src/style.css'),
-      'utf8'
-    );
+    const callaCss = readAppCss();
     expect(callaCss).toContain('linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)');
     expect(callaCss).toMatch(
       /\.calla-pit-valid \.calla-pit-circle\s*\{[^}]*fill:\s*#5a3a22/s

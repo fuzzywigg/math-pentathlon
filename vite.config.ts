@@ -10,10 +10,11 @@ import {
  * Build + PWA for offline play after first visit.
  *
  * Code splitting: games (and demos) are dynamic-imported from main.ts so the
- * landing/menu does not download every game. manualChunks emit stable
- * per-game / shell-core / deferred-core / ui / three files. Three.js stays
- * under dist/vendor/ so the CI dist/assets 250 kB budget applies to
- * always-loaded app chunks.
+ * landing/menu does not download every game. Per-game help/mounts live in
+ * game-route-mounts (lazy). Play CSS is dynamic-imported on /game/:id.
+ * manualChunks emit stable per-game / shell-core / deferred-core / ui /
+ * game-routes / three files. Three.js stays under dist/vendor/ so the CI
+ * dist/assets 250 kB budget applies to always-loaded app chunks.
  *
  * Offline: Workbox precaches the full build (shell + every game/3D chunk) so
  * after one online visit any game works in airplane mode. Updates use
@@ -30,10 +31,10 @@ export default defineConfig({
         'favicon.ico',
         'favicon.svg',
         'icons/*.png',
-        'king.svg',
         'health.txt',
         'CNAME',
-        'fonts/*.woff2',
+        // Body weight only — 500/600/700 are runtime-cached (see workbox).
+        'fonts/inter-latin-400-normal.woff2',
       ],
       // Keep existing index.html link href (/site.webmanifest).
       manifestFilename: 'site.webmanifest',
@@ -87,13 +88,35 @@ export default defineConfig({
         globPatterns: [
           '**/*.{js,css,html,ico,svg,png,txt,webmanifest,woff,woff2}',
         ],
+        // Skip unused king art + heavier Inter weights from first SW install
+        // so cheap tablets finish precache sooner; weights cache on first use.
+        globIgnores: [
+          '**/king.svg',
+          '**/inter-latin-500-normal.woff2',
+          '**/inter-latin-600-normal.woff2',
+          '**/inter-latin-700-normal.woff2',
+        ],
         // Hash-router SPA: unknown navigations get the shell.
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//, /^\/health/],
         // Keep SW install reliable on low-end tablets (three.js ~688 kB).
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
-        // Fonts are self-hosted under /fonts and covered by globPatterns.
-        runtimeCaching: [],
+        runtimeCaching: [
+          {
+            urlPattern: /\/fonts\/inter-latin-(500|600|700)-normal\.woff2$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'inter-weights',
+              expiration: {
+                maxEntries: 6,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
       },
       // Keep playwright/dev lightweight unless explicitly enabled.
       devOptions: {

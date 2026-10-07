@@ -71,8 +71,20 @@ export function canPrefetchGame(gameId: string): boolean {
 /**
  * Kick off a background import for `gameId` (no-op if unknown / already warm).
  */
+function prefersSaveData(): boolean {
+  try {
+    const conn = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    return conn?.saveData === true;
+  } catch {
+    return false;
+  }
+}
+
 export function prefetchGameChunk(gameId: string): void {
   if (!canPrefetchGame(gameId) || started.has(gameId)) return;
+  if (prefersSaveData()) return;
   started.add(gameId);
   if (!shouldExecutePrefetchImport()) return;
   const load = loaders[gameId];

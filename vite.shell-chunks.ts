@@ -45,6 +45,15 @@ export function shouldPreloadMenuDependency(dep: string): boolean {
     return false;
   }
 
+  // Game route mounts + play CSS (lazy on /game/:id).
+  if (
+    name.includes('game-routes') ||
+    name.includes('game-play') ||
+    name.includes('game-route-mounts')
+  ) {
+    return false;
+  }
+
   for (const prefix of DEFERRED_CORE_PREFIXES) {
     if (name.includes(`core-${prefix}`) || name.includes(`/core-${prefix}`)) {
       return false;
@@ -81,5 +90,14 @@ export function uiManualChunkName(id: string): string | undefined {
   if (normalized.includes('/src/ui/owl/')) return 'owl-ui';
   if (normalized.includes('/src/ui/stats-dashboard')) return 'stats';
   if (normalized.includes('/src/ui/styles/stats-dashboard')) return 'stats';
+  // Keep help HTML + per-game mounts out of the menu `ui` chunk.
+  if (normalized.includes('/src/ui/game-route-mounts')) {
+    return 'game-routes';
+  }
+  // Dynamic play CSS — leave unnamed so Vite emits an async stylesheet
+  // instead of folding it into the menu `ui` CSS.
+  if (normalized.includes('/src/ui/styles/game-play')) {
+    return undefined;
+  }
   return 'ui';
 }

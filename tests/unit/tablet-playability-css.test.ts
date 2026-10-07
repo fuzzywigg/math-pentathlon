@@ -5,11 +5,9 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { readAppCss } from './_app-css';
 
-const styleCss = readFileSync(
-  resolve(__dirname, '../../src/style.css'),
-  'utf8'
-);
+const styleCss = readAppCss();
 const mobileCss = readFileSync(
   resolve(__dirname, '../../src/ui/styles/mobile-play-shell.css'),
   'utf8'

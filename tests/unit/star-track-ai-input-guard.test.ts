@@ -4,8 +4,7 @@
  * and taps during the think pause must not change state.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readAppCss } from './_app-css';
 import { createInitialState } from '../../src/games/star-track/types';
 import { drawChains } from '../../src/games/star-track/rules';
 import {
@@ -95,10 +94,7 @@ describe('Star Track AI-turn input guard', () => {
   });
 
   it('style.css ships 44px targets and star-track reduced-motion overrides', () => {
-    const css = readFileSync(
-      resolve(__dirname, '../../src/style.css'),
-      'utf8'
-    );
+    const css = readAppCss();
     expect(css).toMatch(
       /\.star-track-draw-btn\s*\{[^}]*min-height:\s*44px/s
     );
