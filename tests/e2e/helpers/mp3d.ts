@@ -3,6 +3,7 @@
  * Prefer ready-signal waits over fixed sleep; opt into board3dLQ for CI GL load.
  */
 import { expect, type Locator, type Page } from '@playwright/test';
+import * as fs from 'node:fs';
 
 /** Heavy multi-viewport / play-through 3D specs. */
 export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
@@ -76,9 +77,119 @@ export async function keyboardActivateA11yCell(
   cell: Locator
 ): Promise<void> {
   await expect(cell).toBeAttached({ timeout: 10_000 });
+  // #region agent log
+  const preFocus = await cell.evaluate((el) => ({
+    tag: el.tagName,
+    value: el.getAttribute('data-value'),
+    row: el.getAttribute('data-row'),
+    col: el.getAttribute('data-col'),
+    tabIndex: (el as HTMLElement).tabIndex,
+    aria: el.getAttribute('aria-label'),
+    inDoc: document.contains(el),
+  }));
+  fs.appendFileSync(
+    '/opt/cursor/logs/debug.log',
+    JSON.stringify({
+      location: 'mp3d.ts:keyboardActivateA11yCell',
+      message: 'pre-focus cell snapshot',
+      data: preFocus,
+      timestamp: Date.now(),
+      hypothesisId: 'A',
+    }) + '\n'
+  );
+  // #endregion
   await cell.focus();
   await expect(cell).toBeFocused({ timeout: 5_000 });
+  // #region agent log
+  const preEnter = await page.evaluate(() => {
+    const active = document.activeElement as HTMLElement | null;
+    const zeros = Array.from(
+      document.querySelectorAll('.pg-a11y-grid button[tabindex="0"]')
+    ).map((b) => ({
+      value: b.getAttribute('data-value'),
+      row: b.getAttribute('data-row'),
+      col: b.getAttribute('data-col'),
+    }));
+    const api = (
+      window as unknown as {
+        __mpPrimeGoldTest?: {
+          getState: () => {
+            phase: string;
+            diceRoll: number[] | null;
+            moveHistory: unknown[];
+          };
+        };
+      }
+    ).__mpPrimeGoldTest;
+    const state = api?.getState();
+    const exprItems = Array.from(
+      document.querySelectorAll('.pg-expr-item')
+    ).map((el) => el.textContent?.trim() ?? '');
+    return {
+      activeTag: active?.tagName,
+      activeValue: active?.getAttribute?.('data-value'),
+      activeRow: active?.getAttribute?.('data-row'),
+      activeCol: active?.getAttribute?.('data-col'),
+      activeTabIndex: active?.tabIndex,
+      tabindex0Count: zeros.length,
+      tabindex0Cells: zeros.slice(0, 8),
+      phase: state?.phase ?? null,
+      dice: state?.diceRoll ?? null,
+      moveHistoryLen: state?.moveHistory?.length ?? null,
+      exprItemCount: exprItems.length,
+      exprItemsSample: exprItems.slice(0, 6),
+      statusText:
+        document.querySelector('.pg-status')?.textContent?.trim() ?? null,
+    };
+  });
+  fs.appendFileSync(
+    '/opt/cursor/logs/debug.log',
+    JSON.stringify({
+      location: 'mp3d.ts:keyboardActivateA11yCell',
+      message: 'pre-Enter grid/state snapshot',
+      data: preEnter,
+      timestamp: Date.now(),
+      hypothesisId: 'A,B,C',
+    }) + '\n'
+  );
+  // #endregion
   await page.keyboard.press('Enter');
+  // #region agent log
+  const postEnter = await page.evaluate(() => {
+    const api = (
+      window as unknown as {
+        __mpPrimeGoldTest?: {
+          getState: () => {
+            phase: string;
+            moveHistory: unknown[];
+            currentPlayer: string;
+          };
+        };
+      }
+    ).__mpPrimeGoldTest;
+    const state = api?.getState();
+    return {
+      phase: state?.phase ?? null,
+      moveHistoryLen: state?.moveHistory?.length ?? null,
+      currentPlayer: state?.currentPlayer ?? null,
+      statusText:
+        document.querySelector('.pg-status')?.textContent?.trim() ?? null,
+      hasMoveHistory: !!document.querySelector('.pg-move-history'),
+      activeValue: document.activeElement?.getAttribute?.('data-value'),
+      stillInDoc: document.contains(document.activeElement),
+    };
+  });
+  fs.appendFileSync(
+    '/opt/cursor/logs/debug.log',
+    JSON.stringify({
+      location: 'mp3d.ts:keyboardActivateA11yCell',
+      message: 'post-Enter state snapshot',
+      data: postEnter,
+      timestamp: Date.now(),
+      hypothesisId: 'A,D,E',
+    }) + '\n'
+  );
+  // #endregion
 }
 
 /**
