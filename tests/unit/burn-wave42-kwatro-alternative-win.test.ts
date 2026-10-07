@@ -32,13 +32,18 @@ function placeChip(state: KwaState, chipId: string, nodeId: string): KwaState {
   return { ...state, nodes, chips };
 }
 
-/** Four p1 chips scattered on non-numbered nodes; p1-4 still on n0-4 */
+/**
+ * Four p1 chips scattered on non-numbered nodes; p1-4 still on n0-4.
+ * Placement avoids any straight-line 2+1 arithmetic of 4/5 (including gaps),
+ * so the last chips-off move is territory-only.
+ */
 function forgeAlmostAllOff(): KwaState {
   let state = createInitialState();
   state = placeChip(state, 'p1-0', 'n2-1');
   state = placeChip(state, 'p1-1', 'n3-3');
   state = placeChip(state, 'p1-2', 'n1-0');
-  state = placeChip(state, 'p1-3', 'n3-4');
+  // Was n3-4 — with gaps, n1-4 / n3-4 / n4-4 formed 8+6−9=5. Park on n2-0 instead.
+  state = placeChip(state, 'p1-3', 'n2-0');
   return state;
 }
 
