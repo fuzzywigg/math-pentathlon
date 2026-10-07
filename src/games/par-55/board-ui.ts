@@ -32,8 +32,8 @@ const BLOCK_COLORS: Record<BlockColor, string> = {
   yellow: '#fdd835',
 };
 
-// Dimensions
-const BASE_SIZE = 50; // Size of each pentagon base
+// Dimensions — bases sized so the pentagon bbox stays ≥44×44 (WCAG 2.5.5).
+const BASE_SIZE = 54; // Size of each pentagon base
 const BLOCK_SIZE = 36; // Size of block shape
 
 export interface Par55BoardRenderOptions {
@@ -163,8 +163,20 @@ function renderBase(
     }
   }
 
-  // Click handler
+  // Invisible 44px hit target under the visual pentagon (coarse / tablet taps).
   if (isValid) {
+    const hit = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
+    hit.setAttribute('cx', String(pos.x));
+    hit.setAttribute('cy', String(pos.y));
+    hit.setAttribute('r', '22');
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('pointer-events', 'all');
+    hit.classList.add('par55-base-hit');
+    group.appendChild(hit);
+
     const activate = () => onClick(base.id);
     group.addEventListener('click', activate);
     bindCellActivateKeys(group, activate);
@@ -490,18 +502,30 @@ export function injectPar55Styles(): void {
   const style = document.createElement('style');
   style.id = 'par55-styles';
   style.textContent = `
+    /* Shell #app is max-width 700px with overflow-x clip — widen when Par 55
+       is mounted so the side-hand layout stays hittable on desktop. */
+    #app:has(.par55-board),
+    #app:has(.par55-game-area) {
+      max-width: min(1100px, 100%);
+      overflow-x: visible;
+    }
+
     .par55-game-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       padding: 1rem;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .par55-main-layout {
       display: flex;
-      gap: 2rem;
+      gap: 1.25rem;
       align-items: flex-start;
+      justify-content: center;
+      max-width: 100%;
     }
 
     .par55-board {
@@ -552,6 +576,8 @@ export function injectPar55Styles(): void {
       padding: 4px;
       border-radius: 8px;
       transition: all 0.15s;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     .par55-hand-block.clickable {
@@ -620,6 +646,17 @@ export function injectPar55Styles(): void {
       color: var(--color-player2, #f44336);
     }
 
+    .par55-status.status-ai-thinking {
+      opacity: 0.92;
+    }
+
+    .par55-turn-hint {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: -0.5rem;
+    }
+
     .par55-winner-banner {
       text-align: center;
       padding: 1.5rem;
@@ -636,6 +673,22 @@ export function injectPar55Styles(): void {
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .par55-winner-banner {
+        animation: none;
+      }
+      .par55-hand-block.clickable:hover {
+        transform: none;
+      }
+      .par55-btn-primary:hover {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .par55-winner-banner {
+      animation: none;
+    }
+
     .par55-controls {
       display: flex;
       gap: 1rem;
@@ -644,6 +697,8 @@ export function injectPar55Styles(): void {
 
     .par55-btn {
       padding: 0.75rem 1.5rem;
+      min-height: 44px;
+      min-width: 44px;
       border: none;
       border-radius: 6px;
       font-weight: bold;
@@ -727,6 +782,21 @@ export function injectPar55Styles(): void {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+      }
+    }
+
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap floors */
+    @media (pointer: coarse), (hover: none) {
+      .par55-hand-block {
+        min-width: 48px;
+        min-height: 48px;
+        padding: 6px;
+      }
+
+      .par55-btn {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.85rem 1.5rem;
       }
     }
   `;
