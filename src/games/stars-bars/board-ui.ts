@@ -26,14 +26,8 @@ import {
 // Style Injection
 // =============================================================================
 
-let stylesInjected = false;
-
 export function injectStarsStyles(): void {
-  if (document.getElementById('stars-styles')) {
-    stylesInjected = true;
-    return;
-  }
-  stylesInjected = true;
+  if (document.getElementById('stars-styles')) return;
 
   const style = document.createElement('style');
   style.id = 'stars-styles';
