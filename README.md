@@ -92,14 +92,14 @@ npm run build
 ## Branches
 
 - alpha -- trunk. All development merges here.
-- main -- 315 behind / 2 ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
+- main -- `317` behind / `2` ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
 
 ## Status (2026-10-07)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: Vitest under `tests/unit` + Playwright under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
+- Tests: 3051 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + Playwright under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
 - CI (`ci.yml` on alpha): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ 250 kB JS chunk budget), unit (required), Chromium e2e (required), visual-baseline (**report-only**; see `docs/wiki/development.md`)
-- Latest alpha CI green at `593270b` (2026-10-06)
+- Latest alpha tip `eec2b32` (2026-10-07) includes overnight polish (#413) + tablet playtest docs (#414)
 
 ## Agent rules
 
