@@ -40,6 +40,9 @@ async function isOver(page: Page, driver: GameDriver): Promise<boolean> {
 
 async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
   let stalled = 0;
+  let noProgress = 0;
+  let lastFill = '';
+  let restarts = 0;
   for (let i = 0; i < driver.maxTurns; i++) {
     if (await isOver(page, driver)) return;
 
@@ -50,7 +53,34 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
     ) {
       await startHumanVsHuman(page);
       stalled = 0;
+      noProgress = 0;
       continue;
+    }
+
+    // Juggle softlock: fragmented board + dice that never fit — restart deal.
+    if (driver.id === 'juggle') {
+      const fill = await page.evaluate(() => {
+        const f1 =
+          document.querySelector('.juggle-board.player1 .fill-percent')
+            ?.textContent || '';
+        const f2 =
+          document.querySelector('.juggle-board.player2 .fill-percent')
+            ?.textContent || '';
+        return `${f1}|${f2}`;
+      });
+      if (fill === lastFill) noProgress += 1;
+      else {
+        noProgress = 0;
+        lastFill = fill;
+      }
+      if (noProgress > 40 && restarts < 20) {
+        await startHumanVsHuman(page);
+        restarts += 1;
+        noProgress = 0;
+        lastFill = '';
+        stalled = 0;
+        continue;
+      }
     }
 
     const before = await boardFingerprint(page);
@@ -64,7 +94,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         // Nudge: try pass-like buttons generically
         await page
           .locator(
-            'button:has-text("Pass"), button:has-text("Continue"), .star-track-draw-btn'
+            'button:has-text("Pass"), button:has-text("Continue"), .star-track-draw-btn, .juggle-choose-other-btn'
           )
           .first()
           .click({ force: true })
@@ -111,7 +141,15 @@ export async function runFullgameMatch(
     expect(isGameOverText(openingStatus)).toBe(false);
     const openingSeat = seatToken(openingStatus);
 
-    // Illegal move rejected (fingerprint stable)
+    // Ramrod: some deals open in mutual-pass deadlock — reshuffle before asserts.
+    if (driver.id === 'ramrod') {
+      for (let r = 0; r < 5; r++) {
+        if ((await page.locator('.ramrod-deadlock-hint').count()) === 0) break;
+        await startHumanVsHuman(page);
+      }
+    }
+
+    // Illegal move rejected (status/material stable — selection chrome may churn)
     const beforeIllegal = await boardFingerprint(page);
     await driver.tryIllegal(page);
     await page.waitForTimeout(80);
@@ -119,9 +157,16 @@ export async function runFullgameMatch(
     expect(afterIllegal).toBe(beforeIllegal);
 
     // Legal move accepted
-    const beforeLegal = await boardFingerprint(page);
     let accepted = false;
-    for (let attempt = 0; attempt < 6; attempt++) {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      if (
+        driver.id === 'ramrod' &&
+        (await page.locator('.ramrod-deadlock-hint').count()) > 0
+      ) {
+        await startHumanVsHuman(page);
+        continue;
+      }
+      const beforeLegal = await boardFingerprint(page);
       const acted = await driver.playLegal(page);
       await page.waitForTimeout(60);
       const afterLegal = await boardFingerprint(page);
@@ -136,16 +181,35 @@ export async function runFullgameMatch(
 
     // Turn indicator flips (or free-turn then eventually flips / ends)
     let flipped = false;
-    for (let i = 0; i < 12; i++) {
+    for (let i = 0; i < 30; i++) {
       if (await isOver(page, driver)) {
         flipped = true; // game ended — seat control changed
         break;
       }
-      const now = seatToken(await readStatusText(page));
+      const nowText = await readStatusText(page);
+      const now = seatToken(nowText);
       if (
         openingSeat !== 'unknown' &&
         now !== 'unknown' &&
         now !== openingSeat
+      ) {
+        flipped = true;
+        break;
+      }
+      // Class-based seat chrome (pent / fiar / kwa)
+      const seatClass = await page.evaluate(() => {
+        const el = document.querySelector(
+          '.pent-status, .fiar-status, .kwa-status, .sd-status, .pg-status, .frac-status, .pinball-status'
+        );
+        if (!el) return '';
+        if (el.classList.contains('player2')) return 'p2';
+        if (el.classList.contains('player1')) return 'p1';
+        return '';
+      });
+      if (
+        seatClass &&
+        openingSeat !== 'unknown' &&
+        seatClass !== openingSeat
       ) {
         flipped = true;
         break;

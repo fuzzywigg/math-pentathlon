@@ -155,26 +155,98 @@ export async function readStatusText(page: Page): Promise<string> {
 }
 
 export function isGameOverText(text: string): boolean {
-  return /wins?|win!|tie|draw|game over/i.test(text);
+  const s = text.replace(/\s+/g, ' ').trim();
+  // Avoid false positives like Star Track "Draw chains from the bucket".
+  if (/\bdraw chains\b/i.test(s)) return false;
+  return (
+    /\bwins?\b|\bwin!|\btie\b|\bgame over\b|\bit'?s a draw\b|\bdraw!\b/i.test(
+      s
+    ) || /^draw\b/i.test(s)
+  );
 }
 
-export async function boardFingerprint(page: Page): Promise<string> {
+/** Status + history + material — ignores selection chrome / aria churn. */
+export async function moveFingerprint(page: Page): Promise<string> {
   return page.evaluate(() => {
-    const root =
-      document.querySelector('#board, #game-container, main') ??
-      document.body;
-    const status = (
+    // Ordered lookup (not querySelector(a,b)): shell `#status[role=status]` is
+    // often empty while the game writes into `.ramrod-status` / `.qg-status` etc.
+    const statusSels = [
+      '.status-winner',
+      '.status-turn',
+      '.qg-status',
+      '.fiar-status',
+      '.ramrod-status',
+      '.par55-status',
+      '.kwa-status',
+      '.juggle-status',
+      '.contig-status',
+      '.stars-status',
+      '.fab-status',
+      '.pg-status',
+      '.pent-status',
+      '.sd-status',
+      '.remainder-status',
+      '.frac-status',
+      '.pinball-status',
+      '.hex-status',
+      '.calla-status',
+      '.hex-a-gone-status',
+      '.star-track-status',
+      '[role="status"]',
+    ];
+    let status = '';
+    for (const sel of statusSels) {
+      const text = (document.querySelector(sel)?.textContent ?? '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (text) {
+        status = text;
+        break;
+      }
+    }
+    const history = document.querySelectorAll(
+      [
+        '.move-history-entry',
+        '.history-entry',
+        '.kwa-history-move',
+        '.sd-history-entry',
+        '.pg-move-item',
+        '.stars-move-item',
+        '.fab-history-move',
+        '.juggle-history-entry',
+        '.contig-history-entry',
+        '.ramrod-history-move',
+        '.par55-history-move',
+      ].join(', ')
+    ).length;
+    const scores = (
       document.querySelector(
-        '.status-turn, .status-winner, [role="status"]'
+        '.ramrod-scores, .par55-scores, .kwa-scores, .fab-scores, .stars-scores'
       )?.textContent ?? ''
     )
       .replace(/\s+/g, ' ')
       .trim();
-    const history = document.querySelectorAll(
-      '.move-history-entry, .history-entry, .kwa-history li, .sd-history-entry, .pg-move-item, .stars-move-item, .fab-history-move, .juggle-history-entry, .contig-history-entry, .ramrod-history-entry, .par55-history-move'
+    const material = document.querySelectorAll(
+      [
+        '.hex-cell-p1, .hex-cell-p2',
+        '.cell-king',
+        '.calla-pit',
+        '.juggle-cell.occupied-player1, .juggle-cell.occupied-player2',
+        '.kwa-chip, .kwa-selectable-chip',
+        '.fiar-board-container [data-owner], .fiar-board-container circle[fill]',
+        '.pent-cell-p1, .pent-cell-p2, .pent-board [data-owner]',
+        '.qg-board-container svg g[aria-label*="Blue"], .qg-board-container svg g[aria-label*="Red"]',
+        // Ramrod / Par-55: occupied slots (history only lists captures)
+        '.ramrod-slot .ramrod-rod, .ramrod-slot [class*="rod"]',
+        '.par55-base .par55-block, .par55-placed',
+      ].join(', ')
     ).length;
-    return `${status}|h=${history}|len=${root.innerHTML.length}`;
+    return `${status}|h=${history}|m=${material}|s=${scores}`;
   });
+}
+
+export async function boardFingerprint(page: Page): Promise<string> {
+  return moveFingerprint(page);
 }
 
 export async function clickDom(

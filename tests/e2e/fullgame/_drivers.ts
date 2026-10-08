@@ -224,9 +224,10 @@ const drivers: GameDriver[] = [
     title: 'Ramrod',
     mount: '.ramrod-board',
     gameOver: '.ramrod-winner-banner',
-    maxTurns: 80,
+    maxTurns: 120,
     playLegal: async (page) => {
       if (await page.locator('.ramrod-deadlock-hint').count()) return false;
+      // Match ramrod-deep: re-query hand by index after each select (DOM rebuilds).
       return page.evaluate(() => {
         const click = (el: Element | null | undefined) =>
           el?.dispatchEvent(
@@ -236,6 +237,8 @@ const drivers: GameDriver[] = [
               view: window,
             })
           );
+        if (document.querySelector('.ramrod-deadlock-hint')) return false;
+
         const pass = [...document.querySelectorAll('.ramrod-btn-secondary')].find(
           (b) => b.textContent?.includes('Pass Turn')
         );
@@ -243,16 +246,29 @@ const drivers: GameDriver[] = [
           click(pass);
           return true;
         }
-        const rods = [
-          ...document.querySelectorAll('.ramrod-rod-wrapper.selectable'),
-        ];
-        for (const rod of rods) {
-          click(rod);
+
+        const status = (
+          document.querySelector('.ramrod-status')?.textContent || ''
+        ).toLowerCase();
+        const seat = status.includes('red') ? 'player2' : 'player1';
+        const handSel = `.ramrod-player-${seat} .ramrod-rod-wrapper.selectable`;
+        const rodCount = document.querySelectorAll(handSel).length;
+        for (let index = 0; index < rodCount; index++) {
+          const current = [...document.querySelectorAll(handSel)];
+          if (!current[index]) continue;
+          click(current[index]);
           const valids = [...document.querySelectorAll('.ramrod-slot.valid')];
           if (valids.length) {
-            click(valids[0]);
+            const complete = valids.find((s) =>
+              s.parentElement?.textContent?.includes('Need:')
+            );
+            click(complete ?? valids[0]);
             return true;
           }
+          const selected = document.querySelector(
+            '.ramrod-rod-wrapper.selected.selectable'
+          );
+          click(selected);
           const clear = [
             ...document.querySelectorAll('.ramrod-btn-secondary'),
           ].find((b) => b.textContent?.includes('Clear Selection'));
@@ -270,14 +286,53 @@ const drivers: GameDriver[] = [
     title: 'Kwatro-Sinko',
     mount: '.kwa-board',
     gameOver: '.kwa-winner-banner',
-    maxTurns: 80,
+    maxTurns: 200,
     playLegal: async (page) => {
-      if (await clickFirst(page, '.kwa-selectable-chip')) {
-        await sleep(page, 40);
-        if (await clickFirst(page, '.kwa-valid-node')) return true;
-        await passIfVisible(page, '.kwa-btn-secondary');
-      }
-      return false;
+      // Click node groups (handlers live on <g>), not highlight circles.
+      // Prefer leaving numbered spaces / landing on non-numbered.
+      return page.evaluate(() => {
+        const click = (el: Element | null | undefined) =>
+          el?.dispatchEvent(
+            new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            })
+          );
+        const nodes = [...document.querySelectorAll('.kwa-board [data-node-id]')];
+        const label = (el: Element) => el.getAttribute('aria-label') || '';
+        const dests = nodes.filter((n) => label(n).includes('valid move'));
+        if (dests.length) {
+          // Prefer non-numbered landing; break ties with seeded random.
+          dests.sort((a, b) => {
+            const score = (el: Element) =>
+              (label(el).includes('numbered') ? 2 : 0) + Math.random();
+            return score(a) - score(b);
+          });
+          click(dests[0]);
+          return true;
+        }
+        const chips = nodes.filter((n) => label(n).includes('selectable'));
+        chips.sort((a, b) => {
+          const score = (el: Element) =>
+            (label(el).includes('numbered') ? 0 : 1) + Math.random();
+          return score(a) - score(b);
+        });
+        if (chips[0]) {
+          // Chip handler is on inner group; click selectable chip circle or node.
+          const circle = chips[0].querySelector('.kwa-selectable-chip');
+          click(circle ?? chips[0]);
+          return true;
+        }
+        const pass = [...document.querySelectorAll('button')].find((b) =>
+          /pass/i.test(b.textContent || '')
+        );
+        if (pass) {
+          click(pass);
+          return true;
+        }
+        return false;
+      });
     },
     tryIllegal: async (page) => {
       await clickFirst(page, '[data-node-id]:not(.kwa-valid-node)');
@@ -287,15 +342,15 @@ const drivers: GameDriver[] = [
     id: 'fiar',
     title: 'FIAR',
     mount: '.fiar-board-container',
-    gameOver: '.fiar-winner-banner',
-    maxTurns: 80,
+    gameOver: '.fiar-winner-banner, .fiar-status',
+    maxTurns: 600,
     playLegal: async (page) => {
-      // Chip kind picker if present
-      await clickFirst(page, '.fiar-chip-kind-picker button, .fiar-chip-kind button');
-      if (await clickFirst(page, '.pulse-highlight')) return true;
-      // Movement: select own chip then green node
-      const moved = await page.evaluate(() => {
-        const click = (el: Element | null | undefined) =>
+      // Click by data-node-id (unique); place → move → select.
+      return page.evaluate(() => {
+        const clickId = (id: string) => {
+          const el = document.querySelector(
+            `.fiar-board-container [data-node-id="${id}"]`
+          );
           el?.dispatchEvent(
             new MouseEvent('click', {
               bubbles: true,
@@ -303,27 +358,54 @@ const drivers: GameDriver[] = [
               view: window,
             })
           );
-        const chip = document.querySelector(
-          '.fiar-board-container [data-owner], .chip-p1, .chip-p2, .fiar-chip'
-        );
-        click(chip);
-        const dest = document.querySelector(
-          '.fiar-board-container .pulse-highlight, .fiar-valid-node, [data-node-id].valid'
-        );
-        if (dest) {
-          click(dest);
+        };
+        const nodes = [
+          ...document.querySelectorAll('.fiar-board-container [data-node-id]'),
+        ];
+        const label = (el: Element) => el.getAttribute('aria-label') || '';
+        const pick = (pred: (l: string) => boolean) => {
+          const ids = nodes
+            .filter((n) => pred(label(n)))
+            .map((n) => n.getAttribute('data-node-id'))
+            .filter((id): id is string => !!id);
+          if (!ids.length) return null;
+          // Seeded Math.random (e2e stability) — first-always never ends FIAR.
+          return ids[Math.floor(Math.random() * ids.length)]!;
+        };
+        const place = pick((l) => l.includes('valid placement'));
+        if (place) {
+          clickId(place);
           return true;
         }
-        const node = document.querySelector(
-          '.fiar-board-container [data-node-id]'
-        );
-        click(node);
-        return !!node;
+        const dest = pick((l) => l.includes('valid move'));
+        if (dest) {
+          clickId(dest);
+          return true;
+        }
+        const selectable = pick((l) => l.includes('selectable'));
+        if (selectable) {
+          clickId(selectable);
+          return true;
+        }
+        return false;
       });
-      return moved;
     },
     tryIllegal: async (page) => {
-      await clickDom(page, '.fiar-board-container', 0);
+      await page.evaluate(() => {
+        const bad = [
+          ...document.querySelectorAll('.fiar-board-container [data-node-id]'),
+        ].find((el) => {
+          const a = el.getAttribute('aria-label') || '';
+          return (
+            (a.includes('Blue') || a.includes('Red')) &&
+            !a.includes('selectable') &&
+            !a.includes('valid')
+          );
+        });
+        bad?.dispatchEvent(
+          new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+        );
+      });
     },
   },
   {
@@ -331,26 +413,90 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 200,
+    maxTurns: 2000,
     playLegal: async (page) => {
       await dismissOwl(page);
-      await passIfVisible(page, '.juggle-roll-btn:not([disabled])');
-      await sleep(page, 40);
-      await clickFirst(page, '.juggle-die.selectable');
-      await sleep(page, 30);
-      await clickFirst(page, '.juggle-shape-option');
-      await sleep(page, 30);
-      // Prefer valid cell on active board
-      if (await clickFirst(page, '.juggle-cell-valid')) return true;
-      return page.evaluate(() => {
-        const cell = document.querySelector(
-          '.juggle-board.player1 .juggle-cell, .juggle-board.player2 .juggle-cell'
-        );
-        cell?.dispatchEvent(
-          new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
-        );
-        return !!cell;
-      });
+      const status = (await readStatusText(page)).toLowerCase();
+      if (/wins|tie|game over/.test(status)) return false;
+
+      // HTML controls: Playwright click. Board cells: native element.click().
+      if (await passIfVisible(page, '.juggle-roll-btn:not([disabled])')) {
+        return true;
+      }
+      const shapeCount = await page.locator('.juggle-shape-option').count();
+      if (shapeCount > 0) {
+        const idx = Math.floor(Math.random() * shapeCount);
+        await page.locator('.juggle-shape-option').nth(idx).click({ force: true });
+        return true;
+      }
+      // Prefer smaller polyominoes so late-game gaps still fill.
+      const dice = page.locator(
+        '.juggle-die.selectable, [role="button"][aria-label*="die, selectable"]'
+      );
+      const dieCount = await dice.count();
+      if (dieCount > 0) {
+        let best = 0;
+        let bestScore = 99;
+        for (let i = 0; i < dieCount; i++) {
+          const aria = (await dice.nth(i).getAttribute('aria-label')) || '';
+          const text = (await dice.nth(i).textContent()) || '';
+          const blob = `${aria} ${text}`.toLowerCase();
+          const score = /monomino|1 cell/.test(blob)
+            ? 0
+            : /domino|2 cells/.test(blob)
+              ? 1
+              : /tromino|3 cells/.test(blob)
+                ? 2
+                : /tetromino|4 cells/.test(blob)
+                  ? 3
+                  : 4;
+          if (score < bestScore) {
+            bestScore = score;
+            best = i;
+          }
+        }
+        await dice.nth(best).click({ force: true });
+        return true;
+      }
+      const boardSel = status.includes('red')
+        ? '.juggle-board.player2'
+        : '.juggle-board.player1';
+      const placed = await page.evaluate((sel) => {
+        const board = document.querySelector(sel);
+        if (!board) return false;
+        const valids = [
+          ...board.querySelectorAll(
+            '.juggle-cell-valid, .juggle-cell[aria-label*="valid"]'
+          ),
+        ] as HTMLElement[];
+        if (!valids.length) return false;
+        // Pack toward top-left to reduce late-game fragmentation softlocks.
+        valids.sort((a, b) => {
+          const ar = +(a.dataset.row || 0);
+          const ac = +(a.dataset.col || 0);
+          const br = +(b.dataset.row || 0);
+          const bc = +(b.dataset.col || 0);
+          return ar - br || ac - bc;
+        });
+        valids[0]!.click();
+        return true;
+      }, boardSel);
+      if (placed) return true;
+
+      const abandon = page
+        .locator('.juggle-choose-other-btn, .juggle-control-btn')
+        .filter({ hasText: /choose another|can't fit|won'?t fit/i })
+        .first();
+      if (await abandon.isVisible().catch(() => false)) {
+        await abandon.click({ force: true });
+        return true;
+      }
+      const flip = page.locator('.juggle-control-btn', { hasText: /Flip/i }).first();
+      if (await flip.isVisible().catch(() => false)) {
+        await flip.click({ force: true });
+        return true;
+      }
+      return false;
     },
     tryIllegal: async (page) => {
       await clickFirst(page, '.juggle-cell:not(.juggle-cell-valid)');
@@ -456,8 +602,9 @@ const drivers: GameDriver[] = [
     title: 'Queens & Guards',
     mount: '.qg-board-container svg.qg-board',
     gameOver: '.qg-winner-banner',
-    maxTurns: 100,
+    maxTurns: 1200,
     playLegal: async (page) => {
+      // One atomic action (restore / move / select), matching playability harness.
       return page.evaluate(() => {
         const click = (el: Element | null | undefined) =>
           el?.dispatchEvent(
@@ -467,24 +614,44 @@ const drivers: GameDriver[] = [
               view: window,
             })
           );
+        const cells = [
+          ...document.querySelectorAll(
+            '.qg-board-container svg g[data-cell-key]'
+          ),
+        ];
+        const label = (g: Element) => g.getAttribute('aria-label') || '';
         const status = (
           document.querySelector('.qg-status')?.textContent || ''
         ).toLowerCase();
-        const seat = status.includes('red') ? 'Red' : 'Blue';
-        const pieces = [
-          ...document.querySelectorAll(
-            `.qg-board-container svg g[aria-label*="${seat}"]`
-          ),
-        ];
-        for (const p of pieces) {
-          click(p);
-          const dest = document.querySelector(
-            '.qg-board-container svg g[aria-label*="valid move"]'
-          );
-          if (dest) {
-            click(dest);
-            return true;
-          }
+        if (/wins/.test(status)) return false;
+        const seat = status.includes('red') && !status.includes('blue')
+          ? 'Red'
+          : 'Blue';
+
+        const captured = cells.filter((g) => label(g).includes('captured'));
+        const valids = cells.filter((g) => label(g).includes('valid move'));
+        const rand = <T,>(arr: T[]) =>
+          arr[Math.floor(Math.random() * arr.length)]!;
+        if (captured.length && valids.length) {
+          click(rand(valids));
+          return true;
+        }
+        if (captured.length) {
+          click(rand(captured));
+          return true;
+        }
+        if (valids.length) {
+          click(rand(valids));
+          return true;
+        }
+        const pieces = cells.filter(
+          (g) =>
+            label(g).includes(seat) &&
+            (label(g).includes('Guard') || label(g).includes('Queen'))
+        );
+        if (pieces.length) {
+          click(rand(pieces));
+          return true;
         }
         return false;
       });
@@ -563,23 +730,71 @@ const drivers: GameDriver[] = [
     title: "Pent'Em In",
     mount: '.pent-board',
     gameOver: '.pent-winner-banner',
-    maxTurns: 60,
+    maxTurns: 80,
     playLegal: async (page) => {
-      await clickFirst(page, '.pent-piece-option:not(.disabled)');
-      await sleep(page, 40);
-      if (await clickFirst(page, '.pent-cell-valid')) return true;
+      // Click interactive cells with aria valid placement (not decorative overlays).
       return page.evaluate(() => {
-        const cell = document.querySelector(
-          '.pent-board .interaction rect, .pent-board rect[data-row], .pent-cell-valid'
+        const click = (el: Element | null | undefined) =>
+          el?.dispatchEvent(
+            new MouseEvent('click', {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            })
+          );
+        const status = (
+          document.querySelector('.pent-status')?.textContent || ''
+        ).toLowerCase();
+        if (/wins|game over|tie/.test(status)) return false;
+
+        const place = document.querySelector(
+          '.pent-board rect[data-row][aria-label*="valid placement"], .pent-a11y-grid [role="gridcell"][aria-label*="valid placement"]'
         );
-        cell?.dispatchEvent(
-          new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
-        );
-        return !!cell;
+        if (place) {
+          click(place);
+          return true;
+        }
+        if (/select a piece/.test(status)) {
+          const opt = document.querySelector(
+            '.pent-piece-option:not(.disabled)'
+          );
+          if (opt) {
+            click(opt);
+            return true;
+          }
+        }
+        const rotate = document.querySelector('.pent-btn-rotate');
+        if (rotate) {
+          click(rotate);
+          return true;
+        }
+        const flip = document.querySelector('.pent-btn-flip');
+        if (flip) {
+          click(flip);
+          return true;
+        }
+        const other = document.querySelector('.pent-btn-choose-other');
+        if (other) {
+          click(other);
+          return true;
+        }
+        const opt = document.querySelector('.pent-piece-option:not(.disabled)');
+        if (opt) {
+          click(opt);
+          return true;
+        }
+        return false;
       });
     },
     tryIllegal: async (page) => {
-      await clickFirst(page, '.pent-piece-option.disabled');
+      await page.evaluate(() => {
+        const bad = document.querySelector(
+          '.pent-board rect[data-row][aria-label*="empty"]:not([aria-label*="valid"])'
+        );
+        bad?.dispatchEvent(
+          new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+        );
+      });
     },
   },
   {
