@@ -21,15 +21,31 @@ import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  CPU_THROTTLE,
+  MOVE_TARGET_RENDER,
+  finalizeGameResult,
+  installRenderObservers,
+  measureHoverCosts,
+  measureMoveCost,
+  measureTTI,
+  readRenderSummary,
+  setupRenderContext,
+  writeRenderReport,
+} from './render-perf-mode.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
+const RENDER_MODE = process.env.PERF_MODE === 'render';
 const REPORT_MD = resolve(ROOT, 'docs/runtime-perf-2026-10-07.md');
 const REPORT_JSON = resolve(ROOT, 'docs/runtime-perf-2026-10-07.json');
 
-const MOVE_TARGET = Number(process.env.PERF_MOVES || 30);
+const MOVE_TARGET = RENDER_MODE
+  ? MOVE_TARGET_RENDER
+  : Number(process.env.PERF_MOVES || 30);
 const NAV_CYCLES = Number(process.env.PERF_NAV_CYCLES || 5);
 const FRAME_SAMPLE_MS = Number(process.env.PERF_FRAME_MS || 2000);
+const PERF_PHASE = process.env.PERF_PHASE || 'baseline';
 
 const BOARD3D_GAMES = new Set([
   'kings-quadraphages',
@@ -125,7 +141,9 @@ async function attemptScriptedMove(page, gameId) {
         '.cell.valid, .cell[aria-label*="valid"], .cell-king'
       );
       if ((await valid.count()) > 0) {
-        await valid.nth(Math.floor(Math.random() * Math.min(3, await valid.count()))).click({ force: true });
+        await valid
+          .nth(Math.floor(Math.random() * Math.min(3, await valid.count())))
+          .click({ force: true });
         return true;
       }
       return clickFirst('.cell:not(.cell-blocked)');
@@ -211,9 +229,7 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'fab-a-diffy': {
       if (await clickFirst('.fab-bar-wrapper:not(.fab-bar-disabled)')) {
-        return clickFirst(
-          '.fab-op-valid, .fab-op-btn:not(.fab-op-disabled)'
-        );
+        return clickFirst('.fab-op-valid, .fab-op-btn:not(.fab-op-disabled)');
       }
       return false;
     }
@@ -271,9 +287,7 @@ async function attemptScriptedMove(page, gameId) {
     case 'fraction-pinball': {
       if (await clickFirst('.pinball-choice-btn')) {
         await page.waitForTimeout(100);
-        await clickFirst(
-          '.pinball-continue-btn, button:has-text("Continue")'
-        );
+        await clickFirst('.pinball-continue-btn, button:has-text("Continue")');
         return true;
       }
       return false;
@@ -405,7 +419,104 @@ function suspectLeaks(gameId, heapGrowthBytes, board3d) {
   return suspects;
 }
 
+async function measureGameRender(browser, baseURL, gameId) {
+  const board3d = BOARD3D_GAMES.has(gameId);
+  const { context, page } = await setupRenderContext(browser, baseURL);
+
+  let result = {
+    gameId,
+    board3d,
+    ttiMs: null,
+    movesAttempted: 0,
+    movesLanded: 0,
+    moveSamples: [],
+    hoverSamples: [],
+    longTasksOver50: 0,
+    longTaskMaxMs: 0,
+    error: null,
+  };
+
+  try {
+    // Tracing for one game at a time (kept brief; discarded after metrics).
+    await context.tracing
+      .start({ screenshots: false, snapshots: true, sources: false })
+      .catch(() => {});
+
+    result.ttiMs = await measureTTI(page, async () => {
+      await gotoGame(page, baseURL, gameId, board3d);
+      await startHuman(page);
+    });
+    await installRenderObservers(page);
+
+    let landed = 0;
+    let attempts = 0;
+    const maxAttempts = MOVE_TARGET * 4;
+    while (landed < MOVE_TARGET && attempts < maxAttempts) {
+      attempts++;
+      const before = await page.evaluate(() => document.body.innerHTML.length);
+      const { ok, sample } = await measureMoveCost(page, () =>
+        attemptScriptedMove(page, gameId)
+      );
+      result.moveSamples.push(sample);
+      await page.waitForTimeout(80);
+      const after = await page.evaluate(() => document.body.innerHTML.length);
+      const thinking = await page
+        .locator('.status-ai-thinking')
+        .isVisible()
+        .catch(() => false);
+      if (ok || before !== after || thinking) {
+        landed++;
+      }
+      const over = await page
+        .locator('.game-over, .status-winner, text=/wins|draw|game over/i')
+        .first()
+        .isVisible()
+        .catch(() => false);
+      if (over && landed < MOVE_TARGET) {
+        await page
+          .locator('#new-game-btn')
+          .click()
+          .catch(() => {});
+        await startHuman(page);
+        await installRenderObservers(page);
+      }
+    }
+    result.movesAttempted = attempts;
+    result.movesLanded = landed;
+
+    // Hover preview cost (juggle / pent-em-in) — INPUT path, not AI.
+    // Pent'Em In 2D SVG hover is the hotspot we fix; under board3d the
+    // interaction layer is a canvas, so re-open 2D for hover samples only.
+    if (gameId === 'pent-em-in' && board3d) {
+      await gotoGame(page, baseURL, gameId, false);
+      await startHuman(page);
+      await installRenderObservers(page);
+    }
+    result.hoverSamples = await measureHoverCosts(page, gameId);
+
+    const summary = await readRenderSummary(page);
+    result.longTasksOver50 = summary.longTasksOver50;
+    result.longTaskMaxMs = summary.longTaskMaxMs;
+    // Prefer samples collected via measureMoveCost / measureHoverCosts
+    if (summary.moveSamples?.length) result.moveSamples = summary.moveSamples;
+    if (summary.hoverSamples?.length)
+      result.hoverSamples = summary.hoverSamples;
+
+    await context.tracing.stop({ path: undefined }).catch(() => {});
+  } catch (err) {
+    result.error = err instanceof Error ? err.message : String(err);
+  } finally {
+    await context.close().catch(() => {});
+  }
+
+  return finalizeGameResult(result);
+}
+
 async function measureGame(browser, baseURL, gameId) {
+  if (RENDER_MODE) {
+    return measureGameRender(browser, baseURL, gameId);
+  }
+
   const board3d = BOARD3D_GAMES.has(gameId);
   const context = await browser.newContext({ baseURL });
   const page = await context.newPage();
@@ -438,9 +549,7 @@ async function measureGame(browser, baseURL, gameId) {
     const maxAttempts = MOVE_TARGET * 4;
     while (landed < MOVE_TARGET && attempts < maxAttempts) {
       attempts++;
-      const before = await page.evaluate(
-        () => document.body.innerHTML.length
-      );
+      const before = await page.evaluate(() => document.body.innerHTML.length);
       const ok = await attemptScriptedMove(page, gameId);
       await page.waitForTimeout(120);
       const after = await page.evaluate(() => document.body.innerHTML.length);
@@ -453,14 +562,15 @@ async function measureGame(browser, baseURL, gameId) {
       }
       // Restart if game over mid-session
       const over = await page
-        .locator(
-          '.game-over, .status-winner, text=/wins|draw|game over/i'
-        )
+        .locator('.game-over, .status-winner, text=/wins|draw|game over/i')
         .first()
         .isVisible()
         .catch(() => false);
       if (over && landed < MOVE_TARGET) {
-        await page.locator('#new-game-btn').click().catch(() => {});
+        await page
+          .locator('#new-game-btn')
+          .click()
+          .catch(() => {});
         await startHuman(page);
       }
     }
@@ -506,9 +616,7 @@ function renderMarkdown(results, meta) {
   lines.push('');
   lines.push('## Method');
   lines.push('');
-  lines.push(
-    `- Base URL: \`${meta.baseURL}\``
-  );
+  lines.push(`- Base URL: \`${meta.baseURL}\``);
   lines.push(
     `- Per game: up to **${MOVE_TARGET}** scripted legal moves (human-vs-human, both seats), then **${NAV_CYCLES}** navigate-away/back cycles.`
   );
@@ -516,8 +624,7 @@ function renderMarkdown(results, meta) {
     '- Metrics: `PerformanceObserver` long tasks, rAF frame deltas (~2s sample), CDP `Performance.getMetrics` JSHeapUsedSize (with GC best-effort).'
   );
   lines.push(
-    '- 3D games loaded with `?board3d=1`: ' +
-      [...BOARD3D_GAMES].join(', ')
+    '- 3D games loaded with `?board3d=1`: ' + [...BOARD3D_GAMES].join(', ')
   );
   lines.push('');
   lines.push('## Per-game results');
@@ -525,9 +632,7 @@ function renderMarkdown(results, meta) {
   lines.push(
     '| Game | 3D | Moves | Long tasks | Max LT (ms) | Frame p50/p95 (ms) | Heap mount → last | Δ heap | Suspected leaks |'
   );
-  lines.push(
-    '|---|---|---:|---:|---:|---:|---:|---:|---|'
-  );
+  lines.push('|---|---|---:|---:|---:|---:|---:|---:|---|');
 
   for (const r of results) {
     const play = r.play || {};
@@ -570,7 +675,9 @@ function renderMarkdown(results, meta) {
   lines.push('');
   lines.push('```bash');
   lines.push('npm run perf:runtime');
-  lines.push('# optional: PERF_GAMES=hex,fiar PERF_MOVES=30 npm run perf:runtime');
+  lines.push(
+    '# optional: PERF_GAMES=hex,fiar PERF_MOVES=30 npm run perf:runtime'
+  );
   lines.push('```');
   lines.push('');
   lines.push(`Generated: ${meta.generatedAt}`);
@@ -599,14 +706,25 @@ async function main() {
   });
 
   const results = [];
-  console.log(`Runtime perf → ${baseURL} (${GAMES.length} games)`);
+  const modeLabel = RENDER_MODE
+    ? `render CPU=${CPU_THROTTLE}x tablet phase=${PERF_PHASE}`
+    : 'runtime/leak';
+  console.log(
+    `Runtime perf [${modeLabel}] → ${baseURL} (${GAMES.length} games)`
+  );
   for (const gameId of GAMES) {
     process.stdout.write(`  … ${gameId} `);
     const r = await measureGame(browser, baseURL, gameId);
     results.push(r);
-    console.log(
-      `moves=${r.movesLanded} Δheap=${fmtMb(r.heapGrowthBytes)}${r.error ? ' ERR' : ''}`
-    );
+    if (RENDER_MODE) {
+      console.log(
+        `tti=${r.ttiMs?.toFixed?.(0) ?? '—'} moveP95=${r.move?.p95Ms?.toFixed?.(1) ?? '—'} hoverP95=${r.hover?.p95Ms?.toFixed?.(1) ?? '—'} lt50=${r.longTasksOver50 ?? 0}${r.error ? ' ERR' : ''}`
+      );
+    } else {
+      console.log(
+        `moves=${r.movesLanded} Δheap=${fmtMb(r.heapGrowthBytes)}${r.error ? ' ERR' : ''}`
+      );
+    }
   }
 
   await browser.close();
@@ -617,17 +735,34 @@ async function main() {
     baseURL,
     moveTarget: MOVE_TARGET,
     navCycles: NAV_CYCLES,
+    mode: RENDER_MODE ? 'render' : 'runtime',
+    phase: PERF_PHASE,
+    cpuThrottle: RENDER_MODE ? CPU_THROTTLE : 1,
+    fixedGames: (process.env.PERF_FIXED_GAMES || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean),
+    fixNotes: (process.env.PERF_FIX_NOTES || '')
+      .split('|')
+      .map((s) => s.trim())
+      .filter(Boolean),
   };
 
-  await mkdir(dirname(REPORT_MD), { recursive: true });
-  await writeFile(
-    REPORT_JSON,
-    JSON.stringify({ meta, results }, null, 2),
-    'utf8'
-  );
-  await writeFile(REPORT_MD, renderMarkdown(results, meta), 'utf8');
-  console.log(`Wrote ${REPORT_MD}`);
-  console.log(`Wrote ${REPORT_JSON}`);
+  if (RENDER_MODE) {
+    const paths = await writeRenderReport(ROOT, results, meta);
+    console.log(`Wrote ${paths.md}`);
+    console.log(`Wrote ${paths.json}`);
+  } else {
+    await mkdir(dirname(REPORT_MD), { recursive: true });
+    await writeFile(
+      REPORT_JSON,
+      JSON.stringify({ meta, results }, null, 2),
+      'utf8'
+    );
+    await writeFile(REPORT_MD, renderMarkdown(results, meta), 'utf8');
+    console.log(`Wrote ${REPORT_MD}`);
+    console.log(`Wrote ${REPORT_JSON}`);
+  }
 }
 
 main().catch((err) => {

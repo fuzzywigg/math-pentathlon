@@ -36,6 +36,7 @@ npm run format:check
 npm run size:check               # gzip budgets (needs dist/; report-only, exit 0)
 npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
 npm run perf:runtime             # runtime AI/move timing probe
+                                 # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
 ```
 

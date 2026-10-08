@@ -11,6 +11,7 @@ import {
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
+  syncContigBoard,
   renderDice,
   renderExpressionSelector,
   injectContigStyles,
@@ -86,8 +87,16 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
-  boardContainer.innerHTML = '';
   const humanCanAct = !isComputerTurn();
+
+  let board = boardContainer.querySelector(
+    '.contig-board'
+  ) as HTMLElement | null;
+
+  // Rebuild chrome around a persistent board grid.
+  for (const child of Array.from(boardContainer.children)) {
+    if (!child.classList.contains('contig-board')) child.remove();
+  }
 
   // Render scores
   const scoresDiv = document.createElement('div');
@@ -100,7 +109,7 @@ function updateUI(): void {
       ${seatIcon('player2')} Red: <strong>${gameState.scores.player2}</strong> pts
     </div>
   `;
-  boardContainer.appendChild(scoresDiv);
+  boardContainer.insertBefore(scoresDiv, board);
 
   // Render dice area
   const diceArea = renderDice(
@@ -108,13 +117,19 @@ function updateUI(): void {
     handleRollDice,
     gameState.phase === 'rolling' && humanCanAct
   );
-  boardContainer.appendChild(diceArea);
+  boardContainer.insertBefore(diceArea, board);
 
   // Board before expression list so green targets stay above the fold on tablets
-  const board = renderBoard(gameState, handleCellClick, {
-    allowInput: humanCanAct,
-  });
-  boardContainer.appendChild(board);
+  if (!board) {
+    board = renderBoard(gameState, handleCellClick, {
+      allowInput: humanCanAct,
+    });
+    boardContainer.appendChild(board);
+  } else {
+    syncContigBoard(board, gameState, handleCellClick, {
+      allowInput: humanCanAct,
+    });
+  }
 
   // Expression / pass chrome only on the human seat (blocks AI soft-lock taps)
   if (

@@ -27,6 +27,7 @@ import {
   renderShapeControls,
   injectJuggleStyles,
   getPlayerName,
+  applyJuggleHoverPreview,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
@@ -291,13 +292,29 @@ function handleCellHover(row: number, col: number): void {
   if (gameState.phase !== 'placing') return;
 
   gameState = { ...gameState, hoverPosition: { row, col } };
-  updateUI();
+  if (!boardContainer) return;
+  const boards = boardContainer.querySelector('.juggle-boards');
+  if (boards) {
+    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
+      allowInput: true,
+    });
+  } else {
+    updateUI();
+  }
 }
 
 function handleCellLeave(): void {
   if (isComputerTurnPending()) return;
   gameState = { ...gameState, hoverPosition: null };
-  updateUI();
+  if (!boardContainer) return;
+  const boards = boardContainer.querySelector('.juggle-boards');
+  if (boards) {
+    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
+      allowInput: true,
+    });
+  } else {
+    updateUI();
+  }
 }
 
 // =============================================================================

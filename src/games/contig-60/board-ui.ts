@@ -13,7 +13,6 @@ import {
   makeGridCell,
   markBoardAsGrid,
   bindGridNavigation,
-  bindCellActivateKeys,
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
@@ -34,6 +33,81 @@ export interface ContigBoardRenderOptions {
   allowInput?: boolean;
 }
 
+interface ContigClickBinding {
+  onCellClick: (value: number) => void;
+}
+
+const contigClickBindings = new WeakMap<HTMLElement, ContigClickBinding>();
+type ContigCellMap = Map<number, HTMLElement>;
+
+function getContigCellMap(container: HTMLElement): ContigCellMap {
+  let map = (container as HTMLElement & { __contigCells?: ContigCellMap })
+    .__contigCells;
+  if (!map) {
+    map = new Map();
+    for (const cell of Array.from(
+      container.querySelectorAll('.contig-cell')
+    ) as HTMLElement[]) {
+      map.set(Number(cell.dataset.value), cell);
+    }
+    (
+      container as HTMLElement & { __contigCells?: ContigCellMap }
+    ).__contigCells = map;
+  }
+  return map;
+}
+
+/**
+ * Sync an existing contig board in place (no wipe / recreate).
+ */
+export function syncContigBoard(
+  container: HTMLElement,
+  state: ContigState,
+  onCellClick: (value: number) => void,
+  options: ContigBoardRenderOptions = {}
+): void {
+  const allowInput = options.allowInput !== false;
+  contigClickBindings.set(container, { onCellClick });
+
+  const validPlacements = state.currentDice
+    ? new Set(getValidPlacements(state, state.currentDice).map((p) => p.result))
+    : new Set<number>();
+
+  const cells = getContigCellMap(container);
+  for (const [value, cellEl] of cells) {
+    const cell = state.cells.get(value);
+    const isValid =
+      allowInput && validPlacements.has(value) && state.phase === 'calculating';
+
+    cellEl.className = 'contig-cell';
+    delete cellEl.dataset.points;
+
+    if (cell?.owner === 'player1') {
+      cellEl.classList.add('contig-cell-p1');
+    } else if (cell?.owner === 'player2') {
+      cellEl.classList.add('contig-cell-p2');
+    } else if (isValid) {
+      cellEl.classList.add('contig-cell-valid');
+      const points = calculatePoints(state, value);
+      if (points > 0) cellEl.dataset.points = `+${points}`;
+    }
+
+    const ownerLabel = cell?.owner ? getPlayerName(cell.owner) : undefined;
+    makeGridCell(
+      cellEl,
+      buildCellAriaLabel({
+        coord: String(value),
+        empty: !cell?.owner,
+        owner: ownerLabel,
+        validPlacement: isValid,
+      })
+    );
+    cellEl.style.cursor = isValid ? 'pointer' : '';
+  }
+
+  applyRovingTabindex(collectGridCells(container));
+}
+
 /**
  * Render the game board
  */
@@ -46,11 +120,15 @@ export function renderBoard(
   const container = document.createElement('div');
   container.className = 'contig-board';
   markBoardAsGrid(container);
+  contigClickBindings.set(container, { onCellClick });
 
   // Get valid placements if dice are rolled
   const validPlacements = state.currentDice
     ? new Set(getValidPlacements(state, state.currentDice).map((p) => p.result))
     : new Set<number>();
+
+  const fragment = document.createDocumentFragment();
+  const cellMap: ContigCellMap = new Map();
 
   // Create grid
   for (let row = 0; row < CONFIG.GRID_ROWS; row++) {
@@ -104,19 +182,42 @@ export function renderBoard(
         })
       );
 
-      // Click + keyboard on valid placements
       if (isValid) {
         cellEl.style.cursor = 'pointer';
-        const activate = () => onCellClick(value);
-        cellEl.addEventListener('click', activate);
-        bindCellActivateKeys(cellEl, activate);
       }
 
+      cellMap.set(value, cellEl);
       rowEl.appendChild(cellEl);
     }
 
-    container.appendChild(rowEl);
+    fragment.appendChild(rowEl);
   }
+
+  container.appendChild(fragment);
+  (container as HTMLElement & { __contigCells?: ContigCellMap }).__contigCells =
+    cellMap;
+
+  // Delegated activate — syncContigBoard never rebinds per-cell listeners.
+  container.addEventListener('click', (e) => {
+    const target = (e.target as HTMLElement).closest(
+      '.contig-cell'
+    ) as HTMLElement | null;
+    if (!target || !container.contains(target)) return;
+    if (target.style.cursor !== 'pointer') return;
+    const value = Number(target.dataset.value);
+    if (!Number.isFinite(value)) return;
+    contigClickBindings.get(container)?.onCellClick(value);
+  });
+  container.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const target = e.target as HTMLElement;
+    if (!target.classList.contains('contig-cell')) return;
+    if (target.style.cursor !== 'pointer') return;
+    e.preventDefault();
+    const value = Number(target.dataset.value);
+    if (!Number.isFinite(value)) return;
+    contigClickBindings.get(container)?.onCellClick(value);
+  });
 
   bindGridNavigation(container);
   applyRovingTabindex(collectGridCells(container));
