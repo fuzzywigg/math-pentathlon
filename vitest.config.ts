@@ -1,4 +1,8 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 const coverage = {
   provider: 'v8' as const,
@@ -24,7 +28,17 @@ const isolatedFiles = [
   'tests/unit/tablet-ai-hard-latency.bench.test.ts',
   // Re-imports StorageManager via vi.resetModules to exercise constructor load().
   'tests/unit/durable-progress-persistence.test.ts',
+  // Hoisted game-controller mocks must not leak into shared controller suites.
+  'tests/unit/burn-1007-game-route-mounts.test.ts',
 ];
+
+/** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
+const pwaRegisterAlias = {
+  'virtual:pwa-register': path.join(
+    rootDir,
+    'tests/unit/mocks/virtual-pwa-register.ts'
+  ),
+};
 
 export default defineConfig({
   test: {
@@ -34,6 +48,7 @@ export default defineConfig({
     sequence: { hooks: 'stack' },
     projects: [
       {
+        resolve: { alias: pwaRegisterAlias },
         test: {
           name: 'unit-shared',
           globals: true,
@@ -55,6 +70,7 @@ export default defineConfig({
         },
       },
       {
+        resolve: { alias: pwaRegisterAlias },
         test: {
           name: 'unit-isolated',
           globals: true,

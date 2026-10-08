@@ -1,9 +1,11 @@
-import { registerSW } from 'virtual:pwa-register';
+import { registerSW as defaultRegisterSW } from 'virtual:pwa-register';
 import { registerPwa } from './register';
 
 export type BootstrapPwaOptions = {
   /** Injected for tests. */
   schedule?: (cb: () => void) => void;
+  /** Injected for tests; defaults to vite-plugin-pwa virtual module. */
+  registerSW?: typeof defaultRegisterSW;
   /** When false, skip registration. Default: true in browsers. */
   enabled?: boolean;
 };
@@ -34,6 +36,7 @@ export function bootstrapPwa(options: BootstrapPwaOptions = {}): void {
   if (!enabled) return;
 
   const schedule = options.schedule ?? defaultSchedule;
+  const registerSW = options.registerSW ?? defaultRegisterSW;
   schedule(() => {
     registerPwa({ registerSW });
   });
