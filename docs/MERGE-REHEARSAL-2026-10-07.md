@@ -68,7 +68,7 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491` `#493` `#494` `#495` `#496` `#497` `#498` `#499` `#500` `#501` `#502` `#504` `#509` `#513` `#507` `#512`
+`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491` `#493` `#494` `#495` `#496` `#497` `#498` `#499` `#500` `#501` `#502` `#504` `#509` `#513` `#507` `#512` `#508` `#514` `#515` `#516` `#517`
 
 Already on `alpha` (close as merged/superseded): **#413**, **#414**.
 
@@ -99,3 +99,10 @@ Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**,
 
 - Did: fold wave-5 candidates onto tip (including `#486`/`#489`/`#490`/`#491`/`#493`–`#501` `#502`/`#497`), merge `origin/alpha` after `#413`+`#414` landed (prefer tip folds; keep hex Hard **450ms** + CI security; held Stars & Bars history-cap from `#501` `#502`), update this rehearsal to **wave-5 tip alone → `alpha`**, run lint/tsc/unit/Playwright e2e.
 - Did **not**: merge/close/retarget any existing PR from the agent; change game rules or scoring; commit secrets.
+
+### Burn-wave fold notes (2026-10-08)
+
+- Superseded twins (human close): **#503**←#502, **#506**←#504, **#510**←#509(+ported), **#511**←#513(+ported), **#505**←#507
+- Phase-2 out-of-scope ceiling: **520** after #514/#516 stack (not AI edits)
+- Held for Andrew: Stars & Bars history-cap; Phase-2 AI type fixes; CSP enforcing / frame-ancestors policy changes beyond tip's existing X-Frame DENY
+- Known pre-existing: `ai-move-time-midgame.bench`; Prime Gold keyboard e2e flake (track separately; #508 keeps Playwright CI at 2 workers)
