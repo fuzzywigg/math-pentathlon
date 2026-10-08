@@ -90,6 +90,24 @@ const IN_SCOPE = new RegExp(
     '^tests/unit/burn-wave35-ramrod-box-format-helpers\\.test\\.ts$',
     '^tests/unit/burn-wave41-fab-pass-winner-helpers\\.test\\.ts$',
     '^tests/unit/overnight-dice-selector-reset-helpers\\.test\\.ts$',
+    // Phase 2 Batch 8 — remaining helper-test floor + script-.mjs ambient (no @types/node)
+    '^tests/unit/burn-wave35-fraction-pinball-format-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave41-calla-types-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave41-stars-types-diff-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave42-fiar-types-graph-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave42-kings-pieces-board-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave42-pent-type-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave44-fab-initial-types-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave47-stars-types-diff-helpers\\.test\\.ts$',
+    '^tests/unit/check-build-helpers\\.test\\.ts$',
+    '^tests/unit/history-routing-helpers\\.test\\.ts$',
+    '^tests/unit/offline-helpers\\.test\\.ts$',
+    '^tests/unit/overnight-graph-directed-edge-helpers\\.test\\.ts$',
+    '^tests/unit/overnight-wave50-calla-types-helpers-matrix\\.test\\.ts$',
+    '^tests/unit/pwa-manifest-contract-helpers\\.test\\.ts$',
+    '^tests/unit/report-licenses-helpers\\.test\\.ts$',
+    // Soft-lock clean PWA shell modules (skip register/bootstrap-owl — open #568)
+    '^src/pwa/(bootstrap|idle-warm)\\.ts$',
   ].join('|')
 );
 
@@ -270,7 +288,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch-7',
+  taskId: 'burn-1008-mp-type-ratchet-batch-8',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {
