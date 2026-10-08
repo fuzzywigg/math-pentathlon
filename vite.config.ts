@@ -23,9 +23,36 @@ import { securityHeadersPlugin } from './vite.security-headers';
  * autoUpdate (skipWaiting + clientsClaim) so a new deploy is not stuck behind
  * a stale tab forever — see src/pwa/register.ts.
  *
+ * Reproducibility (build-config only; see docs/build-repro-2026-10-08.md):
+ * - base `/` matches absolute asset URLs in index.html + site.webmanifest
+ * - sourcemaps off (no absolute path leakage via .map files)
+ * - esbuild legalComments none (no license banner path variance)
+ * - Workbox precache manifest sorted by URL (stable SW across FS order)
+ * - manualChunks + [name]-[hash] keep chunk names content-addressed
+ *
  * Optional treemap: PERF_VISUALIZE=1 npm run build → test-results/perf/stats.html
+ * Report-only dual-build audit: npm run check:build
  */
 const visualize = process.env.PERF_VISUALIZE === '1';
+
+/**
+ * Dedupe + sort Workbox precache entries so sw.js is stable across filesystem
+ * readdir order. (includeAssets are appended afterward by workbox-build — keep
+ * that list free of glob overlaps; see includeAssets below.)
+ */
+function sortPrecacheManifest<T extends { url: string }>(
+  entries: T[]
+): { manifest: T[]; warnings: string[] } {
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+  for (const entry of entries) {
+    if (seen.has(entry.url)) continue;
+    seen.add(entry.url);
+    deduped.push(entry);
+  }
+  deduped.sort((a, b) => (a.url < b.url ? -1 : a.url > b.url ? 1 : 0));
+  return { manifest: deduped, warnings: [] };
+}
 
 const plugins: PluginOption[] = [
   securityHeadersPlugin(),
@@ -33,15 +60,16 @@ const plugins: PluginOption[] = [
     registerType: 'autoUpdate',
     // Manual registration via src/pwa/bootstrap.ts (update + reload policy).
     injectRegister: false,
+    // Only list assets NOT already matched by workbox.globPatterns.
+    // workbox-build appends includeAssets + manifest icons + the generated
+    // webmanifest AFTER manifestTransforms — overlapping entries become
+    // unsorted duplicate tails on sw.js.
     includeAssets: [
-      'favicon.ico',
-      'favicon.svg',
-      'icons/*.png',
-      'health.txt',
+      // No file extension → not covered by globPatterns.
       'CNAME',
-      // Body weight only — 500/600/700 are runtime-cached (see workbox).
-      'fonts/inter-latin-400-normal.woff2',
     ],
+    // Icons are already matched by globPatterns (`*.png` / favicon.*).
+    includeManifestIcons: false,
     // Keep existing index.html link href (/site.webmanifest).
     manifestFilename: 'site.webmanifest',
     manifest: {
@@ -91,9 +119,10 @@ const plugins: PluginOption[] = [
       // Precache everything needed for full offline play after first visit.
       // Includes Vite-emitted AI Web Worker chunks (*.js under assets/).
       // png: tablet install icons under /icons (Add to Home Screen).
-      globPatterns: [
-        '**/*.{js,css,html,ico,svg,png,txt,webmanifest,woff,woff2}',
-      ],
+      // Omit webmanifest: vite-plugin-pwa always injects site.webmanifest via
+      // additionalManifestEntries (MD5 of the manifest JSON). Including it in
+      // the glob duplicated the URL with a different revision.
+      globPatterns: ['**/*.{js,css,html,ico,svg,png,txt,woff,woff2}'],
       // Skip heavier Inter weights from first SW install so cheap tablets
       // finish precache sooner; weights cache on first use.
       globIgnores: [
@@ -106,6 +135,8 @@ const plugins: PluginOption[] = [
       navigateFallbackDenylist: [/^\/api\//, /^\/health/],
       // Keep SW install reliable on low-end tablets (three.js ~688 kB).
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+      // Stable SW bytes: glob/includeAssets order can vary by filesystem.
+      manifestTransforms: [sortPrecacheManifest],
       // Fonts: CacheFirst for non-precached Inter weights.
       // Do NOT add a redundant CacheFirst for /assets/*.js — Workbox
       // precacheAndRoute already serves those. A second route does not fix
@@ -148,8 +179,18 @@ if (visualize) {
 }
 
 export default defineConfig({
+  // Absolute asset URLs in index.html / manifest assume site root hosting
+  // (Cloudflare Pages + custom domain). Do not switch to relative base without
+  // updating public/ links and PWA start_url/scope/icons.
+  base: '/',
+  // Production: no .map files (avoids absolute path leakage; kids do not need
+  // browser sourcemaps). Enable locally only when debugging a prod bundle.
+  esbuild: {
+    legalComments: 'none',
+  },
   plugins,
   build: {
+    sourcemap: false,
     // Menu entry should only preload shell deps (core/ui), not games or 3D.
     modulePreload: {
       resolveDependencies(filename, deps) {
@@ -163,6 +204,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
+        // Content-hashed names; manualChunks below keep logical names stable.
         chunkFileNames(chunkInfo) {
           if (
             chunkInfo.name === 'three' ||
