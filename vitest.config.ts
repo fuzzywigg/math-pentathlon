@@ -27,12 +27,22 @@ const isolatedFiles = [
 ];
 
 /**
- * Pure AI / rules leftovers that never touch the DOM. Run under `node` to skip
- * jsdom environment cost (largest cumulative Vitest timer on this suite).
+ * Curated pure AI / rules leftovers that never touch the DOM.
+ * Run under `node` to skip jsdom environment cost. Keep this list conservative:
+ * owl/storage suites need extra browser APIs beyond localStorage polyfill.
  */
 const nodePureFiles = [
+  'tests/unit/ai-determinism-shard-a.test.ts',
+  'tests/unit/ai-determinism-shard-b.test.ts',
+  'tests/unit/ai-determinism-shard-c.test.ts',
+  'tests/unit/ai-determinism-shard-d.test.ts',
+  'tests/unit/ai-determinism-shard-e.test.ts',
+  'tests/unit/ai-calibration-difficulty-order.test.ts',
+  'tests/unit/state-roundtrip-fuzz.test.ts',
+  'tests/unit/engine-property-invariants.test.ts',
   'tests/unit/ai-worker-parity-fab.test.ts',
   'tests/unit/ai-worker-parity-queens-hex.test.ts',
+  'tests/unit/ai-worker-parity-fiar.test.ts',
   'tests/unit/burn-wave41-fab-ai-execute-steps.test.ts',
   'tests/unit/burn-wave43-fab-ai-execute-difficulties.test.ts',
   'tests/unit/overnight-fab-ai-difficulties-gates.test.ts',
@@ -54,6 +64,7 @@ const nodePureFiles = [
   'tests/unit/burn-wave18-ai-midphase.test.ts',
   'tests/unit/burn-wave41-pent-ai-difficulties.test.ts',
   'tests/unit/burn-wave42-pent-ai-difficulty-random.test.ts',
+  'tests/unit/burn-wave13-win-draw-ai.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
