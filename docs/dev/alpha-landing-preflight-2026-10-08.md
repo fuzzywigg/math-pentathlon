@@ -265,7 +265,7 @@ Also related docs: `docs/tutorial-engine-mismatches-2026-10-07.md`, `docs/RULES-
 **Process / soft (resolve before or during window):**
 
 1. **Owner eyeball** of every `src/games/*/ai.ts`, non-trivial `rules.ts`, and all `tutorial.ts` / player copy listed in §5 — tip includes intentional AI timing (Hex/Queens Hard 450), AI heuristic edits (esp. Kwatro), and widespread kid-friendly tutorial rewrites.
-2. **Unit suite flake risk** under full parallel load (`ui-helper-dedupe-characterization` generation-timeout tests). Confirmation run passed; if CI is single-shot without retry of that file, watch Actions on the tip→`alpha` PR.
+2. **Unit suite flake risk** under full parallel load (`ui-helper-dedupe-characterization` generation-timeout tests — **2 timeouts** on first run only). Tracked in [`docs/flake-rate-wave5-2026-10-08.md`](../flake-rate-wave5-2026-10-08.md) §3 (#505/#547 track). Mitigated on tip with fake timers + `unit-isolated` (`edcff8bf`); **do not raise timeouts globally**. Confirmation run passed; still watch Actions.
 3. **Tip drift:** `7b99c2bb` landed after this preflight (fullgame e2e fold). Re-run at least `npm run test:unit` + `CI=true npm run test:e2e:chromium` on the tip tip actually merged, or re-run this preflight if more folds land before Oct 9.
 4. **Non-blocking:** menu-home axe `landmark-unique` (moderate); 9 report-only gzip budget OVERs.
 

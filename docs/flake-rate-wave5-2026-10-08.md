@@ -75,6 +75,17 @@ Blocked initially by missing `rollup-plugin-visualizer` (dev `webServer` / vite 
 - **Root cause:** Wall-clock `performance.now()` under parallel unit-node/shared workers. File already `skipIf(CI)` for the same reason on GHA. Not an AI deadline / Hex 450ms change.
 - **Fix:** Keep `HARD_FLAG_MS = 500`; Hard-flag assert is strict only when the file is invoked directly (or `AI_BENCH_STRICT=1`); full-suite runs stay report-only (still write the markdown).
 
+### 3. UI-helper generation-gate timeouts under full-suite load (#505 / #547 track)
+
+Tracked here for the tip that carries the `#505` fullgame fold (`7b99c2bb`) and the `#547` alpha-landing preflight (`e1692696`). **Do not raise Vitest / CI timeouts globally.**
+
+| Test | Source | Symptom | Cause | Mitigation |
+| --- | --- | --- | --- | --- |
+| `ui-helper-dedupe-characterization` — `generation gate drops stale callbacks` | #547 preflight first `npm run test:unit` @ `e1692696` | `Test timed out in 30000ms`; isolated rerun **pass** (~1.5s, 48/48) | Real `setTimeout(10/30)` awaits starved under full parallel suite | Fake timers in that describe + file in `unit-isolated` (`edcff8bf`); no timeout raise |
+| `ui-helper-dedupe-characterization` — `scheduleGenerationGated matches separate timer/generation bindings` | same first-run fail (2 timeouts total) | same 30000ms timeout; isolated + full confirmation **pass** | same load starvation | same |
+
+**Evidence:** [`docs/dev/alpha-landing-preflight-2026-10-08.md`](./dev/alpha-landing-preflight-2026-10-08.md) §3 unit first-run fail. Confirmation full `test:unit` exit 0; e2e 204 passed.
+
 ## After
 
 See PR verification section / `unit-after-summary.json` + e2e summaries under artifacts.
