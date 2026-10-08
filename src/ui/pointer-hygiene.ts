@@ -263,17 +263,18 @@ export function bindPrimaryPointerActivate(
 ): () => void {
   const tap = createPointerTapController(options);
 
-  const onDown = (e: PointerEvent): void => {
-    tap.onPointerDown(e);
+  // Element (incl. SVG) listeners are typed as Event — narrow at the boundary.
+  const onDown = (e: Event): void => {
+    tap.onPointerDown(e as PointerEvent);
   };
-  const onMove = (e: PointerEvent): void => {
-    tap.onPointerMove(e);
+  const onMove = (e: Event): void => {
+    tap.onPointerMove(e as PointerEvent);
   };
-  const onUp = (e: PointerEvent): void => {
-    if (tap.onPointerUp(e)) activate();
+  const onUp = (e: Event): void => {
+    if (tap.onPointerUp(e as PointerEvent)) activate();
   };
-  const onCancel = (e: PointerEvent): void => {
-    tap.onPointerCancel(e);
+  const onCancel = (e: Event): void => {
+    tap.onPointerCancel(e as PointerEvent);
   };
   const onClick = (): void => {
     if (!tap.shouldAcceptClick()) return;
