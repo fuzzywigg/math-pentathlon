@@ -453,11 +453,9 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   render();
   owlSystem.onGameStart('fiar');
 
-  if (gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => {
-      void aiTurn();
-    }, 500);
-  }
+  // Route opening AI seat through the tracked timer so destroyGame/clearAiTimer
+  // can cancel it (raw setTimeout previously survived remount).
+  scheduleAiIfNeeded();
 }
 
 export function getCurrentState(): FiarGameState {
