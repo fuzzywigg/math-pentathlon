@@ -1,0 +1,3652 @@
+{
+  "taskId": "burn-1008-mp-engine-bench",
+  "date": "2026-10-08",
+  "seed": 20261008,
+  "measureMs": 120,
+  "warmupMs": 40,
+  "method": [
+    "Reuse GameFuzzAdapter legalMoves/apply/isOver/roundTrip (no AI calls)",
+    "Positions from seeded deterministic playouts (opening / midgame / near-end)",
+    "Undo/redo = prefix replay from seeded create (undo-audit pattern)",
+    "Vitest node project via vitest.engines-bench.config.ts"
+  ],
+  "games": [
+    {
+      "id": "calla",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 5,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 5.562117999999941,
+              "nsPerOp": 111.24235999999883,
+              "opsPerSec": 8989381.38313508,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 11.077258000000029,
+              "nsPerOp": 221.5451600000006,
+              "opsPerSec": 4513752.410569463,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.6743280000000595,
+              "nsPerOp": 53.48656000000119,
+              "opsPerSec": 18696285.57155251,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 10606,
+              "totalMs": 120.00737500000002,
+              "nsPerOp": 11315.04572883274,
+              "opsPerSec": 88377.90177478673,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 4,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 5.466996000000108,
+              "nsPerOp": 109.33992000000217,
+              "opsPerSec": 9145790.485304728,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 10.217947999999978,
+              "nsPerOp": 204.35895999999954,
+              "opsPerSec": 4893350.406559136,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4227529999999433,
+              "nsPerOp": 48.455059999998866,
+              "opsPerSec": 20637679.532334153,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 2782,
+              "totalMs": 120.03013300000009,
+              "nsPerOp": 43145.26707404748,
+              "opsPerSec": 23177.513266606125,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 50000,
+              "totalMs": 116.60244499999999,
+              "nsPerOp": 2332.0489,
+              "opsPerSec": 428807.474834683,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 43532,
+              "totalMs": 120.00141699999995,
+              "nsPerOp": 2756.625402003123,
+              "opsPerSec": 362762.383047527,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 4.129265000000032,
+              "nsPerOp": 82.58530000000064,
+              "opsPerSec": 12108692.467061235,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 13.444915000000037,
+              "nsPerOp": 268.89830000000075,
+              "opsPerSec": 3718878.1037291694,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.6111539999999422,
+              "nsPerOp": 52.223079999998845,
+              "opsPerSec": 19148621.64391725,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1518,
+              "totalMs": 120.0037440000001,
+              "nsPerOp": 79053.84980237161,
+              "opsPerSec": 12649.605332313622,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 20649,
+              "totalMs": 120.00540000000001,
+              "nsPerOp": 5811.680953072789,
+              "opsPerSec": 172067.2569734362,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 20230,
+              "totalMs": 120.00169600000027,
+              "nsPerOp": 5931.868314384591,
+              "opsPerSec": 168580.95072256273,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contig-60",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3996369999999843,
+              "nsPerOp": 47.992739999999685,
+              "opsPerSec": 20836484.851667285,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 10501,
+              "totalMs": 120.00794999999971,
+              "nsPerOp": 11428.240167603059,
+              "opsPerSec": 87502.53629030431,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3815499999996064,
+              "nsPerOp": 47.63099999999213,
+              "opsPerSec": 20994730.322692476,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 549,
+              "totalMs": 120.09468400000014,
+              "nsPerOp": 218751.7012750458,
+              "opsPerSec": 4571.393018528608,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.453266999999869,
+              "nsPerOp": 49.06533999999738,
+              "opsPerSec": 20380985.84459118,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 10547,
+              "totalMs": 120.00708899999972,
+              "nsPerOp": 11378.31506589549,
+              "opsPerSec": 87886.47477316964,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2977090000003955,
+              "nsPerOp": 45.95418000000791,
+              "opsPerSec": 21760806.089888405,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 489,
+              "totalMs": 120.23461300000008,
+              "nsPerOp": 245878.5541922292,
+              "opsPerSec": 4067.048479625411,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 1502,
+              "totalMs": 120.04161500000009,
+              "nsPerOp": 79921.18175765652,
+              "opsPerSec": 12512.327495760524,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1441,
+              "totalMs": 120.06071800000018,
+              "nsPerOp": 83317.6391394866,
+              "opsPerSec": 12002.260389613844,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3826389999999265,
+              "nsPerOp": 47.65277999999853,
+              "opsPerSec": 20985134.550387844,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 10720,
+              "totalMs": 120.01097200000004,
+              "nsPerOp": 11195.05335820896,
+              "opsPerSec": 89325.16603565212,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.333937999999762,
+              "nsPerOp": 46.67875999999523,
+              "opsPerSec": 21423019.80601246,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 446,
+              "totalMs": 120.02920600000016,
+              "nsPerOp": 269123.78026905865,
+              "opsPerSec": 3715.762312049281,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 664,
+              "totalMs": 120.0398210000003,
+              "nsPerOp": 180782.86295180768,
+              "opsPerSec": 5531.497751900166,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 640,
+              "totalMs": 120.17863100000022,
+              "nsPerOp": 187779.11093750034,
+              "opsPerSec": 5325.405978372301,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fab-a-diffy",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 2030,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 37,
+              "totalMs": 120.46473700000024,
+              "nsPerOp": 3255803.702702709,
+              "opsPerSec": 307.1438241715493,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 39582,
+              "totalMs": 120.00254899999982,
+              "nsPerOp": 3031.745465110399,
+              "opsPerSec": 329842.99358507845,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.317863999999645,
+              "nsPerOp": 46.3572799999929,
+              "opsPerSec": 21571584.872972555,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 399,
+              "totalMs": 120.1604040000002,
+              "nsPerOp": 301153.8947368426,
+              "opsPerSec": 3320.5614055691703,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 191,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 148,
+              "totalMs": 120.16119999999955,
+              "nsPerOp": 811899.999999997,
+              "opsPerSec": 1231.6787781746566,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 41721,
+              "totalMs": 120.00230499999998,
+              "nsPerOp": 2876.3046187771142,
+              "opsPerSec": 347668.32187098416,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3002209999995102,
+              "nsPerOp": 46.004419999990205,
+              "opsPerSec": 21737041.788597986,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 369,
+              "totalMs": 120.23051200000009,
+              "nsPerOp": 325827.94579945825,
+              "opsPerSec": 3069.1044549490043,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 3668,
+              "totalMs": 120.01063700000032,
+              "nsPerOp": 32718.276172301066,
+              "opsPerSec": 30563.95742654037,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 3437,
+              "totalMs": 120.00758099999985,
+              "nsPerOp": 34916.37503636888,
+              "opsPerSec": 28639.857343679018,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 19,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.384711000000607,
+              "nsPerOp": 47.69422000001214,
+              "opsPerSec": 20966901.230374362,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.315241999999671,
+              "nsPerOp": 46.30483999999342,
+              "opsPerSec": 21596014.585087482,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 330,
+              "totalMs": 120.29513899999984,
+              "nsPerOp": 364530.7242424237,
+              "opsPerSec": 2743.252992126311,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 2025,
+              "totalMs": 120.05463400000008,
+              "nsPerOp": 59286.239012345715,
+              "opsPerSec": 16867.320590057345,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1269,
+              "totalMs": 120.0142850000002,
+              "nsPerOp": 94573.90464933033,
+              "opsPerSec": 10573.741284214606,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fiar",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 80,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 115.16445599999952,
+              "nsPerOp": 2303.2891199999904,
+              "opsPerSec": 434161.7347630263,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 191,
+              "totalMs": 120.31914199999937,
+              "nsPerOp": 629943.1518324574,
+              "opsPerSec": 1587.444830682062,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.7316609999998036,
+              "nsPerOp": 54.63321999999607,
+              "opsPerSec": 18303881.77742538,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 316,
+              "totalMs": 120.34688600000027,
+              "nsPerOp": 380844.57594936795,
+              "opsPerSec": 2625.743054124386,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 9,
+          "legalCount": 31,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 50.106308000000354,
+              "nsPerOp": 1002.126160000007,
+              "opsPerSec": 997878.3509653045,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 21611,
+              "totalMs": 120.00053399999979,
+              "nsPerOp": 5552.752487159308,
+              "opsPerSec": 180090.86526231657,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.686569999999847,
+              "nsPerOp": 53.73139999999694,
+              "opsPerSec": 18611091.466071177,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 290,
+              "totalMs": 120.3279650000004,
+              "nsPerOp": 414924.0172413807,
+              "opsPerSec": 2410.0798181037885,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 144,
+              "totalMs": 120.05047599999943,
+              "nsPerOp": 833683.8611111072,
+              "opsPerSec": 1199.4954522296161,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 163,
+              "totalMs": 120.40547799999968,
+              "nsPerOp": 738683.9141104275,
+              "opsPerSec": 1353.7590042207253,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 18,
+          "legalCount": 56,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 374,
+              "totalMs": 120.09386300000006,
+              "nsPerOp": 321106.5855614975,
+              "opsPerSec": 3114.2307413327176,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 8259,
+              "totalMs": 120.00143600000047,
+              "nsPerOp": 14529.777939217878,
+              "opsPerSec": 68824.1764040221,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 1141,
+              "totalMs": 120.01998100000037,
+              "nsPerOp": 105188.41454864187,
+              "opsPerSec": 9506.750380172085,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 269,
+              "totalMs": 120.17517800000041,
+              "nsPerOp": 446747.8736059495,
+              "opsPerSec": 2238.3990144786726,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 146,
+              "totalMs": 120.46502799999962,
+              "nsPerOp": 825102.9315068468,
+              "opsPerSec": 1211.9700001231931,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 144,
+              "totalMs": 120.63779599999998,
+              "nsPerOp": 837762.4722222221,
+              "opsPerSec": 1193.65575942717,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frac-fact",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 4,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.9647710000008374,
+              "nsPerOp": 59.29542000001675,
+              "opsPerSec": 16864708.943788875,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 5.971233000000211,
+              "nsPerOp": 119.42466000000422,
+              "opsPerSec": 8373479.98311207,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.28336599999966,
+              "nsPerOp": 45.667319999993204,
+              "opsPerSec": 21897496.94092294,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 4435,
+              "totalMs": 120.01678099999845,
+              "nsPerOp": 27061.280947012052,
+              "opsPerSec": 36953.165741047975,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 4,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 3.0927499999997963,
+              "nsPerOp": 61.85499999999592,
+              "opsPerSec": 16166841.807453979,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 6.456459999999424,
+              "nsPerOp": 129.1291999999885,
+              "opsPerSec": 7744181.796217193,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.325205000001006,
+              "nsPerOp": 46.50410000002012,
+              "opsPerSec": 21503480.33828345,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1056,
+              "totalMs": 120.05123099999946,
+              "nsPerOp": 113684.87784090858,
+              "opsPerSec": 8796.244663247182,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 21217,
+              "totalMs": 120.00318100000004,
+              "nsPerOp": 5655.991940425133,
+              "opsPerSec": 176803.6465633356,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 15342,
+              "totalMs": 120.00619000000006,
+              "nsPerOp": 7822.069482466436,
+              "opsPerSec": 127843.40541100416,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 20,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.5516779999998107,
+              "nsPerOp": 51.03355999999622,
+              "opsPerSec": 19594948.892455753,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.6539709999997285,
+              "nsPerOp": 53.07941999999457,
+              "opsPerSec": 18839693.42543875,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 649,
+              "totalMs": 120.05298100000073,
+              "nsPerOp": 184981.48073960052,
+              "opsPerSec": 5405.946562876236,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 9868,
+              "totalMs": 120.00127499999871,
+              "nsPerOp": 12160.648054316855,
+              "opsPerSec": 82232.45961345082,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 9808,
+              "totalMs": 120.00609299999996,
+              "nsPerOp": 12235.531504893961,
+              "opsPerSec": 81729.18353403942,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fraction-pinball",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 4,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.8356370000001334,
+              "nsPerOp": 56.71274000000266,
+              "opsPerSec": 17632722.383012228,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.500539000000572,
+              "nsPerOp": 90.01078000001144,
+              "opsPerSec": 11109780.406301033,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.295089999999618,
+              "nsPerOp": 45.90179999999236,
+              "opsPerSec": 21785638.035984784,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 3943,
+              "totalMs": 120.01502000000073,
+              "nsPerOp": 30437.489221405205,
+              "opsPerSec": 32854.22107999462,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 4,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.8351330000004964,
+              "nsPerOp": 56.70266000000993,
+              "opsPerSec": 17635856.942158002,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.555387000000337,
+              "nsPerOp": 91.10774000000674,
+              "opsPerSec": 10976015.86868389,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2976699999999255,
+              "nsPerOp": 45.95339999999851,
+              "opsPerSec": 21761175.451653905,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 3932,
+              "totalMs": 120.00595900000008,
+              "nsPerOp": 30520.335452695846,
+              "opsPerSec": 32765.039609408042,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 23543,
+              "totalMs": 120.00229000000036,
+              "nsPerOp": 5097.15371872745,
+              "opsPerSec": 196187.9227471403,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 19238,
+              "totalMs": 120.00035899999966,
+              "nsPerOp": 6237.673302838115,
+              "opsPerSec": 160316.18705407417,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 20,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.346563999999489,
+              "nsPerOp": 46.93127999998978,
+              "opsPerSec": 21307750.39590264,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3887290000002395,
+              "nsPerOp": 47.77458000000479,
+              "opsPerSec": 20931633.517236568,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 4999,
+              "totalMs": 120.01762400000007,
+              "nsPerOp": 24008.326465293074,
+              "opsPerSec": 41652.21601120846,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 12014,
+              "totalMs": 120.00232700000015,
+              "nsPerOp": 9988.540619277523,
+              "opsPerSec": 100114.72527528559,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 11577,
+              "totalMs": 120.00831500000095,
+              "nsPerOp": 10366.097866459442,
+              "opsPerSec": 96468.31554963428,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hex",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 25,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 12.794340999998894,
+              "nsPerOp": 255.88681999997786,
+              "opsPerSec": 3907977.753602497,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 20.07333800000015,
+              "nsPerOp": 401.466760000003,
+              "opsPerSec": 2490866.242575083,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2788799999998446,
+              "nsPerOp": 45.57759999999689,
+              "opsPerSec": 21940602.40118102,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 6573,
+              "totalMs": 120.00115199999891,
+              "nsPerOp": 18256.67914194415,
+              "opsPerSec": 54774.47416504851,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 15,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 8.778449999999793,
+              "nsPerOp": 175.56899999999587,
+              "opsPerSec": 5695766.33688193,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 32.62892800000009,
+              "nsPerOp": 652.5785600000017,
+              "opsPerSec": 1532382.553297487,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4352949999993143,
+              "nsPerOp": 48.70589999998629,
+              "opsPerSec": 20531393.527278658,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 2440,
+              "totalMs": 120.02390600000035,
+              "nsPerOp": 49190.12540983621,
+              "opsPerSec": 20329.283401258355,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 24069,
+              "totalMs": 120.00437600000078,
+              "nsPerOp": 4985.848020275075,
+              "opsPerSec": 200567.6859650505,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 19528,
+              "totalMs": 120.00357499999882,
+              "nsPerOp": 6145.205602212148,
+              "opsPerSec": 162728.4853805413,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 17,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3531160000002274,
+              "nsPerOp": 47.06232000000455,
+              "opsPerSec": 21248421.242299642,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3553890000002866,
+              "nsPerOp": 47.10778000000574,
+              "opsPerSec": 21227916.06821375,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1705,
+              "totalMs": 120.0470150000001,
+              "nsPerOp": 70408.80645161297,
+              "opsPerSec": 14202.768806871196,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 9723,
+              "totalMs": 120.00384300000042,
+              "nsPerOp": 12342.265041653853,
+              "opsPerSec": 81022.40525747134,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 8171,
+              "totalMs": 120.00747000000047,
+              "nsPerOp": 14686.999143311768,
+              "opsPerSec": 68087.42822425945,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hex-a-gone",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 5,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 18.38213700000051,
+              "nsPerOp": 367.64274000001024,
+              "opsPerSec": 2720031.9527592794,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 5.111938000000009,
+              "nsPerOp": 102.23876000000018,
+              "opsPerSec": 9781026.295702316,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.591263999998773,
+              "nsPerOp": 51.82527999997547,
+              "opsPerSec": 19295602.455027226,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1129,
+              "totalMs": 120.06608500000038,
+              "nsPerOp": 106347.28520814914,
+              "opsPerSec": 9403.154937549569,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 34,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 22.309118999999555,
+              "nsPerOp": 446.18237999999116,
+              "opsPerSec": 2241235.9717118815,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 24.661407999999938,
+              "nsPerOp": 493.22815999999875,
+              "opsPerSec": 2027459.2594226627,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.6079760000011447,
+              "nsPerOp": 52.159520000022894,
+              "opsPerSec": 19171955.57013487,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1016,
+              "totalMs": 120.10446700000102,
+              "nsPerOp": 118213.05807086715,
+              "opsPerSec": 8459.30235051117,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 50000,
+              "totalMs": 107.66127799999958,
+              "nsPerOp": 2153.2255599999917,
+              "opsPerSec": 464419.5288114655,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 50000,
+              "totalMs": 109.17447800000082,
+              "nsPerOp": 2183.4895600000164,
+              "opsPerSec": 457982.4966051097,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 29,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 19.82366499999989,
+              "nsPerOp": 396.47329999999783,
+              "opsPerSec": 2522237.941369584,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 30.494127999998454,
+              "nsPerOp": 609.8825599999691,
+              "opsPerSec": 1639659.9371525736,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.590131000000838,
+              "nsPerOp": 51.802620000016766,
+              "opsPerSec": 19304042.922919273,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 881,
+              "totalMs": 120.08379299999979,
+              "nsPerOp": 136303.9648127126,
+              "opsPerSec": 7336.543741585524,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 24102,
+              "totalMs": 120.00237699999889,
+              "nsPerOp": 4978.938552817147,
+              "opsPerSec": 200846.02157505785,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 22605,
+              "totalMs": 120.00016599999981,
+              "nsPerOp": 5308.567396593666,
+              "opsPerSec": 188374.7394149441,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "juggle",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3977859999995417,
+              "nsPerOp": 47.95571999999083,
+              "opsPerSec": 20852569.82900457,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.53709600000002,
+              "nsPerOp": 90.74192000000039,
+              "opsPerSec": 11020264.94480165,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3620950000004086,
+              "nsPerOp": 47.24190000000818,
+              "opsPerSec": 21167649.904001046,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1371,
+              "totalMs": 120.0270359999995,
+              "nsPerOp": 87547.07221006528,
+              "opsPerSec": 11422.426527303445,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.4677789999987,
+              "nsPerOp": 49.355579999974,
+              "opsPerSec": 20261133.594226364,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.583560999999463,
+              "nsPerOp": 91.67121999998928,
+              "opsPerSec": 10908549.0517102,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3267940000005183,
+              "nsPerOp": 46.535880000010366,
+              "opsPerSec": 21488795.31234345,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 876,
+              "totalMs": 120.23070200000075,
+              "nsPerOp": 137249.65981735245,
+              "opsPerSec": 7285.992557874232,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 1229,
+              "totalMs": 120.03409300000021,
+              "nsPerOp": 97668.09845402783,
+              "opsPerSec": 10238.757750266815,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1097,
+              "totalMs": 120.21477099999902,
+              "nsPerOp": 109585.02370100183,
+              "opsPerSec": 9125.334523159463,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.59686899999906,
+              "nsPerOp": 51.937379999981204,
+              "opsPerSec": 19253955.43634203,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.572109000000637,
+              "nsPerOp": 91.44218000001274,
+              "opsPerSec": 10935872.263761217,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2821960000001127,
+              "nsPerOp": 45.643920000002254,
+              "opsPerSec": 21908723.001879565,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 612,
+              "totalMs": 120.09092200000123,
+              "nsPerOp": 196226.99673202814,
+              "opsPerSec": 5096.138740611832,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 545,
+              "totalMs": 120.03141399999913,
+              "nsPerOp": 220241.126605503,
+              "opsPerSec": 4540.478045189103,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 498,
+              "totalMs": 120.08384999999907,
+              "nsPerOp": 241132.2289156608,
+              "opsPerSec": 4147.102212329167,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kings-quadraphages",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 5,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 27.997691000000486,
+              "nsPerOp": 559.9538200000097,
+              "opsPerSec": 1785861.5555118145,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 24.88035299999865,
+              "nsPerOp": 497.60705999997293,
+              "opsPerSec": 2009617.789586937,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.363430999999764,
+              "nsPerOp": 47.26861999999528,
+              "opsPerSec": 21155684.257338163,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 50000,
+              "totalMs": 61.330009999999675,
+              "nsPerOp": 1226.6001999999935,
+              "opsPerSec": 815261.5660750791,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 8,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 16459,
+              "totalMs": 120.00534100000004,
+              "nsPerOp": 7291.168418494443,
+              "opsPerSec": 137152.22891621126,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 70.910124,
+              "nsPerOp": 1418.20248,
+              "opsPerSec": 705117.9321023329,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3884369999996125,
+              "nsPerOp": 47.76873999999225,
+              "opsPerSec": 20934192.52842261,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 50000,
+              "totalMs": 64.19097600000168,
+              "nsPerOp": 1283.8195200000337,
+              "opsPerSec": 778925.6857536904,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 1326,
+              "totalMs": 120.0480920000009,
+              "nsPerOp": 90534.00603318319,
+              "opsPerSec": 11045.573302406088,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1140,
+              "totalMs": 120.03925700000036,
+              "nsPerOp": 105297.59385964944,
+              "opsPerSec": 9496.893170540006,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 5,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 21926,
+              "totalMs": 120.00083699999959,
+              "nsPerOp": 5472.992657119384,
+              "opsPerSec": 182715.3922268065,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 92.1018409999997,
+              "nsPerOp": 1842.0368199999941,
+              "opsPerSec": 542877.3133861696,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4201739999989513,
+              "nsPerOp": 48.40347999997903,
+              "opsPerSec": 20659671.577341825,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 50000,
+              "totalMs": 72.42873500000132,
+              "nsPerOp": 1448.5747000000265,
+              "opsPerSec": 690333.746682157,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 605,
+              "totalMs": 120.01357199999984,
+              "nsPerOp": 198369.5404958675,
+              "opsPerSec": 5041.096518650414,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 559,
+              "totalMs": 120.04160200000115,
+              "nsPerOp": 214743.47406082496,
+              "opsPerSec": 4656.718926493456,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kwatro-sinko",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 5,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 22.10174900000129,
+              "nsPerOp": 442.0349800000258,
+              "opsPerSec": 2262264.4026948763,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 88.77771999999823,
+              "nsPerOp": 1775.5543999999645,
+              "opsPerSec": 563204.3715472869,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3793189999996684,
+              "nsPerOp": 47.58637999999337,
+              "opsPerSec": 21014416.30987983,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 556,
+              "totalMs": 120.02403400000185,
+              "nsPerOp": 215870.56474820475,
+              "opsPerSec": 4632.405539710417,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 9,
+          "legalCount": 12,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 20.553310999999667,
+              "nsPerOp": 411.0662199999934,
+              "opsPerSec": 2432698.0699119866,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 88.46330400000079,
+              "nsPerOp": 1769.2660800000158,
+              "opsPerSec": 565206.1107733389,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3797709999998915,
+              "nsPerOp": 47.59541999999783,
+              "opsPerSec": 21010424.952653967,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 459,
+              "totalMs": 120.25943699999698,
+              "nsPerOp": 262003.13071894765,
+              "opsPerSec": 3816.7482856252814,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 5986,
+              "totalMs": 120.00409999999829,
+              "nsPerOp": 20047.460741730418,
+              "opsPerSec": 49881.629044341695,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 5426,
+              "totalMs": 120.00294999999824,
+              "nsPerOp": 22116.282712863664,
+              "opsPerSec": 45215.555117604024,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 18,
+          "legalCount": 14,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 27.722623000001477,
+              "nsPerOp": 554.4524600000295,
+              "opsPerSec": 1803581.1402116364,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 88.94757000000027,
+              "nsPerOp": 1778.9514000000054,
+              "opsPerSec": 562128.9035776902,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 3.612113999999565,
+              "nsPerOp": 72.2422799999913,
+              "opsPerSec": 13842309.517364629,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 390,
+              "totalMs": 120.20797600000151,
+              "nsPerOp": 308225.57948718336,
+              "opsPerSec": 3244.3770619679603,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 3256,
+              "totalMs": 120.01192900000024,
+              "nsPerOp": 36858.70055282563,
+              "opsPerSec": 27130.636321994236,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 3066,
+              "totalMs": 120.0138909999987,
+              "nsPerOp": 39143.47390737074,
+              "opsPerSec": 25547.042716913773,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "par-55",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 30,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 32962,
+              "totalMs": 120.00254000000132,
+              "nsPerOp": 3640.6328499484653,
+              "opsPerSec": 274677.5193258379,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 47795,
+              "totalMs": 120.00105800000165,
+              "nsPerOp": 2510.7450151689854,
+              "opsPerSec": 398288.15509276045,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4301919999998063,
+              "nsPerOp": 48.603839999996126,
+              "opsPerSec": 20574506.047260456,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 476,
+              "totalMs": 120.0318150000021,
+              "nsPerOp": 252167.67857143297,
+              "opsPerSec": 3965.6152829147145,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.4922009999972943,
+              "nsPerOp": 49.84401999994589,
+              "opsPerSec": 20062587.247198075,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.5847109999995155,
+              "nsPerOp": 51.69421999999032,
+              "opsPerSec": 19344522.463056557,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 343,
+              "totalMs": 120.08993499999997,
+              "nsPerOp": 350116.42857142846,
+              "opsPerSec": 2856.1927358858184,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 2869,
+              "totalMs": 120.0203560000009,
+              "nsPerOp": 41833.5155106312,
+              "opsPerSec": 23904.27837091217,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 2603,
+              "totalMs": 120.01922399999967,
+              "nsPerOp": 46108.03841721079,
+              "opsPerSec": 21688.19221827336,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 10,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3375620000006165,
+              "nsPerOp": 46.75124000001233,
+              "opsPerSec": 21389806.98693203,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3548250000021653,
+              "nsPerOp": 47.09650000004331,
+              "opsPerSec": 21233000.32909198,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 333,
+              "totalMs": 120.46894000000248,
+              "nsPerOp": 361768.58858859603,
+              "opsPerSec": 2764.1979750132537,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 2718,
+              "totalMs": 120.01125799999863,
+              "nsPerOp": 44154.25239146381,
+              "opsPerSec": 22647.87525183705,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 2629,
+              "totalMs": 120.02715700000044,
+              "nsPerOp": 45655.06162038815,
+              "opsPerSec": 21903.37641672201,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pent-em-in",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 4472,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 63,
+              "totalMs": 121.07111199999781,
+              "nsPerOp": 1921763.6825396477,
+              "opsPerSec": 520.3553428996435,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 5257,
+              "totalMs": 120.00994700000228,
+              "nsPerOp": 22828.59939128824,
+              "opsPerSec": 43804.70228855196,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 3.3130139999993844,
+              "nsPerOp": 66.26027999998769,
+              "opsPerSec": 15091997.800193204,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 391,
+              "totalMs": 120.09534599999824,
+              "nsPerOp": 307149.2225063894,
+              "opsPerSec": 3255.7464799677227,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 67,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 154,
+              "totalMs": 120.6720069999974,
+              "nsPerOp": 783584.4610389441,
+              "opsPerSec": 1276.1866138515732,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 5855,
+              "totalMs": 120.0106990000022,
+              "nsPerOp": 20497.13048676383,
+              "opsPerSec": 48787.316870805764,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.368654999998398,
+              "nsPerOp": 47.37309999996796,
+              "opsPerSec": 21109026.00844522,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 250,
+              "totalMs": 120.417641,
+              "nsPerOp": 481670.564,
+              "opsPerSec": 2076.1077689605295,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 653,
+              "totalMs": 120.149730000001,
+              "nsPerOp": 183996.52373660184,
+              "opsPerSec": 5434.885288547836,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 628,
+              "totalMs": 120.08656100000007,
+              "nsPerOp": 191220.63853503196,
+              "opsPerSec": 5229.5610330618065,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 16,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.32590799999889,
+              "nsPerOp": 46.5181599999778,
+              "opsPerSec": 21496980.964003675,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4457369999981893,
+              "nsPerOp": 48.91473999996379,
+              "opsPerSec": 20443735.364856083,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 198,
+              "totalMs": 120.3241139999991,
+              "nsPerOp": 607697.545454541,
+              "opsPerSec": 1645.5554370423329,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 271,
+              "totalMs": 120.15119400000185,
+              "nsPerOp": 443362.3394834017,
+              "opsPerSec": 2255.491526784127,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 170,
+              "totalMs": 120.61036700000113,
+              "nsPerOp": 709472.7470588302,
+              "opsPerSec": 1409.4974107822622,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prime-gold",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.365712999999232,
+              "nsPerOp": 47.31425999998464,
+              "opsPerSec": 21135277.18705364,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 6.422821000000113,
+              "nsPerOp": 128.45642000000225,
+              "opsPerSec": 7784741.315381376,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.415387000000919,
+              "nsPerOp": 48.307740000018384,
+              "opsPerSec": 20700616.5057529,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 523,
+              "totalMs": 120.1210030000002,
+              "nsPerOp": 229676.8699808799,
+              "opsPerSec": 4353.942998627802,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.771306000002369,
+              "nsPerOp": 55.426120000047376,
+              "opsPerSec": 18042035.05493701,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 6.859714999998687,
+              "nsPerOp": 137.19429999997374,
+              "opsPerSec": 7288932.557695119,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.5361770000017714,
+              "nsPerOp": 50.72354000003543,
+              "opsPerSec": 19714712.340646997,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 479,
+              "totalMs": 120.1467109999976,
+              "nsPerOp": 250828.20668057955,
+              "opsPerSec": 3986.7924474437723,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 700,
+              "totalMs": 120.15233499999886,
+              "nsPerOp": 171646.19285714123,
+              "opsPerSec": 5825.937548363139,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 586,
+              "totalMs": 120.19814899999983,
+              "nsPerOp": 205116.29522184274,
+              "opsPerSec": 4875.283062803245,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.4849490000015066,
+              "nsPerOp": 49.69898000003014,
+              "opsPerSec": 20121137.29495844,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 6.633791000000201,
+              "nsPerOp": 132.67582000000402,
+              "opsPerSec": 7537168.415465377,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4032570000017586,
+              "nsPerOp": 48.065140000035164,
+              "opsPerSec": 20805099.08010813,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 428,
+              "totalMs": 120.33005000000048,
+              "nsPerOp": 281144.9766355151,
+              "opsPerSec": 3556.8837543074096,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 296,
+              "totalMs": 120.06882799999948,
+              "nsPerOp": 405637.9324324307,
+              "opsPerSec": 2465.252679904573,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 277,
+              "totalMs": 120.7771700000012,
+              "nsPerOp": 436018.6642599322,
+              "opsPerSec": 2293.4798025156347,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "queens-guards",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 28,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 7096,
+              "totalMs": 120.09750200000053,
+              "nsPerOp": 16924.676155580684,
+              "opsPerSec": 59085.32552159135,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 20842,
+              "totalMs": 120.00008700000035,
+              "nsPerOp": 5757.609010651586,
+              "opsPerSec": 173683.20741300745,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.409322000003158,
+              "nsPerOp": 48.186440000063165,
+              "opsPerSec": 20752726.285624947,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 420,
+              "totalMs": 120.0356869999996,
+              "nsPerOp": 285799.2547619038,
+              "opsPerSec": 3498.959438620961,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 25,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 6455,
+              "totalMs": 120.00270299999829,
+              "nsPerOp": 18590.65886909346,
+              "opsPerSec": 53790.45503666773,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 15943,
+              "totalMs": 120.00082099999781,
+              "nsPerOp": 7526.865771811943,
+              "opsPerSec": 132857.42436712404,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.345004999999219,
+              "nsPerOp": 46.90009999998437,
+              "opsPerSec": 21321916.157968387,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 351,
+              "totalMs": 120.10982800000056,
+              "nsPerOp": 342193.2421652438,
+              "opsPerSec": 2922.3253903918535,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 2023,
+              "totalMs": 120.00387299999784,
+              "nsPerOp": 59319.75926841218,
+              "opsPerSec": 16857.789248185654,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1853,
+              "totalMs": 120.06629099999918,
+              "nsPerOp": 64795.62385321056,
+              "opsPerSec": 15433.141013742255,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 27,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 6147,
+              "totalMs": 120.01596699999936,
+              "nsPerOp": 19524.315438425143,
+              "opsPerSec": 51218.184993668656,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 17510,
+              "totalMs": 120.0060999999987,
+              "nsPerOp": 6853.575099942815,
+              "opsPerSec": 145909.24961314624,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2674609999994573,
+              "nsPerOp": 45.34921999998914,
+              "opsPerSec": 22051095.917421278,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 291,
+              "totalMs": 120.25480700000116,
+              "nsPerOp": 413246.7594501758,
+              "opsPerSec": 2419.8616858617315,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 848,
+              "totalMs": 120.03815799999938,
+              "nsPerOp": 141554.43160377286,
+              "opsPerSec": 7064.420298752038,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 829,
+              "totalMs": 120.05081400000199,
+              "nsPerOp": 144814.00965018335,
+              "opsPerSec": 6905.409237791476,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ramrod",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 98,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 30074,
+              "totalMs": 120.00216,
+              "nsPerOp": 3990.2294340626454,
+              "opsPerSec": 250612.155647865,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 43986,
+              "totalMs": 120.00183900000047,
+              "nsPerOp": 2728.182580821181,
+              "opsPerSec": 366544.3827073336,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.5760259999988193,
+              "nsPerOp": 51.52051999997638,
+              "opsPerSec": 19409741.982426774,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 539,
+              "totalMs": 120.10228799999823,
+              "nsPerOp": 222824.28200370728,
+              "opsPerSec": 4487.841230801598,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 10,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 42941,
+              "totalMs": 120.00218900000255,
+              "nsPerOp": 2794.583009245303,
+              "opsPerSec": 357835.13915732893,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 39560,
+              "totalMs": 120.00047799999811,
+              "nsPerOp": 3033.3791203235114,
+              "opsPerSec": 329665.3534996804,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.4017350000031,
+              "nsPerOp": 48.03470000006201,
+              "opsPerSec": 20818283.4492296,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 367,
+              "totalMs": 120.07782100000259,
+              "nsPerOp": 327187.52316077,
+              "opsPerSec": 3056.351264068925,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 4018,
+              "totalMs": 120.01361099999849,
+              "nsPerOp": 29868.99228471839,
+              "opsPerSec": 33479.535916972374,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 3598,
+              "totalMs": 120.01797499999884,
+              "nsPerOp": 33356.85797665337,
+              "opsPerSec": 29978.842752512985,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 18,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3199690000001283,
+              "nsPerOp": 46.39938000000257,
+              "opsPerSec": 21552012.117402103,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3511390000021493,
+              "nsPerOp": 47.02278000004299,
+              "opsPerSec": 21266288.38190949,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 301,
+              "totalMs": 120.01434800000061,
+              "nsPerOp": 398718.7641196034,
+              "opsPerSec": 2508.0334561330824,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 2272,
+              "totalMs": 120.00962399999844,
+              "nsPerOp": 52821.137323942974,
+              "opsPerSec": 18931.815001770436,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 2114,
+              "totalMs": 120.07306999999855,
+              "nsPerOp": 56798.992431408966,
+              "opsPerSec": 17605.946112646456,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "remainder-islands",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3778759999986505,
+              "nsPerOp": 47.55751999997301,
+              "opsPerSec": 21027168.784254678,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 11.86194500000056,
+              "nsPerOp": 237.2389000000112,
+              "opsPerSec": 4215160.329945691,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.293749000000389,
+              "nsPerOp": 45.87498000000779,
+              "opsPerSec": 21798374.625990693,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1007,
+              "totalMs": 120.10192200000165,
+              "nsPerOp": 119267.05263158059,
+              "opsPerSec": 8384.545253155784,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3918870000015886,
+              "nsPerOp": 47.83774000003178,
+              "opsPerSec": 20903997.55505456,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 11.662911999999778,
+              "nsPerOp": 233.25823999999557,
+              "opsPerSec": 4287093.995050374,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3685220000006666,
+              "nsPerOp": 47.37044000001334,
+              "opsPerSec": 21110211.34698598,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 740,
+              "totalMs": 120.03857599999901,
+              "nsPerOp": 162214.29189189055,
+              "opsPerSec": 6164.684925952522,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 31265,
+              "totalMs": 120.00338699999702,
+              "nsPerOp": 3838.266016312075,
+              "opsPerSec": 260534.3130856863,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 26739,
+              "totalMs": 120.00134600000092,
+              "nsPerOp": 4487.877108343652,
+              "opsPerSec": 222822.50067428238,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.460878000001685,
+              "nsPerOp": 49.21756000003369,
+              "opsPerSec": 20317951.56036413,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 11.774342999997316,
+              "nsPerOp": 235.48685999994632,
+              "opsPerSec": 4246521.440730187,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.55112999999983,
+              "nsPerOp": 51.0225999999966,
+              "opsPerSec": 19599158.02017276,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 541,
+              "totalMs": 120.15782799999943,
+              "nsPerOp": 222103.19408502668,
+              "opsPerSec": 4502.411611501521,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 13721,
+              "totalMs": 120.00546899999972,
+              "nsPerOp": 8746.116828219498,
+              "opsPerSec": 114336.45578269463,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 13137,
+              "totalMs": 120.00290700000187,
+              "nsPerOp": 9134.726878282854,
+              "opsPerSec": 109472.34803236721,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "star-track",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.9897109999983513,
+              "nsPerOp": 59.794219999967034,
+              "opsPerSec": 16724024.49602238,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.295711999999185,
+              "nsPerOp": 85.91423999998368,
+              "opsPerSec": 11639514.008390108,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.8406189999986964,
+              "nsPerOp": 56.81237999997392,
+              "opsPerSec": 17601797.354739565,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 2931,
+              "totalMs": 120.01831900000252,
+              "nsPerOp": 40947.90822245053,
+              "opsPerSec": 24421.27188933498,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.9243380000007164,
+              "nsPerOp": 58.48676000001432,
+              "opsPerSec": 17097886.769582637,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 4.125390000001062,
+              "nsPerOp": 82.50780000002123,
+              "opsPerSec": 12120066.224038728,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.8524169999982405,
+              "nsPerOp": 57.04833999996482,
+              "opsPerSec": 17528993.832259044,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 2445,
+              "totalMs": 120.04404700000305,
+              "nsPerOp": 49097.76973415257,
+              "opsPerSec": 20367.523930611384,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 50000,
+              "totalMs": 71.37000800000169,
+              "nsPerOp": 1427.4001600000336,
+              "opsPerSec": 700574.3925375323,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 50000,
+              "totalMs": 77.7068270000018,
+              "nsPerOp": 1554.1365400000357,
+              "opsPerSec": 643444.108199127,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 18,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.7953509999970265,
+              "nsPerOp": 55.90701999994052,
+              "opsPerSec": 17886841.402046893,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.965134999998554,
+              "nsPerOp": 59.30269999997108,
+              "opsPerSec": 16862638.631976075,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 2189,
+              "totalMs": 120.02906299999813,
+              "nsPerOp": 54832.829145727796,
+              "opsPerSec": 18237.249756752946,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 50000,
+              "totalMs": 117.65131900000051,
+              "nsPerOp": 2353.0263800000102,
+              "opsPerSec": 424984.6106697689,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 47914,
+              "totalMs": 120.00174200000038,
+              "nsPerOp": 2504.523563050473,
+              "opsPerSec": 399277.5371544177,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stars-bars",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 125,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 36574,
+              "totalMs": 120.02504200000112,
+              "nsPerOp": 3281.7039973752153,
+              "opsPerSec": 304719.743401545,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 50000,
+              "totalMs": 84.95469300000332,
+              "nsPerOp": 1699.0938600000666,
+              "opsPerSec": 588549.00458528,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.35838899999726,
+              "nsPerOp": 47.1677799999452,
+              "opsPerSec": 21200912.9961419,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 468,
+              "totalMs": 120.13993100000152,
+              "nsPerOp": 256709.2542735075,
+              "opsPerSec": 3895.457539425373,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 60,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 13069,
+              "totalMs": 120.08391199999824,
+              "nsPerOp": 9188.45451067398,
+              "opsPerSec": 108832.2305822298,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 22886,
+              "totalMs": 120.00450799999817,
+              "nsPerOp": 5243.577208773843,
+              "opsPerSec": 190709.50234636478,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.2905659999996715,
+              "nsPerOp": 45.81131999999342,
+              "opsPerSec": 21828665.92798774,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 372,
+              "totalMs": 120.19687500000146,
+              "nsPerOp": 323109.879032262,
+              "opsPerSec": 3094.9223929490304,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 1790,
+              "totalMs": 120.00491799999872,
+              "nsPerOp": 67041.8536312842,
+              "opsPerSec": 14916.055356998111,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1824,
+              "totalMs": 120.01250000000437,
+              "nsPerOp": 65796.32675438836,
+              "opsPerSec": 15198.41683157949,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 11,
+          "legalCount": 0,
+          "isOver": true,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.617091000000073,
+              "nsPerOp": 52.34182000000146,
+              "opsPerSec": 19105182.051368717,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "no legal moves"
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3548609999998007,
+              "nsPerOp": 47.097219999996014,
+              "opsPerSec": 21232675.729057565,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 379,
+              "totalMs": 120.04461299999821,
+              "nsPerOp": 316740.4036939267,
+              "opsPerSec": 3157.159580330403,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 1817,
+              "totalMs": 120.09728899999755,
+              "nsPerOp": 66096.47165657542,
+              "opsPerSec": 15129.400631183584,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 1703,
+              "totalMs": 120.04092400000081,
+              "nsPerOp": 70487.91779213201,
+              "opsPerSec": 14186.828485258815,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sum-dominoes",
+      "positions": [
+        {
+          "kind": "opening",
+          "ply": 0,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3641179999976885,
+              "nsPerOp": 47.28235999995377,
+              "opsPerSec": 21149536.52907718,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 440,
+              "totalMs": 120.13688600000023,
+              "nsPerOp": 273038.37727272784,
+              "opsPerSec": 3662.48880464572,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3781380000000354,
+              "nsPerOp": 47.56276000000071,
+              "opsPerSec": 21024852.21631346,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 1071,
+              "totalMs": 120.01645100000314,
+              "nsPerOp": 112060.1783380048,
+              "opsPerSec": 8923.77662458934,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            },
+            {
+              "op": "redo",
+              "iters": 0,
+              "totalMs": 0,
+              "nsPerOp": 0,
+              "opsPerSec": 0,
+              "available": false,
+              "note": "opening / no history"
+            }
+          ]
+        },
+        {
+          "kind": "midgame",
+          "ply": 10,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.371768000004522,
+              "nsPerOp": 47.43536000009044,
+              "opsPerSec": 21081319.926698003,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 2677,
+              "totalMs": 120.0765609999944,
+              "nsPerOp": 44854.89764661725,
+              "opsPerSec": 22294.1095056855,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.288835999999719,
+              "nsPerOp": 45.776719999994384,
+              "opsPerSec": 21845164.965950437,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 656,
+              "totalMs": 120.05044800000178,
+              "nsPerOp": 183003.73170731976,
+              "opsPerSec": 5464.369445751591,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 409,
+              "totalMs": 120.16906700000254,
+              "nsPerOp": 293811.8997555075,
+              "opsPerSec": 3403.538116843258,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 335,
+              "totalMs": 120.19676099999924,
+              "nsPerOp": 358796.30149253504,
+              "opsPerSec": 2787.0967338296423,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        },
+        {
+          "kind": "near-end",
+          "ply": 22,
+          "legalCount": 1,
+          "isOver": false,
+          "samples": [
+            {
+              "op": "legalMoves",
+              "iters": 50000,
+              "totalMs": 2.3522199999933946,
+              "nsPerOp": 47.04439999986789,
+              "opsPerSec": 21256515.12194455,
+              "available": true
+            },
+            {
+              "op": "apply",
+              "iters": 3989,
+              "totalMs": 120.00223299999925,
+              "nsPerOp": 30083.287290047443,
+              "opsPerSec": 33241.04810616337,
+              "available": true
+            },
+            {
+              "op": "isOver",
+              "iters": 50000,
+              "totalMs": 2.3942260000039823,
+              "nsPerOp": 47.88452000007965,
+              "opsPerSec": 20883575.735923357,
+              "available": true
+            },
+            {
+              "op": "serialize",
+              "iters": 453,
+              "totalMs": 120.10037499999453,
+              "nsPerOp": 265122.24061808945,
+              "opsPerSec": 3771.8450088105105,
+              "available": true
+            },
+            {
+              "op": "undo",
+              "iters": 157,
+              "totalMs": 120.6112839999987,
+              "nsPerOp": 768224.7388534949,
+              "opsPerSec": 1301.7024178268568,
+              "available": true,
+              "note": "prefix-replay"
+            },
+            {
+              "op": "redo",
+              "iters": 156,
+              "totalMs": 120.02806799999962,
+              "nsPerOp": 769410.6923076899,
+              "opsPerSec": 1299.6960011053454,
+              "available": true,
+              "note": "prefix-replay+reapply"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "hotspots": [
+    {
+      "rank": 1,
+      "game": "fab-a-diffy",
+      "position": "opening",
+      "op": "legalMoves",
+      "nsPerOp": 3255803.702702709,
+      "opsPerSec": 307.1438241715493,
+      "ply": 0
+    },
+    {
+      "rank": 2,
+      "game": "pent-em-in",
+      "position": "opening",
+      "op": "legalMoves",
+      "nsPerOp": 1921763.6825396477,
+      "opsPerSec": 520.3553428996435,
+      "ply": 0
+    },
+    {
+      "rank": 3,
+      "game": "fab-a-diffy",
+      "position": "midgame",
+      "op": "legalMoves",
+      "nsPerOp": 811899.999999997,
+      "opsPerSec": 1231.6787781746566,
+      "ply": 10
+    },
+    {
+      "rank": 4,
+      "game": "pent-em-in",
+      "position": "midgame",
+      "op": "legalMoves",
+      "nsPerOp": 783584.4610389441,
+      "opsPerSec": 1276.1866138515732,
+      "ply": 10
+    },
+    {
+      "rank": 5,
+      "game": "fiar",
+      "position": "opening",
+      "op": "apply",
+      "nsPerOp": 629943.1518324574,
+      "opsPerSec": 1587.444830682062,
+      "ply": 0
+    }
+  ]
+}
