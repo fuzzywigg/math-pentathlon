@@ -38,6 +38,30 @@ let skipNotice: string | null = null;
 let aiGeneration = 0;
 /** Single pending AI timer — cleared on destroy / re-schedule. */
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
+/**
+ * After a human roll (esp. empty-valid skip), ignore a rapid second Roll so
+ * double-click/tap cannot operate the opponent's newly painted Roll control.
+ */
+const HUMAN_ROLL_SETTLE_MS = 250;
+let humanRollSettleTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearHumanRollSettle(): void {
+  if (humanRollSettleTimer !== null) {
+    clearTimeout(humanRollSettleTimer);
+    humanRollSettleTimer = null;
+  }
+}
+
+function markHumanRollSettle(): void {
+  clearHumanRollSettle();
+  humanRollSettleTimer = setTimeout(() => {
+    humanRollSettleTimer = null;
+  }, HUMAN_ROLL_SETTLE_MS);
+}
+
+function isHumanRollSettling(): boolean {
+  return humanRollSettleTimer !== null;
+}
 
 function clearAiTimer(): void {
   if (aiTimer !== null) {
@@ -118,7 +142,12 @@ function render(): void {
         const rollBtn = document.createElement('button');
         rollBtn.className = 'remainder-btn remainder-btn-roll';
         rollBtn.textContent = '🎲 Roll Dice';
-        rollBtn.addEventListener('click', handleRoll);
+        // Reject multi-click detail>1 so a double-click cannot roll for the
+        // opponent after an empty-valid skip rebuilds this button in place.
+        rollBtn.addEventListener('click', (event) => {
+          if (event.detail > 1) return;
+          handleRoll();
+        });
         controls.appendChild(rollBtn);
       }
     } else if (gameState.phase === 'selectIsland') {
@@ -178,10 +207,13 @@ function noteEmptyValidSkip(
 
 function handleRoll(): void {
   if (isComputerTurn()) return;
+  if (isHumanRollSettling()) return;
   if (gameState.phase !== 'rolling') return;
   const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
   noteEmptyValidSkip(beforePlayer);
+  // Seat may have flipped on empty-valid skip — drop click-through Roll.
+  markHumanRollSettle();
   render();
 }
 
@@ -244,6 +276,7 @@ export function initGame(containerEl: HTMLElement): void {
   injectRemainderIslandsStyles();
   gameContainer = containerEl;
   aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = false;
   syncOpponentChrome();
@@ -252,6 +285,7 @@ export function initGame(containerEl: HTMLElement): void {
 
 export function newGameVsHuman(): void {
   aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = false;
   skipNotice = null;
@@ -261,6 +295,7 @@ export function newGameVsHuman(): void {
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = true;
   skipNotice = null;
@@ -298,5 +333,6 @@ export function isTutorialActive(): boolean {
 export function destroyGame(): void {
   aiGeneration += 1;
   clearAiTimer();
+  clearHumanRollSettle();
   gameContainer = null;
 }
