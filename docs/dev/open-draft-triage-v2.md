@@ -4,7 +4,7 @@
 **Tip branch:** `cursor/integration-fold-wave5-tip-4af0`  
 **Tip SHA checked:** `69a53b16f59cec2c53b98b410cd5a3e474a33d55` (`69a53b16f59c`)  
 **Prior triage:** #545 / docs/dev/open-draft-triage-2026-10-08.md (tip was `5f5712366d20` / earlier `7b99c2bb`)  
-**Open PRs enumerated:** 127 (via `gh pr list --state open`)  
+**Open PRs enumerated:** 129 (via `gh pr list --state open`, includes this #575 + concurrent #574)  
 **Andrew bulk-close window:** after **2026-10-14** (approved)  
 **Scope:** report only — no PR closes, comments, labels, edits, merges, or ready-for-review flips.
 
@@ -15,13 +15,13 @@
 | FOLDED | 92 | close (Oct 14) |
 | SUPERSEDED | 7 | close (Oct 14) |
 | VIOLATION | 11 | close (Oct 14); do not fold |
-| RESIDUAL | 11 | salvage/fold (see list) |
+| RESIDUAL | 13 | salvage/fold (see list) |
 | OWNER-OPTION | 6 | hold for owner |
-| **Total (each open PR once)** | **127** | |
+| **Total (each open PR once)** | **129** | |
 
 ## Method (diff vs tip, not titles)
 
-1. `gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 500 --json number,title,headRefName,baseRefName,isDraft,headRefOid,url` → **127** open PRs.
+1. `gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 500 --json number,title,headRefName,baseRefName,isDraft,headRefOid,url` → **129** open PRs (re-checked after opening this triage).
 2. Live tip `69a53b16f59c` on `cursor/integration-fold-wave5-tip-4af0` (ff-only from `origin`).
 3. For every open PR: `git fetch origin pull/$N/head:refs/triage-v2/pr-$N`, then:
    - `git merge-base --is-ancestor refs/triage-v2/pr-$N $TIP`
@@ -31,6 +31,7 @@
    - Hard-rule scan on residual/different paths (`ai.ts`, `rules.ts`, `tutorial.ts`, copy/registry, Stars & Bars history cap, Hex Hard 450ms assert)
 4. Tip owner is restoring alpha AI/copy surfaces on #477 — **not evaluated here**; #559/#560/#570 held as OWNER-OPTION.
 5. PR #541 dead-code cleanup already merged into tip as FOLD LAST (cc4120d2); not in open set. No successor dead-code PR remains open.
+6. Concurrent open drafts #574 (engine coverage round 2) and #575 (this triage) classified after initial 127-PR pass.
 
 ## Exact compare commands (per PR)
 
@@ -198,20 +199,24 @@ Unique compliant value not on tip. Fold order preferred (no dead-code successor;
 | 2 | #568 | fix(shell): try/finally cleanup + soft-fail owl/SW bootstrap (burn-100 | `docs/dev/runtime-error-path-audit.md` (new): `@@ -0,0 +1,134 @@` · `src/pwa/bootstrap-owl.ts`: `@@ -5,6 +5,10 @@; @@ -32,15 +36,22 @@ export function bootstrapOwl(options: BootstrapOwlOptions = {}): void {` · `src/pwa/register.ts`: `@@ -54,29 +54,35 @@ export function registerPwa(` · `src/ui/game-route-mounts.ts`: `@@ -102,17 +102,47 @@ async function mountGameShellForRoute(; @@ -181,16 +211,16 @@ async function renderKingsQuadraphag` · `tests/unit/burn-1007-game-route-mounts.test.ts`: `@@ -166,11 +166,11 @@ describe('burn-1007 game-route-mounts', () => {; @@ -256,6 +256,29 @@ describe('burn-1007 game-rou` · `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts`: `@@ -323,4 +323,38 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {` · `tests/unit/mp3d-queens-guards-board-3d-lifecycle.test.ts`: `@@ -444,6 +444,31 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {` · `tests/unit/runtime-error-path-audit.test.ts` (new): `@@ -0,0 +1,423 @@` |
 | 3 | #573 | fix(types): Phase-2 type-ratchet Batch 7 shell/helper floor (burn-1008 | `docs/dev/type-ratchet-batch-7.md` (new): `@@ -0,0 +1,102 @@` · `docs/dev/type-ratchet-phase2-baseline.json`: `@@ -2,9 +2,9 @@; @@ -19,14 +19,14 @@; @@ -34,45 +34,45 @@; @@ -100,8 +100,8 @@; @@ -126,7 +126,7 @@; @@ -135,9 +135,9 @@` · `docs/dev/type-ratchet-phase2-export.mjs`: `@@ -61,9 +61,35 @@ const IN_SCOPE = new RegExp(; @@ -244,7 +270,7 @@ const baseline = {` · `docs/dev/type-ratchet-phase2-plan.md`: `@@ -4,9 +4,9 @@` · `scripts/check-type-ratchet.mjs`: `@@ -62,9 +62,35 @@ const IN_SCOPE = new RegExp(; @@ -113,7 +139,7 @@ console.log(` · `src/core/ai-worker/client.ts`: `@@ -3,8 +3,10 @@ import type { AiWorkerGameId, AiWorkerResponse } from './protocol';` · `src/core/ai-worker/protocol.ts`: `@@ -7,9 +7,9 @@ export interface AiWorkerRequestBase {` · `tests/unit/burn-wave14-types-helpers.test.ts`: `@@ -203,7 +203,7 @@ describe('Wave 14 — Pent-em-in piece helpers', () => {; @@ -297,7 +297,7 @@ describe('Wave 14 — Par ` |
 | 4 | #562 | test(engines): engine coverage round — characterization for lowest-cov | `docs/dev/engine-coverage-round.md` (new): `@@ -0,0 +1,159 @@` · `scripts/engine-coverage-rank.mjs` (new): `@@ -0,0 +1,92 @@` · `tests/unit/engine-coverage-round-burn-1008.test.ts` (new): `@@ -0,0 +1,825 @@` |
-| 5 | #571 | test(ui): non-engine UI coverage round 3 (burn-1008-mp-ui-coverage-rou | `docs/dev/ui-coverage-round-2.md` (new): `@@ -0,0 +1,89 @@` · `docs/dev/ui-coverage-round-3.md` (new): `@@ -0,0 +1,90 @@` · `tests/unit/burn-1007-main-shell-routes.test.ts`: `@@ -179,4 +179,96 @@ describe('burn-1007 main shell routes', () => {` · `tests/unit/burn-1008-ui-cov-r2-demos-highlight.test.ts` (new): `@@ -0,0 +1,139 @@` · `tests/unit/burn-1008-ui-cov-r2-owl-idle.test.ts` (new): `@@ -0,0 +1,212 @@` · `tests/unit/burn-1008-ui-cov-r2-prefetch.test.ts` (new): `@@ -0,0 +1,134 @@` · `tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts` (new): `@@ -0,0 +1,435 @@` · `tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts` (new): `@@ -0,0 +1,407 @@` |
-| 6 | #563 | test(docs): runtime error-path audit + behavior pins (burn-1008) | `docs/dev/runtime-error-path-audit.md` (new): `@@ -0,0 +1,134 @@` · `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts`: `@@ -323,4 +323,38 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {` · `tests/unit/mp3d-queens-guards-board-3d-lifecycle.test.ts`: `@@ -444,6 +444,31 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {` · `tests/unit/runtime-error-path-audit.test.ts` (new): `@@ -0,0 +1,304 @@` |
-| 7 | #565 | docs(dev): dependency security-advisory audit (burn-1008) | `docs/dev/dependency-advisory-audit.md` (new): `@@ -0,0 +1,166 @@` |
-| 8 | #561 | docs(dev): burn-1008 compliance review 4 of tip drafts #553–#557 | `docs/dev/compliance-review-4-2026-10-08.md` (new): `@@ -0,0 +1,287 @@` |
-| 9 | #564 | docs(dev): burn-1008 compliance review 5 of OWNER OPTION drafts #559/# | `docs/dev/compliance-review-5-2026-10-08.md` (new): `@@ -0,0 +1,274 @@` |
-| 10 | #569 | docs(dev): Friday landing preflight v2 tip→alpha (burn-1008) | `docs/dev/friday-landing-preflight-v2.md` (new): `@@ -0,0 +1,402 @@` |
-| 11 | #572 | docs(dev): burn-1008 compliance review 6 of tip drafts #562–#568 | `docs/dev/burn-1008-compliance-review-6.md` (new): `@@ -0,0 +1,359 @@` |
+| 5 | #574 | test(engines): coverage round 2 — next lowest non-AI rules (burn-1008) | `docs/dev/engine-coverage-round-2.md` (new): `@@ -0,0 +1,146 @@` · `docs/dev/engine-coverage-round.md` (new): `@@ -0,0 +1,159 @@` · `scripts/engine-coverage-rank.mjs` (new): `@@ -0,0 +1,92 @@` · `tests/unit/engine-coverage-round-2-burn-1008.test.ts` (new): `@@ -0,0 +1,874 @@` · `tests/unit/engine-coverage-round-burn-1008.test.ts` (new): `@@ -0,0 +1,825 @@` |
+| 6 | #571 | test(ui): non-engine UI coverage round 3 (burn-1008-mp-ui-coverage-rou | `docs/dev/ui-coverage-round-2.md` (new): `@@ -0,0 +1,89 @@` · `docs/dev/ui-coverage-round-3.md` (new): `@@ -0,0 +1,90 @@` · `tests/unit/burn-1007-main-shell-routes.test.ts`: `@@ -179,4 +179,96 @@ describe('burn-1007 main shell routes', () => {` · `tests/unit/burn-1008-ui-cov-r2-demos-highlight.test.ts` (new): `@@ -0,0 +1,139 @@` · `tests/unit/burn-1008-ui-cov-r2-owl-idle.test.ts` (new): `@@ -0,0 +1,212 @@` · `tests/unit/burn-1008-ui-cov-r2-prefetch.test.ts` (new): `@@ -0,0 +1,134 @@` · `tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts` (new): `@@ -0,0 +1,435 @@` · `tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts` (new): `@@ -0,0 +1,407 @@` |
+| 7 | #563 | test(docs): runtime error-path audit + behavior pins (burn-1008) | `docs/dev/runtime-error-path-audit.md` (new): `@@ -0,0 +1,134 @@` · `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts`: `@@ -323,4 +323,38 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {` · `tests/unit/mp3d-queens-guards-board-3d-lifecycle.test.ts`: `@@ -444,6 +444,31 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {` · `tests/unit/runtime-error-path-audit.test.ts` (new): `@@ -0,0 +1,304 @@` |
+| 8 | #565 | docs(dev): dependency security-advisory audit (burn-1008) | `docs/dev/dependency-advisory-audit.md` (new): `@@ -0,0 +1,166 @@` |
+| 9 | #561 | docs(dev): burn-1008 compliance review 4 of tip drafts #553–#557 | `docs/dev/compliance-review-4-2026-10-08.md` (new): `@@ -0,0 +1,287 @@` |
+| 10 | #564 | docs(dev): burn-1008 compliance review 5 of OWNER OPTION drafts #559/# | `docs/dev/compliance-review-5-2026-10-08.md` (new): `@@ -0,0 +1,274 @@` |
+| 11 | #569 | docs(dev): Friday landing preflight v2 tip→alpha (burn-1008) | `docs/dev/friday-landing-preflight-v2.md` (new): `@@ -0,0 +1,402 @@` |
+| 12 | #572 | docs(dev): burn-1008 compliance review 6 of tip drafts #562–#568 | `docs/dev/burn-1008-compliance-review-6.md` (new): `@@ -0,0 +1,359 @@` |
+| 13 | #575 | docs(dev): open draft PR triage v2 for Oct 14 bulk-close (burn-1008) | `docs/dev/open-draft-triage-v2.md` (new): `@@ -0,0 +1,395 @@` |
 
 ### Residual notes
 
 - **#566** is SUPERSEDED by **#571** (all #566 paths blob-identical on #571 head) — close #566; salvage via #571.
+- **#574** stacks on **#562** (round-1 paths blob-identical on #574); fold #562 then #574, or fold #574 alone to land both rounds.
 - **#563** audit docs/tests overlap #567/#568 — when folding implementations, prefer #567/#568 file versions for overlapping paths; keep #563-only characterization if still unique after those folds.
 - **#569** is tip→alpha preflight docs only (no AI/copy edits). **#570** (HOLD AI/copy audit) is OWNER-OPTION and stacks on #569 — do not fold AI/copy hunk guidance from #570 while tip owner restores alpha surfaces.
 - **#573** AI-worker edits are type-only (`seed?: number` → `number | undefined`); not AI behavior.
+- **#575** is this triage deliverable (docs-only).
 - **#541** dead-code cleanup: already merged `cc4120d2 merge(#541): safe dead-code removals (fold last)` — marked LAST historically; nothing further to schedule last among open residuals.
 
 ## OWNER-OPTION (do not bulk-close)
@@ -352,16 +357,16 @@ Unique compliant value not on tip. Fold order preferred (no dead-code successor;
 
 ## Completeness check
 
-- Open PRs from API: **127**
-- Classification rows: **127**
-- Unique PR numbers: **127**
-- Category sum: **127**
+- Open PRs from API: **129**
+- Classification rows: **129**
+- Unique PR numbers: **129**
+- Category sum: **129**
 
 ## Verification commands run (this triage)
 
 ```bash
 gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 500 --json number | jq length
-# → 127
+# → 129 (after #574/#575 opened)
 
 git fetch origin cursor/integration-fold-wave5-tip-4af0
 git rev-parse origin/cursor/integration-fold-wave5-tip-4af0
