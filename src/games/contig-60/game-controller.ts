@@ -26,10 +26,7 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
-import {
-  replaceWithSafeHtml,
-  safeHtml,
-} from '../../core/dom-security';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -222,11 +219,15 @@ function updateStatus(): void {
   replaceWithSafeHtml(
     statusContainer,
     safeHtml`
-    <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
+    <div class="contig-status">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
     `
   );
+  const statusEl = statusContainer.querySelector('.contig-status');
+  if (statusEl) {
+    statusEl.className = `contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}`;
+  }
 }
 
 // =============================================================================

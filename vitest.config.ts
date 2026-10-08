@@ -113,6 +113,7 @@ export default defineConfig({
         },
       },
       {
+        resolve: { alias: pwaRegisterAlias },
         test: {
           name: 'unit-shared',
           globals: true,
