@@ -4,29 +4,11 @@
  * No pointer clicks on board controls (shell Start may use click once to dismiss modal).
  */
 import { test, expect, type Page } from '@playwright/test';
-
-async function dismissOwlIfNeeded(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
+import {
+  waitForGameReady,
+  gotoGame,
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 /** Start human mode using keyboard on the New Game modal when it is open. */
 async function startHumanKeyboard(page: Page) {

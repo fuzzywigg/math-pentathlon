@@ -4,57 +4,19 @@
  * runner / docs — these specs guard the fixes.
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  waitForGameReady,
+  startVsAi,
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 const DESKTOP = { width: 1280, height: 800 };
 const TABLET = { width: 768, height: 1024 };
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
 
 async function gotoFab(page: Page) {
   await page.goto('/#/game/fab-a-diffy');
   await waitForGameReady(page);
   await dismissOwlIfNeeded(page);
-}
-
-async function startVsAi(
-  page: Page,
-  difficulty: 'easy' | 'medium' | 'hard'
-) {
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  await page.locator(`.difficulty-btn.${difficulty}`).click();
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwlIfNeeded(page);
-  await expect(
-    page.locator('.fab-bar-pool, .fab-answer-board').first()
-  ).toBeVisible();
 }
 
 /** Complete one human claim (or pass). */

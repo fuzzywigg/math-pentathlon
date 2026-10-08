@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format win-first-1', () => {
     storage.resetAll();
   });
 
-
   it('selects win-first-1 and substitutes gameName in celebration', () => {
     for (const m of owlMessages.getMessagesByCategory('game:end')) {
       if (m.id !== 'win-first-1') storage.markMessageSeen(m.id);

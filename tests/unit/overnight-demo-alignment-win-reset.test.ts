@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -29,7 +24,7 @@ afterEach(() => {
 
 describe('Overnight demos — alignment win/reset edges', () => {
   it('four-in-row column drops alternate X/O and update status', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const col0 = root.querySelector(
       '#four-board [data-col="0"]'
@@ -47,7 +42,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('four-in-row vertical win marks winner and blocks further play', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     // X drops in col0 four times interleaved with O in col1
     for (let i = 0; i < 4; i++) {
@@ -77,7 +72,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('four reset clears pieces and restores X to move', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     (root.querySelector('#four-board [data-col="3"]') as HTMLElement).click();
     (root.querySelector('#four-reset') as HTMLButtonElement).click();
@@ -86,7 +81,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('hex board places alternate colors and reset clears', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const cells = root.querySelectorAll('#hex-board [data-row][data-col]');
     expect(cells.length).toBeGreaterThan(1);
@@ -102,7 +97,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('potential board click fills info; reset clears selection chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const cell = root.querySelector(
       '#potential-board [data-row="0"][data-col="0"]'
@@ -120,7 +115,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('full column four-in-row rejects overflow without throwing', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     expect(() => {
       for (let i = 0; i < 10; i++) {
@@ -137,7 +132,7 @@ describe('Overnight demos — alignment win/reset edges', () => {
   });
 
   it('triple remount keeps three independent section boards', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     renderAlignmentDemo(root);
     renderAlignmentDemo(root);

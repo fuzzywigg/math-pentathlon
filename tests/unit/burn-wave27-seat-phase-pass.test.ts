@@ -80,6 +80,7 @@ import {
   createInitialState as createFab,
   passTurn as fabPass,
 } from '../../src/games/fab-a-diffy/rules';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -98,12 +99,6 @@ function mountPair(): { board: HTMLElement; status: HTMLElement } {
   document.body.appendChild(board);
   document.body.appendChild(status);
   return { board, status };
-}
-
-function mountContainer(): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  return container;
 }
 
 describe('Wave 27 seat-phase-pass — Contig roll → place/pass restores rolling', () => {
@@ -255,7 +250,7 @@ describe('Wave 27 seat-phase-pass — Juggle roll → selectShape phase chrome',
 describe('Wave 27 seat-phase-pass — Sum Dominoes passTurn / pass-btn seat flip', () => {
   it('DOM roll enters placing/passing; pass path flips to P2 rolling', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.05);
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = sdVsHuman(container);
     expect(ctrl.state.phase).toBe('rolling');
 
@@ -329,7 +324,7 @@ describe('Wave 27 seat-phase-pass — Sum Dominoes passTurn / pass-btn seat flip
 describe('Wave 27 seat-phase-pass — Prime Gold passTurn / DOM roll', () => {
   it('DOM roll enters placing/passing; place or pass flips seat when possible', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.45);
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = primeVsHuman(container);
     click(container.querySelector('.pg-roll-btn, .prime-roll-btn'));
     expect(['placing', 'passing', 'rolling']).toContain(ctrl.state.phase);

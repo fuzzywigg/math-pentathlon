@@ -1,7 +1,7 @@
 /**
  * #378 — Human chip/node clicks must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
   getValidMoves,
@@ -9,14 +9,10 @@ import {
   selectChip,
 } from '../../src/games/kwatro-sinko/rules';
 import { renderBoard } from '../../src/games/kwatro-sinko/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Kwatro-Sinko AI-turn input guard (#378)', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('kwa-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['kwa-styles'] });
   afterEach(async () => {
     vi.useRealTimers();
     const { destroyGame } =

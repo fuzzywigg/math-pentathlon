@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — frac vs span exact', () => {
   it('locks comparison-inputs vs separator span', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     expect(
       [...root.querySelectorAll('.comparison-inputs > span')].map(

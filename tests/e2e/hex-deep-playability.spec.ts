@@ -3,6 +3,10 @@
  * Chromium only (matches deep playtest harness).
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAiAt,
+} from './helpers/page';
 
 test.describe('Hex deep playability', () => {
   test.describe.configure({ mode: 'serial' });
@@ -11,30 +15,6 @@ test.describe('Hex deep playability', () => {
     ({ browserName }) => browserName !== 'chromium',
     'Deep playtest targets Chromium'
   );
-
-  async function dismissOwl(page: Page) {
-    await page.evaluate(() => {
-      const el = document.getElementById('ollie-owl');
-      if (el) (el as HTMLElement).style.pointerEvents = 'none';
-    });
-  }
-
-  async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-    await page.goto('/#/game/hex');
-    await expect(page.getByTestId('game-loading')).toBeHidden({
-      timeout: 15_000,
-    });
-    await expect(page.locator('#new-game-btn')).toBeVisible({ timeout: 15_000 });
-    await dismissOwl(page);
-    await page.locator('#new-game-btn').click();
-    await expect(page.locator('#new-game-modal')).toBeVisible();
-    await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-    await page.locator(`.difficulty-btn.${difficulty}`).click();
-    await page.locator('#start-game-btn').click();
-    await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
-    await dismissOwl(page);
-    await expect(page.locator('svg.hex-board')).toBeVisible({ timeout: 15_000 });
-  }
 
   test('desktop + tablet hex cells clear 44px CSS tap targets', async ({
     browser,
@@ -49,7 +29,7 @@ test.describe('Hex deep playability', () => {
         isMobile: vp.isMobile,
       });
       const page = await context.newPage();
-      await startVsAi(page, 'easy');
+      await startVsAiAt(page, 'hex', 'easy');
 
       const metrics = await page.evaluate(() => {
         const svg = document.querySelector('svg.hex-board');
@@ -87,7 +67,7 @@ test.describe('Hex deep playability', () => {
       if (msg.type() === 'error') errors.push(msg.text());
     });
 
-    await startVsAi(page, 'easy');
+    await startVsAiAt(page, 'hex', 'easy');
 
     let maxThink = 0;
     const deadline = Date.now() + 150_000;

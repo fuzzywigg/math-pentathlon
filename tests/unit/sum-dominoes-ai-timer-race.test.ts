@@ -5,27 +5,17 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { initGame } from '../../src/games/sum-dominoes/game-controller';
+import { clearDom, mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  document.body.innerHTML = '';
-  document.getElementById('sd-styles')?.remove();
+  clearDom(['sd-styles']);
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
-
 describe('Sum Dominoes AI timer race', () => {
   it('does not auto-roll when it becomes the human seat after AI finishes', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'easy');
 
     // Red (AI) to roll
@@ -68,7 +58,7 @@ describe('Sum Dominoes AI timer race', () => {
 
   it('makeAIMove is a no-op when called while Blue is to move', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'medium');
     expect(ctrl.state.currentPlayer).toBe('player1');
     expect(ctrl.state.phase).toBe('rolling');

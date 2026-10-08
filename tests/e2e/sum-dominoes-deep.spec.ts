@@ -3,44 +3,13 @@
  * Easy/Medium/Hard — finishes without stall, exposes thinking UI, ≥44px targets.
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAiAt,
+} from './helpers/page';
 
 const MAX_HUMAN_TURNS = 60;
 const STALL_MS = 15_000;
-
-async function dismissOwl(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true }).catch(() => {});
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  await page.goto('/#/game/sum-dominoes');
-  await expect(page.getByTestId('game-loading')).toBeHidden({ timeout: 20_000 });
-  await expect(page.locator('.sd-board, #new-game-btn').first()).toBeVisible({
-    timeout: 20_000,
-  });
-  await dismissOwl(page);
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  await page.locator(`.difficulty-btn.${difficulty}`).click();
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwl(page);
-  await expect(page.locator('.sd-board')).toBeVisible();
-}
 
 async function playHumanTurn(page: Page) {
   const roll = page.locator('.sd-roll-btn');
@@ -94,7 +63,7 @@ async function waitHumanOrEnd(page: Page) {
 }
 
 async function playFullGame(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  await startVsAi(page, difficulty);
+  await startVsAiAt(page, 'sum-dominoes', difficulty);
   let sawThinking = false;
   let turns = 0;
 
@@ -141,7 +110,7 @@ test.describe('Sum Dominoes deep playtest e2e', () => {
     });
 
     test('tablet Easy full game + 44px hit floors', async ({ page }) => {
-      await startVsAi(page, 'easy');
+      await startVsAiAt(page, 'sum-dominoes', 'easy');
 
       const sizes = await page.evaluate(() => {
         const roll = document.querySelector('.sd-roll-btn');
@@ -182,7 +151,7 @@ test.describe('Sum Dominoes deep playtest e2e', () => {
     test('tablet Medium shows computer thinking and does not illicit-roll Blue', async ({
       page,
     }) => {
-      await startVsAi(page, 'medium');
+      await startVsAiAt(page, 'sum-dominoes', 'medium');
       // Human opens
       await page.locator('.sd-roll-btn').click({ force: true });
       const pass = page.locator('.sd-pass-btn');

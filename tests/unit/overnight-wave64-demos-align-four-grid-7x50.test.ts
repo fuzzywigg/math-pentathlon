@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — align four-board 7×50 grid', () => {
   it('locks four-board grid-template-columns repeat(7, 50px)', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const css = root.querySelector('style')?.textContent ?? '';
     expect(css).toContain('grid-template-columns: repeat(7, 50px)');

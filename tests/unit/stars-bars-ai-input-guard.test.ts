@@ -1,7 +1,7 @@
 /**
  * Human card/cell input must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
@@ -9,20 +9,10 @@ import {
   selectCard,
 } from '../../src/games/stars-bars/rules';
 import { renderBoard, renderPlayerHand } from '../../src/games/stars-bars/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Stars & Bars AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('stars-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('stars-styles')?.remove();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['stars-styles'] });
   it('renderBoard with allowInput false does not mark valid placements', () => {
     let state = createInitialState();
     const cardId = state.playerHands.player1[0]!.id;

@@ -7,46 +7,15 @@
  * hint, restarts New Game, and retries so CI does not flake on deal seed.
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAiAt,
+} from './helpers/page';
 
 const MAX_HUMAN_TURNS = 60;
 const STALL_MS = 15_000;
 /** Bad deals that surface mutual-place deadlock — restart rather than burn budget. */
 const MAX_DEADLOCK_RESTARTS = 4;
-
-async function dismissOwl(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true }).catch(() => {});
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  await page.goto('/#/game/ramrod');
-  await expect(page.getByTestId('game-loading')).toBeHidden({ timeout: 20_000 });
-  await expect(page.locator('.ramrod-board, #new-game-btn').first()).toBeVisible({
-    timeout: 20_000,
-  });
-  await dismissOwl(page);
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  await page.locator(`.difficulty-btn.${difficulty}`).click();
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwl(page);
-  await expect(page.locator('.ramrod-board')).toBeVisible();
-}
 
 /** DOM-dispatch clicks — survives shell overflow-clip quirks (same as playtest harness). */
 async function playHumanTurn(
@@ -282,7 +251,7 @@ async function playFullGame(
   let thinkSeen = 0;
   let restarts = 0;
 
-  await startVsAi(page, difficulty);
+  await startVsAiAt(page, 'ramrod', difficulty);
 
   for (let t = 0; t < MAX_HUMAN_TURNS; t++) {
     const gate = await waitHumanOrEnd(page);
@@ -299,7 +268,7 @@ async function playFullGame(
         );
       }
       restarts++;
-      await startVsAi(page, difficulty);
+      await startVsAiAt(page, 'ramrod', difficulty);
       t = -1; // restart turn counter for the new deal
       continue;
     }
@@ -314,7 +283,7 @@ async function playFullGame(
         );
       }
       restarts++;
-      await startVsAi(page, difficulty);
+      await startVsAiAt(page, 'ramrod', difficulty);
       t = -1;
       continue;
     }
@@ -328,7 +297,7 @@ async function playFullGame(
         );
       }
       restarts++;
-      await startVsAi(page, difficulty);
+      await startVsAiAt(page, 'ramrod', difficulty);
       t = -1;
       continue;
     }
@@ -355,7 +324,7 @@ test.describe('Ramrod deep playtest', () => {
       isMobile: true,
     });
     const page = await context.newPage();
-    await startVsAi(page, 'medium');
+    await startVsAiAt(page, 'ramrod', 'medium');
 
     const measures = await page.evaluate(() => {
       const rods = [
@@ -393,7 +362,7 @@ test.describe('Ramrod deep playtest', () => {
             throw new Error('tablet deadlock restarts exhausted');
           }
           restarts++;
-          await startVsAi(page, 'medium');
+          await startVsAiAt(page, 'ramrod', 'medium');
           t = -1;
           continue;
         }
@@ -404,7 +373,7 @@ test.describe('Ramrod deep playtest', () => {
             throw new Error('tablet deadlock restarts exhausted');
           }
           restarts++;
-          await startVsAi(page, 'medium');
+          await startVsAiAt(page, 'ramrod', 'medium');
           t = -1;
           continue;
         }
@@ -415,7 +384,7 @@ test.describe('Ramrod deep playtest', () => {
             throw new Error('tablet deadlock restarts exhausted');
           }
           restarts++;
-          await startVsAi(page, 'medium');
+          await startVsAiAt(page, 'ramrod', 'medium');
           t = -1;
           continue;
         }

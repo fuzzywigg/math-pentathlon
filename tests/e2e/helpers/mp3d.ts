@@ -3,6 +3,7 @@
  * Prefer ready-signal waits over fixed sleep; opt into board3dLQ for CI GL load.
  */
 import { expect, type Locator, type Page } from '@playwright/test';
+import { waitForGameReady as sharedWaitForGameReady } from './page';
 
 /** Heavy multi-viewport / play-through 3D specs. */
 export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
@@ -14,10 +15,9 @@ export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
 declare const process: { env: Record<string, string | undefined> };
 export const MP3D_READY_TIMEOUT_MS = process.env.CI ? 60_000 : 45_000;
 
+/** Loading-only ready (mp3d specs do not require #new-game-btn chrome). */
 export async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
+  await sharedWaitForGameReady(page, { requireChrome: false });
 }
 
 export async function dismissModeIfNeeded(page: Page): Promise<void> {

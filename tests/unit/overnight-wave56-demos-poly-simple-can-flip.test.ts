@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 56 demos — poly simple Can Flip', () => {
   it('simple first shape fills Can Flip Yes/No in shape-info', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (
       root.querySelector('.set-btn[data-set="simple"]') as HTMLButtonElement

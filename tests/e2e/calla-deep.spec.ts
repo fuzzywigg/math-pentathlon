@@ -3,13 +3,9 @@
  * Desktop + tablet Chromium. Complements the offline harness script.
  */
 import { test, expect, type Page } from '@playwright/test';
-
-async function dismissOwl(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
+import {
+  dismissOwl,
+} from './helpers/page';
 
 async function startCallaVsAi(
   page: Page,

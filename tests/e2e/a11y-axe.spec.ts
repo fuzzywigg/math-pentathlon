@@ -15,6 +15,13 @@ import type { Result, AxeResults } from 'axe-core';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
+import {
+  dismissOwlIfNeeded,
+  gotoGame,
+  startHuman,
+  waitForGameReady,
+  GAME_MOUNT as MOUNT,
+} from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_DIR = path.join(process.cwd(), 'test-results', 'a11y-axe');
@@ -38,67 +45,6 @@ const ENFORCED_RULES = new Set([
   'focus-order-semantics',
   'tabindex',
 ]);
-
-const MOUNT: Record<string, string> = {
-  'kings-quadraphages': '#board .board .cell, .cell-king',
-  hex: '.hex-board',
-  'star-track': '.star-track-board',
-  'hex-a-gone': '.hex-a-gone-board',
-  calla: '.calla-wrapper, .calla-pit',
-  'sum-dominoes': '.sd-board',
-  'par-55': '.par55-board',
-  ramrod: '.ramrod-board',
-  'kwatro-sinko': '.kwa-board',
-  fiar: '.fiar-board-container',
-  juggle: '.juggle-board',
-  'contig-60': '.contig-board',
-  'stars-bars': '.stars-board',
-  'fab-a-diffy': '.fab-bar-pool, .fab-answer-board',
-  'queens-guards': '.qg-board-container',
-  'prime-gold': '.pg-board, .prime-board',
-  'remainder-islands': '.remainder-board',
-  'pent-em-in': '.pent-board',
-  'frac-fact': '.frac-problem, .frac-choice-btn',
-  'fraction-pinball':
-    '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
-};
-
-async function dismissOwlIfNeeded(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
-  }
-  await dismissOwlIfNeeded(page);
-}
 
 /** Wait out entrance fades so axe contrast isn't measured mid-animation. */
 async function waitForVisualSettle(page: Page) {

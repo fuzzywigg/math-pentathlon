@@ -4,6 +4,9 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
+import {
+  waitForGameReady,
+} from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
@@ -14,15 +17,6 @@ function isIgnoredConsoleError(text: string): boolean {
     /favicon\.ico/i.test(text) ||
     /\[vite\]/i.test(text)
   );
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
 }
 
 test.describe('Console clean on game load', () => {

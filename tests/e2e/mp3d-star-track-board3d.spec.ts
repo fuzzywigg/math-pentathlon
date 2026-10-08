@@ -16,43 +16,13 @@ import {
   waitForMp3dReady,
 } from './helpers/mp3d';
 import { softWaitVisible } from './helpers/stability';
+import { dismissOwlIfNeeded } from './helpers/page';
 
 const VIEWPORTS = [
   { name: 'phone', width: 390, height: 844 },
   { name: 'tablet-portrait', width: 800, height: 1280 },
   { name: 'tablet-landscape', width: 1024, height: 768 },
 ] as const;
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    'button:has-text("Dismiss"), button[aria-label="Dismiss message"], .owl-dismiss, #owl-dismiss'
-  );
-  if (
-    await dismiss
-      .first()
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await dismiss
-      .first()
-      .click()
-      .catch(() => undefined);
-  }
-  const minimize = page.locator(
-    'button:has-text("Minimize"), button[aria-label="Minimize Ollie"]'
-  );
-  if (
-    await minimize
-      .first()
-      .isVisible()
-      .catch(() => false)
-  ) {
-    await minimize
-      .first()
-      .click()
-      .catch(() => undefined);
-  }
-}
 
 async function assertChainAboveFold(page: Page, viewportHeight: number) {
   await dismissOwlIfNeeded(page);

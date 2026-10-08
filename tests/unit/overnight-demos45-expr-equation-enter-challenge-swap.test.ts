@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — expr equation Enter / challenge swap', () => {
   it('equation Enter key evaluates true and false paths', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#equation-input') as HTMLInputElement;
 
@@ -54,7 +49,7 @@ describe('Overnight demos45 — expr equation Enter / challenge swap', () => {
   });
 
   it('switching challenges rebuilds target + builder chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const cards = root.querySelectorAll('#challenge-grid .challenge-card');
     expect(cards.length).toBeGreaterThanOrEqual(2);
@@ -77,7 +72,7 @@ describe('Overnight demos45 — expr equation Enter / challenge swap', () => {
   });
 
   it('24-solver exact solutions get .exact class when present', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const numInputs = ['num1', 'num2', 'num3', 'num4'].map(
       (id) => root.querySelector(`#${id}`) as HTMLInputElement

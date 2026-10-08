@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — expr True! bang exact', () => {
   it('2 + 2 = 4 paints exact True! Both sides equal 4', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#equation-input') as HTMLInputElement;
     const check = root.querySelector('#check-equation-btn') as HTMLButtonElement;

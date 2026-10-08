@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ afterEach(() => {
 
 describe('Overnight demos — expression solver + equations', () => {
   it('default 1,2,3,4 solve lists exact solutions for 24', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     (root.querySelector('#solve-btn') as HTMLButtonElement).click();
     expect(root.querySelector('#solutions-list')?.textContent).toMatch(/Searching/i);
@@ -37,7 +32,7 @@ describe('Overnight demos — expression solver + equations', () => {
   });
 
   it('equation checker marks true / false / error classes', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#equation-input') as HTMLInputElement;
     const check = root.querySelector('#check-equation-btn') as HTMLButtonElement;

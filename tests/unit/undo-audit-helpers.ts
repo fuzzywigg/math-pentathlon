@@ -1,26 +1,16 @@
 /**
  * Shared helpers for undo/redo + move-log property tests (2026-10-07 audit).
+ *
+ * RNG: `mulberry32Uint` preserves historical uint32-forced streams used by
+ * these property tests. Math.random install uses that same stream.
  */
+import {
+  mulberry32Uint as mulberry32,
+  pickIndex,
+  pickOne,
+} from '../helpers/rng';
 
-/** Mulberry32 — deterministic [0,1) stream from a 32-bit seed. */
-export function mulberry32(seed: number): () => number {
-  let t = seed >>> 0;
-  return () => {
-    t = (t + 0x6d2b79f5) >>> 0;
-    let r = Math.imul(t ^ (t >>> 15), 1 | t);
-    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-export function pickIndex(rng: () => number, length: number): number {
-  if (length <= 0) throw new Error('pickIndex on empty');
-  return Math.floor(rng() * length);
-}
-
-export function pickOne<T>(rng: () => number, items: readonly T[]): T {
-  return items[pickIndex(rng, items.length)]!;
-}
+export { mulberry32, pickIndex, pickOne };
 
 /** Deep-serialize game state including Map entries (stable key order). */
 export function serializeState(value: unknown): string {

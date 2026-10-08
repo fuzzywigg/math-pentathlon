@@ -13,21 +13,13 @@ import {
   injectRemainderIslandsStyles,
   renderBoard,
 } from '../../src/games/remainder-islands/board-ui';
+import { mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.restoreAllMocks();
   document.body.innerHTML = '';
   document.getElementById('remainder-islands-styles')?.remove();
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
 
 function hitPolygon(
   container: HTMLElement,
@@ -105,7 +97,7 @@ describe('Remainder Islands polish — pointer tap + click claim-once', () => {
       return ((0.17 * 1000 + i * 37) % 1000) / 1000;
     });
 
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 
@@ -145,7 +137,7 @@ describe('Remainder Islands polish — empty-valid skip status', () => {
       return ((0.41 * 1000 + i * 37) % 1000) / 1000;
     });
 
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 

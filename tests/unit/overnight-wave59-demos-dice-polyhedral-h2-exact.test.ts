@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 59 demos — dice polyhedral h2 exact', () => {
   it('exposes Interactive Selector (3 Polyhedral - Prime Gold Style) h2', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const h2 = [...root.querySelectorAll('h2')].map((el) => el.textContent ?? '');
     expect(h2).toContain(

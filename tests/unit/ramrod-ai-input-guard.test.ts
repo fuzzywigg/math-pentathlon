@@ -1,7 +1,7 @@
 /**
  * Human rod/box input must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
@@ -9,20 +9,10 @@ import {
   selectRod,
 } from '../../src/games/ramrod/rules';
 import { renderBoard, renderPlayerRods } from '../../src/games/ramrod/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Ramrod AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('ramrod-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('ramrod-styles')?.remove();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['ramrod-styles'] });
   it('renderBoard with allowInput false does not mark valid slots', () => {
     let state = createInitialState();
     const rodId = state.playerRods.player1[0]!;

@@ -3,55 +3,10 @@
  * touch cell size, vs-AI You copy, AI input lock, full game reaches end.
  */
 import { test, expect, devices, type Page } from '@playwright/test';
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  // Compress controller think/move pauses so a full Easy game fits e2e budgets.
-  await page.addInitScript(() => {
-    const orig = window.setTimeout.bind(window);
-    window.setTimeout = ((
-      fn: TimerHandler,
-      ms?: number,
-      ...args: unknown[]
-    ) =>
-      orig(
-        fn as never,
-        typeof ms === 'number' && ms >= 100 ? Math.min(ms, 20) : (ms ?? 0),
-        ...args
-      )) as typeof window.setTimeout;
-  });
-
-  await page.goto('/#/game/kings-quadraphages');
-  await waitForGameReady(page);
-
-  const modal = page.locator('#new-game-modal');
-  if (!(await modal.isVisible().catch(() => false))) {
-    await page.locator('#new-game-btn').click();
-  }
-  await expect(modal).toBeVisible();
-
-  const aiOpt = page.locator('.mode-option[data-mode="human-vs-ai"]');
-  if (await aiOpt.isVisible().catch(() => false)) {
-    await aiOpt.click();
-  }
-  const diffBtn = page.locator(
-    `.difficulty-btn[data-difficulty="${difficulty}"]`
-  );
-  if (await diffBtn.isVisible().catch(() => false)) {
-    await diffBtn.click();
-  }
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await expect(page.locator('.board.kings-board .cell').first()).toBeVisible();
-}
+import {
+  waitForGameReady,
+  startVsAiAt,
+} from './helpers/page';
 
 async function playHumanTurn(page: Page) {
   const status = page.locator('.status-turn');
@@ -74,7 +29,7 @@ test.describe('Kings deep playability', () => {
     page,
   }) => {
     test.setTimeout(120_000);
-    await startVsAi(page, 'easy');
+    await startVsAiAt(page, 'kings-quadraphages', 'easy');
 
     await expect(page.locator('.status-mode')).toContainText('vs AI (Easy)');
     await expect(page.locator('.status-turn')).toHaveText(
@@ -151,7 +106,7 @@ test.describe('Kings deep playability (tablet)', () => {
     page,
   }) => {
     test.setTimeout(120_000);
-    await startVsAi(page, 'medium');
+    await startVsAiAt(page, 'kings-quadraphages', 'medium');
 
     await expect(page.locator('.status-turn')).toHaveText(
       'You: Click your King to select it'

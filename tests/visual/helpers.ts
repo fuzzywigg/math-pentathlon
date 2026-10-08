@@ -1,5 +1,7 @@
 import { expect, type Page } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
+import { GAME_MOUNT } from '../e2e/helpers/game-mounts';
+import { waitForGameReady as sharedWaitForGameReady } from '../e2e/helpers/page';
 
 /** Fixed PRNG seed for deterministic board/dice layout across runs. */
 export const VISUAL_SEED = 0x4d50_5652; // "MPVR"
@@ -8,29 +10,7 @@ export const VISUAL_SEED = 0x4d50_5652; // "MPVR"
 export const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
 /** Primary board / play surface that proves the game mounted in 2D. */
-export const MOUNT: Record<string, string> = {
-  'kings-quadraphages': '#board .board .cell, .cell-king',
-  hex: '.hex-board',
-  'star-track': '.star-track-board',
-  'hex-a-gone': '.hex-a-gone-board',
-  calla: '.calla-wrapper, .calla-pit',
-  'sum-dominoes': '.sd-board',
-  'par-55': '.par55-board',
-  ramrod: '.ramrod-board',
-  'kwatro-sinko': '.kwa-board',
-  fiar: '.fiar-board-container',
-  juggle: '.juggle-board',
-  'contig-60': '.contig-board',
-  'stars-bars': '.stars-board',
-  'fab-a-diffy': '.fab-bar-pool, .fab-answer-board',
-  'queens-guards': '.qg-board-container',
-  'prime-gold': '.pg-board, .prime-board',
-  'remainder-islands': '.remainder-board',
-  'pent-em-in': '.pent-board',
-  'frac-fact': '.frac-problem, .frac-choice-btn',
-  'fraction-pinball':
-    '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
-};
+export const MOUNT = GAME_MOUNT;
 
 declare global {
   interface Window {
@@ -123,12 +103,7 @@ export async function installVisualDeterminism(page: Page): Promise<void> {
 
 /** Lazy game chunks show `data-testid="game-loading"` until the shell mounts. */
 export async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
+  await sharedWaitForGameReady(page);
 }
 
 /** Hide Ollie and wait for fonts before capturing. */

@@ -1,27 +1,20 @@
 /**
  * Stale AI timers must not pass or place on Blue's seat.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
   placeRod,
   selectRod,
 } from '../../src/games/ramrod/rules';
+import { installDomHooks } from './helpers/dom';
 
 describe('Ramrod AI timer race', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('ramrod-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['ramrod-styles'] });
   afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('ramrod-styles')?.remove();
+    vi.restoreAllMocks();
   });
-
   it('stacked updateUI schedules do not illicitly pass Blue after AI finishes', async () => {
     const { newGameVsAI } =
       await import('../../src/games/ramrod/game-controller');

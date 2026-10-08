@@ -16,20 +16,7 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
-
-function createEmptyBoard(): Board {
-  return Array.from({ length: BOARD_SIZE }, () =>
-    Array.from({ length: BOARD_SIZE }, () => null)
-  );
-}
-
-function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
-}
-
-function createRulesState(board: Board): RulesGameState {
-  return { board, player1Supply: 30, player2Supply: 30 };
-}
+import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
 
 /**
  * P2 king in corner with a single escape at (1,1).

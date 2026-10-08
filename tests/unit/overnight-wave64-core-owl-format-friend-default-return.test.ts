@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format return-generic-2 unchanged', () => {
     storage.resetAll();
   });
 
-
   it('return-generic-2 has no placeholders so missing playerName is fine', () => {
     for (const m of owlMessages.getMessagesByCategory('app:return')) {
       if (m.id !== 'return-generic-2') storage.markMessageSeen(m.id);

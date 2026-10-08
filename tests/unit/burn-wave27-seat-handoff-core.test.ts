@@ -65,6 +65,7 @@ import { newGameVsHuman as parVsHuman } from '../../src/games/par-55/game-contro
 import { newGameVsHuman as starsVsHuman } from '../../src/games/stars-bars/game-controller';
 import { newGameVsHuman as ramrodVsHuman } from '../../src/games/ramrod/game-controller';
 import { newGameVsHuman as kwaVsHuman } from '../../src/games/kwatro-sinko/game-controller';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -83,12 +84,6 @@ function mountPair(): { board: HTMLElement; status: HTMLElement } {
 function click(el: Element | null): void {
   expect(el).toBeTruthy();
   el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
-
-function mountContainer(): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  return container;
 }
 
 describe('Wave 27 seat-handoff — Hex legal click flips seat + status', () => {
@@ -387,7 +382,7 @@ describe('Wave 27 seat-handoff — Juggle roll advances status instruction', () 
 
 describe('Wave 27 seat-handoff — Sum Dominoes roll→place when playable', () => {
   it('roll enters placing/passing; place flips seat when valid cell exists', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = sdVsHuman(container);
 
     expect(ctrl.state.phase).toBe('rolling');
@@ -422,7 +417,7 @@ describe('Wave 27 seat-handoff — Sum Dominoes roll→place when playable', () 
 
 describe('Wave 27 seat-handoff — Prime Gold roll→place when valid', () => {
   it('roll enters placing; valid cell place flips seat and grows history', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = primeVsHuman(container);
 
     click(container.querySelector('.pg-roll-btn, .prime-roll-btn'));
@@ -452,7 +447,7 @@ describe('Wave 27 seat-handoff — Prime Gold roll→place when valid', () => {
 
 describe('Wave 27 seat-handoff — Par 55 select→place flips seat', () => {
   it('hand block + valid base place grows history and flips player', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = parVsHuman(container);
 
     expect(ctrl.state.phase).toBe('selectingBlock');
@@ -476,7 +471,7 @@ describe('Wave 27 seat-handoff — Par 55 select→place flips seat', () => {
 
 describe('Wave 27 seat-handoff — Stars & Bars select→place flips seat', () => {
   it('card + valid cell place grows history and flips player', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = starsVsHuman(container);
 
     expect(ctrl.state.phase).toBe('selectingCard');
@@ -505,7 +500,7 @@ describe('Wave 27 seat-handoff — Stars & Bars select→place flips seat', () =
 
 describe('Wave 27 seat-handoff — Ramrod / Kwatro select advances phase chrome', () => {
   it('Ramrod rod select enters placing and status updates', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = ramrodVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingRod');
 
@@ -535,7 +530,7 @@ describe('Wave 27 seat-handoff — Ramrod / Kwatro select advances phase chrome'
   });
 
   it('Kwatro chip select enters move phase chrome', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = kwaVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingChip');
 

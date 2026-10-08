@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ afterEach(() => {
 
 describe('Wave 56 demos — dice Rolled format', () => {
   it('logs Rolled: [a, b] Total: N after 2d6 settle', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 

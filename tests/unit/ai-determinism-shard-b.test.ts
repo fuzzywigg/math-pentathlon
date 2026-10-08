@@ -151,7 +151,6 @@ import { createInitialState as createSum } from '../../src/games/sum-dominoes/ru
 import { getAIMove as sumAI } from '../../src/games/sum-dominoes/ai';
 import { doRollDice as sumRoll } from '../../src/games/sum-dominoes/rules';
 
-
 afterEach(() => {
   vi.restoreAllMocks();
 });

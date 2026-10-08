@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — expr calc Enter / examples', () => {
   it('calc-input Enter evaluates and fills result chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#calc-input') as HTMLInputElement;
     input.value = '(2 + 3) * 4';
@@ -37,7 +32,7 @@ describe('Overnight demos45 — expr calc Enter / examples', () => {
   });
 
   it('example buttons populate input then evaluate on click', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const example = root.querySelector(
       '.example-btn, [data-example], .calc-examples button'
@@ -56,7 +51,7 @@ describe('Overnight demos45 — expr calc Enter / examples', () => {
   });
 
   it('card-builder tray remains interactive after equation check', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const eq = root.querySelector('#equation-input') as HTMLInputElement;
     eq.value = '1 + 1 = 2';

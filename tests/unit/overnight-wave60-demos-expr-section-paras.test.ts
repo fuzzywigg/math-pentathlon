@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — expr section paras', () => {
   it('exposes exact expression section support paragraphs', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const paras = [...root.querySelectorAll('.demo-section > p')].map(
       (el) => el.textContent ?? ''

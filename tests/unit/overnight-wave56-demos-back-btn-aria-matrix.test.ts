@@ -11,12 +11,7 @@ import { renderAttributeDemo } from '../../src/demos/attribute-demo';
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -28,35 +23,35 @@ afterEach(() => {
 
 describe('Wave 56 demos — back-btn aria matrix', () => {
   it('graph/attr/expr use Back to home; frac/poly use Back to game list', () => {
-    const home = mount();
+    const home = mountRoot();
     renderGraphDemo(home);
     expect(home.querySelector('#back-btn')?.getAttribute('aria-label')).toBe(
       'Back to home'
     );
 
     document.body.innerHTML = '';
-    const attr = mount();
+    const attr = mountRoot();
     renderAttributeDemo(attr);
     expect(attr.querySelector('#back-btn')?.getAttribute('aria-label')).toBe(
       'Back to home'
     );
 
     document.body.innerHTML = '';
-    const expr = mount();
+    const expr = mountRoot();
     renderExpressionDemo(expr);
     expect(expr.querySelector('#back-btn')?.getAttribute('aria-label')).toBe(
       'Back to home'
     );
 
     document.body.innerHTML = '';
-    const frac = mount();
+    const frac = mountRoot();
     renderFractionDemo(frac);
     expect(frac.querySelector('#back-btn')?.getAttribute('aria-label')).toBe(
       'Back to game list'
     );
 
     document.body.innerHTML = '';
-    const poly = mount();
+    const poly = mountRoot();
     renderPolyominoDemo(poly);
     expect(poly.querySelector('#back-btn')?.getAttribute('aria-label')).toBe(
       'Back to game list'

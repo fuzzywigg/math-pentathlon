@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — expression challenges + builder', () => {
   it('challenge-grid cards reveal active-challenge target + builder', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const cards = root.querySelectorAll('#challenge-grid .challenge-card');
     expect(cards.length).toBeGreaterThanOrEqual(4);
@@ -43,7 +38,7 @@ describe('Overnight demos — expression challenges + builder', () => {
   });
 
   it('card-builder-area mounts interactive tray slots', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const area = root.querySelector('#card-builder-area') as HTMLElement;
     expect(area.children.length).toBeGreaterThan(0);

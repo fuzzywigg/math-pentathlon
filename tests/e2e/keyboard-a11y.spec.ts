@@ -3,32 +3,10 @@
  * and board move entry via Enter on a focusable grid cell.
  */
 import { test, expect, type Page } from '@playwright/test';
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn')).toBeVisible({ timeout: 15_000 });
-}
+import {
+  waitForGameReady,
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 test.describe('Keyboard a11y reachability', () => {
   test('main menu: Tab reaches division tab and Enter/Space activates a game card', async ({

@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 51 demos — dice log timestamp brackets', () => {
   it('each log-entry starts with locale time brackets', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 

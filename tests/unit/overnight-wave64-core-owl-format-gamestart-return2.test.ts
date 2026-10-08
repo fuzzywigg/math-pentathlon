@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format game-start-return-2', () => {
     storage.resetAll();
   });
 
-
   it('selects game-start-return-2 at gamesPlayed gte-3 and formats gameName', () => {
     for (const m of owlMessages.getMessagesByCategory('game:start')) {
       if (m.id !== 'game-start-return-2') storage.markMessageSeen(m.id);

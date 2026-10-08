@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — graph path restart + counts', () => {
   it('third pathfinding click restarts start selection', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const nodes = [
       ...root.querySelectorAll('#pathfinding-graph .graph-node'),
@@ -39,7 +34,7 @@ describe('Overnight demos — graph path restart + counts', () => {
   });
 
   it('circular template reports 8 nodes; complete reports 5', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     (
       root.querySelector(

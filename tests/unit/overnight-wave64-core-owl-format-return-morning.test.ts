@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format return-morning-1', () => {
     storage.resetAll();
   });
 
-
   it('selects return-morning-1 when streak messages are seen', () => {
     for (const m of owlMessages.getMessagesByCategory('app:return')) {
       if (m.id !== 'return-morning-1') storage.markMessageSeen(m.id);

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 59 demos — poly section titles', () => {
   it('exposes Rotation / Placement / Shape Info h2s', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     const h2 = [...root.querySelectorAll('h2')].map((el) => el.textContent ?? '');
     expect(h2).toContain('Shape Rotation & Flip');

@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickPotential(root: HTMLElement, row: number, col: number): void {
 
 describe('Overnight demos45 — align potential seeded cycle', () => {
   it('cycles seeded (2,2) X→O→null with potential chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Pre-seeded board already has X at (2,2)
@@ -60,7 +55,7 @@ describe('Overnight demos45 — align potential seeded cycle', () => {
   });
 
   it('neighbor seed keeps independent potential readout', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     // (2,3) is pre-seeded X; click cycles to O and shows potential at that cell
     clickPotential(root, 2, 3);

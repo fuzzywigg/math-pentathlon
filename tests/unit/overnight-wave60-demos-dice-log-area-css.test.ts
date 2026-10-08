@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — dice log-area CSS', () => {
   it('locks log-area dark chrome + max-width 800px', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const css = root.querySelector('style')?.textContent ?? '';
     expect(css).toContain('max-width: 800px');

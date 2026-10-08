@@ -8,12 +8,7 @@ vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -25,14 +20,14 @@ afterEach(() => {
 
 describe('Wave 58 demos — back-link copy', () => {
   it('dice and align back-links read Back to Games', () => {
-    const dice = mount();
+    const dice = mountRoot();
     renderDiceDemo(dice);
     expect(dice.querySelector('.back-link')?.textContent ?? '').toMatch(
       /Back to Games/
     );
 
     document.body.innerHTML = '';
-    const align = mount();
+    const align = mountRoot();
     renderAlignmentDemo(align);
     expect(align.querySelector('.back-link')?.textContent ?? '').toMatch(
       /Back to Games/
