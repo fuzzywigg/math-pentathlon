@@ -1,8 +1,9 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import { PrimeGoldState, Player, CONFIG, isPrime } from './types';
+import { PrimeGoldState, CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -13,6 +14,8 @@ import {
   applyRovingTabindex,
 } from '../../ui/board-a11y';
 import { seatIcon } from '../../ui/player-colors';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
@@ -21,11 +24,7 @@ import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 // =============================================================================
 
 export function injectPrimeGoldStyles(): void {
-  if (document.getElementById('prime-gold-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'prime-gold-styles';
-  style.textContent = `
+  injectStylesOnce('prime-gold-styles', `
     .pg-game-area {
       display: flex;
       flex-direction: column;
@@ -435,8 +434,7 @@ export function injectPrimeGoldStyles(): void {
         animation: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 export interface PrimeGoldBoardRenderOptions {
@@ -448,9 +446,6 @@ export interface PrimeGoldBoardRenderOptions {
 // Player Names
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Board Rendering

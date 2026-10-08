@@ -20,7 +20,8 @@ import {
 import { getAIAnswer, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 
 import { clearElement } from '../../core/dom-security';
@@ -31,9 +32,7 @@ const AI_THINK_MS = 650;
 const AI_RESULT_MS = 900;
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 function gameMode(): PinballGameMode {
@@ -55,14 +54,8 @@ let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimers(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
-  if (resultTimer !== null) {
-    clearTimeout(resultTimer);
-    resultTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
+  resultTimer = clearNullableTimeout(resultTimer);
 }
 /** Display-only: points from the most recent hit (not part of rules state). */
 let lastPointsAwarded = 0;

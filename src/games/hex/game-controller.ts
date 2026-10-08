@@ -12,12 +12,11 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, gameMode);
+  syncAppOpponentChrome(gameMode);
 }
 
 // Game mode
@@ -39,10 +38,7 @@ let aiTimer: ReturnType<typeof setTimeout> | null = null;
 const AI_THINKING_DELAY = 250;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 // Track game end for owl notifications

@@ -201,6 +201,4 @@ export function isDrawCondition(state: GameState): boolean {
 }
 
 // Get the opponent player
-export function getOpponent(player: PlayerOwner): PlayerOwner {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';

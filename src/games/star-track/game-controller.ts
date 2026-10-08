@@ -7,7 +7,8 @@ import { tutorialManager } from '../../core/tutorial';
 import { starTrackTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAIChainChoice, AIDifficulty } from './ai';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
   markBoard3dWebGlFallback,
@@ -17,9 +18,7 @@ import { loadStarTrackBoard3DModule } from './board-3d-loader';
 import type { StarTrackBoard3D } from '../../ui/three/star-track-board-3d';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, gameMode);
+  syncAppOpponentChrome(gameMode);
 }
 
 // Game mode
@@ -77,14 +76,8 @@ function isHumanSeatSettling(): boolean {
 }
 
 function clearAiTimers(): void {
-  if (aiDrawTimer !== null) {
-    clearTimeout(aiDrawTimer);
-    aiDrawTimer = null;
-  }
-  if (aiSelectTimer !== null) {
-    clearTimeout(aiSelectTimer);
-    aiSelectTimer = null;
-  }
+  aiDrawTimer = clearNullableTimeout(aiDrawTimer);
+  aiSelectTimer = clearNullableTimeout(aiSelectTimer);
 }
 
 function cancelAiTurn(): void {

@@ -21,9 +21,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { par55Tutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
 import { clearElement } from '../../core/dom-security';
-
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -39,26 +42,25 @@ let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let aiGeneration = 0;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAI(controller: Par55GameController, delayMs: number): void {
-  clearAiTimer();
-  const gen = aiGeneration;
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    if (gen !== aiGeneration) return;
-    makeAIMove(controller);
-  }, delayMs);
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    () => makeAIMove(controller),
+    delayMs
+  );
 }
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 /** True while it is the computer's seat (including the think pause). */

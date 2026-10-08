@@ -28,7 +28,8 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
@@ -45,9 +46,7 @@ import {
 } from '../../core/dom-security';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 let gameState: FiarGameState;
@@ -65,10 +64,7 @@ let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let isAIThinking = false;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 let hasNotifiedGameEnd = false;
 let moveCount = 0;

@@ -1,11 +1,12 @@
 // Kwatro-Sinko Board UI
 // Rendering the pathway board, chips, and game state
 
-import { KwaState, BoardNode, Chip, Player } from './types';
+import { KwaState, BoardNode, Chip } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
-
+import { getPlayerName } from '../../ui/seat-labels';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -15,14 +16,11 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+export { getPlayerName };
 
 // Dimensions
 const NODE_RADIUS = 22;
 const CHIP_RADIUS = 18;
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 /**
  * Render the game board
@@ -240,7 +238,7 @@ function renderChip(
   circle.setAttribute('cx', String(cx));
   circle.setAttribute('cy', String(cy));
   circle.setAttribute('r', String(CHIP_RADIUS));
-  circle.setAttribute('fill', playerColors()[chip.owner]);
+  circle.setAttribute('fill', getPlayerSeatColors()[chip.owner]);
   circle.setAttribute('stroke', '#333');
   circle.setAttribute('stroke-width', '2');
 
@@ -341,12 +339,7 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
  * Inject CSS styles
  */
 export function injectKwaStyles(): void {
-  const existingStyle = document.getElementById('kwa-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'kwa-styles';
-  style.textContent = `
+  injectStylesOnce('kwa-styles', `
     .kwa-game-area {
       display: flex;
       flex-direction: column;
@@ -552,13 +545,9 @@ export function injectKwaStyles(): void {
     html[data-reduced-motion='true'] .kwa-winner-banner {
       animation: none !important;
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

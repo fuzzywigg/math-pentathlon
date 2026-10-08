@@ -1,6 +1,7 @@
 // Par 55 Board UI
 // Rendering pentagon bases, attribute blocks, and game state
 
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   Par55State,
   Base,
@@ -23,10 +24,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 const BLOCK_COLORS: Record<BlockColor, string> = {
   red: '#e53935',
@@ -326,7 +325,7 @@ function renderBlock(
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(size / 2 + 4));
     ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', playerColors()[placedBy]);
+    ring.setAttribute('stroke', getPlayerSeatColors()[placedBy]);
     ring.setAttribute('stroke-width', '2');
     ring.setAttribute('opacity', '0.6');
     group.appendChild(ring);
@@ -512,12 +511,7 @@ export function renderMoveHistory(state: Par55State): HTMLElement {
  * Inject CSS styles
  */
 export function injectPar55Styles(): void {
-  const existingStyle = document.getElementById('par55-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'par55-styles';
-  style.textContent = `
+  injectStylesOnce('par55-styles', `
     /* Shell #app is max-width 700px with overflow-x clip — widen when Par 55
        is mounted so the side-hand layout stays hittable on desktop. */
     #app:has(.par55-board),
@@ -840,13 +834,9 @@ export function injectPar55Styles(): void {
         padding: 0.85rem 1.5rem;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

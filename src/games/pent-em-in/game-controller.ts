@@ -25,8 +25,9 @@ import { Cell } from '../../core/polyomino/types';
 import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
 import { clearElement } from '../../core/dom-security';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
@@ -37,9 +38,7 @@ import { loadPentEmInBoard3DModule } from './board-3d-loader';
 import type { PentEmInBoard3D } from '../../ui/three/pent-em-in-board-3d';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 /** True while it is the computer's seat (including the think pause). */
@@ -63,10 +62,7 @@ let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function unmountBoard3d(): void {

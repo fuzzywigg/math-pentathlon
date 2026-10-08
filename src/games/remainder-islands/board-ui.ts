@@ -1,11 +1,13 @@
 // Remainder Islands Board UI
 // Renders the hexagonal island grid, dice, and game status
 
+import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
+import { getDieFaceEmojiOrQuestion } from '../../ui/die-faces';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   RemainderIslandsState,
   DiceRoll,
   Island,
-  Player,
   getPlayerScore,
   getPlayerChips,
 } from './types';
@@ -18,29 +20,20 @@ import {
   makeSvgFocusable,
   bindCellActivateKeys,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 const HEX_SIZE = 45;
 const HEX_WIDTH = HEX_SIZE * 2;
 const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
 const BOARD_PADDING = 40;
 
-function playerColors() {
-  return getPlayerSeatColors();
-}
-
 // =============================================================================
 // Hexagon Helpers
 // =============================================================================
 
 function hexPoints(cx: number, cy: number, size: number): string {
-  const points: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 180) * (60 * i - 30);
-    const x = cx + size * Math.cos(angle);
-    const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
+  return pointyTopHexPolygonPoints(cx, cy, size);
 }
 
 function getHexCenter(row: number, col: number): { x: number; y: number } {
@@ -54,7 +47,7 @@ function getHexCenter(row: number, col: number): { x: number; y: number } {
 // =============================================================================
 
 function islandFillColor(owner: Island['owner']): string {
-  const seats = playerColors();
+  const seats = getPlayerSeatColors();
   if (owner === 'player1') return seats.player1;
   if (owner === 'player2') return seats.player2;
   return '#8bc34a';
@@ -339,8 +332,7 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
 }
 
 function getDieFace(value: number): string {
-  const faces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-  return faces[value - 1] || '?';
+  return getDieFaceEmojiOrQuestion(value);
 }
 
 // =============================================================================
@@ -467,20 +459,13 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
 // Helper Functions
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectRemainderIslandsStyles(): void {
-  if (document.getElementById('remainder-islands-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'remainder-islands-styles';
-  style.textContent = `
+  injectStylesOnce('remainder-islands-styles', `
     .remainder-game-container {
       display: flex;
       flex-direction: column;
@@ -752,6 +737,5 @@ export function injectRemainderIslandsStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }

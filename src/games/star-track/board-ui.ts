@@ -3,6 +3,7 @@
 import { StarTrackGameState, Player, TRACK_LENGTH, ChainLink } from './types';
 import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { formatModeSeatLabel } from '../../ui/seat-labels';
 import { markStatusLive } from '../../ui/board-a11y';
 
 import {
@@ -441,14 +442,7 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName =
-      gameMode === 'human-vs-ai'
-        ? state.winner === 'player1'
-          ? 'You'
-          : 'AI'
-        : state.winner === 'player1'
-          ? 'Blue'
-          : 'Red';
+    const winnerName = formatModeSeatLabel(state.winner, gameMode);
     // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!" (#436; #415 intent)
     const verb = winnerName === 'You' ? 'Win' : 'Wins';
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${verb}! 🎉`;

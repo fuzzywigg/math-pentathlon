@@ -16,7 +16,8 @@ import { tutorialManager } from '../../core/tutorial';
 import { hexAGoneTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAISelection, getAIPlacement, AIDifficulty } from './ai';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
   markBoard3dWebGlFallback,
@@ -26,9 +27,7 @@ import { loadHexAGoneBoard3DModule } from './board-3d-loader';
 import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, gameMode);
+  syncAppOpponentChrome(gameMode);
 }
 
 // Game mode
@@ -58,10 +57,7 @@ let selectionHost: HTMLElement | null = null;
 const AI_THINKING_DELAY = 350;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAiTimeout(fn: () => void, delayMs: number): void {

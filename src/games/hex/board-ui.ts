@@ -3,6 +3,7 @@
 import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
+import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
 import {
   clearElement,
   replaceWithSafeHtml,
@@ -57,13 +58,7 @@ function hexLayout(size: number) {
     hexWidth +
     padding * 2;
   const boardHeight = (size - 1) * vertSpacing + hexHeight + padding * 2;
-  const hexPoints: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const x = hexRadius * Math.cos(angle);
-    const y = hexRadius * Math.sin(angle);
-    hexPoints.push(`${x},${y}`);
-  }
+  const hexPath = pointyTopHexPolygonPoints(0, 0, hexRadius);
   const getHexCenter = (row: number, col: number): { x: number; y: number } => {
     const x =
       padding + hexWidth / 2 + col * horizSpacing + row * (hexWidth / 2);
@@ -77,7 +72,7 @@ function hexLayout(size: number) {
     padding,
     boardWidth,
     boardHeight,
-    hexPath: hexPoints.join(' '),
+    hexPath,
     getHexCenter,
   };
 }

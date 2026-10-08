@@ -1,6 +1,7 @@
 // Sum Dominoes & Dice Board UI
 // Rendering dominoes, board, and dice
 
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   SumDominoesState,
   Domino,
@@ -20,6 +21,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 export interface SDBoardRenderOptions {
   /** When false, skip placement / hand activation (AI seat pending). */
@@ -388,12 +391,7 @@ function createDie(value: number): HTMLElement {
  * Inject CSS styles
  */
 export function injectSDStyles(): void {
-  const existingStyle = document.getElementById('sd-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'sd-styles';
-  style.textContent = `
+  injectStylesOnce('sd-styles', `
     /* .sd-game-area / .sd-main-layout chrome → style.css */
 
     .sd-board {
@@ -617,13 +615,9 @@ export function injectSDStyles(): void {
     }
 
     /* Chrome (.sd-game-area / controls / dice / status / winner) lives in style.css */
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

@@ -29,7 +29,8 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
@@ -63,9 +64,7 @@ declare global {
 }
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -87,10 +86,7 @@ let hasNotifiedGameEnd = false;
 let moveCount = 0;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAiTimeout(fn: () => void, delayMs: number): void {

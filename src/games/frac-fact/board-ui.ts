@@ -1,10 +1,13 @@
 // Frac Fact Board UI
 // Renders fraction problems, answer choices, and game status
 
-import { FracFactState, Player, getPlayerStats } from './types';
+import { FracFactState, getPlayerStats } from './types';
 import { Fraction } from '../../core/fractions/types';
 import { getOperationSymbol } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { injectStylesOnce } from '../../ui/inject-styles';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
@@ -372,20 +375,13 @@ export function renderGameOver(state: FracFactState): HTMLElement {
 // Helper Functions
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectFracFactStyles(): void {
-  if (document.getElementById('frac-fact-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'frac-fact-styles';
-  style.textContent = `
+  injectStylesOnce('frac-fact-styles', `
     .frac-game-container {
       display: flex;
       flex-direction: column;
@@ -706,6 +702,5 @@ export function injectFracFactStyles(): void {
       background: #9e9e9e;
       color: white;
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }

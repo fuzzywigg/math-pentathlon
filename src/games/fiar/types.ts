@@ -173,9 +173,7 @@ export function createInitialState(
   };
 }
 
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
 
 export function chipsRemaining(inv: ChipInventory): number {
   return inv.plain + inv.marked;

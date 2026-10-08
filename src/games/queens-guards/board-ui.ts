@@ -1,6 +1,7 @@
 // Queens & Guards Board UI
 // SVG rendering for the hexagonal game board
 
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   QueensGuardsState,
   CONFIG,
@@ -11,6 +12,7 @@ import {
 } from './types';
 import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import { pointyTopHexPathD } from '../../ui/hex-svg';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -20,6 +22,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -33,10 +37,6 @@ const COLORS = {
   selected: '#ff9800',
   queen: '#ffd700',
 };
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 /**
  * Convert ring/position to pixel coordinates
@@ -62,34 +62,10 @@ function ringPosToPixel(
 }
 
 /**
- * Get hex corners for a cell
- */
-function getHexCorners(
-  cx: number,
-  cy: number,
-  size: number
-): { x: number; y: number }[] {
-  const corners: { x: number; y: number }[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    corners.push({
-      x: cx + size * Math.cos(angle),
-      y: cy + size * Math.sin(angle),
-    });
-  }
-  return corners;
-}
-
-/**
  * Create hex path string
  */
 function hexPath(cx: number, cy: number, size: number): string {
-  const corners = getHexCorners(cx, cy, size);
-  return (
-    corners
-      .map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`))
-      .join(' ') + ' Z'
-  );
+  return pointyTopHexPathD(cx, cy, size);
 }
 
 /**
@@ -187,7 +163,7 @@ export function renderBoard(
 
     // Draw piece if present
     if (cell.piece) {
-      const seats = playerColors();
+      const seats = getPlayerSeatColors();
       const pieceColor =
         cell.piece.player === 'player1' ? seats.player1 : seats.player2;
       const pieceSize = CONFIG.HEX_SIZE * 0.6;
@@ -330,12 +306,7 @@ export function renderBoard(
  * Inject CSS styles
  */
 export function injectQGStyles(): void {
-  const existingStyle = document.getElementById('qg-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'qg-styles';
-  style.textContent = `
+  injectStylesOnce('qg-styles', `
     /* Pin board CSS width so hex hit areas clear WCAG 2.5.5 (~44px).
        viewBox ≈791 → 660px ⇒ scale≈0.83 ⇒ path ≈46×53. Shell #app is
        ~700px, so allow a short horizontal scroll rather than shrinking cells. */
@@ -423,13 +394,9 @@ export function injectQGStyles(): void {
         animation: none !important;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

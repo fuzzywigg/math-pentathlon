@@ -20,9 +20,9 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { sumDominoesTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
 import { clearElement } from '../../core/dom-security';
-
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -30,9 +30,7 @@ import {
 } from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 /** True while it is the computer's seat (including the think pause). */
@@ -69,10 +67,7 @@ let activeContainer: HTMLElement | null = null;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAI(controller: SDGameController, delayMs: number): void {

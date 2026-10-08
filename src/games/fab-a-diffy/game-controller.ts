@@ -27,16 +27,15 @@ import { applyAIMoveSteps, AIDifficulty } from './ai';
 import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 
 import { clearElement } from '../../core/dom-security';
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 // =============================================================================
@@ -64,10 +63,7 @@ let aiGeneration = 0;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function isComputerSeat(controller: FabGameController): boolean {
