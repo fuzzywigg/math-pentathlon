@@ -33,7 +33,9 @@ export function bootstrapPwa(options: BootstrapPwaOptions = {}): void {
   const enabled =
     options.enabled ??
     (typeof window !== 'undefined' && typeof document !== 'undefined');
-  if (!enabled) return;
+  if (!enabled) {
+    return;
+  }
 
   const schedule = options.schedule ?? defaultSchedule;
   const registerSW = options.registerSW ?? defaultRegisterSW;

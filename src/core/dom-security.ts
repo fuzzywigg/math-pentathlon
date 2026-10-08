@@ -54,7 +54,9 @@ export function safeHtml(
 
   for (let i = 0; i < values.length; i++) {
     const slot = template.content.querySelector(`[data-mp-safe="${i}"]`);
-    if (!slot) continue;
+    if (!slot) {
+      continue;
+    }
     const value = values[i];
     if (value instanceof Node) {
       slot.replaceWith(value);
@@ -106,7 +108,9 @@ export function setTrustedMarkup(el: HTMLElement, html: string): void {
   clearElement(el);
   for (const child of Array.from(template.content.childNodes)) {
     const cleaned = sanitizeTrustedNode(child);
-    if (cleaned) el.appendChild(cleaned);
+    if (cleaned) {
+      el.appendChild(cleaned);
+    }
   }
 }
 
@@ -125,12 +129,16 @@ function sanitizeTrustedNode(node: Node): Node | DocumentFragment | null {
 
   if (!TRUSTED_TAGS.has(elem.tagName)) {
     const frag = document.createDocumentFragment();
-    for (const c of children) frag.appendChild(c);
+    for (const c of children) {
+      frag.appendChild(c);
+    }
     return frag;
   }
 
   const out = document.createElement(elem.tagName.toLowerCase());
   // Intentionally copy no attributes.
-  for (const c of children) out.appendChild(c);
+  for (const c of children) {
+    out.appendChild(c);
+  }
   return out;
 }

@@ -13,7 +13,9 @@ import { axialToPixel, hexesInRange } from './coordinates';
 let stylesInjected = false;
 
 export function injectHexStyles(): void {
-  if (stylesInjected) return;
+  if (stylesInjected) {
+    return;
+  }
   stylesInjected = true;
 
   const style = document.createElement('style');

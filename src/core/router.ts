@@ -58,7 +58,9 @@ export function getPathParams(
   const regex = new RegExp(`^${regexPattern.replace(/\//g, '\\/')}$`);
   const match = path.match(regex);
 
-  if (!match) return {};
+  if (!match) {
+    return {};
+  }
 
   const params: Record<string, string> = {};
   paramNames.forEach((name, index) => {

@@ -7,7 +7,9 @@ import type { Cell, Rotation, PolyominoShape } from './types';
  * Rotate a set of cells by the given angle around the origin
  */
 export function rotateCells(cells: Cell[], rotation: Rotation): Cell[] {
-  if (rotation === 0) return cells.map((c) => ({ ...c }));
+  if (rotation === 0) {
+    return cells.map((c) => ({ ...c }));
+  }
 
   return cells.map((cell) => {
     switch (rotation) {
@@ -42,7 +44,9 @@ export function flipCellsVertical(cells: Cell[]): Cell[] {
  * This ensures shapes are positioned consistently
  */
 export function normalizeCells(cells: Cell[]): Cell[] {
-  if (cells.length === 0) return [];
+  if (cells.length === 0) {
+    return [];
+  }
 
   const minRow = Math.min(...cells.map((c) => c.row));
   const minCol = Math.min(...cells.map((c) => c.col));
@@ -189,7 +193,9 @@ export function getAllOrientations(shape: PolyominoShape): Cell[][] {
 export function cellsToKey(cells: Cell[]): string {
   const normalized = normalizeCells(cells);
   const sorted = [...normalized].sort((a, b) => {
-    if (a.row !== b.row) return a.row - b.row;
+    if (a.row !== b.row) {
+      return a.row - b.row;
+    }
     return a.col - b.col;
   });
   return sorted.map((c) => `${c.row},${c.col}`).join('|');
@@ -260,7 +266,9 @@ export function getCellsAtPosition(
  * Calculate the center of mass of cells
  */
 export function getCenterOfMass(cells: Cell[]): { row: number; col: number } {
-  if (cells.length === 0) return { row: 0, col: 0 };
+  if (cells.length === 0) {
+    return { row: 0, col: 0 };
+  }
 
   const sumRow = cells.reduce((sum, c) => sum + c.row, 0);
   const sumCol = cells.reduce((sum, c) => sum + c.col, 0);
@@ -293,7 +301,9 @@ export function isAdjacent(cell: Cell, cells: Cell[]): boolean {
  * Check if all cells are connected (4-way connectivity)
  */
 export function areCellsConnected(cells: Cell[]): boolean {
-  if (cells.length <= 1) return true;
+  if (cells.length <= 1) {
+    return true;
+  }
 
   const cellSet = new Set(cells.map((c) => `${c.row},${c.col}`));
   const visited = new Set<string>();
@@ -303,7 +313,9 @@ export function areCellsConnected(cells: Cell[]): boolean {
     const current = queue.shift()!;
     const key = `${current.row},${current.col}`;
 
-    if (visited.has(key)) continue;
+    if (visited.has(key)) {
+      continue;
+    }
     visited.add(key);
 
     const directions = [
@@ -388,7 +400,9 @@ export function transformCells(
   flipped: boolean
 ): Cell[] {
   let result = cells;
-  if (flipped) result = flipCellsHorizontal(result);
+  if (flipped) {
+    result = flipCellsHorizontal(result);
+  }
   result = rotateCells(result, rotation);
   return normalizeCells(result);
 }
@@ -455,7 +469,9 @@ export function arePolyominoesEquivalent(
   a: PolyominoShape,
   b: PolyominoShape
 ): boolean {
-  if (a.cells.length !== b.cells.length) return false;
+  if (a.cells.length !== b.cells.length) {
+    return false;
+  }
   const aTransforms = getAllTransformations(a);
   const bKey = cellsToKey(normalizeCells(b.cells));
   return aTransforms.some((t) => cellsToKey(t.cells) === bKey);

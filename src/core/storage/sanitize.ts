@@ -59,10 +59,14 @@ export function sanitizeDisplayString(
   value: unknown,
   maxLength: number
 ): string | null {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string') {
+    return null;
+  }
   // eslint-disable-next-line no-control-regex -- intentional control-char strip
   const cleaned = value.replace(/[\u0000-\u001F\u007F]/g, '').trim();
-  if (!cleaned) return null;
+  if (!cleaned) {
+    return null;
+  }
   return cleaned.slice(0, maxLength);
 }
 
@@ -74,22 +78,30 @@ export function sanitizeDisplayStringAllowEmpty(
   value: unknown,
   maxLength: number
 ): string | null {
-  if (typeof value !== 'string') return null;
+  if (typeof value !== 'string') {
+    return null;
+  }
   // eslint-disable-next-line no-control-regex -- intentional control-char strip
   const cleaned = value.replace(/[\u0000-\u001F\u007F]/g, '');
   return cleaned.slice(0, maxLength);
 }
 
 export function sanitizeProfile(raw: unknown): PlayerProfile | null {
-  if (!isPlainObject(raw)) return null;
+  if (!isPlainObject(raw)) {
+    return null;
+  }
   // Name/avatar may be empty strings (historical createProfile behavior).
-  if (typeof raw.name !== 'string' || typeof raw.id !== 'string') return null;
+  if (typeof raw.name !== 'string' || typeof raw.id !== 'string') {
+    return null;
+  }
   const name = sanitizeDisplayStringAllowEmpty(
     raw.name,
     MAX_PROFILE_NAME_LENGTH
   );
   const id = sanitizeDisplayStringAllowEmpty(raw.id, MAX_PROFILE_ID_LENGTH);
-  if (name === null || id === null || !id) return null;
+  if (name === null || id === null || !id) {
+    return null;
+  }
   const avatar =
     typeof raw.avatar === 'string'
       ? (sanitizeDisplayStringAllowEmpty(
@@ -107,7 +119,9 @@ export function sanitizeProfile(raw: unknown): PlayerProfile | null {
 }
 
 export function sanitizeStreak(raw: unknown): StreakData {
-  if (!isPlainObject(raw)) return { ...DEFAULT_STREAK };
+  if (!isPlainObject(raw)) {
+    return { ...DEFAULT_STREAK };
+  }
   return {
     currentStreak: asNonNegativeInt(raw.currentStreak, 0),
     bestStreak: asNonNegativeInt(raw.bestStreak, 0),
@@ -121,7 +135,9 @@ export function sanitizeStreak(raw: unknown): StreakData {
 }
 
 export function sanitizeSettings(raw: unknown): UserSettings {
-  if (!isPlainObject(raw)) return { ...DEFAULT_SETTINGS };
+  if (!isPlainObject(raw)) {
+    return { ...DEFAULT_SETTINGS };
+  }
   const freq = raw.owlFrequency;
   return {
     owlEnabled:
@@ -182,12 +198,18 @@ export function sanitizeOwlState(raw: unknown): OwlState {
 }
 
 export function sanitizeAchievements(raw: unknown): Achievement[] {
-  if (!Array.isArray(raw)) return [];
+  if (!Array.isArray(raw)) {
+    return [];
+  }
   const out: Achievement[] = [];
   for (const item of raw) {
-    if (!isPlainObject(item)) continue;
+    if (!isPlainObject(item)) {
+      continue;
+    }
     const id = sanitizeDisplayString(item.id, MAX_ACHIEVEMENT_ID_LENGTH);
-    if (!id) continue;
+    if (!id) {
+      continue;
+    }
     out.push({
       id,
       unlockedAt: asNonNegativeInt(item.unlockedAt, 0),
@@ -197,11 +219,15 @@ export function sanitizeAchievements(raw: unknown): Achievement[] {
 }
 
 export function sanitizeGameStatsMap(raw: unknown): Record<string, GameStats> {
-  if (!isPlainObject(raw)) return {};
+  if (!isPlainObject(raw)) {
+    return {};
+  }
   const out: Record<string, GameStats> = {};
   for (const [key, value] of Object.entries(raw)) {
     const gameId = sanitizeDisplayString(key, MAX_GAME_ID_LENGTH);
-    if (!gameId || !isPlainObject(value)) continue;
+    if (!gameId || !isPlainObject(value)) {
+      continue;
+    }
     const defaults = createDefaultGameStats(gameId);
     const idFromValue = sanitizeDisplayString(value.gameId, MAX_GAME_ID_LENGTH);
     out[gameId] = {

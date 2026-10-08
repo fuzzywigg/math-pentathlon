@@ -28,13 +28,17 @@ export type InspectTarget =
 
 /** Walk from the hit element up the DOM for known game / chrome attrs. */
 export function resolveInspectTarget(el: Element | null): InspectTarget {
-  if (!el) return { kind: 'unknown' };
+  if (!el) {
+    return { kind: 'unknown' };
+  }
 
   // Hex-a-Gone bank shape (button) before generic cells
   const bankBtn = el.closest('[data-shape]');
   if (bankBtn instanceof Element) {
     const shape = bankBtn.getAttribute('data-shape');
-    if (shape) return { kind: 'hex-a-gone-bank', shape };
+    if (shape) {
+      return { kind: 'hex-a-gone-bank', shape };
+    }
   }
 
   // Hex-a-Gone board cell (axial)
@@ -68,7 +72,9 @@ export function resolveInspectTarget(el: Element | null): InspectTarget {
   const fiarNode = el.closest('[data-node-id]');
   if (fiarNode instanceof Element) {
     const nodeId = fiarNode.getAttribute('data-node-id');
-    if (nodeId) return { kind: 'fiar-node', nodeId };
+    if (nodeId) {
+      return { kind: 'fiar-node', nodeId };
+    }
   }
 
   // Hex board cell (SVG group) — before Kings .cell so attrs don't collide wrongly
@@ -92,14 +98,18 @@ export function resolveInspectTarget(el: Element | null): InspectTarget {
   }
 
   // Known chrome controls (ids used across game shells)
-  if (el.closest('#help-btn')) return { kind: 'chrome', chrome: 'howto' };
+  if (el.closest('#help-btn')) {
+    return { kind: 'chrome', chrome: 'howto' };
+  }
   if (el.closest('#tutorial-btn')) {
     return { kind: 'chrome', chrome: 'tutorial' };
   }
   if (el.closest('#new-game-btn')) {
     return { kind: 'chrome', chrome: 'new-game' };
   }
-  if (el.closest('#back-btn')) return { kind: 'chrome', chrome: 'back' };
+  if (el.closest('#back-btn')) {
+    return { kind: 'chrome', chrome: 'back' };
+  }
   if (el.closest('.button-row')) {
     return { kind: 'chrome', chrome: 'button-row' };
   }
