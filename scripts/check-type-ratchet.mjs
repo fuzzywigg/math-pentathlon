@@ -35,6 +35,13 @@ const IN_SCOPE = new RegExp(
     '^src/games/fab-a-diffy/(types|board-ui|rules)\\.ts$',
     '^src/games/fiar/(types|board-ui|rules)\\.ts$',
     '^src/games/par-55/(types|board-ui|rules)\\.ts$',
+    // Phase 2 Batch 2 — rules-heavy / low-AI non-AI modules (AI stays out of scope)
+    '^src/games/frac-fact/rules\\.ts$',
+    '^src/games/fraction-pinball/rules\\.ts$',
+    '^src/games/queens-guards/(types|board-ui|rules)\\.ts$',
+    '^src/games/ramrod/(types|board-ui|rules)\\.ts$',
+    '^src/games/sum-dominoes/(types|board-ui|rules|game-controller)\\.ts$',
+    '^src/games/calla/(board-ui|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -86,7 +93,7 @@ console.log(
   `  flags: noUncheckedIndexedAccess, exactOptionalPropertyTypes, noImplicitOverride, forceConsistentCasingInFileNames, noImplicitReturns`
 );
 console.log(
-  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1 non-AI game shells, tests/helpers, unit *-helpers.ts`
+  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2 non-AI game shells, tests/helpers, unit *-helpers.ts`
 );
 console.log(`  in-scope errors:     ${inScope.length} (must be 0)`);
 console.log(

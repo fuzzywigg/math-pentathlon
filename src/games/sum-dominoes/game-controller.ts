@@ -358,11 +358,12 @@ function makeAIMove(controller: SDGameController): void {
       const hand = state.hands[aiPlayer];
       for (const domino of hand) {
         const placements = getValidPlacements(state, domino, sum);
-        if (placements.length > 0) {
+        const firstPlacement = placements[0];
+        if (firstPlacement !== undefined) {
           move = {
             dominoId: domino.id,
-            position: placements[0].position,
-            orientation: placements[0].orientation,
+            position: firstPlacement.position,
+            orientation: firstPlacement.orientation,
           };
           break;
         }

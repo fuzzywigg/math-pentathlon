@@ -65,7 +65,9 @@ function getOperationsForDifficulty(
  */
 function randomFraction(difficulty: Difficulty): Fraction {
   const fractions = getFractionsForDifficulty(difficulty);
-  return fractions[Math.floor(Math.random() * fractions.length)];
+  const picked = fractions[Math.floor(Math.random() * fractions.length)];
+  // COMMON_FRACTIONS is never empty for any Difficulty; fallback is unreachable.
+  return picked ?? { numerator: 1, denominator: 2 };
 }
 
 /**
@@ -118,6 +120,7 @@ function generateDistractors(
     ];
 
     const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    if (strategy === undefined) return null;
     const result = strategy();
 
     // Ensure valid fraction
@@ -164,7 +167,11 @@ function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    const a = result[i];
+    const b = result[j];
+    if (a === undefined || b === undefined) continue;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }
@@ -177,7 +184,8 @@ export function generateProblem(
   problemNumber: number
 ): FractionProblem {
   const operations = getOperationsForDifficulty(difficulty);
-  const operation = operations[Math.floor(Math.random() * operations.length)];
+  const operation =
+    operations[Math.floor(Math.random() * operations.length)] ?? 'add';
 
   let operand1: Fraction;
   let operand2: Fraction;

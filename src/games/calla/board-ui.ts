@@ -108,7 +108,7 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p2Y,
-      state.player2Pits[displayIndex],
+      state.player2Pits[displayIndex] ?? 0,
       'player2',
       displayIndex,
       isValid,
@@ -130,7 +130,7 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p1Y,
-      state.player1Pits[i],
+      state.player1Pits[i] ?? 0,
       'player1',
       i,
       isValid,

@@ -110,7 +110,7 @@ export function createRod(id: string, length: number): Rod {
   return {
     id,
     length,
-    color: ROD_COLORS[length],
+    color: ROD_COLORS[length] ?? '#888888',
     owner: null,
     position: null,
   };
@@ -138,7 +138,8 @@ export function createRodSet(): Rod[] {
   };
 
   for (let length = 1; length <= 10; length++) {
-    for (let i = 0; i < counts[length]; i++) {
+    const count = counts[length] ?? 0;
+    for (let i = 0; i < count; i++) {
       rods.push(createRod(`r${id++}`, length));
     }
   }
@@ -153,7 +154,11 @@ export function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    const a = result[i];
+    const b = result[j];
+    if (a === undefined || b === undefined) continue;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }
