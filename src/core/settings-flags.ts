@@ -20,11 +20,7 @@ function peekReducedMotionFromLocalStorage(): boolean {
   const parsedResult = safeParseJson(raw);
   if (!parsedResult.ok) return false;
   const parsed = parsedResult.value;
-  if (
-    typeof parsed !== 'object' ||
-    parsed === null ||
-    Array.isArray(parsed)
-  ) {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
     return false;
   }
   const settings = (parsed as { settings?: unknown }).settings;

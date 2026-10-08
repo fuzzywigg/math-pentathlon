@@ -222,9 +222,7 @@ export function buildSelectionArea(
       const canSelect =
         state.phase === 'selectBlocks' && !state.turnSelection.committed;
       const canPlaceSwitch =
-        state.phase === 'placeBlocks' &&
-        isSelected &&
-        Boolean(onBlockSelect);
+        state.phase === 'placeBlocks' && isSelected && Boolean(onBlockSelect);
       const selectable =
         interactive &&
         ((canSelect && isAvailable && Boolean(onBlockSelect)) ||
