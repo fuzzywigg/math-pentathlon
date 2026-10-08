@@ -84,6 +84,8 @@ const nodePureFiles = [
   'tests/unit/burn-wave41-pent-ai-difficulties.test.ts',
   'tests/unit/burn-wave42-pent-ai-difficulty-random.test.ts',
   'tests/unit/burn-wave13-win-draw-ai.test.ts',
+  // Rules engines must load without jsdom (module-boundary audit).
+  'tests/unit/engines-plain-node-load.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
