@@ -75,7 +75,7 @@ describe('Remainder Islands playability — hover must not swallow click (#373)'
     expect(getCurrentState().moveHistory[0]?.island.id).toBe(islandId);
   });
 
-  it('pointerdown on a valid hit area claims the island', () => {
+  it('primary pointer tap (down+up) on a valid hit area claims the island', () => {
     mockRandomCycle(0.41);
     const container = mount();
     initGame(container);
@@ -84,7 +84,17 @@ describe('Remainder Islands playability — hover must not swallow click (#373)'
     click(container.querySelector('.remainder-btn-roll'));
     const islandId = getCurrentState().validIslands[0];
     const hit = hitPolygon(container, islandId);
-    hit.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    const init: PointerEventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      clientX: 10,
+      clientY: 10,
+    };
+    hit.dispatchEvent(new PointerEvent('pointerdown', { ...init, buttons: 1 }));
+    hit.dispatchEvent(new PointerEvent('pointerup', { ...init, buttons: 0 }));
 
     expect(getCurrentState().phase).toBe('rolling');
     expect(getCurrentState().moveHistory[0]?.island.id).toBe(islandId);

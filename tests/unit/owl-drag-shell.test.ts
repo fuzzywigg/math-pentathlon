@@ -126,6 +126,39 @@ describe('Ollie drag shell (Cycle-2 A)', () => {
     expect(root.classList.contains('owl-dragging')).toBe(false);
   });
 
+  it('ignores a secondary multi-touch finger during an active drag', () => {
+    const character = root.querySelector('.owl-character')!;
+
+    dispatchPointer(character, 'pointerdown', {
+      pointerId: 1,
+      clientX: 320,
+      clientY: 30,
+    });
+    expect(owl.getIsDragging()).toBe(true);
+
+    dispatchPointer(character, 'pointerdown', {
+      pointerId: 2,
+      isPrimary: false,
+      clientX: 340,
+      clientY: 40,
+    });
+    // Still the original drag — second finger must not steal / restart.
+    expect(owl.getIsDragging()).toBe(true);
+    dispatchPointer(root, 'pointermove', {
+      pointerId: 1,
+      clientX: 200,
+      clientY: 400,
+    });
+    expect(root.style.left).toBe('180px');
+
+    dispatchPointer(root, 'pointercancel', {
+      pointerId: 1,
+      clientX: 200,
+      clientY: 400,
+    });
+    expect(owl.getIsDragging()).toBe(false);
+  });
+
   it('snapBackToDock clears inline position', () => {
     root.style.left = '10px';
     root.style.top = '20px';

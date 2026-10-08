@@ -30,6 +30,10 @@ import {
   markBoardAsGrid,
   restoreGridFocus,
 } from '../board-a11y';
+import {
+  bindCanvasPointerTap,
+  isPrimaryActivatingPointer,
+} from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -285,20 +289,21 @@ export async function createPentEmInBoard3D(
     return null;
   };
 
-  const onPointerUp = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
-    const cell = pickCell(event);
-    if (cell) clickHandler(cell);
+  const clearHover = (): void => {
+    if (!hoverHandler || disposed) return;
+    hoverHandler(null);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
     if (!hoverHandler || disposed) return;
+    if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
+      return;
+    }
     hoverHandler(pickCell(event));
   };
 
   const onPointerLeave = (): void => {
-    if (!hoverHandler || disposed) return;
-    hoverHandler(null);
+    clearHover();
   };
 
   let tearDown: (() => void) | null = null;
@@ -314,7 +319,14 @@ export async function createPentEmInBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointerUp);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: (event) => {
+      if (!clickHandler || disposed) return;
+      const cell = pickCell(event);
+      if (cell) clickHandler(cell);
+    },
+    onGestureEnd: clearHover,
+  });
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
@@ -541,7 +553,7 @@ export async function createPentEmInBoard3D(
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointerUp);
+    unbindPointer();
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);

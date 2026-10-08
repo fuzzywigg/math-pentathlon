@@ -5,6 +5,7 @@
 
 import { clearElement } from '../../core/dom-security';
 import { markStatusLive } from '../board-a11y';
+import { suppressBoardContextMenu } from '../pointer-hygiene';
 import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -580,8 +581,14 @@ export function mountGameShell(
 
   document.addEventListener('keydown', keydownHandler);
 
+  // Long-press context menu / text-select chrome on the board surface
+  const unbindBoardContextMenu = board
+    ? suppressBoardContextMenu(board)
+    : () => undefined;
+
   const cleanup = () => {
     document.removeEventListener('keydown', keydownHandler);
+    unbindBoardContextMenu();
     clearGameModeChrome(container);
   };
 

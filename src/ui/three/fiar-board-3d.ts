@@ -18,6 +18,7 @@ import {
 } from '../../games/fiar/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import { prefersReducedMotion } from '../reduced-motion';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -233,7 +234,7 @@ export async function createFiarBoard3D(
     paint();
   };
 
-  const onPointer = (event: PointerEvent): void => {
+  const pickFromEvent = (event: PointerEvent): void => {
     if (!clickHandler || disposed) return;
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
@@ -267,7 +268,9 @@ export async function createFiarBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: pickFromEvent,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
   const unbindLayout = bindBoard3dLayout(container, () => resize());
 
@@ -457,7 +460,7 @@ export async function createFiarBoard3D(
     if (disposed) return;
     disposed = true;
     cancelMountPaint();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     unbindLayout();
     unbindVisibility();

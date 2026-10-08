@@ -75,4 +75,11 @@ describe('tablet / offline playability CSS', () => {
       /\.modal-close\s*\{[^}]*touch-action:\s*manipulation/s
     );
   });
+
+  it('applies board pointer hygiene touch-action on #board surfaces', () => {
+    expect(gamePlayCss).toMatch(
+      /#board\s*,[\s\S]*#game-container[\s\S]*touch-action:\s*manipulation/
+    );
+    expect(gamePlayCss).toMatch(/-webkit-touch-callout:\s*none/);
+  });
 });
