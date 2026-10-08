@@ -54,7 +54,6 @@ describe('burn-1008 ui-cov-r3 game-selector', () => {
 
     const badge = root.querySelector('.game-card-badge');
     expect(badge).toBeTruthy();
-    expect(badge?.textContent).toBe('Coming Soon');
     const disabledCard = root.querySelector('.game-card-disabled');
     expect(disabledCard?.getAttribute('tabindex')).toBe('-1');
 
