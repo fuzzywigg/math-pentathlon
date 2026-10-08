@@ -68,11 +68,13 @@ Squash tip → `alpha` should be **CLEAN** (tip already contains `alpha` + `#435
 
 Stack layers and leaves folded into tip (including wave-4 `#476` contents and wave-5 folds):
 
-`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491` `#493` `#494` `#495` `#496` `#497` `#498` `#499` `#500` `#501` `#502`
+`#392` `#395`–`#412` `#415`–`#417` `#421`–`#427` `#430`–`#434` `#435` `#436`–`#440` `#442`–`#445` `#447` `#449` `#450` `#452` `#454`–`#458` `#464`–`#467` `#469` `#470` `#471` `#472` `#473` `#474` `#475` `#476` `#478` `#479` `#480` `#482` `#483` `#484` `#485` `#486` `#489` `#490` `#491` `#493` `#494` `#495` `#496` `#497` `#498` `#499` `#500` `#501` `#502` `#504` `#509`
 
 Already on `alpha` (close as merged/superseded): **#413**, **#414**.
 
 Superseded by tip fold (close as duplicate, human): **#503** (duplicate of **#502** Phase-2 type-ratchet docs; tip took #502 export script + #503 fuller plan/baseline regenerated to tip).
+
+Also superseded (human close): **#506** (twin of **#504** engine docs; tip took #504 checker + #506 `check:dev-docs` script); **#510** (twin of **#509** UI coverage; tip took #509 + ported #510 main-shell-routes).
 
 Also close tip/intermediate fold PRs once tip is on `alpha`: **#477**, **#454**, **#466**, **#449**, **#447**, **#444**, **#440**, **#438**.
 

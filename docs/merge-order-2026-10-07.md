@@ -93,7 +93,7 @@ alpha
 | **#454** | `cursor/overnight-flake-engine-stack-737e` | ~152 | **#450**, **#451**, **#452** onto #449 lineage |
 | **#466** | `cursor/overnight-fold-coverage-tip-460a` | ~170 | **#454** + fold-wave2 (**#442**, **#455–#458**) + engine-coverage-next5 |
 | **#476** | `cursor/integration-fold-wave4-tip-36e4` | ~190+ | **#466** + **#464**, **#465**, **#467**, **#469**, **#472**, **#473** |
-| **tip** | `cursor/integration-fold-wave5-tip-4af0` | ~270+ | **#476** + **#474**, **#475**, **#471**, **#478**, **#479**, **#480**, **#486**, **#489**, **#490**, **#491**, **#494**, **#495**, **#493**, **#496**, **#498**, **#499**, **#500**, **#501**, **#497**, **#502** (`#469` already contained; tip contains `alpha` @ `eec2b32` incl. `#413`+`#414`) |
+| **tip** | `cursor/integration-fold-wave5-tip-4af0` | ~270+ | **#476** + **#474**, **#475**, **#471**, **#478**, **#479**, **#480**, **#486**, **#489**, **#490**, **#491**, **#494**, **#495**, **#493**, **#496**, **#498**, **#499**, **#500**, **#501**, **#497**, **#502**, **#504**, **#509** (`#469` already contained; tip contains `alpha` @ `eec2b32` incl. `#413`+`#414`) |
 
 **#393 note:** #413 history briefly merged then **reverted** #393 (`55b4212` Revert …). Tip **tree** matches contiguous path-scan (same as `alpha`); do **not** treat #393 as folded.
 
