@@ -2,7 +2,7 @@
 // Renders the game board, pieces, and piece selector
 
 import type {
-  PentEmInState} from './types';
+  PentEmInState } from './types';
 import {
   BOARD_SIZE,
   getPlayerPieces,

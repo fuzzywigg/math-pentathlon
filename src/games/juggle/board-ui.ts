@@ -1,8 +1,7 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
-import type {
-  JuggleState} from './types';
+import type { JuggleState } from './types';
 import {
   CONFIG,
   getCategoryFromDie,

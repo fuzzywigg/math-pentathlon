@@ -1,6 +1,6 @@
 import type {
   GameState,
-  Position} from './game-state';
+  Position } from './game-state';
 import {
   selectKing,
   moveKing,

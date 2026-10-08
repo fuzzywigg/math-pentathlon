@@ -2,7 +2,7 @@
 // Orchestrates game state, UI, and player interactions
 
 import type {
-  PentEmInState} from './types';
+  PentEmInState } from './types';
 import {
   createInitialState,
   getPlayerPieces,

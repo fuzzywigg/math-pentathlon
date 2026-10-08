@@ -1,6 +1,6 @@
 // Calla Game Controller
 
-import type { CallaGameState} from './types';
+import type { CallaGameState } from './types';
 import { createInitialState } from './types';
 import {
   makeMove,

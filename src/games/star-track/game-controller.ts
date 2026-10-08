@@ -1,6 +1,6 @@
 // Star Track Game Controller
 
-import type { StarTrackGameState} from './types';
+import type { StarTrackGameState } from './types';
 import { createInitialState } from './types';
 import { drawChains, selectChain, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';

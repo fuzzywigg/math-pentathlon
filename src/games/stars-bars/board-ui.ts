@@ -1,10 +1,7 @@
 // Stars & Bars Board UI
 // Renders the attribute logic board and cards
 
-import type {
-  StarsState,
-  AttributeCard,
-  Player} from './types';
+import type { StarsState, AttributeCard, Player } from './types';
 import {
   CONFIG,
   COLOR_VALUES,

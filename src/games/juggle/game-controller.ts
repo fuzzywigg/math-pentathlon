@@ -13,7 +13,7 @@ import {
   placeShape,
 } from './rules';
 import type {
-  AIDifficulty} from './ai';
+  AIDifficulty } from './ai';
 import {
   getAIDieChoice,
   getAIShapeChoice,

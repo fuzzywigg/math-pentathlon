@@ -1,7 +1,7 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import type { FractionPinballState} from './types';
+import type { FractionPinballState } from './types';
 import { createInitialState } from './types';
 import { submitAnswer, nextChallenge, startGame } from './rules';
 import {

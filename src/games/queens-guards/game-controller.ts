@@ -4,7 +4,7 @@
 import type {
   QueensGuardsState,
   Player,
-  BoardCoord} from './types';
+  BoardCoord } from './types';
 import {
   createInitialState,
   cellKey,

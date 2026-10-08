@@ -4,7 +4,7 @@
 import type {
   ContigState,
   Player,
-  ContigWinner} from './types';
+  ContigWinner } from './types';
 import {
   createInitialState,
   getValidPlacements,
