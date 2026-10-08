@@ -33,6 +33,12 @@ import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
+import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
@@ -94,7 +100,7 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
-  boardContainer.innerHTML = '';
+  clearElement(boardContainer);
 
   const allowInput = !isComputerTurnPending();
   const inputOpts = { allowInput };
@@ -172,11 +178,14 @@ function updateStatus(): void {
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);
-    statusContainer.innerHTML = `
+    replaceWithSafeHtml(
+      statusContainer,
+      safeHtml`
       <div class="juggle-winner-banner">
         ${seatIcon(gameState.winner)} ${winnerName} filled their board first and wins!
       </div>
-    `;
+    `
+    );
     return;
   }
 
@@ -185,11 +194,18 @@ function updateStatus(): void {
   const icon = seatIcon(gameState.currentPlayer);
 
   if (isComputerTurnPending()) {
-    statusContainer.innerHTML = `
-      <div class="juggle-status ${playerClass} status-ai-thinking">
+    replaceWithSafeHtml(
+      statusContainer,
+      safeHtml`
+      <div class="juggle-status status-ai-thinking">
         <strong>${icon} ${playerName}'s turn</strong> - Computer is thinking…
       </div>
-    `;
+    `
+    );
+    const statusEl = statusContainer.querySelector('.juggle-status');
+    if (statusEl) {
+      statusEl.className = `juggle-status ${playerClass} status-ai-thinking`;
+    }
     return;
   }
 
@@ -212,11 +228,18 @@ function updateStatus(): void {
       break;
   }
 
-  statusContainer.innerHTML = `
-    <div class="juggle-status ${playerClass}">
+  replaceWithSafeHtml(
+    statusContainer,
+    safeHtml`
+    <div class="juggle-status">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
-  `;
+  `
+  );
+  const statusEl = statusContainer.querySelector('.juggle-status');
+  if (statusEl) {
+    statusEl.className = `juggle-status ${playerClass}`;
+  }
 }
 
 // =============================================================================

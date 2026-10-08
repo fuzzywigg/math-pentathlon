@@ -4,6 +4,12 @@ import { CallaGameState, PITS_PER_SIDE } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
+import {
   buildCellAriaLabel,
   makeSvgFocusable,
   bindCellActivateKeys,
@@ -28,7 +34,7 @@ export function renderBoard(
   onPitClick?: PitClickCallback,
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human'
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'calla-wrapper';
@@ -380,7 +386,7 @@ export function renderStatus(
   teachingHint: string | null = null
 ): void {
   markStatusLive(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'calla-status';
@@ -439,12 +445,18 @@ export function renderStatus(
 
   const p1Score = document.createElement('div');
   p1Score.className = `calla-score calla-score-p1 ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1Score.innerHTML = `${seatIcon('player1')} ${p1Label}: <strong>${state.player1Calla}</strong>`;
+  replaceWithSafeHtml(
+    p1Score,
+    safeHtml`${seatIcon('player1')} ${p1Label}: <strong>${state.player1Calla}</strong>`
+  );
   scoreEl.appendChild(p1Score);
 
   const p2Score = document.createElement('div');
   p2Score.className = `calla-score calla-score-p2 ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2Score.innerHTML = `${seatIcon('player2')} ${p2Label}: <strong>${state.player2Calla}</strong>`;
+  replaceWithSafeHtml(
+    p2Score,
+    safeHtml`${seatIcon('player2')} ${p2Label}: <strong>${state.player2Calla}</strong>`
+  );
   scoreEl.appendChild(p2Score);
 
   statusEl.appendChild(scoreEl);

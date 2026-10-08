@@ -4,6 +4,8 @@
 import { RamrodState, SumBox, Rod, Player, CONFIG, ROD_COLORS } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -238,7 +240,10 @@ export function renderScores(state: RamrodState): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'ramrod-score player1';
-  p1Score.innerHTML = `<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}cm</span>`;
+  replaceWithSafeHtml(
+    p1Score,
+    safeHtml`<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}cm</span>`
+  );
 
   const target = document.createElement('div');
   target.className = 'ramrod-target';
@@ -246,7 +251,10 @@ export function renderScores(state: RamrodState): HTMLElement {
 
   const p2Score = document.createElement('div');
   p2Score.className = 'ramrod-score player2';
-  p2Score.innerHTML = `<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}cm</span>`;
+  replaceWithSafeHtml(
+    p2Score,
+    safeHtml`<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}cm</span>`
+  );
 
   container.appendChild(p1Score);
   container.appendChild(target);
@@ -278,7 +286,10 @@ export function renderMoveHistory(state: RamrodState): HTMLElement {
     moveEl.className = `ramrod-history-move ${move.player}`;
 
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
-    moveEl.innerHTML = `<strong>${playerName}</strong> captured ${move.pointsScored}cm box`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`<strong>${playerName}</strong> captured ${move.pointsScored}cm box`
+    );
 
     list.appendChild(moveEl);
   }

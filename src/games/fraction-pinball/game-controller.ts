@@ -23,6 +23,8 @@ import { fractionPinballTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 
+import { clearElement } from '../../core/dom-security';
+
 /** Think pause before computer selects an answer (snappier than 1s). */
 const AI_THINK_MS = 650;
 /** Auto-advance after computer result (human still reads HIT/Miss). */
@@ -109,7 +111,7 @@ function statusForTurn(): string {
 function render(): void {
   if (!gameContainer) return;
 
-  gameContainer.innerHTML = '';
+  clearElement(gameContainer);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'pinball-game-container';

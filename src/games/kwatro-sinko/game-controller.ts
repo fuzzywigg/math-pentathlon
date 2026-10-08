@@ -34,6 +34,8 @@ import {
 import { loadKwatroSinkoBoard3DModule } from './board-3d-loader';
 import type { KwatroSinkoBoard3D } from '../../ui/three/kwatro-sinko-board-3d';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
   if (!root) return;
@@ -220,7 +222,7 @@ function updateUI(controller: KwaGameController): void {
   }
 
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -247,6 +249,7 @@ function updateUI(controller: KwaGameController): void {
   // Target info
   const targetInfo = document.createElement('div');
   targetInfo.className = 'kwa-target-info';
+  // trusted constant markup
   targetInfo.innerHTML =
     'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
   gameArea.appendChild(targetInfo);
@@ -364,6 +367,7 @@ function updateUI3d(controller: KwaGameController): void {
 
   const targetInfo = document.createElement('div');
   targetInfo.className = 'kwa-target-info';
+  // trusted constant markup
   targetInfo.innerHTML =
     'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
   gameArea.appendChild(targetInfo);

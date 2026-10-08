@@ -5,6 +5,12 @@ import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
 export type DrawChainsCallback = () => void;
 export type SelectChainCallback = (index: 0 | 1) => void;
 
@@ -35,7 +41,7 @@ export function renderBoard(
   onSelectChain?: SelectChainCallback,
   options: StarTrackChainRenderOptions = {}
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'star-track-wrapper';
@@ -269,7 +275,7 @@ export function fillChainArea(
       chainBtn.type = 'button';
       chainBtn.className = 'star-track-chain-btn';
       chainBtn.setAttribute('data-chain-index', String(index));
-      chainBtn.innerHTML = renderChainLink(chain);
+      chainBtn.appendChild(renderChainLink(chain));
       if (interactive && onSelectChain) {
         const select = onSelectChain;
         chainBtn.setAttribute(
@@ -400,10 +406,10 @@ function getSpacePosition(
   };
 }
 
-// Render a chain link as HTML
-function renderChainLink(chain: ChainLink): string {
+// Render a chain link as DOM nodes
+function renderChainLink(chain: ChainLink): DocumentFragment {
   const links = '🔗'.repeat(chain.length);
-  return `<span class="chain-links">${links}</span><span class="chain-length">${chain.length}</span>`;
+  return safeHtml`<span class="chain-links">${links}</span><span class="chain-length">${chain.length}</span>`;
 }
 
 // Render status display
@@ -413,7 +419,7 @@ export function renderStatus(
   gameMode: StarTrackGameMode = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'star-track-status';
@@ -457,24 +463,38 @@ export function renderStatus(
 
   const p1Progress = document.createElement('div');
   p1Progress.className = 'progress-bar progress-p1';
-  p1Progress.innerHTML = `
+  replaceWithSafeHtml(
+    p1Progress,
+    safeHtml`
     <span class="progress-label">${seatIcon('player1')} ${p1Label}</span>
     <div class="progress-track">
-      <div class="progress-fill" style="width: ${getProgress(state, 'player1')}%"></div>
+      <div class="progress-fill"></div>
     </div>
     <span class="progress-value">${state.player1Position}/${TRACK_LENGTH}</span>
-  `;
+  `
+  );
+  const p1Fill = p1Progress.querySelector('.progress-fill');
+  if (p1Fill instanceof HTMLElement) {
+    p1Fill.style.width = `${getProgress(state, 'player1')}%`;
+  }
   progressEl.appendChild(p1Progress);
 
   const p2Progress = document.createElement('div');
   p2Progress.className = 'progress-bar progress-p2';
-  p2Progress.innerHTML = `
+  replaceWithSafeHtml(
+    p2Progress,
+    safeHtml`
     <span class="progress-label">${seatIcon('player2')} ${p2Label}</span>
     <div class="progress-track">
-      <div class="progress-fill" style="width: ${getProgress(state, 'player2')}%"></div>
+      <div class="progress-fill"></div>
     </div>
     <span class="progress-value">${state.player2Position}/${TRACK_LENGTH}</span>
-  `;
+  `
+  );
+  const p2Fill = p2Progress.querySelector('.progress-fill');
+  if (p2Fill instanceof HTMLElement) {
+    p2Fill.style.width = `${getProgress(state, 'player2')}%`;
+  }
   progressEl.appendChild(p2Progress);
 
   statusEl.appendChild(progressEl);

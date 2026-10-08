@@ -26,6 +26,10 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import {
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -101,14 +105,17 @@ function updateUI(): void {
   // Render scores
   const scoresDiv = document.createElement('div');
   scoresDiv.className = 'contig-scores';
-  scoresDiv.innerHTML = `
+  replaceWithSafeHtml(
+    scoresDiv,
+    safeHtml`
     <div class="contig-score contig-score-p1">
       ${seatIcon('player1')} Blue: <strong>${gameState.scores.player1}</strong> pts
     </div>
     <div class="contig-score contig-score-p2">
       ${seatIcon('player2')} Red: <strong>${gameState.scores.player2}</strong> pts
     </div>
-  `;
+    `
+  );
   boardContainer.insertBefore(scoresDiv, board);
 
   // Render dice area
@@ -170,11 +177,14 @@ function updateStatus(): void {
   markStatusLive(statusContainer);
 
   if (gameState.phase === 'gameOver') {
-    statusContainer.innerHTML = `
+    replaceWithSafeHtml(
+      statusContainer,
+      safeHtml`
       <div class="contig-winner-banner game-winner-banner">
         ${formatEndBanner(gameState.winner)}
       </div>
-    `;
+      `
+    );
     return;
   }
 
@@ -209,11 +219,14 @@ function updateStatus(): void {
     }
   }
 
-  statusContainer.innerHTML = `
+  replaceWithSafeHtml(
+    statusContainer,
+    safeHtml`
     <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
-  `;
+    `
+  );
 }
 
 // =============================================================================

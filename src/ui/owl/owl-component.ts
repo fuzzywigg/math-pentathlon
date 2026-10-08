@@ -51,7 +51,10 @@ export class OwlComponent {
     this.container = document.createElement('div');
     this.container.id = 'ollie-owl';
     this.container.className = 'owl-container';
-    this.container.innerHTML = this.getTemplate();
+    // trusted constant markup (messages use textContent elsewhere)
+    const owlTpl = document.createElement('template');
+    owlTpl.innerHTML = this.getTemplate();
+    this.container.appendChild(owlTpl.content);
 
     document.body.appendChild(this.container);
 

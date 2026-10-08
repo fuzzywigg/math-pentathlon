@@ -26,6 +26,7 @@ import { getAIMove, isAITurn, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { clearElement } from '../../core/dom-security';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import {
@@ -123,7 +124,7 @@ function render(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -149,7 +150,7 @@ function renderBoardOnly(): void {
     if (existing && patchPentPreview(existing, gameState, inputOpts)) {
       return;
     }
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -162,7 +163,7 @@ function renderBoardOnly(): void {
 
 function renderStatusAndControls(): void {
   if (!statusContainer) return;
-  statusContainer.innerHTML = '';
+  clearElement(statusContainer);
   markStatusLive(statusContainer);
 
   // Winner banner

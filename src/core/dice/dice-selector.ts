@@ -1,3 +1,4 @@
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 // Dice Selector - UI for selecting and combining dice results
 
 import {
@@ -225,7 +226,7 @@ export class DiceSelector {
   }
 
   private render(): void {
-    this.container.innerHTML = '';
+    clearElement(this.container);
     this.container.className = 'dice-selector';
 
     // Header
@@ -247,6 +248,7 @@ export class DiceSelector {
         onDieClick: (die) => this.handleDieClick(die),
       });
     } else {
+      // trusted constant markup
       resultArea.innerHTML =
         '<span class="dice-placeholder">Click Roll to begin</span>';
     }
@@ -263,10 +265,13 @@ export class DiceSelector {
         (d) => d.isSelected
       ).length;
 
-      selectionInfo.innerHTML = `
+      replaceWithSafeHtml(
+        selectionInfo,
+        safeHtml`
         <span class="dice-selection-label">${selectedCount} dice selected</span>
         <span class="dice-selection-sum">${selectedSum}</span>
-      `;
+      `
+      );
       this.container.appendChild(selectionInfo);
 
       // Possible sums
@@ -418,7 +423,7 @@ export class DiceSelector {
     this.cancelRollAnim?.();
     this.cancelRollAnim = null;
     this.isRolling = false;
-    this.container.innerHTML = '';
+    clearElement(this.container);
   }
 }
 

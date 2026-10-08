@@ -304,14 +304,14 @@ export function createRotationControls(
 
   const ccwBtn = document.createElement('button');
   ccwBtn.style.cssText = btnStyle;
-  ccwBtn.innerHTML = '↺';
+  ccwBtn.textContent = '↺';
   ccwBtn.title = 'Rotate counter-clockwise';
   ccwBtn.addEventListener('click', () => onRotate('ccw'));
   container.appendChild(ccwBtn);
 
   const cwBtn = document.createElement('button');
   cwBtn.style.cssText = btnStyle;
-  cwBtn.innerHTML = '↻';
+  cwBtn.textContent = '↻';
   cwBtn.title = 'Rotate clockwise';
   cwBtn.addEventListener('click', () => onRotate('cw'));
   container.appendChild(cwBtn);
@@ -319,7 +319,7 @@ export function createRotationControls(
   if (canFlip) {
     const flipBtn = document.createElement('button');
     flipBtn.style.cssText = btnStyle;
-    flipBtn.innerHTML = '⇄';
+    flipBtn.textContent = '⇄';
     flipBtn.title = 'Flip horizontally';
     flipBtn.addEventListener('click', onFlip);
     container.appendChild(flipBtn);

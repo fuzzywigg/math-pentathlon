@@ -3,6 +3,8 @@
 import { DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
 import { getUserReducedMotionFlag } from '../settings-flags';
 
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
+
 /** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
 function dicePrefersReducedMotion(): boolean {
   if (getUserReducedMotionFlag()) return true;
@@ -281,7 +283,7 @@ export function renderRollResult(
     onDieClick,
   } = options;
 
-  container.innerHTML = '';
+  clearElement(container);
   container.className = 'dice-roll-result';
 
   const diceContainer = document.createElement('div');
@@ -301,7 +303,10 @@ export function renderRollResult(
   if (showTotal) {
     const totalEl = document.createElement('div');
     totalEl.className = 'dice-total';
-    totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${result.total}</span>`;
+    replaceWithSafeHtml(
+      totalEl,
+      safeHtml`<span class="total-label">Total:</span> <span class="total-value">${result.total}</span>`
+    );
     container.appendChild(totalEl);
   }
 }
@@ -338,14 +343,14 @@ export function animateRoll(
     clearTimer();
   };
 
-  container.innerHTML = '';
+  clearElement(container);
   container.className = 'dice-roll-result';
 
   const finish = (): void => {
     if (cancelled) return;
     clearTimer();
     container.className = 'dice-roll-result';
-    container.innerHTML = '';
+    clearElement(container);
 
     const diceContainer = document.createElement('div');
     diceContainer.className = 'dice-container';
@@ -359,7 +364,10 @@ export function animateRoll(
 
     const totalEl = document.createElement('div');
     totalEl.className = 'dice-total';
-    totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${finalResult.total}</span>`;
+    replaceWithSafeHtml(
+      totalEl,
+      safeHtml`<span class="total-label">Total:</span> <span class="total-value">${finalResult.total}</span>`
+    );
     container.appendChild(totalEl);
 
     onComplete?.();
@@ -412,7 +420,7 @@ export function animateRoll(
         const randomValue = Math.ceil(Math.random() * config.faces);
         const tempDie: DieRoll = { ...die, value: randomValue };
 
-        wrapper.innerHTML = '';
+        clearElement(wrapper);
         wrapper.appendChild(renderDie(tempDie, dieSize));
       });
 

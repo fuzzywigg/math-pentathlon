@@ -14,6 +14,8 @@ import {
   getFractionColor,
 } from '../../core/fractions/fraction-bar-ui';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -348,13 +350,16 @@ export function renderOperationSelector(
   // Show selected fractions
   const preview = document.createElement('div');
   preview.className = 'fab-operation-preview';
-  preview.innerHTML = `
+  replaceWithSafeHtml(
+    preview,
+    safeHtml`
     <span class="fab-fraction">${formatFraction(simplify(bar1.fraction))}</span>
     <span class="fab-op-placeholder">?</span>
     <span class="fab-fraction">${formatFraction(simplify(bar2.fraction))}</span>
     <span class="fab-equals">=</span>
     <span class="fab-result">?</span>
-  `;
+  `
+  );
   container.appendChild(preview);
 
   // Get possible results for each operation
@@ -387,10 +392,13 @@ export function renderOperationSelector(
     const symbol = getOperationSymbol(op);
     const resultStr = result ? formatFraction(simplify(result)) : '—';
 
-    btn.innerHTML = `
+    replaceWithSafeHtml(
+      btn,
+      safeHtml`
       <span class="fab-op-symbol">${symbol}</span>
       <span class="fab-op-result">${resultStr}</span>
-    `;
+    `
+    );
 
     // Only enable ops that claim at least one answer — avoids a confirmingMove
     // dead-end with no matchable targets (Clear Selection still recovers).
@@ -418,11 +426,17 @@ export function renderScores(state: FabADiffyState): HTMLElement {
 
   const p1 = document.createElement('div');
   p1.className = 'fab-score fab-score-p1';
-  p1.innerHTML = `<span class="fab-score-label">${seatIcon('player1')} Blue</span><span class="fab-score-value">${state.scores.player1}</span>`;
+  replaceWithSafeHtml(
+    p1,
+    safeHtml`<span class="fab-score-label">${seatIcon('player1')} Blue</span><span class="fab-score-value">${state.scores.player1}</span>`
+  );
 
   const p2 = document.createElement('div');
   p2.className = 'fab-score fab-score-p2';
-  p2.innerHTML = `<span class="fab-score-label">${seatIcon('player2')} Red</span><span class="fab-score-value">${state.scores.player2}</span>`;
+  replaceWithSafeHtml(
+    p2,
+    safeHtml`<span class="fab-score-label">${seatIcon('player2')} Red</span><span class="fab-score-value">${state.scores.player2}</span>`
+  );
 
   container.appendChild(p1);
   container.appendChild(p2);
@@ -454,7 +468,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
 
     const moveEl = document.createElement('div');
     moveEl.className = `fab-history-move fab-history-${move.player}`;
-    moveEl.innerHTML = `
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`
       <span class="fab-move-num">${move.moveNumber}.</span>
       <span class="fab-move-expr">
         ${formatFraction(simplify(bar1.fraction))}
@@ -463,7 +479,8 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
         =
         ${formatFraction(simplify(answer.fraction))}
       </span>
-    `;
+    `
+    );
     list.appendChild(moveEl);
   }
 

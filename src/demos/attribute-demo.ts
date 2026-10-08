@@ -3,6 +3,13 @@
 
 import { navigate } from '../core/router';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+  setText,
+} from '../core/dom-security';
+
+import {
   AttributePiece,
   AttributeDefinition,
   BASIC_ATTRIBUTES,
@@ -28,6 +35,7 @@ import {
 export function renderAttributeDemo(container: HTMLElement): void {
   injectAttributeStyles();
 
+  // trusted constant markup
   container.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" aria-label="Back to home">← Back</button>
@@ -291,7 +299,7 @@ function initAttributePiecesSection(): void {
   function render(): void {
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = '';
+    clearElement(gridContainer);
     const selectedIds = selectedPiece
       ? new Set([selectedPiece.id])
       : new Set<string>();
@@ -314,17 +322,26 @@ function initAttributePiecesSection(): void {
   function showInfo(): void {
     if (!infoContainer || !selectedPiece) {
       if (infoContainer) {
+        // trusted constant markup
         infoContainer.innerHTML =
           '<span class="placeholder">Click a piece to see its attributes</span>';
       }
       return;
     }
 
-    const attrs = Object.entries(selectedPiece.attributes)
-      .map(([k, v]) => `<strong>${k}:</strong> ${v}`)
-      .join(' | ');
-
-    infoContainer.innerHTML = `<strong>Piece ${selectedPiece.id}</strong><br>${attrs}`;
+    clearElement(infoContainer);
+    const title = document.createElement('strong');
+    title.textContent = `Piece ${selectedPiece.id}`;
+    infoContainer.appendChild(title);
+    infoContainer.appendChild(document.createElement('br'));
+    const entries = Object.entries(selectedPiece.attributes);
+    entries.forEach(([k, v], i) => {
+      if (i > 0) infoContainer.appendChild(document.createTextNode(' | '));
+      const keyEl = document.createElement('strong');
+      keyEl.textContent = `${k}:`;
+      infoContainer.appendChild(keyEl);
+      infoContainer.appendChild(document.createTextNode(` ${v}`));
+    });
   }
 
   setBtns.forEach((btn) => {
@@ -390,7 +407,7 @@ function initSetGameSection(): void {
   function render(): void {
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = '';
+    clearElement(gridContainer);
 
     const grid = document.createElement('div');
     grid.style.cssText = `
@@ -434,7 +451,7 @@ function initSetGameSection(): void {
     if (!resultContainer) return;
 
     if (selectedCards.size < 3) {
-      resultContainer.innerHTML = `Select ${3 - selectedCards.size} more card(s)`;
+      setText(resultContainer, `Select ${3 - selectedCards.size} more card(s)`);
       resultContainer.className = 'set-result';
       return;
     }
@@ -443,7 +460,7 @@ function initSetGameSection(): void {
     const isValid = isValidSetGameSet(selected, SET_GAME_ATTRIBUTES);
 
     if (isValid) {
-      resultContainer.innerHTML = '✓ Valid SET!';
+      setText(resultContainer, '✓ Valid SET!');
       resultContainer.className = 'set-result valid';
     } else {
       // Show why it's not valid
@@ -457,7 +474,7 @@ function initSetGameSection(): void {
           break;
         }
       }
-      resultContainer.innerHTML = `✗ Not a valid SET (${reason})`;
+      setText(resultContainer, `✗ Not a valid SET (${reason})`);
       resultContainer.className = 'set-result invalid';
     }
   }
@@ -465,6 +482,7 @@ function initSetGameSection(): void {
   // Show valid sets count
   if (validSetsContainer) {
     // This is simplified - real SET uses "all same OR all different"
+    // trusted constant markup
     validSetsContainer.innerHTML = `<strong>Tip:</strong> A valid SET requires each attribute to be either ALL the same or ALL different across the 3 cards.`;
   }
 
@@ -484,7 +502,7 @@ function initComparisonSection(): void {
   function render(): void {
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = '';
+    clearElement(gridContainer);
 
     const grid = createPieceGrid(
       pieces,
@@ -510,7 +528,7 @@ function initComparisonSection(): void {
 
   function updateSlots(): void {
     if (slot1) {
-      slot1.innerHTML = '';
+      clearElement(slot1);
       if (piece1) {
         slot1.classList.add('filled');
         const svg = renderAttributePiece(piece1, BASIC_ATTRIBUTES, {
@@ -520,12 +538,13 @@ function initComparisonSection(): void {
         slot1.appendChild(svg);
       } else {
         slot1.classList.remove('filled');
+        // trusted constant markup
         slot1.innerHTML = '<span class="placeholder">Piece 1</span>';
       }
     }
 
     if (slot2) {
-      slot2.innerHTML = '';
+      clearElement(slot2);
       if (piece2) {
         slot2.classList.add('filled');
         const svg = renderAttributePiece(piece2, BASIC_ATTRIBUTES, {
@@ -535,6 +554,7 @@ function initComparisonSection(): void {
         slot2.appendChild(svg);
       } else {
         slot2.classList.remove('filled');
+        // trusted constant markup
         slot2.innerHTML = '<span class="placeholder">Piece 2</span>';
       }
     }
@@ -544,6 +564,7 @@ function initComparisonSection(): void {
     if (!resultsContainer) return;
 
     if (!piece1 || !piece2) {
+      // trusted constant markup
       resultsContainer.innerHTML =
         '<span class="placeholder">Select two pieces to compare</span>';
       return;
@@ -553,17 +574,48 @@ function initComparisonSection(): void {
     const differing = getDifferingAttributes(piece1, piece2);
     const matchCount = countMatchingAttributes(piece1, piece2);
 
-    resultsContainer.innerHTML = `
-      <div><strong>Match Score:</strong> ${matchCount}/${Object.keys(piece1.attributes).length}</div>
-      <div class="match-list">
-        <strong>Same:</strong>
-        ${matching.map((a) => `<span class="attr-tag match">${a}</span>`).join(' ')}
-      </div>
-      <div class="diff-list">
-        <strong>Different:</strong>
-        ${differing.map((a) => `<span class="attr-tag diff">${a}</span>`).join(' ')}
-      </div>
-    `;
+    clearElement(resultsContainer);
+
+    const scoreDiv = document.createElement('div');
+    const scoreLabel = document.createElement('strong');
+    scoreLabel.textContent = 'Match Score:';
+    scoreDiv.appendChild(scoreLabel);
+    scoreDiv.appendChild(
+      document.createTextNode(
+        ` ${matchCount}/${Object.keys(piece1.attributes).length}`
+      )
+    );
+    resultsContainer.appendChild(scoreDiv);
+
+    const matchList = document.createElement('div');
+    matchList.className = 'match-list';
+    const sameLabel = document.createElement('strong');
+    sameLabel.textContent = 'Same:';
+    matchList.appendChild(sameLabel);
+    matchList.appendChild(document.createTextNode(' '));
+    matching.forEach((a, i) => {
+      if (i > 0) matchList.appendChild(document.createTextNode(' '));
+      const tag = document.createElement('span');
+      tag.className = 'attr-tag match';
+      tag.textContent = a;
+      matchList.appendChild(tag);
+    });
+    resultsContainer.appendChild(matchList);
+
+    const diffList = document.createElement('div');
+    diffList.className = 'diff-list';
+    const diffLabel = document.createElement('strong');
+    diffLabel.textContent = 'Different:';
+    diffList.appendChild(diffLabel);
+    diffList.appendChild(document.createTextNode(' '));
+    differing.forEach((a, i) => {
+      if (i > 0) diffList.appendChild(document.createTextNode(' '));
+      const tag = document.createElement('span');
+      tag.className = 'attr-tag diff';
+      tag.textContent = a;
+      diffList.appendChild(tag);
+    });
+    resultsContainer.appendChild(diffList);
   }
 
   render();
@@ -581,7 +633,7 @@ function initFilterSection(): void {
   function renderControls(): void {
     if (!controlsContainer) return;
 
-    controlsContainer.innerHTML = '';
+    clearElement(controlsContainer);
 
     for (const attr of BASIC_ATTRIBUTES) {
       const group = document.createElement('div');
@@ -592,9 +644,15 @@ function initFilterSection(): void {
       group.appendChild(label);
 
       const select = document.createElement('select');
-      select.innerHTML = `<option value="">Any</option>`;
+      const anyOpt = document.createElement('option');
+      anyOpt.value = '';
+      anyOpt.textContent = 'Any';
+      select.appendChild(anyOpt);
       for (const value of attr.possibleValues) {
-        select.innerHTML += `<option value="${value}">${value}</option>`;
+        const opt = document.createElement('option');
+        opt.value = String(value);
+        opt.textContent = String(value);
+        select.appendChild(opt);
       }
 
       select.value = filters[attr.name] || '';
@@ -624,7 +682,7 @@ function initFilterSection(): void {
       }
     }
 
-    gridContainer.innerHTML = '';
+    clearElement(gridContainer);
     const grid = createPieceGrid(
       filtered,
       BASIC_ATTRIBUTES,
@@ -634,7 +692,10 @@ function initFilterSection(): void {
     );
     gridContainer.appendChild(grid);
 
-    countContainer.innerHTML = `<strong>Showing:</strong> ${filtered.length} of ${allPieces.length} pieces`;
+    replaceWithSafeHtml(
+      countContainer,
+      safeHtml`<strong>Showing:</strong> ${filtered.length} of ${allPieces.length} pieces`
+    );
   }
 
   renderControls();

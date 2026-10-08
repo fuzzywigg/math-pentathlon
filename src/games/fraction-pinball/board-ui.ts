@@ -5,6 +5,8 @@ import { FractionPinballState, Player, getPlayerStats } from './types';
 import { formatDecimal, formatFraction } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 // =============================================================================
 // Challenge Display
 // =============================================================================
@@ -27,6 +29,7 @@ export function renderChallenge(
   container.className = 'pinball-challenge';
 
   if (!state.currentChallenge) {
+    // trusted constant markup
     container.innerHTML =
       '<div class="pinball-no-challenge">No challenge loaded</div>';
     return container;
@@ -39,15 +42,21 @@ export function renderChallenge(
   question.className = 'pinball-question';
 
   if (challenge.type === 'fractionToDecimal') {
-    question.innerHTML = `
+    replaceWithSafeHtml(
+      question,
+      safeHtml`
       <div class="pinball-instruction">Convert to decimal:</div>
       <div class="pinball-value pinball-fraction">${formatFraction(challenge.fraction)}</div>
-    `;
+    `
+    );
   } else {
-    question.innerHTML = `
+    replaceWithSafeHtml(
+      question,
+      safeHtml`
       <div class="pinball-instruction">Convert to fraction:</div>
       <div class="pinball-value pinball-decimal">${formatDecimal(challenge.decimal)}</div>
-    `;
+    `
+    );
   }
 
   container.appendChild(question);
@@ -118,20 +127,31 @@ export function renderResult(
     const hitText = pointsAwarded > 0 ? 'HIT!' : 'HIT! Points scored!';
     const pointsLine =
       pointsAwarded > 0
-        ? `<div class="pinball-points">+${pointsAwarded} points</div>`
-        : '';
-    feedback.innerHTML = `
+        ? (() => {
+            const el = document.createElement('div');
+            el.className = 'pinball-points';
+            el.textContent = `+${pointsAwarded} points`;
+            return el;
+          })()
+        : null;
+    replaceWithSafeHtml(
+      feedback,
+      safeHtml`
       <div class="pinball-feedback-icon">🎯</div>
       <div class="pinball-feedback-text">${hitText}</div>
       ${pointsLine}
       <div class="pinball-animation">★ ★ ★</div>
-    `;
+    `
+    );
   } else {
-    feedback.innerHTML = `
+    replaceWithSafeHtml(
+      feedback,
+      safeHtml`
       <div class="pinball-feedback-icon">✗</div>
       <div class="pinball-feedback-text">Miss! Ball lost.</div>
       <div class="pinball-correct">Correct: ${state.currentChallenge.correctAnswer}</div>
-    `;
+    `
+    );
   }
 
   container.appendChild(feedback);
@@ -191,6 +211,7 @@ export function renderPinballBoard(_state: FractionPinballState): SVGElement {
     'radialGradient'
   );
   gradient.setAttribute('id', 'target-glow');
+  // trusted constant markup
   gradient.innerHTML = `
     <stop offset="0%" stop-color="#ffeb3b" stop-opacity="0.8"/>
     <stop offset="100%" stop-color="#ffeb3b" stop-opacity="0"/>
@@ -306,22 +327,36 @@ export function renderScores(
   const p1Balls = Math.max(0, p1Stats.ballsRemaining);
   const p2Balls = Math.max(0, p2Stats.ballsRemaining);
 
-  container.innerHTML = `
-    <div class="pinball-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1">
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
+    <div class="pinball-player-score player1">
       <div class="pinball-player-name">${p1Name}</div>
       <div class="pinball-score-value">${p1Stats.score}</div>
-      <div class="pinball-balls" aria-label="${p1Balls} balls remaining">${seatIcon('player1').repeat(p1Balls)}</div>
+      <div class="pinball-balls">${seatIcon('player1').repeat(p1Balls)}</div>
     </div>
     <div class="pinball-round">
       <div class="pinball-round-label">Round</div>
       <div class="pinball-round-value">${state.roundNumber}/${state.maxRounds}</div>
     </div>
-    <div class="pinball-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2">
+    <div class="pinball-player-score player2">
       <div class="pinball-player-name">${p2Name}</div>
       <div class="pinball-score-value">${p2Stats.score}</div>
-      <div class="pinball-balls" aria-label="${p2Balls} balls remaining">${seatIcon('player2').repeat(p2Balls)}</div>
+      <div class="pinball-balls">${seatIcon('player2').repeat(p2Balls)}</div>
     </div>
-  `;
+  `
+  );
+  const p1El = container.querySelector('.pinball-player-score.player1');
+  const p2El = container.querySelector('.pinball-player-score.player2');
+  if (p1El) {
+    p1El.className = `pinball-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1`;
+  }
+  if (p2El) {
+    p2El.className = `pinball-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2`;
+  }
+  const balls = container.querySelectorAll('.pinball-balls');
+  balls[0]?.setAttribute('aria-label', `${p1Balls} balls remaining`);
+  balls[1]?.setAttribute('aria-label', `${p2Balls} balls remaining`);
 
   return container;
 }
@@ -355,7 +390,9 @@ export function renderGameOver(
     winnerText = "It's a Draw!";
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="pinball-winner-banner">${winnerText}</div>
     <div class="pinball-final-scores">
       <div class="pinball-final-score player1">
@@ -373,7 +410,8 @@ export function renderGameOver(
         </div>
       </div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }

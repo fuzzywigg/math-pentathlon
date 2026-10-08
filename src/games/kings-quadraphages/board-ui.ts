@@ -14,6 +14,8 @@ import {
 import { getOpponent } from './rules';
 import { PlayerOwner } from './pieces';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
+import { clearElement } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -429,7 +431,7 @@ export function renderStatus(
   isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'status';
@@ -508,7 +510,7 @@ export function renderMoveHistory(
   state: GameState,
   container: HTMLElement
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const titleEl = document.createElement('div');
   titleEl.className = 'move-history-title';

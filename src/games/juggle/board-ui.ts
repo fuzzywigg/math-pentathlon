@@ -18,6 +18,8 @@ import {
 import { Board } from '../../core/polyomino/placement';
 import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -181,10 +183,13 @@ export function renderBoard(
   // Board header
   const header = document.createElement('div');
   header.className = 'juggle-board-header';
-  header.innerHTML = `
+  replaceWithSafeHtml(
+    header,
+    safeHtml`
     <span class="player-name">${player === 'player1' ? 'Blue' : 'Red'}</span>
     <span class="fill-percent">${getBoardFillPercentage(board)}%</span>
-  `;
+  `
+  );
   container.appendChild(header);
 
   // Grid

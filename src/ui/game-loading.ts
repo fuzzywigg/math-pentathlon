@@ -1,17 +1,30 @@
 /** Small loading / error UI shown while a game chunk is fetched. */
 
+import { clearElement, setText } from '../core/dom-security';
 import { gameLoadErrorHint } from './offline';
 
 export function renderGameLoading(
   container: HTMLElement,
   gameName: string
 ): void {
-  container.innerHTML = `
-    <div class="game-loading" role="status" aria-live="polite" data-testid="game-loading">
-      <div class="game-loading-spinner" aria-hidden="true"></div>
-      <p class="game-loading-text">Loading ${escapeHtml(gameName)}…</p>
-    </div>
-  `;
+  clearElement(container);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'game-loading';
+  wrap.setAttribute('role', 'status');
+  wrap.setAttribute('aria-live', 'polite');
+  wrap.setAttribute('data-testid', 'game-loading');
+
+  const spinner = document.createElement('div');
+  spinner.className = 'game-loading-spinner';
+  spinner.setAttribute('aria-hidden', 'true');
+
+  const text = document.createElement('p');
+  text.className = 'game-loading-text';
+  setText(text, `Loading ${gameName}…`);
+
+  wrap.append(spinner, text);
+  container.appendChild(wrap);
 }
 
 export function renderGameLoadError(
@@ -21,30 +34,41 @@ export function renderGameLoadError(
   onHome: () => void,
   options: { offline?: boolean } = {}
 ): void {
-  const hint = gameLoadErrorHint(options.offline);
-  container.innerHTML = `
-    <div class="game-loading game-loading-error" role="alert" data-testid="game-load-error">
-      <p class="game-loading-text">Could not load ${escapeHtml(gameName)}.</p>
-      <p class="game-loading-hint" data-testid="game-load-error-hint">${escapeHtml(hint)}</p>
-      <div class="game-loading-actions">
-        <button type="button" class="btn btn-primary" data-action="retry">Try again</button>
-        <button type="button" class="btn btn-secondary" data-action="home">Back to games</button>
-      </div>
-    </div>
-  `;
+  const hintText = gameLoadErrorHint(options.offline);
+  clearElement(container);
 
-  container
-    .querySelector('[data-action="retry"]')
-    ?.addEventListener('click', onRetry);
-  container
-    .querySelector('[data-action="home"]')
-    ?.addEventListener('click', onHome);
-}
+  const wrap = document.createElement('div');
+  wrap.className = 'game-loading game-loading-error';
+  wrap.setAttribute('role', 'alert');
+  wrap.setAttribute('data-testid', 'game-load-error');
 
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  const title = document.createElement('p');
+  title.className = 'game-loading-text';
+  setText(title, `Could not load ${gameName}.`);
+
+  const hint = document.createElement('p');
+  hint.className = 'game-loading-hint';
+  hint.setAttribute('data-testid', 'game-load-error-hint');
+  setText(hint, hintText);
+
+  const actions = document.createElement('div');
+  actions.className = 'game-loading-actions';
+
+  const retryBtn = document.createElement('button');
+  retryBtn.type = 'button';
+  retryBtn.className = 'btn btn-primary';
+  retryBtn.dataset.action = 'retry';
+  setText(retryBtn, 'Try again');
+  retryBtn.addEventListener('click', onRetry);
+
+  const homeBtn = document.createElement('button');
+  homeBtn.type = 'button';
+  homeBtn.className = 'btn btn-secondary';
+  homeBtn.dataset.action = 'home';
+  setText(homeBtn, 'Back to games');
+  homeBtn.addEventListener('click', onHome);
+
+  actions.append(retryBtn, homeBtn);
+  wrap.append(title, hint, actions);
+  container.appendChild(wrap);
 }

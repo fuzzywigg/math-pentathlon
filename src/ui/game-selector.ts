@@ -6,6 +6,11 @@ import {
   GameInfo,
   getGamesByDivision,
 } from '../core/game-registry';
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../core/dom-security';
 import { navigate } from '../core/router';
 import { prefetchGameChunk, prefetchGameChunksIdle } from './game-prefetch';
 import { scrollBehaviorForMotion } from './reduced-motion';
@@ -143,10 +148,12 @@ function createDivisionAccordion(
 
   header.appendChild(headerContent);
 
-  // Chevron icon
+  // Chevron icon (trusted constant SVG markup)
   const chevron = document.createElement('span');
   chevron.className = 'accordion-chevron';
-  chevron.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  const chevronTpl = document.createElement('template');
+  chevronTpl.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  chevron.appendChild(chevronTpl.content);
   header.appendChild(chevron);
 
   section.appendChild(header);
@@ -211,7 +218,7 @@ function toggleAccordion(section: HTMLElement, open: boolean): void {
 }
 
 export function renderGameSelector(container: HTMLElement): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'game-selector';
@@ -225,13 +232,16 @@ export function renderGameSelector(container: HTMLElement): void {
 
   const logo = document.createElement('div');
   logo.className = 'hero-logo';
-  logo.innerHTML = `
+  // trusted constant markup
+  const logoTpl = document.createElement('template');
+  logoTpl.innerHTML = `
     <span class="logo-icon">🏆</span>
     <div class="logo-text">
       <h1>Math Pentathlon</h1>
       <p class="tagline">Practice Edition</p>
     </div>
   `;
+  logo.appendChild(logoTpl.content);
   heroContent.appendChild(logo);
 
   const heroDescription = document.createElement('p');
@@ -244,7 +254,9 @@ export function renderGameSelector(container: HTMLElement): void {
   const stats = document.createElement('div');
   stats.className = 'hero-stats';
 
-  stats.innerHTML = `
+  replaceWithSafeHtml(
+    stats,
+    safeHtml`
     <div class="stat">
       <span class="stat-number">${GAMES.length}</span>
       <span class="stat-label">Games</span>
@@ -257,7 +269,8 @@ export function renderGameSelector(container: HTMLElement): void {
       <span class="stat-number">K–7</span>
       <span class="stat-label">Grades</span>
     </div>
-  `;
+  `
+  );
   heroContent.appendChild(stats);
 
   const heroActions = document.createElement('div');
@@ -294,10 +307,13 @@ export function renderGameSelector(container: HTMLElement): void {
     tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
     tab.setAttribute('aria-controls', panelId);
     tab.id = `division-tab-${div.name.replace(/\s+/g, '-').toLowerCase()}`;
-    tab.innerHTML = `
+    replaceWithSafeHtml(
+      tab,
+      safeHtml`
       <span class="tab-name">${div.name}</span>
       <span class="tab-grade">${div.gradeRange}</span>
-    `;
+    `
+    );
 
     tabNav.appendChild(tab);
   });
@@ -321,16 +337,18 @@ export function renderGameSelector(container: HTMLElement): void {
 
   wrapper.appendChild(accordionContainer);
 
-  // Footer
+  // Footer (trusted constant markup)
   const footer = document.createElement('footer');
   footer.className = 'game-selector-footer';
-  footer.innerHTML = `
+  const footerTpl = document.createElement('template');
+  footerTpl.innerHTML = `
     <p>Select a game to start practicing!</p>
     <p class="footer-note">
       Math Pentathlon is a registered trademark of the Pentathlon Institute.
       This is an unofficial practice tool.
     </p>
   `;
+  footer.appendChild(footerTpl.content);
   wrapper.appendChild(footer);
 
   container.appendChild(wrapper);

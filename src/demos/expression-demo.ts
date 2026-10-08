@@ -2,6 +2,8 @@
 // Interactive demo for testing expression building, parsing, and evaluation
 
 import { navigate } from '../core/router';
+import { clearElement, setText } from '../core/dom-security';
+
 import {
   ExpressionCard,
   TargetChallenge,
@@ -30,6 +32,7 @@ import {
 export function renderExpressionDemo(container: HTMLElement): void {
   injectExpressionStyles();
 
+  // trusted constant markup
   container.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" aria-label="Back to home">← Back</button>
@@ -299,12 +302,12 @@ function initCalculator(): void {
 
     const expr = input.value.trim();
     if (!expr) {
-      resultContainer.innerHTML = '';
+      clearElement(resultContainer);
       return;
     }
 
     const result = evaluate(expr);
-    resultContainer.innerHTML = '';
+    clearElement(resultContainer);
     resultContainer.appendChild(
       renderCalculatorDisplay(expr, result.value, result.error)
     );
@@ -354,7 +357,7 @@ function initTargetGame(): void {
     activeChallenge.style.display = 'block';
 
     // Show target
-    challengeTarget.innerHTML = '';
+    clearElement(challengeTarget);
     challengeTarget.appendChild(renderTargetDisplay(challenge));
 
     // Create cards from challenge numbers
@@ -371,7 +374,7 @@ function initTargetGame(): void {
     cards.push(createParenCard(false));
 
     // Create interactive builder
-    expressionBuilder.innerHTML = '';
+    clearElement(expressionBuilder);
     createInteractiveBuilder(expressionBuilder, {
       slotCount: challenge.numbers.length * 2 - 1, // Numbers + operators between them
       availableCards: cards,
@@ -401,6 +404,7 @@ function initSolver(): void {
 
     const numbers = numInputs.map((input) => parseInt(input.value, 10) || 1);
 
+    // trusted constant markup
     solutionsList.innerHTML = '<div style="color: #666;">Searching...</div>';
 
     // Use setTimeout to allow UI to update
@@ -416,16 +420,17 @@ function initSolver(): void {
       const solutions = solveTargetChallenge(challenge, 20);
 
       if (solutions.length === 0) {
+        // trusted constant markup
         solutionsList.innerHTML =
           '<div style="color: #666;">No solutions found for these numbers.</div>';
         return;
       }
 
-      solutionsList.innerHTML = '';
+      clearElement(solutionsList);
       for (const sol of solutions) {
         const item = document.createElement('div');
         item.className = `solution-item ${sol.isExact ? 'exact' : ''}`;
-        item.innerHTML = `${sol.expression} = ${formatNumber(sol.result)}`;
+        setText(item, `${sol.expression} = ${formatNumber(sol.result)}`);
         solutionsList.appendChild(item);
       }
     }, 10);
@@ -442,7 +447,7 @@ function initEquationChecker(): void {
 
     const equation = input.value.trim();
     if (!equation) {
-      resultEl.innerHTML = '';
+      clearElement(resultEl);
       resultEl.className = '';
       return;
     }
@@ -450,13 +455,16 @@ function initEquationChecker(): void {
     const result = evaluateEquation(equation);
 
     if (result.error) {
-      resultEl.innerHTML = `Error: ${result.error}`;
+      setText(resultEl, `Error: ${result.error}`);
       resultEl.className = 'false';
     } else {
       resultEl.className = result.isTrue ? 'true' : 'false';
-      resultEl.innerHTML = result.isTrue
-        ? `✓ True! Both sides equal ${formatNumber(result.leftValue)}`
-        : `✗ False: ${formatNumber(result.leftValue)} ≠ ${formatNumber(result.rightValue)}`;
+      setText(
+        resultEl,
+        result.isTrue
+          ? `✓ True! Both sides equal ${formatNumber(result.leftValue)}`
+          : `✗ False: ${formatNumber(result.leftValue)} ≠ ${formatNumber(result.rightValue)}`
+      );
     }
   }
 

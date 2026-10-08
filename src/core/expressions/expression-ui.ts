@@ -9,6 +9,8 @@ import {
 } from './types';
 import { validateSlots, evaluate, formatNumber } from './evaluator';
 
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
+
 // =============================================================================
 // Style Injection
 // =============================================================================
@@ -452,13 +454,18 @@ export function renderExpressionBuilder(
         Math.abs(validation.result - builder.targetValue) < 0.0001;
 
       resultEl.classList.add(matchesTarget ? 'valid' : 'neutral');
-      resultEl.innerHTML = `= <strong>${formatNumber(validation.result)}</strong>`;
+      replaceWithSafeHtml(
+        resultEl,
+        safeHtml`= <strong>${formatNumber(validation.result)}</strong>`
+      );
 
       if (builder.targetValue !== undefined) {
         if (matchesTarget) {
-          resultEl.innerHTML += ' ✓';
+          resultEl.appendChild(document.createTextNode(' ✓'));
         } else {
-          resultEl.innerHTML += ` (target: ${builder.targetValue})`;
+          resultEl.appendChild(
+            document.createTextNode(` (target: ${builder.targetValue})`)
+          );
         }
       }
     } else if (!validation.isValid || validation.errors.length > 0) {
@@ -619,16 +626,19 @@ export function createInteractiveBuilder(
   const usedCardIds = new Set<string>();
 
   function render(): void {
-    container.innerHTML = '';
+    clearElement(container);
 
     // Target display
     if (options.targetValue !== undefined) {
       const targetEl = document.createElement('div');
       targetEl.className = 'target-display';
-      targetEl.innerHTML = `
+      replaceWithSafeHtml(
+        targetEl,
+        safeHtml`
         <div class="label">Target:</div>
         <div class="value">${options.targetValue}</div>
-      `;
+      `
+      );
       container.appendChild(targetEl);
     }
 

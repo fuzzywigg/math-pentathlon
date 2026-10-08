@@ -3,6 +3,7 @@
  * Keeps page-to-page cohesion without changing game logic.
  */
 
+import { clearElement } from '../../core/dom-security';
 import { markStatusLive } from '../board-a11y';
 import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
@@ -374,7 +375,12 @@ export function mountGameShell(
   container: HTMLElement,
   options: GameShellOptions
 ): GameShellElements {
-  container.innerHTML = buildShellHtml(options);
+  // Titles/attrs are escaped in buildShellHtml; helpContentHtml is
+  // repo-authored trusted markup from game-route-mounts (not user/URL input).
+  clearElement(container);
+  const shellTpl = document.createElement('template');
+  shellTpl.innerHTML = buildShellHtml(options);
+  container.appendChild(shellTpl.content);
 
   const mountId = options.mountId ?? 'board';
   const board = document.getElementById(mountId);

@@ -4,6 +4,13 @@ import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+  setText,
+} from '../../core/dom-security';
+
+import {
   buildCellAriaLabel,
   makeGridCell,
   markBoardAsGrid,
@@ -55,7 +62,7 @@ export function renderBoard(
   options: SelectionAreaOptions = {}
 ): void {
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
   // Static/test callers omit options → keep human placing copy.
   const selectionOptions: SelectionAreaOptions = {
     interactive: options.interactive !== false,
@@ -221,11 +228,18 @@ export function buildSelectionArea(
       if (isCurrentPlacement) blockBtn.classList.add('placing');
       if (!isAvailable) blockBtn.classList.add('empty');
 
-      blockBtn.innerHTML = `
-        <div class="block-icon" style="background-color: ${BLOCK_COLORS[shape]}">${getShapeIcon(shape)}</div>
+      replaceWithSafeHtml(
+        blockBtn,
+        safeHtml`
+        <div class="block-icon">${getShapeIcon(shape)}</div>
         <div class="block-name">${shape}</div>
         <div class="block-count">${state.bank[shape]} left</div>
-      `;
+      `
+      );
+      const icon = blockBtn.querySelector('.block-icon');
+      if (icon instanceof HTMLElement) {
+        icon.style.backgroundColor = BLOCK_COLORS[shape];
+      }
 
       if (canSelect && isAvailable && onBlockSelect) {
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
@@ -246,12 +260,18 @@ export function buildSelectionArea(
       if (state.turnSelection.blocks.length > 0) {
         const selectedList = document.createElement('div');
         selectedList.className = 'selected-blocks';
-        selectedList.innerHTML = `<strong>Selected:</strong> ${state.turnSelection.blocks
-          .map(
-            (s) =>
-              `<span class="selected-shape" style="background-color: ${BLOCK_COLORS[s]}">${getShapeIcon(s)}</span>`
-          )
-          .join(' ')}`;
+        const selectedLabel = document.createElement('strong');
+        selectedLabel.textContent = 'Selected:';
+        selectedList.appendChild(selectedLabel);
+        selectedList.appendChild(document.createTextNode(' '));
+        state.turnSelection.blocks.forEach((s, i) => {
+          if (i > 0) selectedList.appendChild(document.createTextNode(' '));
+          const shapeSpan = document.createElement('span');
+          shapeSpan.className = 'selected-shape';
+          shapeSpan.style.backgroundColor = BLOCK_COLORS[s];
+          shapeSpan.textContent = getShapeIcon(s);
+          selectedList.appendChild(shapeSpan);
+        });
         selectionStatus.appendChild(selectedList);
 
         if (onConfirm) {
@@ -275,13 +295,21 @@ export function buildSelectionArea(
       const hint = interactive
         ? 'Click an empty cell to place'
         : 'Computer is placing…';
-      placingInfo.innerHTML = `
+      replaceWithSafeHtml(
+        placingInfo,
+        safeHtml`
         <strong>Placing:</strong>
-        <span class="placing-shape" style="background-color: ${BLOCK_COLORS[state.selectedBlockForPlacement]}">
+        <span class="placing-shape">
           ${getShapeIcon(state.selectedBlockForPlacement)} ${state.selectedBlockForPlacement}
         </span>
         <span class="placing-hint">${hint}</span>
-      `;
+      `
+      );
+      const placingShape = placingInfo.querySelector('.placing-shape');
+      if (placingShape instanceof HTMLElement) {
+        placingShape.style.backgroundColor =
+          BLOCK_COLORS[state.selectedBlockForPlacement];
+      }
       selectionArea.appendChild(placingInfo);
     }
   }
@@ -323,7 +351,7 @@ export function renderStatus(
   isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'hex-a-gone-status';
@@ -361,12 +389,12 @@ export function renderStatus(
 
   const p1El = document.createElement('div');
   p1El.className = `player-indicator ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1El.innerHTML = `${seatIcon('player1')} ${p1Label}`;
+  setText(p1El, `${seatIcon('player1')} ${p1Label}`);
   playersEl.appendChild(p1El);
 
   const p2El = document.createElement('div');
   p2El.className = `player-indicator ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2El.innerHTML = `${seatIcon('player2')} ${p2Label}`;
+  setText(p2El, `${seatIcon('player2')} ${p2Label}`);
   playersEl.appendChild(p2El);
 
   statusEl.appendChild(playersEl);
