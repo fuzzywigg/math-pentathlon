@@ -84,13 +84,18 @@ export function sanitizeProfile(raw: unknown): PlayerProfile | null {
   if (!isPlainObject(raw)) return null;
   // Name/avatar may be empty strings (historical createProfile behavior).
   if (typeof raw.name !== 'string' || typeof raw.id !== 'string') return null;
-  const name = sanitizeDisplayStringAllowEmpty(raw.name, MAX_PROFILE_NAME_LENGTH);
+  const name = sanitizeDisplayStringAllowEmpty(
+    raw.name,
+    MAX_PROFILE_NAME_LENGTH
+  );
   const id = sanitizeDisplayStringAllowEmpty(raw.id, MAX_PROFILE_ID_LENGTH);
   if (name === null || id === null || !id) return null;
   const avatar =
     typeof raw.avatar === 'string'
-      ? (sanitizeDisplayStringAllowEmpty(raw.avatar, MAX_PROFILE_AVATAR_LENGTH) ??
-        '')
+      ? (sanitizeDisplayStringAllowEmpty(
+          raw.avatar,
+          MAX_PROFILE_AVATAR_LENGTH
+        ) ?? '')
       : 'default';
   return {
     id,
@@ -191,9 +196,7 @@ export function sanitizeAchievements(raw: unknown): Achievement[] {
   return out;
 }
 
-export function sanitizeGameStatsMap(
-  raw: unknown
-): Record<string, GameStats> {
+export function sanitizeGameStatsMap(raw: unknown): Record<string, GameStats> {
   if (!isPlainObject(raw)) return {};
   const out: Record<string, GameStats> = {};
   for (const [key, value] of Object.entries(raw)) {
