@@ -15,9 +15,21 @@ describe('mutation-ui2 game-prefetch survivors', () => {
   afterEach(() => {
     resetGamePrefetchForTests();
     vi.restoreAllMocks();
-    // restore connection if we stubbed it
     try {
       delete (navigator as Navigator & { connection?: unknown }).connection;
+    } catch {
+      /* ignore */
+    }
+    // Drop idle stubs so later isolate:false suites see a clean window.
+    try {
+      delete (window as Window & { requestIdleCallback?: unknown })
+        .requestIdleCallback;
+    } catch {
+      /* ignore */
+    }
+    try {
+      delete (window as Window & { cancelIdleCallback?: unknown })
+        .cancelIdleCallback;
     } catch {
       /* ignore */
     }

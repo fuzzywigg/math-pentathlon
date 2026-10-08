@@ -5,6 +5,12 @@ import {
 } from '../../src/pwa/idle-warm';
 
 describe('mutation-ui2 idle-warm survivors', () => {
+  const hadRic = Object.prototype.hasOwnProperty.call(
+    window,
+    'requestIdleCallback'
+  );
+  const originalRic = window.requestIdleCallback;
+
   beforeEach(() => {
     Object.defineProperty(document, 'hidden', {
       configurable: true,
@@ -16,10 +22,33 @@ describe('mutation-ui2 idle-warm survivors', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     document.documentElement.removeAttribute(IDLE_WARM_DONE_ATTR);
+    // Restore globals — unit-shared uses isolate:false across files.
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
     try {
       delete (navigator as Navigator & { connection?: unknown }).connection;
     } catch {
       /* ignore */
+    }
+    if (hadRic) {
+      Object.defineProperty(window, 'requestIdleCallback', {
+        configurable: true,
+        writable: true,
+        value: originalRic,
+      });
+    } else {
+      try {
+        delete (window as Window & { requestIdleCallback?: unknown })
+          .requestIdleCallback;
+      } catch {
+        Object.defineProperty(window, 'requestIdleCallback', {
+          configurable: true,
+          writable: true,
+          value: undefined,
+        });
+      }
     }
   });
 
