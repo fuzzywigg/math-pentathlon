@@ -142,13 +142,14 @@ describe('runtime-error-path-audit — recovered pins', () => {
     expect(src).toContain('Failed to load game');
   });
 
-  it('R-GL recovered pattern: kings/fiar/kwatro dispatch mp3d-context-lost', () => {
+  it('R-GL recovered pattern: kings/fiar/kwatro/prime-gold dispatch mp3d-context-lost', () => {
     for (const rel of [
       'src/ui/three/kings-quadraphages-board-3d.ts',
       'src/ui/three/fiar-board-3d.ts',
       'src/ui/three/kwatro-sinko-board-3d.ts',
       'src/ui/three/queens-guards-board-3d.ts',
       'src/ui/three/pent-em-in-board-3d.ts',
+      'src/ui/three/prime-gold-board-3d.ts',
     ]) {
       const src = readSrc(rel);
       expect(src).toContain("addEventListener('webglcontextlost'");
@@ -229,14 +230,6 @@ describe('runtime-error-path-audit — CURRENT unrecovered pins', () => {
     expect(cleanupIdx).toBeGreaterThan(initIdx);
   });
 
-  it('R-GL-08 CURRENT: prime-gold context-lost unmounts without mp3d-context-lost', () => {
-    const src = readSrc('src/ui/three/prime-gold-board-3d.ts');
-    expect(src).toContain("addEventListener('webglcontextlost'");
-    expect(src).toContain('unmount()');
-    expect(src).not.toContain("CustomEvent('mp3d-context-lost')");
-    expect(src).not.toContain('onWebglLost');
-  });
-
   it('R-SHELL-01 CURRENT: missing #app throws at module eval (source contract)', () => {
     const src = readSrc('src/main.ts');
     expect(src).toContain("getElementById('app')");
@@ -245,10 +238,16 @@ describe('runtime-error-path-audit — CURRENT unrecovered pins', () => {
 });
 
 describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it.skip('TODO(runtime-error-path P0 R-GL-08): Prime Gold webglcontextlost should notify controller and fall back to 2D', () => {
-    // Expected: dispatch mp3d-context-lost (or callback), clear board3dEnabled,
-    // remount 2D board chrome — same as kings/queens/hex-a-gone.
-    expect(true).toBe(false);
+  it('R-GL-08: Prime Gold webglcontextlost notifies controller and falls back to 2D', () => {
+    const board = readSrc('src/ui/three/prime-gold-board-3d.ts');
+    expect(board).toContain("addEventListener('webglcontextlost'");
+    expect(board).toContain("CustomEvent('mp3d-context-lost')");
+    expect(board).not.toContain('onWebglLost');
+
+    const controller = readSrc('src/games/prime-gold/game-controller.ts');
+    expect(controller).toContain("addEventListener('mp3d-context-lost'");
+    expect(controller).toContain("markBoard3dWebGlFallback(boardHostEl, 'context-lost')");
+    expect(controller).toContain('onBoard3dContextLost');
   });
 
   it.skip('TODO(runtime-error-path P1 R-SHELL-07): setGameRouteCleanup should try/finally so shell.cleanup always runs', () => {
