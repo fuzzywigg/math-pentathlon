@@ -5,7 +5,7 @@
  * Task: consolidate identical/near-identical copies across game screens.
  * Zero behavior change.
  */
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getOpponentSeat } from '../../src/core/seats';
 import {
   getPlayerName as sharedGetPlayerName,
@@ -250,6 +250,15 @@ describe('ui-helper-dedupe characterization — syncAppOpponentChrome', () => {
 });
 
 describe('ui-helper-dedupe characterization — timeout handle', () => {
+  // Real-timer awaits flake under full-suite load (CI 30s timeouts). Drive
+  // these with fake timers; do not raise the Vitest timeout.
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('clearNullableTimeout clears and returns null', () => {
     let ran = false;
     const id = setTimeout(() => {
@@ -271,7 +280,7 @@ describe('ui-helper-dedupe characterization — timeout handle', () => {
       10
     );
     bumpGeneration(handle);
-    await new Promise((r) => setTimeout(r, 30));
+    await vi.advanceTimersByTimeAsync(30);
     expect(count).toBe(0);
 
     scheduleGenerationTimeout(
@@ -281,7 +290,7 @@ describe('ui-helper-dedupe characterization — timeout handle', () => {
       },
       10
     );
-    await new Promise((r) => setTimeout(r, 30));
+    await vi.advanceTimersByTimeAsync(30);
     expect(count).toBe(1);
     clearGenerationTimeout(handle);
   });
@@ -307,7 +316,7 @@ describe('ui-helper-dedupe characterization — timeout handle', () => {
       10
     );
     generation += 1;
-    await new Promise((r) => setTimeout(r, 30));
+    await vi.advanceTimersByTimeAsync(30);
     expect(count).toBe(0);
     scheduleGenerationGated(
       {
@@ -322,7 +331,7 @@ describe('ui-helper-dedupe characterization — timeout handle', () => {
       },
       10
     );
-    await new Promise((r) => setTimeout(r, 30));
+    await vi.advanceTimersByTimeAsync(30);
     expect(count).toBe(1);
     clearTimer();
   });

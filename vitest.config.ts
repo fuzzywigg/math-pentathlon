@@ -37,6 +37,9 @@ const isolatedFiles = [
   'tests/unit/burn-1007-main-shell-routes.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
   'tests/unit/burn-1008-registry-module-contract.test.ts',
+  // Generation-gated timeout characterization — fake timers + isolate so
+  // shared-graph timer pollution cannot starve real-timer awaits (CI flake).
+  'tests/unit/ui-helper-dedupe-characterization.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
