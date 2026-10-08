@@ -222,10 +222,13 @@ export function buildSelectionArea(
       const canSelect =
         state.phase === 'selectBlocks' && !state.turnSelection.committed;
       const canPlaceSwitch =
-        state.phase === 'placeBlocks' && isSelected && !!onBlockSelect;
+        state.phase === 'placeBlocks' &&
+        isSelected &&
+        Boolean(onBlockSelect);
       const selectable =
         interactive &&
-        ((canSelect && isAvailable && !!onBlockSelect) || canPlaceSwitch);
+        ((canSelect && isAvailable && Boolean(onBlockSelect)) ||
+          canPlaceSwitch);
 
       if (isSelected) blockBtn.classList.add('selected');
       if (isCurrentPlacement) blockBtn.classList.add('placing');

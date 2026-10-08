@@ -36,6 +36,7 @@
 | `src/games/hex-a-gone/board-ui.ts` | #429 (bank disabled / Confirm gate) |
 | `src/ui/styles/game-play.css` | #429 (disabled + sticky confirm CSS) |
 | `tests/unit/remainder-islands-touch-hints-salvage.test.ts` | #419 rewritten to tip |
+| `tests/unit/burn-wave27-quiz-seat-chrome.test.ts` | pin tip: no empty preview; expect `.island-r-hint` |
 | `tests/unit/hex-a-gone-bank-a11y-salvage.test.ts` | #429 rewritten to tip |
 | `tests/unit/rules-text-audit-characterization-salvage.test.ts` | #492 rewritten to tip |
 | `docs/dev/violation-salvage-2026-10-08.md` | this report |

@@ -318,9 +318,10 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
         container.querySelector('.remainder-instruction')?.textContent
       ).toMatch(/Select|island/i);
       expect(getRemainderState().validIslands.length).toBeGreaterThan(0);
-      expect(
-        container.querySelector('.remainder-preview, .division-equation')
-      ).toBeTruthy();
+      // Tip (#419 salvage): no empty division preview until an island is selected;
+      // touch users get on-hex .island-r-hint overlays instead.
+      expect(container.querySelector('.remainder-preview')).toBeNull();
+      expect(container.querySelector('.island-r-hint')).toBeTruthy();
       expect(
         container.querySelector('.remainder-status.player1')?.textContent
       ).toMatch(/turn/i);
