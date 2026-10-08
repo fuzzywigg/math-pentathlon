@@ -34,6 +34,8 @@ In `src/ui/game-route-mounts.ts`:
 1. Add a `render…` function that dynamic-imports the controller, mounts the shared shell (`mountGameShell`), and binds New Game / Tutorial / Help.
 2. Add a matching `case '<id>':` in `mountGameById`.
 
+Also add a matching loader key in `src/ui/game-prefetch.ts` so idle/menu prefetch stays aligned with the registry and mount switch (three-way id handshake).
+
 `src/main.ts` already routes `/#/game/:id` through this switch — you should not add a new top-level route for a catalog game.
 
 ## 4. Tests (minimum)
