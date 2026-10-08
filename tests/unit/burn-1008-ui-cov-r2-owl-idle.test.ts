@@ -190,6 +190,16 @@ describe('burn-1008 ui-cov-r2 idle-warm default imports', () => {
   });
 
   it('prefersSaveData catch path treats getter throw as false and still warms', async () => {
+    // Isolate from parallel/shared workers that may leave connection or hidden set.
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      get: () => false,
+    });
+    try {
+      delete (navigator as Navigator & { connection?: unknown }).connection;
+    } catch {
+      /* non-configurable — redefine below */
+    }
     Object.defineProperty(navigator, 'connection', {
       configurable: true,
       get() {

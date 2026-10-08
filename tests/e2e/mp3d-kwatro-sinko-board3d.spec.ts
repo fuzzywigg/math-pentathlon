@@ -198,9 +198,8 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
     await page.locator('#start-game-btn').click();
     await expect(modal).toHaveClass(/hidden/);
 
-    await expect(page.locator('canvas[data-mp3d="kwatro-sinko"]')).toBeVisible({
-      timeout: 15_000,
-    });
+    // waitForMp3dReady skips on Firefox when WebGL never mounts (harness).
+    await waitForMp3dReady(page, 'kwatro-sinko');
     await expect(page.locator('.kwa-board')).toHaveCount(1);
     await expect(page.locator('.kwa-board')).toBeVisible();
     await expect(page.locator('.kwa-board svg')).toHaveCount(0);

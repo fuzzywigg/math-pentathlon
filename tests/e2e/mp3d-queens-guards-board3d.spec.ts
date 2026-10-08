@@ -266,11 +266,8 @@ test.describe('mp3d Queens & Guards 3D board', () => {
     await page.goto(board3dUrl('#/game/queens-guards'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await expect(page.locator('canvas[data-mp3d="queens-guards"]')).toBeVisible(
-      {
-        timeout: 15000,
-      }
-    );
+    // waitForMp3dReady skips on Firefox when WebGL never mounts (harness).
+    await waitForMp3dReady(page, 'queens-guards');
     await page.waitForFunction(() => {
       const label = document
         .querySelector('.qg-a11y-grid [data-cell-key="5-7"]')
