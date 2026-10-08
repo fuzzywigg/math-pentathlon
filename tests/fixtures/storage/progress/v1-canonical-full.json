@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "profile": {
+    "id": "fixture-kid-1",
+    "name": "FixtureKid",
+    "avatar": "owl",
+    "createdAt": 1700000000000,
+    "lastActiveAt": 1700000100000
+  },
+  "streak": {
+    "currentStreak": 2,
+    "bestStreak": 4,
+    "lastPlayDate": "2026-10-07",
+    "streakStartDate": "2026-10-06"
+  },
+  "achievements": [{ "id": "first-win", "unlockedAt": 1700000050000 }],
+  "gameStats": {
+    "hex": {
+      "gameId": "hex",
+      "gamesPlayed": 3,
+      "gamesWon": 2,
+      "gamesLost": 1,
+      "gamesDraw": 0,
+      "totalPlayTime": 9000,
+      "bestWinStreak": 2,
+      "currentWinStreak": 1,
+      "lastPlayed": 1700000100000,
+      "firstPlayed": 1700000000000
+    }
+  },
+  "owlState": {
+    "mood": "proud",
+    "lastInteraction": 1700000090000,
+    "messagesSeen": ["welcome"],
+    "tutorialsCompleted": ["hex"],
+    "totalMessagesShown": 1
+  },
+  "settings": {
+    "owlEnabled": true,
+    "soundEnabled": false,
+    "reducedMotion": true,
+    "owlFrequency": "quiet"
+  }
+}

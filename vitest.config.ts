@@ -28,6 +28,8 @@ const isolatedFiles = [
   'tests/unit/tablet-ai-hard-latency.bench.test.ts',
   // Re-imports StorageManager via vi.resetModules to exercise constructor load().
   'tests/unit/durable-progress-persistence.test.ts',
+  // Golden save fixtures + migrateProgressData remount path (burn-1008).
+  'tests/unit/storage-save-migration-fixtures.test.ts',
   // Hoisted game-controller mocks must not leak into shared controller suites.
   'tests/unit/burn-1007-game-route-mounts.test.ts',
   'tests/unit/burn-1007-main-shell-routes.test.ts',

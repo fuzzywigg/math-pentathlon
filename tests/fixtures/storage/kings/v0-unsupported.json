@@ -1,0 +1,42 @@
+{
+  "version": 0,
+  "savedAt": "2025-12-06T09:32:47.000Z",
+  "board": [
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [
+      null,
+      null,
+      null,
+      null,
+      { "type": "king", "owner": "player1" },
+      null,
+      null,
+      null,
+      null
+    ],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [null, null, null, null, null, null, null, null, null],
+    [
+      null,
+      null,
+      null,
+      null,
+      { "type": "king", "owner": "player2" },
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "currentPlayer": "player1",
+  "turnPhase": "moveKing",
+  "player1Supply": 20,
+  "player2Supply": 20,
+  "selectedKingPosition": null,
+  "winner": null,
+  "moveHistory": []
+}

@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "profile": {
+    "id": "hostile-1",
+    "name": "Kid\u0000Name",
+    "avatar": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    "createdAt": 1,
+    "lastActiveAt": 2
+  },
+  "streak": {
+    "currentStreak": 0,
+    "bestStreak": 0,
+    "lastPlayDate": "",
+    "streakStartDate": ""
+  },
+  "achievements": [],
+  "gameStats": {},
+  "owlState": {
+    "mood": "happy",
+    "lastInteraction": 0,
+    "messagesSeen": [],
+    "tutorialsCompleted": [],
+    "totalMessagesShown": 0
+  },
+  "settings": {
+    "owlEnabled": true,
+    "soundEnabled": true,
+    "reducedMotion": false,
+    "owlFrequency": "normal"
+  }
+}

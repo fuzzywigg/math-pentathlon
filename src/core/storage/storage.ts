@@ -2,13 +2,14 @@
 
 import { setUserReducedMotionFlag } from '../settings-flags';
 import {
-  sanitizeAchievements,
+  ensureProgressDefaults,
+  isPlainProgressObject,
+  normalizeLoadedProgress,
+} from './migrate';
+import {
   sanitizeDisplayStringAllowEmpty,
-  sanitizeGameStatsMap,
-  sanitizeOwlState,
   sanitizeProfile,
   sanitizeSettings,
-  sanitizeStreak,
   MAX_PROFILE_AVATAR_LENGTH,
   MAX_PROFILE_NAME_LENGTH,
 } from './sanitize';
@@ -23,16 +24,13 @@ import {
   OwlState,
   createDefaultProgress,
   createDefaultGameStats,
-  CURRENT_DATA_VERSION,
 } from './types';
 
-const STORAGE_KEY = 'math-pentathlon-progress';
-const MAX_MESSAGES_HISTORY = 50; // Prevent unbounded growth
+/** localStorage key for the on-device progress blob. */
+export const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';
 
-/** True for non-null, non-array objects (the only valid progress root / maps). */
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-}
+const STORAGE_KEY = PROGRESS_STORAGE_KEY;
+const MAX_MESSAGES_HISTORY = 50; // Prevent unbounded growth
 
 class StorageManager {
   private data: ProgressData;
@@ -54,7 +52,7 @@ class StorageManager {
       const parsed: unknown = JSON.parse(stored);
 
       // Primitives / arrays / null are corrupt — never hand them to ensureDefaults.
-      if (!isPlainObject(parsed)) {
+      if (!isPlainProgressObject(parsed)) {
         console.warn(
           'Failed to load progress data, starting fresh:',
           new TypeError('Progress root must be a plain object')
@@ -63,55 +61,11 @@ class StorageManager {
       }
 
       const progress = parsed as unknown as ProgressData;
-
-      // Handle version migrations
-      if (
-        typeof progress.version === 'number' &&
-        progress.version < CURRENT_DATA_VERSION
-      ) {
-        return this.migrate(progress);
-      }
-
-      // Ensure all required fields exist (defensive)
-      return this.ensureDefaults(progress);
+      return normalizeLoadedProgress(progress);
     } catch (error) {
       console.warn('Failed to load progress data, starting fresh:', error);
       return createDefaultProgress();
     }
-  }
-
-  // Migrate old data versions
-  private migrate(data: ProgressData): ProgressData {
-    // Version migrations go here as needed
-    // For now, just update version and ensure defaults
-    data.version = CURRENT_DATA_VERSION;
-    return this.ensureDefaults(data);
-  }
-
-  // Ensure all required fields have values
-  private ensureDefaults(data: ProgressData): ProgressData {
-    // importData relies on a throw here for JSON null / non-objects so the
-    // previous in-memory session is preserved (returns false).
-    if (!isPlainObject(data)) {
-      throw new TypeError('Progress data must be a plain object');
-    }
-
-    // `version || CURRENT` preserves historical import behavior: version 0
-    // (and other falsy numbers) is stamped up to CURRENT_DATA_VERSION.
-    const version =
-      typeof data.version === 'number' && Number.isFinite(data.version)
-        ? data.version || CURRENT_DATA_VERSION
-        : CURRENT_DATA_VERSION;
-
-    return {
-      version,
-      profile: sanitizeProfile(data.profile),
-      streak: sanitizeStreak(data.streak),
-      achievements: sanitizeAchievements(data.achievements),
-      gameStats: sanitizeGameStatsMap(data.gameStats),
-      owlState: sanitizeOwlState(data.owlState),
-      settings: sanitizeSettings(data.settings),
-    };
   }
 
   // Save data to localStorage (debounced)
@@ -395,7 +349,7 @@ class StorageManager {
   public importData(json: string): boolean {
     try {
       const imported = JSON.parse(json) as ProgressData;
-      this.data = this.ensureDefaults(imported);
+      this.data = ensureProgressDefaults(imported);
       setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
       this.saveNow();
       return true;
