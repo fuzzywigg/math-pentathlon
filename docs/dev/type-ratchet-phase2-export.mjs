@@ -61,6 +61,8 @@ const IN_SCOPE = new RegExp(
     '^src/games/contig-60/rules\\.ts$',
     '^src/games/juggle/rules\\.ts$',
     '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
+    // OWNER OPTION AI type-only (emit-identical) — burn-1008-mp-ai-typeonly-emit-identical
+    '^src/games/[^/]+/ai(\\.|-client\\.|\\.worker\\.)ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -244,7 +246,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch6-nonrules',
+  taskId: 'burn-1008-mp-ai-typeonly-emit-identical',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {

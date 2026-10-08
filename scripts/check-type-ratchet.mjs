@@ -62,6 +62,8 @@ const IN_SCOPE = new RegExp(
     '^src/games/contig-60/rules\\.ts$',
     '^src/games/juggle/rules\\.ts$',
     '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
+    // OWNER OPTION AI type-only (emit-identical) — burn-1008-mp-ai-typeonly-emit-identical
+    '^src/games/[^/]+/ai(\\.|-client\\.|\\.worker\\.)ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -113,7 +115,7 @@ console.log(
   `  flags: noUncheckedIndexedAccess, exactOptionalPropertyTypes, noImplicitOverride, forceConsistentCasingInFileNames, noImplicitReturns`
 );
 console.log(
-  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3/4/6 shells+rules, tests/helpers, unit *-helpers.ts`
+  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3/4/6 shells+rules, AI modules (emit-identical option), tests/helpers, unit *-helpers.ts`
 );
 console.log(`  in-scope errors:     ${inScope.length} (must be 0)`);
 console.log(
