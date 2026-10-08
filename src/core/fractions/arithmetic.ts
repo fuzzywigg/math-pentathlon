@@ -1,6 +1,6 @@
 // Fraction Arithmetic Operations
 
-import {
+import type {
   Fraction,
   MixedNumber,
   FractionOperation,
@@ -561,20 +561,23 @@ export function formatFraction(
     const remainder = absNum % denom;
     if (whole === 0) {
       const basic = `${absNum}/${denom}`;
-      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) {
         return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+      }
       return `${prefix}${basic}`;
     }
     if (remainder === 0) return `${prefix}${whole}`;
     const fracPart = `${remainder}/${denom}`;
-    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart])
+    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart]) {
       return `${prefix}${whole} ${UNICODE_FRACTIONS[fracPart]}`;
+    }
     return `${prefix}${whole} ${fracPart}`;
   }
 
   const basic = `${absNum}/${denom}`;
-  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) {
     return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+  }
   return `${prefix}${basic}`;
 }
 

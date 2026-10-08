@@ -1,7 +1,7 @@
 // Kwatro-Sinko Board UI
 // Rendering the pathway board, chips, and game state
 
-import { KwaState, BoardNode, Chip } from './types';
+import type { KwaState, BoardNode, Chip } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
@@ -151,11 +151,12 @@ function renderNode(
     group.addEventListener('click', () => onNodeClick(node.id));
   }
 
+  const chip = node.chip;
   const canSelect =
     allowInput &&
-    !!node.chip &&
+    chip != null &&
     state.phase === 'selectingChip' &&
-    node.chip.owner === state.currentPlayer;
+    chip.owner === state.currentPlayer;
 
   // Render chip if present
   if (node.chip) {
@@ -339,7 +340,9 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
  * Inject CSS styles
  */
 export function injectKwaStyles(): void {
-  injectStylesOnce('kwa-styles', `
+  injectStylesOnce(
+    'kwa-styles',
+    `
     .kwa-game-area {
       display: flex;
       flex-direction: column;
@@ -545,7 +548,8 @@ export function injectKwaStyles(): void {
     html[data-reduced-motion='true'] .kwa-winner-banner {
       animation: none !important;
     }
-  `);
+  `
+  );
 }
 
 /**

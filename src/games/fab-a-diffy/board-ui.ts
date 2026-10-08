@@ -1,8 +1,8 @@
 // Fab-a-Diffy Board UI
 // Rendering fraction bars, answer board, and operation selection
 
-import { FabADiffyState, FractionBar, AnswerBar } from './types';
-import { FractionOperation } from '../../core/fractions/types';
+import type { FabADiffyState, FractionBar, AnswerBar } from './types';
+import type { FractionOperation } from '../../core/fractions/types';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 import { injectStylesOnce } from '../../ui/inject-styles';
 import {
@@ -490,7 +490,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
  * Inject CSS styles
  */
 export function injectFabStyles(): void {
-  injectStylesOnce('fab-styles', `
+  injectStylesOnce(
+    'fab-styles',
+    `
     .fab-game-area {
       display: flex;
       flex-direction: column;
@@ -905,7 +907,8 @@ export function injectFabStyles(): void {
         transform: none;
       }
     }
-  `);
+  `
+  );
 }
 
 /**

@@ -2,14 +2,8 @@
 // Renders the attribute logic board and cards
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
-  StarsState,
-  AttributeCard,
-  Player,
-  CONFIG,
-  COLOR_VALUES,
-  countDifferences,
-} from './types';
+import type { StarsState, AttributeCard, Player } from './types';
+import { CONFIG, COLOR_VALUES, countDifferences } from './types';
 import { getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
@@ -30,7 +24,9 @@ export { getPlayerName };
 // =============================================================================
 
 export function injectStarsStyles(): void {
-  injectStylesOnce('stars-styles', `
+  injectStylesOnce(
+    'stars-styles',
+    `
     .stars-game-area {
       display: flex;
       flex-direction: column;
@@ -375,7 +371,8 @@ export function injectStarsStyles(): void {
     html[data-reduced-motion='true'] .stars-card.selected {
       transform: none;
     }
-  `);
+  `
+  );
 }
 
 // =============================================================================

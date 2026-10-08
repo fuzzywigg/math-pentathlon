@@ -1,13 +1,5 @@
-import {
-  GameState,
-  Position,
-  Board,
-  BOARD_SIZE,
-  isValidPosition,
-  isEmpty,
-  getSupply,
-  PlayerOwner,
-} from './board';
+import type { GameState, Position, Board, PlayerOwner } from './board';
+import { BOARD_SIZE, isValidPosition, isEmpty, getSupply } from './board';
 
 // All 8 possible directions a King can move
 const KING_DIRECTIONS: Position[] = [

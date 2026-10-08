@@ -1,13 +1,15 @@
 // Hex Coordinate Conversions and Operations
 // Full coordinate system utilities for hex grids
 
-import {
+import type {
   AxialCoord,
   CubeCoord,
   OffsetCoord,
   PixelCoord,
   HexLayout,
   OffsetParity,
+} from './types';
+import {
   AXIAL_DIRECTIONS,
   CUBE_DIAGONALS,
   createAxial,

@@ -1,9 +1,7 @@
 // Hex-a-Gone! Game Rules
 
+import type { HexAGoneGameState, BlockShape, GamePhase } from './types';
 import {
-  HexAGoneGameState,
-  BlockShape,
-  GamePhase,
   getCellAt,
   getOpponent,
   getAvailableShapes,

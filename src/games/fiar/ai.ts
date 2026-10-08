@@ -1,9 +1,7 @@
 // FIAR AI — Division II rules (7 chips, marked blockers, gapped wins, either color)
 
+import type { FiarGameState, Player, ChipKind } from './types';
 import {
-  FiarGameState,
-  Player,
-  ChipKind,
   CONFIG,
   getOpponent,
   getNodesInDirection,

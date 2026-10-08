@@ -1,7 +1,7 @@
 // Expression UI Components
 // Visual rendering for expression cards, slots, and builders
 
-import {
+import type {
   ExpressionCard,
   ExpressionSlot,
   ExpressionBuilder,
@@ -511,8 +511,9 @@ export function renderCardTray(
       selected?: boolean;
     } = { selected: card.id === options?.selectedId };
     if (options?.onClick) cardOpts.onClick = options.onClick;
-    if (options?.draggable !== undefined)
+    if (options?.draggable !== undefined) {
       cardOpts.draggable = options.draggable;
+    }
     tray.appendChild(renderCard(card, cardOpts));
   }
 

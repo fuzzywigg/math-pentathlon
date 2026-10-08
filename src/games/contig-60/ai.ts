@@ -12,9 +12,8 @@
 // 4. Numbers in the middle of the board can touch more neighbors
 // 5. Division only works when it divides evenly - check your math!
 
+import type { ContigState, Player } from './types';
 import {
-  ContigState,
-  Player,
   CONFIG,
   getOpponent,
   getAdjacentPositions,

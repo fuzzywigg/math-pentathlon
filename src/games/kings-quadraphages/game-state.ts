@@ -1,4 +1,4 @@
-import { PlayerOwner } from './pieces';
+import type { PlayerOwner } from './pieces';
 import {
   isValidKingMove,
   isValidQuadraphagePlacement,

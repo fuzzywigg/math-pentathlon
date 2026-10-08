@@ -458,8 +458,9 @@ export class TutorialManager {
       // Author-trusted tutorial copy (allowlisted tags, no attributes).
       setTrustedMarkup(messageEl, step.message);
     }
-    if (counterEl)
+    if (counterEl) {
       counterEl.textContent = `Step ${this.currentStepIndex + 1} of ${this.getTotalSteps()}`;
+    }
 
     // Update button states
     if (prevBtn) {
@@ -470,7 +471,7 @@ export class TutorialManager {
 
     if (nextBtn) {
       const isLastStep = this.currentStepIndex === this.getTotalSteps() - 1;
-      const hasRequiredAction = !!step.requiredAction;
+      const hasRequiredAction = Boolean(step.requiredAction);
       nextBtn.textContent = isLastStep ? 'Finish' : 'Next';
       nextBtn.disabled = hasRequiredAction;
 
@@ -659,8 +660,9 @@ export class TutorialManager {
         : side === 'bottom'
           ? 'top'
           : this.preferVerticalSide(clearRect, height, margin);
-    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin))
+    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin)) {
       return flip;
+    }
 
     // Last resort: clamp preferred side (proxy/cue still tappable via option 1 stacking)
     const fallback = this.computeSidePosition(

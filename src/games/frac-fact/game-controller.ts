@@ -1,7 +1,8 @@
 // Frac Fact Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { FracFactState, createInitialState, Difficulty } from './types';
+import type { FracFactState, Difficulty } from './types';
+import { createInitialState } from './types';
 import { submitAnswer, nextProblem, startGame } from './rules';
 import {
   renderProblem,
@@ -12,8 +13,9 @@ import {
   getPlayerName,
   injectFracFactStyles,
 } from './board-ui';
-import { Fraction } from '../../core/fractions/types';
-import { getAIAnswer, isAITurn, AIDifficulty } from './ai';
+import type { Fraction } from '../../core/fractions/types';
+import type { AIDifficulty } from './ai';
+import { getAIAnswer, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fracFactTutorial } from './tutorial';
 import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
@@ -140,8 +142,9 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2')
+  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2') {
     return;
+  }
   if (!gameState.currentProblem) return;
 
   // Use AI module to get answer

@@ -1,6 +1,6 @@
 // Owl Messages - Library of contextual messages for Ollie the Owl
 
-import { OwlEventType } from './owl-events';
+import type { OwlEventType } from './owl-events';
 import { storage } from '../storage';
 
 export interface OwlMessage {

@@ -1,6 +1,7 @@
 // Calla Board UI - Renders the Mancala-style board
 
-import { CallaGameState, PITS_PER_SIDE } from './types';
+import type { CallaGameState } from './types';
+import { PITS_PER_SIDE } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {

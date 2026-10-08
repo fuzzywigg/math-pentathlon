@@ -1,13 +1,13 @@
 // Juggle Game Types
 // Polyomino placement game with dice selection
 
+import type { PolyominoShape } from '../../core/polyomino/types';
 import {
-  PolyominoShape,
   TETROMINOES,
   PENTOMINOES,
   SIMPLE_SHAPES,
 } from '../../core/polyomino/types';
-import { Board } from '../../core/polyomino/placement';
+import type { Board } from '../../core/polyomino/placement';
 
 export type Player = 'player1' | 'player2';
 

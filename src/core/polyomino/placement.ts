@@ -1,7 +1,7 @@
 // Polyomino Placement - Validation and Board Management
 // Handles placement rules, collision detection, and board state
 
-import {
+import type {
   Cell,
   PolyominoShape,
   PlacedPolyomino,

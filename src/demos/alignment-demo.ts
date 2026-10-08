@@ -1,6 +1,6 @@
 // Alignment Detection Demo - Interactive test page
 
-import {
+import type {
   AlignmentConfig,
   ContiguousConfig,
   CellValue,
@@ -318,13 +318,15 @@ function renderHexConnectDemo(container: HTMLElement): void {
       if (
         region.value === 'B' &&
         regionConnectsEdges(region, 'top', 'bottom', config)
-      )
+      ) {
         return;
+      }
       if (
         region.value === 'R' &&
         regionConnectsEdges(region, 'left', 'right', config)
-      )
+      ) {
         return;
+      }
     }
 
     setBoardCell(board, row, col, player);

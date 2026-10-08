@@ -1,8 +1,8 @@
 // Fab-a-Diffy Game Controller
 // Manages game flow, AI, and UI updates
 
-import { FabADiffyState, Player } from './types';
-import { FractionOperation } from '../../core/fractions/types';
+import type { FabADiffyState, Player } from './types';
+import type { FractionOperation } from '../../core/fractions/types';
 import {
   createInitialState,
   selectBar1,
@@ -23,7 +23,8 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
-import { applyAIMoveSteps, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { applyAIMoveSteps } from './ai';
 import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';

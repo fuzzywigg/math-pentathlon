@@ -3,8 +3,8 @@
 
 import { getDieFaceEmoji } from '../../ui/die-faces';
 import { injectStylesOnce } from '../../ui/inject-styles';
+import type { JuggleState } from './types';
 import {
-  JuggleState,
   CONFIG,
   getCategoryFromDie,
   getShapesForDie,
@@ -17,8 +17,12 @@ import {
   getCurrentOrientationPlacements,
   selectedShapeFitsAnywhere,
 } from './rules';
-import { Board } from '../../core/polyomino/placement';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
@@ -99,7 +103,7 @@ function previewStateForBoard(
       : new Set<string>();
   return {
     previewSet,
-    isPreviewValid: !!isPreviewValid,
+    isPreviewValid: Boolean(isPreviewValid),
     legalAnchors,
     showPreview,
   };
@@ -585,7 +589,9 @@ function getDieFace(value: number): string {
  * Inject CSS styles
  */
 export function injectJuggleStyles(): void {
-  injectStylesOnce('juggle-styles', `
+  injectStylesOnce(
+    'juggle-styles',
+    `
     .juggle-boards {
       display: flex;
       gap: 2rem;
@@ -919,7 +925,8 @@ export function injectJuggleStyles(): void {
         max-width: 100%;
       }
     }
-  `);
+  `
+  );
 }
 
 /**

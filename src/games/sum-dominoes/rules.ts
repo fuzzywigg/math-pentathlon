@@ -1,13 +1,15 @@
 // Sum Dominoes & Dice Game Rules
 // Matching dominoes to dice sums on the board
 
-import {
+import type {
   SumDominoesState,
   Domino,
   PlacedDomino,
   BoardPosition,
   SDMove,
   Player,
+} from './types';
+import {
   CONFIG,
   createDominoSet,
   shuffleArray,
@@ -163,8 +165,9 @@ export function isValidPlacement(
 
   // For horizontal: check col+1 is also in bounds (domino occupies 2 cells)
   // For vertical: check row+1 is also in bounds
-  if (orientation === 'horizontal' && col + 1 >= CONFIG.BOARD_SIZE)
+  if (orientation === 'horizontal' && col + 1 >= CONFIG.BOARD_SIZE) {
     return false;
+  }
   if (orientation === 'vertical' && row + 1 >= CONFIG.BOARD_SIZE) return false;
 
   // Check cells are empty

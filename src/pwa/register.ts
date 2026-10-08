@@ -22,7 +22,8 @@ export type RegisterPwaOptions = {
 };
 
 export type RegisterPwaResult = {
-  update?: () => void;
+  /** Workbox `registerSW` may return a Promise-returning updater. */
+  update?: () => void | Promise<void>;
 };
 
 let reloadScheduled = false;

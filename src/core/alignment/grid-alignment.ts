@@ -1,6 +1,6 @@
 // Grid-based N-in-a-row Alignment Detection
 
-import {
+import type {
   GridPosition,
   CellValue,
   CellGetter,
@@ -8,8 +8,8 @@ import {
   AlignmentConfig,
   AlignmentResult,
   AlignmentCheckResult,
-  ALL_DIRECTIONS,
 } from './types';
+import { ALL_DIRECTIONS } from './types';
 
 /**
  * Check if a position is within grid bounds

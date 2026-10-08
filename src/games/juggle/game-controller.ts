@@ -1,8 +1,8 @@
 // Juggle Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import { JuggleState, Player } from './types';
-import { PolyominoShape } from '../../core/polyomino/types';
+import type { JuggleState, Player } from './types';
+import type { PolyominoShape } from '../../core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
@@ -14,12 +14,8 @@ import {
   abandonPlacement,
   selectedShapeFitsAnywhere,
 } from './rules';
-import {
-  getAIDieChoice,
-  getAIShapeChoice,
-  getAIPlacement,
-  AIDifficulty,
-} from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
 import {
   renderBoard,
   renderDice,

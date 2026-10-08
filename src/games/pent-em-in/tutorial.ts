@@ -1,7 +1,7 @@
 // Tutorial content for Pent'Em In
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const pentEmInTutorial: TutorialConfig = {
   id: 'pent-em-in-basics',

@@ -1,12 +1,7 @@
 // Star Track Game Rules
 
-import {
-  StarTrackGameState,
-  Player,
-  TRACK_LENGTH,
-  getOpponent,
-  getPlayerPosition,
-} from './types';
+import type { StarTrackGameState, Player } from './types';
+import { TRACK_LENGTH, getOpponent, getPlayerPosition } from './types';
 
 // Determine winner by position when the bucket runs out
 function determineWinnerByPosition(state: StarTrackGameState): Player | null {

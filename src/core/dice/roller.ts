@@ -1,14 +1,13 @@
 // Dice Rolling Logic
 
-import {
+import type {
   DiceConfig,
   DiceType,
   DieRoll,
   RollResult,
   RollConfig,
-  DICE_CONFIGS,
-  DICE_FACES,
 } from './types';
+import { DICE_CONFIGS, DICE_FACES } from './types';
 
 /** Generate a unique ID */
 function generateId(): string {
@@ -140,13 +139,15 @@ export function isValidSelection(
   if (
     config.minSelectable !== undefined &&
     selectedCount < config.minSelectable
-  )
+  ) {
     return false;
+  }
   if (
     config.maxSelectable !== undefined &&
     selectedCount > config.maxSelectable
-  )
+  ) {
     return false;
+  }
   return true;
 }
 

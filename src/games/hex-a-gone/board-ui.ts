@@ -1,6 +1,7 @@
 // Hex-a-Gone! Board UI - Renders the hexagonal board and pattern blocks
 
-import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
+import type { HexAGoneGameState, BlockShape } from './types';
+import { BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { formatModeSeatLabel } from '../../ui/seat-labels';
@@ -132,7 +133,7 @@ export function renderBoard(
         : cell.filledBy === 'player2'
           ? 'Red'
           : undefined;
-    const isValidPlacement = !cell.filled && isValid && !!onCellClick;
+    const isValidPlacement = !cell.filled && isValid && Boolean(onCellClick);
 
     makeGridCell(
       hex,

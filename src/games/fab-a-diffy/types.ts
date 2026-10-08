@@ -1,7 +1,7 @@
 // Fab-a-Diffy Game Types
 // Fraction bars game - combine two fractions with operations to match answer bars
 
-import { Fraction, FractionOperation } from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
 
 export type Player = 'player1' | 'player2';
 

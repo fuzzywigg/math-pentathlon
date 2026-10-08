@@ -1,14 +1,14 @@
 // Graph UI - Visual rendering of graphs and network boards
 // SVG-based rendering for nodes, edges, and interactive elements
 
-import {
+import type {
   Graph,
   GraphBoard,
   NodeId,
   GraphRenderConfig,
-  DEFAULT_GRAPH_CONFIG,
   NodeState,
 } from './types';
+import { DEFAULT_GRAPH_CONFIG } from './types';
 import { getNeighbors } from './algorithms';
 
 /**

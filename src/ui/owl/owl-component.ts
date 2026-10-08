@@ -1,8 +1,8 @@
 // Owl UI Component - Visual representation of Ollie the Owl
 
+import type { OwlDisplayState } from '../../core/owl';
 import {
   owlSystem,
-  OwlDisplayState,
   inspectDropSpeech,
   integrate,
   clampToViewport,
@@ -169,8 +169,9 @@ export class OwlComponent {
   /** True when the event target is a drag handle (body / mini icon), not chrome. */
   private isDragHandle(target: EventTarget | null): boolean {
     if (!(target instanceof Element) || !this.container) return false;
-    if (target.closest('.owl-bubble') || target.closest('.owl-controls'))
+    if (target.closest('.owl-bubble') || target.closest('.owl-controls')) {
       return false;
+    }
     return Boolean(
       target.closest('.owl-character') || target.closest('.owl-minimized')
     );
@@ -215,8 +216,9 @@ export class OwlComponent {
 
   private onPointerMove = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
+    }
 
     const dx = e.clientX - this.dragStartX;
     const dy = e.clientY - this.dragStartY;
@@ -242,8 +244,9 @@ export class OwlComponent {
 
   private onPointerUp = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
+    }
 
     const wasRealDrag = this.didDrag;
 
@@ -276,8 +279,9 @@ export class OwlComponent {
   /** Cancelled gesture: return to dock (even after a real drag). */
   private onPointerCancel = (e: PointerEvent): void => {
     if (!this.container || !this.isDragging) return;
-    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId)
+    if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
+    }
 
     this.isDragging = false;
     this.dragPointerId = null;

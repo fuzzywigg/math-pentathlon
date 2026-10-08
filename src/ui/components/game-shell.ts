@@ -542,9 +542,11 @@ export function mountGameShell(
     }
 
     if (e.key !== 'Escape') return;
-    const helpWasOpen = !!helpModal && !helpModal.classList.contains('hidden');
+    const helpEl = helpModal;
+    const newGameEl = newGameModal;
+    const helpWasOpen = helpEl != null && !helpEl.classList.contains('hidden');
     const newGameWasOpen =
-      !!newGameModal && !newGameModal.classList.contains('hidden');
+      newGameEl != null && !newGameEl.classList.contains('hidden');
     if (!helpWasOpen && !newGameWasOpen) return;
     // Hide without per-modal focus restore; pick one opener below (#437).
     if (helpWasOpen) {

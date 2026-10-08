@@ -1,7 +1,7 @@
 // Expression Evaluator
 // Parsing, tokenizing, and evaluating mathematical expressions
 
-import {
+import type {
   ExpressionToken,
   ExpressionNode,
   EvaluationResult,
@@ -450,8 +450,9 @@ function buildExpression(numbers: number[], operators: Operator[]): string {
  * Build expressions with parentheses for 4 numbers
  */
 function buildParenExpressions(nums: number[], ops: Operator[]): string[] {
-  if (nums.length !== 4 || ops.length !== 3)
+  if (nums.length !== 4 || ops.length !== 3) {
     return [buildExpression(nums, ops)];
+  }
 
   const [a, b, c, d] = nums;
   const [op1, op2, op3] = ops;

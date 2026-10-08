@@ -93,15 +93,19 @@ export function resolveInspectTarget(el: Element | null): InspectTarget {
 
   // Known chrome controls (ids used across game shells)
   if (el.closest('#help-btn')) return { kind: 'chrome', chrome: 'howto' };
-  if (el.closest('#tutorial-btn'))
+  if (el.closest('#tutorial-btn')) {
     return { kind: 'chrome', chrome: 'tutorial' };
-  if (el.closest('#new-game-btn'))
+  }
+  if (el.closest('#new-game-btn')) {
     return { kind: 'chrome', chrome: 'new-game' };
+  }
   if (el.closest('#back-btn')) return { kind: 'chrome', chrome: 'back' };
-  if (el.closest('.button-row'))
+  if (el.closest('.button-row')) {
     return { kind: 'chrome', chrome: 'button-row' };
-  if (el.closest('.game-header'))
+  }
+  if (el.closest('.game-header')) {
     return { kind: 'chrome', chrome: 'game-header' };
+  }
 
   return { kind: 'unknown' };
 }

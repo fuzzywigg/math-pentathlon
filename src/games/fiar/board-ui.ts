@@ -1,6 +1,7 @@
 // FIAR Board UI — SVG rendering (marked chips, yellow center, gapped wins)
 
-import { FiarGameState, CONFIG, Player } from './types';
+import type { FiarGameState, Player } from './types';
+import { CONFIG } from './types';
 import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   getValidMoves,
@@ -358,7 +359,9 @@ export function renderBoard(
 }
 
 export function injectFiarStyles(): void {
-  injectStylesOnce('fiar-styles', `
+  injectStylesOnce(
+    'fiar-styles',
+    `
     .fiar-board-container {
       display: flex;
       justify-content: center;
@@ -499,9 +502,9 @@ export function injectFiarStyles(): void {
       from { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
-  `);
+  `
+  );
 }
-
 
 export function getPlayerColor(player: Player): string {
   const colors = getPlayerSeatColors();

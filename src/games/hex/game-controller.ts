@@ -1,9 +1,11 @@
 // Hex Game Controller - Manages game flow and UI updates
 
-import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
+import type { HexGameState } from './types';
+import { createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
-import { AIDifficulty, getRandomMove } from './ai';
+import type { AIDifficulty } from './ai';
+import { getRandomMove } from './ai';
 import {
   cancelHexAiRequests,
   disposeHexAiWorker,

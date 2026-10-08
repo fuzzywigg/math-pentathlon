@@ -2,14 +2,8 @@
 // SVG rendering for the hexagonal game board
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
-  QueensGuardsState,
-  CONFIG,
-  BoardCoord,
-  cellKey,
-  cellsInRing,
-  parseKey,
-} from './types';
+import type { QueensGuardsState, BoardCoord } from './types';
+import { CONFIG, cellKey, cellsInRing, parseKey } from './types';
 import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import { pointyTopHexPathD } from '../../ui/hex-svg';
@@ -306,7 +300,9 @@ export function renderBoard(
  * Inject CSS styles
  */
 export function injectQGStyles(): void {
-  injectStylesOnce('qg-styles', `
+  injectStylesOnce(
+    'qg-styles',
+    `
     /* Pin board CSS width so hex hit areas clear WCAG 2.5.5 (~44px).
        viewBox ≈791 → 660px ⇒ scale≈0.83 ⇒ path ≈46×53. Shell #app is
        ~700px, so allow a short horizontal scroll rather than shrinking cells. */
@@ -394,7 +390,8 @@ export function injectQGStyles(): void {
         animation: none !important;
       }
     }
-  `);
+  `
+  );
 }
 
 /**

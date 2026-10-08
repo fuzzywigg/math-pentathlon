@@ -4,13 +4,8 @@
 import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
 import { getDieFaceEmojiOrQuestion } from '../../ui/die-faces';
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
-  RemainderIslandsState,
-  DiceRoll,
-  Island,
-  getPlayerScore,
-  getPlayerChips,
-} from './types';
+import type { RemainderIslandsState, DiceRoll, Island } from './types';
+import { getPlayerScore, getPlayerChips } from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
@@ -459,13 +454,14 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
 // Helper Functions
 // =============================================================================
 
-
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectRemainderIslandsStyles(): void {
-  injectStylesOnce('remainder-islands-styles', `
+  injectStylesOnce(
+    'remainder-islands-styles',
+    `
     .remainder-game-container {
       display: flex;
       flex-direction: column;
@@ -737,5 +733,6 @@ export function injectRemainderIslandsStyles(): void {
         transform: none;
       }
     }
-  `);
+  `
+  );
 }

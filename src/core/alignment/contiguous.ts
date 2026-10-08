@@ -1,11 +1,13 @@
 // Contiguous Region Detection (Flood Fill)
 
-import {
+import type {
   GridPosition,
   CellValue,
   CellGetter,
   ContiguousConfig,
   Region,
+} from './types';
+import {
   NEIGHBORS_4WAY,
   NEIGHBORS_8WAY,
   HEX_NEIGHBORS_EVEN_ROW,

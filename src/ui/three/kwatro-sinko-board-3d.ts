@@ -579,11 +579,12 @@ export async function createKwatroSinkoBoard3D(
 
       const isValid = validMoves.has(nm.id) && !node.chip;
       const isWinning = state.winningAlignment?.nodes.includes(nm.id) ?? false;
+      const chip = node.chip;
       const canSelect =
-        !!chipClickHandler &&
-        !!node.chip &&
+        chipClickHandler != null &&
+        chip != null &&
         state.phase === 'selectingChip' &&
-        node.chip.owner === state.currentPlayer;
+        chip.owner === state.currentPlayer;
 
       if (node.chip?.owner === 'player2') {
         btn.classList.add('kwa-chip-p2');
@@ -665,8 +666,9 @@ export async function createKwatroSinkoBoard3D(
       let padMat = isNumbered ? mats.padNumbered : mats.pad;
       if (winning.has(nm.id)) padMat = mats.winner;
       else if (validMoves.has(nm.id) && !node.chip) padMat = mats.valid;
-      else if (node.chip && state.selectedChip === node.chip.id)
+      else if (node.chip && state.selectedChip === node.chip.id) {
         padMat = mats.selected;
+      }
       nm.pad.material = padMat;
 
       syncChip(nm, node.chip);

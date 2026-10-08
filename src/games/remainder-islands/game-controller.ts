@@ -1,7 +1,8 @@
 // Remainder Islands Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { RemainderIslandsState, createInitialState } from './types';
+import type { RemainderIslandsState } from './types';
+import { createInitialState } from './types';
 import { performRoll, selectIsland, setSelectedIsland } from './rules';
 import {
   renderBoard,
@@ -12,7 +13,8 @@ import {
   getPlayerName,
   injectRemainderIslandsStyles,
 } from './board-ui';
-import { getAIIslandChoice, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIIslandChoice } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
 import { syncAppOpponentChrome } from '../../ui/player-colors';
@@ -248,8 +250,9 @@ function handleIslandHover(islandId: string | null): void {
 // =============================================================================
 
 function aiRoll(): void {
-  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2')
+  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2') {
     return;
+  }
   const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
   noteEmptyValidSkip(beforePlayer);
@@ -260,8 +263,9 @@ function aiSelectIsland(): void {
   if (
     gameState.phase !== 'selectIsland' ||
     gameState.currentPlayer !== 'player2'
-  )
+  ) {
     return;
+  }
 
   // Use AI module to get choice
   const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);

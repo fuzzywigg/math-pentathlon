@@ -1,13 +1,15 @@
 // Par 55 Game Rules
 // Placing blocks, scoring by matching attributes, bump mechanics
 
-import {
+import type {
   Par55State,
   Base,
   AttributeBlock,
   Par55Move,
   MatchDetail,
   Player,
+} from './types';
+import {
   CONFIG,
   createBlockSet,
   shuffleArray,

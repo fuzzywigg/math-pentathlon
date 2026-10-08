@@ -1,7 +1,8 @@
 // Fraction Pinball Board UI
 // Renders the pinball-style game board, challenges, and scores
 
-import { FractionPinballState, getPlayerStats } from './types';
+import type { FractionPinballState } from './types';
+import { getPlayerStats } from './types';
 import { formatDecimal, formatFraction } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { injectStylesOnce } from '../../ui/inject-styles';
@@ -426,13 +427,14 @@ export function renderGameOver(
 // Helper Functions
 // =============================================================================
 
-
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectFractionPinballStyles(): void {
-  injectStylesOnce('fraction-pinball-styles', `
+  injectStylesOnce(
+    'fraction-pinball-styles',
+    `
     .pinball-game-container {
       display: flex;
       flex-direction: column;
@@ -768,5 +770,6 @@ export function injectFractionPinballStyles(): void {
         transform: none;
       }
     }
-  `);
+  `
+  );
 }

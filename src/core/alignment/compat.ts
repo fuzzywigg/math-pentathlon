@@ -21,7 +21,7 @@
  *   from production bundles if unused.
  */
 
-import {
+import type {
   GridPosition,
   CellValue,
   CellGetter,
@@ -242,8 +242,9 @@ export function checkLineAlignment(
   if (positions.length === 0) return { isAligned: false, value: null };
   const firstPos = positions[0]!;
   const first = getCell(firstPos.row, firstPos.col);
-  if (first === null || first === undefined)
+  if (first === null || first === undefined) {
     return { isAligned: false, value: null };
+  }
   const aligned = positions.every((p) => {
     const v = getCell(p.row, p.col);
     return v !== null && v !== undefined && v === first;

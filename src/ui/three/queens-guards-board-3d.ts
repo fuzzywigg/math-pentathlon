@@ -525,14 +525,14 @@ export async function createQueensGuardsBoard3D(
         : null;
     const lastFrom = last ? cellKey(last.from.ring, last.from.position) : null;
     const lastTo = last ? cellKey(last.to.ring, last.to.position) : null;
-    const lastWasCapture = !!last?.wasCapture;
+    const lastWasCapture = Boolean(last?.wasCapture);
 
     const captured = new Set(
       state.capturedPieces.map((c) => cellKey(c.ring, c.position))
     );
 
     const winnerThrone =
-      !!state.winner &&
+      Boolean(state.winner) &&
       state.cells.get(cellKey(0, 0))?.piece?.player === state.winner;
 
     for (const cell of cells) {
@@ -545,9 +545,9 @@ export async function createQueensGuardsBoard3D(
       else if (validMoves.has(cell.key)) tileMat = mats.valid;
       else if (captured.has(cell.key)) tileMat = mats.capture;
       else if (lastWasCapture && lastTo === cell.key) tileMat = mats.capture;
-      else if (lastFrom === cell.key || lastTo === cell.key)
+      else if (lastFrom === cell.key || lastTo === cell.key) {
         tileMat = mats.last;
-      else if (focusedKey === cell.key) tileMat = mats.focus;
+      } else if (focusedKey === cell.key) tileMat = mats.focus;
 
       if (winnerThrone && (cell.ring === 0 || cell.ring === 1)) {
         const owner = state.cells.get(cell.key)?.piece?.player;
@@ -614,9 +614,12 @@ export async function createQueensGuardsBoard3D(
         }${extras.length ? `, ${extras.join(', ')}` : ''}`
       );
 
+      const cellPiece = piece;
       const selectable = restoring
         ? captured.has(cell.key)
-        : !!piece && piece.player === state.currentPlayer && !state.winner;
+        : cellPiece != null &&
+          cellPiece.player === state.currentPlayer &&
+          !state.winner;
       btn.tabIndex =
         selectable ||
         validMoves.has(cell.key) ||

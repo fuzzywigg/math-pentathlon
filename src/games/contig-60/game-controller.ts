@@ -1,13 +1,8 @@
 // Contig 60 Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import {
-  ContigState,
-  Player,
-  ContigWinner,
-  createInitialState,
-  getValidPlacements,
-} from './types';
+import type { ContigState, Player, ContigWinner } from './types';
+import { createInitialState, getValidPlacements } from './types';
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
@@ -17,7 +12,8 @@ import {
   injectContigStyles,
   getPlayerName,
 } from './board-ui';
-import { getAIPlacement, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIPlacement } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
 import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
@@ -321,8 +317,9 @@ function handlePass(): void {
 // =============================================================================
 
 function makeAIMove(): void {
-  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer)
+  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer) {
     return;
+  }
   if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
 
   // Use AI module to get the best placement

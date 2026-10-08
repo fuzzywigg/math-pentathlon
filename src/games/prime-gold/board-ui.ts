@@ -1,7 +1,8 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import { PrimeGoldState, CONFIG, isPrime } from './types';
+import type { PrimeGoldState } from './types';
+import { CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
 import { injectStylesOnce } from '../../ui/inject-styles';
 import {
@@ -24,7 +25,9 @@ import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 // =============================================================================
 
 export function injectPrimeGoldStyles(): void {
-  injectStylesOnce('prime-gold-styles', `
+  injectStylesOnce(
+    'prime-gold-styles',
+    `
     .pg-game-area {
       display: flex;
       flex-direction: column;
@@ -434,7 +437,8 @@ export function injectPrimeGoldStyles(): void {
         animation: none;
       }
     }
-  `);
+  `
+  );
 }
 
 export interface PrimeGoldBoardRenderOptions {
@@ -445,7 +449,6 @@ export interface PrimeGoldBoardRenderOptions {
 // =============================================================================
 // Player Names
 // =============================================================================
-
 
 // =============================================================================
 // Board Rendering
@@ -489,7 +492,7 @@ export function renderBoard(
         if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
 
         const expr = validMap.get(cell.value);
-        const isValid = allowInput && !!expr;
+        const isValid = allowInput && Boolean(expr);
 
         if (isValid && expr) {
           cellEl.classList.add('valid');

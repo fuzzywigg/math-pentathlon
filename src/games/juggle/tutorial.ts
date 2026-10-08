@@ -1,7 +1,7 @@
 // Tutorial content for Juggle
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const juggleTutorial: TutorialConfig = {
   id: 'juggle-basics',

@@ -1,11 +1,8 @@
 // Queens & Guards Game Rules
 // Movement, capture, and win condition logic
 
+import type { QueensGuardsState, Player, BoardCoord, QGMove } from './types';
 import {
-  QueensGuardsState,
-  Player,
-  BoardCoord,
-  QGMove,
   CONFIG,
   cellKey,
   parseKey,
@@ -224,8 +221,9 @@ function checkCaptures(
 
     for (const far of furtherAdjacent) {
       // Skip if it's the cell we just moved to
-      if (far.ring === movedTo.ring && far.position === movedTo.position)
+      if (far.ring === movedTo.ring && far.position === movedTo.position) {
         continue;
+      }
 
       const farCell = cells.get(cellKey(far.ring, far.position));
 

@@ -2,14 +2,13 @@
 // Rendering dominoes, board, and dice
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
+import type {
   SumDominoesState,
   Domino,
   PlacedDomino,
   BoardPosition,
-  CONFIG,
-  getDiceSum,
 } from './types';
+import { CONFIG, getDiceSum } from './types';
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
@@ -262,7 +261,7 @@ export function renderHand(
     allowInput &&
     isCurrentPlayer &&
     state.phase === 'placing' &&
-    !!state.currentDice;
+    Boolean(state.currentDice);
 
   for (const domino of hand) {
     const isPlayable = canSelect
@@ -391,7 +390,9 @@ function createDie(value: number): HTMLElement {
  * Inject CSS styles
  */
 export function injectSDStyles(): void {
-  injectStylesOnce('sd-styles', `
+  injectStylesOnce(
+    'sd-styles',
+    `
     /* .sd-game-area / .sd-main-layout chrome → style.css */
 
     .sd-board {
@@ -615,7 +616,8 @@ export function injectSDStyles(): void {
     }
 
     /* Chrome (.sd-game-area / controls / dice / status / winner) lives in style.css */
-  `);
+  `
+  );
 }
 
 /**

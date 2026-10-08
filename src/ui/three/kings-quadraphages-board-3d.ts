@@ -376,14 +376,17 @@ export async function createKingsQuadraphagesBoard3D(
       const isLight = (row + col) % 2 === 0;
       let tileMat = isLight ? mats.light : mats.dark;
 
+      const selectedKing = state.selectedKingPosition;
       const isSelected =
-        !!state.selectedKingPosition &&
-        state.selectedKingPosition.row === row &&
-        state.selectedKingPosition.col === col;
+        selectedKing != null &&
+        selectedKing.row === row &&
+        selectedKing.col === col;
       const isValidMoveTarget = isKingMoveTarget(state, row, col);
       const isValidPlacement =
         state.turnPhase === 'placeQuadraphage' && piece === null;
-      const isLast = !!last && last.row === row && last.col === col;
+      const lastMove = last;
+      const isLast =
+        lastMove != null && lastMove.row === row && lastMove.col === col;
 
       if (isSelected) tileMat = mats.selected;
       else if (isValidMoveTarget || isValidPlacement) tileMat = mats.valid;

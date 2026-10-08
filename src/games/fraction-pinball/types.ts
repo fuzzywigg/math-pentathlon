@@ -1,7 +1,7 @@
 // Fraction Pinball Game Types
 // Fraction-decimal conversion game with pinball-style scoring
 
-import { Fraction } from '../../core/fractions/types';
+import type { Fraction } from '../../core/fractions/types';
 
 export type Player = 'player1' | 'player2';
 

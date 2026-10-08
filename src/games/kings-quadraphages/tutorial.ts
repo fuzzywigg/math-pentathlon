@@ -1,6 +1,6 @@
 // Tutorial content for Kings & Quadraphages
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const kingsQuadraphagesTutorial: TutorialConfig = {
   id: 'kings-quadraphages-basics',

@@ -1,7 +1,7 @@
 // Frac Fact Game Types
 // Fraction arithmetic challenge game - solve fraction problems to score points
 
-import { Fraction, FractionOperation } from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
 
 export type Player = 'player1' | 'player2';
 

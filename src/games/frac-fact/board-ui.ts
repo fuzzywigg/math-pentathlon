@@ -1,8 +1,9 @@
 // Frac Fact Board UI
 // Renders fraction problems, answer choices, and game status
 
-import { FracFactState, getPlayerStats } from './types';
-import { Fraction } from '../../core/fractions/types';
+import type { FracFactState } from './types';
+import { getPlayerStats } from './types';
+import type { Fraction } from '../../core/fractions/types';
 import { getOperationSymbol } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { injectStylesOnce } from '../../ui/inject-styles';
@@ -375,13 +376,14 @@ export function renderGameOver(state: FracFactState): HTMLElement {
 // Helper Functions
 // =============================================================================
 
-
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectFracFactStyles(): void {
-  injectStylesOnce('frac-fact-styles', `
+  injectStylesOnce(
+    'frac-fact-styles',
+    `
     .frac-game-container {
       display: flex;
       flex-direction: column;
@@ -702,5 +704,6 @@ export function injectFracFactStyles(): void {
       background: #9e9e9e;
       color: white;
     }
-  `);
+  `
+  );
 }

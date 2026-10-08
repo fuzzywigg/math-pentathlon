@@ -212,7 +212,7 @@ function wrapGridCellsInRows(grid: Element): void {
 
 function parentHasForeignRole(el: Element): boolean {
   const role = el.getAttribute('role');
-  return !!role && role !== 'presentation' && role !== 'none';
+  return Boolean(role) && role !== 'presentation' && role !== 'none';
 }
 
 /**

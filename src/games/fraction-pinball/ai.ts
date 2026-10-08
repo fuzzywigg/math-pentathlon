@@ -13,7 +13,7 @@
 // 4. To convert fraction to decimal: divide numerator by denominator
 // 5. To convert decimal to fraction: use place value (0.75 = 75/100 = 3/4)
 
-import { FractionPinballState, Player } from './types';
+import type { FractionPinballState, Player } from './types';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 

@@ -3,12 +3,8 @@
 
 import { getDieFaceEmoji } from '../../ui/die-faces';
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
-  ContigState,
-  CONFIG,
-  BOARD_NUMBERS,
-  getValidPlacements,
-} from './types';
+import type { ContigState } from './types';
+import { CONFIG, BOARD_NUMBERS, getValidPlacements } from './types';
 import { calculatePoints } from './rules';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
@@ -353,7 +349,9 @@ function getDieFace(value: number): string {
  * Inject CSS styles
  */
 export function injectContigStyles(): void {
-  injectStylesOnce('contig-styles', `
+  injectStylesOnce(
+    'contig-styles',
+    `
     .contig-board {
       display: flex;
       flex-direction: column;
@@ -563,7 +561,8 @@ export function injectContigStyles(): void {
         max-width: 100%;
       }
     }
-  `);
+  `
+  );
 }
 
 /**

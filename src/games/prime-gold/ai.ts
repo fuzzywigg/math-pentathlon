@@ -13,7 +13,8 @@
 // 4. Look for expressions: (a + b) × c, a × b - c, a^b, etc.
 // 5. Block opponent's prime veins when you can
 
-import { PrimeGoldState, Player, CONFIG } from './types';
+import type { PrimeGoldState, Player } from './types';
+import { CONFIG } from './types';
 import {
   rollDice,
   placeChip,

@@ -1,6 +1,7 @@
 // Star Track Board UI - Renders the star-shaped track and game elements
 
-import { StarTrackGameState, Player, TRACK_LENGTH, ChainLink } from './types';
+import type { StarTrackGameState, Player, ChainLink } from './types';
+import { TRACK_LENGTH } from './types';
 import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { formatModeSeatLabel } from '../../ui/seat-labels';
@@ -233,7 +234,7 @@ export function fillChainArea(
   const allowInput = options.allowInput !== false;
 
   if (state.phase === 'drawChains') {
-    const interactive = allowInput && !!onDrawChains;
+    const interactive = allowInput && Boolean(onDrawChains);
     const drawBtn = document.createElement('button');
     drawBtn.type = 'button';
     drawBtn.className = 'star-track-draw-btn';
@@ -265,7 +266,7 @@ export function fillChainArea(
       chainArea.appendChild(hint);
     }
   } else if (state.phase === 'selectChain' && state.drawnChains) {
-    const interactive = allowInput && !!onSelectChain;
+    const interactive = allowInput && Boolean(onSelectChain);
     const choiceLabel = document.createElement('div');
     choiceLabel.className = 'star-track-choice-label';
     choiceLabel.textContent = interactive

@@ -1,7 +1,7 @@
 // Prime Gold Game Controller
 // Manages game flow, AI, and UI updates
 
-import { PrimeGoldState, Player } from './types';
+import type { PrimeGoldState, Player } from './types';
 import {
   createInitialState,
   rollDice,
@@ -9,7 +9,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIPlacement, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIPlacement } from './ai';
 import {
   renderBoard,
   renderDice,

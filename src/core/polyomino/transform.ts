@@ -1,7 +1,7 @@
 // Polyomino Transform - Rotation, Reflection, and Transformation
 // Handles all shape manipulations for polyominoes
 
-import { Cell, Rotation, PolyominoShape } from './types';
+import type { Cell, Rotation, PolyominoShape } from './types';
 
 /**
  * Rotate a set of cells by the given angle around the origin

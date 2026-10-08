@@ -1,7 +1,7 @@
 // Attribute Logic - Matching, filtering, and set validation
 // Core logic for attribute-based game mechanics
 
-import {
+import type {
   AttributeValue,
   AttributePiece,
   AttributeDefinition,

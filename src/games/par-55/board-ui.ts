@@ -2,14 +2,14 @@
 // Rendering pentagon bases, attribute blocks, and game state
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import {
+import type {
   Par55State,
   Base,
   AttributeBlock,
   Player,
-  CONFIG,
   BlockColor,
 } from './types';
+import { CONFIG } from './types';
 import { getValidPlacements, calculateScore } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
@@ -511,7 +511,9 @@ export function renderMoveHistory(state: Par55State): HTMLElement {
  * Inject CSS styles
  */
 export function injectPar55Styles(): void {
-  injectStylesOnce('par55-styles', `
+  injectStylesOnce(
+    'par55-styles',
+    `
     /* Shell #app is max-width 700px with overflow-x clip — widen when Par 55
        is mounted so the side-hand layout stays hittable on desktop. */
     #app:has(.par55-board),
@@ -834,7 +836,8 @@ export function injectPar55Styles(): void {
         padding: 0.85rem 1.5rem;
       }
     }
-  `);
+  `
+  );
 }
 
 /**

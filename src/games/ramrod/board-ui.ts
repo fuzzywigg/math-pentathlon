@@ -1,7 +1,8 @@
 // Ramrod Board UI
 // Rendering Cuisenaire rods, sum boxes, and game state
 
-import { RamrodState, SumBox, Rod, Player, CONFIG, ROD_COLORS } from './types';
+import type { RamrodState, SumBox, Rod, Player } from './types';
+import { CONFIG, ROD_COLORS } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
@@ -342,7 +343,9 @@ export function renderRodLegend(): HTMLElement {
  * Inject CSS styles
  */
 export function injectRamrodStyles(): void {
-  injectStylesOnce('ramrod-styles', `
+  injectStylesOnce(
+    'ramrod-styles',
+    `
     .ramrod-game-area {
       display: flex;
       flex-direction: column;
@@ -790,7 +793,8 @@ export function injectRamrodStyles(): void {
         transform: none;
       }
     }
-  `);
+  `
+  );
 }
 
 /**
