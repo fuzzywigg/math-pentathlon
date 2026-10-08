@@ -60,7 +60,7 @@ async function startHuman(page: Page) {
 }
 
 test.describe('Pointer edge cases', () => {
-  test('every game #board uses touch-action manipulation (or none on 3D canvas)', async ({
+  test('every game board mount uses touch-action manipulation (or none on 3D canvas)', async ({
     page,
   }) => {
     for (const game of AVAILABLE) {
@@ -70,20 +70,23 @@ test.describe('Pointer edge cases', () => {
       expect(sel, game.id).toBeTruthy();
       await expect(page.locator(sel!).first()).toBeVisible({ timeout: 15_000 });
 
-      const board = page.locator('#board').first();
+      // Most games mount `#board`; frac-fact / remainder / pinball use `#game-container`.
+      const board = page.locator('#board, #game-container').first();
       await expect(board).toBeVisible();
       const boardTouch = await board.evaluate(
         (el) => getComputedStyle(el).touchAction
       );
       expect(
         /manipulation|none/.test(boardTouch),
-        `${game.id} #board touch-action=${boardTouch}`
+        `${game.id} mount touch-action=${boardTouch}`
       ).toBe(true);
 
-      const canvas = page.locator('#board canvas').first();
+      const canvas = page.locator('#board canvas, #game-container canvas').first();
       if ((await canvas.count()) > 0 && (await canvas.isVisible())) {
         const canvasTouch = await canvas.evaluate(
-          (el) => (el as HTMLElement).style.touchAction || getComputedStyle(el).touchAction
+          (el) =>
+            (el as HTMLElement).style.touchAction ||
+            getComputedStyle(el).touchAction
         );
         expect(
           canvasTouch === 'none' || /none/.test(canvasTouch),
@@ -93,10 +96,10 @@ test.describe('Pointer edge cases', () => {
     }
   });
 
-  test('contextmenu on #board is prevented', async ({ page }) => {
+  test('contextmenu on board mount is prevented', async ({ page }) => {
     await gotoGame(page, 'hex');
     await startHuman(page);
-    const board = page.locator('#board').first();
+    const board = page.locator('#board, #game-container').first();
     await expect(board).toBeVisible();
     const prevented = await board.evaluate((el) => {
       const ev = new MouseEvent('contextmenu', {
@@ -233,39 +236,57 @@ test.describe('Pointer edge cases', () => {
     page,
   }) => {
     await page.goto('/#/');
-    await expect(page.locator('#ollie-owl, .owl-container').first()).toBeVisible(
-      { timeout: 15_000 }
-    );
     const owl = page.locator('#ollie-owl, .owl-container').first();
-    const character = owl.locator('.owl-character, .owl-minimized').first();
-    await expect(character).toBeVisible();
+    await expect(owl).toBeAttached({ timeout: 15_000 });
 
-    await character.dispatchEvent('pointerdown', {
-      pointerId: 1,
-      pointerType: 'touch',
-      isPrimary: true,
-      button: 0,
-      buttons: 1,
-      clientX: 300,
-      clientY: 40,
-    });
-    await owl.dispatchEvent('pointermove', {
-      pointerId: 1,
-      pointerType: 'touch',
-      isPrimary: true,
-      buttons: 1,
-      clientX: 120,
-      clientY: 220,
-    });
-    await owl.dispatchEvent('pointercancel', {
-      pointerId: 1,
-      pointerType: 'touch',
-      isPrimary: true,
-      buttons: 0,
-      clientX: 120,
-      clientY: 220,
+    // Menu may dock Ollie minimized / CSS-hidden; drive the drag SM via evaluate.
+    const stuck = await page.evaluate(() => {
+      const root = document.querySelector(
+        '#ollie-owl, .owl-container'
+      ) as HTMLElement | null;
+      if (!root) return 'missing-root';
+      const handle = (root.querySelector('.owl-character') ??
+        root.querySelector('.owl-minimized')) as HTMLElement | null;
+      if (!handle) return 'missing-handle';
+
+      const fire = (
+        target: EventTarget,
+        type: string,
+        init: PointerEventInit
+      ): void => {
+        target.dispatchEvent(
+          new PointerEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            pointerId: 1,
+            pointerType: 'touch',
+            isPrimary: true,
+            ...init,
+          })
+        );
+      };
+
+      fire(handle, 'pointerdown', {
+        button: 0,
+        buttons: 1,
+        clientX: 300,
+        clientY: 40,
+      });
+      fire(root, 'pointermove', {
+        buttons: 1,
+        clientX: 120,
+        clientY: 220,
+      });
+      const dragging = root.classList.contains('owl-dragging');
+      fire(root, 'pointercancel', {
+        buttons: 0,
+        clientX: 120,
+        clientY: 220,
+      });
+      if (!dragging) return 'never-dragged';
+      return root.classList.contains('owl-dragging') ? 'stuck' : 'ok';
     });
 
-    await expect(owl).not.toHaveClass(/owl-dragging/);
+    expect(stuck).toBe('ok');
   });
 });

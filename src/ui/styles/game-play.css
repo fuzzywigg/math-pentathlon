@@ -763,7 +763,9 @@
  * Shell chrome touch-action covered by #486; tap-target sizes by #457.
  */
 #board,
+#game-container,
 #board *:not(input):not(textarea),
+#game-container *:not(input):not(textarea),
 [class$='-game-area'] svg,
 [class$='-board'],
 .board,
