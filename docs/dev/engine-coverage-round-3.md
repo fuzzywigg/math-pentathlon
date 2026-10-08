@@ -70,25 +70,35 @@ Lowest non-AI modules by branch % (baseline):
 | frac-fact/rules.ts | 98.38 | divide zero-numerator guard |
 | fab-a-diffy/rules.ts | 99.08 | calculateResult catch |
 
-## Modules targeted for coverage gain (round 3)
+## Modules with coverage gain (round 3)
 
-| Module | Theme | Approach |
-| --- | --- | --- |
-| **fab-a-diffy/types.ts** | shuffle guard | `shuffleArray` with `undefined` elements |
-| **par-55/types.ts** | shuffle guard | same |
-| **remainder-islands/types.ts** | table hole | punch `ISLAND_VALUES` slot + restore |
-| **kings-quadraphages/game-state.ts** | state / serialize | forged `TurnPhase` default; save validate |
-| **kings-quadraphages/serialization.ts** | serialization | version/board/validate/save-info pins |
-| **fiar/types.ts** | geometry helper | forged `undefined` Map key → prevId arm |
-| **fab-a-diffy/rules.ts** | ops / catch | Proxy-throw `calculateResult` catch |
-| **fraction-pinball/rules.ts** | wrong-answer gen | fill-while duplicate; zero-numerator `\|\| 1` |
-| **pent-em-in/rules.ts** | legal-move scan | jammed board + unknown mid-list continue |
-| **frac-fact/rules.ts** | problem gen | mutate `COMMON_FRACTIONS` + force divide |
-| **stars-bars/rules.ts** | scoring tally | adjacent `card: undefined` → `!card` continue |
-| calla / juggle / prime-gold / star-track | transitions | characterization + todos for dead arms |
+| Module | Before branch % | After branch % | Before line % | After line % | Δ branch | Δ line |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **fab-a-diffy/types.ts** | **75.00** (3/4) | **100** (4/4) | 100 | 100 | **+1** | 0 |
+| **par-55/types.ts** | **91.66** (11/12) | **100** (12/12) | 100 | 100 | **+1** | 0 |
+| **remainder-islands/types.ts** | **90.00** (9/10) | **100** (10/10) | 100 | 100 | **+1** | 0 |
+| **fraction-pinball/rules.ts** | **96.22** (51/53) | **100** (53/53) | 100 | 100 | **+2** | 0 |
+| **kings-quadraphages/game-state.ts** | 98.18 (54/55) | **100** (55/55) | 97.67 | **100** | **+1** | **+2** |
+| **frac-fact/rules.ts** | 98.38 (61/62) | **100** (62/62) | 99.00 | **100** | **+1** | **+1** |
+| **pent-em-in/rules.ts** | 98.71 (77/78) | **100** (78/78) | 100 | 100 | **+1** | 0 |
+| **fab-a-diffy/rules.ts** | 99.08 (108/109) | 99.08 | 99.21 | **100** | 0 | **+1** |
 
-**Acceptance target:** 8+ engine modules gain meaningful branch (and/or line)
-coverage vs the #574 baseline.
+**8 engine modules** gained meaningful branch and/or line coverage (acceptance: 8+).
+
+Additional characterization (no % delta on remaining dead arms): kings
+serialization validate pins, fiar types helpers, stars-bars scoring forge,
+calla/juggle/prime-gold/star-track transitions + `it.todo`.
+
+### Aggregate (included engine files)
+
+| Metric | Before (#574 tip) | After round 3 | Δ |
+| --- | ---: | ---: | ---: |
+| Lines | 99.73% (2650/2657) | **99.88%** (2654/2657) | **+4 lines** |
+| Branches | 97.94% (1861/1900) | **98.36%** (1869/1900) | **+8 arms** |
+| Statements | 99.16% | 99.41% | +8 |
+| Functions | 100% | 100% | — |
+
+**Largest gains:** `fab-a-diffy/types.ts` 75%→100% branch; `fraction-pinball/rules.ts` +2 arms → 100%.
 
 ## Bugs / oddities found (not fixed)
 
@@ -145,8 +155,8 @@ npx vitest run tests/unit/engine-coverage-round-3-burn-1008.test.ts
 | Command | Result |
 | --- | --- |
 | Baseline coverage suite | engine branches **97.94%** (1861/1900); lines 99.73% |
-| After coverage suite | _(filled after `coverage-engine-r3-after`)_ |
+| After coverage suite | engine branches **98.36%** (1869/1900); lines 99.88%; **+8 arms / +4 lines** |
 | New suite alone | **37** passed / **6** todo |
-| `npm run lint` | _(pending)_ |
-| `npx tsc --noEmit` | _(pending)_ |
-| `npm run test:unit` | _(pending)_ |
+| `npm run lint` | **pass** (exit 0) |
+| `npx tsc --noEmit` | **pass** (exit 0) |
+| `npm run test:unit` (via `test:unit:coverage` same vitest run) | **pass** — 3108 files / **11853** passed / 21 skipped / **22** todo |
