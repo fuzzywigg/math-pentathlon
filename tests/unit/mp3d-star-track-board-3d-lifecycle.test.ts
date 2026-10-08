@@ -251,6 +251,31 @@ describe('mp3d Star Track board 3D lifecycle', () => {
     ).rejects.toThrow(/WebGL/);
   });
 
+  it('notifies onContextLost and prevents default on webglcontextlost', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createStarTrackBoard3D } =
+      await import('../../src/ui/three/star-track-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const onContextLost = vi.fn();
+
+    const board = await createStarTrackBoard3D(host, onContextLost);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    board.canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(onContextLost).toHaveBeenCalledTimes(1);
+
+    // Controller fallbackTo2dBoard unmounts; board notifies via callback (hex pattern).
+    board.unmount();
+    expect(host.querySelector('canvas')).toBeNull();
+  });
+
   it('highlight path uses engine landing spaces up to TRACK_LENGTH', async () => {
     const three = installThreeMock();
     vi.doMock('../../src/ui/three/load-three', () => ({
