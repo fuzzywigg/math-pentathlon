@@ -23,9 +23,27 @@ import { securityHeadersPlugin } from './vite.security-headers';
  * autoUpdate (skipWaiting + clientsClaim) so a new deploy is not stuck behind
  * a stale tab forever — see src/pwa/register.ts.
  *
+ * Reproducibility (build-config only; see docs/build-repro-2026-10-08.md):
+ * - base `/` matches absolute asset URLs in index.html + site.webmanifest
+ * - sourcemaps off (no absolute path leakage via .map files)
+ * - esbuild legalComments none (no license banner path variance)
+ * - Workbox precache manifest sorted by URL (stable SW across FS order)
+ * - manualChunks + [name]-[hash] keep chunk names content-addressed
+ *
  * Optional treemap: PERF_VISUALIZE=1 npm run build → test-results/perf/stats.html
+ * Report-only dual-build audit: npm run check:build
  */
 const visualize = process.env.PERF_VISUALIZE === '1';
+
+/** Sort Workbox precache entries so sw.js is stable across filesystem readdir order. */
+function sortPrecacheManifest<T extends { url: string }>(
+  entries: T[]
+): { manifest: T[]; warnings: string[] } {
+  const manifest = [...entries].sort((a, b) =>
+    a.url < b.url ? -1 : a.url > b.url ? 1 : 0
+  );
+  return { manifest, warnings: [] };
+}
 
 const plugins: PluginOption[] = [
   securityHeadersPlugin(),
@@ -106,6 +124,8 @@ const plugins: PluginOption[] = [
       navigateFallbackDenylist: [/^\/api\//, /^\/health/],
       // Keep SW install reliable on low-end tablets (three.js ~688 kB).
       maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+      // Stable SW bytes: glob/includeAssets order can vary by filesystem.
+      manifestTransforms: [sortPrecacheManifest],
       // Fonts: CacheFirst for non-precached Inter weights.
       // Do NOT add a redundant CacheFirst for /assets/*.js — Workbox
       // precacheAndRoute already serves those. A second route does not fix
@@ -148,8 +168,18 @@ if (visualize) {
 }
 
 export default defineConfig({
+  // Absolute asset URLs in index.html / manifest assume site root hosting
+  // (Cloudflare Pages + custom domain). Do not switch to relative base without
+  // updating public/ links and PWA start_url/scope/icons.
+  base: '/',
+  // Production: no .map files (avoids absolute path leakage; kids do not need
+  // browser sourcemaps). Enable locally only when debugging a prod bundle.
+  esbuild: {
+    legalComments: 'none',
+  },
   plugins,
   build: {
+    sourcemap: false,
     // Menu entry should only preload shell deps (core/ui), not games or 3D.
     modulePreload: {
       resolveDependencies(filename, deps) {
@@ -163,6 +193,7 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
+        // Content-hashed names; manualChunks below keep logical names stable.
         chunkFileNames(chunkInfo) {
           if (
             chunkInfo.name === 'three' ||
