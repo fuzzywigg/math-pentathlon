@@ -35,6 +35,12 @@ import {
 } from '../core/polyomino/polyomino-ui';
 import { navigate } from '../core/router';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../core/dom-security';
+
 // Demo state
 let currentShapeSet: PolyominoShape[] = TETROMINOES;
 let selectedShape: PolyominoShape | null = null;
@@ -55,6 +61,7 @@ export function renderPolyominoDemo(container: HTMLElement): void {
 
   injectPolyominoStyles();
 
+  // trusted constant markup
   container.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" aria-label="Back to game list">← Back</button>
@@ -401,7 +408,7 @@ function renderShapeGallery(): void {
   const gallery = document.getElementById('shape-gallery');
   if (!gallery) return;
 
-  gallery.innerHTML = '';
+  clearElement(gallery);
 
   currentShapeSet.forEach((shape) => {
     const item = document.createElement('div');
@@ -447,23 +454,24 @@ function updateSelectedShapeDisplay(): void {
     return;
 
   if (!selectedShape) {
+    // trusted constant markup
     display.innerHTML =
       '<div class="placeholder">Click a shape above to select</div>';
-    controlsContainer.innerHTML = '';
-    orientationsGallery.innerHTML = '';
+    clearElement(controlsContainer);
+    clearElement(orientationsGallery);
     orientationCount.textContent = '';
     return;
   }
 
   // Render current orientation
-  display.innerHTML = '';
+  clearElement(display);
   const svg = renderPolyomino(selectedShape, currentRotation, isFlipped, {
     cellSize: 30,
   });
   display.appendChild(svg);
 
   // Rotation controls
-  controlsContainer.innerHTML = '';
+  clearElement(controlsContainer);
   const controls = createRotationControls(
     (dir) => {
       if (dir === 'cw') {
@@ -487,7 +495,7 @@ function updateSelectedShapeDisplay(): void {
   const allOrientations = getAllOrientations(selectedShape);
   orientationCount.textContent = `${allOrientations.length} unique orientation(s)`;
 
-  orientationsGallery.innerHTML = '';
+  clearElement(orientationsGallery);
   allOrientations.forEach((cells, i) => {
     const item = document.createElement('div');
     item.className = 'orientation-item';
@@ -540,13 +548,21 @@ function updateShapeInfo(): void {
   if (!infoContainer) return;
 
   if (!selectedShape) {
+    // trusted constant markup
     infoContainer.innerHTML = '<p>Select a shape to see details</p>';
     return;
   }
 
   const orientations = getAllOrientations(selectedShape);
 
-  infoContainer.innerHTML = `
+  const colorSwatch = document.createElement('span');
+  colorSwatch.style.cssText =
+    'display: inline-block; width: 20px; height: 20px; border-radius: 3px; vertical-align: middle;';
+  colorSwatch.style.background = selectedShape.color;
+
+  replaceWithSafeHtml(
+    infoContainer,
+    safeHtml`
     <h3>${selectedShape.name}</h3>
     <dl>
       <dt>ID</dt>
@@ -560,9 +576,10 @@ function updateShapeInfo(): void {
       <dt>Unique Orientations</dt>
       <dd>${orientations.length}</dd>
       <dt>Color</dt>
-      <dd><span style="display: inline-block; width: 20px; height: 20px; background: ${selectedShape.color}; border-radius: 3px; vertical-align: middle;"></span> ${selectedShape.color}</dd>
+      <dd>${colorSwatch} ${selectedShape.color}</dd>
     </dl>
-  `;
+  `
+  );
 }
 
 function renderBoardSection(): void {
@@ -575,7 +592,7 @@ function renderBoardSection(): void {
   const container = boardContainer; // Capture for nested functions
 
   function renderCurrentBoard(): void {
-    container.innerHTML = '';
+    clearElement(container);
 
     const svg = renderBoard(board, currentShapeSet, { cellSize: 30 });
     container.appendChild(svg);
@@ -725,8 +742,11 @@ function updateValidPositions(): void {
   );
   const canPlace = canPlaceShape(board, selectedShape);
 
-  positionsInfo.innerHTML = `
+  replaceWithSafeHtml(
+    positionsInfo,
+    safeHtml`
     <div><strong>Current orientation:</strong> ${positions.length} valid position(s)</div>
     <div><strong>Any orientation:</strong> ${canPlace ? 'Can be placed' : 'Cannot be placed'}</div>
-  `;
+  `
+  );
 }

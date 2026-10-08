@@ -21,6 +21,8 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { sumDominoesTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { clearElement } from '../../core/dom-security';
+
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -127,7 +129,7 @@ function updateUI(controller: SDGameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
   const computerTurn = isComputerTurnPending(controller);
-  container.innerHTML = '';
+  clearElement(container);
 
   // Main game area
   const gameArea = document.createElement('div');

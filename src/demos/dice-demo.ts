@@ -1,3 +1,4 @@
+import { clearElement } from '../core/dom-security';
 // Dice System Demo - Test page for dice functionality
 
 import {
@@ -8,10 +9,11 @@ import {
 } from '../core/dice';
 
 export function renderDiceDemo(container: HTMLElement): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'dice-demo';
+  // trusted constant markup
   wrapper.innerHTML = `
     <style>
       .dice-demo {

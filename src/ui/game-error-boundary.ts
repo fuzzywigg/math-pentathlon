@@ -4,6 +4,8 @@
  * shows a friendly reset UI — analogous to a React error boundary.
  */
 
+import { clearElement, setText } from '../core/dom-security';
+
 export interface GameErrorBoundaryOptions {
   /** Display name for copy (e.g. "Hex"). */
   gameName: string;
@@ -27,8 +29,9 @@ export interface GameErrorBoundaryHandle {
 }
 
 /**
- * Friendly crash / reset screen for a game route.
+ * Friendly crash / reset UI for a game route.
  * Distinct from chunk-load failure (`game-load-error`).
+ * Built with safe DOM APIs — gameName is never parsed as HTML.
  */
 export function renderGameCrash(
   container: HTMLElement,
@@ -36,25 +39,45 @@ export function renderGameCrash(
   onReset: () => void,
   onHome: () => void
 ): void {
-  container.innerHTML = `
-    <div class="game-loading game-loading-error" role="alert" data-testid="game-error-boundary">
-      <p class="game-loading-text">Something went wrong in ${escapeHtml(gameName)}.</p>
-      <p class="game-loading-hint" data-testid="game-error-boundary-hint">
-        You can try again or head back to the game list — your other games are fine.
-      </p>
-      <div class="game-loading-actions">
-        <button type="button" class="btn btn-primary" data-action="reset">Try again</button>
-        <button type="button" class="btn btn-secondary" data-action="home">Back to games</button>
-      </div>
-    </div>
-  `;
+  clearElement(container);
 
-  container
-    .querySelector('[data-action="reset"]')
-    ?.addEventListener('click', onReset);
-  container
-    .querySelector('[data-action="home"]')
-    ?.addEventListener('click', onHome);
+  const wrap = document.createElement('div');
+  wrap.className = 'game-loading game-loading-error';
+  wrap.setAttribute('role', 'alert');
+  wrap.setAttribute('data-testid', 'game-error-boundary');
+
+  const title = document.createElement('p');
+  title.className = 'game-loading-text';
+  setText(title, `Something went wrong in ${gameName}.`);
+
+  const hint = document.createElement('p');
+  hint.className = 'game-loading-hint';
+  hint.setAttribute('data-testid', 'game-error-boundary-hint');
+  setText(
+    hint,
+    'You can try again or head back to the game list — your other games are fine.'
+  );
+
+  const actions = document.createElement('div');
+  actions.className = 'game-loading-actions';
+
+  const resetBtn = document.createElement('button');
+  resetBtn.type = 'button';
+  resetBtn.className = 'btn btn-primary';
+  resetBtn.dataset.action = 'reset';
+  setText(resetBtn, 'Try again');
+  resetBtn.addEventListener('click', onReset);
+
+  const homeBtn = document.createElement('button');
+  homeBtn.type = 'button';
+  homeBtn.className = 'btn btn-secondary';
+  homeBtn.dataset.action = 'home';
+  setText(homeBtn, 'Back to games');
+  homeBtn.addEventListener('click', onHome);
+
+  actions.append(resetBtn, homeBtn);
+  wrap.append(title, hint, actions);
+  container.appendChild(wrap);
 }
 
 /**
@@ -119,12 +142,4 @@ export function installGameErrorBoundary(
       removeListeners();
     },
   };
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }

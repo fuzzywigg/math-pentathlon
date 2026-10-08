@@ -21,6 +21,12 @@ import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
+import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
@@ -86,20 +92,23 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
-  boardContainer.innerHTML = '';
+  clearElement(boardContainer);
   const humanCanAct = !isComputerTurn();
 
   // Render scores
   const scoresDiv = document.createElement('div');
   scoresDiv.className = 'contig-scores';
-  scoresDiv.innerHTML = `
+  replaceWithSafeHtml(
+    scoresDiv,
+    safeHtml`
     <div class="contig-score contig-score-p1">
       ${seatIcon('player1')} Blue: <strong>${gameState.scores.player1}</strong> pts
     </div>
     <div class="contig-score contig-score-p2">
       ${seatIcon('player2')} Red: <strong>${gameState.scores.player2}</strong> pts
     </div>
-  `;
+  `
+  );
   boardContainer.appendChild(scoresDiv);
 
   // Render dice area
@@ -155,11 +164,14 @@ function updateStatus(): void {
   markStatusLive(statusContainer);
 
   if (gameState.phase === 'gameOver') {
-    statusContainer.innerHTML = `
+    replaceWithSafeHtml(
+      statusContainer,
+      safeHtml`
       <div class="contig-winner-banner game-winner-banner">
         ${formatEndBanner(gameState.winner)}
       </div>
-    `;
+    `
+    );
     return;
   }
 
@@ -194,11 +206,18 @@ function updateStatus(): void {
     }
   }
 
-  statusContainer.innerHTML = `
-    <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
+  replaceWithSafeHtml(
+    statusContainer,
+    safeHtml`
+    <div class="contig-status">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
-  `;
+  `
+  );
+  const statusEl = statusContainer.querySelector('.contig-status');
+  if (statusEl) {
+    statusEl.className = `contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}`;
+  }
 }
 
 // =============================================================================

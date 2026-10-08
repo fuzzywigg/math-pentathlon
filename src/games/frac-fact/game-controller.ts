@@ -19,6 +19,8 @@ import { fracFactTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
   if (!root) return;
@@ -71,7 +73,7 @@ function scheduleAiTurn(): void {
 function render(): void {
   if (!gameContainer) return;
 
-  gameContainer.innerHTML = '';
+  clearElement(gameContainer);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'frac-game-container';

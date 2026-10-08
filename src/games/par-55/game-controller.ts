@@ -22,6 +22,8 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { par55Tutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { clearElement } from '../../core/dom-security';
+
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -133,7 +135,7 @@ export function initGame(
 function updateUI(controller: Par55GameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   // Main game area
   const gameArea = document.createElement('div');

@@ -1,5 +1,7 @@
 // Tutorial System - Provides step-by-step guidance for learning games
 
+import { setTrustedMarkup } from './dom-security';
+
 export interface TutorialStep {
   id: string;
   title: string;
@@ -232,10 +234,11 @@ export class TutorialManager {
     // Create overlay container
     this.overlayElement = document.createElement('div');
     this.overlayElement.className = 'tutorial-overlay';
-    this.overlayElement.innerHTML = `
-      <div class="tutorial-backdrop"></div>
-      <div class="tutorial-highlight-ring"></div>
-    `;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'tutorial-backdrop';
+    const highlightRing = document.createElement('div');
+    highlightRing.className = 'tutorial-highlight-ring';
+    this.overlayElement.append(backdrop, highlightRing);
 
     // Create tooltip
     this.tooltipElement = document.createElement('div');
@@ -250,30 +253,46 @@ export class TutorialManager {
       'aria-describedby',
       'tutorial-tooltip-message'
     );
-    this.tooltipElement.innerHTML = `
-      <div class="tutorial-tooltip-header">
-        <span class="tutorial-step-counter"></span>
-        <button class="tutorial-exit-btn" type="button" aria-label="Exit tutorial">&times;</button>
-      </div>
-      <h2 id="tutorial-tooltip-title" class="tutorial-tooltip-title"></h2>
-      <p id="tutorial-tooltip-message" class="tutorial-tooltip-message"></p>
-      <div class="tutorial-tooltip-actions">
-        <button class="tutorial-prev-btn" type="button">Back</button>
-        <button class="tutorial-next-btn" type="button">Next</button>
-      </div>
-    `;
+
+    const header = document.createElement('div');
+    header.className = 'tutorial-tooltip-header';
+    const counter = document.createElement('span');
+    counter.className = 'tutorial-step-counter';
+    const exitBtn = document.createElement('button');
+    exitBtn.className = 'tutorial-exit-btn';
+    exitBtn.type = 'button';
+    exitBtn.setAttribute('aria-label', 'Exit tutorial');
+    exitBtn.textContent = '\u00d7';
+    header.append(counter, exitBtn);
+
+    const title = document.createElement('h2');
+    title.id = 'tutorial-tooltip-title';
+    title.className = 'tutorial-tooltip-title';
+
+    const message = document.createElement('p');
+    message.id = 'tutorial-tooltip-message';
+    message.className = 'tutorial-tooltip-message';
+
+    const actions = document.createElement('div');
+    actions.className = 'tutorial-tooltip-actions';
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'tutorial-prev-btn';
+    prevBtn.type = 'button';
+    prevBtn.textContent = 'Back';
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'tutorial-next-btn';
+    nextBtn.type = 'button';
+    nextBtn.textContent = 'Next';
+    actions.append(prevBtn, nextBtn);
+
+    this.tooltipElement.append(header, title, message, actions);
 
     document.body.appendChild(this.overlayElement);
     document.body.appendChild(this.tooltipElement);
 
-    // Wire up buttons
-    const exitBtn = this.tooltipElement.querySelector('.tutorial-exit-btn');
-    const prevBtn = this.tooltipElement.querySelector('.tutorial-prev-btn');
-    const nextBtn = this.tooltipElement.querySelector('.tutorial-next-btn');
-
-    exitBtn?.addEventListener('click', () => this.exit());
-    prevBtn?.addEventListener('click', () => this.prevStep());
-    nextBtn?.addEventListener('click', () => {
+    exitBtn.addEventListener('click', () => this.exit());
+    prevBtn.addEventListener('click', () => this.prevStep());
+    nextBtn.addEventListener('click', () => {
       const step = this.getCurrentStep();
       // Only allow Next if there's no required action
       if (!step?.requiredAction) {
@@ -435,7 +454,10 @@ export class TutorialManager {
     ) as HTMLButtonElement;
 
     if (titleEl) titleEl.textContent = step.title;
-    if (messageEl) messageEl.innerHTML = step.message;
+    if (messageEl instanceof HTMLElement) {
+      // Author-trusted tutorial copy (allowlisted tags, no attributes).
+      setTrustedMarkup(messageEl, step.message);
+    }
     if (counterEl)
       counterEl.textContent = `Step ${this.currentStepIndex + 1} of ${this.getTotalSteps()}`;
 

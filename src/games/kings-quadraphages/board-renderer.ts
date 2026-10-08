@@ -1,3 +1,4 @@
+import { clearElement } from '../../core/dom-security';
 import { Board, BOARD_SIZE, Position, Cell } from './board';
 
 export type CellClickHandler = (position: Position) => void;
@@ -135,7 +136,7 @@ export function updateBoard(
   board: Board,
   options: BoardRendererOptions = {}
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {

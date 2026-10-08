@@ -6,6 +6,7 @@ import {
   shouldPreloadMenuDependency,
   uiManualChunkName,
 } from './vite.shell-chunks';
+import { securityHeadersPlugin } from './vite.security-headers';
 
 /**
  * Build + PWA for offline play after first visit.
@@ -27,6 +28,7 @@ import {
 const visualize = process.env.PERF_VISUALIZE === '1';
 
 const plugins: PluginOption[] = [
+  securityHeadersPlugin(),
   VitePWA({
     registerType: 'autoUpdate',
     // Manual registration via src/pwa/bootstrap.ts (update + reload policy).

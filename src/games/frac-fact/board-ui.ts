@@ -6,6 +6,8 @@ import { Fraction } from '../../core/fractions/types';
 import { getOperationSymbol } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 // =============================================================================
 // Fraction Visual Rendering
 // =============================================================================
@@ -100,6 +102,7 @@ export function renderProblem(state: FracFactState): HTMLElement {
   container.className = 'frac-problem';
 
   if (!state.currentProblem) {
+    // trusted constant markup
     container.innerHTML =
       '<div class="frac-no-problem">No problem loaded</div>';
     return container;
@@ -222,6 +225,7 @@ export function renderResult(
   feedback.className = `frac-feedback ${state.isCorrect ? 'correct' : 'incorrect'}`;
 
   if (state.isCorrect) {
+    // trusted constant markup
     feedback.innerHTML = `
       <div class="frac-feedback-icon">✓</div>
       <div class="frac-feedback-text">Correct!</div>
@@ -231,6 +235,7 @@ export function renderResult(
       state.currentProblem.correctAnswer,
       'medium'
     );
+    // trusted constant markup
     feedback.innerHTML = `
       <div class="frac-feedback-icon">✗</div>
       <div class="frac-feedback-text">Incorrect. The answer is:</div>
@@ -268,32 +273,45 @@ export function renderScores(state: FracFactState): HTMLElement {
   // Player 1 score
   const p1Score = document.createElement('div');
   p1Score.className = `frac-player-score ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1Score.innerHTML = `
+  replaceWithSafeHtml(
+    p1Score,
+    safeHtml`
     <div class="frac-player-name player1">${seatIcon('player1')} Blue</div>
     <div class="frac-score-value">${p1Stats.score}</div>
     <div class="frac-streak">${p1Stats.currentStreak > 0 ? `🔥 ${p1Stats.currentStreak}` : ''}</div>
-  `;
+  `
+  );
   container.appendChild(p1Score);
 
   // Progress indicator
   const progress = document.createElement('div');
   progress.className = 'frac-progress';
-  progress.innerHTML = `
+  replaceWithSafeHtml(
+    progress,
+    safeHtml`
     <div class="frac-progress-text">Problem ${state.problemsCompleted + 1} of ${state.maxProblems}</div>
     <div class="frac-progress-bar">
-      <div class="frac-progress-fill" style="width: ${(state.problemsCompleted / state.maxProblems) * 100}%"></div>
+      <div class="frac-progress-fill"></div>
     </div>
-  `;
+  `
+  );
+  const fill = progress.querySelector('.frac-progress-fill');
+  if (fill instanceof HTMLElement) {
+    fill.style.width = `${(state.problemsCompleted / state.maxProblems) * 100}%`;
+  }
   container.appendChild(progress);
 
   // Player 2 score
   const p2Score = document.createElement('div');
   p2Score.className = `frac-player-score ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2Score.innerHTML = `
+  replaceWithSafeHtml(
+    p2Score,
+    safeHtml`
     <div class="frac-player-name player2">${seatIcon('player2')} Red</div>
     <div class="frac-score-value">${p2Stats.score}</div>
     <div class="frac-streak">${p2Stats.currentStreak > 0 ? `🔥 ${p2Stats.currentStreak}` : ''}</div>
-  `;
+  `
+  );
   container.appendChild(p2Score);
 
   return container;
@@ -322,7 +340,9 @@ export function renderGameOver(state: FracFactState): HTMLElement {
     winnerText = "It's a Draw!";
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="frac-winner-banner">${winnerText}</div>
     <div class="frac-final-scores">
       <div class="frac-final-score player1">
@@ -342,7 +362,8 @@ export function renderGameOver(state: FracFactState): HTMLElement {
         </div>
       </div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }

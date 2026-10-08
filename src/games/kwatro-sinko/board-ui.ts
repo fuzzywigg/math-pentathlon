@@ -4,6 +4,8 @@
 import { KwaState, BoardNode, Chip, Player } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -280,11 +282,17 @@ export function renderChipInfo(_state: KwaState): HTMLElement {
 
   const p1Info = document.createElement('div');
   p1Info.className = 'kwa-player-info player1';
-  p1Info.innerHTML = `<span class="label">${seatIcon('player1')} Blue (Even):</span> 0, 2, 4, 6, 8`;
+  replaceWithSafeHtml(
+    p1Info,
+    safeHtml`<span class="label">${seatIcon('player1')} Blue (Even):</span> 0, 2, 4, 6, 8`
+  );
 
   const p2Info = document.createElement('div');
   p2Info.className = 'kwa-player-info player2';
-  p2Info.innerHTML = `<span class="label">${seatIcon('player2')} Red (Odd):</span> 1, 3, 5, 7, 9`;
+  replaceWithSafeHtml(
+    p2Info,
+    safeHtml`<span class="label">${seatIcon('player2')} Red (Odd):</span> 1, 3, 5, 7, 9`
+  );
 
   container.appendChild(p1Info);
   container.appendChild(p2Info);
@@ -317,7 +325,10 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
 
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
     const alignInfo = move.alignment ? ` → ${move.alignment.expression}` : '';
-    moveEl.innerHTML = `<strong>${move.moveNumber}.</strong> ${playerName}: ${move.chip.value}${alignInfo}`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`<strong>${move.moveNumber}.</strong> ${playerName}: ${move.chip.value}${alignInfo}`
+    );
 
     list.appendChild(moveEl);
   }

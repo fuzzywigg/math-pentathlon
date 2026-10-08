@@ -8,6 +8,8 @@ import {
   getValidPlacements,
 } from './types';
 import { calculatePoints } from './rules';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -179,6 +181,7 @@ export function renderExpressionSelector(
   if (placements.length === 0) {
     const noMoves = document.createElement('div');
     noMoves.className = 'contig-no-moves';
+    // trusted constant markup
     noMoves.innerHTML = `
       <p>No valid moves with these dice!</p>
       <button class="contig-pass-btn">Pass Turn</button>
@@ -201,11 +204,23 @@ export function renderExpressionSelector(
 
     const option = document.createElement('button');
     option.className = 'contig-expr-option';
-    option.innerHTML = `
+    const pointsEl =
+      points > 0
+        ? (() => {
+            const span = document.createElement('span');
+            span.className = 'expr-points';
+            span.textContent = `+${points} pt${points > 1 ? 's' : ''}`;
+            return span;
+          })()
+        : null;
+    replaceWithSafeHtml(
+      option,
+      safeHtml`
       <span class="expr-result">${result}</span>
       <span class="expr-formula">${formatExpression(expression)}</span>
-      ${points > 0 ? `<span class="expr-points">+${points} pt${points > 1 ? 's' : ''}</span>` : ''}
-    `;
+      ${pointsEl}
+    `
+    );
     option.addEventListener('click', () => onSelect(result, expression));
     list.appendChild(option);
   }

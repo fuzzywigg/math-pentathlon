@@ -25,9 +25,16 @@ import {
 } from '../core/fractions/fraction-bar-ui';
 import { navigate } from '../core/router';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../core/dom-security';
+
 export function renderFractionDemo(container: HTMLElement): void {
   injectFractionBarStyles();
 
+  // trusted constant markup
   container.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" aria-label="Back to game list">← Back</button>
@@ -533,6 +540,7 @@ function setupArithmeticCalculator(): void {
 
     if (!a || !b) {
       if (resultContainer) {
+        // trusted constant markup
         resultContainer.innerHTML =
           '<p style="color: red;">Invalid fraction format. Use format like "3/4" or "1 1/2"</p>';
       }
@@ -542,17 +550,24 @@ function setupArithmeticCalculator(): void {
     const result = performOperation(a, b, currentOp);
 
     if (resultContainer) {
-      const stepsHtml =
-        result.steps?.map((s) => `<div>${s}</div>`).join('') || '';
+      const stepsFrag = document.createDocumentFragment();
+      for (const s of result.steps ?? []) {
+        const stepEl = document.createElement('div');
+        stepEl.textContent = s;
+        stepsFrag.appendChild(stepEl);
+      }
 
-      resultContainer.innerHTML = `
-        <div class="steps">${stepsHtml}</div>
+      replaceWithSafeHtml(
+        resultContainer,
+        safeHtml`
+        <div class="steps">${stepsFrag}</div>
         <div class="final-result">${formatFraction(result.simplified)} = ${result.decimal.toFixed(4)}</div>
         <div class="visual-result">
           <span>Visual:</span>
           <div id="result-bar"></div>
         </div>
-      `;
+      `
+      );
 
       const barContainer = document.getElementById('result-bar');
       if (barContainer) {
@@ -582,7 +597,7 @@ function setupInteractiveBar(): void {
 
   function renderInteractive(): void {
     if (!container) return;
-    container.innerHTML = '';
+    clearElement(container);
 
     const bar = createInteractiveFractionBar(
       { numerator: currentNumer, denominator: currentDenom },
@@ -627,6 +642,7 @@ function setupComparison(): void {
 
     if (!a || !b) {
       if (resultContainer) {
+        // trusted constant markup
         resultContainer.innerHTML =
           '<p style="color: red;">Invalid fraction format</p>';
       }
@@ -634,7 +650,7 @@ function setupComparison(): void {
     }
 
     if (resultContainer) {
-      resultContainer.innerHTML = '';
+      clearElement(resultContainer);
 
       const comparison = renderFractionComparison(a, b, {
         width: 150,
@@ -678,6 +694,7 @@ function setupEquivalentFinder(): void {
 
     if (!fraction) {
       if (resultContainer) {
+        // trusted constant markup
         resultContainer.innerHTML =
           '<p style="color: red;">Invalid fraction format</p>';
       }
@@ -688,11 +705,12 @@ function setupEquivalentFinder(): void {
     const equivalents = findEquivalentFractions(simplified, 24);
 
     if (resultContainer) {
-      resultContainer.innerHTML = '';
+      clearElement(resultContainer);
 
       // Show simplified form first
       const simplifiedItem = document.createElement('div');
       simplifiedItem.className = 'equivalent-item';
+      // trusted constant markup
       simplifiedItem.innerHTML = `
         <span>Simplified</span>
       `;
@@ -714,7 +732,7 @@ function setupEquivalentFinder(): void {
         ) {
           const item = document.createElement('div');
           item.className = 'equivalent-item';
-          item.innerHTML = `<span>/ ${eq.denominator}</span>`;
+          replaceWithSafeHtml(item, safeHtml`<span>/ ${eq.denominator}</span>`);
 
           const bar = renderFractionBar(eq, {
             style: 'horizontal',

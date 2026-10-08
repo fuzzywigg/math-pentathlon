@@ -39,6 +39,12 @@ import {
 import { loadQueensGuardsBoard3DModule } from './board-3d-loader';
 import type { QueensGuardsBoard3D } from '../../ui/three/queens-guards-board-3d';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
 declare global {
   interface Window {
     __mp3dQueensGuardsCtrl?: {
@@ -172,7 +178,7 @@ function updateUI(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, onCell);
   } else if (!board3dEnabled) {
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(gameState, onCell);
     boardContainer.appendChild(svg);
   }
@@ -189,17 +195,20 @@ function updateStatus(): void {
     const winnerName = getPlayerName(gameState.winner);
     // Formation win vs stalemate (no queen+guards ring) — keep prior copy.
     const isFormationWin = checkWinner(gameState) === gameState.winner;
-    statusContainer.innerHTML = isFormationWin
-      ? `
+    replaceWithSafeHtml(
+      statusContainer,
+      isFormationWin
+        ? safeHtml`
       <div class="qg-winner-banner">
         ${winnerName} wins! 👑
       </div>
     `
-      : `
+        : safeHtml`
       <div class="qg-winner-banner">
         ${getPlayerName(gameState.currentPlayer)} cannot move - ${winnerName} wins!
       </div>
-    `;
+    `
+    );
 
     if (!hasNotifiedGameEnd) {
       hasNotifiedGameEnd = true;
@@ -234,15 +243,25 @@ function updateStatus(): void {
     instruction = 'Computer is thinking…';
   }
 
-  statusContainer.innerHTML = `
-    <div class="qg-status ${playerClass}${showAiChrome ? ' status-ai-thinking' : ''}">
+  const vsAiNote = vsAI ? document.createElement('span') : null;
+  if (vsAiNote) vsAiNote.textContent = 'Playing vs AI';
+
+  replaceWithSafeHtml(
+    statusContainer,
+    safeHtml`
+    <div class="qg-status">
       ${playerName}'s turn - ${instruction}
     </div>
     <div class="qg-info">
       <span>Move ${Math.floor(gameState.moveHistory.length / 2) + 1}</span>
-      ${vsAI ? `<span>Playing vs AI</span>` : ''}
+      ${vsAiNote}
     </div>
-  `;
+  `
+  );
+  const statusEl = statusContainer.querySelector('.qg-status');
+  if (statusEl) {
+    statusEl.className = `qg-status ${playerClass}${showAiChrome ? ' status-ai-thinking' : ''}`;
+  }
 }
 
 // =============================================================================

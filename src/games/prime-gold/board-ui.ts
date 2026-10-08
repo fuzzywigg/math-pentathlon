@@ -14,6 +14,8 @@ import {
 } from '../../ui/board-a11y';
 import { seatIcon } from '../../ui/player-colors';
 
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 // =============================================================================
 // Style Injection
 // =============================================================================
@@ -525,6 +527,7 @@ export function renderBoard(
   // Legend
   const legend = document.createElement('div');
   legend.className = 'pg-legend';
+  // trusted constant markup
   legend.innerHTML = `
     <div class="pg-legend-item">
       <div class="pg-legend-swatch prime"></div>
@@ -561,7 +564,10 @@ export function renderDice(
   container.className = 'pg-dice-area';
 
   const title = document.createElement('div');
-  title.innerHTML = `<strong>${getPlayerName(state.currentPlayer)}'s Turn</strong>`;
+  replaceWithSafeHtml(
+    title,
+    safeHtml`<strong>${getPlayerName(state.currentPlayer)}'s Turn</strong>`
+  );
   container.appendChild(title);
 
   const diceContainer = document.createElement('div');
@@ -646,7 +652,7 @@ export function renderExpressions(
       const item = document.createElement('div');
       item.className = 'pg-expr-item';
       if (isPrime(value)) item.classList.add('prime');
-      item.innerHTML = `<strong>${value}</strong> = ${expr}`;
+      replaceWithSafeHtml(item, safeHtml`<strong>${value}</strong> = ${expr}`);
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
       item.setAttribute(
@@ -711,7 +717,10 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
     const move = state.moveHistory[i];
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;
-    moveEl.innerHTML = `${getPlayerName(move.player)}: ${move.expression} = <strong>${move.result}</strong>`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`${getPlayerName(move.player)}: ${move.expression} = <strong>${move.result}</strong>`
+    );
     container.appendChild(moveEl);
   }
 

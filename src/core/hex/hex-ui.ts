@@ -1,6 +1,7 @@
 // Hex Rendering UI
 // SVG-based hex grid rendering utilities
 
+import { clearElement } from '../dom-security';
 import { AxialCoord, HexLayout, PixelCoord, coordKey } from './types';
 import { axialToPixel, hexesInRange } from './coordinates';
 
@@ -350,7 +351,7 @@ export function createInteractiveHexGrid(
   let currentGetCellOptions = options.getCellOptions;
 
   function render(): void {
-    container.innerHTML = '';
+    clearElement(container);
 
     const wrappedGetCellOptions = (coord: AxialCoord): HexRenderOptions => {
       const baseOptions = currentGetCellOptions?.(coord) ?? {};

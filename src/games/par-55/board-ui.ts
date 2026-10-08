@@ -11,6 +11,8 @@ import {
 } from './types';
 import { getValidPlacements, calculateScore } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -442,7 +444,10 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'par55-score player1';
-  p1Score.innerHTML = `<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}</span>`;
+  replaceWithSafeHtml(
+    p1Score,
+    safeHtml`<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}</span>`
+  );
 
   const target = document.createElement('div');
   target.className = 'par55-target';
@@ -450,7 +455,10 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p2Score = document.createElement('div');
   p2Score.className = 'par55-score player2';
-  p2Score.innerHTML = `<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}</span>`;
+  replaceWithSafeHtml(
+    p2Score,
+    safeHtml`<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}</span>`
+  );
 
   container.appendChild(p1Score);
   container.appendChild(target);
@@ -483,7 +491,10 @@ export function renderMoveHistory(state: Par55State): HTMLElement {
     const b = move.block;
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
     const attrs = `${b.color} ${b.shape}`;
-    moveEl.innerHTML = `<strong>${move.moveNumber}.</strong> ${playerName}: ${attrs} (+${move.pointsScored})`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`<strong>${move.moveNumber}.</strong> ${playerName}: ${attrs} (+${move.pointsScored})`
+    );
 
     list.appendChild(moveEl);
   }

@@ -11,6 +11,8 @@ import {
 } from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeSvgFocusable,
@@ -310,6 +312,7 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
   container.className = 'remainder-dice';
 
   if (!roll) {
+    // trusted constant markup
     container.innerHTML = `
       <div class="dice-placeholder">
         <span class="dice-icon">🎲</span>
@@ -319,7 +322,9 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
     return container;
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="dice-result">
       <div class="die">${getDieFace(roll.die1)}</div>
       <div class="dice-plus">+</div>
@@ -327,7 +332,8 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
       <div class="dice-equals">=</div>
       <div class="dice-total">${roll.total}</div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }
@@ -350,8 +356,10 @@ export function renderScores(state: RemainderIslandsState): HTMLElement {
   const p1Chips = getPlayerChips(state, 'player1');
   const p2Chips = getPlayerChips(state, 'player2');
 
-  container.innerHTML = `
-    <div class="remainder-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1">
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
+    <div class="remainder-player-score player1">
       <div class="remainder-player-name">Blue</div>
       <div class="remainder-score-value">${p1Score}</div>
       <div class="remainder-chips">🪙 ${p1Chips}</div>
@@ -360,12 +368,21 @@ export function renderScores(state: RemainderIslandsState): HTMLElement {
       <div class="remainder-turns-label">Turns Left</div>
       <div class="remainder-turns-value">${state.turnsRemaining}</div>
     </div>
-    <div class="remainder-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2">
+    <div class="remainder-player-score player2">
       <div class="remainder-player-name">Red</div>
       <div class="remainder-score-value">${p2Score}</div>
       <div class="remainder-chips">🪙 ${p2Chips}</div>
     </div>
-  `;
+  `
+  );
+  const p1El = container.querySelector('.remainder-player-score.player1');
+  const p2El = container.querySelector('.remainder-player-score.player2');
+  if (p1El) {
+    p1El.className = `remainder-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1`;
+  }
+  if (p2El) {
+    p2El.className = `remainder-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2`;
+  }
 
   return container;
 }
@@ -387,7 +404,9 @@ export function renderDivisionPreview(
   const preview = previewDivision(state, state.selectedIsland);
   if (!preview) return container;
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="division-equation">
       <span class="dividend">${preview.dividend}</span>
       <span class="operator">÷</span>
@@ -398,7 +417,8 @@ export function renderDivisionPreview(
       <span class="remainder">${preview.remainder}</span>
     </div>
     <div class="points-preview">+${preview.remainder} points</div>
-  `;
+  `
+  );
 
   return container;
 }
@@ -423,7 +443,9 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
     winnerText = "It's a Draw!";
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="remainder-winner-banner">${winnerText}</div>
     <div class="remainder-final-scores">
       <div class="remainder-final-score player1">
@@ -435,7 +457,8 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
         <div class="remainder-final-value">${p2Score} points</div>
       </div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }

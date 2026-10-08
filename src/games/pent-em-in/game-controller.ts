@@ -34,6 +34,8 @@ import {
 import { loadPentEmInBoard3DModule } from './board-3d-loader';
 import type { PentEmInBoard3D } from '../../ui/three/pent-em-in-board-3d';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
   if (!root) return;
@@ -122,7 +124,7 @@ function render(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -142,7 +144,7 @@ function renderBoardOnly(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -155,7 +157,7 @@ function renderBoardOnly(): void {
 
 function renderStatusAndControls(): void {
   if (!statusContainer) return;
-  statusContainer.innerHTML = '';
+  clearElement(statusContainer);
   markStatusLive(statusContainer);
 
   // Winner banner

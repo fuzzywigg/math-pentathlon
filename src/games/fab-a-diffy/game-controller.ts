@@ -31,6 +31,8 @@ import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
   if (!root) return;
@@ -122,7 +124,7 @@ export function initGame(
  */
 function updateUI(controller: FabGameController): void {
   const { container, state } = controller;
-  container.innerHTML = '';
+  clearElement(container);
 
   const humanCanAct = !isComputerSeat(controller);
 

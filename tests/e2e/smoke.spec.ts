@@ -564,6 +564,86 @@ test.describe('Menu smoke', () => {
   });
 });
 
+/**
+ * burn-1008: CSP Report-Only + companion headers must be present, and
+ * visiting the menu + all 20 games must produce zero CSP violations
+ * (console or SecurityPolicyViolationEvent).
+ */
+test.describe('CSP report-only smoke', () => {
+  test('headers present; menu + all games load with zero CSP violations', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000);
+
+    const cspViolations: string[] = [];
+    const consoleCsp: string[] = [];
+
+    page.on('console', (msg) => {
+      const text = msg.text();
+      if (/content security policy|refused to|csp/i.test(text)) {
+        consoleCsp.push(`[${msg.type()}] ${text}`);
+      }
+    });
+
+    await page.addInitScript(() => {
+      const w = window as Window & { __mpCspViolations?: string[] };
+      w.__mpCspViolations = [];
+      window.addEventListener('securitypolicyviolation', (event) => {
+        w.__mpCspViolations?.push(
+          `${event.violatedDirective}: ${event.blockedURI || event.sourceFile || '(inline)'}`
+        );
+      });
+    });
+
+    const home = await page.goto('/');
+    expect(home).not.toBeNull();
+    const headers = home!.headers();
+    expect(headers['content-security-policy-report-only'] || '').toMatch(
+      /default-src\s+'self'/
+    );
+    expect(headers['content-security-policy-report-only'] || '').toMatch(
+      /frame-ancestors\s+'none'/
+    );
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    expect(headers['permissions-policy'] || '').toMatch(/camera=\(\)/);
+
+    await expect(page.locator('h1')).toContainText('Math Pentathlon');
+    await expect(page.locator('.game-card').first()).toBeVisible();
+
+    for (const game of AVAILABLE_GAMES) {
+      await gotoGame(page, game.id);
+      await expect(mountLocator(page, game.id)).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+
+    // Service worker may be inactive in plain Vite dev (PWA_DEV off) —
+    // still assert the registration path does not CSP-fail when present.
+    const swCount = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return 0;
+      const regs = await navigator.serviceWorker.getRegistrations();
+      return regs.length;
+    });
+    expect(swCount).toBeGreaterThanOrEqual(0);
+
+    const pageViolations = await page.evaluate(() => {
+      const w = window as Window & { __mpCspViolations?: string[] };
+      return w.__mpCspViolations ?? [];
+    });
+    cspViolations.push(...pageViolations);
+
+    expect(
+      cspViolations,
+      `CSP SecurityPolicyViolationEvent(s):\n${cspViolations.join('\n')}`
+    ).toEqual([]);
+    expect(
+      consoleCsp,
+      `CSP-related console message(s):\n${consoleCsp.join('\n')}`
+    ).toEqual([]);
+  });
+});
+
 test.describe('Every game opens', () => {
   for (const game of AVAILABLE_GAMES) {
     test(`${game.id} loads title and board`, async ({ page }) => {

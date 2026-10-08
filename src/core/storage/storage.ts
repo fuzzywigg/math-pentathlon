@@ -2,6 +2,17 @@
 
 import { setUserReducedMotionFlag } from '../settings-flags';
 import {
+  sanitizeAchievements,
+  sanitizeDisplayStringAllowEmpty,
+  sanitizeGameStatsMap,
+  sanitizeOwlState,
+  sanitizeProfile,
+  sanitizeSettings,
+  sanitizeStreak,
+  MAX_PROFILE_AVATAR_LENGTH,
+  MAX_PROFILE_NAME_LENGTH,
+} from './sanitize';
+import {
   ProgressData,
   PlayerProfile,
   GameStats,
@@ -13,8 +24,6 @@ import {
   createDefaultProgress,
   createDefaultGameStats,
   CURRENT_DATA_VERSION,
-  DEFAULT_SETTINGS,
-  DEFAULT_OWL_STATE,
 } from './types';
 
 const STORAGE_KEY = 'math-pentathlon-progress';
@@ -87,60 +96,17 @@ class StorageManager {
       throw new TypeError('Progress data must be a plain object');
     }
 
-    const owl = isPlainObject(data.owlState)
-      ? (data.owlState as OwlState)
-      : null;
-    const streak = isPlainObject(data.streak)
-      ? (data.streak as StreakData)
-      : null;
-    const settings = isPlainObject(data.settings)
-      ? (data.settings as Partial<UserSettings>)
-      : null;
-    const profile = isPlainObject(data.profile)
-      ? (data.profile as PlayerProfile)
-      : null;
-    const achievements = Array.isArray(data.achievements)
-      ? data.achievements
-      : [];
-    const gameStats = isPlainObject(data.gameStats)
-      ? (data.gameStats as Record<string, GameStats>)
-      : {};
-
     return {
-      version: data.version || CURRENT_DATA_VERSION,
-      profile,
-      streak: streak || {
-        currentStreak: 0,
-        bestStreak: 0,
-        lastPlayDate: '',
-        streakStartDate: '',
-      },
-      achievements,
-      gameStats,
-      owlState: owl
-        ? {
-            mood: owl.mood ?? DEFAULT_OWL_STATE.mood,
-            lastInteraction:
-              owl.lastInteraction ?? DEFAULT_OWL_STATE.lastInteraction,
-            messagesSeen: [
-              ...(Array.isArray(owl.messagesSeen) ? owl.messagesSeen : []),
-            ],
-            tutorialsCompleted: [
-              ...(Array.isArray(owl.tutorialsCompleted)
-                ? owl.tutorialsCompleted
-                : []),
-            ],
-            totalMessagesShown:
-              owl.totalMessagesShown ?? DEFAULT_OWL_STATE.totalMessagesShown,
-          }
-        : {
-            mood: DEFAULT_OWL_STATE.mood,
-            lastInteraction: DEFAULT_OWL_STATE.lastInteraction,
-            messagesSeen: [],
-            tutorialsCompleted: [],
-            totalMessagesShown: DEFAULT_OWL_STATE.totalMessagesShown,
-          },
-      settings: { ...DEFAULT_SETTINGS, ...settings },
+      version:
+        typeof data.version === 'number' && Number.isFinite(data.version)
+          ? data.version
+          : CURRENT_DATA_VERSION,
+      profile: sanitizeProfile(data.profile),
+      streak: sanitizeStreak(data.streak),
+      achievements: sanitizeAchievements(data.achievements),
+      gameStats: sanitizeGameStatsMap(data.gameStats),
+      owlState: sanitizeOwlState(data.owlState),
+      settings: sanitizeSettings(data.settings),
     };
   }
 
@@ -179,15 +145,23 @@ class StorageManager {
   }
 
   public setProfile(profile: PlayerProfile): void {
-    this.data.profile = profile;
+    const sanitized = sanitizeProfile(profile);
+    if (!sanitized) {
+      throw new TypeError('Invalid player profile');
+    }
+    this.data.profile = sanitized;
     this.save();
   }
 
   public createProfile(name: string, avatar: string): PlayerProfile {
+    const safeName =
+      sanitizeDisplayStringAllowEmpty(name, MAX_PROFILE_NAME_LENGTH) ?? '';
+    const safeAvatar =
+      sanitizeDisplayStringAllowEmpty(avatar, MAX_PROFILE_AVATAR_LENGTH) ?? '';
     const profile: PlayerProfile = {
       id: crypto.randomUUID(),
-      name,
-      avatar,
+      name: safeName,
+      avatar: safeAvatar,
       createdAt: Date.now(),
       lastActiveAt: Date.now(),
     };
@@ -367,7 +341,10 @@ class StorageManager {
   }
 
   public updateSettings(settings: Partial<UserSettings>): void {
-    this.data.settings = { ...this.data.settings, ...settings };
+    this.data.settings = sanitizeSettings({
+      ...this.data.settings,
+      ...settings,
+    });
     setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
     this.save();
   }

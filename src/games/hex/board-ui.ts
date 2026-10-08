@@ -4,6 +4,12 @@ import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
 import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
+import {
   buildCellAriaLabel,
   makeGridCell,
   markBoardAsGrid,
@@ -31,7 +37,7 @@ export function renderBoard(
   onCellClick?: CellClickCallback
 ): void {
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const size = state.boardSize;
 
@@ -348,7 +354,7 @@ export function renderStatus(
   isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'hex-status';
@@ -416,10 +422,13 @@ export function renderStatus(
     gameMode === 'human-vs-ai'
       ? `${seatIcon('player2')} AI: Left ↔ Right`
       : `${seatIcon('player2')} Red: Left ↔ Right`;
-  legendEl.innerHTML = `
+  replaceWithSafeHtml(
+    legendEl,
+    safeHtml`
     <span class="hex-legend-item hex-legend-p1">${p1Legend}</span>
     <span class="hex-legend-item hex-legend-p2">${p2Legend}</span>
-  `;
+  `
+  );
   statusEl.appendChild(legendEl);
 
   container.appendChild(statusEl);
