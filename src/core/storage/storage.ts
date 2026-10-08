@@ -96,11 +96,15 @@ class StorageManager {
       throw new TypeError('Progress data must be a plain object');
     }
 
+    // `version || CURRENT` preserves historical import behavior: version 0
+    // (and other falsy numbers) is stamped up to CURRENT_DATA_VERSION.
+    const version =
+      typeof data.version === 'number' && Number.isFinite(data.version)
+        ? data.version || CURRENT_DATA_VERSION
+        : CURRENT_DATA_VERSION;
+
     return {
-      version:
-        typeof data.version === 'number' && Number.isFinite(data.version)
-          ? data.version
-          : CURRENT_DATA_VERSION,
+      version,
       profile: sanitizeProfile(data.profile),
       streak: sanitizeStreak(data.streak),
       achievements: sanitizeAchievements(data.achievements),
