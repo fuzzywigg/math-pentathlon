@@ -1953,6 +1953,21 @@ svg [role='gridcell']:focus-visible {
   }
 }
 
+/* In-app reduced-motion setting mirrors OS media for Hex */
+html[data-reduced-motion='true'] .hex-cell-p1,
+html[data-reduced-motion='true'] .hex-cell-p2,
+html[data-reduced-motion='true'] .hex-cell-winning {
+  animation: none !important;
+}
+
+html[data-reduced-motion='true'] .hex-cell-empty:hover {
+  transform: none;
+}
+
+html[data-reduced-motion='true'] .hex-cell-winning {
+  filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+}
+
 /* =====================================================
    STAR TRACK GAME STYLES
    ===================================================== */
@@ -2356,6 +2371,27 @@ svg [role='gridcell']:focus-visible {
   .star-track-chain-btn:hover:not(:disabled) {
     transform: none;
   }
+}
+
+/* In-app reduced-motion setting mirrors OS media for Star Track */
+html[data-reduced-motion='true'] .star-track-goal,
+html[data-reduced-motion='true'] .star-track-ray,
+html[data-reduced-motion='true'] .star-track-winner {
+  animation: none !important;
+}
+
+html[data-reduced-motion='true'] .star-track-space,
+html[data-reduced-motion='true'] .star-track-piece,
+html[data-reduced-motion='true'] .star-track-draw-btn,
+html[data-reduced-motion='true'] .star-track-chain-btn,
+html[data-reduced-motion='true'] .star-track-progress .progress-fill {
+  transition: none !important;
+}
+
+html[data-reduced-motion='true'] .star-track-space:hover,
+html[data-reduced-motion='true'] .star-track-draw-btn:hover:not(:disabled),
+html[data-reduced-motion='true'] .star-track-chain-btn:hover:not(:disabled) {
+  transform: none;
 }
 
 /* =====================================================

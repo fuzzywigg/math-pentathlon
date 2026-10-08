@@ -1,5 +1,6 @@
 import './style.css';
 import './ui/styles/mobile-play-shell.css';
+import './ui/styles/forced-colors.css';
 import {
   addRoute,
   initRouter,

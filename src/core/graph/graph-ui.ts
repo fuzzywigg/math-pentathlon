@@ -10,6 +10,23 @@ import {
   NodeState,
 } from './types';
 import { getNeighbors } from './algorithms';
+import { getUserReducedMotionFlag } from '../settings-flags';
+
+/** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
+function graphPrefersReducedMotion(): boolean {
+  if (getUserReducedMotionFlag()) return true;
+  if (
+    typeof window === 'undefined' ||
+    typeof window.matchMedia !== 'function'
+  ) {
+    return false;
+  }
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Calculate the bounding box of all nodes
@@ -332,6 +349,8 @@ export function animateMove(
   graph: Graph,
   duration: number = 500
 ): Promise<void> & { cancel: AnimateMoveCancel } {
+  // Decorative path marker only — skip motion under reduced-motion (no AI timing).
+  const effectiveDuration = graphPrefersReducedMotion() ? 0 : duration;
   let cancelled = false;
   let rafId = 0;
   let settled = false;
@@ -379,7 +398,8 @@ export function animateMove(
 
     let currentStep = 0;
     const totalSteps = path.length - 1;
-    const stepDuration = duration / totalSteps;
+    const stepDuration =
+      effectiveDuration <= 0 ? 0 : effectiveDuration / totalSteps;
 
     function animateStep(): void {
       if (cancelled) {

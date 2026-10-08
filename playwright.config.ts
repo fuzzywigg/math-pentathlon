@@ -21,6 +21,9 @@ import { defineConfig, devices } from '@playwright/test';
  *   npm run test:e2e:fullgame
  *   npx playwright test tests/e2e/fullgame --project=chromium
  *
+ * Forced-colors / reduced-motion smoke (Chromium, report-only):
+ *   npm run test:e2e:forced-colors
+ *
  * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
  * CI never accidentally pulls in WebKit/Firefox/mobile.
@@ -39,7 +42,7 @@ const workerLimit = process.env.CI
 
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =
-  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
+  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts|forced-colors-a11y\.spec\.ts/;
 
 /**
  * Fullgame HvH specs live under tests/e2e/fullgame/ and stay on the chromium
@@ -132,6 +135,22 @@ export default defineConfig({
         defaultBrowserType: 'chromium',
         hasTouch: true,
         isMobile: true,
+      },
+    },
+    {
+      name: 'forced-colors',
+      testMatch: /forced-colors-a11y\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        // Spec drives emulateMedia(forcedColors / reducedMotion) per test.
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
       },
     },
     {

@@ -565,6 +565,22 @@ export function injectContigStyles(): void {
         max-width: 100%;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .contig-cell,
+      .contig-expr-option,
+      .contig-roll-btn,
+      .contig-pass-btn {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .contig-cell,
+    html[data-reduced-motion='true'] .contig-expr-option,
+    html[data-reduced-motion='true'] .contig-roll-btn,
+    html[data-reduced-motion='true'] .contig-pass-btn {
+      transition: none !important;
+    }
   `;
   document.head.appendChild(style);
 }
