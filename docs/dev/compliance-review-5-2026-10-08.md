@@ -92,13 +92,15 @@ Scratch: `git checkout -B scratch <PR559>` then `git revert --no-edit <restore-s
 | ai-queens | `b94d6068` | **OK** | |
 | ai-kings | `a1b2495e` | **OK** | lint/tsc green after revert (`eef51679`) |
 | ai-kwatro | `75518dac` | **FAIL** | conflict in `src/games/kwatro-sinko/ai.ts` — only `import type { … BoardNode}` vs `BoardNode }` whitespace from later tip-compat on same file; still fails after reverting companion `e5c7de39` first |
-| ai-contig | `63baef8d` | **OK** | |
+| ai-contig | `63baef8d` | **OK** | Full `test:unit` after revert: **0** (3042 files / 11221 passed) |
 | ai-think-delays | `7dbf46fe` | **OK** | |
 | tutorial-div1 | `6b36f336` | **FAIL** alone | modify/delete on handshake tests deleted by companion `fc9a1076`; **OK** if companion reverted first then restore |
 | tutorial-div2 | `3af2a597` | **OK** | |
 | tutorial-div3 | `e7ea8186` | **OK** | |
 | tutorial-div4 | `3c06c8ad` | **OK** | |
 | status-copy | `b464f8df` | **OK** | |
+
+Sample post-revert suite: after clean `git revert 63baef8d` on PR559 HEAD, `npm run test:unit` → exit **0**. After clean `git revert a1b2495e` (ai-kings), `npm run lint` + `npx tsc --noEmit` → exit **0** / **0**.
 
 #### 4) Scope outside AI/copy
 
@@ -117,7 +119,7 @@ Product extras: `storage.ts` (lint unblock), `juggle/game-controller.ts` (not in
 | `npm run test:unit` | **0** — 3042 files passed (fewer than tip: tip pins deleted) |
 | `npm run build` | **0** (after env `npm install --no-save rollup-plugin-visualizer`) |
 
-Logs: `/opt/cursor/artifacts/pr559-suite.log`, revert notes `/opt/cursor/artifacts/pr559-revert-tests.log`, tip merge `/opt/cursor/artifacts/tip-plus-559-merge.log`.
+Logs: `/opt/cursor/artifacts/pr559-suite.log`, revert notes `/opt/cursor/artifacts/pr559-revert-tests.log`, post-revert unit `/opt/cursor/artifacts/pr559-revert-contig-unit.log`, tip merge `/opt/cursor/artifacts/tip-plus-559-merge.log`.
 
 ### Pairwise conflicts
 
@@ -243,6 +245,13 @@ Logs: `/opt/cursor/artifacts/pr560-suite.log`, `tip-plus-560-suite.log`, `pr560-
 | --- | ---: | ---: | ---: | ---: |
 | #559 `8d930739` | 0 | 0 | 0 | 0* |
 | #560 `13812c59` | 0 | 0 | 0 | 0* |
+
+### #559 post-revert sample
+
+| Command | Exit |
+| --- | ---: |
+| `git revert 63baef8d` then `npm run test:unit` | 0 |
+| `git revert a1b2495e` then `npm run lint` / `npx tsc --noEmit` | 0 / 0 |
 
 ### #560 emit-identity
 
