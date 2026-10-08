@@ -137,19 +137,30 @@ Before/after comparison (same tip, no package changes; second `npm run build` af
 
 Artifact paths used during the pass: `/opt/cursor/artifacts/dep-advisory/` (`audit-before.json`, `outdated-after-ci.json`, `dist-inventory-before.json`, logs).
 
-## Verification commands
+## Verification commands and results
+
+| Command | Result |
+| --- | --- |
+| `npm ci` | **pass** (exit 0; 536 packages; `found 0 vulnerabilities`) |
+| `npm audit` (before) | **0** total (info/low/moderate/high/critical all 0) |
+| `npm audit` (after) | **0** total (no package edits) |
+| `npm outdated --json` | majors only (table above); all `current == wanted` |
+| `npm run lint` | **pass** (exit 0) |
+| `npx tsc --noEmit` | **pass** (exit 0) |
+| `npm run test:unit` | **pass** — 3104 files / 11724 passed / 11 skipped (exit 0) |
+| `npm run build` | **pass** — `tsc && vite build` + PWA generateSW 67 entries (exit 0) |
+| Dist before/after | **identical** — 74 files, 1 917 887 bytes, 0 size/hash diffs |
+| `npm run check:build` | **pass** — `byteIdentical=true` `precacheOk=true` `leaks=0` (exit 0) |
+| `git diff --name-only` vs tip | `docs/dev/dependency-advisory-audit.md` only |
 
 ```bash
 npm ci
-npm audit --json          # before: total 0; after: total 0 (no package edits)
-npm outdated --json       # majors only (table above)
+npm audit --json
+npm outdated --json
 npm run lint
 npx tsc --noEmit
 npm run test:unit
 npm run build
-npm run check:build       # tip #524 harness
+npm run check:build
 git diff --name-only origin/cursor/integration-fold-wave5-tip-4af0
-# expected: docs/dev/dependency-advisory-audit.md only
 ```
-
-Results recorded in the PR body.
