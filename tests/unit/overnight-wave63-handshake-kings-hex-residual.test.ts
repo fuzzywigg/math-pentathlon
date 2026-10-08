@@ -3,7 +3,6 @@
  * Distinct from wave59 select-king / Ready to Play / Red Trapezoids handshake. Tests-only.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { readAppCss } from './_app-css';
 import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tutorial';
 import { hexTutorial } from '../../src/games/hex/tutorial';
 import { hexAGoneTutorial } from '../../src/games/hex-a-gone/tutorial';
@@ -31,7 +30,7 @@ describe('Wave 63 handshake — kings/hex leftovers', () => {
       kingsQuadraphagesTutorial.steps.find((s) => s.id === 'welcome')?.title
     ).toBe('Welcome to Kings & Quadraphages!');
     expect(hexTutorial.steps.find((s) => s.id === 'winning')?.message).toMatch(
-      /cannot end in a tie/
+      /no draws possible/
     );
     expect(
       hexAGoneTutorial.steps.find((s) => s.id === 'select-shapes')?.title
@@ -60,7 +59,7 @@ describe('Wave 63 handshake — kings/hex leftovers', () => {
     hexagoneStatus(hexagoneInit(), goneStat, 'human-vs-human');
     expect(goneStat.querySelectorAll('.hex-a-gone-players')).toHaveLength(1);
 
-    const css = readAppCss();
+    const css = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
     expect(css).toContain('stroke: #7a6448');
     expect(css).toContain('#48bb78');
     expect(css).toContain('@keyframes hexFillPlace');

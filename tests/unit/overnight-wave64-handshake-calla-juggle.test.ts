@@ -30,7 +30,7 @@ describe('Wave 64 handshake — calla × juggle leftovers', () => {
     ).toContain("Red's pits");
     expect(
       callaTutorial.steps.find((s) => s.id === 'capture')?.message
-    ).toContain('you capture ALL those cubes into your Calla');
+    ).toContain('You capture ALL those cubes into your Calla');
     expect(
       callaTutorial.steps.find((s) => s.id === 'complete')?.message
     ).toContain('Now you know how to play Calla!');
@@ -51,9 +51,9 @@ describe('Wave 64 handshake — calla × juggle leftovers', () => {
     ).toContain('Roll two dice');
     expect(
       juggleTutorial.steps.find((s) => s.id === 'dice-values')?.message
-    ).toContain('one square');
+    ).toContain('Monomino (1 cell)');
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
-    ).toContain('Shapes must fit entirely inside your 9×9 board');
+    ).toContain('Shapes must fit entirely within your 9x9 grid');
   });
 });

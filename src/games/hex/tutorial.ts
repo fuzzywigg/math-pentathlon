@@ -1,7 +1,7 @@
 // Tutorial content for Classic Hex
 // Division I — Next-only steps ported from existing How-to / helpContentHtml
 
-import type { TutorialConfig } from '../../core/tutorial';
+import { TutorialConfig } from '../../core/tutorial';
 
 export const hexTutorial: TutorialConfig = {
   id: 'hex-basics',
@@ -53,7 +53,7 @@ export const hexTutorial: TutorialConfig = {
       message: `
         <ol>
           <li>Blue goes first</li>
-          <li>On your turn, tap any empty hex to place your piece</li>
+          <li>On your turn, click any empty hex to place your piece</li>
           <li>Pieces cannot be moved once placed</li>
         </ol>
       `,
@@ -64,8 +64,8 @@ export const hexTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>Make an unbroken path of your pieces from one of your sides to the other.</p>
-        <p>Someone always wins — this game cannot end in a tie!</p>
+        <p>Create an unbroken path of your pieces connecting your two edges.
+        Hex is a solved game - there are no draws possible!</p>
       `,
       position: 'center',
     },
@@ -75,7 +75,7 @@ export const hexTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Control the center of the board</li>
-          <li>Leave two ways to connect your pieces later</li>
+          <li>Create "bridges" - two pieces that can connect via two paths</li>
           <li>Block your opponent while building your own path</li>
         </ul>
       `,

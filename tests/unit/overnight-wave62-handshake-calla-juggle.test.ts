@@ -50,7 +50,7 @@ describe('Wave 62 handshake — calla × juggle leftovers', () => {
       'human-vs-ai'
     );
     expect(status.querySelector('.status-winner')?.textContent).toBe(
-      '🎉 🔵 You Win! 🎉'
+      '🎉 🔵 You Wins! 🎉'
     );
     expect(
       analyzeMoves(
@@ -87,6 +87,6 @@ describe('Wave 62 handshake — calla × juggle leftovers', () => {
     );
     expect(
       juggleTutorial.steps.find((s) => s.id === 'placement-rules')?.message
-    ).toContain('fit entirely inside your 9×9 board');
+    ).toContain('fit entirely within your 9x9 grid');
   });
 });

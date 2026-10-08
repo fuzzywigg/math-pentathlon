@@ -1,6 +1,6 @@
 // Tutorial content for Kings & Quadraphages
 
-import type { TutorialConfig } from '../../core/tutorial';
+import { TutorialConfig } from '../../core/tutorial';
 
 export const kingsQuadraphagesTutorial: TutorialConfig = {
   id: 'kings-quadraphages-basics',
@@ -10,8 +10,9 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       id: 'welcome',
       title: 'Welcome to Kings & Quadraphages!',
       message: `
-        <p>This game is about trapping the other player's King.</p>
-        <p>Let's learn how to play Kings & Quadraphages!</p>
+        <p>This tutorial will teach you how to play Kings & Quadraphages,
+        a strategic two-player game from Math Pentathlon.</p>
+        <p>Let's learn the basics together!</p>
       `,
       position: 'center',
     },
@@ -20,8 +21,8 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       title: 'Game Objective',
       message: `
         <p>Your goal is to <strong>trap your opponent's King</strong> so it cannot move
-        to any square next to it (including corners).</p>
-        <p>The player who traps the other King wins!</p>
+        to any adjacent cell.</p>
+        <p>The player who traps the other's King wins!</p>
       `,
       position: 'center',
     },
@@ -91,8 +92,8 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       message: `
         <p>Great! See the <span style="color: green">green highlighted cells</span>?
         These show where your King can move.</p>
-        <p>Kings move one square in any direction
-        (across, up and down, or diagonally).</p>
+        <p>Kings move like in chess - one square in any direction
+        (horizontally, vertically, or diagonally).</p>
       `,
       highlightSelector: '.board',
       position: 'right',
@@ -118,7 +119,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       title: 'Step 2: Place a Quadraphage',
       message: `
         <p>Excellent move! Now you need to <strong>place a Quadraphage</strong>.</p>
-        <p>Quadraphages are blockers. Once placed, they stay on the board forever
+        <p>Quadraphages are blockers - once placed, they stay on the board forever
         and block all movement through that square.</p>
       `,
       position: 'center',
@@ -128,7 +129,8 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       title: 'Place Your Quadraphage',
       message: `
         <p><strong>Click on any empty cell</strong> to place your Quadraphage.</p>
-        <p>Hint: Place blockers so the other King has fewer ways to move!</p>
+        <p>Strategic tip: Try to place Quadraphages where they might limit your
+        opponent's movement options!</p>
       `,
       highlightSelector: '.board',
       position: 'right',
@@ -157,7 +159,7 @@ export const kingsQuadraphagesTutorial: TutorialConfig = {
       id: 'winning',
       title: 'How to Win',
       message: `
-        <p>You win when your opponent's King has <strong>nowhere safe to move</strong>
+        <p>You win when your opponent's King has <strong>no valid moves</strong>
         at the start of their turn.</p>
         <p>This happens when all 8 squares around their King are either:</p>
         <ul>

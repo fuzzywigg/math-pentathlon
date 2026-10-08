@@ -61,7 +61,7 @@ describe('Wave 60 handshake — calla/juggle/ramrod leftovers', () => {
     ).toBe("🔵 Blue's turn - Roll the dice");
     expect(
       juggleTutorial.steps.find((s) => s.id === 'dice-values')?.message
-    ).toContain('1</strong> = one square');
+    ).toContain('1</strong> = Monomino');
 
     injectRamrodStyles();
     const rCss = document.getElementById('ramrod-styles')?.textContent ?? '';

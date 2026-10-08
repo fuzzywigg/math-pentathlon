@@ -1,7 +1,7 @@
 // Tutorial content for Star Track
 // Division I (Grades K-1) - Simple language for young learners
 
-import type { TutorialConfig } from '../../core/tutorial';
+import { TutorialConfig } from '../../core/tutorial';
 
 export const starTrackTutorial: TutorialConfig = {
   id: 'star-track-basics',
@@ -12,7 +12,7 @@ export const starTrackTutorial: TutorialConfig = {
       title: 'Welcome to Star Track!',
       message: `
         <p>Let's learn how to play <strong>Star Track</strong>!</p>
-        <p>Race to the star. You move by picking chain links.</p>
+        <p>It's a fun racing game where you use chains to move along the track.</p>
       `,
       position: 'center',
     },
@@ -42,7 +42,7 @@ export const starTrackTutorial: TutorialConfig = {
       title: 'Chain Links',
       message: `
         <p>You move by picking <strong>chain links</strong>!</p>
-        <p>Each chain is 1, 2, 3, 4, 5, or 6 spaces long.</p>
+        <p>Chains come in different sizes: 1, 2, 3, 4, 5, or 6 links long.</p>
         <p>A longer chain moves you farther!</p>
       `,
       position: 'center',
@@ -81,7 +81,7 @@ export const starTrackTutorial: TutorialConfig = {
       message: `
         <p>After drawing, you'll see your 2 chains.</p>
         <p>Click on the chain you want to use!</p>
-        <p><strong>Tip:</strong> A bigger number moves you more spaces toward the star!</p>
+        <p><strong>Tip:</strong> Bigger numbers move you farther toward the star!</p>
       `,
       highlightSelector: '.star-track-choices',
       position: 'bottom',

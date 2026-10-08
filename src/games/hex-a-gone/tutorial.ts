@@ -1,7 +1,7 @@
 // Tutorial content for Hex-a-Gone!
 // Division I (Grades K-1) - Simple language for young learners
 
-import type { TutorialConfig } from '../../core/tutorial';
+import { TutorialConfig } from '../../core/tutorial';
 
 export const hexAGoneTutorial: TutorialConfig = {
   id: 'hex-a-gone-basics',
@@ -12,7 +12,7 @@ export const hexAGoneTutorial: TutorialConfig = {
       title: 'Welcome to Hex-a-Gone!',
       message: `
         <p>Let's learn how to play <strong>Hex-a-Gone!</strong></p>
-        <p>It's a shape puzzle. Try to be the last player who can still place a shape!</p>
+        <p>It's a shape-fitting puzzle game where you fill up the board!</p>
       `,
       position: 'center',
     },
@@ -43,7 +43,7 @@ export const hexAGoneTutorial: TutorialConfig = {
         <ul>
           <li><span style="color: #FFD700">● Yellow Hexagons</span></li>
           <li><span style="color: #FF4444">● Red Trapezoids</span></li>
-          <li><span style="color: #4169E1">● Blue diamond shapes (rhombuses)</span></li>
+          <li><span style="color: #4169E1">● Blue Rhombuses</span></li>
           <li><span style="color: #32CD32">● Green Triangles</span></li>
           <li><span style="color: #FF8C00">● Orange Squares</span></li>
         </ul>
@@ -59,7 +59,7 @@ export const hexAGoneTutorial: TutorialConfig = {
           <li><strong>Pick 1 to 3 shapes</strong> (they must be different!)</li>
           <li><strong>Place them</strong> on the board</li>
         </ol>
-        <p>Choosing more shapes can fill the board faster, but it is riskier!</p>
+        <p>More shapes = Riskier but fills the board faster!</p>
       `,
       position: 'center',
     },
@@ -101,7 +101,7 @@ export const hexAGoneTutorial: TutorialConfig = {
       title: 'Ready to Play!',
       message: `
         <p>Now you know how to play Hex-a-Gone!</p>
-        <p>Click <strong>Finish</strong> and try to be the last one who can place a shape!</p>
+        <p>Click <strong>Finish</strong> and try to be the last player standing!</p>
         <p>Have fun! 🎨</p>
       `,
       position: 'center',

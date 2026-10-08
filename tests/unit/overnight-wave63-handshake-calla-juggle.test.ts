@@ -32,7 +32,7 @@ describe('Wave 63 handshake — calla × juggle leftovers', () => {
     const jCss = document.getElementById('juggle-styles')?.textContent ?? '';
     expect(jCss).toContain('linear-gradient(135deg, #ff9800, #f57c00)');
     expect(jCss).toMatch(/\.juggle-cell\s*\{[^}]*height:\s*24px/);
-    expect(jCss).toMatch(/\.fill-percent\s*\{[^}]*color:\s*inherit/);
+    expect(jCss).toMatch(/\.fill-percent\s*\{[^}]*opacity:\s*0\.8/);
     expect(jCss).toMatch(
       /\.juggle-winner-banner\s*\{[^}]*padding:\s*1\.5rem/
     );
@@ -46,7 +46,7 @@ describe('Wave 63 handshake — calla × juggle leftovers', () => {
     expect(
       juggleTutorial.steps.find((s) => s.id === 'welcome')?.message
     ).toContain(
-      'Be first to fill every square on your 9×9 board with shapes!'
+      'Be the first player to completely fill your 9x9 grid with polyomino shapes!'
     );
   });
 });

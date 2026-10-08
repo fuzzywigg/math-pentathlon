@@ -7,7 +7,7 @@ import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tu
 describe('Wave 67 kings — tutorial place limit opponent', () => {
   it('place-quadraphage pins limit opponent movement tip', () => {
     const step = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'place-quadraphage');
-    expect(step?.message).toMatch(/Hint: Place blockers/);
+    expect(step?.message).toMatch(/limit your\s+opponent's movement options/);
     expect(step?.message).toContain('<strong>Click on any empty cell</strong>');
     expect(step?.highlightSelector).toBe('.board');
   });
