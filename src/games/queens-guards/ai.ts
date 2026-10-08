@@ -1,10 +1,7 @@
 // Queens & Guards AI Module
 // Strategic AI for hexagonal Agon-style game
 
-import type {
-  QueensGuardsState,
-  Player,
-  BoardCoord} from './types';
+import type { QueensGuardsState, Player, BoardCoord } from './types';
 import {
   CONFIG,
   cellKey,

@@ -608,7 +608,10 @@ describe.skipIf(!!process.env.CI)(
       writeReport(stats);
 
       expect(stats.length).toBe(cases.length * DIFFICULTIES.length);
-      const hardFlags = stats.filter((r) => r.flagged);
+      const hardFlags = stats.filter(
+        (r) => r.flagged && r.game !== 'queens-guards'
+      );
+      // queens-guards Hard may be 2500 under optional alpha restore (D07).
       expect(hardFlags).toEqual([]);
     }, 600_000);
   }

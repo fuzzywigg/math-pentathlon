@@ -2,7 +2,7 @@
  * Play-budget iterative deepening for Queens (#377) and Hex (#382).
  * Hard budgets are asserted with an injected clock (not wall-clock).
  */
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createInitialState as createQueensState } from '../../src/games/queens-guards/types';
 import {
   searchAIMove,
@@ -33,10 +33,6 @@ function hexMidgame() {
   state = makeHexMove(state, { row: 6, col: 5 });
   return state;
 }
-
-afterEach(() => {
-  document.body.innerHTML = '';
-});
 
 describe('Queens play-budget search', () => {
   it('exposes a Hard play budget far below the 180s safety cap', () => {

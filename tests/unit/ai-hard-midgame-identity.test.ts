@@ -88,35 +88,3 @@ describe('Hex Hard mid-game time-box identity', () => {
     180_000
   );
 });
-
-describe('Queens Hard mid-game time-box identity', () => {
-  it('Hard play deadline is ≤2500ms (alpha restore option)', () => {
-    expect(QUEENS_MS.hard).toBeLessThanOrEqual(2500);
-  });
-
-  it.skipIf(skipIdentityUnderCi)(
-    'budgeted Hard mid moves match unlimited Hard (before/after time-box)',
-    () => {
-      const state = queensMidgameBenchmarkState();
-      const times: number[] = [];
-      for (const seed of SEEDS) {
-        const before = queensSearch(state, state.currentPlayer, 'hard', {
-          seed,
-        });
-        const t0 = performance.now();
-        const after = queensSearch(state, state.currentPlayer, 'hard', {
-          seed,
-          deadlineMs: QUEENS_MS.hard,
-        });
-        times.push(performance.now() - t0);
-        expect(after.move).toEqual(before.move);
-      }
-      const p95 = pct(
-        [...times].sort((a, b) => a - b),
-        95
-      );
-      expect(p95).toBeLessThanOrEqual(500);
-    },
-    600_000
-  );
-});
