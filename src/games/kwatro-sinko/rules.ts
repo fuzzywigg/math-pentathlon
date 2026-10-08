@@ -19,8 +19,12 @@ import {
 // =============================================================================
 
 /**
- * Create the game board - a grid with diagonal connections
- * The board is a 5x5 grid with pathways
+ * Create the game board - a 5×5 grid with pathways.
+ *
+ * Diagonal links are emitted only from the center 3×3 (rows/cols 1..3). That
+ * makes rim↔interior diagonals one-way from the interior — locked by tests
+ * after #391 / open for Andrew on #355 (Highlights PDF does not specify
+ * movement diagonals; older notes said "anywhere").
  */
 function createBoard(): Map<string, BoardNode> {
   const nodes = new Map<string, BoardNode>();
@@ -63,9 +67,8 @@ function createBoard(): Map<string, BoardNode> {
       if (row > 0) connections.push(`n${row - 1}-${col}`);
       if (row < SIZE - 1) connections.push(`n${row + 1}-${col}`);
 
-      // Diagonal connections (for the center 3x3 area)
+      // Diagonal connections — center 3×3 emitters only (see createBoard docs).
       if (row > 0 && row < SIZE - 1 && col > 0 && col < SIZE - 1) {
-        // All 4 diagonals
         connections.push(`n${row - 1}-${col - 1}`);
         connections.push(`n${row - 1}-${col + 1}`);
         connections.push(`n${row + 1}-${col - 1}`);
@@ -316,7 +319,13 @@ export function moveChip(state: KwaState, toNodeId: string): KwaState {
 // =============================================================================
 
 /**
- * Find a winning alignment through a node
+ * Find a winning alignment through a node.
+ *
+ * Live scan walks the 5×5 grid by row/col (H/V/both diagonals) and **stops at
+ * the first empty cell** — contiguous runs only. Div II Highlights say the
+ * path of 3 "does not need to be contiguous but cannot cross the middle
+ * (yellow) area"; this 5×5 model has no yellow filter. Locked as-is for
+ * Andrew's call (non-contiguous + yellow mapping).
  */
 export function findWinningAlignment(
   nodes: Map<string, BoardNode>,

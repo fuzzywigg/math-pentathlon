@@ -1242,15 +1242,16 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
           <ul>
             <li>Chips move along the pathway connections</li>
             <li>You can only move to empty adjacent spaces</li>
-            <li>Diagonal connections exist on numbered spaces</li>
+            <li>Diagonal connections exist in the center 3×3 (including toward numbered spaces)</li>
           </ul>
 
           <h3>Winning</h3>
           <ul>
-            <li>Form 3 chips in a line (any direction)</li>
-            <li>The alignment must satisfy: <strong>a + b - c = 4</strong> OR <strong>a + b - c = 5</strong></li>
-            <li>Example: 6 + 3 - 5 = 4 ✓</li>
-            <li>Example: 8 + 1 - 4 = 5 ✓</li>
+            <li>All 5 of your chips must be off the numbered start rows</li>
+            <li>Form 3 chips in a line: two of one color and one of the opposite color</li>
+            <li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>
+            <li>Example: 6 + 2 - 3 = 5 ✓</li>
+            <li>Example: 9 + 1 - 6 = 4 ✓</li>
           </ul>
 
           <h3>Strategy Tips</h3>

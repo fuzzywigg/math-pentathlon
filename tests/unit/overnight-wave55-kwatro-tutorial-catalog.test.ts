@@ -18,7 +18,9 @@ describe('Wave 55 kwatro — tutorial catalog', () => {
     expect(winning?.message).toMatch(/like \+ like/);
     expect(
       kwatroSinkoTutorial.steps.find((s) => s.id === 'movement-rules')?.message
-    ).toMatch(/Diagonal connections exist on numbered spaces/);
+    ).toMatch(
+      /Diagonal connections exist in the center 3×3 \(including toward numbered spaces\)/
+    );
     const tips = kwatroSinkoTutorial.steps.find((s) => s.id === 'strategy-tips');
     expect(tips?.message).toMatch(/Control the center/);
     expect(tips?.message).toMatch(/Block your opponent's alignments/);
