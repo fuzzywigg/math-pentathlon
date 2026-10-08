@@ -416,29 +416,19 @@ const drivers: GameDriver[] = [
     maxTurns: 4000,
     playLegal: async (page) => {
       await dismissOwl(page);
-      const status = (await readStatusText(page)).toLowerCase();
-      if (/wins|tie|game over/.test(status)) return false;
+      // Entire turn in one evaluate — Playwright locator loops were too slow
+      // under softlock reshuffles (test timeout / closed page).
+      return page.evaluate(() => {
+        const status = (
+          document.querySelector('.juggle-status')?.textContent || ''
+        ).toLowerCase();
+        if (/wins|tie|game over/.test(status)) return false;
 
-      // HTML controls: Playwright click. Board cells: native element.click().
-      if (await passIfVisible(page, '.juggle-roll-btn:not([disabled])')) {
-        return true;
-      }
-      // Prefer smaller shapes when the picker is open (late-game gaps).
-      const shapeCount = await page.locator('.juggle-shape-option').count();
-      if (shapeCount > 0) {
-        let best = 0;
-        let bestScore = 99;
-        for (let i = 0; i < shapeCount; i++) {
-          const aria =
-            (await page
-              .locator('.juggle-shape-option')
-              .nth(i)
-              .getAttribute('aria-label')) || '';
-          const text =
-            (await page.locator('.juggle-shape-option').nth(i).textContent()) ||
-            '';
-          const blob = `${aria} ${text}`.toLowerCase();
-          const score = /monomino|1[- ]?cell/.test(blob)
+        const click = (el: Element | null | undefined) => {
+          (el as HTMLElement | null)?.click();
+        };
+        const sizeScore = (blob: string) =>
+          /monomino|1[- ]?cell/.test(blob)
             ? 0
             : /domino|2[- ]?cell/.test(blob)
               ? 1
@@ -447,55 +437,60 @@ const drivers: GameDriver[] = [
                 : /tetromino|4[- ]?cell/.test(blob)
                   ? 3
                   : 4;
-          if (score < bestScore) {
-            bestScore = score;
-            best = i;
-          }
+
+        const roll = document.querySelector(
+          '.juggle-roll-btn:not([disabled])'
+        ) as HTMLElement | null;
+        if (roll) {
+          click(roll);
+          return true;
         }
-        await page
-          .locator('.juggle-shape-option')
-          .nth(best)
-          .click({ force: true });
-        return true;
-      }
-      // Prefer smaller polyominoes so late-game gaps still fill.
-      const dice = page.locator(
-        '.juggle-die.selectable, [role="button"][aria-label*="die, selectable"]'
-      );
-      const dieCount = await dice.count();
-      if (dieCount > 0) {
-        let best = 0;
-        let bestScore = 99;
-        for (let i = 0; i < dieCount; i++) {
-          const aria = (await dice.nth(i).getAttribute('aria-label')) || '';
-          const text = (await dice.nth(i).textContent()) || '';
-          const blob = `${aria} ${text}`.toLowerCase();
-          const score = /monomino|1 cell/.test(blob)
-            ? 0
-            : /domino|2 cells/.test(blob)
-              ? 1
-              : /tromino|3 cells/.test(blob)
-                ? 2
-                : /tetromino|4 cells/.test(blob)
-                  ? 3
-                  : 4;
-          if (score < bestScore) {
-            bestScore = score;
-            best = i;
-          }
+
+        const shapes = [
+          ...document.querySelectorAll('.juggle-shape-option'),
+        ] as HTMLElement[];
+        if (shapes.length) {
+          shapes.sort((a, b) => {
+            const sa = sizeScore(
+              `${a.getAttribute('aria-label') || ''} ${a.textContent || ''}`.toLowerCase()
+            );
+            const sb = sizeScore(
+              `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
+            );
+            return sa - sb;
+          });
+          click(shapes[0]);
+          return true;
         }
-        await dice.nth(best).click({ force: true });
-        return true;
-      }
-      const boardSel = status.includes('red')
-        ? '.juggle-board.player2'
-        : '.juggle-board.player1';
-      // One atomic try: place, or cycle rotate/flip looking for a fit, else abandon.
-      const outcome = await page.evaluate((sel) => {
-        const click = (el: Element | null | undefined) =>
-          (el as HTMLElement | null)?.click();
+
+        const dice = [
+          ...document.querySelectorAll(
+            '.juggle-die.selectable, [role="button"][aria-label*="die, selectable"]'
+          ),
+        ] as HTMLElement[];
+        if (dice.length) {
+          dice.sort((a, b) => {
+            const sa = sizeScore(
+              `${a.getAttribute('aria-label') || ''} ${a.textContent || ''}`.toLowerCase()
+            );
+            const sb = sizeScore(
+              `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
+            );
+            return sa - sb;
+          });
+          click(dice[0]);
+          return true;
+        }
+
+        const boardSel = status.includes('red')
+          ? '.juggle-board.player2'
+          : '.juggle-board.player1';
+        const btn = (re: RegExp) =>
+          [...document.querySelectorAll('.juggle-control-btn')].find((b) =>
+            re.test(b.textContent || '')
+          ) as HTMLElement | undefined;
         const placeIfValid = (): boolean => {
-          const board = document.querySelector(sel);
+          const board = document.querySelector(boardSel);
           if (!board) return false;
           const valids = [
             ...board.querySelectorAll(
@@ -513,21 +508,16 @@ const drivers: GameDriver[] = [
           valids[0]!.click();
           return true;
         };
-        if (placeIfValid()) return 'placed';
-        const rotateBtn = [...document.querySelectorAll('.juggle-control-btn')].find(
-          (b) => /Rotate/i.test(b.textContent || '')
-        );
-        const flipBtn = [...document.querySelectorAll('.juggle-control-btn')].find(
-          (b) => /Flip/i.test(b.textContent || '')
-        );
+        if (placeIfValid()) return true;
         for (let f = 0; f < 2; f++) {
           for (let r = 0; r < 4; r++) {
-            if (placeIfValid()) return 'placed';
-            if (rotateBtn) click(rotateBtn);
-            else break;
+            if (placeIfValid()) return true;
+            const rotateBtn = btn(/Rotate/i);
+            if (!rotateBtn) break;
+            rotateBtn.click();
           }
-          if (placeIfValid()) return 'placed';
-          if (f === 0 && flipBtn) click(flipBtn);
+          if (placeIfValid()) return true;
+          if (f === 0) btn(/Flip/i)?.click();
         }
         const abandon = [
           ...document.querySelectorAll(
@@ -535,14 +525,13 @@ const drivers: GameDriver[] = [
           ),
         ].find((b) =>
           /choose another|can't fit|won'?t fit/i.test(b.textContent || '')
-        );
+        ) as HTMLElement | undefined;
         if (abandon) {
-          click(abandon);
-          return 'abandoned';
+          abandon.click();
+          return true;
         }
-        return 'noop';
-      }, boardSel);
-      return outcome !== 'noop';
+        return false;
+      });
     },
     tryIllegal: async (page) => {
       await clickFirst(page, '.juggle-cell:not(.juggle-cell-valid)');
