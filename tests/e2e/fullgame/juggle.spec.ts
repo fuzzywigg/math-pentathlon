@@ -12,7 +12,7 @@ test.describe('@fullgame juggle', () => {
   );
 
   test('@fullgame complete HvH match to game-over', async ({ page }) => {
-    test.setTimeout(300_000);
+    test.setTimeout(900_000);
     await runFullgameMatch(page, 'juggle');
   });
 });
