@@ -11,6 +11,7 @@
     "size:check": "node scripts/check-bundle-budgets.mjs",
     "check:perf": "node scripts/check-perf.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
+    "report:licenses": "node scripts/report-licenses.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
