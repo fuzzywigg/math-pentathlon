@@ -68,6 +68,7 @@ export const kwatroSinkoTutorial: TutorialConfig = {
         <ul>
           <li>All 5 of your chips must be off the numbered start rows</li>
           <li>Form 3 chips in a line: two of one color and one of the opposite color</li>
+          <li>Empty spaces between the 3 chips are allowed (the path need not be contiguous)</li>
           <li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>
           <li>Example: 6 + 2 - 3 = 5 ✓</li>
           <li>Example: 9 + 1 - 6 = 4 ✓</li>
