@@ -3,7 +3,7 @@
 **Task (plan):** `burn-1007-mp-typeratchet-plan`  
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batch **0** (demos + `main.ts`) and Batch **1** (tiny non-AI game shells) cleared under ratchet flags; Phase-2 baseline ceiling lowered **564 → 518**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling.  
+**Status:** Batches **0**–**1** cleared on tip; Batches **2**/**3** are open drafts (#546 / #544). Batch **4** (this work) clears **prime-gold** `types.ts` + `board-ui.ts` only — Phase-2 ceiling **520 → 450** from tip; deferred list in [`type-ratchet-batch4-deferred.md`](./type-ratchet-batch4-deferred.md).  
 **Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
@@ -177,15 +177,16 @@ Fix **non-AI** files only, smallest games first:
 
 **Estimate:** L (~132 non-AI errors). Stars-bars board-ui (23) and contig types/board-ui are the volume.
 
-### Batch 4 — `prime-gold` types mountain (still no AI)
+### Batch 4 — `prime-gold` types mountain (still no AI) — **in progress / draft**
 
 | Path | Errors | Notes |
 | --- | ---: | --- |
-| `src/games/prime-gold/types.ts` | 65 | Dominant file; mostly NUI on optional/indexed shapes |
-| other prime-gold non-AI | 15 | rules + board-ui |
+| `src/games/prime-gold/types.ts` | 65 → **0** | Cleared with NUI asserts in `generateExpressions` |
+| `src/games/prime-gold/board-ui.ts` | 5 → **0** | EOPT spreads + history-index assert |
+| `src/games/prime-gold/rules.ts` | 10 | **deferred** (see batch4-deferred.md) |
 | prime-gold `ai.ts` | 7 | **defer to Batch A** |
 
-**Estimate:** L (~80 non-AI). Types changes can cascade — keep PR to types+call-site construction only; run unit suite for prime-gold.
+**Estimate:** L (~70 cleared of ~80 non-AI). Types + board-ui only; no rules/AI.
 
 ### Batch A — AI search / scoring (**LAST**, needs Andrew)
 

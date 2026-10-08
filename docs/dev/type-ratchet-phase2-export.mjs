@@ -34,6 +34,8 @@ const IN_SCOPE = new RegExp(
     '^src/games/fab-a-diffy/(types|board-ui|rules)\\.ts$',
     '^src/games/fiar/(types|board-ui|rules)\\.ts$',
     '^src/games/par-55/(types|board-ui|rules)\\.ts$',
+    // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
+    '^src/games/prime-gold/(types|board-ui)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -217,7 +219,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1007-mp-typeratchet-plan',
+  taskId: 'burn-1008-mp-type-ratchet-batch4-nonrules',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {

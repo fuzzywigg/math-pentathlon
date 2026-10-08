@@ -501,14 +501,15 @@ export function renderBoard(
           bindCellActivateKeys(cellEl, activate);
         }
 
+        const ownerLabel = cell.owner ? getPlayerName(cell.owner) : undefined;
         makeGridCell(
           cellEl,
           buildCellAriaLabel({
             coord: String(cell.value),
             empty: !cell.owner,
-            owner: cell.owner ? getPlayerName(cell.owner) : undefined,
+            ...(ownerLabel !== undefined ? { owner: ownerLabel } : {}),
             validPlacement: isValid,
-            extras: cell.isPrime ? ['prime'] : undefined,
+            ...(cell.isPrime ? { extras: ['prime'] } : {}),
           })
         );
       }
@@ -712,7 +713,8 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
     i >= Math.max(0, state.moveHistory.length - 10);
     i--
   ) {
-    const move = state.moveHistory[i];
+    // i is in [max(0,len-10), len); assert for NUI.
+    const move = state.moveHistory[i]!;
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;
     replaceWithSafeHtml(
