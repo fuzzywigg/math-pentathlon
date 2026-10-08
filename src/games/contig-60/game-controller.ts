@@ -3,9 +3,6 @@
 
 import type { ContigState, Player, ContigWinner } from './types';
 import { createInitialState, getValidPlacements } from './types';
-// #region agent log
-require('fs').appendFileSync('/opt/cursor/logs/debug.log',JSON.stringify({location:'game-controller.ts:module',message:'runtime imports after type split',data:{createInitialStateType:typeof createInitialState,getValidPlacementsType:typeof getValidPlacements},timestamp:Date.now(),hypothesisId:'B'})+'\n');
-// #endregion
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
@@ -223,9 +220,6 @@ function updateStatus(): void {
     </div>
     `
   );
-  // #region agent log
-  {const statusEl=statusContainer.querySelector('.contig-status');require('fs').appendFileSync('/opt/cursor/logs/debug.log',JSON.stringify({location:'game-controller.ts:updateStatus',message:'status DOM after safeHtml',data:{playerClass,isComputerTurn:isComputerTurn(),phase:gameState.phase,statusInnerHTML:statusContainer.innerHTML.slice(0,400),statusElClassName:statusEl?.className??null,hasPlayer1:!!statusContainer.querySelector('.contig-status.player1'),hasPlayer2:!!statusContainer.querySelector('.contig-status.player2'),hasAiThinking:!!statusContainer.querySelector('.status-ai-thinking'),text:(statusContainer.textContent??'').slice(0,120)},timestamp:Date.now(),hypothesisId:'A'})+'\n');}
-  // #endregion
 }
 
 // =============================================================================

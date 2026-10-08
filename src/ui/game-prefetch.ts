@@ -93,9 +93,6 @@ function prefersSaveData(): boolean {
 }
 
 export function prefetchGameChunk(gameId: string): void {
-  // #region agent log
-  {const saveData=prefersSaveData();require('fs').appendFileSync('/opt/cursor/logs/debug.log',JSON.stringify({location:'game-prefetch.ts:prefetchGameChunk',message:'prefetch entry',data:{gameId,canPrefetch:canPrefetchGame(gameId),alreadyStarted:started.has(gameId),saveData,willSkipSaveData:saveData},timestamp:Date.now(),hypothesisId:'F'})+'\n');}
-  // #endregion
   if (!canPrefetchGame(gameId) || started.has(gameId)) return;
   if (prefersSaveData()) return;
   started.add(gameId);
