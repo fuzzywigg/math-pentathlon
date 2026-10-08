@@ -482,7 +482,10 @@ export class OwlComponent {
     ) as HTMLElement;
 
     if (state.message) {
-      messageEl.textContent = state.message.text;
+      // Only rewrite when text changes so aria-live does not re-announce repeats (#500).
+      if (messageEl.textContent !== state.message.text) {
+        messageEl.textContent = state.message.text;
+      }
       bubble.classList.add('owl-bubble-visible');
       this.container.classList.add('owl-has-message');
 
