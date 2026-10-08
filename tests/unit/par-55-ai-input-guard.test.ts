@@ -1,7 +1,7 @@
 /**
  * Human block/base input must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
@@ -9,10 +9,20 @@ import {
   selectBlock,
 } from '../../src/games/par-55/rules';
 import { renderBoard, renderHand } from '../../src/games/par-55/board-ui';
-import { installDomHooks } from './helpers/dom';
 
 describe('Par 55 AI-turn input guard', () => {
-  installDomHooks({ fakeTimers: true, styleIds: ['par55-styles'] });
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    document.getElementById('par55-styles')?.remove();
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    document.body.innerHTML = '';
+    document.getElementById('par55-styles')?.remove();
+  });
+
   it('renderBoard with allowInput false does not mark valid bases', () => {
     let state = createInitialState();
     const blockId = state.hands.player1[0]!.id;
@@ -34,7 +44,7 @@ describe('Par 55 AI-turn input guard', () => {
     expect(el.querySelector('[aria-disabled="true"]')).toBeTruthy();
   });
 
-  it('blocks selecting a Red block during the AI think pause', async () => {
+  it('blocks selecting a Red block during the 800ms AI pause', async () => {
     const { newGameVsAI } =
       await import('../../src/games/par-55/game-controller');
 
@@ -61,7 +71,7 @@ describe('Par 55 AI-turn input guard', () => {
     expect(ctrl.state.currentPlayer).toBe('player2');
     expect(ctrl.state.moveHistory).toHaveLength(1);
 
-    await vi.advanceTimersByTimeAsync(450);
+    await vi.advanceTimersByTimeAsync(800);
     expect(ctrl.state.currentPlayer).toBe('player1');
     expect(ctrl.state.moveHistory.length).toBeGreaterThanOrEqual(2);
     expect(ctrl.state.moveHistory[1]?.player).toBe('player2');

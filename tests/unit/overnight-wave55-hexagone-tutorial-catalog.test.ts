@@ -26,7 +26,7 @@ describe('Wave 55 hexagone — tutorial catalog', () => {
       /Finish/
     );
     expect(hexAGoneTutorial.steps.find((s) => s.id === 'complete')?.message).toMatch(
-      /last one who can place a shape/
+      /last player standing/
     );
     expect(hexAGoneTutorial.steps.find((s) => s.id === 'board-intro')?.position).toBe(
       'right'

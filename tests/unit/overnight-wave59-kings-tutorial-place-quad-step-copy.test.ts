@@ -9,7 +9,7 @@ describe('Wave 59 kings — tutorial place-quad step', () => {
     const place = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'place-quadraphage');
     expect(place?.title).toBe('Place Your Quadraphage');
     expect(place?.message).toMatch(/Click on any empty cell/);
-    expect(place?.message).toMatch(/Hint:/);
+    expect(place?.message).toMatch(/Strategic tip/);
     expect(place?.highlightSelector).toBe('.board');
   });
 });

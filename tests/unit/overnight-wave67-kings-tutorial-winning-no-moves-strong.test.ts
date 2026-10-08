@@ -7,7 +7,7 @@ import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tu
 describe('Wave 67 kings — tutorial winning no moves strong', () => {
   it('winning locks no valid moves strong + all 8 squares', () => {
     const step = kingsQuadraphagesTutorial.steps.find((s) => s.id === 'winning');
-    expect(step?.message).toContain('<strong>nowhere safe to move</strong>');
+    expect(step?.message).toContain('<strong>no valid moves</strong>');
     expect(step?.message).toContain('all 8 squares around their King');
     expect(step?.position).toBe('center');
   });

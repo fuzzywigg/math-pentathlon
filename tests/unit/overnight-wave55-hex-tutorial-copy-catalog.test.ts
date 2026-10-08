@@ -8,9 +8,9 @@ describe('Wave 55 hex — tutorial catalog', () => {
   it('id/name plus winning/strategy/gameplay/complete copy', () => {
     expect(hexTutorial.id).toBe('hex-basics');
     expect(hexTutorial.name).toBe('Learn Hex');
-    expect(hexTutorial.steps.find((s) => s.id === 'winning')?.message).toMatch(/cannot end in a tie/);
+    expect(hexTutorial.steps.find((s) => s.id === 'winning')?.message).toMatch(/no draws/);
     const tips = hexTutorial.steps.find((s) => s.id === 'strategy-tips');
-    expect(tips?.message).toMatch(/two ways to connect/);
+    expect(tips?.message).toMatch(/bridges/);
     expect(tips?.message).toMatch(/Control the center/);
     const play = hexTutorial.steps.find((s) => s.id === 'gameplay');
     expect(play?.message).toMatch(/Blue goes first/);

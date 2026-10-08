@@ -15,7 +15,7 @@ describe('Wave 55 kwatro — tutorial catalog', () => {
     expect(winning?.message).toMatch(/All 5 of your chips must be off/);
     expect(winning?.message).toMatch(/6 \+ 2 - 3 = 5/);
     expect(winning?.message).toMatch(/9 \+ 1 - 6 = 4/);
-    expect(winning?.message).toMatch(/Add your two same-color chips/);
+    expect(winning?.message).toMatch(/like \+ like/);
     expect(
       kwatroSinkoTutorial.steps.find((s) => s.id === 'movement-rules')?.message
     ).toMatch(/Diagonal connections exist on numbered spaces/);

@@ -10,14 +10,12 @@ describe('Wave 57 par55 — select status', () => {
     document.getElementById('par55-styles')?.remove();
   });
 
-  it("opening shows Blue's turn — Tap a block from your hand", () => {
+  it("opening shows Blue's turn - Select a block", () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
     newGameVsHuman(root);
     const status = root.querySelector('.par55-status');
     expect(status?.classList.contains('player1')).toBe(true);
-    expect(status?.textContent).toBe(
-      "🔵 Blue's turn — Tap a block from your hand"
-    );
+    expect(status?.textContent).toBe("🔵 Blue's turn - Select a block");
   });
 });

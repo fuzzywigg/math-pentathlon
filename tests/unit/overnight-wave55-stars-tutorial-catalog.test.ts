@@ -13,7 +13,7 @@ describe('Wave 55 stars — tutorial catalog', () => {
     );
     const scoring = starsBarsTutorial.steps.find((s) => s.id === 'scoring');
     expect(scoring?.message).toMatch(/Star cells double your points/);
-    expect(scoring?.message).toMatch(/up, down, left, right, and diagonals/);
+    expect(scoring?.message).toMatch(/8 directions/);
     expect(scoring?.highlightSelector).toBe('.stars-board');
     const examples = starsBarsTutorial.steps.find((s) => s.id === 'examples');
     expect(examples?.message).toMatch(/Same shape, same color/);
