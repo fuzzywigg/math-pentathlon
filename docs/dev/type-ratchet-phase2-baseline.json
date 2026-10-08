@@ -4,7 +4,7 @@
   "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
   "taskId": "burn-1008-mp-type-ratchet-batch-7",
   "generatedAt": "2026-10-08T12:44:30.885Z",
-  "tipSha": "pending-fold-573",
+  "tipSha": "e2dbba83f7fdf435d31aa5b74e18656c77c7d626",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
