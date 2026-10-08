@@ -108,7 +108,7 @@ export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): {
   for (let row = 0; row < CONFIG.GRID_ROWS; row++) {
     const gridRow: (number | null)[] = [];
     grid[row] = gridRow;
-    // Indexed access is definite for CONFIG-sized BOARD_NUMBERS; narrow for NUI.
+    // Indexed access is definite for CONFIG-sized BOARD_NUMBERS; `!` is NUI-only.
     const numberRow = boardNumbers[row]!;
     for (let col = 0; col < CONFIG.GRID_COLS; col++) {
       const value = numberRow[col]!;

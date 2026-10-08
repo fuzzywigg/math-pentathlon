@@ -114,16 +114,21 @@ export function handleCellClick(
 
   // Move King phase
   if (state.turnPhase === 'moveKing') {
+    // Board is always BOARD_SIZE×BOARD_SIZE; keep tip soft-return (no throw).
     const moveRow = state.board[row - 1];
     if (moveRow === undefined) {
       return { state, isInvalidClick: false };
     }
     const clickedCell = moveRow[col - 1]; // Convert 1-based to 0-based
+    if (clickedCell === undefined) {
+      return { state, isInvalidClick: false };
+    }
 
     // Check if clicked on current player's King
     if (
-      clickedCell?.type === 'king' &&
-      clickedCell?.owner === state.currentPlayer
+      clickedCell !== null &&
+      clickedCell.type === 'king' &&
+      clickedCell.owner === state.currentPlayer
     ) {
       // If King is already selected and we click it again, deselect
       if (
@@ -169,6 +174,10 @@ export function handleCellClick(
       return { state, isInvalidClick: false };
     }
     const clickedCell = placeRow[col - 1];
+    if (clickedCell === undefined) {
+      // Tip treated missing index like occupied (not placeable).
+      return { state, isInvalidClick: true };
+    }
 
     // Only place on empty cells
     if (clickedCell === null) {
@@ -206,8 +215,9 @@ function syncKingsCell(
   cell.dataset.row = String(row);
   cell.dataset.col = String(col);
 
-  const boardRow = state.board[row - 1];
-  const piece = boardRow?.[col - 1] ?? null;
+  // Sync only runs on the dense 1..BOARD_SIZE grid; `!` is NUI-only.
+  const boardRow = state.board[row - 1]!;
+  const piece = boardRow[col - 1]!;
   const colLetter = String.fromCharCode(64 + col);
   const coord = `${colLetter}${row}`;
   let owner: string | undefined;
@@ -273,12 +283,8 @@ function syncKingsCell(
   );
 
   if (state.moveHistory.length > 0) {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
-    if (
-      lastMove !== undefined &&
-      lastMove.to.row === row &&
-      lastMove.to.col === col
-    ) {
+    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
+    if (lastMove.to.row === row && lastMove.to.col === col) {
       cell.classList.add('cell-last-move');
     }
   }

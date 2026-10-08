@@ -223,9 +223,8 @@ export function renderBoard(
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
 
-      const rowCells = board.cells[row];
-      if (rowCells === undefined) continue;
-      const isOccupied = rowCells[col];
+      // Grid is CONFIG.GRID_SIZE dense; `!` is NUI-only.
+      const isOccupied = board.cells[row]![col]!;
       const isPreview = previewSet.has(`${row},${col}`);
 
       const isLegalAnchor = legalAnchors.has(`${row},${col}`);
@@ -245,6 +244,7 @@ export function renderBoard(
         isCurrentPlayer &&
         state.phase === 'placing' &&
         !isOccupied;
+
       const owner = isOccupied ? getPlayerName(player) : undefined;
 
       makeGridCell(
@@ -351,14 +351,13 @@ export function renderDice(
     diceDisplay.className = 'juggle-dice-display';
 
     for (let i = 0; i < 2; i++) {
-      const dieValue = dice[i];
-      if (dieValue === undefined) continue;
-
       const dieContainer = document.createElement('div');
       dieContainer.className = 'juggle-die-container';
 
       const die = document.createElement('div');
       die.className = 'juggle-die';
+      // Dice tuple always has 2 faces when rendered here; `!` is NUI-only.
+      const dieValue = dice[i]!;
       die.textContent = getDieFace(dieValue);
 
       const category = getCategoryFromDie(dieValue);

@@ -501,11 +501,10 @@ export function renderBoard(
   const validSet = new Set(validPlacements.map((p) => `${p.row},${p.col}`));
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
-    const rowCells = state.cells[row];
-    if (rowCells === undefined) continue;
+    // CONFIG.BOARD_SIZE rows/cols are always allocated; `!` is NUI-only.
+    const rowCells = state.cells[row]!;
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
-      const cell = rowCells[col];
-      if (cell === undefined) continue;
+      const cell = rowCells[col]!;
       const cellEl = document.createElement('div');
       cellEl.className = 'stars-cell';
       cellEl.dataset.row = String(row);
@@ -582,8 +581,7 @@ function calculatePreviewScore(
   row: number,
   col: number
 ): number {
-  const cell = state.cells[row]?.[col];
-  if (cell === undefined) return 0;
+  const cell = state.cells[row]![col]!;
   let score = 0;
 
   const directions: ReadonlyArray<readonly [number, number]> = [
@@ -607,8 +605,8 @@ function calculatePreviewScore(
       adjCol >= 0 &&
       adjCol < CONFIG.BOARD_SIZE
     ) {
-      const adjCell = state.cells[adjRow]?.[adjCol];
-      if (adjCell?.card) {
+      const adjCell = state.cells[adjRow]![adjCol]!;
+      if (adjCell.card) {
         score += countDifferences(card, adjCell.card);
       }
     }

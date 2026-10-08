@@ -316,9 +316,9 @@ function syncHexCell(
   const hex = cellGroup.querySelector('polygon') as SVGPolygonElement | null;
   if (!hex) return;
 
-  const rowCells = state.board[row];
-  if (rowCells === undefined) return;
-  const cellState = rowCells[col] ?? null;
+  // Board rows are always size×size; sync only runs on that dense grid (`!` is NUI-only).
+  const rowCells = state.board[row]!;
+  const cellState = rowCells[col]!;
   const isWinningCell = winningSet.has(`${row},${col}`);
 
   let cellClass = 'hex-cell';
@@ -331,12 +331,8 @@ function syncHexCell(
   }
   if (isWinningCell) cellClass += ' hex-cell-winning';
   if (state.moveHistory.length > 0) {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
-    if (
-      lastMove !== undefined &&
-      lastMove.position.row === row &&
-      lastMove.position.col === col
-    ) {
+    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
+    if (lastMove.position.row === row && lastMove.position.col === col) {
       cellClass += ' hex-cell-last-move';
     }
   }
@@ -347,6 +343,7 @@ function syncHexCell(
     state.winner === null &&
     Boolean(onCellClick) &&
     !isComputerPlacementTurn(state);
+
   const owner =
     cellState === 'player1'
       ? 'Blue'

@@ -163,9 +163,9 @@ export function renderBoard(
     validGroup.classList.add('pent-valid-cells');
     for (const key of legalAnchors) {
       const parts = key.split(',').map(Number);
-      const r = parts[0];
-      const c = parts[1];
-      if (r === undefined || c === undefined) continue;
+      // Legal-anchor keys are always "r,c"; `!` is NUI-only.
+      const r = parts[0]!;
+      const c = parts[1]!;
       const rect = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'

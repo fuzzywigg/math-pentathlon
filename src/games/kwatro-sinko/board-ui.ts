@@ -109,8 +109,9 @@ function renderNode(
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   const match = /^n(\d+)-(\d+)$/.exec(node.id);
-  const row = match?.[1] ?? '0';
-  const col = match?.[2] ?? '0';
+  // Regex always captures two groups when it matches; `!` is NUI-only.
+  const row = match ? match[1]! : '0';
+  const col = match ? match[2]! : '0';
   group.setAttribute('data-row', row);
   group.setAttribute('data-col', col);
   group.setAttribute('data-node-id', node.id);
