@@ -1,7 +1,7 @@
 {
   "summary": {
-    "generatedAt": "2026-10-08T08:44:54.032Z",
-    "taskId": "burn-1008-mp-dead-code-inventory",
+    "generatedAt": "2026-10-08T08:48:18.790Z",
+    "taskId": "burn-1008-mp-dead-code-removal-exec",
     "foldOrder": "fold last",
     "gameIds": [
       "division-1",
@@ -30,15 +30,17 @@
       "fraction-pinball"
     ],
     "dynamicImportCount": 32,
-    "cssClassTotal": 372,
-    "cssUnusedCandidates": 10,
+    "cssClassTotal": 370,
+    "cssUnusedCandidates": 8,
     "knipError": null,
     "depcheckUnused": {
       "dependencies": [],
       "devDependencies": []
     },
-    "candidateCount": 173,
-    "safeYes": 35,
+    "candidateCount": 165,
+    "safeYes": 27,
+    "executedRemovals": 8,
+    "deferredSafeHelpers": 24,
     "deferPrs": [
       {
         "pr": 518,
@@ -60,120 +62,75 @@
         "topic": "test fixture consolidation",
         "note": "Helper moves/merges — inventory lists unused helper *exports* only"
       }
+    ],
+    "executedRemovalRows": [
+      {
+        "kind": "export",
+        "path": "src/core/dom-security.ts",
+        "symbol": "setChildren",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted unused export (zero external refs)"
+      },
+      {
+        "kind": "export",
+        "path": "src/core/storage/sanitize.ts",
+        "symbol": "MAX_PROFILE_ID_LENGTH",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "demoted to module-private const"
+      },
+      {
+        "kind": "export",
+        "path": "src/core/storage/sanitize.ts",
+        "symbol": "MAX_GAME_ID_LENGTH",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "demoted to module-private const"
+      },
+      {
+        "kind": "export",
+        "path": "src/core/storage/sanitize.ts",
+        "symbol": "MAX_ACHIEVEMENT_ID_LENGTH",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "demoted to module-private const"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/style.css",
+        "symbol": "game-selector-header",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted dead CSS rule (live class is game-selector-hero)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/style.css",
+        "symbol": "tutorial-action-target",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted dead CSS selectors (live class is tutorial-tap-target)"
+      },
+      {
+        "kind": "export",
+        "path": "src/ui/game-prefetch.ts",
+        "symbol": "allowGamePrefetchImportsForTests",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "demoted to module-private; used by resetGamePrefetchForTests"
+      },
+      {
+        "kind": "export",
+        "path": "src/ui/game-route-mounts.ts",
+        "symbol": "resetGameMountDepsForTests",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted unused test-hook export (zero refs)"
+      }
     ]
   },
   "rows": [
-    {
-      "kind": "export",
-      "path": "src/core/dom-security.ts",
-      "symbol": "setChildren",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "production export with zero references after grep"
-    },
-    {
-      "kind": "export",
-      "path": "src/core/storage/sanitize.ts",
-      "symbol": "MAX_PROFILE_ID_LENGTH",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "demote to module-private (used only inside defining file)"
-    },
-    {
-      "kind": "export",
-      "path": "src/core/storage/sanitize.ts",
-      "symbol": "MAX_GAME_ID_LENGTH",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "demote to module-private (used only inside defining file)"
-    },
-    {
-      "kind": "export",
-      "path": "src/core/storage/sanitize.ts",
-      "symbol": "MAX_ACHIEVEMENT_ID_LENGTH",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "demote to module-private (used only inside defining file)"
-    },
-    {
-      "kind": "css-class",
-      "path": "src/style.css",
-      "symbol": "game-selector-header",
-      "origins": [
-        "src/style.css"
-      ],
-      "source": "css-scan",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)"
-    },
-    {
-      "kind": "css-class",
-      "path": "src/style.css",
-      "symbol": "tutorial-action-target",
-      "origins": [
-        "src/style.css",
-        "src/style.css"
-      ],
-      "source": "css-scan",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)"
-    },
-    {
-      "kind": "export",
-      "path": "src/ui/game-prefetch.ts",
-      "symbol": "allowGamePrefetchImportsForTests",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "demote to module-private (used only inside defining file)"
-    },
-    {
-      "kind": "export",
-      "path": "src/ui/game-route-mounts.ts",
-      "symbol": "resetGameMountDepsForTests",
-      "source": "knip",
-      "evidence": "grep: no references outside defining module",
-      "externalRefs": 0,
-      "dynamicHit": false,
-      "registryHit": false,
-      "rank": 1,
-      "safeToRemove": "yes",
-      "reason": "production export with zero references after grep"
-    },
     {
       "kind": "css-class",
       "path": "src/ui/styles/forced-colors.css",
@@ -188,7 +145,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -204,7 +162,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
+      "disposition": "kept"
     },
     {
       "kind": "test-helper-export",
@@ -217,7 +176,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -230,7 +190,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -243,7 +204,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -256,7 +218,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -269,7 +232,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -282,7 +246,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -295,7 +260,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -308,7 +274,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -321,7 +288,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -334,7 +302,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -347,7 +316,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -360,7 +330,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -373,7 +344,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -386,7 +358,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -399,7 +372,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-module",
@@ -412,7 +386,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "kept"
     },
     {
       "kind": "test-helper-export",
@@ -425,7 +400,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -438,7 +414,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -451,7 +428,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -464,7 +442,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -477,7 +456,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -490,7 +470,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -503,7 +484,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -516,7 +498,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "test-helper-export",
@@ -529,7 +512,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep"
+      "reason": "test helper with zero importers after grep",
+      "disposition": "deferred"
     },
     {
       "kind": "unused-type",
@@ -542,7 +526,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -555,7 +540,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -568,7 +554,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -581,7 +568,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -594,7 +582,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -607,7 +596,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -620,7 +610,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -633,7 +624,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -646,7 +638,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -659,7 +652,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -672,7 +666,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -686,7 +681,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -699,7 +695,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -712,7 +709,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -725,7 +723,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -738,7 +737,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -751,7 +751,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -764,7 +765,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -777,7 +779,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -790,7 +793,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -803,7 +807,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -816,7 +821,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -829,7 +835,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -842,7 +849,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -855,7 +863,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -868,7 +877,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -881,7 +891,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -895,7 +906,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -908,7 +920,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -921,7 +934,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -934,7 +948,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -947,7 +962,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -960,7 +976,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -973,7 +990,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -986,7 +1004,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -999,7 +1018,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1012,7 +1032,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1025,7 +1046,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1038,7 +1060,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1051,7 +1074,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1064,7 +1088,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1077,7 +1102,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1090,7 +1116,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1103,7 +1130,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1116,7 +1144,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1129,7 +1158,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1142,7 +1172,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1155,7 +1186,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1168,7 +1200,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1181,7 +1214,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1194,7 +1228,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1207,7 +1242,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1220,7 +1256,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1233,7 +1270,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1246,7 +1284,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1259,7 +1298,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1272,7 +1312,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1285,7 +1326,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1298,7 +1340,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1311,7 +1354,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1325,7 +1369,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1339,7 +1384,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "no",
-      "reason": "tip-fold keeper after #497 (intentional export surface)"
+      "reason": "tip-fold keeper after #497 (intentional export surface)",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1352,7 +1398,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1365,7 +1412,8 @@
       "registryHit": false,
       "rank": 3,
       "safeToRemove": "review",
-      "reason": "exported type unused outside module — often intentional public API"
+      "reason": "exported type unused outside module — often intentional public API",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1378,7 +1426,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1391,7 +1440,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1404,7 +1454,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1417,7 +1468,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1430,7 +1482,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1443,7 +1496,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1456,7 +1510,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1469,7 +1524,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1482,7 +1538,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1495,7 +1552,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1508,7 +1566,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1521,7 +1580,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1534,7 +1594,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1547,7 +1608,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1561,7 +1623,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag constant used inside its defining module"
+      "reason": "flag constant used inside its defining module",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1575,7 +1638,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag is read at runtime"
+      "reason": "flag is read at runtime",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1588,7 +1652,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1601,7 +1666,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1614,7 +1680,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1627,7 +1694,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1640,7 +1708,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1653,7 +1722,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1666,7 +1736,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1680,7 +1751,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag constant used inside its defining module"
+      "reason": "flag constant used inside its defining module",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1694,7 +1766,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag is read at runtime"
+      "reason": "flag is read at runtime",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1708,7 +1781,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag is read at runtime"
+      "reason": "flag is read at runtime",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1721,7 +1795,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "export",
@@ -1734,7 +1809,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1747,7 +1823,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1761,7 +1838,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag constant used inside its defining module"
+      "reason": "flag constant used inside its defining module",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -1769,13 +1847,14 @@
       "symbol": "readUrlOrStorageFlag",
       "detail": "flag API",
       "source": "flag-catalog",
-      "evidence": "grep: 3 file(s) outside defining module (scripts/report-dead-code.mjs, src/core/feature-flags.ts, tests/unit/url-flags-security.test.ts)",
+      "evidence": "grep: 3 file(s) outside defining module (src/core/feature-flags.ts, scripts/report-dead-code.mjs, tests/unit/url-flags-security.test.ts)",
       "externalRefs": 3,
       "dynamicHit": false,
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag is read at runtime"
+      "reason": "flag is read at runtime",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1788,7 +1867,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1801,7 +1881,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1814,7 +1895,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1827,7 +1909,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1840,7 +1923,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1853,7 +1937,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1866,7 +1951,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1879,7 +1965,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1892,7 +1979,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1905,7 +1993,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1918,7 +2007,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1931,7 +2021,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1944,7 +2035,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1957,7 +2049,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1970,7 +2063,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1983,7 +2077,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -1996,7 +2091,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2009,7 +2105,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2022,7 +2119,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2035,7 +2133,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2048,7 +2147,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2061,7 +2161,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2074,7 +2175,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2087,20 +2189,22 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
       "path": "src/games/par-55/ai.ts",
       "symbol": "AIMove",
       "source": "knip",
-      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/stars-bars/ai.ts, src/games/calla/ai.ts); registry: game id 'par-55' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'par-55' is registered; dynamic-import: referenced from mounts/prefetch/main",
       "externalRefs": 28,
       "dynamicHit": true,
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2113,7 +2217,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2126,7 +2231,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2139,7 +2245,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2152,7 +2259,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2165,7 +2273,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2178,7 +2287,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2191,20 +2301,22 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
       "path": "src/games/stars-bars/ai.ts",
       "symbol": "AIMove",
       "source": "knip",
-      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'stars-bars' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: 28 file(s) outside defining module (tests/unit/burn-wave42-fiar-ai-apply-noop-wrong-type.test.ts, src/games/pent-em-in/ai.ts, tests/unit/ai-worker-parity-fab.test.ts); registry: game id 'stars-bars' is registered; dynamic-import: referenced from mounts/prefetch/main",
       "externalRefs": 28,
       "dynamicHit": true,
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2217,7 +2329,8 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry"
+      "reason": "reachable via dynamic import or game registry",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2233,7 +2346,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "applied via `difficulty-${game.difficulty}` template"
+      "reason": "applied via `difficulty-${game.difficulty}` template",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2249,7 +2363,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "applied via `difficulty-${game.difficulty}` template"
+      "reason": "applied via `difficulty-${game.difficulty}` template",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2265,7 +2380,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "applied via `difficulty-${game.difficulty}` template"
+      "reason": "applied via `difficulty-${game.difficulty}` template",
+      "disposition": "kept"
     },
     {
       "kind": "unused-type",
@@ -2278,7 +2394,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2294,7 +2411,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "external references found"
+      "reason": "external references found",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2310,7 +2428,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "applied via `star-track-path-${p1|p2}` template in board-ui"
+      "reason": "applied via `star-track-path-${p1|p2}` template in board-ui",
+      "disposition": "kept"
     },
     {
       "kind": "css-class",
@@ -2328,7 +2447,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "applied via `star-track-path-${p1|p2}` template in board-ui"
+      "reason": "applied via `star-track-path-${p1|p2}` template in board-ui",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -2342,7 +2462,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag constant used inside its defining module"
+      "reason": "flag constant used inside its defining module",
+      "disposition": "kept"
     },
     {
       "kind": "feature-flag",
@@ -2356,7 +2477,8 @@
       "registryHit": false,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "flag constant used inside its defining module"
+      "reason": "flag constant used inside its defining module",
+      "disposition": "kept"
     }
   ]
 }
