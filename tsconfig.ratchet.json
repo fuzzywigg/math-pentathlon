@@ -18,6 +18,12 @@
     "tests/unit/ai-determinism-helpers.ts",
     "tests/unit/engine-invariants-helpers.ts",
     "tests/unit/undo-audit-helpers.ts",
-    "tests/unit/fiar-test-helpers.ts"
+    "tests/unit/fiar-test-helpers.ts",
+    // Phase 2 Batch 7 — helper-test ratchet surface (NUI/EOPT; script-.mjs helpers deferred)
+    "tests/unit/burn-wave14-types-helpers.test.ts",
+    "tests/unit/burn-wave35-fab-a-diffy-format-helpers.test.ts",
+    "tests/unit/burn-wave35-ramrod-box-format-helpers.test.ts",
+    "tests/unit/burn-wave41-fab-pass-winner-helpers.test.ts",
+    "tests/unit/overnight-dice-selector-reset-helpers.test.ts"
   ]
 }
