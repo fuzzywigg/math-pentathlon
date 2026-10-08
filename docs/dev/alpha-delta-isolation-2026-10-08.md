@@ -11,7 +11,7 @@
 | --- | --- |
 | Tip base (`cursor/integration-fold-wave5-tip-4af0`) | `c9c54a94742e5bdef4c4657a35617873edb963fa` |
 | Alpha (`origin/alpha`) | `eec2b327c1e65586537cbe03b1c29b93065dee03` |
-| This branch HEAD | `cca6f6ad13f8e26140a979499066b948ff884946` |
+| This branch HEAD | `b14bd5f4` (docs commit; product restores green at `cca6f6ad`) |
 | Audit source | #552 / `cursor/tip-vs-alpha-hard-rule-audit-551d` (tip `36a1340d` vs alpha `eec2b327…`) |
 | Decision sheet | #549 item **D07** |
 
