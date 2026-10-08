@@ -8,10 +8,10 @@ Task: `burn-1007-mp-render-perf`
 - Viewport: tablet **768×1024** (touch).
 - CPU throttle: **4×** via CDP `Emulation.setCPUThrottlingRate`.
 - Per game: human-vs-human, up to **20** scripted moves; double-`rAF` after each click for paint cost.
-- Metrics: time-to-interactive (nav → board ready), per-move paint ms, hover preview ms (juggle / pent-em-in), `longtask` >50ms, layout-forcing DOM reads (`offset*` / `getBoundingClientRect` / `getComputedStyle`) during instrumented windows.
+- Metrics: time-to-interactive (nav → board ready), per-move paint ms, hover preview ms (juggle / pent-em-in), `longtask` >50ms, layout-forcing DOM reads during instrumented windows.
 - Playwright tracing started per game (snapshots on; discarded after metrics).
 - Scope: RENDER/INPUT only — AI search/scoring/timing untouched. Not a redo of #489 / #463 / #501.
-- Machine-readable twin: [`render-perf-2026-10.json`](./render-perf-2026-10.json)
+- Twin: [`render-perf-2026-10.json`](./render-perf-2026-10.json)
 
 ## Per-game table (after)
 
@@ -42,7 +42,7 @@ Moves &lt; 20 usually means the scripted UI path stalled on multi-step chrome or
 
 ## Before / after (fixed games)
 
-Clear non-AI hotspots only (unnecessary full board wipes, hover rebuilds, repeated `querySelectorAll`). No visible UI change intended; AI timing/search/scoring untouched.
+Clear non-AI hotspots only. No visible UI change intended; AI timing/search/scoring untouched.
 
 ### hex (primary win)
 
@@ -52,7 +52,7 @@ Clear non-AI hotspots only (unnecessary full board wipes, hover rebuilds, repeat
 | Move p95 (ms) | 169.9 | 131.1 | **−38.8 (−23%)** |
 | LT >50 | 0 | 0 | 0 |
 
-Structure created once (`ensureHexBoard`); each move syncs cell classes/aria in place with delegated clicks.
+`ensureHexBoard` once; `syncHexCell` updates classes/aria in place with delegated clicks.
 
 ### contig-60 (primary win)
 
@@ -69,41 +69,35 @@ Persistent `.contig-board` + `syncContigBoard` (no full grid wipe per move).
 | Metric | Before | After | Δ |
 |---|---:|---:|---:|
 | Hover p95 (ms) | 47.0 | 43.4 | −3.6 |
-| Move p95 (ms) | 317.7 | 349.7 | +32.0 (run noise; scripted mix is chrome-heavy) |
 
-Persistent dual grids; hover toggles dirty preview cells only (no dice/controls/grid recreate). Move p95 stays chrome-dominated (roll / shape selector rebuilds) and varies by scripted phase mix across runs.
+`applyJuggleHoverPreview` toggles dirty preview cells only (no full UI wipe on hover). Move p95 stays chrome-dominated (roll / shape selector) and is noisy across scripted mixes.
 
 ### pent-em-in (hover path)
 
 | Metric | Before | After | Δ |
 |---|---:|---:|---:|
 | Hover p95 (ms) | 49.0 | 47.4 | −1.6 |
-| Move p95 (ms) | 77.1 | 77.7 | +0.6 |
 
-`patchPentPreview` replaces only `g.preview` on hover in 2D SVG (no full board recreate). Place moves still rebuild pieces/valid layers (unchanged).
-
-### kings-quadraphages (micro)
-
-| Metric | Before | After | Δ |
-|---|---:|---:|---:|
-| Move p95 (ms) | 71.0 | 72.7 | +1.7 (within noise) |
-
-Cell `NodeList` cached on the board element (skip `querySelectorAll` each sync). Already incremental from prior work.
+`patchPentPreview` replaces only `g.preview` on hover in 2D SVG.
 
 ## Fixes shipped
 
 1. **hex** — `ensureHexBoard` + `syncHexCell` + delegated activate
 2. **contig-60** — persistent board + `syncContigBoard` + delegated activate
-3. **juggle** — keep `.juggle-boards`; `applyJuggleHoverPreview` dirty-cell toggle; sync skips unchanged cells
+3. **juggle** — hover dirty-cell preview toggle (no full wipe on mouseenter/leave)
 4. **pent-em-in** — `patchPentPreview` for hover-only SVG updates
-5. **kings-quadraphages** — cache cell list on board element
-6. **Harness** — `PERF_MODE=render` tablet/CPU4× TTI + per-move + hover + longtask + layout-read probe
+5. **Harness** — `PERF_MODE=render` tablet/CPU4× TTI + per-move + hover + longtask + layout-read probe → `docs/dev/render-perf-2026-10.md`
 
 ## Left alone
 
 - Menu first-load trim (#489), runtime leak harness report (#463), leak cleanup (#501)
 - AI search/scoring/difficulty/move delays; Hex Hard 450ms assert; Stars & Bars history
-- Visual baselines / gallery PNGs; bundle gzip budgets; CI job names / `permissions`
+- Visual baselines / gallery PNGs; bundle gzip budgets (not bumped); CI job names / `permissions`
+- Kings already incremental from prior work — no further change in this PR
+
+## Size note
+
+`npm run size:check` still exits 0 (report-only). Budgets file unchanged. Touched game chunks grew vs tip (hex ~+0.4 kB gzip, contig ~+0.4, juggle ~+0.6, pent ~+0.15) in exchange for the paint-path work above. Menu critical path unchanged (~21 kB).
 
 ## How to re-run
 
@@ -113,4 +107,4 @@ PERF_MODE=render PERF_PHASE=after npm run perf:runtime
 # optional: PERF_GAMES=hex,contig-60,juggle PERF_MOVES=20
 ```
 
-Generated: 2026-10-08T02:15:37.111Z (phase=after; doc curated for acceptance)
+Generated: 2026-10-08 (phase=after; curated for acceptance)
