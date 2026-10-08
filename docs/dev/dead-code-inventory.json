@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generatedAt": "2026-10-08T08:48:18.790Z",
+    "generatedAt": "2026-10-08T09:01:17.945Z",
     "taskId": "burn-1008-mp-dead-code-removal-exec",
     "foldOrder": "fold last",
     "gameIds": [
@@ -2197,7 +2197,7 @@
       "path": "src/games/par-55/ai.ts",
       "symbol": "AIMove",
       "source": "knip",
-      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'par-55' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, tests/unit/burn-wave42-fiar-ai-apply-noop-wrong-type.test.ts); registry: game id 'par-55' is registered; dynamic-import: referenced from mounts/prefetch/main",
       "externalRefs": 28,
       "dynamicHit": true,
       "registryHit": true,
@@ -2253,7 +2253,7 @@
       "path": "src/games/ramrod/ai.ts",
       "symbol": "AIMove",
       "source": "knip",
-      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: 28 file(s) outside defining module (tests/unit/burn-wave42-fiar-ai-apply-noop-wrong-type.test.ts, tests/unit/ai-worker-parity-fab.test.ts, tests/unit/fiar-ai-null-draw-recovery.test.ts); registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main",
       "externalRefs": 28,
       "dynamicHit": true,
       "registryHit": true,
@@ -2309,7 +2309,7 @@
       "path": "src/games/stars-bars/ai.ts",
       "symbol": "AIMove",
       "source": "knip",
-      "evidence": "grep: 28 file(s) outside defining module (tests/unit/burn-wave42-fiar-ai-apply-noop-wrong-type.test.ts, src/games/pent-em-in/ai.ts, tests/unit/ai-worker-parity-fab.test.ts); registry: game id 'stars-bars' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: 28 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'stars-bars' is registered; dynamic-import: referenced from mounts/prefetch/main",
       "externalRefs": 28,
       "dynamicHit": true,
       "registryHit": true,
