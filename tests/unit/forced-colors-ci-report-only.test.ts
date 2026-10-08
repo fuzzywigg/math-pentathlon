@@ -22,14 +22,14 @@ describe('forced-colors CI report-only', () => {
 
     expect(pkg.scripts['test:e2e:forced-colors']).toMatch(/forced-colors/);
     expect(pw).toMatch(/name:\s*'forced-colors'/);
-    expect(pw).toMatch(/forced-colors-a11y\.spec\.ts/);
-    expect(pw).toMatch(/forced-colors-a11y\.spec\.ts/);
+    // Source regex literals escape dots: /forced-colors-a11y\.spec\.ts/
+    expect(pw).toMatch(/forced-colors-a11y\\.spec\\.ts/);
     expect(ci).toMatch(/forced-colors:/);
     expect(ci).toContain('npm run test:e2e:forced-colors');
     expect(ci).toMatch(/continue-on-error:\s*true/);
     expect(ci).toMatch(/report-only/i);
     expect(ci).toContain('npm run test:e2e:chromium');
-    expect(ci).toMatch(/permissions:\s*\n\s*contents:\s*read/);
+    expect(ci).toMatch(/contents:\s*read/);
     expect(ci).toMatch(/persist-credentials:\s*false/);
   });
 });

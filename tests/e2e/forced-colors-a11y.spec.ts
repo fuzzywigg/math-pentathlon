@@ -242,8 +242,6 @@ function writeSummary(reports: ScreenReport[]): void {
 const collected: ScreenReport[] = [];
 
 test.describe('forced-colors + reduced-motion smoke', () => {
-  test.describe.configure({ mode: 'serial' });
-
   test.afterAll(() => {
     if (collected.length) writeSummary(collected);
   });
@@ -343,12 +341,20 @@ test.describe('forced-colors + reduced-motion smoke', () => {
     expect(game).toBeTruthy();
     await page.goto(`/#/game/${game!.id}`);
     await waitForGameReady(page);
+    await dismissOwlIfNeeded(page);
 
     const issues: Issue[] = [];
     const notes: string[] = [];
 
     const modal = page.locator('#new-game-modal');
-    await expect(modal).toBeVisible();
+    // Some routes dismiss auto-open; open via New Game when needed.
+    if (!(await modal.isVisible().catch(() => false))) {
+      const newGameBtn = page.locator('#new-game-btn');
+      await expect(newGameBtn).toBeVisible({ timeout: 10_000 });
+      await newGameBtn.click({ force: true });
+    }
+    await expect(modal).toBeVisible({ timeout: 10_000 });
+
     const modeFocus = await probeFocusOutline(page, '.mode-option');
     if (modeFocus.found && modeFocus.outlineStyle === 'none') {
       issues.push({
@@ -359,23 +365,30 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       notes.push(`mode-option outline=${modeFocus.outlineStyle}`);
     }
 
-    // Close start modal if open, open Help
-    if (await modal.isVisible().catch(() => false)) {
-      const close = page.locator('#new-game-modal .modal-close').first();
-      if (await close.isVisible().catch(() => false)) {
-        await close.click({ force: true });
-      } else {
-        await page.keyboard.press('Escape');
-      }
+    // Close start modal, then open Help
+    const close = page.locator('#new-game-modal .modal-close').first();
+    if (await close.isVisible().catch(() => false)) {
+      await close.click({ force: true });
+    } else {
+      await page.keyboard.press('Escape');
     }
+    await expect(modal).toHaveClass(/hidden/, { timeout: 5_000 });
 
     const helpBtn = page.locator('#help-btn');
     if (await helpBtn.isVisible().catch(() => false)) {
       await helpBtn.click({ force: true });
-      const helpModal = page.locator('#help-modal, [role="dialog"]').first();
-      await expect(helpModal).toBeVisible({ timeout: 10_000 });
-      notes.push('help modal visible under forced-colors');
-      await page.keyboard.press('Escape');
+      const helpModal = page.locator('#help-modal').first();
+      if (await helpModal.count()) {
+        await expect(helpModal).toBeVisible({ timeout: 10_000 });
+        notes.push('help modal visible under forced-colors');
+        await page.keyboard.press('Escape');
+      } else {
+        // Fallback: any open dialog besides new-game
+        const dialog = page.locator('[role="dialog"]:not(.hidden)').first();
+        await expect(dialog).toBeVisible({ timeout: 10_000 });
+        notes.push('help dialog visible under forced-colors');
+        await page.keyboard.press('Escape');
+      }
     } else {
       notes.push('help button not visible on this shell');
     }
