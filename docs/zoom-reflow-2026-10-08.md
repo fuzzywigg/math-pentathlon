@@ -33,11 +33,13 @@ Suite stays green unless `ZOOM_REFLOW_ENFORCE=1`.
 
 ## CSS fixes (this pass)
 
+Scoped so default desktop/phone visual baselines stay unchanged: `@media (max-width: 360px)`, `html[data-zoom-reflow-text='200']`, and `html[data-zoom-reflow-zoom='200']` (harness markers). No silent baseline regeneration.
+
 | Area | Issue | Fix | Status |
 | ---- | ----- | --- | ------ |
-| `body` | Hard `min-width: 320px` fought 320 CSS px reflow | `min-width: 0; width/max-width: 100%` in `zoom-reflow.css` | **fixed** |
-| `.game-grid` | `minmax(300px, 1fr)` forced wide tracks | `minmax(min(100%, 300px), 1fr)` | **fixed** |
-| Open accordion | Stale `max-height` clipped last game card into next header | `.accordion-open > .accordion-panel { max-height: 5000px !important }` | **fixed** |
+| `body` | Hard `min-width: 320px` fought 320 CSS px reflow | `min-width: 0; width/max-width: 100%` under narrow/zoom scopes | **fixed** |
+| `.game-grid` | `minmax(300px, 1fr)` forced wide tracks | `minmax(min(100%, 300px), 1fr)` under narrow/zoom scopes | **fixed** |
+| Open accordion | Stale `max-height` clipped last game card into next header | `.accordion-open > .accordion-panel { max-height: 5000px !important }` under scopes | **fixed** |
 | Shell / modals | Narrow padding + fixed modal width | Wrap chrome; `modal-content` `width: min(500px, calc(100vw − 24px))`; ≤360px tighter gutters | **fixed** |
 | Hex board 801px pin | Wide intrinsic SVG for ≥44px cells | Contained in `.hex-game-area { overflow-x: auto }` (pre-existing); documented exception | **reported** (exception) |
 | Dense boards (Kings, FIAR, Queens, …) | 2D board geometry | WCAG 1.4.10 complex-graphic exception; no shrink | **reported** (exception) |

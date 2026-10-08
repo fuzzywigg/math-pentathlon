@@ -154,6 +154,7 @@ async function applyMode(page: Page, mode: ModeId) {
       document.documentElement.style.zoom = '';
       document.documentElement.style.fontSize = '';
       document.documentElement.removeAttribute('data-zoom-reflow-text');
+      document.documentElement.removeAttribute('data-zoom-reflow-zoom');
     });
     return;
   }
@@ -163,6 +164,8 @@ async function applyMode(page: Page, mode: ModeId) {
     await page.evaluate(() => {
       document.documentElement.style.fontSize = '';
       document.documentElement.removeAttribute('data-zoom-reflow-text');
+      // Marker so zoom-reflow.css can apply without changing default baselines.
+      document.documentElement.setAttribute('data-zoom-reflow-zoom', '200');
       // Chromium supports CSS zoom; approximates browser page zoom for layout.
       (document.documentElement.style as CSSStyleDeclaration & { zoom?: string }).zoom =
         '200%';
@@ -174,6 +177,7 @@ async function applyMode(page: Page, mode: ModeId) {
   await page.evaluate(() => {
     (document.documentElement.style as CSSStyleDeclaration & { zoom?: string }).zoom =
       '';
+    document.documentElement.removeAttribute('data-zoom-reflow-zoom');
     document.documentElement.style.fontSize = '200%';
     document.documentElement.setAttribute('data-zoom-reflow-text', '200');
   });
