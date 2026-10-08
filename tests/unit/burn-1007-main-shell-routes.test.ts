@@ -147,6 +147,18 @@ describe('burn-1007 main shell routes', () => {
         true
       );
     });
+
+    // Unknown hash path (not /game/:id) also recovers to menu via notFound.
+    await go('#/game/hex');
+    await vi.waitFor(() => {
+      expect(mountGameById).toHaveBeenCalled();
+    });
+    await go('#/totally-unknown-route');
+    await vi.waitFor(() => {
+      expect(window.location.hash === '#/' || window.location.hash === '').toBe(
+        true
+      );
+    });
   });
 
   it('shows load-error UI when game mount rejects', async () => {

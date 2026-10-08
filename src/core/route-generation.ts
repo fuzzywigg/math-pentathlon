@@ -12,3 +12,8 @@ export function nextRouteGeneration(): number {
 export function isCurrentRouteGeneration(gen: number): boolean {
   return gen === generation;
 }
+
+/** Current route-generation token (for stale-shell clobber recovery). */
+export function getRouteGeneration(): number {
+  return generation;
+}

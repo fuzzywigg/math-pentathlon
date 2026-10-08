@@ -225,6 +225,32 @@ describe('burn-1007 game-route-mounts', () => {
     expect(mocks.hex.initGame).not.toHaveBeenCalled();
   });
 
+  it('skips init/cleanup when generation goes stale during mountGameShell', async () => {
+    let resolveShell!: (s: GameShellElements) => void;
+    initGameMountDeps({
+      container,
+      setCleanup: (fn) => {
+        lastCleanup = fn;
+      },
+      mountGameShell: () =>
+        new Promise<GameShellElements>((resolve) => {
+          resolveShell = resolve;
+        }),
+      resolveAIDifficulty: (d) => d ?? 'medium',
+    });
+
+    const stale = nextRouteGeneration();
+    const pending = mountGameById('hex', stale);
+    // Navigate away while the shell mount is in-flight.
+    nextRouteGeneration();
+    resolveShell!(shell);
+    await pending;
+
+    expect(mocks.hex.initGame).not.toHaveBeenCalled();
+    expect(shell.cleanup).toHaveBeenCalled();
+    expect(lastCleanup).toBeNull();
+  });
+
   it.each([...GAME_IDS])(
     'mounts %s: wires init, AI/human start, tutorial, home, cleanup',
     async (gameId) => {
