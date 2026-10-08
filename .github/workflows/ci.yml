@@ -40,6 +40,8 @@ jobs:
         run: npm run typecheck
       - name: TypeScript type ratchet (ui/core/demos/Batch-1 shells + Phase-2 ceiling)
         run: npm run typecheck:ratchet
+      - name: Module-boundary import-graph ceilings (engine_imports_ui must stay 0)
+        run: npm run check:boundaries
 
   audit:
     runs-on: ubuntu-latest

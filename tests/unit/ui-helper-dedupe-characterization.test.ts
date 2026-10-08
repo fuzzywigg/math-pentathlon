@@ -6,11 +6,11 @@
  * Zero behavior change.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { getOpponentSeat } from '../../src/core/seats';
 import {
   getPlayerName as sharedGetPlayerName,
   formatModeSeatLabel,
   formatModeSeatLabelComputer,
-  getOpponentSeat,
 } from '../../src/ui/seat-labels';
 import { injectStylesOnce } from '../../src/ui/inject-styles';
 import {
