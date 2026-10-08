@@ -43,30 +43,39 @@ export async function setupRenderContext(browser, baseURL) {
 export async function installRenderObservers(page) {
   await page.evaluate(() => {
     const w = window;
+    const prior = w.__mpRenderPerf;
     w.__mpRenderPerf = {
-      longTasks: [],
+      longTasks: prior?.longTasks ?? [],
       layoutReads: 0,
-      moveSamples: [],
-      hoverSamples: [],
-      started: performance.now(),
+      moveSamples: prior?.moveSamples ?? [],
+      hoverSamples: prior?.hoverSamples ?? [],
+      started: prior?.started ?? performance.now(),
+      _patched: prior?._patched ?? false,
+      _po: prior?._po,
+      _counting: false,
     };
 
-    try {
-      const po = new PerformanceObserver((list) => {
-        for (const e of list.getEntries()) {
-          w.__mpRenderPerf.longTasks.push({
-            duration: e.duration,
-            startTime: e.startTime,
-          });
-        }
-      });
-      po.observe({ type: 'longtask', buffered: true });
-      w.__mpRenderPerf._po = po;
-    } catch {
-      /* longtask unsupported */
+    if (!w.__mpRenderPerf._po) {
+      try {
+        const po = new PerformanceObserver((list) => {
+          for (const e of list.getEntries()) {
+            w.__mpRenderPerf.longTasks.push({
+              duration: e.duration,
+              startTime: e.startTime,
+            });
+          }
+        });
+        po.observe({ type: 'longtask', buffered: true });
+        w.__mpRenderPerf._po = po;
+      } catch {
+        /* longtask unsupported */
+      }
     }
 
-    // Count forced-layout style reads during instrumented windows.
+    // Patch layout getters once — re-entry must not stack wrappers.
+    if (w.__mpRenderPerf._patched) return;
+    w.__mpRenderPerf._patched = true;
+
     const bump = () => {
       if (w.__mpRenderPerf._counting) w.__mpRenderPerf.layoutReads += 1;
     };
@@ -355,7 +364,30 @@ export async function writeRenderReport(root, results, meta) {
     (phase === 'after' ? results : null) ||
     prior?.phases?.after?.results ||
     null;
-  const baseline = after || before || results;
+
+  // Merge: prefer after per gameId, fall back to before so a focus re-run
+  // does not drop the full per-game table.
+  function mergeByGame(primary, secondary) {
+    const map = new Map();
+    for (const r of secondary || []) map.set(r.gameId, r);
+    for (const r of primary || []) map.set(r.gameId, r);
+    const order = (secondary || primary || []).map((r) => r.gameId);
+    const seen = new Set();
+    const out = [];
+    for (const id of order) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const row = map.get(id);
+      if (row) out.push(row);
+    }
+    for (const [id, row] of map) {
+      if (!seen.has(id)) out.push(row);
+    }
+    return out;
+  }
+  const baseline = mergeByGame(after, before).length
+    ? mergeByGame(after, before)
+    : results;
 
   const lines = [];
   lines.push('# Render / input latency — 2026-10');

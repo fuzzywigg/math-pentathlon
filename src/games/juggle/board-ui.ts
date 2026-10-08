@@ -66,8 +66,6 @@ function getCellMap(grid: HTMLElement): JuggleCellMap {
 }
 
 function previewStateForBoard(
-  board: Board,
-  player: 'player1' | 'player2',
   isCurrentPlayer: boolean,
   state: JuggleState,
   allowInput: boolean
@@ -97,78 +95,8 @@ function previewStateForBoard(
 }
 
 /**
- * Sync cell classes / aria in place (no DOM recreate). Used for moves + hover.
- */
-export function syncJuggleBoardCells(
-  container: HTMLElement,
-  board: Board,
-  player: 'player1' | 'player2',
-  isCurrentPlayer: boolean,
-  state: JuggleState,
-  options: JuggleBoardRenderOptions = {}
-): void {
-  const allowInput = options.allowInput !== false;
-  container.className = `juggle-board ${player} ${isCurrentPlayer ? 'active' : ''}`;
-  const fillEl = container.querySelector('.fill-percent');
-  if (fillEl) fillEl.textContent = `${getBoardFillPercentage(board)}%`;
-
-  const grid = container.querySelector('.juggle-grid') as HTMLElement | null;
-  if (!grid) return;
-
-  const { previewSet, isPreviewValid, legalAnchors } = previewStateForBoard(
-    board,
-    player,
-    isCurrentPlayer,
-    state,
-    allowInput
-  );
-  const cells = getCellMap(grid);
-
-  for (let row = 0; row < CONFIG.GRID_SIZE; row++) {
-    for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
-      const cell = cells.get(`${row},${col}`);
-      if (!cell) continue;
-
-      const isOccupied = board.cells[row][col];
-      const isPreview = previewSet.has(`${row},${col}`);
-      const isLegalAnchor = legalAnchors.has(`${row},${col}`);
-
-      cell.className = 'juggle-cell';
-      if (isOccupied) {
-        cell.classList.add(`occupied-${player}`);
-      } else if (isPreview) {
-        cell.classList.add(
-          isPreviewValid ? 'preview-valid' : 'preview-invalid'
-        );
-      } else if (isLegalAnchor) {
-        cell.classList.add('juggle-cell-valid');
-      }
-
-      const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
-      const canPlace =
-        allowInput &&
-        isCurrentPlayer &&
-        state.phase === 'placing' &&
-        !isOccupied;
-
-      makeGridCell(
-        cell,
-        buildCellAriaLabel({
-          coord,
-          empty: !isOccupied,
-          owner: isOccupied ? getPlayerName(player) : undefined,
-          validPlacement:
-            canPlace && (isLegalAnchor || (isPreview && isPreviewValid)),
-        })
-      );
-      cell.style.cursor = canPlace ? 'pointer' : '';
-    }
-  }
-}
-
-/**
- * Hover-only paint: update preview classes on the active seat board without
- * rebuilding dice/controls/grids (INPUT latency hotspot).
+ * Hover-only paint: toggle preview classes on dirty cells only (no full board
+ * wipe). Clears prior hover keys stored on the board element.
  */
 export function applyJuggleHoverPreview(
   boardsRoot: HTMLElement,
@@ -176,19 +104,56 @@ export function applyJuggleHoverPreview(
   options: JuggleBoardRenderOptions = {}
 ): void {
   const allowInput = options.allowInput !== false;
+  if (!allowInput || state.phase !== 'placing') return;
+
   const player = state.currentPlayer;
   const boardEl = boardsRoot.querySelector(
     `.juggle-board.${player}`
   ) as HTMLElement | null;
   if (!boardEl) return;
-  syncJuggleBoardCells(
-    boardEl,
-    state.boards[player],
-    player,
-    true,
-    state,
-    { allowInput }
+  const grid = boardEl.querySelector('.juggle-grid') as HTMLElement | null;
+  if (!grid) return;
+
+  const cells = getCellMap(grid);
+  const legalAnchors = new Set(
+    getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
   );
+  const prevKeys = (boardEl.dataset.hoverKeys || '').split('|').filter(Boolean);
+
+  const clearPreview = (key: string) => {
+    const cell = cells.get(key);
+    if (!cell || cell.classList.contains(`occupied-${player}`)) return;
+    cell.classList.remove('preview-valid', 'preview-invalid');
+    if (legalAnchors.has(key)) {
+      cell.classList.add('juggle-cell-valid');
+    } else {
+      cell.classList.remove('juggle-cell-valid');
+    }
+  };
+
+  for (const key of prevKeys) clearPreview(key);
+
+  if (!state.hoverPosition) {
+    boardEl.dataset.hoverKeys = '';
+    return;
+  }
+
+  const previewCells = getPreviewCells(state, state.hoverPosition);
+  const isValid = isPlacementValid(state, state.hoverPosition);
+  const nextKeys: string[] = [];
+  for (const c of previewCells) {
+    const key = `${c.row},${c.col}`;
+    const cell = cells.get(key);
+    if (!cell || cell.classList.contains(`occupied-${player}`)) continue;
+    cell.classList.remove(
+      'preview-valid',
+      'preview-invalid',
+      'juggle-cell-valid'
+    );
+    cell.classList.add(isValid ? 'preview-valid' : 'preview-invalid');
+    nextKeys.push(key);
+  }
+  boardEl.dataset.hoverKeys = nextKeys.join('|');
 }
 
 /**
@@ -224,8 +189,6 @@ export function renderBoard(
   markBoardAsGrid(grid);
 
   const { previewSet, isPreviewValid, legalAnchors } = previewStateForBoard(
-    board,
-    player,
     isCurrentPlayer,
     state,
     allowInput

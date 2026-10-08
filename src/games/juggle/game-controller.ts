@@ -27,7 +27,6 @@ import {
   renderShapeControls,
   injectJuggleStyles,
   getPlayerName,
-  syncJuggleBoardCells,
   applyJuggleHoverPreview,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
@@ -95,17 +94,10 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
+  boardContainer.innerHTML = '';
+
   const allowInput = !isComputerTurnPending();
   const inputOpts = { allowInput };
-
-  // Keep persistent board grids; only rebuild chrome that changes by phase.
-  let boardsContainer = boardContainer.querySelector(
-    '.juggle-boards'
-  ) as HTMLElement | null;
-  const chromeNodes = Array.from(boardContainer.children).filter(
-    (el) => !el.classList.contains('juggle-boards')
-  );
-  for (const node of chromeNodes) node.remove();
 
   // Render dice area — hide Roll / selectable dice while the computer seat thinks
   const diceArea = renderDice(
@@ -116,18 +108,18 @@ function updateUI(): void {
     gameState.phase,
     inputOpts
   );
-  boardContainer.insertBefore(diceArea, boardsContainer);
+  boardContainer.appendChild(diceArea);
 
   // Render shape selector or controls
-  let phaseChrome: HTMLElement | null = null;
   if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
-    phaseChrome = renderShapeSelector(
+    const shapeSelector = renderShapeSelector(
       gameState,
       handleSelectShape,
       inputOpts
     );
+    boardContainer.appendChild(shapeSelector);
   } else if (gameState.phase === 'placing') {
-    phaseChrome = renderShapeControls(
+    const shapeControls = renderShapeControls(
       gameState,
       handleRotate,
       handleFlip,
@@ -136,67 +128,38 @@ function updateUI(): void {
         onAbandonPlacement: allowInput ? handleAbandonPlacement : undefined,
       }
     );
-  }
-  if (phaseChrome) {
-    boardContainer.insertBefore(phaseChrome, boardsContainer);
+    boardContainer.appendChild(shapeControls);
   }
 
-  if (!boardsContainer) {
-    boardsContainer = document.createElement('div');
-    boardsContainer.className = 'juggle-boards';
+  // Render boards side by side
+  const boardsContainer = document.createElement('div');
+  boardsContainer.className = 'juggle-boards';
 
-    const p1Board = renderBoard(
-      gameState.boards.player1,
-      'player1',
-      gameState.currentPlayer === 'player1',
-      gameState,
-      (row, col) => handleCellClick(row, col, 'player1'),
-      (row, col) => handleCellHover(row, col),
-      handleCellLeave,
-      inputOpts
-    );
-    boardsContainer.appendChild(p1Board);
+  const p1Board = renderBoard(
+    gameState.boards.player1,
+    'player1',
+    gameState.currentPlayer === 'player1',
+    gameState,
+    (row, col) => handleCellClick(row, col, 'player1'),
+    (row, col) => handleCellHover(row, col),
+    handleCellLeave,
+    inputOpts
+  );
+  boardsContainer.appendChild(p1Board);
 
-    const p2Board = renderBoard(
-      gameState.boards.player2,
-      'player2',
-      gameState.currentPlayer === 'player2',
-      gameState,
-      (row, col) => handleCellClick(row, col, 'player2'),
-      (row, col) => handleCellHover(row, col),
-      handleCellLeave,
-      inputOpts
-    );
-    boardsContainer.appendChild(p2Board);
-    boardContainer.appendChild(boardsContainer);
-  } else {
-    const p1Board = boardsContainer.querySelector(
-      '.juggle-board.player1'
-    ) as HTMLElement | null;
-    const p2Board = boardsContainer.querySelector(
-      '.juggle-board.player2'
-    ) as HTMLElement | null;
-    if (p1Board) {
-      syncJuggleBoardCells(
-        p1Board,
-        gameState.boards.player1,
-        'player1',
-        gameState.currentPlayer === 'player1',
-        gameState,
-        inputOpts
-      );
-    }
-    if (p2Board) {
-      syncJuggleBoardCells(
-        p2Board,
-        gameState.boards.player2,
-        'player2',
-        gameState.currentPlayer === 'player2',
-        gameState,
-        inputOpts
-      );
-    }
-  }
+  const p2Board = renderBoard(
+    gameState.boards.player2,
+    'player2',
+    gameState.currentPlayer === 'player2',
+    gameState,
+    (row, col) => handleCellClick(row, col, 'player2'),
+    (row, col) => handleCellHover(row, col),
+    handleCellLeave,
+    inputOpts
+  );
+  boardsContainer.appendChild(p2Board);
+
+  boardContainer.appendChild(boardsContainer);
 
   // Update status
   updateStatus();

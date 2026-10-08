@@ -270,19 +270,6 @@ function syncKingsCell(
   }
 }
 
-type KingsCellCache = HTMLElement[];
-
-function getKingsCells(boardEl: HTMLElement): KingsCellCache {
-  let cells = (boardEl as HTMLElement & { __kingsCells?: KingsCellCache })
-    .__kingsCells;
-  if (!cells || cells.length !== KINGS_CELL_COUNT) {
-    cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
-    (boardEl as HTMLElement & { __kingsCells?: KingsCellCache }).__kingsCells =
-      cells;
-  }
-  return cells;
-}
-
 function ensureKingsBoard(container: HTMLElement): {
   boardEl: HTMLElement;
   created: boolean;
@@ -290,7 +277,9 @@ function ensureKingsBoard(container: HTMLElement): {
   let boardEl = container.querySelector(
     ':scope > .board'
   ) as HTMLElement | null;
-  const cells = boardEl ? getKingsCells(boardEl) : [];
+  const cells = boardEl
+    ? (Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[])
+    : [];
 
   if (boardEl && cells.length === KINGS_CELL_COUNT) {
     return { boardEl, created: false };
@@ -302,20 +291,16 @@ function ensureKingsBoard(container: HTMLElement): {
   markBoardAsGrid(boardEl);
 
   const fragment = document.createDocumentFragment();
-  const cellList: KingsCellCache = [];
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {
       const cell = document.createElement('div');
       cell.className = 'cell';
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
-      cellList.push(cell);
       fragment.appendChild(cell);
     }
   }
   boardEl.appendChild(fragment);
-  (boardEl as HTMLElement & { __kingsCells?: KingsCellCache }).__kingsCells =
-    cellList;
   container.appendChild(boardEl);
   return { boardEl, created: true };
 }
@@ -379,7 +364,7 @@ export function renderBoard(
   boardEl.className = 'board kings-board';
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  const cells = getKingsCells(boardEl);
+  const cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {

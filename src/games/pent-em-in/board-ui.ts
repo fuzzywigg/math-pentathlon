@@ -186,14 +186,17 @@ export function renderBoard(
     svg.appendChild(validGroup);
   }
 
-  // Preview layer (patched in place on hover — see patchPentPreview)
-  const previewGroup = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'g'
-  );
-  previewGroup.classList.add('preview');
-  svg.appendChild(previewGroup);
-  fillPentPreviewGroup(previewGroup, state, allowInput);
+  // Preview layer (patched in place on hover — see patchPentPreview).
+  // Omit the group entirely when input is suppressed (AI seat aria honesty).
+  if (allowInput) {
+    const previewGroup = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
+    previewGroup.classList.add('preview');
+    svg.appendChild(previewGroup);
+    fillPentPreviewGroup(previewGroup, state, allowInput);
+  }
 
   // Click/hover areas
   const interactionGroup = document.createElementNS(
