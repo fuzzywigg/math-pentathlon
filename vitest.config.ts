@@ -40,6 +40,8 @@ const isolatedFiles = [
   // Generation-gated timeout characterization — fake timers + isolate so
   // shared-graph timer pollution cannot starve real-timer awaits (CI flake).
   'tests/unit/ui-helper-dedupe-characterization.test.ts',
+  // Hoisted game-registry mock injects unavailable card for selector coverage.
+  'tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
