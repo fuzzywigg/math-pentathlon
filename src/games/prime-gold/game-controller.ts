@@ -81,6 +81,9 @@ function scheduleAI(controller: PrimeGoldController, delayMs: number): void {
 }
 
 function unmountBoard3d(): void {
+  if (boardHostEl) {
+    boardHostEl.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
   if (board3d) {
     board3d.unmount();
     board3d = null;
@@ -89,6 +92,20 @@ function unmountBoard3d(): void {
   board3dEnabled = false;
   boardHostEl = null;
   clearAiTimer();
+}
+
+function onBoard3dContextLost(): void {
+  if (boardHostEl) {
+    boardHostEl.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
+  // Board already tore itself down via webglcontextlost → unmount.
+  board3d = null;
+  markBoard3dWebGlFallback(boardHostEl, 'context-lost');
+  board3dEnabled = false;
+  board3dLoading = null;
+  if (activeController) {
+    activeController.update();
+  }
 }
 
 async function ensureBoard3d(): Promise<void> {
@@ -114,6 +131,7 @@ async function ensureBoard3d(): Promise<void> {
       if (activeController) handlePlacement(activeController, value, expr);
     });
     clearBoard3dWebGlFallback(liveHost);
+    liveHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D board.
     markBoard3dWebGlFallback(boardHostEl, 'webgl-unavailable');

@@ -119,4 +119,70 @@ describe('mp3d Prime Gold board view selection', () => {
     expect(board.querySelector('.pg-board')).not.toBeNull();
     expect(board.querySelector('canvas[data-mp3d]')).toBeNull();
   });
+
+  it('webglcontextlost falls back to playable 2D board and preserves game state', async () => {
+    isBoard3dEnabled.mockReturnValue(true);
+
+    const fakeCanvas = document.createElement('canvas');
+    fakeCanvas.setAttribute('data-mp3d', 'prime-gold');
+    let hostEl: HTMLElement | null = null;
+    const unmount = vi.fn(() => {
+      fakeCanvas.remove();
+    });
+    const update = vi.fn();
+    const createPrimeGoldBoard3D = vi.fn(async (container: HTMLElement) => {
+      hostEl = container;
+      container.replaceChildren(fakeCanvas);
+      const a11y = document.createElement('div');
+      a11y.className = 'pg-a11y-grid';
+      container.appendChild(a11y);
+      return {
+        canvas: fakeCanvas,
+        update,
+        unmount,
+        cellToClientPoint: () => ({ x: 0, y: 0 }),
+        valueToClientPoint: () => ({ x: 0, y: 0 }),
+      };
+    });
+    loadPrimeGoldBoard3DModule.mockResolvedValue({
+      createPrimeGoldBoard3D,
+    });
+
+    const { initGame, isUsingBoard3d, whenBoard3dReady, getGameState } =
+      await import('../../src/games/prime-gold/game-controller');
+
+    const board = document.createElement('div');
+    document.body.append(board);
+
+    const controller = initGame(board, false);
+    await whenBoard3dReady();
+    expect(isUsingBoard3d()).toBe(true);
+    expect(hostEl).not.toBeNull();
+
+    const before = getGameState()!;
+    const center = before.cells.get('3,3')!;
+    before.cells.set('3,3', { ...center, owner: 'player1' });
+    before.playerChips = { ...before.playerChips, player1: 19 };
+    before.phase = 'placing';
+    controller.state = before;
+    controller.update();
+
+    // Board already tore itself down; notify like the real 3D module.
+    unmount();
+    hostEl!.dispatchEvent(new CustomEvent('mp3d-context-lost'));
+
+    expect(isUsingBoard3d()).toBe(false);
+    expect(board.querySelector('canvas[data-mp3d]')).toBeNull();
+    const pgBoard = board.querySelector('.pg-board');
+    expect(pgBoard).not.toBeNull();
+    expect(
+      pgBoard!.querySelector(`.pg-cell.player1[data-value="${center.value}"]`)
+    ).not.toBeNull();
+
+    const after = getGameState()!;
+    expect(after.cells.get('3,3')?.owner).toBe('player1');
+    expect(after.playerChips.player1).toBe(19);
+    expect(after.phase).toBe('placing');
+    expect(after.currentPlayer).toBe(before.currentPlayer);
+  });
 });

@@ -7,6 +7,7 @@
  * - render-on-demand (no continuous RAF)
  * - size to available width/height
  * - throws when WebGL is unavailable so the controller can keep 2D
+ * - webglcontextlost → tear down + `mp3d-context-lost` for 2D fallback
  * - hidden a11y grid mirrors state and drives the same click path
  *
  * Original procedural number textures only — no kit photos.
@@ -568,10 +569,9 @@ export async function createPrimeGoldBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    // Signal failure to callers by disposing; controller falls back on next ensure.
-    if (!disposed) {
-      unmount();
-    }
+    if (disposed) return;
+    unmount();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
   const unbindVisibility = bindPageVisibility({
