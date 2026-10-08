@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/fab-a-diffy/rules';
 import { getAIMove } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -13,7 +14,7 @@ describe('Wave 44 fab AI — easy teaching', () => {
     () => {
       const state = createInitialState();
       vi.spyOn(Math, 'random').mockReturnValue(0.99); // skip suboptimal branch
-      const move = getAIMove(state, 'player1', 'easy');
+      const move = getAIMove(state, 'player1', 'easy', fastDeadlineOpts());
       expect(move).not.toBeNull();
       expect(move!.bar1Id).not.toBe(move!.bar2Id);
     },
@@ -26,7 +27,7 @@ describe('Wave 44 fab AI — easy teaching', () => {
       const state = createInitialState();
       const spy = vi.spyOn(Math, 'random');
       spy.mockReturnValueOnce(0.1).mockReturnValue(0);
-      const move = getAIMove(state, 'player1', 'easy');
+      const move = getAIMove(state, 'player1', 'easy', fastDeadlineOpts());
       expect(move).not.toBeNull();
     },
     15_000

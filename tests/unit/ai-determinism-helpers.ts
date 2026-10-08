@@ -48,8 +48,10 @@ export function withSeededRandom<T>(seed: number, fn: () => T): T {
  */
 export function cappedSeedOptions(
   seed: number,
-  deadlineMs = 120,
-  tick = 1
+  // Tighter default soft budget: still scores multiple candidates, but aborts
+  // sooner on Fab-style full enumerations (audit asserts unchanged).
+  deadlineMs = 48,
+  tick = 2
 ): { seed: number; deadlineMs: number; now: () => number } {
   let t = 0;
   return {
@@ -64,8 +66,8 @@ export function cappedSeedOptions(
 
 /** Deadline-only options (Math.random / withSeededRandom supplies entropy). */
 export function cappedClockOptions(
-  deadlineMs = 120,
-  tick = 0.05
+  deadlineMs = 48,
+  tick = 0.1
 ): { deadlineMs: number; now: () => number } {
   let t = 0;
   return {

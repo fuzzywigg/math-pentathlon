@@ -9,6 +9,7 @@ import {
   executeAITurn,
   applyAIMoveSteps,
 } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -31,9 +32,9 @@ describe('Overnight fab — AI gates', () => {
   it('hard prefers a legal move; executeAITurn advances or passes', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99); // low randomness branch
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'hard');
+    const move = getAIMove(state, 'player1', 'hard', fastDeadlineOpts());
     expect(move).not.toBeNull();
-    const next = executeAITurn(state, 'player1', 'hard');
+    const next = executeAITurn(state, 'player1', 'hard', fastDeadlineOpts());
     expect(next).not.toBe(state);
     expect(['selectingBar1', 'gameOver']).toContain(next.phase);
   });
@@ -53,7 +54,12 @@ describe('Overnight fab — AI gates', () => {
 
   it('easy teaching can return a move', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.9);
-    const move = getAIMove(createInitialState(), 'player1', 'easy');
+    const move = getAIMove(
+      createInitialState(),
+      'player1',
+      'easy',
+      fastDeadlineOpts()
+    );
     expect(move).not.toBeNull();
   });
 });

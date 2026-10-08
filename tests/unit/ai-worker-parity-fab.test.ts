@@ -9,10 +9,12 @@ import {
   searchAIMove,
   type AIDifficulty,
   type AIMove,
+  type AISearchOptions,
 } from '../../src/games/fab-a-diffy/ai';
 import type { FabADiffyState, Player } from '../../src/games/fab-a-diffy/types';
 import { AiWorkerClient } from '../../src/core/ai-worker/client';
 import { disposeFabAiWorker } from '../../src/games/fab-a-diffy/ai-client';
+import { expireAfterStart, fastDeadlineOpts } from './helpers/ai-search-fast';
 
 function installSearchWorker(
   run: (payload: Record<string, unknown>) => {
@@ -59,14 +61,21 @@ describe('Fab-a-Diffy worker vs direct parity', () => {
 
   beforeEach(() => {
     OriginalWorker = globalThis.Worker;
-    installSearchWorker((payload) =>
-      searchAIMove(
+    installSearchWorker((payload) => {
+      const deadlineMs = payload.deadlineMs as number | undefined;
+      const opts: AISearchOptions = {
+        seed: payload.seed as number | undefined,
+        ...(deadlineMs === undefined
+          ? {}
+          : { deadlineMs, now: expireAfterStart(deadlineMs) }),
+      };
+      return searchAIMove(
         payload.state as FabADiffyState,
         payload.player as Player,
         payload.difficulty as AIDifficulty,
-        { seed: payload.seed as number | undefined }
-      )
-    );
+        opts
+      );
+    });
   });
 
   afterEach(() => {
@@ -88,13 +97,15 @@ describe('Fab-a-Diffy worker vs direct parity', () => {
     );
 
     for (const seed of [1, 2, 3, 7, 11]) {
-      const direct = getAIMove(state, 'player1', 'easy', { seed });
+      const opts = fastDeadlineOpts(seed);
+      const direct = getAIMove(state, 'player1', 'easy', opts);
       const viaWorker = await client.request({
         game: 'fab-a-diffy',
         state: structuredClone(state),
         player: 'player1',
         difficulty: 'easy',
         seed,
+        deadlineMs: opts.deadlineMs,
       });
       expect(viaWorker).toEqual(direct);
     }
@@ -104,8 +115,16 @@ describe('Fab-a-Diffy worker vs direct parity', () => {
   it('structuredClone does not change the chosen move', () => {
     const state = createInitialState();
     const seed = 9;
-    const a = getAIMove(state, 'player1', 'hard', { seed });
-    const b = getAIMove(structuredClone(state), 'player1', 'hard', { seed });
+    // Clone parity is difficulty-agnostic; hard unlimited is covered in
+    // fab-a-diffy-ai-play-deadline.test.ts (truncated:false).
+    // Fresh opts per call so the fake clock tick counters do not share state.
+    const a = getAIMove(state, 'player1', 'hard', fastDeadlineOpts(seed));
+    const b = getAIMove(
+      structuredClone(state),
+      'player1',
+      'hard',
+      fastDeadlineOpts(seed)
+    );
     expect(a).toEqual(b);
   });
 });

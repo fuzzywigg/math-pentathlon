@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/fab-a-diffy/rules';
 import { getAIMove } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -13,7 +14,7 @@ describe('Wave 44 fab AI — medium random', () => {
     () => {
       const state = createInitialState();
       vi.spyOn(Math, 'random').mockReturnValue(0.01); // < 0.15 randomness
-      const move = getAIMove(state, 'player1', 'medium');
+      const move = getAIMove(state, 'player1', 'medium', fastDeadlineOpts());
       expect(move).not.toBeNull();
       expect(['add', 'subtract', 'multiply', 'divide']).toContain(move!.operation);
     },
@@ -25,7 +26,7 @@ describe('Wave 44 fab AI — medium random', () => {
     () => {
       const state = createInitialState();
       vi.spyOn(Math, 'random').mockReturnValue(0.99);
-      const move = getAIMove(state, 'player1', 'medium');
+      const move = getAIMove(state, 'player1', 'medium', fastDeadlineOpts());
       expect(move).not.toBeNull();
     },
     15_000

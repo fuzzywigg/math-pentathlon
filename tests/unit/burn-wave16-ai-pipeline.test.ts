@@ -30,6 +30,7 @@ import {
   applyAIMoveSteps,
   executeAITurn as fabExec,
 } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 import { createInitialState as createStar } from '../../src/games/star-track/types';
 import { drawChains, selectChain } from '../../src/games/star-track/rules';
@@ -193,7 +194,7 @@ describe('Wave 16 AI pipeline — Fab applyAIMoveSteps / execute', () => {
   it('getAIMove + applyAIMoveSteps advances away from selectingBar1 or passes', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.05);
     const opening = createFab();
-    const move = fabMove(opening, 'player1', 'hard');
+    const move = fabMove(opening, 'player1', 'hard', fastDeadlineOpts());
     expect(move).not.toBeNull();
     const applied = applyAIMoveSteps(opening, move!);
     expect(applied.phase).not.toBe('confirmingMove');
@@ -203,7 +204,7 @@ describe('Wave 16 AI pipeline — Fab applyAIMoveSteps / execute', () => {
 
   it('executeAITurn from opening leaves selectingBar1 for next seat or gameOver', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.08);
-    const next = fabExec(createFab(), 'player1', 'medium');
+    const next = fabExec(createFab(), 'player1', 'medium', fastDeadlineOpts());
     expect(['selectingBar1', 'gameOver']).toContain(next.phase);
   });
 
