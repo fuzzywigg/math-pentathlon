@@ -11,6 +11,7 @@
     "size:check": "node scripts/check-bundle-budgets.mjs",
     "check:perf": "node scripts/check-perf.mjs",
     "check:build": "node scripts/check-build.mjs",
+    "check:pwa-manifest": "node scripts/check-pwa-manifest.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "preview": "vite preview",
     "lint": "eslint src",

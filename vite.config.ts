@@ -60,6 +60,9 @@ const plugins: PluginOption[] = [
     registerType: 'autoUpdate',
     // Manual registration via src/pwa/bootstrap.ts (update + reload policy).
     injectRegister: false,
+    // SW registration scope must match deploy base path (site is served at /).
+    scope: '/',
+    base: '/',
     // Only list assets NOT already matched by workbox.globPatterns.
     // workbox-build appends includeAssets + manifest icons + the generated
     // webmanifest AFTER manifestTransforms — overlapping entries become
@@ -77,9 +80,13 @@ const plugins: PluginOption[] = [
       short_name: 'Math Pentathlon',
       description:
         'Educational math strategy games — play offline vs the computer.',
+      // Stable install identity (Chrome); keep aligned with start_url/scope.
+      id: '/',
       theme_color: '#102a43',
       background_color: '#102a43',
       display: 'standalone',
+      // Tablets rotate; do not lock portrait.
+      orientation: 'any',
       start_url: '/',
       scope: '/',
       lang: 'en',
@@ -130,6 +137,8 @@ const plugins: PluginOption[] = [
         '**/inter-latin-600-normal.woff2',
         '**/inter-latin-700-normal.woff2',
       ],
+      // Drop previous precache revisions so deploys do not leave a stale shell.
+      cleanupOutdatedCaches: true,
       // Hash-router SPA: unknown navigations get the shell.
       navigateFallback: '/index.html',
       navigateFallbackDenylist: [/^\/api\//, /^\/health/],
