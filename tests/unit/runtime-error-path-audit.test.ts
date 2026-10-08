@@ -1,0 +1,304 @@
+/**
+ * burn-1008-mp-runtime-error-path-audit — behavior pins for runtime error paths.
+ *
+ * Pins CURRENT tip behavior only (no src/ edits). Unrecovered gaps use it.skip
+ * with TODO(runtime-error-path) + expected-fix description for the tip owner.
+ *
+ * Skips inventory already covered by folded drafts:
+ * - #528 storage failure modes (safe-web-storage)
+ * - #480 destroyGame wiring presence
+ * - #479 idle-warm / offline soft-nav
+ *
+ * See docs/dev/runtime-error-path-audit.md for the full site table.
+ */
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  installGameErrorBoundary,
+  renderGameCrash,
+} from '../../src/ui/game-error-boundary';
+import { renderGameLoadError } from '../../src/ui/game-loading';
+import {
+  registerPwa,
+  resetPwaReloadGuardForTests,
+} from '../../src/pwa/register';
+import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
+import { safeParseJson } from '../../src/core/safe-web-storage';
+
+const root = join(import.meta.dirname, '../..');
+
+function readSrc(rel: string): string {
+  return readFileSync(join(root, rel), 'utf8');
+}
+
+describe('runtime-error-path-audit — recovered pins', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    resetPwaReloadGuardForTests();
+    vi.restoreAllMocks();
+  });
+
+  it('R-SHELL-03: onBeforeShow throw is swallowed so crash UI still shows', () => {
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const handle = installGameErrorBoundary({
+      gameName: 'Hex',
+      container: rootEl,
+      onReset: vi.fn(),
+      onHome: vi.fn(),
+      onBeforeShow: () => {
+        throw new Error('destroy blew up');
+      },
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('in-game boom'),
+        message: 'in-game boom',
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    expect(handle.didCatch).toBe(true);
+    handle.dispose();
+    errSpy.mockRestore();
+  });
+
+  it('R-SHELL-03: unhandledrejection while boundary active shows crash UI', () => {
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const handle = installGameErrorBoundary({
+      gameName: 'Calla',
+      container: rootEl,
+      onReset: vi.fn(),
+      onHome: vi.fn(),
+    });
+
+    window.dispatchEvent(
+      new PromiseRejectionEvent('unhandledrejection', {
+        promise: Promise.resolve(),
+        reason: new Error('async handler fail'),
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    handle.dispose();
+    errSpy.mockRestore();
+  });
+
+  it('R-SHELL-05 / R-EVT-04: load-error UI exposes retry + home actions', () => {
+    const rootEl = document.createElement('div');
+    const onRetry = vi.fn();
+    const onHome = vi.fn();
+    renderGameLoadError(rootEl, 'Hex', onRetry, onHome, { offline: false });
+
+    expect(rootEl.querySelector('[data-testid="game-load-error"]')).not.toBeNull();
+    rootEl.querySelector<HTMLButtonElement>('[data-action="retry"]')?.click();
+    rootEl.querySelector<HTMLButtonElement>('[data-action="home"]')?.click();
+    expect(onRetry).toHaveBeenCalledOnce();
+    expect(onHome).toHaveBeenCalledOnce();
+  });
+
+  it('R-SW-02: registerPwa skips when disabled (no throw)', () => {
+    const registerSW = vi.fn();
+    const result = registerPwa({ enabled: false, registerSW });
+    expect(registerSW).not.toHaveBeenCalled();
+    expect(result.update).toBeUndefined();
+  });
+
+  it('R-JSON-01: safeParseJson soft-fails on garbage (cite #528)', () => {
+    // Thin re-pin of #528 wrapper — full storage matrix lives in safe-web-storage*.test.ts
+    expect(safeParseJson('{not-json').ok).toBe(false);
+    expect(safeParseJson(null).ok).toBe(false);
+    expect(safeParseJson('{"a":1}').ok).toBe(true);
+  });
+
+  it('R-IMP-02: prefetch catch clears started mark (source contract)', () => {
+    const src = readSrc('src/ui/game-prefetch.ts');
+    expect(src).toMatch(/void load\(\)\.catch\(\(\) => \{/);
+    expect(src).toMatch(/started\.delete\(gameId\)/);
+  });
+
+  it('R-IMP-03: idle-warm soft-fails warm imports (cite #479, source contract)', () => {
+    const src = readSrc('src/pwa/idle-warm.ts');
+    expect(src).toContain('await importShell()');
+    expect(src).toMatch(/catch \{\s*\/\/ Shell warm is best-effort/);
+    expect(src).toMatch(/catch \{\s*\/\/ Warm is best-effort/);
+  });
+
+  it('R-SHELL-05: main renderGame catch renders load-error (source contract)', () => {
+    const src = readSrc('src/main.ts');
+    expect(src).toContain('renderGameLoadError');
+    expect(src).toContain('retryLazyChunkLoad');
+    expect(src).toContain('Failed to load game');
+  });
+
+  it('R-GL recovered pattern: kings/fiar/kwatro dispatch mp3d-context-lost', () => {
+    for (const rel of [
+      'src/ui/three/kings-quadraphages-board-3d.ts',
+      'src/ui/three/fiar-board-3d.ts',
+      'src/ui/three/kwatro-sinko-board-3d.ts',
+      'src/ui/three/queens-guards-board-3d.ts',
+      'src/ui/three/pent-em-in-board-3d.ts',
+    ]) {
+      const src = readSrc(rel);
+      expect(src).toContain("addEventListener('webglcontextlost'");
+      expect(src).toContain("CustomEvent('mp3d-context-lost')");
+    }
+  });
+
+  it('R-GL-06/07: hex-a-gone / star-track use callback notify (not CustomEvent)', () => {
+    const hex = readSrc('src/ui/three/hex-a-gone-board-3d.ts');
+    const star = readSrc('src/ui/three/star-track-board-3d.ts');
+    expect(hex).toContain('onWebglLost?.()');
+    expect(star).toMatch(/onContextLost\?\.\(\)|onLost/);
+    expect(hex).toContain("addEventListener('webglcontextlost'");
+    expect(star).toContain("addEventListener('webglcontextlost'");
+  });
+});
+
+describe('runtime-error-path-audit — CURRENT unrecovered pins', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    resetPwaReloadGuardForTests();
+    vi.restoreAllMocks();
+  });
+
+  it('R-SW-01 CURRENT: registerSW throw propagates from registerPwa', () => {
+    const registerSW = vi.fn(() => {
+      throw new Error('SW registration failed');
+    });
+    expect(() =>
+      registerPwa({ enabled: true, registerSW, reload: vi.fn() })
+    ).toThrow(/SW registration failed/);
+  });
+
+  it('R-SW-03 CURRENT: registration.update is fire-and-forget (void, no catch)', () => {
+    const src = readSrc('src/pwa/register.ts');
+    expect(src).toMatch(/void registration\.update\(\)/);
+    expect(src).not.toMatch(/registration\.update\(\)\.catch/);
+  });
+
+  it('R-IMP-04 CURRENT: bootstrapOwl schedules async import with no try/catch', () => {
+    const src = readSrc('src/pwa/bootstrap-owl.ts');
+    expect(src).toContain('void (async () => {');
+    expect(src).toContain("import('../core/owl')");
+    expect(src).not.toMatch(/catch\s*\{/);
+
+    const schedule = vi.fn((cb: () => void) => cb());
+    // Pin schedule wiring only — do not await the real owl import reject here
+    // (would trip Vitest unhandledRejection). Rejection path is the skip below.
+    bootstrapOwl({ schedule, enabled: true });
+    expect(schedule).toHaveBeenCalledOnce();
+  });
+
+  it('R-SHELL-07 CURRENT: setGameRouteCleanup calls destroy before shell.cleanup (no try)', () => {
+    const src = readSrc('src/ui/game-route-mounts.ts');
+    expect(src).toMatch(
+      /setCurrentCleanup\(\(\) => \{\s*destroyGame\(\);\s*shell\.cleanup\(\);/
+    );
+    expect(src).not.toMatch(/setCurrentCleanup\(\(\) => \{\s*try/);
+
+    // Local replica of CURRENT wrapper semantics (destroy throw skips shell).
+    const shellCleanup = vi.fn();
+    const destroyGame = vi.fn(() => {
+      throw new Error('destroy failed');
+    });
+    const cleanup = () => {
+      destroyGame();
+      shellCleanup();
+    };
+    expect(() => cleanup()).toThrow(/destroy failed/);
+    expect(shellCleanup).not.toHaveBeenCalled();
+  });
+
+  it('R-SHELL-08 CURRENT: init*Game runs before setGameRouteCleanup (KQ sample)', () => {
+    const src = readSrc('src/ui/game-route-mounts.ts');
+    const initIdx = src.indexOf('initKQGame(');
+    const cleanupIdx = src.indexOf('setGameRouteCleanup(destroyKQGame');
+    expect(initIdx).toBeGreaterThan(-1);
+    expect(cleanupIdx).toBeGreaterThan(initIdx);
+  });
+
+  it('R-GL-08 CURRENT: prime-gold context-lost unmounts without mp3d-context-lost', () => {
+    const src = readSrc('src/ui/three/prime-gold-board-3d.ts');
+    expect(src).toContain("addEventListener('webglcontextlost'");
+    expect(src).toContain('unmount()');
+    expect(src).not.toContain("CustomEvent('mp3d-context-lost')");
+    expect(src).not.toContain('onWebglLost');
+  });
+
+  it('R-SHELL-01 CURRENT: missing #app throws at module eval (source contract)', () => {
+    const src = readSrc('src/main.ts');
+    expect(src).toContain("getElementById('app')");
+    expect(src).toContain("throw new Error('App container not found')");
+  });
+});
+
+describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
+  it.skip('TODO(runtime-error-path P0 R-GL-08): Prime Gold webglcontextlost should notify controller and fall back to 2D', () => {
+    // Expected: dispatch mp3d-context-lost (or callback), clear board3dEnabled,
+    // remount 2D board chrome — same as kings/queens/hex-a-gone.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P1 R-SHELL-07): setGameRouteCleanup should try/finally so shell.cleanup always runs', () => {
+    // Expected: destroyGame throw still runs shell.cleanup(); document keydown unbound.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P1 R-SHELL-08): init*Game throw should still shell.cleanup (or register cleanup first)', () => {
+    // Expected: load-error UI + no leaked document keydown from orphaned shell.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P2 R-IMP-04): bootstrapOwl should catch import/init failures like idle-warm', () => {
+    // Expected: rejected owl chunk does not surface as unhandledrejection /
+    // false game-error-boundary trip.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P2 R-SW-01): registerPwa should guard registerSW throws', () => {
+    // Expected: SW registration failure soft-fails; menu/games stay playable online.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P2 R-SHELL-04): home/menu should recover from thrown handlers', () => {
+    // Expected: menu error boundary or soft reset — blank selector is unrecovered today.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P3 R-SW-03): registration.update() rejection should be swallowed/logged', () => {
+    // Expected: void registration.update().catch(...) or equivalent.
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P3 R-SHELL-01): missing #app should not hard-throw without diagnostics', () => {
+    // Expected: friendly boot fail for misconfigured hosts (dev/deploy).
+    expect(true).toBe(false);
+  });
+
+  it.skip('TODO(runtime-error-path P3 R-JSON-04): gameStateFromJSON should soft-fail if ever bound to UI', () => {
+    // Dormant thrower today (tests only). Harden before wiring to player UI.
+    expect(true).toBe(false);
+  });
+});
+
+describe('runtime-error-path-audit — crash UI copy contract (no new player text)', () => {
+  it('renderGameCrash keeps existing boundary strings (characterization)', () => {
+    const rootEl = document.createElement('div');
+    renderGameCrash(rootEl, 'Hex', vi.fn(), vi.fn());
+    expect(rootEl.textContent).toContain('Something went wrong in Hex');
+    expect(rootEl.textContent).toContain('Try again');
+    expect(rootEl.textContent).toContain('Back to games');
+  });
+});
