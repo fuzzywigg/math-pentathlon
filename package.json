@@ -10,6 +10,7 @@
     "typecheck:ratchet": "node scripts/check-type-ratchet.mjs",
     "size:check": "node scripts/check-bundle-budgets.mjs",
     "check:perf": "node scripts/check-perf.mjs",
+    "check:pwa-manifest": "node scripts/check-pwa-manifest.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "preview": "vite preview",
     "lint": "eslint src",

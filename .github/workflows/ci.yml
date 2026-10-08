@@ -96,6 +96,10 @@ jobs:
       - name: Report gzip bundle budgets (non-blocking)
         continue-on-error: true
         run: npm run size:check
+      # Report-only: parses dist/site.webmanifest after build (burn-1008-mp-pwa-manifest).
+      - name: PWA manifest installability contract (report-only)
+        continue-on-error: true
+        run: npm run check:pwa-manifest
 
   # Unit suite pruned from ~5k TOKENMAXX files; tip fold suite targets ~8 min
   # on GHA (AI benches skipped under CI; see *.bench.test.ts skipIf).
