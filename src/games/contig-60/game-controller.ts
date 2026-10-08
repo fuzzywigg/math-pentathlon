@@ -212,14 +212,16 @@ function updateStatus(): void {
     }
   }
 
-  replaceWithSafeHtml(
-    statusContainer,
-    safeHtml`
-    <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
-      <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
-    </div>
-    `
-  );
+  // Build via DOM APIs so seat/AI classes stay real class tokens.
+  // (safeHtml interpolations become text nodes — unsafe inside attributes.)
+  const statusEl = document.createElement('div');
+  statusEl.className = `contig-status ${playerClass}${
+    isComputerTurn() ? ' status-ai-thinking' : ''
+  }`;
+  const strong = document.createElement('strong');
+  strong.textContent = `${icon} ${playerName}'s turn`;
+  statusEl.append(strong, document.createTextNode(` - ${instruction}`));
+  statusContainer.replaceChildren(statusEl);
 }
 
 // =============================================================================

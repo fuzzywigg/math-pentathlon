@@ -155,7 +155,7 @@ function renderNode(
 
   const canSelect =
     allowInput &&
-    Boolean(node.chip) &&
+    node.chip != null &&
     state.phase === 'selectingChip' &&
     node.chip.owner === state.currentPlayer;
 
