@@ -444,6 +444,18 @@ describe('burn-1007 reduced-motion bind + duration', () => {
 });
 
 describe('burn-1007 game-prefetch saveData + idle reset', () => {
+  beforeEach(() => {
+    // renderGameSelector idle-prefetch can leave `started` dirty under
+    // isolate:false before this file runs; clear before asserting saveData skip.
+    resetGamePrefetchForTests();
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      delete (navigator as any).connection;
+    } catch {
+      // ignore
+    }
+  });
+
   afterEach(() => {
     resetGamePrefetchForTests();
     vi.restoreAllMocks();

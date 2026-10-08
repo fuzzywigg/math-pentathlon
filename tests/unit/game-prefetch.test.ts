@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   canPrefetchGame,
   isGamePrefetchStarted,
@@ -8,6 +8,10 @@ import {
 } from '../../src/ui/game-prefetch';
 
 describe('game-prefetch', () => {
+  beforeEach(() => {
+    resetGamePrefetchForTests();
+  });
+
   afterEach(() => {
     resetGamePrefetchForTests();
     vi.useRealTimers();
