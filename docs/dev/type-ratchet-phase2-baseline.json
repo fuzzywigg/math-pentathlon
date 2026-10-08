@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "reportOnly": true,
-  "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease. Batch 7: 220→216 (core AiWorker EOPT widen); AI residual owned by #560.",
+  "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
   "taskId": "burn-1008-mp-type-ratchet-batch-7",
-  "generatedAt": "2026-10-08T12:43:58.937Z",
-  "tipSha": "6e75e5d934bb46efd63d962367562011150b2c45",
+  "generatedAt": "2026-10-08T12:44:30.885Z",
+  "tipSha": "e65493c33918943effeb060ac0304f8f6a4b8fd2",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
