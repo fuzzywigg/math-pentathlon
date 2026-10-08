@@ -81,8 +81,8 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       const softlocked =
         noProgress > 15 ||
         (fillInfo.max >= 85 && noProgress > 8) ||
-        turnsSinceRestart > 280;
-      if (softlocked && restarts < 200) {
+        turnsSinceRestart > 200;
+      if (softlocked && restarts < 60) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;

@@ -413,7 +413,7 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 4000,
+    maxTurns: 12_000,
     playLegal: async (page) => {
       await dismissOwl(page);
       // Entire turn in one evaluate — Playwright locator loops were too slow
