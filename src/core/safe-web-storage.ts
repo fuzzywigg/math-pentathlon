@@ -20,6 +20,10 @@ export type SafeWriteResult =
   | { ok: true }
   | { ok: false; error: unknown };
 
+export type SafeReadResult =
+  | { ok: true; value: string | null }
+  | { ok: false; error: unknown };
+
 const CROSS_TAB_FLAG = '__mpSafeWebStorageCrossTabBound';
 const CROSS_TAB_HANDLER = '__mpSafeWebStorageCrossTabHandler';
 
@@ -62,18 +66,31 @@ export function getWebStorage(
   }
 }
 
+/**
+ * Read a key with a structured result. Distinguishes missing keys
+ * (`ok: true, value: null`) from SecurityError / blocked storage (`ok: false`)
+ * so callers like StorageManager.load can warn on private-mode failures.
+ */
+export function safeGetItemResult(
+  key: string,
+  kind: WebStorageKind = 'local'
+): SafeReadResult {
+  try {
+    const store = storageFromKind(kind);
+    if (store == null) return { ok: false, error: storageUnavailableError() };
+    return { ok: true, value: store.getItem(key) };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 /** Read a key; returns null when missing or when storage is unavailable. */
 export function safeGetItem(
   key: string,
   kind: WebStorageKind = 'local'
 ): string | null {
-  const store = getWebStorage(kind);
-  if (!store) return null;
-  try {
-    return store.getItem(key);
-  } catch {
-    return null;
-  }
+  const result = safeGetItemResult(key, kind);
+  return result.ok ? result.value : null;
 }
 
 /**

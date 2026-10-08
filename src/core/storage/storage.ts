@@ -1,7 +1,7 @@
 // Storage System - LocalStorage wrapper with versioning and type safety
 
 import {
-  safeGetItem,
+  safeGetItemResult,
   safeParseJson,
   safeSetItemResult,
   subscribeStorageEvent,
@@ -99,12 +99,17 @@ class StorageManager {
   // Load data from localStorage
   private load(): ProgressData {
     try {
-      const stored = safeGetItem(STORAGE_KEY);
-      if (!stored) {
+      const read = safeGetItemResult(STORAGE_KEY);
+      // Blocked / SecurityError — warn (matches prior private-mode diagnostics).
+      if (!read.ok) {
+        console.warn('Failed to load progress data, starting fresh:', read.error);
+        return createDefaultProgress();
+      }
+      if (!read.value) {
         return createDefaultProgress();
       }
 
-      const parsedResult = safeParseJson(stored);
+      const parsedResult = safeParseJson(read.value);
       if (!parsedResult.ok) {
         console.warn(
           'Failed to load progress data, starting fresh:',
