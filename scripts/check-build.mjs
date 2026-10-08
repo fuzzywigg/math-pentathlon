@@ -178,17 +178,46 @@ export function auditPrecache(distRoot) {
   const entries = parsePrecacheManifest(fs.readFileSync(swPath, 'utf8'));
   const urls = entries.map((e) => e.url.replace(/^\//, ''));
   const urlSet = new Set(urls);
+  /** @type {Map<string, number>} */
+  const counts = new Map();
+  for (const u of urls) counts.set(u, (counts.get(u) || 0) + 1);
+  const duplicates = [...counts.entries()]
+    .filter(([, n]) => n > 1)
+    .map(([u, n]) => `${u} (×${n})`)
+    .sort();
   const tree = hashTree(distRoot);
-  const missingFromDist = urls.filter((u) => !tree.has(u));
+  const missingFromDist = [...urlSet].filter((u) => !tree.has(u)).sort();
   const needed = offlineNeededPaths(tree.keys());
   const notPrecached = needed.filter((p) => !urlSet.has(p));
+  const sortedByUrl = [...urls].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  // vite-plugin-pwa / workbox-build append additionalManifestEntries after
+  // manifestTransforms. Expected stable tail: CNAME (includeAssets) then
+  // site.webmanifest (auto-injected from the VitePWA manifest option).
+  const expectedTail = ['CNAME', 'site.webmanifest'];
+  let body = urls;
+  if (
+    urls.length >= expectedTail.length &&
+    expectedTail.every((u, i) => urls[urls.length - expectedTail.length + i] === u)
+  ) {
+    body = urls.slice(0, -expectedTail.length);
+  }
+  const sortedBody = [...body].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+  const orderOk =
+    duplicates.length === 0 &&
+    JSON.stringify(body) === JSON.stringify(sortedBody);
   return {
-    ok: missingFromDist.length === 0 && notPrecached.length === 0,
+    ok:
+      missingFromDist.length === 0 &&
+      notPrecached.length === 0 &&
+      duplicates.length === 0,
     error: null,
     entries,
     missingFromDist,
     notPrecached,
-    urls: urls.sort(),
+    duplicates,
+    orderOk,
+    urls: sortedByUrl,
+    urlsInSwOrder: urls,
   };
 }
 
@@ -367,12 +396,16 @@ function main() {
     chunkNameDiff,
     manifestIdentical,
     precache: {
-      countA: precacheA.urls.length,
-      countB: precacheB.urls.length,
+      countA: precacheA.entries.length,
+      countB: precacheB.entries.length,
+      uniqueA: precacheA.urls.length,
+      uniqueB: precacheB.urls.length,
       urlsIdentical: precacheUrlsIdentical,
       entriesIdentical: precacheEntriesIdentical,
       missingFromDist: precacheB.missingFromDist,
       notPrecached: precacheB.notPrecached,
+      duplicates: precacheB.duplicates,
+      orderOk: precacheB.orderOk,
       ok: precacheB.ok,
     },
     sourcemaps: policy,
@@ -430,13 +463,23 @@ function main() {
     '',
     `| Check | Result |`,
     `| --- | --- |`,
-    `| Precache entries | ${precacheB.urls.length} |`,
+    `| Precache entries (raw) | ${precacheB.entries.length} |`,
+    `| Precache unique URLs | ${precacheB.urls.length} |`,
+    `| Duplicate precache URLs | ${precacheB.duplicates.length} |`,
+    `| Glob portion URL-sorted | ${precacheB.orderOk ? 'YES' : 'NO'} |`,
     `| Precached URL missing from dist | ${precacheB.missingFromDist.length} |`,
     `| Offline asset not precached | ${precacheB.notPrecached.length} |`,
     `| Precache OK | ${precacheB.ok ? 'YES' : 'NO'} |`,
     ''
   );
 
+  if (precacheB.duplicates.length) {
+    md.push(
+      'Duplicates:',
+      ...precacheB.duplicates.map((u) => `- \`${u}\``),
+      ''
+    );
+  }
   if (precacheB.missingFromDist.length) {
     md.push(
       'Missing from dist:',

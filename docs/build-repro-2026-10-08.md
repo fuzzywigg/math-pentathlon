@@ -19,6 +19,7 @@ Base tip: `cursor/integration-fold-wave5-tip-4af0` (#477)
 | Source | Status | Fix (build config only) |
 | --- | --- | --- |
 | Workbox precache **entry order** (filesystem `readdir` / glob order) | Risk — can make `sw.js` byte-differ when file set is identical | `workbox.manifestTransforms` sorts by `url` |
+| Duplicate precache URLs | **Found** — `includeAssets` + default `includeManifestIcons` + auto-injected `site.webmanifest` overlapped `globPatterns` (favicon/icons/manifest ×2). workbox-build appends those *after* `manifestTransforms`, leaving an unsorted duplicate tail | `includeAssets: ['CNAME']` only; `includeManifestIcons: false`; drop `webmanifest` from `globPatterns` |
 | Sourcemap absolute paths | Default was already off; unset policy was implicit | Explicit `build.sourcemap: false` |
 | esbuild legal / license comment variance | Vite already used `legalComments: 'none'` | Explicit `esbuild.legalComments: 'none'` |
 | Base-path drift vs absolute HTML/manifest URLs | Default `base: '/'` matched hosting | Explicit `base: '/'` + audit in `check:build` |
@@ -31,10 +32,11 @@ Base tip: `cursor/integration-fold-wave5-tip-4af0` (#477)
 
 ## Precache / offline audit (tip build)
 
-- Precache entries: **76** (every URL exists under `dist/`).
+- Precache entries after dedupe fix: **67** unique URLs (was 76 raw with duplicates from overlapping includeAssets/manifest icons/webmanifest).
+- Every precached URL exists under `dist/`.
 - Offline-needed assets (globPatterns minus intentional font ignores and deploy meta): **all precached**.
 - Intentionally **not** precached: Inter 500/600/700 (`runtimeCaching` CacheFirst), `_headers`, `_redirects`, `sw.js`, `workbox-*.js`.
-- `CNAME` is `includeAssets`'d (tiny DNS helper file); not required for offline play.
+- Stable SW tail after sorted glob body: `CNAME` + `site.webmanifest` (additionalManifestEntries appended post-transform).
 - Sourcemaps: **0** `.map` files in dist.
 - Base path: `index.html` asset URLs and `site.webmanifest` `start_url` / `scope` / icon `src` are root-absolute (`/…`), matching `base: '/'`.
 

@@ -65,4 +65,13 @@ describe('check-build helpers', () => {
       'index.html',
     ]);
   });
+
+  it('surfaces duplicate precache URLs when includeAssets overlaps globs', () => {
+    const sw = `s.precacheAndRoute([{url:"favicon.ico",revision:"a"},{url:"index.html",revision:"b"},{url:"favicon.ico",revision:"a"}],{})`;
+    const urls = parsePrecacheManifest(sw).map((e) => e.url);
+    const counts = new Map<string, number>();
+    for (const u of urls) counts.set(u, (counts.get(u) || 0) + 1);
+    const duplicates = [...counts.entries()].filter(([, n]) => n > 1);
+    expect(duplicates).toEqual([['favicon.ico', 2]]);
+  });
 });

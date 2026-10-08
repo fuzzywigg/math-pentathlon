@@ -35,14 +35,23 @@ import { securityHeadersPlugin } from './vite.security-headers';
  */
 const visualize = process.env.PERF_VISUALIZE === '1';
 
-/** Sort Workbox precache entries so sw.js is stable across filesystem readdir order. */
+/**
+ * Dedupe + sort Workbox precache entries so sw.js is stable across filesystem
+ * readdir order. (includeAssets are appended afterward by workbox-build — keep
+ * that list free of glob overlaps; see includeAssets below.)
+ */
 function sortPrecacheManifest<T extends { url: string }>(
   entries: T[]
 ): { manifest: T[]; warnings: string[] } {
-  const manifest = [...entries].sort((a, b) =>
-    a.url < b.url ? -1 : a.url > b.url ? 1 : 0
-  );
-  return { manifest, warnings: [] };
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+  for (const entry of entries) {
+    if (seen.has(entry.url)) continue;
+    seen.add(entry.url);
+    deduped.push(entry);
+  }
+  deduped.sort((a, b) => (a.url < b.url ? -1 : a.url > b.url ? 1 : 0));
+  return { manifest: deduped, warnings: [] };
 }
 
 const plugins: PluginOption[] = [
@@ -51,15 +60,16 @@ const plugins: PluginOption[] = [
     registerType: 'autoUpdate',
     // Manual registration via src/pwa/bootstrap.ts (update + reload policy).
     injectRegister: false,
+    // Only list assets NOT already matched by workbox.globPatterns.
+    // workbox-build appends includeAssets + manifest icons + the generated
+    // webmanifest AFTER manifestTransforms — overlapping entries become
+    // unsorted duplicate tails on sw.js.
     includeAssets: [
-      'favicon.ico',
-      'favicon.svg',
-      'icons/*.png',
-      'health.txt',
+      // No file extension → not covered by globPatterns.
       'CNAME',
-      // Body weight only — 500/600/700 are runtime-cached (see workbox).
-      'fonts/inter-latin-400-normal.woff2',
     ],
+    // Icons are already matched by globPatterns (`*.png` / favicon.*).
+    includeManifestIcons: false,
     // Keep existing index.html link href (/site.webmanifest).
     manifestFilename: 'site.webmanifest',
     manifest: {
@@ -109,9 +119,10 @@ const plugins: PluginOption[] = [
       // Precache everything needed for full offline play after first visit.
       // Includes Vite-emitted AI Web Worker chunks (*.js under assets/).
       // png: tablet install icons under /icons (Add to Home Screen).
-      globPatterns: [
-        '**/*.{js,css,html,ico,svg,png,txt,webmanifest,woff,woff2}',
-      ],
+      // Omit webmanifest: vite-plugin-pwa always injects site.webmanifest via
+      // additionalManifestEntries (MD5 of the manifest JSON). Including it in
+      // the glob duplicated the URL with a different revision.
+      globPatterns: ['**/*.{js,css,html,ico,svg,png,txt,woff,woff2}'],
       // Skip heavier Inter weights from first SW install so cheap tablets
       // finish precache sooner; weights cache on first use.
       globIgnores: [
