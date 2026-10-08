@@ -444,6 +444,11 @@ describe('burn-1007 reduced-motion bind + duration', () => {
 });
 
 describe('burn-1007 game-prefetch saveData + idle reset', () => {
+  beforeEach(() => {
+    // unit-shared pool can leave warm marks from earlier files.
+    resetGamePrefetchForTests();
+  });
+
   afterEach(() => {
     resetGamePrefetchForTests();
     vi.restoreAllMocks();

@@ -4,6 +4,8 @@
  *
  * Covers glue only (hash router + shell lifecycle). No rules/AI assertions.
  */
+import { existsSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
 import { installE2eStability } from './helpers/stability';
@@ -222,23 +224,26 @@ test.describe('history routing (parameterized @history)', () => {
     expect(res?.ok() ?? true).toBeTruthy();
     await waitForMenu(page);
 
-    // Manifest declares standalone + start_url `/`.
-    const manifest = await page.evaluate(async () => {
-      const link = document.querySelector(
-        'link[rel="manifest"]'
-      ) as HTMLLinkElement | null;
-      if (!link?.href) return null;
-      const r = await fetch(link.href);
-      return (await r.json()) as {
+    // Manifest is emit-only (vite-plugin-pwa → dist/). Prefer the build
+    // artifact when present; otherwise assert the vite.config contract.
+    const distManifest = join(process.cwd(), 'dist/site.webmanifest');
+    if (existsSync(distManifest)) {
+      const manifest = JSON.parse(readFileSync(distManifest, 'utf8')) as {
         display?: string;
         start_url?: string;
       };
-    });
-    expect(manifest).toBeTruthy();
-    expect(manifest!.display).toBe('standalone');
-    expect(manifest!.start_url === '/' || manifest!.start_url === './').toBe(
-      true
-    );
+      expect(manifest.display).toBe('standalone');
+      expect(manifest.start_url === '/' || manifest.start_url === './').toBe(
+        true
+      );
+    } else {
+      const viteConfig = readFileSync(
+        join(process.cwd(), 'vite.config.ts'),
+        'utf8'
+      );
+      expect(viteConfig).toMatch(/display:\s*'standalone'/);
+      expect(viteConfig).toMatch(/start_url:\s*'\//);
+    }
 
     // Standalone can still deep-link via hash after launch.
     await page.evaluate(() => {
