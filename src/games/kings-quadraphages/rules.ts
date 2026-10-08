@@ -20,7 +20,8 @@ export function findKingPosition(
 ): Position | null {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const piece = board[row][col];
+      // ratchet: dense BOARD_SIZE×BOARD_SIZE board.
+      const piece = board[row]![col];
       if (piece && piece.type === 'king' && piece.owner === player) {
         return { row, col };
       }

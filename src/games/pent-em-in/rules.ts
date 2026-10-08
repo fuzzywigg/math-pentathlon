@@ -77,7 +77,8 @@ function areCellsInBounds(cells: Cell[]): boolean {
  * Check if cells are all unoccupied
  */
 function areCellsFree(state: PentEmInState, cells: Cell[]): boolean {
-  return cells.every((cell) => !state.board[cell.row][cell.col].occupied);
+  // ratchet: areCellsInBounds gates callers; board is dense BOARD_SIZE×BOARD_SIZE.
+  return cells.every((cell) => !state.board[cell.row]![cell.col]!.occupied);
 }
 
 /**
@@ -130,7 +131,8 @@ export function getValidPlacements(
  */
 export function canPlayerMove(state: PentEmInState, player: Player): boolean {
   const pieces = getPlayerPieces(state, player);
-  const shape = getPentominoShape(pieces.available[0]);
+  // ratchet: getPentominoShape accepts string | undefined; probe first available.
+  const shape = getPentominoShape(pieces.available[0]!);
 
   if (!shape) return pieces.available.length > 0;
 
@@ -194,8 +196,11 @@ export function placePiece(
   );
 
   for (const cell of cells) {
-    newBoard[cell.row][cell.col] = {
-      ...newBoard[cell.row][cell.col],
+    // ratchet: cells are in-bounds (canPlacePiece); board rows/cols are dense.
+    const prev = newBoard[cell.row]![cell.col]!;
+    newBoard[cell.row]![cell.col] = {
+      row: prev.row,
+      col: prev.col,
       occupied: true,
       owner: state.currentPlayer,
       pieceId,
@@ -381,7 +386,8 @@ export function rotateSelectedPiece(state: PentEmInState): PentEmInState {
 
   return withFirstLegalPreview({
     ...state,
-    selectedRotation: rotations[nextIndex],
+    // ratchet: rotations is length-4 literal; nextIndex is always 0..3.
+    selectedRotation: rotations[nextIndex]!,
   });
 }
 
