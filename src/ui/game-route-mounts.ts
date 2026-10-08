@@ -929,9 +929,9 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        fabNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        fabNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        fabNewGameVsHuman(shell.board!);
+        fabNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startFabTutorial(),
@@ -1006,9 +1006,9 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        sdNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        sdNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        sdNewGameVsHuman(shell.board!);
+        sdNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startSDTutorial(),
@@ -1081,9 +1081,9 @@ async function renderPar55(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        par55NewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        par55NewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        par55NewGameVsHuman(shell.board!);
+        par55NewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startPar55Tutorial(),
@@ -1157,9 +1157,9 @@ async function renderRamrod(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        ramrodNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        ramrodNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        ramrodNewGameVsHuman(shell.board!);
+        ramrodNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startRamrodTutorial(),
@@ -1233,9 +1233,9 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        kwaNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        kwaNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        kwaNewGameVsHuman(shell.board!);
+        kwaNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startKwaTutorial(),
@@ -1311,9 +1311,9 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        primeGoldNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        primeGoldNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        primeGoldNewGameVsHuman(shell.board!);
+        primeGoldNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startPrimeGoldTutorial(),
@@ -1678,9 +1678,9 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        starsNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        starsNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        starsNewGameVsHuman(shell.board!);
+        starsNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startStarsTutorial(),
