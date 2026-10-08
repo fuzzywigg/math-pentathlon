@@ -286,3 +286,7 @@ Do **not** promote `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` int
 
 6. **Promote ratchet flags into main `tsconfig.json` after Phase 2?**  
    **Recommendation: NO until out-of-scope is ~0 and a full unit+e2e pass is green on tip.**
+
+## Tip fold note (wave5 `#477`)
+
+After stacking `#514` (XSS/CSP) and other burn folds onto Batch 0+1, tip measured **520** out-of-scope (not AI edits). Baseline ceiling raised **518 → 520** to match the real post-fold count; counts may only go down from here.

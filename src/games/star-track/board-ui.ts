@@ -239,7 +239,12 @@ export function fillChainArea(
     drawBtn.textContent = '🔗 Draw Chains';
     if (interactive && onDrawChains) {
       drawBtn.setAttribute('aria-label', 'Draw chains');
-      drawBtn.addEventListener('click', onDrawChains);
+      // Reject multi-click detail>1 so a double-click cannot click-through
+      // onto Draw after a chain select rebuilt this control under the cursor.
+      drawBtn.addEventListener('click', (event) => {
+        if (event.detail > 1) return;
+        onDrawChains();
+      });
     } else {
       drawBtn.disabled = true;
       drawBtn.setAttribute('aria-disabled', 'true');
@@ -282,7 +287,12 @@ export function fillChainArea(
           'aria-label',
           `Chain of length ${chain.length}, selectable`
         );
-        chainBtn.addEventListener('click', () => select(index as 0 | 1));
+        // Reject multi-click detail>1 so a double-click on Draw cannot
+        // immediately select a chain that replaced the Draw button.
+        chainBtn.addEventListener('click', (event) => {
+          if (event.detail > 1) return;
+          select(index as 0 | 1);
+        });
         if (onPreviewChain) {
           const preview = (): void => onPreviewChain(index as 0 | 1);
           const clear = (): void => onPreviewChain(null);

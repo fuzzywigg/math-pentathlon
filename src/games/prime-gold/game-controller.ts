@@ -152,6 +152,7 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -380,6 +381,8 @@ function makeAIMove(controller: PrimeGoldController): void {
   if (state.phase === 'gameOver' || !aiPlayer) return;
   // Guard against stale timers after destroy / new game
   if (activeController !== controller) return;
+  // Hard seat guard — stale timers must not roll/place for Blue
+  if (!isComputerTurnPending(controller)) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {

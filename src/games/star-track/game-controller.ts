@@ -50,6 +50,31 @@ let aiDrawTimer: ReturnType<typeof setTimeout> | null = null;
 let aiSelectTimer: ReturnType<typeof setTimeout> | null = null;
 /** Bumps on every new game / destroy so in-flight AI timeouts become no-ops. */
 let aiTurnGeneration = 0;
+/**
+ * After a seat-changing human select, ignore rapid follow-up draws so a
+ * double-click/tap cannot operate the opponent's newly painted Draw control.
+ * Does not alter AI think delays.
+ */
+const HUMAN_SEAT_SETTLE_MS = 250;
+let humanSeatSettleTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearHumanSeatSettle(): void {
+  if (humanSeatSettleTimer !== null) {
+    clearTimeout(humanSeatSettleTimer);
+    humanSeatSettleTimer = null;
+  }
+}
+
+function markHumanSeatSettle(): void {
+  clearHumanSeatSettle();
+  humanSeatSettleTimer = setTimeout(() => {
+    humanSeatSettleTimer = null;
+  }, HUMAN_SEAT_SETTLE_MS);
+}
+
+function isHumanSeatSettling(): boolean {
+  return humanSeatSettleTimer !== null;
+}
 
 function clearAiTimers(): void {
   if (aiDrawTimer !== null) {
@@ -64,6 +89,7 @@ function clearAiTimers(): void {
 
 function cancelAiTurn(): void {
   clearAiTimers();
+  clearHumanSeatSettle();
   aiTurnGeneration += 1;
   isAIThinking = false;
 }
@@ -161,6 +187,7 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 // Handle draw chains action
 function handleDrawChains(): void {
   if (!canHumanInteract()) return;
+  if (isHumanSeatSettling()) return;
   if (gameState.phase !== 'drawChains') return;
 
   if (tutorialManager.getIsActive()) {
@@ -187,6 +214,8 @@ function handleSelectChain(index: 0 | 1): void {
 
   gameState = selectChain(gameState, index);
   moveCount++;
+  // Seat (or game-over) changed — drop click-through onto the next Draw control.
+  markHumanSeatSettle();
   render();
 
   // Check for game end
@@ -341,6 +370,7 @@ export function isTutorialActive(): boolean {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   cancelAiTurn();
+  clearHumanSeatSettle();
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;

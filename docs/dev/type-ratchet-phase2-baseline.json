@@ -19,7 +19,7 @@
     "noImplicitReturns"
   ],
   "inScopeErrors": 0,
-  "outOfScopeErrors": 518,
+  "outOfScopeErrors": 520,
   "fileCount": 65,
   "byKind": {
     "ai_search_scoring": 219,
