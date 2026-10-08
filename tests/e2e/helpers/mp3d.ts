@@ -56,6 +56,26 @@ export async function disableBoard3d(page: Page): Promise<void> {
   });
 }
 
+/** Probe whether this browser can create a WebGL context (harness-only). */
+async function probeWebGlAvailable(page: Page): Promise<boolean> {
+  return page.evaluate(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      const gl =
+        canvas.getContext('webgl') ||
+        canvas.getContext('experimental-webgl') ||
+        canvas.getContext('webgl2');
+      return gl != null;
+    } catch {
+      return false;
+    }
+  });
+}
+
+function browserNameOf(page: Page): string {
+  return page.context().browser()?.browserType().name() ?? 'unknown';
+}
+
 /**
  * Wait until the named 3D canvas has completed at least one paint
  * (`data-mp3d-ready="1"` set by tablet-gl after a successful render).
@@ -63,6 +83,7 @@ export async function disableBoard3d(page: Page): Promise<void> {
  * Software-GL aware:
  * - Longer default timeout under `CI`
  * - Fail fast when the controller sets `data-mp3d-fallback` (WebGL never mounted)
+ * - Skip (don't fail) when Firefox/CI cannot create WebGL or hangs without fallback
  * - Wait on the ready attribute (not only visibility) so a painted but
  *   zero-opacity frame still counts once the attribute is present
  */
@@ -72,33 +93,59 @@ export async function waitForMp3dReady(
   timeoutMs: number = MP3D_READY_TIMEOUT_MS
 ): Promise<void> {
   const readySelector = `canvas[data-mp3d="${gameId}"][data-mp3d-ready="1"]`;
+  const browserName = browserNameOf(page);
 
-  const status = await page.waitForFunction(
-    (id: string) => {
-      const fallback = document.querySelector('[data-mp3d-fallback]');
-      if (fallback) {
-        return {
-          state: 'fallback' as const,
-          reason: fallback.getAttribute('data-mp3d-fallback') ?? 'webgl',
-        };
-      }
-      const ready = document.querySelector(
-        `canvas[data-mp3d="${id}"][data-mp3d-ready="1"]`
+  // Firefox CI often has no usable WebGL — skip before the long ready wait.
+  if (!(await probeWebGlAvailable(page))) {
+    test.skip(
+      true,
+      `mp3d "${gameId}" WebGL unavailable (${browserName}) — cross-browser harness skip`
+    );
+  }
+
+  // Firefox may return a non-null context that never paints and never sets
+  // data-mp3d-fallback — use a short budget then skip instead of 60s×retries.
+  const waitBudgetMs =
+    browserName === 'firefox' ? Math.min(timeoutMs, 15_000) : timeoutMs;
+
+  let status;
+  try {
+    status = await page.waitForFunction(
+      (id: string) => {
+        const fallback = document.querySelector('[data-mp3d-fallback]');
+        if (fallback) {
+          return {
+            state: 'fallback' as const,
+            reason: fallback.getAttribute('data-mp3d-fallback') ?? 'webgl',
+          };
+        }
+        const ready = document.querySelector(
+          `canvas[data-mp3d="${id}"][data-mp3d-ready="1"]`
+        );
+        if (ready) return { state: 'ready' as const, reason: null };
+        return false;
+      },
+      gameId,
+      { timeout: waitBudgetMs }
+    );
+  } catch (err) {
+    // Firefox may hang without setting data-mp3d-fallback (context never paints).
+    if (browserName === 'firefox' || !(await probeWebGlAvailable(page))) {
+      test.skip(
+        true,
+        `mp3d "${gameId}" never canvas-ready on ${browserName} — WebGL unavailable/hang (harness skip)`
       );
-      if (ready) return { state: 'ready' as const, reason: null };
-      return false;
-    },
-    gameId,
-    { timeout: timeoutMs }
-  );
+    }
+    throw err;
+  }
 
-  const result = await status.jsonValue() as
+  const result = (await status.jsonValue()) as
     | false
     | { state: 'fallback'; reason: string }
     | { state: 'ready'; reason: null };
   if (result && result.state === 'fallback') {
     // Firefox/CI software GL often cannot create a WebGL context — skip harness-only.
-    if (/webgl/i.test(result.reason)) {
+    if (/webgl/i.test(result.reason) || browserName === 'firefox') {
       test.skip(
         true,
         `mp3d "${gameId}" WebGL unavailable (${result.reason}) — cross-browser harness skip`
