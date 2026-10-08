@@ -20,7 +20,8 @@ export function canSelectPit(
   if (pitIndex < 0 || pitIndex >= PITS_PER_SIDE) return false;
 
   const pits = getPlayerPits(state, player);
-  return pits[pitIndex] > 0;
+  // ratchet: pitIndex bounds-checked; pits always length PITS_PER_SIDE.
+  return pits[pitIndex]! > 0;
 }
 
 // Get valid pits that can be selected
@@ -54,7 +55,8 @@ export function makeMove(
 
   // Pick up cubes from selected pit
   const playerPits = currentPlayer === 'player1' ? newP1Pits : newP2Pits;
-  let cubesInHand = playerPits[pitIndex];
+  // ratchet: canSelectPit already proved pitIndex in range with cubes > 0.
+  let cubesInHand = playerPits[pitIndex]!;
   const cubesDistributed = cubesInHand;
   playerPits[pitIndex] = 0;
 
@@ -77,10 +79,11 @@ export function makeMove(
     if (position < PITS_PER_SIDE) {
       // Current player's pits
       if (currentPlayer === 'player1') {
-        newP1Pits[position]++;
+        // ratchet: position < PITS_PER_SIDE; arrays are length PITS_PER_SIDE.
+        newP1Pits[position] = newP1Pits[position]! + 1;
         lastSownSide = 'player1';
       } else {
-        newP2Pits[position]++;
+        newP2Pits[position] = newP2Pits[position]! + 1;
         lastSownSide = 'player2';
       }
       lastSownIndex = position;
@@ -97,10 +100,10 @@ export function makeMove(
       // Opponent's pits (sow in reverse order from their view)
       const opponentPitIndex = PITS_PER_SIDE * 2 - position;
       if (opponent === 'player1') {
-        newP1Pits[opponentPitIndex]++;
+        newP1Pits[opponentPitIndex] = newP1Pits[opponentPitIndex]! + 1;
         lastSownSide = 'player1';
       } else {
-        newP2Pits[opponentPitIndex]++;
+        newP2Pits[opponentPitIndex] = newP2Pits[opponentPitIndex]! + 1;
         lastSownSide = 'player2';
       }
       lastSownIndex = opponentPitIndex;
@@ -126,9 +129,10 @@ export function makeMove(
     currentPlayerPits[lastSownIndex] === 1 // Was empty before this cube
   ) {
     const oppositeIndex = getOppositePitIndex(lastSownIndex);
-    if (opponentPits[oppositeIndex] > 0) {
+    // ratchet: oppositeIndex is always in 0..PITS_PER_SIDE-1.
+    if (opponentPits[oppositeIndex]! > 0) {
       // Capture!
-      captured = opponentPits[oppositeIndex] + 1; // Opponent's cubes + the capturing cube
+      captured = opponentPits[oppositeIndex]! + 1; // Opponent's cubes + the capturing cube
       opponentPits[oppositeIndex] = 0;
       currentPlayerPits[lastSownIndex] = 0;
 
@@ -310,7 +314,8 @@ export function getLastMoveInfo(
 ): string | null {
   if (state.moveHistory.length === 0) return null;
 
-  const lastMove = state.moveHistory[state.moveHistory.length - 1];
+  // ratchet: length check above guarantees a last element.
+  const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
   const playerName = seatDisplayName(lastMove.player, gameMode);
 
   let info = `${playerName} distributed ${lastMove.cubesDistributed} cube${lastMove.cubesDistributed !== 1 ? 's' : ''}`;

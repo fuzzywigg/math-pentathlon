@@ -93,7 +93,8 @@ export function renderBoard(
         continue;
       }
 
-      const placed = state.board[row][col];
+      // ratchet: board is always BOARD_SIZE × BOARD_SIZE dense.
+      const placed = state.board[row]![col];
 
       if (placed) {
         // Render domino

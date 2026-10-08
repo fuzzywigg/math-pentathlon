@@ -361,10 +361,12 @@ function makeAIMove(controller: SDGameController): void {
       for (const domino of hand) {
         const placements = getValidPlacements(state, domino, sum);
         if (placements.length > 0) {
+          // ratchet: length > 0 guarantees index 0 exists (dense array).
+          const firstPlacement = placements[0]!;
           move = {
             dominoId: domino.id,
-            position: placements[0].position,
-            orientation: placements[0].orientation,
+            position: firstPlacement.position,
+            orientation: firstPlacement.orientation,
           };
           break;
         }

@@ -68,8 +68,10 @@ export function cellKey(ring: number, position: number): string {
  * Parse a cell key to coordinates
  */
 export function parseKey(key: string): BoardCoord {
-  const [ring, position] = key.split('-').map(Number);
-  return { ring, position };
+  const parts = key.split('-').map(Number);
+  // ratchet: callers always pass `ring-position` keys from cellKey().
+  // Keep tip runtime (undefined on malformed keys) — no ?? 0 defaults.
+  return { ring: parts[0]!, position: parts[1]! };
 }
 
 /**
