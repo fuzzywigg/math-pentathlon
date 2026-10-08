@@ -223,7 +223,7 @@ Use [#559](https://github.com/fuzzywigg/math-pentathlon/pull/559) restore SHAs w
 
 | Field | Value |
 | --- | --- |
-| Tip audited | `388f12bc045c0a721fd86d89b97f8cd6691c992f` (`388f12bc`) — after #572 fold + alpha AI/copy restore |
+| Tip audited | `0cdab37f6c062185a8280ebc2886715eb2264eb5` (`0cdab37f`) — after #572 fold + alpha AI/copy restore |
 | Alpha | `eec2b327` (unchanged) |
 | Method | Same as §Method above on new HEAD |
 | Owner decision | Andrew / #559: **KEEP** tip Hex AI (Hard 450 + `ai-client` watchdog) and tip Kwatro-Sinko AI; **RESTORE** Queens/Kings/Contig AI, 11 think/place delays, Div I–IV tutorials, You/Computer/status/rules chrome (incl. calla) |
@@ -252,3 +252,5 @@ Use [#559](https://github.com/fuzzywigg/math-pentathlon/pull/559) restore SHAs w
 ### One-line verdict
 
 **CLEAN** — no remaining HELD AI/copy deltas vs `origin/alpha` except the explicit **KEEP** set (Hex AI + `ai-client` + Kwatro AI). Tip-compat import/destroyGame/`Boolean` noise only.
+
+Companion test cleanup: tip-only deep e2e that pinned restored You/Computer / 44px / AI-lock chrome were removed (no alpha versions), matching the unit-pin treatment.
