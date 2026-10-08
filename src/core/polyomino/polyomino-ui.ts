@@ -129,7 +129,9 @@ export function renderBoard(
   // Render placed polyominoes
   for (const placement of board.placements) {
     const shape = shapes.find((s) => s.id === placement.shapeId);
-    if (!shape) continue;
+    if (!shape) {
+      continue;
+    }
 
     const cells = getCellsAtPosition(
       shape,
@@ -445,7 +447,9 @@ export function createDraggableShape(
  * Inject required styles for polyomino components
  */
 export function injectPolyominoStyles(): void {
-  if (document.getElementById('polyomino-styles')) return;
+  if (document.getElementById('polyomino-styles')) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = 'polyomino-styles';

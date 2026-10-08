@@ -299,7 +299,9 @@ function initAttributePiecesSection(): void {
   }
 
   function render(): void {
-    if (!gridContainer) return;
+    if (!gridContainer) {
+      return;
+    }
 
     clearElement(gridContainer);
     const selectedIds = selectedPiece
@@ -338,7 +340,9 @@ function initAttributePiecesSection(): void {
     infoContainer.appendChild(document.createElement('br'));
     const entries = Object.entries(selectedPiece.attributes);
     entries.forEach(([k, v], i) => {
-      if (i > 0) infoContainer.appendChild(document.createTextNode(' | '));
+      if (i > 0) {
+        infoContainer.appendChild(document.createTextNode(' | '));
+      }
       const keyEl = document.createElement('strong');
       keyEl.textContent = `${k}:`;
       infoContainer.appendChild(keyEl);
@@ -413,7 +417,9 @@ function initSetGameSection(): void {
   const selectedCards = new Set<string>();
 
   function render(): void {
-    if (!gridContainer) return;
+    if (!gridContainer) {
+      return;
+    }
 
     clearElement(gridContainer);
 
@@ -456,7 +462,9 @@ function initSetGameSection(): void {
   }
 
   function checkSet(): void {
-    if (!resultContainer) return;
+    if (!resultContainer) {
+      return;
+    }
 
     if (selectedCards.size < 3) {
       setText(resultContainer, `Select ${3 - selectedCards.size} more card(s)`);
@@ -508,7 +516,9 @@ function initComparisonSection(): void {
   let piece2: AttributePiece | null = null;
 
   function render(): void {
-    if (!gridContainer) return;
+    if (!gridContainer) {
+      return;
+    }
 
     clearElement(gridContainer);
 
@@ -569,7 +579,9 @@ function initComparisonSection(): void {
   }
 
   function updateComparison(): void {
-    if (!resultsContainer) return;
+    if (!resultsContainer) {
+      return;
+    }
 
     if (!piece1 || !piece2) {
       // trusted constant markup
@@ -602,7 +614,9 @@ function initComparisonSection(): void {
     matchList.appendChild(sameLabel);
     matchList.appendChild(document.createTextNode(' '));
     matching.forEach((a, i) => {
-      if (i > 0) matchList.appendChild(document.createTextNode(' '));
+      if (i > 0) {
+        matchList.appendChild(document.createTextNode(' '));
+      }
       const tag = document.createElement('span');
       tag.className = 'attr-tag match';
       tag.textContent = a;
@@ -617,7 +631,9 @@ function initComparisonSection(): void {
     diffList.appendChild(diffLabel);
     diffList.appendChild(document.createTextNode(' '));
     differing.forEach((a, i) => {
-      if (i > 0) diffList.appendChild(document.createTextNode(' '));
+      if (i > 0) {
+        diffList.appendChild(document.createTextNode(' '));
+      }
       const tag = document.createElement('span');
       tag.className = 'attr-tag diff';
       tag.textContent = a;
@@ -639,7 +655,9 @@ function initFilterSection(): void {
   const filters: Record<string, string> = {};
 
   function renderControls(): void {
-    if (!controlsContainer) return;
+    if (!controlsContainer) {
+      return;
+    }
 
     clearElement(controlsContainer);
 
@@ -675,7 +693,9 @@ function initFilterSection(): void {
   }
 
   function renderFiltered(): void {
-    if (!gridContainer || !countContainer) return;
+    if (!gridContainer || !countContainer) {
+      return;
+    }
 
     // Build filter condition
     let filtered = allPieces;

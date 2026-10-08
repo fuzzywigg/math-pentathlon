@@ -66,9 +66,13 @@ export function createArrayAccessor<T extends CellValue>(
   grid: T[][]
 ): (row: number, col: number) => T | undefined {
   return (row, col) => {
-    if (row < 0 || row >= grid.length) return undefined;
+    if (row < 0 || row >= grid.length) {
+      return undefined;
+    }
     const gridRow = grid[row];
-    if (!gridRow || col < 0 || col >= gridRow.length) return undefined;
+    if (!gridRow || col < 0 || col >= gridRow.length) {
+      return undefined;
+    }
     return gridRow[col];
   };
 }
@@ -239,7 +243,9 @@ export function checkLineAlignment(
   positions: GridPosition[],
   getCell: (row: number, col: number) => CellValue | undefined
 ): LineAlignmentResult {
-  if (positions.length === 0) return { isAligned: false, value: null };
+  if (positions.length === 0) {
+    return { isAligned: false, value: null };
+  }
   const firstPos = positions[0]!;
   const first = getCell(firstPos.row, firstPos.col);
   if (first === null || first === undefined) {
@@ -272,7 +278,9 @@ export function findAlignmentAt(
   const dir =
     DIRECTIONS[dirKey] ??
     Object.values(DIRECTIONS).find((d) => d.name === direction);
-  if (!dir) return null;
+  if (!dir) {
+    return null;
+  }
 
   const safeGet: CellGetter = (r, c) => {
     const v = getCell(r, c);
@@ -285,7 +293,9 @@ export function findAlignmentAt(
     cols: dimensions.cols,
   });
 
-  if (!result) return null;
+  if (!result) {
+    return null;
+  }
 
   // The test expects result.direction to be the direction name string,
   // not the Direction object. Map it.
@@ -407,7 +417,9 @@ export function countMaxAligned(
     }
   }
 
-  if (!best) return { count: 1, direction: 'horizontal', positions: [pos] };
+  if (!best) {
+    return { count: 1, direction: 'horizontal', positions: [pos] };
+  }
 
   return {
     count: best.length,
@@ -500,7 +512,9 @@ export function findLargestRegion(
   filter?: (value: CellValue) => boolean
 ): Region | null {
   const regions = findAllRegions(dimensions, getCell, options, filter);
-  if (regions.length === 0) return null;
+  if (regions.length === 0) {
+    return null;
+  }
   return regions.reduce((a, b) => (b.size > a.size ? b : a));
 }
 

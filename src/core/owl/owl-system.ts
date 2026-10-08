@@ -140,7 +140,9 @@ class OwlSystem {
   // Handle events and trigger messages
   private handleEvent(event: OwlEvent): void {
     const settings = storage.getSettings();
-    if (!settings.owlEnabled) return;
+    if (!settings.owlEnabled) {
+      return;
+    }
 
     const context = this.buildContext(event);
     const message = owlMessages.selectMessage(event.type, context);
@@ -197,8 +199,12 @@ class OwlSystem {
         return 'encouraging';
       case 'game:end': {
         const endEvent = event as GameEndEvent;
-        if (endEvent.playerWon) return 'celebrating';
-        if (endEvent.isDraw) return 'thinking';
+        if (endEvent.playerWon) {
+          return 'celebrating';
+        }
+        if (endEvent.isDraw) {
+          return 'thinking';
+        }
         return 'encouraging';
       }
       case 'achievement:unlock':
@@ -225,14 +231,18 @@ class OwlSystem {
 
   // Process message queue
   private async processQueue(): Promise<void> {
-    if (this.isProcessingQueue || this.messageQueue.length === 0) return;
+    if (this.isProcessingQueue || this.messageQueue.length === 0) {
+      return;
+    }
 
     this.isProcessingQueue = true;
     const epochAtStart = this.speakEpoch;
 
     while (this.messageQueue.length > 0) {
       // speakNow may have taken over the bubble mid-queue
-      if (this.speakEpoch !== epochAtStart) break;
+      if (this.speakEpoch !== epochAtStart) {
+        break;
+      }
 
       const message = this.messageQueue.shift()!;
 
@@ -278,9 +288,15 @@ class OwlSystem {
   // Get time of day for contextual messages
   private getTimeOfDay(): 'morning' | 'afternoon' | 'evening' | 'night' {
     const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return 'morning';
-    if (hour >= 12 && hour < 17) return 'afternoon';
-    if (hour >= 17 && hour < 21) return 'evening';
+    if (hour >= 5 && hour < 12) {
+      return 'morning';
+    }
+    if (hour >= 12 && hour < 17) {
+      return 'afternoon';
+    }
+    if (hour >= 17 && hour < 21) {
+      return 'evening';
+    }
     return 'night';
   }
 
@@ -289,7 +305,9 @@ class OwlSystem {
   // Call when a game starts
   onGameStart(gameId: string): void {
     const game = getGameById(gameId);
-    if (!game) return;
+    if (!game) {
+      return;
+    }
 
     const stats = storage.getGameStats(gameId);
     this.gameStartTime = Date.now();
@@ -314,7 +332,9 @@ class OwlSystem {
     }
   ): void {
     const game = getGameById(gameId);
-    if (!game) return;
+    if (!game) {
+      return;
+    }
 
     const duration = Date.now() - this.gameStartTime;
     const playerWon = result.winner === 'player1';
@@ -363,7 +383,9 @@ class OwlSystem {
   // Call when tutorial starts
   onTutorialStart(gameId: string): void {
     const game = getGameById(gameId);
-    if (!game) return;
+    if (!game) {
+      return;
+    }
 
     this.events.emit({
       type: 'tutorial:start',
@@ -376,7 +398,9 @@ class OwlSystem {
   // Call when tutorial completes
   onTutorialComplete(gameId: string): void {
     const game = getGameById(gameId);
-    if (!game) return;
+    if (!game) {
+      return;
+    }
 
     storage.markTutorialCompleted(gameId);
 
@@ -400,7 +424,9 @@ class OwlSystem {
    */
   speakNow(text: string, mood: OwlMood = 'thinking'): void {
     const settings = storage.getSettings();
-    if (!settings.owlEnabled) return;
+    if (!settings.owlEnabled) {
+      return;
+    }
 
     const message: OwlMessage = {
       id: `ollie-inspect-stub-${Date.now()}`,
@@ -425,7 +451,9 @@ class OwlSystem {
 
     const displayMs = this.getDisplayTime(message);
     void this.delay(displayMs).then(() => {
-      if (this.speakEpoch !== epoch) return;
+      if (this.speakEpoch !== epoch) {
+        return;
+      }
       if (this.currentState.message?.id === message.id) {
         this.updateState({ message: null, isAnimating: false });
       }

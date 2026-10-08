@@ -65,7 +65,9 @@ export function evaluateCondition(
   condition: AttributeCondition
 ): boolean {
   const value = piece.attributes[condition.attribute];
-  if (value === undefined) return false;
+  if (value === undefined) {
+    return false;
+  }
   return compare(value, condition.operator, condition.value);
 }
 
@@ -162,7 +164,9 @@ export function findMatchingAttribute(
   attributeName: string
 ): AttributePiece[] {
   const targetValue = target.attributes[attributeName];
-  if (targetValue === undefined) return [];
+  if (targetValue === undefined) {
+    return [];
+  }
 
   return pieces.filter(
     (piece) =>
@@ -230,7 +234,9 @@ export function checkSetRelationship(
   attribute: string,
   relationship: SetRelationship
 ): boolean {
-  if (pieces.length === 0) return true;
+  if (pieces.length === 0) {
+    return true;
+  }
 
   const values = pieces.map((p) => p.attributes[attribute]);
 
@@ -270,7 +276,9 @@ export function isValidSetGameSet(
   pieces: AttributePiece[],
   attributes: AttributeDefinition[]
 ): boolean {
-  if (pieces.length !== 3) return false;
+  if (pieces.length !== 3) {
+    return false;
+  }
 
   for (const attr of attributes) {
     const values = pieces.map((p) => p.attributes[attr.name]);
@@ -322,11 +330,19 @@ export function findAllValidSets(
  * Check if a number is prime
  */
 export function isPrime(n: number): boolean {
-  if (n < 2) return false;
-  if (n === 2) return true;
-  if (n % 2 === 0) return false;
+  if (n < 2) {
+    return false;
+  }
+  if (n === 2) {
+    return true;
+  }
+  if (n % 2 === 0) {
+    return false;
+  }
   for (let i = 3; i <= Math.sqrt(n); i += 2) {
-    if (n % i === 0) return false;
+    if (n % i === 0) {
+      return false;
+    }
   }
   return true;
 }
@@ -335,7 +351,9 @@ export function isPrime(n: number): boolean {
  * Check if a number is a perfect square
  */
 export function isPerfectSquare(n: number): boolean {
-  if (n < 0) return false;
+  if (n < 0) {
+    return false;
+  }
   const sqrt = Math.sqrt(n);
   return sqrt === Math.floor(sqrt);
 }

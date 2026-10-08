@@ -593,7 +593,9 @@ function setupInteractiveBar(): void {
   let currentNumer = 1;
 
   function renderInteractive(): void {
-    if (!container) return;
+    if (!container) {
+      return;
+    }
     clearElement(container);
 
     const bar = createInteractiveFractionBar(
@@ -751,7 +753,9 @@ function setupEquivalentFinder(): void {
 
 function renderFractionGallery(): void {
   const gallery = document.getElementById('fraction-gallery');
-  if (!gallery) return;
+  if (!gallery) {
+    return;
+  }
 
   COMMON_FRACTIONS.forEach((f) => {
     const item = document.createElement('div');

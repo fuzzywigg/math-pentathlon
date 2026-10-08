@@ -250,7 +250,9 @@ export function createHexLatticeGraph(rings: number, size: number = 40): Graph {
     const parts = id.split(',').map(Number);
     const q = parts[0];
     const r = parts[1];
-    if (q === undefined || r === undefined) return;
+    if (q === undefined || r === undefined) {
+      return;
+    }
 
     for (const dir of directions) {
       const neighborId = `${q + dir.q},${r + dir.r}`;

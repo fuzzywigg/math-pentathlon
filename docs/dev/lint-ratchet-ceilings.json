@@ -1,6 +1,6 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344).",
+  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344). q-mp-040: brace autofix on src/core/** (excl. ai-worker, tutorial.ts, timer-scoring.ts, owl-messages copy registry), src/pwa/**, src/demos/** — 197 curly:all fixed; minify emit-identical; ceiling 1320→1123.",
   "rules": {
-    "curly": 1320
+    "curly": 1123
   }
 }

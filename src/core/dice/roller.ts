@@ -158,7 +158,9 @@ export function getAllPossibleSums(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) sum += values[i]!;
+      if (mask & (1 << i)) {
+        sum += values[i]!;
+      }
     }
     sums.add(sum);
   }
@@ -172,7 +174,9 @@ export function getAllPossibleProducts(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let product = 1;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) product *= values[i]!;
+      if (mask & (1 << i)) {
+        product *= values[i]!;
+      }
     }
     products.add(product);
   }
@@ -187,8 +191,12 @@ export function getTwoDiceResults(a: number, b: number): Map<string, number> {
   results.set(`${b} - ${a}`, b - a);
   results.set(`${a} × ${b}`, a * b);
   // Only include integer divisions
-  if (b !== 0 && a % b === 0) results.set(`${a} ÷ ${b}`, a / b);
-  if (a !== 0 && b % a === 0) results.set(`${b} ÷ ${a}`, b / a);
+  if (b !== 0 && a % b === 0) {
+    results.set(`${a} ÷ ${b}`, a / b);
+  }
+  if (a !== 0 && b % a === 0) {
+    results.set(`${b} ÷ ${a}`, b / a);
+  }
   return results;
 }
 

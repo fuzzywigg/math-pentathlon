@@ -65,7 +65,9 @@ export function registerPwa(
       },
       onRegisteredSW(_swUrl, registration) {
         // Periodic update check while the tab stays open (school Wi‑Fi flaps).
-        if (!registration) return;
+        if (!registration) {
+          return;
+        }
         if (updateCheckInterval !== null) {
           clearInterval(updateCheckInterval);
           updateCheckInterval = null;
@@ -86,7 +88,9 @@ export function registerPwa(
 }
 
 function scheduleReload(reload: () => void): void {
-  if (reloadScheduled) return;
+  if (reloadScheduled) {
+    return;
+  }
   reloadScheduled = true;
 
   const doReload = () => {

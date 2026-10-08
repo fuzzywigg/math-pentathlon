@@ -271,7 +271,9 @@ export function hexesInRange(center: AxialCoord, range: number): AxialCoord[] {
  * Get all hexes at exactly the given distance (ring)
  */
 export function hexRing(center: AxialCoord, radius: number): AxialCoord[] {
-  if (radius === 0) return [center];
+  if (radius === 0) {
+    return [center];
+  }
 
   const results: AxialCoord[] = [];
   const dir4 = AXIAL_DIRECTIONS[4]!;
@@ -323,7 +325,9 @@ function cubeLerp(a: CubeCoord, b: CubeCoord, t: number): CubeCoord {
  */
 export function hexLine(a: AxialCoord, b: AxialCoord): AxialCoord[] {
   const n = hexDistance(a, b);
-  if (n === 0) return [a];
+  if (n === 0) {
+    return [a];
+  }
 
   const ac = axialToCube(a);
   const bc = axialToCube(b);
