@@ -220,8 +220,27 @@ function writeReport(report: ScreenReport): void {
   fs.writeFileSync(file, JSON.stringify(report, null, 2));
 }
 
-function writeSummary(reports: ScreenReport[]): void {
+/** Rebuild summary from on-disk JSON so parallel workers don't drop rows. */
+function writeSummaryFromDisk(): void {
   ensureReportDirs();
+  if (!fs.existsSync(REPORT_ROOT)) return;
+  const reports: ScreenReport[] = fs
+    .readdirSync(REPORT_ROOT)
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => {
+      try {
+        return JSON.parse(
+          fs.readFileSync(path.join(REPORT_ROOT, f), 'utf8')
+        ) as ScreenReport;
+      } catch {
+        return null;
+      }
+    })
+    .filter((r): r is ScreenReport => !!r)
+    .sort((a, b) =>
+      `${a.screenId}:${a.mode}`.localeCompare(`${b.screenId}:${b.mode}`)
+    );
+
   const lines = [
     '# Forced-colors / reduced-motion / color-scheme smoke',
     '',
@@ -239,11 +258,9 @@ function writeSummary(reports: ScreenReport[]): void {
   fs.writeFileSync(path.join(REPORT_ROOT, 'summary.md'), lines.join('\n'));
 }
 
-const collected: ScreenReport[] = [];
-
 test.describe('forced-colors + reduced-motion smoke', () => {
   test.afterAll(() => {
-    if (collected.length) writeSummary(collected);
+    writeSummaryFromDisk();
   });
 
   test('menu-home under forced-colors + reduce', async ({ page }) => {
@@ -286,7 +303,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       screenshot,
       notes,
     };
-    collected.push(report);
     writeReport(report);
     if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
   });
@@ -329,7 +345,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       screenshot,
       notes,
     };
-    collected.push(report);
     writeReport(report);
     if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
   });
@@ -406,7 +421,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       screenshot,
       notes,
     };
-    collected.push(report);
     writeReport(report);
     if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
   });
@@ -482,7 +496,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
         screenshot,
         notes,
       };
-      collected.push(report);
       writeReport(report);
       if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
       else {
@@ -549,7 +562,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       screenshot,
       notes,
     };
-    collected.push(report);
     writeReport(report);
     if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
   });
@@ -586,7 +598,6 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       screenshot,
       notes,
     };
-    collected.push(report);
     writeReport(report);
     if (ENFORCE) expect(issues, JSON.stringify(issues)).toHaveLength(0);
   });
