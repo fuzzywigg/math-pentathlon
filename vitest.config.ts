@@ -88,6 +88,8 @@ const nodePureFiles = [
   'tests/unit/burn-wave13-win-draw-ai.test.ts',
   // Rules engines must load without jsdom (module-boundary audit).
   'tests/unit/engines-plain-node-load.test.ts',
+  // Engine→UI seat helper characterization + auditBoundaries ratchet.
+  'tests/unit/engine-ui-boundary-seats-characterization.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
