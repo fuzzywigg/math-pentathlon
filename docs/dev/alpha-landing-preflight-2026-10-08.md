@@ -281,4 +281,4 @@ Also related docs: `docs/tutorial-engine-mismatches-2026-10-07.md`, `docs/RULES-
 
 ## 8. Next action
 
-**Next action: fold into tip by the tip owner** (docs-only). Human merge of tip → `alpha` stays on Andrew’s window schedule after eyeball + optional tip-SHA re-verify.
+**Folded into tip** (`f17bfb52` merge(#547); tip advanced past `#541`). Human merge of tip → `alpha` stays on Andrew’s window schedule after eyeball + final tip-SHA preflight re-verify (never push `alpha` from tip agent).
