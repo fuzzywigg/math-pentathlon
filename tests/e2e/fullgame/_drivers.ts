@@ -413,7 +413,7 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 12_000,
+    maxTurns: 3000,
     playLegal: async (page) => {
       await dismissOwl(page);
       // Entire turn in one evaluate — Playwright locator loops were too slow
@@ -437,17 +437,6 @@ const drivers: GameDriver[] = [
                 : /tetromino|4[- ]?cell/.test(blob)
                   ? 3
                   : 4;
-        const parseFill = (sel: string) => {
-          const t =
-            document.querySelector(sel)?.textContent?.replace('%', '') || '0';
-          return parseInt(t, 10) || 0;
-        };
-        const seatFill = status.includes('red')
-          ? parseFill('.juggle-board.player2 .fill-percent')
-          : parseFill('.juggle-board.player1 .fill-percent');
-        // Large shapes early (speed); small shapes late (gap fill).
-        const preferSmall = seatFill >= 70;
-
         const roll = document.querySelector(
           '.juggle-roll-btn:not([disabled])'
         ) as HTMLElement | null;
@@ -456,6 +445,8 @@ const drivers: GameDriver[] = [
           return true;
         }
 
+        // Always prefer smaller polyominoes — late gaps need monomino/domino.
+        // Seeded Math.random breaks ties so repeats explore different lines.
         const shapes = [
           ...document.querySelectorAll('.juggle-shape-option'),
         ] as HTMLElement[];
@@ -467,7 +458,7 @@ const drivers: GameDriver[] = [
             const sb = sizeScore(
               `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
             );
-            return preferSmall ? sa - sb : sb - sa;
+            return sa - sb || Math.random() - 0.5;
           });
           click(shapes[0]);
           return true;
@@ -486,7 +477,7 @@ const drivers: GameDriver[] = [
             const sb = sizeScore(
               `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
             );
-            return preferSmall ? sa - sb : sb - sa;
+            return sa - sb || Math.random() - 0.5;
           });
           click(dice[0]);
           return true;

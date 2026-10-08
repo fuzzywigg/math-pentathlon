@@ -58,9 +58,9 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       continue;
     }
 
-    // Juggle softlock: greedy UI often crawls to ~90–95% then never finishes
-    // (fill still ticks, so "no progress" alone is not enough). Reshuffle on
-    // stalled fill, high-fill crawl, or a hard deal-length budget.
+    // Juggle softlock: boards stall with unfillable gaps. Reshuffle when fill
+    // is unchanged for a stretch (or stuck high). Do not hard-cap deal length —
+    // completable slow fills need room past ~200 turns.
     if (driver.id === 'juggle') {
       turnsSinceRestart += 1;
       const fillInfo = await page.evaluate(() => {
@@ -71,7 +71,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         };
         const f1 = parse('.juggle-board.player1 .fill-percent');
         const f2 = parse('.juggle-board.player2 .fill-percent');
-        return { key: `${f1}|${f2}`, max: Math.max(f1, f2) };
+        return { key: `${f1}|${f2}`, max: Math.max(f1, f2), min: Math.min(f1, f2) };
       });
       if (fillInfo.key === lastFill) noProgress += 1;
       else {
@@ -79,10 +79,10 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         lastFill = fillInfo.key;
       }
       const softlocked =
-        noProgress > 15 ||
-        (fillInfo.max >= 85 && noProgress > 8) ||
-        turnsSinceRestart > 200;
-      if (softlocked && restarts < 60) {
+        noProgress > 25 ||
+        (fillInfo.max >= 90 && noProgress > 12) ||
+        (fillInfo.min >= 85 && turnsSinceRestart > 120 && noProgress > 6);
+      if (softlocked && restarts < 40) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;
