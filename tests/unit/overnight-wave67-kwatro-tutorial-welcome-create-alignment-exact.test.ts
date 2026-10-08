@@ -9,7 +9,7 @@ describe('Wave 67 kwatro — tutorial welcome create alignment exact', () => {
   it('welcome second p locks create-alignment strong formula', () => {
     const welcome = kwatroSinkoTutorial.steps.find((s) => s.id === 'welcome');
     expect(welcome?.message).toContain(
-      '<p>Make a straight line of three chips where <strong>a + b − c = 4 or 5</strong>.</p>'
+      '<p>Create an alignment of three chips where <strong>a + b - c = 4 or 5</strong></p>'
     );
   });
 });

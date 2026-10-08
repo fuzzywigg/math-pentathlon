@@ -9,7 +9,7 @@ describe('Wave 67 kwatro — tutorial winning alignment satisfy exact', () => {
   it('winning lists alignment must satisfy 4 OR 5 strong', () => {
     const winning = kwatroSinkoTutorial.steps.find((s) => s.id === 'winning');
     expect(winning?.message).toContain(
-      '<li>Add your two same-color chips, then subtract the other color: the answer must be <strong>4</strong> or <strong>5</strong></li>'
+      '<li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>'
     );
   });
 });

@@ -9,7 +9,7 @@ describe('Wave 65 fiar — tutorial objective pathways exact', () => {
   it('objective locks four chips along connected pathways sentence', () => {
     const step = fiarTutorial.steps.find((s) => s.id === 'objective');
     expect(step?.message).toContain(
-      'Find four (or more) chips of the same color on a straight line of connected spaces'
+      'Identify four (or more) chips of the same color along a straight line'
     );
   });
 });

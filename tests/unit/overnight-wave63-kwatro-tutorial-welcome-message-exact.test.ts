@@ -13,7 +13,7 @@ describe('Wave 63 kwatro — tutorial welcome message', () => {
       "Let's learn how to play <strong>Kwatro-Sinko</strong>!"
     );
     expect(welcome?.message).toContain(
-      '<strong>a + b − c = 4 or 5</strong>'
+      '<strong>a + b - c = 4 or 5</strong>'
     );
   });
 });

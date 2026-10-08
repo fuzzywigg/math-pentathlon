@@ -12,7 +12,7 @@ export const kwatroSinkoTutorial: TutorialConfig = {
       title: 'Welcome to Kwatro-Sinko!',
       message: `
         <p>Let's learn how to play <strong>Kwatro-Sinko</strong>!</p>
-        <p>Make a straight line of three chips where <strong>a + b − c = 4 or 5</strong>.</p>
+        <p>Create an alignment of three chips where <strong>a + b - c = 4 or 5</strong></p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const kwatroSinkoTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Make a straight line of three chips where <strong>a + b − c = 4 or 5</strong>.</p>
+        <p>Create an alignment of three chips where <strong>a + b - c = 4 or 5</strong></p>
       `,
       position: 'center',
     },
@@ -53,8 +53,8 @@ export const kwatroSinkoTutorial: TutorialConfig = {
       title: 'Movement Rules',
       message: `
         <ul>
-          <li>Chips move along the lines that connect spaces</li>
-          <li>You can only move to empty spaces next to you</li>
+          <li>Chips move along the pathway connections</li>
+          <li>You can only move to empty adjacent spaces</li>
           <li>Diagonal connections exist on numbered spaces</li>
         </ul>
       `,
@@ -68,7 +68,7 @@ export const kwatroSinkoTutorial: TutorialConfig = {
         <ul>
           <li>All 5 of your chips must be off the numbered start rows</li>
           <li>Form 3 chips in a line: two of one color and one of the opposite color</li>
-          <li>Add your two same-color chips, then subtract the other color: the answer must be <strong>4</strong> or <strong>5</strong></li>
+          <li>The alignment must satisfy: <strong>like + like − opposite = 4</strong> OR <strong>5</strong></li>
           <li>Example: 6 + 2 - 3 = 5 ✓</li>
           <li>Example: 9 + 1 - 6 = 4 ✓</li>
         </ul>
