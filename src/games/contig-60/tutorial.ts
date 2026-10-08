@@ -60,9 +60,9 @@ export const contig60Tutorial: TutorialConfig = {
       message: `
         <ul>
           <li>You must use <strong>all three dice</strong></li>
-          <li>You can use <strong>any two math signs</strong> (they can be the same)</li>
-          <li>Math signs: + (add), − (subtract), × (multiply), ÷ (divide)</li>
-          <li>Division must make a whole number (no leftover)</li>
+          <li>You can use <strong>any two operations</strong> (can repeat)</li>
+          <li>Operations: + (add), - (subtract), × (multiply), ÷ (divide)</li>
+          <li>Division must result in a whole number</li>
         </ul>
       `,
       position: 'center',
@@ -72,8 +72,8 @@ export const contig60Tutorial: TutorialConfig = {
       title: 'Passing',
       message: `
         <ul>
-          <li>If you cannot make any open number on the board, you must pass</li>
-          <li>If both players pass in a row, the game ends and the line-up tiebreak picks the winner</li>
+          <li>If you cannot make any available number, you must pass</li>
+          <li>If both players pass in a row, the game ends and the alignment tiebreak decides the winner</li>
         </ul>
       `,
       position: 'center',

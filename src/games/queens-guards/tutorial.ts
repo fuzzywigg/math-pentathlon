@@ -42,7 +42,7 @@ export const queensGuardsTutorial: TutorialConfig = {
       title: 'Movement Rules',
       message: `
         <ul>
-          <li>Tap a piece to select it, then tap a highlighted cell to move</li>
+          <li>Click a piece to select it, then click a highlighted cell to move</li>
           <li>Pieces can only move <strong>inward</strong> (toward center) or <strong>sideways</strong> (same ring)</li>
           <li>Pieces cannot move outward (away from center)</li>
           <li>Only the Queen can occupy the center cell (throne)</li>
@@ -56,9 +56,9 @@ export const queensGuardsTutorial: TutorialConfig = {
       title: 'Capturing',
       message: `
         <ul>
-          <li>Trap an opponent's piece between two of your pieces to capture it</li>
-          <li>Captured pieces must be moved back to an empty space on the outside ring</li>
-          <li>You cannot move into a spot where you would be trapped between two enemy pieces</li>
+          <li>Sandwich an opponent's piece between two of yours to capture it</li>
+          <li>Captured pieces must be relocated to the outer ring</li>
+          <li>You cannot move into a position where you would be sandwiched</li>
         </ul>
       `,
       position: 'center',
@@ -67,7 +67,7 @@ export const queensGuardsTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>Place your Queen on the center throne and surround it with all 6 of your Guards on the six spaces right around the throne!</p>
+        <p>Place your Queen on the center throne and surround it with all 6 of your Guards in the inner ring!</p>
       `,
       position: 'center',
     },

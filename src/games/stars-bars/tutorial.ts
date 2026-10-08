@@ -12,7 +12,7 @@ export const starsBarsTutorial: TutorialConfig = {
       title: 'Welcome to Stars & Bars!',
       message: `
         <p>Let's learn how to play <strong>Stars & Bars</strong>!</p>
-        <p>Score 30 points by making your card as different as you can from the cards next to it!</p>
+        <p>Score 30 points by placing attribute cards with maximum differences from adjacent cards!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const starsBarsTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Score 30 points by making your card as different as you can from the cards next to it!</p>
+        <p>Score 30 points by placing attribute cards with maximum differences from adjacent cards!</p>
       `,
       position: 'center',
     },
@@ -44,9 +44,9 @@ export const starsBarsTutorial: TutorialConfig = {
       title: 'Scoring',
       message: `
         <ul>
-          <li>Compare your card to every neighboring card (up, down, left, right, and diagonals)</li>
-          <li>Score 1 point for each feature that is different</li>
-          <li>You can get up to 4 points from each neighbor if every feature is different</li>
+          <li>Compare your card to ALL adjacent cards (8 directions)</li>
+          <li>Score 1 point for each attribute that differs</li>
+          <li>Maximum 4 points per adjacent card (all different)</li>
           <li>Star cells double your points!</li>
         </ul>
       `,
@@ -70,7 +70,7 @@ export const starsBarsTutorial: TutorialConfig = {
       message: `
         <ol>
           <li>Select a card from your hand</li>
-          <li>Place it on a highlighted green cell</li>
+          <li>Place it on a green (valid) cell</li>
           <li>Must place adjacent to existing cards</li>
         </ol>
       `,
