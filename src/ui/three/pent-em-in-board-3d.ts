@@ -37,7 +37,10 @@ import {
   scheduleBoard3dMountPaint,
   bindPageVisibility,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type CellClickCallback = (cell: Cell) => void;
 export type CellHoverCallback = (cell: Cell | null) => void;
@@ -257,17 +260,16 @@ export async function createPentEmInBoard3D(
     if (disposed) return;
     const w = Math.max(container.clientWidth || 400, 120);
     const h = Math.max(container.clientHeight || 400, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   const pickCell = (event: PointerEvent): Cell | null => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return null;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -309,7 +311,6 @@ export async function createPentEmInBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
@@ -317,7 +318,7 @@ export async function createPentEmInBoard3D(
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const clearGroup = (group: Object3D): void => {
     while (group.children.length > 0) {
@@ -544,7 +545,7 @@ export async function createPentEmInBoard3D(
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dPentEmIn) {
       delete window.__mp3dPentEmIn;
     }

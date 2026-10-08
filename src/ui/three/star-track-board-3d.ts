@@ -30,6 +30,9 @@ import {
   scheduleBoard3dMountPaint,
   bindPageVisibility,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
+  resolveCssViewportSize,
 } from './tablet-gl';
 
 type Three = ThreeModule;
@@ -353,14 +356,9 @@ export async function createStarTrackBoard3D(
     // Budget for draw / choose-chain / taller game-over winner block under a
     // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
     const chainBudget = 230;
-    const available = Math.max(
-      120,
-      window.innerHeight - top - chainBudget - 12
-    );
-    const side = Math.max(
-      140,
-      Math.min(window.innerWidth * 0.92, available, 520)
-    );
+    const { width: vw, height: vh } = resolveCssViewportSize();
+    const available = Math.max(120, vh - top - chainBudget - 12);
+    const side = Math.max(140, Math.min(vw * 0.92, available, 520));
     canvasHost.style.width = `${side}px`;
     canvasHost.style.height = `${side}px`;
     canvasHost.style.maxHeight = `${side}px`;
@@ -371,17 +369,14 @@ export async function createStarTrackBoard3D(
     fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(canvasHost, () => resize());
 
   const onLost = (event: Event): void => {
     event.preventDefault();
@@ -568,7 +563,7 @@ export async function createStarTrackBoard3D(
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     canvas.removeEventListener('webglcontextlost', onLost);
     if (window.__mp3dStarTrack) {
       delete window.__mp3dStarTrack;

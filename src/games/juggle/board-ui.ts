@@ -36,6 +36,7 @@ import {
   applyRovingTabindex,
 } from '../../ui/board-a11y';
 import { getPlayerName } from '../../ui/seat-labels';
+import { configureCanvas2dBackingStore } from '../../ui/coord-map';
 export { getPlayerName };
 
 // Colors
@@ -479,12 +480,13 @@ function renderShapePreview(
   const height = (maxRow - minRow + 1) * cellSize + 4;
 
   const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-
-  const ctx = canvas.getContext('2d')!;
+  const dpr = configureCanvas2dBackingStore(canvas, width, height);
+  const ctx = canvas.getContext('2d');
+  // Test doubles often stub getContext without setTransform — skip scale then.
+  if (ctx && typeof ctx.setTransform === 'function') {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  if (!ctx) return canvas;
 
   for (const cell of cells) {
     const x = (cell.col - minCol) * cellSize + 2;

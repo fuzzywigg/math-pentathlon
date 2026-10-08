@@ -26,7 +26,10 @@ import {
   scheduleBoard3dMountPaint,
   bindPageVisibility,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type PrimeGoldCellClickCallback = (value: number, expr: string) => void;
 
@@ -312,9 +315,7 @@ export async function createPrimeGoldBoard3D(
     if (disposed) return;
     const w = Math.max(container.clientWidth || 420, 120);
     const h = Math.max(container.clientHeight || 420, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
@@ -538,9 +539,10 @@ export async function createPrimeGoldBoard3D(
     if (!clickHandler || disposed || !lastState) return;
     if (lastState.phase !== 'placing') return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     const validMap = new Map(
@@ -571,13 +573,12 @@ export async function createPrimeGoldBoard3D(
     }
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
   canvas.addEventListener('pointerup', onPointer);
   canvas.addEventListener('webglcontextlost', onContextLost, false);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const cellToClientPoint = (
     row: number,
@@ -628,7 +629,7 @@ export async function createPrimeGoldBoard3D(
     unbindVisibility();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dPrimeGold) {
       delete window.__mp3dPrimeGold;
     }
