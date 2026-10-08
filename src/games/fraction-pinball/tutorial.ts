@@ -12,7 +12,7 @@ export const fractionPinballTutorial: TutorialConfig = {
       title: 'Welcome to Fraction Pinball!',
       message: `
         <p>Let's learn how to play <strong>Fraction Pinball</strong>!</p>
-        <p>Get points by matching fractions and decimals!</p>
+        <p>Score points by correctly converting between fractions and decimals!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const fractionPinballTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Get points by matching fractions and decimals!</p>
+        <p>Score points by correctly converting between fractions and decimals!</p>
       `,
       position: 'center',
     },
@@ -29,9 +29,9 @@ export const fractionPinballTutorial: TutorialConfig = {
       title: 'Gameplay',
       message: `
         <ul>
-          <li>On your turn, change a fraction into a decimal, or a decimal into a fraction</li>
-          <li>A right answer hits a pinball target and adds points</li>
-          <li>A wrong answer costs you one ball</li>
+          <li>Each turn, convert a fraction to decimal or decimal to fraction</li>
+          <li>Correct answers hit pinball targets for points</li>
+          <li>Wrong answers lose a ball</li>
         </ul>
       `,
       highlightSelector: '.pinball-challenge',
@@ -63,7 +63,7 @@ export const fractionPinballTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>The player with the most points after all rounds wins!</p>
+        <p>Player with the most points after all rounds wins!</p>
       `,
       highlightSelector: '.pinball-scores',
       position: 'bottom',

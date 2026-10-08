@@ -29,10 +29,10 @@ export const fracFactTutorial: TutorialConfig = {
       title: 'Gameplay',
       message: `
         <ul>
-          <li>Players take turns solving fraction problems</li>
-          <li>Choose the right answer from 4 choices</li>
+          <li>Players take turns solving fraction arithmetic problems</li>
+          <li>Choose the correct answer from 4 options</li>
           <li>Earn points for correct answers</li>
-          <li>Get answers right in a row for bonus points!</li>
+          <li>Build streaks for bonus points!</li>
         </ul>
       `,
       highlightSelector: '.frac-problem',
