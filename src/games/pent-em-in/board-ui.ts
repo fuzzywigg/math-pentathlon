@@ -306,6 +306,83 @@ export function renderBoard(
   return svg;
 }
 
+/**
+ * Replace only the ghost preview `<g class="preview">` on an existing board SVG.
+ * Hover must not tear down the full 10×10 interaction layer (listeners + focus).
+ */
+export function patchBoardPreview(
+  svg: SVGElement,
+  state: PentEmInState,
+  options: PentEmInBoardRenderOptions = {}
+): void {
+  const allowInput = options.allowInput !== false;
+  const stats = ((
+    globalThis as unknown as {
+      __mpRenderStats?: Record<string, number>;
+    }
+  ).__mpRenderStats ??= {});
+  stats.pentPreviewPatch = (stats.pentPreviewPatch ?? 0) + 1;
+
+  svg.querySelector('g.preview')?.remove();
+
+  if (!allowInput || !state.selectedPiece || !state.previewPosition) return;
+
+  const previewCells = getPieceCells(
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+
+  const isValid = canPlacePiece(
+    state,
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+
+  const previewGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
+  previewGroup.classList.add('preview');
+
+  for (const cell of previewCells) {
+    if (
+      cell.row < 0 ||
+      cell.row >= BOARD_SIZE ||
+      cell.col < 0 ||
+      cell.col >= BOARD_SIZE
+    ) {
+      continue;
+    }
+
+    const rect = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'rect'
+    );
+    rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
+    rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
+    rect.setAttribute('width', String(CELL_SIZE - 2));
+    rect.setAttribute('height', String(CELL_SIZE - 2));
+    rect.setAttribute(
+      'fill',
+      isValid ? playerColors()[state.currentPlayer] : '#ff5252'
+    );
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('opacity', '0.5');
+    previewGroup.appendChild(rect);
+  }
+
+  const interaction = svg.querySelector('g.interaction');
+  if (interaction) {
+    svg.insertBefore(previewGroup, interaction);
+  } else {
+    svg.appendChild(previewGroup);
+  }
+}
+
 // =============================================================================
 // Piece Selector Rendering
 // =============================================================================

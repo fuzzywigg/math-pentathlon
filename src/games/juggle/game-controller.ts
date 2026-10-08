@@ -27,6 +27,7 @@ import {
   renderShapeControls,
   injectJuggleStyles,
   getPlayerName,
+  patchHoverPreview,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
@@ -286,18 +287,42 @@ function handleCellClick(row: number, col: number, player: Player): void {
   }
 }
 
+function patchHoverOnly(): void {
+  if (!boardContainer) return;
+  const inputOpts = { allowInput: !isComputerTurnPending() };
+  patchHoverPreview(
+    boardContainer,
+    'player1',
+    gameState.currentPlayer === 'player1',
+    gameState,
+    inputOpts
+  );
+  patchHoverPreview(
+    boardContainer,
+    'player2',
+    gameState.currentPlayer === 'player2',
+    gameState,
+    inputOpts
+  );
+}
+
 function handleCellHover(row: number, col: number): void {
   if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placing') return;
 
+  const prev = gameState.hoverPosition;
+  if (prev && prev.row === row && prev.col === col) return;
+
   gameState = { ...gameState, hoverPosition: { row, col } };
-  updateUI();
+  // Preview-only: do not rebuild dice/controls/boards under the pointer.
+  patchHoverOnly();
 }
 
 function handleCellLeave(): void {
   if (isComputerTurnPending()) return;
+  if (!gameState.hoverPosition) return;
   gameState = { ...gameState, hoverPosition: null };
-  updateUI();
+  patchHoverOnly();
 }
 
 // =============================================================================
