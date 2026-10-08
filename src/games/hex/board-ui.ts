@@ -3,6 +3,7 @@
 import { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
+import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -65,14 +66,7 @@ export function renderBoard(
   const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
 
   // Pointy-top hexagon path
-  const hexPoints = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const x = hexRadius * Math.cos(angle);
-    const y = hexRadius * Math.sin(angle);
-    hexPoints.push(`${x},${y}`);
-  }
-  const hexPath = hexPoints.join(' ');
+  const hexPath = pointyTopHexPolygonPoints(0, 0, hexRadius);
 
   // Create hex symbol
   const hexSymbol = document.createElementNS(

@@ -3,6 +3,11 @@
 import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { formatModeSeatLabel } from '../../ui/seat-labels';
+import {
+  flatTopAxialToPixel,
+  pointyTopHexPolygonPoints,
+} from '../../ui/hex-svg';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -28,21 +33,12 @@ const HEX_SIZE = 30;
 
 // Convert axial coordinates to pixel coordinates
 function axialToPixel(q: number, r: number): { x: number; y: number } {
-  const x = HEX_SIZE * ((3 / 2) * q);
-  const y = HEX_SIZE * ((Math.sqrt(3) / 2) * q + Math.sqrt(3) * r);
-  return { x, y };
+  return flatTopAxialToPixel(q, r, HEX_SIZE);
 }
 
 // Create hexagon path for SVG
 function hexagonPath(cx: number, cy: number, size: number): string {
-  const points: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const x = cx + size * Math.cos(angle);
-    const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
+  return pointyTopHexPolygonPoints(cx, cy, size);
 }
 
 // Render the game board
@@ -334,14 +330,7 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName =
-      gameMode === 'human-vs-ai'
-        ? state.winner === 'player1'
-          ? 'You'
-          : 'AI'
-        : state.winner === 'player1'
-          ? 'Blue'
-          : 'Red';
+    const winnerName = formatModeSeatLabel(state.winner, gameMode);
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';

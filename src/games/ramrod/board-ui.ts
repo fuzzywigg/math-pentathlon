@@ -4,6 +4,7 @@
 import { RamrodState, SumBox, Rod, Player, CONFIG, ROD_COLORS } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -13,6 +14,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Dimensions
 const BOX_WIDTH = 120;
@@ -329,12 +332,7 @@ export function renderRodLegend(): HTMLElement {
  * Inject CSS styles
  */
 export function injectRamrodStyles(): void {
-  const existingStyle = document.getElementById('ramrod-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'ramrod-styles';
-  style.textContent = `
+  injectStylesOnce('ramrod-styles', `
     .ramrod-game-area {
       display: flex;
       flex-direction: column;
@@ -782,13 +780,9 @@ export function injectRamrodStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

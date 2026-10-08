@@ -1,6 +1,7 @@
 // Pent'Em In Board UI
 // Renders the game board, pieces, and piece selector
 
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   PentEmInState,
   BOARD_SIZE,
@@ -25,16 +26,14 @@ import {
   applyRovingTabindex,
   collectGridCells,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 const CELL_SIZE = 36;
 const PREVIEW_CELL_SIZE = 16;
 const BOARD_PADDING = 20;
 const VALID_FILL = 'rgba(76, 175, 80, 0.28)';
 const VALID_STROKE = '#4caf50';
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 // =============================================================================
 // Board Rendering
@@ -122,7 +121,7 @@ export function renderBoard(
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
       rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', playerColors()[piece.player]);
+      rect.setAttribute('fill', getPlayerSeatColors()[piece.player]);
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.9');
       piecesGroup.appendChild(rect);
@@ -229,7 +228,7 @@ export function renderBoard(
       rect.setAttribute('height', String(CELL_SIZE - 2));
       rect.setAttribute(
         'fill',
-        isValid ? playerColors()[state.currentPlayer] : '#ff5252'
+        isValid ? getPlayerSeatColors()[state.currentPlayer] : '#ff5252'
       );
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.5');
@@ -320,7 +319,7 @@ export function renderPieceSelector(
   container.className = 'pent-piece-selector';
 
   const pieces = getPlayerPieces(state, state.currentPlayer);
-  const playerColor = playerColors()[state.currentPlayer];
+  const playerColor = getPlayerSeatColors()[state.currentPlayer];
 
   for (const shapeId of pieces.available) {
     const shape = getPentominoShape(shapeId);
@@ -443,7 +442,7 @@ export function renderPlaceControls(
       String(Math.max(maxRow * PREVIEW_CELL_SIZE + 4, 40))
     );
     svg.setAttribute('aria-hidden', 'true');
-    const color = playerColors()[state.currentPlayer];
+    const color = getPlayerSeatColors()[state.currentPlayer];
     for (const cell of used) {
       const rect = document.createElementNS(
         'http://www.w3.org/2000/svg',
@@ -510,16 +509,9 @@ export function renderPlaceControls(
   return container;
 }
 
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 export function injectPentEmInStyles(): void {
-  if (document.getElementById('pent-em-in-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'pent-em-in-styles';
-  style.textContent = `
+  injectStylesOnce('pent-em-in-styles', `
     .pent-game-container {
       display: flex;
       flex-direction: column;
@@ -699,6 +691,5 @@ export function injectPentEmInStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }

@@ -1,6 +1,8 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
+import { getDieFaceEmoji } from '../../ui/die-faces';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   JuggleState,
   CONFIG,
@@ -27,6 +29,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -420,20 +424,14 @@ export function renderShapeControls(
  * Get dice face emoji
  */
 function getDieFace(value: number): string {
-  const faces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-  return faces[value] || value.toString();
+  return getDieFaceEmoji(value);
 }
 
 /**
  * Inject CSS styles
  */
 export function injectJuggleStyles(): void {
-  const existingStyle = document.getElementById('juggle-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'juggle-styles';
-  style.textContent = `
+  injectStylesOnce('juggle-styles', `
     .juggle-boards {
       display: flex;
       gap: 2rem;
@@ -767,13 +765,9 @@ export function injectJuggleStyles(): void {
         max-width: 100%;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

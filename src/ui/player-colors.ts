@@ -59,6 +59,25 @@ export function getGameModeChromeRoot(
   return document.getElementById('app');
 }
 
+/**
+ * Sync `#app` opponent chrome from a boolean AI flag or an explicit mode.
+ * Replaces the identical `syncOpponentChrome` copies in game controllers.
+ */
+export function syncAppOpponentChrome(
+  modeOrIsAi: boolean | GameModeChrome,
+  aiSeat: PlayerSeat = 'player2'
+): void {
+  const root = document.getElementById('app');
+  if (!root) return;
+  const mode: GameModeChrome =
+    typeof modeOrIsAi === 'boolean'
+      ? modeOrIsAi
+        ? 'human-vs-ai'
+        : 'human-vs-human'
+      : modeOrIsAi;
+  applyGameModeChrome(root, mode, aiSeat);
+}
+
 function isAiOpponent(el: HTMLElement | null | undefined): boolean {
   return el?.dataset.opponent === 'ai';
 }

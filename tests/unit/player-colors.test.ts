@@ -4,6 +4,7 @@ import {
   clearGameModeChrome,
   getPlayerSeatColors,
   seatIcon,
+  syncAppOpponentChrome,
 } from '../../src/ui/player-colors';
 
 describe('player-colors / Scope A mode chrome', () => {
@@ -72,5 +73,12 @@ describe('player-colors / Scope A mode chrome', () => {
     applyGameModeChrome(app, 'human-vs-ai', 'player1');
     expect(seatIcon('player1')).toBe('🟣');
     expect(seatIcon('player2')).toBe('🔴');
+  });
+
+  it('syncAppOpponentChrome boolean mirrors applyGameModeChrome', () => {
+    syncAppOpponentChrome(true);
+    expect(app.dataset.opponent).toBe('ai');
+    syncAppOpponentChrome(false);
+    expect(app.dataset.opponent).toBeUndefined();
   });
 });

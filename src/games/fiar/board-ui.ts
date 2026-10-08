@@ -1,6 +1,7 @@
 // FIAR Board UI — SVG rendering (marked chips, yellow center, gapped wins)
 
 import { FiarGameState, CONFIG, Player } from './types';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   getValidMoves,
   getSelectableNodes,
@@ -20,6 +21,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 /** Theme tokens for the 2D SVG board (marked-dot color matches kit green). */
 const FIAR_THEME = {
@@ -39,10 +42,6 @@ const FIAR_THEME = {
 };
 
 const COLORS = FIAR_THEME;
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 /** True when vs-AI chrome is on and it is the computer's seat to act. */
 function isComputerSeatTurn(state: FiarGameState): boolean {
@@ -243,7 +242,7 @@ export function renderBoard(
       chipCircle.setAttribute('cx', node.x.toString());
       chipCircle.setAttribute('cy', node.y.toString());
       chipCircle.setAttribute('r', (CONFIG.NODE_RADIUS - 6).toString());
-      const seats = playerColors();
+      const seats = getPlayerSeatColors();
       chipCircle.setAttribute(
         'fill',
         node.chip === 'player1' ? seats.player1 : seats.player2
@@ -359,12 +358,7 @@ export function renderBoard(
 }
 
 export function injectFiarStyles(): void {
-  const existingStyle = document.getElementById('fiar-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'fiar-styles';
-  style.textContent = `
+  injectStylesOnce('fiar-styles', `
     .fiar-board-container {
       display: flex;
       justify-content: center;
@@ -505,15 +499,11 @@ export function injectFiarStyles(): void {
       from { box-shadow: 0 0 10px rgba(255,215,0,0.5); }
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 export function getPlayerColor(player: Player): string {
-  const colors = playerColors();
+  const colors = getPlayerSeatColors();
   return player === 'player1' ? colors.player1 : colors.player2;
 }

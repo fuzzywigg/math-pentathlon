@@ -76,9 +76,7 @@ export const PLAYER_CHIPS = {
 /**
  * Get opponent
  */
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
 
 /**
  * Create a chip

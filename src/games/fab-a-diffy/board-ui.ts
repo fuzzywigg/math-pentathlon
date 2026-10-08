@@ -4,6 +4,7 @@
 import { FabADiffyState, FractionBar, AnswerBar } from './types';
 import { FractionOperation } from '../../core/fractions/types';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   findMatchingAnswers,
   calculateResult,
@@ -23,6 +24,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -32,10 +35,6 @@ const COLORS = {
   validLight: '#c8e6c9',
   disabled: '#bdbdbd',
 };
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 export interface FabBoardRenderOptions {
   /** When false, suppress selectable/matchable chrome and click handlers (AI seat). */
@@ -276,7 +275,7 @@ function createAnswerBarElement(
   }
 
   // Create visual bar
-  const seats = playerColors();
+  const seats = getPlayerSeatColors();
   const color = isClaimed
     ? answer.claimedBy === 'player1'
       ? seats.player1
@@ -475,12 +474,7 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
  * Inject CSS styles
  */
 export function injectFabStyles(): void {
-  const existingStyle = document.getElementById('fab-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'fab-styles';
-  style.textContent = `
+  injectStylesOnce('fab-styles', `
     .fab-game-area {
       display: flex;
       flex-direction: column;
@@ -895,13 +889,9 @@ export function injectFabStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

@@ -19,7 +19,11 @@ import {
 import { getAIPlacement, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -27,9 +31,7 @@ import {
 } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -61,21 +63,22 @@ function bumpAIGeneration(): void {
 }
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 /** Schedule AI work; no-ops if New Game / mode change invalidated the generation. */
 function scheduleAI(fn: () => void, delayMs: number): void {
-  clearAiTimer();
-  const gen = aiGeneration;
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    if (gen !== aiGeneration) return;
-    fn();
-  }, delayMs);
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
 }
 
 // =============================================================================

@@ -21,7 +21,8 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { primeGoldTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -36,9 +37,7 @@ import { loadPrimeGoldBoard3DModule } from './board-3d-loader';
 import type { PrimeGoldBoard3D } from '../../ui/three/prime-gold-board-3d';
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 // =============================================================================
@@ -69,10 +68,7 @@ let boardHostEl: HTMLElement | null = null;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAI(controller: PrimeGoldController, delayMs: number): void {

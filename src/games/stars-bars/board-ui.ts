@@ -1,6 +1,7 @@
 // Stars & Bars Board UI
 // Renders the attribute logic board and cards
 
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   StarsState,
   AttributeCard,
@@ -21,17 +22,15 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // =============================================================================
 // Style Injection
 // =============================================================================
 
 export function injectStarsStyles(): void {
-  if (document.getElementById('stars-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'stars-styles';
-  style.textContent = `
+  injectStylesOnce('stars-styles', `
     .stars-game-area {
       display: flex;
       flex-direction: column;
@@ -376,8 +375,7 @@ export function injectStarsStyles(): void {
     html[data-reduced-motion='true'] .stars-card.selected {
       transform: none;
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }
 
 // =============================================================================
@@ -387,12 +385,6 @@ export function injectStarsStyles(): void {
 /**
  * Seat label for chrome. In human-vs-AI, player1 is "You" and player2 is "Computer".
  */
-export function getPlayerName(player: Player, vsAI: boolean = false): string {
-  if (vsAI) {
-    return player === 'player1' ? 'You' : 'Computer';
-  }
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Card Rendering

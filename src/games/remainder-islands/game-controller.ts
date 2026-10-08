@@ -15,13 +15,15 @@ import {
 import { getAIIslandChoice, AIDifficulty } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -40,21 +42,22 @@ let aiGeneration = 0;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 /** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
 function scheduleAI(fn: () => void, delayMs: number): void {
-  clearAiTimer();
-  const gen = aiGeneration;
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    if (gen !== aiGeneration) return;
-    fn();
-  }, delayMs);
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
 }
 
 // =============================================================================

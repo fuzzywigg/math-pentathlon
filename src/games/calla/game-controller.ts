@@ -12,12 +12,11 @@ import { tutorialManager } from '../../core/tutorial';
 import { callaTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { getAIMove, AIDifficulty } from './ai';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, gameMode);
+  syncAppOpponentChrome(gameMode);
 }
 
 // Game mode
@@ -43,10 +42,7 @@ const AI_THINKING_DELAY = 600;
 const AI_FREE_TURN_DELAY = 250;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAiTimeout(fn: () => void, delayMs: number): void {

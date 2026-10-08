@@ -20,7 +20,8 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kwatroSinkoTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -35,9 +36,7 @@ import { loadKwatroSinkoBoard3DModule } from './board-3d-loader';
 import type { KwatroSinkoBoard3D } from '../../ui/three/kwatro-sinko-board-3d';
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 // =============================================================================
@@ -70,10 +69,7 @@ let board3dMountGen = 0;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 /** True while it is the computer's seat (including the 800ms think pause). */

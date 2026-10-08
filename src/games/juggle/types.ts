@@ -83,9 +83,7 @@ export const CONFIG = {
 /**
  * Get opponent
  */
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
 
 /**
  * Roll two dice

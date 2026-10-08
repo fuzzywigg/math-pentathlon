@@ -63,9 +63,7 @@ export function createInitialState(): CallaGameState {
 }
 
 // Get opponent
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
 
 // Get pits for a player
 export function getPlayerPits(state: CallaGameState, player: Player): number[] {

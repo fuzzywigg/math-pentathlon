@@ -1,9 +1,15 @@
 // Fraction Pinball Board UI
 // Renders the pinball-style game board, challenges, and scores
 
-import { FractionPinballState, Player, getPlayerStats } from './types';
+import { FractionPinballState, getPlayerStats } from './types';
 import { formatDecimal, formatFraction } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { injectStylesOnce } from '../../ui/inject-styles';
+import {
+  getPlayerName,
+  formatModeSeatLabelComputer,
+} from '../../ui/seat-labels';
+export { getPlayerName };
 
 // =============================================================================
 // Challenge Display
@@ -301,8 +307,8 @@ export function renderScores(
 
   const p1Stats = getPlayerStats(state, 'player1');
   const p2Stats = getPlayerStats(state, 'player2');
-  const p1Name = gameMode === 'human-vs-ai' ? 'You' : 'Blue';
-  const p2Name = gameMode === 'human-vs-ai' ? 'Computer' : 'Red';
+  const p1Name = formatModeSeatLabelComputer('player1', gameMode);
+  const p2Name = formatModeSeatLabelComputer('player2', gameMode);
   const p1Balls = Math.max(0, p1Stats.ballsRemaining);
   const p2Balls = Math.max(0, p2Stats.ballsRemaining);
 
@@ -382,20 +388,13 @@ export function renderGameOver(
 // Helper Functions
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectFractionPinballStyles(): void {
-  if (document.getElementById('fraction-pinball-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'fraction-pinball-styles';
-  style.textContent = `
+  injectStylesOnce('fraction-pinball-styles', `
     .pinball-game-container {
       display: flex;
       flex-direction: column;
@@ -731,6 +730,5 @@ export function injectFractionPinballStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `);
 }

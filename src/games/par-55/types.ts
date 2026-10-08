@@ -135,9 +135,7 @@ export function shuffleArray<T>(array: T[]): T[] {
 /**
  * Get opponent
  */
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
 
 /**
  * Count matching attributes between two blocks
