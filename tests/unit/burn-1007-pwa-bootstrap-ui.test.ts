@@ -405,6 +405,28 @@ describe('burn-1007 game-prefetch saveData + reset cancel', () => {
     expect(isGamePrefetchStarted('hex')).toBe(true);
     vi.useRealTimers();
   });
+
+  it('direct prefetch with imports allowed warms many registered loaders', async () => {
+    allowGamePrefetchImportsForTests(true);
+    const ids = [
+      'hex',
+      'calla',
+      'fiar',
+      'juggle',
+      'par-55',
+      'ramrod',
+      'stars-bars',
+      'frac-fact',
+      'not-registered',
+    ];
+    for (const id of ids) {
+      prefetchGameChunk(id);
+    }
+    await Promise.resolve();
+    expect(isGamePrefetchStarted('hex')).toBe(true);
+    expect(isGamePrefetchStarted('calla')).toBe(true);
+    expect(isGamePrefetchStarted('not-registered')).toBe(false);
+  });
 });
 
 describe('burn-1007 loadThree', () => {
