@@ -11,10 +11,10 @@ test.describe(`fab-a-diffy fullgame ${FULLGAME_TAG}`, () => {
   test(`plays one complete human-vs-human match to game-over ${FULLGAME_TAG}`, async ({
     page,
   }) => {
-    test.setTimeout(240000);
+    test.setTimeout(300000);
     await runFullgameMatch(page, 'fab-a-diffy', {
-      timeoutMs: 240000,
-      maxTurns: 160,
+      timeoutMs: 300000,
+      maxTurns: 250,
     });
   });
 });

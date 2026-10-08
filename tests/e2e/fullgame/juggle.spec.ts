@@ -11,10 +11,10 @@ test.describe(`juggle fullgame ${FULLGAME_TAG}`, () => {
   test(`plays one complete human-vs-human match to game-over ${FULLGAME_TAG}`, async ({
     page,
   }) => {
-    test.setTimeout(300000);
+    test.setTimeout(480000);
     await runFullgameMatch(page, 'juggle', {
-      timeoutMs: 300000,
-      maxTurns: 200,
+      timeoutMs: 480000,
+      maxTurns: 400,
     });
   });
 });

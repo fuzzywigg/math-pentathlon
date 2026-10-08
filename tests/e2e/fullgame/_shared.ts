@@ -35,7 +35,7 @@ export const MOUNT: Record<string, string> = {
 export const STATUS: Record<string, string> = {
   'kings-quadraphages': '.status-turn',
   hex: '.hex-status .status-turn, .status-turn',
-  'star-track': '.star-track-status .status-turn, .status-turn',
+  'star-track': '.star-track-status > .status-turn, .star-track-status .status-turn',
   'hex-a-gone': '.hex-a-gone-status .status-turn, .status-turn',
   calla: '.calla-status .status-turn, .status-turn',
   'sum-dominoes': '.sd-status',
@@ -141,12 +141,26 @@ export function gameOverLocator(page: Page, gameId: string): Locator {
 }
 
 export async function readStatus(page: Page, gameId: string): Promise<string> {
-  const text = (await statusLocator(page, gameId).textContent().catch(() => '')) ?? '';
-  return text.replace(/\s+/g, ' ').trim();
+  // Prefer evaluate so a momentarily-missing status node does not burn the
+  // Playwright action timeout (important during modal/re-render transitions).
+  const sel = STATUS[gameId] ?? '.status-turn, [role="status"]';
+  const text = await page.evaluate((selector) => {
+    for (const part of selector.split(',').map((s) => s.trim())) {
+      const el = document.querySelector(part);
+      const t = el?.textContent?.replace(/\s+/g, ' ').trim() ?? '';
+      if (t) return t;
+    }
+    return '';
+  }, sel);
+  return text;
 }
 
 export function isGameOverText(status: string): boolean {
-  return /winner|wins|game over|draw|tie|you win|you lose/i.test(status);
+  // Avoid matching instructional copy like Star Track "Draw chains…".
+  if (/draw chains|draw from|draw a|draw the/i.test(status)) return false;
+  return /winner|\bwins\b|game over|it's a draw|\bdraw!|\btie\b|you win|you lose/i.test(
+    status
+  );
 }
 
 export async function isGameOver(page: Page, gameId: string): Promise<boolean> {
