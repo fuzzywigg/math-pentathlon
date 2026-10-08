@@ -27,7 +27,10 @@ import {
   paintBoard3dAndMarkReady,
   scheduleBoard3dMountPaint,
   bindPageVisibility,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -230,18 +233,17 @@ export async function createKingsQuadraphagesBoard3D(
     if (disposed) return;
     const w = Math.max(container.clientWidth || 450, 120);
     const h = Math.max(container.clientHeight || 450, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   const onPointer = (event: PointerEvent): void => {
     if (!clickHandler || disposed) return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -266,7 +268,6 @@ export async function createKingsQuadraphagesBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     // On-demand boards: nothing to cancel; next update/resize paints when visible.
     onVisible: () => paint(),
@@ -274,7 +275,7 @@ export async function createKingsQuadraphagesBoard3D(
 
   canvas.addEventListener('pointerup', onPointer);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const cellToClientPoint = (
     row: number,
@@ -402,7 +403,7 @@ export async function createKingsQuadraphagesBoard3D(
     cancelMountPaint();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     unbindVisibility();
 
     if (import.meta.env.DEV && window.__mp3dKingsQuadraphages) {

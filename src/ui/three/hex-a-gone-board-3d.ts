@@ -24,7 +24,10 @@ import {
   scheduleBoard3dMountPaint,
   bindPageVisibility,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 import {
   createHexAGonePieceGeometries,
   disposeHexAGonePieceGeometries,
@@ -242,9 +245,7 @@ export async function createHexAGoneBoard3D(
     if (disposed) return;
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 480, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
@@ -272,9 +273,10 @@ export async function createHexAGoneBoard3D(
     event: PointerEvent
   ): { q: number; r: number } | null => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return null;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -322,11 +324,10 @@ export async function createHexAGoneBoard3D(
   const onContextLost = (event: Event): void => {
     event.preventDefault();
     if (disposed) return;
-    disposed = true;
+    // Do not mark disposed here — unmount() must run to drop listeners/GPU.
     onWebglLost?.();
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
@@ -334,7 +335,7 @@ export async function createHexAGoneBoard3D(
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const syncA11y = (
     state: HexAGoneGameState,
@@ -532,7 +533,7 @@ export async function createHexAGoneBoard3D(
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dHexAGone) {
       delete window.__mp3dHexAGone;
     }

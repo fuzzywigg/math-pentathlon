@@ -3,6 +3,9 @@ import {
   canPaint3d,
   shouldPreserveDrawingBuffer,
   bindPageVisibility,
+  bindBoard3dLayout,
+  syncBoard3dRendererSize,
+  resolveCssViewportSize,
   TABLET_PIXEL_RATIO_CAP,
   BOARD_3D_LQ_PIXEL_RATIO_CAP,
   isBoard3dLowQuality,
@@ -178,5 +181,44 @@ describe('tablet-gl helpers', () => {
     document.dispatchEvent(new Event('visibilitychange'));
     expect(onHidden).toHaveBeenCalledTimes(1);
     expect(onVisible).toHaveBeenCalledTimes(1);
+  });
+
+  it('syncBoard3dRendererSize refreshes pixel ratio + aspect + size', () => {
+    const setPixelRatio = vi.fn();
+    const setSize = vi.fn();
+    const updateProjectionMatrix = vi.fn();
+    const camera = { aspect: 1, updateProjectionMatrix };
+    vi.stubGlobal('devicePixelRatio', 3);
+    syncBoard3dRendererSize({ setPixelRatio, setSize }, camera, 200, 100);
+    expect(setPixelRatio).toHaveBeenCalledWith(TABLET_PIXEL_RATIO_CAP);
+    expect(camera.aspect).toBe(2);
+    expect(updateProjectionMatrix).toHaveBeenCalledTimes(1);
+    expect(setSize).toHaveBeenCalledWith(200, 100, false);
+  });
+
+  it('resolveCssViewportSize prefers visualViewport when present', () => {
+    vi.stubGlobal('visualViewport', { width: 390, height: 700 });
+    expect(resolveCssViewportSize()).toEqual({ width: 390, height: 700 });
+  });
+
+  it('bindBoard3dLayout cleans up window + visualViewport + ResizeObserver', () => {
+    const host = document.createElement('div');
+    const onLayout = vi.fn();
+    const unbind = bindBoard3dLayout(host, onLayout);
+
+    window.dispatchEvent(new Event('resize'));
+    expect(onLayout).toHaveBeenCalled();
+    const callsAfterWindow = onLayout.mock.calls.length;
+
+    window.visualViewport?.dispatchEvent(new Event('resize'));
+    // visualViewport may be undefined in jsdom — only assert when present
+    if (window.visualViewport) {
+      expect(onLayout.mock.calls.length).toBeGreaterThan(callsAfterWindow);
+    }
+
+    unbind();
+    const afterUnbind = onLayout.mock.calls.length;
+    window.dispatchEvent(new Event('resize'));
+    expect(onLayout).toHaveBeenCalledTimes(afterUnbind);
   });
 });

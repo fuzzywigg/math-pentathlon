@@ -25,7 +25,10 @@ import {
   scheduleBoard3dMountPaint,
   bindPageVisibility,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type FiarNodeClickCallback = (nodeId: string) => void;
 
@@ -226,18 +229,17 @@ export async function createFiarBoard3D(
     if (disposed) return;
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 360, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   const onPointer = (event: PointerEvent): void => {
     if (!clickHandler || disposed) return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -262,13 +264,12 @@ export async function createFiarBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
   canvas.addEventListener('pointerup', onPointer);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const clearChip = (nm: NodeMeshes): void => {
     if (nm.chip) {
@@ -458,7 +459,7 @@ export async function createFiarBoard3D(
     cancelMountPaint();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     unbindVisibility();
     if (window.__mp3dFiar) {
       delete window.__mp3dFiar;

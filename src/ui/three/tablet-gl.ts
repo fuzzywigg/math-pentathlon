@@ -197,3 +197,73 @@ export function bindPageVisibility(handlers: {
   document.addEventListener('visibilitychange', onChange);
   return () => document.removeEventListener('visibilitychange', onChange);
 }
+
+/** CSS viewport size — prefer visualViewport (mobile chrome / keyboard). */
+export function resolveCssViewportSize(): { width: number; height: number } {
+  if (typeof window === 'undefined') return { width: 0, height: 0 };
+  const vv = window.visualViewport;
+  return {
+    width: vv?.width || window.innerWidth || 0,
+    height: vv?.height || window.innerHeight || 0,
+  };
+}
+
+type Board3dRendererSize = {
+  setPixelRatio: (ratio: number) => void;
+  setSize: (width: number, height: number, updateStyle?: boolean) => void;
+};
+
+type Board3dCameraAspect = {
+  aspect: number;
+  updateProjectionMatrix: () => void;
+};
+
+/**
+ * Keep WebGL drawing buffer, pixel ratio, and camera aspect in sync with
+ * the CSS host size. Re-reads DPR so monitor moves / 2×↔3× stay sharp
+ * without oversized 3× buffers (still capped by `resolveBoard3dPixelRatio`).
+ */
+export function syncBoard3dRendererSize(
+  renderer: Board3dRendererSize,
+  camera: Board3dCameraAspect,
+  width: number,
+  height: number
+): void {
+  const w = Math.max(width, 1);
+  const h = Math.max(height, 1);
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h, false);
+}
+
+/**
+ * Bind layout signals that can change board CSS size or DPR:
+ * window resize, visualViewport resize, and ResizeObserver on `host`.
+ * Returns an unsubscribe that removes every listener / observer.
+ */
+export function bindBoard3dLayout(
+  host: Element,
+  onLayout: () => void
+): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+
+  const onWindowResize = (): void => onLayout();
+  window.addEventListener('resize', onWindowResize);
+
+  const vv = window.visualViewport;
+  const onVvResize = (): void => onLayout();
+  vv?.addEventListener('resize', onVvResize);
+
+  let ro: ResizeObserver | null = null;
+  if (typeof ResizeObserver !== 'undefined') {
+    ro = new ResizeObserver(() => onLayout());
+    ro.observe(host);
+  }
+
+  return () => {
+    window.removeEventListener('resize', onWindowResize);
+    vv?.removeEventListener('resize', onVvResize);
+    ro?.disconnect();
+  };
+}
