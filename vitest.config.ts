@@ -93,6 +93,8 @@ const nodePureFiles = [
   'tests/unit/engines-plain-node-load.test.ts',
   // Engine→UI seat helper characterization + auditBoundaries ratchet.
   'tests/unit/engine-ui-boundary-seats-characterization.test.ts',
+  // Emit-identity checker imports esbuild (needs Node TextEncoder, not jsdom).
+  'tests/unit/check-emit-identity.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
