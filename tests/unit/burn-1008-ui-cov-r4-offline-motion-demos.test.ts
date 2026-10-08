@@ -143,4 +143,58 @@ describe('burn-1008 ui-cov-r4 demo residual mounts', () => {
     expect(() => renderPolyominoDemo(polyRoot)).not.toThrow();
     expect(polyRoot.childElementCount).toBeGreaterThan(0);
   });
+
+  it('fraction-demo calculate invalid + valid paths; polyomino shape select', async () => {
+    const fracRoot = document.createElement('div');
+    const polyRoot = document.createElement('div');
+    document.body.append(fracRoot, polyRoot);
+    const { renderFractionDemo } = await import('../../src/demos/fraction-demo');
+    const { renderPolyominoDemo } = await import(
+      '../../src/demos/polyomino-demo'
+    );
+    renderFractionDemo(fracRoot);
+    renderPolyominoDemo(polyRoot);
+
+    const inputA = fracRoot.querySelector(
+      'input#fraction-a, input[id*="fraction"]'
+    ) as HTMLInputElement | null;
+    const inputs = [...fracRoot.querySelectorAll('input')].filter(
+      (el) => (el as HTMLInputElement).type !== 'hidden'
+    ) as HTMLInputElement[];
+    const calculateBtn = [...fracRoot.querySelectorAll('button')].find((b) =>
+      /calc/i.test(b.textContent ?? '')
+    ) as HTMLButtonElement | undefined;
+
+    if (inputs.length >= 2 && calculateBtn) {
+      inputs[0]!.value = 'not-a-fraction';
+      inputs[1]!.value = '1/2';
+      calculateBtn.click();
+      expect(fracRoot.querySelector('[style*="red"], .steps, .final-result')).toBeTruthy();
+
+      inputs[0]!.value = '1/2';
+      inputs[1]!.value = '1/3';
+      calculateBtn.click();
+      expect(
+        fracRoot.querySelector('.final-result, #result-bar, .visual-result')
+      ).toBeTruthy();
+    } else if (inputA && calculateBtn) {
+      inputA.value = 'bad';
+      calculateBtn.click();
+    }
+
+    const shapeBtn = polyRoot.querySelector(
+      '[data-shape-id], .shape-option, button, svg'
+    ) as HTMLElement | null;
+    shapeBtn?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const boardCell = polyRoot.querySelector(
+      'rect[data-row]'
+    ) as SVGElement | null;
+    if (boardCell) {
+      boardCell.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+      boardCell.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      const svg = boardCell.ownerSVGElement;
+      svg?.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }));
+    }
+    expect(polyRoot.childElementCount).toBeGreaterThan(0);
+  });
 });

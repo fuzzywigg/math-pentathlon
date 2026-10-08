@@ -12,7 +12,13 @@ import {
   isBoardFilled,
   createBoardWithBlockedCells,
   isCellOccupied,
+  isOccupied,
   createGrid,
+  validatePlacement,
+  removeLastPolyomino,
+  removePolyomino,
+  findPlacementAtCell,
+  createHexagonalBoard,
 } from '../../src/core/polyomino/placement';
 import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 import type { MessageCondition } from '../../src/core/owl/owl-messages';
@@ -107,5 +113,57 @@ describe('burn-1008 ui-cov-r4 polyomino placement residuals', () => {
     const board = createBoard(1, 1);
     const sols = solvePlacement(board, [mono], 2);
     expect(sols.length).toBe(1);
+  });
+
+  it('placement edges: invalid throw, OOB occupied, remove helpers, hex board', () => {
+    const board = createBoard(2, 2);
+    expect(isOccupied(board, { row: -1, col: 0 })).toBe(true);
+    expect(isOccupied(board, { row: 0, col: 0 })).toBe(false);
+    expect(
+      validatePlacement(board, mono, { row: 5, col: 5 }).valid
+    ).toBe(false);
+    expect(() =>
+      placePolyomino(board, mono, { row: 5, col: 5 })
+    ).toThrow();
+
+    // Blocked-cell helper ignores OOB entries
+    const blocked = createBoardWithBlockedCells(2, 2, [
+      { row: 0, col: 0 },
+      { row: 99, col: 99 },
+    ]);
+    expect(blocked.cells[0]![0]).toBe(true);
+
+    const placed = placePolyomino(board, mono, { row: 0, col: 0 });
+    expect(
+      findPlacementAtCell(placed, { row: 0, col: 0 }, [mono])?.shapeId
+    ).toBe('monomino');
+    expect(findPlacementAtCell(placed, { row: 1, col: 1 }, [mono])).toBeUndefined();
+
+    const undone = removeLastPolyomino(placed, [mono]);
+    expect(undone.placements).toHaveLength(0);
+    expect(removeLastPolyomino(createBoard(1, 1), [mono]).placements).toHaveLength(
+      0
+    );
+    // Unknown shapeId on removeLast → identity
+    const ghost = {
+      ...placed,
+      placements: [
+        {
+          shapeId: 'nope',
+          position: { row: 0, col: 0 },
+          rotation: 0 as const,
+          flipped: false,
+        },
+      ],
+    };
+    expect(removeLastPolyomino(ghost, [mono])).toBe(ghost);
+
+    const grid = placePolyomino(createGrid(2, 2), mono, { row: 1, col: 1 });
+    const cleared = removePolyomino(grid, 'monomino');
+    expect(cleared.cells[1]![1]!.occupied).toBe(false);
+
+    const hex = createHexagonalBoard(1);
+    expect(hex.rows).toBe(3);
+    expect(hex.cells.flat().some(Boolean)).toBe(true);
   });
 });

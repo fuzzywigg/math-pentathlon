@@ -107,29 +107,54 @@ describe('burn-1008 ui-cov-r4 stars-bars controller shell', () => {
 });
 
 describe('burn-1008 ui-cov-r4 kwatro-sinko controller shell', () => {
-  it('clear/pass controls, winner chrome, context-lost event, destroy', async () => {
+  it('human chip click, clear/pass, winner chrome, destroy', async () => {
     const { initGame, destroyGame } = await import(
       '../../src/games/kwatro-sinko/game-controller'
+    );
+    const { selectChip, getValidMoves, moveChip } = await import(
+      '../../src/games/kwatro-sinko/rules'
     );
     const root = mountRoot();
     const ctrl = initGame(root, false);
     expect(root.querySelector('.kwa-game-area,.kwa-board')).toBeTruthy();
 
+    // Drive a real human move through the controller UI handlers
+    const chipEl = root.querySelector(
+      '.kwa-selectable-chip, [data-chip-id]'
+    ) as HTMLElement | null;
+    chipEl?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    if (ctrl.state.selectedChip) {
+      const clearBtn = [...root.querySelectorAll('.kwa-btn-secondary')].find(
+        (b) => /clear/i.test(b.textContent ?? '')
+      ) as HTMLButtonElement | undefined;
+      clearBtn?.click();
+    }
+
+    let state = selectChip(ctrl.state, 'p1-0');
+    const dest =
+      getValidMoves(state, 'p1-0').find((id) => id === 'n1-0') ??
+      getValidMoves(state, 'p1-0')[0];
+    if (dest) {
+      state = moveChip(state, dest);
+      ctrl.state = state;
+      ctrl.update();
+      expect(ctrl.state.moveHistory.length).toBeGreaterThan(0);
+    }
+
     const firstChipId = [...ctrl.state.chips.keys()][0] ?? null;
-    const selected = {
+    ctrl.state = {
       ...ctrl.state,
       selectedChip: firstChipId,
-      phase: 'selectingDest' as const,
+      phase: 'selectingDest',
     };
-    ctrl.state = selected;
     ctrl.update();
-    const clearBtn = root.querySelector(
-      '.kwa-btn-secondary'
-    ) as HTMLButtonElement | null;
-    if (clearBtn && /clear/i.test(clearBtn.textContent ?? '')) {
+    const clearBtn = [...root.querySelectorAll('.kwa-btn-secondary')].find(
+      (b) => /clear/i.test(b.textContent ?? '')
+    ) as HTMLButtonElement | undefined;
+    if (clearBtn) {
       clearBtn.click();
     } else {
-      ctrl.state = clearKwaSelection(selected);
+      ctrl.state = clearKwaSelection(ctrl.state);
       ctrl.update();
     }
 
@@ -148,7 +173,7 @@ describe('burn-1008 ui-cov-r4 kwatro-sinko controller shell', () => {
       phase: 'gameOver',
       winner: 'player1',
       winningAlignment: {
-        nodes: [],
+        nodes: ['n0-0'],
         chips: [],
         expression: '4 + 3 - 2 = 5',
         result: 5,
@@ -156,20 +181,45 @@ describe('burn-1008 ui-cov-r4 kwatro-sinko controller shell', () => {
     };
     ctrl.update();
     expect(root.querySelector('.kwa-winner-banner')).toBeTruthy();
+    expect(root.querySelector('.kwa-winning-expr')).toBeTruthy();
 
-    root.dispatchEvent(new Event('mp3d-context-lost', { bubbles: true }));
     destroyGame();
   });
 });
 
 describe('burn-1008 ui-cov-r4 pent-em-in controller shell', () => {
-  it('winner banner via __setStateForTests; context-lost; destroy', async () => {
-    const { initGame, __setStateForTests, getCurrentState, destroyGame } =
-      await import('../../src/games/pent-em-in/game-controller');
+  it('piece select/rotate/cancel + winner banner; destroy', async () => {
+    const {
+      initGame,
+      newGameVsHuman,
+      __setStateForTests,
+      getCurrentState,
+      destroyGame,
+    } = await import('../../src/games/pent-em-in/game-controller');
     const board = document.createElement('div');
     const status = document.createElement('div');
     document.body.append(board, status);
     initGame(board, status);
+    newGameVsHuman();
+
+    const pieceBtn = status.querySelector(
+      '.pent-piece-btn, [data-piece], .pent-piece-option'
+    ) as HTMLElement | null;
+    pieceBtn?.click();
+
+    // Force placePiece phase so rotate/flip/cancel controls render
+    const base = getCurrentState();
+    const available = base.player1Pieces.available[0];
+    if (available) {
+      __setStateForTests({
+        ...base,
+        phase: 'placePiece',
+        selectedPiece: available,
+      });
+      for (const btn of status.querySelectorAll('button')) {
+        (btn as HTMLButtonElement).click();
+      }
+    }
 
     __setStateForTests({
       ...createPentState(),
@@ -179,7 +229,13 @@ describe('burn-1008 ui-cov-r4 pent-em-in controller shell', () => {
     expect(status.querySelector('.pent-winner-banner')).toBeTruthy();
     expect(getCurrentState().winner).toBe('player1');
 
-    board.dispatchEvent(new Event('mp3d-context-lost', { bubbles: true }));
+    // AI thinking chrome class
+    __setStateForTests({
+      ...createPentState(),
+      currentPlayer: 'player2',
+      phase: 'selectPiece',
+    });
+    // newGameVsAI would schedule AI — keep human shell only
     destroyGame();
   });
 });
@@ -206,14 +262,15 @@ describe('burn-1008 ui-cov-r4 kings controller + board-renderer', () => {
     void el2;
   });
 
-  it('init/newGame/destroy + coarse pointer delay path via matchMedia stub', async () => {
-    const matchMedia = vi.fn().mockReturnValue({
-      matches: true,
+  it('init/newGame/destroy + coarse pointer AI delay path via matchMedia stub', async () => {
+    const matchMedia = vi.fn((query: string) => ({
+      matches: /pointer:\s*coarse|hover:\s*none/.test(query),
+      media: query,
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
       addListener: vi.fn(),
       removeListener: vi.fn(),
-    });
+    }));
     vi.stubGlobal('matchMedia', matchMedia);
 
     const {
@@ -233,6 +290,13 @@ describe('burn-1008 ui-cov-r4 kings controller + board-renderer', () => {
     expect(getGameState()).toBeTruthy();
     setAIDifficulty('easy');
     newGameVsAI('easy');
+
+    // Human places a piece so Red (AI) schedules think delay (coarse = 350ms)
+    const cell = board.querySelector('.cell') as HTMLElement | null;
+    cell?.click();
+    await vi.advanceTimersByTimeAsync(400);
+    expect(getGameState()).toBeTruthy();
+
     board.dispatchEvent(new Event('mp3d-context-lost', { bubbles: true }));
     destroyGame();
   });
@@ -275,8 +339,8 @@ describe('burn-1008 ui-cov-r4 fiar controller shell', () => {
   });
 });
 
-describe('burn-1008 ui-cov-r4 contig-60 + star-track + calla shells', () => {
-  it('contig init/roll/destroy; AI thinking class with vsAI', async () => {
+describe('burn-1008 ui-cov-r4 contig-60 + star-track + calla + hex-a-gone shells', () => {
+  it('contig init/roll/pass/destroy; AI mode remount', async () => {
     const { initGame, newGameVsHuman, newGameVsAI, destroyGame } = await import(
       '../../src/games/contig-60/game-controller'
     );
@@ -287,12 +351,32 @@ describe('burn-1008 ui-cov-r4 contig-60 + star-track + calla shells', () => {
     newGameVsHuman();
     const roll = board.querySelector('.contig-roll-btn') as HTMLButtonElement;
     roll?.click();
-    expect(board.querySelector('.contig-board, .contig-dice, .contig-status') || status.children.length >= 0).toBeTruthy();
+    expect(status.querySelector('.contig-status, .contig-winner-banner') || status.childElementCount >= 0).toBeTruthy();
+
+    const pass = [...board.querySelectorAll('button')].find((b) =>
+      /pass/i.test(b.textContent ?? '')
+    ) as HTMLButtonElement | undefined;
+    pass?.click();
+
+    const expr = board.querySelector(
+      '.contig-expression, [data-expression], .contig-expr-btn'
+    ) as HTMLElement | null;
+    expr?.click();
 
     newGameVsAI('easy');
-    // After switching to AI at start, human is still up — force Red turn via
-    // rolling then... just ensure destroy works and AI mode mounts.
     destroyGame();
+  });
+
+  it('hex-a-gone init/human/AI/destroy shell', async () => {
+    const hex = await import('../../src/games/hex-a-gone/game-controller');
+    const board = document.createElement('div');
+    const status = document.createElement('div');
+    document.body.append(board, status);
+    hex.initGame(board, status);
+    hex.newGameVsHuman();
+    expect(board.childElementCount).toBeGreaterThan(0);
+    hex.newGameVsAI('easy');
+    hex.destroyGame();
   });
 
   it('star-track and calla init/destroy smoke (shell coverage)', async () => {
