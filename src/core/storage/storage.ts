@@ -20,6 +20,10 @@ import {
   MAX_PROFILE_NAME_LENGTH,
 } from './sanitize';
 import {
+  createDefaultProgress,
+  createDefaultGameStats,
+} from './types';
+import type {
   ProgressData,
   PlayerProfile,
   GameStats,
@@ -28,8 +32,6 @@ import {
   Achievement,
   UserSettings,
   OwlState,
-  createDefaultProgress,
-  createDefaultGameStats,
 } from './types';
 
 /** localStorage key for the on-device progress blob. */
