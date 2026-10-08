@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "reportOnly": true,
   "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
-  "taskId": "burn-1008-mp-type-ratchet-batch3-nonrules",
-  "generatedAt": "2026-10-08T08:38:33.268Z",
-  "tipSha": "a42fcecf1858befd33e92ab9b655db8cf390b92c",
+  "taskId": "burn-1008-mp-type-ratchet-batch2-3-4-combined",
+  "generatedAt": "2026-10-08T08:40:40.979Z",
+  "tipSha": "d6c35e331db52e856e8e9585c14f5df7d2b301da",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
@@ -19,34 +19,31 @@
     "noImplicitReturns"
   ],
   "inScopeErrors": 0,
-  "outOfScopeErrors": 356,
-  "fileCount": 40,
+  "outOfScopeErrors": 286,
+  "fileCount": 38,
   "byKind": {
     "ai_search_scoring": 219,
-    "other_game_module": 65,
     "rules_engine": 62,
-    "game_ui": 10
+    "game_ui": 5
   },
   "byRootCause": {
-    "unchecked_index_access": 336,
-    "exact_optional_property_types": 16,
+    "unchecked_index_access": 267,
+    "exact_optional_property_types": 15,
     "undefined_as_index": 2,
     "possibly_undefined_iterable": 1,
     "type_assignability": 1
   },
   "byCode": {
-    "TS18048": 134,
     "TS2532": 127,
+    "TS18048": 69,
     "TS2322": 53,
     "TS2345": 19,
-    "TS2379": 14,
-    "TS2339": 4,
+    "TS2379": 13,
     "TS2375": 2,
     "TS2538": 2,
     "TS2488": 1
   },
   "byGame": {
-    "prime-gold": 87,
     "stars-bars": 30,
     "hex": 28,
     "kwatro-sinko": 24,
@@ -55,6 +52,7 @@
     "fab-a-diffy": 20,
     "juggle": 20,
     "pent-em-in": 19,
+    "prime-gold": 17,
     "calla": 15,
     "fiar": 12,
     "hex-a-gone": 9,
@@ -68,15 +66,6 @@
     "fraction-pinball": 2
   },
   "perGame": {
-    "prime-gold": {
-      "total": 87,
-      "ai_search_scoring": 7,
-      "rules_engine": 10,
-      "game_ui": 5,
-      "other_game_module": 65,
-      "shell_misc": 0,
-      "other": 0
-    },
     "stars-bars": {
       "total": 30,
       "ai_search_scoring": 18,
@@ -144,6 +133,15 @@
       "total": 19,
       "ai_search_scoring": 12,
       "rules_engine": 7,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "prime-gold": {
+      "total": 17,
+      "ai_search_scoring": 7,
+      "rules_engine": 10,
       "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
@@ -250,7 +248,6 @@
     }
   },
   "byFile": {
-    "src/games/prime-gold/types.ts": 65,
     "src/games/contig-60/ai.ts": 19,
     "src/games/juggle/ai.ts": 18,
     "src/games/stars-bars/ai.ts": 18,
@@ -274,7 +271,6 @@
     "src/games/kings-quadraphages/game-state.ts": 6,
     "src/games/star-track/ai.ts": 6,
     "src/games/kings-quadraphages/board.ts": 5,
-    "src/games/prime-gold/board-ui.ts": 5,
     "src/games/contig-60/rules.ts": 4,
     "src/games/frac-fact/ai.ts": 4,
     "src/games/remainder-islands/ai.ts": 4,
@@ -2433,56 +2429,6 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/prime-gold/board-ui.ts",
-      "line": 506,
-      "col": 30,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "prime-gold",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; validPlacement: boolean; extras: string[] | undefined; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/prime-gold/board-ui.ts",
-      "line": 717,
-      "col": 40,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "prime-gold",
-      "message": "'move' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/board-ui.ts",
-      "line": 720,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "prime-gold",
-      "message": "'move' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/board-ui.ts",
-      "line": 720,
-      "col": 49,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "prime-gold",
-      "message": "'move' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/board-ui.ts",
-      "line": 720,
-      "col": 78,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "prime-gold",
-      "message": "'move' is possibly 'undefined'."
-    },
-    {
       "file": "src/games/prime-gold/rules.ts",
       "line": 42,
       "col": 5,
@@ -2581,656 +2527,6 @@
       "kind": "rules_engine",
       "game": "prime-gold",
       "message": "'val' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 127,
-      "col": 15,
-      "code": "TS2339",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "Property 'v' does not exist on type '{ v: number; s: string; } | undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 127,
-      "col": 21,
-      "code": "TS2339",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "Property 's' does not exist on type '{ v: number; s: string; } | undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 128,
-      "col": 15,
-      "code": "TS2339",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "Property 'v' does not exist on type '{ v: number; s: string; } | undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 128,
-      "col": 21,
-      "code": "TS2339",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "Property 's' does not exist on type '{ v: number; s: string; } | undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 49,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 55,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 154,
-      "col": 61,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 49,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 55,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 155,
-      "col": 61,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 50,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 56,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 156,
-      "col": 63,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 50,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 56,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 157,
-      "col": 63,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 49,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 55,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 158,
-      "col": 61,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 23,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 42,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 49,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 55,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 159,
-      "col": 61,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 160,
-      "col": 13,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 160,
-      "col": 27,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 160,
-      "col": 33,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 160,
-      "col": 40,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 25,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 34,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 44,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 52,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 58,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 161,
-      "col": 65,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 163,
-      "col": 13,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 163,
-      "col": 26,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 163,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 25,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 34,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 44,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 51,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 57,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 164,
-      "col": 63,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 25,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 34,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 44,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 52,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'a' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 58,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'b' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/types.ts",
-      "line": 165,
-      "col": 65,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "prime-gold",
-      "message": "'c' is possibly 'undefined'."
     },
     {
       "file": "src/games/queens-guards/ai-client.ts",

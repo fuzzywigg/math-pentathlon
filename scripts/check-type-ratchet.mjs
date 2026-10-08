@@ -51,6 +51,8 @@ const IN_SCOPE = new RegExp(
     '^src/games/contig-60/(board-ui|types)\\.ts$',
     '^src/games/kings-quadraphages/(board-ui|board-renderer)\\.ts$',
     '^src/games/stars-bars/board-ui\\.ts$',
+    // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
+    '^src/games/prime-gold/(types|board-ui)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -102,7 +104,7 @@ console.log(
   `  flags: noUncheckedIndexedAccess, exactOptionalPropertyTypes, noImplicitOverride, forceConsistentCasingInFileNames, noImplicitReturns`
 );
 console.log(
-  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3 shells, tests/helpers, unit *-helpers.ts`
+  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3/4 shells, tests/helpers, unit *-helpers.ts`
 );
 console.log(`  in-scope errors:     ${inScope.length} (must be 0)`);
 console.log(

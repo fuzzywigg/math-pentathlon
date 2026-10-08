@@ -41,7 +41,7 @@ jobs:
         run: npm run format:check
       - name: TypeScript type checking
         run: npm run typecheck
-      - name: TypeScript type ratchet (ui/core/demos/Batch-1/2/3 shells + Phase-2 ceiling)
+      - name: TypeScript type ratchet (ui/core/demos/Batch-1/2/3/4 shells + Phase-2 ceiling)
         run: npm run typecheck:ratchet
       - name: Module-boundary import-graph ceilings (engine_imports_ui must stay 0)
         run: npm run check:boundaries
