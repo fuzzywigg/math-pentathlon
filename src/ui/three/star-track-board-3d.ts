@@ -46,10 +46,10 @@ const PIECE_H = 0.36;
 const BOARD_Y = 0;
 
 export interface StarTrackBoard3DCallbacks {
-  onDrawChains?: DrawChainsCallback;
-  onSelectChain?: SelectChainCallback;
+  onDrawChains?: DrawChainsCallback | undefined;
+  onSelectChain?: SelectChainCallback | undefined;
   /** Winner-banner labels (You/AI vs Blue/Red). */
-  gameMode?: StarTrackGameMode;
+  gameMode?: StarTrackGameMode | undefined;
 }
 
 export interface StarTrackBoard3D {

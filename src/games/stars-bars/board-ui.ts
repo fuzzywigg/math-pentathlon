@@ -449,7 +449,8 @@ export function renderBoard(
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
-      const cell = state.cells[row][col];
+      // CONFIG.BOARD_SIZE rows/cols are always allocated; `!` is NUI-only.
+      const cell = state.cells[row]![col]!;
       const cellEl = document.createElement('div');
       cellEl.className = 'stars-cell';
       cellEl.dataset.row = String(row);
@@ -524,7 +525,8 @@ function calculatePreviewScore(
   row: number,
   col: number
 ): number {
-  const cell = state.cells[row][col];
+  // ratchet: caller passes in-bounds row/col on dense BOARD_SIZE grid.
+  const cell = state.cells[row]![col]!;
   let score = 0;
 
   const directions = [
@@ -536,7 +538,7 @@ function calculatePreviewScore(
     [1, -1],
     [1, 0],
     [1, 1],
-  ];
+  ] as const;
 
   for (const [dr, dc] of directions) {
     const adjRow = row + dr;
@@ -548,7 +550,7 @@ function calculatePreviewScore(
       adjCol >= 0 &&
       adjCol < CONFIG.BOARD_SIZE
     ) {
-      const adjCell = state.cells[adjRow][adjCol];
+      const adjCell = state.cells[adjRow]![adjCol]!;
       if (adjCell.card) {
         score += countDifferences(card, adjCell.card);
       }
@@ -677,7 +679,8 @@ export function renderMoveHistory(state: StarsState): HTMLElement {
   container.appendChild(title);
 
   for (let i = state.moveHistory.length - 1; i >= 0; i--) {
-    const move = state.moveHistory[i];
+    // ratchet: i walks existing indices of moveHistory.
+    const move = state.moveHistory[i]!;
     const moveEl = document.createElement('div');
     moveEl.className = `stars-move-item ${move.player}`;
 
