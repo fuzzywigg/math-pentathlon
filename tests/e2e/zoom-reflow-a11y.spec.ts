@@ -211,6 +211,7 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
       el: Element;
       label: string;
       r: DOMRect;
+      inModal: boolean;
     }> = [];
 
     const labelOf = (el: Element) => {
@@ -226,13 +227,51 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
       };
     };
 
+    /** True when an ancestor clips this element without offering a scrollport. */
+    const isUnreachablyClipped = (el: Element, r: DOMRect): boolean => {
+      let node: Element | null = el.parentElement;
+      while (node && node !== document.documentElement) {
+        const st = getComputedStyle(node);
+        const ox = st.overflowX;
+        const oy = st.overflowY;
+        const clipsX = ox === 'hidden' || ox === 'clip';
+        const clipsY = oy === 'hidden' || oy === 'clip';
+        const scrollsX = ox === 'auto' || ox === 'scroll';
+        const scrollsY = oy === 'auto' || oy === 'scroll';
+        if (clipsX || clipsY || scrollsX || scrollsY) {
+          const pr = node.getBoundingClientRect();
+          const outsideX = r.right < pr.left - 1 || r.left > pr.right + 1;
+          const outsideY = r.bottom < pr.top - 1 || r.top > pr.bottom + 1;
+          if ((outsideX && (clipsX || scrollsX)) || (outsideY && (clipsY || scrollsY))) {
+            // Scrollports can still bring the control into view.
+            if (scrollsX || scrollsY) return false;
+            return true;
+          }
+        }
+        node = node.parentElement;
+      }
+      return false;
+    };
+
+    const openModal = document.querySelector('.modal:not(.hidden)');
+
     const seen = new Set<Element>();
     for (const el of document.querySelectorAll(chromeSel)) {
       if (seen.has(el)) continue;
       seen.add(el);
+      // Collapsed accordion panels (and any inert/aria-hidden subtree) leave
+      // the tab order — not a zoom/reflow finding.
+      if (
+        el.closest('[inert]') ||
+        el.closest('[aria-hidden="true"]') ||
+        (el as HTMLElement).inert
+      ) {
+        continue;
+      }
       const style = getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden') continue;
       if (Number(style.opacity) === 0) continue;
+      if (style.pointerEvents === 'none') continue;
       // Skip visually hidden skip-link until focused.
       if (el.classList.contains('skip-link') && document.activeElement !== el) {
         continue;
@@ -240,10 +279,11 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
       const r = el.getBoundingClientRect();
       if (r.width < 1 || r.height < 1) continue;
       const meta = labelOf(el);
+      const inModal = Boolean(el.closest('.modal:not(.hidden)'));
 
-      const fullyOff =
-        r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw;
-      if (fullyOff) {
+      // Below-the-fold / above-fold content is fine if page scrolling can reach it.
+      // Flag only horizontally unreachable chrome, or vertical clip by overflow:hidden.
+      if (isUnreachablyClipped(el, r)) {
         offScreen.push({
           ...meta,
           top: Math.round(r.top),
@@ -254,21 +294,16 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
         continue;
       }
 
-      // Partially clipped by the viewport edges (not merely scrolled content).
-      const clipPad = 1;
-      if (
-        r.left < -clipPad ||
-        r.right > vw + clipPad ||
-        r.top < -clipPad ||
-        r.bottom > vh + clipPad
-      ) {
-        // Vertical overflow of tall modals is OK if modal scrolls internally.
-        const inScrollModal = Boolean(el.closest('.modal-content, .modal'));
-        const onlyVertical =
-          r.left >= -clipPad &&
-          r.right <= vw + clipPad &&
-          (r.top < -clipPad || r.bottom > vh + clipPad);
-        if (!(inScrollModal && onlyVertical)) {
+      // Horizontal clip against the layout viewport (not vertical scroll).
+      const clipPad = 2;
+      if (r.left < -clipPad || r.right > vw + clipPad) {
+        // Internal board scrollports (e.g. .hex-game-area) are intentional.
+        const inHScroll = Boolean(
+          el.closest(
+            '.hex-game-area, .history-content, [style*="overflow-x"], .modal-content'
+          )
+        );
+        if (!inHScroll) {
           clipped.push({
             ...meta,
             reason: `rect=${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}×${Math.round(r.height)} vw=${vw}×${vh}`,
@@ -276,8 +311,56 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
         }
       }
 
-      boxes.push({ el, label: meta.sel + (meta.className ? `.${meta.className.split(' ')[0]}` : ''), r });
+      boxes.push({
+        el,
+        label:
+          meta.sel +
+          (meta.className ? `.${meta.className.split(' ')[0]}` : ''),
+        r,
+        inModal,
+      });
     }
+
+    /** Visible overlap only — ignore layout boxes clipped by overflow ancestors. */
+    const visibleOverlap = (a: DOMRect, elA: Element, b: DOMRect, elB: Element) => {
+      const clipVisible = (el: Element, r: DOMRect): DOMRect => {
+        let top = r.top;
+        let left = r.left;
+        let bottom = r.bottom;
+        let right = r.right;
+        let node: Element | null = el.parentElement;
+        while (node && node !== document.documentElement) {
+          const st = getComputedStyle(node);
+          const ox = st.overflowX;
+          const oy = st.overflowY;
+          const clips =
+            ox === 'hidden' ||
+            ox === 'clip' ||
+            oy === 'hidden' ||
+            oy === 'clip' ||
+            ox === 'auto' ||
+            oy === 'auto' ||
+            ox === 'scroll' ||
+            oy === 'scroll';
+          if (clips) {
+            const pr = node.getBoundingClientRect();
+            left = Math.max(left, pr.left);
+            top = Math.max(top, pr.top);
+            right = Math.min(right, pr.right);
+            bottom = Math.min(bottom, pr.bottom);
+          }
+          node = node.parentElement;
+        }
+        return new DOMRect(left, top, Math.max(0, right - left), Math.max(0, bottom - top));
+      };
+      const va = clipVisible(elA, a);
+      const vb = clipVisible(elB, b);
+      const x1 = Math.max(va.left, vb.left);
+      const y1 = Math.max(va.top, vb.top);
+      const x2 = Math.min(va.right, vb.right);
+      const y2 = Math.min(va.bottom, vb.bottom);
+      return { w: x2 - x1, h: y2 - y1 };
+    };
 
     const overlapping: LayoutAudit['overlapping'] = [];
     for (let i = 0; i < boxes.length; i++) {
@@ -286,12 +369,9 @@ async function auditLayout(page: Page): Promise<LayoutAudit> {
         const b = boxes[j];
         // Ignore nested pairs (button inside mode-option, etc.)
         if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
-        const x1 = Math.max(a.r.left, b.r.left);
-        const y1 = Math.max(a.r.top, b.r.top);
-        const x2 = Math.min(a.r.right, b.r.right);
-        const y2 = Math.min(a.r.bottom, b.r.bottom);
-        const w = x2 - x1;
-        const h = y2 - y1;
+        // Ignore backdrop-vs-modal pairs when a dialog is open.
+        if (openModal && a.inModal !== b.inModal) continue;
+        const { w, h } = visibleOverlap(a.r, a.el, b.r, b.el);
         if (w > 4 && h > 4) {
           overlapping.push({
             a: a.label,

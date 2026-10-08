@@ -22,6 +22,7 @@ npm run test:e2e:chromium        # required CI e2e path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
 npm run test:e2e:mobile          # phone + tablet touch smoke (report-only)
+npm run test:e2e:zoom-reflow     # WCAG 1.4.4/1.4.10 zoom+reflow (report-only)
 npm run test:e2e:ui              # Playwright UI mode
 npm run test:visual              # opt-in 2D suite (playwright.visual.config.ts; not CI)
 npm run test:visual:update       # refresh separate-config baselines
@@ -44,6 +45,7 @@ npm run audit:memory             # heap / detach probe across game mounts
 
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 Mobile touch notes: [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md).
+Zoom / reflow (WCAG 1.4.4 / 1.4.10): [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md).
 Bundle budgets: [`docs/bundle-budget.md`](../bundle-budget.md). Perf: [`docs/perf-2026-10-07.md`](../perf-2026-10-07.md).
 
 Opt-in visual regression via separate config (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
@@ -90,7 +92,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `zoom-reflow`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
@@ -125,6 +127,7 @@ Stack of checks builders should know. Required CI paths stay green on Chromium u
 | Unit | Vitest + jsdom | Pure rules/state, shell helpers | `npm run test:unit` |
 | E2E smoke / play | Playwright Chromium | Menu, game mounts, playability | `npm run test:e2e:chromium` |
 | Mobile touch | Playwright Chromium device profiles | Phone + tablet touch smoke (report-only CI) | `npm run test:e2e:mobile` — [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md) |
+| Zoom / reflow | Playwright Chromium | WCAG 1.4.4 / 1.4.10 zoom + 320 CSS px reflow (report-only CI) | `npm run test:e2e:zoom-reflow` — [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md) |
 | Cross-browser | Playwright Firefox / WebKit / iPad | Full suite or smoke (report-only CI for firefox+webkit) | `npm run test:e2e:cross` — [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md) |
 | **Axe a11y sweep** | `@axe-core/playwright` | Menu, progress, Help, every available New Game modal — serious/critical only | `tests/e2e/a11y-sweep.spec.ts`. Run: `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
 | **Visual (opt-in config)** | Playwright screenshots | Landing + each available game 2D start/board (seeded, motion off) | `npm run test:visual` / `test:visual:update` (`tests/visual/`, **not** CI) — [`docs/visual-regression.md`](../visual-regression.md) |

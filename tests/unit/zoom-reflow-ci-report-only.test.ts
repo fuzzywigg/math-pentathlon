@@ -21,7 +21,8 @@ describe('zoom-reflow CI report-only', () => {
 
     expect(pkg.scripts['test:e2e:zoom-reflow']).toMatch(/zoom-reflow/);
     expect(pw).toMatch(/name:\s*'zoom-reflow'/);
-    expect(pw).toMatch(/zoom-reflow-a11y\.spec\.ts/);
+    // Source writes the RegExp as /zoom-reflow-a11y\.spec\.ts/ (escaped dots).
+    expect(pw).toMatch(/zoom-reflow-a11y\\.spec\\.ts/);
     expect(pw).toMatch(/nonDefaultSpecs/);
     expect(ci).toMatch(/zoom-reflow:/);
     expect(ci).toContain('npm run test:e2e:zoom-reflow');
