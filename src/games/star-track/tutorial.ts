@@ -1,7 +1,7 @@
 // Tutorial content for Star Track
 // Division I (Grades K-1) - Simple language for young learners
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const starTrackTutorial: TutorialConfig = {
   id: 'star-track-basics',

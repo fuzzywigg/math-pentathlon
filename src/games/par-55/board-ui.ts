@@ -1,16 +1,19 @@
 // Par 55 Board UI
 // Rendering pentagon bases, attribute blocks, and game state
 
-import {
+import { injectStylesOnce } from '../../ui/inject-styles';
+import type {
   Par55State,
   Base,
   AttributeBlock,
   Player,
-  CONFIG,
   BlockColor,
 } from './types';
+import { CONFIG } from './types';
 import { getValidPlacements, calculateScore } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -21,10 +24,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 const BLOCK_COLORS: Record<BlockColor, string> = {
   red: '#e53935',
@@ -32,8 +33,8 @@ const BLOCK_COLORS: Record<BlockColor, string> = {
   yellow: '#fdd835',
 };
 
-// Dimensions
-const BASE_SIZE = 50; // Size of each pentagon base
+// Dimensions — bases sized so the pentagon bbox stays ≥44×44 (WCAG 2.5.5).
+const BASE_SIZE = 54; // Size of each pentagon base
 const BLOCK_SIZE = 36; // Size of block shape
 
 export interface Par55BoardRenderOptions {
@@ -163,8 +164,20 @@ function renderBase(
     }
   }
 
-  // Click handler
+  // Invisible 44px hit target under the visual pentagon (coarse / tablet taps).
   if (isValid) {
+    const hit = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'circle'
+    );
+    hit.setAttribute('cx', String(pos.x));
+    hit.setAttribute('cy', String(pos.y));
+    hit.setAttribute('r', '22');
+    hit.setAttribute('fill', 'transparent');
+    hit.setAttribute('pointer-events', 'all');
+    hit.classList.add('par55-base-hit');
+    group.appendChild(hit);
+
     const activate = () => onClick(base.id);
     group.addEventListener('click', activate);
     bindCellActivateKeys(group, activate);
@@ -179,10 +192,10 @@ function renderBase(
     buildCellAriaLabel({
       coord: `${base.row},${base.col}`,
       empty: !base.block,
-      owner,
-      piece,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(piece !== undefined ? { piece } : {}),
       validPlacement: isValid,
-      extras: isLastMove ? ['last move'] : undefined,
+      ...(isLastMove ? { extras: ['last move'] } : {}),
     })
   );
 
@@ -312,7 +325,7 @@ function renderBlock(
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(size / 2 + 4));
     ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', playerColors()[placedBy]);
+    ring.setAttribute('stroke', getPlayerSeatColors()[placedBy]);
     ring.setAttribute('stroke-width', '2');
     ring.setAttribute('opacity', '0.6');
     group.appendChild(ring);
@@ -415,7 +428,12 @@ function renderHandBlock(
   // Label
   const label = document.createElement('div');
   label.className = 'par55-block-label';
-  label.textContent = `${block.size[0].toUpperCase()}/${block.thickness[0].toUpperCase()}`;
+  const sizeLetter = block.size[0];
+  const thickLetter = block.thickness[0];
+  label.textContent =
+    sizeLetter !== undefined && thickLetter !== undefined
+      ? `${sizeLetter.toUpperCase()}/${thickLetter.toUpperCase()}`
+      : `${block.size}/${block.thickness}`;
   wrapper.appendChild(label);
 
   return wrapper;
@@ -430,7 +448,10 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p1Score = document.createElement('div');
   p1Score.className = 'par55-score player1';
-  p1Score.innerHTML = `<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}</span>`;
+  replaceWithSafeHtml(
+    p1Score,
+    safeHtml`<span class="label">${seatIcon('player1')} Blue:</span> <span class="value">${state.scores.player1}</span>`
+  );
 
   const target = document.createElement('div');
   target.className = 'par55-target';
@@ -438,7 +459,10 @@ export function renderScores(state: Par55State): HTMLElement {
 
   const p2Score = document.createElement('div');
   p2Score.className = 'par55-score player2';
-  p2Score.innerHTML = `<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}</span>`;
+  replaceWithSafeHtml(
+    p2Score,
+    safeHtml`<span class="label">${seatIcon('player2')} Red:</span> <span class="value">${state.scores.player2}</span>`
+  );
 
   container.appendChild(p1Score);
   container.appendChild(target);
@@ -471,7 +495,10 @@ export function renderMoveHistory(state: Par55State): HTMLElement {
     const b = move.block;
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
     const attrs = `${b.color} ${b.shape}`;
-    moveEl.innerHTML = `<strong>${move.moveNumber}.</strong> ${playerName}: ${attrs} (+${move.pointsScored})`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`<strong>${move.moveNumber}.</strong> ${playerName}: ${attrs} (+${move.pointsScored})`
+    );
 
     list.appendChild(moveEl);
   }
@@ -484,24 +511,34 @@ export function renderMoveHistory(state: Par55State): HTMLElement {
  * Inject CSS styles
  */
 export function injectPar55Styles(): void {
-  const existingStyle = document.getElementById('par55-styles');
-  if (existingStyle) return;
+  injectStylesOnce(
+    'par55-styles',
+    `
+    /* Shell #app is max-width 700px with overflow-x clip — widen when Par 55
+       is mounted so the side-hand layout stays hittable on desktop. */
+    #app:has(.par55-board),
+    #app:has(.par55-game-area) {
+      max-width: min(1100px, 100%);
+      overflow-x: visible;
+    }
 
-  const style = document.createElement('style');
-  style.id = 'par55-styles';
-  style.textContent = `
     .par55-game-area {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 1rem;
       padding: 1rem;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .par55-main-layout {
       display: flex;
-      gap: 2rem;
+      gap: 1.25rem;
       align-items: flex-start;
+      justify-content: center;
+      max-width: 100%;
     }
 
     .par55-board {
@@ -509,10 +546,14 @@ export function injectPar55Styles(): void {
       padding: 1rem;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
     .par55-svg {
       display: block;
+      max-width: 100%;
+      height: auto;
     }
 
     .par55-valid-base {
@@ -552,6 +593,8 @@ export function injectPar55Styles(): void {
       padding: 4px;
       border-radius: 8px;
       transition: all 0.15s;
+      min-width: 44px;
+      min-height: 44px;
     }
 
     .par55-hand-block.clickable {
@@ -589,11 +632,11 @@ export function injectPar55Styles(): void {
     }
 
     .par55-score.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .par55-score.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-on-dark, #f87171);
     }
 
     .par55-score .value {
@@ -601,7 +644,7 @@ export function injectPar55Styles(): void {
     }
 
     .par55-target {
-      color: #999;
+      color: #cbd5e1;
       font-size: 0.9rem;
     }
 
@@ -613,11 +656,22 @@ export function injectPar55Styles(): void {
     }
 
     .par55-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .par55-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
+    }
+
+    .par55-status.status-ai-thinking {
+      opacity: 0.92;
+    }
+
+    .par55-turn-hint {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #555;
+      margin-top: -0.5rem;
     }
 
     .par55-winner-banner {
@@ -636,6 +690,22 @@ export function injectPar55Styles(): void {
       to { box-shadow: 0 0 20px rgba(255,215,0,0.8); }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+      .par55-winner-banner {
+        animation: none;
+      }
+      .par55-hand-block.clickable:hover {
+        transform: none;
+      }
+      .par55-btn-primary:hover {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .par55-winner-banner {
+      animation: none;
+    }
+
     .par55-controls {
       display: flex;
       gap: 1rem;
@@ -644,6 +714,8 @@ export function injectPar55Styles(): void {
 
     .par55-btn {
       padding: 0.75rem 1.5rem;
+      min-height: 44px;
+      min-width: 44px;
       border: none;
       border-radius: 6px;
       font-weight: bold;
@@ -710,32 +782,64 @@ export function injectPar55Styles(): void {
     }
 
     .par55-hand-label.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .par55-hand-label.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     @media (max-width: 768px) {
+      /* Keep fold-wave2 phone smoke: no document horizontal scroll.
+         Desktop still uses the widen/visible rule above. */
+      #app:has(.par55-board),
+      #app:has(.par55-game-area) {
+        max-width: 100%;
+        overflow-x: clip;
+      }
+
       .par55-main-layout {
         flex-direction: column;
         align-items: center;
+        width: 100%;
       }
 
       .par55-hand {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      .par55-scores {
+        max-width: 100%;
+        box-sizing: border-box;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.75rem 1rem;
       }
     }
-  `;
-  document.head.appendChild(style);
+
+    /* Coarse pointers (tablets / touch laptops): keep 44px tap floors */
+    @media (pointer: coarse), (hover: none) {
+      .par55-hand-block {
+        min-width: 48px;
+        min-height: 48px;
+        padding: 6px;
+      }
+
+      .par55-btn {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.85rem 1.5rem;
+      }
+    }
+  `
+  );
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

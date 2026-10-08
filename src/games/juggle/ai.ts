@@ -13,16 +13,15 @@
 // 4. Consider which shapes can fill corners and edges
 // 5. Plan ahead - don't leave spaces that no shape can fill!
 
+import type { JuggleState, Player, ShapeCategory } from './types';
+import { getCategoryFromDie, getShapesForDie } from './types';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
 import {
-  JuggleState,
-  Player,
-  ShapeCategory,
-  getCategoryFromDie,
-  getShapesForDie,
-} from './types';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
-import {
-  Board,
   findValidPlacements,
   countEmptyCells,
 } from '../../core/polyomino/placement';

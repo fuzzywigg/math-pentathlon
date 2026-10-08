@@ -5,6 +5,10 @@
 export type BootstrapOwlOptions = {
   schedule?: (cb: () => void) => void;
   enabled?: boolean;
+  /** Injected for tests. */
+  importOwl?: () => Promise<typeof import('../core/owl')>;
+  /** Injected for tests. */
+  importOwlUi?: () => Promise<typeof import('../ui/owl')>;
 };
 
 function defaultSchedule(cb: () => void): void {
@@ -29,18 +33,27 @@ export function bootstrapOwl(options: BootstrapOwlOptions = {}): void {
   const enabled =
     options.enabled ??
     (typeof window !== 'undefined' && typeof document !== 'undefined');
-  if (!enabled) return;
+  if (!enabled) {
+    return;
+  }
 
   const schedule = options.schedule ?? defaultSchedule;
+  const importOwl = options.importOwl ?? (() => import('../core/owl'));
+  const importOwlUi = options.importOwlUi ?? (() => import('../ui/owl'));
 
   schedule(() => {
     void (async () => {
-      const [{ owlSystem }, { owlComponent }] = await Promise.all([
-        import('../core/owl'),
-        import('../ui/owl'),
-      ]);
-      owlComponent.init();
-      owlSystem.initialize();
+      try {
+        const [{ owlSystem }, { owlComponent }] = await Promise.all([
+          importOwl(),
+          importOwlUi(),
+        ]);
+        owlComponent.init();
+        owlSystem.initialize();
+      } catch (err) {
+        // Best-effort mascot — menu/games must still load if owl chunks fail.
+        console.error('[bootstrap-owl] init failed', err);
+      }
     })();
   });
 }

@@ -4,8 +4,13 @@
  * Provides save/load functionality for Kings & Quadraphages game state.
  */
 
-import { GameState, Board, TurnPhase, MoveHistoryEntry } from './game-state';
-import { PlayerOwner } from './pieces';
+import type {
+  GameState,
+  Board,
+  TurnPhase,
+  MoveHistoryEntry,
+} from './game-state';
+import type { PlayerOwner } from './pieces';
 
 const SAVE_VERSION = 1;
 const BOARD_SIZE = 9;
@@ -142,8 +147,9 @@ export function validateSerializedState(data: unknown): boolean {
   const obj = data as Record<string, unknown>;
 
   if (typeof obj['version'] !== 'number') return false;
-  if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner))
+  if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner)) {
     return false;
+  }
   if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) return false;
 
   if (

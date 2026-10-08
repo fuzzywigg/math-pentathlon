@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -23,12 +18,13 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 describe('Overnight demos — fraction op/compare edges', () => {
   it('mount auto-calculates default 3/4 + 1/2 with visual bar', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const result = root.querySelector('#arithmetic-result')?.textContent ?? '';
     expect(result.length).toBeGreaterThan(0);
@@ -36,7 +32,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('all four ops produce distinct final-result chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const a = root.querySelector('#fraction-a') as HTMLInputElement;
     const b = root.querySelector('#fraction-b') as HTMLInputElement;
@@ -60,7 +56,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('invalid arithmetic inputs show red format guidance', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('#fraction-a') as HTMLInputElement).value = 'not-a-frac';
     (root.querySelector('#fraction-b') as HTMLInputElement).value = '1/2';
@@ -71,7 +67,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('compare equals / less / greater paths', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const a = root.querySelector('#compare-a') as HTMLInputElement;
     const b = root.querySelector('#compare-b') as HTMLInputElement;
@@ -100,7 +96,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('invalid compare input shows red error', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('#compare-a') as HTMLInputElement).value = 'xx';
     (root.querySelector('#compare-btn') as HTMLButtonElement).click();
@@ -110,7 +106,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('equivalent finder lists simplified + /denom items', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     // initial find runs on mount for 1/2
     expect(
@@ -129,7 +125,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('invalid equiv input shows red error', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('#equiv-fraction') as HTMLInputElement).value = 'bad';
     (root.querySelector('#find-equiv-btn') as HTMLButtonElement).click();
@@ -139,7 +135,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('denominator select re-renders interactive bar value', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const select = root.querySelector(
       '#denominator-select'
@@ -160,7 +156,7 @@ describe('Overnight demos — fraction op/compare edges', () => {
   });
 
   it('gallery mounts common fractions with labels', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const items = root.querySelectorAll('#fraction-gallery .gallery-item');
     expect(items.length).toBeGreaterThan(0);

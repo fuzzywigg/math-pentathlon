@@ -1,18 +1,36 @@
 /**
  * Wave 57 leftover after #257 — FIAR movement-phase vsAI 500ms handoff. Tests-only.
  */
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fiarAiClient from '../../src/games/fiar/ai-client';
 import {
   initGame,
   newGameVsAI,
+  newGameVsHuman,
+  destroyGame,
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
 
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.clearAllTimers();
+});
+
 afterEach(() => {
+  try {
+    newGameVsHuman();
+  } catch {
+    // controller may not be mounted
+  }
+  destroyGame();
+  vi.clearAllTimers();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  const ai = fiarAiClient.getAIMoveAsync as unknown as {
+    mockRestore?: () => void;
+  };
+  ai.mockRestore?.();
+  vi.clearAllMocks();
   document.body.innerHTML = '';
   document.getElementById('fiar-styles')?.remove();
 });
@@ -43,7 +61,7 @@ function forgeMovement(): void {
 
 describe('Wave 57 fiar — movement AI timer 500', () => {
   it('after P1 move, AI move runs at 500ms via mocked getAIMoveAsync', async () => {
-    vi.useFakeTimers();
+    vi.spyOn(Math, 'random').mockReturnValue(0.1);
     vi.spyOn(fiarAiClient, 'getAIMoveAsync').mockResolvedValue({
       type: 'move',
       from: 'c2r5',
@@ -55,6 +73,7 @@ describe('Wave 57 fiar — movement AI timer 500', () => {
     document.body.append(board, status);
     initGame(board, status);
     newGameVsAI('easy');
+    vi.clearAllTimers();
     forgeMovement();
 
     board

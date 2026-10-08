@@ -1,12 +1,8 @@
 // Ramrod Game Rules
 // Place rods to complete sum boxes, capture with addend combinations
 
+import type { RamrodState, SumBox, Rod, RamrodMove, Player } from './types';
 import {
-  RamrodState,
-  SumBox,
-  Rod,
-  RamrodMove,
-  Player,
   CONFIG,
   createRodSet,
   shuffleArray,
@@ -36,7 +32,8 @@ function createBoard(): Map<string, SumBox> {
       const id = createBoxId(row, col);
       boxes.set(id, {
         id,
-        targetSum: targetSums[row][col],
+        // ratchet: targetSums is a full BOARD_ROWS × BOARD_COLS literal.
+        targetSum: targetSums[row]![col]!,
         row,
         col,
         rods: [null, null],
@@ -66,8 +63,9 @@ export function createInitialState(): RamrodState {
   const player2Rods: string[] = [];
 
   for (let i = 0; i < CONFIG.STARTING_RODS_PER_PLAYER; i++) {
-    const rod1 = allRods[i * 2];
-    const rod2 = allRods[i * 2 + 1];
+    // ratchet: createRodSet deals enough rods for STARTING_RODS_PER_PLAYER * 2.
+    const rod1 = allRods[i * 2]!;
+    const rod2 = allRods[i * 2 + 1]!;
 
     rod1.owner = 'player1';
     player1Rods.push(rod1.id);

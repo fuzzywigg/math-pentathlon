@@ -1,18 +1,15 @@
 // Kwatro-Sinko Game Rules
 // Movement along pathways, creating alignments of 4 or 5
 
-import {
+import type {
   KwaState,
   BoardNode,
   Chip,
   Alignment,
   KwaMove,
   Player,
-  PLAYER_CHIPS,
-  getOpponent,
-  createChip,
-  isWinningValue,
 } from './types';
+import { PLAYER_CHIPS, getOpponent, createChip, isWinningValue } from './types';
 
 // =============================================================================
 // Board Creation
@@ -348,8 +345,9 @@ export function findWinningAlignment(
   // Parse node position
   const match = nodeId.match(/n(\d+)-(\d+)/);
   if (!match) return null;
-  const row = parseInt(match[1]);
-  const col = parseInt(match[2]);
+  // ratchet: match groups exist after /n(\d+)-(\d+)/ truthy match.
+  const row = parseInt(match[1]!);
+  const col = parseInt(match[2]!);
 
   for (const [dir1, dir2] of directions) {
     // Collect chips in this line
@@ -359,9 +357,10 @@ export function findWinningAlignment(
     lineChips.push({ node, chip: node.chip });
 
     // Go in both directions
-    for (const [dr, dc] of [dir1, dir2]) {
-      let r = row + dr;
-      let c = col + dc;
+    // ratchet: each directions entry is a literal pair of [dr, dc] vectors.
+    for (const [dr, dc] of [dir1!, dir2!]) {
+      let r = row + dr!;
+      let c = col + dc!;
 
       while (r >= 0 && r < 5 && c >= 0 && c < 5) {
         const adjId = `n${r}-${c}`;
@@ -373,8 +372,8 @@ export function findWinningAlignment(
           break; // Stop at empty node
         }
 
-        r += dr;
-        c += dc;
+        r += dr!;
+        c += dc!;
       }
     }
 
@@ -400,7 +399,8 @@ function checkLineForWin(
   for (let i = 0; i < lineChips.length - 2; i++) {
     for (let j = i + 1; j < lineChips.length - 1; j++) {
       for (let k = j + 1; k < lineChips.length; k++) {
-        const trio = [lineChips[i], lineChips[j], lineChips[k]];
+        // ratchet: i < j < k < length — indexed trio members exist.
+        const trio = [lineChips[i]!, lineChips[j]!, lineChips[k]!];
         const alignment = checkTrioForWin(trio);
         if (alignment) return alignment;
       }
@@ -431,18 +431,20 @@ export function checkTrioForWin(
   let opposite: { node: BoardNode; chip: Chip } | null = null;
   for (const group of byOwner.values()) {
     if (group.length === 2) likes = group;
-    if (group.length === 1) opposite = group[0];
+    // ratchet: length === 1 guarantees group[0].
+    if (group.length === 1) opposite = group[0]!;
   }
   if (!likes || !opposite) return null;
 
+  // ratchet: likes length === 2 after the group scan above.
   const result =
-    likes[0].chip.value + likes[1].chip.value - opposite.chip.value;
+    likes[0]!.chip.value + likes[1]!.chip.value - opposite.chip.value;
   if (!isWinningValue(result)) return null;
 
   return {
     nodes: trio.map((c) => c.node.id),
     chips: trio.map((c) => c.chip),
-    expression: `${likes[0].chip.value} + ${likes[1].chip.value} - ${opposite.chip.value} = ${result}`,
+    expression: `${likes[0]!.chip.value} + ${likes[1]!.chip.value} - ${opposite.chip.value} = ${result}`,
     result,
   };
 }

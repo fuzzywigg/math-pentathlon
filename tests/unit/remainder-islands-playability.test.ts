@@ -10,6 +10,7 @@ import {
 } from '../../src/games/remainder-islands/game-controller';
 import { createInitialState } from '../../src/games/remainder-islands/types';
 import { renderBoard } from '../../src/games/remainder-islands/board-ui';
+import { mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -17,15 +18,6 @@ afterEach(() => {
   document.body.innerHTML = '';
   document.getElementById('remainder-islands-styles')?.remove();
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
 
 function click(el: Element | null): void {
   expect(el).toBeTruthy();
@@ -51,7 +43,7 @@ function mockRandomCycle(seed = 0.17): void {
 describe('Remainder Islands playability — hover must not swallow click (#373)', () => {
   it('mouseenter keeps the hit polygon in the DOM so click can claim the island', () => {
     mockRandomCycle();
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 
@@ -75,16 +67,26 @@ describe('Remainder Islands playability — hover must not swallow click (#373)'
     expect(getCurrentState().moveHistory[0]?.island.id).toBe(islandId);
   });
 
-  it('pointerdown on a valid hit area claims the island', () => {
+  it('primary pointer tap (down+up) on a valid hit area claims the island', () => {
     mockRandomCycle(0.41);
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 
     click(container.querySelector('.remainder-btn-roll'));
     const islandId = getCurrentState().validIslands[0];
     const hit = hitPolygon(container, islandId);
-    hit.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    const init: PointerEventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      clientX: 10,
+      clientY: 10,
+    };
+    hit.dispatchEvent(new PointerEvent('pointerdown', { ...init, buttons: 1 }));
+    hit.dispatchEvent(new PointerEvent('pointerup', { ...init, buttons: 0 }));
 
     expect(getCurrentState().phase).toBe('rolling');
     expect(getCurrentState().moveHistory[0]?.island.id).toBe(islandId);
@@ -96,7 +98,7 @@ describe('Remainder Islands playability — no human input on AI turn (#374)', (
     vi.useFakeTimers();
     mockRandomCycle();
 
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsAI('easy');
 

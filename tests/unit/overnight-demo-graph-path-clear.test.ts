@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -23,7 +18,8 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 const TEMPLATES = [
@@ -37,7 +33,7 @@ const TEMPLATES = [
 
 describe('Overnight demos — graph path/template matrix', () => {
   it('exhausts every template with single selected + nodes info', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
 
     for (const name of TEMPLATES) {
@@ -56,7 +52,7 @@ describe('Overnight demos — graph path/template matrix', () => {
   });
 
   it('pathfinding start→end→clear restores prompt', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const status = root.querySelector('#path-status') as HTMLElement;
     expect(status.textContent).toMatch(/Click a node/i);
@@ -81,7 +77,7 @@ describe('Overnight demos — graph path/template matrix', () => {
   });
 
   it('third node click resets start without leftover end path', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const nodes = Array.from(
       root.querySelectorAll('#pathfinding-graph .graph-node')
@@ -100,7 +96,7 @@ describe('Overnight demos — graph path/template matrix', () => {
   });
 
   it('player seat toggle + clear board resets analysis empty count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
 
     const p2 = root.querySelector(
@@ -128,7 +124,7 @@ describe('Overnight demos — graph path/template matrix', () => {
   });
 
   it('connectivity section mounts alongside game analysis chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     // #connectivity-info is a reserved mount point (currently empty shell);
     // game analysis card is the live territory chrome next to it.
@@ -140,7 +136,7 @@ describe('Overnight demos — graph path/template matrix', () => {
   });
 
   it('rapid template thrash leaves one svg and one selected btn', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     for (let i = 0; i < 18; i++) {
       const name = TEMPLATES[i % TEMPLATES.length];

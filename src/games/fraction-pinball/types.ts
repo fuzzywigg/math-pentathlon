@@ -1,7 +1,7 @@
 // Fraction Pinball Game Types
 // Fraction-decimal conversion game with pinball-style scoring
 
-import { Fraction } from '../../core/fractions/types';
+import type { Fraction } from '../../core/fractions/types';
 
 export type Player = 'player1' | 'player2';
 
@@ -107,9 +107,7 @@ export function createInitialState(): FractionPinballState {
 }
 
 // Get opponent
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player stats
 export function getPlayerStats(

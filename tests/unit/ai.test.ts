@@ -12,41 +12,7 @@ import {
   Position,
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
-
-// Helper to create an empty board
-function createEmptyBoard(): Board {
-  return Array.from({ length: BOARD_SIZE }, () =>
-    Array.from({ length: BOARD_SIZE }, () => null)
-  );
-}
-
-// Helper to create a game state with custom board
-function createCustomGameState(
-  board: Board,
-  player1Supply = 30,
-  player2Supply = 30
-): RulesGameState {
-  return {
-    board,
-    player1Supply,
-    player2Supply,
-  };
-}
-
-// Helper to place a piece on the board
-function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
-}
-
-// Helper to place a King
-function placeKing(board: Board, pos: Position, owner: 'player1' | 'player2'): void {
-  placePiece(board, pos, { type: 'king', owner });
-}
-
-// Helper to place a Quadraphage
-function placeQuadraphage(board: Board, pos: Position, owner: 'player1' | 'player2'): void {
-  placePiece(board, pos, { type: 'quadraphage', owner });
-}
+import { createEmptyBoard, placeKing, placeQuadraphage, createCustomGameState } from './helpers/kings-board';
 
 describe('AI', () => {
   describe('getBestMove', () => {

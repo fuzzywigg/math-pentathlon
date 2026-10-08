@@ -1,6 +1,26 @@
 // Dice UI - SVG rendering with animations
 
-import { DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
+import type { DiceType, DieRoll, RollResult } from './types';
+import { DICE_CONFIGS } from './types';
+import { getUserReducedMotionFlag } from '../settings-flags';
+
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
+
+/** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
+function dicePrefersReducedMotion(): boolean {
+  if (getUserReducedMotionFlag()) return true;
+  if (
+    typeof window === 'undefined' ||
+    typeof window.matchMedia !== 'function'
+  ) {
+    return false;
+  }
+  try {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
 
 /** Pip positions for d6 faces (normalized 0-1 coordinates) */
 const D6_PIP_POSITIONS: Record<number, [number, number][]> = {
@@ -264,7 +284,7 @@ export function renderRollResult(
     onDieClick,
   } = options;
 
-  container.innerHTML = '';
+  clearElement(container);
   container.className = 'dice-roll-result';
 
   const diceContainer = document.createElement('div');
@@ -284,12 +304,18 @@ export function renderRollResult(
   if (showTotal) {
     const totalEl = document.createElement('div');
     totalEl.className = 'dice-total';
-    totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${result.total}</span>`;
+    replaceWithSafeHtml(
+      totalEl,
+      safeHtml`<span class="total-label">Total:</span> <span class="total-value">${result.total}</span>`
+    );
     container.appendChild(totalEl);
   }
 }
 
-/** Animation: Roll dice with tumbling effect */
+/** Cancel handle returned by {@link animateRoll}. */
+export type AnimateRollCancel = () => void;
+
+/** Animation: Roll dice with tumbling effect (skipped / instant when reduced motion). */
 export function animateRoll(
   container: HTMLElement,
   finalResult: RollResult,
@@ -298,11 +324,62 @@ export function animateRoll(
     dieSize?: number;
     onComplete?: () => void;
   } = {}
-): void {
+): AnimateRollCancel {
   const { duration = 1000, dieSize = 60, onComplete } = options;
+  const reduceMotion = dicePrefersReducedMotion();
+  const motionDuration = reduceMotion ? 0 : duration;
 
-  container.innerHTML = '';
-  container.className = 'dice-roll-result rolling';
+  let cancelled = false;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  const clearTimer = (): void => {
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+  };
+
+  const cancel: AnimateRollCancel = () => {
+    cancelled = true;
+    clearTimer();
+  };
+
+  clearElement(container);
+  container.className = 'dice-roll-result';
+
+  const finish = (): void => {
+    if (cancelled) return;
+    clearTimer();
+    container.className = 'dice-roll-result';
+    clearElement(container);
+
+    const diceContainer = document.createElement('div');
+    diceContainer.className = 'dice-container';
+    for (const die of finalResult.rolls) {
+      const wrapper = document.createElement('div');
+      wrapper.className = reduceMotion ? 'die-wrapper' : 'die-wrapper settled';
+      wrapper.appendChild(renderDie(die, dieSize));
+      diceContainer.appendChild(wrapper);
+    }
+    container.appendChild(diceContainer);
+
+    const totalEl = document.createElement('div');
+    totalEl.className = 'dice-total';
+    replaceWithSafeHtml(
+      totalEl,
+      safeHtml`<span class="total-label">Total:</span> <span class="total-value">${finalResult.total}</span>`
+    );
+    container.appendChild(totalEl);
+
+    onComplete?.();
+  };
+
+  if (motionDuration <= 0) {
+    finish();
+    return cancel;
+  }
+
+  container.classList.add('rolling');
 
   const diceContainer = document.createElement('div');
   diceContainer.className = 'dice-container';
@@ -333,44 +410,30 @@ export function animateRoll(
   const interval = 50; // Update every 50ms
 
   const animate = () => {
+    if (cancelled) return;
     const elapsed = Date.now() - startTime;
 
-    if (elapsed < duration) {
+    if (elapsed < motionDuration) {
       // Update each die with random value
       dieElements.forEach((wrapper, index) => {
-        const die = finalResult.rolls[index];
-        const config = DICE_CONFIGS[die.diceType];
+        const die = finalResult.rolls[index]!;
+        const config = DICE_CONFIGS[die.diceType]!;
         const randomValue = Math.ceil(Math.random() * config.faces);
         const tempDie: DieRoll = { ...die, value: randomValue };
 
-        wrapper.innerHTML = '';
+        clearElement(wrapper);
         wrapper.appendChild(renderDie(tempDie, dieSize));
       });
 
-      setTimeout(animate, interval);
+      timerId = setTimeout(animate, interval);
     } else {
-      // Animation complete - show final values
-      container.classList.remove('rolling');
-      dieElements.forEach((wrapper, index) => {
-        wrapper.classList.remove('rolling');
-        wrapper.classList.add('settled');
-        wrapper.innerHTML = '';
-        wrapper.appendChild(renderDie(finalResult.rolls[index], dieSize));
-      });
-
-      // Add total
-      const totalEl = document.createElement('div');
-      totalEl.className = 'dice-total';
-      totalEl.innerHTML = `<span class="total-label">Total:</span> <span class="total-value">${finalResult.total}</span>`;
-      container.appendChild(totalEl);
-
-      if (onComplete) {
-        onComplete();
-      }
+      // Prefer shared finish() so reduced-motion + rolling cleanup stay consistent (#495).
+      finish();
     }
   };
 
   animate();
+  return cancel;
 }
 
 /** Get CSS styles for dice UI */
@@ -428,6 +491,26 @@ export function getDiceStyles(): string {
       0% { transform: scale(1.2); }
       50% { transform: scale(0.95); }
       100% { transform: scale(1); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .die-wrapper.rolling,
+      .die-wrapper.settled {
+        animation: none !important;
+      }
+      .die-wrapper:hover,
+      .die-wrapper.selected {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .die-wrapper.rolling,
+    html[data-reduced-motion='true'] .die-wrapper.settled {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .die-wrapper:hover,
+    html[data-reduced-motion='true'] .die-wrapper.selected {
+      transform: none;
     }
 
     .dice-total {

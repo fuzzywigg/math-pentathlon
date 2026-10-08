@@ -7,6 +7,7 @@
  * - render-on-demand (no continuous RAF)
  * - size to available width/height
  * - throws when WebGL is unavailable so the controller can keep 2D
+ * - webglcontextlost → tear down + `mp3d-context-lost` for 2D fallback
  * - hidden a11y grid mirrors state and drives the same click path
  *
  * Original procedural number textures only — no kit photos.
@@ -19,13 +20,18 @@ import {
   getPrimeVeinSegments,
 } from '../../games/prime-gold/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type PrimeGoldCellClickCallback = (value: number, expr: string) => void;
 
@@ -205,9 +211,7 @@ export async function createPrimeGoldBoard3D(
     );
   }
 
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'prime-gold');
@@ -302,17 +306,18 @@ export async function createPrimeGoldBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 420, 120);
     const h = Math.max(container.clientHeight || 420, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
@@ -465,8 +470,9 @@ export async function createPrimeGoldBoard3D(
       else if (focusedValue === cell.value) tileMat = mats.tileFocus;
       else if (veinOwner === 'player1') tileMat = mats.tileVein1;
       else if (veinOwner === 'player2') tileMat = mats.tileVein2;
-      else if (last && last.row === cm.row && last.col === cm.col)
+      else if (last && last.row === cm.row && last.col === cm.col) {
         tileMat = mats.tileLast;
+      }
 
       cm.tile.material = tileMat;
     }
@@ -535,9 +541,10 @@ export async function createPrimeGoldBoard3D(
     if (!clickHandler || disposed || !lastState) return;
     if (lastState.phase !== 'placing') return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     const validMap = new Map(
@@ -562,19 +569,19 @@ export async function createPrimeGoldBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    // Signal failure to callers by disposing; controller falls back on next ensure.
-    if (!disposed) {
-      unmount();
-    }
+    if (disposed) return;
+    unmount();
+    container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost, false);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const cellToClientPoint = (
     row: number,
@@ -617,13 +624,15 @@ export async function createPrimeGoldBoard3D(
     paint();
   };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dPrimeGold) {
       delete window.__mp3dPrimeGold;
     }
@@ -654,6 +663,7 @@ export async function createPrimeGoldBoard3D(
   };
 
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, valueToClientPoint, canvas };
 }

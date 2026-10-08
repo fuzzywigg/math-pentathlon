@@ -32,6 +32,8 @@ function getClient(): AiWorkerClient<HexPosition> {
 
 /**
  * Async Hex AI move via Web Worker (sync fallback if Worker unavailable).
+ * A client-side watchdog races the play budget so a stuck worker cannot
+ * soft-lock the AI seat (playtest 2026-10-07 desktop Hard hang).
  */
 export async function getBestMoveAsync(
   state: HexGameState,
@@ -40,17 +42,60 @@ export async function getBestMoveAsync(
   options: AISearchOptions = {}
 ): Promise<HexPosition | null> {
   const cloned = structuredClone(state);
-  return getClient().request({
-    game: 'hex',
-    state: cloned,
-    player: aiPlayer,
-    difficulty,
-    seed: options.seed,
-    deadlineMs: Math.min(
-      options.deadlineMs ?? AI_PLAY_DEADLINE_MS[difficulty],
-      AI_WORKER_SAFETY_DEADLINE_MS
-    ),
+  const deadlineMs = Math.min(
+    options.deadlineMs ?? AI_PLAY_DEADLINE_MS[difficulty],
+    AI_WORKER_SAFETY_DEADLINE_MS
+  );
+  // Slack above the search budget for postMessage / main-thread scheduling.
+  const watchdogMs = deadlineMs + 1500;
+  const c = getClient();
+
+  let finished = false;
+  let watchdogId: ReturnType<typeof setTimeout> | null = null;
+  const requestPromise = c
+    .request({
+      game: 'hex',
+      state: cloned,
+      player: aiPlayer,
+      difficulty,
+      seed: options.seed,
+      deadlineMs,
+    })
+    .then((move) => {
+      finished = true;
+      return move;
+    });
+
+  const watchdogPromise = new Promise<HexPosition | null>((resolve) => {
+    watchdogId = setTimeout(() => {
+      watchdogId = null;
+      if (finished) {
+        resolve(null);
+        return;
+      }
+      // Drop the stuck worker so the next turn gets a fresh thread.
+      cancelHexAiRequests();
+      disposeHexAiWorker();
+      resolve(null);
+    }, watchdogMs);
   });
+
+  try {
+    const raced = await Promise.race([requestPromise, watchdogPromise]);
+    if (raced !== null) return raced;
+    // Watchdog (or cancel) — sync fallback on the main thread with the same budget.
+    return getBestMove(cloned, aiPlayer, difficulty, {
+      seed: options.seed,
+      deadlineMs,
+    });
+  } finally {
+    // Lifecycle only: clear the watchdog so winning requests do not leave
+    // a dangling timer holding closures until deadlineMs+1500.
+    if (watchdogId !== null) {
+      clearTimeout(watchdogId);
+      watchdogId = null;
+    }
+  }
 }
 
 export function cancelHexAiRequests(): void {

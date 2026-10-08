@@ -1,17 +1,13 @@
 /**
  * Play-budget anytime enumeration for Fab-a-Diffy Hard AI (tablet latency).
  */
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createInitialState } from '../../src/games/fab-a-diffy/rules';
 import {
   searchAIMove,
   applyAIMoveSteps,
   AI_PLAY_DEADLINE_MS,
 } from '../../src/games/fab-a-diffy/ai';
-
-afterEach(() => {
-  document.body.innerHTML = '';
-});
 
 describe('Fab-a-Diffy play-budget search', () => {
   it('exposes a Hard play budget of a few seconds', () => {

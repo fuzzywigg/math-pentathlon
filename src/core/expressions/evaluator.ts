@@ -1,7 +1,7 @@
 // Expression Evaluator
 // Parsing, tokenizing, and evaluating mathematical expressions
 
-import {
+import type {
   ExpressionToken,
   ExpressionNode,
   EvaluationResult,
@@ -28,7 +28,7 @@ export function tokenize(expression: string): ExpressionToken[] {
   let i = 0;
 
   while (i < expression.length) {
-    const char = expression[i];
+    const char = expression[i]!;
 
     // Skip whitespace
     if (/\s/.test(char)) {
@@ -42,8 +42,8 @@ export function tokenize(expression: string): ExpressionToken[] {
       (char === '.' && /[0-9]/.test(expression[i + 1] ?? ''))
     ) {
       let numStr = '';
-      while (i < expression.length && /[0-9.]/.test(expression[i])) {
-        numStr += expression[i];
+      while (i < expression.length && /[0-9.]/.test(expression[i]!)) {
+        numStr += expression[i]!;
         i++;
       }
       tokens.push({ type: 'number', value: parseFloat(numStr) });
@@ -92,8 +92,8 @@ export function tokenize(expression: string): ExpressionToken[] {
     // Variables (letters)
     if (/[a-zA-Z]/.test(char)) {
       let name = '';
-      while (i < expression.length && /[a-zA-Z0-9_]/.test(expression[i])) {
-        name += expression[i];
+      while (i < expression.length && /[a-zA-Z0-9_]/.test(expression[i]!)) {
+        name += expression[i]!;
         i++;
       }
       tokens.push({ type: 'variable', name });
@@ -122,7 +122,7 @@ export function parse(tokens: ExpressionToken[]): ExpressionNode {
   }
 
   function consume(): ExpressionToken {
-    return tokens[pos++];
+    return tokens[pos++]!;
   }
 
   function parseExpression(): ExpressionNode {
@@ -371,12 +371,15 @@ export function validateSlots(slots: ExpressionSlot[]): ExpressionValidation {
     const result = evaluate(exprStr);
 
     if (result.success) {
-      return {
+      const validation: ExpressionValidation = {
         isValid: true,
         canEvaluate: true,
-        result: result.value,
         errors: [],
       };
+      if (result.value !== undefined) {
+        validation.result = result.value;
+      }
+      return validation;
     } else {
       return {
         isValid: true,
@@ -405,7 +408,7 @@ function* permutations<T>(arr: T[]): Generator<T[]> {
   for (let i = 0; i < arr.length; i++) {
     const rest = [...arr.slice(0, i), ...arr.slice(i + 1)];
     for (const perm of permutations(rest)) {
-      yield [arr[i], ...perm];
+      yield [arr[i]!, ...perm];
     }
   }
 }
@@ -434,11 +437,11 @@ function* operatorCombinations(
  */
 function buildExpression(numbers: number[], operators: Operator[]): string {
   if (numbers.length === 0) return '';
-  if (numbers.length === 1) return numbers[0].toString();
+  if (numbers.length === 1) return numbers[0]!.toString();
 
-  let expr = numbers[0].toString();
+  let expr = numbers[0]!.toString();
   for (let i = 0; i < operators.length && i < numbers.length - 1; i++) {
-    expr += ` ${operators[i]} ${numbers[i + 1]}`;
+    expr += ` ${operators[i]!} ${numbers[i + 1]!}`;
   }
   return expr;
 }
@@ -447,8 +450,9 @@ function buildExpression(numbers: number[], operators: Operator[]): string {
  * Build expressions with parentheses for 4 numbers
  */
 function buildParenExpressions(nums: number[], ops: Operator[]): string[] {
-  if (nums.length !== 4 || ops.length !== 3)
+  if (nums.length !== 4 || ops.length !== 3) {
     return [buildExpression(nums, ops)];
+  }
 
   const [a, b, c, d] = nums;
   const [op1, op2, op3] = ops;
@@ -535,7 +539,11 @@ export function validateSolution(
   const result = evaluate(expression);
 
   if (!result.success) {
-    return { valid: false, error: result.error };
+    const out: { valid: boolean; error?: string } = { valid: false };
+    if (result.error !== undefined) {
+      out.error = result.error;
+    }
+    return out;
   }
 
   if (Math.abs((result.value ?? 0) - challenge.target) > 0.0001) {
@@ -587,8 +595,8 @@ export function parseEquation(equation: string): Equation | null {
   if (parts.length !== 2) return null;
 
   try {
-    const leftTokens = tokenize(parts[0].trim());
-    const rightTokens = tokenize(parts[1].trim());
+    const leftTokens = tokenize(parts[0]!.trim());
+    const rightTokens = tokenize(parts[1]!.trim());
 
     return {
       left: parse(leftTokens),

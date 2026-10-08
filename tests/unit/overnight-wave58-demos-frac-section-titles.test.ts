@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — frac section titles', () => {
   it('exposes Fraction System Demo h1 and catalog h2s', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     expect(root.querySelector('h1')?.textContent).toBe('Fraction System Demo');
     const h2 = [...root.querySelectorAll('h2')].map((el) => el.textContent ?? '');

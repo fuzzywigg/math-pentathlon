@@ -1,7 +1,7 @@
 /**
  * Human piece/board input must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/pent-em-in/types';
 import {
   selectPiece,
@@ -11,15 +11,10 @@ import {
   renderBoard,
   renderPieceSelector,
 } from '../../src/games/pent-em-in/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe("Pent'Em In AI-turn input guard", () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('pent-em-in-styles')?.remove();
-    document.getElementById('app')?.remove();
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['pent-em-in-styles'] });
   afterEach(async () => {
     vi.useRealTimers();
     const { destroyGame } =

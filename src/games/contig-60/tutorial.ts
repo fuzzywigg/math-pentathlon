@@ -1,7 +1,7 @@
 // Tutorial content for Contig 60
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const contig60Tutorial: TutorialConfig = {
   id: 'contig-60-basics',

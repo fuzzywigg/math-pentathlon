@@ -1,6 +1,6 @@
 // Owl Messages - Library of contextual messages for Ollie the Owl
 
-import { OwlEventType } from './owl-events';
+import type { OwlEventType } from './owl-events';
 import { storage } from '../storage';
 
 export interface OwlMessage {
@@ -527,13 +527,13 @@ class OwlMessageManager {
     const finalPool = unseenMessages.length > 0 ? unseenMessages : pool;
 
     // Random selection
-    const selected = finalPool[Math.floor(Math.random() * finalPool.length)];
+    const selected = finalPool[Math.floor(Math.random() * finalPool.length)]!;
 
     // Format message with context
     return {
       ...selected,
       text: this.formatMessage(selected.text, context),
-    };
+    } as OwlMessage;
   }
 
   // Replace placeholders in message text

@@ -3,6 +3,7 @@
  * Distinct from wave57 status/aria handshake. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { injectPar55Styles } from '../../src/games/par-55/board-ui';
@@ -27,7 +28,7 @@ describe('Wave 58 handshake — kings hex par inject chrome', () => {
     expect(kingsCss).toContain('#daa520');
     expect(kingsCss).toContain('#4169e1');
 
-    const styleCss = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+    const styleCss = readAppCss();
     expect(styleCss).toContain('@keyframes hexWinPulse');
     expect(styleCss).toContain('@keyframes hexValidPulse');
     expect(styleCss).toContain('width: min(350px, 100%)');

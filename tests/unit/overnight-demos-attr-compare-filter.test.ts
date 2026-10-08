@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — attribute compare + filter', () => {
   it('two compare-grid picks fill slots and show match score', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const pieces = root.querySelectorAll('#compare-grid .piece-wrapper');
     expect(pieces.length).toBeGreaterThanOrEqual(2);
@@ -42,7 +37,7 @@ describe('Overnight demos — attribute compare + filter', () => {
   });
 
   it('filter select narrows filtered-grid and updates count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const before =
       root.querySelector('#filtered-grid')?.querySelectorAll('.piece-wrapper').length ?? 0;
@@ -64,7 +59,7 @@ describe('Overnight demos — attribute compare + filter', () => {
   });
 
   it('math set switch refreshes piece-grid without crashing', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     (root.querySelector('.set-btn[data-set="math"]') as HTMLButtonElement).click();
     expect(root.querySelector('.set-btn[data-set="math"]')?.classList.contains('selected')).toBe(

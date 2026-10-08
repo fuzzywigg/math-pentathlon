@@ -23,7 +23,7 @@ describe('Overnight dice-selector — reset clears result helpers', () => {
     });
     const root = document.createElement('div');
     document.body.appendChild(root);
-    const sel = new DiceSelector(root, { diceSet: COMMON_DICE_SETS.standard });
+    const sel = new DiceSelector(root, { diceSet: COMMON_DICE_SETS.standard! });
     expect(sel.getResult()).toBeNull();
     expect(sel.getSelectedSum()).toBe(0);
     sel.roll();

@@ -1,13 +1,13 @@
 // Juggle Game Types
 // Polyomino placement game with dice selection
 
+import type { PolyominoShape } from '../../core/polyomino/types';
 import {
-  PolyominoShape,
   TETROMINOES,
   PENTOMINOES,
   SIMPLE_SHAPES,
 } from '../../core/polyomino/types';
-import { Board } from '../../core/polyomino/placement';
+import type { Board } from '../../core/polyomino/placement';
 
 export type Player = 'player1' | 'player2';
 
@@ -47,6 +47,8 @@ export interface JuggleState {
   currentPlayer: Player;
   currentDice: [number, number] | null;
   selectedCategory: ShapeCategory | null;
+  /** Face value of the die chosen via selectDie (for accurate move-log chosenDie). */
+  selectedDieValue: number | null;
   selectedShape: PolyominoShape | null;
   selectedRotation: 0 | 90 | 180 | 270;
   selectedFlipped: boolean;
@@ -81,9 +83,7 @@ export const CONFIG = {
 /**
  * Get opponent
  */
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 /**
  * Roll two dice

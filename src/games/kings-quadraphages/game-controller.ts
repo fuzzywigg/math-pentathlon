@@ -1,6 +1,6 @@
+import type { GameState } from './game-state';
 import {
   createInitialGameState,
-  GameState,
   moveKing,
   placeQuadraphage,
 } from './game-state';
@@ -12,8 +12,9 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kingsQuadraphagesTutorial } from './tutorial';
-import { getAIMove, AIDifficulty, isAITurn } from './ai';
-import { PlayerOwner } from './pieces';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
+import type { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
@@ -230,7 +231,7 @@ function checkAndTriggerAITurn(): void {
   if (isAIThinking) return;
 
   if (isAITurn(gameState, aiPlayer, gameMode)) {
-    executeAITurn();
+    void executeAITurn();
   }
 }
 

@@ -1,12 +1,12 @@
 // Attribute UI - Visual rendering of attribute pieces and cards
 // SVG-based rendering for attribute-based game elements
 
-import {
+import type {
   AttributePiece,
   AttributeDefinition,
   AttributeRenderConfig,
-  getAttributeColor,
 } from './types';
+import { getAttributeColor } from './types';
 
 /** Default render configuration */
 const DEFAULT_CONFIG: AttributeRenderConfig = {
@@ -46,6 +46,7 @@ export function renderAttributePiece(
 
   for (const def of definitions) {
     const value = piece.attributes[def.name];
+    if (value === undefined) continue;
     const color = getAttributeColor(definitions, def.name, value);
     if (color) {
       if (def.name === 'color' || def.name.includes('color')) {
@@ -510,6 +511,22 @@ export function injectAttributeStyles(): void {
 
     .piece-wrapper.highlight .attribute-piece {
       animation: highlight-piece 0.5s ease-in-out;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .piece-wrapper.highlight .attribute-piece {
+        animation: none !important;
+      }
+      .piece-wrapper:hover .attribute-piece {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .piece-wrapper.highlight .attribute-piece {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .piece-wrapper:hover .attribute-piece {
+      transform: none;
     }
   `;
 

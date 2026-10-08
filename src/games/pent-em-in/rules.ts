@@ -1,18 +1,20 @@
 // Pent'Em In Game Rules
 // Placement validation, move execution, and win detection
 
-import {
+import type {
   PentEmInState,
   Player,
   PlacedPiece,
   BoardCell,
   MoveRecord,
+} from './types';
+import {
   BOARD_SIZE,
   getOpponent,
   getPlayerPieces,
   getPentominoShape,
 } from './types';
-import { Cell, Rotation } from '../../core/polyomino/types';
+import type { Cell, Rotation } from '../../core/polyomino/types';
 import {
   rotateCells,
   flipCellsHorizontal as flipCells,
@@ -75,7 +77,8 @@ function areCellsInBounds(cells: Cell[]): boolean {
  * Check if cells are all unoccupied
  */
 function areCellsFree(state: PentEmInState, cells: Cell[]): boolean {
-  return cells.every((cell) => !state.board[cell.row][cell.col].occupied);
+  // ratchet: areCellsInBounds gates callers; board is dense BOARD_SIZE×BOARD_SIZE.
+  return cells.every((cell) => !state.board[cell.row]![cell.col]!.occupied);
 }
 
 /**
@@ -128,7 +131,8 @@ export function getValidPlacements(
  */
 export function canPlayerMove(state: PentEmInState, player: Player): boolean {
   const pieces = getPlayerPieces(state, player);
-  const shape = getPentominoShape(pieces.available[0]);
+  // ratchet: getPentominoShape accepts string | undefined; probe first available.
+  const shape = getPentominoShape(pieces.available[0]!);
 
   if (!shape) return pieces.available.length > 0;
 
@@ -192,8 +196,9 @@ export function placePiece(
   );
 
   for (const cell of cells) {
-    newBoard[cell.row][cell.col] = {
-      ...newBoard[cell.row][cell.col],
+    // ratchet: cells are in-bounds (canPlacePiece); board rows/cols are dense.
+    newBoard[cell.row]![cell.col] = {
+      ...newBoard[cell.row]![cell.col]!,
       occupied: true,
       owner: state.currentPlayer,
       pieceId,
@@ -269,6 +274,77 @@ export function placePiece(
 // =============================================================================
 
 /**
+ * Prefer an orientation that actually fits (UI only — same legal placements).
+ */
+export function orientSelectedPieceToFit(state: PentEmInState): PentEmInState {
+  if (state.phase !== 'placePiece' || !state.selectedPiece) return state;
+
+  const shape = getPentominoShape(state.selectedPiece);
+  if (!shape) return state;
+
+  const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+  const flips = shape.canFlip ? [false, true] : [false];
+
+  for (const flipped of flips) {
+    for (const rotation of rotations) {
+      if (
+        getValidPlacements(state, state.selectedPiece, rotation, flipped)
+          .length > 0
+      ) {
+        return {
+          ...state,
+          selectedRotation: rotation,
+          selectedFlipped: flipped,
+        };
+      }
+    }
+  }
+  return state;
+}
+
+/** True if the selected piece fits somewhere in any orientation. */
+export function selectedPieceFitsAnywhere(state: PentEmInState): boolean {
+  if (!state.selectedPiece) return false;
+  const shape = getPentominoShape(state.selectedPiece);
+  if (!shape) return false;
+
+  const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+  const flips = shape.canFlip ? [false, true] : [false];
+
+  for (const flipped of flips) {
+    for (const rotation of rotations) {
+      if (
+        getValidPlacements(state, state.selectedPiece, rotation, flipped)
+          .length > 0
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/** Legal anchors for the currently selected rotation/flip. */
+export function getCurrentOrientationPlacements(state: PentEmInState): Cell[] {
+  if (!state.selectedPiece || state.phase !== 'placePiece') return [];
+  return getValidPlacements(
+    state,
+    state.selectedPiece,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+}
+
+/** Preview the first legal anchor so tablets show a ghost without hover. */
+function withFirstLegalPreview(state: PentEmInState): PentEmInState {
+  const placements = getCurrentOrientationPlacements(state);
+  return {
+    ...state,
+    previewPosition: placements[0] ?? null,
+  };
+}
+
+/**
  * Select a piece for placement
  */
 export function selectPiece(
@@ -281,13 +357,16 @@ export function selectPiece(
     return state;
   }
 
-  return {
-    ...state,
-    selectedPiece: shapeId,
-    selectedRotation: 0,
-    selectedFlipped: false,
-    phase: 'placePiece',
-  };
+  return withFirstLegalPreview(
+    orientSelectedPieceToFit({
+      ...state,
+      selectedPiece: shapeId,
+      selectedRotation: 0,
+      selectedFlipped: false,
+      previewPosition: null,
+      phase: 'placePiece',
+    })
+  );
 }
 
 /**
@@ -303,10 +382,11 @@ export function rotateSelectedPiece(state: PentEmInState): PentEmInState {
   const currentIndex = rotations.indexOf(state.selectedRotation);
   const nextIndex = (currentIndex + 1) % 4;
 
-  return {
+  // ratchet: rotations is length-4 literal; nextIndex is always 0..3.
+  return withFirstLegalPreview({
     ...state,
-    selectedRotation: rotations[nextIndex],
-  };
+    selectedRotation: rotations[nextIndex]!,
+  });
 }
 
 /**
@@ -318,14 +398,14 @@ export function flipSelectedPiece(state: PentEmInState): PentEmInState {
   const shape = getPentominoShape(state.selectedPiece);
   if (!shape?.canFlip) return state;
 
-  return {
+  return withFirstLegalPreview({
     ...state,
     selectedFlipped: !state.selectedFlipped,
-  };
+  });
 }
 
 /**
- * Cancel piece selection
+ * Cancel piece selection — back to the piece tray (placement escape).
  */
 export function cancelSelection(state: PentEmInState): PentEmInState {
   return {

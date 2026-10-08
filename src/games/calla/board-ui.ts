@@ -1,6 +1,7 @@
 // Calla Board UI - Renders the Mancala-style board
 
-import { CallaGameState, PITS_PER_SIDE } from './types';
+import type { CallaGameState } from './types';
+import { PITS_PER_SIDE } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
@@ -98,10 +99,11 @@ export function renderBoard(
       state.lastSownPit?.side === 'player2' &&
       state.lastSownPit?.index === displayIndex;
 
+    // ratchet: displayIndex in 0..PITS_PER_SIDE-1; pits always length PITS_PER_SIDE.
     const pitGroup = createPit(
       x,
       p2Y,
-      state.player2Pits[displayIndex],
+      state.player2Pits[displayIndex]!,
       'player2',
       displayIndex,
       isValid,
@@ -120,10 +122,11 @@ export function renderBoard(
     const isLastSown =
       state.lastSownPit?.side === 'player1' && state.lastSownPit?.index === i;
 
+    // ratchet: i in 0..PITS_PER_SIDE-1; pits always length PITS_PER_SIDE.
     const pitGroup = createPit(
       x,
       p1Y,
-      state.player1Pits[i],
+      state.player1Pits[i]!,
       'player1',
       i,
       isValid,

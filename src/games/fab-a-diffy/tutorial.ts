@@ -1,7 +1,7 @@
 // Tutorial content for Fab-a-Diffy
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const fabADiffyTutorial: TutorialConfig = {
   id: 'fab-a-diffy-basics',

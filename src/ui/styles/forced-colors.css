@@ -1,0 +1,188 @@
+/**
+ * Windows High Contrast / forced-colors + light color-scheme pin.
+ * Task: burn-1008-mp-forced-colors
+ *
+ * Scope: CSS/attribute only. Does not redo #469 axe contrast, #437 shell axe,
+ * #491 keyboard focus design, or #522 zoom/reflow layout.
+ *
+ * Strategy:
+ * - Pin `color-scheme: light` so UA form controls stay consistent (app is light-only).
+ * - Under `forced-colors: active`, restore focus/selection/valid cues with system
+ *   colors (Highlight, CanvasText, ButtonText) because box-shadow/filters die.
+ * - Keep authored piece fills via `forced-color-adjust: none` on boards that encode
+ *   player identity in fill color; pair with visible strokes/outlines.
+ */
+
+/* App is authored light-only; declare so prefers-color-scheme: dark does not
+   darken native controls while page chrome stays light. */
+:root {
+  color-scheme: light;
+}
+
+@media (forced-colors: active) {
+  /*
+   * Shell / menu focus rings that used outline:none + box-shadow only.
+   * System Highlight survives High Contrast; box-shadow does not.
+   */
+  .game-card:focus-visible,
+  .accordion-header:focus-visible,
+  .division-tab:focus-visible,
+  .hero-progress-link:focus-visible,
+  .back-button:focus-visible,
+  .stats-dashboard-cta:focus-visible,
+  .skip-link:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* Board / modal controls already use outline — pin system color. */
+  .button-row button:focus-visible,
+  #new-game-btn:focus-visible,
+  #help-btn:focus-visible,
+  #tutorial-btn:focus-visible,
+  .modal-close:focus-visible,
+  .difficulty-btn:focus-visible,
+  .start-game-btn:focus-visible,
+  .collapse-toggle:focus-visible,
+  .mode-option:focus-within,
+  [role='gridcell']:focus-visible,
+  #board [role='button']:focus-visible,
+  .game-area [role='button']:focus-visible,
+  svg [role='button']:focus-visible,
+  svg [role='gridcell']:focus-visible,
+  .star-track-draw-btn:focus-visible,
+  .star-track-chain-btn:focus-visible,
+  .juggle-roll-btn:focus-visible,
+  .pg-roll-btn:focus-visible,
+  .prime-roll-btn:focus-visible,
+  .remainder-btn-roll:focus-visible,
+  .hex-a-gone-block-btn:focus-visible,
+  .hex-a-gone-confirm-btn:focus-visible,
+  .frac-choice-btn:focus-visible,
+  .frac-continue-btn:focus-visible,
+  .pinball-choice-btn:focus-visible,
+  .pinball-continue-btn:focus-visible,
+  .pent-piece-option:focus-visible,
+  .fab-op-btn:focus-visible,
+  .fab-bar-wrapper:focus-visible,
+  .stars-card:focus-visible,
+  .par55-hand-block:focus-visible,
+  .ramrod-rod-wrapper:focus-visible,
+  .sd-roll-btn:focus-visible,
+  .sd-pass-btn:focus-visible,
+  .contig-roll-btn:focus-visible,
+  .contig-pass-btn:focus-visible,
+  .tutorial-hit-proxy:focus-visible {
+    outline-color: Highlight;
+  }
+
+  /* Selected mode / difficulty — border survives when bg wash remaps. */
+  .mode-option.selected,
+  .difficulty-btn.selected {
+    border-color: Highlight;
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  /*
+   * HTML boards: valid / owned cells that relied on background or inset shadow.
+   */
+  .cell-valid-move,
+  .cell-valid-placement:hover,
+  .contig-cell-valid,
+  .stars-cell.valid,
+  .pg-cell.valid,
+  .sd-cell.valid,
+  .ramrod-slot.valid,
+  .par55-cell.valid,
+  .juggle-cell.valid,
+  .fab-answer-matchable {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+    border-color: Highlight;
+  }
+
+  .contig-cell-p1,
+  .contig-cell-p2,
+  .stars-cell.player1,
+  .stars-cell.player2,
+  .pg-cell.player1,
+  .pg-cell.player2,
+  .stars-card.selected,
+  .pent-piece-option.selected,
+  .ramrod-rod-wrapper.selected,
+  .hex-a-gone-block-btn.selected,
+  .hex-a-gone-block-btn.placing {
+    outline: 2px solid ButtonText;
+    outline-offset: -2px;
+  }
+
+  /*
+   * SVG / canvas play surfaces: preserve authored fills that encode seat
+   * identity, and force a system-color stroke so pieces stay edged if the
+   * UA still remaps some paints.
+   */
+  .hex-board,
+  .hex-a-gone-board,
+  .star-track-board,
+  .calla-wrapper,
+  .calla-board,
+  .qg-board-container,
+  .qg-board,
+  .remainder-board,
+  .pent-board,
+  .fiar-board-container,
+  .fiar-board,
+  .kwa-board,
+  .kwa-board-svg,
+  svg.hex-board,
+  svg.star-track-board {
+    forced-color-adjust: none;
+  }
+
+  .hex-cell-p1,
+  .hex-cell-p2,
+  .hex-a-gone-cell-p1,
+  .hex-a-gone-cell-p2,
+  .star-track-piece-p1,
+  .star-track-piece-p2,
+  .calla-cube,
+  .calla-store-rect,
+  .island.p1 polygon:first-child,
+  .island.p2 polygon:first-child {
+    stroke: CanvasText;
+    stroke-width: 2;
+  }
+
+  /* Valid / selected SVG cues — Highlight stroke survives HC. */
+  .hex-cell-empty.valid,
+  .hex-a-gone-cell.valid,
+  .star-track-space.valid,
+  .calla-pit.valid,
+  .island.valid polygon:first-child,
+  .island.selected polygon:first-child,
+  .qg-board .valid,
+  [data-valid='true'],
+  .fiar-node.valid,
+  .kwa-valid-node,
+  .pent-cell.valid {
+    stroke: Highlight !important;
+    stroke-width: 3 !important;
+    outline: 2px solid Highlight;
+  }
+
+  /* Drop shadow / filter cues are stripped in HC — ensure a border remains. */
+  .remainder-player-score.active,
+  .calla-score.active,
+  .star-track-goal {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  /* Tutorial ring should remain visible without relying on glow/shadow. */
+  .tutorial-highlight-ring,
+  .tutorial-spotlight {
+    outline: 3px solid Highlight;
+    border-color: Highlight;
+  }
+}

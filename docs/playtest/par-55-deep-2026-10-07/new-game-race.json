@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "after": {
+    "status": "🔵 Blue's turn — Tap a block from your hand",
+    "history": 0,
+    "clickable": 5,
+    "computer": false
+  },
+  "sawThink": true
+}

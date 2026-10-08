@@ -3,6 +3,9 @@
  * Keeps page-to-page cohesion without changing game logic.
  */
 
+import { clearElement } from '../../core/dom-security';
+import { markStatusLive } from '../board-a11y';
+import { suppressBoardContextMenu } from '../pointer-hygiene';
 import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -68,6 +71,167 @@ function escapeAttr(value: string): string {
     .replace(/>/g, '&gt;');
 }
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled]):not([type="hidden"])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(', ');
+
+/** True when the element is not inside a hidden/inert/display:none ancestor. */
+export function isKeyboardReachable(el: Element): boolean {
+  let node: Element | null = el;
+  while (node && node !== document.documentElement) {
+    if (node instanceof HTMLElement) {
+      if (node.hasAttribute('hidden') || node.hasAttribute('inert')) {
+        return false;
+      }
+      if (node.classList.contains('hidden')) return false;
+      const { display, visibility } = node.style;
+      if (display === 'none' || visibility === 'hidden') return false;
+    }
+    node = node.parentElement;
+  }
+  return true;
+}
+
+/** True when the element (and ancestors up to `root`) are not display:none / hidden / inert. */
+function isDisplayedWithin(el: HTMLElement, root: HTMLElement): boolean {
+  let cur: HTMLElement | null = el;
+  while (cur && cur !== root) {
+    if (
+      cur.classList.contains('hidden') ||
+      cur.hasAttribute('hidden') ||
+      cur.hasAttribute('inert')
+    ) {
+      return false;
+    }
+    if (cur.style.display === 'none') return false;
+    cur = cur.parentElement;
+  }
+  return true;
+}
+
+/** Focusable controls inside a dialog (skips hidden difficulty section, inert, etc.). */
+export function getFocusableWithin(root: Element): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+  ).filter((el) => {
+    if (el.getAttribute('aria-disabled') === 'true') return false;
+    return isKeyboardReachable(el);
+  });
+}
+
+/** Focusable controls inside an open modal (jsdom-safe; skips nested hidden). */
+function getModalFocusables(modal: HTMLElement): HTMLElement[] {
+  return getFocusableWithin(modal).filter((el) => isDisplayedWithin(el, modal));
+}
+
+function ensureModalDialogSemantics(modal: HTMLElement): void {
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+  const title = modal.querySelector('h2');
+  if (title) {
+    if (!title.id) {
+      title.id = `${modal.id || 'game-modal'}-title`;
+    }
+    modal.setAttribute('aria-labelledby', title.id);
+  }
+}
+
+/** Keep closed dialogs out of the accessibility tree (pairs with `.hidden`). */
+function setModalHiddenState(modal: HTMLElement, hidden: boolean): void {
+  modal.classList.toggle('hidden', hidden);
+  modal.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+}
+
+function syncDifficultyPressed(modal: HTMLElement): void {
+  modal.querySelectorAll('.difficulty-btn').forEach((btn) => {
+    btn.setAttribute(
+      'aria-pressed',
+      btn.classList.contains('selected') ? 'true' : 'false'
+    );
+  });
+}
+
+type ModalFocusState = {
+  restoreEl: HTMLElement | null;
+};
+
+function openShellModal(
+  modal: HTMLElement,
+  state: ModalFocusState,
+  opener: HTMLElement | null
+): void {
+  ensureModalDialogSemantics(modal);
+  state.restoreEl =
+    opener ??
+    (document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null);
+  setModalHiddenState(modal, false);
+  const focusables = getModalFocusables(modal);
+  // Prefer primary action when present; otherwise first control (often Close).
+  const startBtn = modal.querySelector<HTMLElement>('#start-game-btn');
+  const target =
+    (startBtn && isDisplayedWithin(startBtn, modal) ? startBtn : null) ??
+    focusables[0] ??
+    modal;
+  if (target === modal && !modal.hasAttribute('tabindex')) {
+    modal.setAttribute('tabindex', '-1');
+  }
+  target.focus();
+}
+
+function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
+  if (modal.classList.contains('hidden')) return;
+  setModalHiddenState(modal, true);
+  const restore = state.restoreEl;
+  state.restoreEl = null;
+  // Defer so display:none on the modal settles before moving focus (#491).
+  queueMicrotask(() => {
+    if (restore && document.contains(restore)) {
+      restore.focus();
+    }
+  });
+}
+
+/** Keep Tab cycling inside an open dialog (#491 API; used by unit tests). */
+export function trapTabKey(modal: HTMLElement, e: KeyboardEvent): void {
+  if (e.key !== 'Tab') return;
+  const items = getFocusableWithin(modal);
+  if (items.length === 0) return;
+
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (!first || !last) return;
+  const active = document.activeElement;
+
+  if (e.shiftKey) {
+    if (active === first || !modal.contains(active)) {
+      e.preventDefault();
+      last.focus();
+    }
+  } else if (active === last || !modal.contains(active)) {
+    e.preventDefault();
+    first.focus();
+  }
+}
+
+/** Keep Tab / Shift+Tab inside an open modal (focus trap). */
+function trapModalTabKey(e: KeyboardEvent, modal: HTMLElement): void {
+  if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
+  const focusables = getModalFocusables(modal);
+  if (focusables.length === 0) {
+    e.preventDefault();
+    modal.focus();
+    return;
+  }
+  trapTabKey(modal, e);
+}
+
 function buildModeOption(
   mode: GameMode,
   radioName: string,
@@ -94,9 +258,11 @@ function buildDifficultySection(defaultDifficulty: AIDifficultyLevel): string {
   const levels: AIDifficultyLevel[] = ['easy', 'medium', 'hard'];
   const buttons = levels
     .map((level) => {
-      const selected = level === defaultDifficulty ? ' selected' : '';
+      const selected = level === defaultDifficulty;
+      const selectedClass = selected ? ' selected' : '';
+      const pressed = selected ? 'true' : 'false';
       const label = level.charAt(0).toUpperCase() + level.slice(1);
-      return `<button class="difficulty-btn ${level}${selected}" data-difficulty="${level}">${label}</button>`;
+      return `<button class="difficulty-btn ${level}${selectedClass}" data-difficulty="${level}" aria-pressed="${pressed}" type="button">${label}</button>`;
     })
     .join('');
 
@@ -135,10 +301,10 @@ function buildShellHtml(options: GameShellOptions): string {
 
   const moveHistory = options.showMoveHistory
     ? `
-      <div id="move-history" class="move-history collapsible">
+      <div id="move-history" class="move-history collapsible" role="region" aria-labelledby="move-history-label">
         <button class="collapse-toggle" type="button" aria-expanded="true" aria-controls="history-content">
-          <span class="collapse-icon">◀</span>
-          <span class="collapse-label">History</span>
+          <span class="collapse-icon" aria-hidden="true">◀</span>
+          <span class="collapse-label" id="move-history-label">History</span>
         </button>
         <div id="history-content" class="history-content"></div>
       </div>`
@@ -163,24 +329,24 @@ function buildShellHtml(options: GameShellOptions): string {
 
   const gameAreaBlock =
     options.gameAreaHtml ??
-    `<div class="${escapeAttr(gameAreaClass)}">${moveHistory}
+    `<div class="${escapeAttr(gameAreaClass)}" role="region" aria-labelledby="game-title">${moveHistory}
       <div id="board"${boardClassAttr}></div>
     </div>`;
 
   return `
     <header class="game-header">
       <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
-      <h1>${escapeAttr(options.title)}</h1>
+      <h1 id="game-title">${escapeAttr(options.title)}</h1>
     </header>
     <nav class="button-row" aria-label="Game actions">
       <button id="new-game-btn" type="button">New Game</button>${tutorialBtn}
       <button id="help-btn" type="button">How to Play</button>
     </nav>${statusBlock}
     ${gameAreaBlock}
-    <div id="new-game-modal" class="modal hidden">
+    <div id="new-game-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="new-game-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>New Game</h2>
+        <h2 id="new-game-modal-title">New Game</h2>
         <div class="mode-selector">
           <h3>Choose Game Mode</h3>
           <div class="mode-options">
@@ -190,10 +356,10 @@ ${modeOptionsHtml}
         </div>
       </div>
     </div>
-    <div id="help-modal" class="modal hidden">
+    <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="help-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
-        <h2>${escapeAttr(options.helpTitle)}</h2>
+        <h2 id="help-modal-title">${escapeAttr(options.helpTitle)}</h2>
         <div class="rules-content">
           ${options.helpContentHtml}
         </div>
@@ -210,7 +376,12 @@ export function mountGameShell(
   container: HTMLElement,
   options: GameShellOptions
 ): GameShellElements {
-  container.innerHTML = buildShellHtml(options);
+  // Titles/attrs are escaped in buildShellHtml; helpContentHtml is
+  // repo-authored trusted markup from game-route-mounts (not user/URL input).
+  clearElement(container);
+  const shellTpl = document.createElement('template');
+  shellTpl.innerHTML = buildShellHtml(options);
+  container.appendChild(shellTpl.content);
 
   const mountId = options.mountId ?? 'board';
   const board = document.getElementById(mountId);
@@ -232,6 +403,25 @@ export function mountGameShell(
   // defaultMode only selects the modal radio — games init as human until Start.
   applyGameModeChrome(container, 'human-vs-human');
 
+  // Durable polite live region for turn / phase / win strings (existing copy).
+  if (status) {
+    markStatusLive(status);
+  }
+
+  // Custom gameAreaHtml may omit region wiring — name the mount itself (not its
+  // parent, which is often the whole app container).
+  if (
+    board &&
+    !board.closest('[role="region"][aria-labelledby="game-title"]') &&
+    !board.hasAttribute('aria-label') &&
+    !board.hasAttribute('aria-labelledby')
+  ) {
+    if (!board.getAttribute('role')) {
+      board.setAttribute('role', 'region');
+    }
+    board.setAttribute('aria-labelledby', 'game-title');
+  }
+
   // Move-history collapse
   const collapseToggle = moveHistoryPanel?.querySelector('.collapse-toggle');
   if (collapseToggle && moveHistoryPanel) {
@@ -241,10 +431,25 @@ export function mountGameShell(
     });
   }
 
-  // New Game open
+  const newGameFocus: ModalFocusState = { restoreEl: null };
+  const helpFocus: ModalFocusState = { restoreEl: null };
+
+  // Pre-declare dialog semantics so closed modals still expose roles to AT trees.
+  // Markup also ships role/aria from #437; ensureModalDialogSemantics is idempotent.
+  if (newGameModal) {
+    ensureModalDialogSemantics(newGameModal);
+    setModalHiddenState(newGameModal, true);
+    syncDifficultyPressed(newGameModal);
+  }
+  if (helpModal) {
+    ensureModalDialogSemantics(helpModal);
+    setModalHiddenState(helpModal, true);
+  }
+
+  // New Game open — focus trap + restore (#448)
   if (newGameBtn && newGameModal) {
     newGameBtn.addEventListener('click', () => {
-      newGameModal.classList.remove('hidden');
+      openShellModal(newGameModal, newGameFocus, newGameBtn);
     });
   }
 
@@ -271,7 +476,7 @@ export function mountGameShell(
     }
 
     const closeNewGameModal = () => {
-      newGameModal.classList.add('hidden');
+      closeShellModal(newGameModal, newGameFocus);
     };
 
     modeOptions.forEach((option) => {
@@ -294,6 +499,7 @@ export function mountGameShell(
         btn.classList.add('selected');
         selectedDifficulty = (btn as HTMLElement).dataset
           .difficulty as AIDifficultyLevel;
+        syncDifficultyPressed(newGameModal);
       });
     });
 
@@ -328,21 +534,41 @@ export function mountGameShell(
     });
   }
 
-  // Help modal + Escape
-  const escapeHandler = (e: KeyboardEvent) => {
-    if (e.key !== 'Escape') return;
+  // Tab trap (#448) + Escape closes every open shell dialog (#437)
+  const keydownHandler = (e: KeyboardEvent) => {
     if (helpModal && !helpModal.classList.contains('hidden')) {
-      helpModal.classList.add('hidden');
+      trapModalTabKey(e, helpModal);
+    } else if (newGameModal && !newGameModal.classList.contains('hidden')) {
+      trapModalTabKey(e, newGameModal);
     }
-    if (newGameModal && !newGameModal.classList.contains('hidden')) {
-      newGameModal.classList.add('hidden');
+
+    if (e.key !== 'Escape') return;
+    const helpEl = helpModal;
+    const newGameEl = newGameModal;
+    const helpWasOpen = helpEl != null && !helpEl.classList.contains('hidden');
+    const newGameWasOpen =
+      newGameEl != null && !newGameEl.classList.contains('hidden');
+    if (!helpWasOpen && !newGameWasOpen) return;
+    // Hide without per-modal focus restore; pick one opener below (#437).
+    if (helpWasOpen) {
+      setModalHiddenState(helpModal!, true);
+      helpFocus.restoreEl = null;
+    }
+    if (newGameWasOpen) {
+      setModalHiddenState(newGameModal!, true);
+      newGameFocus.restoreEl = null;
+    }
+    if (helpWasOpen) {
+      helpBtn?.focus();
+    } else {
+      newGameBtn?.focus();
     }
   };
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () => helpModal.classList.remove('hidden');
-    const closeHelpModal = () => helpModal.classList.add('hidden');
+    const openHelpModal = () => openShellModal(helpModal, helpFocus, helpBtn);
+    const closeHelpModal = () => closeShellModal(helpModal, helpFocus);
 
     helpBtn.addEventListener('click', openHelpModal);
     modalClose?.addEventListener('click', closeHelpModal);
@@ -353,10 +579,16 @@ export function mountGameShell(
     });
   }
 
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', keydownHandler);
+
+  // Long-press context menu / text-select chrome on the board surface
+  const unbindBoardContextMenu = board
+    ? suppressBoardContextMenu(board)
+    : () => undefined;
 
   const cleanup = () => {
-    document.removeEventListener('keydown', escapeHandler);
+    document.removeEventListener('keydown', keydownHandler);
+    unbindBoardContextMenu();
     clearGameModeChrome(container);
   };
 

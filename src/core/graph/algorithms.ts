@@ -1,7 +1,7 @@
 // Graph Algorithms - Pathfinding, connectivity, and traversal
 // Core algorithms for network-based game mechanics
 
-import { Graph, NodeId, GraphPath, PathResult, GraphBoard } from './types';
+import type { Graph, NodeId, GraphPath, PathResult, GraphBoard } from './types';
 
 /**
  * Get all neighbors of a node

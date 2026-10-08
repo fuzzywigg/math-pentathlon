@@ -9,7 +9,7 @@ import { applyAIMoveSteps, type AIMove } from '../../src/games/fab-a-diffy/ai';
 afterEach(() => vi.restoreAllMocks());
 
 describe('Wave 44 Fab AI — applyAIMoveSteps selectBar2 fail', () => {
-  it('same bar1/bar2 → passTurn with console.error', () => {
+  it('same bar1/bar2 → passTurn without console.error', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const state = createInitialState();
     const id = [...state.fractionBars.keys()][0];
@@ -22,7 +22,7 @@ describe('Wave 44 Fab AI — applyAIMoveSteps selectBar2 fail', () => {
     const next = applyAIMoveSteps(state, bad);
     expect(next.moveHistory).toHaveLength(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('used bar2 → passTurn without claiming', () => {
@@ -41,6 +41,6 @@ describe('Wave 44 Fab AI — applyAIMoveSteps selectBar2 fail', () => {
     const next = applyAIMoveSteps(jammed, bad);
     expect(next.scores.player1).toBe(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

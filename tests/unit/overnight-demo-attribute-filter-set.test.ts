@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -23,12 +18,13 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 describe('Overnight demos — attribute filter/set', () => {
   it('basic↔math set switch remounts piece grid with exclusive selected', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const basic = root.querySelector(
       '.set-btn[data-set="basic"]'
@@ -55,7 +51,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('piece click fills selected-info; second click still paints', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const pieces = root.querySelectorAll('#piece-grid .piece-wrapper');
     expect(pieces.length).toBeGreaterThanOrEqual(2);
@@ -69,7 +65,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('SET grid prompts for more cards then validates selection', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     // SET cards are custom wrappers (not .piece-wrapper) holding SVGs
     const cards = root.querySelectorAll('#set-grid > div > div');
@@ -91,7 +87,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('compare slots fill after two piece picks and show match score', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const pieces = root.querySelectorAll('#compare-grid .piece-wrapper');
     expect(pieces.length).toBeGreaterThanOrEqual(2);
@@ -115,7 +111,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('third compare click resets slot2 and starts new pair', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const pieces = root.querySelectorAll('#compare-grid .piece-wrapper');
     (pieces[0] as HTMLElement).click();
@@ -137,7 +133,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('filter selects narrow showing count below full deck', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const countEl = root.querySelector('#filter-count') as HTMLElement;
     expect(countEl.textContent).toMatch(/Showing:\s*\d+ of \d+/);
@@ -163,7 +159,7 @@ describe('Overnight demos — attribute filter/set', () => {
   });
 
   it('clearing filter select restores full showing count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const select = root.querySelector(
       '#filter-controls select'

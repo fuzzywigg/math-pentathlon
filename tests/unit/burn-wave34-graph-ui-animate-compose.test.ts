@@ -19,7 +19,7 @@ import {
 afterEach(() => {
   document.body.innerHTML = '';
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Avoid restoreAllMocks — breaks hoisted vi.mock on isolate:false.
 });
 
 describe('Wave 34 graph-ui-animate-compose — path lifecycle', () => {

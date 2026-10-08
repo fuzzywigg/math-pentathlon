@@ -1,4 +1,6 @@
-import { Board, BOARD_SIZE, Position, Cell } from './board';
+import { clearElement } from '../../core/dom-security';
+import type { Board, Position, Cell } from './board';
+import { BOARD_SIZE } from './board';
 
 export type CellClickHandler = (position: Position) => void;
 
@@ -117,10 +119,11 @@ export function renderBoard(
     document.head.appendChild(styles);
   }
 
-  // Render each cell
+  // Render each cell — BOARD_SIZE×BOARD_SIZE is always dense; `!` is NUI-only.
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowCells = board[row]!;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = board[row][col];
+      const cell = rowCells[col]!;
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }
@@ -135,11 +138,12 @@ export function updateBoard(
   board: Board,
   options: BoardRendererOptions = {}
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowCells = board[row]!;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = board[row][col];
+      const cell = rowCells[col]!;
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }

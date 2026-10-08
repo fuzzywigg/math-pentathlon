@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format win-streak-1', () => {
     storage.resetAll();
   });
 
-
   it('selects win-streak-1 and substitutes winStreak + gameName', () => {
     for (const m of owlMessages.getMessagesByCategory('game:end')) {
       if (m.id !== 'win-streak-1') storage.markMessageSeen(m.id);

@@ -22,6 +22,7 @@ import {
   renderBoard,
   renderHand,
 } from '../../src/games/sum-dominoes/board-ui';
+import { mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -30,15 +31,6 @@ afterEach(() => {
   document.getElementById('sd-styles')?.remove();
 });
 
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
-
 function makeDomino(id: string, face1: number, face2: number): Domino {
   return { id, face1, face2, owner: 'player1', orientation: 'horizontal' };
 }
@@ -46,7 +38,7 @@ function makeDomino(id: string, face1: number, face2: number): Domino {
 describe('Sum Dominoes playability — no human input on AI turn', () => {
   it('hides Roll and ignores human activation while Red (computer) is to move', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'easy');
 
     // Force Blue's turn to complete so Red (AI) is pending on rolling.
@@ -85,7 +77,7 @@ describe('Sum Dominoes playability — no human input on AI turn', () => {
   });
 
   it('hides Pass Turn while the computer seat is pending', () => {
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = newGameVsAI(container, 'easy');
     ctrl.state = {
       ...ctrl.state,
@@ -194,7 +186,7 @@ describe('Sum Dominoes playability — hand a11y + reduced-motion CSS', () => {
 
 describe('Sum Dominoes playability — human vs human still offers Roll', () => {
   it('shows an enabled Roll button on a fresh human game', () => {
-    const container = mount();
+    const container = mountAppShell();
     newGameVsHuman(container);
     const btn = container.querySelector('.sd-roll-btn') as HTMLButtonElement;
     expect(btn).toBeTruthy();

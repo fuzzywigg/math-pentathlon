@@ -1,6 +1,25 @@
 // Storage System - LocalStorage wrapper with versioning and type safety
 
 import {
+  safeGetItemResult,
+  safeParseJson,
+  safeSetItemResult,
+  subscribeStorageEvent,
+} from '../safe-web-storage';
+import { setUserReducedMotionFlag } from '../settings-flags';
+import {
+  ensureProgressDefaults,
+  isPlainProgressObject,
+  normalizeLoadedProgress,
+} from './migrate';
+import {
+  sanitizeDisplayStringAllowEmpty,
+  sanitizeProfile,
+  sanitizeSettings,
+  MAX_PROFILE_AVATAR_LENGTH,
+  MAX_PROFILE_NAME_LENGTH,
+} from './sanitize';
+import type {
   ProgressData,
   PlayerProfile,
   GameStats,
@@ -9,88 +28,118 @@ import {
   Achievement,
   UserSettings,
   OwlState,
-  createDefaultProgress,
-  createDefaultGameStats,
-  CURRENT_DATA_VERSION,
-  DEFAULT_SETTINGS,
-  DEFAULT_OWL_STATE,
 } from './types';
+import { createDefaultProgress, createDefaultGameStats } from './types';
 
-const STORAGE_KEY = 'math-pentathlon-progress';
+/** localStorage key for the on-device progress blob. */
+export const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';
+
+const STORAGE_KEY = PROGRESS_STORAGE_KEY;
 const MAX_MESSAGES_HISTORY = 50; // Prevent unbounded growth
 
 class StorageManager {
   private data: ProgressData;
   private saveDebounceTimer: number | null = null;
+  private readonly unsubscribeStorageEvent: () => void;
 
   constructor() {
     this.data = this.load();
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
+    // Other tabs only — adopt their writes / clears so we do not silently
+    // overwrite mid-session with stale in-memory state on the next save.
+    this.unsubscribeStorageEvent = subscribeStorageEvent((event) => {
+      this.handleExternalStorageEvent(event);
+    });
+  }
+
+  /** Test helper — drop the cross-tab listener (module remounts). */
+  public disposeForTests(): void {
+    this.unsubscribeStorageEvent();
+  }
+
+  /**
+   * Apply a `storage` event for our progress key from another document.
+   * Cleared key → fresh defaults (keep app running). Non-JSON / wrong shape →
+   * keep current in-memory session (do not spin or wipe good state).
+   */
+  public handleExternalStorageEvent(event: StorageEvent): void {
+    if (event.storageArea != null) {
+      // Ignore sessionStorage and unrelated stores when the browser provides area.
+      try {
+        if (event.storageArea !== globalThis.localStorage) {
+          return;
+        }
+      } catch {
+        // localStorage access itself blocked — nothing to sync.
+        return;
+      }
+    }
+    if (event.key !== null && event.key !== STORAGE_KEY) {
+      return;
+    }
+
+    // key === null means clear() wiped the whole store.
+    if (event.key === null || event.newValue === null) {
+      this.data = createDefaultProgress();
+      setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
+      return;
+    }
+
+    const parsed = safeParseJson(event.newValue);
+    if (!parsed.ok || !isPlainProgressObject(parsed.value)) {
+      console.warn(
+        'Ignoring corrupt progress from another tab; keeping in-memory session'
+      );
+      return;
+    }
+
+    this.data = normalizeLoadedProgress(
+      parsed.value as unknown as ProgressData
+    );
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
   }
 
   // Load data from localStorage
   private load(): ProgressData {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (!stored) {
+      const read = safeGetItemResult(STORAGE_KEY);
+      // Blocked / SecurityError — warn (matches prior private-mode diagnostics).
+      if (!read.ok) {
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          read.error
+        );
+        return createDefaultProgress();
+      }
+      if (!read.value) {
         return createDefaultProgress();
       }
 
-      const parsed = JSON.parse(stored) as ProgressData;
+      const parsedResult = safeParseJson(read.value);
+      if (!parsedResult.ok) {
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          parsedResult.error
+        );
+        return createDefaultProgress();
+      }
+      const parsed = parsedResult.value;
 
-      // Handle version migrations
-      if (parsed.version < CURRENT_DATA_VERSION) {
-        return this.migrate(parsed);
+      // Primitives / arrays / null are corrupt — never hand them to ensureDefaults.
+      if (!isPlainProgressObject(parsed)) {
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          new TypeError('Progress root must be a plain object')
+        );
+        return createDefaultProgress();
       }
 
-      // Ensure all required fields exist (defensive)
-      return this.ensureDefaults(parsed);
+      const progress = parsed as unknown as ProgressData;
+      return normalizeLoadedProgress(progress);
     } catch (error) {
       console.warn('Failed to load progress data, starting fresh:', error);
       return createDefaultProgress();
     }
-  }
-
-  // Migrate old data versions
-  private migrate(data: ProgressData): ProgressData {
-    // Version migrations go here as needed
-    // For now, just update version and ensure defaults
-    data.version = CURRENT_DATA_VERSION;
-    return this.ensureDefaults(data);
-  }
-
-  // Ensure all required fields have values
-  private ensureDefaults(data: ProgressData): ProgressData {
-    const owl = data.owlState;
-    return {
-      version: data.version || CURRENT_DATA_VERSION,
-      profile: data.profile || null,
-      streak: data.streak || {
-        currentStreak: 0,
-        bestStreak: 0,
-        lastPlayDate: '',
-        streakStartDate: '',
-      },
-      achievements: data.achievements || [],
-      gameStats: data.gameStats || {},
-      owlState: owl
-        ? {
-            mood: owl.mood ?? DEFAULT_OWL_STATE.mood,
-            lastInteraction:
-              owl.lastInteraction ?? DEFAULT_OWL_STATE.lastInteraction,
-            messagesSeen: [...(owl.messagesSeen ?? [])],
-            tutorialsCompleted: [...(owl.tutorialsCompleted ?? [])],
-            totalMessagesShown:
-              owl.totalMessagesShown ?? DEFAULT_OWL_STATE.totalMessagesShown,
-          }
-        : {
-            mood: DEFAULT_OWL_STATE.mood,
-            lastInteraction: DEFAULT_OWL_STATE.lastInteraction,
-            messagesSeen: [],
-            tutorialsCompleted: [],
-            totalMessagesShown: DEFAULT_OWL_STATE.totalMessagesShown,
-          },
-      settings: { ...DEFAULT_SETTINGS, ...data.settings },
-    };
   }
 
   // Save data to localStorage (debounced)
@@ -100,10 +149,9 @@ class StorageManager {
     }
 
     this.saveDebounceTimer = window.setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-      } catch (error) {
-        console.error('Failed to save progress data:', error);
+      const result = safeSetItemResult(STORAGE_KEY, JSON.stringify(this.data));
+      if (!result.ok) {
+        console.error('Failed to save progress data:', result.error);
       }
       this.saveDebounceTimer = null;
     }, 100);
@@ -115,10 +163,9 @@ class StorageManager {
       clearTimeout(this.saveDebounceTimer);
       this.saveDebounceTimer = null;
     }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-    } catch (error) {
-      console.error('Failed to save progress data:', error);
+    const result = safeSetItemResult(STORAGE_KEY, JSON.stringify(this.data));
+    if (!result.ok) {
+      console.error('Failed to save progress data:', result.error);
     }
   }
 
@@ -128,15 +175,23 @@ class StorageManager {
   }
 
   public setProfile(profile: PlayerProfile): void {
-    this.data.profile = profile;
+    const sanitized = sanitizeProfile(profile);
+    if (!sanitized) {
+      throw new TypeError('Invalid player profile');
+    }
+    this.data.profile = sanitized;
     this.save();
   }
 
   public createProfile(name: string, avatar: string): PlayerProfile {
+    const safeName =
+      sanitizeDisplayStringAllowEmpty(name, MAX_PROFILE_NAME_LENGTH) ?? '';
+    const safeAvatar =
+      sanitizeDisplayStringAllowEmpty(avatar, MAX_PROFILE_AVATAR_LENGTH) ?? '';
     const profile: PlayerProfile = {
       id: crypto.randomUUID(),
-      name,
-      avatar,
+      name: safeName,
+      avatar: safeAvatar,
       createdAt: Date.now(),
       lastActiveAt: Date.now(),
     };
@@ -232,13 +287,13 @@ class StorageManager {
   }
 
   private getTodayString(): string {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split('T')[0] ?? '';
   }
 
   private getYesterdayString(): string {
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-    return yesterday.toISOString().split('T')[0];
+    return yesterday.toISOString().split('T')[0] ?? '';
   }
 
   // Achievement methods
@@ -316,7 +371,11 @@ class StorageManager {
   }
 
   public updateSettings(settings: Partial<UserSettings>): void {
-    this.data.settings = { ...this.data.settings, ...settings };
+    this.data.settings = sanitizeSettings({
+      ...this.data.settings,
+      ...settings,
+    });
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
     this.save();
   }
 
@@ -350,6 +409,7 @@ class StorageManager {
   // Reset all data
   public resetAll(): void {
     this.data = createDefaultProgress();
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
     this.saveNow();
   }
 
@@ -361,7 +421,8 @@ class StorageManager {
   public importData(json: string): boolean {
     try {
       const imported = JSON.parse(json) as ProgressData;
-      this.data = this.ensureDefaults(imported);
+      this.data = ensureProgressDefaults(imported);
+      setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
       this.saveNow();
       return true;
     } catch {

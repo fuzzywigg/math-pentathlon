@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function setCardWrappers(root: HTMLElement): HTMLElement[] {
 
 describe('Overnight demos — attribute reselect leftovers', () => {
   it('deselecting a SET card after a trio clears valid/invalid chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(3);
@@ -48,7 +43,7 @@ describe('Overnight demos — attribute reselect leftovers', () => {
   });
 
   it('basic piece grid click shows attribute details in selected-info', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const pieces = root.querySelectorAll('#piece-grid .piece-wrapper');
     expect(pieces.length).toBeGreaterThan(1);

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function setCardWrappers(root: HTMLElement): HTMLElement[] {
   return [...root.querySelectorAll('#set-grid .set-card')].map(
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — attr forced SET verdicts', () => {
   it('cards 0,1,2 form a forced Valid SET! with .valid class', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(3);
@@ -43,7 +38,7 @@ describe('Overnight demos46 — attr forced SET verdicts', () => {
   });
 
   it('cards 0,1,3 force invalid Count reason string', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(4);
@@ -59,7 +54,7 @@ describe('Overnight demos46 — attr forced SET verdicts', () => {
   });
 
   it('math→basic switch clears selection back to placeholder', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     (
       root.querySelector('.set-btn[data-set="math"]') as HTMLButtonElement

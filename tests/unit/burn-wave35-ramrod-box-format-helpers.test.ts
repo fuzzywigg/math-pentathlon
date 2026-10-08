@@ -17,23 +17,23 @@ import { getAIMove, isAITurn } from '../../src/games/ramrod/ai';
 describe('Wave 35 Ramrod — box/format helpers', () => {
   it('getBoxSum null until both rods; getRemainingValue equals targetSum', () => {
     const state = createInitialState();
-    const box = [...state.boxes.values()][0];
+    const box = [...state.boxes.values()][0]!;
     expect(getBoxSum(box)).toBeNull();
     expect(getRemainingValue(box)).toBe(box.targetSum);
   });
 
   it('selectRod identity for opponent rod', () => {
     const state = createInitialState();
-    const oppRod = state.playerRods.player2[0];
+    const oppRod = state.playerRods.player2[0]!;
     expect(selectRod(state, oppRod)).toBe(state);
   });
 
   it('select own rod yields placements; formatMove stringy', () => {
     let state = createInitialState();
     expect(hasValidMoves(state)).toBe(true);
-    const rodId = state.playerRods.player1[0];
+    const rodId = state.playerRods.player1[0]!;
     state = selectRod(state, rodId);
-    expect(getValidPlacements(state).length).toBeGreaterThanOrEqual(0);
+    expect(getValidPlacements(state, rodId).length).toBeGreaterThanOrEqual(0);
     const rod = state.rods.get(rodId)!;
     const formatted = formatMove({
       player: 'player1',

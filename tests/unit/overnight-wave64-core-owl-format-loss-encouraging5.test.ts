@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format loss-encouraging-5', () => {
     storage.resetAll();
   });
 
-
   it('selects loss-encouraging-5 when other losses are seen', () => {
     for (const m of owlMessages.getMessagesByCategory('game:end')) {
       if (m.id !== 'loss-encouraging-5') storage.markMessageSeen(m.id);

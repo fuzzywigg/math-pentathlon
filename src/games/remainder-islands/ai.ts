@@ -13,7 +13,7 @@
 // 5. Also consider territory - owning islands blocks opponent
 // 6. Low dice rolls work well with high island values (9 % 8 = 1)
 
-import { RemainderIslandsState, Player } from './types';
+import type { RemainderIslandsState, Player } from './types';
 import { selectIsland, calculateDivision } from './rules';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';

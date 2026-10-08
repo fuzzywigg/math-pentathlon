@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 59 demos — align potential click copy', () => {
   it('exposes exact Click a cell to see alignment potential', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     expect(root.querySelector('#potential-info')?.textContent).toBe(
       'Click a cell to see alignment potential'

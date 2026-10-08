@@ -1,0 +1,2595 @@
+{
+  "taskId": "burn-1008-mp-mutation-audit",
+  "generatedAt": "2026-10-08T02:36:44.160Z",
+  "harness": "scripts/mutation-report.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 30,
+    "timeoutMs": 40000,
+    "games": [
+      "calla",
+      "contig-60",
+      "fab-a-diffy",
+      "fiar",
+      "frac-fact",
+      "fraction-pinball",
+      "hex",
+      "hex-a-gone",
+      "juggle",
+      "kings-quadraphages",
+      "kwatro-sinko",
+      "par-55",
+      "pent-em-in",
+      "prime-gold",
+      "queens-guards",
+      "ramrod",
+      "remainder-islands",
+      "star-track",
+      "stars-bars",
+      "sum-dominoes"
+    ]
+  },
+  "results": [
+    {
+      "game": "calla",
+      "lines": 329,
+      "tests": [
+        "tests/unit/calla-rules.test.ts",
+        "tests/unit/overnight-wave50-calla-rules-p2-capture.test.ts",
+        "tests/unit/overnight-wave50-calla-rules-p2-sweep-default.test.ts",
+        "tests/unit/overnight-wave50-calla-rules-wrap-cycle.test.ts"
+      ],
+      "availableMutants": 120,
+      "ranMutants": 30,
+      "killed": 24,
+      "survived": 6,
+      "timeout": 0,
+      "error": 0,
+      "score": 80,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "BooleanLiteral",
+          "line": 19,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "Logical",
+          "line": 21,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 21,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 33,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 97,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "contig-60",
+      "lines": 264,
+      "tests": [
+        "tests/unit/contig-60-end-rules.test.ts",
+        "tests/unit/contig-60-rules.test.ts"
+      ],
+      "availableMutants": 86,
+      "ranMutants": 30,
+      "killed": 22,
+      "survived": 8,
+      "timeout": 0,
+      "error": 0,
+      "score": 73.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 32,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 32,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 45,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "Logical",
+          "line": 71,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Arithmetic",
+          "line": 102,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 102,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "NumericBoundary",
+          "line": 102,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 146,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "fab-a-diffy",
+      "lines": 469,
+      "tests": [
+        "tests/unit/fab-a-diffy-rules.test.ts"
+      ],
+      "availableMutants": 89,
+      "ranMutants": 30,
+      "killed": 13,
+      "survived": 17,
+      "timeout": 0,
+      "error": 0,
+      "score": 43.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m5",
+          "kind": "Logical",
+          "line": 91,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "Logical",
+          "line": 111,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 159,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 159,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Logical",
+          "line": 189,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 189,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 189,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "Logical",
+          "line": 195,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 195,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 195,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Logical",
+          "line": 197,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 197,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "NumericBoundary",
+          "line": 197,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "UnaryNot",
+          "line": 199,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "Logical",
+          "line": 219,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "Logical",
+          "line": 235,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "Logical",
+          "line": 239,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "fiar",
+      "lines": 451,
+      "tests": [
+        "tests/unit/fiar-official-rules.test.ts",
+        "tests/unit/fiar-rules.test.ts"
+      ],
+      "availableMutants": 106,
+      "ranMutants": 30,
+      "killed": 10,
+      "survived": 20,
+      "timeout": 0,
+      "error": 0,
+      "score": 33.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "BooleanLiteral",
+          "line": 26,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 32,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "Logical",
+          "line": 41,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 41,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 41,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 41,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "Logical",
+          "line": 42,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 42,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 42,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 42,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 43,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Logical",
+          "line": 52,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 52,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "Logical",
+          "line": 53,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 53,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 53,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 54,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "frac-fact",
+      "lines": 394,
+      "tests": [
+        "tests/unit/frac-fact-rules.test.ts"
+      ],
+      "availableMutants": 137,
+      "ranMutants": 30,
+      "killed": 0,
+      "survived": 30,
+      "timeout": 0,
+      "error": 0,
+      "score": 0,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 37,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 37,
+          "description": "4 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 37,
+          "description": "4 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 40,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 40,
+          "description": "8 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 40,
+          "description": "8 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "Arithmetic",
+          "line": 68,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 87,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 87,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 87,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 92,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 92,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Arithmetic",
+          "line": 92,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 92,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 92,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "Arithmetic",
+          "line": 98,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 98,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 98,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Arithmetic",
+          "line": 103,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 103,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "NumericBoundary",
+          "line": 103,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "Logical",
+          "line": 108,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 108,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 108,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "Arithmetic",
+          "line": 112,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "Arithmetic",
+          "line": 112,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "Arithmetic",
+          "line": 112,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 112,
+          "description": "3 → 4",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "NumericBoundary",
+          "line": 112,
+          "description": "3 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "NumericBoundary",
+          "line": 112,
+          "description": "1 → 2",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "fraction-pinball",
+      "lines": 382,
+      "tests": [
+        "tests/unit/fraction-pinball-rules.test.ts"
+      ],
+      "availableMutants": 157,
+      "ranMutants": 30,
+      "killed": 8,
+      "survived": 22,
+      "timeout": 0,
+      "error": 0,
+      "score": 26.7,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "Arithmetic",
+          "line": 30,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 33,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "Arithmetic",
+          "line": 71,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "Arithmetic",
+          "line": 72,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Arithmetic",
+          "line": 73,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 73,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 73,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "Arithmetic",
+          "line": 74,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 74,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 74,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Arithmetic",
+          "line": 75,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Arithmetic",
+          "line": 75,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Arithmetic",
+          "line": 75,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 75,
+          "description": "10 → 11",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 75,
+          "description": "10 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 75,
+          "description": "10 → 11",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "NumericBoundary",
+          "line": 75,
+          "description": "10 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "Arithmetic",
+          "line": 76,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "NumericBoundary",
+          "line": 76,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 76,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "Arithmetic",
+          "line": 77,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "Arithmetic",
+          "line": 78,
+          "description": "flip - → +",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "hex",
+      "lines": 283,
+      "tests": [
+        "tests/unit/hex-rules.test.ts"
+      ],
+      "availableMutants": 115,
+      "ranMutants": 30,
+      "killed": 19,
+      "survived": 11,
+      "timeout": 0,
+      "error": 0,
+      "score": 63.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 16,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 0",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "hex-a-gone",
+      "lines": 283,
+      "tests": [
+        "tests/unit/hex-a-gone-rules.test.ts"
+      ],
+      "availableMutants": 69,
+      "ranMutants": 30,
+      "killed": 24,
+      "survived": 6,
+      "timeout": 0,
+      "error": 0,
+      "score": 80,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 22,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 49,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 76,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "UnaryNot",
+          "line": 77,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "Logical",
+          "line": 109,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 126,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "juggle",
+      "lines": 361,
+      "tests": [
+        "tests/unit/juggle-rules.test.ts"
+      ],
+      "availableMutants": 79,
+      "ranMutants": 30,
+      "killed": 11,
+      "survived": 19,
+      "timeout": 0,
+      "error": 0,
+      "score": 36.7,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 45,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "BooleanLiteral",
+          "line": 46,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "Logical",
+          "line": 84,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 98,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "BooleanLiteral",
+          "line": 99,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Logical",
+          "line": 112,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 117,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "BooleanLiteral",
+          "line": 118,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "Logical",
+          "line": 127,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 127,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "UnaryNot",
+          "line": 127,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 131,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "BooleanLiteral",
+          "line": 132,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "BooleanLiteral",
+          "line": 132,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 136,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "NumericBoundary",
+          "line": 136,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "UnaryNot",
+          "line": 150,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "BooleanLiteral",
+          "line": 150,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "Logical",
+          "line": 156,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "kings-quadraphages",
+      "lines": 207,
+      "tests": [
+        "tests/unit/burn-wave35-kings-can-complete-supply.test.ts",
+        "tests/unit/burn-wave41-kings-king-move-oob-reject.test.ts",
+        "tests/unit/burn-wave41-kings-win-trap-placements.test.ts",
+        "tests/unit/burn-wave42-kings-draw-supply-zero.test.ts",
+        "tests/unit/burn-wave42-kings-king-directions-matrix.test.ts",
+        "tests/unit/kings-quadraphages-supply-exhaustion.test.ts",
+        "tests/unit/overnight-wave49-kings-valid-moves-no-king.test.ts",
+        "tests/unit/overnight-wave55-kings-rules-no-king-reject.test.ts",
+        "tests/unit/rules.test.ts"
+      ],
+      "availableMutants": 102,
+      "ranMutants": 30,
+      "killed": 30,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "game": "kwatro-sinko",
+      "lines": 486,
+      "tests": [
+        "tests/unit/burn-wave41-kwatro-sinko-opening-rules.test.ts",
+        "tests/unit/burn-wave47-kwatro-sinko-opening-rules.test.ts",
+        "tests/unit/kwatro-sinko-end-rules-375.test.ts",
+        "tests/unit/kwatro-sinko-rules.test.ts",
+        "tests/unit/overnight-wave67-kwatro-rules-node-coords-exact.test.ts"
+      ],
+      "availableMutants": 221,
+      "ranMutants": 30,
+      "killed": 19,
+      "survived": 11,
+      "timeout": 0,
+      "error": 0,
+      "score": 63.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 33,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 34,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 36,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 50,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 51,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 59,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "NumericBoundary",
+          "line": 59,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "Arithmetic",
+          "line": 59,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 59,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "NumericBoundary",
+          "line": 59,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 60,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "par-55",
+      "lines": 423,
+      "tests": [
+        "tests/unit/burn-wave47-par-55-rules.test.ts",
+        "tests/unit/par-55-rules.test.ts"
+      ],
+      "availableMutants": 137,
+      "ranMutants": 30,
+      "killed": 0,
+      "survived": 30,
+      "timeout": 0,
+      "error": 0,
+      "score": 0,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 31,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 33,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 33,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 35,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 35,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 65,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 65,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 65,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 65,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 65,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "Arithmetic",
+          "line": 70,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 70,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 70,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Arithmetic",
+          "line": 71,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 71,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 71,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "Arithmetic",
+          "line": 71,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "NumericBoundary",
+          "line": 71,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "NumericBoundary",
+          "line": 71,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "Arithmetic",
+          "line": 72,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 72,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "NumericBoundary",
+          "line": 72,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "Arithmetic",
+          "line": 73,
+          "description": "flip + → -",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "pent-em-in",
+      "lines": 427,
+      "tests": [
+        "tests/unit/pent-em-in-rules.test.ts"
+      ],
+      "availableMutants": 95,
+      "ranMutants": 30,
+      "killed": 14,
+      "survived": 16,
+      "timeout": 0,
+      "error": 0,
+      "score": 46.7,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 41,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "Logical",
+          "line": 46,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 46,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 46,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 67,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 67,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 69,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 69,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 114,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 114,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "NumericBoundary",
+          "line": 115,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 115,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "NumericBoundary",
+          "line": 131,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "UnaryNot",
+          "line": 133,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 133,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "NumericBoundary",
+          "line": 133,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "prime-gold",
+      "lines": 359,
+      "tests": [
+        "tests/unit/prime-gold-rules.test.ts"
+      ],
+      "availableMutants": 128,
+      "ranMutants": 30,
+      "killed": 14,
+      "survived": 16,
+      "timeout": 0,
+      "error": 0,
+      "score": 46.7,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 32,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 35,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 35,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 38,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 39,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 40,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 44,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Arithmetic",
+          "line": 44,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 56,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "NumericBoundary",
+          "line": 58,
+          "description": "1 → 0",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "queens-guards",
+      "lines": 410,
+      "tests": [
+        "tests/unit/queens-guards-rules.test.ts"
+      ],
+      "availableMutants": 124,
+      "ranMutants": 30,
+      "killed": 9,
+      "survived": 21,
+      "timeout": 0,
+      "error": 0,
+      "score": 30,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m3",
+          "kind": "Logical",
+          "line": 44,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 50,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 79,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 79,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 80,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "BooleanLiteral",
+          "line": 82,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 99,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 99,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 100,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 100,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Logical",
+          "line": 107,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 107,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 107,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "Arithmetic",
+          "line": 108,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "Arithmetic",
+          "line": 109,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "NumericBoundary",
+          "line": 109,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "NumericBoundary",
+          "line": 109,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 110,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "Arithmetic",
+          "line": 110,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "NumericBoundary",
+          "line": 110,
+          "description": "2 → 3",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "ramrod",
+      "lines": 381,
+      "tests": [
+        "tests/unit/ramrod-rules.test.ts"
+      ],
+      "availableMutants": 132,
+      "ranMutants": 30,
+      "killed": 6,
+      "survived": 24,
+      "timeout": 0,
+      "error": 0,
+      "score": 20,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "5 → 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "5 → 4",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "6 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "7 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "7 → 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "8 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "8 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "6 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "7 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "7 → 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "8 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "8 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "9 → 10",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 30,
+          "description": "9 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "7 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "7 → 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "8 → 9",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "8 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "9 → 10",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "9 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "10 → 11",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 31,
+          "description": "10 → 9",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "remainder-islands",
+      "lines": 239,
+      "tests": [
+        "tests/unit/remainder-islands-rules.test.ts"
+      ],
+      "availableMutants": 74,
+      "ranMutants": 30,
+      "killed": 16,
+      "survived": 14,
+      "timeout": 0,
+      "error": 0,
+      "score": 53.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Arithmetic",
+          "line": 21,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 21,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 22,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 22,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 45,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 45,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 48,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 48,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 52,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Arithmetic",
+          "line": 52,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m30",
+          "kind": "Logical",
+          "line": 110,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "star-track",
+      "lines": 141,
+      "tests": [
+        "tests/unit/star-track-rules.test.ts"
+      ],
+      "availableMutants": 33,
+      "ranMutants": 30,
+      "killed": 21,
+      "survived": 9,
+      "timeout": 0,
+      "error": 0,
+      "score": 70,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m16",
+          "kind": "Arithmetic",
+          "line": 73,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 73,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 73,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 82,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "Logical",
+          "line": 110,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m25",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 110,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "UnaryNot",
+          "line": 110,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m27",
+          "kind": "UnaryNot",
+          "line": 112,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "Arithmetic",
+          "line": 114,
+          "description": "flip + → -",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "stars-bars",
+      "lines": 433,
+      "tests": [
+        "tests/unit/stars-bars-rules.test.ts"
+      ],
+      "availableMutants": 114,
+      "ranMutants": 30,
+      "killed": 18,
+      "survived": 12,
+      "timeout": 0,
+      "error": 0,
+      "score": 60,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 27,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "Arithmetic",
+          "line": 53,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 53,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 53,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "Arithmetic",
+          "line": 54,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 54,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 81,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 130,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "game": "sum-dominoes",
+      "lines": 495,
+      "tests": [
+        "tests/unit/sum-dominoes-rules.test.ts"
+      ],
+      "availableMutants": 173,
+      "ranMutants": 30,
+      "killed": 7,
+      "survived": 23,
+      "timeout": 0,
+      "error": 0,
+      "score": 23.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 44,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 44,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "Arithmetic",
+          "line": 49,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 49,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 49,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 51,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 51,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "6 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 51,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "6 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "6 → 5",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "UnaryNot",
+          "line": 53,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 54,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "UnaryNot",
+          "line": 56,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 57,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m21",
+          "kind": "Arithmetic",
+          "line": 69,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m22",
+          "kind": "NumericBoundary",
+          "line": 69,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m23",
+          "kind": "NumericBoundary",
+          "line": 69,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m24",
+          "kind": "NumericBoundary",
+          "line": 84,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m26",
+          "kind": "NumericBoundary",
+          "line": 125,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m28",
+          "kind": "NumericBoundary",
+          "line": 126,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m29",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 126,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}

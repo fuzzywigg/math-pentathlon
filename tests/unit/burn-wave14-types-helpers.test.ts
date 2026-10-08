@@ -203,7 +203,7 @@ describe('Wave 14 — Pent-em-in piece helpers', () => {
     expect(p2.available).toEqual(p1.available);
     expect(p1).not.toBe(p2);
 
-    const id = p1.available[0];
+    const id = p1.available[0]!;
     const shape = getPentominoShape(id);
     expect(shape?.id).toBe(id);
     expect(getPentominoShape('not-a-real-shape')).toBeUndefined();
@@ -297,7 +297,7 @@ describe('Wave 14 — Par / Ramrod / Kwatro / Fab factory helpers', () => {
     expect(blocks).toHaveLength(5 * 3 * 2 * 2);
     expect(createBaseId(1, 2)).toBe('base-1-2');
 
-    const a = blocks[0];
+    const a = blocks[0]!;
     const identical: AttributeBlock = { ...a, id: 'copy' };
     expect(countMatchingAttributes(a, identical).sort()).toEqual([
       'color',

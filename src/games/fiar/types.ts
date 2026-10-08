@@ -1,13 +1,8 @@
 // FIAR (Four In A Row) Game Types
 // Division II alignment game: place then move chips to form 4 in a row
 
-import {
-  BoardLayout,
-  LayoutEdge,
-  YellowCenterShape,
-  createVerifiedProductionLayout,
-  edgeKey,
-} from './layout';
+import type { BoardLayout, LayoutEdge, YellowCenterShape } from './layout';
+import { createVerifiedProductionLayout, edgeKey } from './layout';
 
 export type Player = 'player1' | 'player2';
 
@@ -173,9 +168,7 @@ export function createInitialState(
   };
 }
 
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 export function chipsRemaining(inv: ChipInventory): number {
   return inv.plain + inv.marked;
@@ -193,7 +186,7 @@ export function areConnected(
   );
 }
 
-export function edgeCrossesYellow(
+function edgeCrossesYellow(
   board: FiarBoard,
   nodeA: string,
   nodeB: string
@@ -240,6 +233,7 @@ export function getNodesInDirection(
         Math.abs(node.y - currentY) < 10
       ) {
         const prevId = result.length > 0 ? result[result.length - 1] : startId;
+        if (prevId === undefined) break;
         if (!areConnected(board, prevId, id)) break;
         if (!allowYellow && edgeCrossesYellow(board, prevId, id)) {
           return result;
@@ -283,7 +277,6 @@ export function getBoardDirections(board: FiarBoard): {
 /** Re-export layout helpers used by tests / 3D. */
 export {
   createVerifiedProductionLayout,
-  createUnverifiedProductionLayout,
   createYellowCenterTestLayout,
   INCLUDE_DIAMOND_BORDER_EDGES,
   parseNodeId,

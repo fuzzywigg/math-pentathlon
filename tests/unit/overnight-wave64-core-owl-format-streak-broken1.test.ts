@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format streak-broken-1', () => {
     storage.resetAll();
   });
 
-
   it('selects streak-broken-1 when broken-2 is seen', () => {
     for (const m of owlMessages.getMessagesByCategory('streak:broken')) {
       if (m.id !== 'streak-broken-1') storage.markMessageSeen(m.id);

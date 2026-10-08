@@ -1,8 +1,10 @@
 /**
  * Read-only progress / stats dashboard.
  * Data comes only from existing storage APIs — no new keys or writers.
+ * Rendered with safe DOM APIs — stored profile/game ids never parse as HTML.
  */
 
+import { clearElement } from '../core/dom-security';
 import { getGameById } from '../core/game-registry';
 import { navigate } from '../core/router';
 import { storage } from '../core/storage';
@@ -76,14 +78,6 @@ export function formatLastPlayed(timestamp: number): string {
   }
 }
 
-function escapeText(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 function gameDisplayName(gameId: string): { name: string; icon: string } {
   const info = getGameById(gameId);
   if (info) {
@@ -96,137 +90,165 @@ function sortGameStats(stats: Record<string, GameStats>): GameStats[] {
   return Object.values(stats).sort((a, b) => b.lastPlayed - a.lastPlayed);
 }
 
-function buildSummaryHeader(snapshot: StatsDashboardSnapshot): string {
-  const profileName = snapshot.profile?.name
-    ? `<p class="stats-dashboard-profile">Playing as <strong>${escapeText(snapshot.profile.name)}</strong></p>`
-    : '';
+function appendSummaryHeader(
+  parent: HTMLElement,
+  snapshot: StatsDashboardSnapshot
+): void {
+  const section = document.createElement('section');
+  section.className = 'stats-dashboard-summary';
+  section.setAttribute('aria-label', 'Overall progress');
 
-  const achievementCount = snapshot.achievements.length;
-  const achievementsNote =
-    achievementCount > 0
-      ? `<div class="stats-summary-item">
-          <span class="stats-summary-value">${achievementCount}</span>
-          <span class="stats-summary-label">Achievements</span>
-        </div>`
-      : '';
+  if (snapshot.profile?.name) {
+    const profile = document.createElement('p');
+    profile.className = 'stats-dashboard-profile';
+    profile.append('Playing as ');
+    const strong = document.createElement('strong');
+    strong.textContent = snapshot.profile.name;
+    profile.appendChild(strong);
+    section.appendChild(profile);
+  }
 
-  return `
-    <section class="stats-dashboard-summary" aria-label="Overall progress">
-      ${profileName}
-      <div class="stats-summary-grid">
-        <div class="stats-summary-item">
-          <span class="stats-summary-value">${snapshot.streak.currentStreak}</span>
-          <span class="stats-summary-label">Day streak</span>
-        </div>
-        <div class="stats-summary-item">
-          <span class="stats-summary-value">${snapshot.totalGamesPlayed}</span>
-          <span class="stats-summary-label">Games played</span>
-        </div>
-        <div class="stats-summary-item">
-          <span class="stats-summary-value">${escapeText(formatPlayTime(snapshot.totalPlayTime))}</span>
-          <span class="stats-summary-label">Play time</span>
-        </div>
-        <div class="stats-summary-item">
-          <span class="stats-summary-value">${escapeText(formatWinRate(snapshot.overallWinRate))}</span>
-          <span class="stats-summary-label">Win rate</span>
-        </div>
-        ${achievementsNote}
-      </div>
-      ${
-        snapshot.streak.bestStreak > 0
-          ? `<p class="stats-dashboard-best-streak">Best streak: ${snapshot.streak.bestStreak} day${snapshot.streak.bestStreak === 1 ? '' : 's'}</p>`
-          : ''
-      }
-    </section>
-  `;
+  const grid = document.createElement('div');
+  grid.className = 'stats-summary-grid';
+
+  const items: Array<[string | number, string]> = [
+    [snapshot.streak.currentStreak, 'Day streak'],
+    [snapshot.totalGamesPlayed, 'Games played'],
+    [formatPlayTime(snapshot.totalPlayTime), 'Play time'],
+    [formatWinRate(snapshot.overallWinRate), 'Win rate'],
+  ];
+  if (snapshot.achievements.length > 0) {
+    items.push([snapshot.achievements.length, 'Achievements']);
+  }
+
+  for (const [value, label] of items) {
+    const item = document.createElement('div');
+    item.className = 'stats-summary-item';
+    const valueEl = document.createElement('span');
+    valueEl.className = 'stats-summary-value';
+    valueEl.textContent = String(value);
+    const labelEl = document.createElement('span');
+    labelEl.className = 'stats-summary-label';
+    labelEl.textContent = label;
+    item.append(valueEl, labelEl);
+    grid.appendChild(item);
+  }
+
+  section.appendChild(grid);
+
+  if (snapshot.streak.bestStreak > 0) {
+    const best = document.createElement('p');
+    best.className = 'stats-dashboard-best-streak';
+    best.textContent = `Best streak: ${snapshot.streak.bestStreak} day${
+      snapshot.streak.bestStreak === 1 ? '' : 's'
+    }`;
+    section.appendChild(best);
+  }
+
+  parent.appendChild(section);
 }
 
-function buildEmptyState(): string {
-  return `
-    <section class="stats-dashboard-empty" role="status">
-      <h2>No recorded games yet</h2>
-      <p>
-        Progress appears here after a game finishes and is saved.
-        Some games may not record results yet — this list only shows what is already stored.
-      </p>
-      <button type="button" class="stats-dashboard-cta" data-action="home">
-        Pick a game to play
-      </button>
-    </section>
-  `;
+function appendEmptyState(parent: HTMLElement): void {
+  const section = document.createElement('section');
+  section.className = 'stats-dashboard-empty';
+  section.setAttribute('role', 'status');
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'No recorded games yet';
+  const p = document.createElement('p');
+  p.textContent =
+    'Progress appears here after a game finishes and is saved. Some games may not record results yet — this list only shows what is already stored.';
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'stats-dashboard-cta';
+  btn.dataset.action = 'home';
+  btn.textContent = 'Pick a game to play';
+
+  section.append(h2, p, btn);
+  parent.appendChild(section);
 }
 
-function buildGameRow(stats: GameStats): string {
+function appendGameRow(parent: HTMLElement, stats: GameStats): void {
   const { name, icon } = gameDisplayName(stats.gameId);
   const winRate =
     stats.gamesPlayed > 0
       ? formatWinRate(stats.gamesWon / stats.gamesPlayed)
       : '—';
 
-  return `
-    <article class="stats-game-card" data-game-id="${escapeText(stats.gameId)}">
-      <div class="stats-game-card-header">
-        <span class="stats-game-icon" aria-hidden="true">${escapeText(icon)}</span>
-        <div>
-          <h3 class="stats-game-name">${escapeText(name)}</h3>
-          <p class="stats-game-last">Last played ${escapeText(formatLastPlayed(stats.lastPlayed))}</p>
-        </div>
-      </div>
-      <dl class="stats-game-metrics">
-        <div>
-          <dt>Played</dt>
-          <dd>${stats.gamesPlayed}</dd>
-        </div>
-        <div>
-          <dt>Won</dt>
-          <dd>${stats.gamesWon}</dd>
-        </div>
-        <div>
-          <dt>Lost</dt>
-          <dd>${stats.gamesLost}</dd>
-        </div>
-        <div>
-          <dt>Draw</dt>
-          <dd>${stats.gamesDraw}</dd>
-        </div>
-        <div>
-          <dt>Win rate</dt>
-          <dd>${escapeText(winRate)}</dd>
-        </div>
-        <div>
-          <dt>Time</dt>
-          <dd>${escapeText(formatPlayTime(stats.totalPlayTime))}</dd>
-        </div>
-        <div>
-          <dt>Win streak</dt>
-          <dd>${stats.currentWinStreak}</dd>
-        </div>
-        <div>
-          <dt>Best streak</dt>
-          <dd>${stats.bestWinStreak}</dd>
-        </div>
-      </dl>
-    </article>
-  `;
-}
+  const article = document.createElement('article');
+  article.className = 'stats-game-card';
+  article.dataset.gameId = stats.gameId;
 
-function buildGameList(snapshot: StatsDashboardSnapshot): string {
-  const rows = sortGameStats(snapshot.gameStats);
-  if (rows.length === 0) {
-    return buildEmptyState();
+  const header = document.createElement('div');
+  header.className = 'stats-game-card-header';
+  const iconEl = document.createElement('span');
+  iconEl.className = 'stats-game-icon';
+  iconEl.setAttribute('aria-hidden', 'true');
+  iconEl.textContent = icon;
+  const titles = document.createElement('div');
+  const h3 = document.createElement('h3');
+  h3.className = 'stats-game-name';
+  h3.textContent = name;
+  const last = document.createElement('p');
+  last.className = 'stats-game-last';
+  last.textContent = `Last played ${formatLastPlayed(stats.lastPlayed)}`;
+  titles.append(h3, last);
+  header.append(iconEl, titles);
+
+  const dl = document.createElement('dl');
+  dl.className = 'stats-game-metrics';
+  const metrics: Array<[string, string | number]> = [
+    ['Played', stats.gamesPlayed],
+    ['Won', stats.gamesWon],
+    ['Lost', stats.gamesLost],
+    ['Draw', stats.gamesDraw],
+    ['Win rate', winRate],
+    ['Time', formatPlayTime(stats.totalPlayTime)],
+    ['Win streak', stats.currentWinStreak],
+    ['Best streak', stats.bestWinStreak],
+  ];
+  for (const [dt, dd] of metrics) {
+    const wrap = document.createElement('div');
+    const dtEl = document.createElement('dt');
+    dtEl.textContent = dt;
+    const ddEl = document.createElement('dd');
+    ddEl.textContent = String(dd);
+    wrap.append(dtEl, ddEl);
+    dl.appendChild(wrap);
   }
 
-  return `
-    <section class="stats-dashboard-games" aria-label="Per-game progress">
-      <h2>By game</h2>
-      <p class="stats-dashboard-note">
-        Only games that have saved a finished result appear here.
-      </p>
-      <div class="stats-game-list">
-        ${rows.map(buildGameRow).join('')}
-      </div>
-    </section>
-  `;
+  article.append(header, dl);
+  parent.appendChild(article);
+}
+
+function appendGameList(
+  parent: HTMLElement,
+  snapshot: StatsDashboardSnapshot
+): void {
+  const rows = sortGameStats(snapshot.gameStats);
+  if (rows.length === 0) {
+    appendEmptyState(parent);
+    return;
+  }
+
+  const section = document.createElement('section');
+  section.className = 'stats-dashboard-games';
+  section.setAttribute('aria-label', 'Per-game progress');
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'By game';
+  const note = document.createElement('p');
+  note.className = 'stats-dashboard-note';
+  note.textContent =
+    'Only games that have saved a finished result appear here.';
+  const list = document.createElement('div');
+  list.className = 'stats-game-list';
+  for (const row of rows) {
+    appendGameRow(list, row);
+  }
+
+  section.append(h2, note, list);
+  parent.appendChild(section);
 }
 
 /** Build dashboard DOM from a snapshot (testable without writing storage). */
@@ -234,22 +256,36 @@ export function renderStatsDashboardFromSnapshot(
   container: HTMLElement,
   snapshot: StatsDashboardSnapshot
 ): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'stats-dashboard';
 
+  const header = document.createElement('header');
+  header.className = 'game-header';
+  const back = document.createElement('button');
+  back.id = 'back-btn';
+  back.className = 'back-button';
+  back.type = 'button';
+  back.setAttribute('aria-label', 'Back to game list');
+  back.textContent = '← Games';
+  const title = document.createElement('h1');
+  title.id = 'stats-title';
+  title.textContent = 'Your Progress';
+  header.append(back, title);
+
+  const main = document.createElement('div');
+  main.className = 'stats-main';
+  main.setAttribute('role', 'region');
+  main.setAttribute('aria-labelledby', 'stats-title');
+
   const isEmpty = Object.keys(snapshot.gameStats).length === 0;
+  if (!isEmpty) {
+    appendSummaryHeader(main, snapshot);
+  }
+  appendGameList(main, snapshot);
 
-  wrapper.innerHTML = `
-    <header class="game-header">
-      <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
-      <h1>Your Progress</h1>
-    </header>
-    ${isEmpty ? '' : buildSummaryHeader(snapshot)}
-    ${buildGameList(snapshot)}
-  `;
-
+  wrapper.append(header, main);
   container.appendChild(wrapper);
 
   const goHome = () => navigate('/');

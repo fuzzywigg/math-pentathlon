@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — poly shape-info dt catalog', () => {
   it('selecting a gallery shape exposes exact dl dt labels', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     const item = root.querySelector('.shape-item') as HTMLElement;
     expect(item).toBeTruthy();

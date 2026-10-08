@@ -4,8 +4,11 @@
  * capped search; uncapped engines are the sweep targets.
  *
  * Run: npx vitest run tests/unit/tablet-ai-hard-latency.bench.test.ts
+ *
+ * Skipped under CI — offline/local keeper; tip unit step needs the wall for
+ * the required suite.
  */
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, afterAll } from 'vitest';
 import { createInitialState as createCallaState } from '../../src/games/calla/types';
 import {
   makeMove as makeCallaMove,
@@ -94,7 +97,7 @@ afterEach(() => {
   document.body.innerHTML = '';
 });
 
-describe('Tablet Hard AI latency bench', () => {
+describe.skipIf(!!process.env.CI)('Tablet Hard AI latency bench', () => {
   it('Calla Hard opening + midgame (uncapped minimax depth 6)', () => {
     for (const seed of SEEDS) {
       const opening = createCallaState();
@@ -254,7 +257,9 @@ describe('Tablet Hard AI latency bench', () => {
     }
   }, 60_000);
 
-  it('summarizes max Hard latency vs tablet budget', () => {
+  // afterAll — not an `it` — so --sequence.shuffle cannot run the summary
+  // before sibling benches have filled the module-level `rows` accumulator.
+  afterAll(() => {
     const byGame = new Map<
       string,
       { cappedMax: number; uncappedMax: number }

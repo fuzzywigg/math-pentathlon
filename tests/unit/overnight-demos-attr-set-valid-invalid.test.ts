@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 /** SET cards are SVGs; click listeners live on parent wrappers. */
 function setCardWrappers(root: HTMLElement): HTMLElement[] {
@@ -31,7 +26,7 @@ afterEach(() => {
 
 describe('Overnight demos — attribute SET selection', () => {
   it('selecting fewer than 3 cards leaves set-result without valid/invalid class', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(3);
@@ -44,7 +39,7 @@ describe('Overnight demos — attribute SET selection', () => {
   });
 
   it('selecting 3 cards marks result valid or invalid with tip chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(3);

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — fraction arithmetic leftovers', () => {
   it('custom inputs across all four ops fill steps + visual result bar', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const a = root.querySelector('#fraction-a') as HTMLInputElement;
     const b = root.querySelector('#fraction-b') as HTMLInputElement;
@@ -41,7 +36,7 @@ describe('Overnight demos — fraction arithmetic leftovers', () => {
   });
 
   it('invalid fraction format shows red guidance without crashing', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('#fraction-a') as HTMLInputElement).value = 'nope';
     (root.querySelector('#fraction-b') as HTMLInputElement).value = '1/2';
@@ -50,7 +45,7 @@ describe('Overnight demos — fraction arithmetic leftovers', () => {
   });
 
   it('mixed-number input path still produces a decimal result', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('#fraction-a') as HTMLInputElement).value = '1 1/2';
     (root.querySelector('#fraction-b') as HTMLInputElement).value = '1/2';

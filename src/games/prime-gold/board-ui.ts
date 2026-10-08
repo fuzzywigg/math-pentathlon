@@ -1,8 +1,10 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import { PrimeGoldState, Player, CONFIG, isPrime } from './types';
+import type { PrimeGoldState } from './types';
+import { CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -13,17 +15,19 @@ import {
   applyRovingTabindex,
 } from '../../ui/board-a11y';
 import { seatIcon } from '../../ui/player-colors';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
+
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
 // =============================================================================
 // Style Injection
 // =============================================================================
 
 export function injectPrimeGoldStyles(): void {
-  if (document.getElementById('prime-gold-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'prime-gold-styles';
-  style.textContent = `
+  injectStylesOnce(
+    'prime-gold-styles',
+    `
     .pg-game-area {
       display: flex;
       flex-direction: column;
@@ -42,12 +46,12 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .pg-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .pg-status.player2 {
@@ -75,12 +79,12 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: var(--color-player1, #1976d2);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .pg-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: var(--color-player2, #e53935);
+      color: #fca5a5;
     }
 
     [data-opponent="ai"] .pg-score.player2 {
@@ -132,6 +136,7 @@ export function injectPrimeGoldStyles(): void {
       width: 50px;
       height: 50px;
       background: #3d3d3d;
+      color: #e2e8f0;
       border-radius: 6px;
       display: flex;
       align-items: center;
@@ -181,9 +186,14 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-dice-area {
       background: #2d2d2d;
+      color: #e2e8f0;
       padding: 1rem;
       border-radius: 12px;
       text-align: center;
+    }
+
+    .pg-dice-area strong {
+      color: #e2e8f0;
     }
 
     .pg-dice-container {
@@ -218,7 +228,7 @@ export function injectPrimeGoldStyles(): void {
 
     .pg-roll-btn {
       padding: 0.75rem 2rem;
-      background: #4caf50;
+      background: #2e7d32;
       color: white;
       border: none;
       border-radius: 8px;
@@ -228,7 +238,7 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-roll-btn:hover {
-      background: #388e3c;
+      background: #1b5e20;
     }
 
     .pg-roll-btn:disabled {
@@ -248,13 +258,19 @@ export function injectPrimeGoldStyles(): void {
     .pg-expressions h3 {
       margin: 0 0 0.5rem 0;
       font-size: 1rem;
-      color: #aaa;
+      color: #e2e8f0;
+    }
+
+    .pg-expressions,
+    .pg-expressions strong {
+      color: #e2e8f0;
     }
 
     .pg-expr-item {
       padding: 6px 10px;
       margin: 4px 0;
       background: #3d3d3d;
+      color: #e2e8f0;
       border-radius: 4px;
       cursor: pointer;
       font-size: 0.85rem;
@@ -262,7 +278,7 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-expr-item:hover {
-      background: #4caf50;
+      background: #15803d; /* AA white-on-fill (was #4caf50) */
     }
 
     .pg-expr-item.prime {
@@ -301,12 +317,12 @@ export function injectPrimeGoldStyles(): void {
     }
 
     .pg-btn-primary {
-      background: #4caf50;
+      background: #15803d; /* AA white-on-fill (was #4caf50) */
       color: white;
     }
 
     .pg-btn-primary:hover {
-      background: #388e3c;
+      background: #166534;
     }
 
     .pg-btn-secondary {
@@ -374,8 +390,8 @@ export function injectPrimeGoldStyles(): void {
       border-bottom: none;
     }
 
-    .pg-move-item.player1 { color: var(--color-player1, #64b5f6); }
-    .pg-move-item.player2 { color: var(--color-player2, #ef9a9a); }
+    .pg-move-item.player1 { color: var(--color-player1-text, #1d4ed8); }
+    .pg-move-item.player2 { color: var(--color-player2-text, #b91c1c); }
 
     /* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
     @media (pointer: coarse) {
@@ -421,8 +437,8 @@ export function injectPrimeGoldStyles(): void {
         animation: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `
+  );
 }
 
 export interface PrimeGoldBoardRenderOptions {
@@ -433,10 +449,6 @@ export interface PrimeGoldBoardRenderOptions {
 // =============================================================================
 // Player Names
 // =============================================================================
-
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
 
 // =============================================================================
 // Board Rendering
@@ -480,7 +492,7 @@ export function renderBoard(
         if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
 
         const expr = validMap.get(cell.value);
-        const isValid = allowInput && !!expr;
+        const isValid = allowInput && Boolean(expr);
 
         if (isValid && expr) {
           cellEl.classList.add('valid');
@@ -489,14 +501,15 @@ export function renderBoard(
           bindCellActivateKeys(cellEl, activate);
         }
 
+        const ownerLabel = cell.owner ? getPlayerName(cell.owner) : undefined;
         makeGridCell(
           cellEl,
           buildCellAriaLabel({
             coord: String(cell.value),
             empty: !cell.owner,
-            owner: cell.owner ? getPlayerName(cell.owner) : undefined,
+            ...(ownerLabel !== undefined ? { owner: ownerLabel } : {}),
             validPlacement: isValid,
-            extras: cell.isPrime ? ['prime'] : undefined,
+            ...(cell.isPrime ? { extras: ['prime'] } : {}),
           })
         );
       }
@@ -513,6 +526,7 @@ export function renderBoard(
   // Legend
   const legend = document.createElement('div');
   legend.className = 'pg-legend';
+  // trusted constant markup
   legend.innerHTML = `
     <div class="pg-legend-item">
       <div class="pg-legend-swatch prime"></div>
@@ -549,7 +563,10 @@ export function renderDice(
   container.className = 'pg-dice-area';
 
   const title = document.createElement('div');
-  title.innerHTML = `<strong>${getPlayerName(state.currentPlayer)}'s Turn</strong>`;
+  replaceWithSafeHtml(
+    title,
+    safeHtml`<strong>${getPlayerName(state.currentPlayer)}'s Turn</strong>`
+  );
   container.appendChild(title);
 
   const diceContainer = document.createElement('div');
@@ -634,7 +651,7 @@ export function renderExpressions(
       const item = document.createElement('div');
       item.className = 'pg-expr-item';
       if (isPrime(value)) item.classList.add('prime');
-      item.innerHTML = `<strong>${value}</strong> = ${expr}`;
+      replaceWithSafeHtml(item, safeHtml`<strong>${value}</strong> = ${expr}`);
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
       item.setAttribute(
@@ -696,10 +713,14 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
     i >= Math.max(0, state.moveHistory.length - 10);
     i--
   ) {
-    const move = state.moveHistory[i];
+    // i is in [max(0,len-10), len); assert for NUI.
+    const move = state.moveHistory[i]!;
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;
-    moveEl.innerHTML = `${getPlayerName(move.player)}: ${move.expression} = <strong>${move.result}</strong>`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`${getPlayerName(move.player)}: ${move.expression} = <strong>${move.result}</strong>`
+    );
     container.appendChild(moveEl);
   }
 

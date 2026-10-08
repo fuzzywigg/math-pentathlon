@@ -1,12 +1,14 @@
 // Stars & Bars Game Rules
 // Attribute logic placement game
 
-import {
+import type {
   StarsState,
   BoardCell,
   AttributeCard,
   Player,
   MoveRecord,
+} from './types';
+import {
   CONFIG,
   SHAPES,
   COLORS,
@@ -52,7 +54,8 @@ function shuffle<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    // ratchet: dense copy — indexed elements exist for i,j in range (emit-identical `as`).
+    [result[i], result[j]] = [result[j], result[i]] as [T, T];
   }
   return result;
 }
@@ -199,7 +202,8 @@ export function getValidPlacements(
   // Otherwise, must place adjacent to existing card
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
-      if (state.cells[row][col].card !== null) continue;
+      // ratchet: cells is a dense BOARD_SIZE×BOARD_SIZE grid.
+      if (state.cells[row]![col]!.card !== null) continue;
 
       // Check if adjacent to any existing card (orthogonal and diagonal)
       const hasAdjacent = getAdjacentCells(state, row, col).some(
@@ -236,8 +240,9 @@ function getAdjacentCells(
   ];
 
   for (const [dr, dc] of directions) {
-    const newRow = row + dr;
-    const newCol = col + dc;
+    // ratchet: directions is a non-empty literal of [dr, dc] pairs.
+    const newRow = row + dr!;
+    const newCol = col + dc!;
 
     if (
       newRow >= 0 &&
@@ -245,7 +250,8 @@ function getAdjacentCells(
       newCol >= 0 &&
       newCol < CONFIG.BOARD_SIZE
     ) {
-      adjacent.push(state.cells[newRow][newCol]);
+      // ratchet: bounds-checked dense board cells.
+      adjacent.push(state.cells[newRow]![newCol]!);
     }
   }
 
@@ -261,7 +267,8 @@ function calculatePlacementScore(
   row: number,
   col: number
 ): { score: number; breakdown: string } {
-  const cell = state.cells[row][col];
+  // ratchet: callers pass in-bounds row/col on a dense BOARD_SIZE grid.
+  const cell = state.cells[row]![col]!;
   const adjacentCells = getAdjacentCells(state, row, col);
   const adjacentCards = adjacentCells.filter((c) => c.card !== null);
 
@@ -298,7 +305,8 @@ export function placeCard(
 ): StarsState {
   if (state.phase !== 'placingCard' || !state.selectedCard) return state;
 
-  const cell = state.cells[row][col];
+  // ratchet: placeCard is only invoked for board coordinates.
+  const cell = state.cells[row]![col]!;
   if (cell.card !== null) return state;
 
   // Check valid placement

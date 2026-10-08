@@ -2,34 +2,9 @@
  * Compact UI bug-guards that unit tests do not cover (illegal click no-ops,
  * selection integrity). Kept after the e2e smoke prune.
  */
-import { test, expect, type Page } from '@playwright/test';
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
-  }
-}
+import { test } from './fixtures';
+import { expect } from '@playwright/test';
+import { gotoGame, startHuman } from './helpers/page';
 
 test.describe('Bug guards', () => {
   test('Kings: illegal far click keeps selection; legal turn flips seat', async ({

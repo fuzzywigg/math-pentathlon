@@ -20,6 +20,10 @@ Math Pentathlon is a browser practice edition of educational strategy math games
 | Audience | Start here |
 |----------|------------|
 | Parents / educators | [Games](./games.md), live site |
-| Builders | [Development](./development.md), [Big Toads](./big-toads.md) |
+| Builders | [Architecture](./architecture.md), [Development](./development.md), [How to add a game](./adding-a-game.md), [Big Toads](./big-toads.md) |
 | Accessibility reviewers | [Accessibility](./accessibility.md) |
 | Planners | [Roadmap](./roadmap.md) |
+
+## Snapshot
+
+![Practice landing menu](./images/landing.png)

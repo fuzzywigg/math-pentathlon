@@ -1,11 +1,12 @@
 // Game selector / landing page UI with accordion divisions
 
+import type { GameInfo } from '../core/game-registry';
+import { GAMES, DIVISIONS, getGamesByDivision } from '../core/game-registry';
 import {
-  GAMES,
-  DIVISIONS,
-  GameInfo,
-  getGamesByDivision,
-} from '../core/game-registry';
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../core/dom-security';
 import { navigate } from '../core/router';
 import { prefetchGameChunk, prefetchGameChunksIdle } from './game-prefetch';
 import { scrollBehaviorForMotion } from './reduced-motion';
@@ -28,7 +29,8 @@ function createGameCard(game: GameInfo): HTMLElement {
   const content = document.createElement('div');
   content.className = 'game-card-content';
 
-  const title = document.createElement('h3');
+  // h2 keeps heading order under page h1 (avoid skipping to h3).
+  const title = document.createElement('h2');
   title.className = 'game-card-title';
   title.textContent = game.name;
   content.appendChild(title);
@@ -114,10 +116,13 @@ function createDivisionAccordion(
   const titleRow = document.createElement('div');
   titleRow.className = 'division-title-row';
 
+  const titleId = `division-title-${divisionName.replace(/\s+/g, '-').toLowerCase()}`;
   const title = document.createElement('span');
   title.className = 'division-title';
+  title.id = titleId;
   title.textContent = divisionName;
   titleRow.appendChild(title);
+  section.setAttribute('aria-labelledby', titleId);
 
   const grade = document.createElement('span');
   grade.className = 'division-grade';
@@ -139,10 +144,12 @@ function createDivisionAccordion(
 
   header.appendChild(headerContent);
 
-  // Chevron icon
+  // Chevron icon (trusted constant SVG markup)
   const chevron = document.createElement('span');
   chevron.className = 'accordion-chevron';
-  chevron.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  const chevronTpl = document.createElement('template');
+  chevronTpl.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+  chevron.appendChild(chevronTpl.content);
   header.appendChild(chevron);
 
   section.appendChild(header);
@@ -151,6 +158,8 @@ function createDivisionAccordion(
   const panel = document.createElement('div');
   panel.className = 'accordion-panel';
   panel.id = `games-${divisionName.replace(/\s+/g, '-').toLowerCase()}`;
+  panel.setAttribute('role', 'region');
+  panel.setAttribute('aria-labelledby', titleId);
 
   const panelInner = document.createElement('div');
   panelInner.className = 'accordion-panel-inner';
@@ -170,6 +179,17 @@ function createDivisionAccordion(
   return section;
 }
 
+function setPanelKeyboardAccess(panel: HTMLElement, open: boolean): void {
+  // Closed panels stay in the DOM for animation, but must leave the tab order.
+  if (open) {
+    panel.removeAttribute('inert');
+    panel.setAttribute('aria-hidden', 'false');
+  } else {
+    panel.setAttribute('inert', '');
+    panel.setAttribute('aria-hidden', 'true');
+  }
+}
+
 function toggleAccordion(section: HTMLElement, open: boolean): void {
   const header = section.querySelector(
     '.accordion-header'
@@ -182,17 +202,19 @@ function toggleAccordion(section: HTMLElement, open: boolean): void {
   if (open) {
     section.classList.add('accordion-open');
     header.setAttribute('aria-expanded', 'true');
+    setPanelKeyboardAccess(panel, true);
     // Set max-height to scrollHeight for smooth animation
     panel.style.maxHeight = panel.scrollHeight + 'px';
   } else {
     section.classList.remove('accordion-open');
     header.setAttribute('aria-expanded', 'false');
+    setPanelKeyboardAccess(panel, false);
     panel.style.maxHeight = '0px';
   }
 }
 
 export function renderGameSelector(container: HTMLElement): void {
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'game-selector';
@@ -206,13 +228,16 @@ export function renderGameSelector(container: HTMLElement): void {
 
   const logo = document.createElement('div');
   logo.className = 'hero-logo';
-  logo.innerHTML = `
+  // trusted constant markup
+  const logoTpl = document.createElement('template');
+  logoTpl.innerHTML = `
     <span class="logo-icon">🏆</span>
     <div class="logo-text">
       <h1>Math Pentathlon</h1>
       <p class="tagline">Practice Edition</p>
     </div>
   `;
+  logo.appendChild(logoTpl.content);
   heroContent.appendChild(logo);
 
   const heroDescription = document.createElement('p');
@@ -225,7 +250,9 @@ export function renderGameSelector(container: HTMLElement): void {
   const stats = document.createElement('div');
   stats.className = 'hero-stats';
 
-  stats.innerHTML = `
+  replaceWithSafeHtml(
+    stats,
+    safeHtml`
     <div class="stat">
       <span class="stat-number">${GAMES.length}</span>
       <span class="stat-label">Games</span>
@@ -238,7 +265,8 @@ export function renderGameSelector(container: HTMLElement): void {
       <span class="stat-number">K–7</span>
       <span class="stat-label">Grades</span>
     </div>
-  `;
+  `
+  );
   heroContent.appendChild(stats);
 
   const heroActions = document.createElement('div');
@@ -259,19 +287,29 @@ export function renderGameSelector(container: HTMLElement): void {
   hero.appendChild(heroContent);
   wrapper.appendChild(hero);
 
-  // Division tabs for quick nav
+  // Division tabs for quick nav (tablist + tab so aria-selected is valid for axe)
   const tabNav = document.createElement('nav');
   tabNav.className = 'division-tabs';
+  tabNav.setAttribute('role', 'tablist');
   tabNav.setAttribute('aria-label', 'Division navigation');
 
   DIVISIONS.forEach((div, index) => {
+    const panelId = `games-${div.name.replace(/\s+/g, '-').toLowerCase()}`;
     const tab = document.createElement('button');
+    tab.type = 'button';
     tab.className = `division-tab ${index === 0 ? 'active' : ''}`;
+    tab.setAttribute('role', 'tab');
     tab.setAttribute('data-division', div.name);
-    tab.innerHTML = `
+    tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    tab.setAttribute('aria-controls', panelId);
+    tab.id = `division-tab-${div.name.replace(/\s+/g, '-').toLowerCase()}`;
+    replaceWithSafeHtml(
+      tab,
+      safeHtml`
       <span class="tab-name">${div.name}</span>
       <span class="tab-grade">${div.gradeRange}</span>
-    `;
+    `
+    );
 
     tabNav.appendChild(tab);
   });
@@ -295,30 +333,43 @@ export function renderGameSelector(container: HTMLElement): void {
 
   wrapper.appendChild(accordionContainer);
 
-  // Footer
+  // Footer (trusted constant markup)
   const footer = document.createElement('footer');
   footer.className = 'game-selector-footer';
-  footer.innerHTML = `
+  const footerTpl = document.createElement('template');
+  footerTpl.innerHTML = `
     <p>Select a game to start practicing!</p>
     <p class="footer-note">
       Math Pentathlon is a registered trademark of the Pentathlon Institute.
       This is an unofficial practice tool.
     </p>
   `;
+  footer.appendChild(footerTpl.content);
   wrapper.appendChild(footer);
 
   container.appendChild(wrapper);
 
-  // Initialize accordion heights for open sections
+  // Initialize accordion heights + keyboard reachability for open sections
   const allSections = wrapper.querySelectorAll('.division-accordion');
   allSections.forEach((section) => {
     const panel = section.querySelector('.accordion-panel') as HTMLElement;
-    if (section.classList.contains('accordion-open')) {
+    const open = section.classList.contains('accordion-open');
+    setPanelKeyboardAccess(panel, open);
+    if (open) {
       panel.style.maxHeight = panel.scrollHeight + 'px';
     } else {
       panel.style.maxHeight = '0px';
     }
   });
+
+  const syncActiveTab = (divisionName: string | null, active: boolean) => {
+    tabNav.querySelectorAll('.division-tab').forEach((tab) => {
+      const isActive =
+        active && tab.getAttribute('data-division') === divisionName;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+  };
 
   // Tab click handlers - open accordion and scroll
   tabNav.querySelectorAll('.division-tab').forEach((tab) => {
@@ -346,11 +397,7 @@ export function renderGameSelector(container: HTMLElement): void {
           });
         }, 50);
 
-        // Update active tab
-        tabNav
-          .querySelectorAll('.division-tab')
-          .forEach((t) => t.classList.remove('active'));
-        tab.classList.add('active');
+        syncActiveTab(divisionName, true);
       }
     });
   });
@@ -381,11 +428,7 @@ export function renderGameSelector(container: HTMLElement): void {
         }, 50);
       }
 
-      // Update active tab
-      tabNav.querySelectorAll('.division-tab').forEach((tab) => {
-        const tabDivision = tab.getAttribute('data-division');
-        tab.classList.toggle('active', !isOpen && tabDivision === divisionName);
-      });
+      syncActiveTab(divisionName, !isOpen);
     });
   });
 

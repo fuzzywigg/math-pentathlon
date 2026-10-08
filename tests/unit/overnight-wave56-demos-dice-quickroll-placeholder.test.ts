@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 56 demos — dice quick-roll placeholder', () => {
   it('mounts exact italic Click a button to roll copy', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     expect(root.querySelector('#quick-roll-result')?.textContent?.trim()).toBe(
       'Click a button to roll'

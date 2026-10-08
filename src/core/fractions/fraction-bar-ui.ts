@@ -1,11 +1,7 @@
 // Fraction Bar UI - Visual representation of fractions
 
-import {
-  Fraction,
-  FractionBarConfig,
-  FractionBarPiece,
-  FRACTION_COLORS,
-} from './types';
+import type { Fraction, FractionBarConfig, FractionBarPiece } from './types';
+import { FRACTION_COLORS } from './types';
 import { simplify, toDecimal, formatFraction } from './arithmetic';
 
 /** Default configuration */
@@ -403,7 +399,8 @@ export function createInteractiveFractionBar(
     segment.addEventListener('mouseenter', () => {
       // Highlight potential selection
       for (let j = 0; j <= i; j++) {
-        segments[j].style.opacity = '0.8';
+        const seg = segments[j];
+        if (seg) seg.style.opacity = '0.8';
       }
     });
 

@@ -1,44 +1,35 @@
 // Remainder Islands Board UI
 // Renders the hexagonal island grid, dice, and game status
 
-import {
-  RemainderIslandsState,
-  DiceRoll,
-  Island,
-  Player,
-  getPlayerScore,
-  getPlayerChips,
-} from './types';
+import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
+import { getDieFaceEmojiOrQuestion } from '../../ui/die-faces';
+import { injectStylesOnce } from '../../ui/inject-styles';
+import type { RemainderIslandsState, DiceRoll, Island } from './types';
+import { getPlayerScore, getPlayerChips } from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeSvgFocusable,
   bindCellActivateKeys,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+import { bindPrimaryPointerActivate } from '../../ui/pointer-hygiene';
+export { getPlayerName };
 
 const HEX_SIZE = 45;
 const HEX_WIDTH = HEX_SIZE * 2;
 const HEX_HEIGHT = Math.sqrt(3) * HEX_SIZE;
 const BOARD_PADDING = 40;
 
-function playerColors() {
-  return getPlayerSeatColors();
-}
-
 // =============================================================================
 // Hexagon Helpers
 // =============================================================================
 
 function hexPoints(cx: number, cy: number, size: number): string {
-  const points: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 180) * (60 * i - 30);
-    const x = cx + size * Math.cos(angle);
-    const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
+  return pointyTopHexPolygonPoints(cx, cy, size);
 }
 
 function getHexCenter(row: number, col: number): { x: number; y: number } {
@@ -52,7 +43,7 @@ function getHexCenter(row: number, col: number): { x: number; y: number } {
 // =============================================================================
 
 function islandFillColor(owner: Island['owner']): string {
-  const seats = playerColors();
+  const seats = getPlayerSeatColors();
   if (owner === 'player1') return seats.player1;
   if (owner === 'player2') return seats.player2;
   return '#8bc34a';
@@ -245,7 +236,7 @@ export function renderBoard(
     const ariaLabel = buildCellAriaLabel({
       coord: `${island.row},${island.col}`,
       empty: !island.owner,
-      owner,
+      ...(owner !== undefined ? { owner } : {}),
       validMove: isValid,
       extras: [
         `value ${island.value}`,
@@ -267,16 +258,11 @@ export function renderBoard(
       if (isValid) {
         // Only activatable islands are keyboard buttons; others stay announced.
         makeSvgFocusable(group, ariaLabel);
-        let claimed = false;
         const activate = () => {
-          // pointerdown + click can both fire on tablets — claim once.
-          if (claimed) return;
-          claimed = true;
           onIslandClick(island.id);
         };
-        // pointerdown survives tablets; click covers mouse / existing tests.
-        hitArea.addEventListener('pointerdown', activate);
-        hitArea.addEventListener('click', activate);
+        // Primary pointer tap (cancel/multi-touch/slop safe) + click fallback.
+        bindPrimaryPointerActivate(hitArea, activate);
         hitArea.addEventListener('mouseenter', () => {
           applyIslandSelectionVisual(group, island, state, true);
           onIslandHover(island.id);
@@ -310,6 +296,7 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
   container.className = 'remainder-dice';
 
   if (!roll) {
+    // trusted constant markup
     container.innerHTML = `
       <div class="dice-placeholder">
         <span class="dice-icon">🎲</span>
@@ -319,7 +306,9 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
     return container;
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="dice-result">
       <div class="die">${getDieFace(roll.die1)}</div>
       <div class="dice-plus">+</div>
@@ -327,14 +316,14 @@ export function renderDice(roll: DiceRoll | null): HTMLElement {
       <div class="dice-equals">=</div>
       <div class="dice-total">${roll.total}</div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }
 
 function getDieFace(value: number): string {
-  const faces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
-  return faces[value - 1] || '?';
+  return getDieFaceEmojiOrQuestion(value);
 }
 
 // =============================================================================
@@ -350,8 +339,10 @@ export function renderScores(state: RemainderIslandsState): HTMLElement {
   const p1Chips = getPlayerChips(state, 'player1');
   const p2Chips = getPlayerChips(state, 'player2');
 
-  container.innerHTML = `
-    <div class="remainder-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1">
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
+    <div class="remainder-player-score player1">
       <div class="remainder-player-name">Blue</div>
       <div class="remainder-score-value">${p1Score}</div>
       <div class="remainder-chips">🪙 ${p1Chips}</div>
@@ -360,12 +351,21 @@ export function renderScores(state: RemainderIslandsState): HTMLElement {
       <div class="remainder-turns-label">Turns Left</div>
       <div class="remainder-turns-value">${state.turnsRemaining}</div>
     </div>
-    <div class="remainder-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2">
+    <div class="remainder-player-score player2">
       <div class="remainder-player-name">Red</div>
       <div class="remainder-score-value">${p2Score}</div>
       <div class="remainder-chips">🪙 ${p2Chips}</div>
     </div>
-  `;
+  `
+  );
+  const p1El = container.querySelector('.remainder-player-score.player1');
+  const p2El = container.querySelector('.remainder-player-score.player2');
+  if (p1El) {
+    p1El.className = `remainder-player-score ${state.currentPlayer === 'player1' ? 'active' : ''} player1`;
+  }
+  if (p2El) {
+    p2El.className = `remainder-player-score ${state.currentPlayer === 'player2' ? 'active' : ''} player2`;
+  }
 
   return container;
 }
@@ -387,7 +387,9 @@ export function renderDivisionPreview(
   const preview = previewDivision(state, state.selectedIsland);
   if (!preview) return container;
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="division-equation">
       <span class="dividend">${preview.dividend}</span>
       <span class="operator">÷</span>
@@ -398,7 +400,8 @@ export function renderDivisionPreview(
       <span class="remainder">${preview.remainder}</span>
     </div>
     <div class="points-preview">+${preview.remainder} points</div>
-  `;
+  `
+  );
 
   return container;
 }
@@ -423,7 +426,9 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
     winnerText = "It's a Draw!";
   }
 
-  container.innerHTML = `
+  replaceWithSafeHtml(
+    container,
+    safeHtml`
     <div class="remainder-winner-banner">${winnerText}</div>
     <div class="remainder-final-scores">
       <div class="remainder-final-score player1">
@@ -435,7 +440,8 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
         <div class="remainder-final-value">${p2Score} points</div>
       </div>
     </div>
-  `;
+  `
+  );
 
   return container;
 }
@@ -444,20 +450,14 @@ export function renderGameOver(state: RemainderIslandsState): HTMLElement {
 // Helper Functions
 // =============================================================================
 
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
-
 // =============================================================================
 // Styles
 // =============================================================================
 
 export function injectRemainderIslandsStyles(): void {
-  if (document.getElementById('remainder-islands-styles')) return;
-
-  const style = document.createElement('style');
-  style.id = 'remainder-islands-styles';
-  style.textContent = `
+  injectStylesOnce(
+    'remainder-islands-styles',
+    `
     .remainder-game-container {
       display: flex;
       flex-direction: column;
@@ -537,8 +537,8 @@ export function injectRemainderIslandsStyles(): void {
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .remainder-player-score.player1 .remainder-player-name { color: var(--color-player1, #1565c0); }
-    .remainder-player-score.player2 .remainder-player-name { color: var(--color-player2, #c62828); }
+    .remainder-player-score.player1 .remainder-player-name { color: var(--color-player1-text, #1d4ed8); }
+    .remainder-player-score.player2 .remainder-player-name { color: var(--color-player2-text, #b91c1c); }
 
     .remainder-player-name {
       font-size: 14px;
@@ -563,7 +563,7 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-turns-label {
       font-size: 12px;
-      color: #999;
+      color: #475569;
       text-transform: uppercase;
     }
 
@@ -594,7 +594,7 @@ export function injectRemainderIslandsStyles(): void {
       font-weight: bold;
     }
     .division-equation .r-label {
-      color: #999;
+      color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
       font-size: 18px;
     }
 
@@ -614,12 +614,12 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-status.player1 {
       background: #e3f2fd;
-      color: var(--color-player1, #1565c0);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .remainder-status.player2 {
       background: #ffebee;
-      color: var(--color-player2, #c62828);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .remainder-status.player2 {
@@ -729,6 +729,6 @@ export function injectRemainderIslandsStyles(): void {
         transform: none;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `
+  );
 }

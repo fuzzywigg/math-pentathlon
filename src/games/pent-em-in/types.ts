@@ -1,12 +1,12 @@
 // Pent'Em In Game Types
 // Pentomino entrapment strategy game - trap your opponent so they can't place pieces
 
-import {
+import type {
   PolyominoShape,
   Cell,
   Rotation,
-  PENTOMINOES,
 } from '../../core/polyomino/types';
+import { PENTOMINOES } from '../../core/polyomino/types';
 
 export type Player = 'player1' | 'player2';
 
@@ -85,9 +85,10 @@ export interface MoveRecord {
 function createBoard(): BoardCell[][] {
   const board: BoardCell[][] = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
-    board[row] = [];
+    const rowCells: BoardCell[] = [];
+    board[row] = rowCells;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      board[row][col] = {
+      rowCells[col] = {
         row,
         col,
         occupied: false,
@@ -131,9 +132,7 @@ export function createInitialState(): PentEmInState {
 }
 
 // Get opponent
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player's pieces
 export function getPlayerPieces(

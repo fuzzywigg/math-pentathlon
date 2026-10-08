@@ -65,6 +65,7 @@ import {
   placePiece as pentPlace,
   canPlacePiece,
 } from '../../src/games/pent-em-in/rules';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -77,12 +78,6 @@ function click(el: Element | null): void {
   el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 }
 
-function mountContainer(): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  return container;
-}
-
 function mountPair(): { board: HTMLElement; status: HTMLElement } {
   const board = document.createElement('div');
   const status = document.createElement('div');
@@ -93,7 +88,7 @@ function mountPair(): { board: HTMLElement; status: HTMLElement } {
 
 describe('Wave 27 seat-place-select — Par select→place flips seat + history', () => {
   it('hand block + valid base place grows history and flips to player2', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = parVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingBlock');
 
@@ -114,7 +109,7 @@ describe('Wave 27 seat-place-select — Par select→place flips seat + history'
   });
 
   it('second ply for P2 returns seat to player1 when place succeeds', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = parVsHuman(container);
 
     click(
@@ -169,7 +164,7 @@ describe('Wave 27 seat-place-select — Par select→place flips seat + history'
 
 describe('Wave 27 seat-place-select — Stars select→place flips seat + history', () => {
   it('card + valid cell place grows history and flips player', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = starsVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingCard');
 
@@ -225,7 +220,7 @@ describe('Wave 27 seat-place-select — Stars select→place flips seat + histor
 
 describe('Wave 27 seat-place-select — Ramrod select→place when slot valid', () => {
   it('rod select enters placing; place flips seat when slot available', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = ramrodVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingRod');
 
@@ -288,7 +283,7 @@ describe('Wave 27 seat-place-select — Ramrod select→place when slot valid', 
 
 describe('Wave 27 seat-place-select — Kwatro select→move when dest legal', () => {
   it('chip select enters dest phase; move flips when legal dest clicked', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = kwaVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingChip');
 
@@ -361,7 +356,7 @@ describe('Wave 27 seat-place-select — Kwatro select→move when dest legal', (
 
 describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', () => {
   it('newGameVsHuman paints .fab-status and selectable .fab-bar-wrapper', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = fabVsHuman(container);
     expect(ctrl.state.phase).toBe('selectingBar1');
     expect(container.querySelector('.fab-status')?.textContent).toMatch(
@@ -376,7 +371,7 @@ describe('Wave 27 seat-place-select — Fab bars→op→claim when possible', ()
   });
 
   it('two bar clicks advance toward selectingOperation; clear restores bar1', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     const ctrl = fabVsHuman(container);
     const bars = [
       ...container.querySelectorAll('.fab-bar-wrapper:not(.fab-bar-disabled)'),

@@ -1,25 +1,28 @@
 // Juggle Game Rules
 // Dice rolling, shape selection, and placement logic
 
+import type { JuggleState, Player, JuggleMove } from './types';
 import {
-  JuggleState,
-  Player,
-  JuggleMove,
   CONFIG,
   getOpponent,
   rollDice,
   getCategoryFromDie,
   getShapesForDie,
 } from './types';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
 import {
-  Board,
   createBoard,
   validatePlacement,
   placePolyomino,
   isBoardFilled,
   canPlaceShape,
   countEmptyCells,
+  findValidPlacements,
 } from '../../core/polyomino/placement';
 import { getCellsAtPosition } from '../../core/polyomino/transform';
 
@@ -39,6 +42,7 @@ export function createInitialState(): JuggleState {
     currentPlayer: 'player1',
     currentDice: null,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     selectedRotation: 0,
     selectedFlipped: false,
@@ -65,6 +69,7 @@ export function doRollDice(state: JuggleState): JuggleState {
     ...state,
     currentDice: dice,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     phase: 'selectingShape',
   };
@@ -85,16 +90,19 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
   const shapes = getShapesForDie(dieValue);
 
   // Auto-select first shape if only one option
-  const autoShape = shapes.length === 1 ? shapes[0] : null;
+  // ratchet: length === 1 guarantees shapes[0].
+  const autoShape = shapes.length === 1 ? shapes[0]! : null;
 
-  return {
+  const next: JuggleState = {
     ...state,
     selectedCategory: category,
+    selectedDieValue: dieValue,
     selectedShape: autoShape,
     selectedRotation: 0,
     selectedFlipped: false,
     phase: autoShape ? 'placing' : 'selectingShape',
   };
+  return autoShape ? orientSelectedShapeToFit(next) : next;
 }
 
 /**
@@ -106,12 +114,71 @@ export function selectShape(
 ): JuggleState {
   if (state.phase !== 'selectingShape' || !state.selectedCategory) return state;
 
-  return {
+  return orientSelectedShapeToFit({
     ...state,
     selectedShape: shape,
     selectedRotation: 0,
     selectedFlipped: false,
     phase: 'placing',
+  });
+}
+
+/**
+ * Prefer an orientation that actually fits (UI only — same legal placements).
+ */
+function orientSelectedShapeToFit(state: JuggleState): JuggleState {
+  if (state.phase !== 'placing' || !state.selectedShape) return state;
+
+  const board = state.boards[state.currentPlayer];
+  const shape = state.selectedShape;
+  const rotations: Rotation[] = shape.canRotate ? [0, 90, 180, 270] : [0];
+  const flips = shape.canFlip ? [false, true] : [false];
+
+  for (const flipped of flips) {
+    for (const rotation of rotations) {
+      if (findValidPlacements(board, shape, rotation, flipped).length > 0) {
+        return {
+          ...state,
+          selectedRotation: rotation,
+          selectedFlipped: flipped,
+        };
+      }
+    }
+  }
+  return state;
+}
+
+/** True if the selected polyomino fits somewhere in any orientation. */
+export function selectedShapeFitsAnywhere(state: JuggleState): boolean {
+  if (!state.selectedShape) return false;
+  return canPlaceShape(state.boards[state.currentPlayer], state.selectedShape);
+}
+
+/** Legal anchors for the currently selected rotation/flip. */
+export function getCurrentOrientationPlacements(state: JuggleState): Cell[] {
+  if (!state.selectedShape || state.phase !== 'placing') return [];
+  return findValidPlacements(
+    state.boards[state.currentPlayer],
+    state.selectedShape,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+}
+
+/**
+ * Back out of placing so the kid can pick another die/shape.
+ * Does not change boards, dice, or scores.
+ */
+export function abandonPlacement(state: JuggleState): JuggleState {
+  if (state.phase !== 'placing') return state;
+  return {
+    ...state,
+    selectedShape: null,
+    selectedRotation: 0,
+    selectedFlipped: false,
+    hoverPosition: null,
+    selectedCategory: null,
+    phase: 'selectingShape',
   };
 }
 
@@ -123,7 +190,8 @@ export function rotateShape(state: JuggleState): JuggleState {
 
   const rotations: Rotation[] = [0, 90, 180, 270];
   const currentIndex = rotations.indexOf(state.selectedRotation);
-  const nextRotation = rotations[(currentIndex + 1) % 4];
+  // ratchet: rotations is length-4; (currentIndex+1)%4 is always 0..3.
+  const nextRotation = rotations[(currentIndex + 1) % 4]!;
 
   return {
     ...state,
@@ -209,11 +277,11 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
     state.currentPlayer === 'player1' ? 1 : 2
   );
 
-  // Record the move
+  // Record the move — chosenDie must be the die face actually selected
   const move: JuggleMove = {
     player: state.currentPlayer,
     dice: state.currentDice,
-    chosenDie: state.currentDice[0], // Simplified
+    chosenDie: state.selectedDieValue ?? state.currentDice[0],
     shapeId: state.selectedShape.id,
     position,
     rotation: state.selectedRotation,
@@ -237,6 +305,7 @@ export function placeShape(state: JuggleState, position: Cell): JuggleState {
       : getOpponent(state.currentPlayer),
     currentDice: null,
     selectedCategory: null,
+    selectedDieValue: null,
     selectedShape: null,
     selectedRotation: 0,
     selectedFlipped: false,

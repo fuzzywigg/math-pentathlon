@@ -14,6 +14,7 @@ import {
   searchAIMove as searchQueensMove,
   type AIDifficulty as QueensDifficulty,
   type AIMove,
+  type AISearchOptions as QueensSearchOptions,
 } from '../../src/games/queens-guards/ai';
 import { AiWorkerClient } from '../../src/core/ai-worker/client';
 import {
@@ -25,9 +26,11 @@ import {
   getBestMove as getHexMove,
   searchBestMove as searchHexMove,
   type AIDifficulty as HexDifficulty,
+  type AISearchOptions as HexSearchOptions,
 } from '../../src/games/hex/ai';
 import { makeMove as makeHexMove } from '../../src/games/hex/rules';
 import type { HexPosition } from '../../src/games/hex/types';
+import { expireAfterStart, fastDeadlineOpts } from './helpers/ai-search-fast';
 
 /** Mock Worker that executes the real search (what ai.worker.ts does). */
 function installSearchWorker(
@@ -75,14 +78,21 @@ describe('Queens & Guards worker vs direct parity', () => {
 
   beforeEach(() => {
     OriginalWorker = globalThis.Worker;
-    installSearchWorker((payload) =>
-      searchQueensMove(
+    installSearchWorker((payload) => {
+      const deadlineMs = payload.deadlineMs as number | undefined;
+      const opts: QueensSearchOptions = {
+        seed: payload.seed as number | undefined,
+        ...(deadlineMs === undefined
+          ? {}
+          : { deadlineMs, now: expireAfterStart(deadlineMs) }),
+      };
+      return searchQueensMove(
         payload.state as QueensGuardsState,
         payload.player as QueensPlayer,
         payload.difficulty as QueensDifficulty,
-        { seed: payload.seed as number | undefined }
-      )
-    );
+        opts
+      );
+    });
   });
 
   afterEach(() => {
@@ -103,14 +113,15 @@ describe('Queens & Guards worker vs direct parity', () => {
     );
 
     for (const seed of [0, 7, 42]) {
-      const direct = getQueensMove(state, 'player1', 'easy', { seed });
+      const opts = fastDeadlineOpts(seed);
+      const direct = getQueensMove(state, 'player1', 'easy', opts);
       const viaWorker = await client.request({
         game: 'queens-guards',
         state: structuredClone(state),
         player: 'player1',
         difficulty: 'easy',
         seed,
-        deadlineMs: 60_000,
+        deadlineMs: opts.deadlineMs,
       });
       expect(viaWorker).toEqual(direct);
       expect(direct).not.toBeNull();
@@ -121,10 +132,13 @@ describe('Queens & Guards worker vs direct parity', () => {
   it('structuredClone does not change the chosen move', () => {
     const state = createQueensState();
     const seed = 11;
-    const a = getQueensMove(state, 'player1', 'easy', { seed });
-    const b = getQueensMove(structuredClone(state), 'player1', 'easy', {
-      seed,
-    });
+    const a = getQueensMove(state, 'player1', 'easy', fastDeadlineOpts(seed));
+    const b = getQueensMove(
+      structuredClone(state),
+      'player1',
+      'easy',
+      fastDeadlineOpts(seed)
+    );
     expect(b).toEqual(a);
   }, 30_000);
 
@@ -145,14 +159,21 @@ describe('Hex worker vs direct parity', () => {
 
   beforeEach(() => {
     OriginalWorker = globalThis.Worker;
-    installSearchWorker((payload) =>
-      searchHexMove(
+    installSearchWorker((payload) => {
+      const deadlineMs = payload.deadlineMs as number | undefined;
+      const opts: HexSearchOptions = {
+        seed: payload.seed as number | undefined,
+        ...(deadlineMs === undefined
+          ? {}
+          : { deadlineMs, now: expireAfterStart(deadlineMs) }),
+      };
+      return searchHexMove(
         payload.state as HexGameState,
         payload.player as HexPlayer,
         payload.difficulty as HexDifficulty,
-        { seed: payload.seed as number | undefined }
-      )
-    );
+        opts
+      );
+    });
   });
 
   afterEach(() => {
@@ -173,14 +194,15 @@ describe('Hex worker vs direct parity', () => {
     );
 
     for (const seed of [0, 5, 17]) {
-      const direct = getHexMove(state, 'player2', 'hard', { seed });
+      const opts = fastDeadlineOpts(seed);
+      const direct = getHexMove(state, 'player2', 'hard', opts);
       const viaWorker = await client.request({
         game: 'hex',
         state: structuredClone(state),
         player: 'player2',
         difficulty: 'hard',
         seed,
-        deadlineMs: 60_000,
+        deadlineMs: opts.deadlineMs,
       });
       expect(viaWorker).toEqual(direct);
       expect(direct).not.toBeNull();
@@ -209,14 +231,15 @@ describe('Hex worker vs direct parity', () => {
     );
 
     for (const seed of [2, 9]) {
-      const direct = getHexMove(state, 'player1', 'easy', { seed });
+      const opts = fastDeadlineOpts(seed);
+      const direct = getHexMove(state, 'player1', 'easy', opts);
       const viaWorker = await client.request({
         game: 'hex',
         state: structuredClone(state),
         player: 'player1',
         difficulty: 'easy',
         seed,
-        deadlineMs: 60_000,
+        deadlineMs: opts.deadlineMs,
       });
       expect(viaWorker).toEqual(direct);
       expect(direct).not.toBeNull();

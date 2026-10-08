@@ -27,6 +27,7 @@ import {
   getRestoreTargets,
 } from '../../games/queens-guards/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   assembleGuardGroup,
@@ -36,11 +37,15 @@ import {
   type QueensGuardsPieceGeometries,
 } from './queens-guards-pieces';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type CellClickCallback = (coord: BoardCoord) => void;
 
@@ -198,9 +203,7 @@ export async function createQueensGuardsBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'queens-guards');
@@ -327,26 +330,28 @@ export async function createQueensGuardsBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 480, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   /** Prefer raycast; fall back to nearest hex center in screen space (tablet tilt). */
   const pickCoord = (clientX: number, clientY: number): BoardCoord | null => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(clientX, clientY, rect);
+    if (!ndc) return null;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -399,13 +404,14 @@ export async function createQueensGuardsBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const onA11yFocusIn = (event: FocusEvent): void => {
     const t = event.target as HTMLElement | null;
@@ -523,14 +529,14 @@ export async function createQueensGuardsBoard3D(
         : null;
     const lastFrom = last ? cellKey(last.from.ring, last.from.position) : null;
     const lastTo = last ? cellKey(last.to.ring, last.to.position) : null;
-    const lastWasCapture = !!last?.wasCapture;
+    const lastWasCapture = Boolean(last?.wasCapture);
 
     const captured = new Set(
       state.capturedPieces.map((c) => cellKey(c.ring, c.position))
     );
 
     const winnerThrone =
-      !!state.winner &&
+      Boolean(state.winner) &&
       state.cells.get(cellKey(0, 0))?.piece?.player === state.winner;
 
     for (const cell of cells) {
@@ -543,9 +549,9 @@ export async function createQueensGuardsBoard3D(
       else if (validMoves.has(cell.key)) tileMat = mats.valid;
       else if (captured.has(cell.key)) tileMat = mats.capture;
       else if (lastWasCapture && lastTo === cell.key) tileMat = mats.capture;
-      else if (lastFrom === cell.key || lastTo === cell.key)
+      else if (lastFrom === cell.key || lastTo === cell.key) {
         tileMat = mats.last;
-      else if (focusedKey === cell.key) tileMat = mats.focus;
+      } else if (focusedKey === cell.key) tileMat = mats.focus;
 
       if (winnerThrone && (cell.ring === 0 || cell.ring === 1)) {
         const owner = state.cells.get(cell.key)?.piece?.player;
@@ -612,9 +618,12 @@ export async function createQueensGuardsBoard3D(
         }${extras.length ? `, ${extras.join(', ')}` : ''}`
       );
 
+      const cellPiece = piece;
       const selectable = restoring
         ? captured.has(cell.key)
-        : !!piece && piece.player === state.currentPlayer && !state.winner;
+        : cellPiece != null &&
+          cellPiece.player === state.currentPlayer &&
+          !state.winner;
       btn.tabIndex =
         selectable ||
         validMoves.has(cell.key) ||
@@ -674,12 +683,14 @@ export async function createQueensGuardsBoard3D(
 
   window.__mp3dQueensGuards = { cellToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
-    canvas.removeEventListener('pointerup', onPointer);
+    cancelMountPaint();
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     unbindVisibility();
     a11y.removeEventListener('focusin', onA11yFocusIn);
     if (window.__mp3dQueensGuards) {
@@ -709,6 +720,7 @@ export async function createQueensGuardsBoard3D(
 
   tearDown = unmount;
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

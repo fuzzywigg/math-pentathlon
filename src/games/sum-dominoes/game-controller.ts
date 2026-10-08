@@ -1,7 +1,7 @@
 // Sum Dominoes & Dice Game Controller
 // Manages game flow, AI, and UI updates
 
-import { SumDominoesState, Player, BoardPosition } from './types';
+import type { SumDominoesState, Player, BoardPosition } from './types';
 import {
   createInitialState,
   doRollDice,
@@ -9,7 +9,8 @@ import {
   placeDomino,
   passTurn,
 } from './rules';
-import { getAIMove, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove } from './ai';
 import {
   renderBoard,
   renderHand,
@@ -356,3 +357,6 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
+
+/** Tip-held destroy hook for tip mounts / #501. */
+export function destroyGame(): void {}

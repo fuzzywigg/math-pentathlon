@@ -1,6 +1,7 @@
 import { afterEach, vi } from 'vitest';
 import { owlMessages, owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
+import { resetGamePrefetchForTests } from '../../src/ui/game-prefetch';
 
 /**
  * Shared cleanup so Vitest can run with `isolate: false` after the TOKENMAXX
@@ -10,12 +11,49 @@ import { storage } from '../../src/core/storage';
  * the stock catalog once and restore after every test.
  *
  * Do not call vi.restoreAllMocks() here — it tears down hoisted vi.mock factories
- * (e.g. router.navigate) across the shared module graph.
+ * (e.g. router.navigate) across the shared module graph. Under --maxWorkers=1 /
+ * shuffle that shows up as burn-wave24 game-selector navigate call-count flakes.
+ *
+ * Do call vi.unstubAllGlobals() — stubGlobal('requestAnimationFrame') / matchMedia
+ * leaks otherwise, and animateMove / dice RAF tests hang under shuffle.
+ *
+ * Also restore performance.now when a prior file left a spy (clearAllMocks does
+ * not remove mock implementations; a stuck now ahead of RAF timestamps infinite-
+ * loops animateMove).
+ *
+ * Reset owlSystem.gameStartTime — a prior onGameStart under fake/system timers
+ * leaves a future stamp; onGameEnd-without-start then emits negative duration.
+ *
+ * Reset game-prefetch `started` marks — renderGameSelector idle-warms Division I
+ * under MODE=test (sync), so a later saveData / idle-reset assert otherwise sees
+ * leftover started ids under isolate:false shuffle (burn-1007-pwa-shell-ui).
  */
 type MutableOwl = { messages: unknown[] };
+type MutableOwlSystem = { gameStartTime: number };
 
 const owlInternal = owlMessages as unknown as MutableOwl;
+const owlSystemInternal = owlSystem as unknown as MutableOwlSystem;
 const stockOwlMessages = owlInternal.messages.slice();
+
+function restoreIfMocked(fn: unknown): void {
+  const mocked = fn as { mockRestore?: () => void };
+  if (typeof mocked.mockRestore === 'function') {
+    mocked.mockRestore();
+  }
+}
+
+function restorePerformanceNow(): void {
+  restoreIfMocked(performance.now);
+}
+
+function restoreWindowAlert(): void {
+  restoreIfMocked(window.alert);
+}
+
+function restoreMathRandom(): void {
+  // clearAllMocks keeps mockImplementations; a stuck Math.random breaks AI/deal tests.
+  restoreIfMocked(Math.random);
+}
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -38,8 +76,25 @@ afterEach(() => {
   } catch {
     // ignore
   }
+  owlSystemInternal.gameStartTime = 0;
   owlInternal.messages.length = 0;
   owlInternal.messages.push(...stockOwlMessages);
+  try {
+    resetGamePrefetchForTests();
+  } catch {
+    // ignore
+  }
   vi.clearAllMocks();
+  vi.unstubAllGlobals();
+  // Drop pending fake timers before reverting — bare setTimeout AI handoffs
+  // (e.g. FIAR 500ms) otherwise leak into the next file under maxWorkers=1.
+  try {
+    vi.clearAllTimers();
+  } catch {
+    // ignore when timers are already real
+  }
   vi.useRealTimers();
+  restorePerformanceNow();
+  restoreWindowAlert();
+  restoreMathRandom();
 });

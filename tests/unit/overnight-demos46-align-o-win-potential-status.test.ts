@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function clickCol(root: HTMLElement, col: number): void {
   (
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — align O-win / potential status', () => {
   it('O wins vertical four-in-a-row with winning-cell chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // X parks in col1; O stacks four in col0
@@ -59,7 +54,7 @@ describe('Overnight demos46 — align O-win / potential status', () => {
   });
 
   it('potential info surfaces (blocked) and (open) direction status', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     // Seeded board has O at (1,2); click empty neighbor to read potentials
     (
@@ -82,7 +77,7 @@ describe('Overnight demos46 — align O-win / potential status', () => {
   });
 
   it('X wins on falling diagonal opposite demos45 rising path', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Falling diagonal X: (2,0)(3,1)(4,2)(5,3)

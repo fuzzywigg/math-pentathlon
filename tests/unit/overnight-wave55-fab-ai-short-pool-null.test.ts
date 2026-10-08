@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/fab-a-diffy/rules';
 import { getAIMove, executeAITurn } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -23,7 +24,12 @@ describe('Wave 55 fab — AI short pool', () => {
 
   it('add/multiply AI picks keep bar1Id <= bar2Id (commutative skip)', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
-    const move = getAIMove(createInitialState(), 'player1', 'hard');
+    const move = getAIMove(
+      createInitialState(),
+      'player1',
+      'hard',
+      fastDeadlineOpts()
+    );
     expect(move).not.toBeNull();
     if (move && (move.operation === 'add' || move.operation === 'multiply')) {
       expect(move.bar1Id <= move.bar2Id).toBe(true);

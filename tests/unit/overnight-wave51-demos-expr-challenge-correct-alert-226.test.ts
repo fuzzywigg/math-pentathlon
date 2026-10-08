@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function trayCards(root: HTMLElement): HTMLElement[] {
   return [
@@ -39,13 +34,14 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 describe('Wave 51 demos — expr challenge Correct alert 2*6-2', () => {
   it('MAKE_TEN [2,2,6] with 2 * 6 - 2 alerts Correct!', () => {
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
 
     // MAKE_TEN order: [2,3,5], [1,4,5], [2,2,6] → index 2

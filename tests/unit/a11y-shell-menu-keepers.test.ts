@@ -3,6 +3,7 @@
  * Does not touch src/games/* boards. Complements a11y-shell.test.ts.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readAppCss } from './_app-css';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderGameSelector } from '../../src/ui/game-selector';
@@ -12,7 +13,7 @@ vi.mock('../../src/core/router', () => ({
   navigate: vi.fn(),
 }));
 
-const styleCss = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+const styleCss = readAppCss();
 const indexHtml = readFileSync(resolve(process.cwd(), 'index.html'), 'utf8');
 
 describe('Shell/menu a11y keepers — skip-link + document landmarks', () => {
@@ -48,6 +49,12 @@ describe('Shell/menu a11y keepers — focus-visible on primary nav/menu', () => 
     expect(styleCss).toMatch(/\.start-game-btn:focus-visible\s*\{/);
     expect(styleCss).toMatch(/\.modal-close:focus-visible\s*\{/);
     expect(styleCss).toMatch(/\.collapse-toggle:focus-visible\s*\{/);
+  });
+
+  it('declares board/in-game :focus-visible rings for gridcells and role=button', () => {
+    expect(styleCss).toMatch(/\[role=['"]gridcell['"]\]:focus-visible/);
+    expect(styleCss).toMatch(/#board \[role=['"]button['"]\]:focus-visible/);
+    expect(styleCss).toMatch(/svg \[role=['"]gridcell['"]\]:focus-visible/);
   });
 });
 

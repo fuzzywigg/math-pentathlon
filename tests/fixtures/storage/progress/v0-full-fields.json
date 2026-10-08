@@ -1,0 +1,44 @@
+{
+  "version": 0,
+  "profile": {
+    "id": "legacy-full-1",
+    "name": "LegacyFull",
+    "avatar": "F",
+    "createdAt": 100,
+    "lastActiveAt": 200
+  },
+  "streak": {
+    "currentStreak": 1,
+    "bestStreak": 1,
+    "lastPlayDate": "2025-12-06",
+    "streakStartDate": "2025-12-06"
+  },
+  "achievements": [{ "id": "legacy-badge", "unlockedAt": 150 }],
+  "gameStats": {
+    "fiar": {
+      "gameId": "fiar",
+      "gamesPlayed": 1,
+      "gamesWon": 1,
+      "gamesLost": 0,
+      "gamesDraw": 0,
+      "totalPlayTime": 1200,
+      "bestWinStreak": 1,
+      "currentWinStreak": 1,
+      "lastPlayed": 200,
+      "firstPlayed": 100
+    }
+  },
+  "owlState": {
+    "mood": "happy",
+    "lastInteraction": 0,
+    "messagesSeen": [],
+    "tutorialsCompleted": [],
+    "totalMessagesShown": 0
+  },
+  "settings": {
+    "owlEnabled": true,
+    "soundEnabled": true,
+    "reducedMotion": false,
+    "owlFrequency": "normal"
+  }
+}

@@ -1,17 +1,14 @@
 // Prime Gold Game Rules
 // Spiral board, prime pathways, and mathematical expressions
 
-import {
+import type {
   PrimeGoldState,
   BoardCell,
   DiceRoll,
   Player,
   MoveRecord,
-  CONFIG,
-  DICE_CONFIG,
-  isPrime,
-  generateExpressions,
 } from './types';
+import { CONFIG, DICE_CONFIG, isPrime, generateExpressions } from './types';
 
 // =============================================================================
 // Board Creation - Spiral Pattern
@@ -42,13 +39,15 @@ function createBoard(): Map<string, BoardCell> {
 
   // Fill in spiral
   while (value <= size * size) {
-    values[row][col] = value;
+    // ratchet: spiral stays inside the dense size×size values grid.
+    values[row]![col] = value;
     value++;
     stepCount++;
 
     // Move in current direction
-    const dx = [1, 0, -1, 0][direction];
-    const dy = [0, 1, 0, -1][direction];
+    // ratchet: direction is always 0..3; literal tuples are length 4.
+    const dx = [1, 0, -1, 0][direction]!;
+    const dy = [0, 1, 0, -1][direction]!;
     col += dx;
     row += dy;
 
@@ -67,7 +66,8 @@ function createBoard(): Map<string, BoardCell> {
   // Create cells
   for (let r = 0; r < size; r++) {
     for (let c = 0; c < size; c++) {
-      const val = values[r][c];
+      // ratchet: values is a dense size×size grid filled above.
+      const val = values[r]![c]!;
       if (val > 0) {
         cells.set(`${r},${c}`, {
           row: r,

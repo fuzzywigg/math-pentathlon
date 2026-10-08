@@ -1,14 +1,14 @@
 // Remainder Islands Game Rules
 // Dice rolling, island selection, and scoring
 
-import {
+import type {
   RemainderIslandsState,
   DiceRoll,
   DivisionResult,
   MoveRecord,
   Player,
-  getOpponent,
 } from './types';
+import { getOpponent } from './types';
 
 // =============================================================================
 // Dice Rolling

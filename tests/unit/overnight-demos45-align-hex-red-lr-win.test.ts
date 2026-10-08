@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickHex(root: HTMLElement, row: number, col: number): void {
 
 describe('Overnight demos45 — align hex Red LR win', () => {
   it('Red left–right spine wins; post-win clicks no-op; reset restores Blue', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     const redTargets: Array<[number, number]> = [
@@ -74,7 +69,7 @@ describe('Overnight demos45 — align hex Red LR win', () => {
   });
 
   it('Red region info grows along a horizontal chain before win', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     clickHex(root, 1, 1); // Blue
     clickHex(root, 4, 1); // Red

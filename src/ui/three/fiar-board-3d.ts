@@ -17,13 +17,19 @@ import {
   canPlaceChip,
 } from '../../games/fiar/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { prefersReducedMotion } from '../reduced-motion';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type FiarNodeClickCallback = (nodeId: string) => void;
 
@@ -111,9 +117,7 @@ export async function createFiarBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'fiar');
@@ -215,26 +219,28 @@ export async function createFiarBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 360, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
-  const onPointer = (event: PointerEvent): void => {
+  const pickFromEvent = (event: PointerEvent): void => {
     if (!clickHandler || disposed) return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -259,13 +265,14 @@ export async function createFiarBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: pickFromEvent,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const clearChip = (nm: NodeMeshes): void => {
     if (nm.chip) {
@@ -384,9 +391,9 @@ export async function createFiarBoard3D(
 
       let padMat = mats.space;
       if (valid.includes(nm.id)) padMat = mats.spaceValid;
-      else if (state.phase === 'placement' && node.chip === null)
+      else if (state.phase === 'placement' && node.chip === null) {
         padMat = mats.spaceHover;
-      else if (state.selectedNode === nm.id) padMat = mats.selected;
+      } else if (state.selectedNode === nm.id) padMat = mats.selected;
       nm.pad.material = padMat;
 
       if (!node.chip) {
@@ -419,8 +426,11 @@ export async function createFiarBoard3D(
         nm.dot = null;
       }
 
-      // Subtle scale pulse for selectable / winning
-      const scale = selectable.includes(nm.id) || winning.has(nm.id) ? 1.08 : 1;
+      // Subtle scale emphasis for selectable / winning (skipped when reduced motion)
+      const emphasize =
+        !prefersReducedMotion() &&
+        (selectable.includes(nm.id) || winning.has(nm.id));
+      const scale = emphasize ? 1.08 : 1;
       nm.chip.scale.set(scale, 1, scale);
     }
 
@@ -445,12 +455,14 @@ export async function createFiarBoard3D(
   // Test / e2e hook (also used in DEV tooling)
   window.__mp3dFiar = { nodeToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
-    canvas.removeEventListener('pointerup', onPointer);
+    cancelMountPaint();
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     unbindVisibility();
     if (window.__mp3dFiar) {
       delete window.__mp3dFiar;
@@ -477,6 +489,7 @@ export async function createFiarBoard3D(
 
   tearDown = unmount;
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   void CONFIG;
   return { update, unmount, nodeToClientPoint, canvas };

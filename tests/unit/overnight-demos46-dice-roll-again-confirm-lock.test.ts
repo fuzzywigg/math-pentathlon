@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — dice Roll Again / confirm lock', () => {
   it('primary button flips to Roll Again after first 2d6 settle', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 
@@ -41,7 +36,7 @@ describe('Overnight demos46 — dice Roll Again / confirm lock', () => {
   });
 
   it('locked die after confirm ignores further toggle clicks', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 

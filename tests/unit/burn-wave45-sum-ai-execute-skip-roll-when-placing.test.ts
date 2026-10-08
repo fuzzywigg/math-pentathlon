@@ -13,7 +13,6 @@ import {
 } from '../../src/games/sum-dominoes/types';
 import { executeAITurn } from '../../src/games/sum-dominoes/ai';
 
-
 afterEach(() => vi.restoreAllMocks());
 
 function emptyBoard(): (PlacedDomino | null)[][] {

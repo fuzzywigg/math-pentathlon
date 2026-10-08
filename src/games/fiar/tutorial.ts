@@ -1,6 +1,6 @@
 // Tutorial content for FIAR (Four In A Row) — Division II rules
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const fiarTutorial: TutorialConfig = {
   id: 'fiar-basics',

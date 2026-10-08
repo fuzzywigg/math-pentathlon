@@ -62,6 +62,7 @@ import {
 } from '../../src/games/sum-dominoes/game-controller';
 
 import { tutorialManager } from '../../src/core/tutorial';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -70,21 +71,16 @@ afterEach(() => {
   }
 });
 
-function mount(): HTMLElement {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
 
 describe('Wave 20 container-api — initGame human vs AI flags', () => {
   it('Fab initGame(false) clears AI; initGame(true, hard) seats player2', () => {
-    const human = initFab(mount(), false);
+    const human = initFab(mountRoot(), false);
     expect(human.isAI).toBe(false);
     expect(human.aiPlayer).toBeNull();
     expect(human.state.currentPlayer).toBe('player1');
     expect(human.state.moveHistory).toHaveLength(0);
 
-    const ai = initFab(mount(), true, 'hard');
+    const ai = initFab(mountRoot(), true, 'hard');
     expect(ai.isAI).toBe(true);
     expect(ai.aiPlayer).toBe('player2');
     expect(ai.aiDifficulty).toBe('hard');
@@ -93,12 +89,12 @@ describe('Wave 20 container-api — initGame human vs AI flags', () => {
 
   it('Par / Stars / Ramrod / Kwatro / Prime / Sum share aiPlayer contract', () => {
     const cases = [
-      initPar(mount(), true, 'easy'),
-      initStars(mount(), true, 'medium'),
-      initRamrod(mount(), true, 'hard'),
-      initKwa(mount(), true, 'easy'),
-      initPrime(mount(), true, 'medium'),
-      initSum(mount(), true, 'hard'),
+      initPar(mountRoot(), true, 'easy'),
+      initStars(mountRoot(), true, 'medium'),
+      initRamrod(mountRoot(), true, 'hard'),
+      initKwa(mountRoot(), true, 'easy'),
+      initPrime(mountRoot(), true, 'medium'),
+      initSum(mountRoot(), true, 'hard'),
     ];
     for (const ctrl of cases) {
       expect(ctrl.isAI).toBe(true);
@@ -109,12 +105,12 @@ describe('Wave 20 container-api — initGame human vs AI flags', () => {
     }
 
     const humans = [
-      initPar(mount(), false),
-      initStars(mount(), false),
-      initRamrod(mount(), false),
-      initKwa(mount(), false),
-      initPrime(mount(), false),
-      initSum(mount(), false),
+      initPar(mountRoot(), false),
+      initStars(mountRoot(), false),
+      initRamrod(mountRoot(), false),
+      initKwa(mountRoot(), false),
+      initPrime(mountRoot(), false),
+      initSum(mountRoot(), false),
     ];
     for (const ctrl of humans) {
       expect(ctrl.isAI).toBe(false);
@@ -125,7 +121,7 @@ describe('Wave 20 container-api — initGame human vs AI flags', () => {
 
 describe('Wave 20 container-api — newGame / update remount matrix', () => {
   it('Fab newGame flips AI flags and update remounts chrome', () => {
-    const ctrl = fabVsHuman(mount());
+    const ctrl = fabVsHuman(mountRoot());
     expect(ctrl.isAI).toBe(false);
     ctrl.newGame(true, 'easy');
     expect(ctrl.isAI).toBe(true);
@@ -149,7 +145,7 @@ describe('Wave 20 container-api — newGame / update remount matrix', () => {
       { vsHuman: sumVsHuman, vsAI: sumVsAI },
     ];
     for (const { vsHuman, vsAI } of factories) {
-      const ctrl = vsAI(mount(), 'medium');
+      const ctrl = vsAI(mountRoot(), 'medium');
       expect(ctrl.isAI).toBe(true);
       expect(ctrl.aiPlayer).toBe('player2');
       ctrl.newGame(false);
@@ -157,7 +153,7 @@ describe('Wave 20 container-api — newGame / update remount matrix', () => {
       expect(ctrl.aiPlayer).toBeNull();
       expect(() => ctrl.update()).not.toThrow();
       expect(ctrl.container.querySelector('*')).not.toBeNull();
-      const again = vsHuman(mount());
+      const again = vsHuman(mountRoot());
       expect(again.isAI).toBe(false);
       again.newGame(true, 'hard');
       expect(again.aiDifficulty).toBe('hard');
@@ -169,25 +165,25 @@ describe('Wave 20 container-api — newGame / update remount matrix', () => {
 describe('Wave 20 container-api — tutorial then mode clear', () => {
   it('startTutorial then exit leaves isTutorialActive false for all seven', () => {
     const starters = [
-      { mount: () => fabVsHuman(mount()), start: startFabTutorial, active: isFabTutorial },
-      { mount: () => parVsHuman(mount()), start: startParTutorial, active: isParTutorial },
+      { mount: () => fabVsHuman(mountRoot()), start: startFabTutorial, active: isFabTutorial },
+      { mount: () => parVsHuman(mountRoot()), start: startParTutorial, active: isParTutorial },
       {
-        mount: () => starsVsHuman(mount()),
+        mount: () => starsVsHuman(mountRoot()),
         start: startStarsTutorial,
         active: isStarsTutorial,
       },
       {
-        mount: () => ramrodVsHuman(mount()),
+        mount: () => ramrodVsHuman(mountRoot()),
         start: startRamrodTutorial,
         active: isRamrodTutorial,
       },
-      { mount: () => kwaVsHuman(mount()), start: startKwaTutorial, active: isKwaTutorial },
+      { mount: () => kwaVsHuman(mountRoot()), start: startKwaTutorial, active: isKwaTutorial },
       {
-        mount: () => primeVsHuman(mount()),
+        mount: () => primeVsHuman(mountRoot()),
         start: startPrimeTutorial,
         active: isPrimeTutorial,
       },
-      { mount: () => sumVsHuman(mount()), start: startSumTutorial, active: isSumTutorial },
+      { mount: () => sumVsHuman(mountRoot()), start: startSumTutorial, active: isSumTutorial },
     ];
 
     for (const entry of starters) {

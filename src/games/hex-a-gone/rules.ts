@@ -1,9 +1,7 @@
 // Hex-a-Gone! Game Rules
 
+import type { HexAGoneGameState, BlockShape, GamePhase } from './types';
 import {
-  HexAGoneGameState,
-  BlockShape,
-  GamePhase,
   getCellAt,
   getOpponent,
   getAvailableShapes,
@@ -64,7 +62,7 @@ export function commitSelection(state: HexAGoneGameState): HexAGoneGameState {
       ...state.turnSelection,
       committed: true,
     },
-    selectedBlockForPlacement: state.turnSelection.blocks[0],
+    selectedBlockForPlacement: state.turnSelection.blocks[0] ?? null,
   };
 }
 

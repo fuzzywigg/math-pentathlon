@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — align section titles', () => {
   it('exposes Connect Four / Hex-style / Potential Analysis h3s', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const h3 = [...root.querySelectorAll('h3')].map((el) => el.textContent ?? '');
     expect(h3).toContain('Connect Four Style (4-in-a-row)');

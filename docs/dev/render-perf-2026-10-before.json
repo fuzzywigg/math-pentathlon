@@ -1,0 +1,576 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-08T01:39:31.064Z",
+    "baseURL": "http://127.0.0.1:5181",
+    "phase": "before",
+    "moveTarget": 15,
+    "cpuRate": 4,
+    "viewport": {
+      "width": 768,
+      "height": 1024
+    }
+  },
+  "results": [
+    {
+      "gameId": "kings-quadraphages",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 354,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 46.699999999953434,
+        "moveP95Ms": 65.10000000009313,
+        "moveMaxMs": 65.10000000009313,
+        "moveMeanMs": 46.50666666667288,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 15,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "hex",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 389,
+      "movesLanded": 12,
+      "movesAttempted": 12,
+      "play": {
+        "moveCount": 12,
+        "moveP50Ms": 47.199999999953434,
+        "moveP95Ms": 99.4000000001397,
+        "moveMaxMs": 99.4000000001397,
+        "moveMeanMs": 52.79166666668607,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 12,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null,
+      "renderStats": null,
+      "domBurst": {
+        "burstEvents": 40,
+        "burstSyncMs": 89.9000000001397,
+        "burstTotalMs": 97.70000000018626,
+        "deltaStats": {}
+      }
+    },
+    {
+      "gameId": "star-track",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 257,
+      "movesLanded": 5,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 30.800000000046566,
+        "moveP95Ms": 280.0999999998603,
+        "moveMaxMs": 297.5,
+        "moveMeanMs": 51.473333333351185,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 10,
+        "layoutReadsPerMove": 0.16666666666666666
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "hex-a-gone",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 269,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 77.30000000004657,
+        "moveP95Ms": 132.5999999998603,
+        "moveMaxMs": 132.5999999998603,
+        "moveMeanMs": 81.65333333333643,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 33,
+        "layoutReadsPerMove": 2.2
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "calla",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 269,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 47.199999999953434,
+        "moveP95Ms": 57.5,
+        "moveMaxMs": 57.5,
+        "moveMeanMs": 47.81999999998758,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 15,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "sum-dominoes",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 265,
+      "movesLanded": 13,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 47.300000000046566,
+        "moveP95Ms": 114.19999999995343,
+        "moveMaxMs": 136.9000000001397,
+        "moveMeanMs": 55.53833333331859,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 86,
+        "layoutReadsPerMove": 1.4333333333333333
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "par-55",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 253,
+      "movesLanded": 10,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 30.600000000093132,
+        "moveP95Ms": 80.5,
+        "moveMaxMs": 83.5,
+        "moveMeanMs": 37.04166666664727,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 20,
+        "layoutReadsPerMove": 0.3333333333333333
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "ramrod",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 263,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 47.5999999998603,
+        "moveP95Ms": 86.19999999995343,
+        "moveMaxMs": 86.19999999995343,
+        "moveMeanMs": 46.13999999997517,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 9,
+        "layoutReadsPerMove": 0.6
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "kwatro-sinko",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 268,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 64.60000000009313,
+        "moveP95Ms": 82.30000000004657,
+        "moveMaxMs": 82.30000000004657,
+        "moveMeanMs": 65.60000000003105,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 30,
+        "layoutReadsPerMove": 2
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "fiar",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 264,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 47,
+        "moveP95Ms": 71.5999999998603,
+        "moveMaxMs": 71.5999999998603,
+        "moveMeanMs": 47.64666666664804,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 15,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "juggle",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 260,
+      "movesLanded": 12,
+      "movesAttempted": 12,
+      "play": {
+        "moveCount": 12,
+        "moveP50Ms": 46.9000000001397,
+        "moveP95Ms": 147.80000000004657,
+        "moveMaxMs": 147.80000000004657,
+        "moveMeanMs": 57.31666666667055,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 5,
+        "layoutReadsPerMove": 0.4166666666666667
+      },
+      "hover": {
+        "hoverSamples": 16,
+        "hoverSyncTotalMs": 71.20000000018626,
+        "hoverSyncMeanMs": 4.4500000000116415,
+        "hoverTotalMs": 81.10000000009313,
+        "hoverMeanMs": 4.4500000000116415,
+        "hoverLongTasks": 1,
+        "hoverLongTaskMaxMs": 72,
+        "hoverLayoutReads": 0
+      },
+      "error": null,
+      "renderStats": null,
+      "domBurst": {
+        "burstEvents": 40,
+        "burstSyncMs": 3.800000000046566,
+        "burstTotalMs": 25.100000000093132,
+        "deltaStats": {}
+      }
+    },
+    {
+      "gameId": "contig-60",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 239,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 64.9000000001397,
+        "moveP95Ms": 88.10000000009313,
+        "moveMaxMs": 88.10000000009313,
+        "moveMeanMs": 70.18666666670082,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 30,
+        "layoutReadsPerMove": 2
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "stars-bars",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 271,
+      "movesLanded": 11,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 32.10000000009313,
+        "moveP95Ms": 65.10000000009313,
+        "moveMaxMs": 82.4000000001397,
+        "moveMeanMs": 37.86333333334187,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 22,
+        "layoutReadsPerMove": 0.36666666666666664
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "fab-a-diffy",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 302,
+      "movesLanded": 3,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 27.399999999906868,
+        "moveP95Ms": 29.300000000046566,
+        "moveMaxMs": 112.0999999998603,
+        "moveMeanMs": 29.616666666666667,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 3,
+        "layoutReadsPerMove": 0.05
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "queens-guards",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 284,
+      "movesLanded": 2,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 46.199999999953434,
+        "moveP95Ms": 47.799999999813735,
+        "moveMaxMs": 48.0999999998603,
+        "moveMeanMs": 40.40333333331316,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 60,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "prime-gold",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 265,
+      "movesLanded": 15,
+      "movesAttempted": 15,
+      "play": {
+        "moveCount": 15,
+        "moveP50Ms": 80.69999999995343,
+        "moveP95Ms": 99.5,
+        "moveMaxMs": 99.5,
+        "moveMeanMs": 76.76666666666667,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 30,
+        "layoutReadsPerMove": 2
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "remainder-islands",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 247,
+      "movesLanded": 12,
+      "movesAttempted": 12,
+      "play": {
+        "moveCount": 12,
+        "moveP50Ms": 63.200000000186265,
+        "moveP95Ms": 103.69999999995343,
+        "moveMaxMs": 103.69999999995343,
+        "moveMeanMs": 66.71666666667443,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 12,
+        "layoutReadsPerMove": 1
+      },
+      "hover": null,
+      "error": null,
+      "renderStats": null,
+      "domBurst": null
+    },
+    {
+      "gameId": "pent-em-in",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 261,
+      "movesLanded": 12,
+      "movesAttempted": 12,
+      "play": {
+        "moveCount": 12,
+        "moveP50Ms": 46.60000000009313,
+        "moveP95Ms": 101.39999999990687,
+        "moveMaxMs": 101.39999999990687,
+        "moveMeanMs": 53.55833333331005,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 14,
+        "layoutReadsPerMove": 1.1666666666666667
+      },
+      "hover": {
+        "hoverSamples": 16,
+        "hoverSyncTotalMs": 63.10000000009313,
+        "hoverSyncMeanMs": 3.9437500000058208,
+        "hoverTotalMs": 77.60000000009313,
+        "hoverMeanMs": 3.9437500000058208,
+        "hoverLongTasks": 1,
+        "hoverLongTaskMaxMs": 64,
+        "hoverLayoutReads": 0
+      },
+      "error": null,
+      "renderStats": null,
+      "domBurst": {
+        "burstEvents": 40,
+        "burstSyncMs": 9.800000000046566,
+        "burstTotalMs": 27.200000000186265,
+        "deltaStats": {}
+      }
+    },
+    {
+      "gameId": "frac-fact",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 281,
+      "movesLanded": 10,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 31.899999999906868,
+        "moveP95Ms": 180.60000000009313,
+        "moveMaxMs": 183.70000000018626,
+        "moveMeanMs": 55.86166666667753,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 20,
+        "layoutReadsPerMove": 0.3333333333333333
+      },
+      "hover": null,
+      "error": null
+    },
+    {
+      "gameId": "fraction-pinball",
+      "board3d": false,
+      "viewport": {
+        "width": 768,
+        "height": 1024
+      },
+      "cpuRate": 4,
+      "ttiMs": 268,
+      "movesLanded": 10,
+      "movesAttempted": 60,
+      "play": {
+        "moveCount": 60,
+        "moveP50Ms": 32,
+        "moveP95Ms": 165.20000000018626,
+        "moveMaxMs": 182.69999999995343,
+        "moveMeanMs": 54.03499999998603,
+        "longTaskCount": 0,
+        "longTaskOver50Count": 0,
+        "longTaskMaxMs": 0,
+        "layoutReadsTotal": 20,
+        "layoutReadsPerMove": 0.3333333333333333
+      },
+      "hover": null,
+      "error": null
+    }
+  ]
+}

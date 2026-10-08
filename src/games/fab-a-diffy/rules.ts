@@ -1,12 +1,14 @@
 // Fab-a-Diffy Game Rules
 // Fraction combination logic, matching, and scoring
 
-import {
+import type {
   FabADiffyState,
   FractionBar,
   AnswerBar,
   FabMove,
   Player,
+} from './types';
+import {
   FRACTION_BAR_VALUES,
   ANSWER_BAR_VALUES,
   createBarId,
@@ -14,7 +16,7 @@ import {
   getOpponent,
   shuffleArray,
 } from './types';
-import { Fraction, FractionOperation } from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
 import {
   add,
   subtract,
@@ -418,7 +420,10 @@ export function hasAnyValidMove(state: FabADiffyState): boolean {
   // Check if any pair can make a matching result
   for (let i = 0; i < availableBars.length; i++) {
     for (let j = i + 1; j < availableBars.length; j++) {
-      const results = getPossibleResults(availableBars[i], availableBars[j]);
+      const left = availableBars[i];
+      const right = availableBars[j];
+      if (left === undefined || right === undefined) continue;
+      const results = getPossibleResults(left, right);
       for (const { result } of results) {
         const matches = findMatchingAnswers(state, result);
         if (matches.length > 0) return true;

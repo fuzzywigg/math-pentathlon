@@ -1,6 +1,7 @@
 // Hex-a-Gone! Game Controller
 
-import { HexAGoneGameState, createInitialState, BlockShape } from './types';
+import type { HexAGoneGameState, BlockShape } from './types';
+import { createInitialState } from './types';
 import {
   selectBlock,
   deselectBlock,
@@ -15,7 +16,8 @@ import { renderBoard, renderStatus, buildSelectionArea } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { hexAGoneTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { getAISelection, getAIPlacement, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAISelection, getAIPlacement } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadHexAGoneBoard3DModule } from './board-3d-loader';

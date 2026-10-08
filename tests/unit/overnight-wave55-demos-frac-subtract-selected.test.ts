@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 55 demos — frac subtract selected', () => {
   it('subtract button becomes selected and calculate fills arithmetic-result', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const sub = root.querySelector('.op-btn[data-op="subtract"]') as HTMLButtonElement;
     sub.click();

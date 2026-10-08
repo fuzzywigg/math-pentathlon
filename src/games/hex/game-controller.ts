@@ -1,10 +1,15 @@
 // Hex Game Controller - Manages game flow and UI updates
 
-import { HexGameState, createInitialState, DEFAULT_BOARD_SIZE } from './types';
+import type { HexGameState } from './types';
+import { createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
-import { AIDifficulty } from './ai';
-import { cancelHexAiRequests, getBestMoveAsync } from './ai-client';
+import type { AIDifficulty } from './ai';
+import {
+  cancelHexAiRequests,
+  disposeHexAiWorker,
+  getBestMoveAsync,
+} from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
@@ -26,8 +31,17 @@ let boardContainer: HTMLElement | null = null;
 let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let aiDifficulty: AIDifficulty = 'medium';
-/** Invalidates in-flight worker replies after new game. */
+/** Invalidates in-flight worker replies after new game / destroy. */
 let aiGeneration = 0;
+/** Pending paint-delay timer before worker search — cleared on destroy. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 
 // AI config
 const AI_THINKING_DELAY = 500;
@@ -121,7 +135,9 @@ function triggerAIMove(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
     void (async () => {
       let aiMove = null;
       try {
@@ -198,4 +214,15 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Tip-held destroy hook — cancel AI timer/worker so route leave cannot mutate a detached board. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  cancelHexAiRequests();
+  disposeHexAiWorker();
+  isAIThinking = false;
+  boardContainer = null;
+  statusContainer = null;
 }

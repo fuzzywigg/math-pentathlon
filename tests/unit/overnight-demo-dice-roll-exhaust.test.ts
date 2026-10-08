@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -25,7 +20,8 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   document.body.innerHTML = '';
-  vi.restoreAllMocks();
+  // clearAllMocks only — restoreAllMocks kills hoisted router.navigate mock
+  vi.clearAllMocks();
 });
 
 const QUICK_ROLLS = [
@@ -38,7 +34,7 @@ const QUICK_ROLLS = [
 
 describe('Overnight demos — dice roll exhaust', () => {
   it('all five quick-roll presets replace placeholder result', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const result = root.querySelector('#quick-roll-result') as HTMLElement;
     expect(result.textContent).toMatch(/Click a button/i);
@@ -55,7 +51,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('rapid re-roll of same preset keeps a single result container', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const btn = root.querySelector(
       '.quick-roll-btn[data-dice="d6"][data-count="2"]'
@@ -68,7 +64,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('2d6 selector roll/confirm writes isolated log-2d6 entries', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const sel = root.querySelector('#selector-2d6') as HTMLElement;
     const log = root.querySelector('#log-2d6') as HTMLElement;
@@ -103,7 +99,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('poly roll stays isolated from 2d6 log under shared result-area ids', async () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     await vi.advanceTimersByTimeAsync(1200);
 
@@ -139,7 +135,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('sums selector auto-rolls and exposes possible-sums chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(900);
     const sums = root.querySelector('#selector-sums') as HTMLElement;
@@ -151,7 +147,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('log area caps at 20 entries under burst rolls', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const sel = root.querySelector('#selector-2d6') as HTMLElement;
     const log = root.querySelector('#log-2d6') as HTMLElement;
@@ -167,7 +163,7 @@ describe('Overnight demos — dice roll exhaust', () => {
   });
 
   it('remount clears prior quick-roll result and logs', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     (
       root.querySelector(

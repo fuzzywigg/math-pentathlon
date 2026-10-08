@@ -1,13 +1,20 @@
 // Polyomino UI - Visual Rendering and Interaction
 // Renders polyomino shapes, boards, and handles drag-and-drop
 
-import { Cell, PolyominoShape, Rotation, PolyominoRenderConfig } from './types';
-import { Board, validatePlacement } from './placement';
+import type {
+  Cell,
+  PolyominoShape,
+  Rotation,
+  PolyominoRenderConfig,
+} from './types';
+import type { Board } from './placement';
+import { validatePlacement } from './placement';
 import {
   getTransformedCells,
   getBoundingBox,
   getCellsAtPosition,
 } from './transform';
+import { clientToSvgUser, svgUserToGridCell } from '../../ui/coord-map';
 
 /** Default render configuration */
 const DEFAULT_CONFIG: Required<PolyominoRenderConfig> = {
@@ -109,7 +116,7 @@ export function renderBoard(
       rect.setAttribute('y', String(y));
       rect.setAttribute('width', String(cfg.cellSize));
       rect.setAttribute('height', String(cfg.cellSize));
-      rect.setAttribute('fill', board.cells[r][c] ? '#e0e0e0' : '#fff');
+      rect.setAttribute('fill', board.cells[r]?.[c] ? '#e0e0e0' : '#fff');
       rect.setAttribute('stroke', '#ccc');
       rect.setAttribute('stroke-width', '1');
       rect.dataset.row = String(r);
@@ -304,14 +311,14 @@ export function createRotationControls(
 
   const ccwBtn = document.createElement('button');
   ccwBtn.style.cssText = btnStyle;
-  ccwBtn.innerHTML = '↺';
+  ccwBtn.textContent = '↺';
   ccwBtn.title = 'Rotate counter-clockwise';
   ccwBtn.addEventListener('click', () => onRotate('ccw'));
   container.appendChild(ccwBtn);
 
   const cwBtn = document.createElement('button');
   cwBtn.style.cssText = btnStyle;
-  cwBtn.innerHTML = '↻';
+  cwBtn.textContent = '↻';
   cwBtn.title = 'Rotate clockwise';
   cwBtn.addEventListener('click', () => onRotate('cw'));
   container.appendChild(cwBtn);
@@ -319,7 +326,7 @@ export function createRotationControls(
   if (canFlip) {
     const flipBtn = document.createElement('button');
     flipBtn.style.cssText = btnStyle;
-    flipBtn.innerHTML = '⇄';
+    flipBtn.textContent = '⇄';
     flipBtn.title = 'Flip horizontally';
     flipBtn.addEventListener('click', onFlip);
     container.appendChild(flipBtn);
@@ -360,15 +367,15 @@ export function createInteractiveBoard(
   });
 
   svg.addEventListener('mousemove', (e) => {
-    const rect = svg.getBoundingClientRect();
-    const x = e.clientX - rect.left - cfg.padding;
-    const y = e.clientY - rect.top - cfg.padding;
-
-    const col = Math.floor(x / cfg.cellSize);
-    const row = Math.floor(y / cfg.cellSize);
-
-    if (row >= 0 && row < board.rows && col >= 0 && col < board.cols) {
-      onCellHover({ row, col });
+    const cell = getCellFromMouseEvent(e, svg, cfg);
+    if (
+      cell &&
+      cell.row >= 0 &&
+      cell.row < board.rows &&
+      cell.col >= 0 &&
+      cell.col < board.cols
+    ) {
+      onCellHover(cell);
     } else {
       onCellHover(null);
     }
@@ -498,6 +505,24 @@ export function injectPolyominoStyles(): void {
     .placement-preview.invalid rect {
       animation: pulse-invalid 0.5s ease-in-out infinite;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .placement-preview.valid rect,
+      .placement-preview.invalid rect {
+        animation: none !important;
+      }
+      .rotation-controls button:active {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .placement-preview.valid rect,
+    html[data-reduced-motion='true'] .placement-preview.invalid rect {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .rotation-controls button:active {
+      transform: none;
+    }
   `;
 
   document.head.appendChild(style);
@@ -515,7 +540,9 @@ function darkenColor(hex: string, percent: number): string {
 }
 
 /**
- * Get cell from mouse position on board
+ * Get cell from mouse position on board.
+ * Scales CSS client coords into SVG user units so CSS resize / `width: 100%`
+ * does not drift hit-testing away from the drawn grid.
  */
 export function getCellFromMouseEvent(
   e: MouseEvent,
@@ -524,13 +551,21 @@ export function getCellFromMouseEvent(
 ): Cell | null {
   const cfg = { ...DEFAULT_CONFIG, ...config };
   const rect = boardElement.getBoundingClientRect();
-  const x = e.clientX - rect.left - cfg.padding;
-  const y = e.clientY - rect.top - cfg.padding;
-
-  const col = Math.floor(x / cfg.cellSize);
-  const row = Math.floor(y / cfg.cellSize);
-
-  if (row < 0 || col < 0) return null;
-
-  return { row, col };
+  const viewBox = boardElement.viewBox?.baseVal;
+  const viewBoxWidth =
+    viewBox && viewBox.width > 0
+      ? viewBox.width
+      : Number(boardElement.getAttribute('width')) || rect.width || 1;
+  const viewBoxHeight =
+    viewBox && viewBox.height > 0
+      ? viewBox.height
+      : Number(boardElement.getAttribute('height')) || rect.height || 1;
+  const { x, y } = clientToSvgUser(
+    e.clientX,
+    e.clientY,
+    rect,
+    viewBoxWidth,
+    viewBoxHeight
+  );
+  return svgUserToGridCell(x, y, cfg.cellSize, cfg.padding);
 }

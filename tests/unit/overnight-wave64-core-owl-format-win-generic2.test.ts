@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format win-generic-2', () => {
     storage.resetAll();
   });
 
-
   it('selects win-generic-2 when higher-priority wins are seen', () => {
     for (const m of owlMessages.getMessagesByCategory('game:end')) {
       if (m.id !== 'win-generic-2') storage.markMessageSeen(m.id);

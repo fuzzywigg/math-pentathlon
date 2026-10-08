@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — align hex idle regions', () => {
   it('hex-info mounts Blue/Red 0 region(s), largest: 0', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const info = root.querySelector('#hex-info')?.textContent ?? '';
     expect(info).toContain('Blue: 0 region(s), largest: 0');

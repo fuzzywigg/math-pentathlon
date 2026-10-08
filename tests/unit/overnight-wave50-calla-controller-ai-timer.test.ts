@@ -12,10 +12,19 @@ import {
 } from '../../src/games/calla/game-controller';
 
 afterEach(() => {
+  // newGameVsAI clears module-level currentHint; newGameVsHuman / initGame do not.
+  // Without this, isolate:false shuffle leaves "Look carefully!…" for later Calla tests.
+  const board = document.createElement('div');
+  const status = document.createElement('div');
+  document.body.append(board, status);
+  initGame(board, status);
+  newGameVsAI('easy');
   document.body.innerHTML = '';
   vi.clearAllTimers();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Targeted spy cleanup only — restoreAllMocks would tear down hoisted
+  // vi.mock factories (router.navigate) on the shared isolate:false graph.
+  vi.mocked(callaAi.getAIMove).mockRestore?.();
 });
 
 describe('Overnight wave50 calla — controller AI turn', () => {

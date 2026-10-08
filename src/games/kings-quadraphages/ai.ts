@@ -1,6 +1,6 @@
 // AI Opponent for Kings & Quadraphages
 
-import { GameState } from './game-state';
+import type { GameState } from './game-state';
 import { BOARD_SIZE } from './board';
 import {
   getValidKingMoves,
@@ -8,7 +8,7 @@ import {
   findKingPosition,
   getOpponent,
 } from './rules';
-import { PlayerOwner } from './pieces';
+import type { PlayerOwner } from './pieces';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 

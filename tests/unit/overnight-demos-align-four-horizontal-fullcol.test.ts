@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickCol(root: HTMLElement, col: number): void {
 
 describe('Overnight demos — align four horizontal + full column', () => {
   it('X wins horizontal four on bottom row with far-column O fillers', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // X: 0,1,2,3 on bottom; O parks in col 6
@@ -47,7 +42,7 @@ describe('Overnight demos — align four horizontal + full column', () => {
   });
 
   it('full column drops are ignored; reset restores X to move', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Fill column 0 completely (6 rows): X O X O X O

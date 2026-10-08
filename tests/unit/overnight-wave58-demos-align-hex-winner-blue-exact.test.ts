@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function clickHex(root: HTMLElement, row: number, col: number): void {
   (
@@ -32,7 +27,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — align hex Winner Blue exact', () => {
   it('Blue vertical spine paints exact Winner: Blue!', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     for (let row = 0; row < 6; row++) {
       clickHex(root, row, 3);

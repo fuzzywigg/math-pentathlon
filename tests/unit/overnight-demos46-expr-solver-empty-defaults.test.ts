@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — expr solver empty defaults', () => {
   it('cleared num inputs coerce via parseInt||1 and report No solutions', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     for (const id of ['num1', 'num2', 'num3', 'num4']) {
       (root.querySelector(`#${id}`) as HTMLInputElement).value = '';

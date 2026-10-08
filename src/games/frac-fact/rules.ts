@@ -1,22 +1,21 @@
 // Frac Fact Game Rules
 // Problem generation, answer checking, and scoring
 
-import {
+import type {
   FracFactState,
   FractionProblem,
   PlayerStats,
   Difficulty,
   Player,
+} from './types';
+import {
   getOpponent,
   getPlayerStats,
   POINTS_PER_CORRECT,
   STREAK_BONUS,
 } from './types';
-import {
-  Fraction,
-  FractionOperation,
-  COMMON_FRACTIONS,
-} from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
+import { COMMON_FRACTIONS } from '../../core/fractions/types';
 import {
   performOperation,
   simplify,
@@ -65,7 +64,8 @@ function getOperationsForDifficulty(
  */
 function randomFraction(difficulty: Difficulty): Fraction {
   const fractions = getFractionsForDifficulty(difficulty);
-  return fractions[Math.floor(Math.random() * fractions.length)];
+  // ratchet: COMMON_FRACTIONS is never empty for any Difficulty.
+  return fractions[Math.floor(Math.random() * fractions.length)]!;
 }
 
 /**
@@ -117,7 +117,8 @@ function generateDistractors(
       }),
     ];
 
-    const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    // ratchet: strategies is a non-empty literal array.
+    const strategy = strategies[Math.floor(Math.random() * strategies.length)]!;
     const result = strategy();
 
     // Ensure valid fraction
@@ -164,7 +165,11 @@ function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    // ratchet: dense copy — indexed elements exist for i,j in range.
+    const a = result[i]!;
+    const b = result[j]!;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }
@@ -177,7 +182,8 @@ export function generateProblem(
   problemNumber: number
 ): FractionProblem {
   const operations = getOperationsForDifficulty(difficulty);
-  const operation = operations[Math.floor(Math.random() * operations.length)];
+  // ratchet: every Difficulty maps to a non-empty operations list.
+  const operation = operations[Math.floor(Math.random() * operations.length)]!;
 
   let operand1: Fraction;
   let operand2: Fraction;

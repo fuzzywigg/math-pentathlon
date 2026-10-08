@@ -15,9 +15,11 @@ import {
   renderScores,
   renderMoveHistory,
 } from '../../src/games/fab-a-diffy/board-ui';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+  vi.clearAllMocks();
   document.body.innerHTML = '';
 });
 
@@ -54,7 +56,7 @@ describe('Fab-a-Diffy AI', () => {
   it('getAIMove easy returns bars/op/answer present on the board', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.99);
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'easy');
+    const move = getAIMove(state, 'player1', 'easy', fastDeadlineOpts());
     expect(move).not.toBeNull();
     expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
     expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
@@ -67,7 +69,7 @@ describe('Fab-a-Diffy AI', () => {
   it('getAIMove medium returns a concrete move', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'medium');
+    const move = getAIMove(state, 'player1', 'medium', fastDeadlineOpts());
     expect(move).not.toBeNull();
     expect(move!.bar1Id).not.toBe(move!.bar2Id);
   });
@@ -75,7 +77,7 @@ describe('Fab-a-Diffy AI', () => {
   it('executeAITurn easy flips seat and records history', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     const state = createInitialState();
-    const next = executeAITurn(state, 'player1', 'easy');
+    const next = executeAITurn(state, 'player1', 'easy', fastDeadlineOpts());
     expect(next.currentPlayer).toBe('player2');
     expect(next.phase).toBe('selectingBar1');
     expect(next.moveHistory.length).toBe(1);
@@ -102,7 +104,7 @@ describe('Fab-a-Diffy AI', () => {
     expect(next.currentPlayer).toBe('player2');
     expect(next.phase).toBe('selectingBar1');
     expect(next.moveHistory.length).toBe(0);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });
 

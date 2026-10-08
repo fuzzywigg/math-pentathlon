@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — graph clear-path btn exact', () => {
   it('locks #clear-path-btn label Clear (not Clear Board)', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     expect(root.querySelector('#clear-path-btn')?.textContent).toBe('Clear');
     expect(root.querySelector('#clear-game-btn')?.textContent).toBe(

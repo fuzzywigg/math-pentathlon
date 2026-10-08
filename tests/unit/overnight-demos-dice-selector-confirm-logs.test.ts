@@ -7,12 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ afterEach(() => {
 
 describe('Overnight demos — dice selector roll/confirm logs', () => {
   it('2d6 roll + die select + confirm appends log entries', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200); // drain sums autoRoll
 
@@ -56,7 +51,7 @@ describe('Overnight demos — dice selector roll/confirm logs', () => {
   });
 
   it('poly + sums selectors mount controls without rolling secondary ids', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 

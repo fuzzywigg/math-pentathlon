@@ -1,7 +1,7 @@
 // Tutorial content for Sum Dominoes & Dice
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const sumDominoesTutorial: TutorialConfig = {
   id: 'sum-dominoes-basics',

@@ -219,7 +219,12 @@ describe('Wave 24 game-selector — hero / cards / accordion headers', () => {
 
   afterEach(() => {
     container.remove();
-    vi.restoreAllMocks();
+    // Restore scrollIntoView spy only — restoreAllMocks would tear down the
+    // hoisted router.navigate vi.mock on the shared isolate:false graph.
+    const siv = Element.prototype.scrollIntoView as unknown as {
+      mockRestore?: () => void;
+    };
+    siv.mockRestore?.();
   });
 
   it('renders hero brand, stats counts, and division accordions', () => {

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — attr Select 3 more after deselect', () => {
   it('deselecting sole SET card restores Select 3 more card(s)', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = [
       ...root.querySelectorAll('#set-grid > div > div'),

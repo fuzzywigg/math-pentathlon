@@ -1,13 +1,7 @@
 // FIAR Game Controller — Division II rules + kid-friendly auto-win / no timer
 
-import {
-  FiarGameState,
-  Player,
-  ChipKind,
-  createInitialState,
-  CONFIG,
-  chipsRemaining,
-} from './types';
+import type { FiarGameState, Player, ChipKind } from './types';
+import { createInitialState, CONFIG, chipsRemaining } from './types';
 import {
   canPlaceChip,
   placeChip,
@@ -19,7 +13,8 @@ import {
   normalizeSelectedChipKind,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
-import { applyAIMove, getAIMove, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { applyAIMove, getAIMove } from './ai';
 import {
   cancelFiarAiRequests,
   disposeFiarAiWorker,
@@ -28,16 +23,25 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { fiarTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadFiarBoard3DModule } from './board-3d-loader';
 import type { FiarBoard3D } from '../../ui/three/fiar-board-3d';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../../core/dom-security';
+
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 let gameState: FiarGameState;
@@ -49,8 +53,14 @@ let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
+/** Single pending AI schedule timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 /** True while a worker/sync AI search is in flight — blocks human taps. */
 let isAIThinking = false;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let showStarterBanner = false;
@@ -74,9 +84,11 @@ async function ensureBoard3d(): Promise<void> {
     const mod = await loadFiarBoard3DModule();
     if (!boardContainer || !board3dEnabled) return;
     board3d = await mod.createFiarBoard3D(boardContainer, handleNodeClick);
+    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -90,6 +102,7 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
+  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();
@@ -101,7 +114,7 @@ function render(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleNodeClick);
   } else if (!board3dEnabled) {
-    boardContainer.innerHTML = '';
+    clearElement(boardContainer);
     const svg = renderBoard(gameState, handleNodeClick);
     boardContainer.appendChild(svg);
   }
@@ -115,26 +128,40 @@ function inventoryLine(player: Player): string {
   return `${getPlayerName(player)}: ${placed}/${CONFIG.CHIPS_PER_PLAYER} (${inv.plain} plain, ${inv.marked} marked)`;
 }
 
-function renderChipKindPicker(): string {
-  if (gameState.phase !== 'placement' || gameState.winner) return '';
-  if (isAIMode && gameState.currentPlayer === aiPlayer) return '';
+function renderChipKindPicker(): DocumentFragment | null {
+  if (gameState.phase !== 'placement' || gameState.winner) return null;
+  if (isAIMode && gameState.currentPlayer === aiPlayer) return null;
 
   const inv = gameState.chipInventory[gameState.currentPlayer];
   const plainPressed = gameState.selectedChipKind === 'plain';
   const markedPressed = gameState.selectedChipKind === 'marked';
 
-  return `
-    <div class="fiar-chip-kind-picker" role="group" aria-label="Choose chip type to place">
-      <button type="button" class="fiar-chip-kind-btn" data-chip-kind="plain"
-        aria-pressed="${plainPressed}" ${inv.plain <= 0 ? 'disabled' : ''}>
-        Plain (${inv.plain} left)
-      </button>
-      <button type="button" class="fiar-chip-kind-btn" data-chip-kind="marked"
-        aria-pressed="${markedPressed}" ${inv.marked <= 0 ? 'disabled' : ''}>
-        Marked · Fire Extinguisher (${inv.marked} left)
-      </button>
-    </div>
-  `;
+  const picker = document.createElement('div');
+  picker.className = 'fiar-chip-kind-picker';
+  picker.setAttribute('role', 'group');
+  picker.setAttribute('aria-label', 'Choose chip type to place');
+
+  const plainBtn = document.createElement('button');
+  plainBtn.type = 'button';
+  plainBtn.className = 'fiar-chip-kind-btn';
+  plainBtn.dataset.chipKind = 'plain';
+  plainBtn.setAttribute('aria-pressed', String(plainPressed));
+  if (inv.plain <= 0) plainBtn.disabled = true;
+  plainBtn.textContent = `Plain (${inv.plain} left)`;
+
+  const markedBtn = document.createElement('button');
+  markedBtn.type = 'button';
+  markedBtn.className = 'fiar-chip-kind-btn';
+  markedBtn.dataset.chipKind = 'marked';
+  markedBtn.setAttribute('aria-pressed', String(markedPressed));
+  if (inv.marked <= 0) markedBtn.disabled = true;
+  markedBtn.textContent = `Marked · Fire Extinguisher (${inv.marked} left)`;
+
+  picker.appendChild(plainBtn);
+  picker.appendChild(markedBtn);
+  const frag = document.createDocumentFragment();
+  frag.appendChild(picker);
+  return frag;
 }
 
 function bindChipKindPicker(): void {
@@ -162,15 +189,19 @@ function renderStatus(): void {
       gameState.winningPathColor && gameState.winningPathColor !== winner
         ? ` (with ${getPlayerName(gameState.winningPathColor)}'s chips)`
         : '';
-    statusContainer.innerHTML = `
+    replaceWithSafeHtml(
+      statusContainer,
+      safeHtml`
       <div class="fiar-winner-banner">
         ${getPlayerName(winner)} wins!${pathNote}
       </div>
-    `;
+    `
+    );
     return;
   }
 
   if (isDraw(gameState)) {
+    // trusted constant markup
     statusContainer.innerHTML = `
       <div class="fiar-status">
         Draw! No valid moves available.
@@ -178,15 +209,6 @@ function renderStatus(): void {
     `;
     return;
   }
-
-  const starterBanner =
-    showStarterBanner && moveCount === 0
-      ? `<div class="fiar-starter-banner" data-starter="${starter}">
-          ${getPlayerName(starter)} starts${
-            isAIMode ? (starter === aiPlayer ? ' (computer)' : ' (you)') : ''
-          }.
-        </div>`
-      : '';
 
   let statusText = '';
   const playerClass = currentPlayer;
@@ -206,12 +228,31 @@ function renderStatus(): void {
     }
   }
 
-  statusContainer.innerHTML = `
-    ${starterBanner}
-    <div class="fiar-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
-      ${statusText}
-    </div>
-    ${renderChipKindPicker()}
+  clearElement(statusContainer);
+
+  if (showStarterBanner && moveCount === 0) {
+    const banner = document.createElement('div');
+    banner.className = 'fiar-starter-banner';
+    banner.dataset.starter = starter;
+    const modeNote = isAIMode
+      ? starter === aiPlayer
+        ? ' (computer)'
+        : ' (you)'
+      : '';
+    banner.textContent = `${getPlayerName(starter)} starts${modeNote}.`;
+    statusContainer.appendChild(banner);
+  }
+
+  const statusEl = document.createElement('div');
+  statusEl.className = `fiar-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}`;
+  statusEl.textContent = statusText;
+  statusContainer.appendChild(statusEl);
+
+  const picker = renderChipKindPicker();
+  if (picker) statusContainer.appendChild(picker);
+
+  statusContainer.appendChild(
+    safeHtml`
     <div class="fiar-chips-info">
       <div class="fiar-chip-count">
         <span class="fiar-chip-icon player1"></span>
@@ -222,7 +263,8 @@ function renderStatus(): void {
         ${inventoryLine('player2')}
       </div>
     </div>
-  `;
+  `
+  );
   bindChipKindPicker();
 }
 
@@ -243,7 +285,9 @@ function scheduleAiIfNeeded(): void {
     !gameState.winner &&
     gameState.phase !== 'gameOver'
   ) {
-    setTimeout(() => {
+    clearAiTimer();
+    aiTimer = setTimeout(() => {
+      aiTimer = null;
       void aiTurn();
     }, 500);
   }
@@ -374,6 +418,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelFiarAiRequests();
   disposeFiarAiWorker();
@@ -434,11 +479,9 @@ export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   render();
   owlSystem.onGameStart('fiar');
 
-  if (gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => {
-      void aiTurn();
-    }, 500);
-  }
+  // Route opening AI seat through the tracked timer so destroyGame/clearAiTimer
+  // can cancel it (raw setTimeout previously survived remount).
+  scheduleAiIfNeeded();
 }
 
 export function getCurrentState(): FiarGameState {

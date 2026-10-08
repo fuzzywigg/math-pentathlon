@@ -1,11 +1,8 @@
 // Queens & Guards Game Rules
 // Movement, capture, and win condition logic
 
+import type { QueensGuardsState, Player, BoardCoord, QGMove } from './types';
 import {
-  QueensGuardsState,
-  Player,
-  BoardCoord,
-  QGMove,
   CONFIG,
   cellKey,
   parseKey,
@@ -100,8 +97,9 @@ function getDirectionPairs(coord: BoardCoord): [BoardCoord, BoardCoord][] {
     for (let j = i + 1; j < adjacent.length; j++) {
       // Check if these two form a straight line through coord
       // For now, approximate by checking if they're roughly opposite
-      const a = adjacent[i];
-      const b = adjacent[j];
+      // ratchet: nested loops bound by adjacent.length — indices are in range.
+      const a = adjacent[i]!;
+      const b = adjacent[j]!;
 
       // Same ring, opposite sides
       if (a.ring === b.ring && a.ring === coord.ring) {
@@ -224,8 +222,9 @@ function checkCaptures(
 
     for (const far of furtherAdjacent) {
       // Skip if it's the cell we just moved to
-      if (far.ring === movedTo.ring && far.position === movedTo.position)
+      if (far.ring === movedTo.ring && far.position === movedTo.position) {
         continue;
+      }
 
       const farCell = cells.get(cellKey(far.ring, far.position));
 

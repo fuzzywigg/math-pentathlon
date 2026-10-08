@@ -1,9 +1,10 @@
 // Fab-a-Diffy Board UI
 // Rendering fraction bars, answer board, and operation selection
 
-import { FabADiffyState, FractionBar, AnswerBar } from './types';
-import { FractionOperation } from '../../core/fractions/types';
+import type { FabADiffyState, FractionBar, AnswerBar } from './types';
+import type { FractionOperation } from '../../core/fractions/types';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   findMatchingAnswers,
   calculateResult,
@@ -14,6 +15,8 @@ import {
   getFractionColor,
 } from '../../core/fractions/fraction-bar-ui';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -23,6 +26,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -33,8 +38,9 @@ const COLORS = {
   disabled: '#bdbdbd',
 };
 
-function playerColors() {
-  return getPlayerSeatColors();
+export interface FabBoardRenderOptions {
+  /** When false, suppress selectable/matchable chrome and click handlers (AI seat). */
+  allowInput?: boolean;
 }
 
 /**
@@ -42,12 +48,14 @@ function playerColors() {
  */
 export function renderFractionBarPool(
   state: FabADiffyState,
-  onBarClick: (barId: string) => void
+  onBarClick: (barId: string) => void,
+  options: FabBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-bar-pool';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Fraction Bars';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -84,7 +92,8 @@ export function renderFractionBarPool(
         bar,
         onBarClick,
         rowIndex,
-        colIndex
+        colIndex,
+        allowInput
       );
       group.appendChild(barEl);
     });
@@ -107,7 +116,8 @@ function createFractionBarElement(
   bar: FractionBar,
   onClick: (barId: string) => void,
   row: number,
-  col: number
+  col: number,
+  allowInput: boolean = true
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'fab-bar-wrapper';
@@ -117,9 +127,11 @@ function createFractionBarElement(
 
   // Determine state
   const isSelected =
-    state.selectedBar1 === bar.id || state.selectedBar2 === bar.id;
+    allowInput &&
+    (state.selectedBar1 === bar.id || state.selectedBar2 === bar.id);
   const isUsed = bar.used;
   const isSelectable =
+    allowInput &&
     !isUsed &&
     (state.phase === 'selectingBar1' ||
       (state.phase === 'selectingBar2' && state.selectedBar1 !== bar.id));
@@ -161,11 +173,15 @@ function createFractionBarElement(
     buildCellAriaLabel({
       coord: formatFraction(simplify(bar.fraction)),
       empty: !isUsed && !isSelected,
+      selectable: isSelectable,
       extras: [isSelected ? 'selected' : '', isUsed ? 'used' : ''].filter(
         Boolean
       ),
     })
   );
+  if (!isSelectable) {
+    wrapper.setAttribute('aria-disabled', 'true');
+  }
 
   return wrapper;
 }
@@ -175,12 +191,14 @@ function createFractionBarElement(
  */
 export function renderAnswerBoard(
   state: FabADiffyState,
-  onAnswerClick: (answerId: string) => void
+  onAnswerClick: (answerId: string) => void,
+  options: FabBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-answer-board';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Answer Bars';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -189,9 +207,14 @@ export function renderAnswerBoard(
   grid.className = 'fab-answer-grid';
   markBoardAsGrid(grid);
 
-  // Find which answers are currently matchable
+  // Find which answers are currently matchable (suppressed while AI thinks)
   const matchableAnswers = new Set<string>();
-  if (state.selectedBar1 && state.selectedBar2 && state.selectedOperation) {
+  if (
+    allowInput &&
+    state.selectedBar1 &&
+    state.selectedBar2 &&
+    state.selectedOperation
+  ) {
     const bar1 = state.fractionBars.get(state.selectedBar1);
     const bar2 = state.fractionBars.get(state.selectedBar2);
     if (bar1 && bar2) {
@@ -254,7 +277,7 @@ function createAnswerBarElement(
   }
 
   // Create visual bar
-  const seats = playerColors();
+  const seats = getPlayerSeatColors();
   const color = isClaimed
     ? answer.claimedBy === 'player1'
       ? seats.player1
@@ -283,17 +306,18 @@ function createAnswerBarElement(
     const activate = () => onClick(answer.id);
     wrapper.addEventListener('click', activate);
     bindCellActivateKeys(wrapper, activate);
+  } else if (!isClaimed) {
+    wrapper.setAttribute('aria-disabled', 'true');
   }
 
+  const owner =
+    isClaimed && answer.claimedBy ? getPlayerName(answer.claimedBy) : undefined;
   makeGridCell(
     wrapper,
     buildCellAriaLabel({
       coord: formatFraction(simplify(answer.fraction)),
       empty: !isClaimed,
-      owner:
-        isClaimed && answer.claimedBy
-          ? getPlayerName(answer.claimedBy)
-          : undefined,
+      ...(owner !== undefined ? { owner } : {}),
       validPlacement: isMatchable && !isClaimed,
     })
   );
@@ -306,8 +330,10 @@ function createAnswerBarElement(
  */
 export function renderOperationSelector(
   state: FabADiffyState,
-  onSelect: (op: FractionOperation) => void
+  onSelect: (op: FractionOperation) => void,
+  options: FabBoardRenderOptions = {}
 ): HTMLElement {
+  const allowInput = options.allowInput !== false;
   const container = document.createElement('div');
   container.className = 'fab-operation-selector';
 
@@ -322,13 +348,16 @@ export function renderOperationSelector(
   // Show selected fractions
   const preview = document.createElement('div');
   preview.className = 'fab-operation-preview';
-  preview.innerHTML = `
+  replaceWithSafeHtml(
+    preview,
+    safeHtml`
     <span class="fab-fraction">${formatFraction(simplify(bar1.fraction))}</span>
     <span class="fab-op-placeholder">?</span>
     <span class="fab-fraction">${formatFraction(simplify(bar2.fraction))}</span>
     <span class="fab-equals">=</span>
     <span class="fab-result">?</span>
-  `;
+  `
+  );
   container.appendChild(preview);
 
   // Get possible results for each operation
@@ -344,13 +373,14 @@ export function renderOperationSelector(
 
   for (const op of operations) {
     const result = calculateResult(bar1.fraction, bar2.fraction, op);
-    const hasMatch = result
-      ? findMatchingAnswers(state, result).length > 0
-      : false;
+    const hasMatch =
+      allowInput && result
+        ? findMatchingAnswers(state, result).length > 0
+        : false;
 
     const btn = document.createElement('button');
     btn.className = 'fab-op-btn';
-    if (state.selectedOperation === op) {
+    if (allowInput && state.selectedOperation === op) {
       btn.classList.add('fab-op-selected');
     }
     if (hasMatch) {
@@ -360,16 +390,22 @@ export function renderOperationSelector(
     const symbol = getOperationSymbol(op);
     const resultStr = result ? formatFraction(simplify(result)) : '—';
 
-    btn.innerHTML = `
+    replaceWithSafeHtml(
+      btn,
+      safeHtml`
       <span class="fab-op-symbol">${symbol}</span>
       <span class="fab-op-result">${resultStr}</span>
-    `;
+    `
+    );
 
-    if (result && result.numerator >= 0) {
+    // Only enable ops that claim at least one answer — avoids a confirmingMove
+    // dead-end with no matchable targets (Clear Selection still recovers).
+    if (allowInput && result && result.numerator >= 0 && hasMatch) {
       btn.addEventListener('click', () => onSelect(op));
     } else {
       btn.disabled = true;
       btn.classList.add('fab-op-disabled');
+      btn.setAttribute('aria-disabled', 'true');
     }
 
     buttons.appendChild(btn);
@@ -388,11 +424,17 @@ export function renderScores(state: FabADiffyState): HTMLElement {
 
   const p1 = document.createElement('div');
   p1.className = 'fab-score fab-score-p1';
-  p1.innerHTML = `<span class="fab-score-label">${seatIcon('player1')} Blue</span><span class="fab-score-value">${state.scores.player1}</span>`;
+  replaceWithSafeHtml(
+    p1,
+    safeHtml`<span class="fab-score-label">${seatIcon('player1')} Blue</span><span class="fab-score-value">${state.scores.player1}</span>`
+  );
 
   const p2 = document.createElement('div');
   p2.className = 'fab-score fab-score-p2';
-  p2.innerHTML = `<span class="fab-score-label">${seatIcon('player2')} Red</span><span class="fab-score-value">${state.scores.player2}</span>`;
+  replaceWithSafeHtml(
+    p2,
+    safeHtml`<span class="fab-score-label">${seatIcon('player2')} Red</span><span class="fab-score-value">${state.scores.player2}</span>`
+  );
 
   container.appendChild(p1);
   container.appendChild(p2);
@@ -407,7 +449,7 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
   const container = document.createElement('div');
   container.className = 'fab-history';
 
-  const header = document.createElement('h3');
+  const header = document.createElement('h2');
   header.textContent = 'Move History';
   header.className = 'fab-section-header';
   container.appendChild(header);
@@ -424,7 +466,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
 
     const moveEl = document.createElement('div');
     moveEl.className = `fab-history-move fab-history-${move.player}`;
-    moveEl.innerHTML = `
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`
       <span class="fab-move-num">${move.moveNumber}.</span>
       <span class="fab-move-expr">
         ${formatFraction(simplify(bar1.fraction))}
@@ -433,7 +477,8 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
         =
         ${formatFraction(simplify(answer.fraction))}
       </span>
-    `;
+    `
+    );
     list.appendChild(moveEl);
   }
 
@@ -445,12 +490,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
  * Inject CSS styles
  */
 export function injectFabStyles(): void {
-  const existingStyle = document.getElementById('fab-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'fab-styles';
-  style.textContent = `
+  injectStylesOnce(
+    'fab-styles',
+    `
     .fab-game-area {
       display: flex;
       flex-direction: column;
@@ -499,6 +541,11 @@ export function injectFabStyles(): void {
     .fab-bar-wrapper {
       padding: 4px;
       border-radius: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.15s ease;
     }
 
@@ -536,11 +583,17 @@ export function injectFabStyles(): void {
     .fab-answer-wrapper {
       padding: 4px;
       border-radius: 6px;
+      min-height: 44px;
+      min-width: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       transition: all 0.15s ease;
     }
 
     .fab-answer-matchable {
       background: ${COLORS.validLight};
+      box-shadow: 0 0 0 3px ${COLORS.valid};
       animation: fab-pulse 1s ease-in-out infinite;
     }
 
@@ -594,7 +647,7 @@ export function injectFabStyles(): void {
     }
 
     .fab-op-placeholder, .fab-result {
-      color: #999;
+      color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
     }
 
     .fab-equals {
@@ -612,6 +665,8 @@ export function injectFabStyles(): void {
       flex-direction: column;
       align-items: center;
       padding: 0.75rem 1.25rem;
+      min-height: 44px;
+      min-width: 44px;
       border: 2px solid #ddd;
       border-radius: 8px;
       background: white;
@@ -669,12 +724,12 @@ export function injectFabStyles(): void {
 
     .fab-score-p1 {
       background: #bbdefb;
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .fab-score-p2 {
       background: #ffcdd2;
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     [data-opponent="ai"] .fab-score-p2 {
@@ -748,11 +803,11 @@ export function injectFabStyles(): void {
     }
 
     .fab-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .fab-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .fab-winner-banner {
@@ -780,6 +835,7 @@ export function injectFabStyles(): void {
 
     .fab-btn {
       padding: 0.5rem 1rem;
+      min-height: 44px;
       border: none;
       border-radius: 6px;
       font-weight: 500;
@@ -810,17 +866,51 @@ export function injectFabStyles(): void {
         grid-template-columns: 1fr;
       }
 
+      /* While claiming, float answers above the long bar pool. */
+      .fab-main-layout.fab-phase-confirmingMove .fab-left-column {
+        order: 2;
+      }
+
+      .fab-main-layout.fab-phase-confirmingMove .fab-right-column {
+        order: 1;
+      }
+
       .fab-operation-preview {
         font-size: 1.2rem;
       }
+
+      .fab-operation-buttons {
+        flex-wrap: wrap;
+      }
     }
-  `;
-  document.head.appendChild(style);
+
+    @media (pointer: coarse) {
+      .fab-bar-wrapper,
+      .fab-answer-wrapper,
+      .fab-op-btn,
+      .fab-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fab-answer-matchable,
+      .fab-winner-banner {
+        animation: none !important;
+      }
+
+      .fab-bar-wrapper:not(.fab-bar-disabled):hover,
+      .fab-answer-wrapper:hover,
+      .fab-op-btn:hover:not(:disabled),
+      .fab-btn:hover {
+        transform: none;
+      }
+    }
+  `
+  );
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}
