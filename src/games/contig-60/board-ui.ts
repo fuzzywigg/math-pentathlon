@@ -100,7 +100,7 @@ export function syncContigBoard(
       buildCellAriaLabel({
         coord: String(value),
         empty: !cell?.owner,
-        owner: ownerLabel,
+        ...(ownerLabel !== undefined ? { owner: ownerLabel } : {}),
         validPlacement: isValid,
       })
     );
@@ -137,8 +137,12 @@ export function renderBoard(
     const rowEl = document.createElement('div');
     rowEl.className = 'contig-row';
 
+    const numberRow = BOARD_NUMBERS[row];
+    if (numberRow === undefined) continue;
+
     for (let col = 0; col < CONFIG.GRID_COLS; col++) {
-      const value = BOARD_NUMBERS[row][col];
+      const value = numberRow[col];
+      if (value === undefined) continue;
       const cell = state.cells.get(value);
 
       const cellEl = document.createElement('div');
@@ -179,7 +183,7 @@ export function renderBoard(
         buildCellAriaLabel({
           coord: String(value),
           empty: !cell?.owner,
-          owner: ownerLabel,
+          ...(ownerLabel !== undefined ? { owner: ownerLabel } : {}),
           validPlacement: isValid,
         })
       );

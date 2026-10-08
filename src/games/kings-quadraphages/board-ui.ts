@@ -114,7 +114,11 @@ export function handleCellClick(
 
   // Move King phase
   if (state.turnPhase === 'moveKing') {
-    const clickedCell = state.board[row - 1][col - 1]; // Convert 1-based to 0-based
+    const moveRow = state.board[row - 1];
+    if (moveRow === undefined) {
+      return { state, isInvalidClick: false };
+    }
+    const clickedCell = moveRow[col - 1]; // Convert 1-based to 0-based
 
     // Check if clicked on current player's King
     if (
@@ -160,7 +164,11 @@ export function handleCellClick(
       return { state: endTurn(state), isInvalidClick: false };
     }
 
-    const clickedCell = state.board[row - 1][col - 1];
+    const placeRow = state.board[row - 1];
+    if (placeRow === undefined) {
+      return { state, isInvalidClick: false };
+    }
+    const clickedCell = placeRow[col - 1];
 
     // Only place on empty cells
     if (clickedCell === null) {
@@ -182,7 +190,7 @@ const KINGS_CELL_COUNT = KINGS_BOARD_SIZE * KINGS_BOARD_SIZE;
 
 /** Mutable click binding so listeners can be attached once (#11). */
 interface BoardClickBinding {
-  onCellClick?: CellClickCallback;
+  onCellClick?: CellClickCallback | undefined;
 }
 
 const boardClickBindings = new WeakMap<HTMLElement, BoardClickBinding>();
@@ -198,7 +206,8 @@ function syncKingsCell(
   cell.dataset.row = String(row);
   cell.dataset.col = String(col);
 
-  const piece = state.board[row - 1][col - 1];
+  const boardRow = state.board[row - 1];
+  const piece = boardRow?.[col - 1] ?? null;
   const colLetter = String.fromCharCode(64 + col);
   const coord = `${colLetter}${row}`;
   let owner: string | undefined;
@@ -256,8 +265,8 @@ function syncKingsCell(
     buildCellAriaLabel({
       coord,
       empty,
-      owner,
-      piece: pieceName,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(pieceName !== undefined ? { piece: pieceName } : {}),
       validMove: isValidMoveTarget,
       validPlacement: isPlacementTarget,
     })
@@ -265,7 +274,11 @@ function syncKingsCell(
 
   if (state.moveHistory.length > 0) {
     const lastMove = state.moveHistory[state.moveHistory.length - 1];
-    if (lastMove.to.row === row && lastMove.to.col === col) {
+    if (
+      lastMove !== undefined &&
+      lastMove.to.row === row &&
+      lastMove.to.col === col
+    ) {
       cell.classList.add('cell-last-move');
     }
   }

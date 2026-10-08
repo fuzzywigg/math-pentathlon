@@ -85,9 +85,10 @@ export interface MoveRecord {
 function createBoard(): BoardCell[][] {
   const board: BoardCell[][] = [];
   for (let row = 0; row < BOARD_SIZE; row++) {
-    board[row] = [];
+    const rowCells: BoardCell[] = [];
+    board[row] = rowCells;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      board[row][col] = {
+      rowCells[col] = {
         row,
         col,
         occupied: false,

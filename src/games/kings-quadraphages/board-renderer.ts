@@ -121,8 +121,11 @@ export function renderBoard(
 
   // Render each cell
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowCells = board[row];
+    if (rowCells === undefined) continue;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = board[row][col];
+      const cell = rowCells[col];
+      if (cell === undefined) continue;
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }
@@ -140,8 +143,11 @@ export function updateBoard(
   clearElement(container);
 
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const rowCells = board[row];
+    if (rowCells === undefined) continue;
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = board[row][col];
+      const cell = rowCells[col];
+      if (cell === undefined) continue;
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }
