@@ -56,9 +56,11 @@ const nodePureFiles = [
   'tests/unit/burn-wave42-pent-ai-difficulty-random.test.ts',
 ];
 
-// Cap workers: GHA ubuntu-latest is 2 vCPU; local cloud VMs vary. Explicit
-// maxWorkers keeps pool scheduling predictable vs Vitest's auto heuristic.
-const maxWorkers = process.env.CI ? 2 : Math.min(4, Math.max(1, (Number(process.env.VITEST_MAX_WORKERS) || 4)));
+// Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
+// override via VITEST_MAX_WORKERS for local experiments / constrained runners.
+const maxWorkers = process.env.VITEST_MAX_WORKERS
+  ? Number(process.env.VITEST_MAX_WORKERS)
+  : undefined;
 
 export default defineConfig({
   test: {
@@ -66,7 +68,9 @@ export default defineConfig({
     // stack: file afterEach runs before setupFiles afterEach, so shared cleanup
     // is the last safety net for timers / stubs under isolate:false shuffle.
     sequence: { hooks: 'stack' },
-    maxWorkers,
+    ...(maxWorkers && Number.isFinite(maxWorkers) && maxWorkers > 0
+      ? { maxWorkers }
+      : {}),
     projects: [
       {
         test: {
