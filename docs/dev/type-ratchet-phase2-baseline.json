@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "reportOnly": true,
   "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
-  "taskId": "burn-1008-mp-type-ratchet-batch2-3-4-combined",
-  "generatedAt": "2026-10-08T08:40:40.979Z",
-  "tipSha": "d6c35e331db52e856e8e9585c14f5df7d2b301da",
+  "taskId": "burn-1008-mp-type-ratchet-batch6-nonrules",
+  "generatedAt": "2026-10-08T09:28:39.583Z",
+  "tipSha": "edcff8bf35345d13144e471934226f32133d019b",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
@@ -19,46 +19,43 @@
     "noImplicitReturns"
   ],
   "inScopeErrors": 0,
-  "outOfScopeErrors": 286,
-  "fileCount": 38,
+  "outOfScopeErrors": 220,
+  "fileCount": 28,
   "byKind": {
-    "ai_search_scoring": 219,
-    "rules_engine": 62,
-    "game_ui": 5
+    "ai_search_scoring": 220
   },
   "byRootCause": {
-    "unchecked_index_access": 267,
+    "unchecked_index_access": 202,
     "exact_optional_property_types": 15,
     "undefined_as_index": 2,
-    "possibly_undefined_iterable": 1,
-    "type_assignability": 1
+    "possibly_undefined_iterable": 1
   },
   "byCode": {
-    "TS2532": 127,
-    "TS18048": 69,
-    "TS2322": 53,
-    "TS2345": 19,
+    "TS2532": 88,
+    "TS18048": 59,
+    "TS2322": 44,
     "TS2379": 13,
+    "TS2345": 11,
     "TS2375": 2,
     "TS2538": 2,
     "TS2488": 1
   },
   "byGame": {
-    "stars-bars": 30,
-    "hex": 28,
-    "kwatro-sinko": 24,
-    "contig-60": 23,
-    "kings-quadraphages": 23,
     "fab-a-diffy": 20,
-    "juggle": 20,
-    "pent-em-in": 19,
-    "prime-gold": 17,
+    "contig-60": 19,
+    "juggle": 18,
+    "stars-bars": 18,
+    "hex": 17,
+    "kwatro-sinko": 16,
     "calla": 15,
     "fiar": 12,
+    "pent-em-in": 12,
+    "kings-quadraphages": 11,
     "hex-a-gone": 9,
     "par-55": 8,
     "ramrod": 8,
     "sum-dominoes": 8,
+    "prime-gold": 7,
     "queens-guards": 6,
     "star-track": 6,
     "frac-fact": 4,
@@ -66,51 +63,6 @@
     "fraction-pinball": 2
   },
   "perGame": {
-    "stars-bars": {
-      "total": 30,
-      "ai_search_scoring": 18,
-      "rules_engine": 12,
-      "game_ui": 0,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "hex": {
-      "total": 28,
-      "ai_search_scoring": 17,
-      "rules_engine": 11,
-      "game_ui": 0,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "kwatro-sinko": {
-      "total": 24,
-      "ai_search_scoring": 15,
-      "rules_engine": 9,
-      "game_ui": 0,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "contig-60": {
-      "total": 23,
-      "ai_search_scoring": 19,
-      "rules_engine": 4,
-      "game_ui": 0,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "kings-quadraphages": {
-      "total": 23,
-      "ai_search_scoring": 11,
-      "rules_engine": 7,
-      "game_ui": 5,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
     "fab-a-diffy": {
       "total": 20,
       "ai_search_scoring": 20,
@@ -120,28 +72,46 @@
       "shell_misc": 0,
       "other": 0
     },
-    "juggle": {
-      "total": 20,
-      "ai_search_scoring": 18,
-      "rules_engine": 2,
-      "game_ui": 0,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "pent-em-in": {
+    "contig-60": {
       "total": 19,
-      "ai_search_scoring": 12,
-      "rules_engine": 7,
+      "ai_search_scoring": 19,
+      "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
-    "prime-gold": {
+    "juggle": {
+      "total": 18,
+      "ai_search_scoring": 18,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "stars-bars": {
+      "total": 18,
+      "ai_search_scoring": 18,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "hex": {
       "total": 17,
-      "ai_search_scoring": 7,
-      "rules_engine": 10,
+      "ai_search_scoring": 17,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "kwatro-sinko": {
+      "total": 16,
+      "ai_search_scoring": 16,
+      "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
@@ -159,6 +129,24 @@
     "fiar": {
       "total": 12,
       "ai_search_scoring": 12,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "pent-em-in": {
+      "total": 12,
+      "ai_search_scoring": 12,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "kings-quadraphages": {
+      "total": 11,
+      "ai_search_scoring": 11,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
@@ -195,6 +183,15 @@
     "sum-dominoes": {
       "total": 8,
       "ai_search_scoring": 8,
+      "rules_engine": 0,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "prime-gold": {
+      "total": 7,
+      "ai_search_scoring": 7,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
@@ -252,26 +249,18 @@
     "src/games/juggle/ai.ts": 18,
     "src/games/stars-bars/ai.ts": 18,
     "src/games/fab-a-diffy/ai.ts": 17,
+    "src/games/kwatro-sinko/ai.ts": 16,
     "src/games/calla/ai.ts": 15,
-    "src/games/kwatro-sinko/ai.ts": 15,
     "src/games/hex/ai.ts": 13,
     "src/games/pent-em-in/ai.ts": 12,
-    "src/games/stars-bars/rules.ts": 12,
-    "src/games/hex/rules.ts": 11,
     "src/games/kings-quadraphages/ai.ts": 11,
-    "src/games/prime-gold/rules.ts": 10,
     "src/games/fiar/ai.ts": 9,
     "src/games/hex-a-gone/ai.ts": 9,
-    "src/games/kwatro-sinko/rules.ts": 9,
     "src/games/par-55/ai.ts": 8,
     "src/games/ramrod/ai.ts": 8,
     "src/games/sum-dominoes/ai.ts": 8,
-    "src/games/pent-em-in/rules.ts": 7,
     "src/games/prime-gold/ai.ts": 7,
-    "src/games/kings-quadraphages/game-state.ts": 6,
     "src/games/star-track/ai.ts": 6,
-    "src/games/kings-quadraphages/board.ts": 5,
-    "src/games/contig-60/rules.ts": 4,
     "src/games/frac-fact/ai.ts": 4,
     "src/games/remainder-islands/ai.ts": 4,
     "src/games/hex/ai-client.ts": 3,
@@ -279,12 +268,10 @@
     "src/games/fab-a-diffy/ai-client.ts": 2,
     "src/games/fiar/ai-client.ts": 2,
     "src/games/fraction-pinball/ai.ts": 2,
-    "src/games/juggle/rules.ts": 2,
     "src/games/queens-guards/ai-client.ts": 2,
     "src/games/fab-a-diffy/ai.worker.ts": 1,
     "src/games/fiar/ai.worker.ts": 1,
     "src/games/hex/ai.worker.ts": 1,
-    "src/games/kings-quadraphages/rules.ts": 1,
     "src/games/queens-guards/ai.worker.ts": 1
   },
   "errors": [
@@ -627,46 +614,6 @@
       "kind": "ai_search_scoring",
       "game": "contig-60",
       "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/rules.ts",
-      "line": 48,
-      "col": 22,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "contig-60",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/rules.ts",
-      "line": 50,
-      "col": 39,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/rules.ts",
-      "line": 172,
-      "col": 17,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "contig-60",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/rules.ts",
-      "line": 174,
-      "col": 26,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
     },
     {
       "file": "src/games/fab-a-diffy/ai-client.ts",
@@ -1309,116 +1256,6 @@
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; now: () => number; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
-      "file": "src/games/hex/rules.ts",
-      "line": 17,
-      "col": 10,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 85,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 103,
-      "col": 34,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 112,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 130,
-      "col": 34,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 149,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 182,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 210,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 229,
-      "col": 34,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 239,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/rules.ts",
-      "line": 258,
-      "col": 34,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
       "file": "src/games/juggle/ai.ts",
       "line": 68,
       "col": 7,
@@ -1599,26 +1436,6 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/juggle/rules.ts",
-      "line": 99,
-      "col": 5,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "juggle",
-      "message": "Type 'PolyominoShape | null | undefined' is not assignable to type 'PolyominoShape | null'."
-    },
-    {
-      "file": "src/games/juggle/rules.ts",
-      "line": 196,
-      "col": 5,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "juggle",
-      "message": "Type 'Rotation | undefined' is not assignable to type '0 | 180 | 90 | 270'."
-    },
-    {
       "file": "src/games/kings-quadraphages/ai.ts",
       "line": 62,
       "col": 30,
@@ -1729,126 +1546,6 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/kings-quadraphages/board.ts",
-      "line": 60,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board.ts",
-      "line": 66,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board.ts",
-      "line": 95,
-      "col": 3,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Type 'Cell | undefined' is not assignable to type 'Cell'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board.ts",
-      "line": 95,
-      "col": 10,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board.ts",
-      "line": 100,
-      "col": 34,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 78,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 81,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 102,
-      "col": 20,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 184,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 187,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/game-state.ts",
-      "line": 242,
-      "col": 3,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/rules.ts",
-      "line": 23,
-      "col": 21,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
       "file": "src/games/kwatro-sinko/ai.ts",
       "line": 106,
       "col": 24,
@@ -1867,6 +1564,16 @@
       "kind": "ai_search_scoring",
       "game": "kwatro-sinko",
       "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 112,
+      "col": 16,
+      "code": "TS2488",
+      "rootCause": "possibly_undefined_iterable",
+      "kind": "ai_search_scoring",
+      "game": "kwatro-sinko",
+      "message": "Type 'number[] | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
@@ -1995,96 +1702,6 @@
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
-      "game": "kwatro-sinko",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 348,
-      "col": 24,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 349,
-      "col": 24,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 359,
-      "col": 16,
-      "code": "TS2488",
-      "rootCause": "possibly_undefined_iterable",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Type 'number[] | undefined' must have a '[Symbol.iterator]()' method that returns an iterator."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 401,
-      "col": 43,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Argument of type '({ node: BoardNode; chip: Chip; } | undefined)[]' is not assignable to parameter of type '{ node: BoardNode; chip: Chip; }[]'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 431,
-      "col": 29,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Type '{ node: BoardNode; chip: Chip; } | undefined' is not assignable to type '{ node: BoardNode; chip: Chip; } | null'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 436,
-      "col": 5,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 436,
-      "col": 27,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 442,
-      "col": 20,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "kwatro-sinko",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 442,
-      "col": 45,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
       "game": "kwatro-sinko",
       "message": "Object is possibly 'undefined'."
     },
@@ -2289,76 +1906,6 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 80,
-      "col": 33,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 80,
-      "col": 33,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 133,
-      "col": 35,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 197,
-      "col": 5,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 197,
-      "col": 5,
-      "code": "TS2322",
-      "rootCause": "type_assignability",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Type '{ occupied: true; owner: Player; pieceId: string; row?: number; col?: number; }' is not assignable to type 'BoardCell'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 198,
-      "col": 10,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/rules.ts",
-      "line": 384,
-      "col": 5,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "pent-em-in",
-      "message": "Type 'Rotation | undefined' is not assignable to type 'Rotation'."
-    },
-    {
       "file": "src/games/prime-gold/ai.ts",
       "line": 243,
       "col": 7,
@@ -2427,106 +1974,6 @@
       "kind": "ai_search_scoring",
       "game": "prime-gold",
       "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 42,
-      "col": 5,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 49,
-      "col": 12,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'dx' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 50,
-      "col": 12,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'dy' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 67,
-      "col": 19,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 68,
-      "col": 11,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'val' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 72,
-      "col": 11,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "Type 'number | undefined' is not assignable to type 'number'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 74,
-      "col": 28,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 75,
-      "col": 29,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'val' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 75,
-      "col": 46,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'val' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/prime-gold/rules.ts",
-      "line": 75,
-      "col": 57,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "prime-gold",
-      "message": "'val' is possibly 'undefined'."
     },
     {
       "file": "src/games/queens-guards/ai-client.ts",
@@ -2947,126 +2394,6 @@
       "kind": "ai_search_scoring",
       "game": "stars-bars",
       "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 57,
-      "col": 6,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Type 'T | undefined' is not assignable to type 'T'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 57,
-      "col": 17,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Type 'T | undefined' is not assignable to type 'T'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 204,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 204,
-      "col": 11,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 241,
-      "col": 26,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "'dr' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 242,
-      "col": 26,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "'dc' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 250,
-      "col": 21,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 250,
-      "col": 21,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Argument of type 'BoardCell | undefined' is not assignable to parameter of type 'BoardCell'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 266,
-      "col": 16,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 281,
-      "col": 7,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 303,
-      "col": 16,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/rules.ts",
-      "line": 304,
-      "col": 7,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "rules_engine",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
