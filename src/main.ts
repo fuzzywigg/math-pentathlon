@@ -8,6 +8,7 @@ import {
   getCurrentPath,
   getPathParams,
   navigate,
+  setNotFoundHandler,
 } from './core/router';
 import { renderGameSelector } from './ui/game-selector';
 import type {
@@ -381,6 +382,11 @@ addRoute('/demo/polyomino', renderPolyominoDemoPage);
 addRoute('/demo/graph', renderGraphDemoPage);
 addRoute('/demo/attributes', renderAttributeDemoPage);
 addRoute('/demo/expressions', renderExpressionDemoPage);
+
+// Unknown hashes used to leave the previous view mounted (default console.error).
+setNotFoundHandler(() => {
+  navigate('/');
+});
 
 // Initialize router
 initRouter();

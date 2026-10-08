@@ -116,6 +116,7 @@ vi.mock('../../src/games/stars-bars/game-controller', () => mocks.stars);
 
 vi.mock('../../src/core/router', () => ({
   navigate: vi.fn(),
+  handleRoute: vi.fn(),
 }));
 
 import { navigate } from '../../src/core/router';
@@ -223,6 +224,36 @@ describe('burn-1007 game-route-mounts', () => {
     await mountGameById('hex', stale);
     expect(lastOptions).toBeNull();
     expect(mocks.hex.initGame).not.toHaveBeenCalled();
+  });
+
+  it('skips init/cleanup when generation goes stale during mountGameShell', async () => {
+    let resolveShell: ((s: GameShellElements) => void) | null = null;
+    initGameMountDeps({
+      container,
+      setCleanup: (fn) => {
+        lastCleanup = fn;
+      },
+      mountGameShell: () =>
+        new Promise<GameShellElements>((resolve) => {
+          resolveShell = resolve;
+        }),
+      resolveAIDifficulty: (d) => d ?? 'medium',
+    });
+
+    const stale = nextRouteGeneration();
+    const pending = mountGameById('hex', stale);
+    // Wait until the in-flight mount reached mountGameShell.
+    await vi.waitFor(() => {
+      expect(resolveShell).toBeTypeOf('function');
+    });
+    // Navigate away while the shell mount is in-flight.
+    nextRouteGeneration();
+    resolveShell!(shell);
+    await pending;
+
+    expect(mocks.hex.initGame).not.toHaveBeenCalled();
+    expect(shell.cleanup).toHaveBeenCalled();
+    expect(lastCleanup).toBeNull();
   });
 
   it.each([...GAME_IDS])(

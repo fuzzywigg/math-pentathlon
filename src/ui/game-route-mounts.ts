@@ -2,8 +2,11 @@
  * Per-game route mounts — lazy-loaded from main when opening /game/:id.
  * Keeps help HTML + shell wiring out of the menu entry chunk.
  */
-import { navigate } from '../core/router';
-import { isCurrentRouteGeneration } from '../core/route-generation';
+import { handleRoute, navigate } from '../core/router';
+import {
+  getRouteGeneration,
+  isCurrentRouteGeneration,
+} from '../core/route-generation';
 import type {
   AIDifficultyLevel,
   GameShellElements,
@@ -48,6 +51,60 @@ function resolveAIDifficulty(
   return d().resolveAIDifficulty(difficulty);
 }
 
+/**
+ * At most one clobber-recovery remount per turn. A stale `mountGameShell`
+ * already ran `clearElement(#app)` — without a remount the newer route stays
+ * wiped and its cleanup pointer can be lost.
+ */
+let clobberRecoveryQueued = false;
+/** Route generation that last wrote shell chrome into `#app`. */
+let lastShellCommitGen = 0;
+
+function queueClobberRecovery(): void {
+  if (clobberRecoveryQueued) return;
+  clobberRecoveryQueued = true;
+  queueMicrotask(() => {
+    clobberRecoveryQueued = false;
+    // A newer mount may have rewritten #app after our wipe — skip remount.
+    if (lastShellCommitGen === getRouteGeneration()) return;
+    handleRoute();
+  });
+}
+
+/**
+ * Mount shell only while `routeGen` is still current. Re-checks after the
+ * await (dynamic import / yield) so a back-navigation cannot init a game into
+ * a newer route's DOM or overwrite `currentCleanup`.
+ */
+async function mountGameShellForRoute(
+  routeGen: number,
+  options: GameShellOptions
+): Promise<GameShellElements | null> {
+  if (!isCurrentRouteGeneration(routeGen)) return null;
+  const shell = await mountGameShell(appContainer(), options);
+  lastShellCommitGen = routeGen;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    shell.cleanup();
+    queueClobberRecovery();
+    return null;
+  }
+  return shell;
+}
+
+/**
+ * Register destroy + shell cleanup after a successful route-owned mount.
+ * Callers must only invoke this when `mountGameShellForRoute` returned a shell.
+ */
+function setGameRouteCleanup(
+  destroyGame: () => void,
+  shell: GameShellElements
+): void {
+  setCurrentCleanup(() => {
+    destroyGame();
+    shell.cleanup();
+  });
+}
+
 /** Assign once per dynamic import from the router. */
 export function initGameMountDeps(next: GameMountDeps): void {
   deps = next;
@@ -56,6 +113,8 @@ export function initGameMountDeps(next: GameMountDeps): void {
 /** Reset between unit tests so missing-deps paths stay exerciseable. */
 export function resetGameMountDepsForTests(): void {
   deps = null;
+  clobberRecoveryQueued = false;
+  lastShellCommitGen = 0;
 }
 
 // Render Kings & Quadraphages
@@ -68,7 +127,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     startTutorial,
   } = await import('../games/kings-quadraphages/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Kings & Quadraphages',
     helpTitle: 'How to Play Kings & Quadraphages',
     helpContentHtml: `<h3>Objective</h3>
@@ -115,6 +174,8 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     onTutorial: () => startTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initKQGame(
       shell.board,
@@ -124,10 +185,7 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     );
   }
 
-  setCurrentCleanup(() => {
-    destroyKQGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyKQGame, shell);
 }
 
 // Render Hex
@@ -140,7 +198,7 @@ async function renderHex(routeGen: number): Promise<void> {
     startTutorial: startHexTutorial,
   } = await import('../games/hex/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Hex',
     helpTitle: 'How to Play Hex',
     helpContentHtml: `<h3>Objective</h3>
@@ -186,14 +244,13 @@ async function renderHex(routeGen: number): Promise<void> {
     onTutorial: () => startHexTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initHexGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyHexGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyHexGame, shell);
 }
 
 // Render Star Track
@@ -206,7 +263,7 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     startTutorial: startStarTrackTutorial,
   } = await import('../games/star-track/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Star Track',
     helpTitle: 'How to Play Star Track',
     helpContentHtml: `<h3>Objective</h3>
@@ -311,14 +368,13 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     onTutorial: () => startStarTrackTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initStarTrackGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyStarTrackGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyStarTrackGame, shell);
 }
 
 // Render Hex-a-Gone
@@ -331,7 +387,7 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     destroyGame: destroyHexAGoneGame,
   } = await import('../games/hex-a-gone/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Hex-a-Gone!',
     helpTitle: 'How to Play Hex-a-Gone!',
     helpContentHtml: `<h3>Objective</h3>
@@ -434,14 +490,13 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     onTutorial: () => startHexAGoneTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initHexAGoneGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyHexAGoneGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyHexAGoneGame, shell);
 }
 
 // Render Calla
@@ -454,7 +509,7 @@ async function renderCalla(routeGen: number): Promise<void> {
     startTutorial: startCallaTutorial,
   } = await import('../games/calla/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Calla',
     helpTitle: 'How to Play Calla',
     helpContentHtml: `<h3>Objective</h3>
@@ -507,14 +562,13 @@ async function renderCalla(routeGen: number): Promise<void> {
     onTutorial: () => startCallaTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initCallaGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyCallaGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyCallaGame, shell);
 }
 
 // Render FIAR
@@ -527,7 +581,7 @@ async function renderFiar(routeGen: number): Promise<void> {
     startTutorial: startFiarTutorial,
   } = await import('../games/fiar/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'FIAR (Four In A Row)',
     helpTitle: 'How to Play FIAR',
     helpContentHtml: `<h3>Objective</h3>
@@ -585,14 +639,13 @@ async function renderFiar(routeGen: number): Promise<void> {
     onTutorial: () => startFiarTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initFiarGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyFiarGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyFiarGame, shell);
 }
 
 // Render Queens & Guards
@@ -605,7 +658,7 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     startTutorial: startQGTutorial,
   } = await import('../games/queens-guards/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Queens & Guards',
     helpTitle: 'How to Play Queens & Guards',
     helpContentHtml: `<h3>Objective</h3>
@@ -660,14 +713,13 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     onTutorial: () => startQGTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initQGGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyQGGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyQGGame, shell);
 }
 
 // Render Contig 60
@@ -680,7 +732,7 @@ async function renderContig60(routeGen: number): Promise<void> {
     startTutorial: startContigTutorial,
   } = await import('../games/contig-60/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Contig 60',
     helpTitle: 'How to Play Contig 60',
     helpContentHtml: `<h3>Objective</h3>
@@ -738,14 +790,13 @@ async function renderContig60(routeGen: number): Promise<void> {
     onTutorial: () => startContigTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initContigGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyContigGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyContigGame, shell);
 }
 
 // Render Juggle
@@ -758,7 +809,7 @@ async function renderJuggle(routeGen: number): Promise<void> {
     startTutorial: startJuggleTutorial,
   } = await import('../games/juggle/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Juggle',
     helpTitle: 'How to Play Juggle',
     helpContentHtml: `<h3>Objective</h3>
@@ -812,14 +863,13 @@ async function renderJuggle(routeGen: number): Promise<void> {
     onTutorial: () => startJuggleTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initJuggleGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyJuggleGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyJuggleGame, shell);
 }
 
 // Render Fab-a-Diffy
@@ -832,7 +882,7 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     startTutorial: startFabTutorial,
   } = await import('../games/fab-a-diffy/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Fab-a-Diffy',
     helpTitle: 'How to Play Fab-a-Diffy',
     helpContentHtml: `<h3>Objective</h3>
@@ -879,22 +929,21 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        fabNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        fabNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        fabNewGameVsHuman(shell.board!);
+        fabNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startFabTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initFabGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyFabGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyFabGame, shell);
 }
 
 // Render Sum Dominoes
@@ -907,7 +956,7 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     startTutorial: startSDTutorial,
   } = await import('../games/sum-dominoes/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Sum Dominoes & Dice',
     helpTitle: 'How to Play Sum Dominoes & Dice',
     helpContentHtml: `<h3>Objective</h3>
@@ -957,22 +1006,21 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        sdNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        sdNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        sdNewGameVsHuman(shell.board!);
+        sdNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startSDTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initSDGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroySDGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroySDGame, shell);
 }
 
 // Render Par 55
@@ -985,7 +1033,7 @@ async function renderPar55(routeGen: number): Promise<void> {
     startTutorial: startPar55Tutorial,
   } = await import('../games/par-55/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Par 55',
     helpTitle: 'How to Play Par 55',
     helpContentHtml: `<h3>Objective</h3>
@@ -1033,22 +1081,21 @@ async function renderPar55(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        par55NewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        par55NewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        par55NewGameVsHuman(shell.board!);
+        par55NewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startPar55Tutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initPar55Game(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyPar55Game();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyPar55Game, shell);
 }
 
 // Render Ramrod
@@ -1061,7 +1108,7 @@ async function renderRamrod(routeGen: number): Promise<void> {
     startTutorial: startRamrodTutorial,
   } = await import('../games/ramrod/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Ramrod',
     helpTitle: 'How to Play Ramrod',
     helpContentHtml: `<h3>Objective</h3>
@@ -1110,22 +1157,21 @@ async function renderRamrod(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        ramrodNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        ramrodNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        ramrodNewGameVsHuman(shell.board!);
+        ramrodNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startRamrodTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initRamrodGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyRamrodGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyRamrodGame, shell);
 }
 
 // Render Kwatro-Sinko
@@ -1138,7 +1184,7 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     startTutorial: startKwaTutorial,
   } = await import('../games/kwatro-sinko/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Kwatro-Sinko',
     helpTitle: 'How to Play Kwatro-Sinko',
     helpContentHtml: `<h3>Objective</h3>
@@ -1187,22 +1233,21 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        kwaNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        kwaNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        kwaNewGameVsHuman(shell.board!);
+        kwaNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startKwaTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initKwaGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyKwaGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyKwaGame, shell);
 }
 
 // Render Prime Gold
@@ -1215,7 +1260,7 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     startTutorial: startPrimeGoldTutorial,
   } = await import('../games/prime-gold/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Prime Gold',
     helpTitle: 'How to Play Prime Gold',
     helpContentHtml: `<h3>Objective</h3>
@@ -1266,22 +1311,21 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        primeGoldNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        primeGoldNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        primeGoldNewGameVsHuman(shell.board!);
+        primeGoldNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startPrimeGoldTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initPrimeGoldGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyPrimeGoldGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyPrimeGoldGame, shell);
 }
 
 // Render Pent'Em In
@@ -1294,7 +1338,7 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     destroyGame: destroyPentEmInGame,
   } = await import('../games/pent-em-in/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: "Pent'Em In",
     helpTitle: "How to Play Pent'Em In",
     helpContentHtml: `<h3>Objective</h3>
@@ -1346,14 +1390,13 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     onTutorial: () => startPentTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board && shell.status) {
     initPentEmInGame(shell.board, shell.status);
   }
 
-  setCurrentCleanup(() => {
-    destroyPentEmInGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyPentEmInGame, shell);
 }
 
 // Render Frac Fact
@@ -1366,7 +1409,7 @@ async function renderFracFact(routeGen: number): Promise<void> {
     startTutorial: startFracTutorial,
   } = await import('../games/frac-fact/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Frac Fact',
     helpTitle: 'How to Play Frac Fact',
     helpContentHtml: `<h3>Objective</h3>
@@ -1437,14 +1480,13 @@ async function renderFracFact(routeGen: number): Promise<void> {
     onTutorial: () => startFracTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initFracFactGame(shell.board);
   }
 
-  setCurrentCleanup(() => {
-    destroyFracFactGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyFracFactGame, shell);
 }
 
 // Render Remainder Islands
@@ -1457,7 +1499,7 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     startTutorial: startRemainderTutorial,
   } = await import('../games/remainder-islands/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Remainder Islands',
     helpTitle: 'How to Play Remainder Islands',
     helpContentHtml: `<h3>Objective</h3>
@@ -1501,14 +1543,13 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     onTutorial: () => startRemainderTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initRemainderGame(shell.board);
   }
 
-  setCurrentCleanup(() => {
-    destroyRemainderGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyRemainderGame, shell);
 }
 
 // Render Fraction Pinball
@@ -1521,7 +1562,7 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     startTutorial: startPinballTutorial,
   } = await import('../games/fraction-pinball/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Fraction Pinball',
     helpTitle: 'How to Play Fraction Pinball',
     helpContentHtml: `<h3>Objective</h3>
@@ -1566,14 +1607,13 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     onTutorial: () => startPinballTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initPinballGame(shell.board);
   }
 
-  setCurrentCleanup(() => {
-    destroyPinballGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyPinballGame, shell);
 }
 
 // Render Stars & Bars
@@ -1586,7 +1626,7 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     startTutorial: startStarsTutorial,
   } = await import('../games/stars-bars/game-controller');
   if (!isCurrentRouteGeneration(routeGen)) return;
-  const shell = await mountGameShell(appContainer(), {
+  const shell = await mountGameShellForRoute(routeGen, {
     title: 'Stars & Bars',
     helpTitle: 'How to Play Stars & Bars',
     helpContentHtml: `<h3>Objective</h3>
@@ -1638,22 +1678,21 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     onNavigateHome: () => navigate('/'),
     onStartGame: (mode, difficulty) => {
       if (mode === 'human-vs-ai') {
-        starsNewGameVsAI(shell.board!, resolveAIDifficulty(difficulty));
+        starsNewGameVsAI(shell!.board!, resolveAIDifficulty(difficulty));
       } else {
-        starsNewGameVsHuman(shell.board!);
+        starsNewGameVsHuman(shell!.board!);
       }
     },
     onTutorial: () => startStarsTutorial(),
   });
 
+  if (!shell) return;
+
   if (shell.board) {
     initStarsGame(shell.board, false);
   }
 
-  setCurrentCleanup(() => {
-    destroyStarsGame();
-    shell.cleanup();
-  });
+  setGameRouteCleanup(destroyStarsGame, shell);
 }
 
 /** Mount the requested game (already validated by the router). */
