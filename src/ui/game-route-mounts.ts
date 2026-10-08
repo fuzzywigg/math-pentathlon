@@ -53,6 +53,11 @@ export function initGameMountDeps(next: GameMountDeps): void {
   deps = next;
 }
 
+/** Reset between unit tests so missing-deps paths stay exerciseable. */
+export function resetGameMountDepsForTests(): void {
+  deps = null;
+}
+
 // Render Kings & Quadraphages
 async function renderKingsQuadraphages(routeGen: number): Promise<void> {
   const {

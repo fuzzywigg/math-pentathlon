@@ -30,6 +30,7 @@ const isolatedFiles = [
   'tests/unit/durable-progress-persistence.test.ts',
   // Hoisted game-controller mocks must not leak into shared controller suites.
   'tests/unit/burn-1007-game-route-mounts.test.ts',
+  'tests/unit/burn-1007-main-shell-routes.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
