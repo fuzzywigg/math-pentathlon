@@ -101,11 +101,11 @@ In-game handler throws are generally recovered by the per-route boundary. Menu h
 | Priority | IDs | Proposed fix (for tip owner — not in this PR) |
 | --- | --- | --- |
 | **P0** | R-GL-08 | Prime Gold: on `webglcontextlost`, dispatch `mp3d-context-lost` (or callback) and clear `board3dEnabled` + remount 2D like kings/queens/hex-a-gone |
-| **P1** | R-SHELL-02, R-SHELL-07 | Wrap `destroyGame` + `shell.cleanup` in try/finally so one throw cannot strand shell listeners |
-| **P1** | R-SHELL-08 | Register cleanup before `init*Game`, or `finally` call `shell.cleanup()` if init throws |
-| **P2** | R-IMP-04 | `bootstrapOwl`: try/catch like idle-warm; never leave unhandled rejection |
+| **P1** | R-SHELL-02, R-SHELL-07 | Wrap `destroyGame` + `shell.cleanup` in try/finally so one throw cannot strand shell listeners — **FIXED** in `burn-1008-mp-cleanup-finally-and-bootstrap-catch` (R-SHELL-07 via `setGameRouteCleanup` try/finally; R-SHELL-02 still open) |
+| **P1** | R-SHELL-08 | Register cleanup before `init*Game`, or `finally` call `shell.cleanup()` if init throws — **FIXED** (`initGameWithRouteCleanup`) |
+| **P2** | R-IMP-04 | `bootstrapOwl`: try/catch like idle-warm; never leave unhandled rejection — **FIXED** |
 | **P2** | R-SHELL-04, R-EVT-03 | Optional home/menu error boundary (blank menu recovery) |
-| **P2** | R-SW-01 | Guard `registerSW` throw inside `registerPwa` / bootstrap schedule |
+| **P2** | R-SW-01 | Guard `registerSW` throw inside `registerPwa` / bootstrap schedule — **FIXED** |
 | **P3** | R-SW-03 | Swallow/log `registration.update()` rejection |
 | **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |
 | **P3** | R-JSON-04 | Harden `gameStateFromJSON` if ever bound to UI |
