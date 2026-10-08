@@ -91,7 +91,7 @@ export function renderBoard(
         continue;
       }
 
-      const placed = state.board[row][col];
+      const placed = state.board[row]?.[col];
 
       if (placed) {
         // Render domino

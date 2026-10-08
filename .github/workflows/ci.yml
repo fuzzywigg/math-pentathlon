@@ -38,7 +38,7 @@ jobs:
         run: npm run format:check
       - name: TypeScript type checking
         run: npm run typecheck
-      - name: TypeScript type ratchet (ui/core/demos/Batch-1 shells + Phase-2 ceiling)
+      - name: TypeScript type ratchet (ui/core/demos/Batch-1/2 shells + Phase-2 ceiling)
         run: npm run typecheck:ratchet
 
   audit:

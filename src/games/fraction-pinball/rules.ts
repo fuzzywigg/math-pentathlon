@@ -81,6 +81,10 @@ function generateWrongDecimals(correct: number, count: number): string[] {
   let attempts = 0;
   while (wrongs.length < count && attempts < 30) {
     const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    if (strategy === undefined) {
+      attempts++;
+      continue;
+    }
     const value = strategy();
 
     if (value > 0 && value < 10) {
@@ -148,6 +152,10 @@ function generateWrongFractions(correct: Fraction, count: number): string[] {
   let attempts = 0;
   while (wrongs.length < count && attempts < 30) {
     const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    if (strategy === undefined) {
+      attempts++;
+      continue;
+    }
     const fraction = strategy();
 
     if (fraction.numerator > 0 && fraction.denominator > 0) {
@@ -183,7 +191,11 @@ function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    const a = result[i];
+    const b = result[j];
+    if (a === undefined || b === undefined) continue;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }
@@ -195,7 +207,9 @@ export function generateChallenge(
   challengeNumber: number
 ): ConversionChallenge {
   const fractions = getConvertibleFractions();
-  const fraction = fractions[Math.floor(Math.random() * fractions.length)];
+  const fraction =
+    fractions[Math.floor(Math.random() * fractions.length)] ??
+    ({ numerator: 1, denominator: 2 } satisfies Fraction);
   const decimal = toDecimal(fraction);
 
   // Alternate between types
@@ -258,14 +272,20 @@ export function hitRandomTarget(targets: PinballTarget[]): {
   let targetIndex = 0;
 
   for (let i = 0; i < weights.length; i++) {
-    random -= weights[i];
+    const weight = weights[i];
+    if (weight === undefined) continue;
+    random -= weight;
     if (random <= 0) {
       targetIndex = i;
       break;
     }
   }
 
-  const target = targets[targetIndex];
+  // targets is always non-empty (TARGET_POINTS-sized) at call sites.
+  const target = targets[targetIndex] ?? targets[0];
+  if (target === undefined) {
+    throw new Error('hitRandomTarget requires at least one target');
+  }
   return { target, points: target.value };
 }
 

@@ -102,6 +102,7 @@ function getDirectionPairs(coord: BoardCoord): [BoardCoord, BoardCoord][] {
       // For now, approximate by checking if they're roughly opposite
       const a = adjacent[i];
       const b = adjacent[j];
+      if (a === undefined || b === undefined) continue;
 
       // Same ring, opposite sides
       if (a.ring === b.ring && a.ring === coord.ring) {

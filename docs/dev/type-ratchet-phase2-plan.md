@@ -2,9 +2,11 @@
 
 **Task (plan):** `burn-1007-mp-typeratchet-plan`  
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
+**Task (Batch 2 implement):** `burn-1008-mp-type-ratchet-p2-batch1`  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batch **0** (demos + `main.ts`) and Batch **1** (tiny non-AI game shells) cleared under ratchet flags; Phase-2 baseline ceiling lowered **564 → 518**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling.  
-**Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).
+**Status:** Batch **0** (demos + `main.ts`), Batch **1** (tiny non-AI game shells), and Batch **2** (rules-heavy / low-AI non-AI modules) cleared under ratchet flags; Phase-2 baseline ceiling lowered **564 → 518 → 520 (post-fold) → 433**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling.  
+**Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).  
+**Next batch:** Batch **3** — medium games non-AI remainder (juggle, pent-em-in, kwatro-sinko, hex, contig-60, kings-quadraphages, stars-bars).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 
@@ -22,7 +24,7 @@ This document proposes how to clear those 564 without changing student-facing AI
 npx tsc --noEmit -p tsconfig.ratchet.json --pretty false 2>&1 | tee /tmp/type-ratchet-phase2-raw.txt | rg -c "error TS"
 ```
 
-**Expected:** `518` out-of-scope after Batch 0+1 (must match `outOfScopeErrors` in the baseline JSON). Plan snapshot was **564** before those batches.
+**Expected:** `433` out-of-scope after Batch 2 (must match `outOfScopeErrors` in the baseline JSON). Plan snapshot was **564**; after Batch 0+1 / tip folds **520**; Batch 2 clears **87** non-AI errors.
 
 Verify against the committed baseline:
 
@@ -34,16 +36,17 @@ Sanity (Phase 1 + Batch 0/1 in-scope still green):
 
 ```bash
 npm run typecheck:ratchet
-# in-scope errors: 0 ; out-of-scope errors: 518 ; Phase-2 ceiling holds
+# in-scope errors: 0 ; out-of-scope errors: 433 ; Phase-2 ceiling holds
 ```
 
-Plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn-1008-mp-type-ratchet-p2`): **518** / **0** in-scope.
+Plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn-1008-mp-type-ratchet-p2`): **518** / **0** in-scope (later tip folds → **520**). After Batch 2 (`burn-1008-mp-type-ratchet-p2-batch1`): **433** / **0** in-scope.
 
 ## Totals snapshot
 
 | Slice | Count |
 | --- | ---: |
-| Out-of-scope (Phase 2 surface, after Batch 0+1) | **518** |
+| Out-of-scope (Phase 2 surface, after Batch 2) | **433** |
+| After Batch 0+1 / tip folds | 520 |
 | Plan snapshot (pre Batch 0+1) | 564 |
 | In-scope under ratchet (must stay 0) | **0** |
 | `noUncheckedIndexedAccess` (NUI) | 526 |
@@ -149,18 +152,18 @@ Fix **non-AI** files only, smallest games first:
 **Estimate:** S (~21 errors).  
 **Defer:** all `ai*` in these games.
 
-### Batch 2 — Rules-heavy / low-AI games (rules + types + board-ui; still no AI)
+### Batch 2 — Rules-heavy / low-AI games (rules + types + board-ui; still no AI) — **DONE**
 
 | Game | Non-AI | AI deferred |
 | --- | ---: | ---: |
-| frac-fact | 7 | 4 |
-| fraction-pinball | 13 | 2 |
-| queens-guards | 17 | 6 |
-| ramrod | 12 | 8 |
-| sum-dominoes | 19 | 8 |
-| calla | 19 | 15 |
+| frac-fact | 7 → 0 | 4 |
+| fraction-pinball | 13 → 0 | 2 |
+| queens-guards | 17 → 0 | 6 |
+| ramrod | 12 → 0 | 8 |
+| sum-dominoes | 19 → 0 | 8 |
+| calla | 19 → 0 | 15 |
 
-**Estimate:** M (~87 non-AI errors).  
+**Estimate:** M (~87 non-AI errors). **Cleared** under `burn-1008-mp-type-ratchet-p2-batch1` (guards/narrowing only).  
 **Escalate:** any `rules.ts` change that is not a pure guard — AGENTS.md flags scoring/end-condition edits for humans.
 
 ### Batch 3 — Medium games non-AI remainder
@@ -289,4 +292,4 @@ Do **not** promote `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` int
 
 ## Tip fold note (wave5 `#477`)
 
-After stacking `#514` (XSS/CSP) and other burn folds onto Batch 0+1, tip measured **520** out-of-scope (not AI edits). Baseline ceiling raised **518 → 520** to match the real post-fold count; counts may only go down from here.
+After stacking `#514` (XSS/CSP) and other burn folds onto Batch 0+1, tip measured **520** out-of-scope (not AI edits). Baseline ceiling raised **518 → 520** to match the real post-fold count; counts may only go down from here. Batch 2 lowered the ceiling **520 → 433**.

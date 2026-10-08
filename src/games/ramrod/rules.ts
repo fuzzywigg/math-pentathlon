@@ -32,11 +32,15 @@ function createBoard(): Map<string, SumBox> {
   ];
 
   for (let row = 0; row < CONFIG.BOARD_ROWS; row++) {
+    const rowSums = targetSums[row];
+    if (rowSums === undefined) continue;
     for (let col = 0; col < CONFIG.BOARD_COLS; col++) {
       const id = createBoxId(row, col);
+      const targetSum = rowSums[col];
+      if (targetSum === undefined) continue;
       boxes.set(id, {
         id,
-        targetSum: targetSums[row][col],
+        targetSum,
         row,
         col,
         rods: [null, null],
@@ -68,6 +72,7 @@ export function createInitialState(): RamrodState {
   for (let i = 0; i < CONFIG.STARTING_RODS_PER_PLAYER; i++) {
     const rod1 = allRods[i * 2];
     const rod2 = allRods[i * 2 + 1];
+    if (rod1 === undefined || rod2 === undefined) continue;
 
     rod1.owner = 'player1';
     player1Rods.push(rod1.id);

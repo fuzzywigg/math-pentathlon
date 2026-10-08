@@ -68,7 +68,9 @@ export function cellKey(ring: number, position: number): string {
  * Parse a cell key to coordinates
  */
 export function parseKey(key: string): BoardCoord {
-  const [ring, position] = key.split('-').map(Number);
+  const parts = key.split('-').map(Number);
+  const ring = parts[0] ?? 0;
+  const position = parts[1] ?? 0;
   return { ring, position };
 }
 
