@@ -4,6 +4,8 @@
  * strings into the DOM.
  */
 
+import { safeGetItem } from './safe-web-storage';
+
 export type StorageLike = Pick<Storage, 'getItem'>;
 
 const TRUE_TOKENS = new Set(['1', 'true']);
@@ -21,6 +23,8 @@ export function parseAllowlistedFlag(raw: string | null): boolean | null {
 /**
  * Read a flag from search, then hash query (`#/path?key=1`), then storage.
  * Explicit false in the URL wins over storage.
+ * When `storage` is null, peeks localStorage via the safe wrapper (SecurityError /
+ * missing store → treated as unset / false).
  */
 export function readUrlOrStorageFlag(
   key: string,
@@ -42,10 +46,13 @@ export function readUrlOrStorageFlag(
     if (hashFlag !== null) return hashFlag;
   }
 
-  if (!storage) return false;
-  try {
-    return parseAllowlistedFlag(storage.getItem(storageKey)) === true;
-  } catch {
-    return false;
+  if (storage) {
+    try {
+      return parseAllowlistedFlag(storage.getItem(storageKey)) === true;
+    } catch {
+      return false;
+    }
   }
+
+  return parseAllowlistedFlag(safeGetItem(storageKey)) === true;
 }
