@@ -1,9 +1,14 @@
 /**
  * Shared seat display labels for 2P Blue/Red and vs-AI You/Computer|AI copy.
  * Pure UI glue — does not change rules text beyond consolidating identical helpers.
+ * Opponent flip lives in `core/seats` so engines never import this UI module.
  */
 
-export type SeatId = 'player1' | 'player2';
+import type { SeatId } from '../core/seats';
+
+export type { SeatId } from '../core/seats';
+export { getOpponentSeat } from '../core/seats';
+
 export type GameModeLabel = 'human-vs-human' | 'human-vs-ai';
 
 /**
@@ -42,9 +47,4 @@ export function formatModeSeatLabelComputer(
     return player === 'player1' ? 'You' : 'Computer';
   }
   return player === 'player1' ? 'Blue' : 'Red';
-}
-
-/** Flip player1 ↔ player2 (identical across game `types.ts` helpers). */
-export function getOpponentSeat<T extends SeatId>(player: T): T {
-  return (player === 'player1' ? 'player2' : 'player1') as T;
 }

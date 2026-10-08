@@ -124,7 +124,7 @@ export function isDouble(domino: Domino): boolean {
 /**
  * Get opponent
  */
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 /**
  * Roll two dice

@@ -138,7 +138,7 @@ export function createInitialState(): RemainderIslandsState {
 }
 
 // Get opponent
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player chips
 export function getPlayerChips(

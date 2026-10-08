@@ -131,7 +131,7 @@ export function createInitialState(): PentEmInState {
 }
 
 // Get opponent
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player's pieces
 export function getPlayerPieces(

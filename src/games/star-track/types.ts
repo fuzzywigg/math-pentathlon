@@ -113,7 +113,7 @@ export function createInitialState(): StarTrackGameState {
 }
 
 // Get opponent player
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player's current position
 export function getPlayerPosition(

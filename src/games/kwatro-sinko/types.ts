@@ -76,7 +76,7 @@ export const PLAYER_CHIPS = {
 /**
  * Get opponent
  */
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 /**
  * Create a chip

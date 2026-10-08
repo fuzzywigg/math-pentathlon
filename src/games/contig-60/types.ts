@@ -63,7 +63,7 @@ export const BOARD_NUMBERS: number[][] = [
 /**
  * Get opponent
  */
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 /**
  * Get all adjacent cells for a position

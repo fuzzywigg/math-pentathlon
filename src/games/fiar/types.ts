@@ -173,7 +173,7 @@ export function createInitialState(
   };
 }
 
-export { getOpponentSeat as getOpponent } from '../../ui/seat-labels';
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 export function chipsRemaining(inv: ChipInventory): number {
   return inv.plain + inv.marked;
