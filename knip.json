@@ -1,0 +1,29 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "index.html",
+    "src/main.ts",
+    "src/games/*/ai.worker.ts",
+    "scripts/**/*.{mjs,ts}",
+    "tests/**/*.{ts,mjs}",
+    "docs/**/*.{mjs,ts}",
+    "playwright*.config.ts",
+    "vite.config.ts",
+    "vite.*.ts",
+    "vitest*.config.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx,css}",
+    "tests/**/*.{ts,mjs}",
+    "scripts/**/*.{mjs,ts}",
+    "docs/**/*.{mjs,ts}",
+    "playwright*.config.ts",
+    "vite*.ts",
+    "vitest*.config.ts"
+  ],
+  "ignore": ["**/node_modules/**", "dist/**", "test-results/**", "coverage/**"],
+  "ignoreDependencies": ["virtual:pwa-register"],
+  "ignoreBinaries": ["playwright"],
+  "vite": true,
+  "vitest": true
+}
