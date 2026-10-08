@@ -2,8 +2,9 @@
   "schemaVersion": 1,
   "taskId": "burn-1008-mp-module-boundaries",
   "description": "Import-graph / module-boundary ceilings for src/. Counts from npm run check:boundaries may only decrease.",
-  "generatedAt": "2026-10-08T03:55:00.000Z",
-  "tipSha": "f6de423353f7e17549ad5fc95a607f914bc65d94",
+  "generatedAt": "2026-10-08T06:41:00.000Z",
+  "tipSha": "7b99c2b",
+  "tipShaNote": "Re-measured after #518/#520/#521/#505 on tip; ceilings unchanged (engine_imports_ui=0, dead_barrels=8, mixed_ui_barrels=9). mp3d↔game Circular chunk stays report-only under reported_not_changed.",
   "commands": {
     "check": "npm run check:boundaries"
   },
