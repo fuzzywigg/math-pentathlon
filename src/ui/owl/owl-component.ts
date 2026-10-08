@@ -121,7 +121,9 @@ export class OwlComponent {
 
   // Attach event handlers
   private attachEventHandlers(): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
 
     // Minimize button
     const minimizeBtn = this.container.querySelector('.owl-minimize-btn');
@@ -168,7 +170,9 @@ export class OwlComponent {
 
   /** True when the event target is a drag handle (body / mini icon), not chrome. */
   private isDragHandle(target: EventTarget | null): boolean {
-    if (!(target instanceof Element) || !this.container) return false;
+    if (!(target instanceof Element) || !this.container) {
+      return false;
+    }
     if (target.closest('.owl-bubble') || target.closest('.owl-controls')) {
       return false;
     }
@@ -178,13 +182,23 @@ export class OwlComponent {
   }
 
   private onPointerDown = (e: PointerEvent): void => {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
     // Primary button / touch / pen only — ignore secondary multi-touch fingers
-    if (e.isPrimary === false) return;
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    if (!this.isDragHandle(e.target)) return;
+    if (e.isPrimary === false) {
+      return;
+    }
+    if (e.pointerType === 'mouse' && e.button !== 0) {
+      return;
+    }
+    if (!this.isDragHandle(e.target)) {
+      return;
+    }
     // Already dragging with another pointer — do not steal the gesture
-    if (this.isDragging) return;
+    if (this.isDragging) {
+      return;
+    }
 
     this.stopCoast();
 
@@ -218,14 +232,18 @@ export class OwlComponent {
   };
 
   private onPointerMove = (e: PointerEvent): void => {
-    if (!this.container || !this.isDragging) return;
+    if (!this.container || !this.isDragging) {
+      return;
+    }
     if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
     }
 
     const dx = e.clientX - this.dragStartX;
     const dy = e.clientY - this.dragStartY;
-    if (!this.didDrag && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
+    if (!this.didDrag && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) {
+      return;
+    }
 
     this.didDrag = true;
     e.preventDefault();
@@ -246,7 +264,9 @@ export class OwlComponent {
   };
 
   private onPointerUp = (e: PointerEvent): void => {
-    if (!this.container || !this.isDragging) return;
+    if (!this.container || !this.isDragging) {
+      return;
+    }
     if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
     }
@@ -281,7 +301,9 @@ export class OwlComponent {
 
   /** Cancelled gesture: return to dock (even after a real drag). */
   private onPointerCancel = (e: PointerEvent): void => {
-    if (!this.container || !this.isDragging) return;
+    if (!this.container || !this.isDragging) {
+      return;
+    }
     if (this.dragPointerId !== null && e.pointerId !== this.dragPointerId) {
       return;
     }
@@ -309,7 +331,9 @@ export class OwlComponent {
    * Must not leave pointer-events:none during capture — that releases capture (Pointer Events).
    */
   private inspectDropAt(clientX: number, clientY: number): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
 
     const prev = this.container.style.pointerEvents;
     this.container.style.pointerEvents = 'none';
@@ -330,7 +354,9 @@ export class OwlComponent {
 
   /** Clear inline position so CSS dock (top-right mobile / bottom-right desktop) wins. */
   snapBackToDock(): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
     this.stopCoast();
     this.velocityX = 0;
     this.velocityY = 0;
@@ -350,7 +376,9 @@ export class OwlComponent {
 
   /** Friction coast after drop until rest; clamp to viewport (no bounce). */
   private startCoast(): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
     this.stopCoast();
 
     // Reduced motion: snap to rest without coast animation.
@@ -414,10 +442,16 @@ export class OwlComponent {
       );
 
       // Soft stop on edges (clamp only — no bounce invent)
-      if (clamped.x !== next.x) this.velocityX = 0;
-      else this.velocityX = next.vx;
-      if (clamped.y !== next.y) this.velocityY = 0;
-      else this.velocityY = next.vy;
+      if (clamped.x !== next.x) {
+        this.velocityX = 0;
+      } else {
+        this.velocityX = next.vx;
+      }
+      if (clamped.y !== next.y) {
+        this.velocityY = 0;
+      } else {
+        this.velocityY = next.vy;
+      }
 
       this.container.style.left = `${clamped.x}px`;
       this.container.style.top = `${clamped.y}px`;
@@ -458,7 +492,9 @@ export class OwlComponent {
 
   // Update UI based on state
   private updateUI(state: OwlDisplayState): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
 
     const settings = storage.getSettings();
     if (!settings.owlEnabled) {
@@ -514,14 +550,18 @@ export class OwlComponent {
 
   // Minimize the owl
   minimize(): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
     this.isMinimized = true;
     this.container.classList.add('owl-minimized-state');
   }
 
   // Expand the owl
   expand(): void {
-    if (!this.container) return;
+    if (!this.container) {
+      return;
+    }
     this.isMinimized = false;
     this.container.classList.remove('owl-minimized-state');
 
@@ -535,8 +575,12 @@ export class OwlComponent {
   // Handle click on owl
   private onOwlClick(): void {
     // Trigger a playful animation
-    if (!this.container) return;
-    if (prefersReducedMotion()) return;
+    if (!this.container) {
+      return;
+    }
+    if (prefersReducedMotion()) {
+      return;
+    }
 
     this.container.classList.add('owl-clicked');
     if (this.clickAnimTimer !== null) {
@@ -550,8 +594,12 @@ export class OwlComponent {
 
   // Eye tracking for fun
   private handleMouseMove = (e: MouseEvent): void => {
-    if (!this.container || this.isMinimized || this.isDragging) return;
-    if (prefersReducedMotion()) return;
+    if (!this.container || this.isMinimized || this.isDragging) {
+      return;
+    }
+    if (prefersReducedMotion()) {
+      return;
+    }
 
     const pupils = this.container.querySelectorAll('.owl-pupil');
     const owlRect = this.container.getBoundingClientRect();

@@ -66,13 +66,17 @@ class StorageManager {
     if (event.storageArea != null) {
       // Ignore sessionStorage and unrelated stores when the browser provides area.
       try {
-        if (event.storageArea !== globalThis.localStorage) return;
+        if (event.storageArea !== globalThis.localStorage) {
+          return;
+        }
       } catch {
         // localStorage access itself blocked — nothing to sync.
         return;
       }
     }
-    if (event.key !== null && event.key !== STORAGE_KEY) return;
+    if (event.key !== null && event.key !== STORAGE_KEY) {
+      return;
+    }
 
     // key === null means clear() wiped the whole store.
     if (event.key === null || event.newValue === null) {
@@ -101,7 +105,10 @@ class StorageManager {
       const read = safeGetItemResult(STORAGE_KEY);
       // Blocked / SecurityError — warn (matches prior private-mode diagnostics).
       if (!read.ok) {
-        console.warn('Failed to load progress data, starting fresh:', read.error);
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          read.error
+        );
         return createDefaultProgress();
       }
       if (!read.value) {

@@ -26,7 +26,9 @@ export type GameMountDeps = {
 let deps: GameMountDeps | null = null;
 
 function d(): GameMountDeps {
-  if (!deps) throw new Error('Game mount deps not initialized');
+  if (!deps) {
+    throw new Error('Game mount deps not initialized');
+  }
   return deps;
 }
 
@@ -61,12 +63,16 @@ let clobberRecoveryQueued = false;
 let lastShellCommitGen = 0;
 
 function queueClobberRecovery(): void {
-  if (clobberRecoveryQueued) return;
+  if (clobberRecoveryQueued) {
+    return;
+  }
   clobberRecoveryQueued = true;
   queueMicrotask(() => {
     clobberRecoveryQueued = false;
     // A newer mount may have rewritten #app after our wipe — skip remount.
-    if (lastShellCommitGen === getRouteGeneration()) return;
+    if (lastShellCommitGen === getRouteGeneration()) {
+      return;
+    }
     handleRoute();
   });
 }
@@ -80,7 +86,9 @@ async function mountGameShellForRoute(
   routeGen: number,
   options: GameShellOptions
 ): Promise<GameShellElements | null> {
-  if (!isCurrentRouteGeneration(routeGen)) return null;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return null;
+  }
   const shell = await mountGameShell(appContainer(), options);
   lastShellCommitGen = routeGen;
   if (!isCurrentRouteGeneration(routeGen)) {
@@ -119,7 +127,9 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     newGameVsAI: kqNewGameVsAI,
     startTutorial,
   } = await import('../games/kings-quadraphages/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Kings & Quadraphages',
     helpTitle: 'How to Play Kings & Quadraphages',
@@ -167,7 +177,9 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     onTutorial: () => startTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initKQGame(
@@ -190,7 +202,9 @@ async function renderHex(routeGen: number): Promise<void> {
     newGameVsAI: hexNewGameVsAI,
     startTutorial: startHexTutorial,
   } = await import('../games/hex/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Hex',
     helpTitle: 'How to Play Hex',
@@ -237,7 +251,9 @@ async function renderHex(routeGen: number): Promise<void> {
     onTutorial: () => startHexTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initHexGame(shell.board, shell.status);
@@ -255,7 +271,9 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     newGameVsAI: starTrackNewGameVsAI,
     startTutorial: startStarTrackTutorial,
   } = await import('../games/star-track/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Star Track',
     helpTitle: 'How to Play Star Track',
@@ -361,7 +379,9 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     onTutorial: () => startStarTrackTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initStarTrackGame(shell.board, shell.status);
@@ -379,7 +399,9 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     startTutorial: startHexAGoneTutorial,
     destroyGame: destroyHexAGoneGame,
   } = await import('../games/hex-a-gone/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Hex-a-Gone!',
     helpTitle: 'How to Play Hex-a-Gone!',
@@ -483,7 +505,9 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     onTutorial: () => startHexAGoneTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initHexAGoneGame(shell.board, shell.status);
@@ -501,7 +525,9 @@ async function renderCalla(routeGen: number): Promise<void> {
     newGameVsAI: callaNewGameVsAI,
     startTutorial: startCallaTutorial,
   } = await import('../games/calla/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Calla',
     helpTitle: 'How to Play Calla',
@@ -555,7 +581,9 @@ async function renderCalla(routeGen: number): Promise<void> {
     onTutorial: () => startCallaTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initCallaGame(shell.board, shell.status);
@@ -573,7 +601,9 @@ async function renderFiar(routeGen: number): Promise<void> {
     newGameVsAI: fiarNewGameVsAI,
     startTutorial: startFiarTutorial,
   } = await import('../games/fiar/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'FIAR (Four In A Row)',
     helpTitle: 'How to Play FIAR',
@@ -632,7 +662,9 @@ async function renderFiar(routeGen: number): Promise<void> {
     onTutorial: () => startFiarTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initFiarGame(shell.board, shell.status);
@@ -650,7 +682,9 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     newGameVsAI: qgNewGameVsAI,
     startTutorial: startQGTutorial,
   } = await import('../games/queens-guards/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Queens & Guards',
     helpTitle: 'How to Play Queens & Guards',
@@ -706,7 +740,9 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     onTutorial: () => startQGTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initQGGame(shell.board, shell.status);
@@ -724,7 +760,9 @@ async function renderContig60(routeGen: number): Promise<void> {
     newGameVsAI: contigNewGameVsAI,
     startTutorial: startContigTutorial,
   } = await import('../games/contig-60/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Contig 60',
     helpTitle: 'How to Play Contig 60',
@@ -783,7 +821,9 @@ async function renderContig60(routeGen: number): Promise<void> {
     onTutorial: () => startContigTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initContigGame(shell.board, shell.status);
@@ -801,7 +841,9 @@ async function renderJuggle(routeGen: number): Promise<void> {
     newGameVsAI: juggleNewGameVsAI,
     startTutorial: startJuggleTutorial,
   } = await import('../games/juggle/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Juggle',
     helpTitle: 'How to Play Juggle',
@@ -856,7 +898,9 @@ async function renderJuggle(routeGen: number): Promise<void> {
     onTutorial: () => startJuggleTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initJuggleGame(shell.board, shell.status);
@@ -874,7 +918,9 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     newGameVsAI: fabNewGameVsAI,
     startTutorial: startFabTutorial,
   } = await import('../games/fab-a-diffy/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Fab-a-Diffy',
     helpTitle: 'How to Play Fab-a-Diffy',
@@ -930,7 +976,9 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     onTutorial: () => startFabTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initFabGame(shell.board, false);
@@ -948,7 +996,9 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     newGameVsAI: sdNewGameVsAI,
     startTutorial: startSDTutorial,
   } = await import('../games/sum-dominoes/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Sum Dominoes & Dice',
     helpTitle: 'How to Play Sum Dominoes & Dice',
@@ -1007,7 +1057,9 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     onTutorial: () => startSDTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initSDGame(shell.board, false);
@@ -1025,7 +1077,9 @@ async function renderPar55(routeGen: number): Promise<void> {
     newGameVsAI: par55NewGameVsAI,
     startTutorial: startPar55Tutorial,
   } = await import('../games/par-55/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Par 55',
     helpTitle: 'How to Play Par 55',
@@ -1082,7 +1136,9 @@ async function renderPar55(routeGen: number): Promise<void> {
     onTutorial: () => startPar55Tutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initPar55Game(shell.board, false);
@@ -1100,7 +1156,9 @@ async function renderRamrod(routeGen: number): Promise<void> {
     newGameVsAI: ramrodNewGameVsAI,
     startTutorial: startRamrodTutorial,
   } = await import('../games/ramrod/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Ramrod',
     helpTitle: 'How to Play Ramrod',
@@ -1158,7 +1216,9 @@ async function renderRamrod(routeGen: number): Promise<void> {
     onTutorial: () => startRamrodTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initRamrodGame(shell.board, false);
@@ -1176,7 +1236,9 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     newGameVsAI: kwaNewGameVsAI,
     startTutorial: startKwaTutorial,
   } = await import('../games/kwatro-sinko/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Kwatro-Sinko',
     helpTitle: 'How to Play Kwatro-Sinko',
@@ -1234,7 +1296,9 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     onTutorial: () => startKwaTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initKwaGame(shell.board, false);
@@ -1252,7 +1316,9 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     newGameVsAI: primeGoldNewGameVsAI,
     startTutorial: startPrimeGoldTutorial,
   } = await import('../games/prime-gold/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Prime Gold',
     helpTitle: 'How to Play Prime Gold',
@@ -1312,7 +1378,9 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     onTutorial: () => startPrimeGoldTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initPrimeGoldGame(shell.board, false);
@@ -1330,7 +1398,9 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     startTutorial: startPentTutorial,
     destroyGame: destroyPentEmInGame,
   } = await import('../games/pent-em-in/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: "Pent'Em In",
     helpTitle: "How to Play Pent'Em In",
@@ -1383,7 +1453,9 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     onTutorial: () => startPentTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board && shell.status) {
     initPentEmInGame(shell.board, shell.status);
@@ -1401,7 +1473,9 @@ async function renderFracFact(routeGen: number): Promise<void> {
     newGameVsAI: fracNewGameVsAI,
     startTutorial: startFracTutorial,
   } = await import('../games/frac-fact/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Frac Fact',
     helpTitle: 'How to Play Frac Fact',
@@ -1473,7 +1547,9 @@ async function renderFracFact(routeGen: number): Promise<void> {
     onTutorial: () => startFracTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initFracFactGame(shell.board);
@@ -1491,7 +1567,9 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     newGameVsAI: remainderNewGameVsAI,
     startTutorial: startRemainderTutorial,
   } = await import('../games/remainder-islands/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Remainder Islands',
     helpTitle: 'How to Play Remainder Islands',
@@ -1536,7 +1614,9 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     onTutorial: () => startRemainderTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initRemainderGame(shell.board);
@@ -1554,7 +1634,9 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     newGameVsAI: pinballNewGameVsAI,
     startTutorial: startPinballTutorial,
   } = await import('../games/fraction-pinball/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Fraction Pinball',
     helpTitle: 'How to Play Fraction Pinball',
@@ -1600,7 +1682,9 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     onTutorial: () => startPinballTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initPinballGame(shell.board);
@@ -1618,7 +1702,9 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     newGameVsAI: starsNewGameVsAI,
     startTutorial: startStarsTutorial,
   } = await import('../games/stars-bars/game-controller');
-  if (!isCurrentRouteGeneration(routeGen)) return;
+  if (!isCurrentRouteGeneration(routeGen)) {
+    return;
+  }
   const shell = await mountGameShellForRoute(routeGen, {
     title: 'Stars & Bars',
     helpTitle: 'How to Play Stars & Bars',
@@ -1679,7 +1765,9 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     onTutorial: () => startStarsTutorial(),
   });
 
-  if (!shell) return;
+  if (!shell) {
+    return;
+  }
 
   if (shell.board) {
     initStarsGame(shell.board, false);

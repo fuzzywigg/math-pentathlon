@@ -47,10 +47,14 @@ export function svgUserToGridCell(
   cellSize: number,
   padding: number
 ): { row: number; col: number } | null {
-  if (cellSize <= 0) return null;
+  if (cellSize <= 0) {
+    return null;
+  }
   const col = Math.floor((x - padding) / cellSize);
   const row = Math.floor((y - padding) / cellSize);
-  if (row < 0 || col < 0) return null;
+  if (row < 0 || col < 0) {
+    return null;
+  }
   return { row, col };
 }
 
@@ -63,7 +67,9 @@ export function clientToNdc(
   clientY: number,
   rect: CssRect
 ): { x: number; y: number } | null {
-  if (rect.width === 0 || rect.height === 0) return null;
+  if (rect.width === 0 || rect.height === 0) {
+    return null;
+  }
   return {
     x: ((clientX - rect.left) / rect.width) * 2 - 1,
     y: -((clientY - rect.top) / rect.height) * 2 + 1,

@@ -120,15 +120,21 @@ export function applyJuggleHoverPreview(
   options: JuggleBoardRenderOptions = {}
 ): void {
   const allowInput = options.allowInput !== false;
-  if (!allowInput || state.phase !== 'placing') return;
+  if (!allowInput || state.phase !== 'placing') {
+    return;
+  }
 
   const player = state.currentPlayer;
   const boardEl = boardsRoot.querySelector(
     `.juggle-board.${player}`
   ) as HTMLElement | null;
-  if (!boardEl) return;
+  if (!boardEl) {
+    return;
+  }
   const grid = boardEl.querySelector('.juggle-grid') as HTMLElement | null;
-  if (!grid) return;
+  if (!grid) {
+    return;
+  }
 
   const cells = getCellMap(grid);
   const legalAnchors = new Set(
@@ -138,7 +144,9 @@ export function applyJuggleHoverPreview(
 
   const clearPreview = (key: string) => {
     const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) return;
+    if (!cell || cell.classList.contains(`occupied-${player}`)) {
+      return;
+    }
     cell.classList.remove('preview-valid', 'preview-invalid');
     if (legalAnchors.has(key)) {
       cell.classList.add('juggle-cell-valid');
@@ -147,7 +155,9 @@ export function applyJuggleHoverPreview(
     }
   };
 
-  for (const key of prevKeys) clearPreview(key);
+  for (const key of prevKeys) {
+    clearPreview(key);
+  }
 
   if (!state.hoverPosition) {
     boardEl.dataset.hoverKeys = '';
@@ -160,7 +170,9 @@ export function applyJuggleHoverPreview(
   for (const c of previewCells) {
     const key = `${c.row},${c.col}`;
     const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) continue;
+    if (!cell || cell.classList.contains(`occupied-${player}`)) {
+      continue;
+    }
     cell.classList.remove(
       'preview-valid',
       'preview-invalid',
@@ -276,31 +288,51 @@ export function renderBoard(
     const target = (e.target as HTMLElement).closest(
       '.juggle-cell'
     ) as HTMLElement | null;
-    if (!target || !grid.contains(target)) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target || !grid.contains(target)) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     const row = Number(target.dataset.row);
     const col = Number(target.dataset.col);
-    if (Number.isFinite(row) && Number.isFinite(col)) onCellClick(row, col);
+    if (Number.isFinite(row) && Number.isFinite(col)) {
+      onCellClick(row, col);
+    }
   });
   grid.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.key !== 'Enter' && e.key !== ' ') {
+      return;
+    }
     const target = e.target as HTMLElement;
-    if (!target.classList.contains('juggle-cell')) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target.classList.contains('juggle-cell')) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     e.preventDefault();
     const row = Number(target.dataset.row);
     const col = Number(target.dataset.col);
-    if (Number.isFinite(row) && Number.isFinite(col)) onCellClick(row, col);
+    if (Number.isFinite(row) && Number.isFinite(col)) {
+      onCellClick(row, col);
+    }
   });
   grid.addEventListener(
     'mouseenter',
     (e) => {
       const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
-      if (target.style.cursor !== 'pointer') return;
+      if (!target.classList?.contains?.('juggle-cell')) {
+        return;
+      }
+      if (target.style.cursor !== 'pointer') {
+        return;
+      }
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
-      if (Number.isFinite(row) && Number.isFinite(col)) onCellHover(row, col);
+      if (Number.isFinite(row) && Number.isFinite(col)) {
+        onCellHover(row, col);
+      }
     },
     true
   );
@@ -308,7 +340,9 @@ export function renderBoard(
     'mouseleave',
     (e) => {
       const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
+      if (!target.classList?.contains?.('juggle-cell')) {
+        return;
+      }
       onCellLeave();
     },
     true
@@ -416,13 +450,17 @@ export function renderShapeSelector(
   const container = document.createElement('div');
   container.className = 'juggle-shape-selector';
 
-  if (!state.currentDice || !state.selectedCategory) return container;
+  if (!state.currentDice || !state.selectedCategory) {
+    return container;
+  }
 
   // Get selected die value
   const dieValue = state.currentDice.find(
     (d) => getCategoryFromDie(d) === state.selectedCategory
   );
-  if (!dieValue) return container;
+  if (!dieValue) {
+    return container;
+  }
 
   const shapes = getShapesForDie(dieValue);
 
@@ -491,7 +529,9 @@ function renderShapePreview(
   if (ctx && typeof ctx.setTransform === 'function') {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-  if (!ctx) return canvas;
+  if (!ctx) {
+    return canvas;
+  }
 
   for (const cell of cells) {
     const x = (cell.col - minCol) * cellSize + 2;
@@ -519,7 +559,9 @@ export function renderShapeControls(
   const container = document.createElement('div');
   container.className = 'juggle-shape-controls';
 
-  if (!state.selectedShape || state.phase !== 'placing') return container;
+  if (!state.selectedShape || state.phase !== 'placing') {
+    return container;
+  }
 
   // Show current shape preview
   const preview = document.createElement('div');

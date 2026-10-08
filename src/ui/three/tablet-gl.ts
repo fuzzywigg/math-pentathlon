@@ -34,22 +34,30 @@ export const MP3D_READY_ATTR = 'data-mp3d-ready';
 export const MP3D_FALLBACK_ATTR = 'data-mp3d-fallback';
 
 function hashQueryParams(): URLSearchParams {
-  if (typeof window === 'undefined') return new URLSearchParams();
+  if (typeof window === 'undefined') {
+    return new URLSearchParams();
+  }
   const hash = window.location.hash;
   const q = hash.indexOf('?');
-  if (q === -1) return new URLSearchParams();
+  if (q === -1) {
+    return new URLSearchParams();
+  }
   return new URLSearchParams(hash.slice(q + 1));
 }
 
 function readFlag(param: string, storageKey: string): boolean | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   try {
     const search = new URLSearchParams(window.location.search);
     const hashQ = hashQueryParams();
     const flag = search.get(param) ?? hashQ.get(param);
     const parsed = parseAllowlistedFlag(flag);
-    if (parsed !== null) return parsed;
+    if (parsed !== null) {
+      return parsed;
+    }
     return parseAllowlistedFlag(safeGetItem(storageKey));
   } catch {
     return null;
@@ -65,7 +73,9 @@ export function shouldPreserveDrawingBuffer(): boolean {
   if (typeof navigator !== 'undefined' && navigator.webdriver) {
     return true;
   }
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
   const flag = readFlag(PRESERVE_PARAM, PRESERVE_STORAGE_KEY);
   return flag === true;
@@ -95,7 +105,9 @@ export function resolveBoard3dPixelRatio(
 
 /** Mark canvas after first successful paint so e2e can wait on scene readiness. */
 export function markBoard3dCanvasReady(canvas: HTMLCanvasElement): void {
-  if (canvas.getAttribute(MP3D_READY_ATTR) === '1') return;
+  if (canvas.getAttribute(MP3D_READY_ATTR) === '1') {
+    return;
+  }
   canvas.setAttribute(MP3D_READY_ATTR, '1');
   canvas.dispatchEvent(
     new CustomEvent('mp3d-ready', { bubbles: true, detail: { ready: true } })
@@ -107,14 +119,18 @@ export function markBoard3dWebGlFallback(
   host: HTMLElement | null | undefined,
   reason: string
 ): void {
-  if (!host) return;
+  if (!host) {
+    return;
+  }
   host.setAttribute(MP3D_FALLBACK_ATTR, reason || 'webgl');
 }
 
 export function clearBoard3dWebGlFallback(
   host: HTMLElement | null | undefined
 ): void {
-  if (!host) return;
+  if (!host) {
+    return;
+  }
   host.removeAttribute(MP3D_FALLBACK_ATTR);
 }
 
@@ -128,15 +144,23 @@ export function paintBoard3dAndMarkReady(
   render: () => void,
   isDisposed: () => boolean = () => false
 ): void {
-  if (isDisposed()) return;
-  if (!canPaint3d()) return;
+  if (isDisposed()) {
+    return;
+  }
+  if (!canPaint3d()) {
+    return;
+  }
   try {
     render();
     markBoard3dCanvasReady(canvas);
   } catch {
-    if (typeof requestAnimationFrame !== 'function') return;
+    if (typeof requestAnimationFrame !== 'function') {
+      return;
+    }
     requestAnimationFrame(() => {
-      if (isDisposed() || !canPaint3d()) return;
+      if (isDisposed() || !canPaint3d()) {
+        return;
+      }
       try {
         render();
         markBoard3dCanvasReady(canvas);
@@ -162,22 +186,32 @@ export function scheduleBoard3dMountPaint(paint: () => void): () => void {
   let outerId = 0;
   let innerId = 0;
   outerId = requestAnimationFrame(() => {
-    if (cancelled) return;
+    if (cancelled) {
+      return;
+    }
     innerId = requestAnimationFrame(() => {
-      if (cancelled) return;
+      if (cancelled) {
+        return;
+      }
       paint();
     });
   });
   return () => {
     cancelled = true;
-    if (outerId) cancelAnimationFrame(outerId);
-    if (innerId) cancelAnimationFrame(innerId);
+    if (outerId) {
+      cancelAnimationFrame(outerId);
+    }
+    if (innerId) {
+      cancelAnimationFrame(innerId);
+    }
   };
 }
 
 /** Skip on-demand paints while the tab is backgrounded. */
 export function canPaint3d(): boolean {
-  if (typeof document === 'undefined') return true;
+  if (typeof document === 'undefined') {
+    return true;
+  }
   return !document.hidden;
 }
 
@@ -189,11 +223,16 @@ export function bindPageVisibility(handlers: {
   onHidden?: () => void;
   onVisible?: () => void;
 }): () => void {
-  if (typeof document === 'undefined') return () => undefined;
+  if (typeof document === 'undefined') {
+    return () => undefined;
+  }
 
   const onChange = (): void => {
-    if (document.hidden) handlers.onHidden?.();
-    else handlers.onVisible?.();
+    if (document.hidden) {
+      handlers.onHidden?.();
+    } else {
+      handlers.onVisible?.();
+    }
   };
   document.addEventListener('visibilitychange', onChange);
   return () => document.removeEventListener('visibilitychange', onChange);
@@ -201,7 +240,9 @@ export function bindPageVisibility(handlers: {
 
 /** CSS viewport size — prefer visualViewport (mobile chrome / keyboard). */
 export function resolveCssViewportSize(): { width: number; height: number } {
-  if (typeof window === 'undefined') return { width: 0, height: 0 };
+  if (typeof window === 'undefined') {
+    return { width: 0, height: 0 };
+  }
   const vv = window.visualViewport;
   return {
     width: vv?.width || window.innerWidth || 0,
@@ -247,7 +288,9 @@ export function bindBoard3dLayout(
   host: Element,
   onLayout: () => void
 ): () => void {
-  if (typeof window === 'undefined') return () => undefined;
+  if (typeof window === 'undefined') {
+    return () => undefined;
+  }
 
   const onWindowResize = (): void => onLayout();
   window.addEventListener('resize', onWindowResize);

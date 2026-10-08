@@ -13,16 +13,12 @@
 export type WebStorageKind = 'local' | 'session';
 
 export type SafeJsonParseResult =
-  | { ok: true; value: unknown }
-  | { ok: false; error: unknown };
+  { ok: true; value: unknown } | { ok: false; error: unknown };
 
-export type SafeWriteResult =
-  | { ok: true }
-  | { ok: false; error: unknown };
+export type SafeWriteResult = { ok: true } | { ok: false; error: unknown };
 
 export type SafeReadResult =
-  | { ok: true; value: string | null }
-  | { ok: false; error: unknown };
+  { ok: true; value: string | null } | { ok: false; error: unknown };
 
 const CROSS_TAB_FLAG = '__mpSafeWebStorageCrossTabBound';
 const CROSS_TAB_HANDLER = '__mpSafeWebStorageCrossTabHandler';
@@ -52,12 +48,12 @@ function storageFromKind(kind: WebStorageKind): Storage | null {
  * Does not probe writes — quota-full stores still return successfully so
  * callers can soft-fail on setItem.
  */
-export function getWebStorage(
-  kind: WebStorageKind = 'local'
-): Storage | null {
+export function getWebStorage(kind: WebStorageKind = 'local'): Storage | null {
   try {
     const store = storageFromKind(kind);
-    if (store == null) return null;
+    if (store == null) {
+      return null;
+    }
     // Touch a read path — throws SecurityError when storage access is blocked.
     void store.getItem('__mp_storage_probe__');
     return store;
@@ -77,7 +73,9 @@ export function safeGetItemResult(
 ): SafeReadResult {
   try {
     const store = storageFromKind(kind);
-    if (store == null) return { ok: false, error: storageUnavailableError() };
+    if (store == null) {
+      return { ok: false, error: storageUnavailableError() };
+    }
     return { ok: true, value: store.getItem(key) };
   } catch (error) {
     return { ok: false, error };
@@ -103,7 +101,9 @@ export function safeSetItemResult(
   kind: WebStorageKind = 'local'
 ): SafeWriteResult {
   const store = getWebStorage(kind);
-  if (!store) return { ok: false, error: storageUnavailableError() };
+  if (!store) {
+    return { ok: false, error: storageUnavailableError() };
+  }
   try {
     store.setItem(key, value);
     return { ok: true };
@@ -130,7 +130,9 @@ export function safeRemoveItem(
   kind: WebStorageKind = 'local'
 ): boolean {
   const store = getWebStorage(kind);
-  if (!store) return false;
+  if (!store) {
+    return false;
+  }
   try {
     store.removeItem(key);
     return true;
@@ -140,7 +142,9 @@ export function safeRemoveItem(
 }
 
 /** JSON.parse that never throws; treats empty/invalid input as failure. */
-export function safeParseJson(raw: string | null | undefined): SafeJsonParseResult {
+export function safeParseJson(
+  raw: string | null | undefined
+): SafeJsonParseResult {
   if (raw == null || raw === '') {
     return { ok: false, error: new SyntaxError('Empty storage value') };
   }

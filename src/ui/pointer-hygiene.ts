@@ -63,8 +63,12 @@ function isPrimaryPointer(e: PointerEvent): boolean {
  * (left mouse button / touch / pen; not secondary multi-touch).
  */
 export function isPrimaryActivatingPointer(e: PointerEvent): boolean {
-  if (!isPrimaryPointer(e)) return false;
-  if (e.pointerType === 'mouse' && e.button !== 0) return false;
+  if (!isPrimaryPointer(e)) {
+    return false;
+  }
+  if (e.pointerType === 'mouse' && e.button !== 0) {
+    return false;
+  }
   return true;
 }
 
@@ -100,9 +104,13 @@ export function createPointerTapController(
     getState: () => state,
     reset,
     onPointerDown(e: PointerEvent): void {
-      if (requirePrimary && !isPrimaryActivatingPointer(e)) return;
+      if (requirePrimary && !isPrimaryActivatingPointer(e)) {
+        return;
+      }
       // One active gesture — ignore extra fingers while pending.
-      if (state.phase === 'pending') return;
+      if (state.phase === 'pending') {
+        return;
+      }
       state.phase = 'pending';
       state.pointerId = e.pointerId;
       state.startX = e.clientX;
@@ -110,7 +118,9 @@ export function createPointerTapController(
       state.claimed = false;
     },
     onPointerMove(e: PointerEvent): void {
-      if (state.phase !== 'pending' || !matches(e)) return;
+      if (state.phase !== 'pending' || !matches(e)) {
+        return;
+      }
       const dx = e.clientX - state.startX;
       const dy = e.clientY - state.startY;
       if (Math.hypot(dx, dy) > slopPx) {
@@ -118,7 +128,9 @@ export function createPointerTapController(
       }
     },
     onPointerUp(e: PointerEvent): boolean {
-      if (requirePrimary && !isPrimaryPointer(e)) return false;
+      if (requirePrimary && !isPrimaryPointer(e)) {
+        return false;
+      }
       if (state.phase !== 'pending' || !matches(e)) {
         // Stale up after cancel/idle — clear if it was our id.
         if (matches(e)) {
@@ -133,7 +145,9 @@ export function createPointerTapController(
       return true;
     },
     onPointerCancel(e: PointerEvent): void {
-      if (state.pointerId !== null && e.pointerId !== state.pointerId) return;
+      if (state.pointerId !== null && e.pointerId !== state.pointerId) {
+        return;
+      }
       state.phase = 'idle';
       state.pointerId = null;
       // Do not claim — a later click from a real mouse tap may still apply.
@@ -182,8 +196,12 @@ export function bindCanvasPointerTap(
   const onDown = (e: PointerEvent): void => {
     const before = tap.getState().phase;
     tap.onPointerDown(e);
-    if (tap.getState().phase !== 'pending' || before === 'pending') return;
-    if (!capture) return;
+    if (tap.getState().phase !== 'pending' || before === 'pending') {
+      return;
+    }
+    if (!capture) {
+      return;
+    }
     try {
       canvas.setPointerCapture(e.pointerId);
     } catch {
@@ -198,8 +216,11 @@ export function bindCanvasPointerTap(
   const onUp = (e: PointerEvent): void => {
     const tracked = tap.getState().pointerId === e.pointerId;
     const ok = tap.onPointerUp(e);
-    if (ok) options.onTap(e);
-    else if (tracked) options.onGestureEnd?.();
+    if (ok) {
+      options.onTap(e);
+    } else if (tracked) {
+      options.onGestureEnd?.();
+    }
   };
 
   const onCancel = (e: PointerEvent): void => {
@@ -271,13 +292,17 @@ export function bindPrimaryPointerActivate(
     tap.onPointerMove(e as PointerEvent);
   };
   const onUp = (e: Event): void => {
-    if (tap.onPointerUp(e as PointerEvent)) activate();
+    if (tap.onPointerUp(e as PointerEvent)) {
+      activate();
+    }
   };
   const onCancel = (e: Event): void => {
     tap.onPointerCancel(e as PointerEvent);
   };
   const onClick = (): void => {
-    if (!tap.shouldAcceptClick()) return;
+    if (!tap.shouldAcceptClick()) {
+      return;
+    }
     tap.markClaimed();
     activate();
   };

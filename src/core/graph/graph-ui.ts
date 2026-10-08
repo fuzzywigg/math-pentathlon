@@ -14,7 +14,9 @@ import { getUserReducedMotionFlag } from '../settings-flags';
 
 /** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
 function graphPrefersReducedMotion(): boolean {
-  if (getUserReducedMotionFlag()) return true;
+  if (getUserReducedMotionFlag()) {
+    return true;
+  }
   if (
     typeof window === 'undefined' ||
     typeof window.matchMedia !== 'function'
@@ -86,7 +88,9 @@ export function renderGraph(
   for (const edge of graph.edges) {
     const fromNode = graph.nodes.get(edge.from);
     const toNode = graph.nodes.get(edge.to);
-    if (!fromNode || !toNode) continue;
+    if (!fromNode || !toNode) {
+      continue;
+    }
 
     const x1 = fromNode.position.x + offsetX;
     const y1 = fromNode.position.y + offsetY;
@@ -234,7 +238,9 @@ export function createInteractiveGraph(
   const nodes = svg.querySelectorAll('.graph-node');
   nodes.forEach((node) => {
     const nodeId = (node as SVGElement).dataset.nodeId;
-    if (!nodeId) return;
+    if (!nodeId) {
+      return;
+    }
 
     node.addEventListener('click', () => onNodeClick(nodeId));
     node.addEventListener('mouseenter', () => onNodeHover(nodeId));
@@ -358,9 +364,13 @@ export function animateMove(
   let resolvePromise: (() => void) | null = null;
 
   const settle = (): void => {
-    if (settled) return;
+    if (settled) {
+      return;
+    }
     settled = true;
-    if (rafId) cancelAnimationFrame(rafId);
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+    }
     rafId = 0;
     marker?.remove();
     marker = null;
@@ -480,7 +490,9 @@ export function animateMove(
  */
 export function injectGraphStyles(): void {
   const styleId = 'graph-styles';
-  if (document.getElementById(styleId)) return;
+  if (document.getElementById(styleId)) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = styleId;
