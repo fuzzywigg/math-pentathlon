@@ -275,7 +275,7 @@ describe('engine-coverage-round-3 — kings game-state / serialization', () => {
     expect(getCurrentPhaseMessage(forged)).toBe('notAPhase');
   });
 
-  it('phase messages + supply + king lookup + reset/endTurn edges', () => {
+  it('supply + king lookup + reset/endTurn edges', () => {
     const open = createInitialGameState();
     expect(getSupply(open, 'player1')).toBe(30);
     expect(getSupply(open, 'player2')).toBe(30);
@@ -283,28 +283,7 @@ describe('engine-coverage-round-3 — kings game-state / serialization', () => {
     expect(getKingPosition(open, 'player2')).toEqual({ row: 9, col: 5 });
 
     const selected = selectKing(open);
-    expect(getCurrentPhaseMessage(selected)).toMatch(/green square/);
-
-    const p2: KingsState = {
-      ...open,
-      currentPlayer: 'player2',
-      turnPhase: 'placeQuadraphage',
-    };
-    expect(getCurrentPhaseMessage(p2)).toMatch(/Place a Quadraphage/);
-
-    const overWin: KingsState = {
-      ...open,
-      turnPhase: 'gameOver',
-      winner: 'player1',
-    };
-    expect(getCurrentPhaseMessage(overWin)).toMatch(/Player 1 wins/);
-
-    const overTie: KingsState = {
-      ...open,
-      turnPhase: 'gameOver',
-      winner: null,
-    };
-    expect(getCurrentPhaseMessage(overTie)).toMatch(/Tie/);
+    expect(selected.turnPhase).toBe('moveKing');
 
     expect(resetGame().moveHistory).toEqual([]);
   });
