@@ -114,7 +114,15 @@ export function handleCellClick(
 
   // Move King phase
   if (state.turnPhase === 'moveKing') {
-    const clickedCell = state.board[row - 1][col - 1]; // Convert 1-based to 0-based
+    // Board is always BOARD_SIZE×BOARD_SIZE; throw-guard is NUI-only (cells may be null).
+    const moveRow = state.board[row - 1];
+    if (moveRow === undefined) {
+      throw new Error('unreachable: kings board missing row');
+    }
+    const clickedCell = moveRow[col - 1]; // Convert 1-based to 0-based
+    if (clickedCell === undefined) {
+      throw new Error('unreachable: kings board missing cell');
+    }
 
     // Check if clicked on current player's King
     if (
@@ -160,7 +168,14 @@ export function handleCellClick(
       return { state: endTurn(state), isInvalidClick: false };
     }
 
-    const clickedCell = state.board[row - 1][col - 1];
+    const placeRow = state.board[row - 1];
+    if (placeRow === undefined) {
+      throw new Error('unreachable: kings board missing row');
+    }
+    const clickedCell = placeRow[col - 1];
+    if (clickedCell === undefined) {
+      throw new Error('unreachable: kings board missing cell');
+    }
 
     // Only place on empty cells
     if (clickedCell === null) {
@@ -182,7 +197,7 @@ const KINGS_CELL_COUNT = KINGS_BOARD_SIZE * KINGS_BOARD_SIZE;
 
 /** Mutable click binding so listeners can be attached once (#11). */
 interface BoardClickBinding {
-  onCellClick?: CellClickCallback;
+  onCellClick?: CellClickCallback | undefined;
 }
 
 const boardClickBindings = new WeakMap<HTMLElement, BoardClickBinding>();
@@ -198,7 +213,14 @@ function syncKingsCell(
   cell.dataset.row = String(row);
   cell.dataset.col = String(col);
 
-  const piece = state.board[row - 1][col - 1];
+  const boardRow = state.board[row - 1];
+  if (boardRow === undefined) {
+    throw new Error('unreachable: kings board missing row');
+  }
+  const piece = boardRow[col - 1];
+  if (piece === undefined) {
+    throw new Error('unreachable: kings board missing cell');
+  }
   const colLetter = String.fromCharCode(64 + col);
   const coord = `${colLetter}${row}`;
   let owner: string | undefined;
@@ -256,15 +278,15 @@ function syncKingsCell(
     buildCellAriaLabel({
       coord,
       empty,
-      owner,
-      piece: pieceName,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(pieceName !== undefined ? { piece: pieceName } : {}),
       validMove: isValidMoveTarget,
       validPlacement: isPlacementTarget,
     })
   );
 
   if (state.moveHistory.length > 0) {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
     if (lastMove.to.row === row && lastMove.to.col === col) {
       cell.classList.add('cell-last-move');
     }

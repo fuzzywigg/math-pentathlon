@@ -22,7 +22,7 @@ import {
 export type CellClickCallback = (row: number, col: number) => void;
 
 interface HexBoardBinding {
-  onCellClick?: CellClickCallback;
+  onCellClick?: CellClickCallback | undefined;
 }
 
 interface HexBoardCache {
@@ -316,7 +316,15 @@ function syncHexCell(
   const hex = cellGroup.querySelector('polygon') as SVGPolygonElement | null;
   if (!hex) return;
 
-  const cellState = state.board[row][col];
+  // Board rows are always size×size; throw-guard is NUI-only (cells may be null).
+  const rowCells = state.board[row];
+  if (rowCells === undefined) {
+    throw new Error('unreachable: hex board missing row');
+  }
+  const cellState = rowCells[col];
+  if (cellState === undefined) {
+    throw new Error('unreachable: hex board missing cell');
+  }
   const isWinningCell = winningSet.has(`${row},${col}`);
 
   let cellClass = 'hex-cell';
@@ -329,7 +337,7 @@ function syncHexCell(
   }
   if (isWinningCell) cellClass += ' hex-cell-winning';
   if (state.moveHistory.length > 0) {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
     if (lastMove.position.row === row && lastMove.position.col === col) {
       cellClass += ' hex-cell-last-move';
     }
@@ -342,17 +350,19 @@ function syncHexCell(
     Boolean(onCellClick) &&
     !isComputerPlacementTurn(state);
 
+  const owner =
+    cellState === 'player1'
+      ? 'Blue'
+      : cellState === 'player2'
+        ? 'Red'
+        : undefined;
+
   makeGridCell(
     cellGroup,
     buildCellAriaLabel({
       coord: formatPosition({ row, col }),
       empty: cellState === null,
-      owner:
-        cellState === 'player1'
-          ? 'Blue'
-          : cellState === 'player2'
-            ? 'Red'
-            : undefined,
+      ...(owner !== undefined ? { owner } : {}),
       validPlacement: isValidPlacement,
     })
   );

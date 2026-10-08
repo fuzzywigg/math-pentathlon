@@ -54,7 +54,7 @@ export interface JuggleBoardRenderOptions {
   /** When false, suppress selectable chrome and activate handlers (AI seat). */
   allowInput?: boolean;
   /** Human-only: leave placing so they can pick another die/shape. */
-  onAbandonPlacement?: () => void;
+  onAbandonPlacement?: (() => void) | undefined;
 }
 
 /** Cell lookup cached on the grid element (avoid querySelectorAll each sync). */
@@ -223,7 +223,8 @@ export function renderBoard(
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
 
-      const isOccupied = board.cells[row][col];
+      // Grid is CONFIG.GRID_SIZE dense; `!` is NUI-only.
+      const isOccupied = board.cells[row]![col]!;
       const isPreview = previewSet.has(`${row},${col}`);
 
       const isLegalAnchor = legalAnchors.has(`${row},${col}`);
@@ -244,12 +245,13 @@ export function renderBoard(
         state.phase === 'placing' &&
         !isOccupied;
 
+      const owner = isOccupied ? getPlayerName(player) : undefined;
       makeGridCell(
         cell,
         buildCellAriaLabel({
           coord,
           empty: !isOccupied,
-          owner: isOccupied ? getPlayerName(player) : undefined,
+          ...(owner !== undefined ? { owner } : {}),
           validPlacement:
             canPlace && (isLegalAnchor || (isPreview && isPreviewValid)),
         })
@@ -353,9 +355,11 @@ export function renderDice(
 
       const die = document.createElement('div');
       die.className = 'juggle-die';
-      die.textContent = getDieFace(dice[i]);
+      // Dice tuple always has 2 faces when rendered here; `!` is NUI-only.
+      const dieValue = dice[i]!;
+      die.textContent = getDieFace(dieValue);
 
-      const category = getCategoryFromDie(dice[i]);
+      const category = getCategoryFromDie(dieValue);
       const label = document.createElement('div');
       label.className = 'juggle-die-label';
       label.textContent = getCategoryName(category);

@@ -162,7 +162,10 @@ export function renderBoard(
     );
     validGroup.classList.add('pent-valid-cells');
     for (const key of legalAnchors) {
-      const [r, c] = key.split(',').map(Number);
+      const parts = key.split(',').map(Number);
+      // Legal-anchor keys are always "r,c"; `!` is NUI-only.
+      const r = parts[0]!;
+      const c = parts[1]!;
       const rect = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'rect'
@@ -238,7 +241,7 @@ export function renderBoard(
         buildCellAriaLabel({
           coord: `${row},${col}`,
           empty: occupant === null,
-          owner,
+          ...(owner !== undefined ? { owner } : {}),
           validPlacement: isLegalAnchor,
         })
       );

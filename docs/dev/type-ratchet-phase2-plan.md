@@ -3,7 +3,7 @@
 **Task (plan):** `burn-1007-mp-typeratchet-plan`  
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batches **0**–**1** cleared on tip; Batches **2**/**3** are open drafts (#546 / #544). Batch **4** (this work) clears **prime-gold** `types.ts` + `board-ui.ts` only — Phase-2 ceiling **520 → 450** from tip; deferred list in [`type-ratchet-batch4-deferred.md`](./type-ratchet-batch4-deferred.md).  
+**Status:** Batches **0**–**1** cleared on tip; Batch **4** (prime-gold types/board-ui) + Batch **5** (UI/shell/types compliant re-cut) stack on tip — Phase-2 ceiling **520 → 450 → 373**. Batch **2** (#546) remains an open draft (skipped here). Open draft #544 targets the same UI slice with runtime-semantic guards; Batch 5 is the foldable compliant re-cut. See [`type-ratchet-batch5.md`](./type-ratchet-batch5.md).  
 **Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
@@ -177,7 +177,7 @@ Fix **non-AI** files only, smallest games first:
 
 **Estimate:** L (~132 non-AI errors). Stars-bars board-ui (23) and contig types/board-ui are the volume.
 
-### Batch 4 — `prime-gold` types mountain (still no AI) — **in progress / draft**
+### Batch 4 — `prime-gold` types mountain (still no AI) — **done (draft #551)**
 
 | Path | Errors | Notes |
 | --- | ---: | --- |
@@ -187,6 +187,14 @@ Fix **non-AI** files only, smallest games first:
 | prime-gold `ai.ts` | 7 | **defer to Batch A** |
 
 **Estimate:** L (~70 cleared of ~80 non-AI). Types + board-ui only; no rules/AI.
+
+### Batch 5 — UI/shell/types compliant re-cut (still no AI/rules) — **in progress / draft**
+
+Clears the remaining Batch-3 UI/types surface on tip+#551 with assertion / EOPT-spread / throw-guard fixes only (no `??` / `?.` / early-`continue` value rewrites). Skips every `#546` path, all `ai*`, all `rules.ts`, kings `game-state`/`board` engine leftovers, and help/tutorial/copy. Details: [`type-ratchet-batch5.md`](./type-ratchet-batch5.md).
+
+| Metric | Before (#551) | After Batch 5 |
+| --- | ---: | ---: |
+| Out-of-scope | **450** | **373** (−77) |
 
 ### Batch A — AI search / scoring (**LAST**, needs Andrew)
 

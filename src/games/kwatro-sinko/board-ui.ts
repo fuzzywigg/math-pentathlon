@@ -109,8 +109,9 @@ function renderNode(
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   const match = /^n(\d+)-(\d+)$/.exec(node.id);
-  const row = match ? match[1] : '0';
-  const col = match ? match[2] : '0';
+  // Regex always captures two groups when it matches; `!` is NUI-only.
+  const row = match ? match[1]! : '0';
+  const col = match ? match[2]! : '0';
   group.setAttribute('data-row', row);
   group.setAttribute('data-col', col);
   group.setAttribute('data-node-id', node.id);
@@ -174,22 +175,23 @@ function renderNode(
 
   const owner = node.chip ? getPlayerName(node.chip.owner) : undefined;
   const piece = node.chip ? `chip ${node.chip.value}` : undefined;
+  const extras = [
+    node.isNumbered ? 'numbered' : '',
+    state.selectedChip && node.chip?.id === state.selectedChip
+      ? 'selected'
+      : '',
+    canSelect ? 'selectable' : '',
+    isWinning ? 'winning' : '',
+  ].filter(Boolean);
   makeGridCell(
     group,
     buildCellAriaLabel({
       coord: `${row},${col}`,
       empty: !node.chip,
-      owner,
-      piece,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(piece !== undefined ? { piece } : {}),
       validMove: isValid && !node.chip,
-      extras: [
-        node.isNumbered ? 'numbered' : '',
-        state.selectedChip && node.chip?.id === state.selectedChip
-          ? 'selected'
-          : '',
-        canSelect ? 'selectable' : '',
-        isWinning ? 'winning' : '',
-      ].filter(Boolean),
+      ...(extras.length ? { extras } : {}),
     })
   );
 

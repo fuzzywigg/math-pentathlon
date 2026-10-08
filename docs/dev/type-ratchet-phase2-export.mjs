@@ -36,6 +36,14 @@ const IN_SCOPE = new RegExp(
     '^src/games/par-55/(types|board-ui|rules)\\.ts$',
     // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
     '^src/games/prime-gold/(types|board-ui)\\.ts$',
+    // Phase 2 Batch 5 — UI/shell/types (rules/AI/engine deferred; #546 paths skipped)
+    '^src/games/stars-bars/board-ui\\.ts$',
+    '^src/games/kings-quadraphages/(board-ui|board-renderer)\\.ts$',
+    '^src/games/contig-60/(types|board-ui)\\.ts$',
+    '^src/games/hex/board-ui\\.ts$',
+    '^src/games/juggle/(board-ui|game-controller)\\.ts$',
+    '^src/games/pent-em-in/(types|board-ui)\\.ts$',
+    '^src/games/kwatro-sinko/board-ui\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -219,7 +227,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch4-nonrules',
+  taskId: 'burn-1008-mp-type-ratchet-batch5-nonrules',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {
