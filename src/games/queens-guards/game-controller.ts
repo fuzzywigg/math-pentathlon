@@ -75,8 +75,25 @@ let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking = false;
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
+/** Single pending AI paint/chain timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAiTimeout(fn: () => void, delayMs: number): void {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    fn();
+  }, delayMs);
+}
 
 // Optional Three.js board (only when feature flag is on)
 let board3d: QueensGuardsBoard3D | null = null;
@@ -240,7 +257,7 @@ const AI_RESTORE_CHAIN_MS = 280;
 function maybeTriggerAI(): void {
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
     // Slight delay so the thinking status can paint before search starts.
-    setTimeout(() => {
+    scheduleAiTimeout(() => {
       void performAIMove();
     }, AI_THINK_PAINT_MS);
   }
@@ -399,7 +416,7 @@ async function performAIMove(): Promise<void> {
 
   // Capture keeps the AI seat until restore finishes.
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => {
+    scheduleAiTimeout(() => {
       void performAIMove();
     }, AI_RESTORE_CHAIN_MS);
   }
@@ -524,6 +541,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelQueensAiRequests();
   disposeQueensAiWorker();

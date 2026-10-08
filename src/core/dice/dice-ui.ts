@@ -306,6 +306,9 @@ export function renderRollResult(
   }
 }
 
+/** Cancel handle returned by {@link animateRoll}. */
+export type AnimateRollCancel = () => void;
+
 /** Animation: Roll dice with tumbling effect (skipped / instant when reduced motion). */
 export function animateRoll(
   container: HTMLElement,
@@ -315,15 +318,32 @@ export function animateRoll(
     dieSize?: number;
     onComplete?: () => void;
   } = {}
-): void {
+): AnimateRollCancel {
   const { duration = 1000, dieSize = 60, onComplete } = options;
   const reduceMotion = dicePrefersReducedMotion();
   const motionDuration = reduceMotion ? 0 : duration;
+
+  let cancelled = false;
+  let timerId: ReturnType<typeof setTimeout> | null = null;
+
+  const clearTimer = (): void => {
+    if (timerId !== null) {
+      clearTimeout(timerId);
+      timerId = null;
+    }
+  };
+
+  const cancel: AnimateRollCancel = () => {
+    cancelled = true;
+    clearTimer();
+  };
 
   container.innerHTML = '';
   container.className = 'dice-roll-result';
 
   const finish = (): void => {
+    if (cancelled) return;
+    clearTimer();
     container.className = 'dice-roll-result';
     container.innerHTML = '';
 
@@ -347,7 +367,7 @@ export function animateRoll(
 
   if (motionDuration <= 0) {
     finish();
-    return;
+    return cancel;
   }
 
   container.classList.add('rolling');
@@ -381,6 +401,7 @@ export function animateRoll(
   const interval = 50; // Update every 50ms
 
   const animate = () => {
+    if (cancelled) return;
     const elapsed = Date.now() - startTime;
 
     if (elapsed < motionDuration) {
@@ -395,7 +416,7 @@ export function animateRoll(
         wrapper.appendChild(renderDie(tempDie, dieSize));
       });
 
-      setTimeout(animate, interval);
+      timerId = setTimeout(animate, interval);
     } else {
       // Prefer shared finish() so reduced-motion + rolling cleanup stay consistent (#495).
       finish();
@@ -403,6 +424,7 @@ export function animateRoll(
   };
 
   animate();
+  return cancel;
 }
 
 /** Get CSS styles for dice UI */

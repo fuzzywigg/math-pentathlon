@@ -312,31 +312,66 @@ export function showValidMoves(
   }
 }
 
+/** Cancel handle for {@link animateMove}. */
+export type AnimateMoveCancel = () => void;
+
+export type AnimateMoveHandle = {
+  promise: Promise<void>;
+  cancel: AnimateMoveCancel;
+};
+
 /**
- * Animate a move along a path
+ * Animate a move along a path.
+ * Returns a promise (awaitable) plus a cancel() that drops pending rAF frames.
+ * The promise itself is thenable so existing `await animateMove(...)` callers
+ * keep working.
  */
 export function animateMove(
   svg: SVGSVGElement,
   path: NodeId[],
   graph: Graph,
   duration: number = 500
-): Promise<void> {
-  return new Promise((resolve) => {
+): Promise<void> & { cancel: AnimateMoveCancel } {
+  let cancelled = false;
+  let rafId = 0;
+  let settled = false;
+  let marker: SVGCircleElement | null = null;
+  let resolvePromise: (() => void) | null = null;
+
+  const settle = (): void => {
+    if (settled) return;
+    settled = true;
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = 0;
+    marker?.remove();
+    marker = null;
+    resolvePromise?.();
+    resolvePromise = null;
+  };
+
+  const cancel: AnimateMoveCancel = () => {
+    cancelled = true;
+    settle();
+  };
+
+  const promise = new Promise<void>((resolve) => {
+    resolvePromise = resolve;
     if (path.length < 2) {
-      resolve();
+      settle();
       return;
     }
 
     // Create animated marker
-    const marker = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'circle'
-    );
+    marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     marker.setAttribute('r', '10');
     marker.setAttribute('fill', '#ff9800');
     marker.setAttribute('stroke', '#f57c00');
     marker.setAttribute('stroke-width', '2');
     svg.appendChild(marker);
+
+    const finish = (): void => {
+      settle();
+    };
 
     const bounds = svg.viewBox.baseVal;
     const offsetX = bounds.x;
@@ -347,9 +382,12 @@ export function animateMove(
     const stepDuration = duration / totalSteps;
 
     function animateStep(): void {
+      if (cancelled) {
+        finish();
+        return;
+      }
       if (currentStep >= totalSteps) {
-        marker.remove();
-        resolve();
+        finish();
         return;
       }
 
@@ -374,34 +412,47 @@ export function animateMove(
       const endX = toNode.position.x - offsetX + 40;
       const endY = toNode.position.y - offsetY + 40;
 
-      marker.setAttribute('cx', String(startX));
-      marker.setAttribute('cy', String(startY));
+      if (!marker) {
+        finish();
+        return;
+      }
+      // Narrow to a local non-null binding for nested rAF closures.
+      const liveMarker: SVGCircleElement = marker;
+
+      liveMarker.setAttribute('cx', String(startX));
+      liveMarker.setAttribute('cy', String(startY));
 
       const startTime = performance.now();
 
       function animate(currentTime: number): void {
+        if (cancelled) {
+          finish();
+          return;
+        }
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / stepDuration, 1);
 
         const x = startX + (endX - startX) * progress;
         const y = startY + (endY - startY) * progress;
 
-        marker.setAttribute('cx', String(x));
-        marker.setAttribute('cy', String(y));
+        liveMarker.setAttribute('cx', String(x));
+        liveMarker.setAttribute('cy', String(y));
 
         if (progress < 1) {
-          requestAnimationFrame(animate);
+          rafId = requestAnimationFrame(animate);
         } else {
           currentStep++;
           animateStep();
         }
       }
 
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     }
 
     animateStep();
   });
+
+  return Object.assign(promise, { cancel });
 }
 
 /**

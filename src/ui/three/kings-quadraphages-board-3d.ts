@@ -395,9 +395,11 @@ export async function createKingsQuadraphagesBoard3D(
     paint();
   };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
@@ -433,7 +435,7 @@ export async function createKingsQuadraphagesBoard3D(
 
   tearDown = unmount;
   resize();
-  scheduleBoard3dMountPaint(paint);
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

@@ -35,10 +35,27 @@ let moveCount = 0;
 let currentHint: string | null = null;
 /** Invalidates pending AI timeouts after new game / destroy. */
 let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 const AI_THINKING_DELAY = 600;
 /** Faster cadence for AI free-turn chains so multi-sow bursts don't feel stuck. */
 const AI_FREE_TURN_DELAY = 250;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAiTimeout(fn: () => void, delayMs: number): void {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    fn();
+  }, delayMs);
+}
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
@@ -140,7 +157,7 @@ function triggerAITurn(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  scheduleAiTimeout(() => {
     if (gen !== aiGeneration) return;
 
     // Use the AI module to get the best move
@@ -172,7 +189,7 @@ function triggerAITurn(): void {
     // "AI's turn / 0 valid pits" in the gap before the next sow.
     if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
       render();
-      setTimeout(triggerAITurn, AI_FREE_TURN_DELAY);
+      scheduleAiTimeout(triggerAITurn, AI_FREE_TURN_DELAY);
     } else {
       isAIThinking = false;
       render();
@@ -232,6 +249,7 @@ export function getGameState(): CallaGameState {
 /** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   boardContainer = null;
   statusContainer = null;

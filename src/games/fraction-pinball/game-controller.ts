@@ -48,6 +48,20 @@ let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Bumped to cancel in-flight AI timeouts after new game. */
 let aiGeneration = 0;
+/** Pending AI think / result timers — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+let resultTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimers(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+  if (resultTimer !== null) {
+    clearTimeout(resultTimer);
+    resultTimer = null;
+  }
+}
 /** Display-only: points from the most recent hit (not part of rules state). */
 let lastPointsAwarded = 0;
 
@@ -147,7 +161,9 @@ function render(): void {
   // AI turn — generation token cancels stacked timeouts
   if (isComputerAnswering()) {
     const gen = ++aiGeneration;
-    setTimeout(() => {
+    clearAiTimers();
+    aiTimer = setTimeout(() => {
+      aiTimer = null;
       if (gen !== aiGeneration) return;
       aiTurn();
     }, AI_THINK_MS);
@@ -204,7 +220,11 @@ function aiTurn(): void {
 
   // Auto-continue after showing result
   const gen = aiGeneration;
-  setTimeout(() => {
+  if (resultTimer !== null) {
+    clearTimeout(resultTimer);
+  }
+  resultTimer = setTimeout(() => {
+    resultTimer = null;
     if (gen !== aiGeneration) return;
     if (gameState.phase === 'showResult') {
       handleContinue();
@@ -256,6 +276,7 @@ export function getCurrentState(): FractionPinballState {
 /** Invalidate pending AI timeouts and drop the mount (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimers();
   gameContainer = null;
 }
 

@@ -53,8 +53,17 @@ let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
+/** Single pending AI schedule timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 /** True while a worker/sync AI search is in flight — blocks human taps. */
 let isAIThinking = false;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let showStarterBanner = false;
@@ -250,7 +259,9 @@ function scheduleAiIfNeeded(): void {
     !gameState.winner &&
     gameState.phase !== 'gameOver'
   ) {
-    setTimeout(() => {
+    clearAiTimer();
+    aiTimer = setTimeout(() => {
+      aiTimer = null;
       void aiTurn();
     }, 500);
   }
@@ -381,6 +392,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelFiarAiRequests();
   disposeFiarAiWorker();

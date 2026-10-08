@@ -312,9 +312,25 @@ async function executeAITurn(): Promise<void> {
   checkAndTriggerAITurn();
 }
 
+/** Pending UX delay timers from AI turn pacing — cleared on destroy. */
+const delayTimers = new Set<ReturnType<typeof setTimeout>>();
+
+function clearDelayTimers(): void {
+  for (const id of delayTimers) {
+    clearTimeout(id);
+  }
+  delayTimers.clear();
+}
+
 // Simple delay helper
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => {
+    const id = setTimeout(() => {
+      delayTimers.delete(id);
+      resolve();
+    }, ms);
+    delayTimers.add(id);
+  });
 }
 
 // Start a new game with current settings
@@ -436,6 +452,7 @@ export function initGame(
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearDelayTimers();
   isAIThinking = false;
   if (boardContainer) {
     boardContainer.removeEventListener(

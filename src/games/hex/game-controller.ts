@@ -32,9 +32,18 @@ let isAIThinking = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game. */
 let aiGeneration = 0;
+/** Single pending AI paint timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 // AI paint delay before worker search (search budgets are separate).
 const AI_THINKING_DELAY = 250;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 
 // Track game end for owl notifications
 let hasNotifiedGameEnd = false;
@@ -125,7 +134,9 @@ function triggerAIMove(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
     void (async () => {
       let aiMove = null;
       try {
@@ -182,6 +193,7 @@ export function getGameState(): HexGameState {
 /** Cancel in-flight AI and drop mounts (route change / error boundary). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   cancelHexAiRequests();
   disposeHexAiWorker();
   isAIThinking = false;

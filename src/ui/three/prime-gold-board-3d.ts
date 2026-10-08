@@ -619,9 +619,11 @@ export async function createPrimeGoldBoard3D(
     paint();
   };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
@@ -656,7 +658,7 @@ export async function createPrimeGoldBoard3D(
   };
 
   resize();
-  scheduleBoard3dMountPaint(paint);
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, valueToClientPoint, canvas };
 }

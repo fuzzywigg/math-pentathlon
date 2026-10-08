@@ -755,8 +755,11 @@ export function renderMoveHistory(
   title.textContent = 'Move History';
   container.appendChild(title);
 
-  for (let i = state.moveHistory.length - 1; i >= 0; i--) {
-    const move = state.moveHistory[i];
+  // Cap rendered history (matches kings / fab / par-55) so long matches
+  // do not rebuild an unbounded DOM list every paint.
+  const recent = state.moveHistory.slice(-15);
+  for (let i = recent.length - 1; i >= 0; i--) {
+    const move = recent[i]!;
     const moveEl = document.createElement('div');
     moveEl.className = `stars-move-item ${move.player}`;
 

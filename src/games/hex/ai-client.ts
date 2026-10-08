@@ -51,6 +51,7 @@ export async function getBestMoveAsync(
   const c = getClient();
 
   let finished = false;
+  let watchdogId: ReturnType<typeof setTimeout> | null = null;
   const requestPromise = c
     .request({
       game: 'hex',
@@ -66,7 +67,8 @@ export async function getBestMoveAsync(
     });
 
   const watchdogPromise = new Promise<HexPosition | null>((resolve) => {
-    setTimeout(() => {
+    watchdogId = setTimeout(() => {
+      watchdogId = null;
       if (finished) {
         resolve(null);
         return;
@@ -78,13 +80,22 @@ export async function getBestMoveAsync(
     }, watchdogMs);
   });
 
-  const raced = await Promise.race([requestPromise, watchdogPromise]);
-  if (raced !== null) return raced;
-  // Watchdog (or cancel) — sync fallback on the main thread with the same budget.
-  return getBestMove(cloned, aiPlayer, difficulty, {
-    seed: options.seed,
-    deadlineMs,
-  });
+  try {
+    const raced = await Promise.race([requestPromise, watchdogPromise]);
+    if (raced !== null) return raced;
+    // Watchdog (or cancel) — sync fallback on the main thread with the same budget.
+    return getBestMove(cloned, aiPlayer, difficulty, {
+      seed: options.seed,
+      deadlineMs,
+    });
+  } finally {
+    // Lifecycle only: clear the watchdog so winning requests do not leave
+    // a dangling timer holding closures until deadlineMs+1500.
+    if (watchdogId !== null) {
+      clearTimeout(watchdogId);
+      watchdogId = null;
+    }
+  }
 }
 
 export function cancelHexAiRequests(): void {

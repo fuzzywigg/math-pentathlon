@@ -863,3 +863,13 @@ export class TutorialManager {
 
 // Singleton instance
 export const tutorialManager = new TutorialManager();
+
+/**
+ * Route / error-boundary cleanup: drop overlay, keydown, and handlers when
+ * leaving a game mid-tutorial so leftovers do not leak across mounts.
+ */
+export function exitTutorialIfActive(): void {
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.exit();
+  }
+}

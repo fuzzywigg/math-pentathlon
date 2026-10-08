@@ -36,11 +36,22 @@ let aiDifficulty: AIDifficulty = 'medium';
 let skipNotice: string | null = null;
 /** Invalidates nested AI setTimeouts after route leave / new game. */
 let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 
 /** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
 function scheduleAI(fn: () => void, delayMs: number): void {
+  clearAiTimer();
   const gen = aiGeneration;
-  setTimeout(() => {
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
     if (gen !== aiGeneration) return;
     fn();
   }, delayMs);
@@ -286,5 +297,6 @@ export function isTutorialActive(): boolean {
 /** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   gameContainer = null;
 }

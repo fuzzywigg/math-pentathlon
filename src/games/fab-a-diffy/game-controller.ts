@@ -58,6 +58,15 @@ let activeContainer: HTMLElement | null = null;
  * Bumped when scheduling AI think and on newGame.
  */
 let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
 
 function isComputerSeat(controller: FabGameController): boolean {
   return (
@@ -253,7 +262,9 @@ function updateUI(controller: FabGameController): void {
   // AI turn — generation token cancels stacked timeouts from remounts
   if (isComputerSeat(controller)) {
     const gen = ++aiGeneration;
-    setTimeout(() => {
+    clearAiTimer();
+    aiTimer = setTimeout(() => {
+      aiTimer = null;
       if (gen !== aiGeneration) return;
       makeAIMove(controller, gen);
     }, 800);
@@ -375,6 +386,7 @@ export function newGameVsAI(
 /** Cancel in-flight AI worker work and drop the active mount. */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   disposeFabAiWorker();
   activeContainer = null;
 }

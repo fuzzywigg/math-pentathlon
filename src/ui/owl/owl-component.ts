@@ -34,6 +34,8 @@ export class OwlComponent {
   private velocityX = 0;
   private velocityY = 0;
   private coastRaf: number | null = null;
+  /** Click bounce animation timer — cleared on destroy. */
+  private clickAnimTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Initialize the Owl UI
   init(): void {
@@ -524,7 +526,11 @@ export class OwlComponent {
     if (prefersReducedMotion()) return;
 
     this.container.classList.add('owl-clicked');
-    setTimeout(() => {
+    if (this.clickAnimTimer !== null) {
+      clearTimeout(this.clickAnimTimer);
+    }
+    this.clickAnimTimer = setTimeout(() => {
+      this.clickAnimTimer = null;
       this.container?.classList.remove('owl-clicked');
     }, 500);
   }
@@ -556,6 +562,11 @@ export class OwlComponent {
   // Clean up
   destroy(): void {
     this.stopCoast();
+
+    if (this.clickAnimTimer !== null) {
+      clearTimeout(this.clickAnimTimer);
+      this.clickAnimTimer = null;
+    }
 
     if (this.unsubscribe) {
       this.unsubscribe();
