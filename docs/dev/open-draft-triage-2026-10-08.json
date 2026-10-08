@@ -4,9 +4,9 @@
   "tip_branch": "cursor/integration-fold-wave5-tip-4af0",
   "tip_sha": "5f5712366d20680ba7e62ae731e3681ef81609cc",
   "tip_sha_short": "5f5712366d20",
-  "open_pr_count": 121,
+  "open_pr_count": 122,
   "classification_counts": {
-    "fold_worthy": 23,
+    "fold_worthy": 24,
     "already_contained": 80,
     "needs_owner_decision": 4,
     "hard_rule_violation": 9,
@@ -159,31 +159,36 @@
     },
     {
       "order": 18,
+      "number": 546,
+      "title": "fix(types): Batch-2 type-ratchet compliant recut \u2014 supersedes #537 (burn-1008)"
+    },
+    {
+      "order": 19,
       "number": 538,
       "title": "docs(dev): burn-1008 compliance review of open tip drafts"
     },
     {
-      "order": 19,
+      "order": 20,
       "number": 543,
       "title": "docs(dev): burn-1008 compliance review 2 of tip drafts #539\u2013#542"
     },
     {
-      "order": 20,
+      "order": 21,
       "number": 542,
       "title": "docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal)"
     },
     {
-      "order": 21,
+      "order": 22,
       "number": 545,
       "title": "docs(dev): open draft PR triage for Oct 9 merge window (burn-1008)"
     },
     {
-      "order": 22,
+      "order": 23,
       "number": 536,
       "title": "chore: dead-code inventory report (burn-1008) \u2014 fold last"
     },
     {
-      "order": 23,
+      "order": 24,
       "number": 541,
       "title": "chore: execute safe dead-code removals (burn-1008) \u2014 FOLD LAST"
     }
@@ -3424,7 +3429,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 22,
+      "suggested_fold_order": 23,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3449,7 +3454,7 @@
       "category": "hard_rule_violation",
       "category_code": "e",
       "recommended_action": "close",
-      "evidence": "edits rules.ts apply/legality paths with ?? fallbacks/silent no-ops; compliance #538 violation",
+      "evidence": "edits rules.ts apply/legality paths with ?? fallbacks/silent no-ops; compliance #538 violation; superseded for folding by compliant recut #546",
       "owner_question": null,
       "violated_rule": "Hard rule: No legal-move generation / outcome / scoring path changes without owner exemption",
       "superseded_by": null,
@@ -3482,7 +3487,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 18,
+      "suggested_fold_order": 19,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3569,7 +3574,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 23,
+      "suggested_fold_order": 24,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 3,
@@ -3598,7 +3603,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 20,
+      "suggested_fold_order": 21,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3627,7 +3632,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 19,
+      "suggested_fold_order": 20,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3685,7 +3690,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 21,
+      "suggested_fold_order": 22,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3693,6 +3698,35 @@
         "pr_paths": 2,
         "identical_paths": 0,
         "different_paths": 2,
+        "content_ratio": 0.0,
+        "in_tip_merge_log": false,
+        "supersede_note_from_tip_log": null
+      }
+    },
+    {
+      "number": 546,
+      "title": "fix(types): Batch-2 type-ratchet compliant recut \u2014 supersedes #537 (burn-1008)",
+      "base": "cursor/integration-fold-wave5-tip-4af0",
+      "head_ref": "cursor/type-ratchet-batch2-compliant-recut-8b49",
+      "head_sha": "ba5856d6ec6f87bb38a148ed95362a3045041702",
+      "head_sha_short": "ba5856d6ec6f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/546",
+      "is_draft": true,
+      "category": "fold_worthy",
+      "category_code": "c",
+      "recommended_action": "fold",
+      "evidence": "compliant Batch-2 type-ratchet recut: rules.ts diffs are non-null assertions (!) only (no ?? / throw\u2192no-op); supersedes #537; unique vs tip",
+      "owner_question": null,
+      "violated_rule": null,
+      "superseded_by": "supersedes #537",
+      "suggested_fold_order": 18,
+      "analytics": {
+        "head_in_tip": false,
+        "cherry_unique": 1,
+        "cherry_equiv": 0,
+        "pr_paths": 21,
+        "identical_paths": 0,
+        "different_paths": 21,
         "content_ratio": 0.0,
         "in_tip_merge_log": false,
         "supersede_note_from_tip_log": null
