@@ -52,3 +52,7 @@
 ## Next action
 
 **Next action: fold into tip by the tip owner**
+
+## Tip fold note (`#477`)
+
+Dropped `#419` always-on `.island-r-hint` `R=` overlays on fold (new visible text strings). Listed for Andrew under tip PR behavior/decisions. Kept hex-a-gone bank a11y, lazy division preview mount, and characterization tests.
