@@ -473,8 +473,12 @@ function renderShapePreview(
 
   const canvas = document.createElement('canvas');
   const dpr = configureCanvas2dBackingStore(canvas, width, height);
-  const ctx = canvas.getContext('2d')!;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const ctx = canvas.getContext('2d');
+  // Test doubles often stub getContext without setTransform — skip scale then.
+  if (ctx && typeof ctx.setTransform === 'function') {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  if (!ctx) return canvas;
 
   for (const cell of cells) {
     const x = (cell.col - minCol) * cellSize + 2;
