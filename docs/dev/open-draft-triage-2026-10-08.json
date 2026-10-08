@@ -4,20 +4,20 @@
   "tip_branch": "cursor/integration-fold-wave5-tip-4af0",
   "tip_sha": "7b99c2bbd63b4634a5fef9703c9aa76b6d61c343",
   "tip_sha_short": "7b99c2bbd63b",
-  "open_pr_count": 120,
+  "open_pr_count": 121,
   "classification_counts": {
-    "fold_worthy": 22,
+    "fold_worthy": 23,
     "already_contained": 80,
     "needs_owner_decision": 4,
     "hard_rule_violation": 9,
     "superseded": 5
   },
   "method": [
-    "gh pr list --state open (120 drafts at generation time)",
+    "gh pr list --state open (121 drafts including this triage PR #545)",
     "local tip 7b99c2bbd63b after git fetch origin cursor/integration-fold-wave5-tip-4af0",
     "per-PR: git cherry tip head; blob identity tip:path vs head:path; tip merge-log #N / supersede notes",
     "hard-rule signals from PR diffs + compliance reviews #538/#543 cross-check",
-    "fold order aligned with rehearsal #542; #540 replaces #535; #505 folded on tip 7b99c2bb; #511 kept foldable; includes #544 Batch-3 UI ratchet"
+    "fold order aligned with rehearsal #542; includes #544/#545 report/type drafts"
   ],
   "spot_checks_contained": [
     {
@@ -174,11 +174,16 @@
     },
     {
       "order": 21,
+      "number": 545,
+      "title": "docs(dev): open draft PR triage for Oct 9 merge window (burn-1008)"
+    },
+    {
+      "order": 22,
       "number": 536,
       "title": "chore: dead-code inventory report (burn-1008) \u2014 fold last"
     },
     {
-      "order": 22,
+      "order": 23,
       "number": 541,
       "title": "chore: execute safe dead-code removals (burn-1008) \u2014 FOLD LAST"
     }
@@ -3419,7 +3424,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 21,
+      "suggested_fold_order": 22,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3564,7 +3569,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 22,
+      "suggested_fold_order": 23,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 3,
@@ -3659,6 +3664,35 @@
         "pr_paths": 16,
         "identical_paths": 0,
         "different_paths": 16,
+        "content_ratio": 0.0,
+        "in_tip_merge_log": false,
+        "supersede_note_from_tip_log": null
+      }
+    },
+    {
+      "number": 545,
+      "title": "docs(dev): open draft PR triage for Oct 9 merge window (burn-1008)",
+      "base": "cursor/integration-fold-wave5-tip-4af0",
+      "head_ref": "cursor/open-draft-triage-1706",
+      "head_sha": "74eab34da76f8cb70b2824d13005d2474b469311",
+      "head_sha_short": "74eab34da76f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/545",
+      "is_draft": true,
+      "category": "fold_worthy",
+      "category_code": "c",
+      "recommended_action": "fold",
+      "evidence": "this triage deliverable (burn-1008-mp-open-draft-triage); report-only docs/dev/open-draft-triage-2026-10-08.{md,json}; absent on tip",
+      "owner_question": null,
+      "violated_rule": null,
+      "superseded_by": null,
+      "suggested_fold_order": 21,
+      "analytics": {
+        "head_in_tip": false,
+        "cherry_unique": 1,
+        "cherry_equiv": 0,
+        "pr_paths": 2,
+        "identical_paths": 0,
+        "different_paths": 2,
         "content_ratio": 0.0,
         "in_tip_merge_log": false,
         "supersede_note_from_tip_log": null
