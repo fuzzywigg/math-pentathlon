@@ -1,12 +1,17 @@
 // Contig 60 Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import type { ContigState, Player, ContigWinner } from './types';
-import { createInitialState, getValidPlacements } from './types';
+import type {
+  ContigState,
+  Player,
+  ContigWinner} from './types';
+import {
+  createInitialState,
+  getValidPlacements,
+} from './types';
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
-  syncContigBoard,
   renderDice,
   renderExpressionSelector,
   injectContigStyles,
@@ -16,20 +21,17 @@ import type { AIDifficulty } from './ai';
 import { getAIPlacement } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { contig60Tutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import {
-  clearNullableTimeout,
-  scheduleGenerationGated,
-} from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
-import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(vsAI ? 'human-vs-ai' : 'human-vs-human');
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -42,41 +44,9 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
-/** Bumped on init / New Game so pending AI setTimeouts cannot mutate a fresh match. */
-let aiGeneration = 0;
-/** Single pending AI timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
-
-/** Pause before the computer rolls (keeps “thinking…” readable without dragging turns). */
-const AI_ROLL_DELAY_MS = 350;
-/** Pause after the computer rolls before placing / passing. */
-const AI_PLACE_DELAY_MS = 450;
 
 function isComputerTurn(): boolean {
   return vsAI && gameState.currentPlayer === aiPlayer;
-}
-
-function bumpAIGeneration(): void {
-  aiGeneration += 1;
-}
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-/** Schedule AI work; no-ops if New Game / mode change invalidated the generation. */
-function scheduleAI(fn: () => void, delayMs: number): void {
-  scheduleGenerationGated(
-    {
-      clearTimer: clearAiTimer,
-      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
-        aiTimer = t;
-      },
-      getGeneration: () => aiGeneration,
-    },
-    fn,
-    delayMs
-  );
 }
 
 // =============================================================================
@@ -87,32 +57,21 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
+  boardContainer.innerHTML = '';
   const humanCanAct = !isComputerTurn();
-
-  let board = boardContainer.querySelector(
-    '.contig-board'
-  ) as HTMLElement | null;
-
-  // Rebuild chrome around a persistent board grid.
-  for (const child of Array.from(boardContainer.children)) {
-    if (!child.classList.contains('contig-board')) child.remove();
-  }
 
   // Render scores
   const scoresDiv = document.createElement('div');
   scoresDiv.className = 'contig-scores';
-  replaceWithSafeHtml(
-    scoresDiv,
-    safeHtml`
+  scoresDiv.innerHTML = `
     <div class="contig-score contig-score-p1">
       ${seatIcon('player1')} Blue: <strong>${gameState.scores.player1}</strong> pts
     </div>
     <div class="contig-score contig-score-p2">
       ${seatIcon('player2')} Red: <strong>${gameState.scores.player2}</strong> pts
     </div>
-    `
-  );
-  boardContainer.insertBefore(scoresDiv, board);
+  `;
+  boardContainer.appendChild(scoresDiv);
 
   // Render dice area
   const diceArea = renderDice(
@@ -120,19 +79,7 @@ function updateUI(): void {
     handleRollDice,
     gameState.phase === 'rolling' && humanCanAct
   );
-  boardContainer.insertBefore(diceArea, board);
-
-  // Board before expression list so green targets stay above the fold on tablets
-  if (!board) {
-    board = renderBoard(gameState, handleCellClick, {
-      allowInput: humanCanAct,
-    });
-    boardContainer.appendChild(board);
-  } else {
-    syncContigBoard(board, gameState, handleCellClick, {
-      allowInput: humanCanAct,
-    });
-  }
+  boardContainer.appendChild(diceArea);
 
   // Expression / pass chrome only on the human seat (blocks AI soft-lock taps)
   if (
@@ -147,6 +94,12 @@ function updateUI(): void {
     );
     boardContainer.appendChild(exprSelector);
   }
+
+  // Render board — no placement targets while the computer thinks
+  const board = renderBoard(gameState, handleCellClick, {
+    allowInput: humanCanAct,
+  });
+  boardContainer.appendChild(board);
 
   // Update status
   updateStatus();
@@ -173,14 +126,11 @@ function updateStatus(): void {
   markStatusLive(statusContainer);
 
   if (gameState.phase === 'gameOver') {
-    replaceWithSafeHtml(
-      statusContainer,
-      safeHtml`
+    statusContainer.innerHTML = `
       <div class="contig-winner-banner game-winner-banner">
         ${formatEndBanner(gameState.winner)}
       </div>
-      `
-    );
+    `;
     return;
   }
 
@@ -198,15 +148,13 @@ function updateStatus(): void {
         break;
       case 'calculating':
         if (hasValidMoves(gameState)) {
-          instruction =
-            'Tap a green number on the board, or pick an expression below';
+          instruction = 'Choose a number to place your chip';
         } else {
-          instruction = 'No valid moves — tap Pass Turn';
+          instruction = 'No valid moves - you must pass';
         }
         break;
       case 'placing':
-        // Phase retained for typing exhaustiveness; placement resolves in calculating.
-        instruction = 'Select a green number to place your chip';
+        instruction = 'Click a valid cell to place your chip';
         break;
       default: {
         const _exhaustive: never = gameState.phase;
@@ -215,18 +163,11 @@ function updateStatus(): void {
     }
   }
 
-  replaceWithSafeHtml(
-    statusContainer,
-    safeHtml`
-    <div class="contig-status">
+  statusContainer.innerHTML = `
+    <div class="contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
-    `
-  );
-  const statusEl = statusContainer.querySelector('.contig-status');
-  if (statusEl) {
-    statusEl.className = `contig-status ${playerClass}${isComputerTurn() ? ' status-ai-thinking' : ''}`;
-  }
+  `;
 }
 
 // =============================================================================
@@ -238,10 +179,6 @@ function handleRollDice(fromAI: boolean | Event = false): void {
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
   if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
-  // Stale timers after New Game must not roll for the human seat.
-  if (fromAI === true && (!vsAI || gameState.currentPlayer !== aiPlayer)) {
-    return;
-  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
@@ -260,7 +197,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    scheduleAI(makeAIMove, AI_PLACE_DELAY_MS);
+    setTimeout(makeAIMove, 1000);
   }
 }
 
@@ -277,7 +214,7 @@ function handleSelectPlacement(value: number, expression: string): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -308,7 +245,7 @@ function handlePass(): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -317,9 +254,8 @@ function handlePass(): void {
 // =============================================================================
 
 function makeAIMove(): void {
-  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer) {
-    return;
-  }
+  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer)
+    {return;}
   if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
 
   // Use AI module to get the best placement
@@ -334,7 +270,7 @@ function makeAIMove(): void {
       gameState.phase !== 'gameOver' &&
       gameState.currentPlayer === aiPlayer
     ) {
-      scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
+      setTimeout(() => handleRollDice(true), 500);
     }
     return;
   }
@@ -344,7 +280,7 @@ function makeAIMove(): void {
 
   // Continue if AI's turn
   if (gameState.phase !== 'gameOver' && gameState.currentPlayer === aiPlayer) {
-    scheduleAI(() => handleRollDice(true), AI_ROLL_DELAY_MS);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -357,7 +293,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   statusContainer = statusEl;
 
   injectContigStyles();
-  bumpAIGeneration();
   gameState = createInitialState();
   vsAI = false;
   syncOpponentChrome();
@@ -366,7 +301,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
-  bumpAIGeneration();
   vsAI = false;
   syncOpponentChrome();
   gameState = createInitialState();
@@ -374,7 +308,6 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
-  bumpAIGeneration();
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';
@@ -408,10 +341,7 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
 export function destroyGame(): void {
-  bumpAIGeneration();
-  clearAiTimer();
-  boardContainer = null;
-  statusContainer = null;
+  // Minimal stub after alpha controller restore.
 }

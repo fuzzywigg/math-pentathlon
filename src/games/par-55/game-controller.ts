@@ -22,49 +22,20 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { par55Tutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-import {
-  clearNullableTimeout,
-  scheduleGenerationGated,
-} from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
-/** Think pause before computer places — kept under ~1s for playability. */
-const AI_THINK_DELAY_MS = 450;
-
-/** Single pending AI timer — avoids stacked setTimeouts from UI rebuilds. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
-/** Bumped on init / New Game so stale timers cannot move a fresh match. */
-let aiGeneration = 0;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAI(controller: Par55GameController, delayMs: number): void {
-  scheduleGenerationGated(
-    {
-      clearTimer: clearAiTimer,
-      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
-        aiTimer = t;
-      },
-      getGeneration: () => aiGeneration,
-    },
-    () => makeAIMove(controller),
-    delayMs
-  );
-}
-
 function syncOpponentChrome(isAI: boolean): void {
-  syncAppOpponentChrome(isAI);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
-/** True while it is the computer's seat (including the think pause). */
+/** True while it is the computer's seat (including the 800ms think pause). */
 function isComputerTurnPending(controller: Par55GameController): boolean {
   return isAITurn(
     controller.state,
@@ -100,9 +71,6 @@ export function initGame(
 ): Par55GameController {
   injectPar55Styles();
   activeContainer = container;
-  // Invalidate any prior controller's pending AI callback (New Game / remount).
-  aiGeneration += 1;
-  clearAiTimer();
 
   const controller: Par55GameController = {
     state: createInitialState(),
@@ -116,8 +84,6 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    aiGeneration += 1;
-    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -138,7 +104,7 @@ export function initGame(
 function updateUI(controller: Par55GameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
-  clearElement(container);
+  container.innerHTML = '';
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -156,27 +122,14 @@ function updateUI(controller: Par55GameController): void {
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (computerTurn) {
-    status.classList.add('status-ai-thinking');
     status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingBlock') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn — Tap a block from your hand`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
   } else if (state.phase === 'placingBlock') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} — Tap a green base to place`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place block on a green base`;
   }
 
   gameArea.appendChild(status);
-
-  // Secondary hint when Pass is the only escape.
-  if (
-    !computerTurn &&
-    state.phase === 'selectingBlock' &&
-    !hasValidMoves(state)
-  ) {
-    const hint = document.createElement('div');
-    hint.className = 'par55-turn-hint';
-    hint.textContent = 'No legal placements — tap Pass Turn';
-    gameArea.appendChild(hint);
-  }
 
   // Scores
   gameArea.appendChild(renderScores(state));
@@ -281,13 +234,13 @@ function updateUI(controller: Par55GameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn — single clearable timer (not stacked per rebuild).
+  // AI turn
   if (
     controller.isAI &&
     controller.aiPlayer === state.currentPlayer &&
     state.phase !== 'gameOver'
   ) {
-    scheduleAI(controller, AI_THINK_DELAY_MS);
+    setTimeout(() => makeAIMove(controller), 800);
   }
 }
 
@@ -325,8 +278,6 @@ function handleBaseClick(
 function makeAIMove(controller: Par55GameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  // Stale timers after New Game / seat flip must not pass or place for Blue.
-  if (!isComputerTurnPending(controller)) return;
   if (state.phase === 'gameOver' || !aiPlayer) return;
 
   // Get AI move using the AI module
@@ -390,9 +341,7 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timer and drop mounts (route change / error boundary). */
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
 export function destroyGame(): void {
-  aiGeneration += 1;
-  clearAiTimer();
-  activeContainer = null;
+  // Minimal stub after alpha controller restore.
 }

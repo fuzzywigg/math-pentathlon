@@ -1,6 +1,6 @@
 // Calla Game Controller
 
-import type { CallaGameState } from './types';
+import type { CallaGameState} from './types';
 import { createInitialState } from './types';
 import {
   makeMove,
@@ -14,11 +14,12 @@ import { callaTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import type { AIDifficulty } from './ai';
 import { getAIMove } from './ai';
-import { syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome } from '../../ui/player-colors';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(gameMode);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, gameMode);
 }
 
 // Game mode
@@ -34,26 +35,8 @@ let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let currentHint: string | null = null;
-/** Invalidates pending AI timeouts after new game / destroy. */
-let aiGeneration = 0;
-/** Single pending AI timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
-const AI_THINKING_DELAY = 600;
-/** Faster cadence for AI free-turn chains so multi-sow bursts don't feel stuck. */
-const AI_FREE_TURN_DELAY = 250;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAiTimeout(fn: () => void, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    fn();
-  }, delayMs);
-}
+const AI_THINKING_DELAY = 800;
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
@@ -64,7 +47,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
-  aiGeneration += 1;
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -77,7 +59,6 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
-  aiGeneration += 1;
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -100,36 +81,14 @@ export function getCurrentHint(): string | null {
   return currentHint;
 }
 
-/** Soft-lock recovery: empty valids mid-game → existing end collection. */
-function recoverIfNoValidMoves(): boolean {
-  if (isGameOver(gameState)) return false;
-  if (getValidPits(gameState).length > 0) return false;
-  gameState = settleNoValidMoves(gameState);
-  return true;
-}
-
 // Handle pit click
 function handlePitClick(pitIndex: number): void {
   if (isAIThinking) return;
   if (isGameOver(gameState)) return;
 
-  // Human seat with no legal pits (defensive) — settle instead of stalling.
-  if (recoverIfNoValidMoves()) {
-    render();
-    notifyCallaEndIfNeeded();
-    return;
-  }
-
   const prevPlayer = gameState.currentPlayer;
   gameState = makeMove(gameState, pitIndex);
   moveCount++;
-  // Fresh human sow clears the prior Easy teaching tip.
-  currentHint = null;
-  if (recoverIfNoValidMoves()) {
-    render();
-    notifyCallaEndIfNeeded();
-    return;
-  }
   render();
 
   notifyCallaEndIfNeeded();
@@ -151,13 +110,10 @@ function triggerAITurn(): void {
   if (isGameOver(gameState)) return;
   if (gameState.currentPlayer !== 'player2') return;
 
-  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
-  scheduleAiTimeout(() => {
-    if (gen !== aiGeneration) return;
-
+  setTimeout(() => {
     // Use the AI module to get the best move
     let aiMove = getAIMove(gameState, 'player2', aiDifficulty);
 
@@ -180,17 +136,14 @@ function triggerAITurn(): void {
 
     gameState = makeMove(gameState, aiMove.pit);
     moveCount++;
+    isAIThinking = false;
+    render();
 
     notifyCallaEndIfNeeded();
 
-    // Keep thinking chrome through free-turn chains so the board never shows
-    // "AI's turn / 0 valid pits" in the gap before the next sow.
+    // Check if AI gets another turn (free turn from landing in Calla)
     if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
-      render();
-      scheduleAiTimeout(triggerAITurn, AI_FREE_TURN_DELAY);
-    } else {
-      isAIThinking = false;
-      render();
+      setTimeout(triggerAITurn, AI_THINKING_DELAY);
     }
   }, AI_THINKING_DELAY);
 }
@@ -208,12 +161,6 @@ function notifyCallaEndIfNeeded(): void {
 
 // Render the game
 function render(): void {
-  // Defensive: never paint a live board with zero legal pits for the seat.
-  if (!isAIThinking && recoverIfNoValidMoves()) {
-    // Settled during paint — still notify owl/stats once.
-    notifyCallaEndIfNeeded();
-  }
-
   if (boardContainer) {
     const canInteract =
       !isAIThinking &&
@@ -223,19 +170,12 @@ function render(): void {
     renderBoard(
       gameState,
       boardContainer,
-      canInteract ? handlePitClick : undefined,
-      gameMode
+      canInteract ? handlePitClick : undefined
     );
   }
 
   if (statusContainer) {
-    renderStatus(
-      gameState,
-      statusContainer,
-      gameMode,
-      isAIThinking,
-      currentHint
-    );
+    renderStatus(gameState, statusContainer, gameMode, isAIThinking);
   }
 }
 
@@ -244,19 +184,10 @@ export function getGameState(): CallaGameState {
   return gameState;
 }
 
-/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
-export function destroyGame(): void {
-  aiGeneration += 1;
-  clearAiTimer();
-  isAIThinking = false;
-  boardContainer = null;
-  statusContainer = null;
-}
-
-// Reset game (preserve AI difficulty — do not silently drop Hard → Medium)
+// Reset game
 export function resetGame(): void {
   if (gameMode === 'human-vs-ai') {
-    newGameVsAI(aiDifficulty);
+    newGameVsAI();
   } else {
     newGameVsHuman();
   }
@@ -290,4 +221,9 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
+export function destroyGame(): void {
+  // Minimal stub after alpha controller restore.
 }

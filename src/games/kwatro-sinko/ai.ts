@@ -12,7 +12,8 @@
 // 4. Even numbers (player 1) can make 4: 0+6-2, 2+4-2, etc.
 // 5. Odd numbers (player 2) can make 5: 1+7-3, 3+9-7, etc.
 
-import { KwaState, Player, Chip, BoardNode, getOpponent } from './types';
+import type { KwaState, Player, Chip, BoardNode} from './types';
+import { getOpponent } from './types';
 import {
   selectChip,
   moveChip,

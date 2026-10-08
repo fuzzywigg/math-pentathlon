@@ -22,47 +22,26 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { starsBarsTutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
-/** UX think pause before the computer acts (keep under ~1s). */
-const AI_THINK_MS = 450;
-
 function syncOpponentChrome(isAI: boolean): void {
-  syncAppOpponentChrome(isAI);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
-/** True while it is the computer's seat (including the think pause). */
+/** True while it is the computer's seat (including the 800ms think pause). */
 function isComputerTurnPending(controller: StarsGameController): boolean {
   return isAITurn(
     controller.state,
     controller.aiPlayer,
     controller.isAI ? 'human-vs-ai' : 'human-vs-human'
   );
-}
-
-/**
- * Single pending AI timer — avoids stacked setTimeouts from every UI rebuild
- * and stale timers after New Game / re-init.
- */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAI(controller: StarsGameController, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    makeAIMove(controller);
-  }, delayMs);
 }
 
 // =============================================================================
@@ -92,7 +71,6 @@ export function initGame(
 ): StarsGameController {
   injectStarsStyles();
   activeContainer = container;
-  clearAiTimer();
 
   const controller: StarsGameController = {
     state: createInitialState(),
@@ -106,7 +84,6 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -127,7 +104,7 @@ export function initGame(
 function updateUI(controller: StarsGameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
-  clearElement(container);
+  container.innerHTML = '';
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -139,37 +116,30 @@ function updateUI(controller: StarsGameController): void {
   markStatusLive(status);
 
   const computerTurn = isComputerTurnPending(controller);
-  const vsAI = controller.isAI;
-  const seat = (p: Player) => getPlayerName(p, vsAI);
 
   if (state.winner) {
-    status.textContent = `${seatIcon(state.winner)} ${seat(state.winner)} wins with ${state.playerScores[state.winner]} points!`;
+    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins with ${state.playerScores[state.winner]} points!`;
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (computerTurn) {
-    status.classList.add('status-ai-thinking');
     status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingCard') {
-    status.textContent = vsAI
-      ? `${seatIcon(state.currentPlayer)} Your turn — Select a card from your hand`
-      : `${seatIcon(state.currentPlayer)} ${seat(state.currentPlayer)}'s turn — Select a card`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a card`;
   } else if (state.phase === 'placingCard') {
-    status.textContent = vsAI
-      ? `${seatIcon(state.currentPlayer)} Your turn — Tap a green cell to place`
-      : `${seatIcon(state.currentPlayer)} ${seat(state.currentPlayer)} — Place card on a green cell`;
+    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place card on a green cell`;
   }
 
   gameArea.appendChild(status);
 
   // Scores
-  gameArea.appendChild(renderScores(state, { vsAI }));
+  gameArea.appendChild(renderScores(state));
 
   // Winner banner
   if (state.phase === 'gameOver') {
     const banner = document.createElement('div');
     banner.className = 'stars-winner-banner';
     if (state.winner) {
-      banner.textContent = `${seat(state.winner)} Wins!`;
+      banner.textContent = `${getPlayerName(state.winner)} Wins!`;
     } else {
       banner.textContent = "It's a Tie!";
     }
@@ -179,7 +149,7 @@ function updateUI(controller: StarsGameController): void {
   // Main layout
   const mainLayout = document.createElement('div');
   mainLayout.className = 'stars-main-layout';
-  const inputOpts = { allowInput: !computerTurn, vsAI };
+  const inputOpts = { allowInput: !computerTurn };
 
   // Player 1 hand
   mainLayout.appendChild(
@@ -212,7 +182,7 @@ function updateUI(controller: StarsGameController): void {
 
   // Move history
   if (state.moveHistory.length > 0) {
-    mainLayout.appendChild(renderMoveHistory(state, { vsAI }));
+    mainLayout.appendChild(renderMoveHistory(state));
   }
 
   gameArea.appendChild(mainLayout);
@@ -225,7 +195,6 @@ function updateUI(controller: StarsGameController): void {
     const clearBtn = document.createElement('button');
     clearBtn.className = 'stars-btn stars-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
-    clearBtn.type = 'button';
     clearBtn.addEventListener('click', () => {
       if (isComputerTurnPending(controller)) return;
       controller.state = clearSelection(state);
@@ -236,9 +205,8 @@ function updateUI(controller: StarsGameController): void {
 
   if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
     const passBtn = document.createElement('button');
-    passBtn.className = 'stars-btn stars-btn-secondary stars-pass-btn';
+    passBtn.className = 'stars-btn stars-btn-secondary';
     passBtn.textContent = 'Pass Turn';
-    passBtn.type = 'button';
     passBtn.addEventListener('click', () => {
       if (isComputerTurnPending(controller)) return;
       controller.state = passTurn(state);
@@ -254,11 +222,13 @@ function updateUI(controller: StarsGameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn — single scheduled timer (clears prior) so rebuilds cannot stack
-  if (computerTurn) {
-    scheduleAI(controller, AI_THINK_MS);
-  } else {
-    clearAiTimer();
+  // AI turn
+  if (
+    controller.isAI &&
+    controller.aiPlayer === state.currentPlayer &&
+    state.phase !== 'gameOver'
+  ) {
+    setTimeout(() => makeAIMove(controller), 800);
   }
 }
 
@@ -298,8 +268,6 @@ function makeAIMove(controller: StarsGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.phase === 'gameOver' || !aiPlayer) return;
-  // Hard seat guard — refuse to act on the human seat (stale timer safety net)
-  if (!isComputerTurnPending(controller)) return;
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -362,8 +330,7 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timer and drop mounts (route change / error boundary). */
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
 export function destroyGame(): void {
-  clearAiTimer();
-  activeContainer = null;
+  // Minimal stub after alpha controller restore.
 }

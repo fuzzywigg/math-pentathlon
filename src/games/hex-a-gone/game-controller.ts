@@ -18,18 +18,15 @@ import { hexAGoneTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import type { AIDifficulty } from './ai';
 import { getAISelection, getAIPlacement } from './ai';
-import { syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome } from '../../ui/player-colors';
 import { isBoard3dEnabled } from '../../core/feature-flags';
-import {
-  markBoard3dWebGlFallback,
-  clearBoard3dWebGlFallback,
-} from '../../ui/three/tablet-gl';
 import { loadHexAGoneBoard3DModule } from './board-3d-loader';
 import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(gameMode);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, gameMode);
 }
 
 // Game mode
@@ -44,10 +41,6 @@ let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
-/** Invalidates nested AI setTimeouts after route leave / new game. */
-let aiGeneration = 0;
-/** Single pending AI timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 let board3d: HexAGoneBoard3D | null = null;
 let board3dEnabled = false;
@@ -55,20 +48,7 @@ let board3dLoading: Promise<void> | null = null;
 let board3dHost: HTMLElement | null = null;
 let selectionHost: HTMLElement | null = null;
 
-/** Keep multi-block AI turns under the ~3s tablet think budget (delay × places). */
-const AI_THINKING_DELAY = 350;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAiTimeout(fn: () => void, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    fn();
-  }, delayMs);
-}
+const AI_THINKING_DELAY = 800;
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -86,7 +66,6 @@ function fallBackTo2dBoard(): void {
     board3d.unmount();
     board3d = null;
   }
-  markBoard3dWebGlFallback(boardContainer ?? board3dHost, 'context-lost');
   board3dEnabled = false;
   board3dHost = null;
   selectionHost = null;
@@ -115,10 +94,8 @@ async function ensureBoard3d(): Promise<void> {
       handleCellClick,
       fallBackTo2dBoard
     );
-    clearBoard3dWebGlFallback(board3dHost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
-    markBoard3dWebGlFallback(board3dHost, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
     board3dHost = null;
@@ -149,7 +126,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
-  aiGeneration += 1;
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -162,7 +138,6 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
-  aiGeneration += 1;
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -286,15 +261,12 @@ function settleAIStuck(): void {
 
 // AI turn logic
 function triggerAITurn(): void {
-  const gen = ++aiGeneration;
   isAIThinking = true;
   render();
 
-  scheduleAiTimeout(() => {
-    if (gen !== aiGeneration) return;
+  setTimeout(() => {
     // AI selects blocks using AI module
     const aiSelectBlocks = (): void => {
-      if (gen !== aiGeneration) return;
       const selection = getAISelection(gameState, 'player2', aiDifficulty);
 
       if (!selection || selection.blocks.length === 0) {
@@ -312,12 +284,11 @@ function triggerAITurn(): void {
       render();
 
       // Place blocks after a delay
-      scheduleAiTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+      setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
     };
 
     // AI places blocks one by one using AI module
     const aiPlaceBlocks = (): void => {
-      if (gen !== aiGeneration) return;
       if (
         gameState.phase !== 'placeBlocks' ||
         !gameState.selectedBlockForPlacement
@@ -350,7 +321,7 @@ function triggerAITurn(): void {
         gameState.phase === 'placeBlocks' &&
         gameState.currentPlayer === 'player2'
       ) {
-        scheduleAiTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+        setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
       } else {
         isAIThinking = false;
         render();
@@ -390,9 +361,6 @@ function render(): void {
 }
 
 export function destroyGame(): void {
-  aiGeneration += 1;
-  clearAiTimer();
-  isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;
