@@ -337,8 +337,9 @@ describe('memory leak hygiene — dice animateRoll cancel', () => {
   });
 });
 
-describe('memory leak hygiene — stars-bars history DOM cap', () => {
-  it('renderMoveHistory only paints the last 15 moves', () => {
+describe('memory leak hygiene — stars-bars history display', () => {
+  // #501 proposed slice(-15); tip keeps full history (player-visible) until Andrew decides.
+  it('renderMoveHistory paints the full move list', () => {
     let state = createInitialState();
     const history: MoveRecord[] = [];
     for (let i = 0; i < 40; i++) {
@@ -359,7 +360,7 @@ describe('memory leak hygiene — stars-bars history DOM cap', () => {
     }
     state = { ...state, moveHistory: history };
     const el = renderMoveHistory(state);
-    expect(el.querySelectorAll('.stars-move-item').length).toBe(15);
+    expect(el.querySelectorAll('.stars-move-item').length).toBe(40);
   });
 });
 
