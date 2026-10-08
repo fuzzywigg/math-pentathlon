@@ -8,25 +8,25 @@
 
 ## Matrix
 
-| Viewport | Easy | Medium | Hard | Total |
-|----------|------|--------|------|-------|
-| Desktop Chromium 1280×800 | 10 | 10 | 10 | 30 |
-| Tablet Chromium 768×1024 (touch + coarse pointer) | 10 | 10 | 10 | 30 |
-| **All** | **20** | **20** | **20** | **60** |
+| Viewport                                          | Easy   | Medium | Hard   | Total  |
+| ------------------------------------------------- | ------ | ------ | ------ | ------ |
+| Desktop Chromium 1280×800                         | 10     | 10     | 10     | 30     |
+| Tablet Chromium 768×1024 (touch + coarse pointer) | 10     | 10     | 10     | 30     |
+| **All**                                           | **20** | **20** | **20** | **60** |
 
 Human seat played greedy longest-chain; AI seat used Easy / Medium / Hard.
 
 ## Outcomes
 
-| Metric | Result |
-|--------|--------|
-| Games completed to a terminal banner | **60 / 60** |
-| Soft-locks / stalls | **0** |
-| Console / page errors | **0** games |
-| Confusing Blue/Red turn copy (HvA) | **0** |
-| Interactive controls under 44×44 | **0** |
-| Mean wall time / game | **~2.5 s** (AI draw 400ms + select 350ms) |
-| Human wins / AI wins / draws | **47 / 13 / 0** |
+| Metric                               | Result                                    |
+| ------------------------------------ | ----------------------------------------- |
+| Games completed to a terminal banner | **60 / 60**                               |
+| Soft-locks / stalls                  | **0**                                     |
+| Console / page errors                | **0** games                               |
+| Confusing Blue/Red turn copy (HvA)   | **0**                                     |
+| Interactive controls under 44×44     | **0**                                     |
+| Mean wall time / game                | **~2.5 s** (AI draw 400ms + select 350ms) |
+| Human wins / AI wins / draws         | **47 / 13 / 0**                           |
 
 ### By cell
 
@@ -40,7 +40,7 @@ All six cells completed 10/10 with zero findings:
 1. **AI timer races** — Nested `setTimeout` draw→select was not cancelled on New Game / destroy. Controllers for Prime Gold / Pent’Em In already cleared timers; Star Track now clears both timers, bumps a generation token, and no-ops stale callbacks (`game-controller.ts`).
 2. **AI select soft-lock guard** — If `getAIChainChoice` returns null while Red is on `selectChain` with drawn chains, auto-select index `0` so the seat cannot strand.
 3. **Slow AI pauses** — Per-phase delays cut from 600+600ms (**1200ms**) to **400+350ms** (**750ms**) while keeping visible “Computer is thinking…” chrome.
-4. **Confusing turn copy** — HvA status mapped Blue/Red → Your/Computer via `formatPhaseStatusMessage`; winner line uses **You Win!** (not “You Wins!”); board banner uses You/AI in HvA.
+4. **Confusing turn copy** — HvA status mapped Blue/Red → Your/Computer via `formatPhaseStatusMessage` (helper later removed by Friday AI/copy restore; see `docs/dev/post-restore-orphans.md`); winner line uses **You Win!** (not “You Wins!”); board banner uses You/AI in HvA.
 5. **Touch targets** — Narrow layout had `.star-track-chain-btn { min-width: 0 }`, which could shrink below 44px; now **min-width: 44px** (with existing coarse-pointer rules).
 
 ## Screenshots
@@ -79,11 +79,11 @@ Status shows **Computer is thinking…**; draw/chain chrome is disabled and non-
 
 Measured live during playtest (bounding boxes):
 
-| Viewport | Control | Size | ≥44×44 |
-|----------|---------|------|--------|
-| Desktop | Chain buttons (select) | ~106×102, ~210×102 | yes |
-| Desktop | Draw (AI thinking, disabled) | ~218×55 | yes |
-| Tablet (coarse) | Chain buttons | ~132–210×102 | yes |
+| Viewport        | Control                      | Size               | ≥44×44 |
+| --------------- | ---------------------------- | ------------------ | ------ |
+| Desktop         | Chain buttons (select)       | ~106×102, ~210×102 | yes    |
+| Desktop         | Draw (AI thinking, disabled) | ~218×55            | yes    |
+| Tablet (coarse) | Chain buttons                | ~132–210×102       | yes    |
 
 ## Rules / scoring notes (not changed)
 
