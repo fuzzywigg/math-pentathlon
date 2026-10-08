@@ -140,7 +140,9 @@ test.describe('Keyboard a11y reachability', () => {
     await expect(cell).toBeFocused();
     await page.keyboard.press('Enter');
 
-    await expect(page.locator('.pg-status, [role="status"]').first()).toContainText(
+    // Prefer .pg-status — `#status` is an empty shell live region that also
+    // matches `[role="status"]` and would make `.first()` assert on "".
+    await expect(page.locator('.pg-status').first()).toContainText(
       /turn|Roll|Select/i,
       { timeout: 8_000 }
     );

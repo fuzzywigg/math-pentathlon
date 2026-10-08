@@ -155,11 +155,7 @@ export function renderBoard(
   return container;
 }
 
-/**
- * Update placement preview classes in place (no board rebuild).
- * Hover must not tear down the DOM under the pointer — that stalls input
- * and recreates 2×9×9 cells + listeners on every mouseenter.
- */
+/** Update placement preview classes in place (no board rebuild on hover). */
 export function patchHoverPreview(
   root: HTMLElement,
   player: 'player1' | 'player2',
@@ -167,36 +163,26 @@ export function patchHoverPreview(
   state: JuggleState,
   options: JuggleBoardRenderOptions = {}
 ): void {
-  const allowInput = options.allowInput !== false;
-  const boardEl = root.querySelector(`.juggle-board.${player}`);
-  if (!boardEl) return;
-  const grid = boardEl.querySelector('.juggle-grid');
+  const grid = root.querySelector(`.juggle-board.${player} .juggle-grid`);
   if (!grid) return;
-
-  const stats = ((
-    globalThis as unknown as {
-      __mpRenderStats?: Record<string, number>;
-    }
-  ).__mpRenderStats ??= {});
-  stats.juggleHoverPatch = (stats.juggleHoverPatch ?? 0) + 1;
-
-  const cells = grid.querySelectorAll('.juggle-cell');
-  for (const cell of cells) {
-    cell.classList.remove('preview-valid', 'preview-invalid');
+  grid
+    .querySelectorAll('.preview-valid, .preview-invalid')
+    .forEach((c) => c.classList.remove('preview-valid', 'preview-invalid'));
+  if (
+    options.allowInput === false ||
+    !isCurrentPlayer ||
+    state.phase !== 'placing' ||
+    !state.hoverPosition
+  ) {
+    return;
   }
-
-  const showPreview = allowInput && isCurrentPlayer && state.phase === 'placing';
-  if (!showPreview || !state.hoverPosition) return;
-
-  const previewCells = getPreviewCells(state, state.hoverPosition);
-  const isPreviewValid = isPlacementValid(state, state.hoverPosition);
-  for (const c of previewCells) {
+  const valid = isPlacementValid(state, state.hoverPosition);
+  const cls = valid ? 'preview-valid' : 'preview-invalid';
+  for (const c of getPreviewCells(state, state.hoverPosition)) {
     const cell = grid.querySelector(
-      `.juggle-cell[data-row="${c.row}"][data-col="${c.col}"]`
+      `.juggle-cell[data-row="${c.row}"][data-col="${c.col}"]:not(.occupied-${player})`
     );
-    if (!cell) continue;
-    if (cell.classList.contains(`occupied-${player}`)) continue;
-    cell.classList.add(isPreviewValid ? 'preview-valid' : 'preview-invalid');
+    cell?.classList.add(cls);
   }
 }
 

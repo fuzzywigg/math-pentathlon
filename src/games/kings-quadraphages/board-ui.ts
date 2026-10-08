@@ -364,14 +364,7 @@ export function renderBoard(
   boardEl.className = 'board kings-board';
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  // Cache cell list on the board element so each render skips querySelectorAll.
-  let cells = (boardEl as HTMLElement & { __kingsCells?: HTMLElement[] })
-    .__kingsCells;
-  if (!cells || cells.length !== KINGS_BOARD_SIZE * KINGS_BOARD_SIZE) {
-    cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
-    (boardEl as HTMLElement & { __kingsCells?: HTMLElement[] }).__kingsCells =
-      cells;
-  }
+  const cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {

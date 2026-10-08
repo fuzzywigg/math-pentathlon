@@ -287,42 +287,24 @@ function handleCellClick(row: number, col: number, player: Player): void {
   }
 }
 
-function patchHoverOnly(): void {
-  if (!boardContainer) return;
-  const inputOpts = { allowInput: !isComputerTurnPending() };
-  patchHoverPreview(
-    boardContainer,
-    'player1',
-    gameState.currentPlayer === 'player1',
-    gameState,
-    inputOpts
-  );
-  patchHoverPreview(
-    boardContainer,
-    'player2',
-    gameState.currentPlayer === 'player2',
-    gameState,
-    inputOpts
-  );
-}
-
 function handleCellHover(row: number, col: number): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'placing') return;
-
+  if (isComputerTurnPending() || gameState.phase !== 'placing') return;
   const prev = gameState.hoverPosition;
   if (prev && prev.row === row && prev.col === col) return;
-
   gameState = { ...gameState, hoverPosition: { row, col } };
-  // Preview-only: do not rebuild dice/controls/boards under the pointer.
-  patchHoverOnly();
+  if (!boardContainer) return;
+  const opts = { allowInput: true };
+  patchHoverPreview(boardContainer, 'player1', gameState.currentPlayer === 'player1', gameState, opts);
+  patchHoverPreview(boardContainer, 'player2', gameState.currentPlayer === 'player2', gameState, opts);
 }
 
 function handleCellLeave(): void {
-  if (isComputerTurnPending()) return;
-  if (!gameState.hoverPosition) return;
+  if (isComputerTurnPending() || !gameState.hoverPosition) return;
   gameState = { ...gameState, hoverPosition: null };
-  patchHoverOnly();
+  if (!boardContainer) return;
+  const opts = { allowInput: true };
+  patchHoverPreview(boardContainer, 'player1', gameState.currentPlayer === 'player1', gameState, opts);
+  patchHoverPreview(boardContainer, 'player2', gameState.currentPlayer === 'player2', gameState, opts);
 }
 
 // =============================================================================

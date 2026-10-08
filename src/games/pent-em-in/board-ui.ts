@@ -45,6 +45,68 @@ export interface PentEmInBoardRenderOptions {
   allowInput?: boolean;
 }
 
+function buildPreviewGroup(
+  state: PentEmInState,
+  allowInput: boolean
+): SVGGElement | null {
+  if (!allowInput || !state.selectedPiece || !state.previewPosition) return null;
+  const previewCells = getPieceCells(
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+  const isValid = canPlacePiece(
+    state,
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+  const previewGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
+  previewGroup.classList.add('preview');
+  const fill = isValid ? playerColors()[state.currentPlayer] : '#ff5252';
+  for (const cell of previewCells) {
+    if (
+      cell.row < 0 ||
+      cell.row >= BOARD_SIZE ||
+      cell.col < 0 ||
+      cell.col >= BOARD_SIZE
+    ) {
+      continue;
+    }
+    const rect = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'rect'
+    );
+    rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
+    rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
+    rect.setAttribute('width', String(CELL_SIZE - 2));
+    rect.setAttribute('height', String(CELL_SIZE - 2));
+    rect.setAttribute('fill', fill);
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('opacity', '0.5');
+    previewGroup.appendChild(rect);
+  }
+  return previewGroup;
+}
+
+export function patchBoardPreview(
+  svg: SVGElement,
+  state: PentEmInState,
+  options: PentEmInBoardRenderOptions = {}
+): void {
+  svg.querySelector('g.preview')?.remove();
+  const g = buildPreviewGroup(state, options.allowInput !== false);
+  if (!g) return;
+  const layer = svg.querySelector('g.interaction');
+  if (layer) svg.insertBefore(g, layer);
+  else svg.appendChild(g);
+}
+
 export function renderBoard(
   state: PentEmInState,
   onCellClick: (cell: Cell) => void,
@@ -187,56 +249,8 @@ export function renderBoard(
   }
 
   // Preview (if placing) — suppress during computer seat
-  if (allowInput && state.selectedPiece && state.previewPosition) {
-    const previewCells = getPieceCells(
-      state.selectedPiece,
-      state.previewPosition,
-      state.selectedRotation,
-      state.selectedFlipped
-    );
-
-    const isValid = canPlacePiece(
-      state,
-      state.selectedPiece,
-      state.previewPosition,
-      state.selectedRotation,
-      state.selectedFlipped
-    );
-
-    const previewGroup = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'g'
-    );
-    previewGroup.classList.add('preview');
-
-    for (const cell of previewCells) {
-      if (
-        cell.row < 0 ||
-        cell.row >= BOARD_SIZE ||
-        cell.col < 0 ||
-        cell.col >= BOARD_SIZE
-      ) {
-        continue;
-      }
-
-      const rect = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'rect'
-      );
-      rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
-      rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
-      rect.setAttribute('width', String(CELL_SIZE - 2));
-      rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute(
-        'fill',
-        isValid ? playerColors()[state.currentPlayer] : '#ff5252'
-      );
-      rect.setAttribute('rx', '3');
-      rect.setAttribute('opacity', '0.5');
-      previewGroup.appendChild(rect);
-    }
-    svg.appendChild(previewGroup);
-  }
+  const previewGroup = buildPreviewGroup(state, allowInput);
+  if (previewGroup) svg.appendChild(previewGroup);
 
   // Click/hover areas
   const interactionGroup = document.createElementNS(
@@ -304,83 +318,6 @@ export function renderBoard(
   applyRovingTabindex(collectGridCells(svg));
 
   return svg;
-}
-
-/**
- * Replace only the ghost preview `<g class="preview">` on an existing board SVG.
- * Hover must not tear down the full 10×10 interaction layer (listeners + focus).
- */
-export function patchBoardPreview(
-  svg: SVGElement,
-  state: PentEmInState,
-  options: PentEmInBoardRenderOptions = {}
-): void {
-  const allowInput = options.allowInput !== false;
-  const stats = ((
-    globalThis as unknown as {
-      __mpRenderStats?: Record<string, number>;
-    }
-  ).__mpRenderStats ??= {});
-  stats.pentPreviewPatch = (stats.pentPreviewPatch ?? 0) + 1;
-
-  svg.querySelector('g.preview')?.remove();
-
-  if (!allowInput || !state.selectedPiece || !state.previewPosition) return;
-
-  const previewCells = getPieceCells(
-    state.selectedPiece,
-    state.previewPosition,
-    state.selectedRotation,
-    state.selectedFlipped
-  );
-
-  const isValid = canPlacePiece(
-    state,
-    state.selectedPiece,
-    state.previewPosition,
-    state.selectedRotation,
-    state.selectedFlipped
-  );
-
-  const previewGroup = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'g'
-  );
-  previewGroup.classList.add('preview');
-
-  for (const cell of previewCells) {
-    if (
-      cell.row < 0 ||
-      cell.row >= BOARD_SIZE ||
-      cell.col < 0 ||
-      cell.col >= BOARD_SIZE
-    ) {
-      continue;
-    }
-
-    const rect = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'rect'
-    );
-    rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
-    rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
-    rect.setAttribute('width', String(CELL_SIZE - 2));
-    rect.setAttribute('height', String(CELL_SIZE - 2));
-    rect.setAttribute(
-      'fill',
-      isValid ? playerColors()[state.currentPlayer] : '#ff5252'
-    );
-    rect.setAttribute('rx', '3');
-    rect.setAttribute('opacity', '0.5');
-    previewGroup.appendChild(rect);
-  }
-
-  const interaction = svg.querySelector('g.interaction');
-  if (interaction) {
-    svg.insertBefore(previewGroup, interaction);
-  } else {
-    svg.appendChild(previewGroup);
-  }
 }
 
 // =============================================================================

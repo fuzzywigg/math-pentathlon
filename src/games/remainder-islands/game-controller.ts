@@ -5,7 +5,6 @@ import { RemainderIslandsState, createInitialState } from './types';
 import { performRoll, selectIsland, setSelectedIsland } from './rules';
 import {
   renderBoard,
-  syncBoard,
   renderDice,
   renderScores,
   renderDivisionPreview,
@@ -76,103 +75,21 @@ function patchDivisionPreview(): void {
 function render(): void {
   if (!gameContainer) return;
 
+  gameContainer.innerHTML = '';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'remainder-game-container';
   const computerTurn = isComputerTurn();
-  const existingWrapper = gameContainer.querySelector(
-    '.remainder-game-container'
-  ) as HTMLElement | null;
-  const existingBoard = existingWrapper?.querySelector(
-    'svg.remainder-board'
-  ) as SVGElement | null;
-  const wasGameOver = !!existingWrapper?.querySelector('.remainder-game-over');
-  const canReuseBoard =
-    !!existingWrapper &&
-    !!existingBoard &&
-    !wasGameOver &&
-    gameState.phase !== 'gameOver';
 
-  const stats = ((
-    globalThis as unknown as {
-      __mpRenderStats?: Record<string, number>;
-    }
-  ).__mpRenderStats ??= {});
+  // Scores
+  wrapper.appendChild(renderScores(gameState));
 
-  if (!canReuseBoard) {
-    stats.remainderFull = (stats.remainderFull ?? 0) + 1;
-    gameContainer.innerHTML = '';
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'remainder-game-container';
-
-    wrapper.appendChild(renderScores(gameState));
-
-    if (gameState.phase === 'gameOver') {
-      wrapper.appendChild(renderGameOver(gameState));
-    } else {
-      const status = document.createElement('div');
-      status.className = `remainder-status ${gameState.currentPlayer}`;
-      if (skipNotice) {
-        status.textContent = skipNotice;
-      } else if (computerTurn) {
-        status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn (computer)`;
-      } else {
-        status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
-      }
-      markStatusLive(status);
-      wrapper.appendChild(status);
-
-      wrapper.appendChild(renderDice(gameState.currentRoll));
-
-      const controls = document.createElement('div');
-      controls.className = 'remainder-controls';
-
-      if (gameState.phase === 'rolling') {
-        if (computerTurn) {
-          const wait = document.createElement('div');
-          wait.className = 'remainder-instruction';
-          wait.textContent = 'Computer is thinking…';
-          controls.appendChild(wait);
-        } else {
-          const rollBtn = document.createElement('button');
-          rollBtn.className = 'remainder-btn remainder-btn-roll';
-          rollBtn.textContent = '🎲 Roll Dice';
-          rollBtn.addEventListener('click', handleRoll);
-          controls.appendChild(rollBtn);
-        }
-      } else if (gameState.phase === 'selectIsland') {
-        const instruction = document.createElement('div');
-        instruction.className = 'remainder-instruction';
-        instruction.textContent = computerTurn
-          ? 'Computer is choosing an island'
-          : 'Select an island to land on';
-        controls.appendChild(instruction);
-        wrapper.appendChild(renderDivisionPreview(gameState));
-      }
-
-      wrapper.appendChild(controls);
-      wrapper.appendChild(
-        renderBoard(
-          gameState,
-          handleIslandClick,
-          handleIslandHover,
-          !computerTurn
-        )
-      );
-    }
-
-    gameContainer.appendChild(wrapper);
+  // Game over or active game
+  if (gameState.phase === 'gameOver') {
+    wrapper.appendChild(renderGameOver(gameState));
   } else {
-    stats.remainderSync = (stats.remainderSync ?? 0) + 1;
-    // Reuse board SVG; refresh chrome around it (scores / status / dice / controls).
-    const wrapper = existingWrapper!;
-    const board = existingBoard!;
-
-    wrapper.querySelector('.remainder-scores')?.replaceWith(renderScores(gameState));
-
-    let status = wrapper.querySelector('.remainder-status') as HTMLElement | null;
-    if (!status) {
-      status = document.createElement('div');
-      wrapper.insertBefore(status, wrapper.querySelector('.remainder-dice'));
-    }
+    // Current player status
+    const status = document.createElement('div');
     status.className = `remainder-status ${gameState.currentPlayer}`;
     if (skipNotice) {
       status.textContent = skipNotice;
@@ -182,14 +99,15 @@ function render(): void {
       status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn`;
     }
     markStatusLive(status);
+    wrapper.appendChild(status);
 
-    wrapper
-      .querySelector('.remainder-dice')
-      ?.replaceWith(renderDice(gameState.currentRoll));
+    // Dice
+    wrapper.appendChild(renderDice(gameState.currentRoll));
 
-    wrapper.querySelector('.remainder-preview')?.remove();
+    // Roll button or selection instruction
     const controls = document.createElement('div');
     controls.className = 'remainder-controls';
+
     if (gameState.phase === 'rolling') {
       if (computerTurn) {
         const wait = document.createElement('div');
@@ -210,19 +128,25 @@ function render(): void {
         ? 'Computer is choosing an island'
         : 'Select an island to land on';
       controls.appendChild(instruction);
-      const preview = renderDivisionPreview(gameState);
-      board.before(preview);
-    }
-    wrapper.querySelector('.remainder-controls')?.replaceWith(controls);
 
-    syncBoard(
-      board,
-      gameState,
-      handleIslandClick,
-      handleIslandHover,
-      !computerTurn
+      // Division preview
+      wrapper.appendChild(renderDivisionPreview(gameState));
+    }
+
+    wrapper.appendChild(controls);
+
+    // Board
+    wrapper.appendChild(
+      renderBoard(
+        gameState,
+        handleIslandClick,
+        handleIslandHover,
+        !computerTurn
+      )
     );
   }
+
+  gameContainer.appendChild(wrapper);
 
   // AI turn
   if (computerTurn && gameState.phase !== 'gameOver') {
