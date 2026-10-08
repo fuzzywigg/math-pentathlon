@@ -45,7 +45,8 @@ export function calculatePoints(state: ContigState, value: number): number {
   const adjacent = getAdjacentPositions(cell.row, cell.col);
 
   for (const { row, col } of adjacent) {
-    const adjValue = state.grid[row][col];
+    // ratchet: getAdjacentPositions only yields in-bounds dense-grid coords.
+    const adjValue = state.grid[row]![col]!;
     if (adjValue !== null) {
       const adjCell = state.cells.get(adjValue);
       if (adjCell?.owner !== null) {
@@ -169,7 +170,8 @@ function ownerAt(state: ContigState, row: number, col: number): Player | null {
   ) {
     return null;
   }
-  const value = state.grid[row][col];
+  // ratchet: ownerAt bounds-checks row/col against CONFIG before indexing.
+  const value = state.grid[row]![col]!;
   if (value === null) return null;
   return state.cells.get(value)?.owner ?? null;
 }

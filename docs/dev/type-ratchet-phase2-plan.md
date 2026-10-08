@@ -4,9 +4,9 @@
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
 **Task (Batch 2 compliant recut):** `burn-1008-mp-type-ratchet-batch2-compliant-recut` (supersedes #537 for folding)  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batch **0** (demos + `main.ts`), Batch **1** (tiny non-AI game shells), and Batch **2** (rules-heavy / low-AI non-AI modules) cleared under ratchet flags via **type-only** assertions; Phase-2 baseline ceiling lowered **564 → 518 → 520 (post-fold) → 433**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling. Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md).  
+**Status:** Batches **0–4** + tip folds (#546/#544/#551/#553 surface) cleared non-AI UI/shell/types; Batch **6** (`#557`, after `#561`) folded emit-identical / pure `!` rules/engine (ceiling **286 → 220**); pent-em-in BoardCell EOPT rebuild held for Andrew. True eligible floor: AI modules + held rebuild. Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md). Batch notes: [`type-ratchet-batch5.md`](./type-ratchet-batch5.md), [`type-ratchet-batch6.md`](./type-ratchet-batch6.md).
 **Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).  
-**Next batch:** Batch **3** — medium games non-AI remainder (juggle, pent-em-in, kwatro-sinko, hex, contig-60, kings-quadraphages, stars-bars).
+**Next batch:** Batch **A** — AI modules (Andrew gate; Hex Hard 450ms assert stays).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 

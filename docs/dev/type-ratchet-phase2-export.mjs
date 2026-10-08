@@ -52,6 +52,15 @@ const IN_SCOPE = new RegExp(
     '^src/games/stars-bars/board-ui\\.ts$',
     // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
     '^src/games/prime-gold/(types|board-ui)\\.ts$',
+    // Phase 2 Batch 6 — remaining non-AI rules/engine (emit-identical ! only; EOPT rebuilds held)
+    '^src/games/stars-bars/rules\\.ts$',
+    '^src/games/hex/rules\\.ts$',
+    '^src/games/prime-gold/rules\\.ts$',
+    '^src/games/kwatro-sinko/rules\\.ts$',
+    '^src/games/pent-em-in/rules\\.ts$',
+    '^src/games/contig-60/rules\\.ts$',
+    '^src/games/juggle/rules\\.ts$',
+    '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
