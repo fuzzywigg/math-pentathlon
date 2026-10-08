@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "taskId": "burn-1008-mp-module-boundaries",
+  "description": "Import-graph / module-boundary ceilings for src/. Counts from npm run check:boundaries may only decrease.",
+  "generatedAt": "2026-10-08T03:55:00.000Z",
+  "tipSha": "f6de423353f7e17549ad5fc95a607f914bc65d94",
+  "commands": {
+    "check": "npm run check:boundaries"
+  },
+  "ceilings": {
+    "cycles": 0,
+    "cycles_including_type_only": 0,
+    "engine_imports_ui": 0,
+    "engine_imports_ai": 0,
+    "cross_game_imports": 0,
+    "core_imports_games": 0,
+    "core_imports_ui": 0,
+    "ai_imports_ui": 0,
+    "engine_or_ai_dom_globals": 0,
+    "dead_barrels": 8,
+    "mixed_ui_barrels": 9
+  },
+  "notes": {
+    "dead_barrels": [
+      "src/core/alignment/index.ts",
+      "src/core/attributes/index.ts",
+      "src/core/expressions/index.ts",
+      "src/core/fractions/index.ts",
+      "src/core/graph/index.ts",
+      "src/core/hex/index.ts",
+      "src/core/polyomino/index.ts",
+      "src/games/calla/index.ts"
+    ],
+    "mixed_ui_barrels": [
+      "src/core/alignment/index.ts",
+      "src/core/attributes/index.ts",
+      "src/core/dice/index.ts",
+      "src/core/expressions/index.ts",
+      "src/core/fractions/index.ts",
+      "src/core/graph/index.ts",
+      "src/core/hex/index.ts",
+      "src/core/polyomino/index.ts",
+      "src/games/calla/index.ts"
+    ],
+    "reported_not_changed": [
+      "AI workers (fab/fiar/hex/queens) use Worker + import.meta.url — expected browser coupling; not counted as ai→ui because they do not import UI modules.",
+      "src/ui/three/star-track-board-3d.ts imports star-track/board-ui helpers (UI→game-ui); left for a dedicated UI glue pass.",
+      "Core hex package (src/core/hex/*) has zero deep importers in src/ — dead alongside its barrel; removal deferred to tip owner.",
+      "No clear behavior-free cycles in non-AI glue; value and type-only SCC counts are already 0."
+    ]
+  }
+}
