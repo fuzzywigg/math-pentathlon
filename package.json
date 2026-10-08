@@ -38,7 +38,8 @@
     "perf:runtime": "node scripts/runtime-perf.mjs",
     "audit:memory": "node scripts/memory-leak-audit.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium",
-    "check:dev-docs": "node scripts/check-dev-doc-links.mjs"
+    "check:dev-docs": "node scripts/check-dev-doc-links.mjs",
+    "check:workflows": "node scripts/check-workflows.mjs"
   },
   "keywords": [],
   "author": "",
@@ -55,6 +56,7 @@
     "axe-core": "^4.14.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
+    "js-yaml": "4.3.2",
     "jsdom": "^27.4.0",
     "prettier": "^3.9.9",
     "rollup-plugin-visualizer": "^6.0.11",

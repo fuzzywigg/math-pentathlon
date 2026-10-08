@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run lint
       - name: Lint rule ceilings (curly:all ratchet)
@@ -54,6 +55,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Security audit
         run: npm audit --audit-level=high
@@ -70,6 +72,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Build project
         run: npm run build
@@ -112,6 +115,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Run unit tests
         timeout-minutes: 12
@@ -134,6 +138,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -178,6 +183,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -230,6 +236,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -281,6 +288,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -333,6 +341,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
@@ -377,6 +386,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Cache Playwright browsers
         id: playwright-cache
