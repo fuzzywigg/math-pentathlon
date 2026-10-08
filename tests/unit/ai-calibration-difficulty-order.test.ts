@@ -27,9 +27,10 @@ const DEFAULT = { games: 8, timeout: 30_000, deadlineMs: 0 };
  * Tip AI still inverts Hard vs Easy on these seats (seeded samples).
  * #468 proposed heuristic retunes for FIAR/Pent; left for owner decision
  * (see docs/STANDALONE-TRIAGE-2026-10-07.md). fab-a-diffy also inverts under
- * the CI wall-clock budget (no #468 retune in tip). Harness still runs offline.
+ * the CI wall-clock budget (no #468 retune in tip). Optional alpha Kwatro AI
+ * restore (#416 undo) also inverts on this harness. Harness still runs offline.
  */
-const KNOWN_TIP_INVERSIONS = new Set(['fiar', 'pent-em-in', 'fab-a-diffy']);
+const KNOWN_TIP_INVERSIONS = new Set(['fiar', 'pent-em-in', 'fab-a-diffy', 'kwatro-sinko']);
 
 describe('AI calibration — Hard >= Easy win rate vs random', () => {
   for (const adapter of ALL_ADAPTERS) {
