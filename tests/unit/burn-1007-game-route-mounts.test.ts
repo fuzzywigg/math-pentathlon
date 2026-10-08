@@ -166,11 +166,11 @@ describe('burn-1007 game-route-mounts', () => {
     shell = makeShell();
 
     for (const m of Object.values(mocks)) {
-      m.initGame.mockClear();
-      m.destroyGame.mockClear();
-      m.newGameVsHuman.mockClear();
-      m.newGameVsAI.mockClear();
-      m.startTutorial.mockClear();
+      m.initGame.mockReset();
+      m.destroyGame.mockReset();
+      m.newGameVsHuman.mockReset();
+      m.newGameVsAI.mockReset();
+      m.startTutorial.mockReset();
     }
     vi.mocked(navigate).mockClear();
 
@@ -253,6 +253,29 @@ describe('burn-1007 game-route-mounts', () => {
 
     expect(mocks.hex.initGame).not.toHaveBeenCalled();
     expect(shell.cleanup).toHaveBeenCalled();
+    expect(lastCleanup).toBeNull();
+  });
+
+  it('P1: destroyGame throw still runs shell.cleanup (try/finally)', async () => {
+    const gen = nextRouteGeneration();
+    await mountGameById('hex', gen);
+    expect(lastCleanup).toBeTypeOf('function');
+    mocks.hex.destroyGame.mockImplementation(() => {
+      throw new Error('destroy failed');
+    });
+    expect(() => lastCleanup!()).toThrow(/destroy failed/);
+    expect(shell.cleanup).toHaveBeenCalled();
+    lastCleanup = null;
+  });
+
+  it('P1: initGame throw still runs shell.cleanup and clears route cleanup', async () => {
+    mocks.hex.initGame.mockImplementation(() => {
+      throw new Error('init failed');
+    });
+    const gen = nextRouteGeneration();
+    await expect(mountGameById('hex', gen)).rejects.toThrow(/init failed/);
+    expect(shell.cleanup).toHaveBeenCalled();
+    expect(mocks.hex.destroyGame).toHaveBeenCalled();
     expect(lastCleanup).toBeNull();
   });
 
