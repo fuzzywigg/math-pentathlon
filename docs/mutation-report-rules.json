@@ -1,0 +1,30 @@
+{
+  "taskId": "burn-1008-mp-mutation-audit",
+  "generatedAt": "2026-10-08T02:25:05.327Z",
+  "harness": "scripts/mutation-report.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 15,
+    "timeoutMs": 30000,
+    "games": [
+      "star-track"
+    ]
+  },
+  "results": [
+    {
+      "game": "star-track",
+      "lines": 141,
+      "tests": [
+        "tests/unit/star-track-rules.test.ts"
+      ],
+      "availableMutants": 33,
+      "ranMutants": 15,
+      "killed": 15,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
