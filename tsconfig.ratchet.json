@@ -19,11 +19,28 @@
     "tests/unit/engine-invariants-helpers.ts",
     "tests/unit/undo-audit-helpers.ts",
     "tests/unit/fiar-test-helpers.ts",
-    // Phase 2 Batch 7 — helper-test ratchet surface (NUI/EOPT; script-.mjs helpers deferred)
+    // Phase 2 Batch 7 — helper-test ratchet surface (NUI/EOPT)
     "tests/unit/burn-wave14-types-helpers.test.ts",
     "tests/unit/burn-wave35-fab-a-diffy-format-helpers.test.ts",
     "tests/unit/burn-wave35-ramrod-box-format-helpers.test.ts",
     "tests/unit/burn-wave41-fab-pass-winner-helpers.test.ts",
-    "tests/unit/overnight-dice-selector-reset-helpers.test.ts"
+    "tests/unit/overnight-dice-selector-reset-helpers.test.ts",
+    // Phase 2 Batch 8 — remaining *helpers*.test.ts floor + script-.mjs ambient shims
+    "tests/unit/burn-wave35-fraction-pinball-format-helpers.test.ts",
+    "tests/unit/burn-wave41-calla-types-helpers.test.ts",
+    "tests/unit/burn-wave41-stars-types-diff-helpers.test.ts",
+    "tests/unit/burn-wave42-fiar-types-graph-helpers.test.ts",
+    "tests/unit/burn-wave42-kings-pieces-board-helpers.test.ts",
+    "tests/unit/burn-wave42-pent-type-helpers.test.ts",
+    "tests/unit/burn-wave44-fab-initial-types-helpers.test.ts",
+    "tests/unit/burn-wave47-stars-types-diff-helpers.test.ts",
+    "tests/unit/check-build-helpers.test.ts",
+    "tests/unit/history-routing-helpers.test.ts",
+    "tests/unit/offline-helpers.test.ts",
+    "tests/unit/overnight-graph-directed-edge-helpers.test.ts",
+    "tests/unit/overnight-wave50-calla-types-helpers-matrix.test.ts",
+    "tests/unit/pwa-manifest-contract-helpers.test.ts",
+    "tests/unit/report-licenses-helpers.test.ts",
+    "tests/unit/shims/node-minimal.d.ts"
   ]
 }
