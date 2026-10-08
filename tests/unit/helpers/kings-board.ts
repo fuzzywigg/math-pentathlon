@@ -16,7 +16,8 @@ export function createEmptyBoard(): Board {
 }
 
 export function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
+  // ratchet: Board is always BOARD_SIZE × BOARD_SIZE dense.
+  board[pos.row]![pos.col] = piece;
 }
 
 export function placeKing(
