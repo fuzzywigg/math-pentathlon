@@ -17,7 +17,6 @@ import { createInitialState as createQueens } from '../../src/games/queens-guard
 import {
   searchAIMove as queensSearch,
   applyAIMove as queensApply,
-  AI_PLAY_DEADLINE_MS as QUEENS_MS,
 } from '../../src/games/queens-guards/ai';
 
 const SEEDS = [1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29] as const;
