@@ -41,17 +41,10 @@ describe('Wave 37 frac-reciprocal — chains', () => {
     }
   });
 
-  it('negate twice round-trips signed-numerator forms; flag-neg is a leftover', () => {
+  it('negate twice round-trips both signed-numerator and flag-negative encodings', () => {
     for (const f of samples) {
       const twice = negate(negate(f));
-      if (f.isNegative === true) {
-        // negate only flips numerator and drops isNegative — value becomes positive
-        expect(twice.numerator).toBe(Math.abs(f.numerator));
-        expect(twice.isNegative).toBeUndefined();
-        expect(areEqual(twice, f)).toBe(false);
-      } else {
-        expect(areEqual(twice, f)).toBe(true);
-      }
+      expect(areEqual(twice, f)).toBe(true);
       const a = abs(f);
       expect(a.numerator).toBe(Math.abs(f.numerator));
       // abs rebuilds {numerator, denominator} without isNegative, so flag is cleared

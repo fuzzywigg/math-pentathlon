@@ -322,10 +322,11 @@ export function findAllValidSets(
  * Check if a number is prime
  */
 export function isPrime(n: number): boolean {
-  if (n < 2) return false;
+  if (!Number.isInteger(n) || n < 2) return false;
   if (n === 2) return true;
   if (n % 2 === 0) return false;
-  for (let i = 3; i <= Math.sqrt(n); i += 2) {
+  // i * i avoids float Math.sqrt bound error on large integers
+  for (let i = 3; i * i <= n; i += 2) {
     if (n % i === 0) return false;
   }
   return true;
@@ -335,9 +336,9 @@ export function isPrime(n: number): boolean {
  * Check if a number is a perfect square
  */
 export function isPerfectSquare(n: number): boolean {
-  if (n < 0) return false;
-  const sqrt = Math.sqrt(n);
-  return sqrt === Math.floor(sqrt);
+  if (!Number.isInteger(n) || n < 0) return false;
+  const root = Math.round(Math.sqrt(n));
+  return root * root === n;
 }
 
 /**
