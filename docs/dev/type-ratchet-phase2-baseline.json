@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "reportOnly": true,
   "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
-  "taskId": "burn-1008-mp-type-ratchet-p2",
-  "generatedAt": "2026-10-08T02:55:11.470Z",
-  "tipSha": "293ca1d5c878a231543c632d6112e3c1c0fa7ea6",
+  "taskId": "burn-1008-mp-type-ratchet-batch3-nonrules",
+  "generatedAt": "2026-10-08T06:37:22.592Z",
+  "tipSha": "e169269651cc5133a37bbc909b29aafdab5b48ba",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
@@ -19,28 +19,28 @@
     "noImplicitReturns"
   ],
   "inScopeErrors": 0,
-  "outOfScopeErrors": 520,
-  "fileCount": 65,
+  "outOfScopeErrors": 443,
+  "fileCount": 54,
   "byKind": {
     "ai_search_scoring": 219,
     "rules_engine": 133,
-    "other_game_module": 88,
-    "game_ui": 78
+    "other_game_module": 75,
+    "game_ui": 16
   },
   "byRootCause": {
-    "unchecked_index_access": 482,
-    "exact_optional_property_types": 27,
+    "unchecked_index_access": 416,
+    "exact_optional_property_types": 18,
     "possibly_undefined_callable": 3,
     "type_assignability": 3,
     "undefined_as_index": 2,
     "possibly_undefined_iterable": 1
   },
   "byCode": {
-    "TS18048": 199,
-    "TS2532": 164,
-    "TS2322": 77,
-    "TS2345": 41,
-    "TS2379": 25,
+    "TS18048": 164,
+    "TS2532": 150,
+    "TS2322": 76,
+    "TS2345": 25,
+    "TS2379": 16,
     "TS2339": 4,
     "TS2722": 3,
     "TS2375": 2,
@@ -49,18 +49,18 @@
   },
   "byGame": {
     "prime-gold": 87,
-    "stars-bars": 53,
-    "contig-60": 42,
-    "kings-quadraphages": 40,
     "calla": 34,
-    "hex": 32,
-    "kwatro-sinko": 27,
+    "stars-bars": 30,
+    "hex": 28,
     "sum-dominoes": 27,
-    "juggle": 25,
-    "pent-em-in": 23,
+    "kwatro-sinko": 24,
+    "contig-60": 23,
+    "kings-quadraphages": 23,
     "queens-guards": 23,
     "fab-a-diffy": 20,
+    "juggle": 20,
     "ramrod": 20,
+    "pent-em-in": 19,
     "fraction-pinball": 15,
     "fiar": 12,
     "frac-fact": 11,
@@ -79,33 +79,6 @@
       "shell_misc": 0,
       "other": 0
     },
-    "stars-bars": {
-      "total": 53,
-      "ai_search_scoring": 18,
-      "rules_engine": 12,
-      "game_ui": 23,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "contig-60": {
-      "total": 42,
-      "ai_search_scoring": 19,
-      "rules_engine": 4,
-      "game_ui": 8,
-      "other_game_module": 11,
-      "shell_misc": 0,
-      "other": 0
-    },
-    "kings-quadraphages": {
-      "total": 40,
-      "ai_search_scoring": 11,
-      "rules_engine": 7,
-      "game_ui": 22,
-      "other_game_module": 0,
-      "shell_misc": 0,
-      "other": 0
-    },
     "calla": {
       "total": 34,
       "ai_search_scoring": 15,
@@ -115,20 +88,20 @@
       "shell_misc": 0,
       "other": 0
     },
-    "hex": {
-      "total": 32,
-      "ai_search_scoring": 17,
-      "rules_engine": 11,
-      "game_ui": 4,
+    "stars-bars": {
+      "total": 30,
+      "ai_search_scoring": 18,
+      "rules_engine": 12,
+      "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
-    "kwatro-sinko": {
-      "total": 27,
-      "ai_search_scoring": 15,
-      "rules_engine": 9,
-      "game_ui": 3,
+    "hex": {
+      "total": 28,
+      "ai_search_scoring": 17,
+      "rules_engine": 11,
+      "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
@@ -142,21 +115,30 @@
       "shell_misc": 0,
       "other": 0
     },
-    "juggle": {
-      "total": 25,
-      "ai_search_scoring": 18,
-      "rules_engine": 2,
-      "game_ui": 4,
-      "other_game_module": 1,
+    "kwatro-sinko": {
+      "total": 24,
+      "ai_search_scoring": 15,
+      "rules_engine": 9,
+      "game_ui": 0,
+      "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
-    "pent-em-in": {
+    "contig-60": {
       "total": 23,
-      "ai_search_scoring": 12,
+      "ai_search_scoring": 19,
+      "rules_engine": 4,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "kings-quadraphages": {
+      "total": 23,
+      "ai_search_scoring": 11,
       "rules_engine": 7,
-      "game_ui": 3,
-      "other_game_module": 1,
+      "game_ui": 5,
+      "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
@@ -178,12 +160,30 @@
       "shell_misc": 0,
       "other": 0
     },
+    "juggle": {
+      "total": 20,
+      "ai_search_scoring": 18,
+      "rules_engine": 2,
+      "game_ui": 0,
+      "other_game_module": 0,
+      "shell_misc": 0,
+      "other": 0
+    },
     "ramrod": {
       "total": 20,
       "ai_search_scoring": 8,
       "rules_engine": 6,
       "game_ui": 2,
       "other_game_module": 4,
+      "shell_misc": 0,
+      "other": 0
+    },
+    "pent-em-in": {
+      "total": 19,
+      "ai_search_scoring": 12,
+      "rules_engine": 7,
+      "game_ui": 0,
+      "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
@@ -253,7 +253,6 @@
   },
   "byFile": {
     "src/games/prime-gold/types.ts": 65,
-    "src/games/stars-bars/board-ui.ts": 23,
     "src/games/contig-60/ai.ts": 19,
     "src/games/juggle/ai.ts": 18,
     "src/games/stars-bars/ai.ts": 18,
@@ -265,17 +264,14 @@
     "src/games/sum-dominoes/rules.ts": 14,
     "src/games/fraction-pinball/rules.ts": 13,
     "src/games/hex/ai.ts": 13,
-    "src/games/kings-quadraphages/board-ui.ts": 13,
     "src/games/pent-em-in/ai.ts": 12,
     "src/games/stars-bars/rules.ts": 12,
-    "src/games/contig-60/types.ts": 11,
     "src/games/hex/rules.ts": 11,
     "src/games/kings-quadraphages/ai.ts": 11,
     "src/games/prime-gold/rules.ts": 10,
     "src/games/fiar/ai.ts": 9,
     "src/games/hex-a-gone/ai.ts": 9,
     "src/games/kwatro-sinko/rules.ts": 9,
-    "src/games/contig-60/board-ui.ts": 8,
     "src/games/par-55/ai.ts": 8,
     "src/games/ramrod/ai.ts": 8,
     "src/games/sum-dominoes/ai.ts": 8,
@@ -289,14 +285,9 @@
     "src/games/prime-gold/board-ui.ts": 5,
     "src/games/contig-60/rules.ts": 4,
     "src/games/frac-fact/ai.ts": 4,
-    "src/games/hex/board-ui.ts": 4,
-    "src/games/juggle/board-ui.ts": 4,
-    "src/games/kings-quadraphages/board-renderer.ts": 4,
     "src/games/ramrod/types.ts": 4,
     "src/games/remainder-islands/ai.ts": 4,
     "src/games/hex/ai-client.ts": 3,
-    "src/games/kwatro-sinko/board-ui.ts": 3,
-    "src/games/pent-em-in/board-ui.ts": 3,
     "src/games/queens-guards/ai.ts": 3,
     "src/games/calla/board-ui.ts": 2,
     "src/games/fab-a-diffy/ai-client.ts": 2,
@@ -311,9 +302,7 @@
     "src/games/fab-a-diffy/ai.worker.ts": 1,
     "src/games/fiar/ai.worker.ts": 1,
     "src/games/hex/ai.worker.ts": 1,
-    "src/games/juggle/game-controller.ts": 1,
     "src/games/kings-quadraphages/rules.ts": 1,
-    "src/games/pent-em-in/types.ts": 1,
     "src/games/queens-guards/ai.worker.ts": 1,
     "src/games/queens-guards/board-ui.ts": 1,
     "src/games/sum-dominoes/board-ui.ts": 1
@@ -321,7 +310,7 @@
   "errors": [
     {
       "file": "src/games/calla/ai.ts",
-      "line": 78,
+      "line": 77,
       "col": 10,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -331,7 +320,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 84,
+      "line": 83,
       "col": 5,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -341,7 +330,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 121,
+      "line": 120,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -351,23 +340,13 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 133,
+      "line": 132,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
       "game": "calla",
       "message": "Type 'number | undefined' is not assignable to type 'number'."
-    },
-    {
-      "file": "src/games/calla/ai.ts",
-      "line": 391,
-      "col": 5,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "calla",
-      "message": "Object is possibly 'undefined'."
     },
     {
       "file": "src/games/calla/ai.ts",
@@ -381,7 +360,17 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 395,
+      "line": 393,
+      "col": 5,
+      "code": "TS2532",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "calla",
+      "message": "Object is possibly 'undefined'."
+    },
+    {
+      "file": "src/games/calla/ai.ts",
+      "line": 396,
       "col": 23,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -391,7 +380,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 430,
+      "line": 431,
       "col": 41,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -401,7 +390,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 437,
+      "line": 438,
       "col": 40,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -411,7 +400,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 460,
+      "line": 461,
       "col": 7,
       "code": "TS2375",
       "rootCause": "exact_optional_property_types",
@@ -421,7 +410,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 460,
+      "line": 461,
       "col": 21,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -431,7 +420,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 468,
+      "line": 469,
       "col": 19,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -441,7 +430,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 471,
+      "line": 472,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -451,7 +440,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 545,
+      "line": 546,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -461,7 +450,7 @@
     },
     {
       "file": "src/games/calla/ai.ts",
-      "line": 548,
+      "line": 549,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -471,7 +460,7 @@
     },
     {
       "file": "src/games/calla/board-ui.ts",
-      "line": 105,
+      "line": 112,
       "col": 7,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -481,7 +470,7 @@
     },
     {
       "file": "src/games/calla/board-ui.ts",
-      "line": 127,
+      "line": 134,
       "col": 7,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -491,7 +480,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 24,
+      "line": 23,
       "col": 10,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -501,7 +490,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 77,
+      "line": 76,
       "col": 10,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -511,7 +500,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 81,
+      "line": 80,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -521,7 +510,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 84,
+      "line": 83,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -531,7 +520,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 101,
+      "line": 100,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -541,7 +530,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 104,
+      "line": 103,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -551,7 +540,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 111,
+      "line": 110,
       "col": 5,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -561,7 +550,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 130,
+      "line": 129,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -571,7 +560,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 132,
+      "line": 131,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -581,7 +570,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 197,
+      "line": 196,
       "col": 19,
       "code": "TS2322",
       "rootCause": "type_assignability",
@@ -591,7 +580,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 197,
+      "line": 196,
       "col": 41,
       "code": "TS2322",
       "rootCause": "type_assignability",
@@ -601,7 +590,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 315,
+      "line": 314,
       "col": 38,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -611,7 +600,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 317,
+      "line": 316,
       "col": 43,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -621,7 +610,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 317,
+      "line": 316,
       "col": 76,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -631,7 +620,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 319,
+      "line": 318,
       "col": 7,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -641,7 +630,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 320,
+      "line": 319,
       "col": 27,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -651,7 +640,7 @@
     },
     {
       "file": "src/games/calla/rules.ts",
-      "line": 323,
+      "line": 322,
       "col": 7,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -661,7 +650,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 62,
+      "line": 61,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -671,7 +660,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 65,
+      "line": 64,
       "col": 34,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -681,7 +670,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 96,
+      "line": 95,
       "col": 60,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -691,7 +680,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 97,
+      "line": 96,
       "col": 62,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -701,7 +690,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 97,
+      "line": 96,
       "col": 67,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -711,7 +700,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 132,
+      "line": 131,
       "col": 64,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -721,7 +710,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 133,
+      "line": 132,
       "col": 66,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -731,7 +720,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 133,
+      "line": 132,
       "col": 71,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -741,7 +730,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 230,
+      "line": 229,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -751,7 +740,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 231,
+      "line": 230,
       "col": 44,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -761,7 +750,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 247,
+      "line": 246,
       "col": 65,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -771,7 +760,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 248,
+      "line": 247,
       "col": 67,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -781,7 +770,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 248,
+      "line": 247,
       "col": 72,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -791,7 +780,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 305,
+      "line": 304,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -801,7 +790,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 309,
+      "line": 308,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -811,7 +800,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 357,
+      "line": 356,
       "col": 21,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -821,7 +810,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 357,
+      "line": 356,
       "col": 47,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -831,7 +820,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 360,
+      "line": 359,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -841,7 +830,7 @@
     },
     {
       "file": "src/games/contig-60/ai.ts",
-      "line": 360,
+      "line": 359,
       "col": 49,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -850,88 +839,8 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 61,
-      "col": 21,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 62,
-      "col": 36,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 66,
-      "col": 30,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "'value' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 72,
-      "col": 29,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 84,
-      "col": 47,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 93,
-      "col": 31,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "'value' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 99,
-      "col": 28,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; validPlacement: boolean; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/contig-60/board-ui.ts",
-      "line": 110,
-      "col": 44,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
       "file": "src/games/contig-60/rules.ts",
-      "line": 51,
+      "line": 48,
       "col": 22,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -941,7 +850,7 @@
     },
     {
       "file": "src/games/contig-60/rules.ts",
-      "line": 53,
+      "line": 50,
       "col": 39,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -951,7 +860,7 @@
     },
     {
       "file": "src/games/contig-60/rules.ts",
-      "line": 175,
+      "line": 172,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -961,121 +870,11 @@
     },
     {
       "file": "src/games/contig-60/rules.ts",
-      "line": 177,
+      "line": 174,
       "col": 26,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
       "kind": "rules_engine",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 90,
-      "col": 22,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "'dr' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 91,
-      "col": 22,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "'dc' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 113,
-      "col": 21,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 114,
-      "col": 7,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 114,
-      "col": 7,
-      "code": "TS2322",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Type 'number | undefined' is not assignable to type 'number | null'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 116,
-      "col": 21,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 119,
-      "col": 17,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 209,
-      "col": 40,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 211,
-      "col": 56,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 221,
-      "col": 40,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "contig-60",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/contig-60/types.ts",
-      "line": 223,
-      "col": 36,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
       "game": "contig-60",
       "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
     },
@@ -1301,7 +1100,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 135,
+      "line": 133,
       "col": 27,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1311,7 +1110,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 428,
+      "line": 426,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1321,7 +1120,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 429,
+      "line": 427,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1331,7 +1130,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 437,
+      "line": 435,
       "col": 15,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1341,7 +1140,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 438,
+      "line": 436,
       "col": 17,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1351,7 +1150,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 558,
+      "line": 556,
       "col": 28,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1361,7 +1160,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 558,
+      "line": 556,
       "col": 49,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1371,7 +1170,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 561,
+      "line": 559,
       "col": 26,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1381,7 +1180,7 @@
     },
     {
       "file": "src/games/fiar/ai.ts",
-      "line": 561,
+      "line": 559,
       "col": 45,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1441,7 +1240,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 68,
+      "line": 67,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1451,7 +1250,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 121,
+      "line": 120,
       "col": 20,
       "code": "TS2722",
       "rootCause": "possibly_undefined_callable",
@@ -1461,7 +1260,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 121,
+      "line": 120,
       "col": 20,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1471,7 +1270,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 167,
+      "line": 166,
       "col": 6,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1481,7 +1280,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 167,
+      "line": 166,
       "col": 17,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1491,7 +1290,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 206,
+      "line": 205,
       "col": 58,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -1501,7 +1300,7 @@
     },
     {
       "file": "src/games/frac-fact/rules.ts",
-      "line": 223,
+      "line": 222,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1531,7 +1330,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 84,
+      "line": 83,
       "col": 19,
       "code": "TS2722",
       "rootCause": "possibly_undefined_callable",
@@ -1541,7 +1340,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 84,
+      "line": 83,
       "col": 19,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1551,7 +1350,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 151,
+      "line": 150,
       "col": 22,
       "code": "TS2722",
       "rootCause": "possibly_undefined_callable",
@@ -1561,7 +1360,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 151,
+      "line": 150,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1571,7 +1370,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 186,
+      "line": 185,
       "col": 6,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1581,7 +1380,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 186,
+      "line": 185,
       "col": 17,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1591,7 +1390,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 199,
+      "line": 198,
       "col": 29,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -1601,7 +1400,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 212,
+      "line": 211,
       "col": 45,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -1611,7 +1410,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 213,
+      "line": 212,
       "col": 37,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -1621,7 +1420,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 221,
+      "line": 220,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1631,7 +1430,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 261,
+      "line": 260,
       "col": 15,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1641,7 +1440,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 269,
+      "line": 268,
       "col": 12,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1651,7 +1450,7 @@
     },
     {
       "file": "src/games/fraction-pinball/rules.ts",
-      "line": 269,
+      "line": 268,
       "col": 28,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1661,7 +1460,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 100,
+      "line": 96,
       "col": 22,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1671,7 +1470,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 300,
+      "line": 296,
       "col": 30,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1681,7 +1480,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 309,
+      "line": 305,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1691,7 +1490,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 354,
+      "line": 350,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1701,7 +1500,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 357,
+      "line": 353,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1711,7 +1510,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 380,
+      "line": 376,
       "col": 17,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1721,7 +1520,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 380,
+      "line": 376,
       "col": 30,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -1731,7 +1530,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 383,
+      "line": 379,
       "col": 15,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1741,7 +1540,7 @@
     },
     {
       "file": "src/games/hex-a-gone/ai.ts",
-      "line": 383,
+      "line": 379,
       "col": 32,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1781,7 +1580,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 76,
+      "line": 77,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1791,7 +1590,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 86,
+      "line": 87,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1801,7 +1600,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 95,
+      "line": 96,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1811,7 +1610,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 104,
+      "line": 105,
       "col": 23,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1821,7 +1620,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 104,
+      "line": 105,
       "col": 23,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1831,17 +1630,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 117,
-      "col": 21,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/ai.ts",
-      "line": 117,
+      "line": 118,
       "col": 21,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1852,6 +1641,16 @@
     {
       "file": "src/games/hex/ai.ts",
       "line": 118,
+      "col": 21,
+      "code": "TS2532",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "hex",
+      "message": "Object is possibly 'undefined'."
+    },
+    {
+      "file": "src/games/hex/ai.ts",
+      "line": 119,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1861,7 +1660,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 157,
+      "line": 158,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1871,7 +1670,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 160,
+      "line": 161,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1881,7 +1680,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 278,
+      "line": 279,
       "col": 9,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1891,7 +1690,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 369,
+      "line": 370,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1901,7 +1700,7 @@
     },
     {
       "file": "src/games/hex/ai.ts",
-      "line": 386,
+      "line": 387,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -1920,48 +1719,8 @@
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; now: () => number; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
-      "file": "src/games/hex/board-ui.ts",
-      "line": 216,
-      "col": 25,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "hex",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/board-ui.ts",
-      "line": 254,
-      "col": 13,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "hex",
-      "message": "'lastMove' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/board-ui.ts",
-      "line": 254,
-      "col": 46,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "hex",
-      "message": "'lastMove' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/hex/board-ui.ts",
-      "line": 277,
-      "col": 28,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "hex",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; validPlacement: boolean; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
       "file": "src/games/hex/rules.ts",
-      "line": 22,
+      "line": 17,
       "col": 10,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1971,7 +1730,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 90,
+      "line": 85,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1981,7 +1740,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 108,
+      "line": 103,
       "col": 34,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -1991,7 +1750,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 117,
+      "line": 112,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2001,7 +1760,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 135,
+      "line": 130,
       "col": 34,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2011,7 +1770,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 154,
+      "line": 149,
       "col": 3,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2021,7 +1780,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 187,
+      "line": 182,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2031,7 +1790,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 215,
+      "line": 210,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2041,7 +1800,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 234,
+      "line": 229,
       "col": 34,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2051,7 +1810,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 244,
+      "line": 239,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2061,7 +1820,7 @@
     },
     {
       "file": "src/games/hex/rules.ts",
-      "line": 263,
+      "line": 258,
       "col": 34,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2071,7 +1830,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 69,
+      "line": 68,
       "col": 7,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2081,7 +1840,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 69,
+      "line": 68,
       "col": 25,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2091,7 +1850,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 77,
+      "line": 76,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2101,7 +1860,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 95,
+      "line": 94,
       "col": 16,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2111,7 +1870,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 140,
+      "line": 139,
       "col": 13,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2121,7 +1880,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 382,
+      "line": 381,
       "col": 51,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2131,7 +1890,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 386,
+      "line": 385,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2141,7 +1900,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 398,
+      "line": 397,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2151,7 +1910,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 402,
+      "line": 401,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2161,7 +1920,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 455,
+      "line": 454,
       "col": 21,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -2171,7 +1930,7 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 458,
+      "line": 457,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2181,13 +1940,23 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 478,
+      "line": 477,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
       "game": "juggle",
       "message": "Object is possibly 'undefined'."
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "line": 567,
+      "col": 17,
+      "code": "TS18048",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "juggle",
+      "message": "'chosen' is possibly 'undefined'."
     },
     {
       "file": "src/games/juggle/ai.ts",
@@ -2202,7 +1971,7 @@
     {
       "file": "src/games/juggle/ai.ts",
       "line": 569,
-      "col": 17,
+      "col": 16,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
@@ -2211,13 +1980,13 @@
     },
     {
       "file": "src/games/juggle/ai.ts",
-      "line": 570,
-      "col": 16,
-      "code": "TS18048",
+      "line": 574,
+      "col": 15,
+      "code": "TS2532",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
       "game": "juggle",
-      "message": "'chosen' is possibly 'undefined'."
+      "message": "Object is possibly 'undefined'."
     },
     {
       "file": "src/games/juggle/ai.ts",
@@ -2232,16 +2001,6 @@
     {
       "file": "src/games/juggle/ai.ts",
       "line": 576,
-      "col": 15,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "juggle",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/juggle/ai.ts",
-      "line": 577,
       "col": 14,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2250,58 +2009,8 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/juggle/board-ui.ts",
-      "line": 106,
-      "col": 26,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "juggle",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/juggle/board-ui.ts",
-      "line": 129,
-      "col": 28,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "juggle",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; validPlacement: boolean; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/juggle/board-ui.ts",
-      "line": 193,
-      "col": 36,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "juggle",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/juggle/board-ui.ts",
-      "line": 195,
-      "col": 43,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "juggle",
-      "message": "Argument of type 'number | undefined' is not assignable to parameter of type 'number'."
-    },
-    {
-      "file": "src/games/juggle/game-controller.ts",
-      "line": 125,
-      "col": 7,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "other_game_module",
-      "game": "juggle",
-      "message": "Argument of type '{ onAbandonPlacement: (() => void) | undefined; allowInput: boolean; }' is not assignable to parameter of type 'JuggleBoardRenderOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
       "file": "src/games/juggle/rules.ts",
-      "line": 97,
+      "line": 99,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2311,7 +2020,7 @@
     },
     {
       "file": "src/games/juggle/rules.ts",
-      "line": 194,
+      "line": 196,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2430,178 +2139,8 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/kings-quadraphages/board-renderer.ts",
-      "line": 123,
-      "col": 20,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-renderer.ts",
-      "line": 124,
-      "col": 38,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Argument of type 'Cell | undefined' is not assignable to parameter of type 'Cell'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-renderer.ts",
-      "line": 142,
-      "col": 20,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-renderer.ts",
-      "line": 143,
-      "col": 38,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Argument of type 'Cell | undefined' is not assignable to parameter of type 'Cell'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 116,
-      "col": 25,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 162,
-      "col": 25,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 200,
-      "col": 17,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 211,
-      "col": 14,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 213,
-      "col": 24,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 215,
-      "col": 13,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 217,
-      "col": 14,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 219,
-      "col": 24,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 221,
-      "col": 13,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'piece' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 255,
-      "col": 24,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; piece: string | undefined; validMove: boolean; validPlacement: boolean; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 267,
-      "col": 9,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'lastMove' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 267,
-      "col": 36,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "'lastMove' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kings-quadraphages/board-ui.ts",
-      "line": 359,
-      "col": 37,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "kings-quadraphages",
-      "message": "Argument of type '{ onCellClick: CellClickCallback | undefined; }' is not assignable to parameter of type 'BoardClickBinding' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
       "file": "src/games/kings-quadraphages/board.ts",
-      "line": 64,
+      "line": 60,
       "col": 3,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2611,7 +2150,7 @@
     },
     {
       "file": "src/games/kings-quadraphages/board.ts",
-      "line": 70,
+      "line": 66,
       "col": 3,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2621,7 +2160,7 @@
     },
     {
       "file": "src/games/kings-quadraphages/board.ts",
-      "line": 99,
+      "line": 95,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2631,7 +2170,7 @@
     },
     {
       "file": "src/games/kings-quadraphages/board.ts",
-      "line": 99,
+      "line": 95,
       "col": 10,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2641,7 +2180,7 @@
     },
     {
       "file": "src/games/kings-quadraphages/board.ts",
-      "line": 104,
+      "line": 100,
       "col": 34,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2711,23 +2250,13 @@
     },
     {
       "file": "src/games/kings-quadraphages/rules.ts",
-      "line": 31,
+      "line": 23,
       "col": 21,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
       "kind": "rules_engine",
       "game": "kings-quadraphages",
       "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 105,
-      "col": 24,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
@@ -2741,13 +2270,13 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 135,
-      "col": 17,
-      "code": "TS2322",
+      "line": 107,
+      "col": 24,
+      "code": "TS2345",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
       "game": "kwatro-sinko",
-      "message": "Type 'Chip | undefined' is not assignable to type 'Chip'."
+      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
@@ -2771,13 +2300,13 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 330,
-      "col": 30,
-      "code": "TS2345",
+      "line": 138,
+      "col": 17,
+      "code": "TS2322",
       "rootCause": "unchecked_index_access",
       "kind": "ai_search_scoring",
       "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+      "message": "Type 'Chip | undefined' is not assignable to type 'Chip'."
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
@@ -2791,7 +2320,17 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 384,
+      "line": 332,
+      "col": 30,
+      "code": "TS2345",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "kwatro-sinko",
+      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 385,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2801,7 +2340,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 388,
+      "line": 389,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2811,7 +2350,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 435,
+      "line": 436,
       "col": 22,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2821,7 +2360,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 435,
+      "line": 436,
       "col": 47,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2831,7 +2370,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 442,
+      "line": 443,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -2841,7 +2380,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 442,
+      "line": 443,
       "col": 45,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -2851,7 +2390,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 445,
+      "line": 446,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2861,7 +2400,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/ai.ts",
-      "line": 445,
+      "line": 446,
       "col": 45,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2870,38 +2409,8 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/kwatro-sinko/board-ui.ts",
-      "line": 114,
-      "col": 34,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/board-ui.ts",
-      "line": 115,
-      "col": 34,
-      "code": "TS2345",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "kwatro-sinko",
-      "message": "Argument of type 'string | undefined' is not assignable to parameter of type 'string'."
-    },
-    {
-      "file": "src/games/kwatro-sinko/board-ui.ts",
-      "line": 178,
-      "col": 24,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "kwatro-sinko",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; piece: string | undefined; validMove: boolean; extras: string[]; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 351,
+      "line": 348,
       "col": 24,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -2911,7 +2420,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 352,
+      "line": 349,
       "col": 24,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -2921,7 +2430,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 362,
+      "line": 359,
       "col": 16,
       "code": "TS2488",
       "rootCause": "possibly_undefined_iterable",
@@ -2931,7 +2440,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 404,
+      "line": 401,
       "col": 43,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -2941,7 +2450,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 434,
+      "line": 431,
       "col": 29,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -2951,7 +2460,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 439,
+      "line": 436,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2961,7 +2470,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 439,
+      "line": 436,
       "col": 27,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2971,7 +2480,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 445,
+      "line": 442,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2981,7 +2490,7 @@
     },
     {
       "file": "src/games/kwatro-sinko/rules.ts",
-      "line": 445,
+      "line": 442,
       "col": 45,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -2991,7 +2500,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 178,
+      "line": 179,
       "col": 33,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3001,7 +2510,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 181,
+      "line": 182,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3011,7 +2520,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 187,
+      "line": 188,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3021,7 +2530,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 191,
+      "line": 192,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3031,7 +2540,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 238,
+      "line": 239,
       "col": 23,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3041,7 +2550,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 238,
+      "line": 239,
       "col": 47,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3051,7 +2560,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 241,
+      "line": 242,
       "col": 21,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3061,7 +2570,7 @@
     },
     {
       "file": "src/games/par-55/ai.ts",
-      "line": 241,
+      "line": 242,
       "col": 47,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3071,7 +2580,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 67,
+      "line": 63,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3081,7 +2590,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 67,
+      "line": 63,
       "col": 9,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3091,7 +2600,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 224,
+      "line": 220,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3101,7 +2610,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 228,
+      "line": 224,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3111,7 +2620,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 278,
+      "line": 274,
       "col": 16,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3121,7 +2630,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 279,
+      "line": 275,
       "col": 17,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3131,7 +2640,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 280,
+      "line": 276,
       "col": 17,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3141,7 +2650,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 281,
+      "line": 277,
       "col": 16,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3151,7 +2660,7 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 286,
+      "line": 282,
       "col": 14,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3161,67 +2670,37 @@
     },
     {
       "file": "src/games/pent-em-in/ai.ts",
-      "line": 287,
-      "col": 15,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/ai.ts",
-      "line": 288,
-      "col": 15,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/ai.ts",
-      "line": 289,
-      "col": 14,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "ai_search_scoring",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/board-ui.ts",
-      "line": 175,
-      "col": 53,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "pent-em-in",
-      "message": "'c' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/board-ui.ts",
-      "line": 176,
-      "col": 53,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "pent-em-in",
-      "message": "'r' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/pent-em-in/board-ui.ts",
       "line": 283,
-      "col": 28,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
+      "col": 15,
+      "code": "TS2532",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
       "game": "pent-em-in",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; validPlacement: boolean; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
+      "message": "Object is possibly 'undefined'."
+    },
+    {
+      "file": "src/games/pent-em-in/ai.ts",
+      "line": 284,
+      "col": 15,
+      "code": "TS2532",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "pent-em-in",
+      "message": "Object is possibly 'undefined'."
+    },
+    {
+      "file": "src/games/pent-em-in/ai.ts",
+      "line": 285,
+      "col": 14,
+      "code": "TS2532",
+      "rootCause": "unchecked_index_access",
+      "kind": "ai_search_scoring",
+      "game": "pent-em-in",
+      "message": "Object is possibly 'undefined'."
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 78,
+      "line": 80,
       "col": 33,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3231,7 +2710,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 78,
+      "line": 80,
       "col": 33,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3241,7 +2720,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 131,
+      "line": 133,
       "col": 35,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -3251,7 +2730,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 195,
+      "line": 197,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3261,7 +2740,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 195,
+      "line": 197,
       "col": 5,
       "code": "TS2322",
       "rootCause": "type_assignability",
@@ -3271,7 +2750,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 196,
+      "line": 198,
       "col": 10,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3281,7 +2760,7 @@
     },
     {
       "file": "src/games/pent-em-in/rules.ts",
-      "line": 382,
+      "line": 384,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3290,18 +2769,8 @@
       "message": "Type 'Rotation | undefined' is not assignable to type 'Rotation'."
     },
     {
-      "file": "src/games/pent-em-in/types.ts",
-      "line": 90,
-      "col": 7,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "other_game_module",
-      "game": "pent-em-in",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 242,
+      "line": 243,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3311,7 +2780,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 247,
+      "line": 248,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3321,7 +2790,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 251,
+      "line": 252,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3331,7 +2800,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 298,
+      "line": 299,
       "col": 21,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3341,7 +2810,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 298,
+      "line": 299,
       "col": 47,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3351,7 +2820,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 301,
+      "line": 302,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3361,7 +2830,7 @@
     },
     {
       "file": "src/games/prime-gold/ai.ts",
-      "line": 301,
+      "line": 302,
       "col": 47,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3381,7 +2850,7 @@
     },
     {
       "file": "src/games/prime-gold/board-ui.ts",
-      "line": 713,
+      "line": 717,
       "col": 40,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3391,8 +2860,8 @@
     },
     {
       "file": "src/games/prime-gold/board-ui.ts",
-      "line": 714,
-      "col": 41,
+      "line": 720,
+      "col": 32,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
       "kind": "game_ui",
@@ -3401,8 +2870,8 @@
     },
     {
       "file": "src/games/prime-gold/board-ui.ts",
-      "line": 714,
-      "col": 58,
+      "line": 720,
+      "col": 49,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
       "kind": "game_ui",
@@ -3411,8 +2880,8 @@
     },
     {
       "file": "src/games/prime-gold/board-ui.ts",
-      "line": 714,
-      "col": 87,
+      "line": 720,
+      "col": 78,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
       "kind": "game_ui",
@@ -3421,7 +2890,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 45,
+      "line": 42,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3431,7 +2900,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 52,
+      "line": 49,
       "col": 12,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3441,7 +2910,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 53,
+      "line": 50,
       "col": 12,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3451,7 +2920,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 70,
+      "line": 67,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -3461,7 +2930,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 71,
+      "line": 68,
       "col": 11,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3471,7 +2940,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 75,
+      "line": 72,
       "col": 11,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -3481,7 +2950,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 77,
+      "line": 74,
       "col": 28,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -3491,7 +2960,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 78,
+      "line": 75,
       "col": 29,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3501,7 +2970,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 78,
+      "line": 75,
       "col": 46,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -3511,7 +2980,7 @@
     },
     {
       "file": "src/games/prime-gold/rules.ts",
-      "line": 78,
+      "line": 75,
       "col": 57,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4191,7 +3660,7 @@
     },
     {
       "file": "src/games/queens-guards/ai.ts",
-      "line": 492,
+      "line": 490,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4201,7 +3670,7 @@
     },
     {
       "file": "src/games/queens-guards/ai.ts",
-      "line": 495,
+      "line": 493,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4211,7 +3680,7 @@
     },
     {
       "file": "src/games/queens-guards/ai.ts",
-      "line": 525,
+      "line": 523,
       "col": 9,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4231,7 +3700,7 @@
     },
     {
       "file": "src/games/queens-guards/board-ui.ts",
-      "line": 289,
+      "line": 259,
       "col": 26,
       "code": "TS2379",
       "rootCause": "exact_optional_property_types",
@@ -4241,7 +3710,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 107,
+      "line": 104,
       "col": 11,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4251,7 +3720,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 107,
+      "line": 104,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4261,7 +3730,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 107,
+      "line": 104,
       "col": 32,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4271,7 +3740,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 108,
+      "line": 105,
       "col": 31,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4281,7 +3750,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 108,
+      "line": 105,
       "col": 44,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4291,7 +3760,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 109,
+      "line": 106,
       "col": 38,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4301,7 +3770,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 111,
+      "line": 108,
       "col": 23,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4311,7 +3780,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 111,
+      "line": 108,
       "col": 26,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4321,7 +3790,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 117,
+      "line": 114,
       "col": 10,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4331,7 +3800,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 117,
+      "line": 114,
       "col": 33,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4341,7 +3810,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 118,
+      "line": 115,
       "col": 10,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4351,7 +3820,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 118,
+      "line": 115,
       "col": 33,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4361,7 +3830,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 120,
+      "line": 117,
       "col": 21,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4371,7 +3840,7 @@
     },
     {
       "file": "src/games/queens-guards/rules.ts",
-      "line": 120,
+      "line": 117,
       "col": 24,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4401,7 +3870,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 162,
+      "line": 163,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4411,7 +3880,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 166,
+      "line": 167,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4421,7 +3890,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 214,
+      "line": 215,
       "col": 21,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4431,7 +3900,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 214,
+      "line": 215,
       "col": 42,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4441,7 +3910,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 214,
+      "line": 215,
       "col": 62,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4451,7 +3920,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 217,
+      "line": 218,
       "col": 19,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4461,7 +3930,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 217,
+      "line": 218,
       "col": 42,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4471,7 +3940,7 @@
     },
     {
       "file": "src/games/ramrod/ai.ts",
-      "line": 217,
+      "line": 218,
       "col": 64,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4481,7 +3950,7 @@
     },
     {
       "file": "src/games/ramrod/board-ui.ts",
-      "line": 137,
+      "line": 142,
       "col": 26,
       "code": "TS2379",
       "rootCause": "exact_optional_property_types",
@@ -4491,7 +3960,7 @@
     },
     {
       "file": "src/games/ramrod/board-ui.ts",
-      "line": 310,
+      "line": 324,
       "col": 5,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4501,7 +3970,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 39,
+      "line": 35,
       "col": 9,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4511,7 +3980,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 39,
+      "line": 35,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4521,7 +3990,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 72,
+      "line": 68,
       "col": 5,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4531,7 +4000,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 73,
+      "line": 69,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4541,7 +4010,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 75,
+      "line": 71,
       "col": 5,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4551,7 +4020,7 @@
     },
     {
       "file": "src/games/ramrod/rules.ts",
-      "line": 76,
+      "line": 72,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4641,7 +4110,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 134,
+      "line": 130,
       "col": 45,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4651,7 +4120,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 145,
+      "line": 141,
       "col": 27,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4661,7 +4130,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 151,
+      "line": 147,
       "col": 5,
       "code": "TS2375",
       "rootCause": "exact_optional_property_types",
@@ -4671,7 +4140,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 151,
+      "line": 147,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4681,7 +4150,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 193,
+      "line": 189,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4691,7 +4160,7 @@
     },
     {
       "file": "src/games/star-track/ai.ts",
-      "line": 196,
+      "line": 192,
       "col": 24,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4701,7 +4170,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 74,
+      "line": 69,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4711,7 +4180,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 75,
+      "line": 70,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4721,7 +4190,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 83,
+      "line": 78,
       "col": 23,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4731,7 +4200,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 84,
+      "line": 79,
       "col": 11,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4741,7 +4210,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 85,
+      "line": 80,
       "col": 20,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4751,7 +4220,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 102,
+      "line": 97,
       "col": 16,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4761,7 +4230,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 111,
+      "line": 106,
       "col": 7,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4771,7 +4240,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 132,
+      "line": 127,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4781,7 +4250,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 143,
+      "line": 138,
       "col": 11,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4791,7 +4260,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 192,
+      "line": 187,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4801,7 +4270,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 228,
+      "line": 223,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4811,7 +4280,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 232,
+      "line": 227,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -4821,7 +4290,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 280,
+      "line": 275,
       "col": 22,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4831,7 +4300,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 280,
+      "line": 275,
       "col": 42,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4841,7 +4310,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 280,
+      "line": 275,
       "col": 59,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -4851,7 +4320,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 283,
+      "line": 278,
       "col": 20,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4861,7 +4330,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 283,
+      "line": 278,
       "col": 42,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4871,7 +4340,7 @@
     },
     {
       "file": "src/games/stars-bars/ai.ts",
-      "line": 283,
+      "line": 278,
       "col": 61,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -4880,238 +4349,8 @@
       "message": "Object is possibly 'undefined'."
     },
     {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 516,
-      "col": 20,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 522,
-      "col": 11,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 523,
-      "col": 11,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 523,
-      "col": 44,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 551,
-      "col": 11,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 552,
-      "col": 39,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 556,
-      "col": 21,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 557,
-      "col": 25,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 559,
-      "col": 21,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 560,
-      "col": 14,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 560,
-      "col": 32,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 560,
-      "col": 55,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 560,
-      "col": 74,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 564,
-      "col": 28,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "Argument of type '{ coord: string; empty: boolean; owner: string | undefined; piece: string | undefined; validPlacement: boolean; extras: string[] | undefined; }' is not assignable to parameter of type 'CellLabelParts' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 566,
-      "col": 19,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 570,
-      "col": 19,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 593,
-      "col": 16,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 608,
-      "col": 26,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'dr' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 609,
-      "col": 26,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'dc' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 617,
-      "col": 23,
-      "code": "TS2532",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "Object is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 618,
-      "col": 11,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'adjCell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 619,
-      "col": 41,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'adjCell' is possibly 'undefined'."
-    },
-    {
-      "file": "src/games/stars-bars/board-ui.ts",
-      "line": 624,
-      "col": 7,
-      "code": "TS18048",
-      "rootCause": "unchecked_index_access",
-      "kind": "game_ui",
-      "game": "stars-bars",
-      "message": "'cell' is possibly 'undefined'."
-    },
-    {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 55,
+      "line": 57,
       "col": 6,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -5121,7 +4360,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 55,
+      "line": 57,
       "col": 17,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -5131,7 +4370,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 202,
+      "line": 204,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5141,7 +4380,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 202,
+      "line": 204,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5151,7 +4390,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 239,
+      "line": 241,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5161,7 +4400,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 240,
+      "line": 242,
       "col": 26,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5171,7 +4410,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 248,
+      "line": 250,
       "col": 21,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5181,7 +4420,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 248,
+      "line": 250,
       "col": 21,
       "code": "TS2345",
       "rootCause": "unchecked_index_access",
@@ -5191,7 +4430,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 264,
+      "line": 266,
       "col": 16,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5201,7 +4440,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 279,
+      "line": 281,
       "col": 7,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5211,7 +4450,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 301,
+      "line": 303,
       "col": 16,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5221,7 +4460,7 @@
     },
     {
       "file": "src/games/stars-bars/rules.ts",
-      "line": 302,
+      "line": 304,
       "col": 7,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5231,7 +4470,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 145,
+      "line": 140,
       "col": 7,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -5241,7 +4480,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 149,
+      "line": 144,
       "col": 3,
       "code": "TS2322",
       "rootCause": "unchecked_index_access",
@@ -5251,7 +4490,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 199,
+      "line": 194,
       "col": 17,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5261,7 +4500,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 200,
+      "line": 195,
       "col": 17,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5271,7 +4510,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 201,
+      "line": 196,
       "col": 20,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5281,7 +4520,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 206,
+      "line": 201,
       "col": 15,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5291,7 +4530,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 207,
+      "line": 202,
       "col": 15,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5301,7 +4540,7 @@
     },
     {
       "file": "src/games/sum-dominoes/ai.ts",
-      "line": 208,
+      "line": 203,
       "col": 18,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5311,7 +4550,7 @@
     },
     {
       "file": "src/games/sum-dominoes/board-ui.ts",
-      "line": 94,
+      "line": 96,
       "col": 22,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5321,7 +4560,7 @@
     },
     {
       "file": "src/games/sum-dominoes/game-controller.ts",
-      "line": 367,
+      "line": 366,
       "col": 23,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5331,7 +4570,7 @@
     },
     {
       "file": "src/games/sum-dominoes/game-controller.ts",
-      "line": 368,
+      "line": 367,
       "col": 26,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5341,7 +4580,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 68,
+      "line": 70,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5351,7 +4590,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 69,
+      "line": 71,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5361,7 +4600,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 127,
+      "line": 129,
       "col": 11,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5371,7 +4610,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 171,
+      "line": 174,
       "col": 7,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5381,7 +4620,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 172,
+      "line": 175,
       "col": 39,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5391,7 +4630,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 173,
+      "line": 176,
       "col": 37,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5401,7 +4640,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 224,
+      "line": 227,
       "col": 27,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5411,7 +4650,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 225,
+      "line": 228,
       "col": 27,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5421,7 +4660,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 240,
+      "line": 243,
       "col": 30,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5431,7 +4670,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 387,
+      "line": 390,
       "col": 3,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5441,7 +4680,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 391,
+      "line": 394,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5451,7 +4690,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 393,
+      "line": 396,
       "col": 5,
       "code": "TS2532",
       "rootCause": "unchecked_index_access",
@@ -5461,7 +4700,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 405,
+      "line": 408,
       "col": 18,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
@@ -5471,7 +4710,7 @@
     },
     {
       "file": "src/games/sum-dominoes/rules.ts",
-      "line": 406,
+      "line": 409,
       "col": 19,
       "code": "TS18048",
       "rootCause": "unchecked_index_access",
