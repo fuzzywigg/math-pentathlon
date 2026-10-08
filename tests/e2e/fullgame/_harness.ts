@@ -57,7 +57,8 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       continue;
     }
 
-    // Juggle softlock: fragmented board + dice that never fit — restart deal.
+    // Juggle softlock: fragmented board + dice that never fit — reshuffle deal.
+    // Greedy UI play often stalls ~90–95% fill; New Game advances the seeded RNG.
     if (driver.id === 'juggle') {
       const fill = await page.evaluate(() => {
         const f1 =
@@ -73,7 +74,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         noProgress = 0;
         lastFill = fill;
       }
-      if (noProgress > 40 && restarts < 20) {
+      if (noProgress > 18 && restarts < 100) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;

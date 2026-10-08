@@ -413,7 +413,7 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 2000,
+    maxTurns: 4000,
     playLegal: async (page) => {
       await dismissOwl(page);
       const status = (await readStatusText(page)).toLowerCase();
@@ -423,10 +423,39 @@ const drivers: GameDriver[] = [
       if (await passIfVisible(page, '.juggle-roll-btn:not([disabled])')) {
         return true;
       }
+      // Prefer smaller shapes when the picker is open (late-game gaps).
       const shapeCount = await page.locator('.juggle-shape-option').count();
       if (shapeCount > 0) {
-        const idx = Math.floor(Math.random() * shapeCount);
-        await page.locator('.juggle-shape-option').nth(idx).click({ force: true });
+        let best = 0;
+        let bestScore = 99;
+        for (let i = 0; i < shapeCount; i++) {
+          const aria =
+            (await page
+              .locator('.juggle-shape-option')
+              .nth(i)
+              .getAttribute('aria-label')) || '';
+          const text =
+            (await page.locator('.juggle-shape-option').nth(i).textContent()) ||
+            '';
+          const blob = `${aria} ${text}`.toLowerCase();
+          const score = /monomino|1[- ]?cell/.test(blob)
+            ? 0
+            : /domino|2[- ]?cell/.test(blob)
+              ? 1
+              : /tromino|3[- ]?cell/.test(blob)
+                ? 2
+                : /tetromino|4[- ]?cell/.test(blob)
+                  ? 3
+                  : 4;
+          if (score < bestScore) {
+            bestScore = score;
+            best = i;
+          }
+        }
+        await page
+          .locator('.juggle-shape-option')
+          .nth(best)
+          .click({ force: true });
         return true;
       }
       // Prefer smaller polyominoes so late-game gaps still fill.
@@ -461,42 +490,59 @@ const drivers: GameDriver[] = [
       const boardSel = status.includes('red')
         ? '.juggle-board.player2'
         : '.juggle-board.player1';
-      const placed = await page.evaluate((sel) => {
-        const board = document.querySelector(sel);
-        if (!board) return false;
-        const valids = [
-          ...board.querySelectorAll(
-            '.juggle-cell-valid, .juggle-cell[aria-label*="valid"]'
+      // One atomic try: place, or cycle rotate/flip looking for a fit, else abandon.
+      const outcome = await page.evaluate((sel) => {
+        const click = (el: Element | null | undefined) =>
+          (el as HTMLElement | null)?.click();
+        const placeIfValid = (): boolean => {
+          const board = document.querySelector(sel);
+          if (!board) return false;
+          const valids = [
+            ...board.querySelectorAll(
+              '.juggle-cell-valid, .juggle-cell[aria-label*="valid"]'
+            ),
+          ] as HTMLElement[];
+          if (!valids.length) return false;
+          valids.sort((a, b) => {
+            const ar = +(a.dataset.row || 0);
+            const ac = +(a.dataset.col || 0);
+            const br = +(b.dataset.row || 0);
+            const bc = +(b.dataset.col || 0);
+            return ar - br || ac - bc;
+          });
+          valids[0]!.click();
+          return true;
+        };
+        if (placeIfValid()) return 'placed';
+        const rotateBtn = [...document.querySelectorAll('.juggle-control-btn')].find(
+          (b) => /Rotate/i.test(b.textContent || '')
+        );
+        const flipBtn = [...document.querySelectorAll('.juggle-control-btn')].find(
+          (b) => /Flip/i.test(b.textContent || '')
+        );
+        for (let f = 0; f < 2; f++) {
+          for (let r = 0; r < 4; r++) {
+            if (placeIfValid()) return 'placed';
+            if (rotateBtn) click(rotateBtn);
+            else break;
+          }
+          if (placeIfValid()) return 'placed';
+          if (f === 0 && flipBtn) click(flipBtn);
+        }
+        const abandon = [
+          ...document.querySelectorAll(
+            '.juggle-choose-other-btn, .juggle-control-btn'
           ),
-        ] as HTMLElement[];
-        if (!valids.length) return false;
-        // Pack toward top-left to reduce late-game fragmentation softlocks.
-        valids.sort((a, b) => {
-          const ar = +(a.dataset.row || 0);
-          const ac = +(a.dataset.col || 0);
-          const br = +(b.dataset.row || 0);
-          const bc = +(b.dataset.col || 0);
-          return ar - br || ac - bc;
-        });
-        valids[0]!.click();
-        return true;
+        ].find((b) =>
+          /choose another|can't fit|won'?t fit/i.test(b.textContent || '')
+        );
+        if (abandon) {
+          click(abandon);
+          return 'abandoned';
+        }
+        return 'noop';
       }, boardSel);
-      if (placed) return true;
-
-      const abandon = page
-        .locator('.juggle-choose-other-btn, .juggle-control-btn')
-        .filter({ hasText: /choose another|can't fit|won'?t fit/i })
-        .first();
-      if (await abandon.isVisible().catch(() => false)) {
-        await abandon.click({ force: true });
-        return true;
-      }
-      const flip = page.locator('.juggle-control-btn', { hasText: /Flip/i }).first();
-      if (await flip.isVisible().catch(() => false)) {
-        await flip.click({ force: true });
-        return true;
-      }
-      return false;
+      return outcome !== 'noop';
     },
     tryIllegal: async (page) => {
       await clickFirst(page, '.juggle-cell:not(.juggle-cell-valid)');
