@@ -34,12 +34,12 @@ describe('Overnight frac — raw op shapes + negate flag', () => {
     expect((r as Fraction).isNegative).toBeUndefined();
   });
 
-  it('negate on flag-negative keeps value negative (single negate)', () => {
+  it('negate on flag-negative yields the positive counterpart', () => {
     const f: Fraction = { numerator: 3, denominator: 5, isNegative: true };
     const n = negate(f);
-    expect(n).toEqual({ numerator: -3, denominator: 5 });
-    expect(toDecimal(n)).toBe(-0.6);
-    // Original toDecimal also negative via flag
+    expect(n).toEqual({ numerator: 3, denominator: 5 });
+    expect(toDecimal(n)).toBe(0.6);
+    // Original toDecimal is negative via flag
     expect(toDecimal(f)).toBe(-0.6);
   });
 });

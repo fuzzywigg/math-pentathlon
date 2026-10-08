@@ -98,10 +98,11 @@ describe('Wave 37 frac-predicates — proper / whole / simplified', () => {
       expect(isPositive(f) !== isPositive(negate(f))).toBe(true);
       expect(isNegative(f) !== isNegative(negate(f))).toBe(true);
     }
-    // flag-style: negate only flips numerator sign and drops the flag
+    // flag-style: negate flips value (honors isNegative) to positive signed-numerator
     const flagged = flag(4, 9);
     expect(isNegative(flagged)).toBe(true);
-    expect(isNegative(negate(flagged))).toBe(true); // numerator becomes -4
+    expect(isNegative(negate(flagged))).toBe(false);
+    expect(isPositive(negate(flagged))).toBe(true);
     expect(isNegative(abs(flagged))).toBe(false);
   });
 });

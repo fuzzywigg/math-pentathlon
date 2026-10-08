@@ -33,7 +33,8 @@ export function lcm(a: number, b: number): number {
 
   if (a === 0 || b === 0) return 0;
 
-  return (a * b) / gcd(a, b);
+  // Divide before multiply to reduce intermediate overflow vs (a * b) / gcd.
+  return (a / gcd(a, b)) * b;
 }
 
 /**
@@ -286,10 +287,14 @@ export function reciprocal(fraction: Fraction): Fraction {
 }
 
 /**
- * Negate a fraction (returns negative-numerator style for backward compatibility)
+ * Negate a fraction (returns negative-numerator style for backward compatibility).
+ * Honors both signed-numerator and isNegative-flag encodings.
  */
 export function negate(fraction: Fraction): Fraction {
-  return { numerator: -fraction.numerator, denominator: fraction.denominator };
+  return {
+    numerator: -signedNumerator(fraction),
+    denominator: fraction.denominator,
+  };
 }
 
 /**
@@ -333,9 +338,17 @@ export function isProper(fraction: Fraction): boolean {
 }
 
 /**
- * Check if fraction represents a whole number
+ * Check if fraction represents a whole number.
+ * Requires integer numerator/denominator so float `%` coincidence cannot pass.
  */
 export function isWholeNumber(fraction: Fraction): boolean {
+  if (
+    !Number.isInteger(fraction.numerator) ||
+    !Number.isInteger(fraction.denominator) ||
+    fraction.denominator === 0
+  ) {
+    return false;
+  }
   return fraction.numerator % fraction.denominator === 0;
 }
 

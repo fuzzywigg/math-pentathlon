@@ -130,11 +130,11 @@ describe('Wave 27 frac-sign-dual — arithmetic with mixed encodings', () => {
     expect(areEqual(reciprocal(flag(2, 7)), F(-7, 2))).toBe(true);
   });
 
-  it('negate flips signed numerator and drops isNegative flag from result object', () => {
+  it('negate flips value for both signed-numerator and isNegative-flag encodings', () => {
     expect(negate(F(3, 5))).toEqual({ numerator: -3, denominator: 5 });
-    // flag(3,5) means -3/5; negate only negates numerator → {-3,5} still -0.6
-    expect(negate(flag(3, 5))).toEqual({ numerator: -3, denominator: 5 });
-    expect(toDecimal(negate(flag(3, 5)))).toBeCloseTo(-0.6, 10);
+    // flag(3,5) means -3/5; negate must yield +3/5
+    expect(negate(flag(3, 5))).toEqual({ numerator: 3, denominator: 5 });
+    expect(toDecimal(negate(flag(3, 5)))).toBeCloseTo(0.6, 10);
     expect(toDecimal(negate(F(3, 5)))).toBeCloseTo(-0.6, 10);
   });
 
