@@ -8,13 +8,18 @@ import { defineConfig, devices } from '@playwright/test';
  * - `firefox`, `webkit`, `ipad-webkit` — cross-browser (CI report-only: firefox+webkit)
  * - `visual-desktop`, `visual-phone` — start + openings baselines (`npm run test:e2e:visual`)
  *
- * CI required e2e: chromium. Report-only: mobile-touch + e2e-cross-browser + visual-baseline.
+ * CI required e2e: chromium (excludes @fullgame via grep-invert). Report-only:
+ *   mobile-touch + e2e-cross-browser + visual-baseline + e2e-fullgame.
  *   npm run test:e2e:cross
  *   npm run test:e2e -- --project=firefox --project=webkit
  *   CROSS_BROWSER=1 …        # env documented for CI matrices
  *
  * Mobile touch smoke (phone + tablet, report-only):
  *   npm run test:e2e:mobile
+ *
+ * Fullgame HvH suite (Chromium, report-only):
+ *   npm run test:e2e:fullgame
+ *   npx playwright test tests/e2e/fullgame --project=chromium
  *
  * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
@@ -33,6 +38,14 @@ const workerLimit = process.env.CI ? 1 : 2;
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =
   /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
+
+/**
+ * Fullgame HvH specs live under tests/e2e/fullgame/ and stay on the chromium
+ * project so `npx playwright test tests/e2e/fullgame --project=chromium` works.
+ * Firefox/WebKit/iPad ignore them (too long for cross-browser report-only).
+ * Required CI excludes them via `--grep-invert @fullgame`.
+ */
+const fullgameSpecs = /fullgame\/.*\.spec\.ts/;
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -75,17 +88,17 @@ export default defineConfig({
     },
     {
       name: 'firefox',
-      testIgnore: nonDefaultSpecs,
+      testIgnore: [nonDefaultSpecs, fullgameSpecs],
       use: { ...devices['Desktop Firefox'] },
     },
     {
       name: 'webkit',
-      testIgnore: nonDefaultSpecs,
+      testIgnore: [nonDefaultSpecs, fullgameSpecs],
       use: { ...devices['Desktop Safari'] },
     },
     {
       name: 'ipad-webkit',
-      testIgnore: nonDefaultSpecs,
+      testIgnore: [nonDefaultSpecs, fullgameSpecs],
       use: { ...devices['iPad Pro 11'] },
     },
     {
