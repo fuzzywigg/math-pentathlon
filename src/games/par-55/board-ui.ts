@@ -1,14 +1,14 @@
 // Par 55 Board UI
 // Rendering pentagon bases, attribute blocks, and game state
 
-import {
+import type {
   Par55State,
   Base,
   AttributeBlock,
   Player,
-  CONFIG,
   BlockColor,
 } from './types';
+import { CONFIG } from './types';
 import { getValidPlacements, calculateScore } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';

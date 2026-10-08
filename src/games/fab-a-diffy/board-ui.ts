@@ -1,8 +1,8 @@
 // Fab-a-Diffy Board UI
 // Rendering fraction bars, answer board, and operation selection
 
-import { FabADiffyState, FractionBar, AnswerBar } from './types';
-import { FractionOperation } from '../../core/fractions/types';
+import type { FabADiffyState, FractionBar, AnswerBar } from './types';
+import type { FractionOperation } from '../../core/fractions/types';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 import {
   findMatchingAnswers,

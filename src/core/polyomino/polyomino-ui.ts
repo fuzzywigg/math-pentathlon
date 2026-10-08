@@ -1,8 +1,14 @@
 // Polyomino UI - Visual Rendering and Interaction
 // Renders polyomino shapes, boards, and handles drag-and-drop
 
-import { Cell, PolyominoShape, Rotation, PolyominoRenderConfig } from './types';
-import { Board, validatePlacement } from './placement';
+import type {
+  Cell,
+  PolyominoShape,
+  Rotation,
+  PolyominoRenderConfig,
+} from './types';
+import type { Board } from './placement';
+import { validatePlacement } from './placement';
 import {
   getTransformedCells,
   getBoundingBox,

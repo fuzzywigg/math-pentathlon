@@ -2,13 +2,8 @@
 // Player 1 (Blue) wins by connecting top edge to bottom edge
 // Player 2 (Red) wins by connecting left edge to right edge
 
-import {
-  HexBoard,
-  HexPosition,
-  Player,
-  HexGameState,
-  getOpponent,
-} from './types';
+import type { HexBoard, HexPosition, Player, HexGameState } from './types';
+import { getOpponent } from './types';
 
 // Check if a position is valid on the board
 export function isValidPosition(pos: HexPosition, boardSize: number): boolean {

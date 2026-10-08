@@ -1,7 +1,8 @@
 // Fraction Pinball Board UI
 // Renders the pinball-style game board, challenges, and scores
 
-import { FractionPinballState, Player, getPlayerStats } from './types';
+import type { FractionPinballState, Player } from './types';
+import { getPlayerStats } from './types';
 import { formatDecimal, formatFraction } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 

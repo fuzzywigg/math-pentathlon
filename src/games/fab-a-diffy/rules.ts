@@ -1,12 +1,14 @@
 // Fab-a-Diffy Game Rules
 // Fraction combination logic, matching, and scoring
 
-import {
+import type {
   FabADiffyState,
   FractionBar,
   AnswerBar,
   FabMove,
   Player,
+} from './types';
+import {
   FRACTION_BAR_VALUES,
   ANSWER_BAR_VALUES,
   createBarId,
@@ -14,7 +16,7 @@ import {
   getOpponent,
   shuffleArray,
 } from './types';
-import { Fraction, FractionOperation } from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
 import {
   add,
   subtract,

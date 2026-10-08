@@ -12,7 +12,8 @@
 // 4. Higher value boxes (9, 10) give more points but are harder to complete
 // 5. Sometimes it's better to wait for the right rod than place randomly
 
-import { RamrodState, Player, CONFIG } from './types';
+import type { RamrodState, Player } from './types';
+import { CONFIG } from './types';
 import {
   selectRod,
   placeRod,

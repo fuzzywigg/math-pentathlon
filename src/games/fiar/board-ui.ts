@@ -1,6 +1,7 @@
 // FIAR Board UI — SVG rendering (marked chips, yellow center, gapped wins)
 
-import { FiarGameState, CONFIG, Player } from './types';
+import type { FiarGameState, Player } from './types';
+import { CONFIG } from './types';
 import {
   getValidMoves,
   getSelectableNodes,

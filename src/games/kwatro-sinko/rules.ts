@@ -1,18 +1,15 @@
 // Kwatro-Sinko Game Rules
 // Movement along pathways, creating alignments of 4 or 5
 
-import {
+import type {
   KwaState,
   BoardNode,
   Chip,
   Alignment,
   KwaMove,
   Player,
-  PLAYER_CHIPS,
-  getOpponent,
-  createChip,
-  isWinningValue,
 } from './types';
+import { PLAYER_CHIPS, getOpponent, createChip, isWinningValue } from './types';
 
 // =============================================================================
 // Board Creation

@@ -13,9 +13,8 @@
 // 4. Watch for "traps" - don't set up captures for your opponent
 // 5. Sometimes it's better to make your opponent empty their side
 
+import type { CallaGameState, Player } from './types';
 import {
-  CallaGameState,
-  Player,
   PITS_PER_SIDE,
   getOpponent,
   getPlayerPits,
@@ -150,10 +149,12 @@ function evaluatePosition(state: CallaGameState, player: Player): number {
     const playerCalla = getPlayerCalla(state, player);
     const opponentCalla = getPlayerCalla(state, opponent);
 
-    if (playerCalla > opponentCalla)
+    if (playerCalla > opponentCalla) {
       return 10000 + (playerCalla - opponentCalla);
-    if (opponentCalla > playerCalla)
+    }
+    if (opponentCalla > playerCalla) {
       return -10000 - (opponentCalla - playerCalla);
+    }
     return 0; // Tie
   }
 

@@ -1,17 +1,14 @@
 // Prime Gold Game Rules
 // Spiral board, prime pathways, and mathematical expressions
 
-import {
+import type {
   PrimeGoldState,
   BoardCell,
   DiceRoll,
   Player,
   MoveRecord,
-  CONFIG,
-  DICE_CONFIG,
-  isPrime,
-  generateExpressions,
 } from './types';
+import { CONFIG, DICE_CONFIG, isPrime, generateExpressions } from './types';
 
 // =============================================================================
 // Board Creation - Spiral Pattern

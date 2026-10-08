@@ -1,7 +1,7 @@
 // Par 55 Game Controller
 // Manages game flow, AI, and UI updates
 
-import { Par55State, Player } from './types';
+import type { Par55State, Player } from './types';
 import {
   createInitialState,
   selectBlock,
@@ -10,7 +10,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderHand,

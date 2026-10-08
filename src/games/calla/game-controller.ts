@@ -1,6 +1,7 @@
 // Calla Game Controller
 
-import { CallaGameState, createInitialState } from './types';
+import type { CallaGameState } from './types';
+import { createInitialState } from './types';
 import {
   makeMove,
   isGameOver,
@@ -11,7 +12,8 @@ import { renderBoard, renderStatus } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { callaTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { getAIMove, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 
 function syncOpponentChrome(): void {

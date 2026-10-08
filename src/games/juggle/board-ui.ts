@@ -1,8 +1,8 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
+import type { JuggleState } from './types';
 import {
-  JuggleState,
   CONFIG,
   getCategoryFromDie,
   getShapesForDie,
@@ -15,8 +15,12 @@ import {
   getCurrentOrientationPlacements,
   selectedShapeFitsAnywhere,
 } from './rules';
-import { Board } from '../../core/polyomino/placement';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 
@@ -95,7 +99,7 @@ function previewStateForBoard(
       : new Set<string>();
   return {
     previewSet,
-    isPreviewValid: !!isPreviewValid,
+    isPreviewValid: Boolean(isPreviewValid),
     legalAnchors,
     showPreview,
   };

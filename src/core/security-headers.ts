@@ -49,9 +49,7 @@ export function securityHeadersForEnv(
   mode: 'development' | 'production' | string
 ): Record<string, string> {
   const csp =
-    mode === 'development'
-      ? CSP_REPORT_ONLY_DEV
-      : CSP_REPORT_ONLY_PRODUCTION;
+    mode === 'development' ? CSP_REPORT_ONLY_DEV : CSP_REPORT_ONLY_PRODUCTION;
   return {
     ...SECURITY_HEADERS,
     'Content-Security-Policy-Report-Only': csp,

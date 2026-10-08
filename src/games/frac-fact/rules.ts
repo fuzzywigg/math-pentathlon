@@ -1,22 +1,21 @@
 // Frac Fact Game Rules
 // Problem generation, answer checking, and scoring
 
-import {
+import type {
   FracFactState,
   FractionProblem,
   PlayerStats,
   Difficulty,
   Player,
+} from './types';
+import {
   getOpponent,
   getPlayerStats,
   POINTS_PER_CORRECT,
   STREAK_BONUS,
 } from './types';
-import {
-  Fraction,
-  FractionOperation,
-  COMMON_FRACTIONS,
-} from '../../core/fractions/types';
+import type { Fraction, FractionOperation } from '../../core/fractions/types';
+import { COMMON_FRACTIONS } from '../../core/fractions/types';
 import {
   performOperation,
   simplify,

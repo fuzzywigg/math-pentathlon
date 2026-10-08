@@ -1,7 +1,7 @@
 // Tutorial content for Par 55
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const par55Tutorial: TutorialConfig = {
   id: 'par-55-basics',

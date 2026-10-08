@@ -1,12 +1,14 @@
 // FIAR Game Rules — Division II PDF (auto-detect wins; no timer)
 
-import {
+import type {
   FiarGameState,
   Player,
   FiarMove,
   ChipKind,
-  CONFIG,
   PathResult,
+} from './types';
+import {
+  CONFIG,
   getOpponent,
   getConnectedNodes,
   getNodesInDirection,

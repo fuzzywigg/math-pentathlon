@@ -1,11 +1,8 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  FractionPinballState,
-  createInitialState,
-  getPlayerStats,
-} from './types';
+import type { FractionPinballState } from './types';
+import { createInitialState, getPlayerStats } from './types';
 import { submitAnswer, nextChallenge, startGame } from './rules';
 import {
   renderChallenge,
@@ -17,7 +14,8 @@ import {
   injectFractionPinballStyles,
   type PinballGameMode,
 } from './board-ui';
-import { getAIAnswer, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIAnswer } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
@@ -200,8 +198,12 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2')
+  if (
+    gameState.phase !== 'answering' ||
+    gameState.currentPlayer !== 'player2'
+  ) {
     return;
+  }
   if (!gameState.currentChallenge) return;
 
   // Use AI module to get answer; fall back so vs-AI never soft-locks on null.

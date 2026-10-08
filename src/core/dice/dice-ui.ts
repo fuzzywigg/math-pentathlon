@@ -1,6 +1,7 @@
 // Dice UI - SVG rendering with animations
 
-import { DiceType, DieRoll, RollResult, DICE_CONFIGS } from './types';
+import type { DiceType, DieRoll, RollResult } from './types';
+import { DICE_CONFIGS } from './types';
 import { getUserReducedMotionFlag } from '../settings-flags';
 
 import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';

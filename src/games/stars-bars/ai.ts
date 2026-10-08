@@ -14,13 +14,8 @@
 // 5. Look for cards that are "opposite" to multiple neighbors
 // 6. Early center control gives more scoring opportunities
 
-import {
-  StarsState,
-  Player,
-  AttributeCard,
-  CONFIG,
-  countDifferences,
-} from './types';
+import type { StarsState, Player, AttributeCard } from './types';
+import { CONFIG, countDifferences } from './types';
 import {
   selectCard,
   placeCard,

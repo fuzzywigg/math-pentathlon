@@ -13,9 +13,9 @@
 // 4. Some answers can be made multiple ways - find the one using bars you want to use
 // 5. Check if your answer simplifies to match a target (2/4 = 1/2)
 
-import { FabADiffyState, Player, FractionBar } from './types';
+import type { FabADiffyState, Player, FractionBar } from './types';
 
-import { FractionOperation } from '../../core/fractions/types';
+import type { FractionOperation } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
 import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 

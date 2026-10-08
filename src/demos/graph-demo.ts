@@ -8,11 +8,8 @@ import {
   safeHtml,
 } from '../core/dom-security';
 
+import type { Graph, GraphBoard, NodeId, NodeState } from '../core/graph/types';
 import {
-  Graph,
-  GraphBoard,
-  NodeId,
-  NodeState,
   createGridGraph,
   createCircularGraph,
   createStarGraph,
@@ -407,18 +404,21 @@ function initPathfindingSection(): void {
   function handleNodeClick(nodeId: NodeId): void {
     if (!startNode) {
       startNode = nodeId;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
+      }
     } else if (!endNode && nodeId !== startNode) {
       endNode = nodeId;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Path from ${startNode} to ${endNode}`;
+      }
     } else {
       // Reset and start new selection
       startNode = nodeId;
       endNode = null;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
+      }
       if (resultEl) clearElement(resultEl);
     }
 

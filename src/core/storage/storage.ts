@@ -12,7 +12,7 @@ import {
   MAX_PROFILE_AVATAR_LENGTH,
   MAX_PROFILE_NAME_LENGTH,
 } from './sanitize';
-import {
+import type {
   ProgressData,
   PlayerProfile,
   GameStats,
@@ -21,6 +21,8 @@ import {
   Achievement,
   UserSettings,
   OwlState,
+} from './types';
+import {
   createDefaultProgress,
   createDefaultGameStats,
   CURRENT_DATA_VERSION,

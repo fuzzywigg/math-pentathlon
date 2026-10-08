@@ -18,7 +18,8 @@
 // - Opponent-win blocking is skipped when the opponent still has ≥2 chips on
 //   numbered spaces (they cannot win on their next move).
 
-import { KwaState, Player, Chip, BoardNode, getOpponent } from './types';
+import type { KwaState, Player, Chip, BoardNode } from './types';
+import { getOpponent } from './types';
 import {
   selectChip,
   moveChip,

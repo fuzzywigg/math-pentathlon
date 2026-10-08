@@ -1,7 +1,7 @@
 // Kwatro-Sinko Board UI
 // Rendering the pathway board, chips, and game state
 
-import { KwaState, BoardNode, Chip, Player } from './types';
+import type { KwaState, BoardNode, Chip, Player } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
@@ -155,7 +155,7 @@ function renderNode(
 
   const canSelect =
     allowInput &&
-    !!node.chip &&
+    Boolean(node.chip) &&
     state.phase === 'selectingChip' &&
     node.chip.owner === state.currentPlayer;
 

@@ -1,7 +1,7 @@
 // Kwatro-Sinko Game Controller
 // Manages game flow, AI, and UI updates
 
-import { KwaState, Player } from './types';
+import type { KwaState, Player } from './types';
 import {
   createInitialState,
   selectChip,
@@ -10,7 +10,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderChipInfo,

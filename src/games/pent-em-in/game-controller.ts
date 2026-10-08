@@ -1,7 +1,8 @@
 // Pent'Em In Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { PentEmInState, createInitialState, getPlayerPieces } from './types';
+import type { PentEmInState } from './types';
+import { createInitialState, getPlayerPieces } from './types';
 import {
   selectPiece,
   rotateSelectedPiece,
@@ -21,8 +22,9 @@ import {
   injectPentEmInStyles,
   patchPentPreview,
 } from './board-ui';
-import { Cell } from '../../core/polyomino/types';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { Cell } from '../../core/polyomino/types';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';

@@ -1,6 +1,6 @@
 // Hex Board UI - Renders the hexagonal game board
 
-import { HexGameState, HexPosition } from './types';
+import type { HexGameState, HexPosition } from './types';
 import { getWinningPath } from './rules';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
 import {
@@ -344,7 +344,7 @@ function syncHexCell(
   const isValidPlacement =
     cellState === null &&
     state.winner === null &&
-    !!onCellClick &&
+    Boolean(onCellClick) &&
     !isComputerPlacementTurn(state);
 
   makeGridCell(

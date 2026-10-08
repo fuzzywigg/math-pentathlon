@@ -12,12 +12,8 @@
 // 3. Count how many spaces you need to win before choosing
 // 4. Think about what chain you're giving back - your opponent might get it!
 
-import {
-  StarTrackGameState,
-  Player,
-  TRACK_LENGTH,
-  getPlayerPosition,
-} from './types';
+import type { StarTrackGameState, Player } from './types';
+import { TRACK_LENGTH, getPlayerPosition } from './types';
 
 import { drawChains, selectChain, isGameOver } from './rules';
 

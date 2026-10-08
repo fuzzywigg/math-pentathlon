@@ -1,14 +1,13 @@
 // Sum Dominoes & Dice Board UI
 // Rendering dominoes, board, and dice
 
-import {
+import type {
   SumDominoesState,
   Domino,
   PlacedDomino,
   BoardPosition,
-  CONFIG,
-  getDiceSum,
 } from './types';
+import { CONFIG, getDiceSum } from './types';
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
@@ -259,7 +258,7 @@ export function renderHand(
     allowInput &&
     isCurrentPlayer &&
     state.phase === 'placing' &&
-    !!state.currentDice;
+    Boolean(state.currentDice);
 
   for (const domino of hand) {
     const isPlayable = canSelect

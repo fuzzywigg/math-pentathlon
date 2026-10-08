@@ -467,8 +467,9 @@ export async function createPrimeGoldBoard3D(
       else if (focusedValue === cell.value) tileMat = mats.tileFocus;
       else if (veinOwner === 'player1') tileMat = mats.tileVein1;
       else if (veinOwner === 'player2') tileMat = mats.tileVein2;
-      else if (last && last.row === cm.row && last.col === cm.col)
+      else if (last && last.row === cm.row && last.col === cm.col) {
         tileMat = mats.tileLast;
+      }
 
       cm.tile.material = tileMat;
     }

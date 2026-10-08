@@ -1,6 +1,5 @@
+import type { GameState, Position } from './game-state';
 import {
-  GameState,
-  Position,
   selectKing,
   moveKing,
   placeQuadraphage,
@@ -12,7 +11,7 @@ import {
   getSupply,
 } from './game-state';
 import { getOpponent } from './rules';
-import { PlayerOwner } from './pieces';
+import type { PlayerOwner } from './pieces';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
 import { clearElement } from '../../core/dom-security';
 
@@ -237,7 +236,7 @@ function syncKingsCell(
 
   const isValidMoveTarget =
     announceTargets &&
-    !!state.selectedKingPosition &&
+    Boolean(state.selectedKingPosition) &&
     state.turnPhase === 'moveKing' &&
     isValidMove(state, { row, col });
 

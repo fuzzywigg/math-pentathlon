@@ -1,19 +1,21 @@
 // Juggle Game Rules
 // Dice rolling, shape selection, and placement logic
 
+import type { JuggleState, Player, JuggleMove } from './types';
 import {
-  JuggleState,
-  Player,
-  JuggleMove,
   CONFIG,
   getOpponent,
   rollDice,
   getCategoryFromDie,
   getShapesForDie,
 } from './types';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
 import {
-  Board,
   createBoard,
   validatePlacement,
   placePolyomino,

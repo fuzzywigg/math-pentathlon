@@ -75,7 +75,11 @@ export function registerPwa(
     },
   });
 
-  return { update: updateSW };
+  return {
+    update: () => {
+      void updateSW();
+    },
+  };
 }
 
 function scheduleReload(reload: () => void): void {

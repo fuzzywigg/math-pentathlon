@@ -1,14 +1,8 @@
 // Queens & Guards Board UI
 // SVG rendering for the hexagonal game board
 
-import {
-  QueensGuardsState,
-  CONFIG,
-  BoardCoord,
-  cellKey,
-  cellsInRing,
-  parseKey,
-} from './types';
+import type { QueensGuardsState, BoardCoord } from './types';
+import { CONFIG, cellKey, cellsInRing, parseKey } from './types';
 import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import {

@@ -387,9 +387,9 @@ export async function createFiarBoard3D(
 
       let padMat = mats.space;
       if (valid.includes(nm.id)) padMat = mats.spaceValid;
-      else if (state.phase === 'placement' && node.chip === null)
+      else if (state.phase === 'placement' && node.chip === null) {
         padMat = mats.spaceHover;
-      else if (state.selectedNode === nm.id) padMat = mats.selected;
+      } else if (state.selectedNode === nm.id) padMat = mats.selected;
       nm.pad.material = padMat;
 
       if (!node.chip) {

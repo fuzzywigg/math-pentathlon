@@ -1,7 +1,8 @@
 // Ramrod Game Controller
 // Manages game flow, AI, and UI updates
 
-import { RamrodState, Player, getOpponent } from './types';
+import type { RamrodState, Player } from './types';
+import { getOpponent } from './types';
 import {
   createInitialState,
   selectRod,
@@ -11,7 +12,8 @@ import {
   hasValidMoves,
   getValidPlacements,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderPlayerRods,

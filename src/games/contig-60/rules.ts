@@ -1,11 +1,8 @@
 // Contig 60 Game Rules
 // Game logic for rolling, placing, and scoring
 
+import type { ContigState, Player, ContigWinner, ContigMove } from './types';
 import {
-  ContigState,
-  Player,
-  ContigWinner,
-  ContigMove,
   CONFIG,
   getOpponent,
   getAdjacentPositions,

@@ -1,7 +1,8 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import { PrimeGoldState, Player, CONFIG, isPrime } from './types';
+import type { PrimeGoldState, Player } from './types';
+import { CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,
@@ -494,7 +495,7 @@ export function renderBoard(
         if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
 
         const expr = validMap.get(cell.value);
-        const isValid = allowInput && !!expr;
+        const isValid = allowInput && Boolean(expr);
 
         if (isValid && expr) {
           cellEl.classList.add('valid');

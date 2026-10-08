@@ -12,13 +12,8 @@
 // 4. Double dominoes (3-3, 5-5) have only one useful face value
 // 5. Think ahead: what dice rolls will give you playable dominoes?
 
-import {
-  SumDominoesState,
-  Player,
-  Domino,
-  BoardPosition,
-  getDiceSum,
-} from './types';
+import type { SumDominoesState, Player, Domino, BoardPosition } from './types';
+import { getDiceSum } from './types';
 import {
   doRollDice,
   selectDomino,

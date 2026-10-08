@@ -1,12 +1,8 @@
 // Contig 60 Board UI
 // Rendering the game board, dice, and expression selection
 
-import {
-  ContigState,
-  CONFIG,
-  BOARD_NUMBERS,
-  getValidPlacements,
-} from './types';
+import type { ContigState } from './types';
+import { CONFIG, BOARD_NUMBERS, getValidPlacements } from './types';
 import { calculatePoints } from './rules';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 

@@ -1,9 +1,8 @@
 // Calla Game Rules
 // Mancala-style distribution, capture, and free turn mechanics
 
+import type { CallaGameState, Player } from './types';
 import {
-  CallaGameState,
-  Player,
   PITS_PER_SIDE,
   getOpponent,
   getPlayerPits,

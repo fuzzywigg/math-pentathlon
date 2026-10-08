@@ -1,0 +1,6 @@
+{
+  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet.",
+  "rules": {
+    "curly": 1456
+  }
+}

@@ -12,8 +12,8 @@
 // 4. Always simplify your answer (divide by GCD)
 // 5. Watch for distractors that use common mistakes
 
-import { FracFactState, Player, FractionProblem } from './types';
-import { Fraction } from '../../core/fractions/types';
+import type { FracFactState, Player, FractionProblem } from './types';
+import type { Fraction } from '../../core/fractions/types';
 import { areEquivalent } from '../../core/fractions/arithmetic';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';

@@ -1,18 +1,20 @@
 // Pent'Em In Game Rules
 // Placement validation, move execution, and win detection
 
-import {
+import type {
   PentEmInState,
   Player,
   PlacedPiece,
   BoardCell,
   MoveRecord,
+} from './types';
+import {
   BOARD_SIZE,
   getOpponent,
   getPlayerPieces,
   getPentominoShape,
 } from './types';
-import { Cell, Rotation } from '../../core/polyomino/types';
+import type { Cell, Rotation } from '../../core/polyomino/types';
 import {
   rotateCells,
   flipCellsHorizontal as flipCells,

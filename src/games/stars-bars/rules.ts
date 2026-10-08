@@ -1,12 +1,14 @@
 // Stars & Bars Game Rules
 // Attribute logic placement game
 
-import {
+import type {
   StarsState,
   BoardCell,
   AttributeCard,
   Player,
   MoveRecord,
+} from './types';
+import {
   CONFIG,
   SHAPES,
   COLORS,

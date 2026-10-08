@@ -1,5 +1,6 @@
 import { clearElement } from '../../core/dom-security';
-import { Board, BOARD_SIZE, Position, Cell } from './board';
+import type { Board, Position, Cell } from './board';
+import { BOARD_SIZE } from './board';
 
 export type CellClickHandler = (position: Position) => void;
 

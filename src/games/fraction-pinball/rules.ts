@@ -1,16 +1,15 @@
 // Fraction Pinball Game Rules
 // Challenge generation, answer checking, and scoring
 
-import {
+import type {
   FractionPinballState,
   ConversionChallenge,
   PlayerStats,
   PinballTarget,
-  getOpponent,
-  getPlayerStats,
-  TARGET_POINTS,
 } from './types';
-import { Fraction, COMMON_FRACTIONS } from '../../core/fractions/types';
+import { getOpponent, getPlayerStats, TARGET_POINTS } from './types';
+import type { Fraction } from '../../core/fractions/types';
+import { COMMON_FRACTIONS } from '../../core/fractions/types';
 import {
   toDecimal,
   simplify,

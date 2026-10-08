@@ -1,7 +1,7 @@
 // Tutorial content for Ramrod
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const ramrodTutorial: TutorialConfig = {
   id: 'ramrod-basics',

@@ -1,13 +1,7 @@
 // FIAR Game Controller — Division II rules + kid-friendly auto-win / no timer
 
-import {
-  FiarGameState,
-  Player,
-  ChipKind,
-  createInitialState,
-  CONFIG,
-  chipsRemaining,
-} from './types';
+import type { FiarGameState, Player, ChipKind } from './types';
+import { createInitialState, CONFIG, chipsRemaining } from './types';
 import {
   canPlaceChip,
   placeChip,
@@ -19,7 +13,8 @@ import {
   normalizeSelectedChipKind,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
-import { applyAIMove, getAIMove, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { applyAIMove, getAIMove } from './ai';
 import {
   cancelFiarAiRequests,
   disposeFiarAiWorker,

@@ -1,12 +1,8 @@
 // Ramrod Game Rules
 // Place rods to complete sum boxes, capture with addend combinations
 
+import type { RamrodState, SumBox, Rod, RamrodMove, Player } from './types';
 import {
-  RamrodState,
-  SumBox,
-  Rod,
-  RamrodMove,
-  Player,
   CONFIG,
   createRodSet,
   shuffleArray,

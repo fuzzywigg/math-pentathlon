@@ -1,14 +1,8 @@
 // Remainder Islands Board UI
 // Renders the hexagonal island grid, dice, and game status
 
-import {
-  RemainderIslandsState,
-  DiceRoll,
-  Island,
-  Player,
-  getPlayerScore,
-  getPlayerChips,
-} from './types';
+import type { RemainderIslandsState, DiceRoll, Island, Player } from './types';
+import { getPlayerScore, getPlayerChips } from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';

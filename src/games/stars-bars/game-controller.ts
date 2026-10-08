@@ -1,7 +1,7 @@
 // Stars & Bars Game Controller
 // Manages game flow, AI, and UI updates
 
-import { StarsState, Player } from './types';
+import type { StarsState, Player } from './types';
 import {
   createInitialState,
   selectCard,
@@ -10,7 +10,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderPlayerHand,

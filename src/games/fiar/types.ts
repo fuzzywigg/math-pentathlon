@@ -1,13 +1,8 @@
 // FIAR (Four In A Row) Game Types
 // Division II alignment game: place then move chips to form 4 in a row
 
-import {
-  BoardLayout,
-  LayoutEdge,
-  YellowCenterShape,
-  createVerifiedProductionLayout,
-  edgeKey,
-} from './layout';
+import type { BoardLayout, LayoutEdge, YellowCenterShape } from './layout';
+import { createVerifiedProductionLayout, edgeKey } from './layout';
 
 export type Player = 'player1' | 'player2';
 

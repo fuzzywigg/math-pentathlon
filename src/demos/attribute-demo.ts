@@ -9,9 +9,11 @@ import {
   setText,
 } from '../core/dom-security';
 
-import {
+import type {
   AttributePiece,
   AttributeDefinition,
+} from '../core/attributes/types';
+import {
   BASIC_ATTRIBUTES,
   SET_GAME_ATTRIBUTES,
   generateAllPieces,

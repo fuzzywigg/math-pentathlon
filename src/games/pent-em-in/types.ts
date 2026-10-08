@@ -1,12 +1,12 @@
 // Pent'Em In Game Types
 // Pentomino entrapment strategy game - trap your opponent so they can't place pieces
 
-import {
+import type {
   PolyominoShape,
   Cell,
   Rotation,
-  PENTOMINOES,
 } from '../../core/polyomino/types';
+import { PENTOMINOES } from '../../core/polyomino/types';
 
 export type Player = 'player1' | 'player2';
 

@@ -1,6 +1,6 @@
 // Alignment Highlighting UI Utilities
 
-import { GridPosition, AlignmentResult, Region } from './types';
+import type { GridPosition, AlignmentResult, Region } from './types';
 
 /** Highlight style configuration */
 export interface HighlightStyle {
