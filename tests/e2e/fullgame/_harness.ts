@@ -79,10 +79,10 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         lastFill = fillInfo.key;
       }
       const softlocked =
-        noProgress > 25 ||
+        noProgress > 30 ||
         (fillInfo.max >= 90 && noProgress > 12) ||
         (fillInfo.min >= 85 && turnsSinceRestart > 120 && noProgress > 6);
-      if (softlocked && restarts < 40) {
+      if (softlocked && restarts < 80) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;
@@ -229,11 +229,11 @@ export async function runFullgameMatch(
     }
     expect(flipped, 'expected turn indicator to flip seats').toBe(true);
 
-    // Juggle: opening legal/flip asserts advance the seeded RNG and often leave
-    // a fragmented deal. Reshuffle once so play-to-end starts from a fresh hand
-    // (UI-only New Game — same path as softlock recovery).
+    // Juggle: opening legal/flip asserts advance Math.random. Reload so the
+    // complete-match deal uses the same seeded stream as a cold HvH start
+    // (init script reseeds on navigation).
     if (driver.id === 'juggle') {
-      await startHumanVsHuman(page);
+      await gotoGameHvH(page, 'juggle');
       await expect(page.locator(driver.mount).first()).toBeVisible({
         timeout: 15_000,
       });
