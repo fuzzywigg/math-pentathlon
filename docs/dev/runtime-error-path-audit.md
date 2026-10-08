@@ -85,7 +85,7 @@ In-game handler throws are generally recovered by the per-route boundary. Menu h
 | R-GL-05 | `pent-em-in-board-3d.ts:311-316` | `mp3d-context-lost` | remount 2D | **recovered** | unavailable throw; pattern matches kings |
 | R-GL-06 | `hex-a-gone-board-3d.ts:329-333` | `onWebglLost` callback | `fallBackTo2dBoard` | **recovered** | unavailable throw |
 | R-GL-07 | `star-track-board-3d.ts:381-384` | `onContextLost` callback | `fallbackTo2dBoard` | **recovered** | unavailable throw |
-| R-GL-08 | **`prime-gold-board-3d.ts:569-574`** | **unmount only — no event/callback** | keeps `board3dEnabled`; UI stays on empty 3D host | **UNRECOVERED** | CURRENT pin + skip expected fix in `mp3d-prime-gold-board-3d-lifecycle.test.ts` |
+| R-GL-08 | `prime-gold-board-3d.ts` | `mp3d-context-lost` | remount 2D | **recovered** | `mp3d-prime-gold-board-3d-lifecycle.test.ts` + board-select state preservation (#567) |
 
 ### 6. JSON.parse of saved state
 
@@ -100,7 +100,7 @@ In-game handler throws are generally recovered by the per-route boundary. Menu h
 
 | Priority | IDs | Proposed fix (for tip owner — not in this PR) |
 | --- | --- | --- |
-| **P0** | R-GL-08 | Prime Gold: on `webglcontextlost`, dispatch `mp3d-context-lost` (or callback) and clear `board3dEnabled` + remount 2D like kings/queens/hex-a-gone |
+| ~~**P0**~~ | ~~R-GL-08~~ | **Done in #567** — Prime Gold dispatches `mp3d-context-lost` and remounts playable 2D (kings/kwatro pattern) |
 | **P1** | R-SHELL-02, R-SHELL-07 | Wrap `destroyGame` + `shell.cleanup` in try/finally so one throw cannot strand shell listeners |
 | **P1** | R-SHELL-08 | Register cleanup before `init*Game`, or `finally` call `shell.cleanup()` if init throws |
 | **P2** | R-IMP-04 | `bootstrapOwl`: try/catch like idle-warm; never leave unhandled rejection |
@@ -126,7 +126,7 @@ git diff --name-only cursor/integration-fold-wave5-tip-4af0...HEAD
 | Test file | Pins |
 | --- | --- |
 | `tests/unit/runtime-error-path-audit.test.ts` | Inventory behavior pins + todo/skip for unrecovered |
-| `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts` | CURRENT context-lost (no notify) + skip expected 2D fallback |
+| `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts` | R-GL-08 recovered: context-lost → `mp3d-context-lost` (+ board-select 2D fallback/state pin) |
 | `tests/unit/game-error-boundary.test.ts` | Crash UI / window error / rejection |
 | `tests/unit/burn-1007-main-shell-routes.test.ts` | Mount reject → load-error |
 | `tests/unit/burn-1007-game-route-mounts.test.ts` | Mount/cleanup wiring (#480 adjacency) |

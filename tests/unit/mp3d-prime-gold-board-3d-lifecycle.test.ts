@@ -325,11 +325,11 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {
   });
 
   /**
-   * R-GL-08 CURRENT (burn-1008 runtime-error-path-audit):
-   * webglcontextlost tears down the canvas but does NOT dispatch
-   * mp3d-context-lost — controller keeps board3dEnabled and leaves an empty host.
+   * R-GL-08 recovered (burn-1008 runtime-error-path-audit P0):
+   * webglcontextlost tears down and dispatches mp3d-context-lost for 2D fallback
+   * — same pattern as kings/queens/fiar/kwatro.
    */
-  it('CURRENT: webglcontextlost unmounts canvas without mp3d-context-lost notify', async () => {
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
     const three = installThreeMock();
     vi.doMock('../../src/ui/three/load-three', () => ({
       loadThree: async () => three,
@@ -349,12 +349,7 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {
     board.canvas.dispatchEvent(event);
 
     expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
     expect(host.querySelector('canvas')).toBeNull();
-    expect(lost).not.toHaveBeenCalled();
-  });
-
-  it.skip('TODO(runtime-error-path P0 R-GL-08): Prime Gold webglcontextlost should dispatch mp3d-context-lost for 2D fallback', () => {
-    // Expected fix: notify like kings/queens; controller clears board3dEnabled and remounts 2D.
-    expect(true).toBe(false);
   });
 });
