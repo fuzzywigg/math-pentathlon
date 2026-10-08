@@ -23,33 +23,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 5.562117999999941,
-              "nsPerOp": 111.24235999999883,
-              "opsPerSec": 8989381.38313508,
+              "totalMs": 5.3848259999999755,
+              "nsPerOp": 107.69651999999951,
+              "opsPerSec": 9285351.095838608,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 11.077258000000029,
-              "nsPerOp": 221.5451600000006,
-              "opsPerSec": 4513752.410569463,
+              "totalMs": 11.12161100000003,
+              "nsPerOp": 222.4322200000006,
+              "opsPerSec": 4495751.559733556,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.6743280000000595,
-              "nsPerOp": 53.48656000000119,
-              "opsPerSec": 18696285.57155251,
+              "totalMs": 2.538921000000073,
+              "nsPerOp": 50.77842000000146,
+              "opsPerSec": 19693405.190629628,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 10606,
-              "totalMs": 120.00737500000002,
-              "nsPerOp": 11315.04572883274,
-              "opsPerSec": 88377.90177478673,
+              "iters": 10459,
+              "totalMs": 120.01022599999999,
+              "nsPerOp": 11474.349937852565,
+              "opsPerSec": 87150.9066235739,
               "available": true
             },
             {
@@ -81,50 +81,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 5.466996000000108,
-              "nsPerOp": 109.33992000000217,
-              "opsPerSec": 9145790.485304728,
+              "totalMs": 5.1029439999999795,
+              "nsPerOp": 102.05887999999959,
+              "opsPerSec": 9798265.47185315,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 10.217947999999978,
-              "nsPerOp": 204.35895999999954,
-              "opsPerSec": 4893350.406559136,
+              "totalMs": 9.996353999999997,
+              "nsPerOp": 199.92707999999993,
+              "opsPerSec": 5001823.664908227,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4227529999999433,
-              "nsPerOp": 48.455059999998866,
-              "opsPerSec": 20637679.532334153,
+              "totalMs": 2.738770999999929,
+              "nsPerOp": 54.775419999998576,
+              "opsPerSec": 18256363.894608676,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 2782,
-              "totalMs": 120.03013300000009,
-              "nsPerOp": 43145.26707404748,
-              "opsPerSec": 23177.513266606125,
+              "iters": 2747,
+              "totalMs": 120.038636,
+              "nsPerOp": 43698.08372770295,
+              "opsPerSec": 22884.298685299957,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 50000,
-              "totalMs": 116.60244499999999,
-              "nsPerOp": 2332.0489,
-              "opsPerSec": 428807.474834683,
+              "iters": 48544,
+              "totalMs": 120.00023800000008,
+              "nsPerOp": 2471.989082069876,
+              "opsPerSec": 404532.5310104799,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 43532,
-              "totalMs": 120.00141699999995,
-              "nsPerOp": 2756.625402003123,
-              "opsPerSec": 362762.383047527,
+              "iters": 40285,
+              "totalMs": 120.00250699999992,
+              "nsPerOp": 2978.838451036364,
+              "opsPerSec": 335701.3199732571,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -139,50 +139,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 4.129265000000032,
-              "nsPerOp": 82.58530000000064,
-              "opsPerSec": 12108692.467061235,
+              "totalMs": 3.930306999999857,
+              "nsPerOp": 78.60613999999714,
+              "opsPerSec": 12721652.532487111,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 13.444915000000037,
-              "nsPerOp": 268.89830000000075,
-              "opsPerSec": 3718878.1037291694,
+              "totalMs": 13.644502000000102,
+              "nsPerOp": 272.89004000000205,
+              "opsPerSec": 3664479.656348002,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.6111539999999422,
-              "nsPerOp": 52.223079999998845,
-              "opsPerSec": 19148621.64391725,
+              "totalMs": 2.4624700000001667,
+              "nsPerOp": 49.249400000003334,
+              "opsPerSec": 20304815.896232896,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1518,
-              "totalMs": 120.0037440000001,
-              "nsPerOp": 79053.84980237161,
-              "opsPerSec": 12649.605332313622,
+              "iters": 1496,
+              "totalMs": 120.02993200000014,
+              "nsPerOp": 80233.91176470598,
+              "opsPerSec": 12463.557839889456,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 20649,
-              "totalMs": 120.00540000000001,
-              "nsPerOp": 5811.680953072789,
-              "opsPerSec": 172067.2569734362,
+              "iters": 18343,
+              "totalMs": 120.00405499999988,
+              "nsPerOp": 6542.226189827175,
+              "opsPerSec": 152853.16817002575,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 20230,
-              "totalMs": 120.00169600000027,
-              "nsPerOp": 5931.868314384591,
-              "opsPerSec": 168580.95072256273,
+              "iters": 19008,
+              "totalMs": 120.00145099999986,
+              "nsPerOp": 6313.207649410768,
+              "opsPerSec": 158398.08470315931,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -202,33 +202,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3996369999999843,
-              "nsPerOp": 47.992739999999685,
-              "opsPerSec": 20836484.851667285,
+              "totalMs": 2.3692269999996824,
+              "nsPerOp": 47.38453999999365,
+              "opsPerSec": 21103929.67833251,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 10501,
-              "totalMs": 120.00794999999971,
-              "nsPerOp": 11428.240167603059,
-              "opsPerSec": 87502.53629030431,
+              "iters": 10597,
+              "totalMs": 120.0106410000003,
+              "nsPerOp": 11324.963763329271,
+              "opsPerSec": 88300.5032862042,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3815499999996064,
-              "nsPerOp": 47.63099999999213,
-              "opsPerSec": 20994730.322692476,
+              "totalMs": 2.4141500000000633,
+              "nsPerOp": 48.283000000001266,
+              "opsPerSec": 20711223.411966402,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 549,
-              "totalMs": 120.09468400000014,
-              "nsPerOp": 218751.7012750458,
-              "opsPerSec": 4571.393018528608,
+              "iters": 550,
+              "totalMs": 120.1815630000001,
+              "nsPerOp": 218511.93272727288,
+              "opsPerSec": 4576.409111936741,
               "available": true
             },
             {
@@ -260,50 +260,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.453266999999869,
-              "nsPerOp": 49.06533999999738,
-              "opsPerSec": 20380985.84459118,
+              "totalMs": 2.499101000000337,
+              "nsPerOp": 49.98202000000674,
+              "opsPerSec": 20007194.58717085,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 10547,
-              "totalMs": 120.00708899999972,
-              "nsPerOp": 11378.31506589549,
-              "opsPerSec": 87886.47477316964,
+              "iters": 9700,
+              "totalMs": 120.01388899999984,
+              "nsPerOp": 12372.565876288643,
+              "opsPerSec": 80823.97863134003,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2977090000003955,
-              "nsPerOp": 45.95418000000791,
-              "opsPerSec": 21760806.089888405,
+              "totalMs": 2.3233000000000175,
+              "nsPerOp": 46.466000000000356,
+              "opsPerSec": 21521112.21107891,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 489,
-              "totalMs": 120.23461300000008,
-              "nsPerOp": 245878.5541922292,
-              "opsPerSec": 4067.048479625411,
+              "iters": 485,
+              "totalMs": 120.23269699999992,
+              "nsPerOp": 247902.46804123692,
+              "opsPerSec": 4033.844470776534,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 1502,
-              "totalMs": 120.04161500000009,
-              "nsPerOp": 79921.18175765652,
-              "opsPerSec": 12512.327495760524,
+              "iters": 1527,
+              "totalMs": 120.07045400000015,
+              "nsPerOp": 78631.60052390318,
+              "opsPerSec": 12717.53332422644,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1441,
-              "totalMs": 120.06071800000018,
-              "nsPerOp": 83317.6391394866,
-              "opsPerSec": 12002.260389613844,
+              "iters": 1477,
+              "totalMs": 120.01011199999994,
+              "nsPerOp": 81252.6147596479,
+              "opsPerSec": 12307.296238503643,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -318,50 +318,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3826389999999265,
-              "nsPerOp": 47.65277999999853,
-              "opsPerSec": 20985134.550387844,
+              "totalMs": 2.386359999999968,
+              "nsPerOp": 47.72719999999936,
+              "opsPerSec": 20952412.879867528,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 10720,
-              "totalMs": 120.01097200000004,
-              "nsPerOp": 11195.05335820896,
-              "opsPerSec": 89325.16603565212,
+              "iters": 10812,
+              "totalMs": 120.00823799999989,
+              "nsPerOp": 11099.541065482787,
+              "opsPerSec": 90093.81505959624,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.333937999999762,
-              "nsPerOp": 46.67875999999523,
-              "opsPerSec": 21423019.80601246,
+              "totalMs": 2.4820129999998244,
+              "nsPerOp": 49.64025999999649,
+              "opsPerSec": 20144938.805720817,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 446,
-              "totalMs": 120.02920600000016,
-              "nsPerOp": 269123.78026905865,
-              "opsPerSec": 3715.762312049281,
+              "iters": 451,
+              "totalMs": 120.07587299999977,
+              "nsPerOp": 266243.62084257154,
+              "opsPerSec": 3755.958534650844,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 664,
-              "totalMs": 120.0398210000003,
-              "nsPerOp": 180782.86295180768,
-              "opsPerSec": 5531.497751900166,
+              "iters": 677,
+              "totalMs": 120.06588899999997,
+              "nsPerOp": 177349.90989660262,
+              "opsPerSec": 5638.570668476874,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 640,
-              "totalMs": 120.17863100000022,
-              "nsPerOp": 187779.11093750034,
-              "opsPerSec": 5325.405978372301,
+              "iters": 654,
+              "totalMs": 120.09065199999986,
+              "nsPerOp": 183624.85015290498,
+              "opsPerSec": 5445.885996188952,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -380,34 +380,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 37,
-              "totalMs": 120.46473700000024,
-              "nsPerOp": 3255803.702702709,
-              "opsPerSec": 307.1438241715493,
+              "iters": 43,
+              "totalMs": 120.32981900000004,
+              "nsPerOp": 2798367.883720931,
+              "opsPerSec": 357.35115665718723,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 39582,
-              "totalMs": 120.00254899999982,
-              "nsPerOp": 3031.745465110399,
-              "opsPerSec": 329842.99358507845,
+              "iters": 41730,
+              "totalMs": 120.0020969999996,
+              "nsPerOp": 2875.6792954708744,
+              "opsPerSec": 347743.92317494366,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.317863999999645,
-              "nsPerOp": 46.3572799999929,
-              "opsPerSec": 21571584.872972555,
+              "totalMs": 2.4614369999999326,
+              "nsPerOp": 49.22873999999865,
+              "opsPerSec": 20313337.29037199,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 399,
-              "totalMs": 120.1604040000002,
-              "nsPerOp": 301153.8947368426,
-              "opsPerSec": 3320.5614055691703,
+              "iters": 406,
+              "totalMs": 120.09324500000002,
+              "nsPerOp": 295796.169950739,
+              "opsPerSec": 3380.7063836105012,
               "available": true
             },
             {
@@ -438,51 +438,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 148,
-              "totalMs": 120.16119999999955,
-              "nsPerOp": 811899.999999997,
-              "opsPerSec": 1231.6787781746566,
+              "iters": 195,
+              "totalMs": 120.25650799999949,
+              "nsPerOp": 616700.0410256383,
+              "opsPerSec": 1621.5338632650205,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 41721,
-              "totalMs": 120.00230499999998,
-              "nsPerOp": 2876.3046187771142,
-              "opsPerSec": 347668.32187098416,
+              "iters": 41526,
+              "totalMs": 120.00003500000003,
+              "nsPerOp": 2889.756658479026,
+              "opsPerSec": 346049.89906877937,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3002209999995102,
-              "nsPerOp": 46.004419999990205,
-              "opsPerSec": 21737041.788597986,
+              "totalMs": 2.4230530000004364,
+              "nsPerOp": 48.46106000000873,
+              "opsPerSec": 20635124.365827326,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 369,
-              "totalMs": 120.23051200000009,
-              "nsPerOp": 325827.94579945825,
-              "opsPerSec": 3069.1044549490043,
+              "iters": 367,
+              "totalMs": 120.11277100000007,
+              "nsPerOp": 327282.75476839254,
+              "opsPerSec": 3055.461937515369,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 3668,
-              "totalMs": 120.01063700000032,
-              "nsPerOp": 32718.276172301066,
-              "opsPerSec": 30563.95742654037,
+              "iters": 3693,
+              "totalMs": 120.02189799999996,
+              "nsPerOp": 32499.836988897907,
+              "opsPerSec": 30769.38510004234,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 3437,
-              "totalMs": 120.00758099999985,
-              "nsPerOp": 34916.37503636888,
-              "opsPerSec": 28639.857343679018,
+              "iters": 3443,
+              "totalMs": 120.03110500000003,
+              "nsPerOp": 34862.35986058671,
+              "opsPerSec": 28684.231474833123,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -497,9 +497,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.384711000000607,
-              "nsPerOp": 47.69422000001214,
-              "opsPerSec": 20966901.230374362,
+              "totalMs": 2.4203269999998156,
+              "nsPerOp": 48.40653999999631,
+              "opsPerSec": 20658365.584486645,
               "available": true
             },
             {
@@ -514,34 +514,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.315241999999671,
-              "nsPerOp": 46.30483999999342,
-              "opsPerSec": 21596014.585087482,
+              "totalMs": 2.3532079999995403,
+              "nsPerOp": 47.06415999999081,
+              "opsPerSec": 21247590.523238815,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 330,
-              "totalMs": 120.29513899999984,
-              "nsPerOp": 364530.7242424237,
-              "opsPerSec": 2743.252992126311,
+              "iters": 339,
+              "totalMs": 120.34831399999985,
+              "nsPerOp": 355009.775811209,
+              "opsPerSec": 2816.8238401744493,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 2025,
-              "totalMs": 120.05463400000008,
-              "nsPerOp": 59286.239012345715,
-              "opsPerSec": 16867.320590057345,
+              "iters": 2010,
+              "totalMs": 120.01800800000001,
+              "nsPerOp": 59710.45174129354,
+              "opsPerSec": 16747.48676048681,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1269,
-              "totalMs": 120.0142850000002,
-              "nsPerOp": 94573.90464933033,
-              "opsPerSec": 10573.741284214606,
+              "iters": 1263,
+              "totalMs": 120.02167199999985,
+              "nsPerOp": 95029.03562945356,
+              "opsPerSec": 10523.099528225215,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -561,33 +561,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 115.16445599999952,
-              "nsPerOp": 2303.2891199999904,
-              "opsPerSec": 434161.7347630263,
+              "totalMs": 107.73687999999947,
+              "nsPerOp": 2154.7375999999895,
+              "opsPerSec": 464093.6325611085,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 191,
-              "totalMs": 120.31914199999937,
-              "nsPerOp": 629943.1518324574,
-              "opsPerSec": 1587.444830682062,
+              "iters": 201,
+              "totalMs": 120.28564199999983,
+              "nsPerOp": 598436.0298507453,
+              "opsPerSec": 1671.0223818733102,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.7316609999998036,
-              "nsPerOp": 54.63321999999607,
-              "opsPerSec": 18303881.77742538,
+              "totalMs": 3.285906000000068,
+              "nsPerOp": 65.71812000000136,
+              "opsPerSec": 15216503.4544503,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 316,
-              "totalMs": 120.34688600000027,
-              "nsPerOp": 380844.57594936795,
-              "opsPerSec": 2625.743054124386,
+              "iters": 308,
+              "totalMs": 120.18069500000001,
+              "nsPerOp": 390197.06168831175,
+              "opsPerSec": 2562.807612320764,
               "available": true
             },
             {
@@ -619,50 +619,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 50.106308000000354,
-              "nsPerOp": 1002.126160000007,
-              "opsPerSec": 997878.3509653045,
+              "totalMs": 50.27347499999996,
+              "nsPerOp": 1005.4694999999992,
+              "opsPerSec": 994560.2526978698,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 21611,
-              "totalMs": 120.00053399999979,
-              "nsPerOp": 5552.752487159308,
-              "opsPerSec": 180090.86526231657,
+              "iters": 23373,
+              "totalMs": 120.00135299999965,
+              "nsPerOp": 5134.187010653303,
+              "opsPerSec": 194772.80393663616,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.686569999999847,
-              "nsPerOp": 53.73139999999694,
-              "opsPerSec": 18611091.466071177,
+              "totalMs": 2.907419000000118,
+              "nsPerOp": 58.14838000000236,
+              "opsPerSec": 17197383.65883898,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 290,
-              "totalMs": 120.3279650000004,
-              "nsPerOp": 414924.0172413807,
-              "opsPerSec": 2410.0798181037885,
+              "iters": 283,
+              "totalMs": 120.0860389999998,
+              "nsPerOp": 424332.2932862184,
+              "opsPerSec": 2356.6436394825255,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 144,
-              "totalMs": 120.05047599999943,
-              "nsPerOp": 833683.8611111072,
-              "opsPerSec": 1199.4954522296161,
+              "iters": 150,
+              "totalMs": 120.27605099999982,
+              "nsPerOp": 801840.3399999988,
+              "opsPerSec": 1247.1310685117207,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 163,
-              "totalMs": 120.40547799999968,
-              "nsPerOp": 738683.9141104275,
-              "opsPerSec": 1353.7590042207253,
+              "iters": 166,
+              "totalMs": 120.25704500000029,
+              "nsPerOp": 724440.0301204836,
+              "opsPerSec": 1380.3765093346474,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -676,51 +676,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 374,
-              "totalMs": 120.09386300000006,
-              "nsPerOp": 321106.5855614975,
-              "opsPerSec": 3114.2307413327176,
+              "iters": 388,
+              "totalMs": 120.26700299999993,
+              "nsPerOp": 309966.5025773194,
+              "opsPerSec": 3226.155057676129,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 8259,
-              "totalMs": 120.00143600000047,
-              "nsPerOp": 14529.777939217878,
-              "opsPerSec": 68824.1764040221,
+              "iters": 8580,
+              "totalMs": 120.01073600000018,
+              "nsPerOp": 13987.265268065288,
+              "opsPerSec": 71493.60370558836,
               "available": true
             },
             {
               "op": "isOver",
-              "iters": 1141,
-              "totalMs": 120.01998100000037,
-              "nsPerOp": 105188.41454864187,
-              "opsPerSec": 9506.750380172085,
+              "iters": 1145,
+              "totalMs": 120.05013700000018,
+              "nsPerOp": 104847.28122270758,
+              "opsPerSec": 9537.68174375343,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 269,
-              "totalMs": 120.17517800000041,
-              "nsPerOp": 446747.8736059495,
-              "opsPerSec": 2238.3990144786726,
+              "iters": 265,
+              "totalMs": 120.30079000000023,
+              "nsPerOp": 453965.2452830198,
+              "opsPerSec": 2202.811801984006,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 146,
-              "totalMs": 120.46502799999962,
-              "nsPerOp": 825102.9315068468,
-              "opsPerSec": 1211.9700001231931,
+              "iters": 150,
+              "totalMs": 120.61867100000018,
+              "nsPerOp": 804124.4733333346,
+              "opsPerSec": 1243.5885651567141,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 144,
-              "totalMs": 120.63779599999998,
-              "nsPerOp": 837762.4722222221,
-              "opsPerSec": 1193.65575942717,
+              "iters": 146,
+              "totalMs": 120.79864300000008,
+              "nsPerOp": 827387.9657534253,
+              "opsPerSec": 1208.6228485199117,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -740,33 +740,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.9647710000008374,
-              "nsPerOp": 59.29542000001675,
-              "opsPerSec": 16864708.943788875,
+              "totalMs": 2.850985999999466,
+              "nsPerOp": 57.01971999998932,
+              "opsPerSec": 17537792.18839004,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 5.971233000000211,
-              "nsPerOp": 119.42466000000422,
-              "opsPerSec": 8373479.98311207,
+              "totalMs": 5.987990999999965,
+              "nsPerOp": 119.75981999999931,
+              "opsPerSec": 8350045.950302913,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.28336599999966,
-              "nsPerOp": 45.667319999993204,
-              "opsPerSec": 21897496.94092294,
+              "totalMs": 2.34470599999986,
+              "nsPerOp": 46.89411999999721,
+              "opsPerSec": 21324635.156818375,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 4435,
-              "totalMs": 120.01678099999845,
-              "nsPerOp": 27061.280947012052,
-              "opsPerSec": 36953.165741047975,
+              "iters": 4459,
+              "totalMs": 120.01647599999887,
+              "nsPerOp": 26915.558645435944,
+              "opsPerSec": 37153.23219455337,
               "available": true
             },
             {
@@ -798,50 +798,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 3.0927499999997963,
-              "nsPerOp": 61.85499999999592,
-              "opsPerSec": 16166841.807453979,
+              "totalMs": 2.935120000000097,
+              "nsPerOp": 58.702400000001944,
+              "opsPerSec": 17035078.63392241,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 6.456459999999424,
-              "nsPerOp": 129.1291999999885,
-              "opsPerSec": 7744181.796217193,
+              "totalMs": 6.40164299999924,
+              "nsPerOp": 128.0328599999848,
+              "opsPerSec": 7810494.899513444,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.325205000001006,
-              "nsPerOp": 46.50410000002012,
-              "opsPerSec": 21503480.33828345,
+              "totalMs": 2.329009999999471,
+              "nsPerOp": 46.58019999998942,
+              "opsPerSec": 21468349.21276051,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1056,
-              "totalMs": 120.05123099999946,
-              "nsPerOp": 113684.87784090858,
-              "opsPerSec": 8796.244663247182,
+              "iters": 1064,
+              "totalMs": 120.1101749999998,
+              "nsPerOp": 112885.5028195487,
+              "opsPerSec": 8858.533425665242,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 21217,
-              "totalMs": 120.00318100000004,
-              "nsPerOp": 5655.991940425133,
-              "opsPerSec": 176803.6465633356,
+              "iters": 20455,
+              "totalMs": 120.00254000000132,
+              "nsPerOp": 5866.660474211748,
+              "opsPerSec": 170454.7253749777,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 15342,
-              "totalMs": 120.00619000000006,
-              "nsPerOp": 7822.069482466436,
-              "opsPerSec": 127843.40541100416,
+              "iters": 15364,
+              "totalMs": 120.0019599999996,
+              "nsPerOp": 7810.593595417834,
+              "opsPerSec": 128031.24215637853,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -856,9 +856,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.5516779999998107,
-              "nsPerOp": 51.03355999999622,
-              "opsPerSec": 19594948.892455753,
+              "totalMs": 2.37964699999975,
+              "nsPerOp": 47.592939999995,
+              "opsPerSec": 21011519.77583451,
               "available": true
             },
             {
@@ -873,34 +873,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.6539709999997285,
-              "nsPerOp": 53.07941999999457,
-              "opsPerSec": 18839693.42543875,
+              "totalMs": 2.3015599999998813,
+              "nsPerOp": 46.031199999997625,
+              "opsPerSec": 21724395.62731477,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 649,
-              "totalMs": 120.05298100000073,
-              "nsPerOp": 184981.48073960052,
-              "opsPerSec": 5405.946562876236,
+              "iters": 652,
+              "totalMs": 120.00252,
+              "nsPerOp": 184052.94478527608,
+              "opsPerSec": 5433.219235729383,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 9868,
-              "totalMs": 120.00127499999871,
-              "nsPerOp": 12160.648054316855,
-              "opsPerSec": 82232.45961345082,
+              "iters": 9468,
+              "totalMs": 120.00035000000025,
+              "nsPerOp": 12674.308196028755,
+              "opsPerSec": 78899.76987567103,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 9808,
-              "totalMs": 120.00609299999996,
-              "nsPerOp": 12235.531504893961,
-              "opsPerSec": 81729.18353403942,
+              "iters": 9613,
+              "totalMs": 120.00270300000011,
+              "nsPerOp": 12483.376989493405,
+              "opsPerSec": 80106.52893376902,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -920,33 +920,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.8356370000001334,
-              "nsPerOp": 56.71274000000266,
-              "opsPerSec": 17632722.383012228,
+              "totalMs": 2.911612999998397,
+              "nsPerOp": 58.23225999996794,
+              "opsPerSec": 17172611.88215176,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.500539000000572,
-              "nsPerOp": 90.01078000001144,
-              "opsPerSec": 11109780.406301033,
+              "totalMs": 4.373744999998962,
+              "nsPerOp": 87.47489999997924,
+              "opsPerSec": 11431850.736614015,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.295089999999618,
-              "nsPerOp": 45.90179999999236,
-              "opsPerSec": 21785638.035984784,
+              "totalMs": 2.4030750000001717,
+              "nsPerOp": 48.061500000003434,
+              "opsPerSec": 20806674.781268343,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 3943,
-              "totalMs": 120.01502000000073,
-              "nsPerOp": 30437.489221405205,
-              "opsPerSec": 32854.22107999462,
+              "iters": 3903,
+              "totalMs": 120.00978799999939,
+              "nsPerOp": 30748.0881373301,
+              "opsPerSec": 32522.347260541945,
               "available": true
             },
             {
@@ -978,50 +978,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.8351330000004964,
-              "nsPerOp": 56.70266000000993,
-              "opsPerSec": 17635856.942158002,
+              "totalMs": 2.984952999999223,
+              "nsPerOp": 59.699059999984456,
+              "opsPerSec": 16750682.506563092,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.555387000000337,
-              "nsPerOp": 91.10774000000674,
-              "opsPerSec": 10976015.86868389,
+              "totalMs": 4.29516700000022,
+              "nsPerOp": 85.90334000000439,
+              "opsPerSec": 11640990.909083964,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2976699999999255,
-              "nsPerOp": 45.95339999999851,
-              "opsPerSec": 21761175.451653905,
+              "totalMs": 2.452551999998832,
+              "nsPerOp": 49.051039999976645,
+              "opsPerSec": 20386927.575857237,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 3932,
-              "totalMs": 120.00595900000008,
-              "nsPerOp": 30520.335452695846,
-              "opsPerSec": 32765.039609408042,
+              "iters": 3935,
+              "totalMs": 120.00816999999915,
+              "nsPerOp": 30497.62897077488,
+              "opsPerSec": 32789.43425268486,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 23543,
-              "totalMs": 120.00229000000036,
-              "nsPerOp": 5097.15371872745,
-              "opsPerSec": 196187.9227471403,
+              "iters": 24227,
+              "totalMs": 120.0013459999991,
+              "nsPerOp": 4953.207000454002,
+              "opsPerSec": 201889.40214054083,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 19238,
-              "totalMs": 120.00035899999966,
-              "nsPerOp": 6237.673302838115,
-              "opsPerSec": 160316.18705407417,
+              "iters": 19366,
+              "totalMs": 120.00468399999954,
+              "nsPerOp": 6196.668594443847,
+              "opsPerSec": 161377.03424976373,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1036,9 +1036,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.346563999999489,
-              "nsPerOp": 46.93127999998978,
-              "opsPerSec": 21307750.39590264,
+              "totalMs": 2.364383000000089,
+              "nsPerOp": 47.28766000000178,
+              "opsPerSec": 21147166.089418728,
               "available": true
             },
             {
@@ -1053,34 +1053,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3887290000002395,
-              "nsPerOp": 47.77458000000479,
-              "opsPerSec": 20931633.517236568,
+              "totalMs": 2.2769069999994827,
+              "nsPerOp": 45.53813999998965,
+              "opsPerSec": 21959614.512148,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 4999,
-              "totalMs": 120.01762400000007,
-              "nsPerOp": 24008.326465293074,
-              "opsPerSec": 41652.21601120846,
+              "iters": 5005,
+              "totalMs": 120.00430500000039,
+              "nsPerOp": 23976.884115884193,
+              "opsPerSec": 41706.83710055222,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 12014,
-              "totalMs": 120.00232700000015,
-              "nsPerOp": 9988.540619277523,
-              "opsPerSec": 100114.72527528559,
+              "iters": 11549,
+              "totalMs": 120.00173200000063,
+              "nsPerOp": 10390.659970560277,
+              "opsPerSec": 96240.2775986595,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 11577,
-              "totalMs": 120.00831500000095,
-              "nsPerOp": 10366.097866459442,
-              "opsPerSec": 96468.31554963428,
+              "iters": 10918,
+              "totalMs": 120.00710900000013,
+              "nsPerOp": 10991.675123649033,
+              "opsPerSec": 90977.94364832161,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1100,33 +1100,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 12.794340999998894,
-              "nsPerOp": 255.88681999997786,
-              "opsPerSec": 3907977.753602497,
+              "totalMs": 12.951745000000301,
+              "nsPerOp": 259.034900000006,
+              "opsPerSec": 3860483.664556308,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 20.07333800000015,
-              "nsPerOp": 401.466760000003,
-              "opsPerSec": 2490866.242575083,
+              "totalMs": 21.223070999998527,
+              "nsPerOp": 424.4614199999705,
+              "opsPerSec": 2355926.7176745287,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2788799999998446,
-              "nsPerOp": 45.57759999999689,
-              "opsPerSec": 21940602.40118102,
+              "totalMs": 2.322325000001001,
+              "nsPerOp": 46.44650000002002,
+              "opsPerSec": 21530147.589152444,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 6573,
-              "totalMs": 120.00115199999891,
-              "nsPerOp": 18256.67914194415,
-              "opsPerSec": 54774.47416504851,
+              "iters": 6821,
+              "totalMs": 120.01579999999922,
+              "nsPerOp": 17595.04471485108,
+              "opsPerSec": 56834.18349917298,
               "available": true
             },
             {
@@ -1158,50 +1158,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 8.778449999999793,
-              "nsPerOp": 175.56899999999587,
-              "opsPerSec": 5695766.33688193,
+              "totalMs": 9.525062999999136,
+              "nsPerOp": 190.50125999998272,
+              "opsPerSec": 5249309.112181677,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 32.62892800000009,
-              "nsPerOp": 652.5785600000017,
-              "opsPerSec": 1532382.553297487,
+              "totalMs": 33.70350000000144,
+              "nsPerOp": 674.0700000000288,
+              "opsPerSec": 1483525.4498790293,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4352949999993143,
-              "nsPerOp": 48.70589999998629,
-              "opsPerSec": 20531393.527278658,
+              "totalMs": 2.296431999999186,
+              "nsPerOp": 45.92863999998372,
+              "opsPerSec": 21772906.839835767,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 2440,
-              "totalMs": 120.02390600000035,
-              "nsPerOp": 49190.12540983621,
-              "opsPerSec": 20329.283401258355,
+              "iters": 2390,
+              "totalMs": 120.00769800000126,
+              "nsPerOp": 50212.42594142312,
+              "opsPerSec": 19915.389094456048,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 24069,
-              "totalMs": 120.00437600000078,
-              "nsPerOp": 4985.848020275075,
-              "opsPerSec": 200567.6859650505,
+              "iters": 23544,
+              "totalMs": 120.00009899999895,
+              "nsPerOp": 5096.844164118203,
+              "opsPerSec": 196199.83813513524,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 19528,
-              "totalMs": 120.00357499999882,
-              "nsPerOp": 6145.205602212148,
-              "opsPerSec": 162728.4853805413,
+              "iters": 18881,
+              "totalMs": 120.00578700000005,
+              "nsPerOp": 6355.902070864894,
+              "opsPerSec": 157334.0792306957,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1216,9 +1216,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3531160000002274,
-              "nsPerOp": 47.06232000000455,
-              "opsPerSec": 21248421.242299642,
+              "totalMs": 2.444394000000102,
+              "nsPerOp": 48.88788000000204,
+              "opsPerSec": 20454967.570693556,
               "available": true
             },
             {
@@ -1233,34 +1233,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3553890000002866,
-              "nsPerOp": 47.10778000000574,
-              "opsPerSec": 21227916.06821375,
+              "totalMs": 2.459037000000535,
+              "nsPerOp": 49.1807400000107,
+              "opsPerSec": 20333162.94142346,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1705,
-              "totalMs": 120.0470150000001,
-              "nsPerOp": 70408.80645161297,
-              "opsPerSec": 14202.768806871196,
+              "iters": 1625,
+              "totalMs": 120.05302999999913,
+              "nsPerOp": 73878.78769230715,
+              "opsPerSec": 13535.685021860854,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 9723,
-              "totalMs": 120.00384300000042,
-              "nsPerOp": 12342.265041653853,
-              "opsPerSec": 81022.40525747134,
+              "iters": 9674,
+              "totalMs": 120.00225399999908,
+              "nsPerOp": 12404.615877609995,
+              "opsPerSec": 80615.15244538718,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 8171,
-              "totalMs": 120.00747000000047,
-              "nsPerOp": 14686.999143311768,
-              "opsPerSec": 68087.42822425945,
+              "iters": 8161,
+              "totalMs": 120.00099199999931,
+              "nsPerOp": 14704.201936037167,
+              "opsPerSec": 68007.771135759,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1280,33 +1280,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 18.38213700000051,
-              "nsPerOp": 367.64274000001024,
-              "opsPerSec": 2720031.9527592794,
+              "totalMs": 17.32211500000085,
+              "nsPerOp": 346.442300000017,
+              "opsPerSec": 2886483.5500744306,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 5.111938000000009,
-              "nsPerOp": 102.23876000000018,
-              "opsPerSec": 9781026.295702316,
+              "totalMs": 4.864924999999857,
+              "nsPerOp": 97.29849999999715,
+              "opsPerSec": 10277650.734595386,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.591263999998773,
-              "nsPerOp": 51.82527999997547,
-              "opsPerSec": 19295602.455027226,
+              "totalMs": 2.660830000000715,
+              "nsPerOp": 53.216600000014296,
+              "opsPerSec": 18791129.08377708,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1129,
-              "totalMs": 120.06608500000038,
-              "nsPerOp": 106347.28520814914,
-              "opsPerSec": 9403.154937549569,
+              "iters": 1141,
+              "totalMs": 120.03487599999971,
+              "nsPerOp": 105201.46888694103,
+              "opsPerSec": 9505.570697636267,
               "available": true
             },
             {
@@ -1338,50 +1338,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 22.309118999999555,
-              "nsPerOp": 446.18237999999116,
-              "opsPerSec": 2241235.9717118815,
+              "totalMs": 22.852795000000697,
+              "nsPerOp": 457.05590000001393,
+              "opsPerSec": 2187916.1826813077,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 24.661407999999938,
-              "nsPerOp": 493.22815999999875,
-              "opsPerSec": 2027459.2594226627,
+              "totalMs": 25.388356000001295,
+              "nsPerOp": 507.76712000002595,
+              "opsPerSec": 1969406.7626906387,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.6079760000011447,
-              "nsPerOp": 52.159520000022894,
-              "opsPerSec": 19171955.57013487,
+              "totalMs": 2.609875000000102,
+              "nsPerOp": 52.19750000000204,
+              "opsPerSec": 19158005.651610922,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1016,
-              "totalMs": 120.10446700000102,
-              "nsPerOp": 118213.05807086715,
-              "opsPerSec": 8459.30235051117,
+              "iters": 1028,
+              "totalMs": 120.03695300000072,
+              "nsPerOp": 116767.4640077828,
+              "opsPerSec": 8564.029445165888,
               "available": true
             },
             {
               "op": "undo",
               "iters": 50000,
-              "totalMs": 107.66127799999958,
-              "nsPerOp": 2153.2255599999917,
-              "opsPerSec": 464419.5288114655,
+              "totalMs": 109.4075159999993,
+              "nsPerOp": 2188.150319999986,
+              "opsPerSec": 457006.99392535625,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
               "iters": 50000,
-              "totalMs": 109.17447800000082,
-              "nsPerOp": 2183.4895600000164,
-              "opsPerSec": 457982.4966051097,
+              "totalMs": 110.3962479999991,
+              "nsPerOp": 2207.924959999982,
+              "opsPerSec": 452913.94323474116,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1396,50 +1396,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 19.82366499999989,
-              "nsPerOp": 396.47329999999783,
-              "opsPerSec": 2522237.941369584,
+              "totalMs": 20.820364999999583,
+              "nsPerOp": 416.40729999999166,
+              "opsPerSec": 2401494.882534528,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 30.494127999998454,
-              "nsPerOp": 609.8825599999691,
-              "opsPerSec": 1639659.9371525736,
+              "totalMs": 30.97258200000033,
+              "nsPerOp": 619.4516400000066,
+              "opsPerSec": 1614331.0234839146,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.590131000000838,
-              "nsPerOp": 51.802620000016766,
-              "opsPerSec": 19304042.922919273,
+              "totalMs": 2.5495480000008683,
+              "nsPerOp": 50.99096000001737,
+              "opsPerSec": 19611319.33973511,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 881,
-              "totalMs": 120.08379299999979,
-              "nsPerOp": 136303.9648127126,
-              "opsPerSec": 7336.543741585524,
+              "iters": 878,
+              "totalMs": 120.09742400000141,
+              "nsPerOp": 136785.22095672143,
+              "opsPerSec": 7310.731327592753,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 24102,
-              "totalMs": 120.00237699999889,
-              "nsPerOp": 4978.938552817147,
-              "opsPerSec": 200846.02157505785,
+              "iters": 23862,
+              "totalMs": 120.00029699999868,
+              "nsPerOp": 5028.928715111839,
+              "opsPerSec": 198849.50784747026,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 22605,
-              "totalMs": 120.00016599999981,
-              "nsPerOp": 5308.567396593666,
-              "opsPerSec": 188374.7394149441,
+              "iters": 22457,
+              "totalMs": 120.00474199999917,
+              "nsPerOp": 5343.756601505062,
+              "opsPerSec": 187134.27174402954,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1459,33 +1459,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3977859999995417,
-              "nsPerOp": 47.95571999999083,
-              "opsPerSec": 20852569.82900457,
+              "totalMs": 2.6317719999988185,
+              "nsPerOp": 52.63543999997637,
+              "opsPerSec": 18998606.26225313,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.53709600000002,
-              "nsPerOp": 90.74192000000039,
-              "opsPerSec": 11020264.94480165,
+              "totalMs": 4.345243000001574,
+              "nsPerOp": 86.90486000003148,
+              "opsPerSec": 11506836.326525787,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3620950000004086,
-              "nsPerOp": 47.24190000000818,
-              "opsPerSec": 21167649.904001046,
+              "totalMs": 2.321554999998625,
+              "nsPerOp": 46.43109999997251,
+              "opsPerSec": 21537288.584603686,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1371,
-              "totalMs": 120.0270359999995,
-              "nsPerOp": 87547.07221006528,
-              "opsPerSec": 11422.426527303445,
+              "iters": 1386,
+              "totalMs": 120.00252799999907,
+              "nsPerOp": 86581.91053390986,
+              "opsPerSec": 11549.756685125922,
               "available": true
             },
             {
@@ -1517,50 +1517,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.4677789999987,
-              "nsPerOp": 49.355579999974,
-              "opsPerSec": 20261133.594226364,
+              "totalMs": 2.3711089999997057,
+              "nsPerOp": 47.422179999994114,
+              "opsPerSec": 21087179.037322287,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.583560999999463,
-              "nsPerOp": 91.67121999998928,
-              "opsPerSec": 10908549.0517102,
+              "totalMs": 4.624691000000894,
+              "nsPerOp": 92.49382000001788,
+              "opsPerSec": 10811533.138103787,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3267940000005183,
-              "nsPerOp": 46.535880000010366,
-              "opsPerSec": 21488795.31234345,
+              "totalMs": 2.309923999999228,
+              "nsPerOp": 46.198479999984556,
+              "opsPerSec": 21645733.799041316,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 876,
-              "totalMs": 120.23070200000075,
-              "nsPerOp": 137249.65981735245,
-              "opsPerSec": 7285.992557874232,
+              "iters": 870,
+              "totalMs": 120.12949499999922,
+              "nsPerOp": 138079.87931034394,
+              "opsPerSec": 7242.184777352187,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 1229,
-              "totalMs": 120.03409300000021,
-              "nsPerOp": 97668.09845402783,
-              "opsPerSec": 10238.757750266815,
+              "iters": 1212,
+              "totalMs": 120.07837800000016,
+              "nsPerOp": 99074.56930693083,
+              "opsPerSec": 10093.407490897307,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1097,
-              "totalMs": 120.21477099999902,
-              "nsPerOp": 109585.02370100183,
-              "opsPerSec": 9125.334523159463,
+              "iters": 1115,
+              "totalMs": 120.09750600000007,
+              "nsPerOp": 107710.76771300453,
+              "opsPerSec": 9284.122852642748,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1575,50 +1575,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.59686899999906,
-              "nsPerOp": 51.937379999981204,
-              "opsPerSec": 19253955.43634203,
+              "totalMs": 2.5237960000013118,
+              "nsPerOp": 50.475920000026235,
+              "opsPerSec": 19811426.914050903,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.572109000000637,
-              "nsPerOp": 91.44218000001274,
-              "opsPerSec": 10935872.263761217,
+              "totalMs": 4.482920000000377,
+              "nsPerOp": 89.65840000000753,
+              "opsPerSec": 11153444.629838541,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2821960000001127,
-              "nsPerOp": 45.643920000002254,
-              "opsPerSec": 21908723.001879565,
+              "totalMs": 2.2741359999999986,
+              "nsPerOp": 45.48271999999997,
+              "opsPerSec": 21986371.967199866,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 612,
-              "totalMs": 120.09092200000123,
-              "nsPerOp": 196226.99673202814,
-              "opsPerSec": 5096.138740611832,
+              "iters": 611,
+              "totalMs": 120.01056900000003,
+              "nsPerOp": 196416.64320785602,
+              "opsPerSec": 5091.218257618625,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 545,
-              "totalMs": 120.03141399999913,
-              "nsPerOp": 220241.126605503,
-              "opsPerSec": 4540.478045189103,
+              "iters": 559,
+              "totalMs": 120.08729299999868,
+              "nsPerOp": 214825.21109123196,
+              "opsPerSec": 4654.947130834285,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 498,
-              "totalMs": 120.08384999999907,
-              "nsPerOp": 241132.2289156608,
-              "opsPerSec": 4147.102212329167,
+              "iters": 510,
+              "totalMs": 120.30905999999959,
+              "nsPerOp": 235900.117647058,
+              "opsPerSec": 4239.082243681413,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1638,33 +1638,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 27.997691000000486,
-              "nsPerOp": 559.9538200000097,
-              "opsPerSec": 1785861.5555118145,
+              "totalMs": 25.082135999999082,
+              "nsPerOp": 501.6427199999817,
+              "opsPerSec": 1993450.637537482,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 24.88035299999865,
-              "nsPerOp": 497.60705999997293,
-              "opsPerSec": 2009617.789586937,
+              "totalMs": 23.487677999999505,
+              "nsPerOp": 469.7535599999901,
+              "opsPerSec": 2128775.777665253,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.363430999999764,
-              "nsPerOp": 47.26861999999528,
-              "opsPerSec": 21155684.257338163,
+              "totalMs": 2.3916470000003756,
+              "nsPerOp": 47.832940000007504,
+              "opsPerSec": 20906095.2556929,
               "available": true
             },
             {
               "op": "serialize",
               "iters": 50000,
-              "totalMs": 61.330009999999675,
-              "nsPerOp": 1226.6001999999935,
-              "opsPerSec": 815261.5660750791,
+              "totalMs": 57.133678000000145,
+              "nsPerOp": 1142.673560000003,
+              "opsPerSec": 875140.578206778,
               "available": true
             },
             {
@@ -1695,51 +1695,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 16459,
-              "totalMs": 120.00534100000004,
-              "nsPerOp": 7291.168418494443,
-              "opsPerSec": 137152.22891621126,
+              "iters": 19154,
+              "totalMs": 120.00125600000138,
+              "nsPerOp": 6265.075493369603,
+              "opsPerSec": 159614.99602970638,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 70.910124,
-              "nsPerOp": 1418.20248,
-              "opsPerSec": 705117.9321023329,
+              "totalMs": 65.56279000000177,
+              "nsPerOp": 1311.2558000000354,
+              "opsPerSec": 762627.7039155693,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3884369999996125,
-              "nsPerOp": 47.76873999999225,
-              "opsPerSec": 20934192.52842261,
+              "totalMs": 2.29917899999964,
+              "nsPerOp": 45.9835799999928,
+              "opsPerSec": 21746893.130116373,
               "available": true
             },
             {
               "op": "serialize",
               "iters": 50000,
-              "totalMs": 64.19097600000168,
-              "nsPerOp": 1283.8195200000337,
-              "opsPerSec": 778925.6857536904,
+              "totalMs": 63.161849000000075,
+              "nsPerOp": 1263.2369800000015,
+              "opsPerSec": 791617.1041794539,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 1326,
-              "totalMs": 120.0480920000009,
-              "nsPerOp": 90534.00603318319,
-              "opsPerSec": 11045.573302406088,
+              "iters": 1356,
+              "totalMs": 120.00370199999816,
+              "nsPerOp": 88498.30530973316,
+              "opsPerSec": 11299.651405754306,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1140,
-              "totalMs": 120.03925700000036,
-              "nsPerOp": 105297.59385964944,
-              "opsPerSec": 9496.893170540006,
+              "iters": 1226,
+              "totalMs": 120.01364600000306,
+              "nsPerOp": 97890.4127243092,
+              "opsPerSec": 10215.504993490229,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1753,51 +1753,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 21926,
-              "totalMs": 120.00083699999959,
-              "nsPerOp": 5472.992657119384,
-              "opsPerSec": 182715.3922268065,
+              "iters": 24231,
+              "totalMs": 120.00177199999962,
+              "nsPerOp": 4952.406916759507,
+              "opsPerSec": 201922.01828486397,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 92.1018409999997,
-              "nsPerOp": 1842.0368199999941,
-              "opsPerSec": 542877.3133861696,
+              "totalMs": 90.85446899999806,
+              "nsPerOp": 1817.0893799999612,
+              "opsPerSec": 550330.6612248328,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4201739999989513,
-              "nsPerOp": 48.40347999997903,
-              "opsPerSec": 20659671.577341825,
+              "totalMs": 2.2816899999997986,
+              "nsPerOp": 45.63379999999598,
+              "opsPerSec": 21913581.599605735,
               "available": true
             },
             {
               "op": "serialize",
               "iters": 50000,
-              "totalMs": 72.42873500000132,
-              "nsPerOp": 1448.5747000000265,
-              "opsPerSec": 690333.746682157,
+              "totalMs": 71.03492299999925,
+              "nsPerOp": 1420.698459999985,
+              "opsPerSec": 703879.1328034597,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 605,
-              "totalMs": 120.01357199999984,
-              "nsPerOp": 198369.5404958675,
-              "opsPerSec": 5041.096518650414,
+              "iters": 653,
+              "totalMs": 120.07364900000175,
+              "nsPerOp": 183880.01378254482,
+              "opsPerSec": 5438.328937600542,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 559,
-              "totalMs": 120.04160200000115,
-              "nsPerOp": 214743.47406082496,
-              "opsPerSec": 4656.718926493456,
+              "iters": 589,
+              "totalMs": 120.14340099999754,
+              "nsPerOp": 203978.6095076359,
+              "opsPerSec": 4902.47483505159,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1817,33 +1817,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 22.10174900000129,
-              "nsPerOp": 442.0349800000258,
-              "opsPerSec": 2262264.4026948763,
+              "totalMs": 19.334882999999536,
+              "nsPerOp": 386.69765999999066,
+              "opsPerSec": 2585999.6153067593,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 88.77771999999823,
-              "nsPerOp": 1775.5543999999645,
-              "opsPerSec": 563204.3715472869,
+              "totalMs": 86.61498899999788,
+              "nsPerOp": 1732.2997799999578,
+              "opsPerSec": 577267.290307007,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3793189999996684,
-              "nsPerOp": 47.58637999999337,
-              "opsPerSec": 21014416.30987983,
+              "totalMs": 2.3079870000001392,
+              "nsPerOp": 46.159740000002785,
+              "opsPerSec": 21663900.18661153,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 556,
-              "totalMs": 120.02403400000185,
-              "nsPerOp": 215870.56474820475,
-              "opsPerSec": 4632.405539710417,
+              "iters": 555,
+              "totalMs": 120.015156999998,
+              "nsPerOp": 216243.52612612254,
+              "opsPerSec": 4624.415897735394,
               "available": true
             },
             {
@@ -1875,50 +1875,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 20.553310999999667,
-              "nsPerOp": 411.0662199999934,
-              "opsPerSec": 2432698.0699119866,
+              "totalMs": 21.572431000000506,
+              "nsPerOp": 431.4486200000101,
+              "opsPerSec": 2317773.0873260796,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 88.46330400000079,
-              "nsPerOp": 1769.2660800000158,
-              "opsPerSec": 565206.1107733389,
+              "totalMs": 85.13505000000077,
+              "nsPerOp": 1702.7010000000155,
+              "opsPerSec": 587302.1746037565,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3797709999998915,
-              "nsPerOp": 47.59541999999783,
-              "opsPerSec": 21010424.952653967,
+              "totalMs": 2.3520819999976084,
+              "nsPerOp": 47.04163999995217,
+              "opsPerSec": 21257762.271915197,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 459,
-              "totalMs": 120.25943699999698,
-              "nsPerOp": 262003.13071894765,
-              "opsPerSec": 3816.7482856252814,
+              "iters": 455,
+              "totalMs": 120.00785200000246,
+              "nsPerOp": 263753.52087912627,
+              "opsPerSec": 3791.418581510739,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 5986,
-              "totalMs": 120.00409999999829,
-              "nsPerOp": 20047.460741730418,
-              "opsPerSec": 49881.629044341695,
+              "iters": 5951,
+              "totalMs": 120.01335700000345,
+              "nsPerOp": 20166.92270206746,
+              "opsPerSec": 49586.14731525115,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 5426,
-              "totalMs": 120.00294999999824,
-              "nsPerOp": 22116.282712863664,
-              "opsPerSec": 45215.555117604024,
+              "iters": 5492,
+              "totalMs": 120.00814000000173,
+              "nsPerOp": 21851.445739257415,
+              "opsPerSec": 45763.562371685126,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1933,50 +1933,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 27.722623000001477,
-              "nsPerOp": 554.4524600000295,
-              "opsPerSec": 1803581.1402116364,
+              "totalMs": 25.49843200000032,
+              "nsPerOp": 509.9686400000064,
+              "opsPerSec": 1960904.890151652,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 88.94757000000027,
-              "nsPerOp": 1778.9514000000054,
-              "opsPerSec": 562128.9035776902,
+              "totalMs": 89.63530900000114,
+              "nsPerOp": 1792.7061800000229,
+              "opsPerSec": 557815.8937344586,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 3.612113999999565,
-              "nsPerOp": 72.2422799999913,
-              "opsPerSec": 13842309.517364629,
+              "totalMs": 2.602344000002631,
+              "nsPerOp": 52.04688000005262,
+              "opsPerSec": 19213447.568787772,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 390,
-              "totalMs": 120.20797600000151,
-              "nsPerOp": 308225.57948718336,
-              "opsPerSec": 3244.3770619679603,
+              "iters": 385,
+              "totalMs": 120.19558399999733,
+              "nsPerOp": 312196.32207791513,
+              "opsPerSec": 3203.112686735717,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 3256,
-              "totalMs": 120.01192900000024,
-              "nsPerOp": 36858.70055282563,
-              "opsPerSec": 27130.636321994236,
+              "iters": 3199,
+              "totalMs": 120.00016300000061,
+              "nsPerOp": 37511.77336667728,
+              "opsPerSec": 26658.297122479606,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 3066,
-              "totalMs": 120.0138909999987,
-              "nsPerOp": 39143.47390737074,
-              "opsPerSec": 25547.042716913773,
+              "iters": 3055,
+              "totalMs": 120.00215500000195,
+              "nsPerOp": 39280.574468085746,
+              "opsPerSec": 25457.87615230702,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -1995,34 +1995,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 32962,
-              "totalMs": 120.00254000000132,
-              "nsPerOp": 3640.6328499484653,
-              "opsPerSec": 274677.5193258379,
+              "iters": 39015,
+              "totalMs": 120.00138000000152,
+              "nsPerOp": 3075.775470972742,
+              "opsPerSec": 325121.2611054932,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 47795,
-              "totalMs": 120.00105800000165,
-              "nsPerOp": 2510.7450151689854,
-              "opsPerSec": 398288.15509276045,
+              "iters": 50000,
+              "totalMs": 118.5398180000011,
+              "nsPerOp": 2370.796360000022,
+              "opsPerSec": 421799.19662099984,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4301919999998063,
-              "nsPerOp": 48.603839999996126,
-              "opsPerSec": 20574506.047260456,
+              "totalMs": 2.2926210000005085,
+              "nsPerOp": 45.85242000001017,
+              "opsPerSec": 21809099.715997066,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 476,
-              "totalMs": 120.0318150000021,
-              "nsPerOp": 252167.67857143297,
-              "opsPerSec": 3965.6152829147145,
+              "iters": 484,
+              "totalMs": 120.17165100000057,
+              "nsPerOp": 248288.53512396812,
+              "opsPerSec": 4027.572193378601,
               "available": true
             },
             {
@@ -2054,9 +2054,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.4922009999972943,
-              "nsPerOp": 49.84401999994589,
-              "opsPerSec": 20062587.247198075,
+              "totalMs": 2.3980440000013914,
+              "nsPerOp": 47.96088000002783,
+              "opsPerSec": 20850326.34929592,
               "available": true
             },
             {
@@ -2071,34 +2071,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.5847109999995155,
-              "nsPerOp": 51.69421999999032,
-              "opsPerSec": 19344522.463056557,
+              "totalMs": 3.100279000002047,
+              "nsPerOp": 62.00558000004094,
+              "opsPerSec": 16127580.775784045,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 343,
-              "totalMs": 120.08993499999997,
-              "nsPerOp": 350116.42857142846,
-              "opsPerSec": 2856.1927358858184,
+              "iters": 345,
+              "totalMs": 120.21663799999806,
+              "nsPerOp": 348454.0231884002,
+              "opsPerSec": 2869.8190678066176,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 2869,
-              "totalMs": 120.0203560000009,
-              "nsPerOp": 41833.5155106312,
-              "opsPerSec": 23904.27837091217,
+              "iters": 2945,
+              "totalMs": 120.01830599999812,
+              "nsPerOp": 40753.24482173111,
+              "opsPerSec": 24537.9234064514,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 2603,
-              "totalMs": 120.01922399999967,
-              "nsPerOp": 46108.03841721079,
-              "opsPerSec": 21688.19221827336,
+              "iters": 2832,
+              "totalMs": 120.00245699999869,
+              "nsPerOp": 42373.748940677506,
+              "opsPerSec": 23599.51679989378,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2113,9 +2113,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3375620000006165,
-              "nsPerOp": 46.75124000001233,
-              "opsPerSec": 21389806.98693203,
+              "totalMs": 2.335073000002012,
+              "nsPerOp": 46.70146000004024,
+              "opsPerSec": 21412606.800711118,
               "available": true
             },
             {
@@ -2130,34 +2130,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3548250000021653,
-              "nsPerOp": 47.09650000004331,
-              "opsPerSec": 21233000.32909198,
+              "totalMs": 2.31329199999891,
+              "nsPerOp": 46.2658399999782,
+              "opsPerSec": 21614219.043693386,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 333,
-              "totalMs": 120.46894000000248,
-              "nsPerOp": 361768.58858859603,
-              "opsPerSec": 2764.1979750132537,
+              "iters": 344,
+              "totalMs": 120.22122799999852,
+              "nsPerOp": 349480.31395348406,
+              "opsPerSec": 2861.391500675773,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 2718,
-              "totalMs": 120.01125799999863,
-              "nsPerOp": 44154.25239146381,
-              "opsPerSec": 22647.87525183705,
+              "iters": 2803,
+              "totalMs": 120.0170849999995,
+              "nsPerOp": 42817.36889047431,
+              "opsPerSec": 23355.008164046074,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 2629,
-              "totalMs": 120.02715700000044,
-              "nsPerOp": 45655.06162038815,
-              "opsPerSec": 21903.37641672201,
+              "iters": 2450,
+              "totalMs": 120.00921000000017,
+              "nsPerOp": 48983.35102040823,
+              "opsPerSec": 20415.099807756393,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2176,34 +2176,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 63,
-              "totalMs": 121.07111199999781,
-              "nsPerOp": 1921763.6825396477,
-              "opsPerSec": 520.3553428996435,
+              "iters": 73,
+              "totalMs": 121.61662799999976,
+              "nsPerOp": 1665981.205479449,
+              "opsPerSec": 600.2468675582761,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 5257,
-              "totalMs": 120.00994700000228,
-              "nsPerOp": 22828.59939128824,
-              "opsPerSec": 43804.70228855196,
+              "iters": 6429,
+              "totalMs": 120.01138600000195,
+              "nsPerOp": 18667.19334266635,
+              "opsPerSec": 53569.91710769756,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 3.3130139999993844,
-              "nsPerOp": 66.26027999998769,
-              "opsPerSec": 15091997.800193204,
+              "totalMs": 2.3108549999997194,
+              "nsPerOp": 46.217099999994396,
+              "opsPerSec": 21637013.140160706,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 391,
-              "totalMs": 120.09534599999824,
-              "nsPerOp": 307149.2225063894,
-              "opsPerSec": 3255.7464799677227,
+              "iters": 418,
+              "totalMs": 120.21058600000106,
+              "nsPerOp": 287585.1339712944,
+              "opsPerSec": 3477.231198257334,
               "available": true
             },
             {
@@ -2234,51 +2234,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 154,
-              "totalMs": 120.6720069999974,
-              "nsPerOp": 783584.4610389441,
-              "opsPerSec": 1276.1866138515732,
+              "iters": 164,
+              "totalMs": 120.35139700000218,
+              "nsPerOp": 733849.9817073303,
+              "opsPerSec": 1362.6763302132424,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 5855,
-              "totalMs": 120.0106990000022,
-              "nsPerOp": 20497.13048676383,
-              "opsPerSec": 48787.316870805764,
+              "iters": 6833,
+              "totalMs": 120.01284300000043,
+              "nsPerOp": 17563.711839601994,
+              "opsPerSec": 56935.57313695148,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.368654999998398,
-              "nsPerOp": 47.37309999996796,
-              "opsPerSec": 21109026.00844522,
+              "totalMs": 2.3162440000014612,
+              "nsPerOp": 46.324880000029225,
+              "opsPerSec": 21586672.21586692,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 250,
-              "totalMs": 120.417641,
-              "nsPerOp": 481670.564,
-              "opsPerSec": 2076.1077689605295,
+              "iters": 259,
+              "totalMs": 120.13018699999884,
+              "nsPerOp": 463823.1158301113,
+              "opsPerSec": 2155.994313069724,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 653,
-              "totalMs": 120.149730000001,
-              "nsPerOp": 183996.52373660184,
-              "opsPerSec": 5434.885288547836,
+              "iters": 722,
+              "totalMs": 120.13913799999864,
+              "nsPerOp": 166397.69806093996,
+              "opsPerSec": 6009.698521392822,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 628,
-              "totalMs": 120.08656100000007,
-              "nsPerOp": 191220.63853503196,
-              "opsPerSec": 5229.5610330618065,
+              "iters": 667,
+              "totalMs": 120.14906899999914,
+              "nsPerOp": 180133.53673163292,
+              "opsPerSec": 5551.437106849365,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2293,9 +2293,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.32590799999889,
-              "nsPerOp": 46.5181599999778,
-              "opsPerSec": 21496980.964003675,
+              "totalMs": 2.3291229999995267,
+              "nsPerOp": 46.58245999999054,
+              "opsPerSec": 21467307.651854437,
               "available": true
             },
             {
@@ -2310,34 +2310,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4457369999981893,
-              "nsPerOp": 48.91473999996379,
-              "opsPerSec": 20443735.364856083,
+              "totalMs": 2.2891209999979765,
+              "nsPerOp": 45.78241999995952,
+              "opsPerSec": 21842445.20060067,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 198,
-              "totalMs": 120.3241139999991,
-              "nsPerOp": 607697.545454541,
-              "opsPerSec": 1645.5554370423329,
+              "iters": 211,
+              "totalMs": 120.22334000000046,
+              "nsPerOp": 569778.8625592439,
+              "opsPerSec": 1755.0668613931305,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 271,
-              "totalMs": 120.15119400000185,
-              "nsPerOp": 443362.3394834017,
-              "opsPerSec": 2255.491526784127,
+              "iters": 295,
+              "totalMs": 120.21318800000154,
+              "nsPerOp": 407502.332203395,
+              "opsPerSec": 2453.973685482796,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 170,
-              "totalMs": 120.61036700000113,
-              "nsPerOp": 709472.7470588302,
-              "opsPerSec": 1409.4974107822622,
+              "iters": 182,
+              "totalMs": 120.22240099999908,
+              "nsPerOp": 660562.6428571378,
+              "opsPerSec": 1513.8609650625876,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2357,33 +2357,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.365712999999232,
-              "nsPerOp": 47.31425999998464,
-              "opsPerSec": 21135277.18705364,
+              "totalMs": 2.376172000000224,
+              "nsPerOp": 47.52344000000449,
+              "opsPerSec": 21042247.783407632,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 6.422821000000113,
-              "nsPerOp": 128.45642000000225,
-              "opsPerSec": 7784741.315381376,
+              "totalMs": 6.282087999999931,
+              "nsPerOp": 125.64175999999863,
+              "opsPerSec": 7959137.153124972,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.415387000000919,
-              "nsPerOp": 48.307740000018384,
-              "opsPerSec": 20700616.5057529,
+              "totalMs": 2.2870739999998477,
+              "nsPerOp": 45.741479999996955,
+              "opsPerSec": 21861994.84581755,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 523,
-              "totalMs": 120.1210030000002,
-              "nsPerOp": 229676.8699808799,
-              "opsPerSec": 4353.942998627802,
+              "iters": 574,
+              "totalMs": 120.11768800000209,
+              "nsPerOp": 209264.26480836602,
+              "opsPerSec": 4778.646755172227,
               "available": true
             },
             {
@@ -2415,50 +2415,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.771306000002369,
-              "nsPerOp": 55.426120000047376,
-              "opsPerSec": 18042035.05493701,
+              "totalMs": 2.4040940000013507,
+              "nsPerOp": 48.081880000027006,
+              "opsPerSec": 20797855.657878563,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 6.859714999998687,
-              "nsPerOp": 137.19429999997374,
-              "opsPerSec": 7288932.557695119,
+              "totalMs": 6.462996000002022,
+              "nsPerOp": 129.25992000004044,
+              "opsPerSec": 7736350.138540138,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.5361770000017714,
-              "nsPerOp": 50.72354000003543,
-              "opsPerSec": 19714712.340646997,
+              "totalMs": 2.3009279999969294,
+              "nsPerOp": 46.01855999993859,
+              "opsPerSec": 21730362.705858994,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 479,
-              "totalMs": 120.1467109999976,
-              "nsPerOp": 250828.20668057955,
-              "opsPerSec": 3986.7924474437723,
+              "iters": 478,
+              "totalMs": 120.13945199999944,
+              "nsPerOp": 251337.76569037538,
+              "opsPerSec": 3978.7096748202434,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 700,
-              "totalMs": 120.15233499999886,
-              "nsPerOp": 171646.19285714123,
-              "opsPerSec": 5825.937548363139,
+              "iters": 779,
+              "totalMs": 120.07565100000284,
+              "nsPerOp": 154140.7586649587,
+              "opsPerSec": 6487.576736102656,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 586,
-              "totalMs": 120.19814899999983,
-              "nsPerOp": 205116.29522184274,
-              "opsPerSec": 4875.283062803245,
+              "iters": 642,
+              "totalMs": 120.0370449999973,
+              "nsPerOp": 186973.59034267493,
+              "opsPerSec": 5348.348920118905,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2473,50 +2473,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.4849490000015066,
-              "nsPerOp": 49.69898000003014,
-              "opsPerSec": 20121137.29495844,
+              "totalMs": 2.3658570000006875,
+              "nsPerOp": 47.317140000013744,
+              "opsPerSec": 21133990.76951205,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 6.633791000000201,
-              "nsPerOp": 132.67582000000402,
-              "opsPerSec": 7537168.415465377,
+              "totalMs": 6.3260710000031395,
+              "nsPerOp": 126.52142000006279,
+              "opsPerSec": 7903800.0047699725,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4032570000017586,
-              "nsPerOp": 48.065140000035164,
-              "opsPerSec": 20805099.08010813,
+              "totalMs": 2.303249999997206,
+              "nsPerOp": 46.06499999994412,
+              "opsPerSec": 21708455.443421535,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 428,
-              "totalMs": 120.33005000000048,
-              "nsPerOp": 281144.9766355151,
-              "opsPerSec": 3556.8837543074096,
+              "iters": 453,
+              "totalMs": 120.13152300000002,
+              "nsPerOp": 265191.00000000006,
+              "opsPerSec": 3770.867035457462,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 296,
-              "totalMs": 120.06882799999948,
-              "nsPerOp": 405637.9324324307,
-              "opsPerSec": 2465.252679904573,
+              "iters": 327,
+              "totalMs": 120.19879499999661,
+              "nsPerOp": 367580.4128440263,
+              "opsPerSec": 2720.493163013899,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 277,
-              "totalMs": 120.7771700000012,
-              "nsPerOp": 436018.6642599322,
-              "opsPerSec": 2293.4798025156347,
+              "iters": 296,
+              "totalMs": 120.22847299999921,
+              "nsPerOp": 406177.27364864596,
+              "opsPerSec": 2461.9792018817534,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2535,34 +2535,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 7096,
-              "totalMs": 120.09750200000053,
-              "nsPerOp": 16924.676155580684,
-              "opsPerSec": 59085.32552159135,
+              "iters": 7010,
+              "totalMs": 120.00721600000179,
+              "nsPerOp": 17119.43166904448,
+              "opsPerSec": 58413.15408899991,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 20842,
-              "totalMs": 120.00008700000035,
-              "nsPerOp": 5757.609010651586,
-              "opsPerSec": 173683.20741300745,
+              "iters": 20160,
+              "totalMs": 120.00496399999975,
+              "nsPerOp": 5952.62718253967,
+              "opsPerSec": 167993.05068747027,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.409322000003158,
-              "nsPerOp": 48.186440000063165,
-              "opsPerSec": 20752726.285624947,
+              "totalMs": 2.2797170000012557,
+              "nsPerOp": 45.594340000025106,
+              "opsPerSec": 21932546.890676543,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 420,
-              "totalMs": 120.0356869999996,
-              "nsPerOp": 285799.2547619038,
-              "opsPerSec": 3498.959438620961,
+              "iters": 421,
+              "totalMs": 120.44270400000096,
+              "nsPerOp": 286087.1828978645,
+              "opsPerSec": 3495.437963598,
               "available": true
             },
             {
@@ -2593,51 +2593,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 6455,
-              "totalMs": 120.00270299999829,
-              "nsPerOp": 18590.65886909346,
-              "opsPerSec": 53790.45503666773,
+              "iters": 6446,
+              "totalMs": 120.01520800000071,
+              "nsPerOp": 18618.55538318348,
+              "opsPerSec": 53709.85983709633,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 15943,
-              "totalMs": 120.00082099999781,
-              "nsPerOp": 7526.865771811943,
-              "opsPerSec": 132857.42436712404,
+              "iters": 15461,
+              "totalMs": 120.00556999999753,
+              "nsPerOp": 7761.824590905991,
+              "opsPerSec": 128835.68654355225,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.345004999999219,
-              "nsPerOp": 46.90009999998437,
-              "opsPerSec": 21321916.157968387,
+              "totalMs": 2.2847990000009304,
+              "nsPerOp": 45.69598000001861,
+              "opsPerSec": 21883763.079369187,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 351,
-              "totalMs": 120.10982800000056,
-              "nsPerOp": 342193.2421652438,
-              "opsPerSec": 2922.3253903918535,
+              "iters": 343,
+              "totalMs": 120.30193800000052,
+              "nsPerOp": 350734.51311953506,
+              "opsPerSec": 2851.1593886376004,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 2023,
-              "totalMs": 120.00387299999784,
-              "nsPerOp": 59319.75926841218,
-              "opsPerSec": 16857.789248185654,
+              "iters": 1974,
+              "totalMs": 120.02615700000024,
+              "nsPerOp": 60803.52431610954,
+              "opsPerSec": 16446.41509267014,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1853,
-              "totalMs": 120.06629099999918,
-              "nsPerOp": 64795.62385321056,
-              "opsPerSec": 15433.141013742255,
+              "iters": 1809,
+              "totalMs": 120.0427860000018,
+              "nsPerOp": 66358.64344942056,
+              "opsPerSec": 15069.626924519836,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2651,51 +2651,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 6147,
-              "totalMs": 120.01596699999936,
-              "nsPerOp": 19524.315438425143,
-              "opsPerSec": 51218.184993668656,
+              "iters": 5909,
+              "totalMs": 120.01401899999837,
+              "nsPerOp": 20310.377221187744,
+              "opsPerSec": 49235.91468093473,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 17510,
-              "totalMs": 120.0060999999987,
-              "nsPerOp": 6853.575099942815,
-              "opsPerSec": 145909.24961314624,
+              "iters": 17054,
+              "totalMs": 120.00436199999967,
+              "nsPerOp": 7036.728157616963,
+              "opsPerSec": 142111.50091360885,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2674609999994573,
-              "nsPerOp": 45.34921999998914,
-              "opsPerSec": 22051095.917421278,
+              "totalMs": 2.311009999997623,
+              "nsPerOp": 46.220199999952456,
+              "opsPerSec": 21635561.940472536,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 291,
-              "totalMs": 120.25480700000116,
-              "nsPerOp": 413246.7594501758,
-              "opsPerSec": 2419.8616858617315,
+              "iters": 295,
+              "totalMs": 120.01101700000072,
+              "nsPerOp": 406817.00677966344,
+              "opsPerSec": 2458.1076585660317,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 848,
-              "totalMs": 120.03815799999938,
-              "nsPerOp": 141554.43160377286,
-              "opsPerSec": 7064.420298752038,
+              "iters": 849,
+              "totalMs": 120.19227099999989,
+              "nsPerOp": 141569.22379269716,
+              "opsPerSec": 7063.682156400895,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 829,
-              "totalMs": 120.05081400000199,
-              "nsPerOp": 144814.00965018335,
-              "opsPerSec": 6905.409237791476,
+              "iters": 806,
+              "totalMs": 120.20381999999881,
+              "nsPerOp": 149136.2531017355,
+              "opsPerSec": 6705.277752404275,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2714,34 +2714,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 30074,
-              "totalMs": 120.00216,
-              "nsPerOp": 3990.2294340626454,
-              "opsPerSec": 250612.155647865,
+              "iters": 31261,
+              "totalMs": 120.00117800000226,
+              "nsPerOp": 3838.6864783596893,
+              "opsPerSec": 260505.77603496035,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 43986,
-              "totalMs": 120.00183900000047,
-              "nsPerOp": 2728.182580821181,
-              "opsPerSec": 366544.3827073336,
+              "iters": 43527,
+              "totalMs": 120.00111399999878,
+              "nsPerOp": 2756.935097755388,
+              "opsPerSec": 362721.6327341798,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.5760259999988193,
-              "nsPerOp": 51.52051999997638,
-              "opsPerSec": 19409741.982426774,
+              "totalMs": 2.2616549999984272,
+              "nsPerOp": 45.23309999996854,
+              "opsPerSec": 22107704.31389172,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 539,
-              "totalMs": 120.10228799999823,
-              "nsPerOp": 222824.28200370728,
-              "opsPerSec": 4487.841230801598,
+              "iters": 533,
+              "totalMs": 120.06622300000163,
+              "nsPerOp": 225264.95872420567,
+              "opsPerSec": 4439.216847855644,
               "available": true
             },
             {
@@ -2772,51 +2772,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 42941,
-              "totalMs": 120.00218900000255,
-              "nsPerOp": 2794.583009245303,
-              "opsPerSec": 357835.13915732893,
+              "iters": 49765,
+              "totalMs": 120.00020399999994,
+              "nsPerOp": 2411.3373656184053,
+              "opsPerSec": 414707.62833036535,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 39560,
-              "totalMs": 120.00047799999811,
-              "nsPerOp": 3033.3791203235114,
-              "opsPerSec": 329665.3534996804,
+              "iters": 39629,
+              "totalMs": 120.00043600000208,
+              "nsPerOp": 3028.0964949910945,
+              "opsPerSec": 330240.4667929649,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.4017350000031,
-              "nsPerOp": 48.03470000006201,
-              "opsPerSec": 20818283.4492296,
+              "totalMs": 2.25389400000131,
+              "nsPerOp": 45.0778800000262,
+              "opsPerSec": 22183829.408113666,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 367,
-              "totalMs": 120.07782100000259,
-              "nsPerOp": 327187.52316077,
-              "opsPerSec": 3056.351264068925,
+              "iters": 364,
+              "totalMs": 120.15140099999917,
+              "nsPerOp": 330086.26648351416,
+              "opsPerSec": 3029.5110749478695,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 4018,
-              "totalMs": 120.01361099999849,
-              "nsPerOp": 29868.99228471839,
-              "opsPerSec": 33479.535916972374,
+              "iters": 3915,
+              "totalMs": 120.00785800000085,
+              "nsPerOp": 30653.348148148365,
+              "opsPerSec": 32622.86374613879,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 3598,
-              "totalMs": 120.01797499999884,
-              "nsPerOp": 33356.85797665337,
-              "opsPerSec": 29978.842752512985,
+              "iters": 3577,
+              "totalMs": 120.03192900000067,
+              "nsPerOp": 33556.59183673488,
+              "opsPerSec": 29800.4041907881,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2831,9 +2831,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3199690000001283,
-              "nsPerOp": 46.39938000000257,
-              "opsPerSec": 21552012.117402103,
+              "totalMs": 2.359125999999378,
+              "nsPerOp": 47.182519999987555,
+              "opsPerSec": 21194289.74968407,
               "available": true
             },
             {
@@ -2848,34 +2848,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3511390000021493,
-              "nsPerOp": 47.02278000004299,
-              "opsPerSec": 21266288.38190949,
+              "totalMs": 2.327711999998428,
+              "nsPerOp": 46.55423999996856,
+              "opsPerSec": 21480320.58950324,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 301,
-              "totalMs": 120.01434800000061,
-              "nsPerOp": 398718.7641196034,
-              "opsPerSec": 2508.0334561330824,
+              "iters": 297,
+              "totalMs": 120.22840500000166,
+              "nsPerOp": 404809.44444445,
+              "opsPerSec": 2470.298096360805,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 2272,
-              "totalMs": 120.00962399999844,
-              "nsPerOp": 52821.137323942974,
-              "opsPerSec": 18931.815001770436,
+              "iters": 2269,
+              "totalMs": 120.0037650000013,
+              "nsPerOp": 52888.39356544791,
+              "opsPerSec": 18907.740102987398,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 2114,
-              "totalMs": 120.07306999999855,
-              "nsPerOp": 56798.992431408966,
-              "opsPerSec": 17605.946112646456,
+              "iters": 2145,
+              "totalMs": 120.02856400000019,
+              "nsPerOp": 55957.37249417258,
+              "opsPerSec": 17870.746166720754,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -2895,33 +2895,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3778759999986505,
-              "nsPerOp": 47.55751999997301,
-              "opsPerSec": 21027168.784254678,
+              "totalMs": 2.389271000000008,
+              "nsPerOp": 47.78542000000016,
+              "opsPerSec": 20926885.22984619,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 11.86194500000056,
-              "nsPerOp": 237.2389000000112,
-              "opsPerSec": 4215160.329945691,
+              "totalMs": 12.045223000000988,
+              "nsPerOp": 240.90446000001975,
+              "opsPerSec": 4151023.1898567504,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.293749000000389,
-              "nsPerOp": 45.87498000000779,
-              "opsPerSec": 21798374.625990693,
+              "totalMs": 2.3185620000003837,
+              "nsPerOp": 46.371240000007674,
+              "opsPerSec": 21565090.776089545,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1007,
-              "totalMs": 120.10192200000165,
-              "nsPerOp": 119267.05263158059,
-              "opsPerSec": 8384.545253155784,
+              "iters": 1059,
+              "totalMs": 120.07262999999875,
+              "nsPerOp": 113383.03116147191,
+              "opsPerSec": 8819.661899635337,
               "available": true
             },
             {
@@ -2953,50 +2953,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3918870000015886,
-              "nsPerOp": 47.83774000003178,
-              "opsPerSec": 20903997.55505456,
+              "totalMs": 2.5382820000013453,
+              "nsPerOp": 50.765640000026906,
+              "opsPerSec": 19698362.908444963,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 11.662911999999778,
-              "nsPerOp": 233.25823999999557,
-              "opsPerSec": 4287093.995050374,
+              "totalMs": 11.64020999999775,
+              "nsPerOp": 232.804199999955,
+              "opsPerSec": 4295455.150724055,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3685220000006666,
-              "nsPerOp": 47.37044000001334,
-              "opsPerSec": 21110211.34698598,
+              "totalMs": 2.301832999997714,
+              "nsPerOp": 46.03665999995428,
+              "opsPerSec": 21721819.08941685,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 740,
-              "totalMs": 120.03857599999901,
-              "nsPerOp": 162214.29189189055,
-              "opsPerSec": 6164.684925952522,
+              "iters": 746,
+              "totalMs": 120.02671799999735,
+              "nsPerOp": 160893.72386058627,
+              "opsPerSec": 6215.2828339438265,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 31265,
-              "totalMs": 120.00338699999702,
-              "nsPerOp": 3838.266016312075,
-              "opsPerSec": 260534.3130856863,
+              "iters": 31332,
+              "totalMs": 120.0000190000028,
+              "nsPerOp": 3829.9508170561344,
+              "opsPerSec": 261099.95865916714,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 26739,
-              "totalMs": 120.00134600000092,
-              "nsPerOp": 4487.877108343652,
-              "opsPerSec": 222822.50067428238,
+              "iters": 27126,
+              "totalMs": 120.00039800000013,
+              "nsPerOp": 4423.814716508152,
+              "opsPerSec": 226049.25026998634,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3011,50 +3011,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.460878000001685,
-              "nsPerOp": 49.21756000003369,
-              "opsPerSec": 20317951.56036413,
+              "totalMs": 2.612341000000015,
+              "nsPerOp": 52.2468200000003,
+              "opsPerSec": 19139920.86025512,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 11.774342999997316,
-              "nsPerOp": 235.48685999994632,
-              "opsPerSec": 4246521.440730187,
+              "totalMs": 11.86720300000161,
+              "nsPerOp": 237.3440600000322,
+              "opsPerSec": 4213292.719438036,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.55112999999983,
-              "nsPerOp": 51.0225999999966,
-              "opsPerSec": 19599158.02017276,
+              "totalMs": 2.4856890000010026,
+              "nsPerOp": 49.71378000002005,
+              "opsPerSec": 20115147.148327824,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 541,
-              "totalMs": 120.15782799999943,
-              "nsPerOp": 222103.19408502668,
-              "opsPerSec": 4502.411611501521,
+              "iters": 551,
+              "totalMs": 120.07969800000137,
+              "nsPerOp": 217930.48638838725,
+              "opsPerSec": 4588.619135267926,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 13721,
-              "totalMs": 120.00546899999972,
-              "nsPerOp": 8746.116828219498,
-              "opsPerSec": 114336.45578269463,
+              "iters": 13860,
+              "totalMs": 120.00609600000098,
+              "nsPerOp": 8658.448484848555,
+              "opsPerSec": 115494.13289804784,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 13137,
-              "totalMs": 120.00290700000187,
-              "nsPerOp": 9134.726878282854,
-              "opsPerSec": 109472.34803236721,
+              "iters": 13383,
+              "totalMs": 120.00010900000052,
+              "nsPerOp": 8966.607561832214,
+              "opsPerSec": 111524.89869821654,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3074,33 +3074,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.9897109999983513,
-              "nsPerOp": 59.794219999967034,
-              "opsPerSec": 16724024.49602238,
+              "totalMs": 2.6388020000013057,
+              "nsPerOp": 52.776040000026114,
+              "opsPerSec": 18947992.308621585,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.295711999999185,
-              "nsPerOp": 85.91423999998368,
-              "opsPerSec": 11639514.008390108,
+              "totalMs": 4.230178999998316,
+              "nsPerOp": 84.60357999996633,
+              "opsPerSec": 11819830.79203502,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.8406189999986964,
-              "nsPerOp": 56.81237999997392,
-              "opsPerSec": 17601797.354739565,
+              "totalMs": 2.6141239999997197,
+              "nsPerOp": 52.28247999999439,
+              "opsPerSec": 19126866.208338,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 2931,
-              "totalMs": 120.01831900000252,
-              "nsPerOp": 40947.90822245053,
-              "opsPerSec": 24421.27188933498,
+              "iters": 2921,
+              "totalMs": 120.01490800000101,
+              "nsPerOp": 41086.925025676486,
+              "opsPerSec": 24338.642995918268,
               "available": true
             },
             {
@@ -3132,50 +3132,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.9243380000007164,
-              "nsPerOp": 58.48676000001432,
-              "opsPerSec": 17097886.769582637,
+              "totalMs": 2.826905000001716,
+              "nsPerOp": 56.53810000003432,
+              "opsPerSec": 17687187.931667194,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 4.125390000001062,
-              "nsPerOp": 82.50780000002123,
-              "opsPerSec": 12120066.224038728,
+              "totalMs": 4.1757469999975,
+              "nsPerOp": 83.51493999995,
+              "opsPerSec": 11973905.507213425,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.8524169999982405,
-              "nsPerOp": 57.04833999996482,
-              "opsPerSec": 17528993.832259044,
+              "totalMs": 2.645207000001392,
+              "nsPerOp": 52.90414000002784,
+              "opsPerSec": 18902112.386657715,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 2445,
-              "totalMs": 120.04404700000305,
-              "nsPerOp": 49097.76973415257,
-              "opsPerSec": 20367.523930611384,
+              "iters": 2352,
+              "totalMs": 120.02383700000064,
+              "nsPerOp": 51030.54294217714,
+              "opsPerSec": 19596.107396566462,
               "available": true
             },
             {
               "op": "undo",
               "iters": 50000,
-              "totalMs": 71.37000800000169,
-              "nsPerOp": 1427.4001600000336,
-              "opsPerSec": 700574.3925375323,
+              "totalMs": 74.40088900000046,
+              "nsPerOp": 1488.0177800000092,
+              "opsPerSec": 672034.9806572834,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
               "iters": 50000,
-              "totalMs": 77.7068270000018,
-              "nsPerOp": 1554.1365400000357,
-              "opsPerSec": 643444.108199127,
+              "totalMs": 80.1709869999977,
+              "nsPerOp": 1603.419739999954,
+              "opsPerSec": 623667.0131053948,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3190,9 +3190,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.7953509999970265,
-              "nsPerOp": 55.90701999994052,
-              "opsPerSec": 17886841.402046893,
+              "totalMs": 2.8735879999985627,
+              "nsPerOp": 57.47175999997126,
+              "opsPerSec": 17399849.94370279,
               "available": true
             },
             {
@@ -3207,34 +3207,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.965134999998554,
-              "nsPerOp": 59.30269999997108,
-              "opsPerSec": 16862638.631976075,
+              "totalMs": 2.547763999999006,
+              "nsPerOp": 50.95527999998013,
+              "opsPerSec": 19625051.6138934,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 2189,
-              "totalMs": 120.02906299999813,
-              "nsPerOp": 54832.829145727796,
-              "opsPerSec": 18237.249756752946,
+              "iters": 2182,
+              "totalMs": 120.03791400000046,
+              "nsPerOp": 55012.79285059599,
+              "opsPerSec": 18177.59012373367,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 50000,
-              "totalMs": 117.65131900000051,
-              "nsPerOp": 2353.0263800000102,
-              "opsPerSec": 424984.6106697689,
+              "iters": 49199,
+              "totalMs": 120.00022900000113,
+              "nsPerOp": 2439.078619484159,
+              "opsPerSec": 409990.88426739204,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 47914,
-              "totalMs": 120.00174200000038,
-              "nsPerOp": 2504.523563050473,
-              "opsPerSec": 399277.5371544177,
+              "iters": 46658,
+              "totalMs": 120.00136600000042,
+              "nsPerOp": 2571.9354880192127,
+              "opsPerSec": 388812.2406873255,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3253,34 +3253,34 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 36574,
-              "totalMs": 120.02504200000112,
-              "nsPerOp": 3281.7039973752153,
-              "opsPerSec": 304719.743401545,
+              "iters": 37863,
+              "totalMs": 120.0011540000014,
+              "nsPerOp": 3169.3514512849324,
+              "opsPerSec": 315521.9657304259,
               "available": true
             },
             {
               "op": "apply",
               "iters": 50000,
-              "totalMs": 84.95469300000332,
-              "nsPerOp": 1699.0938600000666,
-              "opsPerSec": 588549.00458528,
+              "totalMs": 83.97345400000268,
+              "nsPerOp": 1679.4690800000537,
+              "opsPerSec": 595426.2641143522,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.35838899999726,
-              "nsPerOp": 47.1677799999452,
-              "opsPerSec": 21200912.9961419,
+              "totalMs": 2.3034550000011222,
+              "nsPerOp": 46.069100000022445,
+              "opsPerSec": 21706523.461485308,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 468,
-              "totalMs": 120.13993100000152,
-              "nsPerOp": 256709.2542735075,
-              "opsPerSec": 3895.457539425373,
+              "iters": 476,
+              "totalMs": 120.10037000000011,
+              "nsPerOp": 252311.70168067253,
+              "opsPerSec": 3963.351653287992,
               "available": true
             },
             {
@@ -3311,51 +3311,51 @@
           "samples": [
             {
               "op": "legalMoves",
-              "iters": 13069,
-              "totalMs": 120.08391199999824,
-              "nsPerOp": 9188.45451067398,
-              "opsPerSec": 108832.2305822298,
+              "iters": 13556,
+              "totalMs": 120.00731100000121,
+              "nsPerOp": 8852.708099734524,
+              "opsPerSec": 112959.78459178927,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 22886,
-              "totalMs": 120.00450799999817,
-              "nsPerOp": 5243.577208773843,
-              "opsPerSec": 190709.50234636478,
+              "iters": 23136,
+              "totalMs": 120.00466199999937,
+              "nsPerOp": 5186.923495850595,
+              "opsPerSec": 192792.51001098708,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.2905659999996715,
-              "nsPerOp": 45.81131999999342,
-              "opsPerSec": 21828665.92798774,
+              "totalMs": 2.306584000001749,
+              "nsPerOp": 46.13168000003498,
+              "opsPerSec": 21677077.444377527,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 372,
-              "totalMs": 120.19687500000146,
-              "nsPerOp": 323109.879032262,
-              "opsPerSec": 3094.9223929490304,
+              "iters": 393,
+              "totalMs": 120.22683099999995,
+              "nsPerOp": 305920.6895674299,
+              "opsPerSec": 3268.82108370635,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 1790,
-              "totalMs": 120.00491799999872,
-              "nsPerOp": 67041.8536312842,
-              "opsPerSec": 14916.055356998111,
+              "iters": 1945,
+              "totalMs": 120.0490209999989,
+              "nsPerOp": 61721.86169665753,
+              "opsPerSec": 16201.714797824281,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1824,
-              "totalMs": 120.01250000000437,
-              "nsPerOp": 65796.32675438836,
-              "opsPerSec": 15198.41683157949,
+              "iters": 1863,
+              "totalMs": 120.05077700000402,
+              "nsPerOp": 64439.49382716265,
+              "opsPerSec": 15518.433504182463,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3370,9 +3370,9 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.617091000000073,
-              "nsPerOp": 52.34182000000146,
-              "opsPerSec": 19105182.051368717,
+              "totalMs": 2.3274160000000848,
+              "nsPerOp": 46.548320000001695,
+              "opsPerSec": 21483052.44958279,
               "available": true
             },
             {
@@ -3387,34 +3387,34 @@
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3548609999998007,
-              "nsPerOp": 47.097219999996014,
-              "opsPerSec": 21232675.729057565,
+              "totalMs": 2.4162450000003446,
+              "nsPerOp": 48.32490000000689,
+              "opsPerSec": 20693265.79051084,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 379,
-              "totalMs": 120.04461299999821,
-              "nsPerOp": 316740.4036939267,
-              "opsPerSec": 3157.159580330403,
+              "iters": 386,
+              "totalMs": 120.09577300000092,
+              "nsPerOp": 311128.94559585734,
+              "opsPerSec": 3214.1014655028453,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 1817,
-              "totalMs": 120.09728899999755,
-              "nsPerOp": 66096.47165657542,
-              "opsPerSec": 15129.400631183584,
+              "iters": 1868,
+              "totalMs": 120.05689999999595,
+              "nsPerOp": 64270.28907922695,
+              "opsPerSec": 15559.288970480357,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 1703,
-              "totalMs": 120.04092400000081,
-              "nsPerOp": 70487.91779213201,
-              "opsPerSec": 14186.828485258815,
+              "iters": 1720,
+              "totalMs": 120.23426599999948,
+              "nsPerOp": 69903.64302325551,
+              "opsPerSec": 14305.406081158324,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3434,33 +3434,33 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3641179999976885,
-              "nsPerOp": 47.28235999995377,
-              "opsPerSec": 21149536.52907718,
+              "totalMs": 2.3817979999948875,
+              "nsPerOp": 47.63595999989775,
+              "opsPerSec": 20992544.288015746,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 440,
-              "totalMs": 120.13688600000023,
-              "nsPerOp": 273038.37727272784,
-              "opsPerSec": 3662.48880464572,
+              "iters": 461,
+              "totalMs": 120.01011200000357,
+              "nsPerOp": 260325.6225596607,
+              "opsPerSec": 3841.3429694989895,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3781380000000354,
-              "nsPerOp": 47.56276000000071,
-              "opsPerSec": 21024852.21631346,
+              "totalMs": 2.3855579999944894,
+              "nsPerOp": 47.71115999988979,
+              "opsPerSec": 20959456.865066998,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 1071,
-              "totalMs": 120.01645100000314,
-              "nsPerOp": 112060.1783380048,
-              "opsPerSec": 8923.77662458934,
+              "iters": 1065,
+              "totalMs": 120.02678300000116,
+              "nsPerOp": 112701.20469483678,
+              "opsPerSec": 8873.019615963462,
               "available": true
             },
             {
@@ -3492,50 +3492,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.371768000004522,
-              "nsPerOp": 47.43536000009044,
-              "opsPerSec": 21081319.926698003,
+              "totalMs": 2.3834510000015143,
+              "nsPerOp": 47.66902000003029,
+              "opsPerSec": 20977985.282671317,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 2677,
-              "totalMs": 120.0765609999944,
-              "nsPerOp": 44854.89764661725,
-              "opsPerSec": 22294.1095056855,
+              "iters": 2876,
+              "totalMs": 120.00198799999635,
+              "nsPerOp": 41725.30876216841,
+              "opsPerSec": 23966.26962546727,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.288835999999719,
-              "nsPerOp": 45.776719999994384,
-              "opsPerSec": 21845164.965950437,
+              "totalMs": 2.2816859999948065,
+              "nsPerOp": 45.63371999989613,
+              "opsPerSec": 21913620.016125713,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 656,
-              "totalMs": 120.05044800000178,
-              "nsPerOp": 183003.73170731976,
-              "opsPerSec": 5464.369445751591,
+              "iters": 657,
+              "totalMs": 120.08036800000264,
+              "nsPerOp": 182770.72754947128,
+              "opsPerSec": 5471.335664127759,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 409,
-              "totalMs": 120.16906700000254,
-              "nsPerOp": 293811.8997555075,
-              "opsPerSec": 3403.538116843258,
+              "iters": 433,
+              "totalMs": 120.24721999999747,
+              "nsPerOp": 277707.20554271934,
+              "opsPerSec": 3600.9148485928336,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 335,
-              "totalMs": 120.19676099999924,
-              "nsPerOp": 358796.30149253504,
-              "opsPerSec": 2787.0967338296423,
+              "iters": 397,
+              "totalMs": 120.34219699999812,
+              "nsPerOp": 303128.9596977283,
+              "opsPerSec": 3298.9259785576805,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3550,50 +3550,50 @@
             {
               "op": "legalMoves",
               "iters": 50000,
-              "totalMs": 2.3522199999933946,
-              "nsPerOp": 47.04439999986789,
-              "opsPerSec": 21256515.12194455,
+              "totalMs": 2.367379000002984,
+              "nsPerOp": 47.34758000005968,
+              "opsPerSec": 21120403.619334705,
               "available": true
             },
             {
               "op": "apply",
-              "iters": 3989,
-              "totalMs": 120.00223299999925,
-              "nsPerOp": 30083.287290047443,
-              "opsPerSec": 33241.04810616337,
+              "iters": 4259,
+              "totalMs": 120.00470399999904,
+              "nsPerOp": 28176.732566329898,
+              "opsPerSec": 35490.2754478694,
               "available": true
             },
             {
               "op": "isOver",
               "iters": 50000,
-              "totalMs": 2.3942260000039823,
-              "nsPerOp": 47.88452000007965,
-              "opsPerSec": 20883575.735923357,
+              "totalMs": 2.3979069999986677,
+              "nsPerOp": 47.958139999973355,
+              "opsPerSec": 20851517.594313618,
               "available": true
             },
             {
               "op": "serialize",
-              "iters": 453,
-              "totalMs": 120.10037499999453,
-              "nsPerOp": 265122.24061808945,
-              "opsPerSec": 3771.8450088105105,
+              "iters": 454,
+              "totalMs": 120.0290359999999,
+              "nsPerOp": 264381.13656387647,
+              "opsPerSec": 3782.4181142302964,
               "available": true
             },
             {
               "op": "undo",
-              "iters": 157,
-              "totalMs": 120.6112839999987,
-              "nsPerOp": 768224.7388534949,
-              "opsPerSec": 1301.7024178268568,
+              "iters": 158,
+              "totalMs": 120.48428799999965,
+              "nsPerOp": 762558.7848101244,
+              "opsPerSec": 1311.374309652728,
               "available": true,
               "note": "prefix-replay"
             },
             {
               "op": "redo",
-              "iters": 156,
-              "totalMs": 120.02806799999962,
-              "nsPerOp": 769410.6923076899,
-              "opsPerSec": 1299.6960011053454,
+              "iters": 165,
+              "totalMs": 120.13859100000263,
+              "nsPerOp": 728112.6727272887,
+              "opsPerSec": 1373.4138100553917,
               "available": true,
               "note": "prefix-replay+reapply"
             }
@@ -3608,8 +3608,8 @@
       "game": "fab-a-diffy",
       "position": "opening",
       "op": "legalMoves",
-      "nsPerOp": 3255803.702702709,
-      "opsPerSec": 307.1438241715493,
+      "nsPerOp": 2798367.883720931,
+      "opsPerSec": 357.35115665718723,
       "ply": 0
     },
     {
@@ -3617,26 +3617,26 @@
       "game": "pent-em-in",
       "position": "opening",
       "op": "legalMoves",
-      "nsPerOp": 1921763.6825396477,
-      "opsPerSec": 520.3553428996435,
+      "nsPerOp": 1665981.205479449,
+      "opsPerSec": 600.2468675582761,
       "ply": 0
     },
     {
       "rank": 3,
-      "game": "fab-a-diffy",
+      "game": "pent-em-in",
       "position": "midgame",
       "op": "legalMoves",
-      "nsPerOp": 811899.999999997,
-      "opsPerSec": 1231.6787781746566,
+      "nsPerOp": 733849.9817073303,
+      "opsPerSec": 1362.6763302132424,
       "ply": 10
     },
     {
       "rank": 4,
-      "game": "pent-em-in",
+      "game": "fab-a-diffy",
       "position": "midgame",
       "op": "legalMoves",
-      "nsPerOp": 783584.4610389441,
-      "opsPerSec": 1276.1866138515732,
+      "nsPerOp": 616700.0410256383,
+      "opsPerSec": 1621.5338632650205,
       "ply": 10
     },
     {
@@ -3644,8 +3644,8 @@
       "game": "fiar",
       "position": "opening",
       "op": "apply",
-      "nsPerOp": 629943.1518324574,
-      "opsPerSec": 1587.444830682062,
+      "nsPerOp": 598436.0298507453,
+      "opsPerSec": 1671.0223818733102,
       "ply": 0
     }
   ]
