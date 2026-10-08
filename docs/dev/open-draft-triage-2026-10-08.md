@@ -3,7 +3,7 @@
 **Task id:** `burn-1008-mp-open-draft-triage`  
 **Tip branch:** `cursor/integration-fold-wave5-tip-4af0`  
 **Tip SHA checked:** `7b99c2bbd63b4634a5fef9703c9aa76b6d61c343` (`7b99c2bbd63b`)  
-**Open drafts enumerated:** 119 (all `isDraft: true`)  
+**Open drafts enumerated:** 120 (all `isDraft: true`)  
 **Machine-readable twin:** [`open-draft-triage-2026-10-08.json`](./open-draft-triage-2026-10-08.json)  
 **Scope:** report only — no PR closes, comments, edits, merges, or ready-for-review flips.
 
@@ -13,18 +13,18 @@
 | --- | ---: | --- |
 | (a) Already fully contained in wave5 tip | 80 | close |
 | (b) Superseded by a named newer PR | 5 | close |
-| (c) Still unique and fold-worthy | 21 | fold (see order) |
+| (c) Still unique and fold-worthy | 22 | fold (see order) |
 | (d) Needs owner decision | 4 | decide |
 | (e) Hard-rule violation | 9 | close (do not fold) |
-| **Total (each open PR once)** | **119** | |
+| **Total (each open PR once)** | **120** | |
 
 ## Method
 
-1. `gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 200` → 119 drafts.
+1. `gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 200` → 120 drafts.
 2. `git fetch origin cursor/integration-fold-wave5-tip-4af0` @ `7b99c2bbd63b` (includes tip fold of #505 over #507 layout).
 3. Containment evidence (not titles): `git cherry <tip> <head>`, tip merge-log `#N` / `supersede #N` / `port(#N)`, and per-path blob identity for each PR’s three-dot file list.
 4. Hard-rule review via diff signals + cross-check with compliance drafts #538 / #543.
-5. Fold order for (c) follows rehearsal #542 where it overlaps; #540 replaces #535; #518/#520/#505 treated as already on tip; #511 kept foldable because hover patches are still absent on tip.
+5. Fold order for (c) follows rehearsal #542 where it overlaps; #540 replaces #535; #518/#520/#505 treated as already on tip; #511 kept foldable because hover patches are still absent on tip; #544 Batch-3 UI/shell ratchet appended after #539.
 
 ## Spot-check: 10 “already contained” claims
 
@@ -43,7 +43,7 @@
 
 ## Suggested fold order (category c only)
 
-Consistent with rehearsal #542; updated for tip advances and later drafts (#538–#543, leftover #451/#355/#511).
+Consistent with rehearsal #542; updated for tip advances and later drafts (#538–#544, leftover #451/#355/#511).
 
 | Order | PR | Title |
 | ---: | ---: | --- |
@@ -63,11 +63,12 @@ Consistent with rehearsal #542; updated for tip advances and later drafts (#538�
 | 14 | #527 | ci: workflow hardening contract + lockfile-keyed npm cache (burn-1008) |
 | 15 | #532 | chore(licenses): CycloneDX SBOM + report:licenses (burn-1008-mp-license-sbom) |
 | 16 | #539 | test: restore/enforce engine→UI boundary (burn-1008-mp-engine-ui-boundary-repair) |
-| 17 | #538 | docs(dev): burn-1008 compliance review of open tip drafts |
-| 18 | #543 | docs(dev): burn-1008 compliance review 2 of tip drafts #539–#542 |
-| 19 | #542 | docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal) |
-| 20 | #536 | chore: dead-code inventory report (burn-1008) — fold last |
-| 21 | #541 | chore: execute safe dead-code removals (burn-1008) — FOLD LAST |
+| 17 | #544 | fix(types): Phase-2 type-ratchet Batch 3 UI/shell only (burn-1008) |
+| 18 | #538 | docs(dev): burn-1008 compliance review of open tip drafts |
+| 19 | #543 | docs(dev): burn-1008 compliance review 2 of tip drafts #539–#542 |
+| 20 | #542 | docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal) |
+| 21 | #536 | chore: dead-code inventory report (burn-1008) — fold last |
+| 22 | #541 | chore: execute safe dead-code removals (burn-1008) — FOLD LAST |
 
 After folds: tip owner should re-run `npm run lint && npx tsc --noEmit && npm run test:unit && npm run build` (as in #542 cumulative rehearsal).
 
@@ -172,7 +173,7 @@ After folds: tip owner should re-run `npm run lint && npx tsc --noEmit && npm ru
 
 ## (c) Still unique and fold-worthy
 
-*21 PRs*
+*22 PRs*
 
 | PR | Title | Base | Head SHA | Evidence | Action |
 | ---: | --- | --- | --- | --- | --- |
@@ -190,13 +191,14 @@ After folds: tip owner should re-run `npm run lint && npx tsc --noEmit && npm ru
 | #532 | chore(licenses): CycloneDX SBOM + report:licenses (burn-1008-mp-license-sbom) | `cursor/integration-fold-wave5-tip-4af0` | `3a676d36ea00` | wave5 tip draft; CycloneDX SBOM scripts/docs absent on tip. | **fold** (fold #15) |
 | #533 | fix(ui): pointer edge-case hygiene for boards (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `5e4e6ebabb6d` | wave5 tip draft; pointer hygiene helpers absent on tip; rehearsal clean. | **fold** (fold #9) |
 | #534 | fix(pwa): installability manifest contract + metadata (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `d9c09df69b55` | wave5 tip draft; PWA installability contract absent on tip; before #524 per rehearsal. | **fold** (fold #12) |
-| #536 | chore: dead-code inventory report (burn-1008) — fold last | `cursor/integration-fold-wave5-tip-4af0` | `fdcd40dd876d` | report-only dead-code inventory; fold before #541. | **fold** (fold #20) |
-| #538 | docs(dev): burn-1008 compliance review of open tip drafts | `cursor/integration-fold-wave5-tip-4af0` | `bd69e8ca81f3` | report-only docs/dev/burn-1008-compliance-review.md absent on tip. | **fold** (fold #17) |
+| #536 | chore: dead-code inventory report (burn-1008) — fold last | `cursor/integration-fold-wave5-tip-4af0` | `fdcd40dd876d` | report-only dead-code inventory; fold before #541. | **fold** (fold #21) |
+| #538 | docs(dev): burn-1008 compliance review of open tip drafts | `cursor/integration-fold-wave5-tip-4af0` | `bd69e8ca81f3` | report-only docs/dev/burn-1008-compliance-review.md absent on tip. | **fold** (fold #18) |
 | #539 | test: restore/enforce engine→UI boundary (burn-1008-mp-engine-ui-boundary-repair) | `cursor/integration-fold-wave5-tip-4af0` | `c86896f66574` | characterization + CI check:boundaries for engine→UI=0; unique vs tip. | **fold** (fold #16) |
 | #540 | test(math): safe precision recut — characterize tip, defer scoring fixes (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `fffc4b7b4875` | safe recut: docs + characterization tests only (no src/); supersedes #535 for folding. | **fold** (fold #1) |
-| #541 | chore: execute safe dead-code removals (burn-1008) — FOLD LAST | `cursor/integration-fold-wave5-tip-4af0` | `089c05b54489` | executes #536 safe removals; FOLD LAST after #536. | **fold** (fold #21) |
-| #542 | docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal) | `cursor/integration-fold-wave5-tip-4af0` | `724a4e6618c6` | report-only docs/dev/wave5-fold-rehearsal-2026-10-08.md absent on tip. | **fold** (fold #19) |
-| #543 | docs(dev): burn-1008 compliance review 2 of tip drafts #539–#542 | `cursor/integration-fold-wave5-tip-4af0` | `db2d96670b3d` | report-only docs/dev/burn-1008-compliance-review-2.md absent on tip (reviews #539–#542). | **fold** (fold #18) |
+| #541 | chore: execute safe dead-code removals (burn-1008) — FOLD LAST | `cursor/integration-fold-wave5-tip-4af0` | `089c05b54489` | executes #536 safe removals; FOLD LAST after #536. | **fold** (fold #22) |
+| #542 | docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal) | `cursor/integration-fold-wave5-tip-4af0` | `724a4e6618c6` | report-only docs/dev/wave5-fold-rehearsal-2026-10-08.md absent on tip. | **fold** (fold #20) |
+| #543 | docs(dev): burn-1008 compliance review 2 of tip drafts #539–#542 | `cursor/integration-fold-wave5-tip-4af0` | `db2d96670b3d` | report-only docs/dev/burn-1008-compliance-review-2.md absent on tip (reviews #539–#542). | **fold** (fold #19) |
+| #544 | fix(types): Phase-2 type-ratchet Batch 3 UI/shell only (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `a16a326a02ca` | wave5 tip draft; UI/shell type-ratchet Batch 3 only (board-ui/types narrowing); git diff --name-only shows no rules.ts/ai.ts/tutorial.ts; ceiling 520→443; unique vs tip. | **fold** (fold #17) |
 
 ## (d) Needs an owner decision
 
@@ -227,16 +229,16 @@ After folds: tip owner should re-run `npm run lint && npx tsc --noEmit && npm ru
 
 ## Completeness check
 
-- Open PRs from API: **119**
-- Classification rows in sections (a)–(e): **119**
-- Unique PR numbers: **119**
-- Category sum: **119**
+- Open PRs from API: **120**
+- Classification rows in sections (a)–(e): **120**
+- Unique PR numbers: **120**
+- Category sum: **120**
 
 ## Verification commands (this triage)
 
 ```bash
 gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 200 --json number | jq length
-# → 119
+# → 120
 
 git rev-parse origin/cursor/integration-fold-wave5-tip-4af0
 # → 7b99c2bbd63b4634a5fef9703c9aa76b6d61c343

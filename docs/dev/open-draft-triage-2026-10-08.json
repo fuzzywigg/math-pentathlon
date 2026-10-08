@@ -4,20 +4,20 @@
   "tip_branch": "cursor/integration-fold-wave5-tip-4af0",
   "tip_sha": "7b99c2bbd63b4634a5fef9703c9aa76b6d61c343",
   "tip_sha_short": "7b99c2bbd63b",
-  "open_pr_count": 119,
+  "open_pr_count": 120,
   "classification_counts": {
-    "fold_worthy": 21,
+    "fold_worthy": 22,
     "already_contained": 80,
     "needs_owner_decision": 4,
     "hard_rule_violation": 9,
     "superseded": 5
   },
   "method": [
-    "gh pr list --state open (119 drafts at generation time)",
+    "gh pr list --state open (120 drafts at generation time)",
     "local tip 7b99c2bbd63b after git fetch origin cursor/integration-fold-wave5-tip-4af0",
     "per-PR: git cherry tip head; blob identity tip:path vs head:path; tip merge-log #N / supersede notes",
     "hard-rule signals from PR diffs + compliance reviews #538/#543 cross-check",
-    "fold order aligned with rehearsal #542; #540 replaces #535; #505 folded on tip 7b99c2bb; #511 kept foldable (hover patches absent)"
+    "fold order aligned with rehearsal #542; #540 replaces #535; #505 folded on tip 7b99c2bb; #511 kept foldable; includes #544 Batch-3 UI ratchet"
   ],
   "spot_checks_contained": [
     {
@@ -154,26 +154,31 @@
     },
     {
       "order": 17,
+      "number": 544,
+      "title": "fix(types): Phase-2 type-ratchet Batch 3 UI/shell only (burn-1008)"
+    },
+    {
+      "order": 18,
       "number": 538,
       "title": "docs(dev): burn-1008 compliance review of open tip drafts"
     },
     {
-      "order": 18,
+      "order": 19,
       "number": 543,
       "title": "docs(dev): burn-1008 compliance review 2 of tip drafts #539\u2013#542"
     },
     {
-      "order": 19,
+      "order": 20,
       "number": 542,
       "title": "docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal)"
     },
     {
-      "order": 20,
+      "order": 21,
       "number": 536,
       "title": "chore: dead-code inventory report (burn-1008) \u2014 fold last"
     },
     {
-      "order": 21,
+      "order": 22,
       "number": 541,
       "title": "chore: execute safe dead-code removals (burn-1008) \u2014 FOLD LAST"
     }
@@ -3414,7 +3419,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 20,
+      "suggested_fold_order": 21,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3472,7 +3477,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 17,
+      "suggested_fold_order": 18,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3559,7 +3564,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 21,
+      "suggested_fold_order": 22,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 3,
@@ -3588,7 +3593,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 19,
+      "suggested_fold_order": 20,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3617,7 +3622,7 @@
       "owner_question": null,
       "violated_rule": null,
       "superseded_by": null,
-      "suggested_fold_order": 18,
+      "suggested_fold_order": 19,
       "analytics": {
         "head_in_tip": false,
         "cherry_unique": 1,
@@ -3625,6 +3630,35 @@
         "pr_paths": 1,
         "identical_paths": 0,
         "different_paths": 1,
+        "content_ratio": 0.0,
+        "in_tip_merge_log": false,
+        "supersede_note_from_tip_log": null
+      }
+    },
+    {
+      "number": 544,
+      "title": "fix(types): Phase-2 type-ratchet Batch 3 UI/shell only (burn-1008)",
+      "base": "cursor/integration-fold-wave5-tip-4af0",
+      "head_ref": "cursor/type-ratchet-batch3-nonrules-d6d2",
+      "head_sha": "a16a326a02cadbb635df6489fd2cb29c6c1e57fa",
+      "head_sha_short": "a16a326a02ca",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/544",
+      "is_draft": true,
+      "category": "fold_worthy",
+      "category_code": "c",
+      "recommended_action": "fold",
+      "evidence": "wave5 tip draft; UI/shell type-ratchet Batch 3 only (board-ui/types narrowing); git diff --name-only shows no rules.ts/ai.ts/tutorial.ts; ceiling 520\u2192443; unique vs tip",
+      "owner_question": null,
+      "violated_rule": null,
+      "superseded_by": null,
+      "suggested_fold_order": 17,
+      "analytics": {
+        "head_in_tip": false,
+        "cherry_unique": 1,
+        "cherry_equiv": 0,
+        "pr_paths": 16,
+        "identical_paths": 0,
+        "different_paths": 16,
         "content_ratio": 0.0,
         "in_tip_merge_log": false,
         "supersede_note_from_tip_log": null
