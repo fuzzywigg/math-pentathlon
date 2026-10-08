@@ -14,6 +14,7 @@ import type {
   Position,
 } from '../../games/kings-quadraphages/game-state';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   assembleKingGroup,
@@ -272,7 +273,9 @@ export async function createKingsQuadraphagesBoard3D(
     onVisible: () => paint(),
   });
 
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
@@ -400,7 +403,7 @@ export async function createKingsQuadraphagesBoard3D(
     if (disposed) return;
     disposed = true;
     cancelMountPaint();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
     unbindVisibility();

@@ -24,6 +24,7 @@ import {
   makeGridCell,
   markBoardAsGrid,
 } from '../board-a11y';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -482,7 +483,9 @@ export async function createKwatroSinkoBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
@@ -705,7 +708,7 @@ export async function createKwatroSinkoBoard3D(
     if (disposed) return;
     disposed = true;
     cancelMountPaint();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
     unbindVisibility();

@@ -19,6 +19,7 @@ import {
   getPrimeVeinSegments,
 } from '../../games/prime-gold/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -574,7 +575,9 @@ export async function createPrimeGoldBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost, false);
   window.addEventListener('resize', onResize);
 
@@ -625,7 +628,7 @@ export async function createPrimeGoldBoard3D(
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
     if (window.__mp3dPrimeGold) {

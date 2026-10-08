@@ -17,6 +17,10 @@ import type {
 import { BLOCK_COLORS } from '../../games/hex-a-gone/types';
 import { getValidPlacements } from '../../games/hex-a-gone/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import {
+  bindCanvasPointerTap,
+  isPrimaryActivatingPointer,
+} from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   resolveBoard3dPixelRatio,
@@ -291,14 +295,17 @@ export async function createHexAGoneBoard3D(
     return null;
   };
 
-  const onPointerUp = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
-    const cell = pickCellFromEvent(event);
-    if (cell) clickHandler(cell.q, cell.r);
+  const clearHover = (): void => {
+    if (!hoverKey || !lastState) return;
+    hoverKey = null;
+    syncVisuals(lastState);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
     if (disposed || !lastState) return;
+    if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
+      return;
+    }
     if (lastState.phase !== 'placeBlocks') {
       if (hoverKey) {
         hoverKey = null;
@@ -314,9 +321,7 @@ export async function createHexAGoneBoard3D(
   };
 
   const onPointerLeave = (): void => {
-    if (!hoverKey || !lastState) return;
-    hoverKey = null;
-    syncVisuals(lastState);
+    clearHover();
   };
 
   const onContextLost = (event: Event): void => {
@@ -330,7 +335,14 @@ export async function createHexAGoneBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointerUp);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: (event) => {
+      if (!clickHandler || disposed) return;
+      const cell = pickCellFromEvent(event);
+      if (cell) clickHandler(cell.q, cell.r);
+    },
+    onGestureEnd: clearHover,
+  });
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
@@ -528,7 +540,7 @@ export async function createHexAGoneBoard3D(
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointerUp);
+    unbindPointer();
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);

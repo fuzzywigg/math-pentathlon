@@ -178,9 +178,12 @@ export class OwlComponent {
 
   private onPointerDown = (e: PointerEvent): void => {
     if (!this.container) return;
-    // Primary button / touch / pen only
+    // Primary button / touch / pen only — ignore secondary multi-touch fingers
+    if (e.isPrimary === false) return;
     if (e.pointerType === 'mouse' && e.button !== 0) return;
     if (!this.isDragHandle(e.target)) return;
+    // Already dragging with another pointer — do not steal the gesture
+    if (this.isDragging) return;
 
     this.stopCoast();
 

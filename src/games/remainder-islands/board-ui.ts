@@ -18,6 +18,7 @@ import {
   makeSvgFocusable,
   bindCellActivateKeys,
 } from '../../ui/board-a11y';
+import { bindPrimaryPointerActivate } from '../../ui/pointer-hygiene';
 
 const HEX_SIZE = 45;
 const HEX_WIDTH = HEX_SIZE * 2;
@@ -269,16 +270,11 @@ export function renderBoard(
       if (isValid) {
         // Only activatable islands are keyboard buttons; others stay announced.
         makeSvgFocusable(group, ariaLabel);
-        let claimed = false;
         const activate = () => {
-          // pointerdown + click can both fire on tablets — claim once.
-          if (claimed) return;
-          claimed = true;
           onIslandClick(island.id);
         };
-        // pointerdown survives tablets; click covers mouse / existing tests.
-        hitArea.addEventListener('pointerdown', activate);
-        hitArea.addEventListener('click', activate);
+        // Primary pointer tap (cancel/multi-touch/slop safe) + click fallback.
+        bindPrimaryPointerActivate(hitArea, activate);
         hitArea.addEventListener('mouseenter', () => {
           applyIslandSelectionVisual(group, island, state, true);
           onIslandHover(island.id);

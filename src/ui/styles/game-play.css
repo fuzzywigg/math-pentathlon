@@ -755,6 +755,27 @@
   flex-wrap: wrap;
 }
 
+/*
+ * Board pointer hygiene (burn-1008-mp-pointer-edge-cases):
+ * - touch-action: manipulation → drop iOS 300ms delay / double-tap zoom on boards
+ * - user-select / touch-callout → long-press should not select board text
+ * 3D canvases keep inline touch-action:none (wins over this sheet).
+ * Shell chrome touch-action covered by #486; tap-target sizes by #457.
+ */
+#board,
+#board *:not(input):not(textarea),
+[class$='-game-area'] svg,
+[class$='-board'],
+.board,
+.board-3d-host,
+.cell,
+[role='gridcell'] {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
 /* Button row - above board */
 .button-row {
   display: flex;

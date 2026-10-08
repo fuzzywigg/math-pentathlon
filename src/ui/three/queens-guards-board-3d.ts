@@ -27,6 +27,7 @@ import {
   getRestoreTargets,
 } from '../../games/queens-guards/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   assembleGuardGroup,
@@ -405,7 +406,9 @@ export async function createQueensGuardsBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
   window.addEventListener('resize', onResize);
 
@@ -681,7 +684,7 @@ export async function createQueensGuardsBoard3D(
     if (disposed) return;
     disposed = true;
     cancelMountPaint();
-    canvas.removeEventListener('pointerup', onPointer);
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
     unbindVisibility();

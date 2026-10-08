@@ -97,8 +97,8 @@ describe('Remainder Islands polish — focusable only when activatable', () => {
   });
 });
 
-describe('Remainder Islands polish — pointerdown+click claim-once', () => {
-  it('pointerdown then click activates the island only once', () => {
+describe('Remainder Islands polish — pointer tap + click claim-once', () => {
+  it('pointer tap then click activates the island only once', () => {
     let i = 0;
     vi.spyOn(Math, 'random').mockImplementation(() => {
       i += 1;
@@ -117,8 +117,18 @@ describe('Remainder Islands polish — pointerdown+click claim-once', () => {
     expect(islandId).toBeTruthy();
 
     const hit = hitPolygon(container, islandId);
-    hit.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    // Second event on the same hit node must not double-apply (phase already advanced).
+    const init: PointerEventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      clientX: 10,
+      clientY: 10,
+    };
+    hit.dispatchEvent(new PointerEvent('pointerdown', { ...init, buttons: 1 }));
+    hit.dispatchEvent(new PointerEvent('pointerup', { ...init, buttons: 0 }));
+    // Hybrid mouse echo must not double-apply.
     hit.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(getCurrentState().moveHistory).toHaveLength(1);
