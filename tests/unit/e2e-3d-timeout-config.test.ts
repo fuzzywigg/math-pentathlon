@@ -20,7 +20,11 @@ describe('e2e 3D timeout config', () => {
   );
 
   it('caps workers in CI and locally (no unbounded parallel GL)', () => {
-    expect(pw).toMatch(/process\.env\.CI\s*\?\s*1\s*:\s*2/);
+    // CI defaults to 2 (ubuntu-latest vCPU); override via PLAYWRIGHT_WORKERS.
+    // Local stays at 2. Never leave workers unset (unbounded GL thrash).
+    expect(pw).toMatch(/PLAYWRIGHT_WORKERS/);
+    expect(pw).toMatch(/process\.env\.CI/);
+    expect(pw).toMatch(/:\s*2\b/);
     expect(pw).toMatch(/timeout:\s*60_000/);
   });
 
