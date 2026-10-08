@@ -33,7 +33,9 @@ export function bootstrapOwl(options: BootstrapOwlOptions = {}): void {
   const enabled =
     options.enabled ??
     (typeof window !== 'undefined' && typeof document !== 'undefined');
-  if (!enabled) return;
+  if (!enabled) {
+    return;
+  }
 
   const schedule = options.schedule ?? defaultSchedule;
   const importOwl = options.importOwl ?? (() => import('../core/owl'));
