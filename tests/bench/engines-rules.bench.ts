@@ -323,14 +323,21 @@ function measurePosition(
   };
 }
 
+/** Core engine ops only — undo/redo are prefix-replay and scale with ply. */
+const HOTSPOT_OPS: ReadonlySet<OpName> = new Set([
+  'legalMoves',
+  'apply',
+  'isOver',
+  'serialize',
+]);
+
 function collectHotspots(games: GameReport[], topN = 5): Hotspot[] {
   const rows: Hotspot[] = [];
   for (const g of games) {
     for (const p of g.positions) {
       for (const s of p.samples) {
         if (!s.available) continue;
-        // Undo/redo cost scales with ply depth by construction; still useful
-        // as a hotspot signal for deep prefix replay.
+        if (!HOTSPOT_OPS.has(s.op)) continue;
         rows.push({
           rank: 0,
           game: g.id,
@@ -392,7 +399,9 @@ function writeReports(report: BenchReport): void {
     `Seed \`${report.seed}\`; warmup ~${report.warmupMs} ms; measure ~${report.measureMs} ms per sample (min ${MIN_ITERS} iters).`
   );
   lines.push('');
-  lines.push('## Top-5 hotspots (highest ns/op)');
+  lines.push(
+    '## Top-5 hotspots (highest ns/op among legalMoves / apply / isOver / serialize)'
+  );
   lines.push('');
   lines.push('| Rank | Game | Position | Op | ns/op | ops/s | ply |');
   lines.push('|---:|---|---|---|---:|---:|---:|');
