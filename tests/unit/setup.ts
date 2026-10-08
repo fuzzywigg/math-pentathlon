@@ -1,6 +1,7 @@
 import { afterEach, vi } from 'vitest';
 import { owlMessages, owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
+import { resetGamePrefetchForTests } from '../../src/ui/game-prefetch';
 
 /**
  * Shared cleanup so Vitest can run with `isolate: false` after the TOKENMAXX
@@ -22,6 +23,10 @@ import { storage } from '../../src/core/storage';
  *
  * Reset owlSystem.gameStartTime — a prior onGameStart under fake/system timers
  * leaves a future stamp; onGameEnd-without-start then emits negative duration.
+ *
+ * Reset game-prefetch `started` marks — renderGameSelector idle-warms Division I
+ * under MODE=test (sync), so a later saveData / idle-reset assert otherwise sees
+ * leftover started ids under isolate:false shuffle (burn-1007-pwa-shell-ui).
  */
 type MutableOwl = { messages: unknown[] };
 type MutableOwlSystem = { gameStartTime: number };
@@ -74,6 +79,11 @@ afterEach(() => {
   owlSystemInternal.gameStartTime = 0;
   owlInternal.messages.length = 0;
   owlInternal.messages.push(...stockOwlMessages);
+  try {
+    resetGamePrefetchForTests();
+  } catch {
+    // ignore
+  }
   vi.clearAllMocks();
   vi.unstubAllGlobals();
   // Drop pending fake timers before reverting — bare setTimeout AI handoffs
