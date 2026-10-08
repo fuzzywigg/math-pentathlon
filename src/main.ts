@@ -1,5 +1,6 @@
 import './style.css';
 import './ui/styles/mobile-play-shell.css';
+import './ui/styles/zoom-reflow.css';
 import {
   addRoute,
   initRouter,
