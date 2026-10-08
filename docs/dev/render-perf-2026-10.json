@@ -7,17 +7,12 @@
     "mode": "render",
     "phase": "after",
     "cpuThrottle": 4,
-    "fixedGames": [
-      "juggle",
-      "pent-em-in",
-      "hex",
-      "contig-60"
-    ],
+    "fixedGames": ["juggle", "pent-em-in", "hex", "contig-60"],
     "fixNotes": [
-      "**juggle** — persistent grids; hover toggles dirty preview cells only",
-      "**pent-em-in** — patchPentPreview updates only g.preview on hover (2D SVG)",
-      "**hex** — ensureHexBoard once; syncHexCell in place with delegated clicks",
-      "**contig-60** — persistent board + syncContigBoard (no full grid wipe per move)",
+      "**juggle** — (historical pre-restore) persistent grids + applyJuggleHoverPreview dirty-cell hover; helper removed by AI/copy restore (q-mp-032)",
+      "**pent-em-in** — (historical pre-restore) patchPentPreview hover SVG patch; removed by AI/copy restore (q-mp-032)",
+      "**hex** — (historical pre-restore) ensureHexBoard + syncHexCell; removed by AI/copy restore (q-mp-032)",
+      "**contig-60** — persistent board + syncContigBoard (no full grid wipe per move; still on tip)",
       "**kings-quadraphages** — cache cell NodeList across syncs (micro-opt)"
     ]
   },
@@ -1248,17 +1243,12 @@
         "mode": "render",
         "phase": "after",
         "cpuThrottle": 4,
-        "fixedGames": [
-          "juggle",
-          "pent-em-in",
-          "hex",
-          "contig-60"
-        ],
+        "fixedGames": ["juggle", "pent-em-in", "hex", "contig-60"],
         "fixNotes": [
-          "**juggle** — persistent grids; hover toggles dirty preview cells only",
-          "**pent-em-in** — patchPentPreview updates only g.preview on hover (2D SVG)",
-          "**hex** — ensureHexBoard once; syncHexCell in place with delegated clicks",
-          "**contig-60** — persistent board + syncContigBoard (no full grid wipe per move)",
+          "**juggle** — (historical pre-restore) persistent grids + applyJuggleHoverPreview dirty-cell hover; helper removed by AI/copy restore (q-mp-032)",
+          "**pent-em-in** — (historical pre-restore) patchPentPreview hover SVG patch; removed by AI/copy restore (q-mp-032)",
+          "**hex** — (historical pre-restore) ensureHexBoard + syncHexCell; removed by AI/copy restore (q-mp-032)",
+          "**contig-60** — persistent board + syncContigBoard (no full grid wipe per move; still on tip)",
           "**kings-quadraphages** — cache cell NodeList across syncs (micro-opt)"
         ]
       },
