@@ -101,11 +101,11 @@ In-game handler throws are generally recovered by the per-route boundary. Menu h
 | Priority | IDs | Proposed fix (for tip owner — not in this PR) |
 | --- | --- | --- |
 | ~~**P0**~~ | ~~R-GL-08~~ | **Done in #567** — Prime Gold dispatches `mp3d-context-lost` and remounts playable 2D (kings/kwatro pattern) |
-| **P1** | R-SHELL-02, R-SHELL-07 | Wrap `destroyGame` + `shell.cleanup` in try/finally so one throw cannot strand shell listeners |
-| **P1** | R-SHELL-08 | Register cleanup before `init*Game`, or `finally` call `shell.cleanup()` if init throws |
-| **P2** | R-IMP-04 | `bootstrapOwl`: try/catch like idle-warm; never leave unhandled rejection |
+| ~~**P1**~~ | ~~R-SHELL-07~~ | **Done in #568** — `setGameRouteCleanup` try/finally so `shell.cleanup` always runs (R-SHELL-02 still open) |
+| ~~**P1**~~ | ~~R-SHELL-08~~ | **Done in #568** — `initGameWithRouteCleanup` registers cleanup before init; rethrows original error |
+| ~~**P2**~~ | ~~R-IMP-04~~ | **Done in #568** — `bootstrapOwl` try/catch + `console.error` |
 | **P2** | R-SHELL-04, R-EVT-03 | Optional home/menu error boundary (blank menu recovery) |
-| **P2** | R-SW-01 | Guard `registerSW` throw inside `registerPwa` / bootstrap schedule |
+| ~~**P2**~~ | ~~R-SW-01~~ | **Done in #568** — `registerPwa` guards `registerSW` throw (soft-fail + log) |
 | **P3** | R-SW-03 | Swallow/log `registration.update()` rejection |
 | **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |
 | **P3** | R-JSON-04 | Harden `gameStateFromJSON` if ever bound to UI |
@@ -125,10 +125,10 @@ git diff --name-only cursor/integration-fold-wave5-tip-4af0...HEAD
 
 | Test file | Pins |
 | --- | --- |
-| `tests/unit/runtime-error-path-audit.test.ts` | Inventory behavior pins + todo/skip for unrecovered |
+| `tests/unit/runtime-error-path-audit.test.ts` | Inventory pins; P0/P1/P2 fixed green; remaining P2/P3 skips |
 | `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts` | R-GL-08 recovered: context-lost → `mp3d-context-lost` (+ board-select 2D fallback/state pin) |
 | `tests/unit/game-error-boundary.test.ts` | Crash UI / window error / rejection |
 | `tests/unit/burn-1007-main-shell-routes.test.ts` | Mount reject → load-error |
-| `tests/unit/burn-1007-game-route-mounts.test.ts` | Mount/cleanup wiring (#480 adjacency) |
+| `tests/unit/burn-1007-game-route-mounts.test.ts` | Mount/cleanup wiring + #568 P1 try/finally / init-throw cleanup |
 | `tests/unit/pwa-register.test.ts` / `burn-1007-pwa-shell-ui.test.ts` | SW register / idle-warm (#479) |
 | `tests/unit/safe-web-storage*.test.ts` | Storage failures (#528) |

@@ -54,29 +54,35 @@ export function registerPwa(
 
   const reload = options.reload ?? (() => window.location.reload());
 
-  const updateSW = options.registerSW({
-    immediate: true,
-    onNeedRefresh() {
-      scheduleReload(reload);
-    },
-    onOfflineReady() {
-      // Precache complete — app is ready for airplane mode.
-    },
-    onRegisteredSW(_swUrl, registration) {
-      // Periodic update check while the tab stays open (school Wi‑Fi flaps).
-      if (!registration) return;
-      if (updateCheckInterval !== null) {
-        clearInterval(updateCheckInterval);
-        updateCheckInterval = null;
-      }
-      const hourMs = 60 * 60 * 1000;
-      updateCheckInterval = window.setInterval(() => {
-        void registration.update();
-      }, hourMs);
-    },
-  });
+  try {
+    const updateSW = options.registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        scheduleReload(reload);
+      },
+      onOfflineReady() {
+        // Precache complete — app is ready for airplane mode.
+      },
+      onRegisteredSW(_swUrl, registration) {
+        // Periodic update check while the tab stays open (school Wi‑Fi flaps).
+        if (!registration) return;
+        if (updateCheckInterval !== null) {
+          clearInterval(updateCheckInterval);
+          updateCheckInterval = null;
+        }
+        const hourMs = 60 * 60 * 1000;
+        updateCheckInterval = window.setInterval(() => {
+          void registration.update();
+        }, hourMs);
+      },
+    });
 
-  return { update: updateSW };
+    return { update: updateSW };
+  } catch (err) {
+    // SW registration is best-effort — online play must survive a throw.
+    console.error('[pwa] service worker registration failed', err);
+    return {};
+  }
 }
 
 function scheduleReload(reload: () => void): void {

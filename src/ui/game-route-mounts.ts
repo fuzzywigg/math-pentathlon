@@ -102,15 +102,45 @@ async function mountGameShellForRoute(
 /**
  * Register destroy + shell cleanup after a successful route-owned mount.
  * Callers must only invoke this when `mountGameShellForRoute` returned a shell.
+ * `shell.cleanup()` always runs (try/finally) so a throwing `destroyGame` cannot
+ * strand document keydown / modal listeners.
  */
 function setGameRouteCleanup(
   destroyGame: () => void,
   shell: GameShellElements
 ): void {
   setCurrentCleanup(() => {
-    destroyGame();
-    shell.cleanup();
+    try {
+      destroyGame();
+    } finally {
+      shell.cleanup();
+    }
   });
+}
+
+/**
+ * Register route cleanup first, then run game init. If init throws, tear the
+ * shell down immediately (main's load-error catch does not call currentCleanup)
+ * and rethrow so the existing error path is unchanged.
+ */
+function initGameWithRouteCleanup(
+  destroyGame: () => void,
+  shell: GameShellElements,
+  init: () => void
+): void {
+  setGameRouteCleanup(destroyGame, shell);
+  try {
+    init();
+  } catch (err) {
+    try {
+      destroyGame();
+    } catch {
+      // Destroy during aborted init is best-effort; keep the original init error.
+    }
+    shell.cleanup();
+    setCurrentCleanup(null);
+    throw err;
+  }
 }
 
 /** Assign once per dynamic import from the router. */
@@ -181,16 +211,16 @@ async function renderKingsQuadraphages(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initKQGame(
-      shell.board,
-      shell.status,
-      shell.historyContent || undefined,
-      shell.newGameBtn || undefined
-    );
-  }
-
-  setGameRouteCleanup(destroyKQGame, shell);
+  initGameWithRouteCleanup(destroyKQGame, shell, () => {
+    if (shell.board && shell.status) {
+      initKQGame(
+        shell.board,
+        shell.status,
+        shell.historyContent || undefined,
+        shell.newGameBtn || undefined
+      );
+    }
+  });
 }
 
 // Render Hex
@@ -255,11 +285,11 @@ async function renderHex(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initHexGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyHexGame, shell);
+  initGameWithRouteCleanup(destroyHexGame, shell, () => {
+    if (shell.board && shell.status) {
+      initHexGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Star Track
@@ -383,11 +413,11 @@ async function renderStarTrack(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initStarTrackGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyStarTrackGame, shell);
+  initGameWithRouteCleanup(destroyStarTrackGame, shell, () => {
+    if (shell.board && shell.status) {
+      initStarTrackGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Hex-a-Gone
@@ -509,11 +539,11 @@ async function renderHexAGone(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initHexAGoneGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyHexAGoneGame, shell);
+  initGameWithRouteCleanup(destroyHexAGoneGame, shell, () => {
+    if (shell.board && shell.status) {
+      initHexAGoneGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Calla
@@ -585,11 +615,11 @@ async function renderCalla(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initCallaGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyCallaGame, shell);
+  initGameWithRouteCleanup(destroyCallaGame, shell, () => {
+    if (shell.board && shell.status) {
+      initCallaGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render FIAR
@@ -666,11 +696,11 @@ async function renderFiar(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initFiarGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyFiarGame, shell);
+  initGameWithRouteCleanup(destroyFiarGame, shell, () => {
+    if (shell.board && shell.status) {
+      initFiarGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Queens & Guards
@@ -744,11 +774,11 @@ async function renderQueensGuards(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initQGGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyQGGame, shell);
+  initGameWithRouteCleanup(destroyQGGame, shell, () => {
+    if (shell.board && shell.status) {
+      initQGGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Contig 60
@@ -825,11 +855,11 @@ async function renderContig60(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initContigGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyContigGame, shell);
+  initGameWithRouteCleanup(destroyContigGame, shell, () => {
+    if (shell.board && shell.status) {
+      initContigGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Juggle
@@ -902,11 +932,11 @@ async function renderJuggle(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initJuggleGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyJuggleGame, shell);
+  initGameWithRouteCleanup(destroyJuggleGame, shell, () => {
+    if (shell.board && shell.status) {
+      initJuggleGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Fab-a-Diffy
@@ -980,11 +1010,11 @@ async function renderFabADiffy(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initFabGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyFabGame, shell);
+  initGameWithRouteCleanup(destroyFabGame, shell, () => {
+    if (shell.board) {
+      initFabGame(shell.board, false);
+    }
+  });
 }
 
 // Render Sum Dominoes
@@ -1061,11 +1091,11 @@ async function renderSumDominoes(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initSDGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroySDGame, shell);
+  initGameWithRouteCleanup(destroySDGame, shell, () => {
+    if (shell.board) {
+      initSDGame(shell.board, false);
+    }
+  });
 }
 
 // Render Par 55
@@ -1140,11 +1170,11 @@ async function renderPar55(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initPar55Game(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyPar55Game, shell);
+  initGameWithRouteCleanup(destroyPar55Game, shell, () => {
+    if (shell.board) {
+      initPar55Game(shell.board, false);
+    }
+  });
 }
 
 // Render Ramrod
@@ -1220,11 +1250,11 @@ async function renderRamrod(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initRamrodGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyRamrodGame, shell);
+  initGameWithRouteCleanup(destroyRamrodGame, shell, () => {
+    if (shell.board) {
+      initRamrodGame(shell.board, false);
+    }
+  });
 }
 
 // Render Kwatro-Sinko
@@ -1300,11 +1330,11 @@ async function renderKwatrasinko(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initKwaGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyKwaGame, shell);
+  initGameWithRouteCleanup(destroyKwaGame, shell, () => {
+    if (shell.board) {
+      initKwaGame(shell.board, false);
+    }
+  });
 }
 
 // Render Prime Gold
@@ -1382,11 +1412,11 @@ async function renderPrimeGold(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initPrimeGoldGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyPrimeGoldGame, shell);
+  initGameWithRouteCleanup(destroyPrimeGoldGame, shell, () => {
+    if (shell.board) {
+      initPrimeGoldGame(shell.board, false);
+    }
+  });
 }
 
 // Render Pent'Em In
@@ -1457,11 +1487,11 @@ async function renderPentEmIn(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board && shell.status) {
-    initPentEmInGame(shell.board, shell.status);
-  }
-
-  setGameRouteCleanup(destroyPentEmInGame, shell);
+  initGameWithRouteCleanup(destroyPentEmInGame, shell, () => {
+    if (shell.board && shell.status) {
+      initPentEmInGame(shell.board, shell.status);
+    }
+  });
 }
 
 // Render Frac Fact
@@ -1551,11 +1581,11 @@ async function renderFracFact(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initFracFactGame(shell.board);
-  }
-
-  setGameRouteCleanup(destroyFracFactGame, shell);
+  initGameWithRouteCleanup(destroyFracFactGame, shell, () => {
+    if (shell.board) {
+      initFracFactGame(shell.board);
+    }
+  });
 }
 
 // Render Remainder Islands
@@ -1618,11 +1648,11 @@ async function renderRemainderIslands(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initRemainderGame(shell.board);
-  }
-
-  setGameRouteCleanup(destroyRemainderGame, shell);
+  initGameWithRouteCleanup(destroyRemainderGame, shell, () => {
+    if (shell.board) {
+      initRemainderGame(shell.board);
+    }
+  });
 }
 
 // Render Fraction Pinball
@@ -1686,11 +1716,11 @@ async function renderFractionPinball(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initPinballGame(shell.board);
-  }
-
-  setGameRouteCleanup(destroyPinballGame, shell);
+  initGameWithRouteCleanup(destroyPinballGame, shell, () => {
+    if (shell.board) {
+      initPinballGame(shell.board);
+    }
+  });
 }
 
 // Render Stars & Bars
@@ -1769,11 +1799,11 @@ async function renderStarsBars(routeGen: number): Promise<void> {
     return;
   }
 
-  if (shell.board) {
-    initStarsGame(shell.board, false);
-  }
-
-  setGameRouteCleanup(destroyStarsGame, shell);
+  initGameWithRouteCleanup(destroyStarsGame, shell, () => {
+    if (shell.board) {
+      initStarsGame(shell.board, false);
+    }
+  });
 }
 
 /** Mount the requested game (already validated by the router). */

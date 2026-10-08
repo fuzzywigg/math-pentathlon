@@ -1,9 +1,9 @@
 /**
  * burn-1008-mp-runtime-error-path-audit — behavior pins for runtime error paths.
  *
- * Pins tip behavior; unrecovered gaps use it.skip with TODO(runtime-error-path)
- * + expected-fix description for the tip owner. R-GL-08 P0 recovered via #567
- * (Prime Gold webglcontextlost → mp3d-context-lost → 2D fallback).
+ * From #563 pins; #567 recovered R-GL-08 P0 (Prime Gold context-lost → 2D);
+ * #568 un-skips P1 R-SHELL-07/08 + P2 R-IMP-04/R-SW-01 (cleanup try/finally +
+ * bootstrap/SW catch). Remaining P2/P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
  * - #528 storage failure modes (safe-web-storage)
@@ -168,67 +168,17 @@ describe('runtime-error-path-audit — recovered pins', () => {
   });
 });
 
-describe('runtime-error-path-audit — CURRENT unrecovered pins', () => {
+describe('runtime-error-path-audit — remaining unrecovered pins', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     resetPwaReloadGuardForTests();
     vi.restoreAllMocks();
   });
 
-  it('R-SW-01 CURRENT: registerSW throw propagates from registerPwa', () => {
-    const registerSW = vi.fn(() => {
-      throw new Error('SW registration failed');
-    });
-    expect(() =>
-      registerPwa({ enabled: true, registerSW, reload: vi.fn() })
-    ).toThrow(/SW registration failed/);
-  });
-
   it('R-SW-03 CURRENT: registration.update is fire-and-forget (void, no catch)', () => {
     const src = readSrc('src/pwa/register.ts');
     expect(src).toMatch(/void registration\.update\(\)/);
     expect(src).not.toMatch(/registration\.update\(\)\.catch/);
-  });
-
-  it('R-IMP-04 CURRENT: bootstrapOwl schedules async import with no try/catch', () => {
-    const src = readSrc('src/pwa/bootstrap-owl.ts');
-    expect(src).toContain('void (async () => {');
-    expect(src).toContain("import('../core/owl')");
-    expect(src).not.toMatch(/catch\s*\{/);
-
-    const schedule = vi.fn((cb: () => void) => cb());
-    // Pin schedule wiring only — do not await the real owl import reject here
-    // (would trip Vitest unhandledRejection). Rejection path is the skip below.
-    bootstrapOwl({ schedule, enabled: true });
-    expect(schedule).toHaveBeenCalledOnce();
-  });
-
-  it('R-SHELL-07 CURRENT: setGameRouteCleanup calls destroy before shell.cleanup (no try)', () => {
-    const src = readSrc('src/ui/game-route-mounts.ts');
-    expect(src).toMatch(
-      /setCurrentCleanup\(\(\) => \{\s*destroyGame\(\);\s*shell\.cleanup\(\);/
-    );
-    expect(src).not.toMatch(/setCurrentCleanup\(\(\) => \{\s*try/);
-
-    // Local replica of CURRENT wrapper semantics (destroy throw skips shell).
-    const shellCleanup = vi.fn();
-    const destroyGame = vi.fn(() => {
-      throw new Error('destroy failed');
-    });
-    const cleanup = () => {
-      destroyGame();
-      shellCleanup();
-    };
-    expect(() => cleanup()).toThrow(/destroy failed/);
-    expect(shellCleanup).not.toHaveBeenCalled();
-  });
-
-  it('R-SHELL-08 CURRENT: init*Game runs before setGameRouteCleanup (KQ sample)', () => {
-    const src = readSrc('src/ui/game-route-mounts.ts');
-    const initIdx = src.indexOf('initKQGame(');
-    const cleanupIdx = src.indexOf('setGameRouteCleanup(destroyKQGame');
-    expect(initIdx).toBeGreaterThan(-1);
-    expect(cleanupIdx).toBeGreaterThan(initIdx);
   });
 
   it('R-SHELL-01 CURRENT: missing #app throws at module eval (source contract)', () => {
@@ -238,8 +188,14 @@ describe('runtime-error-path-audit — CURRENT unrecovered pins', () => {
   });
 });
 
-describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it('R-GL-08: Prime Gold webglcontextlost notifies controller and falls back to 2D', () => {
+describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+    resetPwaReloadGuardForTests();
+    vi.restoreAllMocks();
+  });
+
+  it('P0 R-GL-08: Prime Gold webglcontextlost notifies controller and falls back to 2D', () => {
     const board = readSrc('src/ui/three/prime-gold-board-3d.ts');
     expect(board).toContain("addEventListener('webglcontextlost'");
     expect(board).toContain("CustomEvent('mp3d-context-lost')");
@@ -247,31 +203,195 @@ describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
 
     const controller = readSrc('src/games/prime-gold/game-controller.ts');
     expect(controller).toContain("addEventListener('mp3d-context-lost'");
-    expect(controller).toContain("markBoard3dWebGlFallback(boardHostEl, 'context-lost')");
+    expect(controller).toContain(
+      "markBoard3dWebGlFallback(boardHostEl, 'context-lost')"
+    );
     expect(controller).toContain('onBoard3dContextLost');
   });
 
-  it.skip('TODO(runtime-error-path P1 R-SHELL-07): setGameRouteCleanup should try/finally so shell.cleanup always runs', () => {
-    // Expected: destroyGame throw still runs shell.cleanup(); document keydown unbound.
-    expect(true).toBe(false);
+  it('P1 R-SHELL-07: setGameRouteCleanup try/finally runs shell.cleanup when destroy throws', () => {
+    const src = readSrc('src/ui/game-route-mounts.ts');
+    expect(src).toMatch(
+      /setCurrentCleanup\(\(\) => \{\s*try \{\s*destroyGame\(\);\s*\} finally \{\s*shell\.cleanup\(\);/
+    );
+
+    // Listener return-to-baseline: shell keydown unbound even when destroy throws.
+    const probe = vi.fn();
+    document.addEventListener('keydown', probe);
+
+    let boundKeydown: ((e: KeyboardEvent) => void) | null = vi.fn();
+    document.addEventListener('keydown', boundKeydown!);
+    const shellCleanup = vi.fn(() => {
+      if (boundKeydown) {
+        document.removeEventListener('keydown', boundKeydown);
+        boundKeydown = null;
+      }
+    });
+    const destroyGame = vi.fn(() => {
+      throw new Error('destroy failed');
+    });
+
+    // Local replica of FIXED setGameRouteCleanup wrapper semantics.
+    const cleanup = () => {
+      try {
+        destroyGame();
+      } finally {
+        shellCleanup();
+      }
+    };
+
+    expect(() => cleanup()).toThrow(/destroy failed/);
+    expect(shellCleanup).toHaveBeenCalledOnce();
+    expect(boundKeydown).toBeNull();
+
+    probe.mockClear();
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+    // Only the baseline probe remains — shell listener is gone.
+    expect(probe).toHaveBeenCalledOnce();
+    document.removeEventListener('keydown', probe);
   });
 
-  it.skip('TODO(runtime-error-path P1 R-SHELL-08): init*Game throw should still shell.cleanup (or register cleanup first)', () => {
-    // Expected: load-error UI + no leaked document keydown from orphaned shell.
-    expect(true).toBe(false);
+  it('P1 R-SHELL-08: init*Game throw still shell.cleanup (cleanup registered first)', () => {
+    const src = readSrc('src/ui/game-route-mounts.ts');
+    expect(src).toContain('function initGameWithRouteCleanup');
+    const helperIdx = src.indexOf('function initGameWithRouteCleanup');
+    const setIdx = src.indexOf(
+      'setGameRouteCleanup(destroyGame, shell)',
+      helperIdx
+    );
+    const initCallIdx = src.indexOf('init();', helperIdx);
+    expect(setIdx).toBeGreaterThan(helperIdx);
+    expect(initCallIdx).toBeGreaterThan(setIdx);
+
+    // KQ sample: init runs inside initGameWithRouteCleanup callback.
+    const kqWrap = src.indexOf('initGameWithRouteCleanup(destroyKQGame');
+    const kqInit = src.indexOf('initKQGame(', kqWrap);
+    expect(kqWrap).toBeGreaterThan(-1);
+    expect(kqInit).toBeGreaterThan(kqWrap);
+
+    const shellCleanup = vi.fn();
+    const destroyGame = vi.fn();
+    let currentCleanup: (() => void) | null = null;
+    const setCurrentCleanup = (fn: (() => void) | null) => {
+      currentCleanup = fn;
+    };
+    const setGameRouteCleanup = (
+      destroy: () => void,
+      shell: { cleanup: () => void }
+    ) => {
+      setCurrentCleanup(() => {
+        try {
+          destroy();
+        } finally {
+          shell.cleanup();
+        }
+      });
+    };
+    const initGameWithRouteCleanup = (
+      destroy: () => void,
+      shell: { cleanup: () => void },
+      init: () => void
+    ) => {
+      setGameRouteCleanup(destroy, shell);
+      try {
+        init();
+      } catch (err) {
+        try {
+          destroy();
+        } catch {
+          // Destroy during aborted init is best-effort.
+        }
+        shell.cleanup();
+        setCurrentCleanup(null);
+        throw err;
+      }
+    };
+
+    const shell = { cleanup: shellCleanup };
+    const boom = new Error('init failed');
+    expect(() =>
+      initGameWithRouteCleanup(destroyGame, shell, () => {
+        throw boom;
+      })
+    ).toThrow(boom);
+    expect(shellCleanup).toHaveBeenCalledOnce();
+    expect(destroyGame).toHaveBeenCalledOnce();
+    expect(currentCleanup).toBeNull();
+
+    // Destroy throw during aborted init must not mask the original init error.
+    shellCleanup.mockClear();
+    destroyGame.mockImplementation(() => {
+      throw new Error('destroy failed');
+    });
+    expect(() =>
+      initGameWithRouteCleanup(destroyGame, shell, () => {
+        throw boom;
+      })
+    ).toThrow(boom);
+    expect(shellCleanup).toHaveBeenCalledOnce();
   });
 
-  it.skip('TODO(runtime-error-path P2 R-IMP-04): bootstrapOwl should catch import/init failures like idle-warm', () => {
-    // Expected: rejected owl chunk does not surface as unhandledrejection /
-    // false game-error-boundary trip.
-    expect(true).toBe(false);
+  it('P2 R-IMP-04: bootstrapOwl catches import/init failures (no unhandledrejection)', async () => {
+    const src = readSrc('src/pwa/bootstrap-owl.ts');
+    expect(src).toMatch(/catch \(err\)/);
+    expect(src).toContain("console.error('[bootstrap-owl] init failed'");
+
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandled);
+
+    const schedule = vi.fn((cb: () => void) => cb());
+    const fail = new Error('owl chunk missing');
+    bootstrapOwl({
+      schedule,
+      enabled: true,
+      importOwl: async () => {
+        throw fail;
+      },
+      importOwlUi: async () => ({ owlComponent: { init: vi.fn() } }) as never,
+    });
+
+    await vi.waitFor(() => {
+      expect(errSpy).toHaveBeenCalled();
+    });
+    expect(errSpy.mock.calls.some((c) => String(c[0]).includes('bootstrap-owl'))).toBe(
+      true
+    );
+    // Allow microtasks to flush; rejection must not escape.
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(unhandled).toHaveLength(0);
+
+    process.off('unhandledRejection', onUnhandled);
+    errSpy.mockRestore();
   });
 
-  it.skip('TODO(runtime-error-path P2 R-SW-01): registerPwa should guard registerSW throws', () => {
-    // Expected: SW registration failure soft-fails; menu/games stay playable online.
-    expect(true).toBe(false);
-  });
+  it('P2 R-SW-01: registerPwa guards registerSW throws (soft-fail + log)', () => {
+    const src = readSrc('src/pwa/register.ts');
+    expect(src).toContain("console.error('[pwa] service worker registration failed'");
 
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const registerSW = vi.fn(() => {
+      throw new Error('SW registration failed');
+    });
+    const result = registerPwa({
+      enabled: true,
+      registerSW,
+      reload: vi.fn(),
+    });
+    expect(result.update).toBeUndefined();
+    expect(errSpy).toHaveBeenCalled();
+    expect(
+      errSpy.mock.calls.some((c) => String(c[0]).includes('[pwa]'))
+    ).toBe(true);
+    errSpy.mockRestore();
+  });
+});
+
+describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
   it.skip('TODO(runtime-error-path P2 R-SHELL-04): home/menu should recover from thrown handlers', () => {
     // Expected: menu error boundary or soft reset — blank selector is unrecovered today.
     expect(true).toBe(false);
