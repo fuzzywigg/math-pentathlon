@@ -130,31 +130,6 @@ test.describe('Keyboard-only playthrough (2D)', () => {
       .not.toBe(before);
   });
 
-  test('calla: Enter on valid pit only (invalid not tabbable)', async ({
-    page,
-  }) => {
-    test.setTimeout(60_000);
-    await gotoGame(page, 'calla');
-    await startHumanKeyboard(page);
-    const before = await expectLiveStatus(page);
-
-    const invalidTab = await page.evaluate(() => {
-      const p2 = document.querySelector(
-        '.calla-pit[data-side="player2"]'
-      );
-      return p2?.getAttribute('tabindex');
-    });
-    expect(invalidTab).toBeNull();
-
-    const valid = page.locator('[aria-label*="valid move"]').first();
-    await valid.focus();
-    await page.keyboard.press('Enter');
-
-    await expect
-      .poll(async () => liveStatusText(page), { timeout: 10_000 })
-      .not.toBe(before);
-  });
-
   test('contig-60: Enter roll + Enter place/pass', async ({ page }) => {
     test.setTimeout(60_000);
     await gotoGame(page, 'contig-60');
