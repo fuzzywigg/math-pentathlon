@@ -83,7 +83,10 @@ function wouldExtendVein(
     ], // top-right to bottom-left
   ];
 
-  for (const [[dr1, dc1], [dr2, dc2]] of directions) {
+  // ratchet: directions is a literal of [[dr,dc],[dr,dc]] pairs.
+  for (const [[dr1, dc1], [dr2, dc2]] of directions as Array<
+    [[number, number], [number, number]]
+  >) {
     let count = 1; // Include this cell
 
     // Count in first direction
@@ -240,16 +243,19 @@ function getTeachingPlacement(
       return cell && !cell.isPrime;
     });
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: length > 0 — random index is in range.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
     // Otherwise just pick lower scoring
     const bottomHalf = moves.slice(Math.floor(moves.length / 2));
     if (bottomHalf.length > 0) {
-      return bottomHalf[Math.floor(Math.random() * bottomHalf.length)];
+      // ratchet: length > 0 — random index is in range.
+      return bottomHalf[Math.floor(Math.random() * bottomHalf.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -295,11 +301,13 @@ export function getAIPlacement(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { value: chosen.value, expression: chosen.expression };
   }
 
-  return { value: moves[0].value, expression: moves[0].expression };
+  // ratchet: moves.length === 0 returned above.
+  return { value: moves[0]!.value, expression: moves[0]!.expression };
 }
 
 /**

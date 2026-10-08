@@ -48,7 +48,7 @@ export function getAIAnswer(
   if (config.teachingMode && Math.random() < 0.4) {
     const wrongChoices = choices.filter((c) => c !== correctAnswer);
     if (wrongChoices.length > 0) {
-      return wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
+      return wrongChoices[Math.floor(Math.random() * wrongChoices.length)]!; // ratchet: length-gated
     }
   }
 
@@ -58,7 +58,7 @@ export function getAIAnswer(
   } else {
     const wrongChoices = choices.filter((c) => c !== correctAnswer);
     if (wrongChoices.length > 0) {
-      return wrongChoices[Math.floor(Math.random() * wrongChoices.length)];
+      return wrongChoices[Math.floor(Math.random() * wrongChoices.length)]!; // ratchet: length-gated
     }
     return correctAnswer;
   }

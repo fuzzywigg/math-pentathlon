@@ -60,7 +60,8 @@ function countReachableEmpty(state: PentEmInState, start: Cell): number {
     ) {
       continue;
     }
-    if (state.board[cell.row][cell.col].occupied) continue;
+    // ratchet: bounds-checked dense BOARD_SIZE grid above.
+    if (state.board[cell.row]![cell.col]!.occupied) continue;
 
     visited.add(key);
     count++;
@@ -217,11 +218,13 @@ function getTeachingMove(
   if (Math.random() < 0.4 && moves.length > 3) {
     const midMoves = moves.slice(2, Math.min(8, moves.length));
     if (midMoves.length > 0) {
-      return midMoves[Math.floor(Math.random() * midMoves.length)];
+      // ratchet: length > 0 — random index is in range.
+      return midMoves[Math.floor(Math.random() * midMoves.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -269,7 +272,8 @@ export function getAIMove(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, Math.min(5, moves.length));
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return {
       shapeId: chosen.shapeId,
       position: chosen.position,
@@ -278,11 +282,12 @@ export function getAIMove(
     };
   }
 
+  // ratchet: moves.length === 0 returned above.
   return {
-    shapeId: moves[0].shapeId,
-    position: moves[0].position,
-    rotation: moves[0].rotation,
-    flipped: moves[0].flipped,
+    shapeId: moves[0]!.shapeId,
+    position: moves[0]!.position,
+    rotation: moves[0]!.rotation,
+    flipped: moves[0]!.flipped,
   };
 }
 

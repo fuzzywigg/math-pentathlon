@@ -54,7 +54,8 @@ function predictMoveOutcome(
 ): MoveOutcome {
   const currentPlayer = state.currentPlayer;
   const pits = getPlayerPits(state, currentPlayer);
-  const cubes = pits[pitIndex];
+  // ratchet: pitIndex is a valid pit; pits always length PITS_PER_SIDE.
+  const cubes = pits[pitIndex]!;
 
   if (cubes === 0) {
     return {
@@ -117,7 +118,8 @@ function predictMoveOutcome(
 
     if (willBeEmpty) {
       const oppositeIndex = getOppositePitIndex(landsIndex);
-      captureAmount = oppPits[oppositeIndex];
+      // ratchet: oppositeIndex is always in 0..PITS_PER_SIDE-1.
+      captureAmount = oppPits[oppositeIndex]!;
       if (captureAmount > 0) {
         captureAmount += 1; // Include the capturing cube
       }
@@ -389,11 +391,12 @@ export function analyzeMoves(
   analyses.sort((a, b) => b.score - a.score);
 
   if (analyses.length > 0) {
-    analyses[0].isBestMove = true;
-    analyses[0].isGoodMove = true;
+    // ratchet: length-gated.
+    analyses[0]!.isBestMove = true;
+    analyses[0]!.isGoodMove = true;
 
     // Mark moves within 20% of best as "good"
-    const bestScore = analyses[0].score;
+    const bestScore = analyses[0]!.score;
     const threshold = Math.abs(bestScore) * 0.2;
     for (const analysis of analyses) {
       if (Math.abs(analysis.score - bestScore) <= threshold) {
@@ -416,7 +419,7 @@ export function analyzeMoves(
 function getTeachingMove(
   state: CallaGameState,
   aiPlayer: Player
-): { pit: number; hint?: string } | null {
+): { pit: number; hint?: string | undefined } | null {
   const validPits = getValidPits(state);
   if (validPits.length === 0) return null;
 
@@ -428,11 +431,12 @@ function getTeachingMove(
   if (Math.random() < 0.3 && analyses.length > 1) {
     // Find moves that set up captures for opponent
     const suboptimal = analyses.filter(
-      (a) => !a.isGoodMove && a.score < analyses[0].score - 50
+      (a) => !a.isGoodMove && a.score < analyses[0]!.score - 50
     );
 
     if (suboptimal.length > 0) {
-      const chosen = suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: suboptimal non-empty; index length-gated.
+      const chosen = suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
 
       // Figure out what opportunity this creates
       const newState = makeMove(state, chosen.pit);
@@ -465,11 +469,13 @@ function getTeachingMove(
   // Otherwise pick from good moves with some randomness
   const goodMoves = analyses.filter((a) => a.isGoodMove);
   if (goodMoves.length > 0) {
-    const chosen = goodMoves[Math.floor(Math.random() * goodMoves.length)];
+    // ratchet: goodMoves non-empty; index length-gated.
+    const chosen = goodMoves[Math.floor(Math.random() * goodMoves.length)]!;
     return { pit: chosen.pit };
   }
 
-  return { pit: analyses[0].pit };
+  // ratchet: analyses.length === 0 returned above.
+  return { pit: analyses[0]!.pit };
 }
 
 // =============================================================================
@@ -478,7 +484,7 @@ function getTeachingMove(
 
 export interface AIMove {
   pit: number;
-  hint?: string; // Teaching hint for opponent
+  hint?: string | undefined; // Teaching hint for opponent
 }
 
 /**
@@ -543,10 +549,12 @@ export function getAIMove(
   if (Math.random() < config.randomness && scoredMoves.length > 1) {
     const topCount = Math.min(3, scoredMoves.length);
     const randomIndex = Math.floor(Math.random() * topCount);
-    return { pit: scoredMoves[randomIndex].pit };
+    // ratchet: randomIndex < topCount <= scoredMoves.length.
+    return { pit: scoredMoves[randomIndex]!.pit };
   }
 
-  return { pit: scoredMoves[0].pit };
+  // ratchet: scoredMoves built from validPits; empty returned above.
+  return { pit: scoredMoves[0]!.pit };
 }
 
 /**

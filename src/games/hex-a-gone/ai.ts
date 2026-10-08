@@ -93,7 +93,7 @@ function evaluateSelections(
     for (let i = 0; i <= shapes.length - size; i++) {
       const rest = generateCombinations(shapes.slice(i + 1), size - 1);
       for (const combo of rest) {
-        result.push([shapes[i], ...combo]);
+        result.push([shapes[i]!, ...combo]); // ratchet: i <= length - size
       }
     }
     return result;
@@ -293,7 +293,7 @@ function getTeachingSelection(
   if (Math.random() < 0.3 && options.length > 1) {
     const suboptimal = options
       .slice(1)
-      .find((o) => o.score < options[0].score - 20);
+      .find((o) => o.score < options[0]!.score - 20); // ratchet: length > 1
     if (suboptimal) {
       return {
         blocks: suboptimal.blocks,
@@ -302,7 +302,7 @@ function getTeachingSelection(
     }
   }
 
-  return { blocks: options[0].blocks };
+  return { blocks: options[0]!.blocks }; // ratchet: length-gated
 }
 
 // =============================================================================
@@ -346,11 +346,11 @@ export function getAISelection(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && options.length > 1) {
     const topOptions = options.slice(0, 3);
-    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)];
+    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)]!; // ratchet: length-gated
     return { blocks: chosen.blocks };
   }
 
-  return { blocks: options[0].blocks };
+  return { blocks: options[0]!.blocks }; // ratchet: length-gated
 }
 
 /**
@@ -372,11 +372,11 @@ export function getAIPlacement(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && options.length > 1) {
     const topOptions = options.slice(0, 3);
-    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)];
+    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)]!; // ratchet: length-gated
     return { q: chosen.q, r: chosen.r };
   }
 
-  return { q: options[0].q, r: options[0].r };
+  return { q: options[0]!.q, r: options[0]!.r }; // ratchet: length-gated
 }
 
 /**

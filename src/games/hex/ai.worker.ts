@@ -12,8 +12,8 @@ export interface HexAiWorkerRequest {
   state: HexGameState;
   player: Player;
   difficulty: AIDifficulty;
-  seed?: number;
-  deadlineMs?: number;
+  seed?: number | undefined;
+  deadlineMs?: number | undefined;
 }
 
 const workerScope = self as DedicatedWorkerGlobalScope;

@@ -45,15 +45,15 @@ export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
   /** Deterministic PRNG seed (worker/direct parity tests). */
-  seed?: number;
+  seed?: number | undefined;
   /**
    * Soft wall-time budget (ms). When finite, enumeration aborts between
    * candidates and returns the best move scored so far. Omit for historical
    * full enumeration (tests / unlimited).
    */
-  deadlineMs?: number;
+  deadlineMs?: number | undefined;
   /** Clock override for tests. */
-  now?: () => number;
+  now?: (() => number) | undefined;
 }
 
 export interface AISearchResult {
@@ -118,7 +118,8 @@ function findAllValidMoves(
   for (let i = 0; i < availableBars.length; i++) {
     for (let j = 0; j < availableBars.length; j++) {
       if (i === j) continue;
-      orderedPairs.push([availableBars[i], availableBars[j]]);
+      // ratchet: i/j index into availableBars.
+      orderedPairs.push([availableBars[i]!, availableBars[j]!]);
     }
   }
 
@@ -169,8 +170,9 @@ function findAllValidMoves(
         let alternateWays = 0;
         for (let k = 0; k < availableBars.length; k++) {
           for (let l = k + 1; l < availableBars.length; l++) {
-            const a = availableBars[k];
-            const b = availableBars[l];
+            // ratchet: k/l index into availableBars.
+            const a = availableBars[k]!;
+            const b = availableBars[l]!;
             if (
               (a.id === bar1.id && b.id === bar2.id) ||
               (a.id === bar2.id && b.id === bar1.id)
@@ -236,14 +238,16 @@ function getTeachingMove(
   if (rng() < 0.4 && moves.length > 1) {
     const suboptimal = moves.slice(1);
     if (suboptimal.length > 0) {
+      // ratchet: suboptimal non-empty; index length-gated.
       return {
-        move: suboptimal[Math.floor(rng() * suboptimal.length)],
+        move: suboptimal[Math.floor(rng() * suboptimal.length)]!,
         truncated,
       };
     }
   }
 
-  return { move: moves[0], truncated };
+  // ratchet: moves.length === 0 returned above.
+  return { move: moves[0]!, truncated };
 }
 
 // =============================================================================
@@ -306,7 +310,8 @@ export function searchAIMove(
   // Add randomness based on difficulty
   if (rng() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(rng() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(rng() * topMoves.length)]!;
     return {
       move: {
         bar1Id: chosen.bar1Id,
@@ -318,12 +323,13 @@ export function searchAIMove(
     };
   }
 
+  // ratchet: moves.length === 0 returned above.
   return {
     move: {
-      bar1Id: moves[0].bar1Id,
-      bar2Id: moves[0].bar2Id,
-      operation: moves[0].operation,
-      answerId: moves[0].answerId,
+      bar1Id: moves[0]!.bar1Id,
+      bar2Id: moves[0]!.bar2Id,
+      operation: moves[0]!.operation,
+      answerId: moves[0]!.answerId,
     },
     truncated,
   };

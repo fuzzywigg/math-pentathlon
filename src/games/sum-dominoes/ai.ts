@@ -137,11 +137,13 @@ function getTeachingMove(
   if (Math.random() < 0.4 && moves.length > 1) {
     const suboptimal = moves.slice(1, Math.min(4, moves.length));
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: length > 0 — random index is in range.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -189,7 +191,8 @@ export function getAIMove(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return {
       dominoId: chosen.domino.id,
       position: chosen.position,
@@ -197,10 +200,11 @@ export function getAIMove(
     };
   }
 
+  // ratchet: moves.length === 0 returned above.
   return {
-    dominoId: moves[0].domino.id,
-    position: moves[0].position,
-    orientation: moves[0].orientation,
+    dominoId: moves[0]!.domino.id,
+    position: moves[0]!.position,
+    orientation: moves[0]!.orientation,
   };
 }
 

@@ -23,13 +23,13 @@ export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
 
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
-  seed?: number;
+  seed?: number | undefined;
   /**
    * Soft wall-time budget (ms). When finite, iterative deepening + mid-tree
    * abort return a move within the budget. Omit for historical single-depth search.
    */
-  deadlineMs?: number;
-  now?: () => number;
+  deadlineMs?: number | undefined;
+  now?: (() => number) | undefined;
 }
 
 interface SearchClock {
@@ -74,7 +74,7 @@ function shortestPathDistance(state: HexGameState, player: Player): number {
   const deque: { row: number; col: number; d: number }[] = [];
 
   const cellStep = (row: number, col: number): number => {
-    const cell = board[row][col];
+    const cell = board[row]![col]; // ratchet: in-bounds board cell
     if (cell === player) return 0;
     if (cell === null) return 1;
     return INF;
@@ -84,7 +84,7 @@ function shortestPathDistance(state: HexGameState, player: Player): number {
     for (let col = 0; col < boardSize; col++) {
       const step = cellStep(0, col);
       if (step < INF) {
-        dist[0][col] = step;
+        dist[0]![col] = step; // ratchet: row 0 in-bounds
         if (step === 0) deque.unshift({ row: 0, col, d: step });
         else deque.push({ row: 0, col, d: step });
       }
@@ -93,7 +93,7 @@ function shortestPathDistance(state: HexGameState, player: Player): number {
     for (let row = 0; row < boardSize; row++) {
       const step = cellStep(row, 0);
       if (step < INF) {
-        dist[row][0] = step;
+        dist[row]![0] = step; // ratchet: col 0 in-bounds
         if (step === 0) deque.unshift({ row, col: 0, d: step });
         else deque.push({ row, col: 0, d: step });
       }
@@ -102,7 +102,7 @@ function shortestPathDistance(state: HexGameState, player: Player): number {
 
   while (deque.length > 0) {
     const { row, col, d: currentDist } = deque.shift()!;
-    if (currentDist > dist[row][col]) continue;
+    if (currentDist > dist[row]![col]!) continue; // ratchet: in-bounds dist
 
     if (player === 'player1' && row === boardSize - 1) {
       return currentDist;
@@ -115,8 +115,8 @@ function shortestPathDistance(state: HexGameState, player: Player): number {
       const edgeCost = cellStep(neighbor.row, neighbor.col);
       if (edgeCost >= INF) continue;
       const newDist = currentDist + edgeCost;
-      if (newDist < dist[neighbor.row][neighbor.col]) {
-        dist[neighbor.row][neighbor.col] = newDist;
+      if (newDist < dist[neighbor.row]![neighbor.col]!) {
+        dist[neighbor.row]![neighbor.col] = newDist;
         if (edgeCost === 0) {
           deque.unshift({ row: neighbor.row, col: neighbor.col, d: newDist });
         } else {
@@ -155,10 +155,10 @@ function evaluatePosition(state: HexGameState, player: Player): number {
   const center = Math.floor(state.boardSize / 2);
   for (let row = 0; row < state.boardSize; row++) {
     for (let col = 0; col < state.boardSize; col++) {
-      if (state.board[row][col] === player) {
+      if (state.board[row]![col] === player) {
         const distFromCenter = Math.abs(row - center) + Math.abs(col - center);
         centerBonus += (state.boardSize - distFromCenter) * 0.1;
-      } else if (state.board[row][col] === opponent) {
+      } else if (state.board[row]![col] === opponent) {
         const distFromCenter = Math.abs(row - center) + Math.abs(col - center);
         centerBonus -= (state.boardSize - distFromCenter) * 0.1;
       }
@@ -276,7 +276,7 @@ export function searchBestMove(
     );
     if (centerMoves.length > 0) {
       return {
-        move: centerMoves[Math.floor(rng() * centerMoves.length)],
+        move: centerMoves[Math.floor(rng() * centerMoves.length)]!,
         truncated: false,
       };
     }
@@ -367,7 +367,7 @@ export function searchBestMove(
     return { move: moves[0] ?? null, truncated };
   }
 
-  return { move: scoredMoves[0].move, truncated };
+  return { move: scoredMoves[0]!.move, truncated }; // ratchet: length-gated
 }
 
 // Get the best move for the AI
@@ -384,5 +384,5 @@ export function getBestMove(
 export function getRandomMove(state: HexGameState): HexPosition | null {
   const moves = getValidMoves(state);
   if (moves.length === 0) return null;
-  return moves[Math.floor(Math.random() * moves.length)];
+  return moves[Math.floor(Math.random() * moves.length)]!; // ratchet: length-gated
 }

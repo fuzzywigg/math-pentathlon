@@ -103,15 +103,17 @@ function isOnAlignmentPath(
 
   const match = nodeId.match(/n(\d+)-(\d+)/);
   if (!match) return false;
-  const row = parseInt(match[1]);
-  const col = parseInt(match[2]);
+  // ratchet: match groups exist after /n(\d+)-(\d+)/ truthy match.
+  const row = parseInt(match[1]!);
+  const col = parseInt(match[2]!);
 
   for (const [dir1, dir2] of directions) {
     const chipsInLine: Chip[] = [chip];
 
-    for (const [dr, dc] of [dir1, dir2]) {
-      let r = row + dr;
-      let c = col + dc;
+    // ratchet: each directions entry is a literal pair of [dr, dc] vectors.
+    for (const [dr, dc] of [dir1!, dir2!]) {
+      let r = row + dr!;
+      let c = col + dc!;
 
       while (r >= 0 && r < 5 && c >= 0 && c < 5) {
         const adjId = `n${r}-${c}`;
@@ -121,8 +123,8 @@ function isOnAlignmentPath(
           chipsInLine.push(adjNode.chip);
         }
 
-        r += dr;
-        c += dc;
+        r += dr!;
+        c += dc!;
       }
     }
 
@@ -131,11 +133,12 @@ function isOnAlignmentPath(
       for (let i = 0; i < chipsInLine.length - 2; i++) {
         for (let j = i + 1; j < chipsInLine.length - 1; j++) {
           for (let k = j + 1; k < chipsInLine.length; k++) {
+            // ratchet: i < j < k < length — indexed trio members exist.
             if (
               canFormWinningEquation([
-                chipsInLine[i],
-                chipsInLine[j],
-                chipsInLine[k],
+                chipsInLine[i]!,
+                chipsInLine[j]!,
+                chipsInLine[k]!,
               ])
             ) {
               return true;
@@ -328,8 +331,9 @@ function evaluateMoves(
       // Factor 6: Center control (weaker than evacuation)
       const match = nodeId.match(/n(\d+)-(\d+)/);
       if (match) {
-        const row = parseInt(match[1]);
-        const col = parseInt(match[2]);
+        // ratchet: match groups exist after /n(\d+)-(\d+)/ truthy match.
+        const row = parseInt(match[1]!);
+        const col = parseInt(match[2]!);
         const centerDist = Math.abs(row - 2) + Math.abs(col - 2);
         const centerBonus = (4 - centerDist) * 20;
         score += centerBonus;
@@ -382,11 +386,13 @@ function getTeachingMove(state: KwaState, player: Player): MoveOption | null {
     const poolSize = Math.max(2, Math.ceil(moves.length / 2));
     const pool = moves.slice(0, poolSize);
     if (pool.length > 1) {
-      return pool[1 + Math.floor(Math.random() * (pool.length - 1))];
+      // ratchet: index in [1, pool.length) after length > 1 gate.
+      return pool[1 + Math.floor(Math.random() * (pool.length - 1))]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -433,17 +439,20 @@ export function getAIMove(
   // Soft budget guard: if evaluation already burned the tablet slice (rare),
   // take the top move immediately without extra randomness sampling.
   if (performance.now() - started > AI_THINK_BUDGET_MS) {
-    return { chipId: moves[0].chipId, nodeId: moves[0].nodeId };
+    // ratchet: moves.length === 0 returned above.
+    return { chipId: moves[0]!.chipId, nodeId: moves[0]!.nodeId };
   }
 
   // Add randomness based on difficulty (only among top progressive moves)
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, Math.min(3, moves.length));
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { chipId: chosen.chipId, nodeId: chosen.nodeId };
   }
 
-  return { chipId: moves[0].chipId, nodeId: moves[0].nodeId };
+  // ratchet: moves.length === 0 returned above.
+  return { chipId: moves[0]!.chipId, nodeId: moves[0]!.nodeId };
 }
 
 /**

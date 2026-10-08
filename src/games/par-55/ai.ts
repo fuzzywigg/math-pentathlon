@@ -175,21 +175,25 @@ function getTeachingMove(state: Par55State, player: Player): MoveOption | null {
   // 40% chance to pick a lower-scoring move
   if (Math.random() < 0.4 && moves.length > 1) {
     // Pick a move that scores fewer points (but not 0)
+    // ratchet: moves.length > 1 gate above guarantees moves[0].
     const suboptimal = moves.filter(
-      (m) => m.immediateScore < moves[0].immediateScore && m.immediateScore > 0
+      (m) => m.immediateScore < moves[0]!.immediateScore && m.immediateScore > 0
     );
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: length > 0 — random index is in range.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
 
     // Otherwise pick from bottom half
     const bottomHalf = moves.slice(Math.floor(moves.length / 2));
     if (bottomHalf.length > 0) {
-      return bottomHalf[Math.floor(Math.random() * bottomHalf.length)];
+      // ratchet: length > 0 — random index is in range.
+      return bottomHalf[Math.floor(Math.random() * bottomHalf.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -235,11 +239,13 @@ export function getAIMove(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { blockId: chosen.blockId, baseId: chosen.baseId };
   }
 
-  return { blockId: moves[0].blockId, baseId: moves[0].baseId };
+  // ratchet: moves.length === 0 returned above.
+  return { blockId: moves[0]!.blockId, baseId: moves[0]!.baseId };
 }
 
 /**

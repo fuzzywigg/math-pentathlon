@@ -122,11 +122,13 @@ function getTeachingMove(
   if (Math.random() < 0.4 && moves.length > 1) {
     const suboptimal = moves.slice(1, Math.min(4, moves.length));
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: length > 0 — random index is in range.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -167,11 +169,13 @@ export function getAIIslandChoice(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { islandId: chosen.islandId };
   }
 
-  return { islandId: moves[0].islandId };
+  // ratchet: moves.length === 0 returned above.
+  return { islandId: moves[0]!.islandId };
 }
 
 /**

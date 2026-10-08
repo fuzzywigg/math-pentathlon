@@ -1,5 +1,6 @@
 import FiarAiWorker from './ai.worker.ts?worker';
 import { AiWorkerClient } from '../../core/ai-worker/client';
+import type { AiWorkerRequestPayload } from '../../core/ai-worker/client';
 import { AI_WORKER_SAFETY_DEADLINE_MS } from '../../core/ai-worker/safety';
 import {
   getAIMove,
@@ -49,7 +50,7 @@ export async function getAIMoveAsync(
     difficulty,
     seed: options.seed,
     deadlineMs: options.deadlineMs ?? AI_WORKER_SAFETY_DEADLINE_MS,
-  });
+  } as AiWorkerRequestPayload);
 }
 
 export function cancelFiarAiRequests(): void {
