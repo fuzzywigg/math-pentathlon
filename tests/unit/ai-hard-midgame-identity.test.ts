@@ -90,8 +90,8 @@ describe('Hex Hard mid-game time-box identity', () => {
 });
 
 describe('Queens Hard mid-game time-box identity', () => {
-  it('Hard play deadline is ≤450ms (≤500ms wall target)', () => {
-    expect(QUEENS_MS.hard).toBeLessThanOrEqual(450);
+  it('Hard play deadline is ≤2500ms (alpha restore option)', () => {
+    expect(QUEENS_MS.hard).toBeLessThanOrEqual(2500);
   });
 
   it.skipIf(skipIdentityUnderCi)(
