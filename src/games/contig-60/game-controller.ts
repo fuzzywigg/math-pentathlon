@@ -1,14 +1,8 @@
 // Contig 60 Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import type {
-  ContigState,
-  Player,
-  ContigWinner } from './types';
-import {
-  createInitialState,
-  getValidPlacements,
-} from './types';
+import type { ContigState, Player, ContigWinner } from './types';
+import { createInitialState, getValidPlacements } from './types';
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
@@ -254,8 +248,9 @@ function handlePass(): void {
 // =============================================================================
 
 function makeAIMove(): void {
-  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer)
-    {return;}
+  if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer) {
+    return;
+  }
   if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
 
   // Use AI module to get the best placement

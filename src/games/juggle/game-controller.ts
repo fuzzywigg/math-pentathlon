@@ -12,13 +12,8 @@ import {
   flipShape,
   placeShape,
 } from './rules';
-import type {
-  AIDifficulty } from './ai';
-import {
-  getAIDieChoice,
-  getAIShapeChoice,
-  getAIPlacement
-} from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
 import {
   renderBoard,
   renderDice,

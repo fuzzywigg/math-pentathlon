@@ -449,4 +449,3 @@ export function renderStatus(
 
   container.appendChild(statusEl);
 }
-

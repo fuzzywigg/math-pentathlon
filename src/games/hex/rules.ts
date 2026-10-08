@@ -103,7 +103,10 @@ export function checkWinner(
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
         // ratchet: getNeighbors only yields in-bounds positions.
-        if (!visited.has(key) && board[neighbor.row]![neighbor.col] === player) {
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           queue.push(neighbor);
         }
@@ -132,7 +135,10 @@ export function checkWinner(
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
         // ratchet: getNeighbors only yields in-bounds positions.
-        if (!visited.has(key) && board[neighbor.row]![neighbor.col] === player) {
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           queue.push(neighbor);
         }
@@ -235,7 +241,10 @@ export function getWinningPath(
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
         // ratchet: getNeighbors only yields in-bounds positions.
-        if (!visited.has(key) && board[neighbor.row]![neighbor.col] === player) {
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           parent.set(key, current);
           queue.push(neighbor);
@@ -266,7 +275,10 @@ export function getWinningPath(
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
         // ratchet: getNeighbors only yields in-bounds positions.
-        if (!visited.has(key) && board[neighbor.row]![neighbor.col] === player) {
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           parent.set(key, current);
           queue.push(neighbor);

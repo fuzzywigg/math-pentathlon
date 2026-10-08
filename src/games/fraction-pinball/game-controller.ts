@@ -133,8 +133,12 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2')
-    {return;}
+  if (
+    gameState.phase !== 'answering' ||
+    gameState.currentPlayer !== 'player2'
+  ) {
+    return;
+  }
   if (!gameState.currentChallenge) return;
 
   // Use AI module to get answer; fall back so vs-AI never soft-locks on null.

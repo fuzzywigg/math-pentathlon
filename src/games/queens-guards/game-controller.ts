@@ -1,16 +1,8 @@
 // Queens & Guards Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import type {
-  QueensGuardsState,
-  Player,
-  BoardCoord } from './types';
-import {
-  createInitialState,
-  cellKey,
-  parseKey,
-  getOpponent,
-} from './types';
+import type { QueensGuardsState, Player, BoardCoord } from './types';
+import { createInitialState, cellKey, parseKey, getOpponent } from './types';
 import {
   getValidMoves,
   makeMove,

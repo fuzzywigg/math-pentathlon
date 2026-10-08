@@ -14,7 +14,11 @@ import {
   getBoardFillPercentage,
 } from './rules';
 import type { Board } from '../../core/polyomino/placement';
-import type { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import {
   buildCellAriaLabel,

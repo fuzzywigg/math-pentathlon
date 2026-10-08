@@ -2,11 +2,7 @@
 // Renders the attribute logic board and cards
 
 import type { StarsState, AttributeCard, Player } from './types';
-import {
-  CONFIG,
-  COLOR_VALUES,
-  countDifferences,
-} from './types';
+import { CONFIG, COLOR_VALUES, countDifferences } from './types';
 import { getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
