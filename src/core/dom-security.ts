@@ -49,6 +49,10 @@ export function safeHtml(
     }
   }
 
+  // #region agent log
+  if(html.includes('contig-status')){require('fs').appendFileSync('/opt/cursor/logs/debug.log',JSON.stringify({location:'dom-security.ts:safeHtml',message:'contig-status template before parse',data:{htmlPreview:html.slice(0,350),valueKinds:values.map(v=>v instanceof Node?'Node':typeof v),valuePreviews:values.map(v=>v instanceof Node?'[Node]':String(v).slice(0,40))},timestamp:Date.now(),hypothesisId:'A'})+'\n');}
+  // #endregion
+
   const template = document.createElement('template');
   template.innerHTML = html;
 
