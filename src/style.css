@@ -1005,10 +1005,6 @@ html[data-reduced-motion='true'] .game-card:active {
     padding: 1rem;
   }
 
-  .game-selector-header h1 {
-    font-size: 2rem;
-  }
-
   .game-grid {
     grid-template-columns: 1fr;
   }
@@ -1174,7 +1170,6 @@ html[data-reduced-motion='true'] {
   .qg-winner-banner,
   .calla-pit-valid .calla-pit-circle,
   .tutorial-highlight,
-  .tutorial-action-target,
   .hero-logo .logo-icon {
     animation: none !important;
     transition: opacity 0.2s ease !important;
@@ -1219,7 +1214,6 @@ html[data-reduced-motion='true'] .game-winner-banner,
 html[data-reduced-motion='true'] .sd-winner-banner,
 html[data-reduced-motion='true'] .contig-winner-banner,
 html[data-reduced-motion='true'] .tutorial-highlight,
-html[data-reduced-motion='true'] .tutorial-action-target,
 html[data-reduced-motion='true'] .hero-logo .logo-icon {
   animation: none !important;
   transition: opacity 0.2s ease !important;

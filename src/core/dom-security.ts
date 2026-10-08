@@ -68,17 +68,6 @@ export function safeHtml(
   return template.content;
 }
 
-/** Replace children with a fragment / nodes built via safe APIs. */
-export function setChildren(
-  el: ParentNode,
-  ...nodes: Array<Node | string | DocumentFragment>
-): void {
-  const prepared = nodes.map((n) =>
-    typeof n === 'string' ? document.createTextNode(n) : n
-  );
-  el.replaceChildren(...prepared);
-}
-
 /** Clear then append `safeHtml` / fragment content. */
 export function replaceWithSafeHtml(
   el: ParentNode,

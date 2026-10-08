@@ -22,9 +22,9 @@ import {
 
 export const MAX_PROFILE_NAME_LENGTH = 64;
 export const MAX_PROFILE_AVATAR_LENGTH = 64;
-export const MAX_PROFILE_ID_LENGTH = 64;
-export const MAX_GAME_ID_LENGTH = 64;
-export const MAX_ACHIEVEMENT_ID_LENGTH = 64;
+const MAX_PROFILE_ID_LENGTH = 64;
+const MAX_GAME_ID_LENGTH = 64;
+const MAX_ACHIEVEMENT_ID_LENGTH = 64;
 
 const OWL_MOODS: ReadonlySet<OwlMood> = new Set([
   'happy',

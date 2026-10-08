@@ -38,12 +38,12 @@ let idleHandle: { kind: 'idle' | 'timeout'; id: number } | null = null;
  * Real dynamic imports must not run under Vitest. `renderGameSelector` schedules
  * idle prefetch; when that fires after a jsdom env tears down, Vitest throws
  * EnvironmentTeardownError (seen on CI with game-selector → kings/star-track).
- * Opt-in via `allowGamePrefetchImportsForTests` for isolated coverage of the
- * idle / import / failure paths.
+ * Opt-in via module-private `allowGamePrefetchImportsForTests` for isolated
+ * coverage of the idle / import / failure paths.
  */
 let allowPrefetchImportsForTests = false;
 
-export function allowGamePrefetchImportsForTests(allow: boolean): void {
+function allowGamePrefetchImportsForTests(allow: boolean): void {
   allowPrefetchImportsForTests = allow;
 }
 
@@ -55,7 +55,7 @@ function shouldExecutePrefetchImport(): boolean {
 /** Reset between tests. */
 export function resetGamePrefetchForTests(): void {
   started.clear();
-  allowPrefetchImportsForTests = false;
+  allowGamePrefetchImportsForTests(false);
   const w = typeof window === 'undefined' ? null : window;
   if (w && idleHandle) {
     if (
