@@ -46,7 +46,8 @@
       "AI workers (fab/fiar/hex/queens) use Worker + import.meta.url — expected browser coupling; not counted as ai→ui because they do not import UI modules.",
       "src/ui/three/star-track-board-3d.ts imports star-track/board-ui helpers (UI→game-ui); left for a dedicated UI glue pass.",
       "Core hex package (src/core/hex/*) has zero deep importers in src/ — dead alongside its barrel; removal deferred to tip owner.",
-      "No clear behavior-free cycles in non-AI glue; value and type-only SCC counts are already 0."
+      "No clear behavior-free cycles in non-AI glue; value and type-only SCC counts are already 0.",
+      "Vite build warns Circular chunk: mp3d <-> game-{star-track,hex-a-gone,fiar,queens-guards,kwatro-sinko,prime-gold,pent-em-in} from board-3d-loader (game chunk) dynamically importing ui/three which statically imports that game's rules/board-ui. Source SCCs remain 0; chunk cycle is a manualChunks packaging smell for the tip owner — do not change AI/rules."
     ]
   }
 }
