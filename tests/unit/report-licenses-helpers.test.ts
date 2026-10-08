@@ -135,9 +135,9 @@ describe('report-licenses helpers', () => {
     expect(bom.bomFormat).toBe('CycloneDX');
     expect(bom.specVersion).toBe('1.5');
     expect(bom.components.length).toBe(2);
-    expect(bom.components[0].purl).toBe('pkg:npm/three@0.186.1');
-    expect(bom.components[0].licenses).toEqual([{ expression: 'MIT' }]);
-    expect(bom.components[1]['bom-ref']).toBe(
+    expect(bom.components[0]!.purl).toBe('pkg:npm/three@0.186.1');
+    expect(bom.components[0]!.licenses).toEqual([{ expression: 'MIT' }]);
+    expect(bom.components[1]!['bom-ref']).toBe(
       'file:public/fonts/inter-latin-400-normal.woff2'
     );
   });
