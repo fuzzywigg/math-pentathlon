@@ -72,6 +72,16 @@ describe('mutation-ui storage sanitize', () => {
     expect(streak.streakStartDate).toBe('');
   });
 
+  it('asFiniteNumber rejects Infinity (requires number && isFinite)', () => {
+    // Survivor: && → || in asFiniteNumber would accept Infinity as a streak.
+    const streak = sanitizeStreak({
+      currentStreak: Number.POSITIVE_INFINITY,
+      bestStreak: Number.NaN,
+    });
+    expect(streak.currentStreak).toBe(0);
+    expect(streak.bestStreak).toBe(0);
+  });
+
   it('sanitizeAchievements caps ids at 64 and keeps unlockedAt 0', () => {
     const list = sanitizeAchievements([
       { id: 'a'.repeat(100), unlockedAt: 0 },

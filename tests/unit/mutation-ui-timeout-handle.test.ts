@@ -18,9 +18,13 @@ describe('mutation-ui timeout-handle', () => {
   });
 
   it('clearNullableTimeout clears only when timer !== null', () => {
+    // Survivor: !== → === would skip clearTimeout for real ids.
     vi.useFakeTimers();
-    const id = setTimeout(() => undefined, 1000);
+    const fn = vi.fn();
+    const id = setTimeout(fn, 50);
     expect(clearNullableTimeout(id)).toBeNull();
+    vi.advanceTimersByTime(50);
+    expect(fn).not.toHaveBeenCalled();
     expect(clearNullableTimeout(null)).toBeNull();
   });
 

@@ -70,6 +70,15 @@ describe('mutation-ui storage migrate', () => {
     expect(out.version).toBe(CURRENT_DATA_VERSION);
   });
 
+  it('Infinity version is not treated as a finite number', () => {
+    // Survivor: typeof === 'number' && Number.isFinite → || would keep Infinity.
+    const out = ensureProgressDefaults(
+      minimalProgress({ version: Number.POSITIVE_INFINITY })
+    );
+    expect(out.version).toBe(CURRENT_DATA_VERSION);
+    expect(Number.isFinite(out.version)).toBe(true);
+  });
+
   it('normalizeLoadedProgress migrates only when version < CURRENT', () => {
     // Survivor: < → <= would also migrate equal CURRENT (still ok) — pin strict <.
     const below = normalizeLoadedProgress(minimalProgress({ version: 0 }));

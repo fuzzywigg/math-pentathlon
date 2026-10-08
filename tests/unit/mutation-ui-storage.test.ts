@@ -124,4 +124,17 @@ describe('mutation-ui storage manager', () => {
     storage.updateSettings({ reducedMotion: false });
     expect(storage.getSettings().reducedMotion).toBe(false);
   });
+
+  it('handleExternalStorageEvent with null storageArea still applies', () => {
+    // When storageArea is null/undefined, area checks are skipped.
+    const payload = createDefaultProgress();
+    payload.settings.soundEnabled = false;
+    storage.handleExternalStorageEvent(
+      new StorageEvent('storage', {
+        key: PROGRESS_STORAGE_KEY,
+        newValue: JSON.stringify(payload),
+      })
+    );
+    expect(storage.getSettings().soundEnabled).toBe(false);
+  });
 });
