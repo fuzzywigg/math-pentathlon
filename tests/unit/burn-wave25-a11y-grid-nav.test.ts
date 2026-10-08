@@ -149,6 +149,48 @@ describe('Wave 25 a11y-grid-nav — collectGridCells filter', () => {
     board.appendChild(row);
     expect(collectGridCells(board)).toHaveLength(2);
   });
+
+  it('skips MP-3D *-a11y-grid mirrors when searching a parent container', () => {
+    const root = document.createElement('div');
+    const playBoard = document.createElement('div');
+    markBoardAsGrid(playBoard);
+    playBoard.append(makeCell(0, 0), makeCell(0, 1));
+
+    const a11y = document.createElement('div');
+    a11y.className = 'pg-a11y-grid';
+    const mirror = document.createElement('button');
+    mirror.setAttribute('role', 'gridcell');
+    mirror.setAttribute('data-row', '0');
+    mirror.setAttribute('data-col', '0');
+    mirror.setAttribute('data-value', '1');
+    mirror.tabIndex = 0;
+    const mirror2 = document.createElement('button');
+    mirror2.setAttribute('role', 'gridcell');
+    mirror2.setAttribute('data-row', '0');
+    mirror2.setAttribute('data-col', '1');
+    mirror2.setAttribute('data-value', '2');
+    mirror2.tabIndex = 0;
+    a11y.append(mirror, mirror2);
+
+    root.append(playBoard, a11y);
+    document.body.appendChild(root);
+
+    const cells = collectGridCells(root);
+    expect(cells).toHaveLength(2);
+    expect(cells.every((c) => !c.closest('.pg-a11y-grid'))).toBe(true);
+    // Mirrors keep multi-tab0 legal targets
+    expect(a11y.querySelectorAll('button[tabindex="0"]')).toHaveLength(2);
+  });
+
+  it('keeps cells when root itself is an *-a11y-grid mirror', () => {
+    const a11y = document.createElement('div');
+    a11y.className = 'pent-a11y-grid';
+    markBoardAsGrid(a11y);
+    a11y.append(makeCell(4, 4), makeCell(4, 5));
+    document.body.appendChild(a11y);
+
+    expect(collectGridCells(a11y)).toHaveLength(2);
+  });
 });
 
 describe('Wave 25 a11y-grid-nav — bindGridNavigation arrows', () => {

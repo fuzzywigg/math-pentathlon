@@ -273,11 +273,21 @@ export function applyRovingTabindex(
   return active;
 }
 
-/** Collect gridcells that carry data-row / data-col. */
+/**
+ * Collect gridcells that carry data-row / data-col.
+ * When searching a game container, skip visually-hidden MP-3D a11y mirrors
+ * (`*-a11y-grid`): those may mark every legal target tabindex=0, and a parent
+ * restoreGridFocus must not collapse them (Prime Gold 3D keyboard flake).
+ * When `root` itself is an a11y mirror, keep its cells (Pent'Em In / others
+ * call collectGridCells/restoreGridFocus on the mirror).
+ */
 export function collectGridCells(root: Element): Element[] {
   return Array.from(
     root.querySelectorAll('[role="gridcell"][data-row][data-col]')
-  );
+  ).filter((el) => {
+    const mirror = el.closest('[class*="-a11y-grid"]');
+    return !mirror || mirror === root;
+  });
 }
 
 /**
