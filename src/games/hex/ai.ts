@@ -1,7 +1,8 @@
 // Hex AI - Strategic AI using shortest path heuristics
 // Player 1 connects top-bottom, Player 2 connects left-right
 
-import { HexGameState, HexPosition, Player, getOpponent } from './types';
+import type { HexGameState, HexPosition, Player } from './types';
+import { getOpponent } from './types';
 import { getNeighbors, makeMove, getValidMoves } from './rules';
 import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
