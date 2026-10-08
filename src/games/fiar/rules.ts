@@ -208,7 +208,7 @@ export function moveChip(
     type: 'move',
     nodeId: toId,
     fromNodeId: fromId,
-    chipKind: chipKind ?? undefined,
+    ...(chipKind != null ? { chipKind } : {}),
     moveNumber: state.moveHistory.length + 1,
   };
 

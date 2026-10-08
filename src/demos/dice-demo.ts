@@ -152,8 +152,9 @@ export function renderDiceDemo(container: HTMLElement): void {
   ) as HTMLElement;
   const log2d6 = wrapper.querySelector('#log-2d6') as HTMLElement;
 
+  const standardDice = COMMON_DICE_SETS.standard;
   new DiceSelector(selector2d6Container, {
-    diceSet: COMMON_DICE_SETS.standard,
+    ...(standardDice !== undefined ? { diceSet: standardDice } : {}),
     multiSelect: true,
     onSelectionChange: (dice, sum) => {
       addLog(
@@ -181,8 +182,9 @@ export function renderDiceDemo(container: HTMLElement): void {
   ) as HTMLElement;
   const logPoly = wrapper.querySelector('#log-poly') as HTMLElement;
 
+  const primeGoldDice = COMMON_DICE_SETS.primeGold;
   new DiceSelector(selectorPolyContainer, {
-    diceSet: COMMON_DICE_SETS.primeGold,
+    ...(primeGoldDice !== undefined ? { diceSet: primeGoldDice } : {}),
     multiSelect: true,
     onSelectionChange: (dice, sum) => {
       addLog(
@@ -206,8 +208,9 @@ export function renderDiceDemo(container: HTMLElement): void {
     '#selector-sums'
   ) as HTMLElement;
 
+  const tripleDice = COMMON_DICE_SETS.triple;
   new DiceSelector(selectorSumsContainer, {
-    diceSet: COMMON_DICE_SETS.triple,
+    ...(tripleDice !== undefined ? { diceSet: tripleDice } : {}),
     multiSelect: true,
     showPossibleSums: true,
     autoRoll: true,

@@ -37,6 +37,25 @@ function createEmptyBoard(rows: number, cols: number): Board {
     .map(() => Array(cols).fill(null));
 }
 
+/** Safe cell read under noUncheckedIndexedAccess (board rows are pre-sized). */
+function getBoardCell(board: Board, row: number, col: number): CellValue {
+  const boardRow = board[row];
+  if (boardRow === undefined) return null;
+  return boardRow[col] ?? null;
+}
+
+/** Safe cell write under noUncheckedIndexedAccess. */
+function setBoardCell(
+  board: Board,
+  row: number,
+  col: number,
+  value: CellValue
+): void {
+  const boardRow = board[row];
+  if (boardRow === undefined) return;
+  boardRow[col] = value;
+}
+
 function renderFourInRowDemo(container: HTMLElement): void {
   const rows = 6;
   const cols = 7;
@@ -78,7 +97,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = currentBoard[row][col];
+        const value = getBoardCell(currentBoard, row, col);
         if (value) {
           cell.classList.add(`cell-${value.toString().toLowerCase()}`);
           cell.textContent = value.toString();
@@ -145,7 +164,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
     // Find lowest empty row in column
     let targetRow = -1;
     for (let row = rows - 1; row >= 0; row--) {
-      if (currentBoard[row][col] === null) {
+      if (getBoardCell(currentBoard, row, col) === null) {
         targetRow = row;
         break;
       }
@@ -153,7 +172,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
 
     if (targetRow === -1) return; // Column full
 
-    currentBoard[targetRow][col] = currentPlayer;
+    setBoardCell(currentBoard, targetRow, col, currentPlayer);
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     render();
   }
@@ -212,7 +231,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = board[row][col];
+        const value = getBoardCell(board, row, col);
         if (value === 'B') {
           cell.classList.add('cell-blue');
         } else if (value === 'R') {
@@ -290,7 +309,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
   }
 
   function handleClick(row: number, col: number): void {
-    if (board[row][col] !== null) return;
+    if (getBoardCell(board, row, col) !== null) return;
 
     // Check for existing winner
     const getCell = createArrayGetter(board);
@@ -308,7 +327,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
         return;
     }
 
-    board[row][col] = player;
+    setBoardCell(board, row, col, player);
     player = player === 'B' ? 'R' : 'B';
     render();
   }
@@ -316,7 +335,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
   resetBtn.addEventListener('click', () => {
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
-        board[r][c] = null;
+        setBoardCell(board, r, c, null);
       }
     }
     player = 'B';
@@ -332,9 +351,9 @@ function renderPotentialDemo(container: HTMLElement): void {
   const board: Board = createEmptyBoard(rows, cols);
 
   // Pre-populate with some pieces
-  board[2][2] = 'X';
-  board[2][3] = 'X';
-  board[1][2] = 'O';
+  setBoardCell(board, 2, 2, 'X');
+  setBoardCell(board, 2, 3, 'X');
+  setBoardCell(board, 1, 2, 'O');
 
   const config: AlignmentConfig = {
     targetLength: 4,
@@ -371,7 +390,7 @@ function renderPotentialDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = board[row][col];
+        const value = getBoardCell(board, row, col);
         if (value) {
           cell.classList.add(`cell-${value.toString().toLowerCase()}`);
           cell.textContent = value.toString();
@@ -415,12 +434,13 @@ function renderPotentialDemo(container: HTMLElement): void {
   }
 
   function handleClick(row: number, col: number): void {
-    if (board[row][col] === null) {
-      board[row][col] = 'X';
-    } else if (board[row][col] === 'X') {
-      board[row][col] = 'O';
+    const current = getBoardCell(board, row, col);
+    if (current === null) {
+      setBoardCell(board, row, col, 'X');
+    } else if (current === 'X') {
+      setBoardCell(board, row, col, 'O');
     } else {
-      board[row][col] = null;
+      setBoardCell(board, row, col, null);
     }
     render(row, col);
   }
@@ -428,7 +448,7 @@ function renderPotentialDemo(container: HTMLElement): void {
   resetBtn.addEventListener('click', () => {
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        board[r][c] = null;
+        setBoardCell(board, r, c, null);
       }
     }
     render();

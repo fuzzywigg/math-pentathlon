@@ -247,7 +247,7 @@ export function renderBoard(
     const ariaLabel = buildCellAriaLabel({
       coord: `${island.row},${island.col}`,
       empty: !island.owner,
-      owner,
+      ...(owner !== undefined ? { owner } : {}),
       validMove: isValid,
       extras: [
         `value ${island.value}`,

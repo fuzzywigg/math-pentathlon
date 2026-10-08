@@ -193,10 +193,10 @@ function renderBase(
     buildCellAriaLabel({
       coord: `${base.row},${base.col}`,
       empty: !base.block,
-      owner,
-      piece,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(piece !== undefined ? { piece } : {}),
       validPlacement: isValid,
-      extras: isLastMove ? ['last move'] : undefined,
+      ...(isLastMove ? { extras: ['last move'] } : {}),
     })
   );
 
@@ -429,7 +429,12 @@ function renderHandBlock(
   // Label
   const label = document.createElement('div');
   label.className = 'par55-block-label';
-  label.textContent = `${block.size[0].toUpperCase()}/${block.thickness[0].toUpperCase()}`;
+  const sizeLetter = block.size[0];
+  const thickLetter = block.thickness[0];
+  label.textContent =
+    sizeLetter !== undefined && thickLetter !== undefined
+      ? `${sizeLetter.toUpperCase()}/${thickLetter.toUpperCase()}`
+      : `${block.size}/${block.thickness}`;
   wrapper.appendChild(label);
 
   return wrapper;

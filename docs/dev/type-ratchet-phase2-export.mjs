@@ -22,9 +22,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '../..');
 const OUT = path.join(__dirname, 'type-ratchet-phase2-baseline.json');
 
+/** Keep in sync with scripts/check-type-ratchet.mjs IN_SCOPE. */
 const IN_SCOPE = new RegExp(
   [
     '^src/(ui|core)/',
+    '^src/demos/',
+    '^src/main\\.ts$',
+    '^src/games/remainder-islands/(types|board-ui)\\.ts$',
+    '^src/games/hex-a-gone/(rules|board-ui)\\.ts$',
+    '^src/games/star-track/(types|game-controller)\\.ts$',
+    '^src/games/fab-a-diffy/(types|board-ui|rules)\\.ts$',
+    '^src/games/fiar/(types|board-ui|rules)\\.ts$',
+    '^src/games/par-55/(types|board-ui|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',

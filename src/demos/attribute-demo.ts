@@ -392,12 +392,18 @@ function initSetGameSection(): void {
 
   // Generate 12 random cards
   for (let i = 0; i < 12; i++) {
+    const shape = shapes[Math.floor(i / 4) % 3];
+    const color = colors[i % 3];
+    const shading = shadings[Math.floor(i / 3) % 3];
+    if (shape === undefined || color === undefined || shading === undefined) {
+      continue;
+    }
     setCards.push(
       createPiece(`set-${i}`, {
         number: (i % 3) + 1,
-        shape: shapes[Math.floor(i / 4) % 3],
-        color: colors[i % 3],
-        shading: shadings[Math.floor(i / 3) % 3],
+        shape,
+        color,
+        shading,
       })
     );
   }
