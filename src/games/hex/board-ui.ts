@@ -8,13 +8,26 @@ import {
   makeGridCell,
   markBoardAsGrid,
   bindGridNavigation,
-  bindCellActivateKeys,
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 
 export type CellClickCallback = (row: number, col: number) => void;
+
+interface HexBoardBinding {
+  onCellClick?: CellClickCallback;
+}
+
+interface HexBoardCache {
+  svg: SVGSVGElement;
+  cells: SVGGElement[];
+  size: number;
+  hexPath: string;
+}
+
+const hexClickBindings = new WeakMap<HTMLElement, HexBoardBinding>();
+const hexBoardCaches = new WeakMap<HTMLElement, HexBoardCache>();
 
 /** True when vs-AI chrome is on and it is the computer's seat to place. */
 function isComputerPlacementTurn(state: HexGameState): boolean {
@@ -24,18 +37,7 @@ function isComputerPlacementTurn(state: HexGameState): boolean {
   return state.currentPlayer === aiSeat;
 }
 
-// Render the hex board as an SVG
-export function renderBoard(
-  state: HexGameState,
-  container: HTMLElement,
-  onCellClick?: CellClickCallback
-): void {
-  const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
-
-  const size = state.boardSize;
-
-  // Calculate SVG dimensions
+function hexLayout(size: number) {
   // Hex dimensions (pointy-top hexagons).
   // Radius 26 → flat-to-flat ≈45.0 and point-to-point 52 (≥44 CSS px at scale 1).
   const hexRadius = 26;
@@ -43,8 +45,6 @@ export function renderBoard(
   const hexHeight = hexRadius * 2;
   const vertSpacing = hexHeight * 0.75;
   const horizSpacing = hexWidth;
-
-  // Board dimensions with padding for edge colors
   const padding = 40;
   const boardWidth =
     (size - 1) * horizSpacing +
@@ -52,29 +52,50 @@ export function renderBoard(
     hexWidth +
     padding * 2;
   const boardHeight = (size - 1) * vertSpacing + hexHeight + padding * 2;
-
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('class', 'hex-board');
-  svg.setAttribute('viewBox', `0 0 ${boardWidth} ${boardHeight}`);
-  // Intrinsic size so the board does not collapse to the 300×150 replaced-element default.
-  svg.setAttribute('width', String(Math.round(boardWidth)));
-  svg.setAttribute('height', String(Math.round(boardHeight)));
-  markBoardAsGrid(svg);
-
-  // Create defs for hex shape
-  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-
-  // Pointy-top hexagon path
-  const hexPoints = [];
+  const hexPoints: string[] = [];
   for (let i = 0; i < 6; i++) {
     const angle = (Math.PI / 3) * i - Math.PI / 6;
     const x = hexRadius * Math.cos(angle);
     const y = hexRadius * Math.sin(angle);
     hexPoints.push(`${x},${y}`);
   }
-  const hexPath = hexPoints.join(' ');
+  const getHexCenter = (row: number, col: number): { x: number; y: number } => {
+    const x =
+      padding + hexWidth / 2 + col * horizSpacing + row * (hexWidth / 2);
+    const y = padding + hexRadius + row * vertSpacing;
+    return { x, y };
+  };
+  return {
+    hexRadius,
+    hexWidth,
+    hexHeight,
+    padding,
+    boardWidth,
+    boardHeight,
+    hexPath: hexPoints.join(' '),
+    getHexCenter,
+  };
+}
 
-  // Create hex symbol
+function ensureHexBoard(container: HTMLElement, size: number): HexBoardCache {
+  const existing = hexBoardCaches.get(container);
+  if (existing && existing.size === size && container.contains(existing.svg)) {
+    return existing;
+  }
+
+  container.replaceChildren();
+  const layout = hexLayout(size);
+  const { hexRadius, hexWidth, boardWidth, boardHeight, hexPath, getHexCenter } =
+    layout;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'hex-board');
+  svg.setAttribute('viewBox', `0 0 ${boardWidth} ${boardHeight}`);
+  svg.setAttribute('width', String(Math.round(boardWidth)));
+  svg.setAttribute('height', String(Math.round(boardHeight)));
+  markBoardAsGrid(svg);
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
   const hexSymbol = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'symbol'
@@ -91,23 +112,12 @@ export function renderBoard(
   hexPolygon.setAttribute('points', hexPath);
   hexSymbol.appendChild(hexPolygon);
   defs.appendChild(hexSymbol);
-
   svg.appendChild(defs);
 
-  // Draw edge indicators (colored borders showing which player connects which sides)
   const edgeGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   edgeGroup.setAttribute('class', 'hex-edges');
 
-  // Calculate hex center positions
-  const getHexCenter = (row: number, col: number): { x: number; y: number } => {
-    const x =
-      padding + hexWidth / 2 + col * horizSpacing + row * (hexWidth / 2);
-    const y = padding + hexRadius + row * vertSpacing;
-    return { x, y };
-  };
-
-  // Draw top edge (Player 1 - Blue)
-  const topEdgePath = [];
+  const topEdgePath: string[] = [];
   for (let col = 0; col < size; col++) {
     const center = getHexCenter(0, col);
     if (col === 0) {
@@ -116,16 +126,12 @@ export function renderBoard(
     topEdgePath.push(`L ${center.x} ${center.y - hexRadius}`);
     topEdgePath.push(`L ${center.x + hexWidth / 2} ${center.y - hexRadius}`);
   }
-  const topEdge = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'path'
-  );
+  const topEdge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   topEdge.setAttribute('d', topEdgePath.join(' '));
   topEdge.setAttribute('class', 'hex-edge hex-edge-p1');
   edgeGroup.appendChild(topEdge);
 
-  // Draw bottom edge (Player 1 - Blue)
-  const bottomEdgePath = [];
+  const bottomEdgePath: string[] = [];
   for (let col = 0; col < size; col++) {
     const center = getHexCenter(size - 1, col);
     if (col === 0) {
@@ -144,8 +150,7 @@ export function renderBoard(
   bottomEdge.setAttribute('class', 'hex-edge hex-edge-p1');
   edgeGroup.appendChild(bottomEdge);
 
-  // Draw left edge (Player 2 - Red)
-  const leftEdgePath = [];
+  const leftEdgePath: string[] = [];
   for (let row = 0; row < size; row++) {
     const center = getHexCenter(row, 0);
     if (row === 0) {
@@ -156,10 +161,8 @@ export function renderBoard(
       `L ${center.x - hexWidth / 2 + hexWidth / 2 / 2} ${center.y + hexRadius * 0.75}`
     );
   }
-  // Connect to bottom-left corner
   const blCorner = getHexCenter(size - 1, 0);
   leftEdgePath.push(`L ${blCorner.x - hexWidth / 2} ${blCorner.y + hexRadius}`);
-
   const leftEdge = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'path'
@@ -168,8 +171,7 @@ export function renderBoard(
   leftEdge.setAttribute('class', 'hex-edge hex-edge-p2');
   edgeGroup.appendChild(leftEdge);
 
-  // Draw right edge (Player 2 - Red)
-  const rightEdgePath = [];
+  const rightEdgePath: string[] = [];
   for (let row = 0; row < size; row++) {
     const center = getHexCenter(row, size - 1);
     if (row === 0) {
@@ -186,7 +188,6 @@ export function renderBoard(
   rightEdgePath.push(
     `L ${brCorner.x + hexWidth / 2} ${brCorner.y + hexRadius}`
   );
-
   const rightEdge = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'path'
@@ -194,28 +195,19 @@ export function renderBoard(
   rightEdge.setAttribute('d', rightEdgePath.join(' '));
   rightEdge.setAttribute('class', 'hex-edge hex-edge-p2');
   edgeGroup.appendChild(rightEdge);
-
   svg.appendChild(edgeGroup);
 
-  // Get winning path for highlighting
-  const winningPath = state.winner
-    ? getWinningPath(state.board, state.winner, state.boardSize)
-    : [];
-  const winningSet = new Set(winningPath.map((p) => `${p.row},${p.col}`));
-
-  // Draw hex cells
   const cellsGroup = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'g'
   );
   cellsGroup.setAttribute('class', 'hex-cells');
+  const cells: SVGGElement[] = [];
+  const fragment = document.createDocumentFragment();
 
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       const center = getHexCenter(row, col);
-      const cellState = state.board[row][col];
-      const isWinningCell = winningSet.has(`${row},${col}`);
-
       const cellGroup = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'g'
@@ -228,83 +220,46 @@ export function renderBoard(
       cellGroup.setAttribute('data-row', String(row));
       cellGroup.setAttribute('data-col', String(col));
 
-      // Draw hex
       const hex = document.createElementNS(
         'http://www.w3.org/2000/svg',
         'polygon'
       );
       hex.setAttribute('points', hexPath);
-
-      let cellClass = 'hex-cell';
-      if (cellState === 'player1') {
-        cellClass += ' hex-cell-p1';
-      } else if (cellState === 'player2') {
-        cellClass += ' hex-cell-p2';
-      } else {
-        cellClass += ' hex-cell-empty';
-      }
-
-      if (isWinningCell) {
-        cellClass += ' hex-cell-winning';
-      }
-
-      // Mark last move
-      if (state.moveHistory.length > 0) {
-        const lastMove = state.moveHistory[state.moveHistory.length - 1];
-        if (lastMove.position.row === row && lastMove.position.col === col) {
-          cellClass += ' hex-cell-last-move';
-        }
-      }
-
-      hex.setAttribute('class', cellClass);
+      hex.setAttribute('class', 'hex-cell hex-cell-empty');
       cellGroup.appendChild(hex);
-
-      const coord = formatPosition({ row, col });
-      const owner =
-        cellState === 'player1'
-          ? 'Blue'
-          : cellState === 'player2'
-            ? 'Red'
-            : undefined;
-      const isValidPlacement =
-        cellState === null &&
-        state.winner === null &&
-        !!onCellClick &&
-        !isComputerPlacementTurn(state);
-
-      makeGridCell(
-        cellGroup,
-        buildCellAriaLabel({
-          coord,
-          empty: cellState === null,
-          owner,
-          validPlacement: isValidPlacement,
-        })
-      );
-
-      // Add click / keyboard activation for empty cells
-      if (isValidPlacement) {
-        cellGroup.style.cursor = 'pointer';
-        const activate = () => onCellClick!(row, col);
-        cellGroup.addEventListener('click', activate);
-        bindCellActivateKeys(cellGroup, activate);
-      }
-
-      cellsGroup.appendChild(cellGroup);
+      cells.push(cellGroup);
+      fragment.appendChild(cellGroup);
     }
   }
-
+  cellsGroup.appendChild(fragment);
   svg.appendChild(cellsGroup);
-  bindGridNavigation(svg);
 
-  // Add coordinate labels (optional, for reference)
+  // Delegated activate (listeners once).
+  const activateFromEvent = (target: EventTarget | null) => {
+    const el = (target as Element | null)?.closest?.(
+      '.hex-cell-group'
+    ) as SVGGElement | null;
+    if (!el || !cellsGroup.contains(el)) return;
+    if (el.style.cursor !== 'pointer') return;
+    const row = Number(el.getAttribute('data-row'));
+    const col = Number(el.getAttribute('data-col'));
+    const binding = hexClickBindings.get(container);
+    if (Number.isFinite(row) && Number.isFinite(col)) {
+      binding?.onCellClick?.(row, col);
+    }
+  };
+  cellsGroup.addEventListener('click', (e) => activateFromEvent(e.target));
+  cellsGroup.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activateFromEvent(e.target);
+  });
+
   const labelsGroup = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'g'
   );
   labelsGroup.setAttribute('class', 'hex-labels');
-
-  // Column labels (A-K for 11x11)
   for (let col = 0; col < size; col++) {
     const center = getHexCenter(0, col);
     const label = document.createElementNS(
@@ -318,8 +273,6 @@ export function renderBoard(
     label.textContent = String.fromCharCode(65 + col);
     labelsGroup.appendChild(label);
   }
-
-  // Row labels (1-11)
   for (let row = 0; row < size; row++) {
     const center = getHexCenter(row, 0);
     const label = document.createElementNS(
@@ -333,10 +286,93 @@ export function renderBoard(
     label.textContent = String(row + 1);
     labelsGroup.appendChild(label);
   }
-
   svg.appendChild(labelsGroup);
 
   container.appendChild(svg);
+  bindGridNavigation(svg);
+
+  const cache: HexBoardCache = { svg, cells, size, hexPath };
+  hexBoardCaches.set(container, cache);
+  return cache;
+}
+
+function syncHexCell(
+  cellGroup: SVGGElement,
+  state: HexGameState,
+  row: number,
+  col: number,
+  winningSet: Set<string>,
+  onCellClick?: CellClickCallback
+): void {
+  const hex = cellGroup.querySelector('polygon') as SVGPolygonElement | null;
+  if (!hex) return;
+
+  const cellState = state.board[row][col];
+  const isWinningCell = winningSet.has(`${row},${col}`);
+
+  let cellClass = 'hex-cell';
+  if (cellState === 'player1') {
+    cellClass += ' hex-cell-p1';
+  } else if (cellState === 'player2') {
+    cellClass += ' hex-cell-p2';
+  } else {
+    cellClass += ' hex-cell-empty';
+  }
+  if (isWinningCell) cellClass += ' hex-cell-winning';
+  if (state.moveHistory.length > 0) {
+    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    if (lastMove.position.row === row && lastMove.position.col === col) {
+      cellClass += ' hex-cell-last-move';
+    }
+  }
+  hex.setAttribute('class', cellClass);
+
+  const isValidPlacement =
+    cellState === null &&
+    state.winner === null &&
+    !!onCellClick &&
+    !isComputerPlacementTurn(state);
+
+  makeGridCell(
+    cellGroup,
+    buildCellAriaLabel({
+      coord: formatPosition({ row, col }),
+      empty: cellState === null,
+      owner:
+        cellState === 'player1'
+          ? 'Blue'
+          : cellState === 'player2'
+            ? 'Red'
+            : undefined,
+      validPlacement: isValidPlacement,
+    })
+  );
+  cellGroup.style.cursor = isValidPlacement ? 'pointer' : '';
+}
+
+// Render the hex board as an SVG (structure once; cell classes sync in place).
+export function renderBoard(
+  state: HexGameState,
+  container: HTMLElement,
+  onCellClick?: CellClickCallback
+): void {
+  const previousFocus = captureFocusedCell(container);
+  const size = state.boardSize;
+  const cache = ensureHexBoard(container, size);
+  hexClickBindings.set(container, { onCellClick });
+
+  const winningPath = state.winner
+    ? getWinningPath(state.board, state.winner, state.boardSize)
+    : [];
+  const winningSet = new Set(winningPath.map((p) => `${p.row},${p.col}`));
+
+  let i = 0;
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      syncHexCell(cache.cells[i++]!, state, row, col, winningSet, onCellClick);
+    }
+  }
+
   restoreGridFocus(container, previousFocus);
 }
 

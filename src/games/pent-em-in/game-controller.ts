@@ -19,6 +19,7 @@ import {
   renderPlaceControls,
   getPlayerName,
   injectPentEmInStyles,
+  patchPentPreview,
 } from './board-ui';
 import { Cell } from '../../core/polyomino/types';
 import { getAIMove, isAITurn, AIDifficulty } from './ai';
@@ -142,6 +143,12 @@ function renderBoardOnly(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
+    const existing = boardContainer.querySelector(
+      'svg.pent-board'
+    ) as SVGElement | null;
+    if (existing && patchPentPreview(existing, gameState, inputOpts)) {
+      return;
+    }
     boardContainer.innerHTML = '';
     const svg = renderBoard(
       gameState,

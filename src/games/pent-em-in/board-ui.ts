@@ -186,57 +186,14 @@ export function renderBoard(
     svg.appendChild(validGroup);
   }
 
-  // Preview (if placing) — suppress during computer seat
-  if (allowInput && state.selectedPiece && state.previewPosition) {
-    const previewCells = getPieceCells(
-      state.selectedPiece,
-      state.previewPosition,
-      state.selectedRotation,
-      state.selectedFlipped
-    );
-
-    const isValid = canPlacePiece(
-      state,
-      state.selectedPiece,
-      state.previewPosition,
-      state.selectedRotation,
-      state.selectedFlipped
-    );
-
-    const previewGroup = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'g'
-    );
-    previewGroup.classList.add('preview');
-
-    for (const cell of previewCells) {
-      if (
-        cell.row < 0 ||
-        cell.row >= BOARD_SIZE ||
-        cell.col < 0 ||
-        cell.col >= BOARD_SIZE
-      ) {
-        continue;
-      }
-
-      const rect = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'rect'
-      );
-      rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
-      rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
-      rect.setAttribute('width', String(CELL_SIZE - 2));
-      rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute(
-        'fill',
-        isValid ? playerColors()[state.currentPlayer] : '#ff5252'
-      );
-      rect.setAttribute('rx', '3');
-      rect.setAttribute('opacity', '0.5');
-      previewGroup.appendChild(rect);
-    }
-    svg.appendChild(previewGroup);
-  }
+  // Preview layer (patched in place on hover — see patchPentPreview)
+  const previewGroup = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'g'
+  );
+  previewGroup.classList.add('preview');
+  svg.appendChild(previewGroup);
+  fillPentPreviewGroup(previewGroup, state, allowInput);
 
   // Click/hover areas
   const interactionGroup = document.createElementNS(
@@ -304,6 +261,71 @@ export function renderBoard(
   applyRovingTabindex(collectGridCells(svg));
 
   return svg;
+}
+
+function fillPentPreviewGroup(
+  previewGroup: SVGGElement,
+  state: PentEmInState,
+  allowInput: boolean
+): void {
+  previewGroup.replaceChildren();
+  if (!allowInput || !state.selectedPiece || !state.previewPosition) return;
+
+  const previewCells = getPieceCells(
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+
+  const isValid = canPlacePiece(
+    state,
+    state.selectedPiece,
+    state.previewPosition,
+    state.selectedRotation,
+    state.selectedFlipped
+  );
+
+  const fragment = document.createDocumentFragment();
+  for (const cell of previewCells) {
+    if (
+      cell.row < 0 ||
+      cell.row >= BOARD_SIZE ||
+      cell.col < 0 ||
+      cell.col >= BOARD_SIZE
+    ) {
+      continue;
+    }
+
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
+    rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
+    rect.setAttribute('width', String(CELL_SIZE - 2));
+    rect.setAttribute('height', String(CELL_SIZE - 2));
+    rect.setAttribute(
+      'fill',
+      isValid ? playerColors()[state.currentPlayer] : '#ff5252'
+    );
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('opacity', '0.5');
+    fragment.appendChild(rect);
+  }
+  previewGroup.appendChild(fragment);
+}
+
+/**
+ * Hover-only: replace the `.preview` group contents without rebuilding the SVG.
+ */
+export function patchPentPreview(
+  svg: SVGElement,
+  state: PentEmInState,
+  options: PentEmInBoardRenderOptions = {}
+): boolean {
+  const allowInput = options.allowInput !== false;
+  const previewGroup = svg.querySelector('g.preview') as SVGGElement | null;
+  if (!previewGroup) return false;
+  fillPentPreviewGroup(previewGroup, state, allowInput);
+  return true;
 }
 
 // =============================================================================
