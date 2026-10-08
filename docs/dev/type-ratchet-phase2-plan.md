@@ -1,9 +1,10 @@
 # Type ratchet Phase 2 plan (AI / rules / games)
 
-**Task:** `burn-1007-mp-typeratchet-plan`  
-**Tip / base:** `cursor/integration-fold-wave5-tip-4af0` @ `b0d71db6`  
-**Status:** planning doc + report-only baseline only — **no `src/` changes**  
-**Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` fails if out-of-scope count rises).
+**Task (plan):** `burn-1007-mp-typeratchet-plan`  
+**Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
+**Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
+**Status:** Batch **0** (demos + `main.ts`) and Batch **1** (tiny non-AI game shells) cleared under ratchet flags; Phase-2 baseline ceiling lowered **564 → 518**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling.  
+**Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 
@@ -21,29 +22,30 @@ This document proposes how to clear those 564 without changing student-facing AI
 npx tsc --noEmit -p tsconfig.ratchet.json --pretty false 2>&1 | tee /tmp/type-ratchet-phase2-raw.txt | rg -c "error TS"
 ```
 
-**Expected:** `564` (must match `totals.outOfScopeErrors` in the baseline JSON).
+**Expected:** `518` out-of-scope after Batch 0+1 (must match `outOfScopeErrors` in the baseline JSON). Plan snapshot was **564** before those batches.
 
 Verify against the committed baseline:
 
 ```bash
-node --input-type=module -e 'import fs from "node:fs"; const b=JSON.parse(fs.readFileSync("docs/dev/type-ratchet-phase2-baseline.json","utf8")); const n=fs.readFileSync("/tmp/type-ratchet-phase2-raw.txt","utf8").split("\n").filter(l=>/error TS\d+:/.test(l)).length; if(n!==b.totals.outOfScopeErrors){console.error("MISMATCH raw="+n+" baseline="+b.totals.outOfScopeErrors); process.exit(1);} console.log("OK outOfScopeErrors="+n);'
+node --input-type=module -e 'import fs from "node:fs"; const b=JSON.parse(fs.readFileSync("docs/dev/type-ratchet-phase2-baseline.json","utf8")); const n=fs.readFileSync("/tmp/type-ratchet-phase2-raw.txt","utf8").split("\n").filter(l=>/error TS\d+:/.test(l)).length; if(n!==b.outOfScopeErrors){console.error("MISMATCH raw="+n+" baseline="+b.outOfScopeErrors); process.exit(1);} console.log("OK outOfScopeErrors="+n);'
 ```
 
-Sanity (Phase 1 still green):
+Sanity (Phase 1 + Batch 0/1 in-scope still green):
 
 ```bash
 npm run typecheck:ratchet
-# in-scope errors: 0 ; out-of-scope errors: 564
+# in-scope errors: 0 ; out-of-scope errors: 518 ; Phase-2 ceiling holds
 ```
 
-Captured on tip `b0d71db6` for this plan: **564** / **0** in-scope.
+Plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn-1008-mp-type-ratchet-p2`): **518** / **0** in-scope.
 
 ## Totals snapshot
 
 | Slice | Count |
 | --- | ---: |
-| Out-of-scope (Phase 2 surface) | **564** |
-| Phase 1 in-scope (must stay 0) | **0** |
+| Out-of-scope (Phase 2 surface, after Batch 0+1) | **518** |
+| Plan snapshot (pre Batch 0+1) | 564 |
+| In-scope under ratchet (must stay 0) | **0** |
 | `noUncheckedIndexedAccess` (NUI) | 526 |
 | `exactOptionalPropertyTypes` (EOPT) | 37 |
 | Other | 1 |

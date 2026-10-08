@@ -328,12 +328,12 @@ export function renderBoard(
       buildCellAriaLabel({
         coord: coordLabel,
         empty: node.chip === null,
-        owner,
+        ...(owner !== undefined ? { owner } : {}),
         validMove: isValidMove,
         selectable:
           state.phase === 'movement' && selectableNodes.includes(nodeId),
         validPlacement: isPlaceable,
-        extras: extras.length ? extras : undefined,
+        ...(extras.length ? { extras } : {}),
       })
     );
 

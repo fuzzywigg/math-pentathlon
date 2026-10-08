@@ -145,6 +145,10 @@ function renderGame(): void {
   const path = getCurrentPath();
   const params = getPathParams('/game/:id', path);
   const gameId = params.id;
+  if (gameId === undefined) {
+    navigate('/');
+    return;
+  }
 
   const gameInfo = getGameById(gameId);
 

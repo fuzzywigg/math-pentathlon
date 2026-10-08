@@ -278,8 +278,12 @@ function render(): void {
 
     if (board3dEnabled && board3d) {
       board3d.update(gameState, {
-        onDrawChains: canInteract ? handleDrawChains : undefined,
-        onSelectChain: canInteract ? handleSelectChain : undefined,
+        ...(canInteract
+          ? {
+              onDrawChains: handleDrawChains,
+              onSelectChain: handleSelectChain,
+            }
+          : {}),
         gameMode,
       });
     } else if (!board3dEnabled) {

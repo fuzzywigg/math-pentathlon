@@ -418,7 +418,10 @@ export function hasAnyValidMove(state: FabADiffyState): boolean {
   // Check if any pair can make a matching result
   for (let i = 0; i < availableBars.length; i++) {
     for (let j = i + 1; j < availableBars.length; j++) {
-      const results = getPossibleResults(availableBars[i], availableBars[j]);
+      const left = availableBars[i];
+      const right = availableBars[j];
+      if (left === undefined || right === undefined) continue;
+      const results = getPossibleResults(left, right);
       for (const { result } of results) {
         const matches = findMatchingAnswers(state, result);
         if (matches.length > 0) return true;

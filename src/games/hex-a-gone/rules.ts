@@ -64,7 +64,7 @@ export function commitSelection(state: HexAGoneGameState): HexAGoneGameState {
       ...state.turnSelection,
       committed: true,
     },
-    selectedBlockForPlacement: state.turnSelection.blocks[0],
+    selectedBlockForPlacement: state.turnSelection.blocks[0] ?? null,
   };
 }
 

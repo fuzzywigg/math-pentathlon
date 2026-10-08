@@ -136,7 +136,7 @@ export function renderBoard(
       buildCellAriaLabel({
         coord: `${cell.q},${cell.r}`,
         empty: !cell.filled,
-        owner,
+        ...(owner !== undefined ? { owner } : {}),
         validPlacement: isValidPlacement,
       })
     );

@@ -83,7 +83,10 @@ function findAdjacentBases(
         [row + 1, col], // bottom-right
       ];
 
-  for (const [r, c] of neighbors) {
+  for (const pair of neighbors) {
+    const r = pair[0];
+    const c = pair[1];
+    if (r === undefined || c === undefined) continue;
     const id = createBaseId(r, c);
     if (bases.has(id)) {
       adjacent.push(id);

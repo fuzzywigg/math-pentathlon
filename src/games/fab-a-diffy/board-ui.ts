@@ -309,15 +309,16 @@ function createAnswerBarElement(
     wrapper.setAttribute('aria-disabled', 'true');
   }
 
+  const owner =
+    isClaimed && answer.claimedBy
+      ? getPlayerName(answer.claimedBy)
+      : undefined;
   makeGridCell(
     wrapper,
     buildCellAriaLabel({
       coord: formatFraction(simplify(answer.fraction)),
       empty: !isClaimed,
-      owner:
-        isClaimed && answer.claimedBy
-          ? getPlayerName(answer.claimedBy)
-          : undefined,
+      ...(owner !== undefined ? { owner } : {}),
       validPlacement: isMatchable && !isClaimed,
     })
   );

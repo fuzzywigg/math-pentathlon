@@ -10,16 +10,31 @@
  */
 
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
+const PHASE2_BASELINE = path.join(
+  ROOT,
+  'docs/dev/type-ratchet-phase2-baseline.json'
+);
 
 /** Paths whose ratchet errors fail the check (must stay at zero). */
 const IN_SCOPE = new RegExp(
   [
     '^src/(ui|core)/',
+    // Phase 2 Batch 0 — demos + entry
+    '^src/demos/',
+    '^src/main\\.ts$',
+    // Phase 2 Batch 1 — tiny-game non-AI shells (AI modules stay out of scope)
+    '^src/games/remainder-islands/(types|board-ui)\\.ts$',
+    '^src/games/hex-a-gone/(rules|board-ui)\\.ts$',
+    '^src/games/star-track/(types|game-controller)\\.ts$',
+    '^src/games/fab-a-diffy/(types|board-ui|rules)\\.ts$',
+    '^src/games/fiar/(types|board-ui|rules)\\.ts$',
+    '^src/games/par-55/(types|board-ui|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -71,11 +86,11 @@ console.log(
   `  flags: noUncheckedIndexedAccess, exactOptionalPropertyTypes, noImplicitOverride, forceConsistentCasingInFileNames, noImplicitReturns`
 );
 console.log(
-  `  scope: src/ui, src/core, tests/helpers, tests/unit/helpers, tests/e2e/helpers, tests/visual/helpers.ts, unit *-helpers.ts`
+  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1 non-AI game shells, tests/helpers, unit *-helpers.ts`
 );
 console.log(`  in-scope errors:     ${inScope.length} (must be 0)`);
 console.log(
-  `  out-of-scope errors: ${outOfScope.length} (AI/rules/games — not blocking)`
+  `  out-of-scope errors: ${outOfScope.length} (remaining AI/rules/games — not blocking here)`
 );
 
 if (inScope.length > 0) {
@@ -90,6 +105,24 @@ if (result.status !== 0 && outOfScope.length === 0 && errorLines.length === 0) {
   console.error('tsc failed with no parseable errors:');
   console.error(output.slice(0, 4000));
   process.exit(result.status ?? 1);
+}
+
+// Phase-2 ceiling: out-of-scope count must not rise above the committed baseline.
+if (fs.existsSync(PHASE2_BASELINE)) {
+  const prev = JSON.parse(fs.readFileSync(PHASE2_BASELINE, 'utf8'));
+  const ceiling =
+    typeof prev.outOfScopeErrors === 'number'
+      ? prev.outOfScopeErrors
+      : prev.totals?.outOfScopeErrors;
+  if (typeof ceiling === 'number' && outOfScope.length > ceiling) {
+    console.error(
+      `FAIL: out-of-scope errors ${outOfScope.length} > Phase-2 baseline ${ceiling} (counts may only go down).`
+    );
+    process.exit(1);
+  }
+  console.log(
+    `  Phase-2 ceiling:     ${outOfScope.length} ≤ baseline ${ceiling}`
+  );
 }
 
 console.log('Type ratchet passed.');
