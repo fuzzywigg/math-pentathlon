@@ -30,6 +30,7 @@
     "test:e2e:firefox-webkit": "playwright test --project=firefox --project=webkit",
     "test:e2e:mobile": "playwright test --project=mobile-iphone-13 --project=mobile-pixel-7 --project=mobile-ipad",
     "test:e2e:zoom-reflow": "playwright test --project=zoom-reflow",
+    "test:e2e:forced-colors": "playwright test --project=forced-colors",
     "test:e2e:ui": "playwright test --ui",
     "test:visual": "playwright test -c playwright.visual.config.ts",
     "test:visual:update": "playwright test -c playwright.visual.config.ts --update-snapshots",

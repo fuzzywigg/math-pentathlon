@@ -325,6 +325,59 @@ jobs:
           echo "::warning::zoom-reflow findings or timeouts (report-only; workflow stays green)"
           exit 0
 
+  # Forced-colors + reduced-motion + color-scheme smoke (Chromium).
+  # Report-only: screenshots/JSON under test-results/forced-colors; does not
+  # fail the workflow. Task: burn-1008-mp-forced-colors
+  forced-colors:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run forced-colors smoke (report-only)
+        id: forced
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          set -euo pipefail
+          echo "forced-colors: report-only — see docs/forced-colors-2026-10-08.md"
+          npm run test:e2e:forced-colors
+      - name: Upload forced-colors artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: forced-colors-report
+          path: |
+            test-results/forced-colors/
+            playwright-report/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.forced.outcome == 'failure'
+        run: |
+          echo "::warning::forced-colors findings or timeouts (report-only; workflow stays green)"
+          exit 0
+
   # Report-only Firefox + WebKit e2e (full suite). Does not block merges.
   # Runs after a successful build on every PR/push (and workflow_dispatch).
   # continue-on-error keeps the required Chromium path green while we triage.
@@ -361,7 +414,7 @@ jobs:
           CROSS_BROWSER: '1'
         run: |
           set -euo pipefail
-          count="$(find tests/e2e -name '*.spec.ts' ! -name 'mobile-touch-smoke.spec.ts' ! -name 'visual-baseline.spec.ts' ! -name 'zoom-reflow-a11y.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
+          count="$(find tests/e2e -name '*.spec.ts' ! -name 'mobile-touch-smoke.spec.ts' ! -name 'visual-baseline.spec.ts' ! -name 'zoom-reflow-a11y.spec.ts' ! -name 'forced-colors-a11y.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
           echo "cross-browser e2e (report-only): ${count} specs × firefox + webkit"
           npm run test:e2e -- --project=firefox --project=webkit
       - name: Upload cross-browser Playwright report

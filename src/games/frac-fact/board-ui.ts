@@ -704,6 +704,33 @@ export function injectFracFactStyles(): void {
       background: #9e9e9e;
       color: white;
     }
-  `
+  
+
+    @media (prefers-reduced-motion: reduce) {
+      .frac-choice-btn,
+      .frac-btn,
+      .frac-continue-btn,
+      .frac-progress-fill {
+        transition: none !important;
+      }
+
+      .frac-btn:hover,
+      .frac-choice-btn:hover {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .frac-choice-btn,
+    html[data-reduced-motion='true'] .frac-btn,
+    html[data-reduced-motion='true'] .frac-continue-btn,
+    html[data-reduced-motion='true'] .frac-progress-fill {
+      transition: none !important;
+    }
+
+    html[data-reduced-motion='true'] .frac-btn:hover,
+    html[data-reduced-motion='true'] .frac-choice-btn:hover {
+      transform: none;
+    }
+`
   );
 }

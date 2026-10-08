@@ -34,6 +34,7 @@ import { markStatusLive } from '../../ui/board-a11y';
 import { formatFraction, simplify } from '../../core/fractions/arithmetic';
 
 import { clearElement } from '../../core/dom-security';
+import { scrollBehaviorForMotion } from '../../ui/reduced-motion';
 
 function syncOpponentChrome(isAI: boolean): void {
   syncAppOpponentChrome(isAI);
@@ -253,7 +254,10 @@ function updateUI(controller: FabGameController): void {
         '.fab-answer-matchable'
       ) as HTMLElement | null;
       if (match && typeof match.scrollIntoView === 'function') {
-        match.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        match.scrollIntoView({
+          block: 'center',
+          behavior: scrollBehaviorForMotion(),
+        });
       }
     });
   }
