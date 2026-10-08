@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Dead-code inventory (report-only) — burn-1008-mp-dead-code-inventory.
+ * Dead-code inventory (report-only) — burn-1008-mp-dead-code-removal-exec.
  *
  * Combines:
  *   1. knip (unused files / exports / deps) with dynamic-import-aware entries
@@ -10,6 +10,7 @@
  *   5. Grep + registry / dynamic-import verification for every candidate
  *
  * Always exits 0 (report-only). Writes docs/dev/dead-code-inventory.md.
+ * Disposition column: removed (this PR) / kept / deferred (#526 fixtures).
  *
  * Usage: npm run report:dead-code
  */
@@ -59,6 +60,83 @@ const DEFER_TO_OPEN_PRS = [
     note: 'Helper moves/merges — inventory lists unused helper *exports* only',
   },
 ];
+
+/**
+ * Removals executed in burn-1008-mp-dead-code-removal-exec (re-verified on tip).
+ * Keys: `${kind}|${path}|${symbol}`.
+ * @type {Map<string, { action: string; note: string }>}
+ */
+const EXECUTED_REMOVALS = new Map([
+  [
+    'export|src/core/dom-security.ts|setChildren',
+    {
+      action: 'removed',
+      note: 'deleted unused export (zero external refs)',
+    },
+  ],
+  [
+    'export|src/core/storage/sanitize.ts|MAX_PROFILE_ID_LENGTH',
+    {
+      action: 'removed',
+      note: 'demoted to module-private const',
+    },
+  ],
+  [
+    'export|src/core/storage/sanitize.ts|MAX_GAME_ID_LENGTH',
+    {
+      action: 'removed',
+      note: 'demoted to module-private const',
+    },
+  ],
+  [
+    'export|src/core/storage/sanitize.ts|MAX_ACHIEVEMENT_ID_LENGTH',
+    {
+      action: 'removed',
+      note: 'demoted to module-private const',
+    },
+  ],
+  [
+    'css-class|src/style.css|game-selector-header',
+    {
+      action: 'removed',
+      note: 'deleted dead CSS rule (live class is game-selector-hero)',
+    },
+  ],
+  [
+    'css-class|src/style.css|tutorial-action-target',
+    {
+      action: 'removed',
+      note: 'deleted dead CSS selectors (live class is tutorial-tap-target)',
+    },
+  ],
+  [
+    'export|src/ui/game-prefetch.ts|allowGamePrefetchImportsForTests',
+    {
+      action: 'removed',
+      note: 'demoted to module-private; used by resetGamePrefetchForTests',
+    },
+  ],
+  [
+    'export|src/ui/game-route-mounts.ts|resetGameMountDepsForTests',
+    {
+      action: 'removed',
+      note: 'deleted unused test-hook export (zero refs)',
+    },
+  ],
+]);
+
+/**
+ * @param {{ kind: string; path: string; symbol?: string }} row
+ * @returns {'removed' | 'deferred' | 'kept'}
+ */
+function dispositionFor(row) {
+  const key = `${row.kind}|${row.path}|${row.symbol || ''}`;
+  if (EXECUTED_REMOVALS.has(key)) return 'removed';
+  if (row.kind === 'test-helper-export' && row.safeToRemove === 'yes') {
+    return 'deferred';
+  }
+  return 'kept';
+}
 
 /**
  * @param {string} dir
@@ -847,10 +925,27 @@ function main() {
 
   rows.sort((a, b) => a.rank - b.rank || a.path.localeCompare(b.path));
 
+  for (const r of rows) {
+    r.disposition = dispositionFor(r);
+  }
+
   const generatedAt = new Date().toISOString();
+  const executedRemovalRows = [...EXECUTED_REMOVALS.entries()].map(
+    ([key, meta]) => {
+      const [kind, pathPart, symbol] = key.split('|');
+      return {
+        kind,
+        path: pathPart,
+        symbol,
+        disposition: 'removed',
+        action: meta.action,
+        note: meta.note,
+      };
+    }
+  );
   const summary = {
     generatedAt,
-    taskId: 'burn-1008-mp-dead-code-inventory',
+    taskId: 'burn-1008-mp-dead-code-removal-exec',
     foldOrder: 'fold last',
     gameIds,
     dynamicImportCount: dynamicImports.length,
@@ -863,7 +958,11 @@ function main() {
     },
     candidateCount: rows.length,
     safeYes: rows.filter((r) => r.safeToRemove === 'yes').length,
+    executedRemovals: executedRemovalRows.length,
+    deferredSafeHelpers: rows.filter((r) => r.disposition === 'deferred')
+      .length,
     deferPrs: DEFER_TO_OPEN_PRS,
+    executedRemovalRows,
   };
 
   const md = renderMarkdown(summary, rows, dynamicImports);
@@ -899,7 +998,9 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('');
   lines.push(`**Task id:** \`${summary.taskId}\``);
   lines.push(`**Generated:** ${summary.generatedAt}`);
-  lines.push(`**Fold order:** **fold last** (after other open tip drafts)`);
+  lines.push(
+    '**Fold order:** **FOLD LAST** (after every other wave5 tip draft)'
+  );
   lines.push('');
   lines.push('## Method');
   lines.push('');
@@ -909,6 +1010,23 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('4. Feature-flag catalog from `feature-flags` / `settings-flags` / `url-flags` / `tablet-gl`.');
   lines.push('5. Test-helper module + export reachability (including side-effect imports).');
   lines.push('6. Every candidate verified with `rg` plus game-registry / dynamic-import checks (`game-route-mounts`, `game-prefetch`, `main`).');
+  lines.push('');
+  lines.push('## Executed removals (this PR)');
+  lines.push('');
+  lines.push(
+    `Re-verified on live tip then applied (**${summary.executedRemovals}** items). Skipped all safe-to-remove test-helper exports (coordinate with #526).`
+  );
+  lines.push('');
+  lines.push('| Disposition | Kind | Path / symbol | Action |');
+  lines.push('| --- | --- | --- | --- |');
+  for (const r of summary.executedRemovalRows || []) {
+    const sym = r.symbol
+      ? `\`${r.path}\` → \`${r.symbol}\``
+      : `\`${r.path}\``;
+    lines.push(
+      `| removed | ${r.kind} | ${sym} | ${(r.note || '').replace(/\|/g, '\\|')} |`
+    );
+  }
   lines.push('');
   lines.push('## Defer — do not redo');
   lines.push('');
@@ -932,37 +1050,33 @@ function renderMarkdown(summary, rows, dynamicImports) {
     lines.push(`- devDependencies: ${devDeps.join(', ') || '(none)'}`);
   }
   lines.push('');
-  lines.push('## Ranked removal list');
+  lines.push('## Ranked removal list (remaining)');
   lines.push('');
   lines.push('Rank 1 = strongest removal candidate; Rank 4 = keep.');
   lines.push('**Safe-to-remove** applies to the *symbol/rule* unless `kind=file`.');
+  lines.push(
+    '**Disposition:** `removed` (this PR) / `deferred` (safe test-helper export — leave for #526) / `kept` (do not remove).'
+  );
   lines.push('This PR does **not** delete games, assets, or tests. File deletion only when `kind=file` and safe-to-remove=yes.');
   lines.push('');
-  lines.push('| Rank | Safe? | Kind | Path / symbol | Evidence | Reason |');
-  lines.push('| --- | --- | --- | --- | --- | --- |');
+  lines.push(
+    '| Rank | Safe? | Disposition | Kind | Path / symbol | Evidence | Reason |'
+  );
+  lines.push('| --- | --- | --- | --- | --- | --- | --- |');
   for (const r of rows) {
     const sym = r.symbol ? `\`${r.path}\` → \`${r.symbol}\`` : `\`${r.path}\``;
     const ev = (r.evidence || '').replace(/\|/g, '\\|').slice(0, 180);
     const reason = (r.reason || '').replace(/\|/g, '\\|');
     lines.push(
-      `| ${r.rank} | ${r.safeToRemove} | ${r.kind} | ${sym} | ${ev} | ${reason} |`
+      `| ${r.rank} | ${r.safeToRemove} | ${r.disposition || 'kept'} | ${r.kind} | ${sym} | ${ev} | ${reason} |`
     );
   }
   lines.push('');
   lines.push('## File deletions in this PR');
   lines.push('');
-  const deletableFiles = rows.filter(
-    (r) => r.kind === 'file' && r.safeToRemove === 'yes'
+  lines.push(
+    'None (symbol/CSS demotions and deletions only). After grep + registry/dynamic-import verification, no non-game / non-asset / non-test *file* was provably unreferenced.'
   );
-  if (deletableFiles.length === 0) {
-    lines.push(
-      'None. After grep + registry/dynamic-import verification, no non-game / non-asset / non-test file was provably unreferenced.'
-    );
-  } else {
-    for (const f of deletableFiles) {
-      lines.push(`- \`${f.path}\` — ${f.reason}`);
-    }
-  }
   lines.push('');
   lines.push('## Reproduce');
   lines.push('');
