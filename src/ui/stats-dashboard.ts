@@ -244,10 +244,12 @@ export function renderStatsDashboardFromSnapshot(
   wrapper.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
-      <h1>Your Progress</h1>
+      <h1 id="stats-title">Your Progress</h1>
     </header>
-    ${isEmpty ? '' : buildSummaryHeader(snapshot)}
-    ${buildGameList(snapshot)}
+    <div class="stats-main" role="region" aria-labelledby="stats-title">
+      ${isEmpty ? '' : buildSummaryHeader(snapshot)}
+      ${buildGameList(snapshot)}
+    </div>
   `;
 
   container.appendChild(wrapper);

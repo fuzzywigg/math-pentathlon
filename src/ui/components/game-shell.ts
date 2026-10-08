@@ -3,6 +3,7 @@
  * Keeps page-to-page cohesion without changing game logic.
  */
 
+import { markStatusLive } from '../board-a11y';
 import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
 export type GameMode = 'human-vs-human' | 'human-vs-ai';
@@ -138,6 +139,21 @@ function ensureModalDialogSemantics(modal: HTMLElement): void {
   }
 }
 
+/** Keep closed dialogs out of the accessibility tree (pairs with `.hidden`). */
+function setModalHiddenState(modal: HTMLElement, hidden: boolean): void {
+  modal.classList.toggle('hidden', hidden);
+  modal.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+}
+
+function syncDifficultyPressed(modal: HTMLElement): void {
+  modal.querySelectorAll('.difficulty-btn').forEach((btn) => {
+    btn.setAttribute(
+      'aria-pressed',
+      btn.classList.contains('selected') ? 'true' : 'false'
+    );
+  });
+}
+
 type ModalFocusState = {
   restoreEl: HTMLElement | null;
 };
@@ -153,7 +169,7 @@ function openShellModal(
     (document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null);
-  modal.classList.remove('hidden');
+  setModalHiddenState(modal, false);
   const focusables = getModalFocusables(modal);
   // Prefer primary action when present; otherwise first control (often Close).
   const startBtn = modal.querySelector<HTMLElement>('#start-game-btn');
@@ -169,7 +185,7 @@ function openShellModal(
 
 function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
   if (modal.classList.contains('hidden')) return;
-  modal.classList.add('hidden');
+  setModalHiddenState(modal, true);
   const restore = state.restoreEl;
   state.restoreEl = null;
   // Defer so display:none on the modal settles before moving focus (#491).
@@ -240,9 +256,11 @@ function buildDifficultySection(defaultDifficulty: AIDifficultyLevel): string {
   const levels: AIDifficultyLevel[] = ['easy', 'medium', 'hard'];
   const buttons = levels
     .map((level) => {
-      const selected = level === defaultDifficulty ? ' selected' : '';
+      const selected = level === defaultDifficulty;
+      const selectedClass = selected ? ' selected' : '';
+      const pressed = selected ? 'true' : 'false';
       const label = level.charAt(0).toUpperCase() + level.slice(1);
-      return `<button class="difficulty-btn ${level}${selected}" data-difficulty="${level}">${label}</button>`;
+      return `<button class="difficulty-btn ${level}${selectedClass}" data-difficulty="${level}" aria-pressed="${pressed}" type="button">${label}</button>`;
     })
     .join('');
 
@@ -281,10 +299,10 @@ function buildShellHtml(options: GameShellOptions): string {
 
   const moveHistory = options.showMoveHistory
     ? `
-      <div id="move-history" class="move-history collapsible">
+      <div id="move-history" class="move-history collapsible" role="region" aria-labelledby="move-history-label">
         <button class="collapse-toggle" type="button" aria-expanded="true" aria-controls="history-content">
-          <span class="collapse-icon">◀</span>
-          <span class="collapse-label">History</span>
+          <span class="collapse-icon" aria-hidden="true">◀</span>
+          <span class="collapse-label" id="move-history-label">History</span>
         </button>
         <div id="history-content" class="history-content"></div>
       </div>`
@@ -309,21 +327,21 @@ function buildShellHtml(options: GameShellOptions): string {
 
   const gameAreaBlock =
     options.gameAreaHtml ??
-    `<div class="${escapeAttr(gameAreaClass)}">${moveHistory}
+    `<div class="${escapeAttr(gameAreaClass)}" role="region" aria-labelledby="game-title">${moveHistory}
       <div id="board"${boardClassAttr}></div>
     </div>`;
 
   return `
     <header class="game-header">
       <button id="back-btn" class="back-button" type="button" aria-label="Back to game list">← Games</button>
-      <h1>${escapeAttr(options.title)}</h1>
+      <h1 id="game-title">${escapeAttr(options.title)}</h1>
     </header>
     <nav class="button-row" aria-label="Game actions">
       <button id="new-game-btn" type="button">New Game</button>${tutorialBtn}
       <button id="help-btn" type="button">How to Play</button>
     </nav>${statusBlock}
     ${gameAreaBlock}
-    <div id="new-game-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="new-game-modal-title">
+    <div id="new-game-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="new-game-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
         <h2 id="new-game-modal-title">New Game</h2>
@@ -336,7 +354,7 @@ ${modeOptionsHtml}
         </div>
       </div>
     </div>
-    <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+    <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="help-modal-title">
       <div class="modal-content">
         <button class="modal-close" type="button" aria-label="Close">&times;</button>
         <h2 id="help-modal-title">${escapeAttr(options.helpTitle)}</h2>
@@ -378,6 +396,25 @@ export function mountGameShell(
   // defaultMode only selects the modal radio — games init as human until Start.
   applyGameModeChrome(container, 'human-vs-human');
 
+  // Durable polite live region for turn / phase / win strings (existing copy).
+  if (status) {
+    markStatusLive(status);
+  }
+
+  // Custom gameAreaHtml may omit region wiring — name the mount itself (not its
+  // parent, which is often the whole app container).
+  if (
+    board &&
+    !board.closest('[role="region"][aria-labelledby="game-title"]') &&
+    !board.hasAttribute('aria-label') &&
+    !board.hasAttribute('aria-labelledby')
+  ) {
+    if (!board.getAttribute('role')) {
+      board.setAttribute('role', 'region');
+    }
+    board.setAttribute('aria-labelledby', 'game-title');
+  }
+
   // Move-history collapse
   const collapseToggle = moveHistoryPanel?.querySelector('.collapse-toggle');
   if (collapseToggle && moveHistoryPanel) {
@@ -392,8 +429,15 @@ export function mountGameShell(
 
   // Pre-declare dialog semantics so closed modals still expose roles to AT trees.
   // Markup also ships role/aria from #437; ensureModalDialogSemantics is idempotent.
-  if (newGameModal) ensureModalDialogSemantics(newGameModal);
-  if (helpModal) ensureModalDialogSemantics(helpModal);
+  if (newGameModal) {
+    ensureModalDialogSemantics(newGameModal);
+    setModalHiddenState(newGameModal, true);
+    syncDifficultyPressed(newGameModal);
+  }
+  if (helpModal) {
+    ensureModalDialogSemantics(helpModal);
+    setModalHiddenState(helpModal, true);
+  }
 
   // New Game open — focus trap + restore (#448)
   if (newGameBtn && newGameModal) {
@@ -448,6 +492,7 @@ export function mountGameShell(
         btn.classList.add('selected');
         selectedDifficulty = (btn as HTMLElement).dataset
           .difficulty as AIDifficultyLevel;
+        syncDifficultyPressed(newGameModal);
       });
     });
 
@@ -497,11 +542,11 @@ export function mountGameShell(
     if (!helpWasOpen && !newGameWasOpen) return;
     // Hide without per-modal focus restore; pick one opener below (#437).
     if (helpWasOpen) {
-      helpModal!.classList.add('hidden');
+      setModalHiddenState(helpModal!, true);
       helpFocus.restoreEl = null;
     }
     if (newGameWasOpen) {
-      newGameModal!.classList.add('hidden');
+      setModalHiddenState(newGameModal!, true);
       newGameFocus.restoreEl = null;
     }
     if (helpWasOpen) {

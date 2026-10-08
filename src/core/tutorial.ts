@@ -246,13 +246,17 @@ export class TutorialManager {
       'aria-labelledby',
       'tutorial-tooltip-title'
     );
+    this.tooltipElement.setAttribute(
+      'aria-describedby',
+      'tutorial-tooltip-message'
+    );
     this.tooltipElement.innerHTML = `
       <div class="tutorial-tooltip-header">
         <span class="tutorial-step-counter"></span>
         <button class="tutorial-exit-btn" type="button" aria-label="Exit tutorial">&times;</button>
       </div>
-      <h3 id="tutorial-tooltip-title" class="tutorial-tooltip-title"></h3>
-      <p class="tutorial-tooltip-message"></p>
+      <h2 id="tutorial-tooltip-title" class="tutorial-tooltip-title"></h2>
+      <p id="tutorial-tooltip-message" class="tutorial-tooltip-message"></p>
       <div class="tutorial-tooltip-actions">
         <button class="tutorial-prev-btn" type="button">Back</button>
         <button class="tutorial-next-btn" type="button">Next</button>
