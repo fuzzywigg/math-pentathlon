@@ -58,7 +58,8 @@ function countInDirection(
   let c = startCell.col + dc;
 
   while (r >= 0 && r < CONFIG.GRID_ROWS && c >= 0 && c < CONFIG.GRID_COLS) {
-    const value = state.grid[r][c];
+    // ratchet: r/c bounds-checked against dense grid dimensions.
+    const value = state.grid[r]![c]!;
     if (value === null) break;
 
     const cell = state.cells.get(value);
@@ -91,9 +92,10 @@ function wouldCreateFiveInRow(
   ];
 
   for (const [dr, dc] of directions) {
+    // ratchet: directions entries are literal [dr, dc] pairs.
     // Count in both directions from this position
-    const forward = countInDirection(state, value, player, dr, dc);
-    const backward = countInDirection(state, value, player, -dr, -dc);
+    const forward = countInDirection(state, value, player, dr!, dc!);
+    const backward = countInDirection(state, value, player, -dr!, -dc!);
 
     // Including this cell, total in line is forward + backward + 1
     if (forward + backward + 1 >= CONFIG.WIN_BY_ALIGNMENT) {
@@ -128,8 +130,9 @@ function getBlockingMoves(
     ];
 
     for (const [dr, dc] of directions) {
-      const forward = countInDirection(state, value, opponent, dr, dc);
-      const backward = countInDirection(state, value, opponent, -dr, -dc);
+      // ratchet: directions entries are literal [dr, dc] pairs.
+      const forward = countInDirection(state, value, opponent, dr!, dc!);
+      const backward = countInDirection(state, value, opponent, -dr!, -dc!);
 
       if (forward + backward >= 4) {
         blockingMoves.push(value);
@@ -226,7 +229,8 @@ function evaluateMoves(
     // Factor 4: Position value (cells with more potential neighbors)
     const adjacent = getAdjacentPositions(cell.row, cell.col);
     const emptyNeighbors = adjacent.filter((pos) => {
-      const v = state.grid[pos.row][pos.col];
+      // ratchet: getAdjacentPositions only yields in-bounds dense-grid coords.
+      const v = state.grid[pos.row]![pos.col]!;
       return v !== null && state.cells.get(v)?.owner === null;
     }).length;
     score += emptyNeighbors * 10;
@@ -243,8 +247,9 @@ function evaluateMoves(
     ];
     let maxChain = 0;
     for (const [dr, dc] of directions) {
-      const forward = countInDirection(state, result, aiPlayer, dr, dc);
-      const backward = countInDirection(state, result, aiPlayer, -dr, -dc);
+      // ratchet: directions entries are literal [dr, dc] pairs.
+      const forward = countInDirection(state, result, aiPlayer, dr!, dc!);
+      const backward = countInDirection(state, result, aiPlayer, -dr!, -dc!);
       maxChain = Math.max(maxChain, forward + backward);
     }
     if (maxChain >= 2) {
@@ -301,11 +306,13 @@ function getTeachingMove(
     // Pick a lower-scoring option
     const suboptimal = options.slice(1);
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: suboptimal non-empty; index length-gated.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
   }
 
-  return options[0];
+  // ratchet: options.length === 0 returned above.
+  return options[0]!;
 }
 
 // =============================================================================
@@ -352,11 +359,13 @@ export function getAIPlacement(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && options.length > 1) {
     const topOptions = options.slice(0, 3);
-    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)];
+    // ratchet: topOptions non-empty when options.length > 1.
+    const chosen = topOptions[Math.floor(Math.random() * topOptions.length)]!;
     return { value: chosen.value, expression: chosen.expression };
   }
 
-  return { value: options[0].value, expression: options[0].expression };
+  // ratchet: options.length === 0 returned above.
+  return { value: options[0]!.value, expression: options[0]!.expression };
 }
 
 /**

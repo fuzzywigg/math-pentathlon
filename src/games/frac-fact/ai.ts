@@ -64,15 +64,15 @@ export function getAIAnswer(
       .filter((i) => i !== correctIndex);
     if (wrongIndices.length > 0) {
       const selectedIndex =
-        wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
-      return choices[selectedIndex];
+        wrongIndices[Math.floor(Math.random() * wrongIndices.length)]!; // ratchet: length-gated
+      return choices[selectedIndex]!; // ratchet: indexed choice
     }
   }
 
   // Normal accuracy-based selection
   if (Math.random() < config.accuracy) {
     // Select correct answer
-    return choices[correctIndex];
+    return choices[correctIndex]!; // ratchet: correctIndex from findIndex / fallback
   } else {
     // Pick a random wrong answer
     const wrongIndices = choices
@@ -80,11 +80,11 @@ export function getAIAnswer(
       .filter((i) => i !== correctIndex);
     if (wrongIndices.length > 0) {
       const selectedIndex =
-        wrongIndices[Math.floor(Math.random() * wrongIndices.length)];
-      return choices[selectedIndex];
+        wrongIndices[Math.floor(Math.random() * wrongIndices.length)]!; // ratchet: length-gated
+      return choices[selectedIndex]!; // ratchet: indexed choice
     }
     // Fallback to correct if no wrong answers
-    return choices[correctIndex];
+    return choices[correctIndex]!; // ratchet: correctIndex from findIndex / fallback
   }
 }
 

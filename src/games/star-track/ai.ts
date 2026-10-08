@@ -114,15 +114,16 @@ function evaluateChainChoices(
 function getTeachingChoice(
   state: StarTrackGameState,
   aiPlayer: Player
-): { chainIndex: 0 | 1; hint?: string } | null {
+): { chainIndex: 0 | 1; hint?: string | undefined } | null {
   const choices = evaluateChainChoices(state, aiPlayer);
 
   if (choices.length < 2) return null;
 
   // 40% chance to pick the worse chain
   if (Math.random() < 0.4) {
-    const worseChoice = choices[1];
-    const betterChoice = choices[0];
+    // ratchet: choices.length < 2 returned above — indices 0 and 1 exist.
+    const worseChoice = choices[1]!;
+    const betterChoice = choices[0]!;
 
     // Generate a hint about the missed opportunity
     let hint: string | undefined;
@@ -156,7 +157,7 @@ function getTeachingChoice(
 
 export interface AIChainChoice {
   chainIndex: 0 | 1;
-  hint?: string;
+  hint?: string | undefined;
 }
 
 /**
@@ -185,11 +186,13 @@ export function getAIChainChoice(
 
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && choices.length > 1) {
-    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
+    // ratchet: choices.length > 1 — random index is in range.
+    const randomChoice = choices[Math.floor(Math.random() * choices.length)]!;
     return { chainIndex: randomChoice.chainIndex };
   }
 
-  return { chainIndex: choices[0].chainIndex };
+  // ratchet: choices.length === 0 returned above.
+  return { chainIndex: choices[0]!.chainIndex };
 }
 
 /**

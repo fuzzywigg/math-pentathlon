@@ -65,7 +65,7 @@ function countHolesCreated(
   for (let r = 0; r < board.rows; r++) {
     boardCopy[r] = [];
     for (let c = 0; c < board.cols; c++) {
-      boardCopy[r][c] = board.cells[r][c] || filledSet.has(`${r},${c}`);
+      boardCopy[r]![c] = board.cells[r]![c]! || filledSet.has(`${r},${c}`); // ratchet: loop-bounded
     }
   }
 
@@ -73,7 +73,7 @@ function countHolesCreated(
   let isolatedCount = 0;
   for (let r = 0; r < board.rows; r++) {
     for (let c = 0; c < board.cols; c++) {
-      if (boardCopy[r][c]) continue; // Cell is filled
+      if (boardCopy[r]![c]) continue; // Cell is filled // ratchet: loop-bounded
 
       // Count empty neighbors
       let emptyNeighbors = 0;
@@ -91,7 +91,7 @@ function countHolesCreated(
           n.col >= 0 &&
           n.col < board.cols
         ) {
-          if (!boardCopy[n.row][n.col]) {
+          if (!boardCopy[n.row]![n.col]) {
             emptyNeighbors++;
           }
         }
@@ -136,7 +136,7 @@ function evaluatePositionQuality(
         n.col >= 0 &&
         n.col < board.cols
       ) {
-        if (board.cells[n.row][n.col]) {
+        if (board.cells[n.row]![n.col]) {
           score += 5; // Adjacent to filled cell
         }
       }
@@ -378,11 +378,11 @@ function getTeachingDieChoice(options: DieOption[]): DieOption | null {
   // 40% chance to pick the smaller die (less optimal)
   if (Math.random() < 0.4 && options.length > 1) {
     // Pick the smaller option (usually second best)
-    const smaller = options.find((o) => o.score < options[0].score);
+    const smaller = options.find((o) => o.score < options[0]!.score); // ratchet: length-gated
     if (smaller) return smaller;
   }
 
-  return options[0];
+  return options[0]!; // ratchet: length-gated
 }
 
 function getTeachingPlacement(
@@ -394,11 +394,11 @@ function getTeachingPlacement(
   if (Math.random() < 0.4 && placements.length > 1) {
     const suboptimal = placements.slice(1, Math.min(5, placements.length));
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!; // ratchet: length-gated
     }
   }
 
-  return placements[0];
+  return placements[0]!; // ratchet: length-gated
 }
 
 // =============================================================================
@@ -450,11 +450,11 @@ export function getAIDieChoice(
 
   // Add randomness
   if (Math.random() < config.randomness && options.length > 1) {
-    const chosen = options[Math.floor(Math.random() * options.length)];
+    const chosen = options[Math.floor(Math.random() * options.length)]!; // ratchet: length-gated
     return { index: chosen.index };
   }
 
-  return { index: options[0].index };
+  return { index: options[0]!.index }; // ratchet: length-gated
 }
 
 /**
@@ -474,7 +474,7 @@ export function getAIShapeChoice(
   if (placements.length === 0) return null;
 
   // Return the shape from the best placement
-  return { shape: placements[0].shape };
+  return { shape: placements[0]!.shape }; // ratchet: length-gated
 }
 
 /**
@@ -562,7 +562,7 @@ export function getAIPlacement(
   if (Math.random() < config.randomness && placements.length > 1) {
     const topPlacements = placements.slice(0, 3);
     const chosen =
-      topPlacements[Math.floor(Math.random() * topPlacements.length)];
+      topPlacements[Math.floor(Math.random() * topPlacements.length)]!; // ratchet: length-gated
     return {
       position: chosen.position,
       rotation: chosen.rotation,
@@ -571,9 +571,9 @@ export function getAIPlacement(
   }
 
   return {
-    position: placements[0].position,
-    rotation: placements[0].rotation,
-    flipped: placements[0].flipped,
+    position: placements[0]!.position,
+    rotation: placements[0]!.rotation,
+    flipped: placements[0]!.flipped,
   };
 }
 

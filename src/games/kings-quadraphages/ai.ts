@@ -59,7 +59,10 @@ function evaluateKingMobility(state: GameState, kingPos: Pos): number {
   let mobility = 0;
   for (const dir of DIRECTIONS) {
     const neighbor = { row: kingPos.row + dir.row, col: kingPos.col + dir.col };
-    if (isValid(neighbor) && state.board[neighbor.row][neighbor.col] === null) {
+    if (
+      isValid(neighbor) &&
+      state.board[neighbor.row]![neighbor.col] === null // ratchet: isValid-gated
+    ) {
       mobility++;
     }
   }
@@ -168,7 +171,7 @@ function scoreQuadraphagePlacement(
   // If placing here leaves the opponent with zero valid moves, it's a win.
   // Give an overwhelming bonus so this is always chosen over any other move.
   const tempBoard = state.board.map((row) => [...row]);
-  tempBoard[placement.row][placement.col] = {
+  tempBoard[placement.row]![placement.col] = {
     type: 'quadraphage',
     owner: aiPlayer,
   };
@@ -197,9 +200,9 @@ function simulateKingMove(
   const newBoard = state.board.map((row) => [...row]);
 
   // Move the king (0-based positions)
-  newBoard[destination.row][destination.col] =
-    newBoard[kingPos.row][kingPos.col];
-  newBoard[kingPos.row][kingPos.col] = null;
+  newBoard[destination.row]![destination.col] =
+    newBoard[kingPos.row]![kingPos.col]!; // ratchet: known king / dest cells
+  newBoard[kingPos.row]![kingPos.col] = null;
 
   return {
     ...state,
@@ -214,7 +217,7 @@ function getEasyMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
 
   // Random king move (getValidKingMoves returns 0-based positions)
   const kingMove =
-    validKingMoves[Math.floor(Math.random() * validKingMoves.length)];
+    validKingMoves[Math.floor(Math.random() * validKingMoves.length)]!; // ratchet: length-gated
 
   // Simulate the king move to get valid placements
   const tempState = simulateKingMove(state, aiPlayer, kingMove);
@@ -224,7 +227,7 @@ function getEasyMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
 
   // Random quadraphage placement (getValidQuadraphagePlacements returns 0-based)
   const quadraphagePlacement =
-    validPlacements[Math.floor(Math.random() * validPlacements.length)];
+    validPlacements[Math.floor(Math.random() * validPlacements.length)]!; // ratchet: length-gated
 
   return { kingMove, quadraphagePlacement };
 }
@@ -248,7 +251,7 @@ function getMediumMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
     0,
     Math.min(3, scoredKingMoves.length)
   );
-  const kingMove = topMoves[Math.floor(Math.random() * topMoves.length)].move;
+  const kingMove = topMoves[Math.floor(Math.random() * topMoves.length)]!.move; // ratchet: length-gated
 
   // Simulate the king move
   const tempState = simulateKingMove(state, aiPlayer, kingMove);
@@ -279,7 +282,7 @@ function getMediumMove(state: GameState, aiPlayer: PlayerOwner): AIMove | null {
       ? winningPlacements
       : scoredPlacements.slice(0, Math.min(5, scoredPlacements.length));
   const quadraphagePlacement =
-    pool[Math.floor(Math.random() * pool.length)].placement;
+    pool[Math.floor(Math.random() * pool.length)]!.placement; // ratchet: length-gated
 
   return { kingMove, quadraphagePlacement };
 }

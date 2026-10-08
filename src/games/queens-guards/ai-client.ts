@@ -1,5 +1,6 @@
 import QueensAiWorker from './ai.worker.ts?worker';
 import { AiWorkerClient } from '../../core/ai-worker/client';
+import type { AiWorkerRequestPayload } from '../../core/ai-worker/client';
 import { AI_WORKER_SAFETY_DEADLINE_MS } from '../../core/ai-worker/safety';
 import {
   AI_PLAY_DEADLINE_MS,
@@ -53,7 +54,7 @@ export async function getAIMoveAsync(
       options.deadlineMs ?? AI_PLAY_DEADLINE_MS[difficulty],
       AI_WORKER_SAFETY_DEADLINE_MS
     ),
-  });
+  } as AiWorkerRequestPayload);
 }
 
 export function cancelQueensAiRequests(): void {

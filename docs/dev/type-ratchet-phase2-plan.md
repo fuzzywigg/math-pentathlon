@@ -4,9 +4,9 @@
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
 **Task (Batch 2 compliant recut):** `burn-1008-mp-type-ratchet-batch2-compliant-recut` (supersedes #537 for folding)  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batch **0** (demos + `main.ts`), Batch **1** (tiny non-AI game shells), and Batch **2** (rules-heavy / low-AI non-AI modules) cleared under ratchet flags via **type-only** assertions; Phase-2 baseline ceiling lowered **564 → 518 → 520 (post-fold) → 433**; `typecheck:ratchet` IN_SCOPE expanded path-by-path for those modules and enforces the Phase-2 ceiling. Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md).  
+**Status:** Batches **0–4** + tip folds (#546/#544/#551) cleared non-AI UI/shell/types; Batch **6** (`burn-1008-mp-type-ratchet-batch6-nonrules`) cleared the remaining eligible non-AI rules/engine surface with type-only `!` (ceiling **286 → 220**). OWNER OPTION AI type-only emit-identical (`burn-1008-mp-ai-typeonly-emit-identical`) cleared all **220** AI-module errors with `!` / `as` / EOPT widens only (ceiling **220 → 0**); proof in [`ai-typeonly-option.md`](./ai-typeonly-option.md). Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md). Batch notes: [`type-ratchet-batch5.md`](./type-ratchet-batch5.md), [`type-ratchet-batch6.md`](./type-ratchet-batch6.md).  
 **Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).  
-**Next batch:** Batch **3** — medium games non-AI remainder (juggle, pent-em-in, kwatro-sinko, hex, contig-60, kings-quadraphages, stars-bars).
+**Next batch:** none under Phase-2 out-of-scope (ceiling 0). Fold AI option only if Andrew approves (after #557 + D07).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 

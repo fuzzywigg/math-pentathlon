@@ -35,14 +35,14 @@ export interface AIMove {
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
   /** Deterministic PRNG seed (worker/direct parity tests). */
-  seed?: number;
+  seed?: number | undefined;
   /**
    * Soft wall-time budget (ms). When exceeded between root-move evaluations,
    * return the best move scored so far. Depth is never reduced.
    */
-  deadlineMs?: number;
+  deadlineMs?: number | undefined;
   /** Clock override for tests. */
-  now?: () => number;
+  now?: (() => number) | undefined;
 }
 
 export interface AISearchResult {
@@ -130,7 +130,8 @@ function chooseKindForPlacement(
 ): ChipKind | null {
   const kinds = availableKinds(state, state.currentPlayer);
   if (kinds.length === 0) return null;
-  if (kinds.length === 1) return kinds[0];
+  // ratchet: kinds.length === 1.
+  if (kinds.length === 1) return kinds[0]!;
 
   // Immediate win with either kind — prefer plain to save marked
   const plainWins = wouldWinAfterPlace(state, nodeId, 'plain');
@@ -421,19 +422,21 @@ function getBestPlacement(
 
   if (ctx.rng() < config.randomness && placements.length > 1) {
     const idx = Math.floor(ctx.rng() * Math.min(3, placements.length));
+    // ratchet: idx < min(3, length) after length > 1 gate.
     return {
       place: {
-        nodeId: placements[idx].nodeId,
-        chipKind: placements[idx].chipKind,
+        nodeId: placements[idx]!.nodeId,
+        chipKind: placements[idx]!.chipKind,
       },
       truncated,
     };
   }
 
+  // ratchet: placements.length === 0 returned above.
   return {
     place: {
-      nodeId: placements[0].nodeId,
-      chipKind: placements[0].chipKind,
+      nodeId: placements[0]!.nodeId,
+      chipKind: placements[0]!.chipKind,
     },
     truncated,
   };
@@ -553,10 +556,12 @@ function getBestMove(
 
   if (ctx.rng() < config.randomness && moves.length > 1) {
     const idx = Math.floor(ctx.rng() * Math.min(3, moves.length));
-    return { move: { from: moves[idx].from, to: moves[idx].to }, truncated };
+    // ratchet: idx < min(3, length) after length > 1 gate.
+    return { move: { from: moves[idx]!.from, to: moves[idx]!.to }, truncated };
   }
 
-  return { move: { from: moves[0].from, to: moves[0].to }, truncated };
+  // ratchet: moves.length === 0 returned above.
+  return { move: { from: moves[0]!.from, to: moves[0]!.to }, truncated };
 }
 
 // =============================================================================

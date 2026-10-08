@@ -160,11 +160,13 @@ function getTeachingMove(
   if (Math.random() < 0.4) {
     const nonCompleting = moves.filter((m) => !m.completesBox);
     if (nonCompleting.length > 0) {
-      return nonCompleting[Math.floor(Math.random() * nonCompleting.length)];
+      // ratchet: length > 0 — random index is in range.
+      return nonCompleting[Math.floor(Math.random() * nonCompleting.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -211,11 +213,13 @@ export function getAIMove(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { rodId: chosen.rodId, boxId: chosen.boxId, slot: chosen.slot };
   }
 
-  return { rodId: moves[0].rodId, boxId: moves[0].boxId, slot: moves[0].slot };
+  // ratchet: moves.length === 0 returned above.
+  return { rodId: moves[0]!.rodId, boxId: moves[0]!.boxId, slot: moves[0]!.slot };
 }
 
 /**

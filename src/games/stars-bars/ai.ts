@@ -66,8 +66,9 @@ function getAdjacentCards(
   ];
 
   for (const [dr, dc] of directions) {
-    const adjRow = row + dr;
-    const adjCol = col + dc;
+    // ratchet: directions is a non-empty literal of [dr, dc] pairs.
+    const adjRow = row + dr!;
+    const adjCol = col + dc!;
 
     if (
       adjRow >= 0 &&
@@ -75,7 +76,8 @@ function getAdjacentCards(
       adjCol >= 0 &&
       adjCol < CONFIG.BOARD_SIZE
     ) {
-      const adjCell = state.cells[adjRow][adjCol];
+      // ratchet: bounds-checked dense BOARD_SIZE grid.
+      const adjCell = state.cells[adjRow]![adjCol]!;
       if (adjCell.card) {
         cards.push(adjCell.card);
       }
@@ -94,7 +96,8 @@ function calculateImmediatePoints(
   row: number,
   col: number
 ): number {
-  const cell = state.cells[row][col];
+  // ratchet: callers pass in-bounds row/col on a dense BOARD_SIZE grid.
+  const cell = state.cells[row]![col]!;
   const adjacentCards = getAdjacentCards(state, row, col);
 
   let points = 0;
@@ -124,7 +127,8 @@ function evaluateMoves(
 
   for (const card of hand) {
     for (const { row, col } of validPlacements) {
-      const cell = state.cells[row][col];
+      // ratchet: validPlacements are in-bounds dense-board coordinates.
+      const cell = state.cells[row]![col]!;
       const immediatePoints = calculateImmediatePoints(state, card, row, col);
 
       let score = immediatePoints * 10; // Base score from points
@@ -220,11 +224,13 @@ function getTeachingMove(state: StarsState, player: Player): MoveOption | null {
     // Pick a move that's not the best but still reasonable
     const suboptimal = moves.slice(1, Math.min(5, moves.length));
     if (suboptimal.length > 0) {
-      return suboptimal[Math.floor(Math.random() * suboptimal.length)];
+      // ratchet: length > 0 — random index is in range.
+      return suboptimal[Math.floor(Math.random() * suboptimal.length)]!;
     }
   }
 
-  return moves[0];
+  // ratchet: moves.length === 0 returned above.
+  return moves[0]!;
 }
 
 // =============================================================================
@@ -271,11 +277,13 @@ export function getAIMove(
   // Add randomness based on difficulty
   if (Math.random() < config.randomness && moves.length > 1) {
     const topMoves = moves.slice(0, 3);
-    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)];
+    // ratchet: topMoves non-empty when moves.length > 1.
+    const chosen = topMoves[Math.floor(Math.random() * topMoves.length)]!;
     return { cardId: chosen.cardId, row: chosen.row, col: chosen.col };
   }
 
-  return { cardId: moves[0].cardId, row: moves[0].row, col: moves[0].col };
+  // ratchet: moves.length === 0 returned above.
+  return { cardId: moves[0]!.cardId, row: moves[0]!.row, col: moves[0]!.col };
 }
 
 /**

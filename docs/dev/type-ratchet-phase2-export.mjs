@@ -52,6 +52,17 @@ const IN_SCOPE = new RegExp(
     '^src/games/stars-bars/board-ui\\.ts$',
     // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
     '^src/games/prime-gold/(types|board-ui)\\.ts$',
+    // Phase 2 Batch 6 — remaining non-AI rules/engine (type-only !; AI deferred)
+    '^src/games/stars-bars/rules\\.ts$',
+    '^src/games/hex/rules\\.ts$',
+    '^src/games/prime-gold/rules\\.ts$',
+    '^src/games/kwatro-sinko/rules\\.ts$',
+    '^src/games/pent-em-in/rules\\.ts$',
+    '^src/games/contig-60/rules\\.ts$',
+    '^src/games/juggle/rules\\.ts$',
+    '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
+    // OWNER OPTION AI type-only (emit-identical) — burn-1008-mp-ai-typeonly-emit-identical
+    '^src/games/[^/]+/ai(\\.|-client\\.|\\.worker\\.)ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -235,7 +246,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch2-3-4-combined',
+  taskId: 'burn-1008-mp-ai-typeonly-emit-identical',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {

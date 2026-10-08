@@ -39,15 +39,15 @@ export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
 /** Optional search controls — defaults preserve historical Math.random behavior. */
 export interface AISearchOptions {
   /** Deterministic PRNG seed (worker/direct parity tests). */
-  seed?: number;
+  seed?: number | undefined;
   /**
    * Soft wall-time budget (ms). When finite, search uses iterative deepening
    * up to the difficulty maxDepth and aborts mid-tree so a move returns on time.
    * Omit to keep the historical single-depth search (tests / unlimited).
    */
-  deadlineMs?: number;
+  deadlineMs?: number | undefined;
   /** Clock override for tests. */
-  now?: () => number;
+  now?: (() => number) | undefined;
 }
 
 interface SearchClock {
@@ -487,10 +487,12 @@ export function searchAIMove(
   // Add randomness based on difficulty
   if (rng() < config.randomness && scoredMoves.length > 1) {
     const randomIndex = Math.floor(rng() * Math.min(3, scoredMoves.length));
-    return { move: scoredMoves[randomIndex].move, truncated };
+    // ratchet: randomIndex < min(3, length) after length > 1 gate.
+    return { move: scoredMoves[randomIndex]!.move, truncated };
   }
 
-  return { move: scoredMoves[0].move, truncated };
+  // ratchet: scoredMoves length checked non-empty above.
+  return { move: scoredMoves[0]!.move, truncated };
 }
 
 /**
@@ -511,7 +513,8 @@ export function getAIMove(
 function getRestoreMove(state: QueensGuardsState): AIMove | null {
   if (state.capturedPieces.length === 0) return null;
 
-  const capturedCoord = state.capturedPieces[0];
+  // ratchet: capturedPieces.length === 0 returned above.
+  const capturedCoord = state.capturedPieces[0]!;
   const outerRing = CONFIG.NUM_RINGS - 1;
   const outerCount = cellsInRing(outerRing);
 
