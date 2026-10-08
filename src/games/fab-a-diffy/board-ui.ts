@@ -312,9 +312,7 @@ function createAnswerBarElement(
   }
 
   const owner =
-    isClaimed && answer.claimedBy
-      ? getPlayerName(answer.claimedBy)
-      : undefined;
+    isClaimed && answer.claimedBy ? getPlayerName(answer.claimedBy) : undefined;
   makeGridCell(
     wrapper,
     buildCellAriaLabel({

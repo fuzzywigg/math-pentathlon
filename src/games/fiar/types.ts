@@ -239,8 +239,7 @@ export function getNodesInDirection(
         Math.abs(node.x - currentX) < 10 &&
         Math.abs(node.y - currentY) < 10
       ) {
-        const prevId =
-          result.length > 0 ? result[result.length - 1] : startId;
+        const prevId = result.length > 0 ? result[result.length - 1] : startId;
         if (prevId === undefined) break;
         if (!areConnected(board, prevId, id)) break;
         if (!allowYellow && edgeCrossesYellow(board, prevId, id)) {
