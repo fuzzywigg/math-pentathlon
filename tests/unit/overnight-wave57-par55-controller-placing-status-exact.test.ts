@@ -11,7 +11,7 @@ describe('Wave 57 par55 — placing status', () => {
     document.getElementById('par55-styles')?.remove();
   });
 
-  it('after selectBlock shows Tap a green base to place', () => {
+  it('after selectBlock shows Place block on a green base', () => {
     const root = document.createElement('div');
     document.body.appendChild(root);
     const ctrl = newGameVsHuman(root);
@@ -19,7 +19,7 @@ describe('Wave 57 par55 — placing status', () => {
     ctrl.state = selectBlock(ctrl.state, blockId);
     ctrl.update();
     expect(root.querySelector('.par55-status')?.textContent).toBe(
-      '🔵 Blue — Tap a green base to place'
+      '🔵 Blue - Place block on a green base'
     );
   });
 });

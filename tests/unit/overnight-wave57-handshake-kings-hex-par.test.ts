@@ -62,7 +62,7 @@ describe('Wave 57 handshake — leftover engines', () => {
     document.body.appendChild(parRoot);
     newPar(parRoot);
     expect(parRoot.querySelector('.par55-status')?.textContent).toMatch(
-      /Tap a block from your hand/
+      /Select a block/
     );
 
     const kwaRoot = document.createElement('div');

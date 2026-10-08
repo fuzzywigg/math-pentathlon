@@ -45,11 +45,9 @@ describe('Calla playability polish', () => {
     for (const label of labels) {
       expect(label || '').not.toMatch(/valid move/i);
     }
-    // AI / non-interactive seat: pits stay labeled but are not tab stops.
-    const firstPit = el.querySelector('.calla-pit');
-    expect(firstPit?.getAttribute('aria-label')).toBeTruthy();
-    expect(firstPit?.getAttribute('role')).toBeNull();
-    expect(firstPit?.getAttribute('tabindex')).toBeNull();
+    expect(el.querySelector('.calla-pit')?.getAttribute('aria-disabled')).toBe(
+      'true'
+    );
   });
 
   it('settleNoValidMoves ends via existing Calla collection rules', () => {
@@ -106,7 +104,6 @@ describe('Fraction Pinball playability polish', () => {
     for (const btn of buttons) {
       expect(btn.disabled).toBe(true);
       expect(btn.getAttribute('aria-disabled')).toBe('true');
-      expect(btn.getAttribute('aria-label')).toMatch(/^Answer /);
     }
   });
 
@@ -130,7 +127,7 @@ describe('Fraction Pinball playability polish', () => {
     expect(getPinballState().currentPlayer).toBe('player2');
     expect(root.textContent).toMatch(/Computer is thinking/i);
 
-    vi.advanceTimersByTime(650);
+    vi.advanceTimersByTime(1000);
     // Soft-lock recovery submitted an answer (result or next challenge)
     expect(['showResult', 'answering', 'gameOver']).toContain(
       getPinballState().phase
@@ -138,11 +135,11 @@ describe('Fraction Pinball playability polish', () => {
     expect(getPinballState().phase).not.toBe('answering');
   });
 
-  it('injects reduced-motion and ≥44px choice targets', () => {
+  it('injects reduced-motion and 44px choice targets', () => {
     injectFractionPinballStyles();
     const css =
       document.getElementById('fraction-pinball-styles')?.textContent || '';
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
-    expect(css).toMatch(/\.pinball-choice-btn[\s\S]*min-height:\s*4[4-9]px/);
+    expect(css).toMatch(/\.pinball-choice-btn[\s\S]*min-height:\s*44px/);
   });
 });

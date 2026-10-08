@@ -4,7 +4,8 @@
  * and taps during the think pause must not change state.
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { readAppCss } from './_app-css';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { createInitialState } from '../../src/games/star-track/types';
 import { drawChains } from '../../src/games/star-track/rules';
 import {
@@ -94,7 +95,10 @@ describe('Star Track AI-turn input guard', () => {
   });
 
   it('style.css ships 44px targets and star-track reduced-motion overrides', () => {
-    const css = readAppCss();
+    const css = readFileSync(
+      resolve(__dirname, '../../src/style.css'),
+      'utf8'
+    );
     expect(css).toMatch(
       /\.star-track-draw-btn\s*\{[^}]*min-height:\s*44px/s
     );
@@ -151,12 +155,7 @@ describe('Star Track AI-turn input guard', () => {
     expect(getGameState().currentPlayer).toBe('player2');
     expect(getGameState().player2Position).toBe(posBefore);
 
-    const {
-      AI_DRAW_DELAY_MS,
-      AI_SELECT_DELAY_MS,
-    } = await import('../../src/games/star-track/game-controller');
-
-    await vi.advanceTimersByTimeAsync(AI_DRAW_DELAY_MS);
+    await vi.advanceTimersByTimeAsync(600);
     expect(getGameState().phase).toBe('selectChain');
     const lockedChains = [
       ...board.querySelectorAll('.star-track-chain-btn'),
@@ -172,7 +171,7 @@ describe('Star Track AI-turn input guard', () => {
     expect(getGameState().phase).toBe('selectChain');
     expect(getGameState().currentPlayer).toBe('player2');
 
-    await vi.advanceTimersByTimeAsync(AI_SELECT_DELAY_MS);
+    await vi.advanceTimersByTimeAsync(600);
     expect(getGameState().currentPlayer).toBe('player1');
     expect(getGameState().phase).toBe('drawChains');
     expect(
