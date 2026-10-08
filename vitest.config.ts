@@ -24,6 +24,10 @@ const isolatedFiles = [
   'tests/unit/tablet-ai-hard-latency.bench.test.ts',
   // Re-imports StorageManager via vi.resetModules to exercise constructor load().
   'tests/unit/durable-progress-persistence.test.ts',
+  // Hoisted game-controller / virtual:pwa-register mocks must not leak.
+  'tests/unit/burn-1007-game-route-mounts.test.ts',
+  'tests/unit/burn-1007-pwa-bootstrap-ui.test.ts',
+  'tests/unit/burn-1007-main-shell-routes.test.ts',
 ];
 
 export default defineConfig({
