@@ -229,6 +229,16 @@ export async function runFullgameMatch(
     }
     expect(flipped, 'expected turn indicator to flip seats').toBe(true);
 
+    // Juggle: opening legal/flip asserts advance the seeded RNG and often leave
+    // a fragmented deal. Reshuffle once so play-to-end starts from a fresh hand
+    // (UI-only New Game — same path as softlock recovery).
+    if (driver.id === 'juggle') {
+      await startHumanVsHuman(page);
+      await expect(page.locator(driver.mount).first()).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+
     // Complete match
     await playToGameOver(page, driver);
     await expect(page.locator(driver.gameOver).first()).toBeVisible({
