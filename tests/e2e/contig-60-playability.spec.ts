@@ -162,12 +162,13 @@ for (const profile of profiles) {
       await page.locator('#start-game-btn').click();
       await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
 
-      await page.waitForTimeout(2000);
-
+      // Wait on the settled post-reset UI instead of a fixed 2s sleep (AI pause).
+      await expect(page.locator('.contig-status')).toContainText("Blue's turn", {
+        timeout: 5_000,
+      });
+      await expect(page.locator('.contig-status')).toContainText('Roll the dice');
       await expect(page.locator('.contig-roll-btn')).toBeVisible();
       await expect(page.locator('.contig-die')).toHaveCount(0);
-      await expect(page.locator('.contig-status')).toContainText("Blue's turn");
-      await expect(page.locator('.contig-status')).toContainText('Roll the dice');
       await expect(page.locator('.contig-cell-p1')).toHaveCount(0);
       await expect(page.locator('.contig-cell-p2')).toHaveCount(0);
     });

@@ -227,10 +227,11 @@ test.describe('Stars & Bars deep playability', () => {
     await page.locator('.difficulty-btn.easy').click();
     await page.locator('#start-game-btn').click();
     await expect(modal).toHaveClass(/hidden/);
-    await page.waitForTimeout(2000);
-    const status = (await page.locator('.stars-status').textContent())?.trim() ?? '';
-    expect(status).toMatch(/Your turn/i);
-    expect(status).not.toMatch(/thinking/i);
+    // Poll for a clean Your-turn board instead of a fixed 2s sleep after New Game.
+    await expect(page.locator('.stars-status')).toContainText(/Your turn/i, {
+      timeout: 5_000,
+    });
+    await expect(page.locator('.stars-status')).not.toContainText(/thinking/i);
     const history = await page.locator('.stars-move-item').count();
     expect(history).toBe(0);
   });

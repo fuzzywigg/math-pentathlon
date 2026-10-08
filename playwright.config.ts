@@ -27,8 +27,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 
 // Cap parallel browsers: each mp3d spec spins WebGL (often software/ANGLE in CI).
-// CI stays single-worker; local caps at 2 to avoid GL thrash on shared runners.
-const workerLimit = process.env.CI ? 1 : 2;
+// CI allows 2 workers on ubuntu-latest (2 vCPU); local caps at 2 to avoid GL thrash.
+const workerLimit = process.env.CI
+  ? Number(process.env.PLAYWRIGHT_WORKERS || 2)
+  : 2;
 
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =

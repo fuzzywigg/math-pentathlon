@@ -5,6 +5,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState } from '../../src/games/fab-a-diffy/rules';
 import { getAIMove, executeAITurn } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -15,7 +16,7 @@ describe('Wave 43 fab — AI execute difficulties', () => {
       // Create before spy so shuffle is not pinned; pin RNG only for AI pick.
       const state = createInitialState();
       vi.spyOn(Math, 'random').mockReturnValue(0.99);
-      const move = getAIMove(state, 'player1', d);
+      const move = getAIMove(state, 'player1', d, fastDeadlineOpts());
       expect(move).not.toBeNull();
       expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
       expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
@@ -29,7 +30,7 @@ describe('Wave 43 fab — AI execute difficulties', () => {
     () => {
       const state = createInitialState();
       vi.spyOn(Math, 'random').mockReturnValue(0.99);
-      const next = executeAITurn(state, 'player1', 'hard');
+      const next = executeAITurn(state, 'player1', 'hard', fastDeadlineOpts());
       expect(next.moveHistory.length).toBe(1);
       expect(next.scores.player1).toBe(1);
       expect(next.currentPlayer).toBe('player2');
