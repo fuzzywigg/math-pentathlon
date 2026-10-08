@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "profile": {
+    "id": "typed-1",
+    "name": "TypedSafe",
+    "avatar": "t",
+    "createdAt": 1,
+    "lastActiveAt": 1
+  },
+  "achievements": "not-an-array",
+  "gameStats": "not-an-object",
+  "streak": "not-streak",
+  "settings": "not-settings",
+  "owlState": "not-owl"
+}

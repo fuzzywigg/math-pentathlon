@@ -1,0 +1,13 @@
+{
+  "profile": {
+    "id": "no-ver-1",
+    "name": "NoVersion",
+    "avatar": "n",
+    "createdAt": 10,
+    "lastActiveAt": 20
+  },
+  "settings": {
+    "reducedMotion": true
+  },
+  "achievements": [{ "id": "kept", "unlockedAt": 15 }]
+}
