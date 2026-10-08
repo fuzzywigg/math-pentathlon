@@ -14,6 +14,7 @@
     "check:pwa-manifest": "node scripts/check-pwa-manifest.mjs",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "report:licenses": "node scripts/report-licenses.mjs",
+    "report:dead-code": "node scripts/report-dead-code.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
