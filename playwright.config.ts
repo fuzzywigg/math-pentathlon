@@ -17,6 +17,9 @@ import { defineConfig, devices } from '@playwright/test';
  * Mobile touch smoke (phone + tablet, report-only):
  *   npm run test:e2e:mobile
  *
+ * Zoom / reflow a11y (WCAG 1.4.4 / 1.4.10, report-only):
+ *   npm run test:e2e:zoom-reflow
+ *
  * Fullgame HvH suite (Chromium, report-only):
  *   npm run test:e2e:fullgame
  *   npx playwright test tests/e2e/fullgame --project=chromium
@@ -39,7 +42,7 @@ const workerLimit = process.env.CI
 
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =
-  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts/;
+  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts|zoom-reflow-a11y\.spec\.ts/;
 
 /**
  * Fullgame HvH specs live under tests/e2e/fullgame/ and stay on the chromium
@@ -132,6 +135,21 @@ export default defineConfig({
         defaultBrowserType: 'chromium',
         hasTouch: true,
         isMobile: true,
+      },
+    },
+    {
+      name: 'zoom-reflow',
+      testMatch: /zoom-reflow-a11y\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
       },
     },
     {
