@@ -15,7 +15,11 @@ function isIgnoredConsoleError(text: string): boolean {
   return (
     /Download the React DevTools/i.test(text) ||
     /favicon\.ico/i.test(text) ||
-    /\[vite\]/i.test(text)
+    /\[vite\]/i.test(text) ||
+    // WebKit logs Content-Security-Policy-Report-Only without report-to as console.error.
+    (/content security policy/i.test(text) &&
+      /report-only/i.test(text) &&
+      /report-to/i.test(text))
   );
 }
 

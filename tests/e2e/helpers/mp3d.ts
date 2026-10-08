@@ -2,7 +2,7 @@
  * Shared helpers for MP-3D Playwright specs.
  * Prefer ready-signal waits over fixed sleep; opt into board3dLQ for CI GL load.
  */
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { waitForGameReady as sharedWaitForGameReady } from './page';
 
 /** Heavy multi-viewport / play-through 3D specs. */
@@ -97,6 +97,13 @@ export async function waitForMp3dReady(
     | { state: 'fallback'; reason: string }
     | { state: 'ready'; reason: null };
   if (result && result.state === 'fallback') {
+    // Firefox/CI software GL often cannot create a WebGL context — skip harness-only.
+    if (/webgl/i.test(result.reason)) {
+      test.skip(
+        true,
+        `mp3d "${gameId}" WebGL unavailable (${result.reason}) — cross-browser harness skip`
+      );
+    }
     throw new Error(
       `mp3d "${gameId}" never became canvas-ready — WebGL fallback (${result.reason}). ` +
         'Under software GL this usually means context creation failed or was lost before first paint.'

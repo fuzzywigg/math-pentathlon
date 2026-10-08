@@ -56,7 +56,8 @@ export function handleCellClick(
 
   // Move King phase
   if (state.turnPhase === 'moveKing') {
-    const clickedCell = state.board[row - 1][col - 1]; // Convert 1-based to 0-based
+    // ratchet: dense BOARD_SIZE×BOARD_SIZE board; row/col are 1-based valid seats.
+    const clickedCell = state.board[row - 1]![col - 1]!; // Convert 1-based to 0-based
 
     // Check if clicked on current player's King
     if (
@@ -102,7 +103,8 @@ export function handleCellClick(
       return { state: endTurn(state), isInvalidClick: false };
     }
 
-    const clickedCell = state.board[row - 1][col - 1];
+    // ratchet: dense BOARD_SIZE×BOARD_SIZE board; row/col are 1-based valid seats.
+    const clickedCell = state.board[row - 1]![col - 1]!;
 
     // Only place on empty cells
     if (clickedCell === null) {
@@ -124,7 +126,7 @@ const KINGS_CELL_COUNT = KINGS_BOARD_SIZE * KINGS_BOARD_SIZE;
 
 /** Mutable click binding so listeners can be attached once (#11). */
 interface BoardClickBinding {
-  onCellClick?: CellClickCallback;
+  onCellClick?: CellClickCallback | undefined;
 }
 
 const boardClickBindings = new WeakMap<HTMLElement, BoardClickBinding>();
@@ -140,7 +142,8 @@ function syncKingsCell(
   cell.dataset.row = String(row);
   cell.dataset.col = String(col);
 
-  const piece = state.board[row - 1][col - 1];
+  // ratchet: dense BOARD_SIZE×BOARD_SIZE board; sync loops 1..KINGS_BOARD_SIZE.
+  const piece = state.board[row - 1]![col - 1]!;
   const colLetter = String.fromCharCode(64 + col);
   const coord = `${colLetter}${row}`;
   let owner: string | undefined;
@@ -206,7 +209,8 @@ function syncKingsCell(
   );
 
   if (state.moveHistory.length > 0) {
-    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    // ratchet: length > 0 ⇒ last index defined.
+    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
     if (lastMove.to.row === row && lastMove.to.col === col) {
       cell.classList.add('cell-last-move');
     }

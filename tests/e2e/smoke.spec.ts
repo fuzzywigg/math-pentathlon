@@ -490,6 +490,14 @@ test.describe('CSP report-only smoke', () => {
 
     page.on('console', (msg) => {
       const text = msg.text();
+      // WebKit warns that Report-Only CSP lacks report-to — not a violation.
+      if (
+        /content security policy/i.test(text) &&
+        /report-only/i.test(text) &&
+        /report-to/i.test(text)
+      ) {
+        return;
+      }
       if (/content security policy|refused to|csp/i.test(text)) {
         consoleCsp.push(`[${msg.type()}] ${text}`);
       }

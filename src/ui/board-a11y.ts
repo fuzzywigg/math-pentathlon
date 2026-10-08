@@ -22,19 +22,19 @@ export interface CellLabelParts {
   /** Coordinate or cell identity, e.g. "E2" or "12". */
   coord: string;
   /** Seat / owner name for screen readers (Blue, Red, Player 1, AI, …). */
-  owner?: string;
+  owner?: string | undefined;
   /** Piece or content name (King, Quadraphage, prime, …). */
-  piece?: string;
+  piece?: string | undefined;
   /** Empty cell (mutually preferred over owner/piece when true). */
-  empty?: boolean;
+  empty?: boolean | undefined;
   /** Announce as a legal move destination (color is not enough). */
-  validMove?: boolean;
+  validMove?: boolean | undefined;
   /** Announce as a legal placement target. */
-  validPlacement?: boolean;
+  validPlacement?: boolean | undefined;
   /** Announce as a piece the current player can select (movement phase). */
-  selectable?: boolean;
+  selectable?: boolean | undefined;
   /** Extra label segments (e.g. "prime"). */
-  extras?: string[];
+  extras?: string[] | undefined;
 }
 
 /** Build a comma-separated aria-label: coord · owner/piece|empty · valid move/placement. */

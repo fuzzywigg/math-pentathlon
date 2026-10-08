@@ -58,14 +58,19 @@ describe('destroyGame unmount cleanup', () => {
   });
 
   it('hex destroyGame bumps generation so stale AI timeout is ignored', async () => {
+    const clearSpy = vi.spyOn(globalThis, 'clearTimeout');
     const mod = await import('../../src/games/hex/game-controller');
     const board = document.createElement('div');
     const status = document.createElement('div');
     document.body.append(board, status);
     mod.initGame(board, status);
     mod.newGameVsAI('easy');
+    // AI paint-delay timer should be armed in vs-AI.
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
     mod.destroyGame();
+    expect(clearSpy).toHaveBeenCalled();
     expect(() => vi.runOnlyPendingTimers()).not.toThrow();
+    clearSpy.mockRestore();
   });
 
   it('star-track destroyGame invalidates nested AI timeouts', async () => {
@@ -85,7 +90,10 @@ describe('destroyGame unmount cleanup', () => {
     document.body.appendChild(host);
     mod.initGame(host);
     mod.newGameVsAI('easy');
+    const htmlAfterStart = host.innerHTML;
     mod.destroyGame();
-    expect(() => vi.runOnlyPendingTimers()).not.toThrow();
+    // Nulled container + generation bump: advancing timers must not repaint / throw.
+    expect(() => vi.advanceTimersByTime(20_000)).not.toThrow();
+    expect(host.innerHTML).toBe(htmlAfterStart);
   });
 });

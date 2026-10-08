@@ -211,7 +211,8 @@ export function renderBoard(
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       const center = getHexCenter(row, col);
-      const cellState = state.board[row][col];
+      // ratchet: dense size×size board; loops bound by state.boardSize.
+      const cellState = state.board[row]![col]!;
       const isWinningCell = winningSet.has(`${row},${col}`);
 
       const cellGroup = document.createElementNS(
@@ -248,7 +249,8 @@ export function renderBoard(
 
       // Mark last move
       if (state.moveHistory.length > 0) {
-        const lastMove = state.moveHistory[state.moveHistory.length - 1];
+        // ratchet: length > 0 ⇒ last index defined.
+        const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
         if (lastMove.position.row === row && lastMove.position.col === col) {
           cellClass += ' hex-cell-last-move';
         }
