@@ -140,7 +140,7 @@ npx vitest run tests/unit/engine-coverage-round-2-burn-1008.test.ts
 | --- | --- |
 | Baseline coverage suite | engine branches **97.36%** (1850/1900); lines 99.43% |
 | After coverage suite | engine branches **97.94%** (1861/1900); lines 99.73%; **+11 arms / +8 lines** |
-| New suite alone | **41** passed / **10** todo |
-| `npm run lint` | (see PR body) |
-| `npx tsc --noEmit` | (see PR body) |
-| `npm run test:unit` | (see PR body) |
+| New suite alone | **41** passed / **9** todo (after dropping redundant seed todo) |
+| `npm run lint` | **pass** (exit 0) |
+| `npx tsc --noEmit` | **pass** (exit 0) |
+| `npm run test:unit` | **pass** — 3106 files / **11795** passed / 13 skipped / **16** todo |
