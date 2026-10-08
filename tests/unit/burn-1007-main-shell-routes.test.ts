@@ -179,4 +179,96 @@ describe('burn-1007 main shell routes', () => {
       { timeout: 5_000 }
     );
   });
+
+  it('resolveAIDifficulty defaults to medium and retry reloads the page', async () => {
+    const reload = vi.fn();
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        ...window.location,
+        hash: window.location.hash,
+        reload,
+        assign: window.location.assign.bind(window.location),
+        replace: window.location.replace.bind(window.location),
+      },
+    });
+
+    initGameMountDeps.mockImplementation(
+      (deps: {
+        resolveAIDifficulty: (d?: 'easy' | 'medium' | 'hard') => string;
+      }) => {
+        expect(deps.resolveAIDifficulty()).toBe('medium');
+        expect(deps.resolveAIDifficulty('hard')).toBe('hard');
+        expect(deps.resolveAIDifficulty('easy')).toBe('easy');
+      }
+    );
+
+    mountGameById.mockRejectedValue(new Error('chunk fail'));
+    await import('../../src/main');
+    window.location.hash = '#/game/hex';
+    const { handleRoute } = await import('../../src/core/router');
+    handleRoute();
+
+    await vi.waitFor(() => {
+      expect(initGameMountDeps).toHaveBeenCalled();
+      expect(
+        document.querySelector('[data-testid="game-load-error"]')
+      ).toBeTruthy();
+    });
+
+    document
+      .querySelector<HTMLButtonElement>('[data-action="retry"]')
+      ?.click();
+    expect(reload).toHaveBeenCalled();
+  });
+
+  it('demo load failures render load-error UI for each demo route', async () => {
+    const demos = await Promise.all([
+      import('../../src/demos/dice-demo'),
+      import('../../src/demos/alignment-demo'),
+      import('../../src/demos/fraction-demo'),
+      import('../../src/demos/polyomino-demo'),
+      import('../../src/demos/graph-demo'),
+      import('../../src/demos/attribute-demo'),
+      import('../../src/demos/expression-demo'),
+    ]);
+
+    for (const mod of demos) {
+      const fn = Object.values(mod)[0] as ReturnType<typeof vi.fn>;
+      vi.mocked(fn).mockImplementation(() => {
+        throw new Error('demo boom');
+      });
+    }
+
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await import('../../src/main');
+    const { handleRoute } = await import('../../src/core/router');
+
+    for (const hash of [
+      '#/demo/dice',
+      '#/demo/alignment',
+      '#/demo/fractions',
+      '#/demo/polyomino',
+      '#/demo/graph',
+      '#/demo/attributes',
+      '#/demo/expressions',
+    ]) {
+      window.location.hash = hash;
+      handleRoute();
+      await vi.waitFor(() => {
+        expect(
+          document.querySelector('[data-testid="game-load-error"]')
+        ).toBeTruthy();
+      });
+    }
+
+    errSpy.mockRestore();
+  });
+
+  it('throws when #app is missing at boot', async () => {
+    document.body.innerHTML = '';
+    await expect(import('../../src/main')).rejects.toThrow(
+      /App container not found/
+    );
+  });
 });
