@@ -31,7 +31,9 @@ export function lcm(a: number, b: number): number {
   a = Math.abs(Math.round(a));
   b = Math.abs(Math.round(b));
 
-  if (a === 0 || b === 0) return 0;
+  if (a === 0 || b === 0) {
+    return 0;
+  }
 
   return (a * b) / gcd(a, b);
 }
@@ -78,7 +80,9 @@ function toStandardForm(f: Fraction): Fraction {
  * Get the effective signed numerator (handles both isNegative flag and negative numerator)
  */
 function signedNumerator(f: Fraction): number {
-  if (f.isNegative === true) return -Math.abs(f.numerator);
+  if (f.isNegative === true) {
+    return -Math.abs(f.numerator);
+  }
   return f.numerator;
 }
 
@@ -183,8 +187,12 @@ export function compare(a: Fraction, b: Fraction): ComparisonResult {
   const crossA = signedNumerator(a) * b.denominator;
   const crossB = signedNumerator(b) * a.denominator;
 
-  if (crossA < crossB) return -1;
-  if (crossA > crossB) return 1;
+  if (crossA < crossB) {
+    return -1;
+  }
+  if (crossA > crossB) {
+    return 1;
+  }
   return 0;
 }
 
@@ -306,7 +314,9 @@ export function abs(fraction: Fraction): Fraction {
  * Check if fraction is positive
  */
 export function isPositive(fraction: Fraction): boolean {
-  if (fraction.isNegative === true) return false;
+  if (fraction.isNegative === true) {
+    return false;
+  }
   return fraction.numerator > 0;
 }
 
@@ -314,7 +324,9 @@ export function isPositive(fraction: Fraction): boolean {
  * Check if fraction is negative
  */
 export function isNegative(fraction: Fraction): boolean {
-  if (fraction.isNegative === true) return true;
+  if (fraction.isNegative === true) {
+    return true;
+  }
   return fraction.numerator < 0;
 }
 
@@ -379,7 +391,9 @@ export function max(...fractions: Fraction[]): Fraction {
  * Sum an array of fractions
  */
 export function sum(fractions: Fraction[]): Fraction {
-  if (fractions.length === 0) return fromWhole(0);
+  if (fractions.length === 0) {
+    return fromWhole(0);
+  }
   return fractions.reduce((acc, f) => add(acc, f));
 }
 
@@ -387,7 +401,9 @@ export function sum(fractions: Fraction[]): Fraction {
  * Average an array of fractions
  */
 export function average(fractions: Fraction[]): Fraction {
-  if (fractions.length === 0) throw new Error('Cannot average empty array');
+  if (fractions.length === 0) {
+    throw new Error('Cannot average empty array');
+  }
   const total = sum(fractions);
   return divide(total, fromWhole(fractions.length));
 }
@@ -396,8 +412,12 @@ export function average(fractions: Fraction[]): Fraction {
  * Raise a fraction to an integer power
  */
 export function power(fraction: Fraction, exponent: number): Fraction {
-  if (exponent === 0) return fromWhole(1);
-  if (exponent < 0) return power(reciprocal(fraction), -exponent);
+  if (exponent === 0) {
+    return fromWhole(1);
+  }
+  if (exponent < 0) {
+    return power(reciprocal(fraction), -exponent);
+  }
   const f = toStandardForm(fraction);
   return {
     numerator: Math.pow(f.numerator, exponent),
@@ -566,7 +586,9 @@ export function formatFraction(
       }
       return `${prefix}${basic}`;
     }
-    if (remainder === 0) return `${prefix}${whole}`;
+    if (remainder === 0) {
+      return `${prefix}${whole}`;
+    }
     const fracPart = `${remainder}/${denom}`;
     if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart]) {
       return `${prefix}${whole} ${UNICODE_FRACTIONS[fracPart]}`;
@@ -610,7 +632,9 @@ export function parseFraction(str: string): Fraction | null {
     const whole = parseInt(mixedMatch[1]!, 10);
     const numer = parseInt(mixedMatch[2]!, 10);
     const denom = parseInt(mixedMatch[3]!, 10);
-    if (denom === 0) return null;
+    if (denom === 0) {
+      return null;
+    }
     return fromMixedNumber(whole, numer, denom);
   }
 
@@ -619,7 +643,9 @@ export function parseFraction(str: string): Fraction | null {
   if (fractionMatch) {
     const numer = parseInt(fractionMatch[1]!, 10);
     const denom = parseInt(fractionMatch[2]!, 10);
-    if (denom === 0) return null;
+    if (denom === 0) {
+      return null;
+    }
     return { numerator: numer, denominator: denom };
   }
 

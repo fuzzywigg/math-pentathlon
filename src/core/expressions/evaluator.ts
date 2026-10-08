@@ -69,9 +69,13 @@ export function tokenize(expression: string): ExpressionToken[] {
     // Unicode operators
     if (['≤', '≥', '×', '÷'].includes(char)) {
       let op: Operator;
-      if (char === '×') op = '*';
-      else if (char === '÷') op = '/';
-      else op = char as Operator;
+      if (char === '×') {
+        op = '*';
+      } else if (char === '÷') {
+        op = '/';
+      } else {
+        op = char as Operator;
+      }
       tokens.push({ type: 'operator', value: op });
       i++;
       continue;
@@ -263,7 +267,9 @@ export function evaluateNode(
         case '*':
           return left * right;
         case '/':
-          if (right === 0) throw new Error('Division by zero');
+          if (right === 0) {
+            throw new Error('Division by zero');
+          }
           return left / right;
         case '^':
           return Math.pow(left, right);
@@ -436,8 +442,12 @@ function* operatorCombinations(
  * Build an expression string from numbers and operators
  */
 function buildExpression(numbers: number[], operators: Operator[]): string {
-  if (numbers.length === 0) return '';
-  if (numbers.length === 1) return numbers[0]!.toString();
+  if (numbers.length === 0) {
+    return '';
+  }
+  if (numbers.length === 1) {
+    return numbers[0]!.toString();
+  }
 
   let expr = numbers[0]!.toString();
   for (let i = 0; i < operators.length && i < numbers.length - 1; i++) {
@@ -496,7 +506,9 @@ export function solveTargetChallenge(
           : [buildExpression(numPerm, ops)];
 
       for (const expr of expressions) {
-        if (seen.has(expr)) continue;
+        if (seen.has(expr)) {
+          continue;
+        }
         seen.add(expr);
 
         const result = evaluate(expr);
@@ -522,7 +534,9 @@ export function solveTargetChallenge(
 
   // Sort by exactness then by expression length
   solutions.sort((a, b) => {
-    if (a.isExact !== b.isExact) return a.isExact ? -1 : 1;
+    if (a.isExact !== b.isExact) {
+      return a.isExact ? -1 : 1;
+    }
     return a.expression.length - b.expression.length;
   });
 
@@ -592,7 +606,9 @@ export function validateSolution(
  */
 export function parseEquation(equation: string): Equation | null {
   const parts = equation.split('=');
-  if (parts.length !== 2) return null;
+  if (parts.length !== 2) {
+    return null;
+  }
 
   try {
     const leftTokens = tokenize(parts[0]!.trim());
@@ -660,7 +676,9 @@ export function evaluateEquation(
  * Format a number for display (handle decimals nicely)
  */
 export function formatNumber(n: number): string {
-  if (Number.isInteger(n)) return n.toString();
+  if (Number.isInteger(n)) {
+    return n.toString();
+  }
   return n.toFixed(4).replace(/\.?0+$/, '');
 }
 

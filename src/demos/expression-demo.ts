@@ -300,7 +300,9 @@ function initCalculator(): void {
   const exampleBtns = document.querySelectorAll('.example-btn');
 
   function calculate(): void {
-    if (!input || !resultContainer) return;
+    if (!input || !resultContainer) {
+      return;
+    }
 
     const expr = input.value.trim();
     if (!expr) {
@@ -317,7 +319,9 @@ function initCalculator(): void {
 
   calcBtn?.addEventListener('click', calculate);
   input?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') calculate();
+    if (e.key === 'Enter') {
+      calculate();
+    }
   });
 
   exampleBtns.forEach((btn) => {
@@ -336,7 +340,9 @@ function initTargetGame(): void {
   const challengeTarget = document.getElementById('challenge-target');
   const expressionBuilder = document.getElementById('expression-builder');
 
-  if (!challengeGrid) return;
+  if (!challengeGrid) {
+    return;
+  }
 
   // Combine challenges
   const allChallenges = [
@@ -354,7 +360,9 @@ function initTargetGame(): void {
   }
 
   function selectChallenge(challenge: TargetChallenge): void {
-    if (!activeChallenge || !challengeTarget || !expressionBuilder) return;
+    if (!activeChallenge || !challengeTarget || !expressionBuilder) {
+      return;
+    }
 
     activeChallenge.style.display = 'block';
 
@@ -402,7 +410,9 @@ function initSolver(): void {
   ];
 
   solveBtn?.addEventListener('click', () => {
-    if (!solutionsList) return;
+    if (!solutionsList) {
+      return;
+    }
 
     const numbers = numInputs.map((input) => parseInt(input.value, 10) || 1);
 
@@ -445,7 +455,9 @@ function initEquationChecker(): void {
   const resultEl = document.getElementById('equation-result');
 
   function checkEquation(): void {
-    if (!input || !resultEl) return;
+    if (!input || !resultEl) {
+      return;
+    }
 
     const equation = input.value.trim();
     if (!equation) {
@@ -472,13 +484,17 @@ function initEquationChecker(): void {
 
   checkBtn?.addEventListener('click', checkEquation);
   input?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkEquation();
+    if (e.key === 'Enter') {
+      checkEquation();
+    }
   });
 }
 
 function initCardBuilder(): void {
   const builderArea = document.getElementById('card-builder-area');
-  if (!builderArea) return;
+  if (!builderArea) {
+    return;
+  }
 
   // Create a deck of cards
   const cards = createExpressionDeck({

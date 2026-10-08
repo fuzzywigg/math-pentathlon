@@ -13,10 +13,16 @@ const FALSE_TOKENS = new Set(['0', 'false']);
 
 /** Normalize a raw query/storage token to a boolean, or null if unknown. */
 export function parseAllowlistedFlag(raw: string | null): boolean | null {
-  if (raw === null) return null;
+  if (raw === null) {
+    return null;
+  }
   const token = raw.trim().toLowerCase();
-  if (TRUE_TOKENS.has(token)) return true;
-  if (FALSE_TOKENS.has(token)) return false;
+  if (TRUE_TOKENS.has(token)) {
+    return true;
+  }
+  if (FALSE_TOKENS.has(token)) {
+    return false;
+  }
   return null;
 }
 
@@ -37,13 +43,17 @@ export function readUrlOrStorageFlag(
     search.startsWith('?') ? search : search ? `?${search}` : ''
   ).get(key);
   const searchFlag = parseAllowlistedFlag(fromSearch);
-  if (searchFlag !== null) return searchFlag;
+  if (searchFlag !== null) {
+    return searchFlag;
+  }
 
   const hashQueryIndex = hash.indexOf('?');
   if (hashQueryIndex >= 0) {
     const fromHash = new URLSearchParams(hash.slice(hashQueryIndex)).get(key);
     const hashFlag = parseAllowlistedFlag(fromHash);
-    if (hashFlag !== null) return hashFlag;
+    if (hashFlag !== null) {
+      return hashFlag;
+    }
   }
 
   if (storage) {

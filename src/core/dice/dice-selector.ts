@@ -320,7 +320,9 @@ export class DiceSelector {
   }
 
   private handleDieClick(die: DieRoll): void {
-    if (!this.currentResult || this.isRolling || die.isLocked) return;
+    if (!this.currentResult || this.isRolling || die.isLocked) {
+      return;
+    }
 
     if (!this.options.multiSelect) {
       // Single select mode - deselect all others first
@@ -344,7 +346,9 @@ export class DiceSelector {
 
   /** Roll the dice */
   public roll(): void {
-    if (this.isRolling) return;
+    if (this.isRolling) {
+      return;
+    }
 
     this.isRolling = true;
     this.cancelRollAnim?.();
@@ -371,7 +375,9 @@ export class DiceSelector {
 
   /** Confirm current selection */
   public confirm(): void {
-    if (!this.currentResult) return;
+    if (!this.currentResult) {
+      return;
+    }
 
     const selectedDice = this.currentResult.rolls.filter((d) => d.isSelected);
     const selectedSum = getSelectedTotal(this.currentResult);
@@ -393,13 +399,17 @@ export class DiceSelector {
 
   /** Get selected dice */
   public getSelectedDice(): DieRoll[] {
-    if (!this.currentResult) return [];
+    if (!this.currentResult) {
+      return [];
+    }
     return this.currentResult.rolls.filter((d) => d.isSelected);
   }
 
   /** Get sum of selected dice */
   public getSelectedSum(): number {
-    if (!this.currentResult) return 0;
+    if (!this.currentResult) {
+      return 0;
+    }
     return getSelectedTotal(this.currentResult);
   }
 

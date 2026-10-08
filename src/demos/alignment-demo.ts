@@ -40,7 +40,9 @@ function createEmptyBoard(rows: number, cols: number): Board {
 /** Safe cell read under noUncheckedIndexedAccess (board rows are pre-sized). */
 function getBoardCell(board: Board, row: number, col: number): CellValue {
   const boardRow = board[row];
-  if (boardRow === undefined) return null;
+  if (boardRow === undefined) {
+    return null;
+  }
   return boardRow[col] ?? null;
 }
 
@@ -52,7 +54,9 @@ function setBoardCell(
   value: CellValue
 ): void {
   const boardRow = board[row];
-  if (boardRow === undefined) return;
+  if (boardRow === undefined) {
+    return;
+  }
   boardRow[col] = value;
 }
 
@@ -159,7 +163,9 @@ function renderFourInRowDemo(container: HTMLElement): void {
   function handleClick(col: number): void {
     const getCell = createArrayGetter(currentBoard);
     const result = checkForWinner(getCell, config);
-    if (result.hasWinner) return;
+    if (result.hasWinner) {
+      return;
+    }
 
     // Find lowest empty row in column
     let targetRow = -1;
@@ -170,7 +176,9 @@ function renderFourInRowDemo(container: HTMLElement): void {
       }
     }
 
-    if (targetRow === -1) return; // Column full
+    if (targetRow === -1) {
+      return;
+    } // Column full
 
     setBoardCell(currentBoard, targetRow, col, currentPlayer);
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
@@ -262,7 +270,9 @@ function renderHexConnectDemo(container: HTMLElement): void {
           const cell = boardEl.querySelector(
             `[data-row="${pos.row}"][data-col="${pos.col}"]`
           );
-          if (cell) cell.classList.add('winning-cell');
+          if (cell) {
+            cell.classList.add('winning-cell');
+          }
         }
       }
       if (
@@ -274,7 +284,9 @@ function renderHexConnectDemo(container: HTMLElement): void {
           const cell = boardEl.querySelector(
             `[data-row="${pos.row}"][data-col="${pos.col}"]`
           );
-          if (cell) cell.classList.add('winning-cell');
+          if (cell) {
+            cell.classList.add('winning-cell');
+          }
         }
       }
     }
@@ -309,7 +321,9 @@ function renderHexConnectDemo(container: HTMLElement): void {
   }
 
   function handleClick(row: number, col: number): void {
-    if (getBoardCell(board, row, col) !== null) return;
+    if (getBoardCell(board, row, col) !== null) {
+      return;
+    }
 
     // Check for existing winner
     const getCell = createArrayGetter(board);

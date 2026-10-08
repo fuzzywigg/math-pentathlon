@@ -46,7 +46,9 @@ export function renderAttributePiece(
 
   for (const def of definitions) {
     const value = piece.attributes[def.name];
-    if (value === undefined) continue;
+    if (value === undefined) {
+      continue;
+    }
     const color = getAttributeColor(definitions, def.name, value);
     if (color) {
       if (def.name === 'color' || def.name.includes('color')) {
@@ -478,7 +480,9 @@ function getContrastColor(bgColor: string): string {
  */
 export function injectAttributeStyles(): void {
   const styleId = 'attribute-styles';
-  if (document.getElementById(styleId)) return;
+  if (document.getElementById(styleId)) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = styleId;

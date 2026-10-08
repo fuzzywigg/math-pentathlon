@@ -8,7 +8,9 @@ import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 
 /** Local check — keep core off the ui/ layer; mirrors ui/reduced-motion. */
 function dicePrefersReducedMotion(): boolean {
-  if (getUserReducedMotionFlag()) return true;
+  if (getUserReducedMotionFlag()) {
+    return true;
+  }
   if (
     typeof window === 'undefined' ||
     typeof window.matchMedia !== 'function'
@@ -348,7 +350,9 @@ export function animateRoll(
   container.className = 'dice-roll-result';
 
   const finish = (): void => {
-    if (cancelled) return;
+    if (cancelled) {
+      return;
+    }
     clearTimer();
     container.className = 'dice-roll-result';
     clearElement(container);
@@ -410,7 +414,9 @@ export function animateRoll(
   const interval = 50; // Update every 50ms
 
   const animate = () => {
-    if (cancelled) return;
+    if (cancelled) {
+      return;
+    }
     const elapsed = Date.now() - startTime;
 
     if (elapsed < motionDuration) {

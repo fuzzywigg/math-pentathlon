@@ -18,7 +18,9 @@ import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 let stylesInjected = false;
 
 export function injectExpressionStyles(): void {
-  if (stylesInjected) return;
+  if (stylesInjected) {
+    return;
+  }
   stylesInjected = true;
 
   const style = document.createElement('style');
@@ -435,8 +437,12 @@ export function renderExpressionBuilder(
       onClick?: (slot: ExpressionSlot) => void;
       highlighted?: boolean;
     } = {};
-    if (options?.onSlotClick) slotOpts.onClick = options.onSlotClick;
-    if (options?.onDrop) slotOpts.onDrop = options.onDrop;
+    if (options?.onSlotClick) {
+      slotOpts.onClick = options.onSlotClick;
+    }
+    if (options?.onDrop) {
+      slotOpts.onDrop = options.onDrop;
+    }
     builderEl.appendChild(renderSlot(slot, slotOpts));
   }
 
@@ -503,14 +509,18 @@ export function renderCardTray(
 
   for (const card of cards) {
     const isUsed = options?.usedIds?.has(card.id);
-    if (isUsed) continue;
+    if (isUsed) {
+      continue;
+    }
 
     const cardOpts: {
       onClick?: (card: ExpressionCard) => void;
       draggable?: boolean;
       selected?: boolean;
     } = { selected: card.id === options?.selectedId };
-    if (options?.onClick) cardOpts.onClick = options.onClick;
+    if (options?.onClick) {
+      cardOpts.onClick = options.onClick;
+    }
     if (options?.draggable !== undefined) {
       cardOpts.draggable = options.draggable;
     }
