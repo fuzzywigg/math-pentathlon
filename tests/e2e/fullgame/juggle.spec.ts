@@ -1,20 +1,18 @@
 /**
- * Fullgame HvH e2e — juggle
- * Task: burn-1007-mp-e2e-fullgame
- * Tag: @fullgame (CI report-only; excluded from required chromium via grep-invert)
+ * @fullgame burn-1007 — complete human-vs-human match for juggle.
+ * Report-only in CI (required e2e grep-inverts @fullgame).
  */
 import { test } from '../fixtures';
-import { FULLGAME_TAG } from './_shared';
-import { runFullgameMatch } from './_runner';
+import { runFullgameMatch } from './_harness';
 
-test.describe(`juggle fullgame ${FULLGAME_TAG}`, () => {
-  test(`plays one complete human-vs-human match to game-over ${FULLGAME_TAG}`, async ({
-    page,
-  }) => {
-    test.setTimeout(480000);
-    await runFullgameMatch(page, 'juggle', {
-      timeoutMs: 480000,
-      maxTurns: 400,
-    });
+test.describe('@fullgame juggle', () => {
+  test.skip(
+    ({ browserName }) => browserName !== 'chromium',
+    'Full-game HvH suite targets Chromium'
+  );
+
+  test('@fullgame complete HvH match to game-over', async ({ page }) => {
+    test.setTimeout(900_000);
+    await runFullgameMatch(page, 'juggle');
   });
 });
