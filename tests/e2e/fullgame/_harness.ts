@@ -43,6 +43,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
   let noProgress = 0;
   let lastFill = '';
   let restarts = 0;
+  let turnsSinceRestart = 0;
   for (let i = 0; i < driver.maxTurns; i++) {
     if (await isOver(page, driver)) return;
 
@@ -57,29 +58,37 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       continue;
     }
 
-    // Juggle softlock: fragmented board + dice that never fit — reshuffle deal.
-    // Greedy UI play often stalls ~90–95% fill; New Game advances the seeded RNG.
+    // Juggle softlock: greedy UI often crawls to ~90–95% then never finishes
+    // (fill still ticks, so "no progress" alone is not enough). Reshuffle on
+    // stalled fill, high-fill crawl, or a hard deal-length budget.
     if (driver.id === 'juggle') {
-      const fill = await page.evaluate(() => {
-        const f1 =
-          document.querySelector('.juggle-board.player1 .fill-percent')
-            ?.textContent || '';
-        const f2 =
-          document.querySelector('.juggle-board.player2 .fill-percent')
-            ?.textContent || '';
-        return `${f1}|${f2}`;
+      turnsSinceRestart += 1;
+      const fillInfo = await page.evaluate(() => {
+        const parse = (sel: string) => {
+          const t =
+            document.querySelector(sel)?.textContent?.replace('%', '') || '0';
+          return parseInt(t, 10) || 0;
+        };
+        const f1 = parse('.juggle-board.player1 .fill-percent');
+        const f2 = parse('.juggle-board.player2 .fill-percent');
+        return { key: `${f1}|${f2}`, max: Math.max(f1, f2) };
       });
-      if (fill === lastFill) noProgress += 1;
+      if (fillInfo.key === lastFill) noProgress += 1;
       else {
         noProgress = 0;
-        lastFill = fill;
+        lastFill = fillInfo.key;
       }
-      if (noProgress > 18 && restarts < 100) {
+      const softlocked =
+        noProgress > 15 ||
+        (fillInfo.max >= 85 && noProgress > 8) ||
+        turnsSinceRestart > 280;
+      if (softlocked && restarts < 200) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;
         lastFill = '';
         stalled = 0;
+        turnsSinceRestart = 0;
         continue;
       }
     }
