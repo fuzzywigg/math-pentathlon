@@ -97,7 +97,7 @@ Alpha still has Hex/Queens Hard **2500** from merged [#389](https://github.com/f
 | `src/games/par-55/game-controller.ts` | 38 | `AI_THINK_DELAY_MS=450` | `71077ddf` → [#433](https://github.com/fuzzywigg/math-pentathlon/pull/433) (fold `970ac936`) | **HELD** |
 | `src/games/queens-guards/game-controller.ts` | 262 | `AI_THINK_PAINT_MS=250` | `34e82847` / `be668f62` → [#427](https://github.com/fuzzywigg/math-pentathlon/pull/427) / #472 | **HELD** |
 | `src/games/ramrod/game-controller.ts` | 70 | `AI_THINKING_DELAY=550` | `145b6cb2` → #415 / [#431](https://github.com/fuzzywigg/math-pentathlon/pull/431) trail | **HELD** |
-| `src/games/star-track/game-controller.ts` | 45–46, 252–264 | Replace `AI_THINKING_DELAY=600` with `AI_DRAW_DELAY_MS=400` + `AI_SELECT_DELAY_MS=350` | `84679199` → [#436](https://github.com/fuzzywigg/math-pentathlon/pull/436) (fold `c2a13d22`) | **HELD** |
+| `src/games/star-track/game-controller.ts` | 47–48, 294–295 | Replace `AI_THINKING_DELAY=600` with `AI_DRAW_DELAY_MS=400` + `AI_SELECT_DELAY_MS=350` | `84679199` → [#436](https://github.com/fuzzywigg/math-pentathlon/pull/436) (fold `c2a13d22`) | **HELD** |
 | `src/games/stars-bars/game-controller.ts` | 35 | `AI_THINK_MS=450` | `30b8c59c` → [#432](https://github.com/fuzzywigg/math-pentathlon/pull/432) (fold `f399129c`) | **HELD** |
 
 ### A4. `ai.ts` files that differ but are **not** AI-behavior (for completeness)
