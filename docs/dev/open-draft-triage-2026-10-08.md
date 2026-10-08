@@ -200,7 +200,7 @@ After folds: tip owner should re-run `npm run lint && npx tsc --noEmit && npm ru
 | #542 | docs(dev): wave5 fold rehearsal report (burn-1008-mp-wave5-fold-rehearsal) | `cursor/integration-fold-wave5-tip-4af0` | `724a4e6618c6` | report-only docs/dev/wave5-fold-rehearsal-2026-10-08.md absent on tip. | **fold** (fold #20) |
 | #543 | docs(dev): burn-1008 compliance review 2 of tip drafts #539–#542 | `cursor/integration-fold-wave5-tip-4af0` | `db2d96670b3d` | report-only docs/dev/burn-1008-compliance-review-2.md absent on tip (reviews #539–#542). | **fold** (fold #19) |
 | #544 | fix(types): Phase-2 type-ratchet Batch 3 UI/shell only (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `a16a326a02ca` | wave5 tip draft; UI/shell type-ratchet Batch 3 only (board-ui/types narrowing); git diff --name-only shows no rules.ts/ai.ts/tutorial.ts; ceiling 520→443; unique vs tip. | **fold** (fold #17) |
-| #545 | docs(dev): open draft PR triage for Oct 9 merge window (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `74eab34da76f` | this triage deliverable (burn-1008-mp-open-draft-triage); report-only docs/dev/open-draft-triage-2026-10-08.{md,json}; absent on tip. | **fold** (fold #21) |
+| #545 | docs(dev): open draft PR triage for Oct 9 merge window (burn-1008) | `cursor/integration-fold-wave5-tip-4af0` | `c983a75c07fa` | this triage deliverable (burn-1008-mp-open-draft-triage); report-only docs/dev/open-draft-triage-2026-10-08.{md,json}; absent on tip. | **fold** (fold #21) |
 
 ## (d) Needs an owner decision
 
