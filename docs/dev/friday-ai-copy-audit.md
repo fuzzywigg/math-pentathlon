@@ -223,7 +223,7 @@ Use [#559](https://github.com/fuzzywigg/math-pentathlon/pull/559) restore SHAs w
 
 | Field | Value |
 | --- | --- |
-| Tip audited | `8f5cefe0cf0d8546fd2db36d6b320bf97bc7d3aa` (`8f5cefe0`) — after #572 fold + alpha AI/copy restore |
+| Tip audited | `382f5e8a2008e4e10cb0af2748b459a7502df921` (`382f5e8a`) — after #572 fold + alpha AI/copy restore |
 | Alpha | `eec2b327` (unchanged) |
 | Method | Same as §Method above on new HEAD |
 | Owner decision | Andrew / #559: **KEEP** tip Hex AI (Hard 450 + `ai-client` watchdog) and tip Kwatro-Sinko AI; **RESTORE** Queens/Kings/Contig AI, 11 think/place delays, Div I–IV tutorials, You/Computer/status/rules chrome (incl. calla) |
