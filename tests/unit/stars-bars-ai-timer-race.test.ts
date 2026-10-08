@@ -10,27 +10,17 @@ import {
   selectCard,
 } from '../../src/games/stars-bars/rules';
 import { initGame } from '../../src/games/stars-bars/game-controller';
+import { clearDom, mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
-  document.body.innerHTML = '';
-  document.getElementById('stars-styles')?.remove();
+  clearDom(['stars-styles']);
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
-
 describe('Stars & Bars AI timer race', () => {
   it('does not place a second AI move after New Game mid-think', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'easy');
 
     // Human places once → AI seat
@@ -57,7 +47,7 @@ describe('Stars & Bars AI timer race', () => {
 
   it('makeAIMove is a no-op when it is the human seat', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'medium');
     expect(ctrl.state.currentPlayer).toBe('player1');
 
@@ -69,7 +59,7 @@ describe('Stars & Bars AI timer race', () => {
 
   it('re-init clears prior AI timer (shell New Game path)', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const first = initGame(container, true, 'hard');
 
     const blueCard = first.state.playerHands.player1[0]!;

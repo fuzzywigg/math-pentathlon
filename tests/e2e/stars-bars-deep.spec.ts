@@ -3,44 +3,13 @@
  * Easy/Medium/Hard — finishes without stall, thinking UI, ≥44px targets.
  */
 import { test, expect, type Page, devices } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAiAt,
+} from './helpers/page';
 
 const MAX_HUMAN_TURNS = 60;
 const STALL_MS = 15_000;
-
-async function dismissOwl(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true }).catch(() => {});
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  await page.goto('/#/game/stars-bars');
-  await expect(page.getByTestId('game-loading')).toBeHidden({ timeout: 20_000 });
-  await expect(page.locator('.stars-board, #new-game-btn').first()).toBeVisible({
-    timeout: 20_000,
-  });
-  await dismissOwl(page);
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  await page.locator(`.difficulty-btn.${difficulty}`).click();
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwl(page);
-  await expect(page.locator('.stars-board')).toBeVisible();
-}
 
 async function playHumanTurn(page: Page) {
   const pass = page.locator('.stars-pass-btn');
@@ -99,7 +68,7 @@ async function playFullGame(
   page: Page,
   difficulty: 'easy' | 'medium' | 'hard'
 ) {
-  await startVsAi(page, difficulty);
+  await startVsAiAt(page, 'stars-bars', difficulty);
   let sawThinking = false;
   let turns = 0;
 
@@ -156,7 +125,7 @@ test.describe('Stars & Bars deep playability', () => {
       viewport: { width: 768, height: 1024 },
     });
     const page = await context.newPage();
-    await startVsAi(page, 'medium');
+    await startVsAiAt(page, 'stars-bars', 'medium');
 
     const sizes = await page.evaluate(() => {
       const cell = document.querySelector('.stars-cell')?.getBoundingClientRect();
@@ -217,7 +186,7 @@ test.describe('Stars & Bars deep playability', () => {
   test('New Game mid AI think leaves a clean Your-turn board', async ({
     page,
   }) => {
-    await startVsAi(page, 'easy');
+    await startVsAiAt(page, 'stars-bars', 'easy');
     await playHumanTurn(page);
     await page.waitForTimeout(80);
     await page.locator('#new-game-btn').click();

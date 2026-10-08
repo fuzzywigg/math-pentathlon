@@ -12,16 +12,7 @@ import {
   Position,
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
-
-function createEmptyBoard(): Board {
-  return Array.from({ length: BOARD_SIZE }, () =>
-    Array.from({ length: BOARD_SIZE }, () => null)
-  );
-}
-
-function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
-}
+import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
 
 function createRulesState(board: Board): RulesGameState {
   return { board, player1Supply: 25, player2Supply: 25 };

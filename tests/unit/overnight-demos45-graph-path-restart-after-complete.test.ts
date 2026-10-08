@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — graph path restart after complete', () => {
   it('third node click after a finished path starts a new selection', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const nodes = [
       ...root.querySelectorAll('#pathfinding-graph .graph-node'),
@@ -43,7 +38,7 @@ describe('Overnight demos45 — graph path restart after complete', () => {
   });
 
   it('player seat toggle updates selected chrome without clearing claims', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const gameNodes = [
       ...root.querySelectorAll('#game-graph .graph-node'),

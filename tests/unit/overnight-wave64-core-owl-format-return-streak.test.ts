@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format return-streak-1', () => {
     storage.resetAll();
   });
 
-
   it('selects return-streak-1 for streak 2–6 and formats placeholders', () => {
     for (const m of owlMessages.getMessagesByCategory('app:return')) {
       if (m.id !== 'return-streak-1') storage.markMessageSeen(m.id);

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — expr solver input width 60', () => {
   it('locks .solver-input input width 60px + media 50px', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const css = root.querySelector('style')?.textContent ?? '';
     expect(css).toContain('width: 60px');

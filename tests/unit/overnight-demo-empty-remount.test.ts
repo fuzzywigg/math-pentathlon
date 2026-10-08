@@ -17,13 +17,8 @@ import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
+import { mountRoot } from './helpers/dom';
 
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  root.id = 'overnight-demo-root';
-  document.body.appendChild(root);
-  return root;
-}
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -59,7 +54,7 @@ describe('Overnight demos — empty remount wipe', () => {
   it.each(RENDERERS)(
     '$name mounts into empty root with brand chrome',
     ({ render, chrome }) => {
-      const root = mount();
+      const root = mountRoot({ id: 'overnight-demo-root' });
       expect(root.childNodes).toHaveLength(0);
       render(root);
       expect(root.querySelector('h1')?.textContent).toMatch(chrome);
@@ -70,7 +65,7 @@ describe('Overnight demos — empty remount wipe', () => {
   it.each(RENDERERS)(
     '$name double-mount leaves a single coherent tree',
     ({ render, chrome }) => {
-      const root = mount();
+      const root = mountRoot({ id: 'overnight-demo-root' });
       render(root);
       const firstLen = root.innerHTML.length;
       render(root);
@@ -85,7 +80,7 @@ describe('Overnight demos — empty remount wipe', () => {
   );
 
   it('cross-demo remount replaces prior demo entirely', () => {
-    const root = mount();
+    const root = mountRoot({ id: 'overnight-demo-root' });
     renderDiceDemo(root);
     expect(root.querySelector('.dice-demo')).toBeTruthy();
     expect(root.querySelectorAll('.quick-roll-btn')).toHaveLength(5);
@@ -111,7 +106,7 @@ describe('Overnight demos — empty remount wipe', () => {
   });
 
   it('pre-seeded junk children are wiped on first render', () => {
-    const root = mount();
+    const root = mountRoot({ id: 'overnight-demo-root' });
     root.innerHTML = '<p class="junk">stale</p><div id="ghost">x</div>';
     expect(root.querySelector('.junk')).toBeTruthy();
 

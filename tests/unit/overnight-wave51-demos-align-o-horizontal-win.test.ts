@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function clickCol(root: HTMLElement, col: number): void {
   (
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Wave 51 demos — align O horizontal win', () => {
   it('O wins bottom-row four with winning-cell chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // X parks on col4/col5 while O claims bottom of cols 0..3

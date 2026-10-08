@@ -1,27 +1,20 @@
 /**
  * Stale AI setTimeout after New Game must not pass/place for Blue.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
   placeBlock,
   selectBlock,
 } from '../../src/games/par-55/rules';
+import { installDomHooks } from './helpers/dom';
 
 describe('Par 55 AI timer race / New Game generation', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('par55-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['par55-styles'] });
   afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('par55-styles')?.remove();
+    vi.restoreAllMocks();
   });
-
   it('New Game during AI pause leaves a clean Blue select seat (no history)', async () => {
     const { newGameVsAI } =
       await import('../../src/games/par-55/game-controller');

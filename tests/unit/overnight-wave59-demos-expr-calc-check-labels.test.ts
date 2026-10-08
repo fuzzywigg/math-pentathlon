@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 59 demos — expr calc/check labels', () => {
   it('exposes Calculate/Check button labels and exact placeholders', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     expect(root.querySelector('#calc-btn')?.textContent).toBe('Calculate');
     expect(root.querySelector('#check-equation-btn')?.textContent).toBe('Check');

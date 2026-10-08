@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — graph path format / P2 connects', () => {
   it('path result uses Path: a → b arrow format after start+end', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const nodes = [
       ...root.querySelectorAll('#pathfinding-graph .graph-node'),
@@ -40,7 +35,7 @@ describe('Overnight demos46 — graph path format / P2 connects', () => {
   });
 
   it('Player 2 claim can surface Connects edges when board bridges', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     (
       root.querySelector('.player-btn[data-player="2"]') as HTMLButtonElement

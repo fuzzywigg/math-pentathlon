@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — graph media template column', () => {
   it('locks @media 600px template-selector flex-direction column', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const css = root.querySelector('style')?.textContent ?? '';
     expect(css).toContain('@media (max-width: 600px)');

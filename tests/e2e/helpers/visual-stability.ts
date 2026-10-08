@@ -4,6 +4,11 @@
  * Does not change production game rules or scoring.
  */
 import { expect, type Page } from '@playwright/test';
+import { browserInstallSeededRandom } from '../../helpers/rng';
+import {
+  dismissOwl,
+  waitForGameReady as sharedWaitForGameReady,
+} from './page';
 
 /** Fixed seed for Mulberry32 — same algorithm as src/core/ai-worker/seeded-rng.ts */
 export const VISUAL_RNG_SEED = 0xc0ffee;
@@ -42,16 +47,9 @@ export const VISUAL_PROGRESS = {
  * Re-runs on every document load so each game starts from the same seed.
  */
 export async function installVisualStability(page: Page): Promise<void> {
+  await page.addInitScript(browserInstallSeededRandom, VISUAL_RNG_SEED);
   await page.addInitScript(
-    ({ seed, storageKey, progress }) => {
-      let t = seed >>> 0;
-      Math.random = () => {
-        t += 0x6d2b79f5;
-        let r = Math.imul(t ^ (t >>> 15), 1 | t);
-        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-      };
-
+    ({ storageKey, progress }) => {
       try {
         localStorage.setItem(storageKey, JSON.stringify(progress));
       } catch {
@@ -59,7 +57,6 @@ export async function installVisualStability(page: Page): Promise<void> {
       }
     },
     {
-      seed: VISUAL_RNG_SEED,
       storageKey: STORAGE_KEY,
       progress: VISUAL_PROGRESS,
     }
@@ -94,22 +91,15 @@ export async function waitForFonts(page: Page): Promise<void> {
 
 /** Hide owl stack if it still mounts despite settings. */
 export async function neutralizeOwl(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.visibility = 'hidden';
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
+  await dismissOwl(page, {
+    minimize: false,
+    pointerEventsNone: true,
+    hide: true,
   });
 }
 
 export async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
+  await sharedWaitForGameReady(page);
 }
 
 /** Reach a settled human-vs-human opening position (modal closed). */

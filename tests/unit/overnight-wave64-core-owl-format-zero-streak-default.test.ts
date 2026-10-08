@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format zero streak default', () => {
     storage.resetAll();
   });
 
-
   it('missing currentStreak formats streak-record as 0 days', () => {
     for (const m of owlMessages.getMessagesByCategory('streak:update')) {
       if (m.id !== 'streak-record-1') storage.markMessageSeen(m.id);

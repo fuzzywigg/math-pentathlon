@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format milestone-games-10', () => {
     storage.resetAll();
   });
 
-
   it('selects milestone-games-10 when others are seen', () => {
     for (const m of owlMessages.getMessagesByCategory('milestone:reached')) {
       if (m.id !== 'milestone-games-10') storage.markMessageSeen(m.id);

@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format streak-new-1', () => {
     storage.resetAll();
   });
 
-
   it('selects streak-new-1 at exact day-2 and formats currentStreak', () => {
     for (const m of owlMessages.getMessagesByCategory('streak:update')) {
       if (m.id !== 'streak-new-1') storage.markMessageSeen(m.id);

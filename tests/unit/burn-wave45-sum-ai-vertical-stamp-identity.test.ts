@@ -14,7 +14,6 @@ import {
 import { executeAITurn } from '../../src/games/sum-dominoes/ai';
 import { getValidPlacements } from '../../src/games/sum-dominoes/rules';
 
-
 afterEach(() => vi.restoreAllMocks());
 
 function emptyBoard(): (PlacedDomino | null)[][] {

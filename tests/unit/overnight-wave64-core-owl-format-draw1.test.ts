@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format draw-1', () => {
     storage.resetAll();
   });
 
-
   it('selects draw-1 via unconditional fallback when win/loss miss', () => {
     for (const m of owlMessages.getMessagesByCategory('game:end')) {
       if (m.id !== 'draw-1') storage.markMessageSeen(m.id);

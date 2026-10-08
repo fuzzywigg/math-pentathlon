@@ -9,12 +9,7 @@ vi.mock('../../src/core/router', () => ({
 }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -31,7 +26,7 @@ afterEach(() => {
 
 describe('Overnight demos — expression solver edges', () => {
   it('empty calc clears result; bad expr surfaces error chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#calc-input') as HTMLInputElement;
     const btn = root.querySelector('#calc-btn') as HTMLButtonElement;
@@ -51,7 +46,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('Enter key triggers calculate like the button', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#calc-input') as HTMLInputElement;
     input.value = '10 / 2 - 3';
@@ -64,7 +59,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('all example buttons fill input and paint calc-result', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const examples = root.querySelectorAll('.example-btn');
     expect(examples.length).toBeGreaterThanOrEqual(4);
@@ -79,7 +74,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('equation checker true / false / empty / error paths', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const input = root.querySelector('#equation-input') as HTMLInputElement;
     const btn = root.querySelector(
@@ -109,7 +104,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('solver finds exact solutions for 1,2,3,6 → 24', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     (root.querySelector('#num1') as HTMLInputElement).value = '1';
     (root.querySelector('#num2') as HTMLInputElement).value = '2';
@@ -127,7 +122,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('solver reports no solutions for impossible set', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     (root.querySelector('#num1') as HTMLInputElement).value = '1';
     (root.querySelector('#num2') as HTMLInputElement).value = '1';
@@ -141,7 +136,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('challenge card select reveals active builder', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const active = root.querySelector('#active-challenge') as HTMLElement;
     expect(active.style.display).toBe('none');
@@ -163,7 +158,7 @@ describe('Overnight demos — expression solver edges', () => {
   });
 
   it('card builder area mounts interactive slots', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const area = root.querySelector('#card-builder-area') as HTMLElement;
     expect(area).toBeTruthy();

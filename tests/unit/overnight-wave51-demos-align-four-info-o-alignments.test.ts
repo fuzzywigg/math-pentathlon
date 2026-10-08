@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function clickCol(root: HTMLElement, col: number): void {
   (
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Wave 51 demos — align four-info O alignments', () => {
   it('after X/O exchange, four-info reports O has N alignments (2+)', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Build a length-2 O pair on bottom of adjacent cols without winning

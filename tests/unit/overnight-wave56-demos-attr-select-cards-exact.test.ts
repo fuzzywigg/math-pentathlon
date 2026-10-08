@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function setCardWrappers(root: HTMLElement): HTMLElement[] {
   return [...root.querySelectorAll('#set-grid .set-card')].map(
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Wave 56 demos — attr select card(s) exact', () => {
   it('ladders Select 2 / Select 1 more card(s) before third pick', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const cards = setCardWrappers(root);
     expect(cards.length).toBeGreaterThanOrEqual(3);

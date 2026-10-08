@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAttributeDemo } from '../../src/demos/attribute-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — attr set-btn labels', () => {
   it('exposes Basic (Shape/Color/Size) and Math Properties labels', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAttributeDemo(root);
     const labels = [...root.querySelectorAll('.set-btn')].map(
       (b) => b.textContent?.trim() ?? ''

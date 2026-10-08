@@ -3,6 +3,10 @@
  * Chromium only (matches deep playtest harness).
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAi,
+} from './helpers/page';
 
 test.describe('Queens & Guards playability', () => {
   test.describe.configure({ mode: 'serial' });
@@ -12,34 +16,6 @@ test.describe('Queens & Guards playability', () => {
     'Deep playtest targets Chromium'
   );
 
-  async function waitReady(page: Page) {
-    await expect(page.getByTestId('game-loading')).toBeHidden({
-      timeout: 15_000,
-    });
-    await expect(page.locator('#new-game-btn')).toBeVisible({ timeout: 15_000 });
-  }
-
-  async function dismissOwl(page: Page) {
-    await page.evaluate(() => {
-      const el = document.getElementById('ollie-owl');
-      if (el) (el as HTMLElement).style.pointerEvents = 'none';
-    });
-  }
-
-  async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-    await waitReady(page);
-    await dismissOwl(page);
-    await page.locator('#new-game-btn').click();
-    await expect(page.locator('#new-game-modal')).toBeVisible();
-    await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-    await page.locator(`.difficulty-btn.${difficulty}`).click();
-    await page.locator('#start-game-btn').click();
-    await expect(page.locator('#new-game-modal')).toHaveClass(/hidden/);
-    await dismissOwl(page);
-    await expect(page.locator('.qg-board-container svg.qg-board')).toBeVisible({
-      timeout: 10_000,
-    });
-  }
 
   test('tablet hex cells clear 44px CSS tap targets', async ({ browser }) => {
     const context = await browser.newContext({

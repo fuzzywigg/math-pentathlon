@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — frac section paras', () => {
   it('exposes exact fraction section support paragraphs', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const paras = [...root.querySelectorAll('.demo-section > p')].map(
       (el) => el.textContent ?? ''

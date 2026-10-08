@@ -13,20 +13,11 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
+import { createEmptyBoard, placePiece } from './helpers/kings-board';
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
-
-function createEmptyBoard(): Board {
-  return Array.from({ length: BOARD_SIZE }, () =>
-    Array.from({ length: BOARD_SIZE }, () => null)
-  );
-}
-
-function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
-}
 
 describe('Overnight kings — late-game close-in', () => {
   it('hard with depleted supplies still returns a legal king+placement', () => {

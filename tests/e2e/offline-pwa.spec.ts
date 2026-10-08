@@ -19,6 +19,10 @@ import { createServer } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installE2eStability } from './helpers/stability';
+import {
+  waitForGameReady,
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -88,34 +92,6 @@ async function waitForIdleWarm(page: Page): Promise<void> {
     null,
     { timeout: 30_000 }
   );
-}
-
-async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function dismissOwlIfNeeded(page: Page): Promise<void> {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
 }
 
 /** New Game → human vs AI → Easy (keeps Hex worker reply wall time low). */

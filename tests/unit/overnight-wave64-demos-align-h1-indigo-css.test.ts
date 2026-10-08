@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — align h1 indigo CSS', () => {
   it('locks alignment-demo h1 #1a237e + section #f5f5f5', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const css = root.querySelector('style')?.textContent ?? '';
     expect(css).toContain('color: #1a237e');

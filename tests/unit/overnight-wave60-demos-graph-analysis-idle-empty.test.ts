@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — graph analysis idle empty', () => {
   it('idle Board Status paints N empty matching Total N nodes', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const text = root.querySelector('#game-analysis')?.textContent ?? '';
     const emptyMatch = /(\d+)\s+empty/.exec(text);

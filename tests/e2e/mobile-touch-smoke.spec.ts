@@ -21,6 +21,12 @@ import { test, expect, type Page, type Locator } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
+import {
+  dismissOwlIfNeeded,
+  mountLocator,
+  startHuman,
+  waitForGameReady,
+} from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'mobile');
@@ -40,30 +46,6 @@ const CHROME_SELECTORS = [
   '.button-row button',
   '.back-button',
 ].join(', ');
-
-const MOUNT: Record<string, string> = {
-  'kings-quadraphages': '#board .board .cell, .cell-king',
-  hex: '.hex-board',
-  'star-track': '.star-track-board',
-  'hex-a-gone': '.hex-a-gone-board',
-  calla: '.calla-wrapper, .calla-pit',
-  'sum-dominoes': '.sd-board',
-  'par-55': '.par55-board',
-  ramrod: '.ramrod-board',
-  'kwatro-sinko': '.kwa-board',
-  fiar: '.fiar-board-container',
-  juggle: '.juggle-board',
-  'contig-60': '.contig-board',
-  'stars-bars': '.stars-board',
-  'fab-a-diffy': '.fab-bar-pool, .fab-answer-board',
-  'queens-guards': '.qg-board-container',
-  'prime-gold': '.pg-board, .prime-board',
-  'remainder-islands': '.remainder-board',
-  'pent-em-in': '.pent-board',
-  'frac-fact': '.frac-problem, .frac-choice-btn',
-  'fraction-pinball':
-    '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
-};
 
 type Issue = {
   kind:
@@ -88,47 +70,8 @@ type GameReport = {
   leftGame: boolean;
 };
 
-async function dismissOwlIfNeeded(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.tap({ force: true }).catch(async () => {
-        await human.click({ force: true });
-      });
-    }
-    await page.locator('#start-game-btn').tap({ force: true }).catch(async () => {
-      await page.locator('#start-game-btn').click({ force: true });
-    });
-    await expect(modal).toHaveClass(/hidden/);
-  }
-  await dismissOwlIfNeeded(page);
-}
-
 function titleStem(game: GameInfo): string {
   return game.name.replace(/[!?]+$/, '').split(' (')[0];
-}
-
-function mountLocator(page: Page, gameId: string): Locator {
-  const sel = MOUNT[gameId] ?? '#board, #game-container, main';
-  return page.locator(sel).first();
 }
 
 async function safeTap(locator: Locator): Promise<boolean> {

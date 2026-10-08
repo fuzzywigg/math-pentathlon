@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 56 demos — graph analysis Blue/Red', () => {
   it('mounts three analysis-cards with Blue/Red/Board Status headings', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const cards = root.querySelectorAll('#game-analysis .analysis-card');
     expect(cards.length).toBe(3);

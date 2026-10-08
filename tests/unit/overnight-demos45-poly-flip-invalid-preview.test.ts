@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — poly flip / invalid preview', () => {
   it('flip control toggles orientation chrome when canFlip', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -53,7 +48,7 @@ describe('Overnight demos45 — poly flip / invalid preview', () => {
   });
 
   it('corner hover paints red invalid preview; invalid click keeps empty count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (

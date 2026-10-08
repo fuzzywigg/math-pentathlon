@@ -10,12 +10,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function trayCards(root: HTMLElement): HTMLElement[] {
   return [
@@ -53,7 +48,7 @@ afterEach(() => {
 describe('Overnight demos46 — expr challenge Correct alert', () => {
   it('target hit without all numbers paints ✓ but validateSolution blocks alert', () => {
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
 
     (root.querySelector('#challenge-grid .challenge-card') as HTMLElement).click();
@@ -75,7 +70,7 @@ describe('Overnight demos46 — expr challenge Correct alert', () => {
 
   it('near-miss expression evaluates but does not alert', () => {
     const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     (root.querySelector('#challenge-grid .challenge-card') as HTMLElement).click();
 
@@ -93,7 +88,7 @@ describe('Overnight demos46 — expr challenge Correct alert', () => {
   });
 
   it('Clear All empties challenge builder slots after partial place', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     (root.querySelector('#challenge-grid .challenge-card') as HTMLElement).click();
 

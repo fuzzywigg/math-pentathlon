@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — graph claim / connects / reject', () => {
   it('same-node end click restarts selection instead of closing a path', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const nodes = [
       ...root.querySelectorAll('#pathfinding-graph .graph-node'),
@@ -47,7 +42,7 @@ describe('Overnight demos45 — graph claim / connects / reject', () => {
   });
 
   it('reclaim owned game node is a no-op; analysis stays stable', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const gameNodes = [
       ...root.querySelectorAll('#game-graph .graph-node'),
@@ -62,7 +57,7 @@ describe('Overnight demos45 — graph claim / connects / reject', () => {
   });
 
   it('claiming many P1 nodes may surface Connects edges chrome when bridged', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     const gameNodes = [
       ...root.querySelectorAll('#game-graph .graph-node'),

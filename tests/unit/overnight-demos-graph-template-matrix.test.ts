@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -26,7 +21,7 @@ const TEMPLATES = ['grid', 'circular', 'star', 'hex', 'track', 'complete'] as co
 
 describe('Overnight demos — graph template matrix', () => {
   it('each template updates selection, svg, and Nodes/Edges info', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
 
     for (const name of TEMPLATES) {
@@ -46,7 +41,7 @@ describe('Overnight demos — graph template matrix', () => {
   });
 
   it('template-info Connected/Components fields update across switches', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     for (const name of ['star', 'complete'] as const) {
       (

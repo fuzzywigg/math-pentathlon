@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — fraction compare / equiv / interactive', () => {
   it('compare less / greater / equal text paths', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const a = root.querySelector('#compare-a') as HTMLInputElement;
     const b = root.querySelector('#compare-b') as HTMLInputElement;
@@ -47,7 +42,7 @@ describe('Overnight demos — fraction compare / equiv / interactive', () => {
   });
 
   it('equivalent finder lists simplified + equivalents; invalid rejects', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const input = root.querySelector('#equiv-fraction') as HTMLInputElement;
     const btn = root.querySelector('#find-equiv-btn') as HTMLButtonElement;
@@ -65,7 +60,7 @@ describe('Overnight demos — fraction compare / equiv / interactive', () => {
   });
 
   it('denominator select re-renders interactive bar; gallery has COMMON items', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const select = root.querySelector('#denominator-select') as HTMLSelectElement;
     expect(select).toBeTruthy();

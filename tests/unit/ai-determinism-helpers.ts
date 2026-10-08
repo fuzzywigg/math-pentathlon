@@ -2,7 +2,9 @@
  * Shared helpers for AI seed determinism + difficulty quality audit
  * (docs/ai-determinism-2026-10-07.md).
  */
-import { createSeededRng } from '../../src/core/ai-worker/seeded-rng';
+import { withSeededRandom } from '../helpers/rng';
+
+export { withSeededRandom };
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -24,21 +26,6 @@ export function moveKey(move: unknown): string {
     }
     return v;
   });
-}
-
-/**
- * Run `fn` with Math.random replaced by mulberry32(seed).
- * Restores the original Math.random afterward.
- */
-export function withSeededRandom<T>(seed: number, fn: () => T): T {
-  const rng = createSeededRng(seed);
-  const original = Math.random;
-  Math.random = rng;
-  try {
-    return fn();
-  } finally {
-    Math.random = original;
-  }
 }
 
 /**

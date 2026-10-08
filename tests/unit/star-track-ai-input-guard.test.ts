@@ -3,7 +3,7 @@
  * Human must not see selectable draw/chain chrome while Red thinks,
  * and taps during the think pause must not change state.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { readAppCss } from './_app-css';
 import { createInitialState } from '../../src/games/star-track/types';
 import { drawChains } from '../../src/games/star-track/rules';
@@ -12,19 +12,13 @@ import {
   renderBoard,
   renderStatus,
 } from '../../src/games/star-track/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Star Track AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true });
   afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
     vi.restoreAllMocks();
   });
-
   it('fillChainArea with allowInput false disables draw and announces lock', () => {
     const host = document.createElement('div');
     const onDraw = vi.fn();

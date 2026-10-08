@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — graph path-status exact', () => {
   it('mount and clear restore Click a node to set start point', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     expect(root.querySelector('#path-status')?.textContent).toBe(
       'Click a node to set start point'

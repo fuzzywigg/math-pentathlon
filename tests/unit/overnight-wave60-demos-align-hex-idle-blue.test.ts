@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 60 demos — align hex idle Blue', () => {
   it('hex status mounts Current player Blue with .player-b span', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const status = root.querySelector('#hex-status');
     expect(status?.textContent).toBe('Current player: Blue');

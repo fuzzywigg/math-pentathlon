@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — poly CCW / fullboard / norotate', () => {
   it('CCW rotate control keeps preview chrome on a flippable/rotatable shape', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -44,7 +39,7 @@ describe('Overnight demos46 — poly CCW / fullboard / norotate', () => {
   });
 
   it('monomino corner hover paints green valid preview fill', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -68,7 +63,7 @@ describe('Overnight demos46 — poly CCW / fullboard / norotate', () => {
   });
 
   it('filling board with monominoes yields Cannot be placed', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -94,7 +89,7 @@ describe('Overnight demos46 — poly CCW / fullboard / norotate', () => {
   });
 
   it('Single monomino reports Can Rotate: No and Can Flip: No', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (
       root.querySelector('.set-btn[data-set="simple"]') as HTMLButtonElement

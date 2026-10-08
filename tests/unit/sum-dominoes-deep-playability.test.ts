@@ -23,6 +23,7 @@ import {
 } from '../../src/games/sum-dominoes/rules';
 import { CONFIG, getDiceSum } from '../../src/games/sum-dominoes/types';
 import { injectSDStyles } from '../../src/games/sum-dominoes/board-ui';
+import { mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.useRealTimers();
@@ -30,15 +31,6 @@ afterEach(() => {
   document.body.innerHTML = '';
   document.getElementById('sd-styles')?.remove();
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
 
 /** Drive a full human+AI game with a greedy human until gameOver or budget. */
 function playScriptedVsAI(
@@ -110,7 +102,7 @@ describe('Sum Dominoes deep — AI multi-game finish', () => {
 describe('Sum Dominoes deep — controller AI seat guard', () => {
   it('clears stacked timers so Blue still must roll after Red', () => {
     vi.useFakeTimers();
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = initGame(container, true, 'hard');
     ctrl.state = {
       ...ctrl.state,
@@ -138,7 +130,7 @@ describe('Sum Dominoes deep — controller AI seat guard', () => {
   });
 
   it('shows turn hint while human is placing or must pass', () => {
-    const container = mount();
+    const container = mountAppShell();
     const ctrl = newGameVsAI(container, 'easy');
     ctrl.state = {
       ...ctrl.state,

@@ -3,19 +3,9 @@
  * for the playtest "Place the … piece" dead-end.
  */
 import { test, expect, type Page } from '@playwright/test';
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
+import {
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 test.describe("Pent'Em In place UX (tablet)", () => {
   test('crowded place step shows green anchors and choose-another escape', async ({

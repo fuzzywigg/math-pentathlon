@@ -2,25 +2,9 @@
  * Par 55 playability — Chromium tablet + desktop × Easy/Med/Hard + New Game race.
  */
 import { test, expect, devices } from '@playwright/test';
+import { dismissOwl } from './helpers/page';
 
 const DIFFS = ['easy', 'medium', 'hard'] as const;
-
-async function dismissOwl(page: import('@playwright/test').Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true }).catch(() => {});
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
 
 async function startVsAi(
   page: import('@playwright/test').Page,

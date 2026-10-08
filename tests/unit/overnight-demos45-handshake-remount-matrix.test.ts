@@ -13,12 +13,7 @@ import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -46,7 +41,7 @@ const DEMOS: Array<{
 
 describe('Overnight demos45 — handshake remount matrix', () => {
   it('each demo mounts probe then survives wipe + cross-swap', () => {
-    const root = mount();
+    const root = mountRoot();
     for (let i = 0; i < DEMOS.length; i++) {
       const a = DEMOS[i];
       const b = DEMOS[(i + 1) % DEMOS.length];

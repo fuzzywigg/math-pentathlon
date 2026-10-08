@@ -13,12 +13,7 @@ import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Overnight demos — remount handshake matrix', () => {
   it('each demo remounts idempotently with a single root chrome node', () => {
-    const root = mount();
+    const root = mountRoot();
     const renders: Array<(el: HTMLElement) => void> = [
       renderAlignmentDemo,
       renderAttributeDemo,
@@ -50,7 +45,7 @@ describe('Overnight demos — remount handshake matrix', () => {
   });
 
   it('switching demos in sequence leaves last demo title mounted', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     renderGraphDemo(root);
     renderFractionDemo(root);

@@ -1,7 +1,7 @@
 /**
  * Human block/base input must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
@@ -9,20 +9,10 @@ import {
   selectBlock,
 } from '../../src/games/par-55/rules';
 import { renderBoard, renderHand } from '../../src/games/par-55/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Par 55 AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('par55-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('par55-styles')?.remove();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['par55-styles'] });
   it('renderBoard with allowInput false does not mark valid bases', () => {
     let state = createInitialState();
     const blockId = state.hands.player1[0]!.id;

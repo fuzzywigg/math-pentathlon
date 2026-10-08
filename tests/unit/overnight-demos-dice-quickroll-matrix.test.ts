@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ const QUICK_ROLLS = [
 
 describe('Overnight demos — dice quick-roll matrix', () => {
   it('each quick-roll button replaces placeholder with rendered result', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const result = root.querySelector('#quick-roll-result') as HTMLElement;
 
@@ -46,7 +41,7 @@ describe('Overnight demos — dice quick-roll matrix', () => {
   });
 
   it('repeated rolls on same button keep a non-empty result area', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const btn = root.querySelector(
       '.quick-roll-btn[data-dice="d6"][data-count="2"]'

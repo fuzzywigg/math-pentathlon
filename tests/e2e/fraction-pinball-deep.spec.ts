@@ -3,33 +3,13 @@
  * Desktop + tablet Chromium: full vs-AI games, touch targets, AI seat lock.
  */
 import { test, expect, type Page } from '@playwright/test';
+import {
+  dismissOwl,
+  startVsAiAt,
+} from './helpers/page';
 
 // Deep playtest regression targets Chromium (desktop + tablet viewports).
 test.skip(({ browserName }) => browserName !== 'chromium');
-
-async function dismissOwl(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
-
-async function startVsAi(page: Page, difficulty: 'easy' | 'medium' | 'hard') {
-  await page.goto('/#/game/fraction-pinball');
-  await expect(page.getByTestId('game-loading')).toBeHidden({ timeout: 15_000 });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-  await dismissOwl(page);
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  await page.locator(`.difficulty-btn.${difficulty}`).click();
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwl(page);
-}
 
 async function playToEnd(page: Page, maxMs = 90_000) {
   const errors: string[] = [];
@@ -92,7 +72,7 @@ for (const profile of profiles) {
         page,
       }) => {
         test.setTimeout(120_000);
-        await startVsAi(page, difficulty);
+        await startVsAiAt(page, 'fraction-pinball', difficulty);
         await expect(page.locator('.pinball-status')).toContainText(/Your turn/i);
         await expect(
           page.locator('.pinball-player-score.player1 .pinball-player-name')

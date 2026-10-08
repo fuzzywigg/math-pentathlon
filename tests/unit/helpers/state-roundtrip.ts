@@ -8,7 +8,10 @@
  * - `structuredRoundTrip`: structuredClone (worker / in-memory snapshot)
  */
 
-import { createSeededRng } from '../../../src/core/ai-worker/seeded-rng';
+import {
+  createSeededRng,
+  withSeededMathRandom,
+} from '../../helpers/rng';
 
 const MAP_TAG = '__mp_map__';
 const SET_TAG = '__mp_set__';
@@ -17,6 +20,7 @@ export function createRng(seed: number): () => number {
   return createSeededRng(seed);
 }
 
+/** Lenient: empty length returns 0 (roundtrip fuzz never throws here). */
 export function pickIndex(rng: () => number, length: number): number {
   if (length <= 0) return 0;
   return Math.floor(rng() * length);
@@ -27,16 +31,7 @@ export function pickOne<T>(rng: () => number, items: T[]): T {
 }
 
 /** Temporarily replace Math.random; always restore in finally. */
-export function withSeededMathRandom<T>(seed: number, fn: () => T): T {
-  const rng = createSeededRng(seed);
-  const previous = Math.random;
-  Math.random = rng;
-  try {
-    return fn();
-  } finally {
-    Math.random = previous;
-  }
-}
+export { withSeededMathRandom };
 
 function isTagged(
   value: unknown,

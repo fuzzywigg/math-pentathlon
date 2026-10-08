@@ -8,6 +8,10 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { GAMES } from '../../src/core/game-registry';
+import {
+  waitForGameReady,
+  dismissOwlIfNeeded,
+} from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
@@ -67,28 +71,6 @@ async function runAxeSeriousCritical(
   return (results.violations as AxeViolation[]).filter(
     (v) => v.impact === 'serious' || v.impact === 'critical'
   );
-}
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
 }
 
 test.describe('A11y sweep (axe serious/critical)', () => {

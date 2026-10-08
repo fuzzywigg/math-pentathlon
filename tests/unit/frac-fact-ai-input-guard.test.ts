@@ -1,26 +1,14 @@
 /**
  * Human answer taps must not succeed during the computer think pause.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { createInitialState } from '../../src/games/frac-fact/types';
 import { startGame, submitAnswer, nextProblem } from '../../src/games/frac-fact/rules';
 import { renderAnswerChoices } from '../../src/games/frac-fact/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Frac Fact AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('frac-fact-styles')?.remove();
-    document.getElementById('app')?.remove();
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('frac-fact-styles')?.remove();
-    document.getElementById('app')?.remove();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['frac-fact-styles', 'app'] });
   it('renderAnswerChoices with allowInput false disables choice buttons', () => {
     const state = startGame(createInitialState('easy'));
     expect(state.phase).toBe('playing');

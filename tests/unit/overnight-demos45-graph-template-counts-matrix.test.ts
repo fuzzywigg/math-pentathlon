@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function parseCounts(info: string): { nodes: number; edges: number } {
 
 describe('Overnight demos45 — graph template exact counts', () => {
   it('star / hex / track / complete report exact Nodes and Edges', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
 
     const expected: Record<string, { nodes: number; edges: number }> = {
