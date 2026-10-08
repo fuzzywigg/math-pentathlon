@@ -67,8 +67,9 @@ export function createInitialState(): SumDominoesState {
       position: { row: CONFIG.CENTER_ROW, col: CONFIG.CENTER_COL },
       orientation: 'horizontal',
     };
-    board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL] = placedSeed;
-    board[CONFIG.CENTER_ROW][CONFIG.CENTER_COL + 1] = placedSeed;
+    // ratchet: createEmptyBoard() always allocates BOARD_SIZE rows/cols.
+    board[CONFIG.CENTER_ROW]![CONFIG.CENTER_COL] = placedSeed;
+    board[CONFIG.CENTER_ROW]![CONFIG.CENTER_COL + 1] = placedSeed;
   }
 
   return {
@@ -126,7 +127,8 @@ export function canPlayDomino(
   // Check all possible positions
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
-      if (state.board[row][col]) continue; // Cell occupied
+      // ratchet: board is always BOARD_SIZE × BOARD_SIZE dense.
+      if (state.board[row]![col]) continue; // Cell occupied
 
       // Check both orientations
       for (const orientation of ['horizontal', 'vertical'] as const) {
@@ -171,9 +173,10 @@ export function isValidPlacement(
   if (orientation === 'vertical' && row + 1 >= CONFIG.BOARD_SIZE) return false;
 
   // Check cells are empty
-  if (state.board[row][col]) return false;
-  if (orientation === 'horizontal' && state.board[row][col + 1]) return false;
-  if (orientation === 'vertical' && state.board[row + 1][col]) return false;
+  // ratchet: board is always BOARD_SIZE × BOARD_SIZE dense (bounds checked above).
+  if (state.board[row]![col]) return false;
+  if (orientation === 'horizontal' && state.board[row]![col + 1]) return false;
+  if (orientation === 'vertical' && state.board[row + 1]![col]) return false;
 
   // Find adjacent faces and check if any match the target sum
   const adjacentMatches = getAdjacentMatches(
@@ -223,7 +226,10 @@ function getAdjacentMatches(
   ];
 
   for (const cell of cells) {
-    for (const [dr, dc] of directions) {
+    for (const dir of directions) {
+      // ratchet: directions is a literal of 2-tuples.
+      const dr = dir[0]!;
+      const dc = dir[1]!;
       const nr = cell.r + dr;
       const nc = cell.c + dc;
 
@@ -240,7 +246,8 @@ function getAdjacentMatches(
       // Skip if this is another cell of the same domino being placed
       if (cells.some((c) => c.r === nr && c.c === nc)) continue;
 
-      const adjacentPlaced = state.board[nr][nc];
+      // ratchet: nr/nc bounds-checked above.
+      const adjacentPlaced = state.board[nr]![nc];
       if (adjacentPlaced) {
         // Get the face value that's adjacent to our cell
         const adjacentFace = getFaceAtPosition(adjacentPlaced, {
@@ -387,26 +394,27 @@ export function placeDomino(
     position,
     orientation,
   };
-  newBoard[position.row][position.col] = placedDomino;
+  // ratchet: isValidPlacement already proved cells exist and are empty.
+  newBoard[position.row]![position.col] = placedDomino;
 
   // For double-cell placement, mark second cell too (reference same object)
   if (orientation === 'horizontal') {
-    newBoard[position.row][position.col + 1] = placedDomino;
+    newBoard[position.row]![position.col + 1] = placedDomino;
   } else {
-    newBoard[position.row + 1][position.col] = placedDomino;
+    newBoard[position.row + 1]![position.col] = placedDomino;
   }
 
   // Remove domino from hand
   const newHand = hand.filter((d) => d.id !== domino.id);
 
-  // Record move
+  // Record move (match exists when isValidPlacement passed)
   const move: SDMove = {
     player: state.currentPlayer,
     domino,
     position,
     orientation,
-    matchedFace: match.myFace,
-    adjacentFace: match.adjacentFace,
+    matchedFace: match!.myFace,
+    adjacentFace: match!.adjacentFace,
     diceSum: sum,
     moveNumber: state.moveHistory.length + 1,
   };

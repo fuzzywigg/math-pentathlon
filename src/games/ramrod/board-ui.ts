@@ -137,17 +137,21 @@ function renderSumBox(
       slotEl.appendChild(hint);
     }
 
+    const piece = rod ? `${rod.length}cm rod` : undefined;
+    const owner = rod?.owner
+      ? getPlayerName(rod.owner)
+      : box.completedBy
+        ? getPlayerName(box.completedBy)
+        : undefined;
     makeGridCell(
       slotEl,
       buildCellAriaLabel({
         coord: `Sum ${box.targetSum} slot ${slot + 1}`,
         empty: !rod,
-        piece: rod ? `${rod.length}cm rod` : undefined,
-        owner: rod?.owner
-          ? getPlayerName(rod.owner)
-          : box.completedBy
-            ? getPlayerName(box.completedBy)
-            : undefined,
+        // ratchet: exactOptionalPropertyTypes — omit undefined optionals
+        // (buildCellAriaLabel treats omitted/undefined the same via filter(Boolean)).
+        ...(piece !== undefined ? { piece } : {}),
+        ...(owner !== undefined ? { owner } : {}),
         validPlacement: isValid,
       })
     );
@@ -321,7 +325,8 @@ export function renderRodLegend(): HTMLElement {
 
     const color = document.createElement('div');
     color.className = 'ramrod-legend-color';
-    color.style.backgroundColor = ROD_COLORS[len];
+    // ratchet: loop is len 1–10; ROD_COLORS defines every key.
+    color.style.backgroundColor = ROD_COLORS[len]!;
     color.style.width = `${len * 8}px`;
     if (len === 1 || len === 5) {
       color.style.border = '1px solid #999';

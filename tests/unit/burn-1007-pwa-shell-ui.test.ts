@@ -444,8 +444,9 @@ describe('burn-1007 reduced-motion bind + duration', () => {
 });
 
 describe('burn-1007 game-prefetch saveData + idle reset', () => {
+  // Clear module-level prefetch marks left by other unit-shared files in the
+  // same Vitest worker (otherwise hex may already be in `started`).
   beforeEach(() => {
-    // unit-shared pool can leave warm marks from earlier files.
     resetGamePrefetchForTests();
   });
 

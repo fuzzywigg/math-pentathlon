@@ -79,7 +79,8 @@ function generateWrongDecimals(correct: number, count: number): string[] {
 
   let attempts = 0;
   while (wrongs.length < count && attempts < 30) {
-    const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    // ratchet: strategies is a non-empty literal array.
+    const strategy = strategies[Math.floor(Math.random() * strategies.length)]!;
     const value = strategy();
 
     if (value > 0 && value < 10) {
@@ -146,7 +147,8 @@ function generateWrongFractions(correct: Fraction, count: number): string[] {
 
   let attempts = 0;
   while (wrongs.length < count && attempts < 30) {
-    const strategy = strategies[Math.floor(Math.random() * strategies.length)];
+    // ratchet: strategies is a non-empty literal array.
+    const strategy = strategies[Math.floor(Math.random() * strategies.length)]!;
     const fraction = strategy();
 
     if (fraction.numerator > 0 && fraction.denominator > 0) {
@@ -182,7 +184,11 @@ function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    // ratchet: dense copy — indexed elements exist for i,j in range.
+    const a = result[i]!;
+    const b = result[j]!;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }
@@ -194,7 +200,8 @@ export function generateChallenge(
   challengeNumber: number
 ): ConversionChallenge {
   const fractions = getConvertibleFractions();
-  const fraction = fractions[Math.floor(Math.random() * fractions.length)];
+  // ratchet: convertible-fraction table is never empty.
+  const fraction = fractions[Math.floor(Math.random() * fractions.length)]!;
   const decimal = toDecimal(fraction);
 
   // Alternate between types
@@ -257,14 +264,16 @@ export function hitRandomTarget(targets: PinballTarget[]): {
   let targetIndex = 0;
 
   for (let i = 0; i < weights.length; i++) {
-    random -= weights[i];
+    // ratchet: weights is TARGET_POINTS.map — same length, dense.
+    random -= weights[i]!;
     if (random <= 0) {
       targetIndex = i;
       break;
     }
   }
 
-  const target = targets[targetIndex];
+  // ratchet: call sites pass TARGET_POINTS-sized targets.
+  const target = targets[targetIndex]!;
   return { target, points: target.value };
 }
 

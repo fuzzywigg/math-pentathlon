@@ -110,7 +110,8 @@ export function createRod(id: string, length: number): Rod {
   return {
     id,
     length,
-    color: ROD_COLORS[length],
+    // ratchet: createRodSet only constructs lengths 1–10 (ROD_COLORS keys).
+    color: ROD_COLORS[length]!,
     owner: null,
     position: null,
   };
@@ -138,7 +139,8 @@ export function createRodSet(): Rod[] {
   };
 
   for (let length = 1; length <= 10; length++) {
-    for (let i = 0; i < counts[length]; i++) {
+    // ratchet: counts defines every length 1–10.
+    for (let i = 0; i < counts[length]!; i++) {
       rods.push(createRod(`r${id++}`, length));
     }
   }
@@ -153,7 +155,11 @@ export function shuffleArray<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    // ratchet: dense copy — indexed elements exist for i,j in range.
+    const a = result[i]!;
+    const b = result[j]!;
+    result[i] = b;
+    result[j] = a;
   }
   return result;
 }

@@ -259,8 +259,10 @@ export function renderBoard(
       buildCellAriaLabel({
         coord: `ring ${cell.ring} pos ${cell.position}`,
         empty: !cell.piece,
-        owner,
-        piece: pieceName,
+        // ratchet: exactOptionalPropertyTypes — omit undefined optionals
+        // (buildCellAriaLabel treats omitted/undefined the same via filter(Boolean)).
+        ...(owner !== undefined ? { owner } : {}),
+        ...(pieceName !== undefined ? { piece: pieceName } : {}),
         // Keep opening labels stable for handshake pins; AI-seat honesty uses
         // aria-disabled + "not available" extras instead of selectable.
         validMove: validMoves.has(key),

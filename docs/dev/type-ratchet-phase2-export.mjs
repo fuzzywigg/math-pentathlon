@@ -34,6 +34,14 @@ const IN_SCOPE = new RegExp(
     '^src/games/fab-a-diffy/(types|board-ui|rules)\\.ts$',
     '^src/games/fiar/(types|board-ui|rules)\\.ts$',
     '^src/games/par-55/(types|board-ui|rules)\\.ts$',
+    // Phase 2 Batch 2 — rules-heavy / low-AI non-AI modules
+    // Compliant recut: type-only assertions; no #537 runtime nullish rewrites.
+    '^src/games/frac-fact/rules\\.ts$',
+    '^src/games/fraction-pinball/rules\\.ts$',
+    '^src/games/queens-guards/(types|board-ui|rules)\\.ts$',
+    '^src/games/ramrod/(types|board-ui|rules)\\.ts$',
+    '^src/games/sum-dominoes/(types|board-ui|rules|game-controller)\\.ts$',
+    '^src/games/calla/(board-ui|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',

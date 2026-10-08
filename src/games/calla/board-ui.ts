@@ -109,7 +109,8 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p2Y,
-      state.player2Pits[displayIndex],
+      // ratchet: displayIndex is in 0..PITS_PER_SIDE-1.
+      state.player2Pits[displayIndex]!,
       'player2',
       displayIndex,
       isValid,
@@ -131,7 +132,8 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p1Y,
-      state.player1Pits[i],
+      // ratchet: loop i is in 0..PITS_PER_SIDE-1.
+      state.player1Pits[i]!,
       'player1',
       i,
       isValid,
