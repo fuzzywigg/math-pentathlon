@@ -29,6 +29,7 @@ import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import { scrollBehaviorForMotion } from '../../ui/reduced-motion';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -208,6 +209,21 @@ function updateUI(controller: FabGameController): void {
     gameArea.appendChild(controls);
   }
   container.appendChild(gameArea);
+
+  // Narrow layouts: bring matchable answers on-screen (reduced-motion aware).
+  if (state.phase === 'confirmingMove') {
+    requestAnimationFrame(() => {
+      const match = container.querySelector(
+        '.fab-answer-matchable'
+      ) as HTMLElement | null;
+      if (match && typeof match.scrollIntoView === 'function') {
+        match.scrollIntoView({
+          block: 'center',
+          behavior: scrollBehaviorForMotion(),
+        });
+      }
+    });
+  }
 
   // AI turn
   if (

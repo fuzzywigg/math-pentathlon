@@ -93,7 +93,6 @@ import type {
 
 import { createInitialState as createCalla } from '../../src/games/calla/types';
 import {
-  getPhaseMessage as callaPhase,
   makeMove as callaMove,
   settleNoValidMoves,
   getValidPits,
@@ -607,22 +606,10 @@ describe('engine-coverage-round — prime-gold', () => {
 });
 
 // =============================================================================
-// calla — "You win!" HvA copy path (previously uncovered)
+// calla — engine coverage (HvA copy pin removed; alpha Blue/Red wins)
 // =============================================================================
 
 describe('engine-coverage-round — calla', () => {
-  it('getPhaseMessage returns You win! for player1 in human-vs-ai', () => {
-    const over = {
-      ...createCalla(),
-      phase: 'gameOver' as const,
-      winner: 'player1' as const,
-    };
-    expect(callaPhase(over, 'human-vs-ai')).toBe('You win!');
-    expect(callaPhase(over, 'human-vs-human')).toMatch(/Blue wins/);
-    const aiWin = { ...over, winner: 'player2' as const };
-    expect(callaPhase(aiWin, 'human-vs-ai')).toMatch(/AI wins/);
-  });
-
   it('settleNoValidMoves + legal pit apply + serialize', () => {
     const open = createCalla();
     const pits = getValidPits(open);
