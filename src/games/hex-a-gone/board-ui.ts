@@ -213,6 +213,7 @@ export function buildSelectionArea(
     shapes.forEach((shape) => {
       const blockBtn = document.createElement('button');
       blockBtn.className = 'hex-a-gone-block-btn';
+      blockBtn.type = 'button';
       blockBtn.setAttribute('data-shape', shape);
 
       const isSelected = state.turnSelection.blocks.includes(shape);
@@ -220,6 +221,11 @@ export function buildSelectionArea(
       const isAvailable = state.bank[shape] > 0;
       const canSelect =
         state.phase === 'selectBlocks' && !state.turnSelection.committed;
+      const canPlaceSwitch =
+        state.phase === 'placeBlocks' && isSelected && !!onBlockSelect;
+      const selectable =
+        interactive &&
+        ((canSelect && isAvailable && !!onBlockSelect) || canPlaceSwitch);
 
       if (isSelected) blockBtn.classList.add('selected');
       if (isCurrentPlacement) blockBtn.classList.add('placing');
@@ -238,10 +244,12 @@ export function buildSelectionArea(
         icon.style.backgroundColor = BLOCK_COLORS[shape];
       }
 
-      if (canSelect && isAvailable && onBlockSelect) {
+      if (selectable && onBlockSelect) {
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
-      } else if (state.phase === 'placeBlocks' && isSelected && onBlockSelect) {
-        blockBtn.addEventListener('click', () => onBlockSelect(shape));
+      } else {
+        // AI-seat / empty bank: disabled for SR honesty (no new player copy).
+        blockBtn.disabled = true;
+        blockBtn.setAttribute('aria-disabled', 'true');
       }
 
       bankBlocks.appendChild(blockBtn);
@@ -271,12 +279,22 @@ export function buildSelectionArea(
         });
         selectionStatus.appendChild(selectedList);
 
-        if (onConfirm) {
+        if (onConfirm && interactive) {
           const confirmBtn = document.createElement('button');
           confirmBtn.className = 'hex-a-gone-confirm-btn';
+          confirmBtn.type = 'button';
           confirmBtn.textContent = `Confirm (${state.turnSelection.blocks.length} block${state.turnSelection.blocks.length > 1 ? 's' : ''})`;
           confirmBtn.addEventListener('click', onConfirm);
           selectionStatus.appendChild(confirmBtn);
+          // Tablet: bank+board can push Confirm past the fold — bring it into view.
+          queueMicrotask(() => {
+            if (typeof confirmBtn.scrollIntoView === 'function') {
+              confirmBtn.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          });
         }
       } else {
         selectionStatus.textContent =

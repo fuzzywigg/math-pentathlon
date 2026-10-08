@@ -64,6 +64,8 @@ function applyIslandSelectionVisual(
     group.classList.add('selected');
     hex.setAttribute('stroke', '#fff');
     hex.setAttribute('stroke-width', '5');
+    // Hide static touch hints while the stronger selected preview is shown.
+    group.querySelector('.island-r-hint')?.setAttribute('visibility', 'hidden');
 
     if (state.currentRoll && !group.querySelector('.island-r-preview')) {
       const preview = previewDivision(state, island.id);
@@ -95,6 +97,7 @@ function applyIslandSelectionVisual(
   hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
   hex.setAttribute('stroke-width', isValid ? '4' : '2');
   group.querySelector('.island-r-preview')?.remove();
+  group.querySelector('.island-r-hint')?.removeAttribute('visibility');
 }
 
 export function renderBoard(
@@ -220,6 +223,33 @@ export function renderBoard(
       chipCount.setAttribute('fill', '#333');
       chipCount.textContent = String(island.chips);
       group.appendChild(chipCount);
+    }
+
+    // Always show remainder hints on valid islands during selection so
+    // touch users (no hover) can compare points before committing a tap.
+    if (
+      state.phase === 'selectIsland' &&
+      isValid &&
+      state.currentRoll &&
+      !isSelected
+    ) {
+      const preview = previewDivision(state, island.id);
+      if (preview) {
+        const hint = document.createElementNS(
+          'http://www.w3.org/2000/svg',
+          'text'
+        );
+        hint.setAttribute('class', 'island-r-hint');
+        hint.setAttribute('x', String(x));
+        hint.setAttribute('y', String(y + HEX_SIZE * 0.6));
+        hint.setAttribute('text-anchor', 'middle');
+        hint.setAttribute('font-size', '13');
+        hint.setAttribute('font-weight', 'bold');
+        hint.setAttribute('fill', '#fff59d');
+        hint.setAttribute('pointer-events', 'none');
+        hint.textContent = `R=${preview.remainder}`;
+        group.appendChild(hint);
+      }
     }
 
     if (isSelected) {
@@ -473,6 +503,13 @@ export function injectRemainderIslandsStyles(): void {
     .remainder-board {
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 100%;
+      height: auto;
+      touch-action: manipulation;
+    }
+
+    .island-r-hint {
+      user-select: none;
     }
 
     .island.valid polygon:first-child {
@@ -579,10 +616,13 @@ export function injectRemainderIslandsStyles(): void {
 
     .remainder-preview {
       text-align: center;
-      padding: 12px;
+      padding: 12px 16px;
       background: #fff3e0;
       border-radius: 8px;
-      min-height: 60px;
+    }
+
+    .remainder-preview:empty {
+      display: none;
     }
 
     .division-equation {
@@ -694,6 +734,9 @@ export function injectRemainderIslandsStyles(): void {
       color: white;
       font-size: 18px;
       padding: 16px 32px;
+      min-height: 44px;
+      min-width: 44px;
+      touch-action: manipulation;
     }
 
     .remainder-btn-roll:hover {
@@ -711,6 +754,55 @@ export function injectRemainderIslandsStyles(): void {
       flex-direction: column;
       align-items: center;
       gap: 12px;
+    }
+
+    .remainder-instruction {
+      font-size: 15px;
+      font-weight: 500;
+      color: #444;
+      text-align: center;
+      max-width: 28rem;
+      line-height: 1.35;
+    }
+
+    /* Tablet / coarse pointer: WCAG 2.5.5 floor for primary controls */
+    @media (pointer: coarse) {
+      .remainder-btn,
+      .remainder-btn-roll {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 16px 28px;
+        font-size: 18px;
+      }
+
+      .remainder-game-container {
+        padding: 12px;
+        gap: 12px;
+      }
+
+      .remainder-scores {
+        gap: 12px;
+      }
+
+      .remainder-player-score {
+        padding: 12px 16px;
+        min-height: 44px;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .remainder-board {
+        width: 100%;
+      }
+
+      .remainder-score-value {
+        font-size: 26px;
+      }
+
+      .dice-icon,
+      .die {
+        font-size: 40px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
