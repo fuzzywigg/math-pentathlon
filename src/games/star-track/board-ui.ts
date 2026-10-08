@@ -4,36 +4,13 @@ import type { StarTrackGameState, Player, ChainLink } from './types';
 import { TRACK_LENGTH } from './types';
 import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
-import { formatModeSeatLabel } from '../../ui/seat-labels';
 import { markStatusLive } from '../../ui/board-a11y';
-
-import {
-  clearElement,
-  replaceWithSafeHtml,
-  safeHtml,
-} from '../../core/dom-security';
 
 export type DrawChainsCallback = () => void;
 export type SelectChainCallback = (index: 0 | 1) => void;
 
+/** Tip-held mode union for 3D board / seat labels (alpha restore keeps tip three/). */
 export type StarTrackGameMode = 'human-vs-human' | 'human-vs-ai';
-
-/** Mode-aware phase copy for the live status line (rules still use Blue/Red). */
-export function formatPhaseStatusMessage(
-  state: StarTrackGameState,
-  gameMode: StarTrackGameMode
-): string {
-  const raw = getPhaseMessage(state);
-  if (gameMode !== 'human-vs-ai') return raw;
-
-  return raw
-    .replace(/^Blue's turn/, 'Your turn')
-    .replace(/^Blue:/, 'You:')
-    .replace(/^Red's turn/, "Computer's turn")
-    .replace(/^Red:/, 'Computer:')
-    .replace(/^Blue wins!/, 'You win!')
-    .replace(/^Red wins!/, 'AI wins!');
-}
 
 // Render the star track board
 export function renderBoard(
@@ -43,7 +20,7 @@ export function renderBoard(
   onSelectChain?: SelectChainCallback,
   options: StarTrackChainRenderOptions = {}
 ): void {
-  clearElement(container);
+  container.innerHTML = '';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'star-track-wrapper';
@@ -214,7 +191,7 @@ export type ChainPreviewCallback = (index: 0 | 1 | null) => void;
 /** When false, suppress selectable chrome and click handlers (AI seat). */
 export interface StarTrackChainRenderOptions {
   allowInput?: boolean;
-  /** Affects winner-banner seat labels (You/AI vs Blue/Red). */
+  /** Tip-held: affects winner-banner seat labels when tip 3D mount passes it. */
   gameMode?: StarTrackGameMode;
 }
 
@@ -241,12 +218,7 @@ export function fillChainArea(
     drawBtn.textContent = '🔗 Draw Chains';
     if (interactive && onDrawChains) {
       drawBtn.setAttribute('aria-label', 'Draw chains');
-      // Reject multi-click detail>1 so a double-click cannot click-through
-      // onto Draw after a chain select rebuilt this control under the cursor.
-      drawBtn.addEventListener('click', (event) => {
-        if (event.detail > 1) return;
-        onDrawChains();
-      });
+      drawBtn.addEventListener('click', onDrawChains);
     } else {
       drawBtn.disabled = true;
       drawBtn.setAttribute('aria-disabled', 'true');
@@ -282,19 +254,14 @@ export function fillChainArea(
       chainBtn.type = 'button';
       chainBtn.className = 'star-track-chain-btn';
       chainBtn.setAttribute('data-chain-index', String(index));
-      chainBtn.appendChild(renderChainLink(chain));
+      chainBtn.innerHTML = renderChainLink(chain);
       if (interactive && onSelectChain) {
         const select = onSelectChain;
         chainBtn.setAttribute(
           'aria-label',
           `Chain of length ${chain.length}, selectable`
         );
-        // Reject multi-click detail>1 so a double-click on Draw cannot
-        // immediately select a chain that replaced the Draw button.
-        chainBtn.addEventListener('click', (event) => {
-          if (event.detail > 1) return;
-          select(index as 0 | 1);
-        });
+        chainBtn.addEventListener('click', () => select(index as 0 | 1));
         if (onPreviewChain) {
           const preview = (): void => onPreviewChain(index as 0 | 1);
           const clear = (): void => onPreviewChain(null);
@@ -318,21 +285,9 @@ export function fillChainArea(
   } else if (state.phase === 'gameOver') {
     const winnerMsg = document.createElement('div');
     winnerMsg.className = 'star-track-winner game-winner-banner';
-    const mode = options.gameMode ?? 'human-vs-human';
-    let winnerName: string;
-    if (!state.winner) {
-      winnerName = 'Nobody';
-      winnerMsg.textContent = `🤝 It's a draw — chains exhausted!`;
-    } else if (mode === 'human-vs-ai') {
-      winnerName = state.winner === 'player1' ? 'You' : 'AI';
-      winnerMsg.textContent =
-        winnerName === 'You'
-          ? `🎉 You reach the star! 🎉`
-          : `🎉 AI reaches the star! 🎉`;
-    } else {
-      winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
-      winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
-    }
+    const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
+    // Board banner uses generic Blue/Red; status panel uses mode-aware labels
+    winnerMsg.textContent = `🎉 ${winnerName} reaches the star! 🎉`;
     chainArea.appendChild(winnerMsg);
   }
 }
@@ -418,20 +373,20 @@ function getSpacePosition(
   };
 }
 
-// Render a chain link as DOM nodes
-function renderChainLink(chain: ChainLink): DocumentFragment {
+// Render a chain link as HTML
+function renderChainLink(chain: ChainLink): string {
   const links = '🔗'.repeat(chain.length);
-  return safeHtml`<span class="chain-links">${links}</span><span class="chain-length">${chain.length}</span>`;
+  return `<span class="chain-links">${links}</span><span class="chain-length">${chain.length}</span>`;
 }
 
 // Render status display
 export function renderStatus(
   state: StarTrackGameState,
   container: HTMLElement,
-  gameMode: StarTrackGameMode = 'human-vs-human',
+  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
   isAIThinking: boolean = false
 ): void {
-  clearElement(container);
+  container.innerHTML = '';
 
   const statusEl = document.createElement('div');
   statusEl.className = 'star-track-status';
@@ -443,18 +398,20 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName = formatModeSeatLabel(state.winner, gameMode);
-    // Grammar: "You Win!" vs "AI Wins!" / "Blue Wins!" (#436; #415 intent)
-    const verb = winnerName === 'You' ? 'Win' : 'Wins';
-    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${verb}! 🎉`;
-  } else if (state.phase === 'gameOver') {
-    // Draw / exhaust — keep without status-winner (burn-wave7 contract).
-    turnEl.textContent = formatPhaseStatusMessage(state, gameMode);
+    const winnerName =
+      gameMode === 'human-vs-ai'
+        ? state.winner === 'player1'
+          ? 'You'
+          : 'AI'
+        : state.winner === 'player1'
+          ? 'Blue'
+          : 'Red';
+    turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 Computer is thinking…';
     turnEl.classList.add('status-ai-thinking');
   } else {
-    turnEl.textContent = formatPhaseStatusMessage(state, gameMode);
+    turnEl.textContent = getPhaseMessage(state);
   }
 
   statusEl.appendChild(turnEl);
@@ -468,41 +425,28 @@ export function renderStatus(
 
   const p1Progress = document.createElement('div');
   p1Progress.className = 'progress-bar progress-p1';
-  replaceWithSafeHtml(
-    p1Progress,
-    safeHtml`
+  p1Progress.innerHTML = `
     <span class="progress-label">${seatIcon('player1')} ${p1Label}</span>
     <div class="progress-track">
-      <div class="progress-fill"></div>
+      <div class="progress-fill" style="width: ${getProgress(state, 'player1')}%"></div>
     </div>
     <span class="progress-value">${state.player1Position}/${TRACK_LENGTH}</span>
-  `
-  );
-  const p1Fill = p1Progress.querySelector('.progress-fill');
-  if (p1Fill instanceof HTMLElement) {
-    p1Fill.style.width = `${getProgress(state, 'player1')}%`;
-  }
+  `;
   progressEl.appendChild(p1Progress);
 
   const p2Progress = document.createElement('div');
   p2Progress.className = 'progress-bar progress-p2';
-  replaceWithSafeHtml(
-    p2Progress,
-    safeHtml`
+  p2Progress.innerHTML = `
     <span class="progress-label">${seatIcon('player2')} ${p2Label}</span>
     <div class="progress-track">
-      <div class="progress-fill"></div>
+      <div class="progress-fill" style="width: ${getProgress(state, 'player2')}%"></div>
     </div>
     <span class="progress-value">${state.player2Position}/${TRACK_LENGTH}</span>
-  `
-  );
-  const p2Fill = p2Progress.querySelector('.progress-fill');
-  if (p2Fill instanceof HTMLElement) {
-    p2Fill.style.width = `${getProgress(state, 'player2')}%`;
-  }
+  `;
   progressEl.appendChild(p2Progress);
 
   statusEl.appendChild(progressEl);
 
   container.appendChild(statusEl);
 }
+

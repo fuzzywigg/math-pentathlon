@@ -11,11 +11,14 @@ import {
   rotateShape,
   flipShape,
   placeShape,
-  abandonPlacement,
-  selectedShapeFitsAnywhere,
 } from './rules';
-import type { AIDifficulty } from './ai';
-import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
+import type {
+  AIDifficulty} from './ai';
+import {
+  getAIDieChoice,
+  getAIShapeChoice,
+  getAIPlacement
+} from './ai';
 import {
   renderBoard,
   renderDice,
@@ -23,21 +26,10 @@ import {
   renderShapeControls,
   injectJuggleStyles,
   getPlayerName,
-  applyJuggleHoverPreview,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { juggleTutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import {
-  clearNullableTimeout,
-  scheduleGenerationGated,
-} from '../../ui/timeout-handle';
-import {
-  clearElement,
-  replaceWithSafeHtml,
-  safeHtml,
-} from '../../core/dom-security';
-
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -45,7 +37,9 @@ import {
 } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(vsAI ? 'human-vs-ai' : 'human-vs-human');
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -58,10 +52,6 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
-/** Invalidates nested AI setTimeouts after route leave / new game. */
-let aiGeneration = 0;
-/** Single pending AI timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function isComputerTurnPending(): boolean {
   return (
@@ -69,25 +59,6 @@ function isComputerTurnPending(): boolean {
     gameState.currentPlayer === aiPlayer &&
     !gameState.winner &&
     gameState.phase !== 'gameOver'
-  );
-}
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
-function scheduleAI(fn: () => void, delayMs: number): void {
-  scheduleGenerationGated(
-    {
-      clearTimer: clearAiTimer,
-      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
-        aiTimer = t;
-      },
-      getGeneration: () => aiGeneration,
-    },
-    fn,
-    delayMs
   );
 }
 
@@ -99,7 +70,7 @@ function updateUI(): void {
   if (!boardContainer || !statusContainer) return;
 
   const previousFocus = captureFocusedCell(boardContainer);
-  clearElement(boardContainer);
+  boardContainer.innerHTML = '';
 
   const allowInput = !isComputerTurnPending();
   const inputOpts = { allowInput };
@@ -128,10 +99,7 @@ function updateUI(): void {
       gameState,
       handleRotate,
       handleFlip,
-      {
-        ...inputOpts,
-        onAbandonPlacement: allowInput ? handleAbandonPlacement : undefined,
-      }
+      inputOpts
     );
     boardContainer.appendChild(shapeControls);
   }
@@ -177,14 +145,11 @@ function updateStatus(): void {
 
   if (gameState.winner) {
     const winnerName = getPlayerName(gameState.winner);
-    replaceWithSafeHtml(
-      statusContainer,
-      safeHtml`
+    statusContainer.innerHTML = `
       <div class="juggle-winner-banner">
         ${seatIcon(gameState.winner)} ${winnerName} filled their board first and wins!
       </div>
-    `
-    );
+    `;
     return;
   }
 
@@ -193,18 +158,11 @@ function updateStatus(): void {
   const icon = seatIcon(gameState.currentPlayer);
 
   if (isComputerTurnPending()) {
-    replaceWithSafeHtml(
-      statusContainer,
-      safeHtml`
-      <div class="juggle-status status-ai-thinking">
+    statusContainer.innerHTML = `
+      <div class="juggle-status ${playerClass} status-ai-thinking">
         <strong>${icon} ${playerName}'s turn</strong> - Computer is thinking…
       </div>
-    `
-    );
-    const statusEl = statusContainer.querySelector('.juggle-status');
-    if (statusEl) {
-      statusEl.className = `juggle-status ${playerClass} status-ai-thinking`;
-    }
+    `;
     return;
   }
 
@@ -221,24 +179,15 @@ function updateStatus(): void {
       }
       break;
     case 'placing':
-      instruction = selectedShapeFitsAnywhere(gameState)
-        ? 'Place the shape on your board'
-        : "Shape won't fit — choose another";
+      instruction = 'Place the shape on your board';
       break;
   }
 
-  replaceWithSafeHtml(
-    statusContainer,
-    safeHtml`
-    <div class="juggle-status">
+  statusContainer.innerHTML = `
+    <div class="juggle-status ${playerClass}">
       <strong>${icon} ${playerName}'s turn</strong> - ${instruction}
     </div>
-  `
-  );
-  const statusEl = statusContainer.querySelector('.juggle-status');
-  if (statusEl) {
-    statusEl.className = `juggle-status ${playerClass}`;
-  }
+  `;
 }
 
 // =============================================================================
@@ -256,7 +205,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
 
   // AI continues after its own roll.
   if (vsAI && gameState.currentPlayer === aiPlayer) {
-    scheduleAI(makeAIMove, 500);
+    setTimeout(makeAIMove, 500);
   }
 }
 
@@ -288,13 +237,6 @@ function handleFlip(): void {
   updateUI();
 }
 
-function handleAbandonPlacement(): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'placing') return;
-  gameState = abandonPlacement(gameState);
-  updateUI();
-}
-
 function handleCellClick(row: number, col: number, player: Player): void {
   if (player !== gameState.currentPlayer) return;
   if (gameState.phase !== 'placing') return;
@@ -305,7 +247,7 @@ function handleCellClick(row: number, col: number, player: Player): void {
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    scheduleAI(() => handleRollDice(true), 500);
+    setTimeout(() => handleRollDice(true), 500);
   }
 }
 
@@ -314,29 +256,13 @@ function handleCellHover(row: number, col: number): void {
   if (gameState.phase !== 'placing') return;
 
   gameState = { ...gameState, hoverPosition: { row, col } };
-  if (!boardContainer) return;
-  const boards = boardContainer.querySelector('.juggle-boards');
-  if (boards) {
-    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
-      allowInput: true,
-    });
-  } else {
-    updateUI();
-  }
+  updateUI();
 }
 
 function handleCellLeave(): void {
   if (isComputerTurnPending()) return;
   gameState = { ...gameState, hoverPosition: null };
-  if (!boardContainer) return;
-  const boards = boardContainer.querySelector('.juggle-boards');
-  if (boards) {
-    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
-      allowInput: true,
-    });
-  } else {
-    updateUI();
-  }
+  updateUI();
 }
 
 // =============================================================================
@@ -351,7 +277,7 @@ function makeAIMove(): void {
     const dieChoice = getAIDieChoice(gameState, aiPlayer, aiDifficulty);
     if (dieChoice) {
       gameState = selectDie(gameState, dieChoice.index);
-      scheduleAI(makeAIMove, 300);
+      setTimeout(makeAIMove, 300);
       updateUI();
       return;
     }
@@ -362,7 +288,7 @@ function makeAIMove(): void {
     const shapeChoice = getAIShapeChoice(gameState, aiPlayer, aiDifficulty);
     if (shapeChoice) {
       gameState = selectShape(gameState, shapeChoice.shape);
-      scheduleAI(makeAIMove, 300);
+      setTimeout(makeAIMove, 300);
       updateUI();
       return;
     }
@@ -386,7 +312,7 @@ function makeAIMove(): void {
 
       // Continue if still AI's turn
       if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-        scheduleAI(() => handleRollDice(true), 500);
+        setTimeout(() => handleRollDice(true), 500);
       }
       return;
     }
@@ -404,7 +330,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   statusContainer = statusEl;
 
   injectJuggleStyles();
-  aiGeneration += 1;
   gameState = createInitialState();
   vsAI = false;
   syncOpponentChrome();
@@ -413,7 +338,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
-  aiGeneration += 1;
   vsAI = false;
   syncOpponentChrome();
   gameState = createInitialState();
@@ -421,7 +345,6 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
-  aiGeneration += 1;
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';
@@ -455,14 +378,6 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
-export function destroyGame(): void {
-  aiGeneration += 1;
-  clearAiTimer();
-  boardContainer = null;
-  statusContainer = null;
-}
-
 /** Test-only: replace state and re-render (AI-seat chrome guards). */
 export function __setStateForTests(state: JuggleState): void {
   gameState = state;
@@ -473,3 +388,6 @@ export function __setStateForTests(state: JuggleState): void {
 export function __getStateForTests(): JuggleState {
   return gameState;
 }
+
+/** Tip-held destroy hook for tip mounts / #501. */
+export function destroyGame(): void {}

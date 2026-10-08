@@ -1,8 +1,13 @@
 // Pent'Em In Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import type { PentEmInState } from './types';
-import { createInitialState, getPlayerPieces } from './types';
+import type {
+  PentEmInState} from './types';
+import {
+  createInitialState,
+  getPlayerPieces,
+  getPentominoShape,
+} from './types';
 import {
   selectPiece,
   rotateSelectedPiece,
@@ -11,36 +16,28 @@ import {
   setPreviewPosition,
   placePiece,
   canPlacePiece,
-  selectedPieceFitsAnywhere,
-  getCurrentOrientationPlacements,
 } from './rules';
 import {
   renderBoard,
   renderPieceSelector,
-  renderPlaceControls,
   getPlayerName,
   injectPentEmInStyles,
-  patchPentPreview,
 } from './board-ui';
 import type { Cell } from '../../core/polyomino/types';
 import type { AIDifficulty } from './ai';
 import { getAIMove, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
-import {
-  markBoard3dWebGlFallback,
-  clearBoard3dWebGlFallback,
-} from '../../ui/three/tablet-gl';
 import { loadPentEmInBoard3DModule } from './board-3d-loader';
 import type { PentEmInBoard3D } from '../../ui/three/pent-em-in-board-3d';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 /** True while it is the computer's seat (including the think pause). */
@@ -64,7 +61,10 @@ let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 
 function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
 }
 
 function unmountBoard3d(): void {
@@ -86,11 +86,9 @@ async function ensureBoard3d(): Promise<void> {
       handleCellClick,
       handleCellHover
     );
-    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
-    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -104,7 +102,6 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
-  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();
@@ -122,7 +119,7 @@ function render(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
-    clearElement(boardContainer);
+    boardContainer.innerHTML = '';
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -142,13 +139,7 @@ function renderBoardOnly(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
   } else if (!board3dEnabled) {
-    const existing = boardContainer.querySelector(
-      'svg.pent-board'
-    ) as SVGElement | null;
-    if (existing && patchPentPreview(existing, gameState, inputOpts)) {
-      return;
-    }
-    clearElement(boardContainer);
+    boardContainer.innerHTML = '';
     const svg = renderBoard(
       gameState,
       handleCellClick,
@@ -161,7 +152,7 @@ function renderBoardOnly(): void {
 
 function renderStatusAndControls(): void {
   if (!statusContainer) return;
-  clearElement(statusContainer);
+  statusContainer.innerHTML = '';
   markStatusLive(statusContainer);
 
   // Winner banner
@@ -184,15 +175,7 @@ function renderStatusAndControls(): void {
   } else if (gameState.phase === 'selectPiece') {
     status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Select a piece`;
   } else if (gameState.phase === 'placePiece') {
-    const fitsAnywhere = selectedPieceFitsAnywhere(gameState);
-    const currentFits = getCurrentOrientationPlacements(gameState).length > 0;
-    if (!fitsAnywhere) {
-      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - ${gameState.selectedPiece} won't fit — choose another`;
-    } else if (!currentFits) {
-      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Rotate or flip ${gameState.selectedPiece} to fit`;
-    } else {
-      status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Place the ${gameState.selectedPiece} piece`;
-    }
+    status.textContent = `${getPlayerName(gameState.currentPlayer)}'s turn - Place the ${gameState.selectedPiece} piece`;
   }
   statusContainer.appendChild(status);
 
@@ -210,17 +193,44 @@ function renderStatusAndControls(): void {
     gameState.phase === 'placePiece' &&
     gameState.selectedPiece
   ) {
-    statusContainer.appendChild(
-      renderPlaceControls(
-        gameState,
-        {
-          onRotate: handleRotate,
-          onFlip: handleFlip,
-          onCancel: handleCancel,
-        },
-        { allowInput: true }
-      )
-    );
+    const controls = document.createElement('div');
+    controls.className = 'pent-controls';
+
+    const shape = getPentominoShape(gameState.selectedPiece);
+
+    // Rotate button
+    if (shape?.canRotate) {
+      const rotateBtn = document.createElement('button');
+      rotateBtn.className = 'pent-btn pent-btn-rotate';
+      rotateBtn.textContent = `Rotate (${gameState.selectedRotation}°)`;
+      rotateBtn.addEventListener('click', handleRotate);
+      controls.appendChild(rotateBtn);
+    }
+
+    // Flip button
+    if (shape?.canFlip) {
+      const flipBtn = document.createElement('button');
+      flipBtn.className = 'pent-btn pent-btn-flip';
+      flipBtn.textContent = gameState.selectedFlipped ? 'Flipped ↔' : 'Flip ↔';
+      flipBtn.addEventListener('click', handleFlip);
+      controls.appendChild(flipBtn);
+    }
+
+    // Cancel button
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'pent-btn pent-btn-cancel';
+    cancelBtn.textContent = 'Cancel';
+    cancelBtn.addEventListener('click', handleCancel);
+    controls.appendChild(cancelBtn);
+
+    statusContainer.appendChild(controls);
+
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.className = 'pent-instructions';
+    instructions.textContent =
+      'Click on the board to place your piece. The preview shows where it will go.';
+    statusContainer.appendChild(instructions);
   }
 
   // Pieces remaining count
@@ -297,20 +307,17 @@ function handleCellClick(cell: Cell): void {
 function handleCellHover(cell: Cell | null): void {
   if (isComputerTurnPending()) return;
   if (gameState.phase !== 'placePiece') return;
-  // Leaving a cell: keep a legal ghost so tablets aren't left blank.
-  const nextCell =
-    cell ?? getCurrentOrientationPlacements(gameState)[0] ?? null;
   const prev = gameState.previewPosition;
   if (
-    (prev === null && nextCell === null) ||
+    (prev === null && cell === null) ||
     (prev !== null &&
-      nextCell !== null &&
-      prev.row === nextCell.row &&
-      prev.col === nextCell.col)
+      cell !== null &&
+      prev.row === cell.row &&
+      prev.col === cell.col)
   ) {
     return;
   }
-  gameState = setPreviewPosition(gameState, nextCell);
+  gameState = setPreviewPosition(gameState, cell);
   // Preview-only: refresh board (3D paint-on-demand) without rebuilding controls.
   renderBoardOnly();
 }

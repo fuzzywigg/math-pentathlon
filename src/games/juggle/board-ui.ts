@@ -1,9 +1,8 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
-import { getDieFaceEmoji } from '../../ui/die-faces';
-import { injectStylesOnce } from '../../ui/inject-styles';
-import type { JuggleState } from './types';
+import type {
+  JuggleState} from './types';
 import {
   CONFIG,
   getCategoryFromDie,
@@ -14,18 +13,10 @@ import {
   getPreviewCells,
   isPlacementValid,
   getBoardFillPercentage,
-  getCurrentOrientationPlacements,
-  selectedShapeFitsAnywhere,
 } from './rules';
 import type { Board } from '../../core/polyomino/placement';
-import type {
-  PolyominoShape,
-  Rotation,
-  Cell,
-} from '../../core/polyomino/types';
+import type { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
-import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
-
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -35,8 +26,6 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
-import { getPlayerName } from '../../ui/seat-labels';
-export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -52,123 +41,6 @@ const COLORS = {
 export interface JuggleBoardRenderOptions {
   /** When false, suppress selectable chrome and activate handlers (AI seat). */
   allowInput?: boolean;
-  /** Human-only: leave placing so they can pick another die/shape. */
-  onAbandonPlacement?: () => void;
-}
-
-/** Cell lookup cached on the grid element (avoid querySelectorAll each sync). */
-type JuggleCellMap = Map<string, HTMLElement>;
-
-function getCellMap(grid: HTMLElement): JuggleCellMap {
-  let map = (grid as HTMLElement & { __juggleCells?: JuggleCellMap })
-    .__juggleCells;
-  if (!map) {
-    map = new Map();
-    for (const cell of Array.from(
-      grid.querySelectorAll('.juggle-cell')
-    ) as HTMLElement[]) {
-      map.set(`${cell.dataset.row},${cell.dataset.col}`, cell);
-    }
-    (grid as HTMLElement & { __juggleCells?: JuggleCellMap }).__juggleCells =
-      map;
-  }
-  return map;
-}
-
-function previewStateForBoard(
-  isCurrentPlayer: boolean,
-  state: JuggleState,
-  allowInput: boolean
-): {
-  previewSet: Set<string>;
-  isPreviewValid: boolean;
-  legalAnchors: Set<string>;
-  showPreview: boolean;
-} {
-  const showPreview = allowInput && isCurrentPlayer;
-  const previewCells: Cell[] =
-    state.hoverPosition && showPreview
-      ? getPreviewCells(state, state.hoverPosition)
-      : [];
-  const isPreviewValid =
-    state.hoverPosition && showPreview
-      ? isPlacementValid(state, state.hoverPosition)
-      : false;
-  const previewSet = new Set(previewCells.map((c) => `${c.row},${c.col}`));
-  const legalAnchors =
-    allowInput && isCurrentPlayer && state.phase === 'placing'
-      ? new Set(
-          getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
-        )
-      : new Set<string>();
-  return {
-    previewSet,
-    isPreviewValid: Boolean(isPreviewValid),
-    legalAnchors,
-    showPreview,
-  };
-}
-
-/**
- * Hover-only paint: toggle preview classes on dirty cells only (no full board
- * wipe). Clears prior hover keys stored on the board element.
- */
-export function applyJuggleHoverPreview(
-  boardsRoot: HTMLElement,
-  state: JuggleState,
-  options: JuggleBoardRenderOptions = {}
-): void {
-  const allowInput = options.allowInput !== false;
-  if (!allowInput || state.phase !== 'placing') return;
-
-  const player = state.currentPlayer;
-  const boardEl = boardsRoot.querySelector(
-    `.juggle-board.${player}`
-  ) as HTMLElement | null;
-  if (!boardEl) return;
-  const grid = boardEl.querySelector('.juggle-grid') as HTMLElement | null;
-  if (!grid) return;
-
-  const cells = getCellMap(grid);
-  const legalAnchors = new Set(
-    getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
-  );
-  const prevKeys = (boardEl.dataset.hoverKeys || '').split('|').filter(Boolean);
-
-  const clearPreview = (key: string) => {
-    const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) return;
-    cell.classList.remove('preview-valid', 'preview-invalid');
-    if (legalAnchors.has(key)) {
-      cell.classList.add('juggle-cell-valid');
-    } else {
-      cell.classList.remove('juggle-cell-valid');
-    }
-  };
-
-  for (const key of prevKeys) clearPreview(key);
-
-  if (!state.hoverPosition) {
-    boardEl.dataset.hoverKeys = '';
-    return;
-  }
-
-  const previewCells = getPreviewCells(state, state.hoverPosition);
-  const isValid = isPlacementValid(state, state.hoverPosition);
-  const nextKeys: string[] = [];
-  for (const c of previewCells) {
-    const key = `${c.row},${c.col}`;
-    const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) continue;
-    cell.classList.remove(
-      'preview-valid',
-      'preview-invalid',
-      'juggle-cell-valid'
-    );
-    cell.classList.add(isValid ? 'preview-valid' : 'preview-invalid');
-    nextKeys.push(key);
-  }
-  boardEl.dataset.hoverKeys = nextKeys.join('|');
 }
 
 /**
@@ -191,13 +63,10 @@ export function renderBoard(
   // Board header
   const header = document.createElement('div');
   header.className = 'juggle-board-header';
-  replaceWithSafeHtml(
-    header,
-    safeHtml`
+  header.innerHTML = `
     <span class="player-name">${player === 'player1' ? 'Blue' : 'Red'}</span>
     <span class="fill-percent">${getBoardFillPercentage(board)}%</span>
-  `
-  );
+  `;
   container.appendChild(header);
 
   // Grid
@@ -206,14 +75,17 @@ export function renderBoard(
   grid.style.gridTemplateColumns = `repeat(${CONFIG.GRID_SIZE}, 1fr)`;
   markBoardAsGrid(grid);
 
-  const { previewSet, isPreviewValid, legalAnchors } = previewStateForBoard(
-    isCurrentPlayer,
-    state,
-    allowInput
-  );
-
-  const fragment = document.createDocumentFragment();
-  const cellMap: JuggleCellMap = new Map();
+  // Preview only while the human seat may place
+  const showPreview = allowInput && isCurrentPlayer;
+  const previewCells: Cell[] =
+    state.hoverPosition && showPreview
+      ? getPreviewCells(state, state.hoverPosition)
+      : [];
+  const isPreviewValid =
+    state.hoverPosition && showPreview
+      ? isPlacementValid(state, state.hoverPosition)
+      : false;
+  const previewSet = new Set(previewCells.map((c) => `${c.row},${c.col}`));
 
   for (let row = 0; row < CONFIG.GRID_SIZE; row++) {
     for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
@@ -225,15 +97,12 @@ export function renderBoard(
       const isOccupied = board.cells[row][col];
       const isPreview = previewSet.has(`${row},${col}`);
 
-      const isLegalAnchor = legalAnchors.has(`${row},${col}`);
       if (isOccupied) {
         cell.classList.add(`occupied-${player}`);
       } else if (isPreview) {
         cell.classList.add(
           isPreviewValid ? 'preview-valid' : 'preview-invalid'
         );
-      } else if (isLegalAnchor) {
-        cell.classList.add('juggle-cell-valid');
       }
 
       const coord = `${String.fromCharCode(65 + col)}${row + 1}`;
@@ -249,66 +118,22 @@ export function renderBoard(
           coord,
           empty: !isOccupied,
           owner: isOccupied ? getPlayerName(player) : undefined,
-          validPlacement:
-            canPlace && (isLegalAnchor || (isPreview && isPreviewValid)),
+          validPlacement: canPlace && isPreview && Boolean(isPreviewValid),
         })
       );
 
       if (canPlace) {
         cell.style.cursor = 'pointer';
+        const activate = () => onCellClick(row, col);
+        cell.addEventListener('click', activate);
+        bindCellActivateKeys(cell, activate);
+        cell.addEventListener('mouseenter', () => onCellHover(row, col));
+        cell.addEventListener('mouseleave', onCellLeave);
       }
-      // Event delegation on the grid (listeners once) — see bind below.
-      cellMap.set(`${row},${col}`, cell);
-      fragment.appendChild(cell);
+
+      grid.appendChild(cell);
     }
   }
-
-  grid.appendChild(fragment);
-  (grid as HTMLElement & { __juggleCells?: JuggleCellMap }).__juggleCells =
-    cellMap;
-
-  // Delegated click / hover so syncJuggleBoardCells never rebinds listeners.
-  grid.addEventListener('click', (e) => {
-    const target = (e.target as HTMLElement).closest(
-      '.juggle-cell'
-    ) as HTMLElement | null;
-    if (!target || !grid.contains(target)) return;
-    if (target.style.cursor !== 'pointer') return;
-    const row = Number(target.dataset.row);
-    const col = Number(target.dataset.col);
-    if (Number.isFinite(row) && Number.isFinite(col)) onCellClick(row, col);
-  });
-  grid.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    const target = e.target as HTMLElement;
-    if (!target.classList.contains('juggle-cell')) return;
-    if (target.style.cursor !== 'pointer') return;
-    e.preventDefault();
-    const row = Number(target.dataset.row);
-    const col = Number(target.dataset.col);
-    if (Number.isFinite(row) && Number.isFinite(col)) onCellClick(row, col);
-  });
-  grid.addEventListener(
-    'mouseenter',
-    (e) => {
-      const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
-      if (target.style.cursor !== 'pointer') return;
-      const row = Number(target.dataset.row);
-      const col = Number(target.dataset.col);
-      if (Number.isFinite(row) && Number.isFinite(col)) onCellHover(row, col);
-    },
-    true
-  );
-  grid.addEventListener(
-    'mouseleave',
-    (e) => {
-      const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
-      onCellLeave();
-    },
-    true
-  );
 
   bindGridNavigation(grid);
   applyRovingTabindex(collectGridCells(grid));
@@ -553,26 +378,13 @@ export function renderShapeControls(
     controls.appendChild(flipBtn);
   }
 
-  const fits = selectedShapeFitsAnywhere(state);
-  if (allowInput && options.onAbandonPlacement) {
-    const otherBtn = document.createElement('button');
-    otherBtn.className = 'juggle-control-btn juggle-choose-other-btn';
-    otherBtn.textContent = fits
-      ? 'Choose another shape'
-      : "Can't fit — choose another";
-    otherBtn.addEventListener('click', options.onAbandonPlacement);
-    controls.appendChild(otherBtn);
-  }
-
   container.appendChild(controls);
 
   const hint = document.createElement('div');
   hint.className = 'juggle-hint';
-  hint.textContent = !allowInput
-    ? 'Computer is placing…'
-    : fits
-      ? 'Click a highlighted cell to place the shape'
-      : "This shape doesn't fit. Choose another, or rotate/flip.";
+  hint.textContent = allowInput
+    ? 'Click on your board to place the shape'
+    : 'Computer is placing…';
   container.appendChild(hint);
 
   return container;
@@ -582,16 +394,20 @@ export function renderShapeControls(
  * Get dice face emoji
  */
 function getDieFace(value: number): string {
-  return getDieFaceEmoji(value);
+  const faces = ['', '⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+  return faces[value] || value.toString();
 }
 
 /**
  * Inject CSS styles
  */
 export function injectJuggleStyles(): void {
-  injectStylesOnce(
-    'juggle-styles',
-    `
+  const existingStyle = document.getElementById('juggle-styles');
+  if (existingStyle) return;
+
+  const style = document.createElement('style');
+  style.id = 'juggle-styles';
+  style.textContent = `
     .juggle-boards {
       display: flex;
       gap: 2rem;
@@ -611,8 +427,8 @@ export function injectJuggleStyles(): void {
       border-color: #ffc107;
     }
 
-    .juggle-board.player1 .juggle-board-header { color: var(--color-player1-text, #1d4ed8); }
-    .juggle-board.player2 .juggle-board-header { color: var(--color-player2-text, #b91c1c); }
+    .juggle-board.player1 .juggle-board-header { color: var(--color-player1, #2196f3); }
+    .juggle-board.player2 .juggle-board-header { color: var(--color-player2, #f44336); }
 
     .juggle-board-header {
       display: flex;
@@ -624,8 +440,7 @@ export function injectJuggleStyles(): void {
 
     .fill-percent {
       font-size: 0.9rem;
-      /* Keep solid color (no opacity) so inherited seat text stays AA. */
-      color: inherit;
+      opacity: 0.8;
     }
 
     .juggle-grid {
@@ -649,10 +464,6 @@ export function injectJuggleStyles(): void {
     .juggle-cell.occupied-player2 { background: var(--color-player2, #f44336); }
 
     .juggle-cell.preview-valid { background: ${COLORS.previewValid}; }
-    .juggle-cell.juggle-cell-valid {
-      background: rgba(76, 175, 80, 0.22);
-      box-shadow: inset 0 0 0 2px ${COLORS.validPlacement};
-    }
     .juggle-cell.preview-invalid { background: ${COLORS.previewInvalid}; }
 
     .juggle-dice-area {
@@ -826,8 +637,8 @@ export function injectJuggleStyles(): void {
       padding: 1rem;
     }
 
-    .juggle-status.player1 { color: var(--color-player1-text, #1d4ed8); }
-    .juggle-status.player2 { color: var(--color-player2-text, #b91c1c); }
+    .juggle-status.player1 { color: var(--color-player1, #2196f3); }
+    .juggle-status.player2 { color: var(--color-player2, #f44336); }
 
     .juggle-status.status-ai-thinking {
       font-style: italic;
@@ -913,22 +724,19 @@ export function injectJuggleStyles(): void {
 
     @media (max-width: 700px) and (pointer: coarse) {
       .juggle-cell {
-        width: 44px;
-        height: 44px;
-        min-width: 44px;
-        min-height: 44px;
-      }
-
-      .juggle-grid {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        max-width: 100%;
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
       }
     }
-  `
-  );
+  `;
+  document.head.appendChild(style);
 }
 
 /**
  * Get player display name
  */
+export function getPlayerName(player: 'player1' | 'player2'): string {
+  return player === 'player1' ? 'Blue' : 'Red';
+}

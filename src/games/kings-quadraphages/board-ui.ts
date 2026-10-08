@@ -1,4 +1,6 @@
-import type { GameState, Position } from './game-state';
+import type {
+  GameState,
+  Position} from './game-state';
 import {
   selectKing,
   moveKing,
@@ -11,10 +13,7 @@ import {
   getSupply,
 } from './game-state';
 import { getOpponent } from './rules';
-import type { PlayerOwner } from './pieces';
 import { getGameModeChromeRoot, seatIcon } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -27,67 +26,12 @@ import {
   type BoardFocusable,
 } from '../../ui/board-a11y';
 
-/** AI seat from game-mode chrome (defaults to player2). */
-function resolveAiSeat(): PlayerOwner {
-  const root = getGameModeChromeRoot();
-  return root?.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
-}
-
 /** True when vs-AI chrome is on and it is the computer's seat to act. */
 function isComputerSeatTurn(state: GameState): boolean {
   const root = getGameModeChromeRoot();
   if (root?.dataset.opponent !== 'ai') return false;
-  return state.currentPlayer === resolveAiSeat();
-}
-
-/** You/AI labels that honor which seat the computer occupies. */
-function vsAiActorName(player: PlayerOwner): 'You' | 'AI' {
-  return player === resolveAiSeat() ? 'AI' : 'You';
-}
-
-/**
- * Inject Kings-local board sizing so cells stay near 44×44 on tablet/desktop.
- * Shared `.board { width: min(450px, 100%) }` collapses under flex shrink-to-fit
- * (~285px / 29px cells on desktop); vw sizing matches the mobile-play-shell fix.
- * Idempotent via DOM marker (safe across test teardowns that remove the node).
- */
-function ensureKingsBoardStyles(): void {
-  if (typeof document === 'undefined') return;
-  if (document.head.querySelector('style[data-kings-board-styles]')) {
-    return;
-  }
-
-  const style = document.createElement('style');
-  style.dataset.kingsBoardStyles = 'true';
-  style.textContent = `
-    /* Prefer vw over % so #board shrink-to-fit does not crush the grid. */
-    .board.kings-board {
-      width: min(450px, calc(100vw - 8rem));
-      max-width: 100%;
-      height: auto;
-      aspect-ratio: 1;
-      box-sizing: border-box;
-    }
-
-    /* Coarse / touch: target ≥44px cells (9×44 + gaps/border ≈ 420px). */
-    @media (pointer: coarse), (hover: none) {
-      .board.kings-board {
-        width: min(420px, calc(100vw - 2rem));
-      }
-
-      .board.kings-board .cell {
-        /* Keep grid fraction sizing; do not force min-width (overflow). */
-        touch-action: manipulation;
-      }
-    }
-
-    @media (max-width: 560px) {
-      .board.kings-board {
-        width: min(420px, calc(100vw - 1.5rem));
-      }
-    }
-  `;
-  document.head.appendChild(style);
+  const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
+  return state.currentPlayer === aiSeat;
 }
 
 // Click handler callback type
@@ -279,7 +223,7 @@ function ensureKingsBoard(container: HTMLElement): {
     ':scope > .board'
   ) as HTMLElement | null;
   const cells = boardEl
-    ? (Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[])
+    ? (Array.from(boardEl.querySelectorAll(':scope > .cell')) as HTMLElement[])
     : [];
 
   if (boardEl && cells.length === KINGS_CELL_COUNT) {
@@ -288,7 +232,7 @@ function ensureKingsBoard(container: HTMLElement): {
 
   container.replaceChildren();
   boardEl = document.createElement('div');
-  boardEl.className = 'board kings-board';
+  boardEl.className = 'board';
   markBoardAsGrid(boardEl);
 
   const fragment = document.createDocumentFragment();
@@ -353,7 +297,6 @@ export function renderBoard(
   container: HTMLElement,
   onCellClick?: CellClickCallback
 ): void {
-  ensureKingsBoardStyles();
   const previousFocus = captureFocusedCell(container);
   const { boardEl, created } = ensureKingsBoard(container);
 
@@ -362,10 +305,12 @@ export function renderBoard(
     bindKingsBoardInteractions(boardEl, container);
   }
 
-  boardEl.className = 'board kings-board';
+  boardEl.className = 'board';
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  const cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
+  const cells = Array.from(
+    boardEl.querySelectorAll(':scope > .cell')
+  ) as HTMLElement[];
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {
@@ -395,32 +340,6 @@ function formatPosition(pos: Position): string {
   return `${colLetter}${pos.row}`;
 }
 
-/** vs-AI turn copy — You/AI (not Player 1/2) + clearer place-phase hint. */
-function getVsAiPhaseMessage(state: GameState): string {
-  const actor = vsAiActorName(state.currentPlayer);
-
-  switch (state.turnPhase) {
-    case 'moveKing':
-      if (state.selectedKingPosition) {
-        return `${actor}: Click a green square to move`;
-      }
-      return `${actor}: Click your King to select it`;
-    case 'placeQuadraphage':
-      return `${actor}: Place a Quadraphage on a green square`;
-    case 'gameOver': {
-      if (!state.winner) {
-        return 'Game Over! Tie!';
-      }
-      const winnerName = vsAiActorName(state.winner);
-      return `Game Over! ${winnerName} win${winnerName === 'You' ? '' : 's'}!`;
-    }
-    default: {
-      const _exhaustive: never = state.turnPhase;
-      return _exhaustive;
-    }
-  }
-}
-
 // Render the status display
 export function renderStatus(
   state: GameState,
@@ -430,7 +349,7 @@ export function renderStatus(
   isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  clearElement(container);
+  container.innerHTML = '';
 
   const statusEl = document.createElement('div');
   statusEl.className = 'status';
@@ -452,8 +371,6 @@ export function renderStatus(
   if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
     turnEl.classList.add('status-ai-thinking');
-  } else if (gameMode === 'human-vs-ai') {
-    turnEl.textContent = getVsAiPhaseMessage(state);
   } else {
     turnEl.textContent = getCurrentPhaseMessage(state);
   }
@@ -469,8 +386,9 @@ export function renderStatus(
     } else {
       let winnerName: string;
       if (gameMode === 'human-vs-ai') {
-        // Honor aiSeat (human may be player2 when the computer opens).
-        winnerName = vsAiActorName(state.winner);
+        // In AI mode, show "You Win!" or "AI Wins!"
+        // AI is always player2 when human plays first
+        winnerName = state.winner === 'player1' ? 'You' : 'AI';
       } else {
         winnerName = state.winner === 'player1' ? 'Player 1' : 'Player 2';
       }
@@ -484,18 +402,15 @@ export function renderStatus(
   const suppliesEl = document.createElement('div');
   suppliesEl.className = 'status-supplies';
 
-  const aiSeat = resolveAiSeat();
   const supply1El = document.createElement('span');
   supply1El.className = 'supply-p1';
-  const p1Label =
-    gameMode === 'human-vs-ai' ? (aiSeat === 'player1' ? 'AI' : 'You') : 'P1';
+  const p1Label = gameMode === 'human-vs-ai' ? 'You' : 'P1';
   supply1El.textContent = `${seatIcon('player1')} ${p1Label}: ${state.player1Supply}`;
   suppliesEl.appendChild(supply1El);
 
   const supply2El = document.createElement('span');
   supply2El.className = 'supply-p2';
-  const p2Label =
-    gameMode === 'human-vs-ai' ? (aiSeat === 'player2' ? 'AI' : 'You') : 'P2';
+  const p2Label = gameMode === 'human-vs-ai' ? 'AI' : 'P2';
   supply2El.textContent = `${seatIcon('player2')} ${p2Label}: ${state.player2Supply}`;
   suppliesEl.appendChild(supply2El);
 
@@ -509,7 +424,7 @@ export function renderMoveHistory(
   state: GameState,
   container: HTMLElement
 ): void {
-  clearElement(container);
+  container.innerHTML = '';
 
   const titleEl = document.createElement('div');
   titleEl.className = 'move-history-title';

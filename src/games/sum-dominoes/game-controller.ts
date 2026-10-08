@@ -2,14 +2,12 @@
 // Manages game flow, AI, and UI updates
 
 import type { SumDominoesState, Player, BoardPosition } from './types';
-import { getDiceSum } from './types';
 import {
   createInitialState,
   doRollDice,
   selectDomino,
   placeDomino,
   passTurn,
-  getValidPlacements,
 } from './rules';
 import type { AIDifficulty } from './ai';
 import { getAIMove } from './ai';
@@ -22,9 +20,7 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { sumDominoesTutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -32,7 +28,9 @@ import {
 } from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
-  syncAppOpponentChrome(isAI);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 /** True while it is the computer's seat (including the think pause). */
@@ -63,24 +61,6 @@ export interface SDGameController {
 let activeContainer: HTMLElement | null = null;
 
 /**
- * Single pending AI timer — avoids stacked setTimeouts from every UI rebuild
- * (a stale timer historically rolled Blue's dice after Red finished).
- */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAI(controller: SDGameController, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    makeAIMove(controller);
-  }, delayMs);
-}
-
-/**
  * Initialize the game
  */
 export function initGame(
@@ -90,7 +70,6 @@ export function initGame(
 ): SDGameController {
   injectSDStyles();
   activeContainer = container;
-  clearAiTimer();
 
   const controller: SDGameController = {
     state: createInitialState(),
@@ -104,7 +83,6 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -126,7 +104,7 @@ function updateUI(controller: SDGameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
   const computerTurn = isComputerTurnPending(controller);
-  clearElement(container);
+  container.innerHTML = '';
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -154,25 +132,6 @@ function updateUI(controller: SDGameController): void {
   }
 
   gameArea.appendChild(status);
-
-  // Secondary hint (keeps primary status copy stable for locked tests)
-  if (!state.winner && !computerTurn) {
-    const hint = document.createElement('div');
-    hint.className = 'sd-turn-hint';
-    hint.setAttribute('aria-hidden', 'true');
-    if (state.phase === 'placing' && state.selectedDomino) {
-      hint.textContent =
-        'Green cells are legal. Tap one to place, or tap another playable domino.';
-      gameArea.appendChild(hint);
-    } else if (state.phase === 'placing') {
-      hint.textContent =
-        'Highlighted dominoes match this dice sum. Pick one, then a green cell.';
-      gameArea.appendChild(hint);
-    } else if (state.phase === 'passing') {
-      hint.textContent = 'No tile fits this roll — tap Pass Turn to continue.';
-      gameArea.appendChild(hint);
-    }
-  }
 
   // Winner banner
   if (state.winner) {
@@ -258,11 +217,9 @@ function updateUI(controller: SDGameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn — single scheduled timer (clears prior) so rebuilds cannot stack
+  // AI turn
   if (computerTurn) {
-    scheduleAI(controller, 800);
-  } else {
-    clearAiTimer();
+    setTimeout(() => makeAIMove(controller), 800);
   }
 }
 
@@ -329,16 +286,12 @@ function makeAIMove(controller: SDGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
   if (state.winner || !aiPlayer) return;
-  // Hard seat guard — refuse to act on the human seat (stale timer safety net)
-  if (!isComputerTurnPending(controller)) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
     controller.state = doRollDice(state);
     controller.update();
-    if (isComputerTurnPending(controller)) {
-      scheduleAI(controller, 600);
-    }
+    setTimeout(() => makeAIMove(controller), 600);
     return;
   }
 
@@ -351,37 +304,14 @@ function makeAIMove(controller: SDGameController): void {
 
   // Get AI move from the module
   if (state.phase === 'placing' && state.currentDice) {
-    let move = getAIMove(state, aiPlayer, aiDifficulty);
-
-    // Fallback: if the scorer returns null but a legal placement exists,
-    // play the first valid tile so the AI seat never soft-locks.
-    if (!move) {
-      const sum = getDiceSum(state.currentDice);
-      const hand = state.hands[aiPlayer];
-      for (const domino of hand) {
-        const placements = getValidPlacements(state, domino, sum);
-        if (placements.length > 0) {
-          move = {
-            dominoId: domino.id,
-            position: placements[0].position,
-            orientation: placements[0].orientation,
-          };
-          break;
-        }
-      }
-    }
+    const move = getAIMove(state, aiPlayer, aiDifficulty);
 
     if (move) {
       let newState = selectDomino(state, move.dominoId);
       newState = placeDomino(newState, move.position, move.orientation);
       controller.state = newState;
       controller.update();
-      return;
     }
-
-    // Truly no legal placement (state desync) — escape via pass phase
-    controller.state = passTurn({ ...state, phase: 'passing' });
-    controller.update();
   }
 }
 
@@ -428,8 +358,5 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timer and drop mounts (route change / error boundary). */
-export function destroyGame(): void {
-  clearAiTimer();
-  activeContainer = null;
-}
+/** Tip-held destroy hook for tip mounts / #501. */
+export function destroyGame(): void {}

@@ -1,9 +1,15 @@
 // Stars & Bars Board UI
 // Renders the attribute logic board and cards
 
-import { injectStylesOnce } from '../../ui/inject-styles';
-import type { StarsState, AttributeCard, Player } from './types';
-import { CONFIG, COLOR_VALUES, countDifferences } from './types';
+import type {
+  StarsState,
+  AttributeCard,
+  Player} from './types';
+import {
+  CONFIG,
+  COLOR_VALUES,
+  countDifferences,
+} from './types';
 import { getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import {
@@ -16,17 +22,19 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
-import { getPlayerName } from '../../ui/seat-labels';
-export { getPlayerName };
 
 // =============================================================================
 // Style Injection
 // =============================================================================
 
+let stylesInjected = false;
+
 export function injectStarsStyles(): void {
-  injectStylesOnce(
-    'stars-styles',
-    `
+  if (stylesInjected) return;
+  stylesInjected = true;
+
+  const style = document.createElement('style');
+  style.textContent = `
     .stars-game-area {
       display: flex;
       flex-direction: column;
@@ -43,18 +51,14 @@ export function injectStarsStyles(): void {
       text-align: center;
     }
 
-    .stars-status.status-ai-thinking {
-      font-style: italic;
-    }
-
     .stars-status.player1 {
       background: rgba(25, 118, 210, 0.2);
-      color: var(--color-player1-on-dark, #60a5fa);
+      color: var(--color-player1, #1976d2);
     }
 
     .stars-status.player2 {
       background: rgba(229, 57, 53, 0.2);
-      color: #fca5a5;
+      color: var(--color-player2, #e53935);
     }
 
     [data-opponent="ai"] .stars-status.player2 {
@@ -83,12 +87,12 @@ export function injectStarsStyles(): void {
 
     .stars-score.player1 {
       background: rgba(25, 118, 210, 0.15);
-      color: var(--color-player1-on-dark, #60a5fa);
+      color: var(--color-player1, #1976d2);
     }
 
     .stars-score.player2 {
       background: rgba(229, 57, 53, 0.15);
-      color: #fca5a5;
+      color: var(--color-player2, #e53935);
     }
 
     [data-opponent="ai"] .stars-score.player2 {
@@ -195,8 +199,8 @@ export function injectStarsStyles(): void {
       text-align: center;
     }
 
-    .stars-hand-label.player1 { color: var(--color-player1-on-dark, #60a5fa); }
-    .stars-hand-label.player2 { color: #fca5a5; }
+    .stars-hand-label.player1 { color: var(--color-player1, #1976d2); }
+    .stars-hand-label.player2 { color: var(--color-player2, #e53935); }
 
     .stars-hand {
       display: flex;
@@ -207,8 +211,6 @@ export function injectStarsStyles(): void {
     .stars-card {
       width: 60px;
       height: 60px;
-      min-width: 44px;
-      min-height: 44px;
       background: #4d4d4d;
       border-radius: 8px;
       display: flex;
@@ -256,23 +258,21 @@ export function injectStarsStyles(): void {
     }
 
     .stars-btn {
-      padding: 0.65rem 1.1rem;
+      padding: 0.5rem 1rem;
       border: none;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.95rem;
-      min-height: 44px;
-      min-width: 44px;
+      font-size: 0.9rem;
       transition: all 0.2s;
     }
 
     .stars-btn-primary {
-      background: #15803d; /* AA white-on-fill (was #4caf50 ~2.8:1) */
+      background: #4caf50;
       color: white;
     }
 
     .stars-btn-primary:hover {
-      background: #166534;
+      background: #388e3c;
     }
 
     .stars-btn-secondary {
@@ -309,8 +309,8 @@ export function injectStarsStyles(): void {
       border-bottom: none;
     }
 
-    .stars-move-item.player1 { color: var(--color-player1-text, #1d4ed8); }
-    .stars-move-item.player2 { color: var(--color-player2-text, #b91c1c); }
+    .stars-move-item.player1 { color: var(--color-player1, #64b5f6); }
+    .stars-move-item.player2 { color: var(--color-player2, #ef9a9a); }
 
     .stars-tooltip {
       position: absolute;
@@ -323,65 +323,17 @@ export function injectStarsStyles(): void {
       pointer-events: none;
       white-space: nowrap;
     }
-
-    /* Tablet / touch: keep cells, hand cards, and controls ≥44px */
-    @media (pointer: coarse), (max-width: 900px) {
-      .stars-board {
-        grid-template-columns: repeat(${CONFIG.BOARD_SIZE}, minmax(44px, 70px));
-        gap: 4px;
-      }
-
-      .stars-cell {
-        width: auto;
-        height: auto;
-        min-width: 44px;
-        min-height: 44px;
-        aspect-ratio: 1;
-      }
-
-      .stars-card {
-        width: 56px;
-        height: 56px;
-        min-width: 48px;
-        min-height: 48px;
-      }
-
-      .stars-btn {
-        min-height: 48px;
-        min-width: 132px;
-        padding: 0.75rem 1.25rem;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .stars-winner-banner {
-        animation: none !important;
-      }
-      .stars-card.selected {
-        transform: none;
-      }
-      .stars-btn {
-        transition: none !important;
-      }
-    }
-
-    html[data-reduced-motion='true'] .stars-winner-banner {
-      animation: none !important;
-    }
-    html[data-reduced-motion='true'] .stars-card.selected {
-      transform: none;
-    }
-  `
-  );
+  `;
+  document.head.appendChild(style);
 }
 
 // =============================================================================
 // Player Names
 // =============================================================================
 
-/**
- * Seat label for chrome. In human-vs-AI, player1 is "You" and player2 is "Computer".
- */
+export function getPlayerName(player: Player): string {
+  return player === 'player1' ? 'Blue' : 'Red';
+}
 
 // =============================================================================
 // Card Rendering
@@ -474,8 +426,6 @@ function renderCardSVG(card: AttributeCard, size: number = 50): SVGSVGElement {
 export interface StarsBoardRenderOptions {
   /** When false, suppress placement highlights and activate handlers (AI seat). */
   allowInput?: boolean;
-  /** Human-vs-AI seat labels (You / Computer). */
-  vsAI?: boolean;
 }
 
 /**
@@ -542,9 +492,7 @@ export function renderBoard(
         cellEl.appendChild(cardSvg);
       }
 
-      const owner = cell.owner
-        ? getPlayerName(cell.owner, options.vsAI === true)
-        : undefined;
+      const owner = cell.owner ? getPlayerName(cell.owner) : undefined;
       const piece = cell.card
         ? `${cell.card.size} ${cell.card.thickness} ${cell.card.color} ${cell.card.shape}`
         : undefined;
@@ -631,14 +579,9 @@ export function renderPlayerHand(
   const container = document.createElement('div');
   container.className = 'stars-hand-container';
 
-  const vsAI = options.vsAI === true;
   const label = document.createElement('div');
   label.className = `stars-hand-label ${player}`;
-  const name = getPlayerName(player, vsAI);
-  label.textContent =
-    vsAI && player === 'player1'
-      ? `${seatIcon(player)} Your Hand`
-      : `${seatIcon(player)} ${name}'s Hand`;
+  label.textContent = `${seatIcon(player)} ${getPlayerName(player)}'s Hand`;
   container.appendChild(label);
 
   const hand = document.createElement('div');
@@ -703,21 +646,17 @@ export function renderPlayerHand(
 /**
  * Render scores
  */
-export function renderScores(
-  state: StarsState,
-  options: StarsBoardRenderOptions = {}
-): HTMLElement {
+export function renderScores(state: StarsState): HTMLElement {
   const container = document.createElement('div');
   container.className = 'stars-scores';
-  const vsAI = options.vsAI === true;
 
   const p1Score = document.createElement('div');
   p1Score.className = 'stars-score player1';
-  p1Score.textContent = `${seatIcon('player1')} ${getPlayerName('player1', vsAI)}: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
+  p1Score.textContent = `${seatIcon('player1')} Blue: ${state.playerScores.player1} / ${CONFIG.TARGET_SCORE}`;
 
   const p2Score = document.createElement('div');
   p2Score.className = 'stars-score player2';
-  p2Score.textContent = `${seatIcon('player2')} ${getPlayerName('player2', vsAI)}: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
+  p2Score.textContent = `${seatIcon('player2')} Red: ${state.playerScores.player2} / ${CONFIG.TARGET_SCORE}`;
 
   container.appendChild(p1Score);
   container.appendChild(p2Score);
@@ -732,26 +671,21 @@ export function renderScores(
 /**
  * Render move history
  */
-export function renderMoveHistory(
-  state: StarsState,
-  options: StarsBoardRenderOptions = {}
-): HTMLElement {
+export function renderMoveHistory(state: StarsState): HTMLElement {
   const container = document.createElement('div');
   container.className = 'stars-move-history';
-  const vsAI = options.vsAI === true;
 
   const title = document.createElement('h3');
   title.textContent = 'Move History';
   container.appendChild(title);
 
-  // Full history display (do not cap — #501 fold held player-visible trim for Andrew).
   for (let i = state.moveHistory.length - 1; i >= 0; i--) {
-    const move = state.moveHistory[i]!;
+    const move = state.moveHistory[i];
     const moveEl = document.createElement('div');
     moveEl.className = `stars-move-item ${move.player}`;
 
     const posStr = `(${move.row + 1},${String.fromCharCode(65 + move.col)})`;
-    moveEl.textContent = `${getPlayerName(move.player, vsAI)}: ${move.card.shape} at ${posStr} = +${move.score}`;
+    moveEl.textContent = `${getPlayerName(move.player)}: ${move.card.shape} at ${posStr} = +${move.score}`;
 
     container.appendChild(moveEl);
   }
