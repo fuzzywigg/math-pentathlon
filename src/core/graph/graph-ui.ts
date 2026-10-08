@@ -412,8 +412,15 @@ export function animateMove(
       const endX = toNode.position.x - offsetX + 40;
       const endY = toNode.position.y - offsetY + 40;
 
-      marker.setAttribute('cx', String(startX));
-      marker.setAttribute('cy', String(startY));
+      if (!marker) {
+        finish();
+        return;
+      }
+      // Narrow to a local non-null binding for nested rAF closures.
+      const liveMarker: SVGCircleElement = marker;
+
+      liveMarker.setAttribute('cx', String(startX));
+      liveMarker.setAttribute('cy', String(startY));
 
       const startTime = performance.now();
 
@@ -428,8 +435,8 @@ export function animateMove(
         const x = startX + (endX - startX) * progress;
         const y = startY + (endY - startY) * progress;
 
-        marker.setAttribute('cx', String(x));
-        marker.setAttribute('cy', String(y));
+        liveMarker.setAttribute('cx', String(x));
+        liveMarker.setAttribute('cy', String(y));
 
         if (progress < 1) {
           rafId = requestAnimationFrame(animate);
