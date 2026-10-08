@@ -149,8 +149,8 @@ jobs:
         timeout-minutes: 12
         run: |
           set -euo pipefail
-          count="$(find tests/e2e -name '*.spec.ts' | wc -l | tr -d ' ')"
-          echo "e2e suite: ${count} files (smoke + bug-guards + mp3d)"
+          count="$(find tests/e2e -name '*.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
+          echo "e2e suite: ${count} files (smoke + bug-guards + mp3d; @fullgame excluded)"
           npm run test:e2e:chromium
       - name: Upload Playwright report
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -159,6 +159,57 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  # Full human-vs-human game-over suite (20 games). Report-only:
+  # failures upload artifacts but do not fail the workflow.
+  e2e-fullgame:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run fullgame HvH suite (report-only)
+        id: fullgame
+        continue-on-error: true
+        timeout-minutes: 80
+        run: |
+          set -euo pipefail
+          echo "e2e-fullgame: report-only — burn-1007-mp-e2e-fullgame"
+          npm run test:e2e:fullgame
+      - name: Upload fullgame Playwright report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: playwright-report-fullgame
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.fullgame.outcome == 'failure'
+        run: |
+          echo "::warning::e2e-fullgame findings or timeouts (report-only; workflow stays green)"
+          exit 0
 
   # Phone + tablet touch smoke (iPhone 13 / Pixel 7 / iPad). Report-only:
   # failures upload artifacts but do not fail the workflow.
@@ -246,9 +297,9 @@ jobs:
           CROSS_BROWSER: '1'
         run: |
           set -euo pipefail
-          count="$(find tests/e2e -name '*.spec.ts' ! -name 'mobile-touch-smoke.spec.ts' ! -name 'visual-baseline.spec.ts' | wc -l | tr -d ' ')"
-          echo "cross-browser e2e (report-only): ${count} specs × firefox + webkit"
-          npm run test:e2e -- --project=firefox --project=webkit
+          count="$(find tests/e2e -name '*.spec.ts' ! -name 'mobile-touch-smoke.spec.ts' ! -name 'visual-baseline.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
+          echo "cross-browser e2e (report-only): ${count} specs × firefox + webkit (@fullgame excluded)"
+          npm run test:e2e -- --project=firefox --project=webkit --grep-invert @fullgame
       - name: Upload cross-browser Playwright report
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()

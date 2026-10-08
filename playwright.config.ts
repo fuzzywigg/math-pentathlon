@@ -8,13 +8,18 @@ import { defineConfig, devices } from '@playwright/test';
  * - `firefox`, `webkit`, `ipad-webkit` — cross-browser (CI report-only: firefox+webkit)
  * - `visual-desktop`, `visual-phone` — start + openings baselines (`npm run test:e2e:visual`)
  *
- * CI required e2e: chromium. Report-only: mobile-touch + e2e-cross-browser + visual-baseline.
+ * CI required e2e: chromium (`test:e2e:chromium` grep-inverts `@fullgame`).
+ * Report-only: mobile-touch + e2e-cross-browser + visual-baseline + e2e-fullgame.
  *   npm run test:e2e:cross
  *   npm run test:e2e -- --project=firefox --project=webkit
  *   CROSS_BROWSER=1 …        # env documented for CI matrices
  *
  * Mobile touch smoke (phone + tablet, report-only):
  *   npm run test:e2e:mobile
+ *
+ * Full HvH game-over suite (report-only, Chromium):
+ *   npm run test:e2e:fullgame
+ *   npx playwright test tests/e2e/fullgame --project=chromium
  *
  * Default `npm run test:e2e` (no --project) runs every registered project. Prefer
  * an explicit `--project=` list, or use the npm scripts below, so Chromium-only
