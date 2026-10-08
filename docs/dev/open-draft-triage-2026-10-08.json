@@ -2,8 +2,8 @@
   "task_id": "burn-1008-mp-open-draft-triage",
   "generated_at_utc": "2026-10-08T06:40:00Z",
   "tip_branch": "cursor/integration-fold-wave5-tip-4af0",
-  "tip_sha": "7b99c2bbd63b4634a5fef9703c9aa76b6d61c343",
-  "tip_sha_short": "7b99c2bbd63b",
+  "tip_sha": "5f5712366d20680ba7e62ae731e3681ef81609cc",
+  "tip_sha_short": "5f5712366d20",
   "open_pr_count": 121,
   "classification_counts": {
     "fold_worthy": 23,
@@ -3698,5 +3698,6 @@
         "supersede_note_from_tip_log": null
       }
     }
-  ]
+  ],
+  "tip_note": "Classifications computed against 7b99c2bb; tip later advanced via docs-only tipSha refresh with the same 121 open PRs."
 }

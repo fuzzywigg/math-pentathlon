@@ -2,7 +2,8 @@
 
 **Task id:** `burn-1008-mp-open-draft-triage`  
 **Tip branch:** `cursor/integration-fold-wave5-tip-4af0`  
-**Tip SHA checked:** `7b99c2bbd63b4634a5fef9703c9aa76b6d61c343` (`7b99c2bbd63b`)  
+**Tip SHA checked:** `5f5712366d20680ba7e62ae731e3681ef81609cc` (`5f5712366d20`)  
+**Note:** Row evidence was computed at `7b99c2bb` (fold of #505); tip then advanced by a docs-only tipSha refresh with the same 121 open PRs.  
 **Open drafts enumerated:** 121 (all `isDraft: true`)  
 **Machine-readable twin:** [`open-draft-triage-2026-10-08.json`](./open-draft-triage-2026-10-08.json)  
 **Scope:** report only — no PR closes, comments, edits, merges, or ready-for-review flips.
@@ -243,7 +244,7 @@ gh pr list --repo fuzzywigg/math-pentathlon --state open --limit 200 --json numb
 # → 121
 
 git rev-parse origin/cursor/integration-fold-wave5-tip-4af0
-# → 7b99c2bbd63b4634a5fef9703c9aa76b6d61c343
+# → 5f5712366d20680ba7e62ae731e3681ef81609cc
 
 # Spot-check (#459 content identity)
 git rev-parse 7b99c2bbd63b4634a5fef9703c9aa76b6d61c343:tests/unit/engine-coverage-hex-a-gone-targeted.test.ts
