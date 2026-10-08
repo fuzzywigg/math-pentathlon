@@ -101,11 +101,11 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 - alpha -- trunk. All development merges here.
 - main -- `317` behind / `2` ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
 
-## Status (2026-10-07)
+## Status (2026-10-08)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: 3057 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`) + 34 Playwright specs under `tests/e2e` (visual baselines in `tests/e2e/visual-baselines/`)
-- CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, and `visual-baseline` (see `docs/wiki/development.md`)
+- Tests: **3083** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **11361** passed / 19 skipped on tip CI) + **34** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **204** passed on tip CI). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
+- CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
 - `origin/alpha` is the trunk tip; the integration tip may be ahead of alpha.
 
 ## Agent rules

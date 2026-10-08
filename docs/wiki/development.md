@@ -90,7 +90,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
@@ -102,7 +102,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to roughly 3k keepers (handwritten + behavioral TOKENMAXX + FIAR leave-alone). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
+The Vitest unit suite under `tests/unit` was pruned from ~5k TOKENMAXX-generated files down to **3083** keepers excl. `_tokenmaxx_archive` (handwritten + behavioral TOKENMAXX + FIAR leave-alone; tip CI **11361** passed / 19 skipped). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`).
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
