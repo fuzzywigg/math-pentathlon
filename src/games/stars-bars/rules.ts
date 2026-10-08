@@ -54,7 +54,8 @@ function shuffle<T>(array: T[]): T[] {
   const result = [...array];
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    // ratchet: dense copy — indexed elements exist for i,j in range (emit-identical `as`).
+    [result[i], result[j]] = [result[j], result[i]] as [T, T];
   }
   return result;
 }
