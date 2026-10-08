@@ -2,9 +2,9 @@
   "schemaVersion": 1,
   "reportOnly": true,
   "description": "Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.",
-  "taskId": "burn-1008-mp-type-ratchet-batch2-3-4-combined",
-  "generatedAt": "2026-10-08T12:57:56.310Z",
-  "tipSha": "3c12adeb03907024da16b46452837eb333e834d2",
+  "taskId": "burn-1008-mp-type-ratchet-batch-7",
+  "generatedAt": "2026-10-08T12:44:30.885Z",
+  "tipSha": "pending-fold-573",
   "commands": {
     "export": "node docs/dev/type-ratchet-phase2-export.mjs",
     "check": "node docs/dev/type-ratchet-phase2-export.mjs --check",
@@ -19,14 +19,14 @@
     "noImplicitReturns"
   ],
   "inScopeErrors": 0,
-  "outOfScopeErrors": 220,
+  "outOfScopeErrors": 216,
   "fileCount": 28,
   "byKind": {
-    "ai_search_scoring": 220
+    "ai_search_scoring": 216
   },
   "byRootCause": {
     "unchecked_index_access": 202,
-    "exact_optional_property_types": 15,
+    "exact_optional_property_types": 11,
     "undefined_as_index": 2,
     "possibly_undefined_iterable": 1
   },
@@ -34,45 +34,45 @@
     "TS2532": 88,
     "TS18048": 59,
     "TS2322": 44,
-    "TS2379": 13,
     "TS2345": 11,
+    "TS2379": 9,
     "TS2375": 2,
     "TS2538": 2,
     "TS2488": 1
   },
   "byGame": {
-    "fab-a-diffy": 20,
     "contig-60": 19,
+    "fab-a-diffy": 19,
     "juggle": 18,
     "stars-bars": 18,
-    "hex": 17,
+    "hex": 16,
     "kwatro-sinko": 16,
     "calla": 15,
-    "fiar": 12,
     "pent-em-in": 12,
+    "fiar": 11,
     "kings-quadraphages": 11,
     "hex-a-gone": 9,
     "par-55": 8,
     "ramrod": 8,
     "sum-dominoes": 8,
     "prime-gold": 7,
-    "queens-guards": 6,
     "star-track": 6,
+    "queens-guards": 5,
     "frac-fact": 4,
     "remainder-islands": 4,
     "fraction-pinball": 2
   },
   "perGame": {
-    "fab-a-diffy": {
-      "total": 20,
-      "ai_search_scoring": 20,
+    "contig-60": {
+      "total": 19,
+      "ai_search_scoring": 19,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
       "shell_misc": 0,
       "other": 0
     },
-    "contig-60": {
+    "fab-a-diffy": {
       "total": 19,
       "ai_search_scoring": 19,
       "rules_engine": 0,
@@ -100,8 +100,8 @@
       "other": 0
     },
     "hex": {
-      "total": 17,
-      "ai_search_scoring": 17,
+      "total": 16,
+      "ai_search_scoring": 16,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
@@ -126,7 +126,7 @@
       "shell_misc": 0,
       "other": 0
     },
-    "fiar": {
+    "pent-em-in": {
       "total": 12,
       "ai_search_scoring": 12,
       "rules_engine": 0,
@@ -135,9 +135,9 @@
       "shell_misc": 0,
       "other": 0
     },
-    "pent-em-in": {
-      "total": 12,
-      "ai_search_scoring": 12,
+    "fiar": {
+      "total": 11,
+      "ai_search_scoring": 11,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
@@ -198,7 +198,7 @@
       "shell_misc": 0,
       "other": 0
     },
-    "queens-guards": {
+    "star-track": {
       "total": 6,
       "ai_search_scoring": 6,
       "rules_engine": 0,
@@ -207,9 +207,9 @@
       "shell_misc": 0,
       "other": 0
     },
-    "star-track": {
-      "total": 6,
-      "ai_search_scoring": 6,
+    "queens-guards": {
+      "total": 5,
+      "ai_search_scoring": 5,
       "rules_engine": 0,
       "game_ui": 0,
       "other_game_module": 0,
@@ -263,15 +263,15 @@
     "src/games/star-track/ai.ts": 6,
     "src/games/frac-fact/ai.ts": 4,
     "src/games/remainder-islands/ai.ts": 4,
-    "src/games/hex/ai-client.ts": 3,
     "src/games/queens-guards/ai.ts": 3,
-    "src/games/fab-a-diffy/ai-client.ts": 2,
-    "src/games/fiar/ai-client.ts": 2,
     "src/games/fraction-pinball/ai.ts": 2,
-    "src/games/queens-guards/ai-client.ts": 2,
+    "src/games/hex/ai-client.ts": 2,
+    "src/games/fab-a-diffy/ai-client.ts": 1,
     "src/games/fab-a-diffy/ai.worker.ts": 1,
+    "src/games/fiar/ai-client.ts": 1,
     "src/games/fiar/ai.worker.ts": 1,
     "src/games/hex/ai.worker.ts": 1,
+    "src/games/queens-guards/ai-client.ts": 1,
     "src/games/queens-guards/ai.worker.ts": 1
   },
   "errors": [
@@ -626,16 +626,6 @@
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
-      "file": "src/games/fab-a-diffy/ai-client.ts",
-      "line": 46,
-      "col": 30,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "ai_search_scoring",
-      "game": "fab-a-diffy",
-      "message": "Argument of type '{ game: \"fab-a-diffy\"; state: FabADiffyState; player: Player; difficulty: AIDifficulty; seed: number | undefined; deadlineMs: number; }' is not assignable to parameter of type 'AiWorkerRequestPayload' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
       "file": "src/games/fab-a-diffy/ai.ts",
       "line": 121,
       "col": 26,
@@ -824,16 +814,6 @@
       "kind": "ai_search_scoring",
       "game": "fiar",
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/fiar/ai-client.ts",
-      "line": 45,
-      "col": 30,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "ai_search_scoring",
-      "game": "fiar",
-      "message": "Argument of type '{ game: \"fiar\"; state: FiarGameState; player: Player; difficulty: AIDifficulty; seed: number | undefined; deadlineMs: number; }' is not assignable to parameter of type 'AiWorkerRequestPayload' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
       "file": "src/games/fiar/ai.ts",
@@ -1094,16 +1074,6 @@
       "kind": "ai_search_scoring",
       "game": "hex",
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/hex/ai-client.ts",
-      "line": 56,
-      "col": 14,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "ai_search_scoring",
-      "game": "hex",
-      "message": "Argument of type '{ game: \"hex\"; state: HexGameState; player: Player; difficulty: AIDifficulty; seed: number | undefined; deadlineMs: number; }' is not assignable to parameter of type 'AiWorkerRequestPayload' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
       "file": "src/games/hex/ai-client.ts",
@@ -1984,16 +1954,6 @@
       "kind": "ai_search_scoring",
       "game": "queens-guards",
       "message": "Argument of type '{ seed: number | undefined; deadlineMs: number | undefined; }' is not assignable to parameter of type 'AISearchOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
-    },
-    {
-      "file": "src/games/queens-guards/ai-client.ts",
-      "line": 46,
-      "col": 30,
-      "code": "TS2379",
-      "rootCause": "exact_optional_property_types",
-      "kind": "ai_search_scoring",
-      "game": "queens-guards",
-      "message": "Argument of type '{ game: \"queens-guards\"; state: QueensGuardsState; player: Player; difficulty: AIDifficulty; seed: number | undefined; deadlineMs: number; }' is not assignable to parameter of type 'AiWorkerRequestPayload' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties."
     },
     {
       "file": "src/games/queens-guards/ai.ts",

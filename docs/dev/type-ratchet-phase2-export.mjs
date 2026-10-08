@@ -61,9 +61,35 @@ const IN_SCOPE = new RegExp(
     '^src/games/contig-60/rules\\.ts$',
     '^src/games/juggle/rules\\.ts$',
     '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
+    // Phase 2 Batch 7 — remaining non-AI shell/types/UI/loaders + helper tests
+    // (tutorials/copy skipped; prime-gold/game-controller owned by open #567)
+    '^src/games/calla/(types|game-controller|index)\\.ts$',
+    '^src/games/contig-60/game-controller\\.ts$',
+    '^src/games/fab-a-diffy/game-controller\\.ts$',
+    '^src/games/fiar/(game-controller|layout|board-3d-loader)\\.ts$',
+    '^src/games/frac-fact/(types|board-ui|game-controller)\\.ts$',
+    '^src/games/fraction-pinball/(types|board-ui|game-controller)\\.ts$',
+    '^src/games/hex/(types|game-controller)\\.ts$',
+    '^src/games/hex-a-gone/(types|game-controller|board-3d-loader)\\.ts$',
+    '^src/games/juggle/types\\.ts$',
+    '^src/games/kings-quadraphages/(game-controller|pieces|serialization|board-3d-loader)\\.ts$',
+    '^src/games/kwatro-sinko/(types|game-controller|board-3d-loader)\\.ts$',
+    '^src/games/par-55/game-controller\\.ts$',
+    '^src/games/pent-em-in/(game-controller|board-3d-loader)\\.ts$',
+    '^src/games/prime-gold/board-3d-loader\\.ts$',
+    '^src/games/queens-guards/(game-controller|board-3d-loader)\\.ts$',
+    '^src/games/ramrod/game-controller\\.ts$',
+    '^src/games/remainder-islands/game-controller\\.ts$',
+    '^src/games/star-track/(board-ui|board-3d-loader)\\.ts$',
+    '^src/games/stars-bars/(types|game-controller)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
+    '^tests/unit/burn-wave14-types-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave35-fab-a-diffy-format-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave35-ramrod-box-format-helpers\\.test\\.ts$',
+    '^tests/unit/burn-wave41-fab-pass-winner-helpers\\.test\\.ts$',
+    '^tests/unit/overnight-dice-selector-reset-helpers\\.test\\.ts$',
   ].join('|')
 );
 
@@ -244,7 +270,7 @@ const baseline = {
   reportOnly: true,
   description:
     'Phase-2 type-ratchet baseline: out-of-scope errors under tsconfig.ratchet.json. Counts must only decrease.',
-  taskId: 'burn-1008-mp-type-ratchet-batch2-3-4-combined',
+  taskId: 'burn-1008-mp-type-ratchet-batch-7',
   generatedAt: new Date().toISOString(),
   tipSha,
   commands: {

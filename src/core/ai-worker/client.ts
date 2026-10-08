@@ -3,8 +3,10 @@ import type { AiWorkerGameId, AiWorkerResponse } from './protocol';
 
 export interface AiWorkerRequestPayload {
   game: AiWorkerGameId;
-  seed?: number;
-  deadlineMs?: number;
+  /** Present-or-absent; may be explicitly undefined under EOPT call sites. */
+  seed?: number | undefined;
+  /** Present-or-absent; may be explicitly undefined under EOPT call sites. */
+  deadlineMs?: number | undefined;
   [key: string]: unknown;
 }
 

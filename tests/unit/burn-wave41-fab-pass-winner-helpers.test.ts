@@ -17,7 +17,9 @@ import type { AnswerBar, FractionBar, FabADiffyState } from '../../src/games/fab
 describe('Wave 41 Fab — pass / winner settle', () => {
   it('passTurn clears selection and flips seat when opponent can move', () => {
     let state = createInitialState();
-    const [a, b] = [...state.fractionBars.keys()];
+    const keys = [...state.fractionBars.keys()];
+    const a = keys[0]!;
+    const b = keys[1]!;
     state = selectBar1(state, a);
     state = selectBar2(state, b);
     state = selectOperation(state, 'add');
@@ -37,7 +39,7 @@ describe('Wave 41 Fab — pass / winner settle', () => {
     }
     // leave only one unused → hasAnyValidMove false
     const ids = [...bars.keys()];
-    bars.set(ids[0], { ...bars.get(ids[0])!, used: false });
+    bars.set(ids[0]!, { ...bars.get(ids[0]!)!, used: false });
     const jammed: FabADiffyState = {
       ...state,
       fractionBars: bars,
@@ -83,8 +85,8 @@ describe('Wave 41 Fab — pass / winner settle', () => {
     const answers = new Map(state.answerBars);
     // claim a few unequally, leave some open so first branch skipped
     const ids = [...answers.keys()];
-    answers.set(ids[0], { ...answers.get(ids[0])!, claimedBy: 'player2' });
-    answers.set(ids[1], { ...answers.get(ids[1])!, claimedBy: 'player2' });
+    answers.set(ids[0]!, { ...answers.get(ids[0]!)!, claimedBy: 'player2' });
+    answers.set(ids[1]!, { ...answers.get(ids[1]!)!, claimedBy: 'player2' });
     const bars = new Map(state.fractionBars);
     const barIds = [...bars.keys()];
     barIds.forEach((id, idx) => {

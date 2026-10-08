@@ -7,9 +7,9 @@ export interface AiWorkerRequestBase {
   id: number;
   game: AiWorkerGameId;
   /** Optional seed → deterministic Math.random replacement. */
-  seed?: number;
+  seed?: number | undefined;
   /** Absolute wall-time budget; see AI_WORKER_SAFETY_DEADLINE_MS. */
-  deadlineMs?: number;
+  deadlineMs?: number | undefined;
 }
 
 export interface AiWorkerSuccess<TMove> {
