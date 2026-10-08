@@ -4,9 +4,9 @@
 **Task (Batch 0+1 implement):** `burn-1008-mp-type-ratchet-p2`  
 **Task (Batch 2 compliant recut):** `burn-1008-mp-type-ratchet-batch2-compliant-recut` (supersedes #537 for folding)  
 **Tip / base:** `cursor/integration-fold-wave5-tip-4af0`  
-**Status:** Batches **0–4** + tip folds (#546/#544/#551/#553 surface) cleared non-AI UI/shell/types; Batch **6** (`#557`, after `#561`) folded emit-identical / pure `!` rules/engine (ceiling **286 → 220**); pent-em-in BoardCell EOPT rebuild held for Andrew. True eligible floor: AI modules + held rebuild. Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md). Batch notes: [`type-ratchet-batch5.md`](./type-ratchet-batch5.md), [`type-ratchet-batch6.md`](./type-ratchet-batch6.md).
+**Status:** Batches **0–4** + tip folds (#546/#544/#551/#553 surface) cleared non-AI UI/shell/types; Batch **6** (`#557`, after `#561`) folded emit-identical / pure `!` rules/engine (ceiling **286 → 220**); Batch **7** core EOPT widen + helper-test gate (ceiling **220 → 216**) and locks remaining non-AI shell modules — see [`type-ratchet-batch-7.md`](./type-ratchet-batch-7.md). pent-em-in BoardCell EOPT rebuild held for Andrew. True eligible floor: AI modules (#560 option) + held rebuild. Deferred #537 nullish rewrites: [`type-ratchet-batch2-owner-decisions.md`](./type-ratchet-batch2-owner-decisions.md). Batch notes: [`type-ratchet-batch5.md`](./type-ratchet-batch5.md), [`type-ratchet-batch6.md`](./type-ratchet-batch6.md), [`type-ratchet-batch-7.md`](./type-ratchet-batch-7.md).
 **Export / check script:** [`type-ratchet-phase2-export.mjs`](./type-ratchet-phase2-export.mjs) (`node docs/dev/type-ratchet-phase2-export.mjs` writes baseline; `--check` / `npm run typecheck:ratchet` fail if out-of-scope count rises).  
-**Next batch:** Batch **A** — AI modules (Andrew gate; Hex Hard 450ms assert stays).
+**Next batch:** Batch **A** — AI modules (Andrew gate / [#560](https://github.com/fuzzywigg/math-pentathlon/pull/560); Hex Hard 450ms assert stays).
 
 **Companion:** [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 
