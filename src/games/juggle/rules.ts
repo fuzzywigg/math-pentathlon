@@ -90,7 +90,8 @@ export function selectDie(state: JuggleState, dieIndex: 0 | 1): JuggleState {
   const shapes = getShapesForDie(dieValue);
 
   // Auto-select first shape if only one option
-  const autoShape = shapes.length === 1 ? shapes[0] : null;
+  // ratchet: length === 1 guarantees shapes[0].
+  const autoShape = shapes.length === 1 ? shapes[0]! : null;
 
   const next: JuggleState = {
     ...state,
@@ -189,7 +190,8 @@ export function rotateShape(state: JuggleState): JuggleState {
 
   const rotations: Rotation[] = [0, 90, 180, 270];
   const currentIndex = rotations.indexOf(state.selectedRotation);
-  const nextRotation = rotations[(currentIndex + 1) % 4];
+  // ratchet: rotations is length-4; (currentIndex+1)%4 is always 0..3.
+  const nextRotation = rotations[(currentIndex + 1) % 4]!;
 
   return {
     ...state,

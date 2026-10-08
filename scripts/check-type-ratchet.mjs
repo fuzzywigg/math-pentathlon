@@ -53,6 +53,15 @@ const IN_SCOPE = new RegExp(
     '^src/games/stars-bars/board-ui\\.ts$',
     // Phase 2 Batch 4 — prime-gold types + board-ui (rules/AI deferred)
     '^src/games/prime-gold/(types|board-ui)\\.ts$',
+    // Phase 2 Batch 6 — remaining non-AI rules/engine (type-only !; AI deferred)
+    '^src/games/stars-bars/rules\\.ts$',
+    '^src/games/hex/rules\\.ts$',
+    '^src/games/prime-gold/rules\\.ts$',
+    '^src/games/kwatro-sinko/rules\\.ts$',
+    '^src/games/pent-em-in/rules\\.ts$',
+    '^src/games/contig-60/rules\\.ts$',
+    '^src/games/juggle/rules\\.ts$',
+    '^src/games/kings-quadraphages/(game-state|board|rules)\\.ts$',
     '^tests/(helpers|unit/helpers|e2e/helpers)/',
     '^tests/visual/helpers\\.ts$',
     '^tests/unit/(ai-determinism|engine-invariants|undo-audit|fiar-test)-helpers\\.ts$',
@@ -104,7 +113,7 @@ console.log(
   `  flags: noUncheckedIndexedAccess, exactOptionalPropertyTypes, noImplicitOverride, forceConsistentCasingInFileNames, noImplicitReturns`
 );
 console.log(
-  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3/4 shells, tests/helpers, unit *-helpers.ts`
+  `  scope: src/ui, src/core, src/demos, src/main.ts, Batch-1/2/3/4/6 shells+rules, tests/helpers, unit *-helpers.ts`
 );
 console.log(`  in-scope errors:     ${inScope.length} (must be 0)`);
 console.log(
