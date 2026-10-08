@@ -382,9 +382,9 @@ export function rotateSelectedPiece(state: PentEmInState): PentEmInState {
   const currentIndex = rotations.indexOf(state.selectedRotation);
   const nextIndex = (currentIndex + 1) % 4;
 
+  // ratchet: rotations is length-4 literal; nextIndex is always 0..3.
   return withFirstLegalPreview({
     ...state,
-    // ratchet: rotations is length-4 literal; nextIndex is always 0..3.
     selectedRotation: rotations[nextIndex]!,
   });
 }
