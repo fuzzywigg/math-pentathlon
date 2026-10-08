@@ -15,7 +15,12 @@ import {
   lockDice,
   getAllPossibleSums,
 } from './roller';
-import { renderRollResult, animateRoll, getDiceStyles } from './dice-ui';
+import {
+  renderRollResult,
+  animateRoll,
+  getDiceStyles,
+  type AnimateRollCancel,
+} from './dice-ui';
 
 export interface DiceSelectorOptions {
   /** Dice set to use */
@@ -45,6 +50,7 @@ export class DiceSelector {
   private options: Required<DiceSelectorOptions>;
   private currentResult: RollResult | null = null;
   private isRolling: boolean = false;
+  private cancelRollAnim: AnimateRollCancel | null = null;
 
   constructor(container: HTMLElement, options: DiceSelectorOptions = {}) {
     this.container = container;
@@ -336,6 +342,7 @@ export class DiceSelector {
     if (this.isRolling) return;
 
     this.isRolling = true;
+    this.cancelRollAnim?.();
     const types = this.getDiceTypes();
     const result = rollDice({ dice: types });
 
@@ -343,10 +350,11 @@ export class DiceSelector {
       '#dice-result-area'
     ) as HTMLElement;
     if (resultArea) {
-      animateRoll(resultArea, result, {
+      this.cancelRollAnim = animateRoll(resultArea, result, {
         duration: 800,
         dieSize: this.options.dieSize,
         onComplete: () => {
+          this.cancelRollAnim = null;
           this.currentResult = result;
           this.isRolling = false;
           this.render();
@@ -392,6 +400,8 @@ export class DiceSelector {
 
   /** Reset the selector */
   public reset(): void {
+    this.cancelRollAnim?.();
+    this.cancelRollAnim = null;
     this.currentResult = null;
     this.isRolling = false;
     this.render();
@@ -405,6 +415,9 @@ export class DiceSelector {
 
   /** Destroy the selector */
   public destroy(): void {
+    this.cancelRollAnim?.();
+    this.cancelRollAnim = null;
+    this.isRolling = false;
     this.container.innerHTML = '';
   }
 }

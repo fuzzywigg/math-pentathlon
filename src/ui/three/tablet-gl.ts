@@ -148,17 +148,28 @@ export function paintBoard3dAndMarkReady(
  * After mount + sync resize, schedule one more paint once layout has settled.
  * Software GL (SwiftShader) often needs a post-layout frame before the first
  * real paint succeeds and the ready attribute can be set.
+ * Returns a cancel function so unmount can drop pending frames.
  */
-export function scheduleBoard3dMountPaint(paint: () => void): void {
+export function scheduleBoard3dMountPaint(paint: () => void): () => void {
   if (typeof requestAnimationFrame !== 'function') {
     paint();
-    return;
+    return () => undefined;
   }
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  let cancelled = false;
+  let outerId = 0;
+  let innerId = 0;
+  outerId = requestAnimationFrame(() => {
+    if (cancelled) return;
+    innerId = requestAnimationFrame(() => {
+      if (cancelled) return;
       paint();
     });
   });
+  return () => {
+    cancelled = true;
+    if (outerId) cancelAnimationFrame(outerId);
+    if (innerId) cancelAnimationFrame(innerId);
+  };
 }
 
 /** Skip on-demand paints while the tab is backgrounded. */

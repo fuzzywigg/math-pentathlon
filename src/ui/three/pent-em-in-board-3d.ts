@@ -534,9 +534,11 @@ export async function createPentEmInBoard3D(
 
   window.__mp3dPentEmIn = { cellToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
     canvas.removeEventListener('pointerup', onPointerUp);
     canvas.removeEventListener('pointermove', onPointerMove);
@@ -565,6 +567,6 @@ export async function createPentEmInBoard3D(
   tearDown = unmount;
 
   resize();
-  scheduleBoard3dMountPaint(paint);
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
   return { update, unmount, cellToClientPoint, canvas };
 }

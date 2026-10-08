@@ -562,9 +562,11 @@ export async function createStarTrackBoard3D(
 
   window.__mp3dStarTrack = { spaceToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
     window.removeEventListener('resize', onResize);
     canvas.removeEventListener('webglcontextlost', onLost);
@@ -590,7 +592,7 @@ export async function createStarTrackBoard3D(
   };
 
   resize();
-  scheduleBoard3dMountPaint(paint);
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, spaceToClientPoint, canvas };
 }

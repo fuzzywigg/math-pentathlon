@@ -26,9 +26,15 @@ export type RegisterPwaResult = {
 };
 
 let reloadScheduled = false;
+/** Periodic SW update check — cleared on re-register so intervals do not stack. */
+let updateCheckInterval: ReturnType<typeof setInterval> | null = null;
 
 export function resetPwaReloadGuardForTests(): void {
   reloadScheduled = false;
+  if (updateCheckInterval !== null) {
+    clearInterval(updateCheckInterval);
+    updateCheckInterval = null;
+  }
 }
 
 /**
@@ -58,8 +64,12 @@ export function registerPwa(
     onRegisteredSW(_swUrl, registration) {
       // Periodic update check while the tab stays open (school Wi‑Fi flaps).
       if (!registration) return;
+      if (updateCheckInterval !== null) {
+        clearInterval(updateCheckInterval);
+        updateCheckInterval = null;
+      }
       const hourMs = 60 * 60 * 1000;
-      window.setInterval(() => {
+      updateCheckInterval = window.setInterval(() => {
         void registration.update();
       }, hourMs);
     },

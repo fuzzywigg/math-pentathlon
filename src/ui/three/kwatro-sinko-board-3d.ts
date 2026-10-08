@@ -700,9 +700,11 @@ export async function createKwatroSinkoBoard3D(
 
   window.__mp3dKwatroSinko = { nodeToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     canvas.removeEventListener('pointerup', onPointer);
     canvas.removeEventListener('webglcontextlost', onContextLost);
     window.removeEventListener('resize', onResize);
@@ -746,7 +748,7 @@ export async function createKwatroSinkoBoard3D(
 
   tearDown = unmount;
   resize();
-  scheduleBoard3dMountPaint(paint);
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, nodeToClientPoint, canvas };
 }

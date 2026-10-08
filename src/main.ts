@@ -28,6 +28,7 @@ import { bindReducedMotionPreference } from './ui/reduced-motion';
 import { bootstrapPwa } from './pwa/bootstrap';
 import { bootstrapOwl } from './pwa/bootstrap-owl';
 import { scheduleIdleGameWarm } from './pwa/idle-warm';
+import { exitTutorialIfActive } from './core/tutorial';
 
 /** Resolve New Game modal AI difficulty (shell Easy/Medium/Hard). */
 function resolveAIDifficulty(
@@ -69,6 +70,7 @@ let activeGameBoundary: GameErrorBoundaryHandle | null = null;
 
 // Cleanup previous view
 function cleanup(): void {
+  exitTutorialIfActive();
   if (currentCleanup) {
     currentCleanup();
     currentCleanup = null;
@@ -91,6 +93,7 @@ function bindGameErrorBoundary(gameName: string): void {
     onReset: () => renderGame(),
     onHome: () => navigate('/'),
     onBeforeShow: () => {
+      exitTutorialIfActive();
       if (currentCleanup) {
         currentCleanup();
         currentCleanup = null;

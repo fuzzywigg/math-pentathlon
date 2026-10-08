@@ -45,6 +45,8 @@ let hasNotifiedGameEnd = false;
 let moveCount = 0;
 /** Invalidates nested AI setTimeouts after route leave / new game. */
 let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 let board3d: HexAGoneBoard3D | null = null;
 let board3dEnabled = false;
@@ -54,6 +56,21 @@ let selectionHost: HTMLElement | null = null;
 
 /** Keep multi-block AI turns under the ~3s tablet think budget (delay × places). */
 const AI_THINKING_DELAY = 350;
+
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
+function scheduleAiTimeout(fn: () => void, delayMs: number): void {
+  clearAiTimer();
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
+    fn();
+  }, delayMs);
+}
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -275,7 +292,7 @@ function triggerAITurn(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  scheduleAiTimeout(() => {
     if (gen !== aiGeneration) return;
     // AI selects blocks using AI module
     const aiSelectBlocks = (): void => {
@@ -297,7 +314,7 @@ function triggerAITurn(): void {
       render();
 
       // Place blocks after a delay
-      setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+      scheduleAiTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
     };
 
     // AI places blocks one by one using AI module
@@ -335,7 +352,7 @@ function triggerAITurn(): void {
         gameState.phase === 'placeBlocks' &&
         gameState.currentPlayer === 'player2'
       ) {
-        setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+        scheduleAiTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
       } else {
         isAIThinking = false;
         render();
@@ -376,6 +393,7 @@ function render(): void {
 
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;

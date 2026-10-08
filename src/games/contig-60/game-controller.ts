@@ -44,6 +44,8 @@ let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
 /** Bumped on init / New Game so pending AI setTimeouts cannot mutate a fresh match. */
 let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Pause before the computer rolls (keeps “thinking…” readable without dragging turns). */
 const AI_ROLL_DELAY_MS = 350;
@@ -58,10 +60,19 @@ function bumpAIGeneration(): void {
   aiGeneration += 1;
 }
 
+function clearAiTimer(): void {
+  if (aiTimer !== null) {
+    clearTimeout(aiTimer);
+    aiTimer = null;
+  }
+}
+
 /** Schedule AI work; no-ops if New Game / mode change invalidated the generation. */
 function scheduleAI(fn: () => void, delayMs: number): void {
+  clearAiTimer();
   const gen = aiGeneration;
-  setTimeout(() => {
+  aiTimer = setTimeout(() => {
+    aiTimer = null;
     if (gen !== aiGeneration) return;
     fn();
   }, delayMs);
@@ -371,6 +382,7 @@ export function isTutorialActive(): boolean {
 /** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
 export function destroyGame(): void {
   bumpAIGeneration();
+  clearAiTimer();
   boardContainer = null;
   statusContainer = null;
 }
