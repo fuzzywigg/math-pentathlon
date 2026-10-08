@@ -1,5 +1,11 @@
 // Storage System - LocalStorage wrapper with versioning and type safety
 
+import {
+  safeGetItem,
+  safeParseJson,
+  safeSetItemResult,
+  subscribeStorageEvent,
+} from '../safe-web-storage';
 import { setUserReducedMotionFlag } from '../settings-flags';
 import {
   ensureProgressDefaults,
@@ -35,21 +41,78 @@ const MAX_MESSAGES_HISTORY = 50; // Prevent unbounded growth
 class StorageManager {
   private data: ProgressData;
   private saveDebounceTimer: number | null = null;
+  private readonly unsubscribeStorageEvent: () => void;
 
   constructor() {
     this.data = this.load();
+    setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
+    // Other tabs only — adopt their writes / clears so we do not silently
+    // overwrite mid-session with stale in-memory state on the next save.
+    this.unsubscribeStorageEvent = subscribeStorageEvent((event) => {
+      this.handleExternalStorageEvent(event);
+    });
+  }
+
+  /** Test helper — drop the cross-tab listener (module remounts). */
+  public disposeForTests(): void {
+    this.unsubscribeStorageEvent();
+  }
+
+  /**
+   * Apply a `storage` event for our progress key from another document.
+   * Cleared key → fresh defaults (keep app running). Non-JSON / wrong shape →
+   * keep current in-memory session (do not spin or wipe good state).
+   */
+  public handleExternalStorageEvent(event: StorageEvent): void {
+    if (event.storageArea != null) {
+      // Ignore sessionStorage and unrelated stores when the browser provides area.
+      try {
+        if (event.storageArea !== globalThis.localStorage) return;
+      } catch {
+        // localStorage access itself blocked — nothing to sync.
+        return;
+      }
+    }
+    if (event.key !== null && event.key !== STORAGE_KEY) return;
+
+    // key === null means clear() wiped the whole store.
+    if (event.key === null || event.newValue === null) {
+      this.data = createDefaultProgress();
+      setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
+      return;
+    }
+
+    const parsed = safeParseJson(event.newValue);
+    if (!parsed.ok || !isPlainProgressObject(parsed.value)) {
+      console.warn(
+        'Ignoring corrupt progress from another tab; keeping in-memory session'
+      );
+      return;
+    }
+
+    this.data = normalizeLoadedProgress(
+      parsed.value as unknown as ProgressData
+    );
     setUserReducedMotionFlag(this.data.settings.reducedMotion === true);
   }
 
   // Load data from localStorage
   private load(): ProgressData {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = safeGetItem(STORAGE_KEY);
       if (!stored) {
         return createDefaultProgress();
       }
 
-      const parsed: unknown = JSON.parse(stored);
+      const parsedResult = safeParseJson(stored);
+      if (!parsedResult.ok) {
+        console.warn(
+          'Failed to load progress data, starting fresh:',
+          parsedResult.error
+        );
+        return createDefaultProgress();
+      }
+      const parsed = parsedResult.value;
 
       // Primitives / arrays / null are corrupt — never hand them to ensureDefaults.
       if (!isPlainProgressObject(parsed)) {
@@ -75,10 +138,9 @@ class StorageManager {
     }
 
     this.saveDebounceTimer = window.setTimeout(() => {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-      } catch (error) {
-        console.error('Failed to save progress data:', error);
+      const result = safeSetItemResult(STORAGE_KEY, JSON.stringify(this.data));
+      if (!result.ok) {
+        console.error('Failed to save progress data:', result.error);
       }
       this.saveDebounceTimer = null;
     }, 100);
@@ -90,10 +152,9 @@ class StorageManager {
       clearTimeout(this.saveDebounceTimer);
       this.saveDebounceTimer = null;
     }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-    } catch (error) {
-      console.error('Failed to save progress data:', error);
+    const result = safeSetItemResult(STORAGE_KEY, JSON.stringify(this.data));
+    if (!result.ok) {
+      console.error('Failed to save progress data:', result.error);
     }
   }
 

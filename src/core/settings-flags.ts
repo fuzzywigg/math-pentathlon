@@ -6,6 +6,8 @@
  * in-memory flag when settings change; until then we peek localStorage once.
  */
 
+import { safeGetItem, safeParseJson } from './safe-web-storage';
+
 /** Must match `STORAGE_KEY` in `src/core/storage/storage.ts`. */
 const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';
 
@@ -13,30 +15,27 @@ const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';
 let userReducedMotion: boolean | null = null;
 
 function peekReducedMotionFromLocalStorage(): boolean {
-  if (typeof localStorage === 'undefined') return false;
-  try {
-    const raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
-    if (!raw) return false;
-    const parsed: unknown = JSON.parse(raw);
-    if (
-      typeof parsed !== 'object' ||
-      parsed === null ||
-      Array.isArray(parsed)
-    ) {
-      return false;
-    }
-    const settings = (parsed as { settings?: unknown }).settings;
-    if (
-      typeof settings !== 'object' ||
-      settings === null ||
-      Array.isArray(settings)
-    ) {
-      return false;
-    }
-    return (settings as { reducedMotion?: unknown }).reducedMotion === true;
-  } catch {
+  const raw = safeGetItem(PROGRESS_STORAGE_KEY);
+  if (!raw) return false;
+  const parsedResult = safeParseJson(raw);
+  if (!parsedResult.ok) return false;
+  const parsed = parsedResult.value;
+  if (
+    typeof parsed !== 'object' ||
+    parsed === null ||
+    Array.isArray(parsed)
+  ) {
     return false;
   }
+  const settings = (parsed as { settings?: unknown }).settings;
+  if (
+    typeof settings !== 'object' ||
+    settings === null ||
+    Array.isArray(settings)
+  ) {
+    return false;
+  }
+  return (settings as { reducedMotion?: unknown }).reducedMotion === true;
 }
 
 /** Read user reduced-motion preference (menu-safe). */

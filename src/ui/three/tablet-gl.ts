@@ -8,6 +8,7 @@
  * - Reliable first-paint readiness signal for software GL (SwiftShader)
  */
 
+import { safeGetItem } from '../../core/safe-web-storage';
 import { parseAllowlistedFlag } from '../../core/url-flags';
 
 const PRESERVE_PARAM = 'preserveDrawingBuffer';
@@ -49,7 +50,7 @@ function readFlag(param: string, storageKey: string): boolean | null {
     const flag = search.get(param) ?? hashQ.get(param);
     const parsed = parseAllowlistedFlag(flag);
     if (parsed !== null) return parsed;
-    return parseAllowlistedFlag(localStorage.getItem(storageKey));
+    return parseAllowlistedFlag(safeGetItem(storageKey));
   } catch {
     return null;
   }
