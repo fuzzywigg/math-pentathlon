@@ -80,9 +80,28 @@ export function makeSvgFocusable(el: Element, ariaLabel: string): void {
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+/**
+ * Prefer naming a board from the visible game title (`#game-title`) so grids
+ * announce an accessible name without inventing new player-facing copy.
+ * No-op when the board already has aria-label / aria-labelledby, or when the
+ * title node is missing.
+ */
+export function labelBoardFromGameTitle(boardEl: Element): void {
+  if (
+    boardEl.hasAttribute('aria-label') ||
+    boardEl.hasAttribute('aria-labelledby')
+  ) {
+    return;
+  }
+  const title = document.getElementById('game-title');
+  if (!title?.id) return;
+  boardEl.setAttribute('aria-labelledby', title.id);
+}
+
 /** Mark a board root as an ARIA grid (Wave 2). */
 export function markBoardAsGrid(boardEl: Element): void {
   boardEl.setAttribute('role', 'grid');
+  labelBoardFromGameTitle(boardEl);
 }
 
 /**

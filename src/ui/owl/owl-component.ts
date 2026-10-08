@@ -94,13 +94,13 @@ export class OwlComponent {
             </div>
           </div>
 
-          <!-- Speech bubble -->
+          <!-- Speech bubble — polite live region reuses existing message text -->
           <div class="owl-bubble">
             <div class="owl-bubble-content">
-              <p class="owl-message"></p>
+              <p class="owl-message" role="status" aria-live="polite"></p>
             </div>
             <button class="owl-bubble-dismiss" aria-label="Dismiss message">&times;</button>
-            <div class="owl-bubble-tail"></div>
+            <div class="owl-bubble-tail" aria-hidden="true"></div>
           </div>
 
           <!-- Controls -->

@@ -115,10 +115,13 @@ function createDivisionAccordion(
   const titleRow = document.createElement('div');
   titleRow.className = 'division-title-row';
 
+  const titleId = `division-title-${divisionName.replace(/\s+/g, '-').toLowerCase()}`;
   const title = document.createElement('span');
   title.className = 'division-title';
+  title.id = titleId;
   title.textContent = divisionName;
   titleRow.appendChild(title);
+  section.setAttribute('aria-labelledby', titleId);
 
   const grade = document.createElement('span');
   grade.className = 'division-grade';
@@ -152,6 +155,8 @@ function createDivisionAccordion(
   const panel = document.createElement('div');
   panel.className = 'accordion-panel';
   panel.id = `games-${divisionName.replace(/\s+/g, '-').toLowerCase()}`;
+  panel.setAttribute('role', 'region');
+  panel.setAttribute('aria-labelledby', titleId);
 
   const panelInner = document.createElement('div');
   panelInner.className = 'accordion-panel-inner';
@@ -280,12 +285,15 @@ export function renderGameSelector(container: HTMLElement): void {
   tabNav.setAttribute('aria-label', 'Division navigation');
 
   DIVISIONS.forEach((div, index) => {
+    const panelId = `games-${div.name.replace(/\s+/g, '-').toLowerCase()}`;
     const tab = document.createElement('button');
     tab.type = 'button';
     tab.className = `division-tab ${index === 0 ? 'active' : ''}`;
     tab.setAttribute('role', 'tab');
     tab.setAttribute('data-division', div.name);
     tab.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    tab.setAttribute('aria-controls', panelId);
+    tab.id = `division-tab-${div.name.replace(/\s+/g, '-').toLowerCase()}`;
     tab.innerHTML = `
       <span class="tab-name">${div.name}</span>
       <span class="tab-grade">${div.gradeRange}</span>
