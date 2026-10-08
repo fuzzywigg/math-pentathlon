@@ -44,6 +44,37 @@ Runtime third-party notices for the built app live in repo-root
 `THIRD_PARTY_NOTICES` (three.js MIT + Inter OFL-1.1). First-party favicons /
 PWA icons are called out there as original artwork.
 
+Vendored Inter (OFL-1.1) paths:
+
+- `public/fonts/inter-latin-400-normal.woff2`
+- `public/fonts/inter-latin-500-normal.woff2`
+- `public/fonts/inter-latin-600-normal.woff2`
+- `public/fonts/inter-latin-700-normal.woff2`
+
+## Owner decisions (accepted — no action)
+
+Flagged items from the final-tip `report:licenses` run are **dev/CI only** and
+accepted with no further action:
+
+| Package | License / note | Scope |
+| --- | --- | --- |
+| `@axe-core/playwright`, `axe-core` | MPL-2.0 | dev/CI |
+| `argparse` | Python-2.0 | dev/CI |
+| `esbuild`, `fsevents` | MIT + install scripts | dev/CI (fsevents optional) |
+
+**Production dependency:** only `three` (MIT). Nothing for Andrew on the
+shipping license surface.
+
+## Final tip snapshot (post-#512 / lockfile peers)
+
+Re-run on tip SHA after later folds (`npm run report:licenses`):
+
+- Packages: **585** (production **1**, development **584**)
+- Production licenses: MIT ×1 (`three`)
+- SBOM / summaries stay under gitignored `test-results/licenses/`
+- Not wired into required CI (`check:workflows` / `ci.yml` have no
+  `report:licenses` gate; stays out unless a later contract adds it report-only)
+
 ## Related work (do not duplicate)
 
 - Dependency hygiene / audit / deferred majors: #512 (`docs/dev/DEPENDENCIES.md`)
