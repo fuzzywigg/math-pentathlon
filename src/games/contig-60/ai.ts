@@ -12,7 +12,9 @@
 // 4. Numbers in the middle of the board can touch more neighbors
 // 5. Division only works when it divides evenly - check your math!
 
-import type { ContigState, Player } from './types';
+import type {
+  ContigState,
+  Player} from './types';
 import {
   CONFIG,
   getOpponent,
@@ -153,39 +155,12 @@ interface MoveOption {
 }
 
 /**
- * After placing `value` for `placer`, count empty cells where `opponent`
- * would immediately complete 5-in-a-row (Hard lookahead threat scan).
- */
-function countOpenWinThreatsFor(
-  state: ContigState,
-  value: number,
-  placer: Player,
-  opponent: Player
-): number {
-  const placed = state.cells.get(value);
-  if (!placed) return 0;
-
-  const cells = new Map(state.cells);
-  cells.set(value, { ...placed, owner: placer });
-  const sim: ContigState = { ...state, cells };
-
-  let threats = 0;
-  for (const [cellValue, cell] of sim.cells) {
-    if (cell.owner !== null) continue;
-    if (wouldCreateFiveInRow(sim, cellValue, opponent)) {
-      threats += 1;
-    }
-  }
-  return threats;
-}
-
-/**
  * Evaluate all possible placements
  */
 function evaluateMoves(
   state: ContigState,
   aiPlayer: Player,
-  difficulty: AIDifficulty
+  _difficulty: AIDifficulty
 ): MoveOption[] {
   if (!state.currentDice) return [];
 
@@ -195,7 +170,6 @@ function evaluateMoves(
   const opponent = getOpponent(aiPlayer);
   const validValues = placements.map((p) => p.result);
   const blockingMoves = getBlockingMoves(state, validValues, opponent);
-  const useLookahead = DIFFICULTY_CONFIG[difficulty].lookahead;
   const options: MoveOption[] = [];
 
   for (const { result, expression } of placements) {
@@ -255,17 +229,6 @@ function evaluateMoves(
     // Factor 6: Center control (rows 2-3 are more central)
     const centerBonus = Math.max(0, 2 - Math.abs(cell.row - 2.5)) * 5;
     score += centerBonus;
-
-    // Factor 7 (Hard): avoid leaving an open 5-in-a-row threat for opponent
-    if (useLookahead) {
-      const threats = countOpenWinThreatsFor(state, result, aiPlayer, opponent);
-      if (threats > 0) {
-        score -= threats * 4000;
-        reasons.push(
-          `Leaves ${threats} open win threat${threats > 1 ? 's' : ''}`
-        );
-      }
-    }
 
     options.push({
       value: result,

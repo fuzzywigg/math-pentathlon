@@ -55,7 +55,7 @@ export const callaTutorial: TutorialConfig = {
         <ol>
           <li><strong>Click a pit</strong> on YOUR side</li>
           <li><strong>Cubes get picked up</strong> from that pit</li>
-          <li><strong>Drop 1 cube</strong> in each pit as you go around (counter-clockwise)</li>
+          <li><strong>Drop 1 cube</strong> in each pit going counter-clockwise</li>
         </ol>
         <p>It's like walking around and giving out one cube at a time!</p>
       `,
@@ -66,8 +66,8 @@ export const callaTutorial: TutorialConfig = {
       title: 'Your Calla',
       message: `
         <p>When passing YOUR Calla, you drop a cube in it too!</p>
-        <p>Cubes in your Calla stay there. That is your score!</p>
-        <p>(You skip over your opponent's Calla.)</p>
+        <p>Cubes in your Calla stay there - that's your score!</p>
+        <p>(You skip over your opponent's Calla)</p>
       `,
       highlightSelector: '.calla-store',
       position: 'left',
@@ -87,8 +87,8 @@ export const callaTutorial: TutorialConfig = {
       message: `
         <p><strong>Another special rule:</strong></p>
         <p>If your last cube lands in an <strong>empty pit on YOUR side</strong>,
-        and the pit across from it has cubes,</p>
-        <p>you capture ALL those cubes into your Calla!</p>
+        AND the pit across from it has cubes...</p>
+        <p>You capture ALL those cubes into your Calla!</p>
       `,
       position: 'center',
     },
@@ -99,7 +99,7 @@ export const callaTutorial: TutorialConfig = {
         <p><strong>Tips for winning:</strong></p>
         <ul>
           <li>Count ahead to land in your Calla!</li>
-          <li>Look for ways to capture</li>
+          <li>Look for capture opportunities</li>
           <li>Watch your opponent's side too!</li>
         </ul>
       `,

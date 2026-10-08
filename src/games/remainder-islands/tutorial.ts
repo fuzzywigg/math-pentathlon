@@ -12,7 +12,7 @@ export const remainderIslandsTutorial: TutorialConfig = {
       title: 'Welcome to Remainder Islands!',
       message: `
         <p>Let's learn how to play <strong>Remainder Islands</strong>!</p>
-        <p>Score the most points by placing chips on islands and using the leftover when you divide!</p>
+        <p>Score the most points by strategically placing chips on islands using division remainders!</p>
       `,
       position: 'center',
     },
@@ -20,7 +20,7 @@ export const remainderIslandsTutorial: TutorialConfig = {
       id: 'objective',
       title: 'Objective',
       message: `
-        <p>Score the most points by placing chips on islands and using the leftover when you divide!</p>
+        <p>Score the most points by strategically placing chips on islands using division remainders!</p>
       `,
       position: 'center',
     },
@@ -41,7 +41,7 @@ export const remainderIslandsTutorial: TutorialConfig = {
       id: 'example',
       title: 'Example',
       message: `
-        <p>Roll 7, choose an island with value 3: 7 ÷ 3 = 2 remainder 1 → Score 1 point</p>
+        <p>Roll 7, choose island with value 3: 7 ÷ 3 = 2 R1 → Score 1 point</p>
       `,
       highlightSelector: '.remainder-board',
       position: 'top',
@@ -52,8 +52,8 @@ export const remainderIslandsTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>Choose islands that give the highest remainder</li>
-          <li>When you land on an island, you own it. Your opponent cannot land there.</li>
-          <li>Remember: a bigger island number can leave a bigger leftover!</li>
+          <li>Claim islands to block your opponent</li>
+          <li>Remember: higher divisors can give higher remainders!</li>
         </ul>
       `,
       position: 'center',
@@ -62,7 +62,7 @@ export const remainderIslandsTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>When there are no turns left, the player with the most points wins!</p>
+        <p>After all turns, the player with the most points wins!</p>
       `,
       highlightSelector: '.remainder-scores',
       position: 'bottom',

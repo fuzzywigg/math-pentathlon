@@ -1,24 +1,20 @@
 // Hex Game Controller - Manages game flow and UI updates
 
-import type { HexGameState } from './types';
+import type { HexGameState} from './types';
 import { createInitialState, DEFAULT_BOARD_SIZE } from './types';
 import { makeMove, isValidMove } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import type { AIDifficulty } from './ai';
-import { getRandomMove } from './ai';
-import {
-  cancelHexAiRequests,
-  disposeHexAiWorker,
-  getBestMoveAsync,
-} from './ai-client';
+import { cancelHexAiRequests, getBestMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome } from '../../ui/player-colors';
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(gameMode);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, gameMode);
 }
 
 // Game mode
@@ -33,15 +29,9 @@ let isAIThinking = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Invalidates in-flight worker replies after new game. */
 let aiGeneration = 0;
-/** Single pending AI paint timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
-// AI paint delay before worker search (search budgets are separate).
-const AI_THINKING_DELAY = 250;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
+// AI config
+const AI_THINKING_DELAY = 500;
 
 // Track game end for owl notifications
 let hasNotifiedGameEnd = false;
@@ -132,9 +122,7 @@ function triggerAIMove(): void {
   isAIThinking = true;
   render();
 
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
+  setTimeout(() => {
     void (async () => {
       let aiMove = null;
       try {
@@ -143,11 +131,6 @@ function triggerAIMove(): void {
         aiMove = null;
       }
       if (gen !== aiGeneration) return;
-
-      // Worker cancel / failure must not soft-lock the AI seat.
-      if (!aiMove && !gameState.winner) {
-        aiMove = getRandomMove(gameState);
-      }
 
       if (aiMove) {
         gameState = makeMove(gameState, aiMove);
@@ -188,17 +171,6 @@ export function getGameState(): HexGameState {
   return gameState;
 }
 
-/** Cancel in-flight AI and drop mounts (route change / error boundary). */
-export function destroyGame(): void {
-  aiGeneration += 1;
-  clearAiTimer();
-  cancelHexAiRequests();
-  disposeHexAiWorker();
-  isAIThinking = false;
-  boardContainer = null;
-  statusContainer = null;
-}
-
 // Reset game
 export function resetGame(): void {
   if (gameMode === 'human-vs-ai') {
@@ -227,4 +199,9 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
+export function destroyGame(): void {
+  // Minimal stub after alpha controller restore.
 }

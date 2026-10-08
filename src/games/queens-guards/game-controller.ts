@@ -1,8 +1,16 @@
 // Queens & Guards Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import type { QueensGuardsState, Player, BoardCoord } from './types';
-import { createInitialState, cellKey, parseKey, getOpponent } from './types';
+import type {
+  QueensGuardsState,
+  Player,
+  BoardCoord} from './types';
+import {
+  createInitialState,
+  cellKey,
+  parseKey,
+  getOpponent,
+} from './types';
 import {
   getValidMoves,
   makeMove,
@@ -23,22 +31,11 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import { syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
-import {
-  markBoard3dWebGlFallback,
-  clearBoard3dWebGlFallback,
-} from '../../ui/three/tablet-gl';
 import { loadQueensGuardsBoard3DModule } from './board-3d-loader';
 import type { QueensGuardsBoard3D } from '../../ui/three/queens-guards-board-3d';
-
-import {
-  clearElement,
-  replaceWithSafeHtml,
-  safeHtml,
-} from '../../core/dom-security';
 
 declare global {
   interface Window {
@@ -58,7 +55,9 @@ declare global {
 }
 
 function syncOpponentChrome(): void {
-  syncAppOpponentChrome(vsAI ? 'human-vs-ai' : 'human-vs-human');
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -74,22 +73,8 @@ let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking = false;
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
-/** Single pending AI paint/chain timer — cleared on destroy / re-schedule. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAiTimeout(fn: () => void, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    fn();
-  }, delayMs);
-}
 
 // Optional Three.js board (only when feature flag is on)
 let board3d: QueensGuardsBoard3D | null = null;
@@ -114,11 +99,9 @@ async function ensureBoard3d(): Promise<void> {
       boardContainer,
       handleCellClick
     );
-    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
-    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -132,7 +115,6 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
-  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   updateUI();
@@ -168,7 +150,7 @@ function updateUI(): void {
   if (board3dEnabled && board3d) {
     board3d.update(gameState, onCell);
   } else if (!board3dEnabled) {
-    clearElement(boardContainer);
+    boardContainer.innerHTML = '';
     const svg = renderBoard(gameState, onCell);
     boardContainer.appendChild(svg);
   }
@@ -185,20 +167,17 @@ function updateStatus(): void {
     const winnerName = getPlayerName(gameState.winner);
     // Formation win vs stalemate (no queen+guards ring) — keep prior copy.
     const isFormationWin = checkWinner(gameState) === gameState.winner;
-    replaceWithSafeHtml(
-      statusContainer,
-      isFormationWin
-        ? safeHtml`
+    statusContainer.innerHTML = isFormationWin
+      ? `
       <div class="qg-winner-banner">
         ${winnerName} wins! 👑
       </div>
     `
-        : safeHtml`
+      : `
       <div class="qg-winner-banner">
         ${getPlayerName(gameState.currentPlayer)} cannot move - ${winnerName} wins!
       </div>
-    `
-    );
+    `;
 
     if (!hasNotifiedGameEnd) {
       hasNotifiedGameEnd = true;
@@ -215,60 +194,40 @@ function updateStatus(): void {
   const playerClass =
     gameState.currentPlayer === 'player1' ? 'player1' : 'player2';
 
-  // Computer seat: never invite a human tap ("Select a piece…") even during the
-  // short paint delay before isAIThinking flips true.
-  const computerSeat =
-    vsAI && gameState.currentPlayer === aiPlayer && !gameState.winner;
-  const showAiChrome = computerSeat || isAIThinking;
-
   let instruction = 'Select a piece to move';
   if (gameState.selectedPiece) {
-    instruction = 'Tap a highlighted cell to move, or select a different piece';
+    instruction =
+      'Click a highlighted cell to move, or select a different piece';
   }
   if (gameState.capturedPieces.length > 0) {
     instruction =
-      'Tap a captured piece (red outline), then an empty outer ring space';
+      'Click a captured piece, then an empty space on the outer ring';
   }
-  if (showAiChrome) {
+  if (isAIThinking) {
     instruction = 'Computer is thinking…';
   }
 
-  const vsAiNote = vsAI ? document.createElement('span') : null;
-  if (vsAiNote) vsAiNote.textContent = 'Playing vs AI';
-
-  replaceWithSafeHtml(
-    statusContainer,
-    safeHtml`
-    <div class="qg-status">
+  statusContainer.innerHTML = `
+    <div class="qg-status ${playerClass}${isAIThinking ? ' status-ai-thinking' : ''}">
       ${playerName}'s turn - ${instruction}
     </div>
     <div class="qg-info">
       <span>Move ${Math.floor(gameState.moveHistory.length / 2) + 1}</span>
-      ${vsAiNote}
+      ${vsAI ? `<span>Playing vs AI</span>` : ''}
     </div>
-  `
-  );
-  const statusEl = statusContainer.querySelector('.qg-status');
-  if (statusEl) {
-    statusEl.className = `qg-status ${playerClass}${showAiChrome ? ' status-ai-thinking' : ''}`;
-  }
+  `;
 }
 
 // =============================================================================
 // Event Handlers
 // =============================================================================
 
-/** Paint delay before AI search — keep short so tablet Hard stays under ~3s. */
-const AI_THINK_PAINT_MS = 250;
-/** Brief pause between capture-restore AI plies. */
-const AI_RESTORE_CHAIN_MS = 280;
-
 function maybeTriggerAI(): void {
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
     // Slight delay so the thinking status can paint before search starts.
-    scheduleAiTimeout(() => {
+    setTimeout(() => {
       void performAIMove();
-    }, AI_THINK_PAINT_MS);
+    }, 500);
   }
 }
 
@@ -425,9 +384,9 @@ async function performAIMove(): Promise<void> {
 
   // Capture keeps the AI seat until restore finishes.
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-    scheduleAiTimeout(() => {
+    setTimeout(() => {
       void performAIMove();
-    }, AI_RESTORE_CHAIN_MS);
+    }, 400);
   }
 }
 
@@ -550,7 +509,6 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
-  clearAiTimer();
   isAIThinking = false;
   cancelQueensAiRequests();
   disposeQueensAiWorker();

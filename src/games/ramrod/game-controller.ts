@@ -2,7 +2,6 @@
 // Manages game flow, AI, and UI updates
 
 import type { RamrodState, Player } from './types';
-import { getOpponent } from './types';
 import {
   createInitialState,
   selectRod,
@@ -10,7 +9,6 @@ import {
   placeRod,
   passTurn,
   hasValidMoves,
-  getValidPlacements,
 } from './rules';
 import type { AIDifficulty } from './ai';
 import { getAIMove, isAITurn } from './ai';
@@ -24,9 +22,7 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { ramrodTutorial } from './tutorial';
-import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
-import { clearElement } from '../../core/dom-security';
-import { clearNullableTimeout } from '../../ui/timeout-handle';
+import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
   captureFocusedCell,
   restoreGridFocus,
@@ -34,7 +30,9 @@ import {
 } from '../../ui/board-a11y';
 
 function syncOpponentChrome(isAI: boolean): void {
-  syncAppOpponentChrome(isAI);
+  const root = document.getElementById('app');
+  if (!root) return;
+  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
 /** True while it is the computer's seat (including the 800ms think pause). */
@@ -63,24 +61,6 @@ export interface RamrodGameController {
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
 
-/** Single pending AI timer — avoids stacked setTimeouts from every UI rebuild. */
-let aiTimer: ReturnType<typeof setTimeout> | null = null;
-
-/** First AI think pause (ms). Short enough to feel responsive; seat guard prevents races. */
-const AI_THINKING_DELAY = 550;
-
-function clearAiTimer(): void {
-  aiTimer = clearNullableTimeout(aiTimer);
-}
-
-function scheduleAI(controller: RamrodGameController, delayMs: number): void {
-  clearAiTimer();
-  aiTimer = setTimeout(() => {
-    aiTimer = null;
-    makeAIMove(controller);
-  }, delayMs);
-}
-
 /**
  * Initialize the game
  */
@@ -91,7 +71,6 @@ export function initGame(
 ): RamrodGameController {
   injectRamrodStyles();
   activeContainer = container;
-  clearAiTimer();
 
   const controller: RamrodGameController = {
     state: createInitialState(),
@@ -105,7 +84,6 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
-    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -126,7 +104,7 @@ export function initGame(
 function updateUI(controller: RamrodGameController): void {
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
-  clearElement(container);
+  container.innerHTML = '';
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -144,7 +122,6 @@ function updateUI(controller: RamrodGameController): void {
   } else if (state.winner === null && state.phase === 'gameOver') {
     status.textContent = "It's a tie!";
   } else if (computerTurn) {
-    status.classList.add('ramrod-computer-thinking');
     status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
   } else if (state.phase === 'selectingRod') {
     status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a rod`;
@@ -153,42 +130,6 @@ function updateUI(controller: RamrodGameController): void {
   }
 
   gameArea.appendChild(status);
-
-  // Secondary hint — primary status strings stay locked for overnight tests
-  if (!state.winner && state.phase !== 'gameOver' && !computerTurn) {
-    const hint = document.createElement('div');
-    hint.className = 'ramrod-turn-hint';
-    const selfStuck = !hasValidMoves(state);
-    const oppProbe: RamrodState = {
-      ...state,
-      currentPlayer: getOpponent(state.currentPlayer),
-      selectedRod: null,
-      phase: 'selectingRod',
-    };
-    const bothStuck = selfStuck && !hasValidMoves(oppProbe);
-    if (bothStuck) {
-      hint.classList.add('ramrod-deadlock-hint');
-      hint.textContent =
-        'Neither player can place a rod — use New Game (scoring unchanged until then)';
-    } else if (state.phase === 'selectingRod') {
-      if (selfStuck) {
-        hint.textContent = 'No rod fits a box — tap Pass Turn';
-      } else {
-        hint.textContent = controller.isAI
-          ? 'Your hand (Blue) — tap a rod, then a green slot'
-          : 'Tap a rod from your hand, then a highlighted slot';
-      }
-    } else if (state.phase === 'placingRod') {
-      const placements = state.selectedRod
-        ? getValidPlacements(state, state.selectedRod).length
-        : 0;
-      hint.textContent =
-        placements > 0
-          ? 'Green slots match this rod — tap one to place'
-          : 'This rod has no fit — Clear Selection or tap it again';
-    }
-    if (hint.textContent) gameArea.appendChild(hint);
-  }
 
   // Scores
   gameArea.appendChild(renderScores(state));
@@ -293,30 +234,22 @@ function updateUI(controller: RamrodGameController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn — single clearable timer (never stack on rebuilds)
+  // AI turn
   if (
     controller.isAI &&
     controller.aiPlayer === state.currentPlayer &&
     state.phase !== 'gameOver'
   ) {
-    scheduleAI(controller, AI_THINKING_DELAY);
-  } else {
-    clearAiTimer();
+    setTimeout(() => makeAIMove(controller), 800);
   }
 }
 
 /**
- * Handle rod click — select, or tap selected rod again to clear
+ * Handle rod click
  */
 function handleRodClick(controller: RamrodGameController, rodId: string): void {
   if (isComputerTurnPending(controller)) return;
-  const { state } = controller;
-  if (state.phase === 'placingRod' && state.selectedRod === rodId) {
-    controller.state = clearSelection(state);
-    controller.update();
-    return;
-  }
-  controller.state = selectRod(state, rodId);
+  controller.state = selectRod(controller.state, rodId);
   controller.update();
 }
 
@@ -343,32 +276,20 @@ function handleBoxClick(
 function makeAIMove(controller: RamrodGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  // Hard seat guard — stale timers must not pass or place for Blue
-  if (!isComputerTurnPending(controller)) return;
   if (state.phase === 'gameOver' || !aiPlayer) return;
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
 
   if (!move) {
-    // No valid moves on the AI seat — pass only when truly stuck
-    if (!hasValidMoves(state)) {
-      controller.state = passTurn(state);
-      controller.update();
-    }
+    // No valid moves, pass
+    controller.state = passTurn(state);
+    controller.update();
     return;
   }
 
   // Execute move step by step
   let newState = selectRod(state, move.rodId);
-  if (newState.phase !== 'placingRod' || newState.selectedRod !== move.rodId) {
-    // Selection failed — escape via pass if the seat is still stuck
-    if (!hasValidMoves(state)) {
-      controller.state = passTurn(state);
-      controller.update();
-    }
-    return;
-  }
   newState = placeRod(newState, move.boxId, move.slot);
 
   controller.state = newState;
@@ -418,8 +339,7 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Cancel pending AI timer and drop mounts (route change / error boundary). */
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
 export function destroyGame(): void {
-  clearAiTimer();
-  activeContainer = null;
+  // Minimal stub after alpha controller restore.
 }

@@ -1,7 +1,9 @@
 // Calla Game Rules
 // Mancala-style distribution, capture, and free turn mechanics
 
-import type { CallaGameState, Player } from './types';
+import type {
+  CallaGameState,
+  Player} from './types';
 import {
   PITS_PER_SIDE,
   getOpponent,
@@ -20,8 +22,7 @@ export function canSelectPit(
   if (pitIndex < 0 || pitIndex >= PITS_PER_SIDE) return false;
 
   const pits = getPlayerPits(state, player);
-  // ratchet: pitIndex bounds-checked; pits always length PITS_PER_SIDE.
-  return pits[pitIndex]! > 0;
+  return pits[pitIndex] > 0;
 }
 
 // Get valid pits that can be selected
@@ -55,8 +56,7 @@ export function makeMove(
 
   // Pick up cubes from selected pit
   const playerPits = currentPlayer === 'player1' ? newP1Pits : newP2Pits;
-  // ratchet: canSelectPit already proved pitIndex in range with cubes > 0.
-  let cubesInHand = playerPits[pitIndex]!;
+  let cubesInHand = playerPits[pitIndex];
   const cubesDistributed = cubesInHand;
   playerPits[pitIndex] = 0;
 
@@ -79,11 +79,10 @@ export function makeMove(
     if (position < PITS_PER_SIDE) {
       // Current player's pits
       if (currentPlayer === 'player1') {
-        // ratchet: position < PITS_PER_SIDE; arrays are length PITS_PER_SIDE.
-        newP1Pits[position] = newP1Pits[position]! + 1;
+        newP1Pits[position]++;
         lastSownSide = 'player1';
       } else {
-        newP2Pits[position] = newP2Pits[position]! + 1;
+        newP2Pits[position]++;
         lastSownSide = 'player2';
       }
       lastSownIndex = position;
@@ -100,10 +99,10 @@ export function makeMove(
       // Opponent's pits (sow in reverse order from their view)
       const opponentPitIndex = PITS_PER_SIDE * 2 - position;
       if (opponent === 'player1') {
-        newP1Pits[opponentPitIndex] = newP1Pits[opponentPitIndex]! + 1;
+        newP1Pits[opponentPitIndex]++;
         lastSownSide = 'player1';
       } else {
-        newP2Pits[opponentPitIndex] = newP2Pits[opponentPitIndex]! + 1;
+        newP2Pits[opponentPitIndex]++;
         lastSownSide = 'player2';
       }
       lastSownIndex = opponentPitIndex;
@@ -129,10 +128,9 @@ export function makeMove(
     currentPlayerPits[lastSownIndex] === 1 // Was empty before this cube
   ) {
     const oppositeIndex = getOppositePitIndex(lastSownIndex);
-    // ratchet: oppositeIndex is always in 0..PITS_PER_SIDE-1.
-    if (opponentPits[oppositeIndex]! > 0) {
+    if (opponentPits[oppositeIndex] > 0) {
       // Capture!
-      captured = opponentPits[oppositeIndex]! + 1; // Opponent's cubes + the capturing cube
+      captured = opponentPits[oppositeIndex] + 1; // Opponent's cubes + the capturing cube
       opponentPits[oppositeIndex] = 0;
       currentPlayerPits[lastSownIndex] = 0;
 
@@ -253,70 +251,33 @@ export function settleNoValidMoves(state: CallaGameState): CallaGameState {
   };
 }
 
-export type CallaDisplayMode = 'human-vs-human' | 'human-vs-ai';
-
-function seatDisplayName(
-  seat: Player,
-  gameMode: CallaDisplayMode = 'human-vs-human'
-): string {
-  if (gameMode === 'human-vs-ai') {
-    return seat === 'player1' ? 'You' : 'AI';
-  }
-  return seat === 'player1' ? 'Blue' : 'Red';
-}
-
-function seatPossessive(
-  seat: Player,
-  gameMode: CallaDisplayMode = 'human-vs-human'
-): string {
-  if (gameMode === 'human-vs-ai') {
-    return seat === 'player1' ? 'Your' : "AI's";
-  }
-  return seat === 'player1' ? "Blue's" : "Red's";
-}
-
 // Get phase message
-export function getPhaseMessage(
-  state: CallaGameState,
-  gameMode: CallaDisplayMode = 'human-vs-human'
-): string {
-  const possessive = seatPossessive(state.currentPlayer, gameMode);
+export function getPhaseMessage(state: CallaGameState): string {
+  const playerName = state.currentPlayer === 'player1' ? 'Blue' : 'Red';
 
   switch (state.phase) {
     case 'selectPit':
-      return `${possessive} turn - Select a shield to distribute`;
+      return `${playerName}'s turn - Select a shield to distribute`;
     case 'animating':
-      return `${seatDisplayName(state.currentPlayer, gameMode)} is distributing cubes...`;
+      return `${playerName} is distributing cubes...`;
     case 'gameOver': {
       if (state.winner === 'tie') {
         return "It's a tie!";
       }
-      if (state.winner === 'player1' || state.winner === 'player2') {
-        const winnerName = seatDisplayName(state.winner, gameMode);
-        // "You win!" vs "Blue wins!" / "AI wins!"
-        if (winnerName === 'You') return 'You win!';
-        return `${winnerName} wins!`;
-      }
-      return '';
+      const winnerName = state.winner === 'player1' ? 'Blue' : 'Red';
+      return `${winnerName} wins!`;
     }
-    default: {
-      const _exhaustive: never = state.phase;
-      void _exhaustive;
+    default:
       return '';
-    }
   }
 }
 
 // Get last move info for display
-export function getLastMoveInfo(
-  state: CallaGameState,
-  gameMode: CallaDisplayMode = 'human-vs-human'
-): string | null {
+export function getLastMoveInfo(state: CallaGameState): string | null {
   if (state.moveHistory.length === 0) return null;
 
-  // ratchet: length check above guarantees a last element.
-  const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
-  const playerName = seatDisplayName(lastMove.player, gameMode);
+  const lastMove = state.moveHistory[state.moveHistory.length - 1];
+  const playerName = lastMove.player === 'player1' ? 'Blue' : 'Red';
 
   let info = `${playerName} distributed ${lastMove.cubesDistributed} cube${lastMove.cubesDistributed !== 1 ? 's' : ''}`;
 

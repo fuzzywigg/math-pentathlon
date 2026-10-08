@@ -30,7 +30,7 @@ export const pentEmInTutorial: TutorialConfig = {
       message: `
         <ul>
           <li>10x10 grid board</li>
-          <li>Each player has 12 pieces. Each piece covers 5 squares.</li>
+          <li>Each player has 12 pentomino pieces (5-cell shapes)</li>
         </ul>
       `,
       highlightSelector: '.pent-board',
@@ -41,9 +41,9 @@ export const pentEmInTutorial: TutorialConfig = {
       title: 'Turn Sequence',
       message: `
         <ol>
-          <li><strong>Select:</strong> Choose a piece from your leftover pieces</li>
-          <li><strong>Rotate/Flip:</strong> Turn or flip it if you need to</li>
-          <li><strong>Place:</strong> Put the piece on empty board squares</li>
+          <li><strong>Select:</strong> Choose a piece from your bank</li>
+          <li><strong>Rotate/Flip:</strong> Adjust orientation if needed</li>
+          <li><strong>Place:</strong> Put piece on empty board cells</li>
         </ol>
       `,
       highlightSelector: '.pent-piece-selector',
@@ -66,7 +66,7 @@ export const pentEmInTutorial: TutorialConfig = {
       id: 'winning',
       title: 'Winning',
       message: `
-        <p>If your opponent has no legal place for any leftover piece, you win!</p>
+        <p>When your opponent cannot place any of their remaining pieces, you win!</p>
       `,
       position: 'center',
     },

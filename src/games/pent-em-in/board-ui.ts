@@ -1,15 +1,14 @@
 // Pent'Em In Board UI
 // Renders the game board, pieces, and piece selector
 
-import { injectStylesOnce } from '../../ui/inject-styles';
-import type { PentEmInState } from './types';
-import { BOARD_SIZE, getPlayerPieces, getPentominoShape } from './types';
+import type {
+  PentEmInState} from './types';
 import {
-  getPieceCells,
-  canPlacePiece,
-  getCurrentOrientationPlacements,
-  selectedPieceFitsAnywhere,
-} from './rules';
+  BOARD_SIZE,
+  getPlayerPieces,
+  getPentominoShape,
+} from './types';
+import { getPieceCells, canPlacePiece } from './rules';
 import type { Cell } from '../../core/polyomino/types';
 import { normalizeCells } from '../../core/polyomino/transform';
 import { getPlayerSeatColors } from '../../ui/player-colors';
@@ -22,14 +21,14 @@ import {
   applyRovingTabindex,
   collectGridCells,
 } from '../../ui/board-a11y';
-import { getPlayerName } from '../../ui/seat-labels';
-export { getPlayerName };
 
 const CELL_SIZE = 36;
 const PREVIEW_CELL_SIZE = 16;
 const BOARD_PADDING = 20;
-const VALID_FILL = 'rgba(76, 175, 80, 0.28)';
-const VALID_STROKE = '#4caf50';
+
+function playerColors() {
+  return getPlayerSeatColors();
+}
 
 // =============================================================================
 // Board Rendering
@@ -117,7 +116,7 @@ export function renderBoard(
       rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
       rect.setAttribute('width', String(CELL_SIZE - 2));
       rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', getPlayerSeatColors()[piece.player]);
+      rect.setAttribute('fill', playerColors()[piece.player]);
       rect.setAttribute('rx', '3');
       rect.setAttribute('opacity', '0.9');
       piecesGroup.appendChild(rect);
@@ -147,53 +146,56 @@ export function renderBoard(
   }
   svg.appendChild(piecesGroup);
 
-  const legalAnchors =
-    allowInput && state.phase === 'placePiece' && state.selectedPiece
-      ? new Set(
-          getCurrentOrientationPlacements(state).map((c) => `${c.row},${c.col}`)
-        )
-      : new Set<string>();
-
-  // Legal placement highlights (visible without hover — critical on tablet)
-  if (legalAnchors.size > 0) {
-    const validGroup = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'g'
+  // Preview (if placing) — suppress during computer seat
+  if (allowInput && state.selectedPiece && state.previewPosition) {
+    const previewCells = getPieceCells(
+      state.selectedPiece,
+      state.previewPosition,
+      state.selectedRotation,
+      state.selectedFlipped
     );
-    validGroup.classList.add('pent-valid-cells');
-    for (const key of legalAnchors) {
-      const parts = key.split(',').map(Number);
-      // Legal-anchor keys are always "r,c"; `!` is NUI-only.
-      const r = parts[0]!;
-      const c = parts[1]!;
-      const rect = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'rect'
-      );
-      rect.setAttribute('x', String(BOARD_PADDING + c * CELL_SIZE + 1));
-      rect.setAttribute('y', String(BOARD_PADDING + r * CELL_SIZE + 1));
-      rect.setAttribute('width', String(CELL_SIZE - 2));
-      rect.setAttribute('height', String(CELL_SIZE - 2));
-      rect.setAttribute('fill', VALID_FILL);
-      rect.setAttribute('stroke', VALID_STROKE);
-      rect.setAttribute('stroke-width', '2');
-      rect.setAttribute('rx', '3');
-      rect.classList.add('pent-cell-valid');
-      validGroup.appendChild(rect);
-    }
-    svg.appendChild(validGroup);
-  }
 
-  // Preview layer (patched in place on hover — see patchPentPreview).
-  // Omit the group entirely when input is suppressed (AI seat aria honesty).
-  if (allowInput) {
+    const isValid = canPlacePiece(
+      state,
+      state.selectedPiece,
+      state.previewPosition,
+      state.selectedRotation,
+      state.selectedFlipped
+    );
+
     const previewGroup = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'g'
     );
     previewGroup.classList.add('preview');
+
+    for (const cell of previewCells) {
+      if (
+        cell.row < 0 ||
+        cell.row >= BOARD_SIZE ||
+        cell.col < 0 ||
+        cell.col >= BOARD_SIZE
+      ) {
+        continue;
+      }
+
+      const rect = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'rect'
+      );
+      rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
+      rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
+      rect.setAttribute('width', String(CELL_SIZE - 2));
+      rect.setAttribute('height', String(CELL_SIZE - 2));
+      rect.setAttribute(
+        'fill',
+        isValid ? playerColors()[state.currentPlayer] : '#ff5252'
+      );
+      rect.setAttribute('rx', '3');
+      rect.setAttribute('opacity', '0.5');
+      previewGroup.appendChild(rect);
+    }
     svg.appendChild(previewGroup);
-    fillPentPreviewGroup(previewGroup, state, allowInput);
   }
 
   // Click/hover areas
@@ -235,14 +237,14 @@ export function renderBoard(
           : occupant === 'player2'
             ? 'Red'
             : undefined;
-      const isLegalAnchor = legalAnchors.has(`${row},${col}`);
       makeGridCell(
         rect,
         buildCellAriaLabel({
           coord: `${row},${col}`,
           empty: occupant === null,
-          ...(owner !== undefined ? { owner } : {}),
-          validPlacement: isLegalAnchor,
+          owner,
+          validPlacement:
+            allowInput && state.phase === 'placePiece' && Boolean(state.selectedPiece),
         })
       );
 
@@ -264,71 +266,6 @@ export function renderBoard(
   return svg;
 }
 
-function fillPentPreviewGroup(
-  previewGroup: SVGGElement,
-  state: PentEmInState,
-  allowInput: boolean
-): void {
-  previewGroup.replaceChildren();
-  if (!allowInput || !state.selectedPiece || !state.previewPosition) return;
-
-  const previewCells = getPieceCells(
-    state.selectedPiece,
-    state.previewPosition,
-    state.selectedRotation,
-    state.selectedFlipped
-  );
-
-  const isValid = canPlacePiece(
-    state,
-    state.selectedPiece,
-    state.previewPosition,
-    state.selectedRotation,
-    state.selectedFlipped
-  );
-
-  const fragment = document.createDocumentFragment();
-  for (const cell of previewCells) {
-    if (
-      cell.row < 0 ||
-      cell.row >= BOARD_SIZE ||
-      cell.col < 0 ||
-      cell.col >= BOARD_SIZE
-    ) {
-      continue;
-    }
-
-    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', String(BOARD_PADDING + cell.col * CELL_SIZE + 1));
-    rect.setAttribute('y', String(BOARD_PADDING + cell.row * CELL_SIZE + 1));
-    rect.setAttribute('width', String(CELL_SIZE - 2));
-    rect.setAttribute('height', String(CELL_SIZE - 2));
-    rect.setAttribute(
-      'fill',
-      isValid ? getPlayerSeatColors()[state.currentPlayer] : '#ff5252'
-    );
-    rect.setAttribute('rx', '3');
-    rect.setAttribute('opacity', '0.5');
-    fragment.appendChild(rect);
-  }
-  previewGroup.appendChild(fragment);
-}
-
-/**
- * Hover-only: replace the `.preview` group contents without rebuilding the SVG.
- */
-export function patchPentPreview(
-  svg: SVGElement,
-  state: PentEmInState,
-  options: PentEmInBoardRenderOptions = {}
-): boolean {
-  const allowInput = options.allowInput !== false;
-  const previewGroup = svg.querySelector('g.preview') as SVGGElement | null;
-  if (!previewGroup) return false;
-  fillPentPreviewGroup(previewGroup, state, allowInput);
-  return true;
-}
-
 // =============================================================================
 // Piece Selector Rendering
 // =============================================================================
@@ -343,7 +280,7 @@ export function renderPieceSelector(
   container.className = 'pent-piece-selector';
 
   const pieces = getPlayerPieces(state, state.currentPlayer);
-  const playerColor = getPlayerSeatColors()[state.currentPlayer];
+  const playerColor = playerColors()[state.currentPlayer];
 
   for (const shapeId of pieces.available) {
     const shape = getPentominoShape(shapeId);
@@ -416,127 +353,16 @@ export function renderPieceSelector(
 // Status and Controls
 // =============================================================================
 
-export interface PentEmInPlaceControlHandlers {
-  onRotate: () => void;
-  onFlip: () => void;
-  onCancel: () => void;
-}
-
-/**
- * Rotate / flip / choose-another controls for the placePiece phase.
- */
-export function renderPlaceControls(
-  state: PentEmInState,
-  handlers: PentEmInPlaceControlHandlers,
-  options: PentEmInBoardRenderOptions = {}
-): HTMLElement {
-  const allowInput = options.allowInput !== false;
-  const container = document.createElement('div');
-  container.className = 'pent-place-controls';
-
-  if (!allowInput || state.phase !== 'placePiece' || !state.selectedPiece) {
-    return container;
-  }
-
-  const shape = getPentominoShape(state.selectedPiece);
-  const fitsAnywhere = selectedPieceFitsAnywhere(state);
-  const currentFits = getCurrentOrientationPlacements(state).length > 0;
-
-  // Orientation preview so rotate/flip is visible without board hover
-  if (shape) {
-    const previewWrap = document.createElement('div');
-    previewWrap.className = 'pent-current-piece';
-    const used = normalizeCells(
-      getPieceCells(
-        state.selectedPiece,
-        { row: 0, col: 0 },
-        state.selectedRotation,
-        state.selectedFlipped
-      )
-    );
-    const maxRow = Math.max(...used.map((c) => c.row), 0) + 1;
-    const maxCol = Math.max(...used.map((c) => c.col), 0) + 1;
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute(
-      'width',
-      String(Math.max(maxCol * PREVIEW_CELL_SIZE + 4, 40))
-    );
-    svg.setAttribute(
-      'height',
-      String(Math.max(maxRow * PREVIEW_CELL_SIZE + 4, 40))
-    );
-    svg.setAttribute('aria-hidden', 'true');
-    const color = getPlayerSeatColors()[state.currentPlayer];
-    for (const cell of used) {
-      const rect = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'rect'
-      );
-      rect.setAttribute('x', String(2 + cell.col * PREVIEW_CELL_SIZE));
-      rect.setAttribute('y', String(2 + cell.row * PREVIEW_CELL_SIZE));
-      rect.setAttribute('width', String(PREVIEW_CELL_SIZE - 1));
-      rect.setAttribute('height', String(PREVIEW_CELL_SIZE - 1));
-      rect.setAttribute('fill', color);
-      rect.setAttribute('rx', '2');
-      svg.appendChild(rect);
-    }
-    previewWrap.appendChild(svg);
-    container.appendChild(previewWrap);
-  }
-
-  const controls = document.createElement('div');
-  controls.className = 'pent-controls';
-
-  if (shape?.canRotate) {
-    const rotateBtn = document.createElement('button');
-    rotateBtn.type = 'button';
-    rotateBtn.className = 'pent-btn pent-btn-rotate';
-    rotateBtn.textContent = `Rotate (${state.selectedRotation}°)`;
-    rotateBtn.addEventListener('click', handlers.onRotate);
-    controls.appendChild(rotateBtn);
-  }
-
-  if (shape?.canFlip) {
-    const flipBtn = document.createElement('button');
-    flipBtn.type = 'button';
-    flipBtn.className = 'pent-btn pent-btn-flip';
-    flipBtn.textContent = state.selectedFlipped ? 'Flipped' : 'Flip';
-    flipBtn.addEventListener('click', handlers.onFlip);
-    controls.appendChild(flipBtn);
-  }
-
-  const otherBtn = document.createElement('button');
-  otherBtn.type = 'button';
-  // Keep .pent-btn-cancel for legacy overnight selectors; choose-other is the UX label.
-  otherBtn.className = 'pent-btn pent-btn-cancel pent-btn-choose-other';
-  otherBtn.textContent = fitsAnywhere
-    ? 'Choose another piece'
-    : "Can't fit — choose another";
-  otherBtn.addEventListener('click', handlers.onCancel);
-  controls.appendChild(otherBtn);
-
-  container.appendChild(controls);
-
-  const hint = document.createElement('div');
-  hint.className = 'pent-instructions pent-place-hint';
-  if (!fitsAnywhere) {
-    hint.textContent = "This piece doesn't fit anywhere. Choose another piece.";
-  } else if (!currentFits) {
-    hint.textContent =
-      'No green cells at this angle — rotate or flip, or choose another piece.';
-  } else {
-    hint.textContent =
-      'Tap a green cell to place. Rotate or flip to try other angles.';
-  }
-  container.appendChild(hint);
-
-  return container;
+export function getPlayerName(player: 'player1' | 'player2'): string {
+  return player === 'player1' ? 'Blue' : 'Red';
 }
 
 export function injectPentEmInStyles(): void {
-  injectStylesOnce(
-    'pent-em-in-styles',
-    `
+  if (document.getElementById('pent-em-in-styles')) return;
+
+  const style = document.createElement('style');
+  style.id = 'pent-em-in-styles';
+  style.textContent = `
     .pent-game-container {
       display: flex;
       flex-direction: column;
@@ -603,12 +429,12 @@ export function injectPentEmInStyles(): void {
 
     .pent-status.player1 {
       background: #e3f2fd;
-      color: var(--color-player1-text, #1d4ed8);
+      color: var(--color-player1, #1565c0);
     }
 
     .pent-status.player2 {
       background: #ffebee;
-      color: var(--color-player2-text, #b91c1c);
+      color: var(--color-player2, #c62828);
     }
 
     [data-opponent="ai"] .pent-status.player2 {
@@ -633,23 +459,6 @@ export function injectPentEmInStyles(): void {
       text-align: center;
     }
 
-    .pent-place-controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .pent-current-piece {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 6px 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-    }
-
     .pent-controls {
       display: flex;
       gap: 8px;
@@ -658,9 +467,7 @@ export function injectPentEmInStyles(): void {
     }
 
     .pent-btn {
-      padding: 10px 16px;
-      min-height: 44px;
-      min-width: 44px;
+      padding: 8px 16px;
       font-size: 14px;
       border: none;
       border-radius: 6px;
@@ -678,9 +485,8 @@ export function injectPentEmInStyles(): void {
       color: white;
     }
 
-    .pent-btn-cancel,
-    .pent-btn-choose-other {
-      background: #546e7a;
+    .pent-btn-cancel {
+      background: #9e9e9e;
       color: white;
     }
 
@@ -700,22 +506,6 @@ export function injectPentEmInStyles(): void {
       text-align: center;
       max-width: 400px;
     }
-
-    .pent-place-hint {
-      font-weight: 500;
-      color: #37474f;
-    }
-
-    .pent-cell-valid {
-      pointer-events: none;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .pent-btn:hover,
-      .pent-piece-option:hover:not(.disabled) {
-        transform: none;
-      }
-    }
-  `
-  );
+  `;
+  document.head.appendChild(style);
 }

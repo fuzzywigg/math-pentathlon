@@ -1,4 +1,5 @@
-import type { GameState } from './game-state';
+import type {
+  GameState} from './game-state';
 import {
   createInitialGameState,
   moveKing,
@@ -12,17 +13,12 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kingsQuadraphagesTutorial } from './tutorial';
-import type { AIDifficulty } from './ai';
+import type { AIDifficulty} from './ai';
 import { getAIMove, isAITurn } from './ai';
 import type { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
-import { prefersReducedMotion } from '../../ui/reduced-motion';
 import { isBoard3dEnabled } from '../../core/feature-flags';
-import {
-  markBoard3dWebGlFallback,
-  clearBoard3dWebGlFallback,
-} from '../../ui/three/tablet-gl';
 import { loadKingsQuadraphagesBoard3DModule } from './board-3d-loader';
 import type { KingsQuadraphagesBoard3D } from '../../ui/three/kings-quadraphages-board-3d';
 
@@ -37,32 +33,10 @@ let gameMode: GameMode = 'human-vs-human';
 let aiPlayer: PlayerOwner | null = null;
 let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking: boolean = false;
-/** Invalidates in-flight async AI turns after route leave / new game. */
-let aiGeneration = 0;
 
-// AI thinking delay (ms) for better UX.
-// Coarse pointers (tablets) use a slightly shorter pause so turns feel responsive
-// without removing the "thinking" affordance.
-const AI_THINKING_DELAY_DESKTOP = 500;
-const AI_THINKING_DELAY_COARSE = 350;
+// AI thinking delay (ms) for better UX
+const AI_THINKING_DELAY = 500;
 const AI_MOVE_DELAY = 300;
-
-function aiThinkingDelayMs(): number {
-  if (
-    typeof window === 'undefined' ||
-    typeof window.matchMedia !== 'function'
-  ) {
-    return AI_THINKING_DELAY_DESKTOP;
-  }
-  try {
-    if (window.matchMedia('(pointer: coarse), (hover: none)').matches) {
-      return AI_THINKING_DELAY_COARSE;
-    }
-  } catch {
-    // jsdom / odd hosts without full matchMedia — keep desktop delay
-  }
-  return AI_THINKING_DELAY_DESKTOP;
-}
 
 // Track if game has ended (to prevent multiple owl notifications)
 let hasNotifiedGameEnd = false;
@@ -96,11 +70,9 @@ async function ensureBoard3d(): Promise<void> {
       boardContainer,
       onCellClick
     );
-    clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
-    markBoard3dWebGlFallback(boardContainer, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -114,7 +86,6 @@ function onBoard3dContextLost(): void {
     );
   }
   board3d = null;
-  markBoard3dWebGlFallback(boardContainer, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   render();
@@ -187,7 +158,10 @@ function render(): void {
 // Trigger invalid click animation on a cell (skipped when reduced motion)
 function triggerInvalidAnimation(row: number, col: number): void {
   if (!boardContainer) return;
-  if (prefersReducedMotion()) {
+  if (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
     return;
   }
 
@@ -266,13 +240,11 @@ function checkAndTriggerAITurn(): void {
 async function executeAITurn(): Promise<void> {
   if (!aiPlayer) return;
 
-  const gen = ++aiGeneration;
   isAIThinking = true;
   render(); // Show "AI is thinking..." status
 
   // Initial thinking delay
-  await delay(aiThinkingDelayMs());
-  if (gen !== aiGeneration) return;
+  await delay(AI_THINKING_DELAY);
 
   // Get AI's move
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
@@ -281,7 +253,6 @@ async function executeAITurn(): Promise<void> {
     // No legal king move — re-render so game-over / trap chrome can paint.
     // (Rules already end the game when a seat is trapped; this clears the
     // thinking spinner if search returns null for any reason.)
-    if (gen !== aiGeneration) return;
     isAIThinking = false;
     render();
     return;
@@ -297,7 +268,6 @@ async function executeAITurn(): Promise<void> {
 
   // Delay before placing quadraphage
   await delay(AI_MOVE_DELAY);
-  if (gen !== aiGeneration) return;
 
   // Execute quadraphage placement (convert from 0-based to 1-based)
   const quadPos = {
@@ -313,30 +283,13 @@ async function executeAITurn(): Promise<void> {
   checkAndTriggerAITurn();
 }
 
-/** Pending UX delay timers from AI turn pacing — cleared on destroy. */
-const delayTimers = new Set<ReturnType<typeof setTimeout>>();
-
-function clearDelayTimers(): void {
-  for (const id of delayTimers) {
-    clearTimeout(id);
-  }
-  delayTimers.clear();
-}
-
 // Simple delay helper
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    const id = setTimeout(() => {
-      delayTimers.delete(id);
-      resolve();
-    }, ms);
-    delayTimers.add(id);
-  });
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 // Start a new game with current settings
 export function newGame(): void {
-  aiGeneration += 1;
   gameState = createInitialGameState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
@@ -452,9 +405,6 @@ export function initGame(
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
-  aiGeneration += 1;
-  clearDelayTimers();
-  isAIThinking = false;
   if (boardContainer) {
     boardContainer.removeEventListener(
       'mp3d-context-lost',

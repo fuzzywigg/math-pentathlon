@@ -1,15 +1,9 @@
 // Calla Board UI - Renders the Mancala-style board
 
-import type { CallaGameState } from './types';
+import type { CallaGameState} from './types';
 import { PITS_PER_SIDE } from './types';
 import { getPhaseMessage, getValidPits, getLastMoveInfo } from './rules';
 import { seatIcon } from '../../ui/player-colors';
-import {
-  clearElement,
-  replaceWithSafeHtml,
-  safeHtml,
-} from '../../core/dom-security';
-
 import {
   buildCellAriaLabel,
   makeSvgFocusable,
@@ -32,10 +26,9 @@ const PIT_SPACING =
 export function renderBoard(
   state: CallaGameState,
   container: HTMLElement,
-  onPitClick?: PitClickCallback,
-  gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human'
+  onPitClick?: PitClickCallback
 ): void {
-  clearElement(container);
+  container.innerHTML = '';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'calla-wrapper';
@@ -109,8 +102,7 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p2Y,
-      // ratchet: displayIndex is in 0..PITS_PER_SIDE-1.
-      state.player2Pits[displayIndex]!,
+      state.player2Pits[displayIndex],
       'player2',
       displayIndex,
       isValid,
@@ -132,8 +124,7 @@ export function renderBoard(
     const pitGroup = createPit(
       x,
       p1Y,
-      // ratchet: loop i is in 0..PITS_PER_SIDE-1.
-      state.player1Pits[i]!,
+      state.player1Pits[i],
       'player1',
       i,
       isValid,
@@ -216,12 +207,11 @@ export function renderBoard(
 
   wrapper.appendChild(svg);
 
-  // Last move info (You/AI labels in vs-AI mode)
-  const lastMoveInfo = getLastMoveInfo(state, gameMode);
+  // Last move info
+  const lastMoveInfo = getLastMoveInfo(state);
   if (lastMoveInfo) {
     const infoEl = document.createElement('div');
     infoEl.className = 'calla-last-move';
-    infoEl.setAttribute('data-testid', 'calla-last-move');
     infoEl.textContent = lastMoveInfo;
     wrapper.appendChild(infoEl);
   }
@@ -248,12 +238,11 @@ function createPit(
   group.setAttribute('data-side', player);
   group.setAttribute('data-pit-index', String(index));
 
-  // Invisible hit target — sized so CSS diameter stays ≥44px on phones/tablets
-  // (viewBox 500 → ~375px phone ≈ r≥16.5; ~768px tablet ≈ r≥14.3; we use r=40).
+  // Invisible hit target (~44px CSS at typical board widths) under the visual pit
   const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
   hit.setAttribute('cx', String(cx));
   hit.setAttribute('cy', String(cy));
-  hit.setAttribute('r', String(PIT_RADIUS + 8));
+  hit.setAttribute('r', String(PIT_RADIUS + 4));
   hit.setAttribute('fill', 'transparent');
   hit.setAttribute('class', 'calla-pit-hit');
   group.appendChild(hit);
@@ -308,25 +297,26 @@ function createPit(
   }
 
   const owner = player === 'player1' ? 'Blue' : 'Red';
-  const ariaLabel = buildCellAriaLabel({
-    coord: `${owner} pit ${index + 1}`,
-    owner,
-    extras: [`${cubes} cube${cubes === 1 ? '' : 's'}`],
-    validMove: isValid,
-  });
-
-  // Only activatable pits are keyboard buttons; others stay announced (no tab stop).
-  if (isValid && onClick) {
-    makeSvgFocusable(group, ariaLabel);
+  makeSvgFocusable(
+    group,
+    buildCellAriaLabel({
+      coord: `${owner} pit ${index + 1}`,
+      owner,
+      extras: [`${cubes} cube${cubes === 1 ? '' : 's'}`],
+      validMove: isValid,
+    })
+  );
+  if (!isValid) {
+    group.setAttribute('aria-disabled', 'true');
+  } else {
     group.removeAttribute('aria-disabled');
+  }
+
+  // Click / keyboard handler
+  if (onClick) {
     group.style.cursor = 'pointer';
     group.addEventListener('click', onClick);
     bindCellActivateKeys(group, onClick);
-  } else {
-    group.setAttribute('aria-label', ariaLabel);
-    group.removeAttribute('role');
-    group.removeAttribute('tabindex');
-    group.removeAttribute('aria-disabled');
   }
 
   return group;
@@ -385,11 +375,10 @@ export function renderStatus(
   state: CallaGameState,
   container: HTMLElement,
   gameMode: 'human-vs-human' | 'human-vs-ai' = 'human-vs-human',
-  isAIThinking: boolean = false,
-  teachingHint: string | null = null
+  isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  clearElement(container);
+  container.innerHTML = '';
 
   const statusEl = document.createElement('div');
   statusEl.className = 'calla-status';
@@ -411,33 +400,16 @@ export function renderStatus(
           : state.winner === 'player1'
             ? 'Blue'
             : 'Red';
-      // Grammar: "You Win!" vs "Blue Wins!" / "AI Wins!"
-      const winVerb = winnerName === 'You' ? 'Win' : 'Wins';
-      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} ${winVerb}! 🎉`;
+      turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
     }
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
     turnEl.classList.add('status-ai-thinking');
   } else {
-    turnEl.textContent = getPhaseMessage(state, gameMode);
+    turnEl.textContent = getPhaseMessage(state);
   }
 
   statusEl.appendChild(turnEl);
-
-  // Easy-mode teaching hint from AI (shown on the human's next turn)
-  if (
-    teachingHint &&
-    !state.winner &&
-    !isAIThinking &&
-    gameMode === 'human-vs-ai'
-  ) {
-    const hintEl = document.createElement('div');
-    hintEl.className = 'calla-teaching-hint';
-    hintEl.setAttribute('data-testid', 'calla-teaching-hint');
-    hintEl.setAttribute('role', 'status');
-    hintEl.textContent = teachingHint;
-    statusEl.appendChild(hintEl);
-  }
 
   // Score display
   const scoreEl = document.createElement('div');
@@ -448,18 +420,12 @@ export function renderStatus(
 
   const p1Score = document.createElement('div');
   p1Score.className = `calla-score calla-score-p1 ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  replaceWithSafeHtml(
-    p1Score,
-    safeHtml`${seatIcon('player1')} ${p1Label}: <strong>${state.player1Calla}</strong>`
-  );
+  p1Score.innerHTML = `${seatIcon('player1')} ${p1Label}: <strong>${state.player1Calla}</strong>`;
   scoreEl.appendChild(p1Score);
 
   const p2Score = document.createElement('div');
   p2Score.className = `calla-score calla-score-p2 ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  replaceWithSafeHtml(
-    p2Score,
-    safeHtml`${seatIcon('player2')} ${p2Label}: <strong>${state.player2Calla}</strong>`
-  );
+  p2Score.innerHTML = `${seatIcon('player2')} ${p2Label}: <strong>${state.player2Calla}</strong>`;
   scoreEl.appendChild(p2Score);
 
   statusEl.appendChild(scoreEl);
