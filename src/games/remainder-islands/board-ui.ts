@@ -42,8 +42,13 @@ function getHexCenter(row: number, col: number): { x: number; y: number } {
 // Board Rendering
 // =============================================================================
 
-function islandFillColor(owner: Island['owner']): string {
-  const seats = getPlayerSeatColors();
+type SeatColors = ReturnType<typeof getPlayerSeatColors>;
+
+/** Prefer a seats snapshot so sync/render does not re-read CSS vars per island. */
+function islandFillColor(
+  owner: Island['owner'],
+  seats: SeatColors = getPlayerSeatColors()
+): string {
   if (owner === 'player1') {
     return seats.player1;
   }
@@ -59,7 +64,8 @@ function applyIslandSelectionVisual(
   state: RemainderIslandsState,
   selected: boolean
 ): void {
-  const hex = group.querySelector('polygon');
+  const hex =
+    group.querySelector('polygon.island-hex') ?? group.querySelector('polygon');
   if (!hex) {
     return;
   }
@@ -87,8 +93,8 @@ function applyIslandSelectionVisual(
         previewText.setAttribute('fill', '#fff');
         previewText.setAttribute('font-weight', 'bold');
         previewText.textContent = `R=${preview.remainder}`;
-        const hitArea = group.querySelector('polygon:last-of-type');
-        if (hitArea && hitArea !== hex) {
+        const hitArea = group.querySelector('polygon.island-hit');
+        if (hitArea) {
           group.insertBefore(previewText, hitArea);
         } else {
           group.appendChild(previewText);
@@ -103,6 +109,18 @@ function applyIslandSelectionVisual(
   hex.setAttribute('stroke-width', isValid ? '4' : '2');
   group.querySelector('.island-r-preview')?.remove();
 }
+
+interface RemainderBoardHandlers {
+  onIslandClick: (islandId: string) => void;
+  onIslandHover: (islandId: string | null) => void;
+}
+
+const remainderBoardHandlers = new WeakMap<
+  SVGElement,
+  RemainderBoardHandlers
+>();
+const remainderKeysBound = new WeakSet<SVGGElement>();
+const remainderHitCleanups = new WeakMap<SVGGElement, () => void>();
 
 export function renderBoard(
   state: RemainderIslandsState,
@@ -161,6 +179,10 @@ export function renderBoard(
   water.setAttribute('opacity', '0.5');
   svg.appendChild(water);
 
+  // One CSS-var read for the whole board (avoids 3×getComputedStyle per island).
+  const seats = getPlayerSeatColors();
+  remainderBoardHandlers.set(svg, { onIslandClick, onIslandHover });
+
   // Islands
   for (const island of state.islands) {
     const { x, y } = getHexCenter(island.row, island.col);
@@ -184,9 +206,10 @@ export function renderBoard(
       'http://www.w3.org/2000/svg',
       'polygon'
     );
+    hex.classList.add('island-hex');
     hex.setAttribute('points', hexPoints(x, y, HEX_SIZE - 2));
 
-    hex.setAttribute('fill', islandFillColor(island.owner));
+    hex.setAttribute('fill', islandFillColor(island.owner, seats));
     hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
     hex.setAttribute('stroke-width', isValid ? '4' : '2');
     group.appendChild(hex);
@@ -196,6 +219,7 @@ export function renderBoard(
       'http://www.w3.org/2000/svg',
       'text'
     );
+    valueText.classList.add('island-value');
     valueText.setAttribute('x', String(x));
     valueText.setAttribute('y', String(y + 6));
     valueText.setAttribute('text-anchor', 'middle');
@@ -211,6 +235,7 @@ export function renderBoard(
         'http://www.w3.org/2000/svg',
         'circle'
       );
+      chipBadge.classList.add('island-chip-badge');
       chipBadge.setAttribute('cx', String(x + HEX_SIZE * 0.6));
       chipBadge.setAttribute('cy', String(y - HEX_SIZE * 0.5));
       chipBadge.setAttribute('r', '12');
@@ -223,6 +248,7 @@ export function renderBoard(
         'http://www.w3.org/2000/svg',
         'text'
       );
+      chipCount.classList.add('island-chip-count');
       chipCount.setAttribute('x', String(x + HEX_SIZE * 0.6));
       chipCount.setAttribute('y', String(y - HEX_SIZE * 0.5 + 5));
       chipCount.setAttribute('text-anchor', 'middle');
@@ -261,6 +287,7 @@ export function renderBoard(
         'http://www.w3.org/2000/svg',
         'polygon'
       );
+      hitArea.classList.add('island-hit');
       hitArea.setAttribute('points', hexPoints(x, y, HEX_SIZE));
       hitArea.setAttribute('fill', 'transparent');
       hitArea.style.cursor = isValid ? 'pointer' : 'not-allowed';
@@ -269,19 +296,20 @@ export function renderBoard(
         // Only activatable islands are keyboard buttons; others stay announced.
         makeSvgFocusable(group, ariaLabel);
         const activate = () => {
-          onIslandClick(island.id);
+          remainderBoardHandlers.get(svg)?.onIslandClick(island.id);
         };
         // Primary pointer tap (cancel/multi-touch/slop safe) + click fallback.
         bindPrimaryPointerActivate(hitArea, activate);
         hitArea.addEventListener('mouseenter', () => {
           applyIslandSelectionVisual(group, island, state, true);
-          onIslandHover(island.id);
+          remainderBoardHandlers.get(svg)?.onIslandHover(island.id);
         });
         hitArea.addEventListener('mouseleave', () => {
           applyIslandSelectionVisual(group, island, state, false);
-          onIslandHover(null);
+          remainderBoardHandlers.get(svg)?.onIslandHover(null);
         });
         bindCellActivateKeys(group, activate);
+        remainderKeysBound.add(group);
       } else {
         group.setAttribute('aria-label', ariaLabel);
       }
@@ -295,6 +323,194 @@ export function renderBoard(
   }
 
   return svg;
+}
+
+function syncIslandChips(group: SVGGElement, island: Island): void {
+  const existingBadge = group.querySelector('circle.island-chip-badge');
+  const chipCountEl = group.querySelector('text.island-chip-count');
+  const shownChips = chipCountEl ? Number(chipCountEl.textContent) : 0;
+  if (island.chips === shownChips) {
+    return;
+  }
+
+  existingBadge?.remove();
+  chipCountEl?.remove();
+  if (island.chips <= 0) {
+    return;
+  }
+
+  const { x, y } = getHexCenter(island.row, island.col);
+  const chipBadge = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'circle'
+  );
+  chipBadge.classList.add('island-chip-badge');
+  chipBadge.setAttribute('cx', String(x + HEX_SIZE * 0.6));
+  chipBadge.setAttribute('cy', String(y - HEX_SIZE * 0.5));
+  chipBadge.setAttribute('r', '12');
+  chipBadge.setAttribute('fill', '#fff');
+  chipBadge.setAttribute('stroke', '#333');
+  chipBadge.setAttribute('stroke-width', '2');
+  const chipCount = document.createElementNS(
+    'http://www.w3.org/2000/svg',
+    'text'
+  );
+  chipCount.classList.add('island-chip-count');
+  chipCount.setAttribute('x', String(x + HEX_SIZE * 0.6));
+  chipCount.setAttribute('y', String(y - HEX_SIZE * 0.5 + 5));
+  chipCount.setAttribute('text-anchor', 'middle');
+  chipCount.setAttribute('font-size', '12');
+  chipCount.setAttribute('font-weight', 'bold');
+  chipCount.setAttribute('fill', '#333');
+  chipCount.textContent = String(island.chips);
+  const hit = group.querySelector('polygon.island-hit');
+  if (hit) {
+    group.insertBefore(chipBadge, hit);
+    group.insertBefore(chipCount, hit);
+  } else {
+    group.appendChild(chipBadge);
+    group.appendChild(chipCount);
+  }
+}
+
+/**
+ * Sync island fills / validity / chips / hit areas on an existing board SVG.
+ * Avoids recreating water pattern + every island group on each roll/click.
+ */
+export function syncBoard(
+  svg: SVGElement,
+  state: RemainderIslandsState,
+  onIslandClick: (islandId: string) => void,
+  onIslandHover: (islandId: string | null) => void,
+  interactive = true
+): void {
+  remainderBoardHandlers.set(svg, { onIslandClick, onIslandHover });
+  const seats = getPlayerSeatColors();
+
+  for (const island of state.islands) {
+    const group = svg.querySelector(
+      `g.island[data-island-id="${island.id}"]`
+    ) as SVGGElement | null;
+    if (!group) {
+      continue;
+    }
+
+    const isValid = state.validIslands.includes(island.id);
+    const isSelected = state.selectedIsland === island.id;
+    group.classList.toggle('valid', isValid);
+    group.classList.toggle('selected', isSelected);
+
+    const hex =
+      group.querySelector('polygon.island-hex') ??
+      group.querySelector('polygon');
+    if (hex) {
+      hex.setAttribute('fill', islandFillColor(island.owner, seats));
+      if (!isSelected) {
+        hex.setAttribute('stroke', isValid ? '#ffeb3b' : '#5d8a31');
+        hex.setAttribute('stroke-width', isValid ? '4' : '2');
+      }
+    }
+
+    const valueText =
+      group.querySelector('text.island-value') ??
+      group.querySelector(
+        'text:not(.island-r-preview):not(.island-chip-count)'
+      );
+    if (valueText) {
+      valueText.classList.add('island-value');
+      valueText.setAttribute('fill', island.owner ? 'white' : '#333');
+      valueText.textContent = String(island.value);
+    }
+
+    syncIslandChips(group, island);
+
+    const owner =
+      island.owner === 'player1'
+        ? 'Blue'
+        : island.owner === 'player2'
+          ? 'Red'
+          : undefined;
+    const ariaLabel = buildCellAriaLabel({
+      coord: `${island.row},${island.col}`,
+      empty: !island.owner,
+      ...(owner !== undefined ? { owner } : {}),
+      validMove: isValid,
+      extras: [
+        `value ${island.value}`,
+        ...(island.chips > 0 ? [`${island.chips} chips`] : []),
+        ...(isSelected ? ['selected'] : []),
+      ],
+    });
+
+    let hit = group.querySelector(
+      'polygon.island-hit'
+    ) as SVGPolygonElement | null;
+    const wantHit = state.phase === 'selectIsland' && interactive;
+
+    remainderHitCleanups.get(group)?.();
+    remainderHitCleanups.delete(group);
+
+    if (wantHit) {
+      const { x, y } = getHexCenter(island.row, island.col);
+      if (!hit) {
+        hit = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        hit.classList.add('island-hit');
+        hit.setAttribute('points', hexPoints(x, y, HEX_SIZE));
+        hit.setAttribute('fill', 'transparent');
+        group.appendChild(hit);
+      } else {
+        // Drop prior listeners without recreating the whole island group.
+        const fresh = hit.cloneNode(true) as SVGPolygonElement;
+        hit.replaceWith(fresh);
+        hit = fresh;
+      }
+      hit.style.cursor = isValid ? 'pointer' : 'not-allowed';
+
+      if (isValid) {
+        makeSvgFocusable(group, ariaLabel);
+        const activate = () => {
+          remainderBoardHandlers.get(svg)?.onIslandClick(island.id);
+        };
+        const unbind = bindPrimaryPointerActivate(hit, activate);
+        const onEnter = (): void => {
+          applyIslandSelectionVisual(group, island, state, true);
+          remainderBoardHandlers.get(svg)?.onIslandHover(island.id);
+        };
+        const onLeave = (): void => {
+          applyIslandSelectionVisual(group, island, state, false);
+          remainderBoardHandlers.get(svg)?.onIslandHover(null);
+        };
+        hit.addEventListener('mouseenter', onEnter);
+        hit.addEventListener('mouseleave', onLeave);
+        remainderHitCleanups.set(group, () => {
+          unbind();
+          hit?.removeEventListener('mouseenter', onEnter);
+          hit?.removeEventListener('mouseleave', onLeave);
+        });
+        if (!remainderKeysBound.has(group)) {
+          remainderKeysBound.add(group);
+          bindCellActivateKeys(group, () => {
+            remainderBoardHandlers.get(svg)?.onIslandClick(island.id);
+          });
+        }
+      } else {
+        group.removeAttribute('role');
+        group.removeAttribute('tabindex');
+        group.setAttribute('aria-label', ariaLabel);
+      }
+    } else {
+      hit?.remove();
+      group.removeAttribute('role');
+      group.removeAttribute('tabindex');
+      group.setAttribute('aria-label', ariaLabel);
+      group.querySelector('.island-r-preview')?.remove();
+      group.classList.remove('selected');
+    }
+
+    if (isSelected && wantHit) {
+      applyIslandSelectionVisual(group, island, state, true);
+    }
+  }
 }
 
 // =============================================================================

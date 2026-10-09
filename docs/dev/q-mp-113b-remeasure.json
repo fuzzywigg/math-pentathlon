@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-09T09:53:15.774Z",
+    "baseURL": "http://127.0.0.1:5179",
+    "moveTarget": 20,
+    "navCycles": 5,
+    "mode": "render",
+    "phase": "qmp113b-remeasure",
+    "cpuThrottle": 4,
+    "fixedGames": [],
+    "fixNotes": []
+  },
+  "results": [
+    {
+      "gameId": "juggle",
+      "board3d": false,
+      "ttiMs": 492.9000000001397,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 107.30000000004657,
+        "p95Ms": 113.60000000009313,
+        "maxMs": 113.60000000009313,
+        "meanMs": 104.97000000001863,
+        "layoutReadsP95": 16,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 12,
+        "p50Ms": 41.10000000009313,
+        "p95Ms": 42,
+        "maxMs": 42,
+        "meanMs": 39.558333333348855,
+        "layoutReadsP95": 0,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "remainder-islands",
+      "board3d": false,
+      "ttiMs": 485.4000000001397,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 147.9000000001397,
+        "p95Ms": 160.60000000009313,
+        "maxMs": 160.60000000009313,
+        "meanMs": 147.94000000000233,
+        "layoutReadsP95": 7,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    }
+  ],
+  "phases": {
+    "qmp113b-remeasure": {
+      "meta": {
+        "generatedAt": "2026-10-09T09:53:15.774Z",
+        "baseURL": "http://127.0.0.1:5179",
+        "moveTarget": 20,
+        "navCycles": 5,
+        "mode": "render",
+        "phase": "qmp113b-remeasure",
+        "cpuThrottle": 4,
+        "fixedGames": [],
+        "fixNotes": []
+      },
+      "results": [
+        {
+          "gameId": "juggle",
+          "board3d": false,
+          "ttiMs": 492.9000000001397,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 107.30000000004657,
+            "p95Ms": 113.60000000009313,
+            "maxMs": 113.60000000009313,
+            "meanMs": 104.97000000001863,
+            "layoutReadsP95": 16,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 12,
+            "p50Ms": 41.10000000009313,
+            "p95Ms": 42,
+            "maxMs": 42,
+            "meanMs": 39.558333333348855,
+            "layoutReadsP95": 0,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "remainder-islands",
+          "board3d": false,
+          "ttiMs": 485.4000000001397,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 147.9000000001397,
+            "p95Ms": 160.60000000009313,
+            "maxMs": 160.60000000009313,
+            "meanMs": 147.94000000000233,
+            "layoutReadsP95": 7,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        }
+      ]
+    }
+  }
+}

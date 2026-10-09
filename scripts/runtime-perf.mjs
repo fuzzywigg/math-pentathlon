@@ -450,6 +450,13 @@ async function measureGameRender(browser, baseURL, gameId) {
     });
     await installRenderObservers(page);
 
+    // Warm up pointer/DOM before counted samples so first-move mouse-travel
+    // outliers do not dominate layoutReadsP95 (n=20 → harness p95 ≈ max).
+    for (let w = 0; w < 2; w++) {
+      await attemptScriptedMove(page, gameId).catch(() => {});
+      await page.waitForTimeout(80);
+    }
+
     let landed = 0;
     let attempts = 0;
     const maxAttempts = MOVE_TARGET * 4;

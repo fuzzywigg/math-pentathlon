@@ -19,6 +19,8 @@ import type { AIDifficulty } from './ai';
 import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
 import {
   renderBoard,
+  syncJuggleBoardCells,
+  applyJuggleHoverPreview,
   renderDice,
   renderShapeSelector,
   renderShapeControls,
@@ -100,10 +102,19 @@ function updateUI(): void {
   }
 
   const previousFocus = captureFocusedCell(boardContainer);
-  boardContainer.innerHTML = '';
-
   const allowInput = !isComputerTurnPending();
   const inputOpts = { allowInput };
+
+  // Keep persistent board grids; only rebuild chrome that changes by phase.
+  let boardsContainer = boardContainer.querySelector(
+    '.juggle-boards'
+  ) as HTMLElement | null;
+  const chromeNodes = Array.from(boardContainer.children).filter(
+    (el) => !el.classList.contains('juggle-boards')
+  );
+  for (const node of chromeNodes) {
+    node.remove();
+  }
 
   // Render dice area — hide Roll / selectable dice while the computer seat thinks
   const diceArea = renderDice(
@@ -114,55 +125,80 @@ function updateUI(): void {
     gameState.phase,
     inputOpts
   );
-  boardContainer.appendChild(diceArea);
+  boardContainer.insertBefore(diceArea, boardsContainer);
 
   // Render shape selector or controls
+  let phaseChrome: HTMLElement | null = null;
   if (gameState.phase === 'selectingShape' && gameState.selectedCategory) {
-    const shapeSelector = renderShapeSelector(
-      gameState,
-      handleSelectShape,
-      inputOpts
-    );
-    boardContainer.appendChild(shapeSelector);
+    phaseChrome = renderShapeSelector(gameState, handleSelectShape, inputOpts);
   } else if (gameState.phase === 'placing') {
-    const shapeControls = renderShapeControls(
+    phaseChrome = renderShapeControls(
       gameState,
       handleRotate,
       handleFlip,
       inputOpts
     );
-    boardContainer.appendChild(shapeControls);
+  }
+  if (phaseChrome) {
+    boardContainer.insertBefore(phaseChrome, boardsContainer);
   }
 
-  // Render boards side by side
-  const boardsContainer = document.createElement('div');
-  boardsContainer.className = 'juggle-boards';
+  if (!boardsContainer) {
+    boardsContainer = document.createElement('div');
+    boardsContainer.className = 'juggle-boards';
 
-  const p1Board = renderBoard(
-    gameState.boards.player1,
-    'player1',
-    gameState.currentPlayer === 'player1',
-    gameState,
-    (row, col) => handleCellClick(row, col, 'player1'),
-    (row, col) => handleCellHover(row, col),
-    handleCellLeave,
-    inputOpts
-  );
-  boardsContainer.appendChild(p1Board);
+    const p1Board = renderBoard(
+      gameState.boards.player1,
+      'player1',
+      gameState.currentPlayer === 'player1',
+      gameState,
+      (row, col) => handleCellClick(row, col, 'player1'),
+      (row, col) => handleCellHover(row, col),
+      handleCellLeave,
+      inputOpts
+    );
+    boardsContainer.appendChild(p1Board);
 
-  const p2Board = renderBoard(
-    gameState.boards.player2,
-    'player2',
-    gameState.currentPlayer === 'player2',
-    gameState,
-    (row, col) => handleCellClick(row, col, 'player2'),
-    (row, col) => handleCellHover(row, col),
-    handleCellLeave,
-    inputOpts
-  );
-  boardsContainer.appendChild(p2Board);
-
-  boardContainer.appendChild(boardsContainer);
+    const p2Board = renderBoard(
+      gameState.boards.player2,
+      'player2',
+      gameState.currentPlayer === 'player2',
+      gameState,
+      (row, col) => handleCellClick(row, col, 'player2'),
+      (row, col) => handleCellHover(row, col),
+      handleCellLeave,
+      inputOpts
+    );
+    boardsContainer.appendChild(p2Board);
+    boardContainer.appendChild(boardsContainer);
+  } else {
+    const p1Board = boardsContainer.querySelector(
+      '.juggle-board.player1'
+    ) as HTMLElement | null;
+    const p2Board = boardsContainer.querySelector(
+      '.juggle-board.player2'
+    ) as HTMLElement | null;
+    if (p1Board) {
+      syncJuggleBoardCells(
+        p1Board,
+        gameState.boards.player1,
+        'player1',
+        gameState.currentPlayer === 'player1',
+        gameState,
+        inputOpts
+      );
+    }
+    if (p2Board) {
+      syncJuggleBoardCells(
+        p2Board,
+        gameState.boards.player2,
+        'player2',
+        gameState.currentPlayer === 'player2',
+        gameState,
+        inputOpts
+      );
+    }
+  }
 
   // Update status
   updateStatus();
@@ -314,7 +350,17 @@ function handleCellHover(row: number, col: number): void {
   }
 
   gameState = { ...gameState, hoverPosition: { row, col } };
-  updateUI();
+  if (!boardContainer) {
+    return;
+  }
+  const boards = boardContainer.querySelector('.juggle-boards');
+  if (boards) {
+    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
+      allowInput: true,
+    });
+  } else {
+    updateUI();
+  }
 }
 
 function handleCellLeave(): void {
@@ -322,7 +368,17 @@ function handleCellLeave(): void {
     return;
   }
   gameState = { ...gameState, hoverPosition: null };
-  updateUI();
+  if (!boardContainer) {
+    return;
+  }
+  const boards = boardContainer.querySelector('.juggle-boards');
+  if (boards) {
+    applyJuggleHoverPreview(boards as HTMLElement, gameState, {
+      allowInput: true,
+    });
+  } else {
+    updateUI();
+  }
 }
 
 // =============================================================================
