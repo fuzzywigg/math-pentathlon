@@ -10,11 +10,16 @@ import {
 } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
+import { clearElement } from '../../core/dom-security';
 import { callaTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import type { AIDifficulty } from './ai';
 import { getAIMove } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -35,8 +40,31 @@ let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
 let currentHint: string | null = null;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI think-delay timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 const AI_THINKING_DELAY = 800;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 // Initialize the game
 export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
@@ -47,6 +75,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -59,6 +89,8 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -113,7 +145,7 @@ function triggerAITurn(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  scheduleAI(() => {
     // Use the AI module to get the best move
     let aiMove = getAIMove(gameState, 'player2', aiDifficulty);
 
@@ -143,7 +175,7 @@ function triggerAITurn(): void {
 
     // Check if AI gets another turn (free turn from landing in Calla)
     if (!isGameOver(gameState) && gameState.currentPlayer === 'player2') {
-      setTimeout(triggerAITurn, AI_THINKING_DELAY);
+      scheduleAI(triggerAITurn, AI_THINKING_DELAY);
     }
   }, AI_THINKING_DELAY);
 }
@@ -223,7 +255,17 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
+/** Cancel pending AI timers and clear mounts (route change / remount). */
 export function destroyGame(): void {
-  // Minimal stub after alpha controller restore.
+  aiGeneration += 1;
+  clearAiTimer();
+  isAIThinking = false;
+  if (boardContainer) {
+    clearElement(boardContainer);
+  }
+  if (statusContainer) {
+    clearElement(statusContainer);
+  }
+  boardContainer = null;
+  statusContainer = null;
 }
