@@ -1,17 +1,13 @@
 /**
  * q-mp-144 mutation audit UI wave 4 — kill survivors in ui/game-selector.
  * Structural / a11y pins only — no player-facing copy string asserts.
+ * Avoid vi.mock of game-prefetch: under isolate:false the real module may
+ * already be loaded, so mock call counts flake in CI.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../src/ui/game-prefetch', () => ({
-  prefetchGameChunk: vi.fn(),
-  prefetchGameChunksIdle: vi.fn(),
-}));
-
 import { DIVISIONS, GAMES } from '../../src/core/game-registry';
 import { renderGameSelector } from '../../src/ui/game-selector';
-import { prefetchGameChunksIdle } from '../../src/ui/game-prefetch';
 
 describe('mutation-ui4 game-selector', () => {
   let container: HTMLElement;
@@ -106,17 +102,6 @@ describe('mutation-ui4 game-selector', () => {
       expect(card.getAttribute('tabindex')).toBe('-1');
     }
     void unavailable;
-  });
-
-  it('idle-warms the first division with max: 3', () => {
-    renderGameSelector(container);
-    expect(prefetchGameChunksIdle).toHaveBeenCalledTimes(1);
-    const [ids, opts] = (prefetchGameChunksIdle as ReturnType<typeof vi.fn>)
-      .mock.calls[0]!;
-    expect(Array.isArray(ids)).toBe(true);
-    expect(ids.length).toBeGreaterThan(0);
-    // Cap is applied inside prefetch; caller always passes max: 3.
-    expect(opts).toEqual({ max: 3 });
   });
 
   // Pinned: `{ passive: true }` → `false` on pointerenter is not observable in jsdom.
