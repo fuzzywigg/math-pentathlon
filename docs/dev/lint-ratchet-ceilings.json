@@ -1,6 +1,7 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344).",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet (probe enables them; live eslint.config.js may stay softer or unset). Lower ceilings when cleaning up; never raise without tip-owner approval. curly:all while live enforces curly:multi-line — post-#553 tip 1344, post-alpha-AI/copy-restore tip 1320. @typescript-eslint/no-non-null-assertion: tip measure 387 (q-mp-045); live rule remains unset (ratchet-only).",
   "rules": {
-    "curly": 1320
+    "curly": 1320,
+    "@typescript-eslint/no-non-null-assertion": 387
   }
 }
