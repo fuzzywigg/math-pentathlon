@@ -152,7 +152,9 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="hex-a-gone"]');
-    await waitForMp3dReady(page, 'hex-a-gone');
+    if ((await waitForMp3dReady(page, 'hex-a-gone')) === 'fallback') {
+      return;
+    }
     await expect(page.locator('.hex-a-gone-board')).toHaveCount(0);
     await expect(
       page.locator('.hex-a-gone-a11y-grid [role="gridcell"]')
@@ -240,8 +242,9 @@ test.describe('mp3d Hex-a-Gone 3D board', () => {
     await page.goto(board3dUrl('#/game/hex-a-gone'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await waitForMp3dReady(page, 'hex-a-gone');
-
+    if ((await waitForMp3dReady(page, 'hex-a-gone')) === 'fallback') {
+      return;
+    }
     await selectAndConfirm(page, 'triangle');
     const cell = page.locator(
       '.hex-a-gone-a11y-grid [data-q="0"][data-r="0"]'

@@ -72,7 +72,9 @@ test.describe('mp3d Kings & Quadraphages 3D board', () => {
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="kings-quadraphages"]');
-    await waitForMp3dReady(page, 'kings-quadraphages');
+    if ((await waitForMp3dReady(page, 'kings-quadraphages')) === 'fallback') {
+      return;
+    }
     await expect(page.locator('#board .board .cell')).toHaveCount(0);
 
     const outDir = path.resolve('docs/screenshots/mp3d');

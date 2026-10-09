@@ -8,6 +8,7 @@ import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import {
   dismissOwlIfNeeded,
   gotoGame,
+  isBenignConsoleNoise,
   mountLocator,
   startHuman,
   startVsAi,
@@ -490,12 +491,8 @@ test.describe('CSP report-only smoke', () => {
 
     page.on('console', (msg) => {
       const text = msg.text();
-      // WebKit warns that Report-Only CSP lacks report-to — not a violation.
-      if (
-        /content security policy/i.test(text) &&
-        /report-only/i.test(text) &&
-        /report-to/i.test(text)
-      ) {
+      // WebKit Report-Only / report-to noise — harness filter (CSP headers unchanged).
+      if (isBenignConsoleNoise(text)) {
         return;
       }
       if (/content security policy|refused to|csp/i.test(text)) {
