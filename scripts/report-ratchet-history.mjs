@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Report-only ratchet ceiling history chart (q-mp-074).
+ * Report-only ratchet ceiling history chart (q-mp-074; refresh q-mp-236).
  *
  * Walks git history for:
- *   - docs/dev/lint-ratchet-ceilings.json          → curly ceiling
+ *   - docs/dev/lint-ratchet-ceilings.json          → curly + void + nnnull + dup-imports
  *   - docs/dev/type-ratchet-phase2-baseline.json   → Phase-2 out-of-scope errors
  *   - docs/dev/module-boundaries-ceilings.json     → sum of boundary ceilings
  *
@@ -28,9 +28,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 export const TRACKED = Object.freeze({
+  lintCeilings: 'docs/dev/lint-ratchet-ceilings.json',
+  /** @deprecated alias — same path as lintCeilings (kept for unit tests) */
   curly: 'docs/dev/lint-ratchet-ceilings.json',
   typePhase2: 'docs/dev/type-ratchet-phase2-baseline.json',
   boundaries: 'docs/dev/module-boundaries-ceilings.json',
+});
+
+/** Lint rule keys plotted / tabulated from lint-ratchet-ceilings.json. */
+export const LINT_RULE_KEYS = Object.freeze({
+  curly: 'curly',
+  voidExpression: '@typescript-eslint/no-confusing-void-expression',
+  nnnull: '@typescript-eslint/no-non-null-assertion',
+  dupImports: 'no-duplicate-imports',
 });
 
 export const OUT_SVG = 'docs/dev/ratchet-ceiling-history.svg';
@@ -43,16 +53,53 @@ export const OUT_MD = 'docs/dev/ratchet-ceiling-history.md';
  *   date: string,
  *   subject: string,
  *   curly: number | null,
+ *   voidExpression: number | null,
+ *   nnnull: number | null,
+ *   dupImports: number | null,
  *   typeOutOfScope: number | null,
  *   boundarySum: number | null,
  * }} HistoryRow
  */
 
 /**
- * Extract the three chart metrics from a parsed ceiling/baseline JSON blob.
+ * @param {unknown} rules
+ * @param {string} ruleKey
+ * @returns {number | null}
+ */
+function ruleNumber(rules, ruleKey) {
+  if (rules == null || typeof rules !== 'object') return null;
+  const n = /** @type {Record<string, unknown>} */ (rules)[ruleKey];
+  return typeof n === 'number' && Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Extract lint step-down metrics from lint-ratchet-ceilings.json shape.
+ * @param {unknown} json
+ * @returns {{ curly: number | null, voidExpression: number | null, nnnull: number | null, dupImports: number | null }}
+ */
+export function extractLintMetrics(json) {
+  if (json == null || typeof json !== 'object') {
+    return {
+      curly: null,
+      voidExpression: null,
+      nnnull: null,
+      dupImports: null,
+    };
+  }
+  const rules = /** @type {Record<string, unknown>} */ (json).rules;
+  return {
+    curly: ruleNumber(rules, LINT_RULE_KEYS.curly),
+    voidExpression: ruleNumber(rules, LINT_RULE_KEYS.voidExpression),
+    nnnull: ruleNumber(rules, LINT_RULE_KEYS.nnnull),
+    dupImports: ruleNumber(rules, LINT_RULE_KEYS.dupImports),
+  };
+}
+
+/**
+ * Extract a single chart metric from a parsed ceiling/baseline JSON blob.
  * Unknown / missing shapes yield null for that metric (row still kept).
  *
- * @param {'curly' | 'typePhase2' | 'boundaries'} kind
+ * @param {'curly' | 'voidExpression' | 'nnnull' | 'dupImports' | 'typePhase2' | 'boundaries'} kind
  * @param {unknown} json
  * @returns {number | null}
  */
@@ -60,12 +107,14 @@ export function extractMetric(kind, json) {
   if (json == null || typeof json !== 'object') return null;
   const obj = /** @type {Record<string, unknown>} */ (json);
   switch (kind) {
-    case 'curly': {
-      const rules = obj.rules;
-      if (rules == null || typeof rules !== 'object') return null;
-      const curly = /** @type {Record<string, unknown>} */ (rules).curly;
-      return typeof curly === 'number' && Number.isFinite(curly) ? curly : null;
-    }
+    case 'curly':
+      return extractLintMetrics(json).curly;
+    case 'voidExpression':
+      return extractLintMetrics(json).voidExpression;
+    case 'nnnull':
+      return extractLintMetrics(json).nnnull;
+    case 'dupImports':
+      return extractLintMetrics(json).dupImports;
     case 'typePhase2': {
       const n = obj.outOfScopeErrors;
       return typeof n === 'number' && Number.isFinite(n) ? n : null;
@@ -115,11 +164,35 @@ export function parseGitLogLines(stdout) {
 }
 
 /**
+ * Empty history row scaffold.
+ * @param {GitCommitMeta} meta
+ * @returns {HistoryRow}
+ */
+function emptyRow(meta) {
+  return {
+    sha: meta.sha,
+    date: meta.date,
+    subject: meta.subject,
+    curly: null,
+    voidExpression: null,
+    nnnull: null,
+    dupImports: null,
+    typeOutOfScope: null,
+    boundarySum: null,
+  };
+}
+
+/**
  * Merge per-file commit lists into chronological rows (oldest → newest).
  * Later commits overwrite earlier metric values for the same sha.
  *
  * @param {{
- *   curly: Array<GitCommitMeta & { value: number | null }>,
+ *   lint: Array<GitCommitMeta & {
+ *     curly: number | null,
+ *     voidExpression: number | null,
+ *     nnnull: number | null,
+ *     dupImports: number | null,
+ *   }>,
  *   typePhase2: Array<GitCommitMeta & { value: number | null }>,
  *   boundaries: Array<GitCommitMeta & { value: number | null }>,
  * }} byKind
@@ -129,34 +202,33 @@ export function mergeHistory(byKind) {
   /** @type {Map<string, HistoryRow>} */
   const bySha = new Map();
 
+  for (const c of byKind.lint) {
+    const existing = bySha.get(c.sha) ?? emptyRow(c);
+    existing.date = c.date;
+    existing.subject = c.subject;
+    existing.curly = c.curly;
+    existing.voidExpression = c.voidExpression;
+    existing.nnnull = c.nnnull;
+    existing.dupImports = c.dupImports;
+    bySha.set(c.sha, existing);
+  }
+
   /**
    * @param {Array<GitCommitMeta & { value: number | null }>} commits
-   * @param {'curly' | 'typeOutOfScope' | 'boundarySum'} field
+   * @param {'typeOutOfScope' | 'boundarySum'} field
    */
-  function apply(commits, field) {
+  function applyScalar(commits, field) {
     for (const c of commits) {
-      const existing = bySha.get(c.sha);
-      if (existing) {
-        existing[field] = c.value;
-        // Prefer the newest subject/date seen for that sha.
-        existing.date = c.date;
-        existing.subject = c.subject;
-      } else {
-        bySha.set(c.sha, {
-          sha: c.sha,
-          date: c.date,
-          subject: c.subject,
-          curly: field === 'curly' ? c.value : null,
-          typeOutOfScope: field === 'typeOutOfScope' ? c.value : null,
-          boundarySum: field === 'boundarySum' ? c.value : null,
-        });
-      }
+      const existing = bySha.get(c.sha) ?? emptyRow(c);
+      existing.date = c.date;
+      existing.subject = c.subject;
+      existing[field] = c.value;
+      bySha.set(c.sha, existing);
     }
   }
 
-  apply(byKind.curly, 'curly');
-  apply(byKind.typePhase2, 'typeOutOfScope');
-  apply(byKind.boundaries, 'boundarySum');
+  applyScalar(byKind.typePhase2, 'typeOutOfScope');
+  applyScalar(byKind.boundaries, 'boundarySum');
 
   const rows = [...bySha.values()];
   rows.sort((a, b) => {
@@ -169,12 +241,24 @@ export function mergeHistory(byKind) {
   /** @type {number | null} */
   let lastCurly = null;
   /** @type {number | null} */
+  let lastVoid = null;
+  /** @type {number | null} */
+  let lastNnnull = null;
+  /** @type {number | null} */
+  let lastDup = null;
+  /** @type {number | null} */
   let lastType = null;
   /** @type {number | null} */
   let lastBound = null;
   for (const row of rows) {
     if (row.curly != null) lastCurly = row.curly;
     else row.curly = lastCurly;
+    if (row.voidExpression != null) lastVoid = row.voidExpression;
+    else row.voidExpression = lastVoid;
+    if (row.nnnull != null) lastNnnull = row.nnnull;
+    else row.nnnull = lastNnnull;
+    if (row.dupImports != null) lastDup = row.dupImports;
+    else row.dupImports = lastDup;
     if (row.typeOutOfScope != null) lastType = row.typeOutOfScope;
     else row.typeOutOfScope = lastType;
     if (row.boundarySum != null) lastBound = row.boundarySum;
@@ -206,34 +290,51 @@ export function escapeXml(s) {
  */
 export function renderSvg(rows, opts = {}) {
   const title = opts.title ?? 'Ratchet ceiling history';
-  const width = 840;
-  const height = 420;
+  const width = 920;
+  const height = 460;
   const padL = 56;
   const padR = 24;
   const padT = 48;
-  const padB = 72;
+  const padB = 96;
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
 
   const series = [
     {
       key: /** @type {const} */ ('curly'),
-      label: 'curly ceiling',
+      label: 'curly',
       color: '#0b6e4f',
     },
     {
+      key: /** @type {const} */ ('voidExpression'),
+      label: 'void',
+      color: '#8b1e3f',
+    },
+    {
+      key: /** @type {const} */ ('nnnull'),
+      label: 'nnnull',
+      color: '#5c4d7a',
+    },
+    {
+      key: /** @type {const} */ ('dupImports'),
+      label: 'dup-imports',
+      color: '#2a6f97',
+    },
+    {
       key: /** @type {const} */ ('typeOutOfScope'),
-      label: 'type Phase-2 out-of-scope',
+      label: 'type Phase-2 oos',
       color: '#1d4e89',
     },
     {
       key: /** @type {const} */ ('boundarySum'),
-      label: 'boundary ceiling sum',
+      label: 'boundary Σ',
       color: '#a15c00',
     },
   ];
 
-  /** @param {'curly' | 'typeOutOfScope' | 'boundarySum'} key */
+  /**
+   * @param {'curly' | 'voidExpression' | 'nnnull' | 'dupImports' | 'typeOutOfScope' | 'boundarySum'} key
+   */
   function seriesMax(key) {
     let m = 0;
     for (const r of rows) {
@@ -266,7 +367,7 @@ export function renderSvg(rows, opts = {}) {
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeXml(title)}">`,
     `<title>${escapeXml(title)}</title>`,
-    `<desc>Normalized line chart of curly lint ceiling, Phase-2 type-ratchet out-of-scope errors, and module-boundary ceiling sum over git history.</desc>`,
+    `<desc>Normalized line chart of lint ratchet ceilings (curly, void, nnnull, dup-imports), Phase-2 type-ratchet out-of-scope errors, and module-boundary ceiling sum over git history.</desc>`,
     `<rect width="100%" height="100%" fill="#f7f5f0"/>`,
     `<text x="${padL}" y="28" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#1a1a1a">${escapeXml(title)}</text>`,
     `<text x="${padL}" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#555">Each series scaled to its own max (see table for raw counts)</text>`,
@@ -304,7 +405,7 @@ export function renderSvg(rows, opts = {}) {
       const y = yAt(r[s.key], max);
       if (y == null) return;
       parts.push(
-        `<circle cx="${xAt(i).toFixed(2)}" cy="${y.toFixed(2)}" r="3.5" fill="${s.color}"/>`
+        `<circle cx="${xAt(i).toFixed(2)}" cy="${y.toFixed(2)}" r="3" fill="${s.color}"/>`
       );
     });
   }
@@ -315,22 +416,26 @@ export function renderSvg(rows, opts = {}) {
     if (i % labelEvery !== 0 && i !== n - 1) return;
     const label = r.date.slice(0, 10);
     parts.push(
-      `<text x="${xAt(i).toFixed(2)}" y="${height - 36}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#444">${escapeXml(label)}</text>`
+      `<text x="${xAt(i).toFixed(2)}" y="${height - 56}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="10" fill="#444">${escapeXml(label)}</text>`
     );
     parts.push(
-      `<text x="${xAt(i).toFixed(2)}" y="${height - 22}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9" fill="#777">${escapeXml(r.sha.slice(0, 7))}</text>`
+      `<text x="${xAt(i).toFixed(2)}" y="${height - 42}" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="9" fill="#777">${escapeXml(r.sha.slice(0, 7))}</text>`
     );
   });
 
-  // legend
-  let lx = padL;
-  const ly = height - 8;
-  for (const s of series) {
-    parts.push(
-      `<rect x="${lx}" y="${ly - 10}" width="12" height="12" fill="${s.color}"/>`,
-      `<text x="${lx + 16}" y="${ly}" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#222">${escapeXml(s.label)}</text>`
-    );
-    lx += 16 + s.label.length * 6.2 + 18;
+  // legend (two rows)
+  const mid = Math.ceil(series.length / 2);
+  for (let rowIdx = 0; rowIdx < 2; rowIdx++) {
+    let lx = padL;
+    const ly = height - 22 + rowIdx * 16;
+    const slice = series.slice(rowIdx * mid, rowIdx * mid + mid);
+    for (const s of slice) {
+      parts.push(
+        `<rect x="${lx}" y="${ly - 10}" width="12" height="12" fill="${s.color}"/>`,
+        `<text x="${lx + 16}" y="${ly}" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#222">${escapeXml(s.label)}</text>`
+      );
+      lx += 16 + s.label.length * 7.2 + 20;
+    }
   }
 
   if (rows.length === 0) {
@@ -344,46 +449,88 @@ export function renderSvg(rows, opts = {}) {
 }
 
 /**
+ * Format a nullable count for markdown tables.
+ * @param {number | null | undefined} n
+ */
+function cell(n) {
+  return n == null ? '—' : String(n);
+}
+
+/**
  * Markdown table + short preamble for docs/dev/.
  * @param {HistoryRow[]} rows
- * @param {{ generatedAt?: string, gitMode?: string }} [meta]
+ * @param {{
+ *   generatedAt?: string,
+ *   gitMode?: string,
+ *   tipSha?: string,
+ *   liveLint?: {
+ *     curly: number | null,
+ *     voidExpression: number | null,
+ *     nnnull: number | null,
+ *     dupImports: number | null,
+ *     nullish?: number | null,
+ *   },
+ * }} [meta]
  */
 export function renderMarkdown(rows, meta = {}) {
   const generatedAt = meta.generatedAt ?? new Date().toISOString();
   const gitMode = meta.gitMode ?? 'git log --all';
+  const tipSha = meta.tipSha ?? '';
+  const live = meta.liveLint;
   const lines = [
     '# Ratchet ceiling history',
     '',
-    `Task: \`q-mp-074\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
+    `Task: \`q-mp-074\` / refresh \`q-mp-236\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
     '',
-    'Tracks three report-only ceilings over git history:',
+    'Tracks report-only ceilings over git history:',
     '',
-    '- **curly** — `docs/dev/lint-ratchet-ceilings.json` → `rules.curly`',
+    '- **curly / void / nnnull / dup-imports** — `docs/dev/lint-ratchet-ceilings.json` → `rules.*`',
     '- **type Phase-2 out-of-scope** — `docs/dev/type-ratchet-phase2-baseline.json` → `outOfScopeErrors`',
     '- **boundary sum** — `docs/dev/module-boundaries-ceilings.json` → sum of `ceilings.*`',
     '',
+  ];
+
+  if (live && tipSha) {
+    lines.push(
+      `## Live tip snapshot (\`${tipSha.slice(0, 7)}\`)`,
+      '',
+      `| Metric | Ceiling |`,
+      `| --- | ---: |`,
+      `| curly | ${cell(live.curly)} |`,
+      `| no-confusing-void-expression | ${cell(live.voidExpression)} |`,
+      `| no-non-null-assertion | ${cell(live.nnnull)} |`,
+      `| no-duplicate-imports | ${cell(live.dupImports)} |`,
+      ...(live.nullish != null
+        ? [
+            `| prefer-nullish-coalescing (HOLD; not charted) | ${cell(live.nullish)} |`,
+          ]
+        : []),
+      '',
+      'Chart series are normalized independently; raw counts are in the history table.',
+      ''
+    );
+  }
+
+  lines.push(
     'Chart (each series normalized to its own max):',
     '',
     '![Ratchet ceiling history](./ratchet-ceiling-history.svg)',
     '',
     'Regenerate with `npm run report:ratchet-history` (no network; reads local git only).',
     '',
-    '| SHA | Date | curly | type oos | boundary Σ | Subject |',
-    '| --- | --- | ---: | ---: | ---: | --- |',
-  ];
+    '| SHA | Date | curly | void | nnnull | dup | type oos | boundary Σ | Subject |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |'
+  );
 
   for (const r of rows) {
-    const curly = r.curly == null ? '—' : String(r.curly);
-    const type = r.typeOutOfScope == null ? '—' : String(r.typeOutOfScope);
-    const bound = r.boundarySum == null ? '—' : String(r.boundarySum);
     const subj = r.subject.replace(/\|/g, '\\|');
     lines.push(
-      `| \`${r.sha.slice(0, 7)}\` | ${r.date.slice(0, 10)} | ${curly} | ${type} | ${bound} | ${subj} |`
+      `| \`${r.sha.slice(0, 7)}\` | ${r.date.slice(0, 10)} | ${cell(r.curly)} | ${cell(r.voidExpression)} | ${cell(r.nnnull)} | ${cell(r.dupImports)} | ${cell(r.typeOutOfScope)} | ${cell(r.boundarySum)} | ${subj} |`
     );
   }
 
   if (rows.length === 0) {
-    lines.push('| — | — | — | — | — | _(no commits found)_ |');
+    lines.push('| — | — | — | — | — | — | — | — | _(no commits found)_ |');
   }
 
   lines.push('');
@@ -405,10 +552,10 @@ export function collectHistory(runGit, opts = {}) {
   ];
 
   /**
-   * @param {'curly' | 'typePhase2' | 'boundaries'} kind
+   * @param {'typePhase2' | 'boundaries'} kind
    * @param {string} filePath
    */
-  function loadKind(kind, filePath) {
+  function loadScalarKind(kind, filePath) {
     const log = runGit([...logArgsBase, filePath]);
     if ((log.status ?? 1) !== 0) {
       throw new Error(
@@ -430,10 +577,45 @@ export function collectHistory(runGit, opts = {}) {
     });
   }
 
+  function loadLintHistory() {
+    const filePath = TRACKED.lintCeilings;
+    const log = runGit([...logArgsBase, filePath]);
+    if ((log.status ?? 1) !== 0) {
+      throw new Error(
+        `git log failed for ${filePath}: ${log.stderr || log.stdout}`
+      );
+    }
+    const metas = parseGitLogLines(log.stdout);
+    return metas.map((m) => {
+      const shown = runGit(['show', `${m.sha}:${filePath}`]);
+      if ((shown.status ?? 1) !== 0) {
+        return {
+          ...m,
+          curly: /** @type {null} */ (null),
+          voidExpression: /** @type {null} */ (null),
+          nnnull: /** @type {null} */ (null),
+          dupImports: /** @type {null} */ (null),
+        };
+      }
+      try {
+        const json = JSON.parse(shown.stdout);
+        return { ...m, ...extractLintMetrics(json) };
+      } catch {
+        return {
+          ...m,
+          curly: /** @type {null} */ (null),
+          voidExpression: /** @type {null} */ (null),
+          nnnull: /** @type {null} */ (null),
+          dupImports: /** @type {null} */ (null),
+        };
+      }
+    });
+  }
+
   return mergeHistory({
-    curly: loadKind('curly', TRACKED.curly),
-    typePhase2: loadKind('typePhase2', TRACKED.typePhase2),
-    boundaries: loadKind('boundaries', TRACKED.boundaries),
+    lint: loadLintHistory(),
+    typePhase2: loadScalarKind('typePhase2', TRACKED.typePhase2),
+    boundaries: loadScalarKind('boundaries', TRACKED.boundaries),
   });
 }
 
@@ -457,22 +639,59 @@ export function runGit(args) {
 /**
  * @param {{ firstParent?: boolean, runGit?: typeof runGit, now?: string }} [opts]
  */
+/**
+ * Read live tip lint ceilings from the working tree (for the markdown snapshot).
+ * @returns {{
+ *   curly: number | null,
+ *   voidExpression: number | null,
+ *   nnnull: number | null,
+ *   dupImports: number | null,
+ *   nullish: number | null,
+ * }}
+ */
+export function readLiveLintSnapshot() {
+  const filePath = path.join(ROOT, TRACKED.lintCeilings);
+  try {
+    const json = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const lint = extractLintMetrics(json);
+    const nullish = ruleNumber(
+      json?.rules,
+      '@typescript-eslint/prefer-nullish-coalescing'
+    );
+    return { ...lint, nullish };
+  } catch {
+    return {
+      curly: null,
+      voidExpression: null,
+      nnnull: null,
+      dupImports: null,
+      nullish: null,
+    };
+  }
+}
+
 export function writeReport(opts = {}) {
   const git = opts.runGit ?? runGit;
   const firstParent = opts.firstParent === true;
   const rows = collectHistory(git, { firstParent });
   const gitMode = firstParent ? 'git log (HEAD only)' : 'git log --all';
+  const tip = git(['rev-parse', 'HEAD']);
+  const tipSha =
+    (tip.status ?? 1) === 0 ? tip.stdout.trim() : (rows.at(-1)?.sha ?? '');
+  const liveLint = opts.liveLint ?? readLiveLintSnapshot();
   const svg = renderSvg(rows);
   const md = renderMarkdown(rows, {
     generatedAt: opts.now ?? new Date().toISOString(),
     gitMode,
+    tipSha,
+    liveLint,
   });
   const svgPath = path.join(ROOT, OUT_SVG);
   const mdPath = path.join(ROOT, OUT_MD);
   fs.mkdirSync(path.dirname(svgPath), { recursive: true });
   fs.writeFileSync(svgPath, svg, 'utf8');
   fs.writeFileSync(mdPath, md, 'utf8');
-  return { rows, svgPath, mdPath, gitMode };
+  return { rows, svgPath, mdPath, gitMode, tipSha, liveLint };
 }
 
 function main() {
