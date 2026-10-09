@@ -138,7 +138,7 @@ export function renderDiceDemo(container: HTMLElement): void {
   wrapper.querySelectorAll('.quick-roll-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const diceType = btn.getAttribute('data-dice') as 'd6' | 'd20' | 'd10';
-      const count = parseInt(btn.getAttribute('data-count') || '1');
+      const count = parseInt(btn.getAttribute('data-count') || '1', 10);
       const result = rollMultiple(diceType, count);
       renderRollResult(result, quickRollResult, { showTotal: true });
     });
