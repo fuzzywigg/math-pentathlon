@@ -282,7 +282,9 @@ class OwlSystem {
 
   // Helper delay function
   private delay(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms);
+    });
   }
 
   // Get time of day for contextual messages
