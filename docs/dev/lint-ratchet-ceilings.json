@@ -1,5 +1,5 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344). q-mp-040/#590 + q-mp-041/#592 + q-mp-042/#596 folded onto tip: brace autofix core/pwa/demos + ui (excl three) + ui/three; tip owner re-measures post-fold.",
+  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344). Post-fold #590+#592+#596 onto cursor/mp-tip-post477: tip owner re-measured curly:all = 896; ceiling lowered 1320→896 (−424).",
   "rules": {
     "curly": 896
   }
