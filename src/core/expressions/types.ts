@@ -145,30 +145,6 @@ export interface EquationResult {
 }
 
 // =============================================================================
-// Game-Specific Types
-// =============================================================================
-
-/**
- * Orion-style game: Build expressions to reach target values
- */
-export interface OrionGame {
-  availableNumbers: ExpressionCard[];
-  availableOperators: ExpressionCard[];
-  targetValue: number;
-  currentExpression: ExpressionSlot[];
-  score: number;
-}
-
-/**
- * Camel-style game: Complete equations with missing values
- */
-export interface CamelGame {
-  equation: ExpressionSlot[]; // Full equation with some slots empty
-  availableCards: ExpressionCard[];
-  correctAnswer?: number;
-}
-
-// =============================================================================
 // Factory Functions
 // =============================================================================
 

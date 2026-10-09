@@ -44,18 +44,6 @@ export interface PlacedPolyomino {
   playerId?: number;
 }
 
-/** Board cell state */
-export interface BoardCell {
-  /** Whether cell is occupied */
-  occupied: boolean;
-  /** ID of polyomino occupying this cell */
-  polyominoId?: string;
-  /** Player who owns this cell */
-  playerId?: number;
-  /** Whether cell is valid for placement */
-  valid: boolean;
-}
-
 /** Polyomino placement result */
 export interface PlacementResult {
   valid: boolean;

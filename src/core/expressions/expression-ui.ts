@@ -603,7 +603,7 @@ export function renderChallengeCard(
 // Interactive Expression Builder
 // =============================================================================
 
-export interface InteractiveBuilderOptions {
+interface InteractiveBuilderOptions {
   slotCount: number;
   availableCards: ExpressionCard[];
   targetValue?: number;

@@ -12,7 +12,7 @@ export interface GameInfo {
   available: boolean;
 }
 
-export interface DivisionInfo {
+interface DivisionInfo {
   id: string;
   name: string;
   gradeRange: string;
