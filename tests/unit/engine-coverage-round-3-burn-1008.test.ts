@@ -4,7 +4,8 @@
  *
  * Themes: legal-move generation, win/draw detection, scoring tallies,
  * state transitions, serialization. Pins CURRENT behavior only.
- * Does not change engine source. Dead/defensive arms → it.todo.
+ * Does not change engine source. Round-4 (q-mp-143) clears prior it.todo
+ * arms via real forged-state pins or documented unreachable invariants.
  *
  * Stacks on #574; avoids duplicating #562 / #574 / #482 suites.
  */
@@ -133,6 +134,7 @@ import {
 } from '../../src/games/star-track/rules';
 
 import {
+  CONFIG as PRIME_CONFIG,
   isGoldbachNumber,
   isPrime,
   factorial,
@@ -168,7 +170,10 @@ import {
   getCurrentOrientationPlacements as juggleOrients,
   selectedShapeFitsAnywhere,
 } from '../../src/games/juggle/rules';
-import { SHAPE_POOLS } from '../../src/games/juggle/types';
+import {
+  SHAPE_POOLS,
+  type ShapeCategory,
+} from '../../src/games/juggle/types';
 
 import {
   jsonRoundTrip,
@@ -464,9 +469,24 @@ describe('engine-coverage-round-3 — fab-a-diffy/rules', () => {
     expect(hasAnyValidMove(lonely)).toBe(false);
   });
 
-  it.todo(
-    'hasAnyValidMove left/right === undefined continue — Array.from+filter never yields holes'
-  );
+  it('hasAnyValidMove left/right === undefined continue (forged Array.from+filter holes)', () => {
+    const open = createFab();
+    const origFrom = Array.from;
+    // Forge: Array.from(...).filter(...) yields length≥2 with holes so
+    // availableBars[i]/[j] are undefined → defensive continue → false.
+    Array.from = (() => ({
+      filter() {
+        const holes: FractionBar[] = [];
+        holes.length = 2;
+        return holes;
+      },
+    })) as unknown as typeof Array.from;
+    try {
+      expect(hasAnyValidMove(open)).toBe(false);
+    } finally {
+      Array.from = origFrom;
+    }
+  });
 });
 
 // =============================================================================
@@ -739,9 +759,16 @@ describe('engine-coverage-round-3 — star-track', () => {
     ).toBe(true);
   });
 
-  it.todo(
-    'shuffleArray a===undefined||b===undefined continue — private Fisher-Yates; dense bucket only (no safe public inject)'
-  );
+  it('createChainBucket dense invariant — private shuffle hole-guard unreachable', () => {
+    // Documented unreachable (round-4): shuffleArray is private and only
+    // called with a dense 24-link bucket; no public inject for a/b undefined.
+    for (let i = 0; i < 8; i++) {
+      const bucket = createChainBucket();
+      expect(bucket).toHaveLength(24);
+      expect(bucket.every((link) => link !== undefined)).toBe(true);
+      expect(new Set(bucket.map((c) => c.id)).size).toBe(24);
+    }
+  });
 });
 
 // =============================================================================
@@ -783,12 +810,54 @@ describe('engine-coverage-round-3 — prime-gold', () => {
     expect(findCellByValue(createPrime(), 1)).not.toBeNull();
   });
 
-  it.todo(
-    'createBoard val>0 false arm — spiral fills every cell 1..BOARD_SIZE²'
-  );
-  it.todo(
-    'isGoldbachNumber loop-exhaust return false — no small even Goldbach counterexample under isPrime'
-  );
+  it('createBoard val>0 false arm (forged Array.from grid swallows one write)', () => {
+    const size = PRIME_CONFIG.BOARD_SIZE;
+    const origFrom = Array.from;
+    let wrapped = false;
+    Array.from = function (this: unknown, ...args: unknown[]) {
+      const grid = (
+        origFrom as unknown as (...a: unknown[]) => unknown
+      ).apply(this, args);
+      if (
+        Array.isArray(grid) &&
+        grid.length === size &&
+        Array.isArray(grid[0]) &&
+        !wrapped
+      ) {
+        wrapped = true;
+        return (grid as number[][]).map(
+          (row, r) =>
+            new Proxy(row, {
+              set(target, prop, value) {
+                // Leave (0,0) at 0 so the val>0 false arm skips the cell.
+                if (r === 0 && String(prop) === '0') return true;
+                Reflect.set(target, prop, value);
+                return true;
+              },
+            })
+        );
+      }
+      return grid;
+    } as typeof Array.from;
+    try {
+      const state = createPrime();
+      expect(state.cells.size).toBe(size * size - 1);
+      expect(state.cells.has('0,0')).toBe(false);
+    } finally {
+      Array.from = origFrom;
+    }
+  });
+
+  it('isGoldbachNumber loop-exhaust unreachable under isPrime (even 4..200)', () => {
+    // Documented unreachable (round-4): for every even n>2 in the game-relevant
+    // range, isPrime finds a Goldbach pair — loop-exhaust return false never runs.
+    // Same-module isPrime binding is not spyable from tests (no src/ change).
+    for (let n = 4; n <= 200; n += 2) {
+      expect(isGoldbachNumber(n)).toBe(true);
+    }
+    expect(isGoldbachNumber(2)).toBe(false);
+    expect(isGoldbachNumber(9)).toBe(false);
+  });
 });
 
 // =============================================================================
@@ -816,9 +885,30 @@ describe('engine-coverage-round-3 — calla', () => {
     expect(settled.phase).toBe('gameOver');
   });
 
-  it.todo(
-    'sow position < PITS_PER_SIDE*2+1 false arm — wrap resets before position≥11'
-  );
+  it('sow wrap resets before position≥11 — <PITS*2+1 false arm unreachable', () => {
+    // Documented unreachable (round-4): after sowing at position 10, position++
+    // yields 11 then `position > PITS*2` wraps to 0 before the next iteration,
+    // so the else-if false arm never runs. Forge a long sow to characterize wrap.
+    const open = createCalla();
+    const forged = {
+      ...open,
+      player1Pits: [20, 0, 0, 0, 0],
+      player2Pits: [3, 3, 3, 3, 3],
+    };
+    const after = callaMove(forged, 0);
+    expect(after.moveHistory.at(-1)?.cubesDistributed).toBe(20);
+    const total =
+      after.player1Pits.reduce((a, b) => a + b, 0) +
+      after.player2Pits.reduce((a, b) => a + b, 0) +
+      after.player1Calla +
+      after.player2Calla;
+    expect(total).toBe(
+      forged.player1Pits.reduce((a, b) => a + b, 0) +
+        forged.player2Pits.reduce((a, b) => a + b, 0) +
+        forged.player1Calla +
+        forged.player2Calla
+    );
+  });
 });
 
 // =============================================================================
@@ -848,9 +938,20 @@ describe('engine-coverage-round-3 — juggle', () => {
     }
   });
 
-  it.todo(
-    'orientSelectedShapeToFit early return — public callers always set placing+shape'
-  );
+  it('orientSelectedShapeToFit early return when selectedShape is null (forged)', () => {
+    // Public callers normally set placing+shape; forge null shape through
+    // selectShape to hit the private early return (phase placing, !shape).
+    const rolled = juggleRoll(createJuggle());
+    const forged = {
+      ...rolled,
+      phase: 'selectingShape' as const,
+      selectedCategory: 'tromino' as ShapeCategory,
+      selectedShape: null,
+    };
+    const out = juggleSelectShape(forged, null as never);
+    expect(out.phase).toBe('placing');
+    expect(out.selectedShape).toBeNull();
+  });
 });
 
 // =============================================================================
