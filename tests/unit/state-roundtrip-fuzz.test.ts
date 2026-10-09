@@ -23,13 +23,13 @@ import {
   createRng,
   pickOne,
   structuredRoundTrip,
-  withSeededMathRandom,
+  withSeededRandom,
 } from './helpers/state-roundtrip';
 
 function runRoundTripFuzz(adapter: GameFuzzAdapter, playSeed: number): void {
   const rng = createRng(playSeed);
 
-  const state0 = withSeededMathRandom(playSeed, () => adapter.create());
+  const state0 = withSeededRandom(playSeed, () => adapter.create());
   let state = state0;
 
   // Initial snapshot
@@ -49,7 +49,7 @@ function runRoundTripFuzz(adapter: GameFuzzAdapter, playSeed: number): void {
     if (legal.length === 0) break;
 
     const choice = pickOne(rng, legal);
-    state = withSeededMathRandom(playSeed + i + 1, () =>
+    state = withSeededRandom(playSeed + i + 1, () =>
       adapter.apply(state, choice)
     );
     movesPlayed++;

@@ -10,7 +10,7 @@
 
 import {
   createSeededRng,
-  withSeededMathRandom,
+  withSeededRandom,
 } from '../../helpers/rng';
 
 const MAP_TAG = '__mp_map__';
@@ -31,7 +31,7 @@ export function pickOne<T>(rng: () => number, items: T[]): T {
 }
 
 /** Temporarily replace Math.random; always restore in finally. */
-export { withSeededMathRandom };
+export { withSeededRandom };
 
 function isTagged(
   value: unknown,

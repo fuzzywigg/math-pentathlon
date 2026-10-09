@@ -1,12 +1,13 @@
 # Runtime error-path audit (burn-1008)
 
-Task id: `burn-1008-mp-runtime-error-path-audit`
+Task id: `burn-1008-mp-runtime-error-path-audit`  
+Doc sync: `q-mp-179` (inventory + recommended-fix table aligned to tip after #568 / q-mp-108 folds).
 
-Tip SHA audited: `0dc1e953` (`cursor/integration-fold-wave5-tip-4af0`).
+Tip SHA audited: `cd33f89d` (`cursor/mp-tip-post700`).
 
 **Scope:** sites where a runtime error can leave a game unplayable without recovery — thrown handlers, uncaught promises (dynamic imports, SW registration, asset fetch, storage), mount/destroy / menu remount, WebGL context loss, JSON parse of saved state.
 
-**Non-goals:** no `ai/` or rules/engine logic changes; no player-facing copy; this draft is **tests + this doc only** (zero `src/` edits).
+**Non-goals:** no `ai/` or rules/engine logic changes; no player-facing copy; `q-mp-179` is **this doc only** (zero `src/` edits).
 
 ## Overlap (skipped — already covered)
 
@@ -15,8 +16,10 @@ Tip SHA audited: `0dc1e953` (`cursor/integration-fold-wave5-tip-4af0`).
 | [#528](https://github.com/fuzzywigg/math-pentathlon/pull/528) | Storage failure modes (SecurityError, QuotaExceeded, cross-tab, non-JSON) | Folded (`safe-web-storage` live on tip) | `src/core/safe-web-storage.ts`, `storage.ts` load/save, flag wrappers; tests `safe-web-storage*.test.ts`, e2e `storage-blocked.spec.ts` |
 | [#480](https://github.com/fuzzywigg/math-pentathlon/pull/480) | Memory leak / `destroyGame` wiring for menu remounts | Folded | Presence of `destroyGame` + route cleanup for all 20 games (not throw-safety of destroy) |
 | [#479](https://github.com/fuzzywigg/math-pentathlon/pull/479) | Offline soft-nav / idle-warm shell+game imports | Folded | `idle-warm.ts` soft-fail on warm import reject; WebKit offline SPA soft-nav |
+| [#568](https://github.com/fuzzywigg/math-pentathlon/pull/568) | try/finally cleanup + owl/SW bootstrap catch | Landed on tip (behavior live) | R-SHELL-07/08, R-IMP-04, R-SW-01 |
+| [#635](https://github.com/fuzzywigg/math-pentathlon/pull/635) `q-mp-108` | Soft-fail missing `#app` boot | Landed on tip (`src/main.ts` soft-fail live; open draft contained) | R-SHELL-01 |
 
-Adjacent gaps **not** covered by those drafts remain in the inventory below (e.g. `destroyGame` *throwing*, Prime Gold context-loss gap, owl bootstrap rejection).
+Prioritized owner fixes from the original audit are marked **Done** in the table below when live tip + unit pins already match.
 
 ## Behavior legend
 
@@ -32,14 +35,14 @@ Adjacent gaps **not** covered by those drafts remain in the inventory below (e.g
 
 | ID | file:line | Trigger | Current behavior | Blast | Tests |
 | --- | --- | --- | --- | --- | --- |
-| R-SHELL-01 | `src/main.ts:65-66` | `#app` missing at boot | **UNRECOVERED** — sync throw aborts bootstrap | shell | `runtime-error-path-audit.test.ts` (source pin + skip expected fix) |
+| R-SHELL-01 | `src/main.ts:63-68` | `#app` missing at boot | **soft-fail** — `console.error('[main] App container not found')`; no throw (q-mp-108) | shell | audit suite P3 R-SHELL-01 fixed pin |
 | R-SHELL-02 | `src/main.ts` `cleanup()` / `onBeforeShow` | Route leave; `currentCleanup` throws | **recovered** — try/finally disposes boundary; cleanup failure logged; crash UI still proceeds | shell | audit suite P1 R-SHELL-02 |
 | R-SHELL-03 | `src/main.ts:88-106` + `game-error-boundary.ts:87-144` | `window` `error` / `unhandledrejection` on game route | **recovered** — crash UI; `onBeforeShow` failures swallowed (`:99-103`) | one game | `game-error-boundary.test.ts`; audit suite pins swallow |
 | R-SHELL-04 | `src/main.ts` `renderHome` | Throw / unhandled rejection on `/` | **recovered** — same `installGameErrorBoundary` / crash UI as game routes | shell | audit suite P2 R-SHELL-04 |
 | R-SHELL-05 | `src/main.ts:168-203` | Dynamic import / `mountGameById` reject | **recovered** — `game-load-error` + `location.reload` retry | one game | `burn-1007-main-shell-routes.test.ts`; audit re-pins |
 | R-SHELL-06 | `src/main.ts:123-140` / `:206-372` | Stats / demo chunk import fail | **recovered** — load-error UI | shell (page) | audit suite (stats reject) |
-| R-SHELL-07 | `src/ui/game-route-mounts.ts:98-105` | `destroyGame()` throws inside cleanup | **UNRECOVERED** — `shell.cleanup()` skipped | shell | skip expected try/finally; CURRENT pattern pin |
-| R-SHELL-08 | `src/ui/game-route-mounts.ts:172-181` (×20) | `init*Game` throws before `setGameRouteCleanup` | **partial** — outer catch shows load-error; shell listeners may leak | one game + shell | skip expected set-cleanup-before-init / finally |
+| R-SHELL-07 | `src/ui/game-route-mounts.ts:108-118` | `destroyGame()` throws inside cleanup | **recovered** — `setGameRouteCleanup` try/finally always runs `shell.cleanup` (#568) | shell | audit suite P1 R-SHELL-07 |
+| R-SHELL-08 | `src/ui/game-route-mounts.ts:126-144` (×20) | `init*Game` throws after cleanup registered | **recovered** — `initGameWithRouteCleanup` registers cleanup first; init throw tears shell down then rethrows (#568) | one game + shell | audit suite P1 R-SHELL-08 |
 | R-SHELL-09 | `src/ui/game-route-mounts.ts:63-71` | Stale shell wiped `#app` | **recovered** — microtask remount | one game | `burn-1007-game-route-mounts.test.ts` |
 
 ### 2. Event handlers
@@ -60,10 +63,10 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | R-IMP-01 | `main.ts:171-184` | `import(game-route-mounts)` + play CSS fail | **recovered** — load-error | one game | `burn-1007-main-shell-routes.test.ts` |
 | R-IMP-02 | `game-prefetch.ts:102-104` | Prefetch `import()` fail | **soft-fail** — clears `started`, retry later | none | source pin in audit suite (#479 adjacent; prefetch not idle-warm) |
 | R-IMP-03 | `idle-warm.ts:102-123` | Shell/game warm import fail | **soft-fail** — SKIP (#479) | none | `burn-1007-pwa-shell-ui.test.ts`, `idle-warm-bootstrap-owl.test.ts` |
-| R-IMP-04 | `bootstrap-owl.ts:37-44` | Owl chunk import / init rejects | **UNRECOVERED** on menu; can false-trigger game boundary | shell / one game | CURRENT unhandled pin + skip expected catch |
-| R-SW-01 | `bootstrap.ts:40-42` → `register.ts:57` | `registerSW(...)` throws | **UNRECOVERED** throw from idle callback | shell (offline degrade) | CURRENT throw pin + skip expected guard |
+| R-IMP-04 | `bootstrap-owl.ts:44-57` | Owl chunk import / init rejects | **soft-fail** — try/catch + `console.error('[bootstrap-owl] init failed', …)` (#568) | shell | audit suite P2 R-IMP-04 |
+| R-SW-01 | `bootstrap.ts:43` → `register.ts:57-89` | `registerSW(...)` throws | **soft-fail** — `registerPwa` try/catch + `console.error('[pwa] service worker registration failed', …)` (#568) | shell (offline degrade) | audit suite P2 R-SW-01 |
 | R-SW-02 | `register.ts:51-52` | SW unsupported / disabled | **soft-fail** — `{}` | shell | `pwa-register.test.ts` |
-| R-SW-03 | `register.ts:74` | `registration.update()` rejects | **soft-fail** — `Promise.resolve(...).catch` + log | shell | fixed pin in audit suite + `pwa-register.test.ts` |
+| R-SW-03 | `register.ts:76-80` | `registration.update()` rejects | **soft-fail** — `Promise.resolve(...).catch` + log | shell | fixed pin in audit suite + `pwa-register.test.ts` |
 | R-FETCH-01 | App `src/` | Direct `fetch()` of game assets | None — Workbox owns cache | — | SKIP (#479 offline soft-nav) |
 
 ### 4. Mount / destroy / menu remount
@@ -108,25 +111,23 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | ~~**P2**~~ | ~~R-SHELL-04, R-EVT-03~~ | **Done in q-mp-107** — `renderHome` installs shared route error boundary (reuse crash UI strings) |
 | ~~**P2**~~ | ~~R-SW-01~~ | **Done in #568** — `registerPwa` guards `registerSW` throw (soft-fail + log) |
 | ~~**P2/P3**~~ | ~~R-SW-03~~ | **Done in q-mp-109** — `Promise.resolve(registration.update()).catch` + `console.error` |
-| **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |
+| ~~**P3**~~ | ~~R-SHELL-01~~ | **Done in q-mp-108** — missing `#app` soft-fails with `console.error('[main] App container not found')` (no throw) |
 | ~~**P3**~~ | ~~R-JSON-04~~ | **Done in q-mp-120** — `tryGameStateFromJSON` Result soft-fail; throwing `gameStateFromJSON` retained for tests |
 
-## Verification (this draft)
+## Verification (q-mp-179 doc sync)
 
 ```bash
-npm run lint
-npx tsc --noEmit
-npm run test:unit
-npm run build
-git diff --name-only cursor/integration-fold-wave5-tip-4af0...HEAD
-# expect: docs/dev/runtime-error-path-audit.md + tests/unit/* only
+npm run check:dev-docs
+npx vitest run --project unit-shared tests/unit/runtime-error-path-audit.test.ts
+git diff --name-only cursor/mp-tip-post700...HEAD
+# expect: docs/dev/runtime-error-path-audit.md only
 ```
 
 ## Related test index
 
 | Test file | Pins |
 | --- | --- |
-| `tests/unit/runtime-error-path-audit.test.ts` | Inventory pins; P0/P1/P2 fixed green; remaining P2/P3 skips |
+| `tests/unit/runtime-error-path-audit.test.ts` | Inventory pins; P0–P3 owner fixes green on tip (R-SHELL-01/07/08, R-IMP-04, R-SW-01, …) |
 | `tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts` | R-GL-08 recovered: context-lost → `mp3d-context-lost` (+ board-select 2D fallback/state pin) |
 | `tests/unit/game-error-boundary.test.ts` | Crash UI / window error / rejection |
 | `tests/unit/burn-1007-main-shell-routes.test.ts` | Mount reject → load-error |

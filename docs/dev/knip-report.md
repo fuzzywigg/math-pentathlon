@@ -36,9 +36,9 @@ Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evid
 | Metric | Prior baseline | Live tip | Action |
 | --- | --- | --- | --- |
 | `unusedTypes` | 95 | 91 | baseline reconciled **downward** to 91 |
-| `unusedExports` | 7 | 7 | unchanged |
+| `unusedExports` | 7 | 3 | `q-mp-188` rng alias + `q-mp-187` tablet-gl demote (BOARD_3D_LQ_*/MP3D_READY_ATTR) |
 | `unlisted` | 3 | 3 | documented below (owners) |
-| `duplicates` | 3 | 3 | documented below (owners) |
+| `duplicates` | 3 | 2 | `withSeededRandom` pair cleared in `q-mp-188` |
 | `enforce` | `false` | `false` | **stays false** |
 
 ## Unlisted script dependencies (owners)
@@ -52,13 +52,14 @@ Knip flags packages imported by entry scripts that are not declared in `package.
 
 ## Duplicate export pairs (owners)
 
-Knip reports **3** alias pairs (same binding under two export names). Counts are stable; cleanup is owner-scoped — do not widen this triage into helper rewrites.
+Knip reports **2** alias pairs (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
 
 | Pair | Module | Owner / disposition |
 | --- | --- | --- |
 | `dismissOwl` / `dismissOwlIfNeeded` | [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) | **e2e Owl helpers** — draft [`q-mp-166` #691](https://github.com/fuzzywigg/math-pentathlon/pull/691) consolidates callers onto the shared helper; alias may remain for call-site compatibility. |
 | `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). |
-| `withSeededRandom` / `withSeededMathRandom` | [`tests/helpers/rng.ts`](../../tests/helpers/rng.ts) | **Shared RNG test helpers** — intentional alias used by benches (`tests/bench/engines-rules.bench.ts`). Owner: engine-bench / unit RNG helpers. |
+
+Cleared in `q-mp-188`: `withSeededRandom` / `withSeededMathRandom` in [`tests/helpers/rng.ts`](../../tests/helpers/rng.ts) — callers migrated to canonical `withSeededRandom`.
 
 ## Future ratchet (tip-owner only)
 

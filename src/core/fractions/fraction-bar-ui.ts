@@ -21,7 +21,7 @@ const DEFAULT_CONFIG: Required<FractionBarConfig> = {
 
 /** Get color for a fraction based on denominator */
 export function getFractionColor(denominator: number): string {
-  return FRACTION_COLORS[denominator] || '#607d8b';
+  return FRACTION_COLORS[denominator] ?? '#607d8b';
 }
 
 /** Create SVG namespace helper */
@@ -70,8 +70,8 @@ export function renderHorizontalBar(
     y: 1,
     width: width - 2,
     height: height - 2,
-    fill: colors.empty || '#e0e0e0',
-    stroke: colors.border || '#333',
+    fill: colors.empty ?? '#e0e0e0',
+    stroke: colors.border ?? '#333',
     'stroke-width': 2,
     rx: 4,
     ry: 4,
@@ -86,7 +86,7 @@ export function renderHorizontalBar(
       y: 1,
       width: fillWidth,
       height: height - 2,
-      fill: colors.filled || getFractionColor(denominator),
+      fill: colors.filled ?? getFractionColor(denominator),
       rx: 4,
       ry: 4,
     });
@@ -107,7 +107,7 @@ export function renderHorizontalBar(
         y1: 1,
         x2: 1 + i * segmentWidth,
         y2: height - 1,
-        stroke: colors.border || '#333',
+        stroke: colors.border ?? '#333',
         'stroke-width': 1,
         'stroke-opacity': 0.5,
       });
@@ -183,8 +183,8 @@ export function renderVerticalBar(
     y: 1,
     width: width - 2,
     height: height - 2,
-    fill: colors.empty || '#e0e0e0',
-    stroke: colors.border || '#333',
+    fill: colors.empty ?? '#e0e0e0',
+    stroke: colors.border ?? '#333',
     'stroke-width': 2,
     rx: 4,
     ry: 4,
@@ -199,7 +199,7 @@ export function renderVerticalBar(
       y: height - 1 - fillHeight,
       width: width - 2,
       height: fillHeight,
-      fill: colors.filled || getFractionColor(denominator),
+      fill: colors.filled ?? getFractionColor(denominator),
       rx: 4,
       ry: 4,
     });
@@ -215,7 +215,7 @@ export function renderVerticalBar(
         y1: 1 + i * segmentHeight,
         x2: width - 1,
         y2: 1 + i * segmentHeight,
-        stroke: colors.border || '#333',
+        stroke: colors.border ?? '#333',
         'stroke-width': 1,
         'stroke-opacity': 0.5,
       });
@@ -278,8 +278,8 @@ export function renderCircleBar(
     cx,
     cy,
     r: radius,
-    fill: colors.empty || '#e0e0e0',
-    stroke: colors.border || '#333',
+    fill: colors.empty ?? '#e0e0e0',
+    stroke: colors.border ?? '#333',
     'stroke-width': 2,
   });
   svg.appendChild(bgCircle);
@@ -293,7 +293,7 @@ export function renderCircleBar(
 
     const path = createSVGElement('path', {
       d: `M ${cx} ${cy} L ${cx} ${cy - radius} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`,
-      fill: colors.filled || getFractionColor(denominator),
+      fill: colors.filled ?? getFractionColor(denominator),
     });
     svg.appendChild(path);
   } else if (fillRatio >= 1) {
@@ -301,7 +301,7 @@ export function renderCircleBar(
       cx,
       cy,
       r: radius,
-      fill: colors.filled || getFractionColor(denominator),
+      fill: colors.filled ?? getFractionColor(denominator),
     });
     svg.appendChild(fillCircle);
   }
@@ -315,7 +315,7 @@ export function renderCircleBar(
         y1: cy,
         x2: cx + radius * Math.cos(angle),
         y2: cy + radius * Math.sin(angle),
-        stroke: colors.border || '#333',
+        stroke: colors.border ?? '#333',
         'stroke-width': 1,
         'stroke-opacity': 0.5,
       });
@@ -347,7 +347,7 @@ export function renderFractionBar(
   fraction: Fraction,
   config: FractionBarConfig = {}
 ): SVGSVGElement {
-  const style = config.style || 'horizontal';
+  const style = config.style ?? 'horizontal';
 
   switch (style) {
     case 'vertical':
@@ -384,8 +384,8 @@ export function createInteractiveFractionBar(
     segment.style.cssText = `
       width: ${segmentWidth}px;
       height: ${height - 2}px;
-      background: ${i < fraction.numerator ? colors?.filled || getFractionColor(denominator) : colors?.empty || '#e0e0e0'};
-      border-right: 1px solid ${colors?.border || '#333'};
+      background: ${i < fraction.numerator ? (colors?.filled ?? getFractionColor(denominator)) : (colors?.empty ?? '#e0e0e0')};
+      border-right: 1px solid ${colors?.border ?? '#333'};
       display: inline-block;
       cursor: pointer;
       transition: background 0.2s ease;
@@ -416,7 +416,7 @@ export function createInteractiveFractionBar(
 
   wrapper.style.cssText = `
     display: inline-flex;
-    border: 2px solid ${colors?.border || '#333'};
+    border: 2px solid ${colors?.border ?? '#333'};
     border-radius: 4px;
     overflow: hidden;
   `;

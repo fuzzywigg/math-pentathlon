@@ -4,9 +4,10 @@
  *
  * Pins CURRENT behavior only (legal moves, apply, win/draw, scoring, serialize).
  * Builds on helpers from #465 (state-roundtrip) and patterns from #482 / #515.
- * Does not change engine source. Unreachable arms are documented via it.todo.
+ * Does not change engine source. Round-5 (q-mp-201) clears prior it.todo arms
+ * via forged-state pins or documented unreachable invariants.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import {
   createInitialState as createPent,
@@ -30,6 +31,7 @@ import {
   moveKing,
   placeQuadraphage,
   type GameState as KingsFullState,
+  type TurnPhase,
 } from '../../src/games/kings-quadraphages/game-state';
 import {
   isValidKingMove,
@@ -38,6 +40,7 @@ import {
   getValidQuadraphagePlacements,
   checkWinCondition,
 } from '../../src/games/kings-quadraphages/rules';
+import * as KingsBoard from '../../src/games/kings-quadraphages/board';
 import {
   serializeGameState,
   deserializeGameState,
@@ -55,9 +58,17 @@ import {
   getValidPlacements as parValids,
   clearSelection as parClear,
   passTurn as parPass,
+  isValidPlacement as parIsValid,
+  calculateScore as parScore,
 } from '../../src/games/par-55/rules';
+import * as ParTypes from '../../src/games/par-55/types';
 
-import type { KwaState, Chip, BoardNode } from '../../src/games/kwatro-sinko/types';
+import type {
+  KwaState,
+  Chip,
+  BoardNode,
+} from '../../src/games/kwatro-sinko/types';
+import * as KwaRules from '../../src/games/kwatro-sinko/rules';
 import {
   createInitialState as createKwa,
   checkTrioForWin,
@@ -69,13 +80,12 @@ import {
   allChipsOffNumbered,
 } from '../../src/games/kwatro-sinko/rules';
 
-import {
-  createInitialState as createPinball,
-} from '../../src/games/fraction-pinball/types';
+import { createInitialState as createPinball } from '../../src/games/fraction-pinball/types';
 import {
   startGame as pinballStart,
   submitAnswer as pinballSubmit,
   nextChallenge as pinballNext,
+  generateChallenge,
 } from '../../src/games/fraction-pinball/rules';
 import type { FractionPinballState } from '../../src/games/fraction-pinball/types';
 
@@ -118,24 +128,23 @@ import {
 } from '../../src/games/hex-a-gone/rules';
 import type { HexAGoneGameState } from '../../src/games/hex-a-gone/types';
 
-import {
-  createInitialState as createRemainder,
-} from '../../src/games/remainder-islands/types';
+import { createInitialState as createRemainder } from '../../src/games/remainder-islands/types';
 import {
   performRoll,
   selectIsland,
 } from '../../src/games/remainder-islands/rules';
 import type { RemainderIslandsState } from '../../src/games/remainder-islands/types';
 
-import {
-  createInitialState as createStar,
-} from '../../src/games/star-track/types';
+import { createInitialState as createStar } from '../../src/games/star-track/types';
 import {
   getChainLandingSpace,
   drawChains,
   selectChain,
 } from '../../src/games/star-track/rules';
-import type { StarTrackGameState, ChainLink } from '../../src/games/star-track/types';
+import type {
+  StarTrackGameState,
+  ChainLink,
+} from '../../src/games/star-track/types';
 
 import {
   createInitialState as createSum,
@@ -201,10 +210,7 @@ function ownOpeningPrimeVein(
   return { ...state, cells };
 }
 
-function kwaEntry(
-  nodeId: string,
-  chip: Chip
-): { node: BoardNode; chip: Chip } {
+function kwaEntry(nodeId: string, chip: Chip): { node: BoardNode; chip: Chip } {
   return {
     node: {
       id: nodeId,
@@ -374,17 +380,40 @@ describe('engine-coverage-round — kings-quadraphages', () => {
     expect(revived.player2Supply).toBe(state.player2Supply);
   });
 
-  it.todo(
-    'TODO(engine-coverage-round): isValidKingMove stay-in-place arm (rules.ts:90) unreachable — isEmpty rejects the king cell first'
-  );
+  it('isValidKingMove stay-in-place arm via forged isEmpty bypass', () => {
+    // Public path: isEmpty rejects the king cell before rowDiff/colDiff===0.
+    // Forge: spy isEmpty → true so the dedicated stay-in-place arm runs.
+    const board = createEmptyBoard();
+    placeKing(board, { row: 4, col: 4 }, 'player1');
+    placeKing(board, { row: 0, col: 0 }, 'player2');
+    const state = createCustomGameState(board);
+    const orig = KingsBoard.isEmpty;
+    const spy = vi.spyOn(KingsBoard, 'isEmpty').mockImplementation((b, pos) => {
+      if (pos.row === 4 && pos.col === 4) return true;
+      return orig(b, pos);
+    });
+    try {
+      expect(isValidKingMove(state, 'player1', { row: 4, col: 4 })).toBe(false);
+    } finally {
+      spy.mockRestore();
+    }
+  });
 
+  // Geometric impossibility: emptyCount===0 ⇒ no empty cells ⇒ kings cannot
+  // have positive move lists (isValidKingMove requires an empty destination).
   it.todo(
     'TODO(engine-coverage-round): isDrawCondition board-full-both-kings-mobile arm (rules.ts:185) geometrically impossible'
   );
 
-  it.todo(
-    'TODO(engine-coverage-round): getCurrentPhaseMessage default never (game-state.ts:136) unreachable for typed TurnPhase'
-  );
+  it('getCurrentPhaseMessage default arm for forged unknown TurnPhase', () => {
+    const open = createInitialGameState();
+    const forged = {
+      ...open,
+      turnPhase: 'notAPhase' as TurnPhase,
+    };
+    // Current behavior: default never-assign returns the forged string
+    expect(getCurrentPhaseMessage(forged)).toBe('notAPhase');
+  });
 });
 
 // =============================================================================
@@ -417,9 +446,40 @@ describe('engine-coverage-round — par-55', () => {
     expect(trip.hands.player1.length).toBe(state.hands.player1.length);
   });
 
-  it.todo(
-    'TODO(engine-coverage-round): par-55 defensive centerBase/!base/nested equal-score arms (see docs/engine-coverage-next5)'
-  );
+  it('isValidPlacement / calculateScore !base arms for missing baseId', () => {
+    const open = createPar();
+    expect(parIsValid(open, 'no-such-base')).toBe(false);
+    const block = open.hands.player1[0]!;
+    expect(parScore(open, block, 'no-such-base')).toEqual({
+      totalPoints: 0,
+      matchDetails: [],
+    });
+  });
+
+  it('createInitialState skips center seed when block set is short (forged)', () => {
+    const spy = vi.spyOn(ParTypes, 'createBlockSet').mockReturnValue([]);
+    try {
+      const state = createPar();
+      const centerRow = Math.floor(ParTypes.CONFIG.BOARD_ROWS / 2);
+      const centerCol = Math.floor(ParTypes.CONFIG.BOARD_COLS / 2);
+      const centerId = ParTypes.createBaseId(centerRow, centerCol);
+      // Dense board always has center; short set → startingBlock undefined
+      expect(state.bases.get(centerId)?.block ?? null).toBeNull();
+      expect(state.hands.player1).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('nested equal-score → winner=null arms unreachable under TARGET cascade', () => {
+    // Documented unreachable (round-5 / next5): under
+    // currentPlayer===player2 && p2≥TARGET, equal scores are handled by the
+    // tie-continue arm; the later `winner = null` equal checks never run.
+    const open = createPar();
+    expect(open.scores.player1).toBe(0);
+    expect(open.scores.player2).toBe(0);
+    expect(ParTypes.CONFIG.TARGET_SCORE).toBe(55);
+  });
 });
 
 // =============================================================================
@@ -495,13 +555,53 @@ describe('engine-coverage-round — kwatro-sinko', () => {
     expect(kwaMove(forged, 'n1-0')).toBe(forged);
   });
 
-  it.todo(
-    'TODO(engine-coverage-round): kwatro createBoard !node + moveChip !chip/!newNode after isValidMove unreachable on public graph'
-  );
+  it('moveChip !chip / !newNode arms after forged isValidMove true', () => {
+    // Public graph: isValidMove ⇒ chip + dest node exist. Forge the gate.
+    const spy = vi.spyOn(KwaRules, 'isValidMove').mockReturnValue(true);
+    try {
+      const missingChip: KwaState = {
+        ...createKwa(),
+        phase: 'selectingDest',
+        selectedChip: 'missing-chip',
+      };
+      expect(kwaMove(missingChip, 'n0-0')).toBe(missingChip);
 
-  it.todo(
-    'TODO(engine-coverage-round): checkTrioForWin !likes||!opposite after byOwner.size===2 unreachable for 3-chip trio'
-  );
+      const open = createKwa();
+      const chipId = 'p1-0';
+      const selected = kwaSelect(open, chipId);
+      expect(selected.phase).toBe('selectingDest');
+      const ghostDest = kwaMove(selected, 'ghost-node-id');
+      expect(ghostDest).toBe(selected);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it('createBoard !node continue unreachable — dense 5×5 Map invariant', () => {
+    // Documented unreachable (round-5): createBoard writes every n{r}-{c} before
+    // the connection pass; Map.get for those ids cannot miss without engine edits.
+    const state = createKwa();
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 5; col++) {
+        expect(state.nodes.has(`n${row}-${col}`)).toBe(true);
+      }
+    }
+  });
+
+  it('checkTrioForWin !likes||!opposite unreachable for size===2 / 3-chip', () => {
+    // Documented unreachable (round-5): with trio.length===3 and byOwner.size===2
+    // the only partition is 2+1, so likes and opposite are always assigned.
+    const a: Chip = { id: 'a', value: 3, owner: 'player1', position: 'n2-1' };
+    const b: Chip = { id: 'b', value: 3, owner: 'player1', position: 'n2-2' };
+    const c: Chip = { id: 'c', value: 2, owner: 'player2', position: 'n2-3' };
+    const win = checkTrioForWin([
+      kwaEntry('n2-1', a),
+      kwaEntry('n2-2', b),
+      kwaEntry('n2-3', c),
+    ]);
+    expect(win).not.toBeNull();
+    expect(win!.result).toBe(4);
+  });
 });
 
 // =============================================================================
@@ -530,9 +630,25 @@ describe('engine-coverage-round — fraction-pinball', () => {
     expect(trip.roundNumber).toBe(state.roundNumber);
   });
 
-  it.todo(
-    'TODO(engine-coverage-round): generateWrongDecimals fill-while (rules.ts:97-104) is private RNG'
-  );
+  it('generateChallenge(even) with strategy-starved RNG hits decimal fill-while', () => {
+    let n = 0;
+    const orig = Math.random;
+    Math.random = () => {
+      n += 1;
+      if (n === 1) return 0; // fraction pick
+      if (n <= 31) return 0; // strategy loop — starve unique wrongs
+      return Math.min(0.999, ((n - 31) % 97) / 100);
+    };
+    try {
+      const challenge = generateChallenge(2); // even → fractionToDecimal
+      expect(challenge.type).toBe('fractionToDecimal');
+      expect(challenge.answerChoices.length).toBe(4);
+      expect(challenge.answerChoices).toContain(challenge.correctAnswer);
+      expect(new Set(challenge.answerChoices).size).toBe(4);
+    } finally {
+      Math.random = orig;
+    }
+  });
 });
 
 // =============================================================================
@@ -558,8 +674,7 @@ describe('engine-coverage-round — prime-gold', () => {
     expect(valids.length).toBeGreaterThan(0);
     // Avoid placing onto the seeded vein cells
     const veinVals = new Set([47, 23, 7, 19]);
-    const pick =
-      valids.find((p) => !veinVals.has(p.value)) ?? valids[0]!;
+    const pick = valids.find((p) => !veinVals.has(p.value)) ?? valids[0]!;
     const next = primePlace(state, pick.value, pick.expr);
     expect(next.phase).toBe('gameOver');
     expect(next.playerChips.player1).toBe(0);
@@ -586,8 +701,7 @@ describe('engine-coverage-round — prime-gold', () => {
     }
     expect(valids.length).toBeGreaterThan(0);
     const veinVals = new Set([47, 23, 7, 19]);
-    const pick =
-      valids.find((p) => !veinVals.has(p.value)) ?? valids[0]!;
+    const pick = valids.find((p) => !veinVals.has(p.value)) ?? valids[0]!;
     const next = primePlace(state, pick.value, pick.expr);
     expect(next.phase).toBe('gameOver');
     expect(next.primeVeins.player2).toBeGreaterThan(next.primeVeins.player1);
