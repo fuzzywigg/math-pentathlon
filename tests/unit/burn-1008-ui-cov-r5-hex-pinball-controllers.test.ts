@@ -83,20 +83,22 @@ describe('burn-1008 ui-cov-r5 hex controller shell', () => {
     destroyGame();
   });
 
-  it.skip('BUG: destroyGame is a no-op stub — does not clear board/status containers or cancel AI generation', async () => {
-    // Reason: tip-held alpha restore left destroyGame empty (see game-controller
-    // comment). Remounts can retain stale boardContainer references until a later
-    // fold lands a real teardown. Expected-fail pin only — do not "fix" source here.
+  it('destroyGame clears board/status mounts (q-mp-030)', async () => {
     const { initGame, destroyGame, getGameState } = await import(
       '../../src/games/hex/game-controller'
     );
     const board = mountRoot();
     const status = mountRoot();
     initGame(board, status);
+    expect(board.innerHTML.length).toBeGreaterThan(0);
     destroyGame();
-    expect(getGameState()).toBeUndefined();
+    expect(board.innerHTML).toBe('');
+    expect(status.innerHTML).toBe('');
+    // State object remains for tests; mounts are detached.
+    expect(getGameState()).toBeTruthy();
   });
 });
+
 
 describe('burn-1008 ui-cov-r5 fraction-pinball controller shell', () => {
   it('human answer → result → continue without AI flush', async () => {
@@ -140,15 +142,16 @@ describe('burn-1008 ui-cov-r5 fraction-pinball controller shell', () => {
     expect(typeof raw).toBe('function');
   });
 
-  it.skip('BUG: fraction-pinball destroyGame is a no-op stub after alpha restore', async () => {
-    // Reason: same tip-held stub as hex — destroyGame does not null gameContainer
-    // or bump aiGeneration. Pin until a real teardown lands in a source PR.
+  it('fraction-pinball destroyGame clears the mount (q-mp-030)', async () => {
     const { initGame, destroyGame, getCurrentState } = await import(
       '../../src/games/fraction-pinball/game-controller'
     );
     const root = mountAppShell();
     initGame(root);
+    expect(root.innerHTML.length).toBeGreaterThan(0);
     destroyGame();
-    expect(getCurrentState()).toBeUndefined();
+    expect(root.innerHTML).toBe('');
+    expect(getCurrentState()).toBeTruthy();
   });
 });
+

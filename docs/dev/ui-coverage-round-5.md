@@ -62,10 +62,10 @@ statements 92.80%→93.01%.
 
 ## Bugs pinned (skipped)
 
-| Pin                      | File                                  | Note                                                                                           |
-| ------------------------ | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `destroyGame` no-op stub | `hex/game-controller.ts`              | Tip-held alpha restore left destroy empty; does not clear board/status or cancel AI generation |
-| `destroyGame` no-op stub | `fraction-pinball/game-controller.ts` | Same stub pattern                                                                              |
+| Pin                              | File                                  | Note                                                                  |
+| -------------------------------- | ------------------------------------- | --------------------------------------------------------------------- |
+| ~~`destroyGame` no-op stub~~     | `hex/game-controller.ts`              | **Fixed in q-mp-030** — destroy clears mounts + AI timers/worker      |
+| ~~`destroyGame` no-op stub~~     | `fraction-pinball/game-controller.ts` | **Fixed in q-mp-030** — destroy clears mount + AI timers              |
 
 ## Stack compatibility note (#577 juggle)
 
