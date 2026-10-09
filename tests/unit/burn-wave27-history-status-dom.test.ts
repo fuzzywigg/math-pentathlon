@@ -5,7 +5,6 @@
  * Tests-only. Existing games only — no product inventing.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import {
   createInitialState as createFab,
   selectBar1,
@@ -18,7 +17,6 @@ import {
 } from '../../src/games/fab-a-diffy/rules';
 import { renderMoveHistory as renderFabHistory } from '../../src/games/fab-a-diffy/board-ui';
 import type { FractionOperation } from '../../src/core/fractions/types';
-
 import {
   createInitialState as createPar,
   selectBlock,
@@ -27,7 +25,6 @@ import {
   getValidPlacements as parPlacements,
 } from '../../src/games/par-55/rules';
 import { renderMoveHistory as renderParHistory } from '../../src/games/par-55/board-ui';
-
 import {
   createInitialState as createRamrod,
   selectRod,
@@ -36,7 +33,6 @@ import {
   getValidPlacements as ramPlacements,
 } from '../../src/games/ramrod/rules';
 import { renderMoveHistory as renderRamrodHistory } from '../../src/games/ramrod/board-ui';
-
 import {
   createInitialState as createKwa,
   selectChip,
@@ -45,7 +41,6 @@ import {
   getValidMoves as kwaMoves,
 } from '../../src/games/kwatro-sinko/rules';
 import { renderMoveHistory as renderKwaHistory } from '../../src/games/kwatro-sinko/board-ui';
-
 import {
   createInitialState as createSum,
   doRollDice as sumRoll,
@@ -55,7 +50,6 @@ import {
   getValidPlacements as sumPlacements,
 } from '../../src/games/sum-dominoes/rules';
 import { getDiceSum } from '../../src/games/sum-dominoes/types';
-
 import {
   createInitialState as createStars,
   selectCard,
@@ -63,7 +57,6 @@ import {
   getValidPlacements as starsPlacements,
 } from '../../src/games/stars-bars/rules';
 import { renderMoveHistory as renderStarsHistory } from '../../src/games/stars-bars/board-ui';
-
 import {
   createInitialState as createPrime,
   rollDice as primeRoll,
@@ -71,24 +64,19 @@ import {
   getValidPlacements as primePlacements,
 } from '../../src/games/prime-gold/rules';
 import { renderMoveHistory as renderPrimeHistory } from '../../src/games/prime-gold/board-ui';
-
 import { renderMoveHistory as renderKingsHistory } from '../../src/games/kings-quadraphages/board-ui';
-
 import { createInitialState as createHex } from '../../src/games/hex/types';
 import { makeMove as hexMove } from '../../src/games/hex/rules';
 import { renderStatus as renderHexStatus } from '../../src/games/hex/board-ui';
-
 import { createInitialState as createCalla } from '../../src/games/calla/types';
 import {
   makeMove as callaMove,
   getLastMoveInfo,
 } from '../../src/games/calla/rules';
 import { renderStatus as renderCallaStatus } from '../../src/games/calla/board-ui';
-
 import { createInitialState as createStar } from '../../src/games/star-track/types';
 import { drawChains, selectChain } from '../../src/games/star-track/rules';
 import { renderStatus as renderStarStatus } from '../../src/games/star-track/board-ui';
-
 import { newGameVsHuman as parVsHuman } from '../../src/games/par-55/game-controller';
 import { newGameVsHuman as starsVsHuman } from '../../src/games/stars-bars/game-controller';
 import { newGameVsHuman as primeVsHuman } from '../../src/games/prime-gold/game-controller';
@@ -103,15 +91,12 @@ import {
   getGameState as getKingsState,
 } from '../../src/games/kings-quadraphages/game-controller';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 describe('Wave 27 history-DOM — Fab formatMove equation appears in render', () => {
   it('completed claim history row shows operator and equals', () => {
