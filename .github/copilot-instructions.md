@@ -14,15 +14,23 @@ Key files and patterns to inspect
 - `src/core/dice/roller.ts` — example of utility library: pure functions for dice rolling, selections, and derived combinatorics.
 - Tests: unit tests under `tests/unit` use `vitest`+`jsdom`. E2E tests under `tests/e2e` use Playwright and expect a dev server.
 
+Draft PR into tip
+- Target **`cursor/mp-tip-post477`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
+- Scan open tip drafts before starting; if covered, comment `superseded` / `contained` — do not close other PRs.
+
 Developer workflows (commands)
 - Start dev server: `npm run dev` (Vite, serves on `http://localhost:5173`).
-- Build: `npm run build` (runs `tsc` then `vite build`); preview with `npm run preview`.
+- Build: `npm run build` (runs `tsc` then `vite build`); preview with `npm run preview`. After build: hard CI chunk budget is 250 kB per JS file under `dist/assets`; report-only gzip budgets via `npm run size:check`; report-only PWA contract via `npm run check:pwa-manifest`.
 - Unit tests: `npm run test:unit` (or `npm run test:unit:watch`).
 - Coverage: `npm run test:unit:coverage`.
 - E2E (required CI path): `npm run test:e2e:chromium`. Bare `npm run test:e2e` runs **every** Playwright project — prefer an explicit script. Playwright config starts a web server with `npm run dev` and uses `http://localhost:5173` as `baseURL`.
-- Full verify shortcut: `npm test` (= unit then Chromium e2e).
-- Lint: `npm run lint`; lint ceilings: `npm run lint:ratchet`; format write: `npm run format`; CI format gate: `npm run format:check`.
-- Types: `npm run typecheck` (not bare `npx tsc`); shell/Phase-2 ceilings: `npm run typecheck:ratchet`; import-graph: `npm run check:boundaries`.
+- Full test shortcut: `npm test` (= unit then Chromium e2e).
+- **CI lint-job chain:** `npm run verify` (= `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`). Matches `.github/workflows/ci.yml` job `lint`.
+- Lint alone: `npm run lint`; ceilings: `npm run lint:ratchet` (ratchet only goes down); format write: `npm run format`; CI format gate: `npm run format:check`.
+- Types: `npm run typecheck` (not bare `npx tsc`); shell/Phase-2 ceilings: `npm run typecheck:ratchet`; import-graph: `npm run check:boundaries` (`engine_imports_ui` must stay 0).
+- Emit identity (type-only / brace-only proofs; not an npm script): `node scripts/check-emit-identity.mjs`.
+- Copy pins (report-only): `npm run check:copy-pins`. Prefer structural asserts; do not pin player-facing copy / phase messages. Do not add asserts that lock AI search, scoring, difficulty, or move timing. Hex Hard stays **450ms** with real time; no Stars & Bars history cap.
+- CI posture (blocking vs report-only jobs): `AGENTS.md`, `docs/dev/ci-gates-mermaid-q-mp-073.md`. Workflow keeps `permissions: contents: read` and checkout `persist-credentials: false`.
 - Full script list: `docs/wiki/development.md` and `CONTRIBUTING.md`.
 
 Project-specific conventions and notes
@@ -59,6 +67,7 @@ New features (recently added)
 Notes for the AI agent
 - Prefer changing core logic in small, focused commits; follow existing immutable-state patterns.
 - Avoid introducing DOM calls into `src/core` or `src/games/*/rules.ts` — keep those files side-effect free.
-- If you update tests or configs, run `npm run test:unit` and `npm run test:e2e:chromium` locally to validate (Playwright may require a GUI environment).
+- Before opening or updating a tip draft, run `npm run verify` then `npm run test:unit` (and `npm run test:e2e:chromium` / `npm run build` as needed). Script names must exist in `package.json`.
+- Do not change AI search/scoring/difficulty/timing, player-facing copy, or `*/rules.ts` legal-move / scoring paths unless a human escalates.
 
 If anything in this guidance is unclear or you want more detail (specific file examples, additional patterns, or automated PR templates), tell me which area to expand.
