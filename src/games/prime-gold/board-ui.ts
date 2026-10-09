@@ -437,6 +437,25 @@ export function injectPrimeGoldStyles(): void {
         animation: none;
       }
     }
+
+    html[data-reduced-motion='true'] .pg-cell,
+    html[data-reduced-motion='true'] .pg-roll-btn,
+    html[data-reduced-motion='true'] .pg-expr-item,
+    html[data-reduced-motion='true'] .pg-btn,
+    html[data-reduced-motion='true'] .pg-winner-banner {
+      transition: none;
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .pg-cell.valid:hover,
+    html[data-reduced-motion='true'] .pg-roll-btn:hover,
+    html[data-reduced-motion='true'] .pg-expr-item:hover,
+    html[data-reduced-motion='true'] .pg-btn-primary:hover,
+    html[data-reduced-motion='true'] .pg-btn-secondary:hover {
+      transform: none;
+    }
+    html[data-reduced-motion='true'] .pg-die.rolling {
+      animation: none;
+    }
   `
   );
 }

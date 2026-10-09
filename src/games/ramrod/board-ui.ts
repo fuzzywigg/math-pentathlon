@@ -798,6 +798,17 @@ export function injectRamrodStyles(): void {
         transform: none;
       }
     }
+
+    html[data-reduced-motion='true'] .ramrod-rod-wrapper,
+    html[data-reduced-motion='true'] .ramrod-btn,
+    html[data-reduced-motion='true'] .ramrod-winner-banner {
+      transition: none;
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .ramrod-btn-primary:hover,
+    html[data-reduced-motion='true'] .ramrod-rod-wrapper.selectable:hover {
+      transform: none;
+    }
   `
   );
 }

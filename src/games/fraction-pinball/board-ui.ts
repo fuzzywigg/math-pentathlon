@@ -630,6 +630,14 @@ export function injectFractionPinballStyles(): void {
         transform: none;
       }
     }
+
+    html[data-reduced-motion='true'] .pinball-animation {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .pinball-choice-btn:hover:not(:disabled),
+    html[data-reduced-motion='true'] .pinball-player-score.active {
+      transform: none;
+    }
   `;
   document.head.appendChild(style);
 }
