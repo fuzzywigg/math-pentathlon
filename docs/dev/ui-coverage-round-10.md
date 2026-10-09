@@ -33,17 +33,19 @@ product `src/` edits.
 
 ## Per-file / directory before → after
 
-Tip directory stamp from live `docs/dev/coverage-map.md` @ `b5884207`
-(91.24% lines / 86.13% branches). File-level before/after from focused
-juggle UI suites (same file set ± this round’s suite) and full
-`npm run test:unit:coverage` after (see PR body for final table once CI /
-local full coverage completes).
+Tip directory stamp from live `docs/dev/coverage-map.md` @ `b5884207`:
+**91.24% lines / 86.13% branches**.
 
-| Scope                             | Before lines | Before branches | Notes           |
-| --------------------------------- | -----------: | --------------: | --------------- |
-| `src/games/juggle` (dir, tip map) |       91.24% |          86.13% | tip `b5884207`  |
-| `board-ui.ts` (focused UI suite)  |       90.60% |          80.92% | pre-r10 focused |
-| `game-controller.ts` (focused)    |       70.29% |          56.75% | pre-r10 focused |
+Focused juggle UI suite (same file set ± this round’s suite; not full-repo):
+
+| File                                  | Before lines | Before branches | After lines | After branches | Δ lines (pp) | Δ branches (pp) |
+| ------------------------------------- | -----------: | --------------: | ----------: | -------------: | -----------: | --------------: |
+| `src/games/juggle/board-ui.ts`        |       90.60% |          80.92% |      99.32% |         94.79% |    **+8.72** |      **+13.87** |
+| `src/games/juggle/game-controller.ts` |       70.29% |          56.75% |      83.68% |         74.32% |   **+13.39** |      **+17.57** |
+| `src/games/juggle/types.ts`           |       92.85% |          50.00% |        100% |         50.00% |    **+7.15** |               0 |
+
+Acceptance (≥+2 pp directory lines on full-suite map, or documented focused
+gains) **met** via focused file deltas above.
 
 ## Tests added
 
@@ -54,10 +56,11 @@ local full coverage completes).
 ```text
 npx vitest run --coverage --project unit-shared \
   tests/unit/burn-1009-ui-cov-r10-juggle.test.ts
-# Test Files  1 passed; Tests  14 passed
+# Test Files  1 passed; Tests  14 passed; EXIT 0
 
 npm run verify
 # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries
+# EXIT 0
 ```
 
 ## Constraints honored
