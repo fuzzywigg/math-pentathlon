@@ -1,23 +1,24 @@
-# Local CI=1 skip smoke (q-mp-175) — same two benches, not full suite
-# Captured on worker VM 2026-10-09; confirms describe.skipIf(!!process.env.CI)
+# Local CI=1 skip smoke — tip cursor/mp-tip-post728 @ b5884207
+# Measured: 2026-10-09T19:34:05Z
 
-## tablet-ai-hard-latency.bench.test.ts
-4: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Calla Hard opening + midgame (uncapped minimax depth 6)
-5: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Hex Hard midgame (play-budget anytime)
-6: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Queens Hard opening (play-budget anytime)
-7: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Fab-a-Diffy Hard opening (play-budget anytime)
-8: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Fab-a-Diffy Hard opening unlimited (baseline)
-9: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > FIAR Hard early placement (worker-capable; uncapped sync here)
-10: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Kings Hard opening
-11: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Pent-Em-In Hard opening
-12: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Kwatro Hard opening
-13: ↓ |unit-isolated| tests/unit/tablet-ai-hard-latency.bench.test.ts > Tablet Hard AI latency bench > Stars & Bars Hard opening
-15: Test Files  1 skipped (1)
-16:      Tests  10 skipped (10)
-18:   Duration  1.14s (transform 438ms, setup 233ms, import 314ms, tests 0ms, environment 444ms)
+$ CI=1 npx vitest run --project unit-isolated tests/unit/tablet-ai-hard-latency.bench.test.ts
 
-## ai-move-time-midgame.bench.test.ts
-4: ↓ |unit-shared| tests/unit/ai-move-time-midgame.bench.test.ts > AI move-time mid-game bench (all games × difficulties) > measures p50/p95 and writes docs/ai-move-time-2026-10-07.md
-6: Test Files  1 skipped (1)
-7:      Tests  1 skipped (1)
-9:   Duration  1.25s (transform 623ms, setup 228ms, import 534ms, tests 0ms, environment 363ms)
+ RUN  v4.1.11 /workspace
+
+
+ Test Files  1 skipped (1)
+      Tests  10 skipped (10)
+   Start at  19:34:05
+   Duration  1.01s (transform 412ms, setup 212ms, import 263ms, tests 0ms, environment 407ms)
+
+
+$ CI=1 npx vitest run --project unit-shared tests/unit/ai-move-time-midgame.bench.test.ts
+
+ RUN  v4.1.11 /workspace
+
+
+ Test Files  1 skipped (1)
+      Tests  1 skipped (1)
+   Start at  19:34:07
+   Duration  1.12s (transform 551ms, setup 185ms, import 479ms, tests 0ms, environment 336ms)
+

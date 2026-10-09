@@ -17,7 +17,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 | [How to add a game](./adding-a-game.md) | Module, registry, mount, and test checklist |
 | [Big Toads](./big-toads.md) | Shared core systems under `src/core/` |
 | [Development](./development.md) | Install, CI, and testing layers with live counts (axe, visual, playtest, bench) — also [CONTRIBUTING.md](../../CONTRIBUTING.md) + [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) |
-| [CI unit budget + AI-bench skips (`q-mp-175`)](./ci-unit-budget.md) | Unit job ~8 min / 12m step / 14m job Mermaid, tip CI screenshot of AI benches skipped under `CI=1`, HOLD link |
+| [CI unit budget + AI-bench skips (`q-mp-233`)](./ci-unit-budget.md) | Unit job ~8 min / 12m step / 14m job Mermaid; tip `post728` CI Duration ≈5.0 min; AI benches skipped under `CI=1`; HOLD Hex Hard 450ms |
 | [Accessibility](./accessibility.md) | Public a11y posture and shared helpers |
 | [Roadmap](./roadmap.md) | Where to read deeper planning docs |
 
