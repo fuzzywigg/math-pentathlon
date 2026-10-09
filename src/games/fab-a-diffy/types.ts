@@ -191,7 +191,9 @@ export function shuffleArray<T>(array: T[]): T[] {
     const j = Math.floor(Math.random() * (i + 1));
     const a = result[i];
     const b = result[j];
-    if (a === undefined || b === undefined) continue;
+    if (a === undefined || b === undefined) {
+      continue;
+    }
     result[i] = b;
     result[j] = a;
   }

@@ -102,7 +102,9 @@ function createIslands(): Island[] {
       // Assign values in a pattern (cycling through island values)
       const value = ISLAND_VALUES[valueIndex % ISLAND_VALUES.length];
       valueIndex++;
-      if (value === undefined) continue;
+      if (value === undefined) {
+        continue;
+      }
 
       islands.push({
         id: `island-${row}-${col}`,

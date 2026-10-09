@@ -91,7 +91,9 @@ export function nodeId(col: number, row: number): string {
 
 export function parseNodeId(id: string): { col: number; row: number } | null {
   const m = /^c(\d+)r(\d+)$/.exec(id);
-  if (!m) return null;
+  if (!m) {
+    return null;
+  }
   return { col: Number(m[1]), row: Number(m[2]) };
 }
 
@@ -117,7 +119,9 @@ function buildConfirmedEdges(): Array<readonly [string, string]> {
     const p = parseNodeId(id)!;
     for (const [dc, dr] of dirs) {
       const other = nodeId(p.col + dc, p.row + dr);
-      if (!nodeSet.has(other)) continue;
+      if (!nodeSet.has(other)) {
+        continue;
+      }
       // No edge into / through the yellow center lattice point.
       if (
         (p.col === 4 && p.row === 3) ||
@@ -126,12 +130,16 @@ function buildConfirmedEdges(): Array<readonly [string, string]> {
         continue;
       }
       const key = edgeKey(id, other);
-      if (seen.has(key)) continue;
+      if (seen.has(key)) {
+        continue;
+      }
       // Skip diamond-border diagonals here — gated separately.
       const isDiamondBorder = DIAMOND_BORDER_EDGES.some(
         ([a, b]) => edgeKey(a, b) === key
       );
-      if (isDiamondBorder) continue;
+      if (isDiamondBorder) {
+        continue;
+      }
       seen.add(key);
       edges.push([id, other]);
     }
