@@ -28,7 +28,7 @@ No open draft already delivers an independent post-review-8 verdict for #581/#58
 
 | PR | Title (short) | Verdict | Exact drops (fold / remaining) |
 | ---: | --- | --- | --- |
-| [#581](https://github.com/fuzzywigg/math-pentathlon/pull/581) | UI coverage round 5 | **COMPLIANT-WITH-NOTES** | **DROP** `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts` (tip kept full delete from `358e75e8`; do **not** fold #581’s `describe.skipIf` reintroduction). Inherited #571 `Coming Soon` exact assert already dropped on tip (`636608e3`). |
+| [#581](https://github.com/fuzzywigg/math-pentathlon/pull/581) | UI coverage round 5 | **COMPLIANT-WITH-NOTES** | **DROP** `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts (absent on tip)` (tip kept full delete from `358e75e8`; do **not** fold #581’s `describe.skipIf` reintroduction). Inherited #571 `Coming Soon` exact assert already dropped on tip (`636608e3`). |
 | [#582](https://github.com/fuzzywigg/math-pentathlon/pull/582) | type-ratchet Batch 9 | **COMPLIANT-WITH-NOTES** | Product `src/` floor **already applied** by tip owner q-mp-001 (`bcb7cf93`). Fold remainder: Batch-9 **docs + baseline tipSha only** (`ec1392da`). Drop stack baggage (#573/#576 merges) and prettier-only import wrap diffs. |
 | [#584](https://github.com/fuzzywigg/math-pentathlon/pull/584) | mutation audit UI wave 2 | **COMPLIANT** | **No drops.** Tests + `docs/dev/mutation-audit-ui-2.md` only. |
 | [#585](https://github.com/fuzzywigg/math-pentathlon/pull/585) | fold rehearsal v3 (drop list) | **COMPLIANT** (list confirmed) | Docs-only; drop list **matches tip**. Tip also applied an extra soft-flag drop (#578 kings copy pins, `f99d85c9`) beyond #585’s required set. |
@@ -58,7 +58,7 @@ Scope: unique content of #581 / #582 / #584 (and #581’s stacked r3/r4 files as
 | PR | File | Lines / assert | Class | Action |
 | ---: | --- | --- | --- | --- |
 | #581 (stack / #571) | `tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts` | `expect(badge?.textContent).toBe('Coming Soon')` | **FLAG — player-facing menu chrome** | **DROP** (already on tip via `636608e3`; keep badge presence + tabindex) |
-| #581 | `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts` | whole file + `describe.skipIf(!JUGGLE_HOVER_HELPER_PRESENT)` | **FLAG — restore-incompatible** (not copy/AI; helper removed) | **DROP file** (tip `358e75e8` / merge `5928c746`); do not prefer skipIf |
+| #581 | `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts (absent on tip)` | whole file + `describe.skipIf(!JUGGLE_HOVER_HELPER_PRESENT)` | **FLAG — restore-incompatible** (not copy/AI; helper removed) | **DROP file** (tip `358e75e8` / merge `5928c746`); do not prefer skipIf |
 | #581 r5-only (`burn-1008-ui-cov-r5-*.test.ts`) | — | — | **none** for copy / AI choice / timing | fold as-is |
 | #582 | helper / emit-identity tests only | — | **none** for copy / AI choice / timing | n/a |
 | #584 | `mutation-ui2-*.test.ts` | seat-labels explicitly avoid Blue/Red/You/Computer strings | **none** for copy / AI choice / timing | fold as-is |
@@ -159,7 +159,7 @@ Three-dot `dff8c013...0bc7cb4c` also lists Batch-7/8 docs, `scripts/check-*.d.mt
 ## #585 — drop list confirmation
 
 **Verdict:** COMPLIANT (list confirmed against live tip `9748c908`)  
-**Head:** `49f150c9` · **Doc:** `docs/dev/fold-rehearsal-v3.md` (not yet on tip)
+**Head:** `49f150c9` · **Doc:** `docs/dev/fold-rehearsal-v3.md (absent on tip)` (not yet on tip)
 
 ### Required drops in #585 — tip status
 

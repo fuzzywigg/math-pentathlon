@@ -69,7 +69,7 @@
 
 **Verdict:** needs-owner-decision
 
-**Evidence:** Diff introduces `tests/e2e/fullgame/_harness.ts` + per-game specs importing `runFullgameMatch` from `./_harness`, plus `test.skip(({ browserName }) => browserName !== 'chromium', …)` on each new file. Tip already has the merged #507 suite under `tests/e2e/fullgame/_runner.ts` / `_shared.ts` / `_play.ts` with the same `@fullgame` report-only CI job. Hard-rule skips are on **new** report-only specs (not weakening previously required tests), but a fold would collide with tip’s harness.
+**Evidence:** Diff introduces `tests/e2e/fullgame/_harness.ts` + per-game specs importing `runFullgameMatch` from `./_harness`, plus `test.skip(({ browserName }) => browserName !== 'chromium', …)` on each new file. Tip already has the merged #507 suite under `tests/e2e/fullgame/_runner.ts (absent on tip)` / `_shared.ts` / `_play.ts` with the same `@fullgame` report-only CI job. Hard-rule skips are on **new** report-only specs (not weakening previously required tests), but a fold would collide with tip’s harness.
 
 **Smallest fix:** Close as duplicate of #507, or rebase and keep only deltas that tip still lacks (if any) without replacing `_runner`.
 
@@ -275,7 +275,7 @@ Same re-export pattern lands in **17** `*/types.ts` files via `export { getOppon
 
 Hard rule forbids **any** change to scoring-adjacent helpers. Tip `prime-gold/rules.ts` sets `isPrime: isPrime(val)` on board cells and scores prime veins from that flag; AI scores primes too. Even “edge-only” gates are still runtime scoring/predicate edits. Tests were rewritten to match the new `negate` semantics (flag-negative encoding).
 
-**Smallest fix:** Revert all `src/**` edits. Keep `docs/math-precision-audit-burn-1008.md` + report-only tests that document findings **without** changing helpers (or gate fixes behind tip-owner written approval).
+**Smallest fix:** Revert all `src/**` edits. Keep `docs/math-precision-audit-burn-1008.md (absent on tip)` + report-only tests that document findings **without** changing helpers (or gate fixes behind tip-owner written approval).
 
 ---
 
