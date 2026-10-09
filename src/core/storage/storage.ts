@@ -64,7 +64,7 @@ class StorageManager {
    * keep current in-memory session (do not spin or wipe good state).
    */
   public handleExternalStorageEvent(event: StorageEvent): void {
-    if (event.storageArea != null) {
+    if (event.storageArea !== null) {
       // Ignore sessionStorage and unrelated stores when the browser provides area.
       try {
         if (event.storageArea !== globalThis.localStorage) {
