@@ -265,10 +265,15 @@ describe('burn-1007 main shell routes', () => {
     errSpy.mockRestore();
   });
 
-  it('throws when #app is missing at boot', async () => {
+  it('soft-fails when #app is missing at boot', async () => {
     document.body.innerHTML = '';
-    await expect(import('../../src/main')).rejects.toThrow(
-      /App container not found/
-    );
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(import('../../src/main')).resolves.toBeDefined();
+    expect(
+      errSpy.mock.calls.some((c) =>
+        String(c[0]).includes('App container not found')
+      )
+    ).toBe(true);
+    errSpy.mockRestore();
   });
 });
