@@ -9,8 +9,10 @@ import {
   placeDomino,
   passTurn,
 } from './rules';
-import type { AIDifficulty } from './ai';
-import { getAIMove } from './ai';
+import {
+  type AIDifficulty,
+  getAIMove,
+} from './ai';
 import {
   renderBoard,
   renderHand,

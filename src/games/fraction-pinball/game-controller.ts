@@ -1,8 +1,10 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import type { FractionPinballState } from './types';
-import { createInitialState } from './types';
+import {
+  type FractionPinballState,
+  createInitialState,
+} from './types';
 import { submitAnswer, nextChallenge, startGame } from './rules';
 import {
   renderChallenge,
@@ -13,8 +15,10 @@ import {
   getPlayerName,
   injectFractionPinballStyles,
 } from './board-ui';
-import type { AIDifficulty } from './ai';
-import { getAIAnswer } from './ai';
+import {
+  type AIDifficulty,
+  getAIAnswer,
+} from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
 import { clearElement } from '../../core/dom-security';
