@@ -119,7 +119,6 @@ Imports from `src/games/stars-bars/` (non-exhaustive; prefer these first):
 - `tests/unit/burn-wave47-stars-ai-winning-preference.test.ts`
 - `tests/unit/overnight-stars-ai-hard-execute-flip.test.ts`
 - `tests/unit/stars-bars-ai-input-guard.test.ts`
-- `tests/unit/stars-bars-ai-timer-race.test.ts`
 - `tests/unit/stars-bars-ai.test.ts`
 - `tests/unit/stars-bars-rules.test.ts`
 - `tests/unit/burn-wave43-handshake-calla-ramrod-stars-ai.test.ts`

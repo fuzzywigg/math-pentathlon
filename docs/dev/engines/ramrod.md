@@ -125,7 +125,6 @@ Imports from `src/games/ramrod/` (non-exhaustive; prefer these first):
 - `tests/unit/overnight-wave56-ramrod-winner-banner-copy.test.ts`
 - `tests/unit/overnight-wave58-ramrod-red-wins-banner.test.ts`
 - `tests/unit/ramrod-ai-input-guard.test.ts`
-- `tests/unit/ramrod-ai-timer-race.test.ts`
 - `tests/unit/ramrod-ai.test.ts`
 - `tests/unit/ramrod-rules.test.ts`
 - `tests/unit/burn-wave43-handshake-calla-ramrod-stars-ai.test.ts`
