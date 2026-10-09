@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-254 unusedTypes demote batch 2 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post748` after Rank-3-only demotes (skip AI / `rules.ts`): deleted unused `RollCallback` / `DieSelectCallback`; module-privated `DiceSelectorOptions`, `WebStorageKind`, `SafeWriteResult`, `SafeReadResult`. Kept `SafeJsonParseResult` exported (documented mirror surface). Baseline `unusedTypes` **89 → 83** (−6). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#752` duplicates already on tip) at fold.
+
 ## q-mp-170 tip re-measure (2026-10-09)
 
 Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evidence expected `unusedTypes` **95→96 (+1)**; live knip reported **91** (shrink vs prior baseline 95). No growth WARNING on tip. No AI public-surface type deleted (screening: report/hygiene only).

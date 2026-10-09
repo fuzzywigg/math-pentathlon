@@ -10,14 +10,14 @@
  * Workbox-managed). This module intentionally covers Web Storage only.
  */
 
-export type WebStorageKind = 'local' | 'session';
+type WebStorageKind = 'local' | 'session';
 
 export type SafeJsonParseResult =
   { ok: true; value: unknown } | { ok: false; error: unknown };
 
-export type SafeWriteResult = { ok: true } | { ok: false; error: unknown };
+type SafeWriteResult = { ok: true } | { ok: false; error: unknown };
 
-export type SafeReadResult =
+type SafeReadResult =
   { ok: true; value: string | null } | { ok: false; error: unknown };
 
 const CROSS_TAB_FLAG = '__mpSafeWebStorageCrossTabBound';

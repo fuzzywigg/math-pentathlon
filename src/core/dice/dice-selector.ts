@@ -23,7 +23,7 @@ import {
   type AnimateRollCancel,
 } from './dice-ui';
 
-export interface DiceSelectorOptions {
+interface DiceSelectorOptions {
   /** Dice set to use */
   diceSet?: DiceSet;
   /** Custom dice configuration */
