@@ -429,7 +429,9 @@ class OwlMessageManager {
       const fallbackMessages = categoryMessages.filter(
         (m) => !m.conditions || m.conditions.length === 0
       );
-      if (fallbackMessages.length === 0) return null;
+      if (fallbackMessages.length === 0) {
+        return null;
+      }
       return this.selectAndFormat(fallbackMessages, context);
     }
 

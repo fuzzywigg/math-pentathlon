@@ -69,21 +69,29 @@ export class AiWorkerClient<TMove> {
         });
       });
 
-      if (gen !== this.generation) return null;
+      if (gen !== this.generation) {
+        return null;
+      }
       return result;
     } catch {
-      if (gen !== this.generation) return null;
+      if (gen !== this.generation) {
+        return null;
+      }
       return this.syncFallback(payload);
     }
   }
 
   private ensureWorker(): Worker {
-    if (this.worker) return this.worker;
+    if (this.worker) {
+      return this.worker;
+    }
     const worker = this.createWorker();
     worker.onmessage = (event: MessageEvent<AiWorkerResponse<TMove>>) => {
       const data = event.data;
       const pending = this.pending.get(data.id);
-      if (!pending) return;
+      if (!pending) {
+        return;
+      }
       this.pending.delete(data.id);
       if (!data.ok) {
         pending.reject(new Error(data.error));

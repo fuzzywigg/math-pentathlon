@@ -48,7 +48,9 @@ export function createTimer(config: Partial<TimerConfig> = {}): Timer {
 
 /** Start or resume a timer. */
 export function startTimer(timer: Timer): Timer {
-  if (timer.state === 'running') return timer;
+  if (timer.state === 'running') {
+    return timer;
+  }
   return {
     ...timer,
     state: 'running',
@@ -59,7 +61,9 @@ export function startTimer(timer: Timer): Timer {
 
 /** Pause a running timer. */
 export function pauseTimer(timer: Timer): Timer {
-  if (timer.state !== 'running') return timer;
+  if (timer.state !== 'running') {
+    return timer;
+  }
   return {
     ...timer,
     state: 'paused',
@@ -96,7 +100,9 @@ export function getTimerValue(timer: Timer): number {
 /** True when remaining ≤ warningThreshold but > criticalThreshold. */
 export function isTimerWarning(timer: Timer): boolean {
   const { warningThreshold, criticalThreshold } = timer.config;
-  if (warningThreshold === undefined) return false;
+  if (warningThreshold === undefined) {
+    return false;
+  }
   const critical = criticalThreshold ?? 0;
   return timer.remaining <= warningThreshold && timer.remaining > critical;
 }
@@ -104,7 +110,9 @@ export function isTimerWarning(timer: Timer): boolean {
 /** True when remaining ≤ criticalThreshold. */
 export function isTimerCritical(timer: Timer): boolean {
   const { criticalThreshold } = timer.config;
-  if (criticalThreshold === undefined) return false;
+  if (criticalThreshold === undefined) {
+    return false;
+  }
   return timer.remaining <= criticalThreshold;
 }
 
@@ -194,7 +202,9 @@ export function parseTime(str: string): number {
  */
 export function getTimerProgress(timer: Timer): number {
   const { initialTime } = timer.config;
-  if (initialTime === 0) return 0;
+  if (initialTime === 0) {
+    return 0;
+  }
   if (timer.config.direction === 'up') {
     return Math.min(100, (timer.elapsed / initialTime) * 100);
   }
@@ -284,7 +294,9 @@ export function addPlayer(
   playerId: string,
   playerName?: string
 ): ScoringState {
-  if (state.players.some((p) => p.playerId === playerId)) return state;
+  if (state.players.some((p) => p.playerId === playerId)) {
+    return state;
+  }
   return {
     ...state,
     players: [
@@ -311,8 +323,12 @@ function applyMultipliers(amount: number, multipliers: Multiplier[]): number {
 
 function clampScore(score: number, config: ScoringConfig): number {
   let s = score;
-  if (config.maxScore !== undefined) s = Math.min(s, config.maxScore);
-  if (config.minScore !== undefined) s = Math.max(s, config.minScore);
+  if (config.maxScore !== undefined) {
+    s = Math.min(s, config.maxScore);
+  }
+  if (config.minScore !== undefined) {
+    s = Math.max(s, config.minScore);
+  }
   return s;
 }
 
@@ -327,7 +343,9 @@ export function addScore(
   return {
     ...state,
     players: state.players.map((p) => {
-      if (p.playerId !== playerId) return p;
+      if (p.playerId !== playerId) {
+        return p;
+      }
       const newTotal = clampScore(p.total + effective, state.config);
       return {
         ...p,
@@ -364,7 +382,9 @@ export function setScore(
   return {
     ...state,
     players: state.players.map((p) => {
-      if (p.playerId !== playerId) return p;
+      if (p.playerId !== playerId) {
+        return p;
+      }
       const clamped = clampScore(value, state.config);
       return {
         ...p,
@@ -419,7 +439,9 @@ export function getLeaderboard(
 
 /** Return the leading player, or null if no players. */
 export function getLeader(state: ScoringState): PlayerData | null {
-  if (state.players.length === 0) return null;
+  if (state.players.length === 0) {
+    return null;
+  }
   const lb = getLeaderboard(state);
   return state.players.find((p) => p.playerId === lb[0]?.playerId) ?? null;
 }
@@ -429,16 +451,22 @@ export function getLeader(state: ScoringState): PlayerData | null {
  */
 export function checkWinCondition(state: ScoringState): string | null {
   const { winCondition } = state.config;
-  if (!winCondition) return null;
+  if (!winCondition) {
+    return null;
+  }
 
   for (const player of state.players) {
     if (winCondition.type === 'target' && winCondition.value !== undefined) {
-      if (player.total >= winCondition.value) return player.playerId;
+      if (player.total >= winCondition.value) {
+        return player.playerId;
+      }
     } else if (
       winCondition.type === 'exact' &&
       winCondition.value !== undefined
     ) {
-      if (player.total === winCondition.value) return player.playerId;
+      if (player.total === winCondition.value) {
+        return player.playerId;
+      }
     }
   }
   return null;
@@ -490,7 +518,9 @@ export function getRecentEntries(
   count: number
 ): ScoreEntry[] {
   const player = getPlayerData(state, playerId);
-  if (!player) return [];
+  if (!player) {
+    return [];
+  }
   return [...player.entries].reverse().slice(0, count);
 }
 
@@ -544,8 +574,12 @@ export function calculateGameResult(
 /** Get the point value for a named action, falling back to 'default' if defined. */
 export function getPointValue(state: ScoringState, key: string): number {
   const pv = state.config.pointValues;
-  if (!pv) return 0;
-  if (key in pv) return pv[key] ?? 0;
+  if (!pv) {
+    return 0;
+  }
+  if (key in pv) {
+    return pv[key] ?? 0;
+  }
   return pv['default'] ?? 0;
 }
 
