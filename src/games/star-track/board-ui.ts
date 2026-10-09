@@ -1,7 +1,11 @@
 // Star Track Board UI - Renders the star-shaped track and game elements
 
-import type { StarTrackGameState, Player, ChainLink } from './types';
-import { TRACK_LENGTH } from './types';
+import {
+  type StarTrackGameState,
+  type Player,
+  type ChainLink,
+  TRACK_LENGTH,
+} from './types';
 import { getProgress, getPhaseMessage } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';

@@ -1,8 +1,7 @@
 // Prime Gold Board UI
 // Renders the spiral board and dice
 
-import type { PrimeGoldState } from './types';
-import { CONFIG, isPrime } from './types';
+import { type PrimeGoldState, CONFIG, isPrime } from './types';
 import { getValidPlacements } from './rules';
 import { injectStylesOnce } from '../../ui/inject-styles';
 import {
