@@ -3,7 +3,6 @@
  * Re-select / cancel no-op matrices where APIs exist. Tests-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import { newGameVsHuman as parVsHuman } from '../../src/games/par-55/game-controller';
 import {
   createInitialState as createPar,
@@ -12,7 +11,6 @@ import {
   clearSelection as clearPar,
   getValidPlacements as parPlacements,
 } from '../../src/games/par-55/rules';
-
 import { newGameVsHuman as starsVsHuman } from '../../src/games/stars-bars/game-controller';
 import {
   createInitialState as createStars,
@@ -21,7 +19,6 @@ import {
   clearSelection as clearStars,
   getValidPlacements as starsPlacements,
 } from '../../src/games/stars-bars/rules';
-
 import { newGameVsHuman as ramrodVsHuman } from '../../src/games/ramrod/game-controller';
 import {
   createInitialState as createRamrod,
@@ -30,7 +27,6 @@ import {
   clearSelection as clearRamrod,
   getValidPlacements as ramPlacements,
 } from '../../src/games/ramrod/rules';
-
 import { newGameVsHuman as kwaVsHuman } from '../../src/games/kwatro-sinko/game-controller';
 import {
   createInitialState as createKwa,
@@ -39,7 +35,6 @@ import {
   clearSelection as clearKwa,
   getValidMoves as kwaMoves,
 } from '../../src/games/kwatro-sinko/rules';
-
 import { newGameVsHuman as fabVsHuman } from '../../src/games/fab-a-diffy/game-controller';
 import {
   createInitialState as createFab,
@@ -52,7 +47,6 @@ import {
   findMatchingAnswers,
 } from '../../src/games/fab-a-diffy/rules';
 import type { FractionOperation } from '../../src/core/fractions/types';
-
 import {
   initGame as initPent,
   newGameVsHuman as pentVsHuman,
@@ -67,24 +61,14 @@ import {
 } from '../../src/games/pent-em-in/rules';
 import { mountRoot } from './helpers/dom';
 
+import { mountPair } from '../helpers/mount-pair';
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
 
 describe('Wave 27 seat-place-select — Par select→place flips seat + history', () => {
   it('hand block + valid base place grows history and flips to player2', () => {

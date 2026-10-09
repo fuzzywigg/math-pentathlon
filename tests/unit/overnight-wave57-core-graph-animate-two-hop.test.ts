@@ -6,6 +6,8 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createTrackGraph } from '../../src/core/graph/types';
 import { renderGraph, animateMove } from '../../src/core/graph/graph-ui';
 
+import { stubRafClock } from '../helpers/raf-clock';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.unstubAllGlobals();
@@ -14,18 +16,6 @@ afterEach(() => {
   const nowFn = performance.now as unknown as { mockRestore?: () => void };
   nowFn.mockRestore?.();
 });
-
-function stubRafClock(): void {
-  vi.useFakeTimers();
-  let now = 0;
-  vi.spyOn(performance, 'now').mockImplementation(() => now);
-  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-    return setTimeout(() => {
-      now += 16;
-      cb(now);
-    }, 16) as unknown as number;
-  });
-}
 
 describe('Wave 57 core graph-ui — animate two-hop', () => {
   it('two-node path animates then removes marker', async () => {

@@ -12,17 +12,14 @@ import { createInitialState } from '../../src/games/remainder-islands/types';
 import { renderBoard } from '../../src/games/remainder-islands/board-ui';
 import { mountAppShell } from './helpers/dom';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
   document.getElementById('remainder-islands-styles')?.remove();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 function hitPolygon(container: HTMLElement, islandId: string): SVGPolygonElement {
   const polys = container.querySelectorAll(
