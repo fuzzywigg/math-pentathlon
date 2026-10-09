@@ -28,7 +28,7 @@ Developer workflows (commands)
 - **CI lint-job chain:** `npm run verify` (= `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`). Matches `.github/workflows/ci.yml` job `lint`.
 - Lint alone: `npm run lint`; ceilings: `npm run lint:ratchet` (ratchet only goes down); format write: `npm run format`; CI format gate: `npm run format:check`.
 - Types: `npm run typecheck` (not bare `npx tsc`); shell/Phase-2 ceilings: `npm run typecheck:ratchet`; import-graph: `npm run check:boundaries` (`engine_imports_ui` must stay 0).
-- Emit identity (type-only / brace-only proofs; not an npm script): `node scripts/check-emit-identity.mjs`.
+- Emit identity (type-only / brace-only proofs): `npm run check:emit-identity` (alias for `node scripts/check-emit-identity.mjs`).
 - Copy pins (report-only): `npm run check:copy-pins`. Prefer structural asserts; do not pin player-facing copy / phase messages. Do not add asserts that lock AI search, scoring, difficulty, or move timing. Hex Hard stays **450ms** with real time; no Stars & Bars history cap.
 - CI posture (blocking vs report-only jobs): `AGENTS.md`, `docs/dev/ci-gates-mermaid-q-mp-073.md`. Report-only also includes `npm run report:knip` (unused-export drift). Workflow keeps `permissions: contents: read` and checkout `persist-credentials: false`.
 - Full script list: `docs/wiki/development.md` and `CONTRIBUTING.md`.
