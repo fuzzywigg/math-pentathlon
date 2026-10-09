@@ -318,6 +318,33 @@ export function injectStarsStyles(): void {
       pointer-events: none;
       white-space: nowrap;
     }
+
+    /* q-mp-054: gate decorative pulse / scale under OS + in-app reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .stars-winner-banner {
+        animation: none !important;
+      }
+      .stars-cell,
+      .stars-card,
+      .stars-btn {
+        transition: none !important;
+      }
+      .stars-card.selected {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .stars-winner-banner {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .stars-cell,
+    html[data-reduced-motion='true'] .stars-card,
+    html[data-reduced-motion='true'] .stars-btn {
+      transition: none !important;
+    }
+    html[data-reduced-motion='true'] .stars-card.selected {
+      transform: none;
+    }
   `;
   document.head.appendChild(style);
 }

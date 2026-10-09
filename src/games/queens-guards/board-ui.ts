@@ -395,6 +395,10 @@ export function injectQGStyles(): void {
         animation: none !important;
       }
     }
+
+    html[data-reduced-motion='true'] .qg-winner-banner {
+      animation: none !important;
+    }
   `
   );
 }

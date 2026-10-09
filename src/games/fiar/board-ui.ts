@@ -394,6 +394,11 @@ export function injectFiarStyles(): void {
       }
     }
 
+    html[data-reduced-motion='true'] .pulse-highlight,
+    html[data-reduced-motion='true'] .fiar-winner-banner {
+      animation: none !important;
+    }
+
     .fiar-status {
       text-align: center;
       padding: 1rem;

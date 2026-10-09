@@ -1,6 +1,6 @@
 /**
  * Windows High Contrast / forced-colors + light color-scheme pin.
- * Task: burn-1008-mp-forced-colors
+ * Task: burn-1008-mp-forced-colors (+ q-mp-054 triage)
  *
  * Scope: CSS/attribute only. Does not redo #469 axe contrast, #437 shell axe,
  * #491 keyboard focus design, or #522 zoom/reflow layout.
@@ -66,19 +66,25 @@
   .fab-op-btn:focus-visible,
   .fab-bar-wrapper:focus-visible,
   .stars-card:focus-visible,
+  .stars-btn:focus-visible,
+  .stars-cell:focus-visible,
   .par55-hand-block:focus-visible,
   .ramrod-rod-wrapper:focus-visible,
   .sd-roll-btn:focus-visible,
   .sd-pass-btn:focus-visible,
   .contig-roll-btn:focus-visible,
   .contig-pass-btn:focus-visible,
+  .fiar-chip-kind-btn:focus-visible,
   .tutorial-hit-proxy:focus-visible {
     outline-color: Highlight;
   }
 
-  /* Selected mode / difficulty — border survives when bg wash remaps. */
+  /* Selected mode / difficulty / ARIA pressed — border survives when bg wash remaps. */
   .mode-option.selected,
-  .difficulty-btn.selected {
+  .difficulty-btn.selected,
+  .difficulty-btn[aria-pressed='true'],
+  .division-tab[aria-selected='true'],
+  .fiar-chip-kind-btn[aria-pressed='true'] {
     border-color: Highlight;
     outline: 2px solid Highlight;
     outline-offset: 1px;
@@ -134,9 +140,21 @@
   .fiar-board-container,
   .fiar-board,
   .kwa-board,
-  .kwa-board-svg,
+  .kwa-board-container,
+  .kwa-board-3d-host,
+  .pinball-board,
+  .stars-board,
+  .pg-board,
+  .sd-board,
+  .juggle-board,
+  .ramrod-board,
+  .par55-board,
+  .contig-board,
+  .fab-answer-board,
+  .fab-bar-pool,
   svg.hex-board,
-  svg.star-track-board {
+  svg.star-track-board,
+  svg.pinball-board {
     forced-color-adjust: none;
   }
 
@@ -181,7 +199,8 @@
 
   /* Tutorial ring should remain visible without relying on glow/shadow. */
   .tutorial-highlight-ring,
-  .tutorial-spotlight {
+  .tutorial-highlight-ring--action,
+  .tutorial-highlight {
     outline: 3px solid Highlight;
     border-color: Highlight;
   }
