@@ -5,19 +5,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollDice,
-  selectDice,
-  getSelectedValues,
-  getSelectedTotal,
-  getAllPossibleSums,
-  getAllPossibleProducts,
-  getTwoDiceResults,
-  lockDice,
-  rerollDice,
-  COMMON_DICE_SETS,
-  DiceSelector,
-} from '../../src/core/dice';
+import { DiceSelector } from '../../src/core/dice/dice-selector';
+import { rollDice, selectDice, getSelectedValues, getSelectedTotal, getAllPossibleSums, getAllPossibleProducts, getTwoDiceResults, lockDice, rerollDice } from '../../src/core/dice/roller';
+import { COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 beforeEach(() => {
   let n = 0;

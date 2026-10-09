@@ -4,13 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  roll,
-  rollDice,
-  rollMultiple,
-  DICE_FACES,
-  type DiceType,
-} from '../../src/core/dice';
+import { roll, rollDice, rollMultiple } from '../../src/core/dice/roller';
+import { DICE_FACES, type DiceType } from '../../src/core/dice/types';
 
 beforeEach(() => {
   let n = 0;

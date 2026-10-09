@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { animateRoll, type RollResult } from '../../src/core/dice';
+import { animateRoll } from '../../src/core/dice/dice-ui';
+import type { RollResult } from '../../src/core/dice/types';
 
 beforeEach(() => {
   document.body.innerHTML = '';

@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { DiceSelector, COMMON_DICE_SETS } from '../../src/core/dice';
+import { DiceSelector } from '../../src/core/dice/dice-selector';
+import { COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 beforeEach(() => {
   document.body.innerHTML = '';

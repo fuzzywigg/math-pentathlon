@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getAllPossibleSums,
-  getAllPossibleProducts,
-  getTwoDiceResults,
-} from '../../src/core/dice';
+import { getAllPossibleSums, getAllPossibleProducts, getTwoDiceResults } from '../../src/core/dice/roller';
 
 describe('Wave 38 dice-subsets — sum/product cardinality', () => {
   it('empty values yield empty subsets', () => {

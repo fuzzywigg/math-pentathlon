@@ -4,15 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollMultiple,
-  lockDice,
-  unlockDice,
-  selectDice,
-  clearSelection,
-  toggleDiceSelection,
-  rerollDice,
-} from '../../src/core/dice';
+import { rollMultiple, lockDice, unlockDice, selectDice, clearSelection, toggleDiceSelection, rerollDice } from '../../src/core/dice/roller';
 
 beforeEach(() => {
   let n = 0;

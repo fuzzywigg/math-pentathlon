@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getTwoDiceResults } from '../../src/core/dice';
+import { getTwoDiceResults } from '../../src/core/dice/roller';
 import { simplifyExpression, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 38 handshake — dice zeros → expr', () => {

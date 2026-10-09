@@ -2,13 +2,7 @@
  * Wave 44 — toggleDiceSelection + clearSelection leftovers. Tests-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import {
-  rollDice,
-  toggleDiceSelection,
-  clearSelection,
-  getSelectedValues,
-  getSelectedTotal,
-} from '../../src/core/dice';
+import { rollDice, toggleDiceSelection, clearSelection, getSelectedValues, getSelectedTotal } from '../../src/core/dice/roller';
 
 afterEach(() => vi.restoreAllMocks());
 

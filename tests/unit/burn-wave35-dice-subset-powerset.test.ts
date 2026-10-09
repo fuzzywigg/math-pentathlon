@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getAllPossibleSums, getAllPossibleProducts } from '../../src/core/dice';
+import { getAllPossibleSums, getAllPossibleProducts } from '../../src/core/dice/roller';
 
 describe('Wave 35 dice-powerset — distinct values cardinality', () => {
   it('all-distinct positives: sums cover 2^n-1 masks (may collide)', () => {

@@ -4,13 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollDice,
-  getSelectedValues,
-  selectDice,
-  getAllPossibleSums,
-  getTwoDiceResults,
-} from '../../src/core/dice';
+import { rollDice, getSelectedValues, selectDice, getAllPossibleSums, getTwoDiceResults } from '../../src/core/dice/roller';
 import { createTargetChallenge } from '../../src/core/expressions/types';
 import { validateSolution, evaluate, solveTargetChallenge } from '../../src/core/expressions/evaluator';
 

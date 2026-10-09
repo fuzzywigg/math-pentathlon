@@ -4,12 +4,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  rollDie,
-  rollMultiple,
-  DICE_FACES,
-  type DiceType,
-} from '../../src/core/dice';
+import { rollDie, rollMultiple } from '../../src/core/dice/roller';
+import { DICE_FACES, type DiceType } from '../../src/core/dice/types';
 
 afterEach(() => {
   vi.restoreAllMocks();

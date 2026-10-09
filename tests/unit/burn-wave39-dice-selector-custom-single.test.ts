@@ -4,11 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  DiceSelector,
-  DICE_CONFIGS,
-  COMMON_DICE_SETS,
-} from '../../src/core/dice';
+import { DiceSelector } from '../../src/core/dice/dice-selector';
+import { DICE_CONFIGS, COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 beforeEach(() => {
   let n = 0;

@@ -5,12 +5,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollDie,
-  DICE_FACES,
-  DICE_CONFIGS,
-  type DiceType,
-} from '../../src/core/dice';
+import { rollDie } from '../../src/core/dice/roller';
+import { DICE_FACES, DICE_CONFIGS, type DiceType } from '../../src/core/dice/types';
 
 const TYPES: DiceType[] = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20'];
 
