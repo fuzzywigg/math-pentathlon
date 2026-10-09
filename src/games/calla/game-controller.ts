@@ -162,8 +162,9 @@ function triggerAITurn(): void {
     // Soft-lock recovery: null search with legal pits → first valid; empty → end settle.
     if (!aiMove) {
       const valids = getValidPits(gameState);
-      if (valids.length > 0) {
-        aiMove = { pit: valids[0]! };
+      const firstValid = valids[0];
+      if (firstValid !== undefined) {
+        aiMove = { pit: firstValid };
       } else {
         gameState = settleNoValidMoves(gameState);
         isAIThinking = false;

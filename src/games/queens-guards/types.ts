@@ -71,7 +71,9 @@ export function parseKey(key: string): BoardCoord {
   const parts = key.split('-').map(Number);
   // ratchet: callers always pass `ring-position` keys from cellKey().
   // Keep tip runtime (undefined on malformed keys) — no ?? 0 defaults.
-  return { ring: parts[0]!, position: parts[1]! };
+  const ring = parts[0] as number;
+  const position = parts[1] as number;
+  return { ring, position };
 }
 
 /**
@@ -211,7 +213,10 @@ export function createBoard(): Map<string, HexCell> {
 
   // Player 1: positions 0-14 (queen at 7)
   for (let i = 0; i <= 14; i++) {
-    const cell = cells.get(cellKey(outerRing, i))!;
+    const cell = cells.get(cellKey(outerRing, i));
+    if (cell === undefined) {
+      continue;
+    }
     if (i === 7) {
       cell.piece = { id: 'p1-queen', player: 'player1', type: 'queen' };
     } else if (i % 2 === 1 && i !== 7) {
@@ -221,7 +226,10 @@ export function createBoard(): Map<string, HexCell> {
 
   // Player 2: positions 15-29 (queen at 22)
   for (let i = 15; i < outerCount; i++) {
-    const cell = cells.get(cellKey(outerRing, i))!;
+    const cell = cells.get(cellKey(outerRing, i));
+    if (cell === undefined) {
+      continue;
+    }
     if (i === 22) {
       cell.piece = { id: 'p2-queen', player: 'player2', type: 'queen' };
     } else if (i % 2 === 0 && i !== 22) {

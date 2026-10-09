@@ -58,16 +58,22 @@ export function createInitialGameState(): GameState {
 
   // Place Player 1's King at top center (row 1, col 5 = index [0][4])
   // ratchet: board is dense BOARD_SIZE×BOARD_SIZE; start coords are constants.
-  board[PLAYER1_KING_START.row]![PLAYER1_KING_START.col] = {
-    type: 'king',
-    owner: 'player1',
-  };
+  const p1Row = board[PLAYER1_KING_START.row];
+  if (p1Row !== undefined) {
+    p1Row[PLAYER1_KING_START.col] = {
+      type: 'king',
+      owner: 'player1',
+    };
+  }
 
   // Place Player 2's King at bottom center (row 9, col 5 = index [8][4])
-  board[PLAYER2_KING_START.row]![PLAYER2_KING_START.col] = {
-    type: 'king',
-    owner: 'player2',
-  };
+  const p2Row = board[PLAYER2_KING_START.row];
+  if (p2Row !== undefined) {
+    p2Row[PLAYER2_KING_START.col] = {
+      type: 'king',
+      owner: 'player2',
+    };
+  }
 
   return {
     board,
@@ -94,13 +100,28 @@ export function getPiece(board: Board, pos: Position): Cell {
     return null;
   }
   // ratchet: isValidPosition gates row/col into the dense board.
-  return board[pos.row]![pos.col]!;
+  const row = board[pos.row];
+  if (row === undefined) {
+    return null;
+  }
+  const cell = row[pos.col];
+  if (cell === undefined) {
+    return null;
+  }
+  return cell;
 }
 
 // Check if a cell is empty
 export function isEmpty(board: Board, pos: Position): boolean {
   // ratchet: isValidPosition gates row/col into the dense board.
-  return isValidPosition(pos) && board[pos.row]![pos.col] === null;
+  if (!isValidPosition(pos)) {
+    return false;
+  }
+  const row = board[pos.row];
+  if (row === undefined) {
+    return false;
+  }
+  return row[pos.col] === null;
 }
 
 // Get the remaining supply for a player

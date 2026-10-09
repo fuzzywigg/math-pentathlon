@@ -288,10 +288,12 @@ function handleRestoreClick(coord: BoardCoord): void {
     return;
   }
 
+  const fromCaptured = gameState.capturedPieces[0];
   const from = gameState.selectedPiece
     ? parseKey(gameState.selectedPiece)
-    : gameState.capturedPieces[0]!;
+    : fromCaptured;
   if (
+    from === undefined ||
     !gameState.capturedPieces.some(
       (c) => c.ring === from.ring && c.position === from.position
     )
@@ -303,14 +305,12 @@ function handleRestoreClick(coord: BoardCoord): void {
   if (next === gameState) {
     return;
   }
+  const nextCaptured = next.capturedPieces[0];
   gameState = {
     ...next,
     selectedPiece:
-      next.capturedPieces.length > 0
-        ? cellKey(
-            next.capturedPieces[0]!.ring,
-            next.capturedPieces[0]!.position
-          )
+      nextCaptured !== undefined
+        ? cellKey(nextCaptured.ring, nextCaptured.position)
         : null,
   };
   moveCount++;
@@ -351,11 +351,11 @@ function handleCellClick(coord: BoardCoord): void {
     if (isValidMove) {
       gameState = makeMove(gameState, fromCoord, coord);
       moveCount++;
-      if (gameState.capturedPieces.length > 0) {
-        const first = gameState.capturedPieces[0]!;
+      const firstCaptured = gameState.capturedPieces[0];
+      if (firstCaptured !== undefined) {
         gameState = {
           ...gameState,
-          selectedPiece: cellKey(first.ring, first.position),
+          selectedPiece: cellKey(firstCaptured.ring, firstCaptured.position),
         };
       }
       updateUI();
@@ -517,7 +517,10 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
       seedWinnerFormation: () => {
         const base = createInitialState();
         const cells = new Map(base.cells);
-        const outerQueen = cells.get(cellKey(5, 7))!;
+        const outerQueen = cells.get(cellKey(5, 7));
+        if (outerQueen === undefined) {
+          return;
+        }
         cells.set(cellKey(5, 7), { ...outerQueen, piece: null });
         cells.set(cellKey(0, 0), {
           ring: 0,
@@ -530,8 +533,15 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
         });
         const guardPositions = [1, 3, 5, 9, 11, 13];
         for (let i = 0; i < 6; i++) {
-          const from = cells.get(cellKey(5, guardPositions[i]!))!;
-          cells.set(cellKey(5, guardPositions[i]!), {
+          const guardPos = guardPositions[i];
+          if (guardPos === undefined) {
+            continue;
+          }
+          const from = cells.get(cellKey(5, guardPos));
+          if (from === undefined) {
+            continue;
+          }
+          cells.set(cellKey(5, guardPos), {
             ...from,
             piece: null,
           });
