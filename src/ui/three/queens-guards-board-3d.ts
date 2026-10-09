@@ -93,7 +93,9 @@ export function ringPosToWorld(
   ring: number,
   position: number
 ): { x: number; z: number } {
-  if (ring === 0) return { x: 0, z: 0 };
+  if (ring === 0) {
+    return { x: 0, z: 0 };
+  }
   const count = cellsInRing(ring);
   const angle = (2 * Math.PI * position) / count - Math.PI / 2;
   const radius = ring * RING_STEP;
@@ -142,8 +144,11 @@ function createFlatTopHexShape(
     const angle = (Math.PI / 3) * i - Math.PI / 6;
     const x = radius * Math.cos(angle);
     const y = radius * Math.sin(angle);
-    if (i === 0) shape.moveTo(x, y);
-    else shape.lineTo(x, y);
+    if (i === 0) {
+      shape.moveTo(x, y);
+    } else {
+      shape.lineTo(x, y);
+    }
   }
   shape.closePath();
   return shape;
@@ -304,8 +309,11 @@ export async function createQueensGuardsBoard3D(
     const count = cellsInRing(ring);
     for (let position = 0; position < count; position++) {
       let baseMat: Material = ring % 2 === 0 ? mats.light : mats.dark;
-      if (ring === 0) baseMat = mats.center;
-      else if (ring === 1) baseMat = mats.ring1;
+      if (ring === 0) {
+        baseMat = mats.center;
+      } else if (ring === 1) {
+        baseMat = mats.ring1;
+      }
 
       const tile = new THREE.Mesh(tileGeo, baseMat);
       const { x, z } = ringPosToWorld(ring, position);
@@ -338,7 +346,9 @@ export async function createQueensGuardsBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 480, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -349,7 +359,9 @@ export async function createQueensGuardsBoard3D(
   const pickCoord = (clientX: number, clientY: number): BoardCoord | null => {
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(clientX, clientY, rect);
-    if (!ndc) return null;
+    if (!ndc) {
+      return null;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -385,21 +397,29 @@ export async function createQueensGuardsBoard3D(
     }
     // ~half a hex in CSS pixels at typical phone width
     const maxDist = Math.max(rect.width, rect.height) * 0.08;
-    if (best && bestDist <= maxDist * maxDist) return best;
+    if (best && bestDist <= maxDist * maxDist) {
+      return best;
+    }
     return null;
   };
 
   const onPointer = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
+    if (!clickHandler || disposed) {
+      return;
+    }
     const coord = pickCoord(event.clientX, event.clientY);
-    if (coord) clickHandler(coord);
+    if (coord) {
+      clickHandler(coord);
+    }
   };
 
   let tearDown: (() => void) | null = null;
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     tearDown?.();
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
@@ -415,7 +435,9 @@ export async function createQueensGuardsBoard3D(
 
   const onA11yFocusIn = (event: FocusEvent): void => {
     const t = event.target as HTMLElement | null;
-    if (!t || !a11y.contains(t)) return;
+    if (!t || !a11y.contains(t)) {
+      return;
+    }
     const ring = Number(t.getAttribute('data-row'));
     const position = Number(t.getAttribute('data-col'));
     if (Number.isFinite(ring) && Number.isFinite(position)) {
@@ -429,13 +451,17 @@ export async function createQueensGuardsBoard3D(
   let lastState: QueensGuardsState | null = null;
 
   const paintFocusOnly = (): void => {
-    if (!lastState || disposed) return;
+    if (!lastState || disposed) {
+      return;
+    }
     applyTileMaterials(lastState);
     paint();
   };
 
   const clearPiece = (cell: CellMeshes): void => {
-    if (!cell.piece) return;
+    if (!cell.piece) {
+      return;
+    }
     root.remove(cell.piece);
     cell.piece = null;
   };
@@ -541,21 +567,32 @@ export async function createQueensGuardsBoard3D(
 
     for (const cell of cells) {
       let baseMat: Material = cell.ring % 2 === 0 ? mats.light : mats.dark;
-      if (cell.ring === 0) baseMat = mats.center;
-      else if (cell.ring === 1) baseMat = mats.ring1;
+      if (cell.ring === 0) {
+        baseMat = mats.center;
+      } else if (cell.ring === 1) {
+        baseMat = mats.ring1;
+      }
 
       let tileMat = baseMat;
-      if (state.selectedPiece === cell.key) tileMat = mats.selected;
-      else if (validMoves.has(cell.key)) tileMat = mats.valid;
-      else if (captured.has(cell.key)) tileMat = mats.capture;
-      else if (lastWasCapture && lastTo === cell.key) tileMat = mats.capture;
-      else if (lastFrom === cell.key || lastTo === cell.key) {
+      if (state.selectedPiece === cell.key) {
+        tileMat = mats.selected;
+      } else if (validMoves.has(cell.key)) {
+        tileMat = mats.valid;
+      } else if (captured.has(cell.key)) {
+        tileMat = mats.capture;
+      } else if (lastWasCapture && lastTo === cell.key) {
+        tileMat = mats.capture;
+      } else if (lastFrom === cell.key || lastTo === cell.key) {
         tileMat = mats.last;
-      } else if (focusedKey === cell.key) tileMat = mats.focus;
+      } else if (focusedKey === cell.key) {
+        tileMat = mats.focus;
+      }
 
       if (winnerThrone && (cell.ring === 0 || cell.ring === 1)) {
         const owner = state.cells.get(cell.key)?.piece?.player;
-        if (owner === state.winner) tileMat = mats.winner;
+        if (owner === state.winner) {
+          tileMat = mats.winner;
+        }
       }
 
       cell.tile.material = tileMat;
@@ -606,11 +643,15 @@ export async function createQueensGuardsBoard3D(
             ? 'Guard'
             : '';
       const extras: string[] = [];
-      if (state.selectedPiece === cell.key) extras.push('selected');
+      if (state.selectedPiece === cell.key) {
+        extras.push('selected');
+      }
       if (validMoves.has(cell.key)) {
         extras.push(restoring ? 'restore target' : 'legal move');
       }
-      if (captured.has(cell.key)) extras.push('captured');
+      if (captured.has(cell.key)) {
+        extras.push('captured');
+      }
       btn.setAttribute(
         'aria-label',
         `ring ${cell.ring} pos ${cell.position}, ${owner}${
@@ -646,7 +687,9 @@ export async function createQueensGuardsBoard3D(
 
     if (!a11y.querySelector('[tabindex="0"]')) {
       const first = a11y.querySelector('button');
-      if (first) first.tabIndex = 0;
+      if (first) {
+        first.tabIndex = 0;
+      }
     }
   };
 
@@ -654,7 +697,9 @@ export async function createQueensGuardsBoard3D(
     state: QueensGuardsState,
     nextClick?: CellClickCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     clickHandler = nextClick;
     lastState = state;
 
@@ -670,8 +715,12 @@ export async function createQueensGuardsBoard3D(
     ring: number,
     position: number
   ): { x: number; y: number } | null => {
-    if (ring < 0 || ring >= CONFIG.NUM_RINGS) return null;
-    if (position < 0 || position >= cellsInRing(ring)) return null;
+    if (ring < 0 || ring >= CONFIG.NUM_RINGS) {
+      return null;
+    }
+    if (position < 0 || position >= cellsInRing(ring)) {
+      return null;
+    }
     const { x, z } = ringPosToWorld(ring, position);
     projectScratch.set(x, TILE_TOP_Y, z).project(camera);
     const rect = canvas.getBoundingClientRect();
@@ -685,7 +734,9 @@ export async function createQueensGuardsBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindPointer();
@@ -697,8 +748,12 @@ export async function createQueensGuardsBoard3D(
       delete window.__mp3dQueensGuards;
     }
 
-    for (const cell of cells) clearPiece(cell);
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    for (const cell of cells) {
+      clearPiece(cell);
+    }
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
 
     tileGeo.dispose();
@@ -713,8 +768,12 @@ export async function createQueensGuardsBoard3D(
 
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove('board-3d-host', 'qg-board-3d-host');
   };
 

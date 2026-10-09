@@ -314,7 +314,9 @@ export async function createPrimeGoldBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 420, 120);
     const h = Math.max(container.clientHeight || 420, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -322,7 +324,9 @@ export async function createPrimeGoldBoard3D(
   };
 
   const clearChip = (cm: CellMeshes): void => {
-    if (!cm.chip) return;
+    if (!cm.chip) {
+      return;
+    }
     root.remove(cm.chip);
     cm.chip = null;
   };
@@ -336,11 +340,15 @@ export async function createPrimeGoldBoard3D(
   };
 
   const buildCellsFromState = (state: PrimeGoldState): void => {
-    if (cells.length > 0) return;
+    if (cells.length > 0) {
+      return;
+    }
     for (let row = 0; row < BOARD_SIZE; row++) {
       for (let col = 0; col < BOARD_SIZE; col++) {
         const cell = state.cells.get(`${row},${col}`);
-        if (!cell) continue;
+        if (!cell) {
+          continue;
+        }
         const { x, z } = boardToWorld(row, col);
 
         const baseTileMat = mats.tile.clone();
@@ -406,7 +414,9 @@ export async function createPrimeGoldBoard3D(
 
     for (const cm of cells) {
       const cell = state.cells.get(`${cm.row},${cm.col}`);
-      if (!cell) continue;
+      if (!cell) {
+        continue;
+      }
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.setAttribute('role', 'gridcell');
@@ -425,7 +435,9 @@ export async function createPrimeGoldBoard3D(
       const expr = validMap.get(cell.value);
       if (expr) {
         btn.tabIndex = 0;
-        if (!firstFocusable) firstFocusable = btn;
+        if (!firstFocusable) {
+          firstFocusable = btn;
+        }
         btn.addEventListener('click', () => handler?.(cell.value, expr));
       }
       btn.addEventListener('focus', () => {
@@ -441,7 +453,9 @@ export async function createPrimeGoldBoard3D(
 
     if (!a11y.querySelector('[tabindex="0"]')) {
       const first = a11y.querySelector('button');
-      if (first) (first as HTMLButtonElement).tabIndex = 0;
+      if (first) {
+        (first as HTMLButtonElement).tabIndex = 0;
+      }
     } else if (firstFocusable && document.activeElement === document.body) {
       // leave focus alone; roving happens via Tab into the grid
       void firstFocusable;
@@ -462,15 +476,21 @@ export async function createPrimeGoldBoard3D(
 
     for (const cm of cells) {
       const cell = state.cells.get(`${cm.row},${cm.col}`);
-      if (!cell) continue;
+      if (!cell) {
+        continue;
+      }
 
       let tileMat: Material = cell.isPrime ? cm.primeTileMat : cm.baseTileMat;
       const veinOwner = veinCells.get(`${cm.row},${cm.col}`);
-      if (valid.has(cell.value)) tileMat = mats.tileValid;
-      else if (focusedValue === cell.value) tileMat = mats.tileFocus;
-      else if (veinOwner === 'player1') tileMat = mats.tileVein1;
-      else if (veinOwner === 'player2') tileMat = mats.tileVein2;
-      else if (last && last.row === cm.row && last.col === cm.col) {
+      if (valid.has(cell.value)) {
+        tileMat = mats.tileValid;
+      } else if (focusedValue === cell.value) {
+        tileMat = mats.tileFocus;
+      } else if (veinOwner === 'player1') {
+        tileMat = mats.tileVein1;
+      } else if (veinOwner === 'player2') {
+        tileMat = mats.tileVein2;
+      } else if (last && last.row === cm.row && last.col === cm.col) {
         tileMat = mats.tileLast;
       }
 
@@ -483,7 +503,9 @@ export async function createPrimeGoldBoard3D(
     for (const player of ['player1', 'player2'] as const) {
       const segs = getPrimeVeinSegments(state.cells, player);
       for (const seg of segs) {
-        if (seg.length < 2) continue;
+        if (seg.length < 2) {
+          continue;
+        }
         const paired: number[] = [];
         for (let i = 0; i + 1 < seg.length; i++) {
           const a = boardToWorld(seg[i]!.row, seg[i]!.col);
@@ -538,11 +560,17 @@ export async function createPrimeGoldBoard3D(
   };
 
   const onPointer = (event: PointerEvent): void => {
-    if (!clickHandler || disposed || !lastState) return;
-    if (lastState.phase !== 'placing') return;
+    if (!clickHandler || disposed || !lastState) {
+      return;
+    }
+    if (lastState.phase !== 'placing') {
+      return;
+    }
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
-    if (!ndc) return;
+    if (!ndc) {
+      return;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -569,7 +597,9 @@ export async function createPrimeGoldBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     unmount();
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
@@ -603,7 +633,9 @@ export async function createPrimeGoldBoard3D(
     value: number
   ): { x: number; y: number } | null => {
     const cm = valueIndex.get(value);
-    if (!cm) return null;
+    if (!cm) {
+      return null;
+    }
     return cellToClientPoint(cm.row, cm.col);
   };
 
@@ -613,7 +645,9 @@ export async function createPrimeGoldBoard3D(
     state: PrimeGoldState,
     nextClick?: PrimeGoldCellClickCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     clickHandler = nextClick;
     lastState = state;
     buildCellsFromState(state);
@@ -626,7 +660,9 @@ export async function createPrimeGoldBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
@@ -644,21 +680,31 @@ export async function createPrimeGoldBoard3D(
     }
     cells.length = 0;
     valueIndex.clear();
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     tileGeo.dispose();
     labelGeo.dispose();
     chipGeo.dispose();
     slabGeo.dispose();
-    for (const tex of labelTextures) tex.dispose();
-    for (const m of labelMats) m.dispose();
+    for (const tex of labelTextures) {
+      tex.dispose();
+    }
+    for (const m of labelMats) {
+      m.dispose();
+    }
     Object.values(mats).forEach((m) => m.dispose());
     slabMat.dispose();
     rimMat.dispose();
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove('board-3d-host', 'pg-board-3d-host');
   };
 

@@ -261,7 +261,9 @@ export async function createPentEmInBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 400, 120);
     const h = Math.max(container.clientHeight || 400, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -271,7 +273,9 @@ export async function createPentEmInBoard3D(
   const pickCell = (event: PointerEvent): Cell | null => {
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
-    if (!ndc) return null;
+    if (!ndc) {
+      return null;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -290,12 +294,16 @@ export async function createPentEmInBoard3D(
   };
 
   const clearHover = (): void => {
-    if (!hoverHandler || disposed) return;
+    if (!hoverHandler || disposed) {
+      return;
+    }
     hoverHandler(null);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
-    if (!hoverHandler || disposed) return;
+    if (!hoverHandler || disposed) {
+      return;
+    }
     if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
       return;
     }
@@ -310,7 +318,9 @@ export async function createPentEmInBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     // Tear down WebGL resources, then let the controller fall back to 2D.
     tearDown?.();
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
@@ -321,9 +331,13 @@ export async function createPentEmInBoard3D(
   });
   const unbindPointer = bindCanvasPointerTap(canvas, {
     onTap: (event) => {
-      if (!clickHandler || disposed) return;
+      if (!clickHandler || disposed) {
+        return;
+      }
       const cell = pickCell(event);
-      if (cell) clickHandler(cell);
+      if (cell) {
+        clickHandler(cell);
+      }
     },
     onGestureEnd: clearHover,
   });
@@ -358,8 +372,12 @@ export async function createPentEmInBoard3D(
   };
 
   const ownerLabel = (owner: Player | null): string | undefined => {
-    if (owner === 'player1') return 'Blue';
-    if (owner === 'player2') return 'Red';
+    if (owner === 'player1') {
+      return 'Blue';
+    }
+    if (owner === 'player2') {
+      return 'Red';
+    }
     return undefined;
   };
 
@@ -403,7 +421,9 @@ export async function createPentEmInBoard3D(
           validPlacement: legalAnchors.has(`${row},${col}`),
         };
         const owner = ownerLabel(occupant);
-        if (owner !== undefined) labelParts.owner = owner;
+        if (owner !== undefined) {
+          labelParts.owner = owner;
+        }
         makeGridCell(btn, buildCellAriaLabel(labelParts));
         const activate = (): void => handler?.({ row, col });
         btn.addEventListener('click', activate);
@@ -427,7 +447,9 @@ export async function createPentEmInBoard3D(
     nextClick?: CellClickCallback,
     nextHover?: CellHoverCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     clickHandler = nextClick;
     hoverHandler = nextHover;
 
@@ -476,9 +498,15 @@ export async function createPentEmInBoard3D(
       const key = `${tm.row},${tm.col}`;
       const isLight = (tm.row + tm.col) % 2 === 0;
       let mat: Material = isLight ? mats.light : mats.dark;
-      if (validAnchors.has(key)) mat = mats.valid;
-      if (lastCells.has(key)) mat = mats.last;
-      if (previewKey === key) mat = mats.focus;
+      if (validAnchors.has(key)) {
+        mat = mats.valid;
+      }
+      if (lastCells.has(key)) {
+        mat = mats.last;
+      }
+      if (previewKey === key) {
+        mat = mats.focus;
+      }
       tm.tile.material = mat;
     }
 
@@ -549,7 +577,9 @@ export async function createPentEmInBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
@@ -563,7 +593,9 @@ export async function createPentEmInBoard3D(
     }
     clearGroup(pieceRoot);
     clearGroup(ghostRoot);
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     tileGeo.dispose();
     blockGeo.dispose();
@@ -573,8 +605,12 @@ export async function createPentEmInBoard3D(
     slabMat.dispose();
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove('board-3d-host', 'pent-board-3d-host');
   };
   tearDown = unmount;
