@@ -1,0 +1,351 @@
+{
+  "taskId": "q-mp-231-mutation-audit-ui-6",
+  "generatedAt": "2026-10-09T19:00:50.020Z",
+  "harness": "node_modules/.cache/mutation-ui-6/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/games/juggle/board-ui.ts",
+      "src/games/fiar/board-ui.ts",
+      "src/games/kwatro-sinko/board-ui.ts"
+    ]
+  },
+  "results": [
+    {
+      "module": "src/games/juggle/board-ui.ts",
+      "lines": 678,
+      "tests": [
+        "tests/unit/burn-wave48-handshake-four-inject-styles.test.ts",
+        "tests/unit/burn-wave48-juggle-board-render-active-fill.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-cell-data-row-col.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-occupied-class.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-preview-invalid.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-preview-valid.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-shape-selector-click.test.ts",
+        "tests/unit/overnight-wave52-juggle-render-shape-selector-options.test.ts",
+        "tests/unit/overnight-wave64-juggle-inject-shape-controls-column.test.ts",
+        "tests/unit/burn-1008-registry-module-contract.test.ts",
+        "tests/unit/burn-wave10-secondary-ui.test.ts",
+        "tests/unit/burn-wave11-secondary-ui.test.ts",
+        "tests/unit/burn-wave13-secondary-ui.test.ts",
+        "tests/unit/burn-wave21-game-core-bridge.test.ts",
+        "tests/unit/burn-wave3-games-ui.test.ts",
+        "tests/unit/burn-wave48-juggle-board-controls-rotate-flip.test.ts",
+        "tests/unit/burn-wave5-secondary-ui.test.ts",
+        "tests/unit/burn-wave7-secondary-ui.test.ts",
+        "tests/unit/burn-wave8-secondary-ui.test.ts",
+        "tests/unit/burn-wave9-secondary-ui.test.ts",
+        "tests/unit/finish-roving-juggle-ramrod-fab.test.ts",
+        "tests/unit/juggle-ai-input-guard.test.ts",
+        "tests/unit/overnight-wave52-handshake-calla-juggle-ramrod-mounts.test.ts",
+        "tests/unit/overnight-wave55-handshake-demos-juggle-ramrod.test.ts",
+        "tests/unit/overnight-wave55-juggle-controls-mono-no-rotate.test.ts",
+        "tests/unit/overnight-wave55-juggle-hover-leave.test.ts",
+        "tests/unit/overnight-wave55-juggle-occupied-aria-owner.test.ts",
+        "tests/unit/overnight-wave55-juggle-placing-click-enter.test.ts",
+        "tests/unit/overnight-wave55-juggle-placing-space.test.ts",
+        "tests/unit/overnight-wave56-handshake-calla-juggle-ramrod.test.ts",
+        "tests/unit/overnight-wave56-juggle-controls-rotate-flip.test.ts",
+        "tests/unit/overnight-wave56-juggle-shape-header-tromino.test.ts",
+        "tests/unit/overnight-wave58-handshake-calla-juggle-ramrod.test.ts",
+        "tests/unit/overnight-wave58-juggle-empty-aria-i9.test.ts",
+        "tests/unit/overnight-wave58-juggle-shape-headers-all-cats.test.ts"
+      ],
+      "availableMutants": 155,
+      "ranMutants": 20,
+      "killed": 9,
+      "survived": 11,
+      "timeout": 0,
+      "error": 0,
+      "score": 45,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "UnaryNot",
+          "line": 46,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "BooleanLiteral",
+          "line": 75,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 112,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 113,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "BooleanLiteral",
+          "line": 120,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "Arithmetic",
+          "line": 132,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "Arithmetic",
+          "line": 132,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 132,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 132,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Logical",
+          "line": 134,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Logical",
+          "line": 134,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/games/fiar/board-ui.ts",
+      "lines": 529,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r4-fiar-layout-board.test.ts",
+        "tests/unit/burn-wave49-handshake-board-ui-names-cross.test.ts",
+        "tests/unit/burn-wave49-handshake-inject-ids-matrix.test.ts",
+        "tests/unit/burn-wave49-handshake-render-opening-mounts.test.ts",
+        "tests/unit/overnight-wave49-handshake-inject-idempotent.test.ts",
+        "tests/unit/overnight-wave51-fiar-render-valid-fill.test.ts",
+        "tests/unit/overnight-wave52-fiar-render-chip-fill-stroke.test.ts",
+        "tests/unit/overnight-wave52-fiar-render-viewbox-padding.test.ts",
+        "tests/unit/overnight-wave54-fiar-inject-styles-chips-glow.test.ts",
+        "tests/unit/overnight-wave56-fiar-inject-status-font-empty-node.test.ts",
+        "tests/unit/overnight-wave57-fiar-render-pulse-radius-plus4.test.ts",
+        "tests/unit/overnight-wave57-fiar-render-valid-stroke-width-3.test.ts",
+        "tests/unit/overnight-wave58-fiar-inject-seat-vars-banner-radius.test.ts",
+        "tests/unit/overnight-wave58-handshake-fab-fiar-inject-chrome.test.ts",
+        "tests/unit/overnight-wave59-handshake-fab-fiar-inject-chrome.test.ts",
+        "tests/unit/burn-1008-registry-module-contract.test.ts",
+        "tests/unit/burn-wave10-secondary-ui.test.ts",
+        "tests/unit/burn-wave11-secondary-ui.test.ts",
+        "tests/unit/burn-wave13-secondary-ui.test.ts",
+        "tests/unit/burn-wave4-games-ui.test.ts",
+        "tests/unit/burn-wave8-secondary-ui.test.ts",
+        "tests/unit/burn-wave9-secondary-ui.test.ts",
+        "tests/unit/fiar-ai-seat-aria-guard.test.ts",
+        "tests/unit/fiar-aria-selectable-movement.test.ts",
+        "tests/unit/fiar-paths.test.ts",
+        "tests/unit/finish-roving-fiar-queens.test.ts",
+        "tests/unit/overnight-wave49-fiar-data-node-id-exact.test.ts",
+        "tests/unit/overnight-wave49-fiar-node-count-25.test.ts",
+        "tests/unit/overnight-wave49-fiar-pulse-highlight-selectable.test.ts",
+        "tests/unit/overnight-wave49-fiar-selected-stroke.test.ts",
+        "tests/unit/overnight-wave51-fiar-blocked-path-stroke.test.ts",
+        "tests/unit/overnight-wave51-fiar-handshake-gold-vs-blocked.test.ts",
+        "tests/unit/overnight-wave51-fiar-winning-path-gold-stroke.test.ts",
+        "tests/unit/overnight-wave51-handshake-remainder-sum-fiar-leftovers.test.ts",
+        "tests/unit/overnight-wave52-fiar-pulse-dasharray-exact.test.ts"
+      ],
+      "availableMutants": 92,
+      "ranMutants": 20,
+      "killed": 18,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 90,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m19",
+          "kind": "Arithmetic",
+          "line": 92,
+          "description": "flip - → +",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Arithmetic",
+          "line": 93,
+          "description": "flip - → +",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/games/kwatro-sinko/board-ui.ts",
+      "lines": 560,
+      "tests": [
+        "tests/unit/burn-wave49-handshake-board-ui-names-cross.test.ts",
+        "tests/unit/burn-wave49-handshake-inject-ids-matrix.test.ts",
+        "tests/unit/burn-wave49-handshake-render-opening-mounts.test.ts",
+        "tests/unit/burn-wave49-kwatro-board-ui-blue-red.test.ts",
+        "tests/unit/burn-wave49-kwatro-inject-styles-idempotent.test.ts",
+        "tests/unit/burn-wave49-kwatro-render-board-opening.test.ts",
+        "tests/unit/burn-wave49-kwatro-render-chip-info.test.ts",
+        "tests/unit/burn-wave49-kwatro-render-history-recent-moves.test.ts",
+        "tests/unit/burn-wave49-kwatro-render-move-history-empty.test.ts",
+        "tests/unit/burn-wave49-kwatro-render-selected-valid-moves.test.ts",
+        "tests/unit/overnight-wave51-handshake-inject-ids.test.ts",
+        "tests/unit/overnight-wave51-kwatro-render-chip-value-label.test.ts",
+        "tests/unit/overnight-wave51-kwatro-render-edge-line-count.test.ts",
+        "tests/unit/overnight-wave51-kwatro-render-selected-chip-stroke.test.ts",
+        "tests/unit/overnight-wave51-kwatro-render-valid-node-fill.test.ts",
+        "tests/unit/overnight-wave51-kwatro-render-winning-gold-stroke.test.ts",
+        "tests/unit/overnight-wave55-kwatro-chip-info-even-odd.test.ts",
+        "tests/unit/overnight-wave55-kwatro-inject-glow-viewbox-stroke.test.ts",
+        "tests/unit/overnight-wave56-kwatro-inject-btn-primary.test.ts",
+        "tests/unit/overnight-wave57-kwatro-inject-board-bg-chip-hover.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-board-shadow-gradient-stop.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-btn-primary-gradient-hover.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-btn-secondary-fill-hover.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-chip-hover-scale-brightness.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-chip-info-seat-vars.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-history-target-chrome.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-status-type-seat-vars.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-valid-node-hover-fill.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-winner-gradient-glow-body.test.ts",
+        "tests/unit/overnight-wave60-kwatro-inject-winning-expr-chrome.test.ts",
+        "tests/unit/overnight-wave63-kwatro-inject-banner-size-anim.test.ts",
+        "tests/unit/overnight-wave63-kwatro-inject-board-pad-radius.test.ts",
+        "tests/unit/overnight-wave63-kwatro-inject-btn-pad-radius.test.ts",
+        "tests/unit/overnight-wave63-kwatro-inject-chip-info-gap-pad.test.ts",
+        "tests/unit/overnight-wave63-kwatro-inject-chip-transition.test.ts"
+      ],
+      "availableMutants": 42,
+      "ranMutants": 20,
+      "killed": 7,
+      "survived": 13,
+      "timeout": 0,
+      "error": 0,
+      "score": 35,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 22,
+          "description": "22 → 23",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 22,
+          "description": "22 → 21",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 23,
+          "description": "18 → 19",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 23,
+          "description": "18 → 17",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 36,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "Logical",
+          "line": 51,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 59,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 113,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 113,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 114,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 114,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "Logical",
+          "line": 151,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "UnaryNot",
+          "line": 151,
+          "description": "remove !",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
