@@ -425,7 +425,11 @@ export function __placeSelectedForTests(): boolean {
       if (spots.length) {
         // Prefer top-left for denser packing under e2e softlock pressure.
         spots.sort((a, b) => a.row - b.row || a.col - b.col);
-        gameState = placeShape(gameState, spots[0]!);
+        const spot = spots[0];
+        if (!spot) {
+          continue;
+        }
+        gameState = placeShape(gameState, spot);
         updateUI();
         return true;
       }
