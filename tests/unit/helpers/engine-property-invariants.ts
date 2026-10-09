@@ -21,7 +21,7 @@
 import { mulberry32, pick } from '../engine-invariants-helpers';
 import { serializeState } from '../undo-audit-helpers';
 import {
-  withSeededMathRandom,
+  withSeededRandom,
   createRng,
   pickOne,
 } from './state-roundtrip';
@@ -97,7 +97,7 @@ export function runPropertyPlayout(
   const legalSampleCap = opts?.legalSampleCap ?? LEGAL_SAMPLE_CAP;
   const rng = createRng(playSeed);
 
-  const initial = withSeededMathRandom(playSeed, () => adapter.create());
+  const initial = withSeededRandom(playSeed, () => adapter.create());
   const snapshots: unknown[] = [adapter.normalize(initial)];
   const applied: unknown[] = [];
   let state = initial;
@@ -126,7 +126,7 @@ export function runPropertyPlayout(
 
     const choice = pickOne(rng, legal);
     const seatBefore = extractSeat(state);
-    const next = withSeededMathRandom(playSeed + ply + 1, () =>
+    const next = withSeededRandom(playSeed + ply + 1, () =>
       adapter.apply(state, choice)
     );
 
@@ -316,7 +316,7 @@ function assertUndoPrefixReplay(
   if (applied.length === 0) return;
 
   // Rebuild from the same seeded create, replaying the prefix.
-  const start = withSeededMathRandom(playSeed, () => adapter.create());
+  const start = withSeededRandom(playSeed, () => adapter.create());
   if (fingerprint(adapter.normalize(start)) !== fingerprint(snapshots[0])) {
     throw new Error(
       `${adapter.id}: seeded create not reproducible for undo baseline`
@@ -325,7 +325,7 @@ function assertUndoPrefixReplay(
 
   let rebuilt = start;
   for (let i = 0; i < applied.length; i++) {
-    rebuilt = withSeededMathRandom(playSeed + i + 1, () =>
+    rebuilt = withSeededRandom(playSeed + i + 1, () =>
       adapter.apply(rebuilt, applied[i])
     );
     if (
@@ -341,9 +341,9 @@ function assertUndoPrefixReplay(
   // Random undo depth: replay only the first `keep` moves.
   const rng = mulberry32(playSeed ^ 0x9e3779b9);
   const keep = Math.floor(rng() * (applied.length + 1));
-  let undone = withSeededMathRandom(playSeed, () => adapter.create());
+  let undone = withSeededRandom(playSeed, () => adapter.create());
   for (let i = 0; i < keep; i++) {
-    undone = withSeededMathRandom(playSeed + i + 1, () =>
+    undone = withSeededRandom(playSeed + i + 1, () =>
       adapter.apply(undone, applied[i])
     );
   }
@@ -364,14 +364,14 @@ export function assertHexStrictAlternation(
 ): void {
   if (adapter.id !== 'hex') return;
   const rng = createRng(playSeed);
-  let state = withSeededMathRandom(playSeed, () => adapter.create());
+  let state = withSeededRandom(playSeed, () => adapter.create());
   for (let ply = 0; ply < maxPlies; ply++) {
     if (adapter.isOver(state)) break;
     const legal = adapter.legalMoves(state);
     if (legal.length === 0) break;
     const before = extractSeat(state);
     const choice = pick(rng, legal);
-    state = withSeededMathRandom(playSeed + ply + 1, () =>
+    state = withSeededRandom(playSeed + ply + 1, () =>
       adapter.apply(state, choice)
     );
     if (adapter.isOver(state)) break;

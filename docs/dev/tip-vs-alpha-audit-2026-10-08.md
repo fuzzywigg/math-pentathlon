@@ -1828,9 +1828,9 @@ Grouped; each path was classified `OK` after rule checks (docs/tests/type-only/a
 - `src/core/graph/algorithms.ts` (M)
 - `src/core/graph/graph-ui.ts` (M)
 - `src/core/graph/types.ts` (M)
-- `src/core/hex/coordinates.ts` (M)
-- `src/core/hex/hex-ui.ts` (M)
-- `src/core/hex/types.ts` (M)
+- `src/core/hex/coordinates.ts (absent on tip)` (M) — quarantined to `tests/helpers/core-hex/coordinates.ts`
+- `src/core/hex/hex-ui.ts (absent on tip)` (M) — quarantined to `tests/helpers/core-hex/hex-ui.ts`
+- `src/core/hex/types.ts (absent on tip)` (M) — quarantined to `tests/helpers/core-hex/types.ts`
 - `src/core/owl/ollie-inspect-map.ts` (M)
 - `src/core/owl/owl-messages.ts` (M)
 - `src/core/owl/owl-system.ts` (M)

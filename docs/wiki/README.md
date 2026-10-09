@@ -12,6 +12,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 | [Architecture](./architecture.md) | Mermaid map + live screenshots of shell/routes |
 | [injectStyles / board CSS (`q-mp-122`)](../dev/engines/inject-styles-board-css.md) | Contributor ownership map: inject vs `game-play.css` |
 | [Games](./games.md) | The 20 registered games by division |
+| [Game visuals gallery](./game-visuals.md) | iPad start/mid embeds from `docs/visuals/2026-10/` |
 | [Game registry](./game-registry.md) | `GameInfo` shape, divisions, menu/route wiring |
 | [How to add a game](./adding-a-game.md) | Module, registry, mount, and test checklist |
 | [Big Toads](./big-toads.md) | Shared core systems under `src/core/` |
@@ -22,7 +23,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 
 ## Screenshots in this wiki
 
-Captured from the running Vite app (`npm run dev`) on the docs tip. Files live under [`images/`](./images/).
+Captured from the running Vite app (`npm run dev`) on the docs tip. Shell/route files live under [`images/`](./images/). Per-game iPad start/mid shots are embedded on [Game visuals gallery](./game-visuals.md) from [`docs/visuals/2026-10/`](../visuals/2026-10/).
 
 | Image | Surface |
 | ----- | ------- |
@@ -31,6 +32,7 @@ Captured from the running Vite app (`npm run dev`) on the docs tip. Files live u
 | `hex-new-game-modal.png` | New Game dialog (axe surface) |
 | `kings-board.png` | Kings & Quadraphages board chrome |
 | `stats-progress.png` | `/#/stats` progress dashboard |
+| `docs/visuals/2026-10/*-start.png` / `*-mid.png` | All 20 games (iPad Pro 11); see [gallery](./game-visuals.md) |
 
 ## Conventions
 
