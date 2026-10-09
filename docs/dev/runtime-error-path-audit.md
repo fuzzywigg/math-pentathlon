@@ -63,7 +63,7 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | R-IMP-04 | `bootstrap-owl.ts:37-44` | Owl chunk import / init rejects | **UNRECOVERED** on menu; can false-trigger game boundary | shell / one game | CURRENT unhandled pin + skip expected catch |
 | R-SW-01 | `bootstrap.ts:40-42` → `register.ts:57` | `registerSW(...)` throws | **UNRECOVERED** throw from idle callback | shell (offline degrade) | CURRENT throw pin + skip expected guard |
 | R-SW-02 | `register.ts:51-52` | SW unsupported / disabled | **soft-fail** — `{}` | shell | `pwa-register.test.ts` |
-| R-SW-03 | `register.ts:74` | `registration.update()` rejects | **soft-fail** — `void` no catch | shell | CURRENT pin + skip expected swallow |
+| R-SW-03 | `register.ts:74` | `registration.update()` rejects | **soft-fail** — `Promise.resolve(...).catch` + log | shell | fixed pin in audit suite + `pwa-register.test.ts` |
 | R-FETCH-01 | App `src/` | Direct `fetch()` of game assets | None — Workbox owns cache | — | SKIP (#479 offline soft-nav) |
 
 ### 4. Mount / destroy / menu remount
@@ -106,7 +106,7 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | ~~**P2**~~ | ~~R-IMP-04~~ | **Done in #568** — `bootstrapOwl` try/catch + `console.error` |
 | ~~**P2**~~ | ~~R-SHELL-04, R-EVT-03~~ | **Done in q-mp-107** — `renderHome` installs shared route error boundary (reuse crash UI strings) |
 | ~~**P2**~~ | ~~R-SW-01~~ | **Done in #568** — `registerPwa` guards `registerSW` throw (soft-fail + log) |
-| **P3** | R-SW-03 | Swallow/log `registration.update()` rejection |
+| ~~**P2/P3**~~ | ~~R-SW-03~~ | **Done in q-mp-109** — `Promise.resolve(registration.update()).catch` + `console.error` |
 | **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |
 | **P3** | R-JSON-04 | Harden `gameStateFromJSON` if ever bound to UI |
 

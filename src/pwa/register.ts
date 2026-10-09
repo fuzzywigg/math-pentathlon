@@ -74,7 +74,10 @@ export function registerPwa(
         }
         const hourMs = 60 * 60 * 1000;
         updateCheckInterval = window.setInterval(() => {
-          void registration.update();
+          // Soft-fail: update() rejection must not surface as unhandledrejection.
+          void Promise.resolve(registration.update()).catch((err: unknown) => {
+            console.error('[pwa] service worker update check failed', err);
+          });
         }, hourMs);
       },
     });

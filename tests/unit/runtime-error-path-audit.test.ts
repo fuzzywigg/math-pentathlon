@@ -177,12 +177,6 @@ describe('runtime-error-path-audit — remaining unrecovered pins', () => {
     vi.restoreAllMocks();
   });
 
-  it('R-SW-03 CURRENT: registration.update is fire-and-forget (void, no catch)', () => {
-    const src = readSrc('src/pwa/register.ts');
-    expect(src).toMatch(/void registration\.update\(\)/);
-    expect(src).not.toMatch(/registration\.update\(\)\.catch/);
-  });
-
   it('P3 R-SHELL-01: missing #app soft-fails with console diagnostic (no hard throw)', () => {
     const src = readSrc('src/main.ts');
     expect(src).toContain("getElementById('app')");
@@ -393,6 +387,61 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
     errSpy.mockRestore();
   });
 
+  it('P2 R-SW-03: registration.update() rejection is swallowed (no unhandledrejection)', async () => {
+    const src = readSrc('src/pwa/register.ts');
+    expect(src).toMatch(
+      /Promise\.resolve\(registration\.update\(\)\)\.catch/
+    );
+    expect(src).toContain(
+      "console.error('[pwa] service worker update check failed'"
+    );
+
+    vi.useFakeTimers();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandled);
+
+    const update = vi.fn(() => Promise.reject(new Error('update failed')));
+    const registration = { update } as unknown as ServiceWorkerRegistration;
+    let onRegisteredSW:
+      | ((_url: string, reg?: ServiceWorkerRegistration) => void)
+      | undefined;
+    const registerSW = vi.fn(
+      (opts: {
+        onRegisteredSW?: (
+          url: string,
+          reg?: ServiceWorkerRegistration
+        ) => void;
+      }) => {
+        onRegisteredSW = opts.onRegisteredSW;
+        return vi.fn();
+      }
+    );
+
+    registerPwa({ enabled: true, registerSW, reload: vi.fn() });
+    onRegisteredSW?.('/sw.js', registration);
+
+    const tick = vi.advanceTimersByTimeAsync(60 * 60 * 1000);
+    await tick;
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(update).toHaveBeenCalledOnce();
+    expect(
+      errSpy.mock.calls.some((c) =>
+        String(c[0]).includes('[pwa] service worker update check failed')
+      )
+    ).toBe(true);
+    expect(unhandled).toHaveLength(0);
+
+    process.off('unhandledRejection', onUnhandled);
+    errSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
   it('P2 R-SHELL-04 / R-EVT-03: home/menu installs same crash boundary as game routes', () => {
     const src = readSrc('src/main.ts');
     // renderHome binds the shared route boundary before the selector mounts.
@@ -440,11 +489,6 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
 });
 
 describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it.skip('TODO(runtime-error-path P3 R-SW-03): registration.update() rejection should be swallowed/logged', () => {
-    // Expected: void registration.update().catch(...) or equivalent.
-    expect(true).toBe(false);
-  });
-
   it.skip('TODO(runtime-error-path P3 R-JSON-04): gameStateFromJSON should soft-fail if ever bound to UI', () => {
     // Dormant thrower today (tests only). Harden before wiring to player UI.
     expect(true).toBe(false);

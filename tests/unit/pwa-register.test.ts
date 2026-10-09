@@ -49,4 +49,49 @@ describe('registerPwa', () => {
 
     expect(reload).toHaveBeenCalledOnce();
   });
+
+  it('swallows registration.update() rejection without unhandledrejection', async () => {
+    vi.useFakeTimers();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandled);
+
+    const update = vi.fn(() => Promise.reject(new Error('offline update')));
+    const registration = { update } as unknown as ServiceWorkerRegistration;
+    let onRegisteredSW:
+      | ((_url: string, reg?: ServiceWorkerRegistration) => void)
+      | undefined;
+    const registerSW = vi.fn(
+      (opts: {
+        onRegisteredSW?: (
+          url: string,
+          reg?: ServiceWorkerRegistration
+        ) => void;
+      }) => {
+        onRegisteredSW = opts.onRegisteredSW;
+        return vi.fn();
+      }
+    );
+
+    registerPwa({ enabled: true, registerSW, reload: vi.fn() });
+    onRegisteredSW?.('/sw.js', registration);
+    await vi.advanceTimersByTimeAsync(60 * 60 * 1000);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(update).toHaveBeenCalledOnce();
+    expect(
+      errSpy.mock.calls.some((c) =>
+        String(c[0]).includes('[pwa] service worker update check failed')
+      )
+    ).toBe(true);
+    expect(unhandled).toHaveLength(0);
+
+    process.off('unhandledRejection', onUnhandled);
+    errSpy.mockRestore();
+    vi.useRealTimers();
+  });
 });
