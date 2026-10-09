@@ -10,6 +10,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 |------|----------|
 | [Overview](./overview.md) | What the product is |
 | [Architecture](./architecture.md) | Mermaid map + live screenshots of shell/routes |
+| [injectStyles / board CSS (`q-mp-122`)](../dev/engines/inject-styles-board-css.md) | Contributor ownership map: inject vs `game-play.css` |
 | [Games](./games.md) | The 20 registered games by division |
 | [Game registry](./game-registry.md) | `GameInfo` shape, divisions, menu/route wiring |
 | [How to add a game](./adding-a-game.md) | Module, registry, mount, and test checklist |
