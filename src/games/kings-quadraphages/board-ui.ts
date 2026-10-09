@@ -68,8 +68,7 @@ export function handleCellClick(
     ) {
       // If King is already selected and we click it again, deselect
       if (
-        state.selectedKingPosition &&
-        state.selectedKingPosition.row === row &&
+        state.selectedKingPosition?.row === row &&
         state.selectedKingPosition.col === col
       ) {
         return {
@@ -171,8 +170,7 @@ function syncKingsCell(
   }
 
   if (
-    state.selectedKingPosition &&
-    state.selectedKingPosition.row === row &&
+    state.selectedKingPosition?.row === row &&
     state.selectedKingPosition.col === col
   ) {
     cell.classList.add('cell-selected');

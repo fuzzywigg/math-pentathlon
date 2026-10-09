@@ -21,7 +21,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 229 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
 | 95 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`) |
-| 35 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps |
+| 21 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`) |
 | 23 | `no-param-reassign` | Surprising mutation of caller state |
 | 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
 | 14 | `default-case` | Switches without `default` |
@@ -42,3 +42,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 **`@typescript-eslint/no-non-null-assertion`** — highest-signal off rule with real crash risk; ceiling **387** (= today's count). No source fixes in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
 
 Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
+
+## q-mp-148 — `@typescript-eslint/prefer-optional-chain`
+
+Live tip probe: **35** hits. Cleared **14** non-HOLD sites (board-ui / game-state / types / main / board-a11y / `src/ui/three/**` only; identical boolean/`?.` semantics). Residual ceiling **21** — HOLD only in `*/rules.ts` and `*/ai.ts` (contig-60, fab-a-diffy, fiar, kings-quadraphages, kwatro-sinko, prime-gold, queens-guards, ramrod). Live `eslint.config.js` does **not** hard-enable the rule (count-down via `npm run lint:ratchet`).

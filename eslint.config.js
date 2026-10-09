@@ -9,7 +9,8 @@ import prettierConfig from 'eslint-config-prettier';
  *   no-unused-vars (underscore ignore for args/vars/caught errors).
  * - Ceiling (report-only / count-down) via `npm run lint:ratchet`
  *   (see scripts/check-lint-ratchet.mjs + docs/dev/lint-ratchet-ceilings.json):
- *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset).
+ *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset);
+ *   @typescript-eslint/prefer-optional-chain (live unset; q-mp-148).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */

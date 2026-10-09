@@ -102,7 +102,7 @@ export function getKingPosition(
     for (let col = 0; col < BOARD_SIZE; col++) {
       // ratchet: dense BOARD_SIZE×BOARD_SIZE board.
       const cell = state.board[row]![col];
-      if (cell && cell.type === 'king' && cell.owner === player) {
+      if (cell?.type === 'king' && cell.owner === player) {
         return toPosition({ row, col });
       }
     }

@@ -490,7 +490,7 @@ export async function createPrimeGoldBoard3D(
         tileMat = mats.tileVein1;
       } else if (veinOwner === 'player2') {
         tileMat = mats.tileVein2;
-      } else if (last && last.row === cm.row && last.col === cm.col) {
+      } else if (last?.row === cm.row && last.col === cm.col) {
         tileMat = mats.tileLast;
       }
 
@@ -537,7 +537,7 @@ export async function createPrimeGoldBoard3D(
   const syncChips = (state: PrimeGoldState): void => {
     for (const cm of cells) {
       const cell = state.cells.get(`${cm.row},${cm.col}`);
-      if (!cell || !cell.owner) {
+      if (!cell?.owner) {
         clearChip(cm);
         continue;
       }
