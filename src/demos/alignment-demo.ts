@@ -107,7 +107,9 @@ function renderFourInRowDemo(container: HTMLElement): void {
           cell.textContent = value.toString();
         }
 
-        cell.addEventListener('click', () => handleClick(col));
+        cell.addEventListener('click', () => {
+          handleClick(col);
+        });
         boardEl.appendChild(cell);
       }
     }
@@ -246,7 +248,9 @@ function renderHexConnectDemo(container: HTMLElement): void {
           cell.classList.add('cell-red');
         }
 
-        cell.addEventListener('click', () => handleClick(row, col));
+        cell.addEventListener('click', () => {
+          handleClick(row, col);
+        });
         rowEl.appendChild(cell);
       }
 
@@ -416,7 +420,9 @@ function renderPotentialDemo(container: HTMLElement): void {
           cell.classList.add('selected-cell');
         }
 
-        cell.addEventListener('click', () => handleClick(row, col));
+        cell.addEventListener('click', () => {
+          handleClick(row, col);
+        });
         boardEl.appendChild(cell);
       }
     }

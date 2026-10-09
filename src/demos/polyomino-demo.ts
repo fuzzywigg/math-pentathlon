@@ -1,8 +1,10 @@
 // Polyomino System Demo Page
 // Interactive demo for testing polyomino shapes, rotation, and placement
 
-import type { PolyominoShape, Rotation, Cell } from '../core/polyomino/types';
 import {
+  type PolyominoShape,
+  type Rotation,
+  type Cell,
   TETROMINOES,
   PENTOMINOES,
   SIMPLE_SHAPES,
@@ -15,8 +17,8 @@ import {
   getBoundingBox,
   getTransformedCells,
 } from '../core/polyomino/transform';
-import type { Board } from '../core/polyomino/placement';
 import {
+  type Board,
   createBoard,
   validatePlacement,
   placePolyomino,
@@ -357,7 +359,9 @@ export function renderPolyominoDemo(container: HTMLElement): void {
   // Wire up back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => navigate('/'));
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
   }
 
   // Set up shape set selector
@@ -373,7 +377,9 @@ function setupShapeSetSelector(): void {
 
   setBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      setBtns.forEach((b) => b.classList.remove('selected'));
+      setBtns.forEach((b) => {
+        b.classList.remove('selected');
+      });
       btn.classList.add('selected');
 
       const setName = (btn as HTMLElement).dataset.set;
@@ -495,7 +501,9 @@ function updateSelectedShapeDisplay(): void {
   controlsContainer.appendChild(controls);
 
   // All unique orientations
-  const allOrientations = getAllOrientations(selectedShape);
+  // Narrow once: module-level selectedShape is mutable across forEach callbacks.
+  const shapeForOrientations = selectedShape;
+  const allOrientations = getAllOrientations(shapeForOrientations);
   orientationCount.textContent = `${allOrientations.length} unique orientation(s)`;
 
   clearElement(orientationsGallery);
@@ -529,7 +537,7 @@ function updateSelectedShapeDisplay(): void {
       rect.setAttribute('y', String(y));
       rect.setAttribute('width', String(cellSize - 1));
       rect.setAttribute('height', String(cellSize - 1));
-      rect.setAttribute('fill', selectedShape!.color);
+      rect.setAttribute('fill', shapeForOrientations.color);
       rect.setAttribute('rx', '2');
 
       miniSvg.appendChild(rect);
@@ -608,14 +616,24 @@ function renderBoardSection(): void {
     const cells = svg.querySelectorAll('rect[data-row]');
     cells.forEach((cell) => {
       cell.addEventListener('click', () => {
-        const row = parseInt((cell as SVGElement).dataset.row!, 10);
-        const col = parseInt((cell as SVGElement).dataset.col!, 10);
+        const rowAttr = (cell as SVGElement).dataset.row;
+        const colAttr = (cell as SVGElement).dataset.col;
+        if (rowAttr === undefined || colAttr === undefined) {
+          return;
+        }
+        const row = parseInt(rowAttr, 10);
+        const col = parseInt(colAttr, 10);
         handleBoardClick({ row, col });
       });
 
       cell.addEventListener('mouseenter', () => {
-        const row = parseInt((cell as SVGElement).dataset.row!, 10);
-        const col = parseInt((cell as SVGElement).dataset.col!, 10);
+        const rowAttr = (cell as SVGElement).dataset.row;
+        const colAttr = (cell as SVGElement).dataset.col;
+        if (rowAttr === undefined || colAttr === undefined) {
+          return;
+        }
+        const row = parseInt(rowAttr, 10);
+        const col = parseInt(colAttr, 10);
         hoverCell = { row, col };
         updatePreview();
       });
@@ -641,18 +659,18 @@ function renderBoardSection(): void {
       return;
     }
 
+    // Narrow once: module-level hoverCell is mutable across forEach callbacks.
+    const hover = hoverCell;
+    const shape = selectedShape;
+
     const validation = validatePlacement(
       board,
-      selectedShape,
-      hoverCell,
+      shape,
+      hover,
       currentRotation,
       isFlipped
     );
-    const cells = getTransformedCells(
-      selectedShape,
-      currentRotation,
-      isFlipped
-    );
+    const cells = getTransformedCells(shape, currentRotation, isFlipped);
 
     // Create preview SVG
     const previewSvg = document.createElementNS(
@@ -668,8 +686,8 @@ function renderBoardSection(): void {
     const color = validation.valid ? '#4caf50' : '#f44336';
 
     cells.forEach((cell) => {
-      const x = (hoverCell!.col + cell.col) * 30 + 2;
-      const y = (hoverCell!.row + cell.row) * 30 + 2;
+      const x = (hover.col + cell.col) * 30 + 2;
+      const y = (hover.row + cell.row) * 30 + 2;
 
       const rect = document.createElementNS(
         'http://www.w3.org/2000/svg',

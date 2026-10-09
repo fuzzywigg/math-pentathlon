@@ -16,7 +16,7 @@ import {
   waitForMp3dReady,
 } from './helpers/mp3d';
 import { softWaitVisible } from './helpers/stability';
-import { dismissOwlIfNeeded } from './helpers/page';
+import { dismissOwl } from './helpers/page';
 
 const VIEWPORTS = [
   { name: 'phone', width: 390, height: 844 },
@@ -25,7 +25,7 @@ const VIEWPORTS = [
 ] as const;
 
 async function assertChainAboveFold(page: Page, viewportHeight: number) {
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
   const chain = page.locator('.star-track-chain-area');
   await expect(chain).toBeVisible();
   const box = await chain.boundingBox();
@@ -104,7 +104,7 @@ test.describe('mp3d Star Track 3D board', () => {
       await expect(page.locator('.star-track-board')).toHaveCount(0);
       await expect(page.locator('.star-track-chain-area')).toBeVisible();
       await expect(page.locator('.star-track-a11y-track')).toHaveCount(1);
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
 
       await assertChainAboveFold(page, vp.height);
       const startPath = path.join(outDir, `star-track-3d-start-${vp.name}.png`);

@@ -6,7 +6,7 @@ import { test } from './fixtures';
 import { expect, type Page } from '@playwright/test';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import {
-  dismissOwlIfNeeded,
+  dismissOwl,
   gotoGame,
   isBenignConsoleNoise,
   mountLocator,
@@ -333,7 +333,7 @@ async function playHumanThenAwaitAi(page: Page, gameId: string) {
       break;
     }
     case 'juggle': {
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
       await page.locator('.juggle-roll-btn').click({ force: true });
       const die = page.locator('.juggle-die.selectable').first();
       if (await die.count()) {
@@ -410,7 +410,7 @@ async function playHumanThenAwaitAi(page: Page, gameId: string) {
       break;
     }
     case 'remainder-islands': {
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
       const roll = page
         .locator('.remainder-btn-roll, button:has-text("Roll")')
         .first();

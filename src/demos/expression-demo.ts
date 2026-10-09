@@ -4,11 +4,9 @@
 import { navigate } from '../core/router';
 import { clearElement, setText } from '../core/dom-security';
 
-import type {
-  ExpressionCard,
-  TargetChallenge,
-} from '../core/expressions/types';
 import {
+  type ExpressionCard,
+  type TargetChallenge,
   createNumberCard,
   createOperatorCard,
   createParenCard,
@@ -282,7 +280,9 @@ export function renderExpressionDemo(container: HTMLElement): void {
   // Wire up back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => navigate('/'));
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
   }
 
   // Initialize sections

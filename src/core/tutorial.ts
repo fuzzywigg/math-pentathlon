@@ -60,6 +60,11 @@ interface AvoidRect {
   bottom: number;
 }
 
+interface TooltipBox {
+  width: number;
+  height: number;
+}
+
 // Tutorial state manager
 export class TutorialManager {
   private config: TutorialConfig | null = null;
@@ -72,6 +77,15 @@ export class TutorialManager {
   private tapCueElement: HTMLElement | null = null;
   /** Control that started the tutorial (usually #tutorial-btn) for focus restore. */
   private returnFocusEl: HTMLElement | null = null;
+
+  /**
+   * Cached tooltip border-box after the last sync measure / ResizeObserver.
+   * Invalidated whenever step chrome content is rewritten.
+   */
+  private cachedTooltipW = 0;
+  private cachedTooltipH = 0;
+  private tooltipSizeValid = false;
+  private tooltipSizeObserver: ResizeObserver | null = null;
 
   // Start a tutorial
   start(config: TutorialConfig): void {
@@ -301,6 +315,7 @@ export class TutorialManager {
 
     document.body.appendChild(this.overlayElement);
     document.body.appendChild(this.tooltipElement);
+    this.attachTooltipSizeObserver();
 
     exitBtn.addEventListener('click', () => this.exit());
     prevBtn.addEventListener('click', () => this.prevStep());
@@ -316,6 +331,47 @@ export class TutorialManager {
     document.addEventListener('keydown', this.handleKeyDown);
   }
 
+  /** Sole highlight-target layout-rect measure — funnel forced geometry reads here. */
+  private measureElementRect(el: HTMLElement): DOMRect {
+    return el.getBoundingClientRect();
+  }
+
+  private invalidateTooltipSize(): void {
+    this.tooltipSizeValid = false;
+  }
+
+  private attachTooltipSizeObserver(): void {
+    this.detachTooltipSizeObserver();
+    if (!this.tooltipElement || typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.tooltipSizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) {
+        return;
+      }
+      const box = entry.borderBoxSize?.[0];
+      if (box && (box.inlineSize > 0 || box.blockSize > 0)) {
+        this.cachedTooltipW = box.inlineSize;
+        this.cachedTooltipH = box.blockSize;
+        this.tooltipSizeValid = true;
+        return;
+      }
+      if (entry.contentRect.width > 0 || entry.contentRect.height > 0) {
+        this.cachedTooltipW = entry.contentRect.width;
+        this.cachedTooltipH = entry.contentRect.height;
+        this.tooltipSizeValid = true;
+      }
+    });
+    this.tooltipSizeObserver.observe(this.tooltipElement);
+  }
+
+  private detachTooltipSizeObserver(): void {
+    this.tooltipSizeObserver?.disconnect();
+    this.tooltipSizeObserver = null;
+    this.invalidateTooltipSize();
+  }
+
   private handleKeyDown = (e: KeyboardEvent): void => {
     if (!this.isActive) {
       return;
@@ -328,6 +384,7 @@ export class TutorialManager {
   private removeOverlay(): void {
     document.removeEventListener('keydown', this.handleKeyDown);
     this.clearActionTargetHelpers();
+    this.detachTooltipSizeObserver();
     this.overlayElement?.remove();
     this.tooltipElement?.remove();
     this.overlayElement = null;
@@ -469,6 +526,9 @@ export class TutorialManager {
       '.tutorial-next-btn'
     ) as HTMLButtonElement;
 
+    // Content rewrite invalidates any prior tooltip size cache.
+    this.invalidateTooltipSize();
+
     if (titleEl) {
       titleEl.textContent = step.title;
     }
@@ -514,7 +574,12 @@ export class TutorialManager {
         step.highlightSelector
       ) as HTMLElement;
       if (targetEl && highlightRing) {
-        const rect = targetEl.getBoundingClientRect();
+        // WRITE: park tooltip for absolute measure (no geometry reads yet).
+        this.parkTooltipForAbsolutePosition();
+        // READ BATCH: target rect + tooltip size in one layout pass.
+        const rect = this.measureElementRect(targetEl);
+        const tipBox = this.measureParkedTooltipSize();
+
         const isClickCellAction = step.requiredAction?.type === 'click-cell';
         const padding = isClickCellAction
           ? CLICK_CELL_HIGHLIGHT_PADDING_PX
@@ -525,6 +590,7 @@ export class TutorialManager {
         const width = rect.width + padding * 2;
         const height = rect.height + padding * 2;
 
+        // WRITE BATCH: highlight cutout + tooltip placement (reuse tipBox).
         highlightRing.style.display = 'block';
         highlightRing.style.left = `${left}px`;
         highlightRing.style.top = `${top}px`;
@@ -557,7 +623,8 @@ export class TutorialManager {
         const resolvedSide = this.positionTooltip(
           rect,
           step.position ?? 'bottom',
-          avoidRect
+          avoidRect,
+          tipBox
         );
         if (isClickCellAction) {
           this.placeTapCueOppositeTooltip(
@@ -636,19 +703,20 @@ export class TutorialManager {
   private positionTooltip(
     targetRect: DOMRect,
     position: NonNullable<TutorialStep['position']>,
-    avoidRect?: AvoidRect
+    avoidRect?: AvoidRect,
+    tipBox?: TooltipBox
   ): NonNullable<TutorialStep['position']> {
     if (!this.tooltipElement) {
       return position;
     }
 
     if (position === 'center') {
-      this.positionTooltipCenter();
+      this.positionTooltipCenter(tipBox);
       return 'center';
     }
 
     const margin = 16;
-    const { width, height } = this.prepareTooltipForAbsolutePosition();
+    const { width, height } = tipBox ?? this.parkAndMeasureTooltip();
     const clearRect: AvoidRect = avoidRect ?? {
       left: targetRect.left,
       top: targetRect.top,
@@ -793,13 +861,13 @@ export class TutorialManager {
     );
   }
 
-  private positionTooltipCenter(): void {
+  private positionTooltipCenter(tipBox?: TooltipBox): void {
     if (!this.tooltipElement) {
       return;
     }
 
     const margin = 16;
-    const { width, height } = this.prepareTooltipForAbsolutePosition();
+    const { width, height } = tipBox ?? this.parkAndMeasureTooltip();
     const {
       width: vw,
       height: vh,
@@ -812,15 +880,23 @@ export class TutorialManager {
     this.applyClampedTooltipPosition(left, top, width, height, margin);
   }
 
+  /** Park + measure when the caller did not already batch a tipBox. */
+  private parkAndMeasureTooltip(): TooltipBox {
+    this.parkTooltipForAbsolutePosition();
+    return this.measureParkedTooltipSize();
+  }
+
   /**
    * Clear centering transforms / CSS margin and constrain width so size
    * measurements match the box we will place with left/top.
+   * Style writes only — pair with {@link measureParkedTooltipSize} in a
+   * read batch (or use {@link parkAndMeasureTooltip}).
    */
-  private prepareTooltipForAbsolutePosition(): {
-    width: number;
-    height: number;
-  } {
-    const tooltip = this.tooltipElement!;
+  private parkTooltipForAbsolutePosition(): void {
+    const tooltip = this.tooltipElement;
+    if (!tooltip) {
+      return;
+    }
     const margin = 16;
     const { width: viewportWidth } = this.getViewportMetrics();
     const maxWidth = Math.max(0, viewportWidth - margin * 2);
@@ -835,9 +911,35 @@ export class TutorialManager {
     // Park off-layout briefly so prior left/top/50% do not skew measurement
     tooltip.style.left = '0px';
     tooltip.style.top = '0px';
+  }
+
+  /**
+   * Sole tooltip size measure (offsetWidth / offsetHeight). Prefer the
+   * ResizeObserver cache when still valid after park styles.
+   */
+  private measureParkedTooltipSize(): TooltipBox {
+    const margin = 16;
+    const { width: viewportWidth } = this.getViewportMetrics();
+    const maxWidth = Math.max(0, viewportWidth - margin * 2);
+    const empty: TooltipBox = { width: 0, height: 0 };
+
+    const tooltip = this.tooltipElement;
+    if (!tooltip) {
+      return empty;
+    }
+
+    if (this.tooltipSizeValid && this.cachedTooltipW > 0) {
+      return {
+        width: Math.min(this.cachedTooltipW, maxWidth),
+        height: this.cachedTooltipH,
+      };
+    }
 
     const width = Math.min(tooltip.offsetWidth || maxWidth, maxWidth);
     const height = tooltip.offsetHeight;
+    this.cachedTooltipW = width;
+    this.cachedTooltipH = height;
+    this.tooltipSizeValid = true;
     return { width, height };
   }
 

@@ -283,7 +283,9 @@ export function renderHand(
     const dominoEl = createHandDomino(domino, isSelected, isPlayable);
 
     if (isPlayable) {
-      const activate = () => onDominoClick(domino.id);
+      const activate = () => {
+        onDominoClick(domino.id);
+      };
       dominoEl.addEventListener('click', activate);
       bindCellActivateKeys(dominoEl, activate);
     }

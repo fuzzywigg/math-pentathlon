@@ -194,7 +194,9 @@ export function renderAnswerChoices(
     button.appendChild(createFractionSVG(choice, 'medium'));
 
     if (allowInput) {
-      button.addEventListener('click', () => onSelect(choice));
+      button.addEventListener('click', () => {
+        onSelect(choice);
+      });
     } else {
       button.classList.add('disabled');
       button.disabled = true;

@@ -2,7 +2,7 @@
 
 **Task:** `burn-1008-mp-ai-typeonly-emit-identical`  
 **Base:** `cursor/integration-fold-wave5-tip-4af0` + [#553](https://github.com/fuzzywigg/math-pentathlon/pull/553) trail + [#557](https://github.com/fuzzywigg/math-pentathlon/pull/557) Batch 6 (ceiling **220** AI-only)  
-**Policy:** Type annotations / type-only imports / interfaces / generics / `!` / `as` / `satisfies` only. **Emitted JavaScript must be byte-for-byte identical** (proved by `scripts/check-emit-identity.mjs`). No `??` / `?.` / defaults / guards / reordering / new runtime variables. No search depth/time budget, scoring, difficulty, timing, or RNG changes. Hex Hard assert stays **450ms**. No Stars & Bars history cap.
+**Policy:** Type annotations / type-only imports / interfaces / generics / `!` / `as` / `satisfies` only. **Emitted JavaScript must be byte-for-byte identical** (proved by `npm run check:emit-identity` → `scripts/check-emit-identity.mjs`). No `??` / `?.` / defaults / guards / reordering / new runtime variables. No search depth/time budget, scoring, difficulty, timing, or RNG changes. Hex Hard assert stays **450ms**. No Stars & Bars history cap.
 
 ## Fold guidance
 
@@ -75,7 +75,7 @@ git diff --name-only c383a5de747a88c081b2622d051f203301343340 -- 'src/games/**/a
   | sort -u > /tmp/touched-ai.txt
 echo 'src/games/queens-guards/ai.worker.ts' >> /tmp/touched-ai.txt
 sort -u /tmp/touched-ai.txt -o /tmp/touched-ai.txt
-node scripts/check-emit-identity.mjs \
+npm run check:emit-identity -- \
   --base c383a5de747a88c081b2622d051f203301343340 \
   --files-from /tmp/touched-ai.txt
 ```
@@ -119,7 +119,9 @@ check-emit-identity
 All 28 file(s) emit-identical.
 ```
 
-Checker: [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) (esbuild transpile at two git refs with repo `target` / `useDefineForClassFields`; raw byte compare). Unit coverage: `tests/unit/check-emit-identity.test.ts`.
+Checker: `npm run check:emit-identity` → [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) (esbuild transpile at two git refs with repo `target` / `useDefineForClassFields`; raw byte compare). Unit coverage: `tests/unit/check-emit-identity.test.ts`.
+
+**Knip note:** the checker imports `esbuild`, which is present only as a Vite transitive (`vite` → `esbuild`) and is **not** declared in `package.json` `devDependencies`. Knip therefore reports it under `unlisted` (stable count **3** with the two offline-probe `playwright` hits). That is intentional — do not add `esbuild` to `knip.json` `ignoreDependencies` or promote knip enforce without tip-owner approval. Details: [`knip-report.md`](./knip-report.md#unlisted-script-dependencies-owners).
 
 ## Deferred (would change emitted JS)
 

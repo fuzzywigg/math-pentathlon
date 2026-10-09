@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-254 unusedTypes demote batch 2 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post748` after Rank-3-only demotes (skip AI / `rules.ts`): deleted unused `RollCallback` / `DieSelectCallback`; module-privated `DiceSelectorOptions`, `WebStorageKind`, `SafeWriteResult`, `SafeReadResult`. Kept `SafeJsonParseResult` exported (documented mirror surface). Baseline `unusedTypes` **89 → 83** (−6). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#752` duplicates already on tip) at fold.
+
 ## q-mp-170 tip re-measure (2026-10-09)
 
 Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evidence expected `unusedTypes` **95→96 (+1)**; live knip reported **91** (shrink vs prior baseline 95). No growth WARNING on tip. No AI public-surface type deleted (screening: report/hygiene only).
@@ -43,21 +47,22 @@ Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evid
 
 ## Unlisted script dependencies (owners)
 
-Knip flags packages imported by entry scripts that are not declared in `package.json` `dependencies` / `devDependencies`. Counts are stable at **3**; do not raise the baseline.
+Knip flags packages imported by entry scripts that are not declared in `package.json` `dependencies` / `devDependencies`. Counts are stable at **3**; do not raise the baseline. Re-measured on tip `cursor/mp-tip-post728` @ `a8a87187` (`q-mp-229`): still **3** (`esbuild` ×1 + `playwright` ×2). Left intentional — no `knip.json` allowlist / `ignoreDependencies` change (avoids fighting baseline editors; enforce stays `false`).
 
 | Package | Script(s) | Owner / disposition |
 | --- | --- | --- |
-| `esbuild` | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`). Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
+| `esbuild` | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) via `npm run check:emit-identity` | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`); resolved from `node_modules` without a direct `devDependency`. Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
 | `playwright` | [`scripts/probe-offline-resilience.mjs`](../../scripts/probe-offline-resilience.mjs), [`scripts/probe-offline-resilience-dev.mjs`](../../scripts/probe-offline-resilience-dev.mjs) | **Offline-resilience probe** (`docs/offline-resilience-2026-10-07.md`). Repo ships `@playwright/test` / `@axe-core/playwright`, not the bare `playwright` package name. Optional later: import from `@playwright/test`, or add `playwright` as a `devDependency`. |
 
 ## Duplicate export pairs (owners)
 
-Knip reports **2** alias pairs (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
+Knip reports **1** alias pair (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
 
 | Pair | Module | Owner / disposition |
 | --- | --- | --- |
-| `dismissOwl` / `dismissOwlIfNeeded` | [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) | **e2e Owl helpers** — draft [`q-mp-166` #691](https://github.com/fuzzywigg/math-pentathlon/pull/691) consolidates callers onto the shared helper; alias may remain for call-site compatibility. |
-| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). |
+| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). Remaining after `q-mp-228`. |
+
+Cleared in `q-mp-228`: `dismissOwl` / `dismissOwlIfNeeded` in [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) — callers migrated to canonical `dismissOwl` (narrows unfinished residue of `q-mp-166` / #691).
 
 Cleared in `q-mp-188`: `withSeededRandom` / `withSeededMathRandom` in [`tests/helpers/rng.ts`](../../tests/helpers/rng.ts) — callers migrated to canonical `withSeededRandom`.
 

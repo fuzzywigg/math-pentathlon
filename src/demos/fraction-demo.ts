@@ -1,8 +1,11 @@
 // Fraction System Demo Page
 // Interactive demo for testing fraction arithmetic and visualization
 
-import type { Fraction } from '../core/fractions/types';
-import { COMMON_FRACTIONS, FRACTION_COLORS } from '../core/fractions/types';
+import {
+  type Fraction,
+  COMMON_FRACTIONS,
+  FRACTION_COLORS,
+} from '../core/fractions/types';
 import {
   simplify,
   toDecimal,
@@ -441,7 +444,9 @@ export function renderFractionDemo(container: HTMLElement): void {
   // Wire up back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => navigate('/'));
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
   }
 
   // Render visual fraction bars
@@ -525,7 +530,9 @@ function setupArithmeticCalculator(): void {
 
   opBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      opBtns.forEach((b) => b.classList.remove('selected'));
+      opBtns.forEach((b) => {
+        b.classList.remove('selected');
+      });
       btn.classList.add('selected');
       currentOp = (btn as HTMLElement).dataset.op as typeof currentOp;
     });

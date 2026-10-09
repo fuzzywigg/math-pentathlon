@@ -7,8 +7,7 @@ import type {
   Rotation,
   PolyominoRenderConfig,
 } from './types';
-import type { Board } from './placement';
-import { validatePlacement } from './placement';
+import { type Board, validatePlacement } from './placement';
 import {
   getTransformedCells,
   getBoundingBox,

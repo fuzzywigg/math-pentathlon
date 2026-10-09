@@ -8,7 +8,7 @@ parent_governance: github.com/fuzzywigg/agents-governance
 - Stack: TypeScript, CSS
 
 ## Purpose
-Math Pentathlon games platform — interactive educational math games and competition tools built with TypeScript. Primary branch is `alpha` (active development). Tip integration branch for stacked agent drafts is `cursor/mp-tip-post728`.
+Math Pentathlon games platform — interactive educational math games and competition tools built with TypeScript. Primary branch is `alpha` (active development). Tip integration branch for stacked agent drafts is `cursor/mp-tip-post748`.
 
 ## Safe Agent Actions
 - Update documentation and game copy
@@ -17,7 +17,7 @@ Math Pentathlon games platform — interactive educational math games and compet
 - Non-breaking dependency updates
 
 ## Draft PR into tip
-- Open **draft** PRs targeting `cursor/mp-tip-post728` (never `alpha` / `main` unless the tip owner asks).
+- Open **draft** PRs targeting `cursor/mp-tip-post748` (never `alpha` / `main` unless the tip owner asks).
 - Do not merge, do not mark ready, do not push to `alpha` / `main` / the tip branch itself.
 - Tip owner folds; PR body ends with: `Next action: fold into tip by the tip owner`.
 - Before starting: read the live tip tree and open draft list so work is not duplicated.
@@ -34,7 +34,7 @@ Script names must match `package.json`. Prefer these over bare `npx tsc` / ad-ho
 Ratchets (`lint:ratchet`, `typecheck:ratchet`, `check:boundaries`) may only go **down**. Do not skip Prettier or ratchets.
 
 ### Local helpers (not blocking CI jobs; script / path must exist)
-- **Emit identity** (type-only / brace-only proofs): `node scripts/check-emit-identity.mjs` (see `docs/dev/ai-typeonly-option.md`). No npm script alias.
+- **Emit identity** (type-only / brace-only proofs): `npm run check:emit-identity` → `node scripts/check-emit-identity.mjs` (see `docs/dev/ai-typeonly-option.md`). Knip `unlisted` for `esbuild` is intentional (Vite transitive); see `docs/dev/knip-report.md`.
 - **Copy pins** (report-only): `npm run check:copy-pins` — prefer structural asserts; do not add new pins on player-facing copy / phase messages (`docs/dev/check-copy-pins.md`).
 - Do **not** add asserts that lock AI search, scoring, difficulty, or move timing. Hex Hard stays **450ms** with real time; no Stars & Bars history cap.
 

@@ -16,7 +16,6 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import {
-  dismissOwlIfNeeded,
   gotoGame,
   startHuman,
   waitForGameReady,

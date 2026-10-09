@@ -185,9 +185,6 @@
   .par55-hand-block.clickable:hover {
     transform: none;
   }
-  .par55-btn-primary:hover {
-    transform: none;
-  }
 }
 
 html[data-reduced-motion='true'] .par55-winner-banner {
@@ -209,16 +206,6 @@ html[data-reduced-motion='true'] .par55-winner-banner {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.par55-btn-primary {
-  background: linear-gradient(135deg, #2196f3, #1976d2);
-  color: white;
-}
-
-.par55-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
 }
 
 .par55-btn-secondary {

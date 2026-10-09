@@ -1,14 +1,14 @@
 import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 // Dice Selector - UI for selecting and combining dice results
 
-import type {
-  DiceConfig,
-  DiceType,
-  DieRoll,
-  RollResult,
-  DiceSet,
+import {
+  type DiceConfig,
+  type DiceType,
+  type DieRoll,
+  type RollResult,
+  type DiceSet,
+  COMMON_DICE_SETS,
 } from './types';
-import { COMMON_DICE_SETS } from './types';
 import {
   rollDice,
   toggleDiceSelection,
@@ -23,7 +23,7 @@ import {
   type AnimateRollCancel,
 } from './dice-ui';
 
-export interface DiceSelectorOptions {
+interface DiceSelectorOptions {
   /** Dice set to use */
   diceSet?: DiceSet;
   /** Custom dice configuration */

@@ -436,7 +436,9 @@ export function renderDice(
           'aria-label',
           `${getCategoryName(category)} die, selectable`
         );
-        const activate = () => onSelectDie(i as 0 | 1);
+        const activate = () => {
+          onSelectDie(i as 0 | 1);
+        };
         die.addEventListener('click', activate);
         bindCellActivateKeys(die, activate);
       } else if (phase === 'selectingShape') {
@@ -517,7 +519,9 @@ export function renderShapeSelector(
       option.setAttribute('role', 'button');
       option.tabIndex = 0;
       option.setAttribute('aria-label', `${shape.name}, selectable`);
-      const activate = () => onSelectShape(shape);
+      const activate = () => {
+        onSelectShape(shape);
+      };
       option.addEventListener('click', activate);
       bindCellActivateKeys(option, activate);
     } else {

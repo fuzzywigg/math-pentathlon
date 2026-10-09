@@ -127,7 +127,9 @@ function renderSumBox(
 
     if (isValid) {
       slotEl.classList.add('valid');
-      const activate = () => onClick(box.id, slot);
+      const activate = () => {
+        onClick(box.id, slot);
+      };
       slotEl.addEventListener('click', activate);
       bindCellActivateKeys(slotEl, activate);
     }
@@ -236,7 +238,9 @@ export function renderPlayerRods(
     }
     if (canSelect || (canDeselect && state.selectedRod === rodId)) {
       wrapper.classList.add('selectable');
-      wrapper.addEventListener('click', () => onRodClick(rodId));
+      wrapper.addEventListener('click', () => {
+        onRodClick(rodId);
+      });
     }
 
     const rodEl = renderRod(rod, true);

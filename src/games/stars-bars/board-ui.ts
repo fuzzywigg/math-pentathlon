@@ -507,7 +507,9 @@ export function renderBoard(
       const isValid = validSet.has(`${row},${col}`);
       if (isValid) {
         cellEl.classList.add('valid');
-        const activate = () => onCellClick(row, col);
+        const activate = () => {
+          onCellClick(row, col);
+        };
         cellEl.addEventListener('click', activate);
         bindCellActivateKeys(cellEl, activate);
 
@@ -656,7 +658,9 @@ export function renderPlayerHand(
     const canSelect =
       allowInput && isCurrentPlayer && state.phase !== 'gameOver';
     if (canSelect) {
-      const activate = () => onCardClick(card.id);
+      const activate = () => {
+        onCardClick(card.id);
+      };
       cardEl.addEventListener('click', activate);
       bindCellActivateKeys(cardEl, activate);
     }

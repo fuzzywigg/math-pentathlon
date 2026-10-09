@@ -520,7 +520,9 @@ export function renderBoard(
 
         if (isValid && expr) {
           cellEl.classList.add('valid');
-          const activate = () => onCellClick(cell.value, expr);
+          const activate = () => {
+            onCellClick(cell.value, expr);
+          };
           cellEl.addEventListener('click', activate);
           bindCellActivateKeys(cellEl, activate);
         }
@@ -684,7 +686,9 @@ export function renderExpressions(
         'aria-label',
         `${value} equals ${expr}${isPrime(value) ? ', prime' : ''}, valid placement`
       );
-      const activate = () => onSelect(value, expr);
+      const activate = () => {
+        onSelect(value, expr);
+      };
       item.addEventListener('click', activate);
       bindCellActivateKeys(item, activate);
       container.appendChild(item);

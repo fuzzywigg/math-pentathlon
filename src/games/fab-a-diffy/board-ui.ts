@@ -174,7 +174,9 @@ function createFractionBarElement(
   // Click handler
   if (isSelectable) {
     wrapper.style.cursor = 'pointer';
-    const activate = () => onClick(bar.id);
+    const activate = () => {
+      onClick(bar.id);
+    };
     wrapper.addEventListener('click', activate);
     bindCellActivateKeys(wrapper, activate);
   }
@@ -314,7 +316,9 @@ function createAnswerBarElement(
   // Click handler
   if (isMatchable && !isClaimed) {
     wrapper.style.cursor = 'pointer';
-    const activate = () => onClick(answer.id);
+    const activate = () => {
+      onClick(answer.id);
+    };
     wrapper.addEventListener('click', activate);
     bindCellActivateKeys(wrapper, activate);
   } else if (!isClaimed) {
@@ -414,7 +418,9 @@ export function renderOperationSelector(
     // Only enable ops that claim at least one answer — avoids a confirmingMove
     // dead-end with no matchable targets (Clear Selection still recovers).
     if (allowInput && result && result.numerator >= 0 && hasMatch) {
-      btn.addEventListener('click', () => onSelect(op));
+      btn.addEventListener('click', () => {
+        onSelect(op);
+      });
     } else {
       btn.disabled = true;
       btn.classList.add('fab-op-disabled');
