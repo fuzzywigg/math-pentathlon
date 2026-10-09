@@ -87,12 +87,16 @@ npm test                    # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:e2e:chromium   # required CI e2e path
 npm run lint
+npm run lint:ratchet        # curly:all ceiling (CI lint job)
 npm run format:check
+npm run typecheck           # tsc --noEmit
+npm run typecheck:ratchet   # ui/core shell + Phase-2 ceiling
+npm run check:boundaries    # engine→UI import-graph ceilings
 npm run build
 npm run preview             # serve dist/ after build
 ```
 
-`npm test` runs `test:unit` then `test:e2e:chromium`. Prefer `test:e2e:chromium` over bare `npm run test:e2e` (the latter runs every Playwright project). The unit suite under `tests/unit` is sized for CI under ~8 minutes (see `docs/wiki/development.md`).
+`npm test` runs `test:unit` then `test:e2e:chromium`. Prefer `test:e2e:chromium` over bare `npm run test:e2e` (the latter runs every Playwright project). Use `npm run typecheck` (not bare `npx tsc`) so local checks match `package.json` and CI. The unit suite under `tests/unit` is sized for CI under ~8 minutes (see `docs/wiki/development.md`).
 
 Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (coverage, visual, mobile, size budgets, perf audits): [docs/wiki/development.md](./docs/wiki/development.md).
 
@@ -105,7 +109,7 @@ Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (cover
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
 - Tests: **3083** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **11361** passed / 19 skipped on tip CI) + **34** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **204** passed on tip CI). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
-- CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
+- CI (`ci.yml`): lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
 - `origin/alpha` is the trunk tip; the integration tip may be ahead of alpha.
 
 ## Agent rules
