@@ -18,7 +18,7 @@ changes (board-ui / sync only).
 Command:
 
 ```bash
-PERF_MODE=render PERF_GAMES=remainder-islands,juggle PERF_MOVES=20 PERF_PHASE=qmp113-verify npm run perf:runtime
+PERF_MODE=render PERF_GAMES=remainder-islands,juggle PERF_MOVES=20 PERF_PHASE=qmp113b-remeasure PERF_RENDER_STEM=q-mp-113b-remeasure npm run perf:runtime
 ```
 
 | Game              | layoutReadsP95 |   Δ vs tip |
@@ -26,8 +26,8 @@ PERF_MODE=render PERF_GAMES=remainder-islands,juggle PERF_MOVES=20 PERF_PHASE=qm
 | remainder-islands |              7 | **−96.5%** |
 | juggle            |             16 | **−82.6%** |
 
-Both meet acceptance (≥30% drop). Move legality unchanged (`npm run test:unit`
-focused + full suites).
+Both meet acceptance (≥30% drop). Re-measured on tip `7d59901c` + this branch
+after curly/nn/tsc fix-up (q-mp-113b). Move legality unchanged (`npm run test:unit`).
 
 ## What changed
 
@@ -59,5 +59,4 @@ focused + full suites).
 
 ## Artifact
 
-Raw phase JSON: agent run `/opt/cursor/artifacts/q-mp-113-verify-report.json`
-(phase `qmp113-verify`).
+Raw phase JSON: `docs/dev/q-mp-113b-remeasure.json` (phase `qmp113b-remeasure`).
