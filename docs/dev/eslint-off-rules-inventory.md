@@ -20,7 +20,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 387 | `@typescript-eslint/no-non-null-assertion` | `!` hides null/undefined; common crash source |
 | 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
-| 95 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`) |
+| 96 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); densest `fraction-bar-ui.ts` 18 |
 | 35 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps |
 | 23 | `no-param-reassign` | Surprising mutation of caller state |
 | 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
@@ -68,8 +68,8 @@ Live `eslint.config.js` does **not** hard-enable `radix`; count-down only via `n
 
 Open-PR overlap for q-mp-129: no open draft already fixes or ratchets `default-case`. Never touch `rules.ts`/`ai.ts`; tip owner folds.
 
-| `curly` (`all`) | **639** | burn-1008 + curly batches | Live still `multi-line` only |
-| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605) | Live unset; count-down only |
-| `no-duplicate-imports` | **124** | q-mp-127 | Live unset; tip re-measure 2026-10-09 (= inventory count); no mass fix |
+## Ratchet chosen for q-mp-140
 
-Open-PR overlap for q-mp-127: #605 covers nnnull only; curly batches lower `curly`. No open draft already ratchets `no-duplicate-imports`.
+**`@typescript-eslint/prefer-nullish-coalescing`** — ceiling **96** (= tip re-measure 2026-10-09 on `cursor/mp-tip-post477` @ `2083a96d`; densest: `src/core/fractions/fraction-bar-ui.ts` 18). No `||`→`??` mass rewrite (falsy `0`/`''` behavior risk); live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+
+Open-PR overlap for q-mp-140: #665 (`no-duplicate-imports`), #672 (`no-confusing-void-expression`), #677 (`default-case`), #676 (curly `main.ts`) also edit `lint-ratchet-ceilings.json` — tip owner folds additive keys. No open draft already ratchets `prefer-nullish-coalescing`.
