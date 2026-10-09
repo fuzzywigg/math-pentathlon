@@ -100,7 +100,9 @@ export class TutorialManager {
   private restoreReturnFocus(): void {
     const trigger = this.returnFocusEl;
     this.returnFocusEl = null;
-    if (!trigger) return;
+    if (!trigger) {
+      return;
+    }
     queueMicrotask(() => {
       if (document.contains(trigger)) {
         trigger.focus();
@@ -110,7 +112,9 @@ export class TutorialManager {
 
   // Get current step
   getCurrentStep(): TutorialStep | null {
-    if (!this.config || !this.isActive) return null;
+    if (!this.config || !this.isActive) {
+      return null;
+    }
     return this.config.steps[this.currentStepIndex] || null;
   }
 
@@ -131,13 +135,17 @@ export class TutorialManager {
 
   /** Reposition highlight / tap helpers after the board re-renders. */
   refreshHighlight(): void {
-    if (!this.isActive) return;
+    if (!this.isActive) {
+      return;
+    }
     this.showCurrentStep();
   }
 
   // Move to next step
   nextStep(): void {
-    if (!this.config || !this.isActive) return;
+    if (!this.config || !this.isActive) {
+      return;
+    }
 
     const currentStep = this.getCurrentStep();
     if (currentStep?.onComplete) {
@@ -160,7 +168,9 @@ export class TutorialManager {
 
   // Move to previous step
   prevStep(): void {
-    if (!this.config || !this.isActive || this.currentStepIndex === 0) return;
+    if (!this.config || !this.isActive || this.currentStepIndex === 0) {
+      return;
+    }
 
     this.currentStepIndex--;
     this.showCurrentStep();
@@ -195,7 +205,9 @@ export class TutorialManager {
     data?: { row?: number; col?: number; selector?: string }
   ): boolean {
     const step = this.getCurrentStep();
-    if (!step?.requiredAction) return false;
+    if (!step?.requiredAction) {
+      return false;
+    }
 
     if (
       step.requiredAction.type === 'click-cell' &&
@@ -305,7 +317,9 @@ export class TutorialManager {
   }
 
   private handleKeyDown = (e: KeyboardEvent): void => {
-    if (!this.isActive) return;
+    if (!this.isActive) {
+      return;
+    }
     if (e.key === 'Escape') {
       this.exit();
     }
@@ -432,7 +446,9 @@ export class TutorialManager {
 
   private showCurrentStep(): void {
     const step = this.getCurrentStep();
-    if (!step || !this.tooltipElement || !this.overlayElement) return;
+    if (!step || !this.tooltipElement || !this.overlayElement) {
+      return;
+    }
 
     this.clearActionTargetHelpers();
 
@@ -453,7 +469,9 @@ export class TutorialManager {
       '.tutorial-next-btn'
     ) as HTMLButtonElement;
 
-    if (titleEl) titleEl.textContent = step.title;
+    if (titleEl) {
+      titleEl.textContent = step.title;
+    }
     if (messageEl instanceof HTMLElement) {
       // Author-trusted tutorial copy (allowlisted tags, no attributes).
       setTrustedMarkup(messageEl, step.message);
@@ -620,7 +638,9 @@ export class TutorialManager {
     position: NonNullable<TutorialStep['position']>,
     avoidRect?: AvoidRect
   ): NonNullable<TutorialStep['position']> {
-    if (!this.tooltipElement) return position;
+    if (!this.tooltipElement) {
+      return position;
+    }
 
     if (position === 'center') {
       this.positionTooltipCenter();
@@ -651,7 +671,9 @@ export class TutorialManager {
     }
 
     const placed = this.tryPlaceOnSide(side, clearRect, width, height, margin);
-    if (placed) return side;
+    if (placed) {
+      return side;
+    }
 
     // One flip to the other vertical band if preferred still overlaps after clamp
     const flip: TooltipSide =
@@ -691,8 +713,12 @@ export class TutorialManager {
     const { height: vh, offsetTop } = this.getViewportMetrics();
     const spaceBelow = offsetTop + vh - avoidRect.bottom - margin;
     const spaceAbove = avoidRect.top - offsetTop - margin;
-    if (spaceBelow >= height + TOOLTIP_AVOID_GAP_PX) return 'bottom';
-    if (spaceAbove >= height + TOOLTIP_AVOID_GAP_PX) return 'top';
+    if (spaceBelow >= height + TOOLTIP_AVOID_GAP_PX) {
+      return 'bottom';
+    }
+    if (spaceAbove >= height + TOOLTIP_AVOID_GAP_PX) {
+      return 'top';
+    }
     return spaceBelow >= spaceAbove ? 'bottom' : 'top';
   }
 
@@ -723,7 +749,9 @@ export class TutorialManager {
       right: left + width,
       bottom: top + height,
     };
-    if (this.rectsOverlap(box, avoidRect, TOOLTIP_AVOID_GAP_PX)) return false;
+    if (this.rectsOverlap(box, avoidRect, TOOLTIP_AVOID_GAP_PX)) {
+      return false;
+    }
     this.applyTooltipCoords(left, top);
     return true;
   }
@@ -766,7 +794,9 @@ export class TutorialManager {
   }
 
   private positionTooltipCenter(): void {
-    if (!this.tooltipElement) return;
+    if (!this.tooltipElement) {
+      return;
+    }
 
     const margin = 16;
     const { width, height } = this.prepareTooltipForAbsolutePosition();
@@ -845,7 +875,9 @@ export class TutorialManager {
   }
 
   private applyTooltipCoords(left: number, top: number): void {
-    if (!this.tooltipElement) return;
+    if (!this.tooltipElement) {
+      return;
+    }
     this.tooltipElement.style.left = `${left}px`;
     this.tooltipElement.style.top = `${top}px`;
   }

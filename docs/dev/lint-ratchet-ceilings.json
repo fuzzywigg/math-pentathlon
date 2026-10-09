@@ -1,7 +1,7 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045).",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639; q-mp-125 src/core/** curly:all autofix −38 → 601. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045).",
   "rules": {
-    "curly": 639,
+    "curly": 601,
     "@typescript-eslint/no-non-null-assertion": 387
   }
 }
