@@ -463,24 +463,24 @@ class OwlMessageManager {
 
       case 'streak':
         return this.compareNumber(
-          context.currentStreak || 0,
+          context.currentStreak ?? 0,
           condition.value as number,
           condition.operator
         );
 
       case 'gamesPlayed':
         return this.compareNumber(
-          context.gamesPlayedThisGame || 0,
+          context.gamesPlayedThisGame ?? 0,
           condition.value as number,
           condition.operator
         );
 
       case 'firstTime':
-        return ((context.gamesPlayedThisGame || 0) === 0) === condition.value;
+        return ((context.gamesPlayedThisGame ?? 0) === 0) === condition.value;
 
       case 'winStreak':
         return this.compareNumber(
-          context.winStreak || 0,
+          context.winStreak ?? 0,
           condition.value as number,
           condition.operator
         );
@@ -541,11 +541,11 @@ class OwlMessageManager {
   // Replace placeholders in message text
   private formatMessage(text: string, context: MessageContext): string {
     return text
-      .replace(/{playerName}/g, context.playerName || 'friend')
-      .replace(/{gameName}/g, context.gameName || 'this game')
-      .replace(/{currentStreak}/g, String(context.currentStreak || 0))
-      .replace(/{winStreak}/g, String(context.winStreak || 0))
-      .replace(/{totalGamesPlayed}/g, String(context.totalGamesPlayed || 0));
+      .replace(/{playerName}/g, context.playerName ?? 'friend')
+      .replace(/{gameName}/g, context.gameName ?? 'this game')
+      .replace(/{currentStreak}/g, String(context.currentStreak ?? 0))
+      .replace(/{winStreak}/g, String(context.winStreak ?? 0))
+      .replace(/{totalGamesPlayed}/g, String(context.totalGamesPlayed ?? 0));
   }
 
   // Add custom messages (for game-specific messages)

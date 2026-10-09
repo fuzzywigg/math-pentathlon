@@ -20,7 +20,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 387 | `@typescript-eslint/no-non-null-assertion` | `!` hides null/undefined; common crash source |
 | 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
-| 85 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); q-mp-185 cleared `highlight-ui.ts` (−11); densest residual `fraction-bar-ui.ts` 18 (#714) |
+| 56 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); q-mp-186 cleared `owl-messages.ts` (−9) after tip folded 184/185 (ceiling was 65) |
 | 21 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`) |
 | 23 | `no-param-reassign` | Surprising mutation of caller state |
 | 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
@@ -70,9 +70,9 @@ Open-PR overlap for q-mp-129: no open draft already fixes or ratchets `default-c
 
 ## Ratchet chosen for q-mp-140
 
-**`@typescript-eslint/prefer-nullish-coalescing`** — ceiling **85** after q-mp-185 (live tip re-measure on `cursor/mp-tip-post709` @ `cdd2f8b1` after clearing `src/core/alignment/highlight-ui.ts` −11; was **96**). Safe style/color/opacity/width defaults only (`??` preserves intentional `0`). Residual densest: `fraction-bar-ui.ts` 18 (open draft #714 / q-mp-184 → ceiling 78); tip owner reconciles with min. Live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+**`@typescript-eslint/prefer-nullish-coalescing`** — ceiling **56** after q-mp-186 (re-measure on tip `cursor/mp-tip-post709` @ `ab438381` after clearing `src/core/owl/owl-messages.ts` −9; tip ceiling was **65** post 184/185 fold). Structural `??` on optional `MessageContext` fields only (no player-facing copy-string edits). Live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
 
-Open-PR overlap for nullish ceiling: #714 (`q-mp-184`, fraction-bar −18 → 78). Tip owner folds; min ceiling wins after re-measure.
+Open-PR overlap for nullish ceiling: tip already folded #714/`q-mp-184` and #722/`q-mp-185`; this draft lowers further (−9). Tip owner folds; min ceiling wins after re-measure.
 
 ## q-mp-148 — `@typescript-eslint/prefer-optional-chain`
 
