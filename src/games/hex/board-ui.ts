@@ -260,10 +260,7 @@ export function renderBoard(
       if (state.moveHistory.length > 0) {
         // ratchet: length > 0 ⇒ last index defined.
         const lastMove = state.moveHistory[state.moveHistory.length - 1];
-        if (
-          lastMove?.position.row === row &&
-          lastMove.position.col === col
-        ) {
+        if (lastMove?.position.row === row && lastMove.position.col === col) {
           cellClass += ' hex-cell-last-move';
         }
       }
