@@ -10,7 +10,8 @@ import prettierConfig from 'eslint-config-prettier';
  * - Ceiling (report-only / count-down) via `npm run lint:ratchet`
  *   (see scripts/check-lint-ratchet.mjs + docs/dev/lint-ratchet-ceilings.json):
  *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset);
- *   @typescript-eslint/no-confusing-void-expression (live unset).
+ *   @typescript-eslint/no-confusing-void-expression (live unset);
+ *   radix (live unset; q-mp-130 ceiling 6 — kwatro ai/rules HOLD).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */
