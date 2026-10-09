@@ -6,6 +6,6 @@
     "@typescript-eslint/no-confusing-void-expression": 224,
     "radix": 6,
     "default-case": 5,
-    "no-duplicate-imports": 124
+    "no-duplicate-imports": 122
   }
 }
