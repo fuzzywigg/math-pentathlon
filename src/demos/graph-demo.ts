@@ -8,8 +8,11 @@ import {
   safeHtml,
 } from '../core/dom-security';
 
-import type { Graph, GraphBoard, NodeId, NodeState } from '../core/graph/types';
 import {
+  type Graph,
+  type GraphBoard,
+  type NodeId,
+  type NodeState,
   createGridGraph,
   createCircularGraph,
   createStarGraph,

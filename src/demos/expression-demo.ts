@@ -4,11 +4,9 @@
 import { navigate } from '../core/router';
 import { clearElement, setText } from '../core/dom-security';
 
-import type {
-  ExpressionCard,
-  TargetChallenge,
-} from '../core/expressions/types';
 import {
+  type ExpressionCard,
+  type TargetChallenge,
   createNumberCard,
   createOperatorCard,
   createParenCard,
