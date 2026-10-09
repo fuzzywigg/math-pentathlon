@@ -16,10 +16,7 @@ import {
   injectContigStyles,
   getPlayerName,
 } from './board-ui';
-import {
-  type AIDifficulty,
-  getAIPlacement,
-} from './ai';
+import { type AIDifficulty, getAIPlacement } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { clearElement } from '../../core/dom-security';
 import { contig60Tutorial } from './tutorial';

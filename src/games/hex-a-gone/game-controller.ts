@@ -19,11 +19,7 @@ import { renderBoard, renderStatus, buildSelectionArea } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { hexAGoneTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import {
-  type AIDifficulty,
-  getAISelection,
-  getAIPlacement,
-} from './ai';
+import { type AIDifficulty, getAISelection, getAIPlacement } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import {
   clearNullableTimeout,

@@ -12,11 +12,7 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kingsQuadraphagesTutorial } from './tutorial';
-import {
-  type AIDifficulty,
-  getAIMove,
-  isAITurn,
-} from './ai';
+import { type AIDifficulty, getAIMove, isAITurn } from './ai';
 import type { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';

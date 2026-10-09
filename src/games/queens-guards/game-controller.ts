@@ -20,11 +20,7 @@ import {
   checkWinner,
 } from './rules';
 import { renderBoard, injectQGStyles, getPlayerName } from './board-ui';
-import {
-  type AIDifficulty,
-  applyAIMove,
-  getAIMove,
-} from './ai';
+import { type AIDifficulty, applyAIMove, getAIMove } from './ai';
 import {
   cancelQueensAiRequests,
   disposeQueensAiWorker,

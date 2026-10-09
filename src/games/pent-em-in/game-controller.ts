@@ -23,11 +23,7 @@ import {
   injectPentEmInStyles,
 } from './board-ui';
 import type { Cell } from '../../core/polyomino/types';
-import {
-  type AIDifficulty,
-  getAIMove,
-  isAITurn,
-} from './ai';
+import { type AIDifficulty, getAIMove, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { pentEmInTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
