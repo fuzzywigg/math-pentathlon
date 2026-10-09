@@ -37,7 +37,8 @@ const drivers: GameDriver[] = [
   {
     id: 'kings-quadraphages',
     title: 'Kings & Quadraphages',
-    mount: '.board.kings-board .cell',
+    // Live board is `#board > .board .cell` (no `kings-board` class).
+    mount: '#board .board .cell, .board .cell',
     gameOver: '.status-winner, .status-turn',
     maxTurns: 120,
     playLegal: async (page) => {
@@ -490,24 +491,51 @@ const drivers: GameDriver[] = [
           [...document.querySelectorAll('.juggle-control-btn')].find((b) =>
             re.test(b.textContent || '')
           ) as HTMLElement | undefined;
+        // Valid highlights only appear on hover (`preview-valid`); empty cells
+        // still accept clicks. Try empties until status advances (place accepted).
         const placeIfValid = (): boolean => {
           const board = document.querySelector(boardSel);
           if (!board) return false;
-          const valids = [
-            ...board.querySelectorAll(
-              '.juggle-cell-valid, .juggle-cell[aria-label*="valid"]'
-            ),
-          ] as HTMLElement[];
-          if (!valids.length) return false;
-          valids.sort((a, b) => {
+          const before =
+            document.querySelector('.juggle-status')?.textContent || '';
+          const empties = [
+            ...board.querySelectorAll('.juggle-cell'),
+          ].filter((c) => {
+            const aria = (c.getAttribute('aria-label') || '').toLowerCase();
+            const cls = (c as HTMLElement).className;
+            return (
+              aria.includes('empty') &&
+              !cls.includes('occupied') &&
+              !aria.includes('blue') &&
+              !aria.includes('red')
+            );
+          }) as HTMLElement[];
+          empties.sort((a, b) => {
             const ar = +(a.dataset.row || 0);
             const ac = +(a.dataset.col || 0);
             const br = +(b.dataset.row || 0);
             const bc = +(b.dataset.col || 0);
             return ar - br || ac - bc;
           });
-          valids[0]!.click();
-          return true;
+          for (const cell of empties) {
+            cell.click();
+            const after =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (after !== before) return true;
+          }
+          // Hover-marked valid cells (legacy / future chrome)
+          const marked = [
+            ...board.querySelectorAll(
+              '.juggle-cell-valid, .juggle-cell.preview-valid, .juggle-cell[aria-label*="valid"]'
+            ),
+          ] as HTMLElement[];
+          for (const cell of marked) {
+            cell.click();
+            const after =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (after !== before) return true;
+          }
+          return false;
         };
         if (placeIfValid()) return true;
         for (let f = 0; f < 2; f++) {
@@ -766,9 +794,12 @@ const drivers: GameDriver[] = [
     title: "Pent'Em In",
     mount: '.pent-board',
     gameOver: '.pent-winner-banner',
-    maxTurns: 80,
+    // Select+orient+place per piece × ~12 remaining × 2 seats needs headroom.
+    maxTurns: 250,
     playLegal: async (page) => {
-      // Click interactive cells with aria valid placement (not decorative overlays).
+      // Aria marks every cell "valid placement" while a piece is selected —
+      // including occupied ones. Only empty cells can accept a place; verify
+      // status advances so illegal clicks are not counted as progress.
       return page.evaluate(() => {
         const click = (el: Element | null | undefined) =>
           el?.dispatchEvent(
@@ -778,18 +809,63 @@ const drivers: GameDriver[] = [
               view: window,
             })
           );
-        const status = (
-          document.querySelector('.pent-status')?.textContent || ''
-        ).toLowerCase();
+        const statusEl = () =>
+          document.querySelector('.pent-status')?.textContent || '';
+        const status = statusEl().toLowerCase();
         if (/wins|game over|tie/.test(status)) return false;
 
-        const place = document.querySelector(
-          '.pent-board rect[data-row][aria-label*="valid placement"], .pent-a11y-grid [role="gridcell"][aria-label*="valid placement"]'
-        );
-        if (place) {
-          click(place);
-          return true;
+        const tryPlace = (): boolean => {
+          const before = statusEl();
+          const candidates = [
+            ...document.querySelectorAll(
+              [
+                '.pent-board rect[data-row][aria-label*="empty"][aria-label*="valid placement"]',
+                '.pent-a11y-grid [role="gridcell"][aria-label*="empty"][aria-label*="valid placement"]',
+                '.pent-board rect[data-row][aria-label*="empty"]',
+                '.pent-a11y-grid [role="gridcell"][aria-label*="empty"]',
+              ].join(', ')
+            ),
+          ] as Element[];
+          // Prefer top-left for deterministic progress under the seed.
+          candidates.sort((a, b) => {
+            const ar = +(a.getAttribute('data-row') || 0);
+            const ac = +(a.getAttribute('data-col') || 0);
+            const br = +(b.getAttribute('data-row') || 0);
+            const bc = +(b.getAttribute('data-col') || 0);
+            return ar - br || ac - bc;
+          });
+          for (const cell of candidates) {
+            click(cell);
+            if (statusEl() !== before) return true;
+          }
+          return false;
+        };
+
+        if (/place the/.test(status) || /place your piece/.test(status)) {
+          if (tryPlace()) return true;
+          for (let f = 0; f < 2; f++) {
+            for (let r = 0; r < 4; r++) {
+              if (tryPlace()) return true;
+              const rotate = document.querySelector('.pent-btn-rotate');
+              if (!rotate) break;
+              click(rotate);
+            }
+            if (tryPlace()) return true;
+            if (f === 0) click(document.querySelector('.pent-btn-flip'));
+          }
+          const cancel = [
+            ...document.querySelectorAll(
+              '.pent-btn-choose-other, .pent-btn-cancel, button'
+            ),
+          ].find((b) =>
+            /cancel|choose another|can'?t place/i.test(b.textContent || '')
+          );
+          if (cancel) {
+            click(cancel);
+            return true;
+          }
         }
+
         if (/select a piece/.test(status)) {
           const opt = document.querySelector(
             '.pent-piece-option:not(.disabled)'
