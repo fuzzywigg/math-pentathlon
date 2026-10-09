@@ -16,7 +16,11 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
-import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
+import {
+  createEmptyBoard,
+  placePiece,
+  createCustomGameState,
+} from './helpers/kings-board';
 
 /**
  * P2 king in corner with a single escape at (1,1).
@@ -43,7 +47,7 @@ function winTrapBoard(): Board {
 describe('Overnight kings — win-trap placement', () => {
   it('hard prefers placing on opponent last escape cell', () => {
     const board = winTrapBoard();
-    const state = createRulesState(board);
+    const state = createCustomGameState(board);
     expect(getValidKingMoves(state, 'player2')).toEqual([{ row: 1, col: 1 }]);
 
     const move = getAIMove(state, 'player1', 'hard');
@@ -52,7 +56,7 @@ describe('Overnight kings — win-trap placement', () => {
   });
 
   it('getBestMove also selects the trapping placement', () => {
-    const move = getBestMove(createRulesState(winTrapBoard()), 'player1');
+    const move = getBestMove(createCustomGameState(winTrapBoard()), 'player1');
     expect(move).not.toBeNull();
     expect(move!.quadraphagePlacement).toEqual({ row: 1, col: 1 });
   });

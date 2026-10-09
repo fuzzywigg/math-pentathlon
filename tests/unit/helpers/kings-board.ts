@@ -48,9 +48,6 @@ export function createCustomGameState(
   };
 }
 
-/** Alias used by overnight kings AI suites. */
-export const createRulesState = createCustomGameState;
-
 /** Opening kings on the standard center files. */
 export function openingBoard(): Board {
   const board = createEmptyBoard();

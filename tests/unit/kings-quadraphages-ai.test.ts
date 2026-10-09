@@ -12,7 +12,11 @@ import {
   Position,
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
-import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
+import {
+  createEmptyBoard,
+  placePiece,
+  createCustomGameState,
+} from './helpers/kings-board';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -41,7 +45,7 @@ describe('Kings & Quadraphages — modern AI API', () => {
     const board = createEmptyBoard();
     placePiece(board, { row: 0, col: 4 }, { type: 'king', owner: 'player1' });
     placePiece(board, { row: 8, col: 4 }, { type: 'king', owner: 'player2' });
-    const move = getAIMove(createRulesState(board), 'player1', 'easy');
+    const move = getAIMove(createCustomGameState(board), 'player1', 'easy');
     expect(move).not.toBeNull();
     expect(move!.kingMove.row).toBeGreaterThanOrEqual(0);
     expect(move!.quadraphagePlacement.col).toBeLessThan(BOARD_SIZE);
@@ -52,7 +56,7 @@ describe('Kings & Quadraphages — modern AI API', () => {
     const board = createEmptyBoard();
     placePiece(board, { row: 0, col: 4 }, { type: 'king', owner: 'player1' });
     placePiece(board, { row: 8, col: 4 }, { type: 'king', owner: 'player2' });
-    const move = getAIMove(createRulesState(board), 'player2', 'medium');
+    const move = getAIMove(createCustomGameState(board), 'player2', 'medium');
     expect(move).not.toBeNull();
     expect(move!.kingMove).toBeDefined();
     expect(move!.quadraphagePlacement).toBeDefined();
@@ -77,7 +81,7 @@ describe('Kings & Quadraphages — modern AI API', () => {
       { row: 1, col: 1 },
       { type: 'quadraphage', owner: 'player1' }
     );
-    expect(getAIMove(createRulesState(board), 'player2', 'easy')).toBeNull();
+    expect(getAIMove(createCustomGameState(board), 'player2', 'easy')).toBeNull();
   });
 
   it('getRandomMove aliases easy difficulty', () => {
@@ -85,7 +89,7 @@ describe('Kings & Quadraphages — modern AI API', () => {
     const board = createEmptyBoard();
     placePiece(board, { row: 0, col: 4 }, { type: 'king', owner: 'player1' });
     placePiece(board, { row: 8, col: 4 }, { type: 'king', owner: 'player2' });
-    const move = getRandomMove(createRulesState(board), 'player1');
+    const move = getRandomMove(createCustomGameState(board), 'player1');
     expect(move).not.toBeNull();
   });
 });

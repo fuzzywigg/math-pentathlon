@@ -12,7 +12,11 @@ import {
   Position,
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
-import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
+import {
+  createEmptyBoard,
+  placePiece,
+  createCustomGameState,
+} from './helpers/kings-board';
 
 function winTrapBoard(): Board {
   const board = createEmptyBoard();
@@ -33,7 +37,7 @@ function winTrapBoard(): Board {
 
 describe('Overnight kings — getBestMove ignores difficulty label', () => {
   it('getBestMove with easy/medium labels still traps on winTrapBoard', () => {
-    const state = createRulesState(winTrapBoard());
+    const state = createCustomGameState(winTrapBoard());
     for (const d of ['easy', 'medium'] as const) {
       const move = getBestMove(state, 'player1', d);
       expect(move).not.toBeNull();
