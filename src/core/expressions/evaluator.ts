@@ -277,6 +277,10 @@ export function evaluateNode(
           throw new Error(`Unknown operator: ${node.operator}`);
       }
     }
+    default: {
+      const _exhaustive: never = node;
+      return _exhaustive;
+    }
   }
 }
 
@@ -700,6 +704,10 @@ export function astToString(node: ExpressionNode): string {
       const left = astToString(node.left);
       const right = astToString(node.right);
       return `(${left} ${node.operator} ${right})`;
+    }
+    default: {
+      const _exhaustive: never = node;
+      return _exhaustive;
     }
   }
 }

@@ -1,7 +1,8 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639; q-mp-121 types/layout/serialization curly:all autofix −44 → 595. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045). Open draft #640 also adjusts curly counts — tip owner must reconcile ceilings on fold.",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-129: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639; q-mp-121 types/layout/serialization curly:all autofix −44 → 595. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045). default-case: 6 (q-mp-129; cleared non-HOLD sites from tip measure 14; residual HOLD = fab-a-diffy/frac-fact rules.ts ×4 + fractions/arithmetic scoring path ×1 + hex/coordinates conflict-avoid ×1). Open draft #640 also adjusts curly counts — tip owner must reconcile ceilings on fold.",
   "rules": {
     "curly": 595,
-    "@typescript-eslint/no-non-null-assertion": 387
+    "@typescript-eslint/no-non-null-assertion": 387,
+    "default-case": 6
   }
 }

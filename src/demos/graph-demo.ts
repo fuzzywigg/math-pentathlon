@@ -331,6 +331,8 @@ function initTemplateSection(): void {
         case 'complete':
           currentGraph = createCompleteGraph(5, 100);
           break;
+        default:
+          break;
       }
 
       renderCurrentGraph();
