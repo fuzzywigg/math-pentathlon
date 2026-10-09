@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 /**
- * Report-only gzip bundle budget check.
+ * Gzip bundle budget check with known-OVER allowlist ratchet (q-mp-123).
  *
  * Measures:
  *   - Menu critical path: JS/CSS linked from dist/index.html (entry + modulepreload + styles)
  *   - Each game lazy chunk: dist/assets/game-<id>-*.js
  *
  * Compares against committed bundle-budgets.json (current size + 10% headroom).
- * Always exits 0 (report-only). Use CI continue-on-error as a second guard.
+ * OVER rows listed in `knownOvers` are expected (warn only). Any other OVER is
+ * a NEW regression — printed loudly. Default exit is still 0 so local/dev use
+ * never fails the hard build path; pass `--fail-on-new-over` (CI does, under
+ * continue-on-error) to exit non-zero only when a novel OVER appears.
  *
- * Usage: npm run build && npm run size:check
+ * Usage:
+ *   npm run build && npm run size:check
+ *   npm run size:check -- --fail-on-new-over
  */
 
 import fs from 'node:fs';
@@ -185,6 +190,47 @@ function compareRow(label, actual, budget) {
 }
 
 /**
+ * Split OVER labels into known (allowlisted) vs novel (new regression).
+ * Also report stale allowlist entries that are no longer OVER (ratchet can shrink).
+ *
+ * @param {string[]} overLabels
+ * @param {string[] | undefined | null} knownOvers
+ * @returns {{ known: string[], novel: string[], stale: string[] }}
+ */
+export function partitionOvers(overLabels, knownOvers) {
+  const knownSet = new Set(
+    Array.isArray(knownOvers)
+      ? knownOvers.filter((id) => typeof id === 'string' && id.length > 0)
+      : []
+  );
+  const overSet = new Set(overLabels);
+  const known = overLabels.filter((l) => knownSet.has(l)).sort();
+  const novel = overLabels.filter((l) => !knownSet.has(l)).sort();
+  const stale = [...knownSet].filter((l) => !overSet.has(l)).sort();
+  return { known, novel, stale };
+}
+
+/**
+ * Exit code for the CLI. Non-zero only when `--fail-on-new-over` is set and
+ * there is at least one novel OVER (CI uses this under continue-on-error).
+ *
+ * @param {{ novelCount: number, failOnNewOver: boolean }} opts
+ * @returns {0 | 1}
+ */
+export function resolveSizeCheckExitCode({ novelCount, failOnNewOver }) {
+  if (failOnNewOver && novelCount > 0) return 1;
+  return 0;
+}
+
+/**
+ * @param {string[]} argv
+ * @returns {{ failOnNewOver: boolean }}
+ */
+export function parseSizeCheckArgs(argv) {
+  return { failOnNewOver: argv.includes('--fail-on-new-over') };
+}
+
+/**
  * @param {ReturnType<typeof compareRow>[]} rows
  */
 function printTable(rows) {
@@ -225,7 +271,9 @@ function printTable(rows) {
   }
 }
 
-function main() {
+function main(argv = process.argv.slice(2)) {
+  const { failOnNewOver } = parseSizeCheckArgs(argv);
+
   if (!fs.existsSync(DIST)) {
     console.error('dist/ not found. Run npm run build before size:check.');
     // Still report-only for the measurement path; missing build is a usage error.
@@ -235,6 +283,7 @@ function main() {
   }
 
   const budgets = JSON.parse(fs.readFileSync(BUDGETS_PATH, 'utf8'));
+  const knownOvers = Array.isArray(budgets.knownOvers) ? budgets.knownOvers : [];
   const menu = measureMenuCriticalPath(DIST);
   const gameIds = listGameIds(ROOT);
   const games = measureGameChunks(DIST, gameIds);
@@ -252,8 +301,13 @@ function main() {
     rows.push(compareRow(`game-${g.id}`, g.gzipBytes, budgets.games?.[g.id]));
   }
 
-  console.log('Bundle size budget check (gzip, report-only)');
+  console.log('Bundle size budget check (gzip)');
   console.log(`Budgets: ${path.relative(ROOT, BUDGETS_PATH)}`);
+  console.log(
+    `Known OVER allowlist: ${knownOvers.length} id(s)${
+      failOnNewOver ? ' · --fail-on-new-over' : ''
+    }`
+  );
   console.log('');
   console.log('Menu critical files:');
   for (const f of menu.files) {
@@ -266,17 +320,41 @@ function main() {
   const missing = rows.filter(
     (r) => r.status === 'MISSING' || r.status === 'NO BUDGET'
   );
+  const overByLabel = new Map(overs.map((r) => [r.label, r]));
+  const { known, novel, stale } = partitionOvers(
+    overs.map((r) => r.label),
+    knownOvers
+  );
+
   console.log('');
   if (overs.length === 0 && missing.length === 0) {
     console.log(`All ${rows.length} budgets within limit.`);
   } else {
-    if (overs.length) {
-      console.log(`${overs.length} over budget (report-only, not failing):`);
-      for (const r of overs) {
-        const msg = `${r.label}: ${formatBytes(r.actual)} > ${formatBytes(r.budget)}`;
+    if (known.length) {
+      console.log(
+        `${known.length} known OVER (allowlisted — warn only, ratchet may shrink):`
+      );
+      for (const label of known) {
+        const r = overByLabel.get(label);
+        const msg = r
+          ? `${r.label}: ${formatBytes(r.actual)} > ${formatBytes(r.budget)}`
+          : label;
         console.log(`  - ${msg}`);
-        // Surface in GitHub Actions UI without failing the job.
-        console.log(`::warning::Bundle budget exceeded — ${msg}`);
+        console.log(`::warning::Bundle budget known OVER — ${msg}`);
+      }
+    }
+    if (novel.length) {
+      console.log(
+        `${novel.length} NEW OVER (not in knownOvers allowlist — loud flag):`
+      );
+      for (const label of novel) {
+        const r = overByLabel.get(label);
+        const msg = r
+          ? `${r.label}: ${formatBytes(r.actual)} > ${formatBytes(r.budget)}`
+          : label;
+        console.log(`  - ${msg}`);
+        // ::error:: surfaces in the Actions UI; exit non-zero only with the flag.
+        console.log(`::error::Bundle budget NEW OVER — ${msg}`);
       }
     }
     if (missing.length) {
@@ -288,7 +366,29 @@ function main() {
     }
   }
 
-  process.exitCode = 0;
+  if (stale.length) {
+    console.log('');
+    console.log(
+      `${stale.length} knownOvers entry(ies) no longer OVER (shrink the allowlist):`
+    );
+    for (const label of stale) {
+      console.log(`  - ${label}`);
+      console.log(
+        `::notice::Bundle budget knownOvers stale — remove ${label} (ratchet down)`
+      );
+    }
+  }
+
+  process.exitCode = resolveSizeCheckExitCode({
+    novelCount: novel.length,
+    failOnNewOver,
+  });
+  if (process.exitCode === 1) {
+    console.log('');
+    console.log(
+      'Exiting 1 because --fail-on-new-over saw NEW OVER row(s). CI keeps this step continue-on-error so the build job stays green.'
+    );
+  }
 }
 
 const isMain =
@@ -297,7 +397,7 @@ const isMain =
 
 if (isMain) {
   try {
-    main();
+    main(process.argv.slice(2));
   } catch (err) {
     console.error(err instanceof Error ? err.message : err);
     console.error('(report-only: exiting 0)');

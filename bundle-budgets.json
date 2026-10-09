@@ -2,8 +2,9 @@
   "version": 1,
   "unit": "gzip-bytes",
   "headroom": 0.1,
-  "description": "Gzip size budgets for the menu critical path (index.html JS/CSS) and each game lazy chunk. Budgets were set at measured size + 10%. Report-only — see docs/bundle-budget.md.",
+  "description": "Gzip size budgets for the menu critical path (index.html JS/CSS) and each game lazy chunk. Budgets were set at measured size + 10%. knownOvers lists bundle ids currently allowed to exceed budget (ratchet-down only). See docs/bundle-budget.md.",
   "menuCriticalPath": 46822,
+  "knownOvers": [],
   "games": {
     "calla": 6967,
     "contig-60": 7372,
