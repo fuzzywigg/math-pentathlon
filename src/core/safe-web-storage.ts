@@ -51,7 +51,7 @@ function storageFromKind(kind: WebStorageKind): Storage | null {
 export function getWebStorage(kind: WebStorageKind = 'local'): Storage | null {
   try {
     const store = storageFromKind(kind);
-    if (store == null) {
+    if (store === null) {
       return null;
     }
     // Touch a read path — throws SecurityError when storage access is blocked.
@@ -73,7 +73,7 @@ export function safeGetItemResult(
 ): SafeReadResult {
   try {
     const store = storageFromKind(kind);
-    if (store == null) {
+    if (store === null) {
       return { ok: false, error: storageUnavailableError() };
     }
     return { ok: true, value: store.getItem(key) };
@@ -145,7 +145,7 @@ export function safeRemoveItem(
 export function safeParseJson(
   raw: string | null | undefined
 ): SafeJsonParseResult {
-  if (raw == null || raw === '') {
+  if (raw === null || raw === undefined || raw === '') {
     return { ok: false, error: new SyntaxError('Empty storage value') };
   }
   try {

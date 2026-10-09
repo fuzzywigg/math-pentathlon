@@ -505,7 +505,7 @@ export function captureFocusedCell(
   }
   const row = active.getAttribute('data-row');
   const col = active.getAttribute('data-col');
-  if (row == null || col == null) {
+  if (row === null || col === null) {
     return null;
   }
   return { row, col };
