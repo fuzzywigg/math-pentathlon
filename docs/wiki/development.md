@@ -120,6 +120,7 @@ Live tip `cursor/mp-tip-post477` @ `a023fc36` (2026-10-09): **3114** Vitest file
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
+- Mermaid + tip CI screenshot of the two AI benches skipped under `CI=1` (HOLD Hex Hard **450ms**): [CI unit budget + AI-bench skips](./ci-unit-budget.md) (`q-mp-175`)
 
 README badges link those workflows. License is **ISC** (`package.json`).
 
