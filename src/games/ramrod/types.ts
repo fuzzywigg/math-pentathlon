@@ -107,11 +107,13 @@ export const ROD_NAMES: Record<number, string> = {
  * Create a rod
  */
 export function createRod(id: string, length: number): Rod {
+  // ratchet: createRodSet only constructs lengths 1–10 (ROD_COLORS keys).
+  // Preserve tip runtime (undefined color if length is unknown) — no fallback.
+  const color = ROD_COLORS[length] as string;
   return {
     id,
     length,
-    // ratchet: createRodSet only constructs lengths 1–10 (ROD_COLORS keys).
-    color: ROD_COLORS[length]!,
+    color,
     owner: null,
     position: null,
   };
@@ -140,7 +142,11 @@ export function createRodSet(): Rod[] {
 
   for (let length = 1; length <= 10; length++) {
     // ratchet: counts defines every length 1–10.
-    for (let i = 0; i < counts[length]!; i++) {
+    const count = counts[length];
+    if (count === undefined) {
+      continue;
+    }
+    for (let i = 0; i < count; i++) {
       rods.push(createRod(`r${id++}`, length));
     }
   }
@@ -156,8 +162,11 @@ export function shuffleArray<T>(array: T[]): T[] {
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     // ratchet: dense copy — indexed elements exist for i,j in range.
-    const a = result[i]!;
-    const b = result[j]!;
+    const a = result[i];
+    const b = result[j];
+    if (a === undefined || b === undefined) {
+      continue;
+    }
     result[i] = b;
     result[j] = a;
   }

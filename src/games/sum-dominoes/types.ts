@@ -103,8 +103,11 @@ export function shuffleArray<T>(array: T[]): T[] {
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     // ratchet: dense copy — indexed elements exist for i,j in range.
-    const a = result[i]!;
-    const b = result[j]!;
+    const a = result[i];
+    const b = result[j];
+    if (a === undefined || b === undefined) {
+      continue;
+    }
     result[i] = b;
     result[j] = a;
   }

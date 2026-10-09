@@ -101,7 +101,11 @@ function buildConfirmedEdges(): Array<readonly [string, string]> {
   // Rebuild from adjacency rules so the source list cannot drift from ROW_COLS.
   const nodeSet = new Set<string>();
   for (let row = 0; row < ROW_COLS.length; row++) {
-    for (const col of ROW_COLS[row]!) {
+    const cols = ROW_COLS[row];
+    if (cols === undefined) {
+      continue;
+    }
+    for (const col of cols) {
       nodeSet.add(nodeId(col, row));
     }
   }
@@ -116,7 +120,10 @@ function buildConfirmedEdges(): Array<readonly [string, string]> {
   const seen = new Set<string>();
 
   for (const id of nodeSet) {
-    const p = parseNodeId(id)!;
+    const p = parseNodeId(id);
+    if (p === null) {
+      continue;
+    }
     for (const [dc, dr] of dirs) {
       const other = nodeId(p.col + dc, p.row + dr);
       if (!nodeSet.has(other)) {
@@ -160,7 +167,11 @@ export function createVerifiedProductionLayout(
 
   const nodes: LayoutNode[] = [];
   for (let row = 0; row < ROW_COLS.length; row++) {
-    for (const col of ROW_COLS[row]!) {
+    const cols = ROW_COLS[row];
+    if (cols === undefined) {
+      continue;
+    }
+    for (const col of cols) {
       nodes.push({
         id: nodeId(col, row),
         col,

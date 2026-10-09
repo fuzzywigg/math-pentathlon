@@ -138,9 +138,14 @@ export function generateExpressions(
       if (i === j) {
         continue;
       }
-      // Indexed access is definite under loop bounds; assert for NUI.
-      const { v: a, s: sa } = vals[i]!;
-      const { v: b, s: sb } = vals[j]!;
+      // Indexed access is definite under loop bounds.
+      const left = vals[i];
+      const right = vals[j];
+      if (left === undefined || right === undefined) {
+        continue;
+      }
+      const { v: a, s: sa } = left;
+      const { v: b, s: sb } = right;
 
       addResult(`${sa} + ${sb}`, a + b);
       addResult(`${sa} - ${sb}`, a - b);
@@ -167,10 +172,13 @@ export function generateExpressions(
         if (i === j || j === k || i === k) {
           continue;
         }
-        // basicVals is length 3; i/j/k are 0..2 — assert for NUI.
-        const a = basicVals[i]!;
-        const b = basicVals[j]!;
-        const c = basicVals[k]!;
+        // basicVals is length 3; i/j/k are 0..2.
+        const a = basicVals[i];
+        const b = basicVals[j];
+        const c = basicVals[k];
+        if (a === undefined || b === undefined || c === undefined) {
+          continue;
+        }
 
         // (a + b) + c, (a + b) - c, etc.
         addResult(`(${a.s} + ${b.s}) + ${c.s}`, a.v + b.v + c.v);
