@@ -260,7 +260,9 @@ export function renderGraphDemo(container: HTMLElement): void {
   // Wire up back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => navigate('/'));
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
   }
 
   // Initialize sections
@@ -307,7 +309,9 @@ function initTemplateSection(): void {
 
   templateBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      templateBtns.forEach((b) => b.classList.remove('selected'));
+      templateBtns.forEach((b) => {
+        b.classList.remove('selected');
+      });
       btn.classList.add('selected');
 
       const template = (btn as HTMLElement).dataset.template;
@@ -380,7 +384,9 @@ function initPathfindingSection(): void {
       }
 
       (node as SVGElement).style.cursor = 'pointer';
-      node.addEventListener('click', () => handleNodeClick(nodeId));
+      node.addEventListener('click', () => {
+        handleNodeClick(nodeId);
+      });
     });
 
     // Show path if both nodes selected
@@ -572,7 +578,9 @@ function initGameSection(): void {
 
   playerBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      playerBtns.forEach((b) => b.classList.remove('selected'));
+      playerBtns.forEach((b) => {
+        b.classList.remove('selected');
+      });
       btn.classList.add('selected');
       currentPlayer = parseInt((btn as HTMLElement).dataset.player!, 10);
     });
