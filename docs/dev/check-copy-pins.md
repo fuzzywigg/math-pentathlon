@@ -1,7 +1,7 @@
 # check:copy-pins — player-facing copy pin detector
 
-**Task id:** `q-mp-064`  
-**Posture:** report-only local helper (not a CI gate in this PR).  
+**Task id:** `q-mp-064` (helper) · `q-mp-137` (CI report-only step)  
+**Posture:** report-only. Local default exits 0; CI lint job runs `npm run check:copy-pins -- --fail` with `continue-on-error: true` so findings surface in Actions without failing the blocking lint job.  
 **Command:** `npm run check:copy-pins`
 
 ## Why this exists
@@ -38,7 +38,7 @@ Scans `tests/**/*.{test,spec}.{ts,tsx,js,mjs}` (skips `_tokenmaxx_archive`) for:
 npm run check:copy-pins              # scan tip tests/; always exit 0
 npm run check:copy-pins -- --json    # machine-readable findings
 npm run check:copy-pins -- --self-test   # prove review 7/8 examples + negatives
-npm run check:copy-pins -- --fail    # opt-in exit 1 when findings (not CI-wired)
+npm run check:copy-pins -- --fail    # opt-in exit 1 when findings (CI uses this + continue-on-error)
 ```
 
 `--self-test` runs in-memory snippets that mirror the review 7/8 drops plus negative cases. It does **not** depend on those hunks still being present in `tests/`.
