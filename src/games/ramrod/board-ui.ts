@@ -62,7 +62,7 @@ export function renderBoard(
     for (let col = 0; col < CONFIG.BOARD_COLS; col++) {
       const boxId = `box-${row}-${col}`;
       const box = state.boxes.get(boxId);
-      if (!box) continue;
+      if (!box) {continue;}
 
       const boxEl = renderSumBox(
         state,
@@ -166,7 +166,7 @@ function renderSumBox(
 function renderRod(rod: Rod, inHand: boolean): HTMLElement {
   const rodEl = document.createElement('div');
   rodEl.className = 'ramrod-rod';
-  if (inHand) rodEl.classList.add('in-hand');
+  if (inHand) {rodEl.classList.add('in-hand');}
 
   const width = rod.length * CM_SCALE;
   rodEl.style.width = `${width}px`;
@@ -215,7 +215,7 @@ export function renderPlayerRods(
 
   for (const rodId of rodIds) {
     const rod = state.rods.get(rodId);
-    if (!rod) continue;
+    if (!rod) {continue;}
 
     const wrapper = document.createElement('div');
     wrapper.className = 'ramrod-rod-wrapper';
