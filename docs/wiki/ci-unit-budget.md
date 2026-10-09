@@ -1,10 +1,10 @@
 # CI unit job budget + AI-bench skips
 
-**Task id:** `q-mp-233` (refresh of `q-mp-175`); suite-size cells remeasured by `q-mp-235`  
+**Task id:** `q-mp-233` (refresh of `q-mp-175`); suite-size cells remeasured by `q-mp-260`  
 **Scope:** Docs / visuals only — no workflow edits, no AI timing or product changes.  
-**Tip at authoring:** `cursor/mp-tip-post748` @ `23926935` (full SHA `23926935c3c8c5771797c8ef6b5fb172b04b60e0`). Wall-budget + AI-bench CI evidence below still cites tip post728 run [`37972882883`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37972882883) (open draft [#746](https://github.com/fuzzywigg/math-pentathlon/pull/746) ownership).
+**Tip at authoring:** `cursor/mp-tip-post755` @ `74a1596f` (full SHA `74a1596f71aab5d6616ff486b2a4eb2a70b5123b`). Wall-budget + AI-bench CI evidence below still cites tip post728 run [`37972882883`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37972882883) (open draft [#746](https://github.com/fuzzywigg/math-pentathlon/pull/746) ownership).
 
-Short contributor page for the **unit** job wall budget and why the two AI latency benches stay skipped when `CI=1`. Orthogonal to the blocking-vs-report-only job graph in [`docs/dev/ci-gates-mermaid-q-mp-073.md`](../dev/ci-gates-mermaid-q-mp-073.md). Full CI-skip inventory + HOLD citations: [`docs/dev/ai-timing-ci-skip-inventory-2026-10-09.md`](../dev/ai-timing-ci-skip-inventory-2026-10-09.md). Layer file/case tables: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) (`q-mp-235`); this page owns the **unit wall budget** + AI-bench skip evidence only.
+Short contributor page for the **unit** job wall budget and why the two AI latency benches stay skipped when `CI=1`. Orthogonal to the blocking-vs-report-only job graph in [`docs/dev/ci-gates-mermaid-q-mp-073.md`](../dev/ci-gates-mermaid-q-mp-073.md). Full CI-skip inventory + HOLD citations: [`docs/dev/ai-timing-ci-skip-inventory-2026-10-09.md`](../dev/ai-timing-ci-skip-inventory-2026-10-09.md). Layer file/case tables: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) (`q-mp-260`); this page owns the **unit wall budget** + AI-bench skip evidence only.
 
 ## Hard-rule HOLD (AI timing)
 
@@ -21,7 +21,7 @@ Do **not** “fix” Hex Hard by raising the deadline above 450ms. Do **not** re
 
 ## Unit job time budget (live `ci.yml`)
 
-From `.github/workflows/ci.yml` `unit` job (re-read on tip `23926935`; knobs unchanged from post728):
+From `.github/workflows/ci.yml` `unit` job (re-read on tip `74a1596f`; knobs unchanged from post728):
 
 | Knob | Value |
 | --- | --- |
@@ -54,14 +54,14 @@ flowchart TB
   step -.->|describe.skipIf CI| skip
 ```
 
-## Live suite size (tip `23926935`)
+## Live suite size (tip `74a1596f`)
 
-Remeasured on tip post748 (same formulas CI / testing-layers use). Historical GHA summary row is from tip post728 run [`37972882883`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37972882883) when the suite was **3140** files:
+Remeasured on tip post755 (same formulas CI / testing-layers use). Historical GHA summary row is from tip post728 run [`37972882883`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37972882883) when the suite was **3140** files:
 
 | Metric | Count | How |
 | --- | ---: | --- |
-| Unit files (excl. `_tokenmaxx_archive`) | **3145** | `find tests/unit … \| wc -l` (matches CI echo) |
-| Cases listed | **12189** | `npx vitest list \| wc -l` |
+| Unit files (excl. `_tokenmaxx_archive`) | **3156** | `find tests/unit … \| wc -l` (matches CI echo) |
+| Cases listed | **12279** | `npx vitest list \| wc -l` |
 | Tip CI run summary (post728 @ `b5884207`) | **3138** passed / **2** skipped files; **12142** passed / **42** skipped / **1** todo (**12185**) | run [`37972882883`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37972882883) |
 
 Vitest `list` counts and the GHA summary totals differ slightly (list includes entries that resolve differently at run time); file/case rows are tip-live.
@@ -91,7 +91,7 @@ CI=1 npx vitest run --project unit-shared tests/unit/ai-move-time-midgame.bench.
 ## Related
 
 - Public CI posture: [Development — CI posture](./development.md#ci-posture-public) · unit runtime note in that page
-- Testing-layer counts (file/case tables): [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) (`q-mp-235`; open [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) for post728 left open as contained)
+- Testing-layer counts (file/case tables): [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) (`q-mp-260`; open [#767](https://github.com/fuzzywigg/math-pentathlon/pull/767) / [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) left open as contained)
 - AI-timing CI-skip inventory + HOLD detail: [`docs/dev/ai-timing-ci-skip-inventory-2026-10-09.md`](../dev/ai-timing-ci-skip-inventory-2026-10-09.md)
 - Blocking vs report-only Mermaid: [`docs/dev/ci-gates-mermaid-q-mp-073.md`](../dev/ci-gates-mermaid-q-mp-073.md)
 - Prior authoring pointer: [`docs/dev/ci-unit-budget-q-mp-175.md`](../dev/ci-unit-budget-q-mp-175.md)

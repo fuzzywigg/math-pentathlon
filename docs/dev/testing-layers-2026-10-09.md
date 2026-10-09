@@ -1,19 +1,20 @@
 # Testing layers — live counts (2026-10-09)
 
-**Task id:** `q-mp-235` (remeasure after `q-mp-199` / tip post728)  
-**Measured tip:** `cursor/mp-tip-post748` @ `23926935` (full SHA `23926935c3c8c5771797c8ef6b5fb172b04b60e0`)  
+**Task id:** `q-mp-260` (remeasure after `q-mp-235` / tip post748 → tip post755)  
+**Measured tip:** `cursor/mp-tip-post755` @ `74a1596f` (full SHA `74a1596f71aab5d6616ff486b2a4eb2a70b5123b`)  
 **Measured on:** 2026-10-09 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post748. Pin policy unchanged. No `src/` or AI/copy/rules changes.
+Docs-only refresh of unit file / Vitest case counts for tip post755. Pin policy unchanged. No `src/` or AI/copy/rules changes.
 
 ## Duplicate check (open drafts)
 
 | Open draft | Overlap | Action |
 | --- | --- | --- |
-| [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) `q-mp-199` → post728 | Same pages; stamped **3140** / **12154** @ `b5884207` | **contained** — leave open; this remeasure owns tip post748 counts |
+| [#767](https://github.com/fuzzywigg/math-pentathlon/pull/767) `q-mp-235` → post748 | Same pages; stamped **3145** / **12189** @ `23926935` | **contained** — leave open; this remeasure owns tip post755 counts |
 | [#746](https://github.com/fuzzywigg/math-pentathlon/pull/746) `q-mp-233` → post728 | Owns wall budget + AI-bench skip evidence in `ci-unit-budget.md` | Keep ownership disjoint — only suite-size count cells / tip SHA updated there |
-| Prior stamps (`q-mp-199` / post728 @ `b5884207`) | Stale **3140** / **12154** on tip | Superseded by this remeasure (**3145** / **12189**) |
+| [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) `q-mp-199` → post728 | Same pages; stamped **3140** / **12154** @ `b5884207` | **contained** — leave open |
+| Prior stamps (`q-mp-235` / post748 @ `23926935`) | Stale **3145** / **12189** on tip | Superseded by this remeasure (**3156** / **12279**) |
 | #658 `q-mp-063` unit CI headroom | May change **unit wall time** (fixtures / virtual clocks) | **Does not change file/case counts** — note only |
 
 ## How counts were measured
@@ -34,15 +35,15 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `23926935`
+## Live counts @ `74a1596f`
 
 ### Unit (Vitest)
 
 | Metric | Count | Command |
 | --- | ---: | --- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3145** | `npm run test:unit` |
-| Cases listed (`npx vitest list`) | **12189** | `npm run test:unit` |
-| → `unit-shared` files / cases | 3066 / 11343 | `npx vitest run --project unit-shared` |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3156** | `npm run test:unit` |
+| Cases listed (`npx vitest list`) | **12279** | `npm run test:unit` |
+| → `unit-shared` files / cases | 3077 / 11433 | `npx vitest run --project unit-shared` |
 | → `unit-node` files / cases | 36 / 380 | `npx vitest run --project unit-node` |
 | → `unit-isolated` files / cases | 43 / 466 | `npx vitest run --project unit-isolated` |
 | Watch / coverage | — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
@@ -78,7 +79,7 @@ Playwright UI mode: `npm run test:e2e:ui`.
 ### Visual (opt-in separate config)
 
 | Suite | Spec files | Cases | Committed PNG baselines | Command |
-| --- | ---: | ---: | ---: | --- |
+| --- | ---: | ---: | --- | --- |
 | Opt-in 2D (`playwright.visual.config.ts`, `tests/visual/`) | 1 | 21 | 21 under `tests/visual/__screenshots__/` | `npm run test:visual` / `npm run test:visual:update` |
 | E2E visual projects (above) | 1 shared spec × 2 projects | 21 + 21 | 42 under `tests/e2e/visual-baselines/` | `npm run test:e2e:visual` / `npm run test:e2e:visual:update` |
 
