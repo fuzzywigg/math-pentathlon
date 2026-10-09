@@ -58,7 +58,7 @@ npm run audit:memory             # heap / detach probe across game mounts
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 Mobile touch notes: [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md).
 Zoom / reflow (WCAG 1.4.4 / 1.4.10): [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md).
-Bundle budgets: [`docs/bundle-budget.md`](../bundle-budget.md). Perf: [`docs/perf-2026-10-07.md`](../perf-2026-10-07.md).
+Bundle budgets: [`docs/bundle-budget.md`](../bundle-budget.md). Vite `mp3d` ↔ `game-*` circular-chunk packaging note: [`docs/dev/vite-circular-chunks-mp3d.md`](../dev/vite-circular-chunks-mp3d.md). Perf: [`docs/perf-2026-10-07.md`](../perf-2026-10-07.md).
 
 Opt-in visual regression via separate config (chromium, fixed viewport, seeded, animations off): see [`docs/visual-regression.md`](../visual-regression.md).
 
