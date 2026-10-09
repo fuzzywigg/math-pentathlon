@@ -143,22 +143,6 @@ export async function startHuman(page: Page): Promise<void> {
   await dismissOwl(page);
 }
 
-/** Always open New Game → HvH → Start for a fresh seeded deal. */
-export async function startHumanFresh(page: Page): Promise<void> {
-  await waitForGameReady(page);
-  await dismissOwl(page);
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-  if (await human.isVisible().catch(() => false)) {
-    await human.click();
-  }
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwl(page);
-}
-
 /**
  * Known non-app console noise (tooling + WebKit Report-Only CSP without
  * report-to). Does **not** change CSP headers — harness filter only.
@@ -173,14 +157,4 @@ export function isBenignConsoleNoise(text: string): boolean {
       /report-only/i.test(text) &&
       /report-to/i.test(text))
   );
-}
-
-/** Attach console / pageerror capture; returns filtered error getter. */
-export function installConsoleGuard(page: Page): () => string[] {
-  const errors: string[] = [];
-  page.on('pageerror', (e) => errors.push(String(e)));
-  page.on('console', (msg) => {
-    if (msg.type() === 'error') errors.push(msg.text());
-  });
-  return () => errors.filter((e) => !isBenignConsoleNoise(e));
 }
