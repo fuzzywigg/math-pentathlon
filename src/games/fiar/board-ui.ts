@@ -47,7 +47,9 @@ const COLORS = FIAR_THEME;
 /** True when vs-AI chrome is on and it is the computer's seat to act. */
 function isComputerSeatTurn(state: FiarGameState): boolean {
   const root = getGameModeChromeRoot();
-  if (root?.dataset.opponent !== 'ai') return false;
+  if (root?.dataset.opponent !== 'ai') {
+    return false;
+  }
   const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
   return state.currentPlayer === aiSeat;
 }
@@ -314,8 +316,12 @@ export function renderBoard(
       node.chip === null &&
       canPlaceChip(state, nodeId);
     const extras: string[] = [];
-    if (state.selectedNode === nodeId) extras.push('selected');
-    if (node.chipKind === 'marked') extras.push('marked blocker');
+    if (state.selectedNode === nodeId) {
+      extras.push('selected');
+    }
+    if (node.chipKind === 'marked') {
+      extras.push('marked blocker');
+    }
 
     const coordLabel = parsed
       ? `${parsed[2]},${parsed[1]}`

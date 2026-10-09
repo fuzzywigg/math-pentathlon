@@ -487,9 +487,15 @@ export function renderBoard(
         cellEl.textContent = cell.value.toString();
         cellEl.dataset.value = String(cell.value);
 
-        if (cell.isPrime && !cell.owner) cellEl.classList.add('prime');
-        if (cell.owner) cellEl.classList.add(cell.owner);
-        if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
+        if (cell.isPrime && !cell.owner) {
+          cellEl.classList.add('prime');
+        }
+        if (cell.owner) {
+          cellEl.classList.add(cell.owner);
+        }
+        if (cell.isPrime && cell.owner) {
+          cellEl.classList.add('prime');
+        }
 
         const expr = validMap.get(cell.value);
         const isValid = allowInput && Boolean(expr);
@@ -650,7 +656,9 @@ export function renderExpressions(
     for (const { value, expr } of placements) {
       const item = document.createElement('div');
       item.className = 'pg-expr-item';
-      if (isPrime(value)) item.classList.add('prime');
+      if (isPrime(value)) {
+        item.classList.add('prime');
+      }
       replaceWithSafeHtml(item, safeHtml`<strong>${value}</strong> = ${expr}`);
       item.setAttribute('role', 'button');
       item.tabIndex = 0;

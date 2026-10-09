@@ -23,7 +23,9 @@ import {
 let stylesInjected = false;
 
 export function injectStarsStyles(): void {
-  if (stylesInjected) return;
+  if (stylesInjected) {
+    return;
+  }
   stylesInjected = true;
 
   const style = document.createElement('style');
@@ -452,8 +454,12 @@ export function renderBoard(
       cellEl.dataset.row = String(row);
       cellEl.dataset.col = String(col);
 
-      if (cell.isStar) cellEl.classList.add('star');
-      if (cell.owner) cellEl.classList.add(cell.owner);
+      if (cell.isStar) {
+        cellEl.classList.add('star');
+      }
+      if (cell.owner) {
+        cellEl.classList.add(cell.owner);
+      }
       if (
         state.lastMove &&
         state.lastMove.row === row &&
@@ -553,7 +559,9 @@ function calculatePreviewScore(
     }
   }
 
-  if (cell.isStar) score *= 2;
+  if (cell.isStar) {
+    score *= 2;
+  }
   return score;
 }
 

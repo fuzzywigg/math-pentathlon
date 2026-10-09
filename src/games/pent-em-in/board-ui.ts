@@ -100,7 +100,9 @@ export function renderBoard(
 
   for (const piece of state.placedPieces) {
     const shape = getPentominoShape(piece.shapeId);
-    if (!shape) continue;
+    if (!shape) {
+      continue;
+    }
 
     for (const cell of piece.cells) {
       const rect = document.createElementNS(
@@ -281,7 +283,9 @@ export function renderPieceSelector(
 
   for (const shapeId of pieces.available) {
     const shape = getPentominoShape(shapeId);
-    if (!shape) continue;
+    if (!shape) {
+      continue;
+    }
 
     const pieceEl = document.createElement('div');
     const selected = state.selectedPiece === shapeId;
@@ -355,7 +359,9 @@ export function getPlayerName(player: 'player1' | 'player2'): string {
 }
 
 export function injectPentEmInStyles(): void {
-  if (document.getElementById('pent-em-in-styles')) return;
+  if (document.getElementById('pent-em-in-styles')) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = 'pent-em-in-styles';

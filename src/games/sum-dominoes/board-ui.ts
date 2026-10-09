@@ -300,8 +300,12 @@ function createHandDomino(
   wrapper.setAttribute('role', 'listitem');
   wrapper.dataset.dominoId = domino.id;
 
-  if (isSelected) wrapper.classList.add('sd-hand-domino-selected');
-  if (isPlayable) wrapper.classList.add('sd-hand-domino-playable');
+  if (isSelected) {
+    wrapper.classList.add('sd-hand-domino-selected');
+  }
+  if (isPlayable) {
+    wrapper.classList.add('sd-hand-domino-playable');
+  }
 
   const label = `Domino ${domino.face1}-${domino.face2}${
     isPlayable ? ', playable' : ''
