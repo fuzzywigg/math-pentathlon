@@ -23,7 +23,7 @@ import type { GameFuzzAdapter } from '../unit/helpers/state-roundtrip-games';
 import {
   createRng,
   pickOne,
-  withSeededMathRandom,
+  withSeededRandom,
 } from '../unit/helpers/state-roundtrip';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -170,7 +170,7 @@ function buildPositions(
   playSeed: number
 ): BuiltPosition[] {
   const rng = createRng(playSeed);
-  const initial = withSeededMathRandom(playSeed, () => adapter.create());
+  const initial = withSeededRandom(playSeed, () => adapter.create());
   const applied: unknown[] = [];
   let state: unknown = initial;
 
@@ -188,7 +188,7 @@ function buildPositions(
     if (legal.length === 0) break;
 
     const choice = pickOne(rng, legal);
-    state = withSeededMathRandom(playSeed + ply + 1, () =>
+    state = withSeededRandom(playSeed + ply + 1, () =>
       adapter.apply(state, choice)
     );
     applied.push(choice);
@@ -229,9 +229,9 @@ function replayFromInitial(
   playSeed: number,
   moves: unknown[]
 ): unknown {
-  let state = withSeededMathRandom(playSeed, () => adapter.create());
+  let state = withSeededRandom(playSeed, () => adapter.create());
   for (let i = 0; i < moves.length; i++) {
-    state = withSeededMathRandom(playSeed + i + 1, () =>
+    state = withSeededRandom(playSeed + i + 1, () =>
       adapter.apply(state, moves[i])
     );
   }

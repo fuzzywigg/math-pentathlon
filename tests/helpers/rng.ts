@@ -50,9 +50,6 @@ export function withSeededRandom<T>(seed: number, fn: () => T): T {
   }
 }
 
-/** Alias used by state-roundtrip helpers. */
-export const withSeededMathRandom = withSeededRandom;
-
 /**
  * Per-ply seed so Easy/Hard consume the same RNG for dice / random opponents
  * at the same decision index (policy differences do not desync later plies).

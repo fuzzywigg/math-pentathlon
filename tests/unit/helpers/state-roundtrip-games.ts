@@ -264,13 +264,13 @@ import {
   LOOP_PRONE_MAX_MOVES,
   jsonRoundTrip,
   stripLazyCaches,
-  withSeededMathRandom,
+  withSeededRandom,
 } from './state-roundtrip';
 
 export interface GameFuzzAdapter<S = unknown> {
   id: string;
   maxMoves: number;
-  /** Create initial state (call inside withSeededMathRandom when shuffle/RNG is used). */
+  /** Create initial state (call inside withSeededRandom when shuffle/RNG is used). */
   create: () => S;
   isOver: (state: S) => boolean;
   /** Stable, JSON-serializable legal move descriptors. */
@@ -293,7 +293,7 @@ function jsonTrip<S>(state: S): S {
 }
 
 function mockAI<T>(fn: () => T): T {
-  return withSeededMathRandom(AI_COMPARE_SEED, fn);
+  return withSeededRandom(AI_COMPARE_SEED, fn);
 }
 
 // ─── calla ───────────────────────────────────────────────────────────────────

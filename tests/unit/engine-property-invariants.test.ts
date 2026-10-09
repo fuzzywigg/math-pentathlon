@@ -27,7 +27,7 @@ import {
 } from './helpers/engine-property-invariants';
 
 import { mulberry32, pick } from './engine-invariants-helpers';
-import { withSeededMathRandom, createRng } from './helpers/state-roundtrip';
+import { withSeededRandom, createRng } from './helpers/state-roundtrip';
 
 import {
   isValidMove as hexIsValid,
@@ -208,10 +208,10 @@ describe('Engine property invariants — legal ⊆ validator (secondary engines)
   it('sum-dominoes: getValidPlacements ⊆ isValidPlacement under random play', () => {
     for (const seed of PROPERTY_SEEDS) {
       const rng = createRng(seed);
-      let state = withSeededMathRandom(seed, () => createSum());
+      let state = withSeededRandom(seed, () => createSum());
       for (let i = 0; i < 20 && state.phase !== 'gameOver'; i++) {
         if (state.phase === 'rolling') {
-          state = withSeededMathRandom(seed + i, () => sumRoll(state));
+          state = withSeededRandom(seed + i, () => sumRoll(state));
           continue;
         }
         if (state.phase === 'passing' || !state.currentDice) {
@@ -263,7 +263,7 @@ describe('Engine property invariants — legal ⊆ validator (secondary engines)
       let state = createPrime();
       for (let i = 0; i < 20 && state.phase !== 'gameOver'; i++) {
         if (state.phase === 'rolling') {
-          state = withSeededMathRandom(seed + i, () => primeRoll(state));
+          state = withSeededRandom(seed + i, () => primeRoll(state));
           continue;
         }
         const spots = primePlacements(state);
@@ -284,7 +284,7 @@ describe('Engine property invariants — legal ⊆ validator (secondary engines)
   it('stars-bars: getValidPlacements re-query stable; places under random play', () => {
     for (const seed of PROPERTY_SEEDS) {
       const rng = createRng(seed);
-      let state = withSeededMathRandom(seed, () => createStars());
+      let state = withSeededRandom(seed, () => createStars());
       for (let i = 0; i < 20 && state.phase !== 'gameOver'; i++) {
         if (!starsHas(state)) {
           state = starsPass(state);
@@ -429,7 +429,7 @@ describe('Engine property invariants — legal ⊆ validator (secondary engines)
       let state = createJuggle();
       for (let i = 0; i < 16 && state.phase !== 'gameOver'; i++) {
         if (state.phase === 'rolling' || !state.currentDice) {
-          state = withSeededMathRandom(seed + i, () => juggleRoll(state));
+          state = withSeededRandom(seed + i, () => juggleRoll(state));
           continue;
         }
         if (!canMakeAnyMove(state)) break;
@@ -544,7 +544,7 @@ describe('Engine property invariants — legal ⊆ validator (secondary engines)
       let state = createContig();
       for (let i = 0; i < 20 && state.phase !== 'gameOver'; i++) {
         if (state.phase === 'rolling') {
-          state = withSeededMathRandom(seed + i, () => contigRoll(state));
+          state = withSeededRandom(seed + i, () => contigRoll(state));
           continue;
         }
         if (!state.currentDice) {
