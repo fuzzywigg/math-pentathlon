@@ -5,8 +5,8 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { renderGraph } from '../../src/core/graph/graph-ui';
 import { createStarGraph, createHexLatticeGraph } from '../../src/core/graph/types';
-import { renderHexGrid } from '../../src/core/hex/hex-ui';
-import { createLayout } from '../../src/core/hex/types';
+import { renderHexGrid } from '../helpers/core-hex/hex-ui';
+import { createLayout } from '../helpers/core-hex/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

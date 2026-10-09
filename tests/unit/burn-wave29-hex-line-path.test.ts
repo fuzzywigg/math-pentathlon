@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { hexLine, hexDistance, areNeighbors, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial, type AxialCoord } from '../../src/core/hex/types';
+import { hexLine, hexDistance, areNeighbors, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, type AxialCoord } from '../helpers/core-hex/types';
 
 function expectSameHex(a: AxialCoord, b: AxialCoord): void {
   expect(hexEquals(a, b)).toBe(true);

@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { createAxial } from '../../src/core/hex/types';
-import { hexesInRange, hexDistance } from '../../src/core/hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
+import { hexesInRange, hexDistance } from '../helpers/core-hex/coordinates';
 import { createArrayGetter } from '../../src/core/alignment/grid-alignment';
 import { areCoprime } from '../../src/core/attributes/logic';
 

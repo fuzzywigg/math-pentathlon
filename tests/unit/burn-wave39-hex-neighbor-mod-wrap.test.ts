@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getNeighbor, getDiagonalNeighbors, areNeighbors, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { getNeighbor, getDiagonalNeighbors, areNeighbors, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Wave 39 hex — neighbor mod wrap', () => {
   it('direction 6 ≡ 0; 7 ≡ 1', () => {

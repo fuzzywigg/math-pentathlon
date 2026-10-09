@@ -7,8 +7,8 @@ import {
   renderHexWithTriangles,
   getHexTriangles,
   getHexCorners,
-} from '../../src/core/hex/hex-ui';
-import { createLayout, createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/hex-ui';
+import { createLayout, createAxial } from '../helpers/core-hex/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

@@ -9,8 +9,8 @@ import {
   reflect,
   hexEquals,
   hexDistance,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight hex — rotate/reflect compose', () => {
   it('six rotateRight returns identity; left is inverse', () => {

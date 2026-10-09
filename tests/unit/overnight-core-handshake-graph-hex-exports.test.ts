@@ -7,9 +7,9 @@ import { describe, it, expect } from 'vitest';
 import * as graphTypes from '../../src/core/graph/types';
 import * as graphAlgos from '../../src/core/graph/algorithms';
 import * as graphUi from '../../src/core/graph/graph-ui';
-import * as hexTypes from '../../src/core/hex/types';
-import * as hexCoords from '../../src/core/hex/coordinates';
-import * as hexUi from '../../src/core/hex/hex-ui';
+import * as hexTypes from '../helpers/core-hex/types';
+import * as hexCoords from '../helpers/core-hex/coordinates';
+import * as hexUi from '../helpers/core-hex/hex-ui';
 
 const graph = { ...graphTypes, ...graphAlgos, ...graphUi };
 const hex = { ...hexTypes, ...hexCoords, ...hexUi };
