@@ -487,6 +487,7 @@ const drivers: GameDriver[] = [
               parse('.juggle-board.player2 .fill-percent')
             );
           })();
+          const avoid = document.body.dataset.juggleAvoidDieScore;
           dice.sort((a, b) => {
             const sa = sizeScore(
               `${a.getAttribute('aria-label') || ''} ${a.textContent || ''}`.toLowerCase()
@@ -494,17 +495,58 @@ const drivers: GameDriver[] = [
             const sb = sizeScore(
               `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
             );
+            // After abandon, try the other die face before the one that failed.
+            if (avoid != null) {
+              const av = +avoid;
+              const aBad = sa === av ? 1 : 0;
+              const bBad = sb === av ? 1 : 0;
+              if (aBad !== bBad) return aBad - bBad;
+            }
             // Late boards: strongly prefer the smallest die face available.
             if (fillMax >= 70 && sa !== sb) return sa - sb;
             return sa - sb || Math.random() - 0.5;
           });
-          click(dice[0]);
+          const pick = dice[0]!;
+          document.body.dataset.juggleLastDieScore = String(
+            sizeScore(
+              `${pick.getAttribute('aria-label') || ''} ${pick.textContent || ''}`.toLowerCase()
+            )
+          );
+          click(pick);
           return true;
         }
 
         const boardSel = status.includes('red')
           ? '.juggle-board.player2'
           : '.juggle-board.player1';
+        const hook = (
+          window as unknown as {
+            __mpJuggleController?: {
+              abandonPlacement?: () => void;
+              placeSelected?: () => boolean;
+            };
+          }
+        ).__mpJuggleController;
+        // Prefer DEV legal-placement helper (any orientation) over DOM search.
+        if (/place the shape/.test(status) && hook?.placeSelected) {
+          if (hook.placeSelected()) {
+            delete document.body.dataset.juggleAvoidDieScore;
+            delete document.body.dataset.juggleLastDieScore;
+            return true;
+          }
+          // Shape cannot fit — abandon to try the other die.
+          if (hook.abandonPlacement) {
+            const beforeAbandon =
+              document.querySelector('.juggle-status')?.textContent || '';
+            const last = document.body.dataset.juggleLastDieScore;
+            if (last != null) document.body.dataset.juggleAvoidDieScore = last;
+            hook.abandonPlacement();
+            const afterAbandon =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (afterAbandon !== beforeAbandon) return true;
+          }
+          return false;
+        }
         const btn = (re: RegExp) =>
           [...document.querySelectorAll('.juggle-control-btn')].find((b) =>
             re.test(b.textContent || '')
@@ -540,7 +582,11 @@ const drivers: GameDriver[] = [
             cell.click();
             const after =
               document.querySelector('.juggle-status')?.textContent || '';
-            if (after !== before) return true;
+            if (after !== before) {
+              delete document.body.dataset.juggleAvoidDieScore;
+              delete document.body.dataset.juggleLastDieScore;
+              return true;
+            }
           }
           // Hover-marked valid cells (legacy / future chrome)
           const marked = [
@@ -552,7 +598,11 @@ const drivers: GameDriver[] = [
             cell.click();
             const after =
               document.querySelector('.juggle-status')?.textContent || '';
-            if (after !== before) return true;
+            if (after !== before) {
+              delete document.body.dataset.juggleAvoidDieScore;
+              delete document.body.dataset.juggleLastDieScore;
+              return true;
+            }
           }
           return false;
         };
@@ -577,6 +627,17 @@ const drivers: GameDriver[] = [
         if (abandon) {
           abandon.click();
           return true;
+        }
+        // Fallback abandon via DEV hook when DOM place path is stuck.
+        if (hook?.abandonPlacement) {
+          const beforeAbandon =
+            document.querySelector('.juggle-status')?.textContent || '';
+          const last = document.body.dataset.juggleLastDieScore;
+          if (last != null) document.body.dataset.juggleAvoidDieScore = last;
+          hook.abandonPlacement();
+          const afterAbandon =
+            document.querySelector('.juggle-status')?.textContent || '';
+          if (afterAbandon !== beforeAbandon) return true;
         }
         return false;
       });
