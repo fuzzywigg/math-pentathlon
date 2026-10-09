@@ -3,7 +3,7 @@
  * Beyond wave39 dedicated x/y/z dominant cases. Tests-only. After #214/#215.
  */
 import { describe, it, expect } from 'vitest';
-import { cubeRound, hexRound } from '../../src/core/hex/coordinates';
+import { cubeRound, hexRound } from '../helpers/core-hex/coordinates';
 
 describe('Overnight core hex — cubeRound equal-ish diffs', () => {
   it('near-equidistant fractional cubes still satisfy x+y+z=0', () => {

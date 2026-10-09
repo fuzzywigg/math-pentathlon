@@ -3,9 +3,9 @@
  * Tests-only. After #214/#215.
  */
 import { describe, it, expect } from 'vitest';
-import { createLayout, type HexLayout } from '../../src/core/hex/types';
-import { axialToPixel } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { createLayout, type HexLayout } from '../helpers/core-hex/types';
+import { axialToPixel } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — layout spacing field', () => {
   it('createLayout does not set spacing', () => {

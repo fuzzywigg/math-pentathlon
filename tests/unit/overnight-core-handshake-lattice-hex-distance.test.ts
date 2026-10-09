@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { createHexLatticeGraph } from '../../src/core/graph/types';
-import { hexDistance } from '../../src/core/hex/coordinates';
-import { parseCoordKey } from '../../src/core/hex/types';
+import { hexDistance } from '../helpers/core-hex/coordinates';
+import { parseCoordKey } from '../helpers/core-hex/types';
 import { getNeighbors, isConnected } from '../../src/core/graph/algorithms';
 
 describe('Overnight core handshake — lattice ↔ hex distance', () => {

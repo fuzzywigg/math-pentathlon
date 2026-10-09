@@ -6,8 +6,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { axialToCube, cubeToAxial, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial, createCube, type AxialCoord } from '../../src/core/hex/types';
+import { axialToCube, cubeToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, createCube, type AxialCoord } from '../helpers/core-hex/types';
 
 const SAMPLE: AxialCoord[] = [
   { q: 0, r: 0 },

@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, hexEquals, hexDistance } from '../../src/core/hex/coordinates';
-import { createAxial, createLayout, type HexLayout, type AxialCoord } from '../../src/core/hex/types';
+import { axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, hexEquals, hexDistance } from '../helpers/core-hex/coordinates';
+import { createAxial, createLayout, type HexLayout, type AxialCoord } from '../helpers/core-hex/types';
 
 const HEXES: AxialCoord[] = [
   { q: 0, r: 0 },

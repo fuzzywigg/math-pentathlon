@@ -2,8 +2,8 @@
  * Overnight TOKENMAXX — hexLine geodesic density leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { hexLine, hexDistance, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { hexLine, hexDistance, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight hex — line geodesic', () => {
   it('line length is distance+1; endpoints preserved', () => {

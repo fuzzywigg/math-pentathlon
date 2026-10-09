@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { cubeRound, hexEquals, hexRound } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { cubeRound, hexEquals, hexRound } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Wave 39 hex — cubeRound ties', () => {
   it('integer cube rounds to itself', () => {

@@ -14,7 +14,7 @@ This page is a public index of those systems as they exist in the tree today. Pr
 | Polyomino | `src/core/polyomino/` | Shapes, transforms, placement, UI |
 | Attributes | `src/core/attributes/` | Attribute logic helpers and UI |
 | Graph / network | `src/core/graph/` | Graph algorithms and board UI |
-| Hex grid | `src/core/hex/` | Hex coordinates and rendering |
+| Hex grid (test-only) | `tests/helpers/core-hex/` | Lattice/UI helpers for unit suites; production boards use `src/ui/hex-svg.ts` |
 | Expressions | `src/core/expressions/` | Number-sentence evaluation and UI |
 
 ## Related product modules

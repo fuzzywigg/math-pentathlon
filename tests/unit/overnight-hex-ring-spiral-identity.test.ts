@@ -9,8 +9,8 @@ import {
   hexDistance,
   hexEquals,
   hexInArray,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight hex — ring/spiral/range identities', () => {
   it('radius-0 ring is center; spiral radius R covers range', () => {

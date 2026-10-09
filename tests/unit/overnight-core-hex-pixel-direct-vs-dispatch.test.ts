@@ -11,8 +11,8 @@ import {
   pixelToAxialPointy,
   pixelToAxialFlat,
   hexEquals,
-} from '../../src/core/hex/coordinates';
-import { createAxial, createLayout } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial, createLayout } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — pixel direct vs dispatch', () => {
   it('pointy dispatch ≡ axialToPixelPointy / pixelToAxialPointy', () => {

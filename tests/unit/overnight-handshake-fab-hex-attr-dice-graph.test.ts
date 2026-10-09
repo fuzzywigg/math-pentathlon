@@ -3,8 +3,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { createInitialState, hasAnyValidMove } from '../../src/games/fab-a-diffy/rules';
-import { hexSpiral, hexDistance } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { hexSpiral, hexDistance } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 import { createMathPiece, isPrime } from '../../src/core/attributes/logic';
 import { getAllPossibleSums, roll } from '../../src/core/dice/roller';
 import { bfs, isConnected } from '../../src/core/graph/algorithms';

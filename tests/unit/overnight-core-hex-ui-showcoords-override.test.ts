@@ -3,8 +3,8 @@
  * Tests-only. After #214/#215.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { renderHexGrid } from '../../src/core/hex/hex-ui';
-import { createLayout, createAxial, coordKey } from '../../src/core/hex/types';
+import { renderHexGrid } from '../helpers/core-hex/hex-ui';
+import { createLayout, createAxial, coordKey } from '../helpers/core-hex/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

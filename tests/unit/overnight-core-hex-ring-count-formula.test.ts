@@ -9,8 +9,8 @@ import {
   hexesInRange,
   hexDistance,
   hexEquals,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — ring/spiral counts', () => {
   it('ring radius r has 6r cells; all at exact distance r', () => {

@@ -8,8 +8,8 @@ import { renderFractionBar, createInteractiveFractionBar, injectFractionBarStyle
 import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 import { createBoard, placePolyomino } from '../../src/core/polyomino/placement';
 import { renderBoard, renderPlacementPreview, injectPolyominoStyles } from '../../src/core/polyomino/polyomino-ui';
-import { renderHexGrid, renderRectHexGrid, createInteractiveHexGrid, injectHexStyles } from '../../src/core/hex/hex-ui';
-import type { HexLayout } from '../../src/core/hex/types';
+import { renderHexGrid, renderRectHexGrid, createInteractiveHexGrid, injectHexStyles } from '../helpers/core-hex/hex-ui';
+import type { HexLayout } from '../helpers/core-hex/types';
 
 const layout: HexLayout = {
   orientation: 'pointy',
