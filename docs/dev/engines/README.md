@@ -13,6 +13,7 @@ Contributor-only maps of what each game **engine module does in code**. Not play
 | [Rules decisions](../../RULES-DECISIONS-2026-10-07.md) | Owner yes/no checklist |
 | [Tutorial vs engine](../../tutorial-engine-mismatches-2026-10-07.md) | Copy mismatches (docs only) |
 | [Board3D WebGL lifecycle (q-mp-072)](./board3d-webgl-lifecycle.md) | `load-three` · `tablet-gl` · context-lost · dispose + SwiftShader shots |
+| [injectStyles / board CSS ownership (q-mp-122)](./inject-styles-board-css.md) | `injectStylesOnce` vs `game-play.css` map + Contig screenshot |
 
 This folder does **not** replace #475 or #496 — link out instead of restating them.
 
