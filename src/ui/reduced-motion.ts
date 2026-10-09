@@ -26,7 +26,9 @@ export function prefersReducedMotion(
 ): boolean {
   const userPref =
     options.userPrefersReducedMotion ?? getUserReducedMotionFlag();
-  if (userPref) return true;
+  if (userPref) {
+    return true;
+  }
 
   if (typeof options.osPrefersReducedMotion === 'boolean') {
     return options.osPrefersReducedMotion;
@@ -53,7 +55,9 @@ export function prefersReducedMotion(
 export function applyReducedMotionPreference(
   options: ReducedMotionOptions = {}
 ): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
   const root = document.documentElement;
   if (prefersReducedMotion(options)) {
     root.setAttribute(REDUCED_MOTION_ATTR, 'true');
