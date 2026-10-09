@@ -12,6 +12,9 @@ describe('Wave 56 workflow — CI unit job', () => {
       resolve(process.cwd(), '.github/workflows/ci.yml'),
       'utf8'
     );
+    const pkg = JSON.parse(
+      readFileSync(resolve(process.cwd(), 'package.json'), 'utf8')
+    ) as { scripts: Record<string, string> };
     expect(yml).toMatch(/^name:\s*CI\b/m);
     expect(yml).toMatch(/^\s+lint:\s*$/m);
     expect(yml).toMatch(/^\s+audit:\s*$/m);
@@ -20,7 +23,8 @@ describe('Wave 56 workflow — CI unit job', () => {
     expect(yml).toMatch(/^\s+e2e:\s*$/m);
     expect(yml).toMatch(/npm run test:unit/);
     expect(yml).toMatch(/npm run test:e2e/);
-    expect(yml).toMatch(/npm run typecheck/);
+    expect(yml).toMatch(/npm run verify/);
+    expect(pkg.scripts.verify).toMatch(/typecheck/);
     // Slice modules remain in-tree under CI's unit gate
     expect(yml).not.toMatch(/skip.*test:unit/i);
   });

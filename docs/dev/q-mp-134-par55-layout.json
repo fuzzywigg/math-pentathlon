@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-09T12:57:45.991Z",
+    "baseURL": "http://127.0.0.1:5179",
+    "moveTarget": 20,
+    "navCycles": 5,
+    "mode": "render",
+    "phase": "qmp134-after",
+    "cpuThrottle": 4,
+    "fixedGames": [],
+    "fixNotes": []
+  },
+  "results": [
+    {
+      "gameId": "par-55",
+      "board3d": false,
+      "ttiMs": 557.8999999999069,
+      "movesAttempted": 80,
+      "movesLanded": 8,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 65.80000000004657,
+        "p95Ms": 170.80000000004657,
+        "maxMs": 189,
+        "meanMs": 76.67749999999941,
+        "layoutReadsP95": 8,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    }
+  ],
+  "phases": {
+    "qmp134-after": {
+      "meta": {
+        "generatedAt": "2026-10-09T12:57:45.991Z",
+        "baseURL": "http://127.0.0.1:5179",
+        "moveTarget": 20,
+        "navCycles": 5,
+        "mode": "render",
+        "phase": "qmp134-after",
+        "cpuThrottle": 4,
+        "fixedGames": [],
+        "fixNotes": []
+      },
+      "results": [
+        {
+          "gameId": "par-55",
+          "board3d": false,
+          "ttiMs": 557.8999999999069,
+          "movesAttempted": 80,
+          "movesLanded": 8,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 65.80000000004657,
+            "p95Ms": 170.80000000004657,
+            "maxMs": 189,
+            "meanMs": 76.67749999999941,
+            "layoutReadsP95": 8,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        }
+      ]
+    }
+  }
+}

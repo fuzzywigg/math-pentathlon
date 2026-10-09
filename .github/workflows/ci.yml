@@ -34,17 +34,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - run: npm run lint
-      - name: Lint rule ceilings (curly:all ratchet)
-        run: npm run lint:ratchet
-      - name: Check formatting
-        run: npm run format:check
-      - name: TypeScript type checking
-        run: npm run typecheck
-      - name: TypeScript type ratchet (ui/core/demos/Batch-1/2/3/4 shells + Phase-2 ceiling)
-        run: npm run typecheck:ratchet
-      - name: Module-boundary import-graph ceilings (engine_imports_ui must stay 0)
-        run: npm run check:boundaries
+      # Same chain as package.json "verify" (lint → lint:ratchet → format:check →
+      # typecheck → typecheck:ratchet → check:boundaries). Keep CI and local aligned.
+      - run: npm run verify
+      # Report-only: surface player-facing copy-pin findings in Actions without
+      # failing the required lint job (q-mp-137). Stays outside package.json
+      # "verify" so verify consolidation and copy-pins can fold together.
+      - name: Player-facing copy pins (report-only)
+        continue-on-error: true
+        run: npm run check:copy-pins -- --fail
 
   audit:
     runs-on: ubuntu-latest

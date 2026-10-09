@@ -490,7 +490,7 @@ export async function createPrimeGoldBoard3D(
         tileMat = mats.tileVein1;
       } else if (veinOwner === 'player2') {
         tileMat = mats.tileVein2;
-      } else if (last && last.row === cm.row && last.col === cm.col) {
+      } else if (last?.row === cm.row && last.col === cm.col) {
         tileMat = mats.tileLast;
       }
 
@@ -508,8 +508,13 @@ export async function createPrimeGoldBoard3D(
         }
         const paired: number[] = [];
         for (let i = 0; i + 1 < seg.length; i++) {
-          const a = boardToWorld(seg[i]!.row, seg[i]!.col);
-          const b = boardToWorld(seg[i + 1]!.row, seg[i + 1]!.col);
+          const segA = seg[i];
+          const segB = seg[i + 1];
+          if (segA === undefined || segB === undefined) {
+            continue;
+          }
+          const a = boardToWorld(segA.row, segA.col);
+          const b = boardToWorld(segB.row, segB.col);
           paired.push(
             a.x,
             TILE_TOP_Y + CHIP_H + 0.08,
@@ -537,7 +542,7 @@ export async function createPrimeGoldBoard3D(
   const syncChips = (state: PrimeGoldState): void => {
     for (const cm of cells) {
       const cell = state.cells.get(`${cm.row},${cm.col}`);
-      if (!cell || !cell.owner) {
+      if (!cell?.owner) {
         clearChip(cm);
         continue;
       }
@@ -681,7 +686,11 @@ export async function createPrimeGoldBoard3D(
     cells.length = 0;
     valueIndex.clear();
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     tileGeo.dispose();

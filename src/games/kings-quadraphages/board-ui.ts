@@ -72,8 +72,7 @@ export function handleCellClick(
     ) {
       // If King is already selected and we click it again, deselect
       if (
-        state.selectedKingPosition &&
-        state.selectedKingPosition.row === row &&
+        state.selectedKingPosition?.row === row &&
         state.selectedKingPosition.col === col
       ) {
         return {
@@ -186,8 +185,7 @@ function syncKingsCell(
   }
 
   if (
-    state.selectedKingPosition &&
-    state.selectedKingPosition.row === row &&
+    state.selectedKingPosition?.row === row &&
     state.selectedKingPosition.col === col
   ) {
     cell.classList.add('cell-selected');
@@ -228,11 +226,7 @@ function syncKingsCell(
   if (state.moveHistory.length > 0) {
     // ratchet: length > 0 ⇒ last index defined.
     const lastMove = state.moveHistory[state.moveHistory.length - 1];
-    if (
-      lastMove !== undefined &&
-      lastMove.to.row === row &&
-      lastMove.to.col === col
-    ) {
+    if (lastMove?.to.row === row && lastMove.to.col === col) {
       cell.classList.add('cell-last-move');
     }
   }

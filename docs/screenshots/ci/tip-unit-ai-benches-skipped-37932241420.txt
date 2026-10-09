@@ -1,0 +1,18 @@
+# Tip CI unit log excerpt — AI benches skipped under CI=1
+#
+# Source run: https://github.com/fuzzywigg/math-pentathlon/actions/runs/37932241420
+# Job: unit (id 113825816967)
+# Workflow head SHA: 2083a96d22fdba76c8ffa3f3506c5b18b43b7c51
+# Tip branch at run: cursor/mp-tip-post477
+# Captured for q-mp-175 — real GHA log lines (ANSI stripped); numbers not invented.
+#
+# Local reproduce of the two skip gates (not the full suite):
+#   CI=1 npx vitest run --project unit-isolated tests/unit/tablet-ai-hard-latency.bench.test.ts
+#   CI=1 npx vitest run --project unit-shared tests/unit/ai-move-time-midgame.bench.test.ts
+
+unit suite: 3123 files (budget ~8 min; step timeout 12m / job 14m)
+↓  unit-isolated  tests/unit/tablet-ai-hard-latency.bench.test.ts (10 tests | 10 skipped)
+↓  unit-shared  tests/unit/ai-move-time-midgame.bench.test.ts (1 test | 1 skipped)
+Test Files  3121 passed | 2 skipped (3123)
+Tests  12031 passed | 35 skipped | 22 todo (12088)
+Duration  360.84s (transform 27.34s, setup 7.08s, import 34.64s, tests 848.19s, environment 2094.31s)

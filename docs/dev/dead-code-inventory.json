@@ -38,8 +38,8 @@
       "devDependencies": []
     },
     "candidateCount": 129,
-    "safeYes": 6,
-    "executedRemovals": 10,
+    "safeYes": 5,
+    "executedRemovals": 11,
     "deferredSafeHelpers": 1,
     "deferPrs": [
       {
@@ -143,6 +143,29 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted on tip via q-mp-054 rename; q-mp-101 confirms + inventory sync"
+      },
+      {
+        "kind": "test-helper-module",
+        "path": "tests/unit/helpers/fake-timers.ts",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted unused module (zero importers after #658 fold / tip demote); q-mp-139"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/game-play.css",
+        "symbol": "calla-teaching-hint",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/game-play.css",
+        "symbol": "sd-hands-container",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule (q-mp-154)"
       }
     ]
   },
@@ -179,8 +202,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
@@ -196,8 +219,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
@@ -229,8 +252,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep",
-      "disposition": "deferred"
+      "reason": "demoted in q-mp-155 — module-private; still used by installDomHooks",
+      "disposition": "removed"
     },
     {
       "kind": "test-helper-module",
@@ -243,8 +266,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep",
-      "disposition": "kept"
+      "reason": "removed in q-mp-139 — zero importers on live tip after #658 fold",
+      "disposition": "removed"
     },
     {
       "kind": "unused-type",

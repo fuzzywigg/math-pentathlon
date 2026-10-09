@@ -12,7 +12,7 @@
 | Divergence | `0` behind / **444** ahead of `alpha` (fast-forward stack) |
 | Prior file audit | [#552](https://github.com/fuzzywigg/math-pentathlon/pull/552) `docs/dev/tip-vs-alpha-audit-2026-10-08.md` @ tip `36a1340d` (16 AI + 32 copy primary; 48 flagged paths) |
 | Isolation option | [#559](https://github.com/fuzzywigg/math-pentathlon/pull/559) (held; after Oct 14) — independent restore commits for the same 48 paths |
-| Preflight | [#569](https://github.com/fuzzywigg/math-pentathlon/pull/569) / `docs/dev/friday-landing-preflight-v2.md` — CONDITIONAL GO; §3 still flags AI + You/Computer/tutorial deltas |
+| Preflight | [#569](https://github.com/fuzzywigg/math-pentathlon/pull/569) / `docs/dev/friday-landing-preflight-v2.md (absent on tip)` — CONDITIONAL GO; §3 still flags AI + You/Computer/tutorial deltas |
 
 **Tip drift check:** product AI/copy paths under `src/games/**/{ai,ai-client,tutorial,board-ui,game-controller}.ts` + `calla/rules.ts` are **byte-identical** at `7466528b` and later tip `9370a30f` (only docs folds after preflight SHA).
 

@@ -130,3 +130,4 @@ Also unchanged by this docs task: CI `permissions: contents: read` + `persist-cr
 
 - Public testing guide: [`docs/wiki/development.md`](../wiki/development.md)
 - CI gate Mermaid (report-only drafts may refresh it): [`docs/dev/ci-gates-mermaid-q-mp-073.md`](./ci-gates-mermaid-q-mp-073.md)
+- Gzip NEW OVER snapshot (juggle / par-55 / remainder-islands): [`docs/dev/bundle-over-2026-10-09.md`](./bundle-over-2026-10-09.md) (`npm run size:check`; allowlist policy in [`docs/bundle-budget.md`](../bundle-budget.md))

@@ -90,7 +90,11 @@ function isKingMoveTarget(state: GameState, row: number, col: number): boolean {
   if (row < 1 || row > BOARD_SIZE || col < 1 || col > BOARD_SIZE) {
     return false;
   }
-  return state.board[row - 1]![col - 1] === null;
+  const boardRow = state.board[row - 1];
+  if (boardRow === undefined) {
+    return false;
+  }
+  return boardRow[col - 1] === null;
 }
 
 /**
@@ -324,7 +328,11 @@ export async function createKingsQuadraphagesBoard3D(
 
   const syncPiece = (cell: CellMeshes, state: GameState): void => {
     const { row, col } = cell;
-    const piece = state.board[row - 1]![col - 1] ?? null;
+    const boardRow = state.board[row - 1];
+    if (boardRow === undefined) {
+      return;
+    }
+    const piece = boardRow[col - 1] ?? null;
     const existing = cell.piece;
     const existingKind = existing?.userData?.kind as string | undefined;
     const existingOwner = existing?.userData?.owner as string | undefined;
@@ -389,28 +397,31 @@ export async function createKingsQuadraphagesBoard3D(
     }
     clickHandler = nextClick;
 
-    const last: Position | null =
-      state.moveHistory.length > 0
-        ? state.moveHistory[state.moveHistory.length - 1]!.to
-        : null;
+    let last: Position | null = null;
+    if (state.moveHistory.length > 0) {
+      const lastEntry = state.moveHistory[state.moveHistory.length - 1];
+      if (lastEntry !== undefined) {
+        last = lastEntry.to;
+      }
+    }
 
     for (const cell of cells) {
       const { row, col } = cell;
-      const piece = state.board[row - 1]![col - 1] ?? null;
+      const boardRow = state.board[row - 1];
+      if (boardRow === undefined) {
+        continue;
+      }
+      const piece = boardRow[col - 1] ?? null;
       const isLight = (row + col) % 2 === 0;
       let tileMat = isLight ? mats.light : mats.dark;
 
       const selectedKing = state.selectedKingPosition;
-      const isSelected =
-        selectedKing != null &&
-        selectedKing.row === row &&
-        selectedKing.col === col;
+      const isSelected = selectedKing?.row === row && selectedKing.col === col;
       const isValidMoveTarget = isKingMoveTarget(state, row, col);
       const isValidPlacement =
         state.turnPhase === 'placeQuadraphage' && piece === null;
       const lastMove = last;
-      const isLast =
-        lastMove != null && lastMove.row === row && lastMove.col === col;
+      const isLast = lastMove?.row === row && lastMove.col === col;
 
       if (isSelected) {
         tileMat = mats.selected;
@@ -447,7 +458,11 @@ export async function createKingsQuadraphagesBoard3D(
     }
 
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     tileGeo.dispose();

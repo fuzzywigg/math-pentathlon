@@ -81,7 +81,7 @@ statements 92.65%→93.12%.
 
 ## Tests added
 
-- `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts`
+- `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts (absent on tip)`
 - `tests/unit/burn-1008-ui-cov-r4-fiar-layout-board.test.ts`
 - `tests/unit/burn-1008-ui-cov-r4-owl-poly-helpers.test.ts`
 - `tests/unit/burn-1008-ui-cov-r4-controllers-shell.test.ts`

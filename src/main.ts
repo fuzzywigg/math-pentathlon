@@ -184,7 +184,7 @@ function renderGame(): void {
 
   const gameInfo = getGameById(gameId);
 
-  if (!gameInfo || !gameInfo.available) {
+  if (!gameInfo?.available) {
     navigate('/');
     return;
   }

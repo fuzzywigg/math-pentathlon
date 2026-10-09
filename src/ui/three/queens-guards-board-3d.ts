@@ -549,10 +549,11 @@ export async function createQueensGuardsBoard3D(
       }
     }
 
-    const last =
+    const lastEntry =
       state.moveHistory.length > 0
-        ? state.moveHistory[state.moveHistory.length - 1]!
-        : null;
+        ? state.moveHistory[state.moveHistory.length - 1]
+        : undefined;
+    const last = lastEntry ?? null;
     const lastFrom = last ? cellKey(last.from.ring, last.from.position) : null;
     const lastTo = last ? cellKey(last.to.ring, last.to.position) : null;
     const lastWasCapture = Boolean(last?.wasCapture);
@@ -662,9 +663,7 @@ export async function createQueensGuardsBoard3D(
       const cellPiece = piece;
       const selectable = restoring
         ? captured.has(cell.key)
-        : cellPiece != null &&
-          cellPiece.player === state.currentPlayer &&
-          !state.winner;
+        : cellPiece?.player === state.currentPlayer && !state.winner;
       btn.tabIndex =
         selectable ||
         validMoves.has(cell.key) ||
@@ -752,7 +751,11 @@ export async function createQueensGuardsBoard3D(
       clearPiece(cell);
     }
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
 

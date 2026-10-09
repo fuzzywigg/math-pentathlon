@@ -10,6 +10,24 @@ npx playwright test -c playwright.visuals-2026-10.config.ts
 
 Distinct from [`docs/gallery/`](../gallery/) (tablet landscape 1024×768) and from `tests/e2e/visual-baselines/` (CI report-only regression suite).
 
+## Route lifecycle visuals (`q-mp-146`)
+
+Desktop Chromium (1024×768) shots for menu → Hex mount → **← Games** destroy → crash-boundary reset. Linked from [`docs/dev/engines/game-lifecycle.md`](../../dev/engines/game-lifecycle.md).
+
+```bash
+npx playwright test -c playwright.lifecycle-visuals.config.ts
+```
+
+| Step | File |
+| --- | --- |
+| Menu | [`lifecycle-menu.png`](./lifecycle-menu.png) |
+| Hex mounted | [`lifecycle-game-mounted-hex.png`](./lifecycle-game-mounted-hex.png) |
+| After ← Games | [`lifecycle-after-back-to-games.png`](./lifecycle-after-back-to-games.png) |
+| Crash boundary | [`lifecycle-crash-boundary-hex.png`](./lifecycle-crash-boundary-hex.png) |
+| After Try again | [`lifecycle-crash-boundary-reset-hex.png`](./lifecycle-crash-boundary-reset-hex.png) |
+
+## Per-game iPad start / mid
+
 | Game | Start | Mid-game (HvH) |
 |------|-------|----------------|
 | Kings & Quadraphages | [`kings-quadraphages-start.png`](./kings-quadraphages-start.png) | [`kings-quadraphages-mid.png`](./kings-quadraphages-mid.png) |

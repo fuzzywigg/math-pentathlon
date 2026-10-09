@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 /**
- * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127).
+ * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141).
  *
  * Counts violations for rules that are too widespread to hard-fail yet
  * (currently: curly "all", @typescript-eslint/no-non-null-assertion,
  * @typescript-eslint/no-confusing-void-expression, radix, default-case,
- * no-duplicate-imports).
+ * no-duplicate-imports, @typescript-eslint/prefer-nullish-coalescing,
+ * @typescript-eslint/prefer-optional-chain,
+ * @typescript-eslint/switch-exhaustiveness-check).
  * Fails if any counted rule exceeds its ceiling so the debt can only go down.
  *
  * Usage: npm run lint:ratchet
@@ -37,6 +39,9 @@ const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
  * - radix (live unset; q-mp-130; residual 6 HOLD on kwatro ai/rules)
  * - default-case (live unset; q-mp-129 — residual HOLD: rules.ts + arithmetic)
  * - no-duplicate-imports (live unset; q-mp-127)
+ * - @typescript-eslint/prefer-nullish-coalescing (live unset; q-mp-140)
+ * - @typescript-eslint/prefer-optional-chain (live unset; q-mp-148)
+ * - @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141)
  */
 // Keep the probe config under the repo root so flat-config `import.meta.dirname`
 // / relative imports to eslint.config.js resolve; always delete in `finally`.
@@ -56,6 +61,9 @@ export default [
       radix: 'error',
       'default-case': 'error',
       'no-duplicate-imports': 'error',
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
     },
   },
 ];

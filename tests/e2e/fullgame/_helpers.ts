@@ -3,7 +3,10 @@
  * Reuses e2e stability seed (0xc0ffee); UI-only clicks/keyboard.
  */
 import { expect, type Page } from '@playwright/test';
-import { isBenignConsoleNoise } from '../helpers/page';
+import {
+  dismissOwl as dismissOwlCanonical,
+  isBenignConsoleNoise,
+} from '../helpers/page';
 import { E2E_RNG_SEED } from '../helpers/stability';
 
 export { E2E_RNG_SEED };
@@ -81,15 +84,9 @@ async function installFullgamePrefs(page: Page): Promise<void> {
   );
 }
 
-export async function dismissOwl(page: Page): Promise<void> {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-      (el as HTMLElement).style.visibility = 'hidden';
-    }
-  });
-}
+/** Fullgame always hides the owl stack so overlays never steal clicks. */
+export const dismissOwl = (page: Page): Promise<void> =>
+  dismissOwlCanonical(page, { hide: true });
 
 export async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({

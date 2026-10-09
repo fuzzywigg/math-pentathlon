@@ -25,6 +25,10 @@ import { queensGuardsTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadQueensGuardsBoard3DModule } from './board-3d-loader';
 import type { QueensGuardsBoard3D } from '../../ui/three/queens-guards-board-3d';
@@ -67,8 +71,29 @@ let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking = false;
 /** Invalidates in-flight worker replies after new game / leave. */
 let aiGeneration = 0;
+/** Pending paint-delay before AI search / capture restore — cleared on destroy. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI paint-delay work; no-ops after New Game / route leave. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 // Optional Three.js board (only when feature flag is on)
 let board3d: QueensGuardsBoard3D | null = null;
@@ -233,7 +258,7 @@ function updateStatus(): void {
 function maybeTriggerAI(): void {
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
     // Slight delay so the thinking status can paint before search starts.
-    setTimeout(() => {
+    scheduleAI(() => {
       void performAIMove();
     }, 500);
   }
@@ -406,7 +431,7 @@ async function performAIMove(): Promise<void> {
 
   // Capture keeps the AI seat until restore finishes.
   if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => {
+    scheduleAI(() => {
       void performAIMove();
     }, 400);
   }
@@ -535,6 +560,7 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelQueensAiRequests();
   disposeQueensAiWorker();
@@ -568,6 +594,7 @@ export function getGameState(): QueensGuardsState {
 
 export function newGameVsHuman(): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelQueensAiRequests();
   vsAI = false;
@@ -581,6 +608,7 @@ export function newGameVsHuman(): void {
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
   aiGeneration += 1;
+  clearAiTimer();
   isAIThinking = false;
   cancelQueensAiRequests();
   vsAI = true;

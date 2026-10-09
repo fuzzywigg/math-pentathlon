@@ -10,6 +10,17 @@
 > `placeSequence`/`withEmptyHands`, `extractSeat`, fake-timer hooks, `jsonReplacer`/`jsonReviver`,
 > visual helpers). Re-run cleared them from the ranked list; remaining Rank-2 deferred is
 > `clearDom` only (`fake-timers.ts` module still `kept`).
+>
+> **q-mp-139 (2026-10-09):** Removed Rank-2 `tests/unit/helpers/fake-timers.ts` after live-tip
+> re-check showed zero importers (`rg 'fake-timers|installFakeTimerHooks|withFakeTimers' tests src`).
+>
+> **q-mp-155 (2026-10-09):** Demoted Rank-2 `tests/unit/helpers/dom.ts` → `clearDom` to
+> module-private (still used by `installDomHooks`). Live tip re-check:
+> `rg '\bclearDom\b' tests src` — definitions/calls only inside `dom.ts`. No Rank-2
+> deferred test-helper exports remain.
+>
+> **q-mp-154 (2026-10-09):** Removed Rank-1 dead CSS `.calla-teaching-hint` (including coarse-pointer
+> media-query group ref) and `.sd-hands-container` from `src/ui/styles/game-play.css`.
 
 ## Method
 
@@ -36,6 +47,9 @@ Re-verified on live tip then applied (**8** items initially; **+2** CSS classes 
 | removed | export | `src/ui/game-route-mounts.ts` → `resetGameMountDepsForTests` | deleted unused test-hook export (zero refs) |
 | removed | css-class | `src/ui/styles/forced-colors.css` → `kwa-board-svg` | deleted on tip via q-mp-054 rename to live `.kwa-board` / container / 3d-host; q-mp-101 confirms + inventory sync |
 | removed | css-class | `src/ui/styles/forced-colors.css` → `tutorial-spotlight` | deleted on tip via q-mp-054 rename to live `.tutorial-highlight*` ; q-mp-101 confirms + inventory sync |
+| removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | deleted unused module (zero importers after #658 fold / tip demote); q-mp-139 |
+| removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154) |
+| removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | deleted Rank-1 dead CSS rule (q-mp-154) |
 
 ## Defer — do not redo
 
@@ -63,11 +77,11 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | Rank | Safe? | Disposition | Kind | Path / symbol | Evidence | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | yes | kept | css-class | `src/style.css` → `game-card-division` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
-| 1 | yes | kept | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
-| 1 | yes | kept | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
+| 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
+| 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | kept | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
-| 2 | yes | deferred | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | test helper with zero importers after grep |
-| 2 | yes | kept | test-helper-module | `tests/unit/helpers/fake-timers.ts` | grep stem: no import-shaped external references | test helper with zero importers after grep |
+| 2 | yes | removed | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | demoted in q-mp-155 — module-private; still used by installDomHooks |
+| 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
 | 3 | review | kept | unused-type | `src/core/ai-worker/client.ts` → `AiWorkerRequestPayload` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/ai-worker/protocol.ts` → `AiWorkerRequestBase` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/alignment/compat.ts` → `WrapOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
