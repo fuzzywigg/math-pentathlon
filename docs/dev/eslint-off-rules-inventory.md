@@ -82,3 +82,7 @@ Residual ceiling **21** — HOLD only in `*/rules.ts` and `*/ai.ts` (contig-60, 
 | #730 (`q-mp-206`, post709)           | `no-console` ratchet + inventory    | may add `no-console` row; tip owner reconciles                         |
 
 Tip owner fold **q-mp-026g**: inventory re-run against folded tree; **min ceiling wins**. Never raise ceilings.
+
+## Non-ceilinged residuals addendum (q-mp-240)
+
+Detailed live overlay for rules **not** in `lint-ratchet-ceilings.json` (`no-console` **24**, `no-param-reassign` **23**, stricter `eqeqeq` **12**, `return-await` **7**, plus HOLD notes) lives in sibling [`eslint-non-ceilinged-residuals-2026-10-09.md`](./eslint-non-ceilinged-residuals-2026-10-09.md) (tip `cursor/mp-tip-post748` @ `ce673656`). Additive to open `#740`; tip owner reconciles on fold.
