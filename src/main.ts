@@ -151,10 +151,14 @@ function renderStats(): void {
         import('./ui/stats-dashboard'),
         import('./ui/styles/stats-dashboard.css'),
       ]);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderStatsDashboard(appContainer!);
     } catch {
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Your Progress',
@@ -197,7 +201,9 @@ function renderGame(): void {
         import('./ui/game-route-mounts'),
         import('./ui/styles/game-play.css'),
       ]);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       initGameMountDeps({
         container: appContainer!,
         setCleanup: (fn: (() => void) | null) => {
@@ -209,7 +215,9 @@ function renderGame(): void {
       await mountGameById(gameId, routeGen);
     } catch (err) {
       console.error(`Failed to load game ${gameId}`, err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       // Load failures use the dedicated load-error UI; drop the runtime boundary.
       if (activeGameBoundary) {
         activeGameBoundary.dispose();
@@ -236,11 +244,15 @@ function renderDiceDemoPage(): void {
   void (async () => {
     try {
       const { renderDiceDemo } = await import('./demos/dice-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderDiceDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Dice System Demo',
@@ -260,11 +272,15 @@ function renderAlignmentDemoPage(): void {
   void (async () => {
     try {
       const { renderAlignmentDemo } = await import('./demos/alignment-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderAlignmentDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Alignment Detection Demo',
@@ -284,11 +300,15 @@ function renderFractionDemoPage(): void {
   void (async () => {
     try {
       const { renderFractionDemo } = await import('./demos/fraction-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderFractionDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Fraction System Demo',
@@ -308,11 +328,15 @@ function renderPolyominoDemoPage(): void {
   void (async () => {
     try {
       const { renderPolyominoDemo } = await import('./demos/polyomino-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderPolyominoDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Polyomino System Demo',
@@ -332,11 +356,15 @@ function renderGraphDemoPage(): void {
   void (async () => {
     try {
       const { renderGraphDemo } = await import('./demos/graph-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGraphDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Graph/Network System Demo',
@@ -356,11 +384,15 @@ function renderAttributeDemoPage(): void {
   void (async () => {
     try {
       const { renderAttributeDemo } = await import('./demos/attribute-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderAttributeDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Attribute Logic Demo',
@@ -380,11 +412,15 @@ function renderExpressionDemoPage(): void {
   void (async () => {
     try {
       const { renderExpressionDemo } = await import('./demos/expression-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderExpressionDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Expression Builder Demo',
