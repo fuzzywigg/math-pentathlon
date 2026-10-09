@@ -1,7 +1,7 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-125: ceilings for rules counted by npm run lint:ratchet. curly lowered after src/core braces (remeasure). nnnull 378; void 224; radix 6; default-case 5; no-duplicate-imports 122. Tip owner reconciles ceilings on fold (min wins).",
+  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-125: ceilings for rules counted by npm run lint:ratchet. curly: 539 after q-mp-125 src/core braces (tip re-measure). nnnull 378; void 224; radix 6; default-case 5; no-duplicate-imports 122. Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
-    "curly": 577,
+    "curly": 539,
     "@typescript-eslint/no-non-null-assertion": 378,
     "@typescript-eslint/no-confusing-void-expression": 224,
     "radix": 6,
