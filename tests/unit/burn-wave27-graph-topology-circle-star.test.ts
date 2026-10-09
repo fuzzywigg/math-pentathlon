@@ -5,18 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createCircularGraph,
-  createStarGraph,
-  createCompleteGraph,
-  getNeighbors,
-  getNodeDegree,
-  isConnected,
-  bfs,
-  dijkstra,
-  findAllPaths,
-  findComponents,
-} from '../../src/core/graph';
+import { createCircularGraph, createStarGraph, createCompleteGraph } from '../../src/core/graph/types';
+import { getNeighbors, getNodeDegree, isConnected, bfs, dijkstra, findAllPaths, findComponents } from '../../src/core/graph/algorithms';
 
 describe('Wave 27 graph-topology — createCircularGraph', () => {
   it('n nodes labeled 1..n with ids n0..', () => {

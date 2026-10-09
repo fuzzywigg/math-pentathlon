@@ -4,10 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  simplifyExpression,
-  evaluate,
-} from '../../src/core/expressions';
+import { simplifyExpression, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 38 expr-simplify — fail passthrough', () => {
   it('invalid expression returns original string', () => {

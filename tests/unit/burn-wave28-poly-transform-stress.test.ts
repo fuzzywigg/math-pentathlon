@@ -5,20 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  transformCells,
-  getAbsoluteCells,
-  getAllTransformations,
-  cellsToKey,
-  normalizeCells,
-  rotateCells,
-  flipCellsHorizontal,
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  PENTOMINOES,
-  type Rotation,
-  type Cell,
-} from '../../src/core/polyomino';
+import { transformCells, getAbsoluteCells, getAllTransformations, cellsToKey, normalizeCells, rotateCells, flipCellsHorizontal } from '../../src/core/polyomino/transform';
+import { SIMPLE_SHAPES, TETROMINOES, PENTOMINOES, type Rotation, type Cell } from '../../src/core/polyomino/types';
 
 const ROTS: Rotation[] = [0, 90, 180, 270];
 

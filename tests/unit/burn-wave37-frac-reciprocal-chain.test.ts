@@ -4,18 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  reciprocal,
-  negate,
-  abs,
-  multiply,
-  areEqual,
-  simplify,
-  fromWhole,
-  isPositive,
-  isNegative,
-} from '../../src/core/fractions';
+import { createFraction, reciprocal, negate, abs, multiply, areEqual, simplify, fromWhole, isPositive, isNegative } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-reciprocal — chains', () => {
   const samples = [

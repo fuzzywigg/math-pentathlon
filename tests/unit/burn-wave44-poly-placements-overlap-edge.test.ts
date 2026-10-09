@@ -2,7 +2,8 @@
  * Wave 44 — doPlacementsOverlap adjacent vs share leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { doPlacementsOverlap, SIMPLE_SHAPES } from '../../src/core/polyomino';
+import { doPlacementsOverlap } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 import type { Placement } from '../../src/core/polyomino/placement';
 
 describe('Wave 44 poly — placements overlap', () => {

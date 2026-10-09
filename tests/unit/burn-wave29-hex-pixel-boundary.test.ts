@@ -5,21 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  axialToPixel,
-  axialToPixelPointy,
-  axialToPixelFlat,
-  pixelToAxial,
-  pixelToAxialPointy,
-  pixelToAxialFlat,
-  cubeRound,
-  hexRound,
-  hexEquals,
-  hexDistance,
-  createAxial,
-  createLayout,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, cubeRound, hexRound, hexEquals, hexDistance } from '../../src/core/hex/coordinates';
+import { createAxial, createLayout, type AxialCoord } from '../../src/core/hex/types';
 
 function expectSameHex(a: AxialCoord, b: AxialCoord): void {
   expect(hexEquals(a, b)).toBe(true);

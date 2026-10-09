@@ -5,22 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createHexLatticeGraph,
-  createGridGraph,
-  createCircularGraph,
-  createStarGraph,
-  createTrackGraph,
-  createCompleteGraph,
-  getNeighbors,
-  getNodeDegree,
-  isConnected,
-  bfs,
-  dijkstra,
-  findComponents,
-  findReachable,
-  findNodesAtDistance,
-} from '../../src/core/graph';
+import { createHexLatticeGraph, createGridGraph, createCircularGraph, createStarGraph, createTrackGraph, createCompleteGraph } from '../../src/core/graph/types';
+import { getNeighbors, getNodeDegree, isConnected, bfs, dijkstra, findComponents, findReachable, findNodesAtDistance } from '../../src/core/graph/algorithms';
 
 /** Closed-form hex count for rings r: 3r(r+1)+1 */
 function hexCount(rings: number): number {

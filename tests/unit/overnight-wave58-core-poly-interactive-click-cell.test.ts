@@ -3,11 +3,9 @@
  * Distinct from wave55 mouseleave-null leftover. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import {
-  createBoard,
-  createInteractiveBoard,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createBoard } from '../../src/core/polyomino/placement';
+import { createInteractiveBoard } from '../../src/core/polyomino/polyomino-ui';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

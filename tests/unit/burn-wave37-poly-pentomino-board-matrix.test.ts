@@ -4,20 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  PENTOMINOES,
-  createBoard,
-  placePolyomino,
-  validatePlacement,
-  findValidPlacements,
-  canPlaceShape,
-  countEmptyCells,
-  getAllOrientations,
-  getAbsoluteCells,
-  areCellsInBounds,
-  cellsToKey,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { PENTOMINOES, type Rotation } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino, validatePlacement, findValidPlacements, canPlaceShape, countEmptyCells } from '../../src/core/polyomino/placement';
+import { getAllOrientations, getAbsoluteCells, areCellsInBounds, cellsToKey } from '../../src/core/polyomino/transform';
 
 describe('Wave 37 poly-pentomino — placeability on 5×5 / 6×6', () => {
   it('every pentomino can place somewhere on a 6×6 board', () => {

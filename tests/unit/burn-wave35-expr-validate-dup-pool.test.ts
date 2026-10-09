@@ -4,10 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTargetChallenge,
-  validateSolution,
-} from '../../src/core/expressions';
+import { createTargetChallenge } from '../../src/core/expressions/types';
+import { validateSolution } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-validate-dup — duplicate tiles', () => {
   it('allows using each duplicate instance once', () => {

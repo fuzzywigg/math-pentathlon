@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  areEqual,
-  areEquivalent,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, areEqual, areEquivalent, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-equal — dual styles', () => {
   it('areEqual matches areEquivalent for scaled pairs', () => {

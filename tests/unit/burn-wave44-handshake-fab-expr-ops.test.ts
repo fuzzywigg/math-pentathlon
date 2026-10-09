@@ -3,8 +3,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { calculateResult, getOperationSymbol } from '../../src/games/fab-a-diffy/rules';
-import { evaluate } from '../../src/core/expressions';
-import { toDecimal } from '../../src/core/fractions';
+import { evaluate } from '../../src/core/expressions/evaluator';
+import { toDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 44 handshake — fab × expr ops', () => {
   it('fab add 1/2+1/3 matches expr decimal path', () => {

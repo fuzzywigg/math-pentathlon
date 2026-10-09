@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createAxial,
-  rotateAround,
-  reflect,
-  hexEquals,
-  getNeighbor,
-} from '../../src/core/hex';
+import { createAxial } from '../../src/core/hex/types';
+import { rotateAround, reflect, hexEquals, getNeighbor } from '../../src/core/hex/coordinates';
 
 describe('Wave 39 hex — rotateAround neg / reflect', () => {
   const center = createAxial(0, 0);

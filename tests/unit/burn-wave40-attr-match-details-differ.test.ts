@@ -4,10 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getMatchDetails,
-  getDifferingAttributes,
-} from '../../src/core/attributes';
+import { getMatchDetails, getDifferingAttributes } from '../../src/core/attributes/logic';
 
 describe('Wave 40 attr — match details / differ', () => {
   const a = { id: '1', attributes: { color: 'red', size: 2, shape: 'circle' } };

@@ -4,23 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COMMON_FRACTIONS,
-  add,
-  subtract,
-  multiply,
-  divide,
-  compare,
-  areEqual,
-  areEquivalent,
-  simplify,
-  toDecimal,
-  min,
-  max,
-  sum,
-  findLCD,
-  toCommonDenominator,
-} from '../../src/core/fractions';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
+import { add, subtract, multiply, divide, compare, areEqual, areEquivalent, simplify, toDecimal, min, max, sum, findLCD, toCommonDenominator } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-common — total order consistency', () => {
   it('compare is antisymmetric and agrees with decimal order', () => {

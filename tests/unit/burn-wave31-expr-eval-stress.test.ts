@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluate } from '../../src/core/expressions';
+import { evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-eval — additive conservation', () => {
   it('sums 1..n equal n*(n+1)/2 for n up to 30', () => {

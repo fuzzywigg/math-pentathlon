@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  doPlacementsOverlap,
-  getAdjacentCells,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, doPlacementsOverlap, getAdjacentCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 40 poly — overlap / adjacent matrix', () => {
   const mono = SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;

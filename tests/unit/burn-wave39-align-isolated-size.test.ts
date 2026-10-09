@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { isIsolated, getRegionSize } from '../../src/core/alignment';
+import { isIsolated, getRegionSize } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — isolated / region size', () => {
   const dims = { rows: 3, cols: 3 };

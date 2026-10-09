@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createSlot,
-  createParenCard,
-  createOperatorCard,
-  createNumberCard,
-  validateSlots,
-  slotsToExpression,
-} from '../../src/core/expressions';
+import { createSlot, createParenCard, createOperatorCard, createNumberCard } from '../../src/core/expressions/types';
+import { validateSlots, slotsToExpression } from '../../src/core/expressions/evaluator';
 
 describe('Wave 39 expr — slot factory validate', () => {
   it('paren + number + op factory cards evaluate to 20', () => {

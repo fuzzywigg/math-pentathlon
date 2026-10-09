@@ -5,22 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createAxial,
-  createCube,
-  createOffset,
-  createLayout,
-  coordKey,
-  parseCoordKey,
-  AXIAL_DIRECTIONS,
-  CUBE_DIRECTIONS,
-  CUBE_DIAGONALS,
-  DIRECTION_NAMES,
-  getNeighbor,
-  axialToCube,
-  hexDistance,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { createAxial, createCube, createOffset, createLayout, coordKey, parseCoordKey, AXIAL_DIRECTIONS, CUBE_DIRECTIONS, CUBE_DIAGONALS, DIRECTION_NAMES, type AxialCoord } from '../../src/core/hex/types';
+import { getNeighbor, axialToCube, hexDistance } from '../../src/core/hex/coordinates';
 
 describe('Wave 29 hex-types — direction catalogs', () => {
   it('AXIAL_DIRECTIONS has 6 unit steps matching DIRECTION_NAMES', () => {

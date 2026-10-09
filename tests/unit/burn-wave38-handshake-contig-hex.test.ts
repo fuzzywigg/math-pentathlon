@@ -5,7 +5,8 @@
 import { describe, it, expect } from 'vitest';
 
 import { getHexNeighbors } from '../../src/core/alignment/contiguous';
-import { getNeighbors as hexGetNeighbors, hexDistance, createAxial } from '../../src/core/hex';
+import { getNeighbors as hexGetNeighbors, hexDistance } from '../../src/core/hex/coordinates';
+import { createAxial } from '../../src/core/hex/types';
 import type { ContiguousConfig } from '../../src/core/alignment/types';
 
 describe('Wave 38 handshake — hex neighbor count parity', () => {

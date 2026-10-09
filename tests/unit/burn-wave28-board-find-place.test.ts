@@ -5,19 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  placePolyomino,
-  findValidPlacements,
-  canPlaceShape,
-  findPlacementAtCell,
-  getPlacementCells,
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  getPolyominoById,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, placePolyomino, findValidPlacements, canPlaceShape, findPlacementAtCell, getPlacementCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, TETROMINOES, getPolyominoById, type Rotation } from '../../src/core/polyomino/types';
 
 function mono() {
   return SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;

@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  formatFraction,
-  parseFraction,
-  areEqual,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, formatFraction, parseFraction, areEqual, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-format — option cartesian', () => {
   const fractions = [

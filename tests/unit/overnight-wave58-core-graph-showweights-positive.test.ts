@@ -3,8 +3,8 @@
  * Distinct from wave52 weight-0 label. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { renderGraph } from '../../src/core/graph';
-import type { Graph } from '../../src/core/graph';
+import { renderGraph } from '../../src/core/graph/graph-ui';
+import type { Graph } from '../../src/core/graph/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

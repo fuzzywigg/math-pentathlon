@@ -3,12 +3,8 @@
  * Distinct from wave57 equivalent-flip / flip-vertical. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  getAbsoluteCells,
-  getCellsAtPosition,
-  cellsToKey,
-  TETROMINOES,
-} from '../../src/core/polyomino';
+import { getAbsoluteCells, getCellsAtPosition, cellsToKey } from '../../src/core/polyomino/transform';
+import { TETROMINOES } from '../../src/core/polyomino/types';
 
 describe('Wave 58 core poly — absolute ignores canFlip', () => {
   it('O canFlip false: absolute flipped differs from flag-aware cells', () => {

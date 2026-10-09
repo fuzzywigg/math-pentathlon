@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { tokenize, parse, evaluateNode } from '../../src/core/expressions';
+import { tokenize, parse, evaluateNode } from '../../src/core/expressions/evaluator';
 
 function evalExpr(src: string): number {
   return evaluateNode(parse(tokenize(src)));

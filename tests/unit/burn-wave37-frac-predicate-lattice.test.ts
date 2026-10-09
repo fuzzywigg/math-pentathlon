@@ -4,20 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  isPositive,
-  isNegative,
-  isZero,
-  isProper,
-  isWholeNumber,
-  isSimplified,
-  simplify,
-  compare,
-  abs,
-  negate,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, isPositive, isNegative, isZero, isProper, isWholeNumber, isSimplified, simplify, compare, abs, negate } from '../../src/core/fractions/arithmetic';
 
 const F = createFraction;
 const flag = (n: number, d: number) =>

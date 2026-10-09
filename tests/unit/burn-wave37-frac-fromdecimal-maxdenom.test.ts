@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  fromDecimal,
-  toDecimal,
-  areEqual,
-  createFraction,
-  simplify,
-} from '../../src/core/fractions';
+import { fromDecimal, toDecimal, areEqual, createFraction, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-fromdecimal — common denom fast path denser', () => {
   const cases: Array<{ d: number; n: number; den: number }> = [

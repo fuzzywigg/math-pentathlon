@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createMathPiece,
-  areCoprime,
-  getDigitSum,
-  isPerfectSquare,
-  sortByAttribute,
-} from '../../src/core/attributes';
+import { createMathPiece, areCoprime, getDigitSum, isPerfectSquare, sortByAttribute } from '../../src/core/attributes/logic';
 
 describe('Wave 39 attr — mathpiece neg/zero', () => {
   it('zero piece has even, non-prime, digitSum 0', () => {

@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  areEqual,
-  toDecimal,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, areEqual, toDecimal, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-create — denom sign flips', () => {
   it('flips both signs so denominator positive', () => {

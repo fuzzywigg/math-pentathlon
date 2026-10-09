@@ -4,11 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  findAllPaths,
-  createTrackGraph,
-  type Graph,
-} from '../../src/core/graph';
+import { findAllPaths } from '../../src/core/graph/algorithms';
+import { createTrackGraph, type Graph } from '../../src/core/graph/types';
 
 describe('Wave 39 graph — findAllPaths weights', () => {
   it('start===end with maxDepth≥1 yields weight-0 singleton', () => {

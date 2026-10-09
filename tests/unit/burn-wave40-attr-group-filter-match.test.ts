@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  groupByAttribute,
-  filterPieces,
-  findMatchingAttribute,
-} from '../../src/core/attributes';
+import { groupByAttribute, filterPieces, findMatchingAttribute } from '../../src/core/attributes/logic';
 
 describe('Wave 40 attr — group / filter / match', () => {
   const pieces = [

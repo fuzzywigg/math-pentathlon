@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  createSlot,
-  createNumberCard,
-  createOperatorCard,
-} from '../../src/core/expressions';
+import { validateSlots } from '../../src/core/expressions/evaluator';
+import { createSlot, createNumberCard, createOperatorCard } from '../../src/core/expressions/types';
 
 describe('Wave 35 expr-slots-unary — leading minus allowed', () => {
   it('accepts -N as starting operator minus', () => {

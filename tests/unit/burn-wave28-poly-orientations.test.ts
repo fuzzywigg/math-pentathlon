@@ -5,20 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getAllRotations,
-  getAllOrientations,
-  getAllTransformations,
-  getTransformedCells,
-  getTransformedPolyomino,
-  cellsToKey,
-  TETROMINOES,
-  PENTOMINOES,
-  SIMPLE_SHAPES,
-  getPolyominoById,
-  type PolyominoShape,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { getAllRotations, getAllOrientations, getAllTransformations, getTransformedCells, getTransformedPolyomino, cellsToKey } from '../../src/core/polyomino/transform';
+import { TETROMINOES, PENTOMINOES, SIMPLE_SHAPES, getPolyominoById, type PolyominoShape, type Rotation } from '../../src/core/polyomino/types';
 
 function byId(id: string): PolyominoShape {
   const s = getPolyominoById(id);

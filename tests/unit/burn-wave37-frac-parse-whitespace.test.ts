@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  parseFraction,
-  areEqual,
-  createFraction,
-  fromWhole,
-  fromMixedNumber,
-} from '../../src/core/fractions';
+import { parseFraction, areEqual, createFraction, fromWhole, fromMixedNumber } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-parse — trim and shapes', () => {
   it('trims surrounding whitespace for all shapes', () => {

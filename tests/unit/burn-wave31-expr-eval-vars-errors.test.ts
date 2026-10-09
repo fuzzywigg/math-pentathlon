@@ -5,12 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  evaluate,
-  evaluateNode,
-  parse,
-  tokenize,
-} from '../../src/core/expressions';
+import { evaluate, evaluateNode, parse, tokenize } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-eval — variable maps', () => {
   it('substitutes multiple variables', () => {

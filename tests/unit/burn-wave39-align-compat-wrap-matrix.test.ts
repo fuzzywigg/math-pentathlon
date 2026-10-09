@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { isInBounds, normalizePosition } from '../../src/core/alignment';
+import { isInBounds, normalizePosition } from '../../src/core/alignment/compat';
 
 const dim = { rows: 4, cols: 5 };
 

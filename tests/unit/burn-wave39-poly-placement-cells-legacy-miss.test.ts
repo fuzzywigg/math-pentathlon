@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  getPlacementCells,
-  SIMPLE_SHAPES,
-  type PlacedPolyomino,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, getPlacementCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, type PlacedPolyomino } from '../../src/core/polyomino/types';
 
 describe('Wave 39 poly — placement cells legacy miss', () => {
   it('legacy missing shapeId / empty shapes → []', () => {

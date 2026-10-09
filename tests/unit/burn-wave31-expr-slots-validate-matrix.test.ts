@@ -5,14 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  slotsToExpression,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-} from '../../src/core/expressions';
+import { validateSlots, slotsToExpression } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot } from '../../src/core/expressions/types';
 
 describe('Wave 31 expr-slots — happy paths', () => {
   it.each([

@@ -4,24 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  placePolyomino,
-  countEmptyCells,
-  TETROMINOES,
-  SIMPLE_SHAPES,
-  createHexagonalBoard,
-} from '../../src/core/polyomino';
-import {
-  createFraction,
-  areEqual,
-  add,
-  subtract,
-  toDecimal,
-  simplify,
-  compare,
-  fromWhole,
-} from '../../src/core/fractions';
+import { createBoard, placePolyomino, countEmptyCells, createHexagonalBoard } from '../../src/core/polyomino/placement';
+import { TETROMINOES, SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createFraction, areEqual, add, subtract, toDecimal, simplify, compare, fromWhole } from '../../src/core/fractions/arithmetic';
 
 function fillRatio(empty: number, total: number) {
   return createFraction(total - empty, total);

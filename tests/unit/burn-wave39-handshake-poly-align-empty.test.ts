@@ -4,7 +4,7 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import { createBoard, countEmptyCells, isBoardFilled } from '../../src/core/polyomino';
+import { createBoard, countEmptyCells, isBoardFilled } from '../../src/core/polyomino/placement';
 import {
   createPathHighlight,
   markCellsForHighlight,

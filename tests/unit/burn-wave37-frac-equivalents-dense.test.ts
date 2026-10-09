@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  findEquivalentFractions,
-  areEqual,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, findEquivalentFractions, areEqual, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-equivalents — density', () => {
   it('count equals floor(max/baseDenom) after simplify', () => {

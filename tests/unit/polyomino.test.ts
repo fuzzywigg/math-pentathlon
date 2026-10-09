@@ -3,51 +3,9 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  // Types
-  TETROMINOES,
-  PENTOMINOES,
-  getPolyominoesByOrder,
-  getPolyominoById,
-  // Transformations
-  getBounds,
-  normalizeCells,
-  sortCells,
-  canonicalizeCells,
-  rotateCells90CW,
-  rotateCells,
-  flipCellsHorizontal,
-  transformCells,
-  rotatePolyomino,
-  flipPolyomino,
-  getTransformedPolyomino,
-  getAllTransformations,
-  cellsToKey,
-  areCellsEquivalent,
-  arePolyominoesEquivalent,
-  getSymmetryCount,
-  translateCells,
-  getAbsoluteCells,
-  areCellsInBounds,
-  // Placement (Grid API)
-  createGrid,
-  isCellOccupied,
-  isValidPlacement,
-  placePolyomino,
-  removePolyomino,
-  getAllValidPositions,
-  getPlacementCells,
-  doPlacementsOverlap,
-  getAdjacentCells,
-  // Placement (legacy Board API)
-  createBoard,
-  validatePlacement,
-  findValidPlacements,
-  canPlaceShape,
-  countEmptyCells,
-  isBoardFilled,
-  removeLastPolyomino,
-} from '../../src/core/polyomino';
+import { TETROMINOES, PENTOMINOES, getPolyominoesByOrder, getPolyominoById } from '../../src/core/polyomino/types';
+import { getBounds, normalizeCells, sortCells, canonicalizeCells, rotateCells90CW, rotateCells, flipCellsHorizontal, transformCells, rotatePolyomino, flipPolyomino, getTransformedPolyomino, getAllTransformations, cellsToKey, areCellsEquivalent, arePolyominoesEquivalent, getSymmetryCount, translateCells, getAbsoluteCells, areCellsInBounds } from '../../src/core/polyomino/transform';
+import { createGrid, isCellOccupied, isValidPlacement, placePolyomino, removePolyomino, getAllValidPositions, getPlacementCells, doPlacementsOverlap, getAdjacentCells, createBoard, validatePlacement, findValidPlacements, canPlaceShape, countEmptyCells, isBoardFilled, removeLastPolyomino } from '../../src/core/polyomino/placement';
 
 describe('getPolyominoesByOrder', () => {
   it('should return 1 monomino', () => {

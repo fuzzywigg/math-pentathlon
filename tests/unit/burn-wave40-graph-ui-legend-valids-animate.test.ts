@@ -9,15 +9,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  createCircularGraph,
-  createGraphLegend,
-  showValidMoves,
-  animateMove,
-  renderGraph,
-  injectGraphStyles,
-} from '../../src/core/graph';
-import type { GraphBoard } from '../../src/core/graph';
+import { createCircularGraph } from '../../src/core/graph/types';
+import { createGraphLegend, showValidMoves, animateMove, renderGraph, injectGraphStyles } from '../../src/core/graph/graph-ui';
+import type { GraphBoard } from '../../src/core/graph/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

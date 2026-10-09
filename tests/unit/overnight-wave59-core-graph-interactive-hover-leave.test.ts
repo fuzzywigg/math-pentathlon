@@ -3,11 +3,8 @@
  * Opposite of wave58 hover-enter leftover. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import {
-  createTrackGraph,
-  createInteractiveGraph,
-  type GraphBoard,
-} from '../../src/core/graph';
+import { createTrackGraph, type GraphBoard } from '../../src/core/graph/types';
+import { createInteractiveGraph } from '../../src/core/graph/graph-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

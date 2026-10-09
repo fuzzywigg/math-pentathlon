@@ -4,12 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import {
-  createPathHighlight,
-  markCellsForHighlight,
-  clearHighlights,
-  createRegionHighlight,
-} from '../../src/core/alignment';
+import { createPathHighlight, markCellsForHighlight, clearHighlights, createRegionHighlight } from '../../src/core/alignment/highlight-ui';
 
 describe('Wave 39 highlight — path mark clear', () => {
   let container: HTMLDivElement;

@@ -5,13 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-} from '../../src/core/expressions';
+import { validateSlots } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot } from '../../src/core/expressions/types';
 
 describe('Wave 31 expr-slots — balanced parentheses', () => {
   it('accepts nested parens with mul outside', () => {

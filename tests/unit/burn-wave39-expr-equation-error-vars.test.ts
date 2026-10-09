@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  parseEquation,
-  checkEquation,
-  evaluateEquation,
-} from '../../src/core/expressions';
+import { parseEquation, checkEquation, evaluateEquation } from '../../src/core/expressions/evaluator';
 
 describe('Wave 39 expr — equation format rejects', () => {
   it('parseEquation null for wrong arity / tokenize failures', () => {

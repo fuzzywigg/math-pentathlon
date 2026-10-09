@@ -5,20 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  fromDecimal,
-  getFactors,
-  roundToDenominator,
-  areEqual,
-  toDecimal,
-  simplify,
-  formatFraction,
-  parseFraction,
-  COMMON_FRACTIONS,
-  FRACTION_COLORS,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, fromDecimal, getFactors, roundToDenominator, areEqual, toDecimal, simplify, formatFraction, parseFraction } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS, FRACTION_COLORS } from '../../src/core/fractions/types';
 
 const F = createFraction;
 

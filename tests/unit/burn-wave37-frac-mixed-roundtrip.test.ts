@@ -4,15 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  toMixedNumber,
-  fromMixedNumber,
-  areEqual,
-  simplify,
-  formatMixedNumber,
-  parseFraction,
-} from '../../src/core/fractions';
+import { createFraction, toMixedNumber, fromMixedNumber, areEqual, simplify, formatMixedNumber, parseFraction } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-mixed — round trips', () => {
   const samples = [

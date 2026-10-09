@@ -4,27 +4,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  tokenize,
-  parse,
-  evaluate,
-  evaluateNode,
-  slotsToExpression,
-  validateSlots,
-  solveTargetChallenge,
-  validateSolution,
-  parseEquation,
-  checkEquation,
-  evaluateEquation,
-  formatNumber,
-  astToString,
-  simplifyExpression,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-  createTargetChallenge,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluate, evaluateNode, slotsToExpression, validateSlots, solveTargetChallenge, validateSolution, parseEquation, checkEquation, evaluateEquation, formatNumber, astToString, simplifyExpression } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot, createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('tokenize', () => {
   it('tokenizes numbers and operators', () => {

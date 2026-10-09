@@ -3,7 +3,8 @@
  * Tests-only.
  */
 import { describe, it, expect, beforeEach } from 'vitest';
-import { createBoard, countEmptyCells, SIMPLE_SHAPES } from '../../src/core/polyomino';
+import { createBoard, countEmptyCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 import { parseTime, formatTime } from '../../src/core/timer-scoring';
 import { storage, createDefaultProgress } from '../../src/core/storage';
 

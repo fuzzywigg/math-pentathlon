@@ -5,15 +5,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  createFraction,
-  add,
-  multiply,
-  toDecimal,
-  simplify,
-  areEqual,
-  formatFraction,
-} from '../../src/core/fractions';
+import { createFraction, add, multiply, toDecimal, simplify, areEqual, formatFraction } from '../../src/core/fractions/arithmetic';
 import { formatTime, parseTime } from '../../src/core/timer-scoring';
 import { storage } from '../../src/core/storage';
 

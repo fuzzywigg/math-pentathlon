@@ -3,7 +3,7 @@
  * Distinct from wave52 default four-label / no-disabled. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { createGraphLegend } from '../../src/core/graph';
+import { createGraphLegend } from '../../src/core/graph/graph-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

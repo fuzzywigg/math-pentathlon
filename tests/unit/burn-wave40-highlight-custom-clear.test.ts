@@ -4,11 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import {
-  markCellsForHighlight,
-  clearHighlights,
-  injectHighlightStyles,
-} from '../../src/core/alignment';
+import { markCellsForHighlight, clearHighlights, injectHighlightStyles } from '../../src/core/alignment/highlight-ui';
 
 describe('Wave 40 highlight — custom clear + cellSelector', () => {
   let container: HTMLDivElement;

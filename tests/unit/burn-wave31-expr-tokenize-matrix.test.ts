@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { tokenize } from '../../src/core/expressions';
+import { tokenize } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-tokenize — number shapes', () => {
   it.each([

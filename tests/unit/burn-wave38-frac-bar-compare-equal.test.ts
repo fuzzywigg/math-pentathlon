@@ -4,11 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import {
-  createFraction,
-  renderFractionComparison,
-  renderFractionBar,
-} from '../../src/core/fractions';
+import { createFraction } from '../../src/core/fractions/arithmetic';
+import { renderFractionComparison, renderFractionBar } from '../../src/core/fractions/fraction-bar-ui';
 
 beforeEach(() => {
   document.body.innerHTML = '';

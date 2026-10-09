@@ -5,21 +5,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  createHexagonalBoard,
-  countEmptyCells,
-  getEmptyCells,
-  isBoardFilled,
-  canPlaceShape,
-  findValidPlacements,
-  findPlacementAtCell,
-  placePolyomino,
-  solvePlacement,
-  getPolyominoesByOrder,
-  getPolyominoById,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, createHexagonalBoard, countEmptyCells, getEmptyCells, isBoardFilled, canPlaceShape, findValidPlacements, findPlacementAtCell, placePolyomino, solvePlacement } from '../../src/core/polyomino/placement';
+import { getPolyominoesByOrder, getPolyominoById } from '../../src/core/polyomino/types';
 
 afterEach(() => {
   vi.restoreAllMocks();

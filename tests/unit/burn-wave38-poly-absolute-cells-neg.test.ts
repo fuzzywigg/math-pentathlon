@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  getShapeById,
-  getAbsoluteCells,
-  getCellsAtPosition,
-  isAdjacent,
-  areCellsConnected,
-  cellsToKey,
-} from '../../src/core/polyomino';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
+import { getAbsoluteCells, getCellsAtPosition, isAdjacent, areCellsConnected, cellsToKey } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-absolute — negative / connectivity', () => {
   it('getAbsoluteCells agrees with getCellsAtPosition for flag-respecting path nuances', () => {

@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  roundToDenominator,
-  toDecimal,
-  fromWhole,
-} from '../../src/core/fractions';
+import { createFraction, roundToDenominator, toDecimal, fromWhole } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-round — target denominator matrix', () => {
   const targets = [1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 100];

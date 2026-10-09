@@ -3,13 +3,8 @@
  * hasAlignment requiredLength. Distinct from wave40 line without animate. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  createAlignmentLine,
-  hasAlignment,
-  createArrayAccessor,
-  getArrayDimensions,
-  HIGHLIGHT_STYLES,
-} from '../../src/core/alignment';
+import { createAlignmentLine, HIGHLIGHT_STYLES } from '../../src/core/alignment/highlight-ui';
+import { hasAlignment, createArrayAccessor, getArrayDimensions } from '../../src/core/alignment/compat';
 
 afterEach(() => {
   document.body.innerHTML = '';

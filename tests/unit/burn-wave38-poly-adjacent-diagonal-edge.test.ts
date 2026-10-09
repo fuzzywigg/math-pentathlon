@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  getAdjacentCells,
-  getPlacementCells,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, getAdjacentCells, getPlacementCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 38 poly-adjacent — edge / diagonal', () => {
   it('1x1 monomino on 1x1 grid has no adjacent cells', () => {

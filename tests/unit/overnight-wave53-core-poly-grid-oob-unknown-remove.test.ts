@@ -3,14 +3,8 @@
  * Distinct from wave52 grid place overwrite. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createGrid,
-  isValidPlacement,
-  isCellOccupied,
-  placePolyomino,
-  removePolyomino,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createGrid, isValidPlacement, isCellOccupied, placePolyomino, removePolyomino } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 53 core poly — grid OOB / unknown remove', () => {
   it('OOB cells count as occupied so placement is invalid', () => {

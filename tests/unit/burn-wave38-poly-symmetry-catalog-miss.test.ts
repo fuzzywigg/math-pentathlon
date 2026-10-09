@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  getSymmetryCount,
-  arePolyominoesEquivalent,
-  getAllTransformations,
-  getShapeById,
-  getPolyominoById,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES, TETROMINOES, getShapeById, getPolyominoById } from '../../src/core/polyomino/types';
+import { getSymmetryCount, arePolyominoesEquivalent, getAllTransformations } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-symmetry — catalog / miss', () => {
   it('O tetromino has fewer unique transforms than L', () => {

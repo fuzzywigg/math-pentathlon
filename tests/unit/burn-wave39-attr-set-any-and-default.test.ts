@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  checkSetRelationship,
-  isValidSet,
-} from '../../src/core/attributes';
-import type {
-  AttributePiece,
-  SetRelationship,
-  SetRule,
-} from '../../src/core/attributes';
+import { checkSetRelationship, isValidSet } from '../../src/core/attributes/logic';
+import type { AttributePiece, SetRelationship, SetRule } from '../../src/core/attributes/types';
 
 describe('Wave 39 attr — set relationship any/default', () => {
   const pieces: AttributePiece[] = [

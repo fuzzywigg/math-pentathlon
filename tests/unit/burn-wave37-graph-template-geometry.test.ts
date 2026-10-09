@@ -4,14 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGridGraph,
-  createCircularGraph,
-  createStarGraph,
-  createTrackGraph,
-  createHexLatticeGraph,
-  createCompleteGraph,
-} from '../../src/core/graph';
+import { createGridGraph, createCircularGraph, createStarGraph, createTrackGraph, createHexLatticeGraph, createCompleteGraph } from '../../src/core/graph/types';
 
 function dist(
   a: { x: number; y: number },

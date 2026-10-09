@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  performOperation,
-  toDecimal,
-  areEqual,
-  simplify,
-  type FractionOperation,
-} from '../../src/core/fractions';
+import { createFraction, performOperation, toDecimal, areEqual, simplify } from '../../src/core/fractions/arithmetic';
+import type { FractionOperation } from '../../src/core/fractions/types';
 
 const ops: FractionOperation[] = ['add', 'subtract', 'multiply', 'divide'];
 

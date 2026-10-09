@@ -5,13 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluate,
-  evaluateNode,
-  type VariableMap,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluate, evaluateNode } from '../../src/core/expressions/evaluator';
+import type { VariableMap } from '../../src/core/expressions/types';
 
 describe('Wave 30 expr-vars — map lookups', () => {
   it('resolves multi-letter and underscored names', () => {

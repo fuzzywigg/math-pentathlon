@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  isProper,
-  isWholeNumber,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, isProper, isWholeNumber, simplify } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-proper — boundaries', () => {
   it('equal abs num/den is improper; below is proper', () => {

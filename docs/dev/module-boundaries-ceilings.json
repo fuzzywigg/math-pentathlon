@@ -4,7 +4,7 @@
   "description": "Import-graph / module-boundary ceilings for src/. Counts from npm run check:boundaries may only decrease.",
   "generatedAt": "2026-10-09T05:45:00.000Z",
   "tipSha": "4448b4ae",
-  "tipShaNote": "q-mp-104: deleted eight zero-importer re-export barrels; dead_barrels 8→0. mixed_ui_barrels 9→1 (remaining: src/core/dice/index.ts). Core hex package contents left in place (removal deferred to tip owner).",
+  "tipShaNote": "q-mp-104: deleted eight zero-importer re-export barrels; dead_barrels 8→0. mixed_ui_barrels 9→1 (remaining: src/core/dice/index.ts). Test callers rewritten to deep imports (boundaries only counts src/). Core hex package contents left in place (removal deferred to tip owner).",
   "commands": {
     "check": "npm run check:boundaries"
   },

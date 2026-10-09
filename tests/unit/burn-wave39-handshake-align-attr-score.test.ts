@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getRegionStats, countMaxAligned } from '../../src/core/alignment';
-import { compare, createMathPiece } from '../../src/core/attributes';
+import { getRegionStats, countMaxAligned } from '../../src/core/alignment/compat';
+import { compare, createMathPiece } from '../../src/core/attributes/logic';
 import {
   createScoringState,
   addPlayer,

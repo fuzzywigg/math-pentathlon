@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  MAKE_TEN_CHALLENGES,
-  solveTargetChallenge,
-  validateSolution,
-  evaluate,
-} from '../../src/core/expressions';
+import { MAKE_TEN_CHALLENGES } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-make-ten — every catalog exact validates', () => {
   it('solver exact solutions pass validateSolution', () => {
