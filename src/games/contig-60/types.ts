@@ -108,10 +108,16 @@ export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): {
   for (let row = 0; row < CONFIG.GRID_ROWS; row++) {
     const gridRow: (number | null)[] = [];
     grid[row] = gridRow;
-    // Indexed access is definite for CONFIG-sized BOARD_NUMBERS; `!` is NUI-only.
-    const numberRow = boardNumbers[row]!;
+    // Indexed access is definite for CONFIG-sized BOARD_NUMBERS.
+    const numberRow = boardNumbers[row];
+    if (numberRow === undefined) {
+      continue;
+    }
     for (let col = 0; col < CONFIG.GRID_COLS; col++) {
-      const value = numberRow[col]!;
+      const value = numberRow[col];
+      if (value === undefined) {
+        continue;
+      }
       gridRow[col] = value;
 
       if (cells.has(value)) {

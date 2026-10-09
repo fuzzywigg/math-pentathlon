@@ -350,8 +350,9 @@ function triggerAITurn(): void {
       // Defensive: if search returns null but cells remain, place the first valid.
       if (!placement) {
         const valids = getValidPlacements(gameState);
-        if (valids.length > 0) {
-          placement = valids[0]!;
+        const firstValid = valids[0];
+        if (firstValid !== undefined) {
+          placement = firstValid;
         } else {
           settleAIStuck();
           return;

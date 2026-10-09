@@ -76,10 +76,16 @@ export function createInitialGameState(): GameState {
 
   // Place Player 1 King at row 1, col 5 (0-indexed: row 0, col 4)
   // ratchet: board is dense BOARD_SIZE×BOARD_SIZE.
-  board[0]![4] = { type: 'king', owner: 'player1' };
+  const p1Row = board[0];
+  if (p1Row !== undefined) {
+    p1Row[4] = { type: 'king', owner: 'player1' };
+  }
 
   // Place Player 2 King at row 9, col 5 (0-indexed: row 8, col 4)
-  board[8]![4] = { type: 'king', owner: 'player2' };
+  const p2Row = board[8];
+  if (p2Row !== undefined) {
+    p2Row[4] = { type: 'king', owner: 'player2' };
+  }
 
   return {
     board,
@@ -99,9 +105,13 @@ export function getKingPosition(
   player: PlayerOwner
 ): Position | null {
   for (let row = 0; row < BOARD_SIZE; row++) {
+    const boardRow = state.board[row];
+    if (boardRow === undefined) {
+      continue;
+    }
     for (let col = 0; col < BOARD_SIZE; col++) {
       // ratchet: dense BOARD_SIZE×BOARD_SIZE board.
-      const cell = state.board[row]![col];
+      const cell = boardRow[col];
       if (cell?.type === 'king' && cell.owner === player) {
         return toPosition({ row, col });
       }
@@ -184,13 +194,19 @@ export function moveKing(state: GameState, destination: Position): GameState {
 
   // Clear old position
   // ratchet: fromIndex/destIndex come from validated king positions.
-  newBoard[fromIndex.row]![fromIndex.col] = null;
+  const fromRow = newBoard[fromIndex.row];
+  if (fromRow !== undefined) {
+    fromRow[fromIndex.col] = null;
+  }
 
   // Place king at new position
-  newBoard[destIndex.row]![destIndex.col] = {
-    type: 'king',
-    owner: state.currentPlayer,
-  };
+  const destRow = newBoard[destIndex.row];
+  if (destRow !== undefined) {
+    destRow[destIndex.col] = {
+      type: 'king',
+      owner: state.currentPlayer,
+    };
+  }
 
   // Create move history entry
   const moveEntry: MoveHistoryEntry = {
@@ -243,10 +259,13 @@ export function placeQuadraphage(
   // Create new board with quadraphage placed
   const newBoard = cloneBoard(state.board);
   // ratchet: isValidQuadraphagePlacement already bounds-checked posIndex.
-  newBoard[posIndex.row]![posIndex.col] = {
-    type: 'quadraphage',
-    owner: state.currentPlayer,
-  };
+  const placeRow = newBoard[posIndex.row];
+  if (placeRow !== undefined) {
+    placeRow[posIndex.col] = {
+      type: 'quadraphage',
+      owner: state.currentPlayer,
+    };
+  }
 
   // Update supply
   const newPlayer1Supply =
