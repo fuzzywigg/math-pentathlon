@@ -21,7 +21,8 @@ Developer workflows (commands)
 - Coverage: `npm run test:unit:coverage`.
 - E2E (required CI path): `npm run test:e2e:chromium`. Bare `npm run test:e2e` runs **every** Playwright project — prefer an explicit script. Playwright config starts a web server with `npm run dev` and uses `http://localhost:5173` as `baseURL`.
 - Full verify shortcut: `npm test` (= unit then Chromium e2e).
-- Lint: `npm run lint`; format write: `npm run format`; CI format gate: `npm run format:check`.
+- Lint: `npm run lint`; lint ceilings: `npm run lint:ratchet`; format write: `npm run format`; CI format gate: `npm run format:check`.
+- Types: `npm run typecheck` (not bare `npx tsc`); shell/Phase-2 ceilings: `npm run typecheck:ratchet`; import-graph: `npm run check:boundaries`.
 - Full script list: `docs/wiki/development.md` and `CONTRIBUTING.md`.
 
 Project-specific conventions and notes
