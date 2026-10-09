@@ -4,7 +4,7 @@ import { GAME_MOUNT } from '../e2e/helpers/game-mounts';
 import { waitForGameReady as sharedWaitForGameReady } from '../e2e/helpers/page';
 
 /** Fixed PRNG seed for deterministic board/dice layout across runs. */
-export const VISUAL_SEED = 0x4d50_5652; // "MPVR"
+const VISUAL_SEED = 0x4d50_5652; // "MPVR"
 
 /** Available games captured by the visual suite (2D boards). */
 export const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
@@ -22,7 +22,7 @@ declare global {
  * Install deterministic Math.random, force 2D boards, and disable motion
  * before any app script runs.
  */
-export async function installVisualDeterminism(page: Page): Promise<void> {
+async function installVisualDeterminism(page: Page): Promise<void> {
   await page.addInitScript((seed: number) => {
     // Mulberry32 — compact, deterministic PRNG. Exposed so tests can re-seed
     // immediately before New Game start (owl / idle code may burn entropy).
@@ -107,7 +107,7 @@ export async function waitForGameReady(page: Page): Promise<void> {
 }
 
 /** Hide Ollie and wait for fonts before capturing. */
-export async function stabilizeChrome(page: Page): Promise<void> {
+async function stabilizeChrome(page: Page): Promise<void> {
   await page.evaluate(() => {
     const owl = document.getElementById('ollie-owl');
     if (owl) {
@@ -123,7 +123,7 @@ export async function stabilizeChrome(page: Page): Promise<void> {
 }
 
 /** Re-seed Math.random so the next createInitialState() is deterministic. */
-export async function reseedVisualRng(page: Page): Promise<void> {
+async function reseedVisualRng(page: Page): Promise<void> {
   await page.evaluate((seed) => {
     window.__mpVisualReseed?.(seed);
   }, VISUAL_SEED);
@@ -134,7 +134,7 @@ export async function reseedVisualRng(page: Page): Promise<void> {
  * (rods, dice, hands) do not depend on how many Math.random calls happened
  * during mount / owl / idle warm.
  */
-export async function startHumanBoard(page: Page): Promise<void> {
+async function startHumanBoard(page: Page): Promise<void> {
   await waitForGameReady(page);
   await stabilizeChrome(page);
 

@@ -28,7 +28,7 @@ export type Harness<T> = {
   quality?: (states: T[]) => void;
 };
 
-export function runDeterminism<T>(h: Harness<T>, states: T[]): void {
+function runDeterminism<T>(h: Harness<T>, states: T[]): void {
   for (const difficulty of DIFFICULTIES) {
     for (let i = 0; i < states.length; i++) {
       const state = states[i]!;
@@ -44,7 +44,7 @@ export function runDeterminism<T>(h: Harness<T>, states: T[]): void {
   }
 }
 
-export function runDefaultQuality<T>(h: Harness<T>, states: T[]): void {
+function runDefaultQuality<T>(h: Harness<T>, states: T[]): void {
   if (h.quality) {
     h.quality(states);
     return;
