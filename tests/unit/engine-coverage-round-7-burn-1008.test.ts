@@ -10,7 +10,7 @@
  *   star-track/types 83.3% · queens-guards/types 85.7% · kings/game-state 90.9% ·
  *   contig-60/types 92.5% · …
  */
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   createRodSet,
@@ -48,6 +48,7 @@ import {
   cellKey,
   cellsInRing,
   CONFIG as QG_CONFIG,
+  createInitialState as createQueens,
 } from '../../src/games/queens-guards/types';
 
 import {
@@ -199,38 +200,23 @@ describe('engine-coverage-round-7 — kings/game-state', () => {
 // =============================================================================
 
 describe('engine-coverage-round-7 — queens-guards/types', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('createBoard continues when Map.get returns undefined for outer-ring seats', () => {
+  it('createBoard seats queens; cell===undefined continues are unreachable on Map', () => {
+    // Documented unreachable: createBoard always `cells.set` before `cells.get`
+    // for the same outer-ring keys, so `if (cell === undefined) continue` never
+    // fires on a real Map. Do not spy Map.prototype.get (isolate:false workers
+    // share the prototype with AI calibration suites).
     const outerRing = QG_CONFIG.NUM_RINGS - 1;
     const outerCount = cellsInRing(outerRing);
-    // Guard seats (odd p1 / even p2) that would normally receive a piece.
-    const missKeys = new Set([cellKey(outerRing, 1), cellKey(outerRing, 16)]);
-    const originalGet = Map.prototype.get;
-    const spy = vi.spyOn(Map.prototype, 'get').mockImplementation(function (
-      this: Map<unknown, unknown>,
-      key
-    ) {
-      if (missKeys.has(String(key))) {
-        return undefined;
-      }
-      return originalGet.call(this, key);
-    });
-
-    let board: ReturnType<typeof createQueensBoard>;
-    try {
-      board = createQueensBoard();
-    } finally {
-      spy.mockRestore();
-    }
-
-    // Cells exist from the ring fill, but piece assignment was skipped.
-    expect(board.get(cellKey(outerRing, 1))?.piece).toBeNull();
-    expect(board.get(cellKey(outerRing, 16))?.piece).toBeNull();
-    expect(board.get(cellKey(outerRing, 7))?.piece?.type).toBe('queen');
+    const board = createQueensBoard();
     expect(board.size).toBeGreaterThan(outerCount);
+    expect(board.get(cellKey(outerRing, 7))?.piece?.type).toBe('queen');
+    expect(board.get(cellKey(outerRing, 22))?.piece?.type).toBe('queen');
+    // Guard seats that the continue would have skipped still exist with pieces.
+    expect(board.get(cellKey(outerRing, 1))?.piece?.type).toBe('guard');
+    expect(board.get(cellKey(outerRing, 16))?.piece?.type).toBe('guard');
+    const open = createQueens();
+    expect(open.cells.size).toBe(board.size);
+    expect(open.currentPlayer).toBe('player1');
   });
 });
 

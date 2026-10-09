@@ -59,43 +59,48 @@ $ node scripts/engine-coverage-rank.mjs coverage-engine-r7-baseline/coverage-sum
 
 ## Round-7 disposition
 
-| Module                                       | Prior cold arm                         | Disposition                | How                                                            |
-| -------------------------------------------- | -------------------------------------- | -------------------------- | -------------------------------------------------------------- |
-| `ramrod/types.ts` shuffle hole-guard         | `a===undefined \|\| b===undefined`     | **Pinned**                 | Dense array with `undefined` slot (same pattern as r3 fab/par) |
-| `ramrod/types.ts` `count===undefined`        | createRodSet continue                  | **Documented unreachable** | Local `counts` Record covers lengths 1–10                      |
-| `sum-dominoes/types.ts` shuffle hole-guard   | same                                   | **Pinned**                 | Hole array + catalog helpers (pips/doubles/dice)               |
-| `kings/board.ts` sparse row/cell             | `row===undefined` / `cell===undefined` | **Pinned**                 | Forge deleted row + empty row array; OOB + hasSupply/coords    |
-| `kings/game-state.ts` `boardRow===undefined` | getKingPosition continue               | **Pinned**                 | Delete non-king / king rows on live state                      |
-| `queens-guards/types.ts` `cell===undefined`  | createBoard outer-ring continue        | **Pinned**                 | Spy `Map.prototype.get` for two guard seats during createBoard |
-| `contig-60/types.ts` short/jagged board      | `numberRow` / `value` undefined        | **Pinned**                 | Short + jagged `boardNumbers`; expression/placement smoke      |
-| `contig-60/types.ts` `evaluate` default      | `never` arm                            | **Documented unreachable** | Private `evaluate` only called with `OPERATORS` union          |
-| `star-track/types.ts` private shuffle        | hole-guard                             | **Documented unreachable** | Module-private; dense `createChainBucket` only (r3–r5)         |
-| `fiar/types.ts` `prevId===undefined`         | getNodesInDirection break              | **Pinned**                 | Forged `undefined` startId + east neighbor + edge              |
-| `prime-gold/types.ts` vals hole continues    | generateExpressions                    | **Documented unreachable** | Built then `.filter()`'d to dense arrays                       |
-| `prime-gold/types.ts` Goldbach exhaust       | `return false`                         | **Documented unreachable** | Invariant: every even `n` in 4..60 is `true`                   |
+| Module                                       | Prior cold arm                         | Disposition                | How                                                                                         |
+| -------------------------------------------- | -------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- |
+| `ramrod/types.ts` shuffle hole-guard         | `a===undefined \|\| b===undefined`     | **Pinned**                 | Dense array with `undefined` slot (same pattern as r3 fab/par)                              |
+| `ramrod/types.ts` `count===undefined`        | createRodSet continue                  | **Documented unreachable** | Local `counts` Record covers lengths 1–10                                                   |
+| `sum-dominoes/types.ts` shuffle hole-guard   | same                                   | **Pinned**                 | Hole array + catalog helpers (pips/doubles/dice)                                            |
+| `kings/board.ts` sparse row/cell             | `row===undefined` / `cell===undefined` | **Pinned**                 | Forge deleted row + empty row array; OOB + hasSupply/coords                                 |
+| `kings/game-state.ts` `boardRow===undefined` | getKingPosition continue               | **Pinned**                 | Delete non-king / king rows on live state                                                   |
+| `queens-guards/types.ts` `cell===undefined`  | createBoard outer-ring continue        | **Documented unreachable** | Always `set` before `get` on a real Map; no `Map.prototype` spy (isolate:false / AI suites) |
+| `contig-60/types.ts` short/jagged board      | `numberRow` / `value` undefined        | **Pinned**                 | Short + jagged `boardNumbers`; expression/placement smoke                                   |
+| `contig-60/types.ts` `evaluate` default      | `never` arm                            | **Documented unreachable** | Private `evaluate` only called with `OPERATORS` union                                       |
+| `star-track/types.ts` private shuffle        | hole-guard                             | **Documented unreachable** | Module-private; dense `createChainBucket` only (r3–r5)                                      |
+| `fiar/types.ts` `prevId===undefined`         | getNodesInDirection break              | **Pinned**                 | Forged `undefined` startId + east neighbor + edge                                           |
+| `prime-gold/types.ts` vals hole continues    | generateExpressions                    | **Documented unreachable** | Built then `.filter()`'d to dense arrays                                                    |
+| `prime-gold/types.ts` Goldbach exhaust       | `return false`                         | **Documented unreachable** | Invariant: every even `n` in 4..60 is `true`                                                |
 
 ## Aggregate (included engine files, full unit suite)
 
-| Metric     | Before (r7 baseline) |          After round 7 | Δ             |
-| ---------- | -------------------: | ---------------------: | ------------- |
-| Lines      |   99.27% (2726/2746) | **99.67%** (2737/2746) | **+11 lines** |
-| Branches   |   97.51% (1885/1933) | **98.08%** (1896/1933) | **+11 arms**  |
-| Statements |               99.01% |                 99.36% | —             |
-| Functions  |                 100% |                   100% | —             |
+| Metric     | Before (r7 baseline) |          After round 7 | Δ                       |
+| ---------- | -------------------: | ---------------------: | ----------------------- |
+| Lines      |   99.27% (2726/2746) | **99.67%** (2737/2746) | **+11 lines** (w/ spy*) |
+| Branches   |   97.51% (1885/1933) | **98.08%** (1896/1933) | **+11 arms** (w/ spy*)  |
+| Statements |               99.01% |                 99.36% | —                       |
+| Functions  |                 100% |                   100% | —                       |
+
+\*First after-measure included a `Map.prototype.get` spy for queens-guards
+continues (+2b/+2l). That spy was removed before merge (isolate:false risk to
+AI calibration); those two arms are now documented unreachable. Remaining
+gains (ramrod / kings board+game-state / sum-dominoes / contig / fiar) stand.
 
 Targeted non-rules gains (full-suite before → after):
 
-| Module              |  Before branch |       After branch | Before line | After line | Δb / Δl        |
-| ------------------- | -------------: | -----------------: | ----------: | ---------: | -------------- |
-| ramrod/types        |   66.66% (4/6) |   **83.33%** (5/6) |      92.30% | **96.15%** | +1 / +1        |
-| kings/board         | 75.00% (15/20) | **90.00%** (18/20) |      90.90% |   **100%** | +3 / +3        |
-| sum-dominoes/types  |   75.00% (3/4) |     **100%** (4/4) |      95.65% |   **100%** | +1 / +1        |
-| queens-guards/types | 85.71% (36/42) | **90.47%** (38/42) |      97.14% |   **100%** | +2 / +2        |
-| contig-60/types     | 92.50% (37/40) | **97.50%** (39/40) |      93.84% | **96.92%** | +2 / +2        |
-| kings/game-state    | 90.90% (60/66) | **92.42%** (61/66) |      98.98% |   **100%** | +1 / +1        |
-| fiar/types          | 97.43% (38/39) |   **100%** (39/39) |      98.21% |   **100%** | +1 / +1        |
-| star-track/types    |   83.33% (5/6) |       83.33% (5/6) |      95.00% |     95.00% | 0 (private)    |
-| prime-gold/types    | 97.01% (65/67) |     97.01% (65/67) |      96.05% |     96.05% | 0 (documented) |
+| Module              |  Before branch |       After branch | Before line |  After line | Δb / Δl             |
+| ------------------- | -------------: | -----------------: | ----------: | ----------: | ------------------- |
+| ramrod/types        |   66.66% (4/6) |   **83.33%** (5/6) |      92.30% |  **96.15%** | +1 / +1             |
+| kings/board         | 75.00% (15/20) | **90.00%** (18/20) |      90.90% |    **100%** | +3 / +3             |
+| sum-dominoes/types  |   75.00% (3/4) |     **100%** (4/4) |      95.65% |    **100%** | +1 / +1             |
+| queens-guards/types | 85.71% (36/42) |   85.71%\* (36/42) |      97.14% | seating pin | 0 (doc unreachable) |
+| contig-60/types     | 92.50% (37/40) | **97.50%** (39/40) |      93.84% |  **96.92%** | +2 / +2             |
+| kings/game-state    | 90.90% (60/66) | **92.42%** (61/66) |      98.98% |    **100%** | +1 / +1             |
+| fiar/types          | 97.43% (38/39) |   **100%** (39/39) |      98.21% |    **100%** | +1 / +1             |
+| star-track/types    |   83.33% (5/6) |       83.33% (5/6) |      95.00% |      95.00% | 0 (private)         |
+| prime-gold/types    | 97.01% (65/67) |     97.01% (65/67) |      96.05% |      96.05% | 0 (documented)      |
 
 ## Files changed
 
