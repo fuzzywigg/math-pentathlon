@@ -227,7 +227,9 @@ export async function createFiarBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 360, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -235,10 +237,14 @@ export async function createFiarBoard3D(
   };
 
   const pickFromEvent = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
+    if (!clickHandler || disposed) {
+      return;
+    }
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
-    if (!ndc) return;
+    if (!ndc) {
+      return;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -260,7 +266,9 @@ export async function createFiarBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     tearDown?.();
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
@@ -330,7 +338,9 @@ export async function createFiarBoard3D(
     // Ensure at least one tab stop
     if (!a11y.querySelector('[tabindex="0"]')) {
       const first = a11y.querySelector('button');
-      if (first) first.tabIndex = 0;
+      if (first) {
+        first.tabIndex = 0;
+      }
     }
   };
 
@@ -338,14 +348,18 @@ export async function createFiarBoard3D(
     state: FiarGameState,
     nextClick?: FiarNodeClickCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     clickHandler = nextClick;
 
     // Build pads / edges once from layout
     if (nodeMeshes.size === 0) {
       for (const [id] of state.board.nodes) {
         const parsed = parseNodeId(id);
-        if (!parsed) continue;
+        if (!parsed) {
+          continue;
+        }
         const { x, z } = nodeToWorld(parsed.col, parsed.row);
         const pad = new THREE.Mesh(spaceGeo, mats.space);
         pad.position.set(x, BOARD_Y + 0.03, z);
@@ -365,7 +379,9 @@ export async function createFiarBoard3D(
       for (const edge of state.board.edges) {
         const a = parseNodeId(edge.from);
         const b = parseNodeId(edge.to);
-        if (!a || !b) continue;
+        if (!a || !b) {
+          continue;
+        }
         const wa = nodeToWorld(a.col, a.row);
         const wb = nodeToWorld(b.col, b.row);
         positions.push(wa.x, BOARD_Y + 0.06, wa.z, wb.x, BOARD_Y + 0.06, wb.z);
@@ -387,13 +403,18 @@ export async function createFiarBoard3D(
 
     for (const nm of nodeMeshes.values()) {
       const node = state.board.nodes.get(nm.id);
-      if (!node) continue;
+      if (!node) {
+        continue;
+      }
 
       let padMat = mats.space;
-      if (valid.includes(nm.id)) padMat = mats.spaceValid;
-      else if (state.phase === 'placement' && node.chip === null) {
+      if (valid.includes(nm.id)) {
+        padMat = mats.spaceValid;
+      } else if (state.phase === 'placement' && node.chip === null) {
         padMat = mats.spaceHover;
-      } else if (state.selectedNode === nm.id) padMat = mats.selected;
+      } else if (state.selectedNode === nm.id) {
+        padMat = mats.selected;
+      }
       nm.pad.material = padMat;
 
       if (!node.chip) {
@@ -442,7 +463,9 @@ export async function createFiarBoard3D(
     nodeId: string
   ): { x: number; y: number } | null => {
     const parsed = parseNodeId(nodeId);
-    if (!parsed) return null;
+    if (!parsed) {
+      return null;
+    }
     const { x, z } = nodeToWorld(parsed.col, parsed.row);
     projectScratch.set(x, BOARD_Y + 0.15, z).project(camera);
     const rect = canvas.getBoundingClientRect();
@@ -457,7 +480,9 @@ export async function createFiarBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindPointer();
@@ -467,9 +492,13 @@ export async function createFiarBoard3D(
     if (window.__mp3dFiar) {
       delete window.__mp3dFiar;
     }
-    for (const nm of nodeMeshes.values()) clearChip(nm);
+    for (const nm of nodeMeshes.values()) {
+      clearChip(nm);
+    }
     nodeMeshes.clear();
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     spaceGeo.dispose();
     chipGeo.dispose();
@@ -482,8 +511,12 @@ export async function createFiarBoard3D(
     rimMat.dispose();
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove('board-3d-host', 'fiar-board-3d-host');
   };
 

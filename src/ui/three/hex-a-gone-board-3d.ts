@@ -246,7 +246,9 @@ export async function createHexAGoneBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 480, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -278,7 +280,9 @@ export async function createHexAGoneBoard3D(
   ): { q: number; r: number } | null => {
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
-    if (!ndc) return null;
+    if (!ndc) {
+      return null;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -298,13 +302,17 @@ export async function createHexAGoneBoard3D(
   };
 
   const clearHover = (): void => {
-    if (!hoverKey || !lastState) return;
+    if (!hoverKey || !lastState) {
+      return;
+    }
     hoverKey = null;
     syncVisuals(lastState);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
-    if (disposed || !lastState) return;
+    if (disposed || !lastState) {
+      return;
+    }
     if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
       return;
     }
@@ -317,7 +325,9 @@ export async function createHexAGoneBoard3D(
     }
     const cell = pickCellFromEvent(event);
     const next = cell ? cellKey(cell.q, cell.r) : null;
-    if (next === hoverKey) return;
+    if (next === hoverKey) {
+      return;
+    }
     hoverKey = next;
     syncVisuals(lastState);
   };
@@ -328,7 +338,9 @@ export async function createHexAGoneBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     // Do not mark disposed here — unmount() must run to drop listeners/GPU.
     onWebglLost?.();
   };
@@ -338,9 +350,13 @@ export async function createHexAGoneBoard3D(
   });
   const unbindPointer = bindCanvasPointerTap(canvas, {
     onTap: (event) => {
-      if (!clickHandler || disposed) return;
+      if (!clickHandler || disposed) {
+        return;
+      }
       const cell = pickCellFromEvent(event);
-      if (cell) clickHandler(cell.q, cell.r);
+      if (cell) {
+        clickHandler(cell.q, cell.r);
+      }
     },
     onGestureEnd: clearHover,
   });
@@ -378,12 +394,16 @@ export async function createHexAGoneBoard3D(
       btn.addEventListener('click', () => handler?.(cell.q, cell.r));
       btn.addEventListener('focus', () => {
         focusKey = cellKey(cell.q, cell.r);
-        if (lastState) syncVisuals(lastState);
+        if (lastState) {
+          syncVisuals(lastState);
+        }
       });
       btn.addEventListener('blur', () => {
         if (focusKey === cellKey(cell.q, cell.r)) {
           focusKey = null;
-          if (lastState) syncVisuals(lastState);
+          if (lastState) {
+            syncVisuals(lastState);
+          }
         }
       });
       // Space / Enter place (PR #353 behaviour) via native button activation
@@ -391,12 +411,16 @@ export async function createHexAGoneBoard3D(
     }
     if (!a11y.querySelector('[tabindex="0"]')) {
       const first = a11y.querySelector('button');
-      if (first) first.tabIndex = 0;
+      if (first) {
+        first.tabIndex = 0;
+      }
     }
   };
 
   const ensureCells = (state: HexAGoneGameState): void => {
-    if (cellMeshes.size > 0) return;
+    if (cellMeshes.size > 0) {
+      return;
+    }
     for (const cell of state.board) {
       const { x, z } = axialToWorld(cell.q, cell.r);
       const tile = new THREE.Mesh(tileGeo, mats.empty);
@@ -420,10 +444,14 @@ export async function createHexAGoneBoard3D(
       return;
     }
     const activeKey = hoverKey ?? focusKey;
-    if (!activeKey) return;
+    if (!activeKey) {
+      return;
+    }
     const valid = getValidPlacements(state);
     const validSet = new Set(valid.map((p) => cellKey(p.q, p.r)));
-    if (!validSet.has(activeKey)) return;
+    if (!validSet.has(activeKey)) {
+      return;
+    }
     const [qs, rs] = activeKey.split(',').map(Number) as [number, number];
     const { x, z } = axialToWorld(qs, rs);
     const shape = state.selectedBlockForPlacement;
@@ -447,7 +475,9 @@ export async function createHexAGoneBoard3D(
     for (const cm of cellMeshes.values()) {
       const key = cellKey(cm.q, cm.r);
       const cell = state.board.find((c) => c.q === cm.q && c.r === cm.r);
-      if (!cell) continue;
+      if (!cell) {
+        continue;
+      }
 
       let tileMat: Material = mats.empty;
       if (state.phase === 'gameOver' && cell.filledBy === state.winner) {
@@ -513,7 +543,9 @@ export async function createHexAGoneBoard3D(
     state: HexAGoneGameState,
     nextClick?: CellClickCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     clickHandler = nextClick;
     lastState = state;
     syncVisuals(state);
@@ -537,7 +569,9 @@ export async function createHexAGoneBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
@@ -550,9 +584,13 @@ export async function createHexAGoneBoard3D(
       delete window.__mp3dHexAGone;
     }
     clearGhost();
-    for (const cm of cellMeshes.values()) clearPiece(cm);
+    for (const cm of cellMeshes.values()) {
+      clearPiece(cm);
+    }
     cellMeshes.clear();
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     tileGeo.dispose();
     ringGeo.dispose();
@@ -565,8 +603,12 @@ export async function createHexAGoneBoard3D(
     feltMat.dispose();
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove('board-3d-host', 'hex-a-gone-board-3d-host');
   };
 
