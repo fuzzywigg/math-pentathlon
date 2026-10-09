@@ -26,7 +26,9 @@ const ROOT = resolve(__dirname, '..');
 const LABEL = process.env.MEM_LEAK_LABEL || 'run';
 const CYCLES = Number(process.env.MEM_LEAK_CYCLES || 10);
 const PORT = Number(process.env.MEM_LEAK_PORT || 5181);
-const OUT_JSON = resolve(ROOT, `docs/memory-leaks-${LABEL}-2026-10-07.json`);
+/** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline twins. */
+const MEM_DATE = process.env.MEM_LEAK_DATE || '2026-10-07';
+const OUT_JSON = resolve(ROOT, `docs/memory-leaks-${LABEL}-${MEM_DATE}.json`);
 
 const BOARD3D_GAMES = new Set([
   'kings-quadraphages',

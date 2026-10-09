@@ -19,9 +19,11 @@ export const MOVE_TARGET_RENDER = Number(process.env.PERF_MOVES || 20);
 const HOVER_GAMES = new Set(['juggle', 'pent-em-in']);
 
 export function renderReportPaths(root) {
+  /** Optional stem so re-runs can avoid clobbering the Oct render baseline. */
+  const stem = process.env.PERF_RENDER_STEM || 'render-perf-2026-10';
   return {
-    md: resolve(root, 'docs/dev/render-perf-2026-10.md'),
-    json: resolve(root, 'docs/dev/render-perf-2026-10.json'),
+    md: resolve(root, `docs/dev/${stem}.md`),
+    json: resolve(root, `docs/dev/${stem}.json`),
   };
 }
 

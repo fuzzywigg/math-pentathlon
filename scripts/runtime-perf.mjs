@@ -37,8 +37,10 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const RENDER_MODE = process.env.PERF_MODE === 'render';
-const REPORT_MD = resolve(ROOT, 'docs/runtime-perf-2026-10-07.md');
-const REPORT_JSON = resolve(ROOT, 'docs/runtime-perf-2026-10-07.json');
+/** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline. */
+const PERF_DATE = process.env.PERF_DATE || '2026-10-07';
+const REPORT_MD = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.md`);
+const REPORT_JSON = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.json`);
 
 const MOVE_TARGET = RENDER_MODE
   ? MOVE_TARGET_RENDER
