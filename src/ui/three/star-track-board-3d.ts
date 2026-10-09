@@ -12,8 +12,11 @@
  * star track, seat-colored movers, and engine-derived landing highlights.
  */
 
-import type { Player, StarTrackGameState } from '../../games/star-track/types';
-import { TRACK_LENGTH } from '../../games/star-track/types';
+import {
+  type Player,
+  type StarTrackGameState,
+  TRACK_LENGTH,
+} from '../../games/star-track/types';
 import { getChainLandingSpace } from '../../games/star-track/rules';
 import {
   fillChainArea,

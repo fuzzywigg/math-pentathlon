@@ -4,16 +4,14 @@
  * smuggle markup into rendering paths.
  */
 
-import type {
-  Achievement,
-  GameStats,
-  OwlMood,
-  OwlState,
-  PlayerProfile,
-  StreakData,
-  UserSettings,
-} from './types';
 import {
+  type Achievement,
+  type GameStats,
+  type OwlMood,
+  type OwlState,
+  type PlayerProfile,
+  type StreakData,
+  type UserSettings,
   DEFAULT_OWL_STATE,
   DEFAULT_SETTINGS,
   DEFAULT_STREAK,

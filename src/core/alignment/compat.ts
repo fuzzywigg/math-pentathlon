@@ -21,12 +21,14 @@
  *   from production bundles if unused.
  */
 
-import type {
-  GridPosition,
-  CellValue,
-  CellGetter,
-  AlignmentResult,
-  Region,
+import {
+  type GridPosition,
+  type CellValue,
+  type CellGetter,
+  type AlignmentResult,
+  type Region,
+  ALL_DIRECTIONS,
+  DIRECTIONS,
 } from './types';
 import {
   findAlignmentFromCenter,
@@ -38,7 +40,6 @@ import {
   findAllRegions as _findAllRegions,
   areConnected as _areConnected,
 } from './contiguous';
-import { ALL_DIRECTIONS, DIRECTIONS } from './types';
 
 // ─── Dimension helpers ────────────────────────────────────────────────────────
 

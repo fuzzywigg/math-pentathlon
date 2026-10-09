@@ -1,15 +1,15 @@
 // Grid-based N-in-a-row Alignment Detection
 
-import type {
-  GridPosition,
-  CellValue,
-  CellGetter,
-  Direction,
-  AlignmentConfig,
-  AlignmentResult,
-  AlignmentCheckResult,
+import {
+  type GridPosition,
+  type CellValue,
+  type CellGetter,
+  type Direction,
+  type AlignmentConfig,
+  type AlignmentResult,
+  type AlignmentCheckResult,
+  ALL_DIRECTIONS,
 } from './types';
-import { ALL_DIRECTIONS } from './types';
 
 /**
  * Check if a position is within grid bounds

@@ -9,8 +9,12 @@
  * - throws when WebGL is unavailable so the controller can keep 2D SVG
  */
 
-import type { FiarGameState, Player } from '../../games/fiar/types';
-import { CONFIG, parseNodeId } from '../../games/fiar/types';
+import {
+  type FiarGameState,
+  type Player,
+  CONFIG,
+  parseNodeId,
+} from '../../games/fiar/types';
 import {
   getValidMoves,
   getSelectableNodes,

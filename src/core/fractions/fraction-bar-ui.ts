@@ -1,7 +1,11 @@
 // Fraction Bar UI - Visual representation of fractions
 
-import type { Fraction, FractionBarConfig, FractionBarPiece } from './types';
-import { FRACTION_COLORS } from './types';
+import {
+  type Fraction,
+  type FractionBarConfig,
+  type FractionBarPiece,
+  FRACTION_COLORS,
+} from './types';
 import { simplify, toDecimal, formatFraction } from './arithmetic';
 
 /** Default configuration */
