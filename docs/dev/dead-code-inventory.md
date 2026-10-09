@@ -13,7 +13,11 @@
 >
 > **q-mp-139 (2026-10-09):** Removed Rank-2 `tests/unit/helpers/fake-timers.ts` after live-tip
 > re-check showed zero importers (`rg 'fake-timers|installFakeTimerHooks|withFakeTimers' tests src`).
-> Remaining Rank-2 deferred is `clearDom` only.
+>
+> **q-mp-155 (2026-10-09):** Demoted Rank-2 `tests/unit/helpers/dom.ts` → `clearDom` to
+> module-private (still used by `installDomHooks`). Live tip re-check:
+> `rg '\bclearDom\b' tests src` — definitions/calls only inside `dom.ts`. No Rank-2
+> deferred test-helper exports remain.
 
 ## Method
 
@@ -71,7 +75,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 1 | yes | kept | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
 | 1 | yes | kept | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
 | 1 | yes | kept | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
-| 2 | yes | deferred | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | test helper with zero importers after grep |
+| 2 | yes | removed | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | demoted in q-mp-155 — module-private; still used by installDomHooks |
 | 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
 | 3 | review | kept | unused-type | `src/core/ai-worker/client.ts` → `AiWorkerRequestPayload` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/ai-worker/protocol.ts` → `AiWorkerRequestBase` | grep: no references outside defining module | exported type unused outside module — often intentional public API |

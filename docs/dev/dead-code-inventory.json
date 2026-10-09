@@ -236,8 +236,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep",
-      "disposition": "deferred"
+      "reason": "demoted in q-mp-155 — module-private; still used by installDomHooks",
+      "disposition": "removed"
     },
     {
       "kind": "test-helper-module",
