@@ -53,7 +53,11 @@ export function bfs(graph: Graph, start: NodeId, end: NodeId): PathResult {
   ];
 
   while (queue.length > 0) {
-    const { node, path } = queue.shift()!;
+    const current = queue.shift();
+    if (current === undefined) {
+      break;
+    }
+    const { node, path } = current;
 
     if (visited.has(node)) {
       continue;
@@ -101,7 +105,10 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
     let minDist = Infinity;
 
     unvisited.forEach((nodeId) => {
-      const dist = distances.get(nodeId)!;
+      const dist = distances.get(nodeId);
+      if (dist === undefined) {
+        return;
+      }
       if (dist < minDist) {
         minDist = dist;
         current = nodeId;
@@ -119,6 +126,10 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
 
     // Update neighbors
     const neighbors = getNeighbors(graph, current);
+    const currentDist = distances.get(current);
+    if (currentDist === undefined) {
+      continue;
+    }
     for (const neighbor of neighbors) {
       if (!unvisited.has(neighbor)) {
         continue;
@@ -126,9 +137,11 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
 
       const edge = getEdge(graph, current, neighbor);
       const weight = edge?.weight ?? 1;
-      const alt = distances.get(current)! + weight;
+      const alt = currentDist + weight;
+      const neighborDist = distances.get(neighbor);
 
-      if (alt < distances.get(neighbor)!) {
+      // Missing map entries never update (same as prior NaN comparison).
+      if (neighborDist !== undefined && alt < neighborDist) {
         distances.set(neighbor, alt);
         previous.set(neighbor, current);
       }
@@ -136,7 +149,9 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
   }
 
   // Reconstruct path
-  if (distances.get(end) === Infinity) {
+  // Missing end is not Infinity (only initialized nodes are); keep found+stub path.
+  const endDistance = distances.get(end);
+  if (endDistance === Infinity) {
     return { found: false, path: [], distance: -1 };
   }
 
@@ -151,7 +166,8 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
   return {
     found: true,
     path,
-    distance: distances.get(end)!,
+    // Documented quirk: absent end yields undefined distance (Map.get).
+    distance: endDistance as number,
   };
 }
 
@@ -172,7 +188,10 @@ export function isConnected(graph: Graph): boolean {
   const queue: NodeId[] = [start];
 
   while (queue.length > 0) {
-    const node = queue.shift()!;
+    const node = queue.shift();
+    if (node === undefined) {
+      break;
+    }
     if (visited.has(node)) {
       continue;
     }
@@ -205,7 +224,10 @@ export function findComponents(graph: Graph): NodeId[][] {
     const queue: NodeId[] = [nodeId];
 
     while (queue.length > 0) {
-      const node = queue.shift()!;
+      const node = queue.shift();
+      if (node === undefined) {
+        break;
+      }
       if (visited.has(node)) {
         continue;
       }
@@ -234,7 +256,10 @@ export function findReachable(graph: Graph, start: NodeId): Set<NodeId> {
   const queue: NodeId[] = [start];
 
   while (queue.length > 0) {
-    const node = queue.shift()!;
+    const node = queue.shift();
+    if (node === undefined) {
+      break;
+    }
     if (reachable.has(node)) {
       continue;
     }
@@ -308,8 +333,14 @@ export function findNodesAtDistance(
   distances.set(start, 0);
 
   while (queue.length > 0) {
-    const node = queue.shift()!;
-    const nodeDist = distances.get(node)!;
+    const node = queue.shift();
+    if (node === undefined) {
+      break;
+    }
+    const nodeDist = distances.get(node);
+    if (nodeDist === undefined) {
+      continue;
+    }
 
     if (nodeDist >= distance) {
       continue;
@@ -342,8 +373,14 @@ export function findNodesWithinDistance(
   distances.set(start, 0);
 
   while (queue.length > 0) {
-    const node = queue.shift()!;
-    const nodeDist = distances.get(node)!;
+    const node = queue.shift();
+    if (node === undefined) {
+      break;
+    }
+    const nodeDist = distances.get(node);
+    if (nodeDist === undefined) {
+      continue;
+    }
 
     if (nodeDist >= maxDistance) {
       continue;
@@ -381,7 +418,10 @@ export function findPlayerRegion(
   const queue: NodeId[] = [startNode];
 
   while (queue.length > 0) {
-    const node = queue.shift()!;
+    const node = queue.shift();
+    if (node === undefined) {
+      break;
+    }
     if (visited.has(node)) {
       continue;
     }
@@ -453,7 +493,10 @@ export function playerConnectsSets(
     const queue: NodeId[] = [startNode];
 
     while (queue.length > 0) {
-      const node = queue.shift()!;
+      const node = queue.shift();
+      if (node === undefined) {
+        break;
+      }
       if (reachable.has(node)) {
         continue;
       }
