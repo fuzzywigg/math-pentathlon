@@ -121,6 +121,8 @@ All 28 file(s) emit-identical.
 
 Checker: `npm run check:emit-identity` → [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) (esbuild transpile at two git refs with repo `target` / `useDefineForClassFields`; raw byte compare). Unit coverage: `tests/unit/check-emit-identity.test.ts`.
 
+**Tip post755 FAIL inventory (report-only):** default `check:emit-identity` vs wave5 merge-base reports **11** AI DIFFs on `cursor/mp-tip-post755` — classified in [`emit-identity-fail-inventory-2026-10-09.md`](./emit-identity-fail-inventory-2026-10-09.md) (`q-mp-264`). Do **not** edit AI files to clear that historical set.
+
 **Knip note:** the checker imports `esbuild`, which is present only as a Vite transitive (`vite` → `esbuild`) and is **not** declared in `package.json` `devDependencies`. Knip therefore reports it under `unlisted` (stable count **3** with the two offline-probe `playwright` hits). That is intentional — do not add `esbuild` to `knip.json` `ignoreDependencies` or promote knip enforce without tip-owner approval. Details: [`knip-report.md`](./knip-report.md#unlisted-script-dependencies-owners).
 
 ## Deferred (would change emitted JS)
