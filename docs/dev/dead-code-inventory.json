@@ -39,7 +39,7 @@
     },
     "candidateCount": 129,
     "safeYes": 6,
-    "executedRemovals": 8,
+    "executedRemovals": 10,
     "deferredSafeHelpers": 1,
     "deferPrs": [
       {
@@ -127,6 +127,22 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted unused test-hook export (zero refs)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/forced-colors.css",
+        "symbol": "kwa-board-svg",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted on tip via q-mp-054 rename; q-mp-101 confirms + inventory sync"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/forced-colors.css",
+        "symbol": "tutorial-spotlight",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted on tip via q-mp-054 rename; q-mp-101 confirms + inventory sync"
       }
     ]
   },
@@ -145,8 +161,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed on tip via q-mp-054 live-class rename; confirmed q-mp-101",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
@@ -199,8 +215,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed on tip via q-mp-054 live-class rename; confirmed q-mp-101",
+      "disposition": "removed"
     },
     {
       "kind": "test-helper-export",

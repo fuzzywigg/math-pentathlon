@@ -22,7 +22,7 @@
 
 ## Executed removals (this PR)
 
-Re-verified on live tip then applied (**8** items). Skipped all safe-to-remove test-helper exports (coordinate with #526).
+Re-verified on live tip then applied (**8** items initially; **+2** CSS classes confirmed removed in q-mp-101 after q-mp-054 rename). Skipped all safe-to-remove test-helper exports (coordinate with #526).
 
 | Disposition | Kind | Path / symbol | Action |
 | --- | --- | --- | --- |
@@ -34,6 +34,8 @@ Re-verified on live tip then applied (**8** items). Skipped all safe-to-remove t
 | removed | css-class | `src/style.css` → `tutorial-action-target` | deleted dead CSS selectors (live class is tutorial-tap-target) |
 | removed | export | `src/ui/game-prefetch.ts` → `allowGamePrefetchImportsForTests` | demoted to module-private; used by resetGamePrefetchForTests |
 | removed | export | `src/ui/game-route-mounts.ts` → `resetGameMountDepsForTests` | deleted unused test-hook export (zero refs) |
+| removed | css-class | `src/ui/styles/forced-colors.css` → `kwa-board-svg` | deleted on tip via q-mp-054 rename to live `.kwa-board` / container / 3d-host; q-mp-101 confirms + inventory sync |
+| removed | css-class | `src/ui/styles/forced-colors.css` → `tutorial-spotlight` | deleted on tip via q-mp-054 rename to live `.tutorial-highlight*` ; q-mp-101 confirms + inventory sync |
 
 ## Defer — do not redo
 

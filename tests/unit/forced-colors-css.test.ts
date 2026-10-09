@@ -55,6 +55,14 @@ describe('forced-colors CSS keepers', () => {
     expect(forcedCss).toMatch(/aria-selected='true'/);
   });
 
+  // q-mp-101: dead rename leftovers must stay gone (live classes remain).
+  it('omits dead kwa-board-svg and tutorial-spotlight selectors', () => {
+    expect(forcedCss).not.toMatch(/kwa-board-svg/);
+    expect(forcedCss).not.toMatch(/tutorial-spotlight/);
+    expect(forcedCss).toMatch(/\.kwa-board,/);
+    expect(forcedCss).toMatch(/\.tutorial-highlight-ring,/);
+  });
+
   it('mirrors Hex + Star Track reduced-motion under html[data-reduced-motion]', () => {
     expect(gamePlay).toMatch(
       /html\[data-reduced-motion='true'\]\s*\.hex-cell-p1/
