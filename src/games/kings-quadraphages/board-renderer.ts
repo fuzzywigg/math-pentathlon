@@ -71,7 +71,9 @@ function createStyles(): HTMLStyleElement {
 
 // Render a single piece
 function renderPiece(cell: Cell): HTMLElement | null {
-  if (!cell) return null;
+  if (!cell) {
+    return null;
+  }
 
   const piece = document.createElement('div');
   piece.className = `piece ${cell.type} ${cell.owner}`;
