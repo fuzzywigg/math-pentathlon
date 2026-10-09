@@ -18,7 +18,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | Count | Rule | Why it matters |
 | ---: | --- | --- |
 | 387 | `@typescript-eslint/no-non-null-assertion` | `!` hides null/undefined; common crash source |
-| 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
+| 132 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions (q-mp-180 cleared `game-controller.ts` −51; was 183) |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
 | 85 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); q-mp-185 cleared `highlight-ui.ts` (−11); densest residual `fraction-bar-ui.ts` 18 (#714) |
 | 21 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`) |
@@ -49,9 +49,7 @@ Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt.
 
 ## Ratchet chosen for q-mp-128
 
-**`@typescript-eslint/no-confusing-void-expression`** — ceiling **228** (= tip re-measure after fold 2026-10-09 on `cursor/mp-tip-post477`; densest: `src/ui/game-route-mounts.ts` 40, `src/main.ts` 12). No source fixes; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
-
-Open-PR overlap for q-mp-128: #605 (nnnull), #665 (`no-duplicate-imports`), #659/#664 (curly ceilings). Expected additive conflict on `docs/dev/lint-ratchet-ceilings.json` / probe script with those drafts — tip owner folds both keys. No open draft already ratchets `no-confusing-void-expression`.
+**`@typescript-eslint/no-confusing-void-expression`** — ceiling **132** (= tip `cursor/mp-tip-post728` after q-mp-180 cleared `src/games/*/game-controller.ts` brace/void hits −51 from 183). Live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`). Residual densest: `src/ui/three/**`, `*/board-ui.ts`, `src/main.ts` (see q-mp-181–183).
 
 ## q-mp-130 · `radix` HOLD residuals
 

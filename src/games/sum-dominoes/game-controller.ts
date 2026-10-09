@@ -111,7 +111,9 @@ export function initGame(
     newGame: () => {},
   };
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     aiGeneration += 1;
     clearAiTimer();
@@ -188,7 +190,9 @@ function updateUI(controller: SDGameController): void {
     gameArea.appendChild(
       renderDice(
         state.currentDice,
-        () => handleRoll(controller),
+        () => {
+          handleRoll(controller);
+        },
         state.phase === 'rolling' && !state.winner && !computerTurn
       )
     );
@@ -205,15 +209,24 @@ function updateUI(controller: SDGameController): void {
   p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length} left)`;
   p1Container.appendChild(p1Label);
   p1Container.appendChild(
-    renderHand(state, 'player1', (id) => handleDominoClick(controller, id), {
-      allowInput: !computerTurn,
-    })
+    renderHand(
+      state,
+      'player1',
+      (id) => {
+        handleDominoClick(controller, id);
+      },
+      {
+        allowInput: !computerTurn,
+      }
+    )
   );
 
   // Board
   const board = renderBoard(
     state,
-    (pos, orientation) => handleCellClick(controller, pos, orientation),
+    (pos, orientation) => {
+      handleCellClick(controller, pos, orientation);
+    },
     { allowInput: !computerTurn }
   );
 
@@ -224,9 +237,16 @@ function updateUI(controller: SDGameController): void {
   p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length} left)`;
   p2Container.appendChild(p2Label);
   p2Container.appendChild(
-    renderHand(state, 'player2', (id) => handleDominoClick(controller, id), {
-      allowInput: !computerTurn,
-    })
+    renderHand(
+      state,
+      'player2',
+      (id) => {
+        handleDominoClick(controller, id);
+      },
+      {
+        allowInput: !computerTurn,
+      }
+    )
   );
 
   mainLayout.appendChild(p1Container);
@@ -243,7 +263,9 @@ function updateUI(controller: SDGameController): void {
     const passBtn = document.createElement('button');
     passBtn.className = 'sd-pass-btn';
     passBtn.textContent = 'Pass Turn';
-    passBtn.addEventListener('click', () => handlePass(controller));
+    passBtn.addEventListener('click', () => {
+      handlePass(controller);
+    });
     controls.appendChild(passBtn);
   }
 
@@ -256,7 +278,9 @@ function updateUI(controller: SDGameController): void {
 
   // AI turn
   if (computerTurn) {
-    scheduleAI(() => makeAIMove(controller), 800);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 800);
   }
 }
 
@@ -338,7 +362,9 @@ function makeAIMove(controller: SDGameController): void {
   if (state.phase === 'rolling') {
     controller.state = doRollDice(state);
     controller.update();
-    scheduleAI(() => makeAIMove(controller), 600);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 600);
     return;
   }
 
