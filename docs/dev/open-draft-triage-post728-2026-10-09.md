@@ -5,8 +5,9 @@
 **Tip SHA checked:** `b5884207c41d10fa3fa7aa1ee01ec80c9bb61b4d` (`b5884207`) — tip fold `q-mp-026f` / PR #728 onto post709  
 **Prior triage (stale for this tip):** [`open-draft-triage-post700-2026-10-09.md`](./open-draft-triage-post700-2026-10-09.md) (`q-mp-209`, tip `post709`)  
 **Machine-readable twin:** [`open-draft-triage-post728-2026-10-09.json`](./open-draft-triage-post728-2026-10-09.json)  
-**Generated (UTC):** 2026-10-09T19:34:13Z  
-**Scope:** report only — **do not close PRs**. Workers may comment `contained` / `superseded` only; tip owner folds into `cursor/mp-tip-post728`. Context note: tip-owner task `q-mp-026g` is folding this queue now.
+**Generated (UTC):** 2026-10-09T19:34:13Z (refresh +#746 at 19:37Z)  
+**Scope:** report only — **do not close PRs**. Workers may comment `contained` / `superseded` only; tip owner folds into `cursor/mp-tip-post728`. Context note: tip-owner task `q-mp-026g` is folding this queue now.  
+**Self note:** this triage lands as draft **#747** (`q-mp-212`) — listed for completeness; tip owner folds it with the docs batch.
 
 ## Hard rule (this doc)
 
@@ -44,11 +45,11 @@ $ npm run check:boundaries   # exit 0 — all zeros at ceilings
 
 | Bucket | Count | Notes |
 | --- | ---: | --- |
-| Open drafts **base** `cursor/mp-tip-post728` | **15** | #731–#745 (no #746+ at snapshot) |
+| Open drafts **base** `cursor/mp-tip-post728` | **17** | #731–#747 (includes this triage #747 + #746) |
 | Open draft **on hold** (base still `post709`) | **1** | #727 (`q-mp-186`) — ticket HOLD; retarget before fold |
-| **Total listed** | **16** | |
+| **Total listed** | **18** | |
 
-Source: `gh pr list --base cursor/mp-tip-post728 --state open` plus explicit `gh pr view 727`. All sixteen are drafts; all report **12/12 SUCCESS** check runs and GitHub `MERGEABLE`/`CLEAN` against their **declared** base (not necessarily against live post728 for #727).
+Source: `gh pr list --base cursor/mp-tip-post728 --state open` plus explicit `gh pr view 727`. Queue drafts report **12/12 SUCCESS** (or still rolling) and GitHub `MERGEABLE`/`CLEAN` against their **declared** base (not necessarily against live post728 for #727).
 
 ## Conflict / shared-file clusters
 
@@ -57,9 +58,10 @@ Source: `gh pr list --base cursor/mp-tip-post728 --state open` plus explicit `gh
 | Lint ceilings JSON | #727, #733, #738, #742 | `docs/dev/lint-ratchet-ceilings.json` | **Different rule keys** (nullish / void / nnnull / dup-imports). Tip owner takes **min** per key after re-measure. |
 | ESLint inventory md | #727, #733, #740 | `docs/dev/eslint-off-rules-inventory.md` | Fold #740 **after** ceiling-changing PRs, or re-refresh inventory post-batch. |
 | Wiki development | #732, #735, #737 | `docs/wiki/development.md` | Small textual overlaps (counts vs tip pointer vs coverage links). Prefer order #737 → #732 → #735. |
+| Wiki README | #735, #746 | `docs/wiki/README.md` | Coverage-map index vs CI unit-budget pointer — reconcile on fold. |
 | Juggle surface (no shared paths) | #733, #742, #744, #745 | controller / board-ui / tests | No path collision; safe in any order relative to each other. |
 
-No open draft already covers `q-mp-212` / a post728 open-draft triage snapshot (prior `q-mp-209` is post700/`post709` only).
+Prior `q-mp-209` is post700/`post709` only; this `q-mp-212` snapshot is the post728 triage (draft #747).
 
 ## Suggested fold order (tip owner)
 
@@ -73,15 +75,17 @@ Prefer docs-only / independent files first, then independent lint keys, then inv
 | 4 | #736 | `q-mp-211` | FOLD_READY | Dead CSS delete + inventory sync; no lint ceilings |
 | 5 | #737 | `q-mp-210` | FOLD_READY | Tip pointer re-anchor (`AGENTS.md` + wiki) |
 | 6 | #732 | `q-mp-199` | FOLD_AFTER_WIKI | Testing-layers counts; shares wiki with #737/#735 |
-| 7 | #735 | `q-mp-171` | FOLD_AFTER_WIKI | Coverage-map + wiki heat visual |
-| 8 | #731 | `q-mp-204` | FOLD_READY | Knip unusedTypes demote; unique `knip-baseline.json` |
-| 9 | #738 | `q-mp-225` | FOLD_READY_RECONCILE | nnnull **268 → 254**; reconcile ceilings JSON |
-| 10 | #742 | `q-mp-226` | FOLD_READY_RECONCILE | `no-duplicate-imports` **122 → 105**; reconcile ceilings JSON |
-| 11 | #733 | `q-mp-180` | FOLD_READY_RECONCILE | void **183 → 132**; reconcile ceilings + eslint inventory |
-| 12 | #740 | `q-mp-230` | FOLD_AFTER_RATCHETS | Inventory refresh vs tip ceilings — fold last among lint docs |
-| 13 | #743 | `q-mp-223` | FOLD_READY | Engine coverage round 6 tests + report |
-| 14 | #744 | `q-mp-222` | FOLD_READY | UI coverage round 10 (juggle) tests + report |
-| 15 | #745 | `q-mp-231` | FOLD_READY | Mutation audit UI wave 6 tests + reports |
+| 7 | #746 | `q-mp-233` | FOLD_AFTER_WIKI | Wiki CI unit-budget refresh; narrow vs #732; shares wiki README with #735 |
+| 8 | #735 | `q-mp-171` | FOLD_AFTER_WIKI | Coverage-map + wiki heat visual |
+| 9 | #747 | `q-mp-212` | FOLD_READY | This triage snapshot (docs-only) |
+| 10 | #731 | `q-mp-204` | FOLD_READY | Knip unusedTypes demote; unique `knip-baseline.json` |
+| 11 | #738 | `q-mp-225` | FOLD_READY_RECONCILE | nnnull **268 → 254**; reconcile ceilings JSON |
+| 12 | #742 | `q-mp-226` | FOLD_READY_RECONCILE | `no-duplicate-imports` **122 → 105**; reconcile ceilings JSON |
+| 13 | #733 | `q-mp-180` | FOLD_READY_RECONCILE | void **183 → 132**; reconcile ceilings + eslint inventory |
+| 14 | #740 | `q-mp-230` | FOLD_AFTER_RATCHETS | Inventory refresh vs tip ceilings — fold last among lint docs |
+| 15 | #743 | `q-mp-223` | FOLD_READY | Engine coverage round 6 tests + report |
+| 16 | #744 | `q-mp-222` | FOLD_READY | UI coverage round 10 (juggle) tests + report |
+| 17 | #745 | `q-mp-231` | FOLD_READY | Mutation audit UI wave 6 tests + reports |
 | — | #727 | `q-mp-186` | **HOLD_RETARGET** | Base still `post709`; tip-owner HOLD; retarget + remeasure nullish vs post728 before fold |
 
 ## Per-PR cards
@@ -280,12 +284,35 @@ Prefer docs-only / independent files first, then independent lint keys, then inv
 | Fold-readiness | Ready (tests-only). |
 | Conflicts / ordering | No shared paths with #742 board-ui edits. |
 
+### #746 — `q-mp-233` — FOLD_AFTER_WIKI
+
+| Field | Value |
+| --- | --- |
+| Title | refresh wiki CI unit-budget page for tip post728 |
+| Base / head | `cursor/mp-tip-post728` / `cursor/q-mp-233-ci-unit-budget-refresh-4046` @ `636d6b07` |
+| Mergeable | UNKNOWN at first poll (draft just opened); CI rolling toward 12 checks |
+| Files | `docs/wiki/ci-unit-budget.md`, `docs/dev/ci-unit-budget-q-mp-175.md`, `docs/wiki/README.md`, `docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt`, `docs/screenshots/ci/tip-unit-ai-benches-skipped-37972882883.txt` |
+| Ratchet ceilings touched | None (docs only; no workflow / AI timing / ratchet edits) |
+| Fold-readiness | Ready after wiki README reconcile with #735; intentionally narrow vs #732 (wall budget + AI-bench skip evidence only). |
+| Conflicts / ordering | Shares `docs/wiki/README.md` with #735; unit **count** tables remain #732’s lane. |
+
+### #747 — `q-mp-212` — FOLD_READY (this PR)
+
+| Field | Value |
+| --- | --- |
+| Title | tip post728 open-draft triage snapshot |
+| Base / head | `cursor/mp-tip-post728` / `cursor/q-mp-212-open-draft-triage-post728-e403` |
+| Files | `docs/dev/open-draft-triage-post728-2026-10-09.md`, `docs/dev/open-draft-triage-post728-2026-10-09.json` |
+| Ratchet ceilings touched | None |
+| Fold-readiness | Ready (docs-only report). |
+| Conflicts / ordering | None with product paths; fold with docs batch. |
+
 ## Method
 
 1. `git fetch origin cursor/mp-tip-post728` → tip `b5884207`.
-2. `gh pr list --base cursor/mp-tip-post728 --state open` → #731–#745 (15).
+2. `gh pr list --base cursor/mp-tip-post728 --state open` → initially #731–#745; refresh saw #746/#747.
 3. Explicit `gh pr view 727` (HOLD; base `post709`).
-4. Search for existing `q-mp-212` / post728 triage drafts → none.
+4. Search for existing `q-mp-212` / post728 triage drafts → none before this PR.
 5. Per PR: GH files, mergeability, statusCheckRollup (12 expected), body ceiling claims; verified ceiling **keys** via `git show origin/<head>:docs/dev/lint-ratchet-ceilings.json` vs tip.
 6. Tip re-measure: `npm run lint:ratchet`, `typecheck:ratchet`, `check:boundaries`; unit file formula from #732 → **3140**.
 7. **No PR closes, merges, or ready-for-review flips** performed by this task.
