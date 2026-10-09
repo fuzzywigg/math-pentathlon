@@ -37,8 +37,12 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 0 | `@typescript-eslint/prefer-includes` | Clean |
 | 0 | `@typescript-eslint/prefer-string-starts-ends-with` | Clean |
 
-## Ratchet chosen this PR
+## Ratchets already on `npm run lint:ratchet`
 
-**`@typescript-eslint/no-non-null-assertion`** — highest-signal off rule with real crash risk; ceiling **387** (= today's count). No source fixes in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+| Rule | Ceiling | Task | Notes |
+| --- | ---: | --- | --- |
+| `curly` (`all`) | **639** | burn-1008 + curly batches | Live still `multi-line` only |
+| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605) | Live unset; count-down only |
+| `no-duplicate-imports` | **124** | q-mp-127 | Live unset; tip re-measure 2026-10-09 (= inventory count); no mass fix |
 
-Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
+Open-PR overlap for q-mp-127: #605 covers nnnull only; curly batches lower `curly`. No open draft already ratchets `no-duplicate-imports`.
