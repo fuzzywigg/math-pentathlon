@@ -6,7 +6,9 @@
  * Append a style element once. No-ops if an element with `id` already exists.
  */
 export function injectStylesOnce(id: string, css: string): void {
-  if (document.getElementById(id)) return;
+  if (document.getElementById(id)) {
+    return;
+  }
   const style = document.createElement('style');
   style.id = id;
   style.textContent = css;

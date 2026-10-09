@@ -48,7 +48,9 @@ function allowGamePrefetchImportsForTests(allow: boolean): void {
 }
 
 function shouldExecutePrefetchImport(): boolean {
-  if (allowPrefetchImportsForTests) return true;
+  if (allowPrefetchImportsForTests) {
+    return true;
+  }
   return import.meta.env.MODE !== 'test';
 }
 
@@ -93,12 +95,20 @@ function prefersSaveData(): boolean {
 }
 
 export function prefetchGameChunk(gameId: string): void {
-  if (!canPrefetchGame(gameId) || started.has(gameId)) return;
-  if (prefersSaveData()) return;
+  if (!canPrefetchGame(gameId) || started.has(gameId)) {
+    return;
+  }
+  if (prefersSaveData()) {
+    return;
+  }
   started.add(gameId);
-  if (!shouldExecutePrefetchImport()) return;
+  if (!shouldExecutePrefetchImport()) {
+    return;
+  }
   const load = loaders[gameId];
-  if (!load) return;
+  if (!load) {
+    return;
+  }
   void load().catch(() => {
     started.delete(gameId);
   });

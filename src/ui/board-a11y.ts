@@ -15,7 +15,9 @@ function isBoardFocusable(el: EventTarget | null): el is BoardFocusable {
 }
 
 function focusBoardEl(el: Element): void {
-  if (isBoardFocusable(el)) el.focus();
+  if (isBoardFocusable(el)) {
+    el.focus();
+  }
 }
 
 export interface CellLabelParts {
@@ -45,18 +47,28 @@ export function buildCellAriaLabel(parts: CellLabelParts): string {
     segments.push('empty');
   } else {
     const mid = [parts.owner, parts.piece].filter(Boolean).join(' ');
-    if (mid) segments.push(mid);
+    if (mid) {
+      segments.push(mid);
+    }
   }
 
   if (parts.extras) {
     for (const extra of parts.extras) {
-      if (extra) segments.push(extra);
+      if (extra) {
+        segments.push(extra);
+      }
     }
   }
 
-  if (parts.selectable) segments.push('selectable');
-  if (parts.validMove) segments.push('valid move');
-  if (parts.validPlacement) segments.push('valid placement');
+  if (parts.selectable) {
+    segments.push('selectable');
+  }
+  if (parts.validMove) {
+    segments.push('valid move');
+  }
+  if (parts.validPlacement) {
+    segments.push('valid placement');
+  }
 
   return segments.join(', ');
 }
@@ -94,7 +106,9 @@ export function labelBoardFromGameTitle(boardEl: Element): void {
     return;
   }
   const title = document.getElementById('game-title');
-  if (!title?.id) return;
+  if (!title?.id) {
+    return;
+  }
   boardEl.setAttribute('aria-labelledby', title.id);
 }
 
@@ -146,7 +160,9 @@ function wrapGridCellsInRows(grid: Element): void {
     const groups = new Map<Element, Map<string, Element[]>>();
     for (const cell of orphanCells) {
       const parent = cell.parentElement;
-      if (!parent) continue;
+      if (!parent) {
+        continue;
+      }
       let byRow = groups.get(parent);
       if (!byRow) {
         byRow = new Map();
@@ -173,7 +189,9 @@ function wrapGridCellsInRows(grid: Element): void {
       }
 
       for (const [, rowCells] of byRow) {
-        if (rowCells.length === 0) continue;
+        if (rowCells.length === 0) {
+          continue;
+        }
         const first = rowCells[0]!;
         const row = isSvg
           ? document.createElementNS(SVG_NS, 'g')
@@ -197,7 +215,9 @@ function wrapGridCellsInRows(grid: Element): void {
   // Decorative non-row children under the grid (SVG chrome, labels, defs).
   for (const child of Array.from(grid.children)) {
     const role = child.getAttribute('role');
-    if (role === 'row' || role === 'rowgroup' || role === 'gridcell') continue;
+    if (role === 'row' || role === 'rowgroup' || role === 'gridcell') {
+      continue;
+    }
     if (child.querySelector('[role="row"], [role="gridcell"]')) {
       if (role !== 'rowgroup' && role !== 'grid' && role !== 'row') {
         child.setAttribute('role', 'rowgroup');
@@ -221,14 +241,18 @@ function parentHasForeignRole(el: Element): boolean {
  * use presentation so we never nest rowgroups (invalid per ARIA).
  */
 function ensureRowgroupAncestors(from: Element, grid: Element): void {
-  if (from === grid || !grid.contains(from)) return;
+  if (from === grid || !grid.contains(from)) {
+    return;
+  }
   const chain: Element[] = [];
   let node = from.parentElement;
   while (node && node !== grid) {
     chain.push(node);
     node = node.parentElement;
   }
-  if (node !== grid || chain.length === 0) return;
+  if (node !== grid || chain.length === 0) {
+    return;
+  }
 
   const top = chain[chain.length - 1]!;
   if (
@@ -254,7 +278,9 @@ export function applyRovingTabindex(
   cells: Element[],
   preferred?: FocusedCellCoords | null
 ): Element | null {
-  if (cells.length === 0) return null;
+  if (cells.length === 0) {
+    return null;
+  }
 
   let active: Element | null = null;
   if (preferred) {
@@ -265,7 +291,9 @@ export function applyRovingTabindex(
           c.getAttribute('data-col') === preferred.col
       ) ?? null;
   }
-  if (!active) active = cells[0] ?? null;
+  if (!active) {
+    active = cells[0] ?? null;
+  }
 
   for (const cell of cells) {
     cell.setAttribute('tabindex', cell === active ? '0' : '-1');
@@ -301,7 +329,9 @@ export function findGridNeighbor(
   dRow: number,
   dCol: number
 ): Element | null {
-  if (cells.length === 0) return null;
+  if (cells.length === 0) {
+    return null;
+  }
 
   const byCoord = new Map(
     cells.map(
@@ -320,7 +350,9 @@ export function findGridNeighbor(
   for (const c of cells) {
     const r = Number(c.getAttribute('data-row'));
     const colN = Number(c.getAttribute('data-col'));
-    if (!Number.isFinite(r) || !Number.isFinite(colN)) continue;
+    if (!Number.isFinite(r) || !Number.isFinite(colN)) {
+      continue;
+    }
     minR = Math.min(minR, r);
     maxR = Math.max(maxR, r);
     minC = Math.min(minC, colN);
@@ -331,7 +363,9 @@ export function findGridNeighbor(
   let c = col + dCol;
   while (r >= minR && r <= maxR && c >= minC && c <= maxC) {
     const found = byCoord.get(`${r},${c}`);
-    if (found) return found;
+    if (found) {
+      return found;
+    }
     r += dRow;
     c += dCol;
   }
@@ -354,20 +388,32 @@ export function bindGridNavigation(boardEl: Element): void {
   boardEl.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
     const delta = ARROW_DELTA[ke.key];
-    if (!delta) return;
+    if (!delta) {
+      return;
+    }
 
     const target = ke.target;
-    if (!isBoardFocusable(target)) return;
-    if (target.getAttribute('role') !== 'gridcell') return;
-    if (!boardEl.contains(target)) return;
+    if (!isBoardFocusable(target)) {
+      return;
+    }
+    if (target.getAttribute('role') !== 'gridcell') {
+      return;
+    }
+    if (!boardEl.contains(target)) {
+      return;
+    }
 
     const row = Number(target.getAttribute('data-row'));
     const col = Number(target.getAttribute('data-col'));
-    if (!Number.isFinite(row) || !Number.isFinite(col)) return;
+    if (!Number.isFinite(row) || !Number.isFinite(col)) {
+      return;
+    }
 
     const cells = collectGridCells(boardEl);
     const next = findGridNeighbor(cells, row, col, delta.dRow, delta.dCol);
-    if (!next) return;
+    if (!next) {
+      return;
+    }
 
     ke.preventDefault();
     applyRovingTabindex(cells, {
@@ -410,7 +456,9 @@ export function bindCellActivateKeys(
 ): void {
   cell.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
-    if (!isBoardActivateKey(ke)) return;
+    if (!isBoardActivateKey(ke)) {
+      return;
+    }
     ke.preventDefault();
     onActivate();
   });
@@ -427,9 +475,13 @@ export function bindBoardCellKeys(
 ): void {
   boardEl.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
-    if (!isBoardActivateKey(ke)) return;
+    if (!isBoardActivateKey(ke)) {
+      return;
+    }
     const target = ke.target;
-    if (!isBoardFocusable(target) || !isCell(target)) return;
+    if (!isBoardFocusable(target) || !isCell(target)) {
+      return;
+    }
     ke.preventDefault();
     onActivate(target);
   });
@@ -445,11 +497,17 @@ export function captureFocusedCell(
   container: Element
 ): FocusedCellCoords | null {
   const active = document.activeElement;
-  if (!isBoardFocusable(active)) return null;
-  if (!container.contains(active)) return null;
+  if (!isBoardFocusable(active)) {
+    return null;
+  }
+  if (!container.contains(active)) {
+    return null;
+  }
   const row = active.getAttribute('data-row');
   const col = active.getAttribute('data-col');
-  if (row == null || col == null) return null;
+  if (row == null || col == null) {
+    return null;
+  }
   return { row, col };
 }
 
@@ -458,11 +516,15 @@ export function restoreFocusedCell(
   container: Element,
   focus: FocusedCellCoords | null
 ): void {
-  if (!focus) return;
+  if (!focus) {
+    return;
+  }
   const cell = container.querySelector(
     `[data-row="${focus.row}"][data-col="${focus.col}"]`
   );
-  if (cell) focusBoardEl(cell);
+  if (cell) {
+    focusBoardEl(cell);
+  }
 }
 
 /** Mark a status root as a polite live region. */
