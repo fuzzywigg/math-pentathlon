@@ -855,11 +855,11 @@
       "isDraft": true,
       "base": "cursor/mp-tip-post728",
       "headRef": "cursor/q-mp-212-open-draft-triage-post728-e403",
-      "headSha": null,
+      "headSha": "379c1d92",
       "mergeable": "MERGEABLE",
       "mergeStateStatus": "CLEAN",
       "changedFiles": 2,
-      "additions": null,
+      "additions": 1222,
       "deletions": null,
       "files": [
         "docs/dev/open-draft-triage-post728-2026-10-09.md",
