@@ -12,7 +12,8 @@ test.describe('@fullgame juggle', () => {
   );
 
   test('@fullgame complete HvH match to game-over', async ({ page }) => {
-    test.setTimeout(900_000);
+    // Softlock reshuffles under seeded deals can take a while in CI; 20m headroom.
+    test.setTimeout(1_200_000);
     await runFullgameMatch(page, 'juggle');
   });
 });
