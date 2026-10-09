@@ -5,7 +5,7 @@
 import { afterEach, beforeEach, vi } from 'vitest';
 
 /** Clear document.body; optionally remove injected style nodes by id. */
-export function clearDom(styleIds?: readonly string[]): void {
+function clearDom(styleIds?: readonly string[]): void {
   document.body.innerHTML = '';
   if (styleIds) {
     for (const id of styleIds) {
