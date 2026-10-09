@@ -2,7 +2,7 @@
 // Orchestrates game state, UI updates, and player interactions
 
 import type { JuggleState, Player } from './types';
-import type { PolyominoShape } from '../../core/polyomino/types';
+import type { PolyominoShape, Rotation } from '../../core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
@@ -11,6 +11,9 @@ import {
   rotateShape,
   flipShape,
   placeShape,
+  abandonPlacement,
+  getCurrentOrientationPlacements,
+  selectedShapeFitsAnywhere,
 } from './rules';
 import type { AIDifficulty } from './ai';
 import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
@@ -382,6 +385,67 @@ export function __setStateForTests(state: JuggleState): void {
 /** Test-only: read current controller state. */
 export function __getStateForTests(): JuggleState {
   return gameState;
+}
+
+/**
+ * Test-only: back out of placing to shape/die select (rules `abandonPlacement`).
+ * Live UI has no abandon control; e2e/fullgame uses this DEV hook instead.
+ */
+export function __abandonPlacementForTests(): void {
+  gameState = abandonPlacement(gameState);
+  updateUI();
+}
+
+/**
+ * Test-only: place the selected shape on a legal anchor (any orientation).
+ * Returns false when the shape cannot fit — caller should abandon / reshuffle.
+ */
+export function __placeSelectedForTests(): boolean {
+  const shape = gameState.selectedShape;
+  if (gameState.phase !== 'placing' || !shape) return false;
+  if (!selectedShapeFitsAnywhere(gameState)) return false;
+
+  const rotations: Rotation[] = [0, 90, 180, 270];
+  const flips = shape.canFlip ? [false, true] : [false];
+  for (const flipped of flips) {
+    for (const rotation of rotations) {
+      if (!shape.canRotate && rotation !== 0) continue;
+      gameState = {
+        ...gameState,
+        selectedRotation: rotation,
+        selectedFlipped: flipped,
+      };
+      const spots = getCurrentOrientationPlacements(gameState);
+      if (spots.length) {
+        // Prefer top-left for denser packing under e2e softlock pressure.
+        spots.sort((a, b) => a.row - b.row || a.col - b.col);
+        gameState = placeShape(gameState, spots[0]!);
+        updateUI();
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+declare global {
+  interface Window {
+    __mpJuggleController?: {
+      setState: (state: JuggleState) => void;
+      getState: () => JuggleState;
+      abandonPlacement: () => void;
+      placeSelected: () => boolean;
+    };
+  }
+}
+
+if (import.meta.env.DEV) {
+  window.__mpJuggleController = {
+    setState: __setStateForTests,
+    getState: __getStateForTests,
+    abandonPlacement: __abandonPlacementForTests,
+    placeSelected: __placeSelectedForTests,
+  };
 }
 
 /** Tip-held destroy hook for tip mounts / #501. */
