@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Report-only ratchet ceiling history chart (q-mp-074; refresh q-mp-236).
+ * Report-only ratchet ceiling history chart (q-mp-074; refresh q-mp-236 / q-mp-290).
  *
  * Walks git history for:
  *   - docs/dev/lint-ratchet-ceilings.json          → curly + void + nnnull + dup-imports
@@ -480,7 +480,7 @@ export function renderMarkdown(rows, meta = {}) {
   const lines = [
     '# Ratchet ceiling history',
     '',
-    `Task: \`q-mp-074\` / refresh \`q-mp-236\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
+    `Task: \`q-mp-074\` / refresh \`q-mp-236\` / \`q-mp-290\`. Generated \`${generatedAt}\` via \`${gitMode}\`.`,
     '',
     'Tracks report-only ceilings over git history:',
     '',

@@ -12,7 +12,7 @@ import {
   LINT_RULE_KEYS,
 } from '../../scripts/report-ratchet-history.mjs';
 
-describe('report-ratchet-history helpers (q-mp-074 / q-mp-236)', () => {
+describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () => {
   it('extracts curly / void / nnnull / dup / type / boundary metrics', () => {
     const lint = {
       rules: {
@@ -212,6 +212,7 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236)', () => {
     );
     expect(md).toContain('# Ratchet ceiling history');
     expect(md).toContain('q-mp-236');
+    expect(md).toContain('q-mp-290');
     expect(md).toContain(TRACKED.lintCeilings);
     expect(md).toContain('Live tip snapshot (`2392693`)');
     expect(md).toContain('| curly | 538 |');
