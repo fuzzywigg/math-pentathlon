@@ -152,8 +152,12 @@ function updateUI(): void {
       'player1',
       gameState.currentPlayer === 'player1',
       gameState,
-      (row, col) => handleCellClick(row, col, 'player1'),
-      (row, col) => handleCellHover(row, col),
+      (row, col) => {
+        handleCellClick(row, col, 'player1');
+      },
+      (row, col) => {
+        handleCellHover(row, col);
+      },
       handleCellLeave,
       inputOpts
     );
@@ -164,8 +168,12 @@ function updateUI(): void {
       'player2',
       gameState.currentPlayer === 'player2',
       gameState,
-      (row, col) => handleCellClick(row, col, 'player2'),
-      (row, col) => handleCellHover(row, col),
+      (row, col) => {
+        handleCellClick(row, col, 'player2');
+      },
+      (row, col) => {
+        handleCellHover(row, col);
+      },
       handleCellLeave,
       inputOpts
     );
@@ -345,7 +353,9 @@ function handleCellClick(row: number, col: number, player: Player): void {
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    scheduleAI(() => handleRollDice(true), 500);
+    scheduleAI(() => {
+      handleRollDice(true);
+    }, 500);
   }
 }
 
@@ -438,7 +448,9 @@ function makeAIMove(): void {
 
       // Continue if still AI's turn
       if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-        scheduleAI(() => handleRollDice(true), 500);
+        scheduleAI(() => {
+          handleRollDice(true);
+        }, 500);
       }
       return;
     }

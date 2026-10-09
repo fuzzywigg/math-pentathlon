@@ -106,7 +106,9 @@ export function initGame(
     newGame: () => {},
   };
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     disposeFabAiWorker();
     aiGeneration += 1;
@@ -181,15 +183,17 @@ function updateUI(controller: FabGameController): void {
 
   // Fraction bar pool
   leftColumn.appendChild(
-    renderFractionBarPool(state, (barId) => handleBarClick(controller, barId))
+    renderFractionBarPool(state, (barId) => {
+      handleBarClick(controller, barId);
+    })
   );
 
   // Operation selector (when two bars selected)
   if (state.selectedBar1 && state.selectedBar2) {
     leftColumn.appendChild(
-      renderOperationSelector(state, (op) =>
-        handleOperationSelect(controller, op)
-      )
+      renderOperationSelector(state, (op) => {
+        handleOperationSelect(controller, op);
+      })
     );
   }
 
@@ -200,9 +204,9 @@ function updateUI(controller: FabGameController): void {
   rightColumn.className = 'fab-right-column';
 
   rightColumn.appendChild(
-    renderAnswerBoard(state, (answerId) =>
-      handleAnswerClick(controller, answerId)
-    )
+    renderAnswerBoard(state, (answerId) => {
+      handleAnswerClick(controller, answerId);
+    })
   );
 
   if (state.moveHistory.length > 0) {
@@ -265,7 +269,9 @@ function updateUI(controller: FabGameController): void {
     controller.aiPlayer === state.currentPlayer &&
     !state.winner
   ) {
-    scheduleAI(() => makeAIMove(controller), 800);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 800);
   }
 }
 

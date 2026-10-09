@@ -175,7 +175,9 @@ export function initGame(
   activeController = controller;
   board3dEnabled = isBoard3dEnabled();
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     clearAiTimer();
     controller.state = createInitialState();
@@ -284,7 +286,13 @@ function updateUI(controller: PrimeGoldController): void {
 
   // Dice area — hide Roll while the computer seat thinks
   mainLayout.appendChild(
-    renderDice(state, () => handleRoll(controller), inputOpts)
+    renderDice(
+      state,
+      () => {
+        handleRoll(controller);
+      },
+      inputOpts
+    )
   );
 
   const allowBoardClicks = !aiThinking && state.phase === 'placing';
@@ -298,7 +306,9 @@ function updateUI(controller: PrimeGoldController): void {
       board3d.update(
         state,
         allowBoardClicks
-          ? (value, expr) => handlePlacement(controller, value, expr)
+          ? (value, expr) => {
+              handlePlacement(controller, value, expr);
+            }
           : undefined
       );
     }
@@ -306,7 +316,9 @@ function updateUI(controller: PrimeGoldController): void {
     mainLayout.appendChild(
       renderBoard(
         state,
-        (value, expr) => handlePlacement(controller, value, expr),
+        (value, expr) => {
+          handlePlacement(controller, value, expr);
+        },
         inputOpts
       )
     );
@@ -317,7 +329,9 @@ function updateUI(controller: PrimeGoldController): void {
     mainLayout.appendChild(
       renderExpressions(
         state,
-        (value, expr) => handlePlacement(controller, value, expr),
+        (value, expr) => {
+          handlePlacement(controller, value, expr);
+        },
         inputOpts
       )
     );
@@ -338,7 +352,9 @@ function updateUI(controller: PrimeGoldController): void {
     const passBtn = document.createElement('button');
     passBtn.className = 'pg-btn pg-btn-secondary';
     passBtn.textContent = 'Pass Turn';
-    passBtn.addEventListener('click', () => handlePass(controller));
+    passBtn.addEventListener('click', () => {
+      handlePass(controller);
+    });
     controls.appendChild(passBtn);
   }
 

@@ -112,7 +112,9 @@ export function initGame(
     newGame: () => {},
   };
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     aiGeneration += 1;
     clearAiTimer();
@@ -193,7 +195,9 @@ function updateUI(controller: StarsGameController): void {
     renderPlayerHand(
       state,
       'player1',
-      (cardId) => handleCardClick(controller, cardId),
+      (cardId) => {
+        handleCardClick(controller, cardId);
+      },
       inputOpts
     )
   );
@@ -202,7 +206,9 @@ function updateUI(controller: StarsGameController): void {
   mainLayout.appendChild(
     renderBoard(
       state,
-      (row, col) => handleCellClick(controller, row, col),
+      (row, col) => {
+        handleCellClick(controller, row, col);
+      },
       inputOpts
     )
   );
@@ -212,7 +218,9 @@ function updateUI(controller: StarsGameController): void {
     renderPlayerHand(
       state,
       'player2',
-      (cardId) => handleCardClick(controller, cardId),
+      (cardId) => {
+        handleCardClick(controller, cardId);
+      },
       inputOpts
     )
   );
@@ -269,7 +277,9 @@ function updateUI(controller: StarsGameController): void {
     controller.aiPlayer === state.currentPlayer &&
     state.phase !== 'gameOver'
   ) {
-    scheduleAI(() => makeAIMove(controller), 800);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 800);
   }
 }
 

@@ -112,7 +112,9 @@ export function initGame(
     newGame: () => {},
   };
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     aiGeneration += 1;
     clearAiTimer();
@@ -198,7 +200,9 @@ function updateUI(controller: RamrodGameController): void {
     renderPlayerRods(
       state,
       'player1',
-      (rodId) => handleRodClick(controller, rodId),
+      (rodId) => {
+        handleRodClick(controller, rodId);
+      },
       inputOpts
     )
   );
@@ -206,7 +210,9 @@ function updateUI(controller: RamrodGameController): void {
   // Board
   const board = renderBoard(
     state,
-    (boxId, slot) => handleBoxClick(controller, boxId, slot),
+    (boxId, slot) => {
+      handleBoxClick(controller, boxId, slot);
+    },
     inputOpts
   );
 
@@ -220,7 +226,9 @@ function updateUI(controller: RamrodGameController): void {
     renderPlayerRods(
       state,
       'player2',
-      (rodId) => handleRodClick(controller, rodId),
+      (rodId) => {
+        handleRodClick(controller, rodId);
+      },
       inputOpts
     )
   );
@@ -281,7 +289,9 @@ function updateUI(controller: RamrodGameController): void {
     controller.aiPlayer === state.currentPlayer &&
     state.phase !== 'gameOver'
   ) {
-    scheduleAI(() => makeAIMove(controller), 800);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 800);
   }
 }
 
