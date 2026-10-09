@@ -1,0 +1,1232 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-09T04:06:11.804Z",
+    "baseURL": "http://127.0.0.1:5179",
+    "moveTarget": 20,
+    "navCycles": 5,
+    "mode": "render",
+    "phase": "tip-rerun",
+    "cpuThrottle": 4,
+    "fixedGames": [],
+    "fixNotes": []
+  },
+  "results": [
+    {
+      "gameId": "kings-quadraphages",
+      "board3d": true,
+      "ttiMs": 825.0999999999767,
+      "movesAttempted": 80,
+      "movesLanded": 2,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 121,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 69.79999999993015,
+        "p95Ms": 76.5,
+        "maxMs": 78.80000000004657,
+        "meanMs": 67.00375000000786,
+        "layoutReadsP95": 10,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "hex",
+      "board3d": false,
+      "ttiMs": 415.89999999990687,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 110.20000000006985,
+        "p95Ms": 162.80000000004657,
+        "maxMs": 162.80000000004657,
+        "meanMs": 114.225,
+        "layoutReadsP95": 1,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "star-track",
+      "board3d": true,
+      "ttiMs": 782.4000000000233,
+      "movesAttempted": 80,
+      "movesLanded": 9,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 128,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 74.40000000002328,
+        "p95Ms": 412.29999999993015,
+        "maxMs": 467.5,
+        "meanMs": 107.87749999999505,
+        "layoutReadsP95": 30,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "hex-a-gone",
+      "board3d": true,
+      "ttiMs": 841.9000000000233,
+      "movesAttempted": 80,
+      "movesLanded": 4,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 120,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 144.40000000002328,
+        "p95Ms": 165.30000000004657,
+        "maxMs": 243.19999999995343,
+        "meanMs": 145.23249999999535,
+        "layoutReadsP95": 18,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "calla",
+      "board3d": false,
+      "ttiMs": 518.5,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 104.09999999997672,
+        "p95Ms": 118.80000000004657,
+        "maxMs": 118.80000000004657,
+        "meanMs": 105.84499999999534,
+        "layoutReadsP95": 1,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "sum-dominoes",
+      "board3d": false,
+      "ttiMs": 439.9000000000233,
+      "movesAttempted": 80,
+      "movesLanded": 14,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 112,
+        "p95Ms": 243.90000000002328,
+        "maxMs": 265.39999999990687,
+        "meanMs": 133.93000000000174,
+        "layoutReadsP95": 3,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "par-55",
+      "board3d": false,
+      "ttiMs": 422.10000000009313,
+      "movesAttempted": 80,
+      "movesLanded": 11,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 66.60000000009313,
+        "p95Ms": 164.80000000004657,
+        "maxMs": 188.09999999997672,
+        "meanMs": 78.43999999999505,
+        "layoutReadsP95": 41,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "ramrod",
+      "board3d": false,
+      "ttiMs": 421.69999999995343,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 143,
+        "p95Ms": 179.40000000002328,
+        "maxMs": 179.40000000002328,
+        "meanMs": 145.875,
+        "layoutReadsP95": 1,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "kwatro-sinko",
+      "board3d": true,
+      "ttiMs": 905.6999999999534,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 193,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 201.59999999997672,
+        "p95Ms": 229.5,
+        "maxMs": 229.5,
+        "meanMs": 201.9149999999674,
+        "layoutReadsP95": 22,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "fiar",
+      "board3d": true,
+      "ttiMs": 794.8000000000466,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 127,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 91.19999999995343,
+        "p95Ms": 121.5,
+        "maxMs": 121.5,
+        "meanMs": 94.43499999999185,
+        "layoutReadsP95": 14,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "juggle",
+      "board3d": false,
+      "ttiMs": 407.60000000009313,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 104.29999999993015,
+        "p95Ms": 270.4000000000233,
+        "maxMs": 270.4000000000233,
+        "meanMs": 119.45999999999185,
+        "layoutReadsP95": 27,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 12,
+        "p50Ms": 35,
+        "p95Ms": 47.89999999990687,
+        "maxMs": 47.89999999990687,
+        "meanMs": 36.82500000001164,
+        "layoutReadsP95": 0,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "contig-60",
+      "board3d": false,
+      "ttiMs": 432.19999999995343,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 109.60000000009313,
+        "p95Ms": 195.9000000001397,
+        "maxMs": 195.9000000001397,
+        "meanMs": 127.91500000004889,
+        "layoutReadsP95": 2,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "stars-bars",
+      "board3d": false,
+      "ttiMs": 394.69999999995343,
+      "movesAttempted": 80,
+      "movesLanded": 10,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 67.60000000009313,
+        "p95Ms": 155.20000000018626,
+        "maxMs": 160.60000000009313,
+        "meanMs": 75.83999999999942,
+        "layoutReadsP95": 2,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "fab-a-diffy",
+      "board3d": false,
+      "ttiMs": 499.69999999995343,
+      "movesAttempted": 80,
+      "movesLanded": 3,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 92.30000000004657,
+        "p95Ms": 114.5,
+        "maxMs": 307.39999999990687,
+        "meanMs": 95.66624999998893,
+        "layoutReadsP95": 0,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "queens-guards",
+      "board3d": true,
+      "ttiMs": 872.5999999998603,
+      "movesAttempted": 80,
+      "movesLanded": 3,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 167,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 88.39999999990687,
+        "p95Ms": 102.20000000018626,
+        "maxMs": 120.69999999995343,
+        "meanMs": 90.05000000001746,
+        "layoutReadsP95": 15,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "prime-gold",
+      "board3d": true,
+      "ttiMs": 865.9000000001397,
+      "movesAttempted": 80,
+      "movesLanded": 3,
+      "longTasksOver50": 2,
+      "longTaskMaxMs": 198,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 81.19999999995343,
+        "p95Ms": 97.29999999981374,
+        "maxMs": 170.29999999981374,
+        "meanMs": 82.01624999999767,
+        "layoutReadsP95": 12,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "remainder-islands",
+      "board3d": false,
+      "ttiMs": 427.49999999976717,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 151.60000000009313,
+        "p95Ms": 201.60000000009313,
+        "maxMs": 201.60000000009313,
+        "meanMs": 155.53500000000932,
+        "layoutReadsP95": 199,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "pent-em-in",
+      "board3d": true,
+      "ttiMs": 812.2999999998137,
+      "movesAttempted": 80,
+      "movesLanded": 3,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 71.10000000009313,
+        "p95Ms": 83.19999999995343,
+        "maxMs": 196.19999999995343,
+        "meanMs": 74.16499999998777,
+        "layoutReadsP95": 10,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 12,
+        "p50Ms": 37.5,
+        "p95Ms": 42.199999999953434,
+        "maxMs": 42.199999999953434,
+        "meanMs": 37.90833333332557,
+        "layoutReadsP95": 15,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "frac-fact",
+      "board3d": false,
+      "ttiMs": 400.5,
+      "movesAttempted": 80,
+      "movesLanded": 11,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 58.300000000046566,
+        "p95Ms": 242.4000000001397,
+        "maxMs": 270.9000000001397,
+        "meanMs": 81.39125000001805,
+        "layoutReadsP95": 2,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "fraction-pinball",
+      "board3d": false,
+      "ttiMs": 395.20000000018626,
+      "movesAttempted": 80,
+      "movesLanded": 11,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 80,
+        "p50Ms": 60.700000000186265,
+        "p95Ms": 243,
+        "maxMs": 270.69999999995343,
+        "meanMs": 82.6987500000163,
+        "layoutReadsP95": 2,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    }
+  ],
+  "phases": {
+    "tip-rerun": {
+      "meta": {
+        "generatedAt": "2026-10-09T04:06:11.804Z",
+        "baseURL": "http://127.0.0.1:5179",
+        "moveTarget": 20,
+        "navCycles": 5,
+        "mode": "render",
+        "phase": "tip-rerun",
+        "cpuThrottle": 4,
+        "fixedGames": [],
+        "fixNotes": []
+      },
+      "results": [
+        {
+          "gameId": "kings-quadraphages",
+          "board3d": true,
+          "ttiMs": 825.0999999999767,
+          "movesAttempted": 80,
+          "movesLanded": 2,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 121,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 69.79999999993015,
+            "p95Ms": 76.5,
+            "maxMs": 78.80000000004657,
+            "meanMs": 67.00375000000786,
+            "layoutReadsP95": 10,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "hex",
+          "board3d": false,
+          "ttiMs": 415.89999999990687,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 110.20000000006985,
+            "p95Ms": 162.80000000004657,
+            "maxMs": 162.80000000004657,
+            "meanMs": 114.225,
+            "layoutReadsP95": 1,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "star-track",
+          "board3d": true,
+          "ttiMs": 782.4000000000233,
+          "movesAttempted": 80,
+          "movesLanded": 9,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 128,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 74.40000000002328,
+            "p95Ms": 412.29999999993015,
+            "maxMs": 467.5,
+            "meanMs": 107.87749999999505,
+            "layoutReadsP95": 30,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "hex-a-gone",
+          "board3d": true,
+          "ttiMs": 841.9000000000233,
+          "movesAttempted": 80,
+          "movesLanded": 4,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 120,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 144.40000000002328,
+            "p95Ms": 165.30000000004657,
+            "maxMs": 243.19999999995343,
+            "meanMs": 145.23249999999535,
+            "layoutReadsP95": 18,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "calla",
+          "board3d": false,
+          "ttiMs": 518.5,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 104.09999999997672,
+            "p95Ms": 118.80000000004657,
+            "maxMs": 118.80000000004657,
+            "meanMs": 105.84499999999534,
+            "layoutReadsP95": 1,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "sum-dominoes",
+          "board3d": false,
+          "ttiMs": 439.9000000000233,
+          "movesAttempted": 80,
+          "movesLanded": 14,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 112,
+            "p95Ms": 243.90000000002328,
+            "maxMs": 265.39999999990687,
+            "meanMs": 133.93000000000174,
+            "layoutReadsP95": 3,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "par-55",
+          "board3d": false,
+          "ttiMs": 422.10000000009313,
+          "movesAttempted": 80,
+          "movesLanded": 11,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 66.60000000009313,
+            "p95Ms": 164.80000000004657,
+            "maxMs": 188.09999999997672,
+            "meanMs": 78.43999999999505,
+            "layoutReadsP95": 41,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "ramrod",
+          "board3d": false,
+          "ttiMs": 421.69999999995343,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 143,
+            "p95Ms": 179.40000000002328,
+            "maxMs": 179.40000000002328,
+            "meanMs": 145.875,
+            "layoutReadsP95": 1,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "kwatro-sinko",
+          "board3d": true,
+          "ttiMs": 905.6999999999534,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 193,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 201.59999999997672,
+            "p95Ms": 229.5,
+            "maxMs": 229.5,
+            "meanMs": 201.9149999999674,
+            "layoutReadsP95": 22,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "fiar",
+          "board3d": true,
+          "ttiMs": 794.8000000000466,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 127,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 91.19999999995343,
+            "p95Ms": 121.5,
+            "maxMs": 121.5,
+            "meanMs": 94.43499999999185,
+            "layoutReadsP95": 14,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "juggle",
+          "board3d": false,
+          "ttiMs": 407.60000000009313,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 104.29999999993015,
+            "p95Ms": 270.4000000000233,
+            "maxMs": 270.4000000000233,
+            "meanMs": 119.45999999999185,
+            "layoutReadsP95": 27,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 12,
+            "p50Ms": 35,
+            "p95Ms": 47.89999999990687,
+            "maxMs": 47.89999999990687,
+            "meanMs": 36.82500000001164,
+            "layoutReadsP95": 0,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "contig-60",
+          "board3d": false,
+          "ttiMs": 432.19999999995343,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 109.60000000009313,
+            "p95Ms": 195.9000000001397,
+            "maxMs": 195.9000000001397,
+            "meanMs": 127.91500000004889,
+            "layoutReadsP95": 2,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "stars-bars",
+          "board3d": false,
+          "ttiMs": 394.69999999995343,
+          "movesAttempted": 80,
+          "movesLanded": 10,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 67.60000000009313,
+            "p95Ms": 155.20000000018626,
+            "maxMs": 160.60000000009313,
+            "meanMs": 75.83999999999942,
+            "layoutReadsP95": 2,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "fab-a-diffy",
+          "board3d": false,
+          "ttiMs": 499.69999999995343,
+          "movesAttempted": 80,
+          "movesLanded": 3,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 92.30000000004657,
+            "p95Ms": 114.5,
+            "maxMs": 307.39999999990687,
+            "meanMs": 95.66624999998893,
+            "layoutReadsP95": 0,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "queens-guards",
+          "board3d": true,
+          "ttiMs": 872.5999999998603,
+          "movesAttempted": 80,
+          "movesLanded": 3,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 167,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 88.39999999990687,
+            "p95Ms": 102.20000000018626,
+            "maxMs": 120.69999999995343,
+            "meanMs": 90.05000000001746,
+            "layoutReadsP95": 15,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "prime-gold",
+          "board3d": true,
+          "ttiMs": 865.9000000001397,
+          "movesAttempted": 80,
+          "movesLanded": 3,
+          "longTasksOver50": 2,
+          "longTaskMaxMs": 198,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 81.19999999995343,
+            "p95Ms": 97.29999999981374,
+            "maxMs": 170.29999999981374,
+            "meanMs": 82.01624999999767,
+            "layoutReadsP95": 12,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "remainder-islands",
+          "board3d": false,
+          "ttiMs": 427.49999999976717,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 151.60000000009313,
+            "p95Ms": 201.60000000009313,
+            "maxMs": 201.60000000009313,
+            "meanMs": 155.53500000000932,
+            "layoutReadsP95": 199,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "pent-em-in",
+          "board3d": true,
+          "ttiMs": 812.2999999998137,
+          "movesAttempted": 80,
+          "movesLanded": 3,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 71.10000000009313,
+            "p95Ms": 83.19999999995343,
+            "maxMs": 196.19999999995343,
+            "meanMs": 74.16499999998777,
+            "layoutReadsP95": 10,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 12,
+            "p50Ms": 37.5,
+            "p95Ms": 42.199999999953434,
+            "maxMs": 42.199999999953434,
+            "meanMs": 37.90833333332557,
+            "layoutReadsP95": 15,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "frac-fact",
+          "board3d": false,
+          "ttiMs": 400.5,
+          "movesAttempted": 80,
+          "movesLanded": 11,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 58.300000000046566,
+            "p95Ms": 242.4000000001397,
+            "maxMs": 270.9000000001397,
+            "meanMs": 81.39125000001805,
+            "layoutReadsP95": 2,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "fraction-pinball",
+          "board3d": false,
+          "ttiMs": 395.20000000018626,
+          "movesAttempted": 80,
+          "movesLanded": 11,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 60.700000000186265,
+            "p95Ms": 243,
+            "maxMs": 270.69999999995343,
+            "meanMs": 82.6987500000163,
+            "layoutReadsP95": 2,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        }
+      ]
+    }
+  }
+}
