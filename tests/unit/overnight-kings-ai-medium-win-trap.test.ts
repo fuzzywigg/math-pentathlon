@@ -13,7 +13,11 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
-import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
+import {
+  createEmptyBoard,
+  placePiece,
+  createCustomGameState,
+} from './helpers/kings-board';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -39,7 +43,7 @@ function winTrapBoard(): Board {
 describe('Overnight kings — medium win-trap', () => {
   it('medium getAIMove places on opponent last escape cell', () => {
     const board = winTrapBoard();
-    const state = createRulesState(board);
+    const state = createCustomGameState(board);
     expect(getValidKingMoves(state, 'player2')).toEqual([{ row: 1, col: 1 }]);
 
     // Seed placement pick toward top of scored list (trap dominates with +10000)

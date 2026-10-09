@@ -12,7 +12,12 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
-import { createEmptyBoard, placePiece, createRulesState, openingBoard } from './helpers/kings-board';
+import {
+  createEmptyBoard,
+  placePiece,
+  createCustomGameState,
+  openingBoard,
+} from './helpers/kings-board';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -21,7 +26,7 @@ afterEach(() => {
 describe('Overnight kings — easy seeded + trapped null', () => {
   it('easy with random=0 picks first valid king move', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
-    const state = createRulesState(openingBoard());
+    const state = createCustomGameState(openingBoard());
     const valids = getValidKingMoves(state, 'player1');
     const move = getAIMove(state, 'player1', 'easy');
     expect(move).not.toBeNull();
@@ -30,7 +35,7 @@ describe('Overnight kings — easy seeded + trapped null', () => {
 
   it('getRandomMove aliases easy with seeded random', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
-    const move = getRandomMove(createRulesState(openingBoard()), 'player1');
+    const move = getRandomMove(createCustomGameState(openingBoard()), 'player1');
     expect(move).not.toBeNull();
     expect(move!.quadraphagePlacement.row).toBeGreaterThanOrEqual(0);
   });
@@ -49,7 +54,7 @@ describe('Overnight kings — easy seeded + trapped null', () => {
         owner: 'player1',
       });
     }
-    const state = createRulesState(board);
+    const state = createCustomGameState(board);
     expect(getAIMove(state, 'player2', 'hard')).toBeNull();
     expect(getAIMove(state, 'player2', 'medium')).toBeNull();
   });
