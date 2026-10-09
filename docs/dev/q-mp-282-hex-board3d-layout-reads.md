@@ -34,19 +34,19 @@ $ rg -n 'getBoundingClientRect|clientWidth|clientHeight' src/ui/three/hex-a-gone
 # → 3 symbol hits (1 gBCR + 2 host size); hot path reuses cache
 ```
 
-| Path                                    | Forced layout reads                                                        |
-| --------------------------------------- | -------------------------------------------------------------------------- |
-| `resize()`                              | invalidate → batched host size → sync → **1×** canvas measure (seed cache) |
-| `pickCellFromEvent` (pointermove / tap) | **0** when cache warm (shared with project)                                |
-| `cellToClientPoint`                     | **0** when cache warm                                                      |
+| Path                                    | Forced layout reads                                                 |
+| --------------------------------------- | ------------------------------------------------------------------- |
+| `resize()`                              | invalidate canvas cache → batched host size → sync (no canvas gBCR) |
+| `pickCellFromEvent` (pointermove / tap) | **1×** on first use after layout; **0** while cache warm            |
+| `cellToClientPoint`                     | **0** when cache warm (shared with pick)                            |
 
-Hot-path reflow on hover: **1 → 0** per pointermove after the first layout seed.
+Hot-path reflow on hover: **1 per pointermove → 1 per layout epoch** (first pick/project after resize; subsequent events reuse cache).
 
 ## What changed
 
 - Funnel canvas geometry through `measureCanvasCssRect()` / `getCanvasCssRect()`.
 - Share one `CssRect` cache between pick (B) and project (C).
-- Batch host `clientWidth`/`clientHeight` in `measureHostCssSize()`; invalidate + re-seed canvas cache inside `resize()` (wired via existing `bindBoard3dLayout`).
+- Batch host `clientWidth`/`clientHeight` in `measureHostCssSize()`; invalidate canvas cache inside `resize()` (wired via existing `bindBoard3dLayout`); lazy-seed on next pick/project.
 - Same NDC / raycast / project math — no visual or pick behavior change intended.
 
 ## Non-goals / left alone
