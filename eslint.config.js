@@ -3,8 +3,8 @@ import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 
 /**
- * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157 + q-mp-159):
- * - Hard errors: eqeqeq, prefer-const, curly (multi-line), no-implicit-coercion,
+ * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157 + q-mp-159 + q-mp-194):
+ * - Hard errors: eqeqeq (always, null:ignore), prefer-const, curly (multi-line), no-implicit-coercion,
  *   prefer-object-has-own, consistent-type-imports, no-floating-promises,
  *   no-misused-promises, no-unused-vars (underscore ignore for args/vars/caught errors).
  * - Ceiling (report-only / count-down) via `npm run lint:ratchet`
@@ -17,7 +17,8 @@ import prettierConfig from 'eslint-config-prettier';
  *   @typescript-eslint/prefer-nullish-coalescing (live unset; q-mp-140);
  *   @typescript-eslint/prefer-optional-chain (live unset; q-mp-148);
  *   @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141 ceiling 8);
- *   @typescript-eslint/no-shadow (live unset; q-mp-157 ceiling 13).
+ *   @typescript-eslint/no-shadow (live unset; q-mp-157 ceiling 13);
+ *   eqeqeq stricter always without null:ignore (q-mp-194 ceiling 1 — fiar/rules HOLD).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */
