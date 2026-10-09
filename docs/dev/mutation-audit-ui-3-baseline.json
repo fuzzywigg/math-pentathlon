@@ -1,0 +1,997 @@
+{
+  "generatedAt": "2026-10-09T09:44:18.326Z",
+  "operators": "scripts/mutation-report.mjs (comparison/equality, arithmetic, logical, boolean, unary !, numeric ±1)",
+  "max": 20,
+  "timeoutMs": 90000,
+  "results": [
+    {
+      "module": "src/ui/game-loading.ts",
+      "lines": 75,
+      "tests": [
+        "tests/unit/game-loading.test.ts"
+      ],
+      "availableMutants": 0,
+      "ranMutants": 0,
+      "killed": 0,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": null,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/inject-styles.ts",
+      "lines": 17,
+      "tests": [
+        "tests/unit/burn-wave48-handshake-four-inject-styles.test.ts",
+        "tests/unit/burn-wave49-kwatro-inject-styles-idempotent.test.ts",
+        "tests/unit/inject-styles-once.test.ts",
+        "tests/unit/overnight-wave54-fiar-inject-styles-chips-glow.test.ts",
+        "tests/unit/overnight-wave55-frac-controller-inject-styles.test.ts",
+        "tests/unit/overnight-wave55-pinball-controller-inject-styles.test.ts",
+        "tests/unit/overnight-wave57-contig-inject-styles-on-init.test.ts"
+      ],
+      "availableMutants": 0,
+      "ranMutants": 0,
+      "killed": 0,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": null,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/stats-dashboard.ts",
+      "lines": 301,
+      "tests": [
+        "tests/unit/stats-dashboard.test.ts"
+      ],
+      "availableMutants": 35,
+      "ranMutants": 20,
+      "killed": 10,
+      "survived": 10,
+      "timeout": 0,
+      "error": 0,
+      "score": 50,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 42,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 42,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 47,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 47,
+          "description": "60 → 61",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 47,
+          "description": "60 → 59",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "60 → 59",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "Logical",
+          "line": 60,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 60,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "UnaryNot",
+          "line": 67,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Arithmetic",
+          "line": 90,
+          "description": "flip - → +",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/game-selector.ts",
+      "lines": 442,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts",
+        "tests/unit/game-selector.test.ts",
+        "tests/unit/keyboard-a11y-game-selector.test.ts"
+      ],
+      "availableMutants": 36,
+      "ranMutants": 20,
+      "killed": 7,
+      "survived": 13,
+      "timeout": 0,
+      "error": 0,
+      "score": 35,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "Arithmetic",
+          "line": 54,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "UnaryNot",
+          "line": 60,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 77,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 199,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 301,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 301,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 304,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 304,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 330,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 330,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/seats.ts",
+      "lines": 12,
+      "tests": [
+        "tests/unit/engine-ui-boundary-seats-characterization.test.ts"
+      ],
+      "availableMutants": 1,
+      "ranMutants": 1,
+      "killed": 1,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/security-headers.ts",
+      "lines": 58,
+      "tests": [
+        "tests/unit/security-headers.test.ts"
+      ],
+      "availableMutants": 1,
+      "ranMutants": 1,
+      "killed": 1,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/route-generation.ts",
+      "lines": 20,
+      "tests": [
+        "tests/unit/route-generation.test.ts"
+      ],
+      "availableMutants": 4,
+      "ranMutants": 4,
+      "killed": 2,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 50,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 5,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 8,
+          "description": "1 → 2",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/pwa/bootstrap.ts",
+      "lines": 46,
+      "tests": [
+        "tests/unit/idle-warm-bootstrap-owl.test.ts"
+      ],
+      "availableMutants": 5,
+      "ranMutants": 5,
+      "killed": 0,
+      "survived": 5,
+      "timeout": 0,
+      "error": 0,
+      "score": 0,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 23,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 35,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 35,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 35,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "UnaryNot",
+          "line": 36,
+          "description": "remove !",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/pwa/bootstrap-owl.ts",
+      "lines": 60,
+      "tests": [
+        "tests/unit/idle-warm-bootstrap-owl.test.ts"
+      ],
+      "availableMutants": 5,
+      "ranMutants": 5,
+      "killed": 3,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 60,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 24,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 35,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/dice/roller.ts",
+      "lines": 209,
+      "tests": [
+        "tests/unit/overnight-wave55-frac-controller-inject-styles.test.ts",
+        "tests/unit/overnight-wave55-pinball-controller-inject-styles.test.ts"
+      ],
+      "availableMutants": 73,
+      "ranMutants": 20,
+      "killed": 0,
+      "survived": 20,
+      "timeout": 0,
+      "error": 0,
+      "score": 0,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "36 → 37",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "36 → 35",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "9 → 10",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 14,
+          "description": "9 → 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "Arithmetic",
+          "line": 20,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 20,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 20,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 20,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "BooleanLiteral",
+          "line": 25,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "BooleanLiteral",
+          "line": 26,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Arithmetic",
+          "line": 37,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 37,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "Logical",
+          "line": 54,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "UnaryNot",
+          "line": 54,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "Arithmetic",
+          "line": 62,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 62,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "BooleanLiteral",
+          "line": 71,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "BooleanLiteral",
+          "line": 81,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/dice/dice-ui.ts",
+      "lines": 546,
+      "tests": [
+        "tests/unit/burn-wave22-dice-ui.test.ts",
+        "tests/unit/burn-wave32-dice-ui-animate-styles.test.ts",
+        "tests/unit/burn-wave32-dice-ui-render-matrix.test.ts",
+        "tests/unit/burn-wave34-dice-ui-fallback.test.ts",
+        "tests/unit/burn-wave34-dice-ui-interactive.test.ts",
+        "tests/unit/burn-wave39-dice-ui-polyhedral-catalog.test.ts",
+        "tests/unit/burn-wave39-dice-ui-rollresult-empty.test.ts",
+        "tests/unit/burn-wave40-dice-ui-animate-total.test.ts",
+        "tests/unit/burn-wave40-dice-ui-styles-empty.test.ts",
+        "tests/unit/overnight-dice-ui-animate-always-total.test.ts",
+        "tests/unit/overnight-dice-ui-animate-face-zero.test.ts",
+        "tests/unit/overnight-dice-ui-d4-text-y.test.ts",
+        "tests/unit/overnight-dice-ui-selectable-noclick.test.ts",
+        "tests/unit/overnight-wave52-dice-ui-poly-polygon-points.test.ts"
+      ],
+      "availableMutants": 103,
+      "ranMutants": 20,
+      "killed": 13,
+      "survived": 7,
+      "timeout": 0,
+      "error": 0,
+      "score": 65,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 12,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 15,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 15,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 16,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 23,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 85,
+          "description": "5 → 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 85,
+          "description": "5 → 4",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/alignment/compat.ts",
+      "lines": 616,
+      "tests": [
+        "tests/unit/burn-wave39-align-compat-region-stats.test.ts",
+        "tests/unit/burn-wave39-align-compat-wrap-matrix.test.ts"
+      ],
+      "availableMutants": 146,
+      "ranMutants": 20,
+      "killed": 5,
+      "survived": 15,
+      "timeout": 0,
+      "error": 0,
+      "score": 25,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 54,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "Logical",
+          "line": 69,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 69,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 73,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "Logical",
+          "line": 73,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 73,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "1 → 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 107,
+          "description": "1 → 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 107,
+          "description": "1 → 0",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/hex/hex-ui.ts",
+      "lines": 475,
+      "tests": [
+        "tests/unit/burn-wave23-hex-ui.test.ts",
+        "tests/unit/burn-wave35-hex-ui-geom-matrix.test.ts",
+        "tests/unit/burn-wave35-hex-ui-grid-matrix.test.ts",
+        "tests/unit/burn-wave35-hex-ui-interactive-tris.test.ts",
+        "tests/unit/burn-wave35-hex-ui-render-options.test.ts",
+        "tests/unit/burn-wave40-hex-ui-interactive-update.test.ts",
+        "tests/unit/burn-wave40-hex-ui-triangles-radius0.test.ts",
+        "tests/unit/overnight-core-handshake-templates-hex-ui.test.ts",
+        "tests/unit/overnight-core-hex-ui-hover-leave-null.test.ts",
+        "tests/unit/overnight-core-hex-ui-padding-viewbox.test.ts",
+        "tests/unit/overnight-core-hex-ui-rect-empty-dims.test.ts",
+        "tests/unit/overnight-core-hex-ui-render-click-hover.test.ts",
+        "tests/unit/overnight-core-hex-ui-showcoords-override.test.ts",
+        "tests/unit/overnight-core-hex-ui-styles-idempotent.test.ts",
+        "tests/unit/overnight-core-hex-ui-triangle-flat.test.ts"
+      ],
+      "availableMutants": 112,
+      "ranMutants": 20,
+      "killed": 18,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 90,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 13,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "BooleanLiteral",
+          "line": 80,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/polyomino/placement.ts",
+      "lines": 704,
+      "tests": [
+        "tests/unit/burn-wave35-pent-em-in-placement-geometry.test.ts",
+        "tests/unit/burn-wave35-stars-bars-empty-placements.test.ts",
+        "tests/unit/burn-wave38-poly-find-placement-miss.test.ts",
+        "tests/unit/burn-wave39-poly-placement-cells-dual.test.ts",
+        "tests/unit/burn-wave39-poly-placement-cells-legacy-miss.test.ts",
+        "tests/unit/burn-wave40-sumdo-placement-oob-matrix.test.ts",
+        "tests/unit/burn-wave40-sumdominoes-placement-oob-reject.test.ts",
+        "tests/unit/burn-wave41-contig-ai-placement-hard.test.ts",
+        "tests/unit/burn-wave41-juggle-placement-oob.test.ts",
+        "tests/unit/burn-wave41-kings-win-trap-placements.test.ts",
+        "tests/unit/burn-wave41-par-valid-placement-matrix.test.ts",
+        "tests/unit/burn-wave41-pent-valid-placements.test.ts",
+        "tests/unit/burn-wave41-prime-find-placements.test.ts",
+        "tests/unit/burn-wave41-ramrod-placement-bounds.test.ts",
+        "tests/unit/burn-wave41-sum-dominoes-first-placement.test.ts",
+        "tests/unit/burn-wave41-sum-dominoes-placement-oob.test.ts",
+        "tests/unit/burn-wave41-sum-dominoes-valid-placements-matrix.test.ts",
+        "tests/unit/burn-wave42-fiar-ai-hard-placement.test.ts",
+        "tests/unit/burn-wave42-hexagone-select-for-placement.test.ts",
+        "tests/unit/burn-wave42-par-first-placement-seed.test.ts",
+        "tests/unit/burn-wave42-pent-valid-placements-opening.test.ts",
+        "tests/unit/burn-wave42-prime-ai-placement.test.ts",
+        "tests/unit/burn-wave42-prime-valid-placements-filter.test.ts",
+        "tests/unit/burn-wave43-juggle-ai-placement-difficulties.test.ts",
+        "tests/unit/burn-wave43-ramrod-valid-placement-sum-fit.test.ts",
+        "tests/unit/burn-wave44-poly-placements-overlap-edge.test.ts",
+        "tests/unit/burn-wave44-sum-valid-placement-bounds.test.ts",
+        "tests/unit/burn-wave44-sum-valid-placement-no-match.test.ts",
+        "tests/unit/burn-wave44-sum-valid-placement-sum-match.test.ts",
+        "tests/unit/burn-wave47-sum-dominoes-first-placement.test.ts",
+        "tests/unit/burn-wave47-sum-dominoes-placement-oob.test.ts",
+        "tests/unit/burn-wave47-sum-dominoes-valid-placements-matrix.test.ts",
+        "tests/unit/burn-wave48-juggle-ai-placement-monomino.test.ts",
+        "tests/unit/burn-wave48-juggle-ai-placement-null-gates.test.ts",
+        "tests/unit/burn-wave48-juggle-ai-placement-teaching-suboptimal.test.ts",
+        "tests/unit/hex-aria-ai-turn-no-placement.test.ts",
+        "tests/unit/overnight-kings-ai-win-trap-placement.test.ts",
+        "tests/unit/overnight-wave52-kings-render-valid-placement-class.test.ts",
+        "tests/unit/overnight-wave54-fiar-get-valid-moves-placement-empty.test.ts",
+        "tests/unit/overnight-wave55-fiar-aria-coord-comma-valid-placement.test.ts",
+        "tests/unit/overnight-wave55-fiar-controller-status-placement-chips.test.ts",
+        "tests/unit/overnight-wave56-kings-aria-valid-placement-exact.test.ts",
+        "tests/unit/overnight-wave56-sum-valid-aria-placement.test.ts",
+        "tests/unit/overnight-wave57-core-poly-placements-overlap.test.ts",
+        "tests/unit/overnight-wave59-core-poly-placement-cells-legacy.test.ts",
+        "tests/unit/overnight-wave61-fiar-status-placement-exact.test.ts",
+        "tests/unit/overnight-wave65-fiar-tutorial-phases-placement-body-exact.test.ts"
+      ],
+      "availableMutants": 212,
+      "ranMutants": 20,
+      "killed": 0,
+      "survived": 20,
+      "timeout": 0,
+      "error": 0,
+      "score": 0,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 62,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 62,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "BooleanLiteral",
+          "line": 63,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "Logical",
+          "line": 72,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "Logical",
+          "line": 72,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "Logical",
+          "line": 72,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 72,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 72,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 72,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 72,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 72,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 72,
+          "description": "flip >= → >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "BooleanLiteral",
+          "line": 73,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "BooleanLiteral",
+          "line": 75,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 87,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "BooleanLiteral",
+          "line": 87,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "BooleanLiteral",
+          "line": 92,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "BooleanLiteral",
+          "line": 95,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 118,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "BooleanLiteral",
+          "line": 119,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}

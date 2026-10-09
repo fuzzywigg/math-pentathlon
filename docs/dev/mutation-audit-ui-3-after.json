@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-10-09T09:47:09.805Z",
+  "operators": "scripts/mutation-report.mjs (comparison/equality, arithmetic, logical, boolean, unary !, numeric ±1)",
+  "max": 20,
+  "timeoutMs": 90000,
+  "results": [
+    {
+      "module": "src/core/route-generation.ts",
+      "lines": 20,
+      "tests": [
+        "tests/unit/mutation-ui3-route-generation.test.ts",
+        "tests/unit/route-generation.test.ts"
+      ],
+      "availableMutants": 4,
+      "ranMutants": 4,
+      "killed": 4,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/pwa/bootstrap.ts",
+      "lines": 46,
+      "tests": [
+        "tests/unit/idle-warm-bootstrap-owl.test.ts",
+        "tests/unit/mutation-ui3-bootstrap-owl.test.ts",
+        "tests/unit/mutation-ui3-bootstrap.test.ts"
+      ],
+      "availableMutants": 5,
+      "ranMutants": 5,
+      "killed": 4,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 80,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 35,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/pwa/bootstrap-owl.ts",
+      "lines": 60,
+      "tests": [
+        "tests/unit/idle-warm-bootstrap-owl.test.ts",
+        "tests/unit/mutation-ui3-bootstrap-owl.test.ts"
+      ],
+      "availableMutants": 5,
+      "ranMutants": 5,
+      "killed": 4,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 80,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 35,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/stats-dashboard.ts",
+      "lines": 301,
+      "tests": [
+        "tests/unit/mutation-ui3-stats-dashboard.test.ts",
+        "tests/unit/stats-dashboard.test.ts"
+      ],
+      "availableMutants": 35,
+      "ranMutants": 20,
+      "killed": 15,
+      "survived": 5,
+      "timeout": 0,
+      "error": 0,
+      "score": 75,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 42,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 42,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "60 → 59",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 60,
+          "description": "flip <= → <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Arithmetic",
+          "line": 90,
+          "description": "flip - → +",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
