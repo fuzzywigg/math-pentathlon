@@ -8,6 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
+import { dismissOwlIfNeeded } from './helpers/page';
 import { installE2eStability } from './helpers/stability';
 import { GAMES } from '../../src/core/game-registry';
 
@@ -37,19 +38,6 @@ const MOUNT: Record<string, string> = {
   'fraction-pinball':
     '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
 };
-
-async function dismissOwlIfNeeded(page: Page): Promise<void> {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
 
 async function waitForGameReady(page: Page): Promise<void> {
   await expect(page.getByTestId('game-loading')).toBeHidden({
