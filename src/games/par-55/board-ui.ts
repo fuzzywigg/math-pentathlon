@@ -37,6 +37,15 @@ const BLOCK_COLORS: Record<BlockColor, string> = {
 const BASE_SIZE = 54; // Size of each pentagon base
 const BLOCK_SIZE = 36; // Size of block shape
 
+type SeatColors = ReturnType<typeof getPlayerSeatColors>;
+
+/** Delegated base-click handlers so syncBoard never rebinds every group. */
+const par55BoardHandlers = new WeakMap<
+  SVGElement,
+  { onBaseClick: (baseId: string) => void }
+>();
+const par55KeysBound = new WeakSet<SVGGElement>();
+
 export interface Par55BoardRenderOptions {
   /** When false, suppress placement highlights and activate handlers (AI seat). */
   allowInput?: boolean;
@@ -70,18 +79,199 @@ export function renderBoard(
   svg.classList.add('par55-svg');
   markBoardAsGrid(svg);
 
+  // One CSS-var read for the whole board (avoids 3×getComputedStyle per placed block).
+  const seats = getPlayerSeatColors();
+  par55BoardHandlers.set(svg, { onBaseClick });
+
   // Render bases
   for (const base of state.bases.values()) {
     const isValid = validPlacements.has(base.id);
     const isLastMove = state.lastMoveBaseId === base.id;
-    const baseGroup = renderBase(state, base, isValid, isLastMove, onBaseClick);
+    const baseGroup = renderBase(
+      state,
+      base,
+      isValid,
+      isLastMove,
+      seats,
+      allowInput
+    );
     svg.appendChild(baseGroup);
   }
+
+  // Delegated click so syncBoard can update markers without rebinding every base.
+  svg.addEventListener('click', (ev) => {
+    const target = ev.target as Element | null;
+    const group = target?.closest?.(
+      'g[data-base-id].par55-base-interactive'
+    ) as SVGGElement | null;
+    if (!group || !svg.contains(group)) {
+      return;
+    }
+    const baseId = group.getAttribute('data-base-id');
+    if (baseId) {
+      par55BoardHandlers.get(svg)?.onBaseClick(baseId);
+    }
+  });
 
   bindGridNavigation(svg);
   applyRovingTabindex(collectGridCells(svg));
   container.appendChild(svg);
   return container;
+}
+
+/**
+ * Sync base fills / validity / blocks / hit markers on an existing board SVG.
+ * Avoids recreating every pentagon group (and re-reading seat CSS vars per block).
+ */
+export function syncBoard(
+  boardEl: HTMLElement,
+  state: Par55State,
+  onBaseClick: (baseId: string) => void,
+  options: Par55BoardRenderOptions = {}
+): void {
+  const svg = boardEl.querySelector('.par55-svg') as SVGElement | null;
+  if (!svg) {
+    return;
+  }
+
+  const allowInput = options.allowInput !== false;
+  const validPlacements =
+    allowInput && state.phase === 'placingBlock'
+      ? new Set(getValidPlacements(state))
+      : new Set<string>();
+  const seats = getPlayerSeatColors();
+  par55BoardHandlers.set(svg, { onBaseClick });
+
+  for (const base of state.bases.values()) {
+    const group = svg.querySelector(
+      `g[data-base-id="${base.id}"]`
+    ) as SVGGElement | null;
+    if (!group) {
+      continue;
+    }
+
+    const isValid = validPlacements.has(base.id);
+    const isLastMove = state.lastMoveBaseId === base.id;
+    const pos = getBasePosition(base.row, base.col);
+
+    const pentagon =
+      group.querySelector('polygon.par55-base-pent') ??
+      group.querySelector('polygon');
+    if (pentagon) {
+      pentagon.classList.add('par55-base-pent');
+      pentagon.setAttribute('fill', base.block ? '#e8e8e8' : '#f5f5f5');
+      pentagon.setAttribute(
+        'stroke',
+        isLastMove ? '#ff9800' : isValid ? '#4caf50' : '#999'
+      );
+      pentagon.setAttribute(
+        'stroke-width',
+        isLastMove ? '3' : isValid ? '3' : '1.5'
+      );
+      pentagon.classList.toggle('par55-valid-base', isValid);
+      (pentagon as SVGElement).style.cursor = isValid ? 'pointer' : '';
+    }
+
+    // Block shape: replace when ownership / presence changes.
+    let blockHost = group.querySelector('g.par55-block-host') as SVGGElement | null;
+    if (base.block) {
+      if (!blockHost) {
+        blockHost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        blockHost.classList.add('par55-block-host');
+        group.insertBefore(blockHost, group.querySelector('.par55-base-hit'));
+      }
+      const blockKey = [
+        base.block.id,
+        base.block.size,
+        base.block.thickness,
+        base.block.color,
+        base.block.shape,
+        base.placedBy ?? '',
+      ].join('|');
+      if (blockHost.dataset.blockKey !== blockKey) {
+        while (blockHost.firstChild) {
+          blockHost.removeChild(blockHost.firstChild);
+        }
+        blockHost.appendChild(
+          renderBlock(base.block, pos.x, pos.y, base.placedBy, seats)
+        );
+        blockHost.dataset.blockKey = blockKey;
+      }
+    } else if (blockHost) {
+      blockHost.remove();
+    }
+
+    // Score preview (placing phase only).
+    group.querySelector('.par55-score-preview')?.remove();
+    if (isValid && state.selectedBlock) {
+      const hand = state.hands[state.currentPlayer];
+      const selectedBlock = hand.find((b) => b.id === state.selectedBlock);
+      if (selectedBlock) {
+        const { totalPoints } = calculateScore(state, selectedBlock, base.id);
+        if (totalPoints > 0) {
+          const scorePreview = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'text'
+          );
+          scorePreview.setAttribute('x', String(pos.x));
+          scorePreview.setAttribute('y', String(pos.y + BASE_SIZE / 2 + 12));
+          scorePreview.setAttribute('text-anchor', 'middle');
+          scorePreview.setAttribute('font-size', '12');
+          scorePreview.setAttribute('font-weight', 'bold');
+          scorePreview.setAttribute('fill', '#4caf50');
+          scorePreview.textContent = `+${totalPoints}`;
+          scorePreview.classList.add('par55-score-preview');
+          group.appendChild(scorePreview);
+        }
+      }
+    }
+
+    // Hit target + interactive class for delegated click / keyboard.
+    let hit = group.querySelector('circle.par55-base-hit') as SVGCircleElement | null;
+    if (isValid) {
+      group.classList.add('par55-base-interactive');
+      if (!hit) {
+        hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        hit.setAttribute('cx', String(pos.x));
+        hit.setAttribute('cy', String(pos.y));
+        hit.setAttribute('r', '22');
+        hit.setAttribute('fill', 'transparent');
+        hit.setAttribute('pointer-events', 'all');
+        hit.classList.add('par55-base-hit');
+        group.appendChild(hit);
+      }
+      if (!par55KeysBound.has(group)) {
+        bindCellActivateKeys(group, () => {
+          const id = group.getAttribute('data-base-id');
+          if (id) {
+            par55BoardHandlers.get(svg)?.onBaseClick(id);
+          }
+        });
+        par55KeysBound.add(group);
+      }
+    } else {
+      group.classList.remove('par55-base-interactive');
+      hit?.remove();
+    }
+
+    const owner = base.placedBy ? getPlayerName(base.placedBy) : undefined;
+    const piece = base.block
+      ? `${base.block.size} ${base.block.thickness} ${base.block.color} ${base.block.shape}`
+      : undefined;
+    makeGridCell(
+      group,
+      buildCellAriaLabel({
+        coord: `${base.row},${base.col}`,
+        empty: !base.block,
+        ...(owner !== undefined ? { owner } : {}),
+        ...(piece !== undefined ? { piece } : {}),
+        validPlacement: isValid,
+        ...(isLastMove ? { extras: ['last move'] } : {}),
+      })
+    );
+  }
+
+  applyRovingTabindex(collectGridCells(svg));
 }
 
 /**
@@ -105,7 +295,8 @@ function renderBase(
   base: Base,
   isValid: boolean,
   isLastMove: boolean,
-  onClick: (baseId: string) => void
+  seats: SeatColors,
+  allowInput: boolean
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('data-row', String(base.row));
@@ -115,6 +306,7 @@ function renderBase(
 
   // Pentagon path
   const pentagon = createPentagon(pos.x, pos.y, BASE_SIZE / 2);
+  pentagon.classList.add('par55-base-pent');
   pentagon.setAttribute('fill', base.block ? '#e8e8e8' : '#f5f5f5');
   pentagon.setAttribute(
     'stroke',
@@ -134,8 +326,21 @@ function renderBase(
 
   // Render block if present
   if (base.block) {
-    const blockGroup = renderBlock(base.block, pos.x, pos.y, base.placedBy);
-    group.appendChild(blockGroup);
+    const blockHost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    blockHost.classList.add('par55-block-host');
+    const blockKey = [
+      base.block.id,
+      base.block.size,
+      base.block.thickness,
+      base.block.color,
+      base.block.shape,
+      base.placedBy ?? '',
+    ].join('|');
+    blockHost.dataset.blockKey = blockKey;
+    blockHost.appendChild(
+      renderBlock(base.block, pos.x, pos.y, base.placedBy, seats)
+    );
+    group.appendChild(blockHost);
   }
 
   // Add hover preview if valid
@@ -165,7 +370,9 @@ function renderBase(
   }
 
   // Invisible 44px hit target under the visual pentagon (coarse / tablet taps).
-  if (isValid) {
+  // Click is delegated on the SVG; keyboard activate still bound per group.
+  if (isValid && allowInput) {
+    group.classList.add('par55-base-interactive');
     const hit = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'circle'
@@ -178,9 +385,14 @@ function renderBase(
     hit.classList.add('par55-base-hit');
     group.appendChild(hit);
 
-    const activate = () => onClick(base.id);
-    group.addEventListener('click', activate);
-    bindCellActivateKeys(group, activate);
+    bindCellActivateKeys(group, () => {
+      const id = group.getAttribute('data-base-id');
+      const svg = group.ownerSVGElement;
+      if (id && svg) {
+        par55BoardHandlers.get(svg)?.onBaseClick(id);
+      }
+    });
+    par55KeysBound.add(group);
   }
 
   const owner = base.placedBy ? getPlayerName(base.placedBy) : undefined;
@@ -228,13 +440,16 @@ function createPentagon(
 }
 
 /**
- * Render an attribute block
+ * Render an attribute block.
+ * Prefer a seats snapshot so render/sync does not re-read CSS vars per block.
+ * Hand tiles pass placedBy=null and omit seats (no CSS-var read).
  */
 function renderBlock(
   block: AttributeBlock,
   cx: number,
   cy: number,
-  placedBy: Player | null
+  placedBy: Player | null,
+  seats?: SeatColors
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
@@ -317,6 +532,7 @@ function renderBlock(
 
   // Add player indicator ring if placed by a player
   if (placedBy) {
+    const colors = seats ?? getPlayerSeatColors();
     const ring = document.createElementNS(
       'http://www.w3.org/2000/svg',
       'circle'
@@ -325,7 +541,7 @@ function renderBlock(
     ring.setAttribute('cy', String(cy));
     ring.setAttribute('r', String(size / 2 + 4));
     ring.setAttribute('fill', 'none');
-    ring.setAttribute('stroke', getPlayerSeatColors()[placedBy]);
+    ring.setAttribute('stroke', colors[placedBy]);
     ring.setAttribute('stroke-width', '2');
     ring.setAttribute('opacity', '0.6');
     group.appendChild(ring);
