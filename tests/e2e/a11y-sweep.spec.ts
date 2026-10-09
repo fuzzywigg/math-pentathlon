@@ -10,7 +10,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { GAMES } from '../../src/core/game-registry';
 import {
   waitForGameReady,
-  dismissOwlIfNeeded,
+  dismissOwl,
 } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
@@ -80,7 +80,7 @@ test.describe('A11y sweep (axe serious/critical)', () => {
     await page.goto('/');
     await expect(page.locator('h1')).toContainText('Math Pentathlon');
     await expect(page.locator('.game-selector')).toBeVisible();
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     const violations = await runAxeSeriousCritical(page, {
       exclude: ['#ollie-owl'],
@@ -98,7 +98,7 @@ test.describe('A11y sweep (axe serious/critical)', () => {
       timeout: 15_000,
     });
     await expect(page.locator('.stats-dashboard')).toBeVisible();
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     const violations = await runAxeSeriousCritical(page, {
       exclude: ['#ollie-owl'],
@@ -111,7 +111,7 @@ test.describe('A11y sweep (axe serious/critical)', () => {
   }) => {
     await page.goto('/#/game/hex');
     await waitForGameReady(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     await page.locator('#help-btn').click();
     const helpModal = page.locator('#help-modal');
@@ -132,7 +132,7 @@ test.describe('A11y sweep (axe serious/critical)', () => {
       test.setTimeout(60_000);
       await page.goto(`/#/game/${game.id}`);
       await waitForGameReady(page);
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
 
       await page.locator('#new-game-btn').click();
       const modal = page.locator('#new-game-modal');

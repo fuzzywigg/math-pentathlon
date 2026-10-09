@@ -52,12 +52,13 @@ Knip flags packages imported by entry scripts that are not declared in `package.
 
 ## Duplicate export pairs (owners)
 
-Knip reports **2** alias pairs (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
+Knip reports **1** alias pair (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
 
 | Pair | Module | Owner / disposition |
 | --- | --- | --- |
-| `dismissOwl` / `dismissOwlIfNeeded` | [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) | **e2e Owl helpers** — draft [`q-mp-166` #691](https://github.com/fuzzywigg/math-pentathlon/pull/691) consolidates callers onto the shared helper; alias may remain for call-site compatibility. |
-| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). |
+| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). Remaining after `q-mp-228`. |
+
+Cleared in `q-mp-228`: `dismissOwl` / `dismissOwlIfNeeded` in [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) — callers migrated to canonical `dismissOwl` (narrows unfinished residue of `q-mp-166` / #691).
 
 Cleared in `q-mp-188`: `withSeededRandom` / `withSeededMathRandom` in [`tests/helpers/rng.ts`](../../tests/helpers/rng.ts) — callers migrated to canonical `withSeededRandom`.
 
