@@ -1,0 +1,452 @@
+.ramrod-game-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ramrod-main-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+}
+
+.ramrod-board {
+  background: #e8d4b8;
+  padding: 0.75rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ramrod-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ramrod-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.ramrod-box {
+  width: min(120px, 22vw);
+  min-width: 72px;
+  min-height: 80px;
+  background: #f5f0e8;
+  border: 2px solid #c9b89b;
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.ramrod-box.completed.player1 {
+  background: rgba(33, 150, 243, 0.1);
+  border-color: var(--color-player1, #2196f3);
+}
+
+.ramrod-box.completed.player2 {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: var(--color-player2, #f44336);
+}
+
+.ramrod-box-label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #666;
+  text-align: center;
+}
+
+.ramrod-slot {
+  min-height: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.ramrod-slot.valid {
+  background: rgba(76, 175, 80, 0.2);
+  cursor: pointer;
+  box-shadow: 0 0 0 2px #4caf50;
+  outline: 2px solid #4caf50;
+  outline-offset: 1px;
+}
+
+.ramrod-slot.valid:hover {
+  background: rgba(76, 175, 80, 0.4);
+}
+
+.ramrod-hint {
+  font-size: 0.7rem;
+  color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
+  font-style: italic;
+}
+
+.ramrod-rod {
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+  min-width: 20px;
+}
+
+.ramrod-rod-label {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.ramrod-player-rods {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  min-width: 120px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.ramrod-player-player1 {
+  border: 3px solid var(--color-player1, #2196f3);
+}
+
+.ramrod-player-player2 {
+  border: 3px solid var(--color-player2, #f44336);
+}
+
+.ramrod-rod-wrapper {
+  padding: 4px;
+  border-radius: 6px;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.ramrod-rod-wrapper.selectable {
+  cursor: pointer;
+}
+
+.ramrod-rod-wrapper.selectable:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.ramrod-rod-wrapper.selected {
+  background: rgba(255, 152, 0, 0.3);
+  box-shadow: 0 0 0 2px #ff9800;
+}
+
+.ramrod-scores {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #333;
+  border-radius: 8px;
+}
+
+.ramrod-score {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.ramrod-score.player1 {
+  color: var(--color-player1-on-dark, #60a5fa);
+}
+
+.ramrod-score.player2 {
+  color: var(--color-player2-on-dark, #f87171);
+}
+
+.ramrod-score .value {
+  font-size: 1.5rem;
+}
+
+.ramrod-target {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.ramrod-status {
+  text-align: center;
+  padding: 1rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.ramrod-status.player1 {
+  color: var(--color-player1-text, #1d4ed8);
+}
+
+.ramrod-status.player2 {
+  color: var(--color-player2-text, #b91c1c);
+}
+
+.ramrod-status.ramrod-computer-thinking {
+  font-style: italic;
+  opacity: 0.95;
+}
+
+.ramrod-turn-hint {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #555;
+  margin-top: -0.5rem;
+  max-width: 28rem;
+  line-height: 1.35;
+}
+
+.ramrod-turn-hint.ramrod-deadlock-hint {
+  color: #8a4b08;
+  font-weight: 600;
+}
+
+.ramrod-winner-banner {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #ffd700, #ffec8b);
+  border-radius: 12px;
+  margin: 1rem;
+  animation: ramrod-glow 1s ease-in-out infinite alternate;
+}
+
+@keyframes ramrod-glow {
+  from {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ramrod-winner-banner {
+    animation: none;
+  }
+  .ramrod-rod-wrapper {
+    transition: none;
+  }
+  .ramrod-btn {
+    transition: none;
+  }
+}
+
+.ramrod-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.ramrod-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
+  min-height: 44px;
+  min-width: 44px;
+}
+
+.ramrod-btn-primary {
+  background: linear-gradient(135deg, #2196f3, #1976d2);
+  color: white;
+}
+
+.ramrod-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.ramrod-btn-secondary {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.ramrod-btn-secondary:hover {
+  background: #bdbdbd;
+}
+
+.ramrod-history {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 200px;
+}
+
+.ramrod-history h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.ramrod-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.ramrod-history-move {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.ramrod-history-move.player1 {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.ramrod-history-move.player2 {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.ramrod-hand-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.ramrod-hand-label.player1 {
+  color: var(--color-player1-text, #1d4ed8);
+}
+
+.ramrod-hand-label.player2 {
+  color: var(--color-player2-text, #b91c1c);
+}
+
+.ramrod-legend {
+  background: rgba(0, 0, 0, 0.05);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.ramrod-legend h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.ramrod-legend-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.ramrod-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ramrod-legend-color {
+  height: 12px;
+  border-radius: 2px;
+}
+
+@media (max-width: 768px) {
+  .ramrod-game-area {
+    padding: 0.25rem;
+    gap: 0.75rem;
+  }
+
+  .ramrod-scores {
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+
+/* Coarse pointers (tablets / touch laptops): keep 44px tap targets */
+@media (pointer: coarse), (max-width: 900px) {
+  .ramrod-slot {
+    min-height: 44px;
+    height: 44px;
+  }
+
+  .ramrod-slot.valid {
+    box-shadow: 0 0 0 2px #4caf50;
+  }
+
+  .ramrod-rod-wrapper {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px;
+  }
+
+  .ramrod-rod.in-hand {
+    min-height: 28px;
+  }
+
+  .ramrod-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.85rem 1.5rem;
+  }
+
+  .ramrod-box {
+    min-height: 110px;
+  }
+}
+
+/* Touch: pad rod wrappers / slots to the 44px floor without changing rod math */
+@media (pointer: coarse) {
+  .ramrod-rod-wrapper {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 10px 6px;
+  }
+
+  .ramrod-slot {
+    min-height: 44px;
+    height: auto;
+    padding: 8px 2px;
+  }
+
+  .ramrod-btn {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ramrod-rod-wrapper,
+  .ramrod-btn,
+  .ramrod-winner-banner {
+    transition: none;
+    animation: none !important;
+  }
+
+  .ramrod-btn-primary:hover,
+  .ramrod-rod-wrapper.selectable:hover {
+    transform: none;
+  }
+}
