@@ -11,7 +11,7 @@ modules with the most surviving mutants. Distinct from the rules-engine audit
 `src/ui/{hex-svg,die-faces,seat-labels,game-prefetch,pointer-hygiene,board-a11y}.ts`,
 `src/pwa/idle-warm.ts`,
 `src/core/dice/dice-selector.ts`,
-`src/core/hex/coordinates.ts`,
+`tests/helpers/core-hex/coordinates.ts` (formerly `src/core/hex/coordinates.ts (absent on tip)`; quarantined under q-mp-133),
 `src/core/alignment/contiguous.ts`.
 
 **Out:** `ai/`, `*/rules.ts`, engine legal-move/scoring, tutorials/copy,
@@ -46,7 +46,7 @@ node node_modules/.cache/mutation-ui-2/mutation-report-ui.mjs \
 
 # After (with tests/unit/mutation-ui2-*.test.ts)
 node node_modules/.cache/mutation-ui-2/mutation-report-ui.mjs \
-  --modules=src/ui/hex-svg.ts,src/ui/die-faces.ts,src/ui/seat-labels.ts,src/ui/game-prefetch.ts,src/pwa/idle-warm.ts,src/ui/pointer-hygiene.ts,src/core/dice/dice-selector.ts,src/core/hex/coordinates.ts,src/ui/board-a11y.ts,src/core/alignment/contiguous.ts \
+  --modules=src/ui/hex-svg.ts,src/ui/die-faces.ts,src/ui/seat-labels.ts,src/ui/game-prefetch.ts,src/pwa/idle-warm.ts,src/ui/pointer-hygiene.ts,src/core/dice/dice-selector.ts,tests/helpers/core-hex/coordinates.ts,src/ui/board-a11y.ts,src/core/alignment/contiguous.ts \
   --max=20 --timeout=90000 \
   --json=/tmp/mutation-ui-2/after.json
 
