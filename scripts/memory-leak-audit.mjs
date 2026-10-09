@@ -134,9 +134,17 @@ async function openGameFromMenu(page, game) {
     name: `${game.name} - Available`,
     exact: true,
   });
-  await card.scrollIntoViewIfNeeded();
-  // Sticky division tabs can intercept mid-scroll; force is OK for audit harness.
-  await card.click({ force: true });
+  // Accordion remounts can detach the card mid-scroll; force-click is enough
+  // for the audit harness (sticky tabs already require force).
+  await card.click({ force: true }).catch(async () => {
+    await openDivision(page, game.division);
+    await page
+      .getByRole('button', {
+        name: `${game.name} - Available`,
+        exact: true,
+      })
+      .click({ force: true });
+  });
   await waitGameReady(page);
   await startHuman(page);
   // Let 3D / first paint settle before closing.
@@ -348,7 +356,7 @@ async function main() {
   await mkdir(dirname(OUT_JSON), { recursive: true });
   const payload = {
     label: LABEL,
-    date: '2026-10-07',
+    date: MEM_DATE,
     cycles: CYCLES,
     baseURL,
     method:

@@ -10,6 +10,10 @@ import { owlSystem } from '../../core/owl';
 import type { AIDifficulty } from './ai';
 import { getAIChainChoice } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadStarTrackBoard3DModule } from './board-3d-loader';
 import type { StarTrackBoard3D } from '../../ui/three/star-track-board-3d';
@@ -34,12 +38,35 @@ let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI think-delay timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 let board3d: StarTrackBoard3D | null = null;
 let board3dEnabled = false;
 let board3dLoading: Promise<void> | null = null;
 
 const AI_THINKING_DELAY = 600;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -104,6 +131,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -116,6 +145,8 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -196,12 +227,12 @@ function triggerAITurn(): void {
   render();
 
   // AI draws chains
-  setTimeout(() => {
+  scheduleAI(() => {
     gameState = drawChains(gameState);
     render();
 
     // AI selects chain (after a delay) using AI module
-    setTimeout(() => {
+    scheduleAI(() => {
       const choice = getAIChainChoice(gameState, 'player2', aiDifficulty);
 
       if (choice) {
@@ -287,6 +318,9 @@ export function isTutorialActive(): boolean {
 
 /** Dispose 3D resources and clear mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;
