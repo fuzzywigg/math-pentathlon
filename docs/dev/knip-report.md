@@ -56,11 +56,9 @@ Knip flags packages imported by entry scripts that are not declared in `package.
 
 ## Duplicate export pairs (owners)
 
-Knip reports **1** alias pair (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
+Knip reports **0** alias pairs (same binding under two export names). Floor reached after `q-mp-273`.
 
-| Pair | Module | Owner / disposition |
-| --- | --- | --- |
-| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). Remaining after `q-mp-228`. |
+Cleared in `q-mp-273`: `createCustomGameState` / `createRulesState` in [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) — callers migrated to canonical `createCustomGameState` (`duplicates` **1 → 0**).
 
 Cleared in `q-mp-228`: `dismissOwl` / `dismissOwlIfNeeded` in [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) — callers migrated to canonical `dismissOwl` (narrows unfinished residue of `q-mp-166` / #691).
 

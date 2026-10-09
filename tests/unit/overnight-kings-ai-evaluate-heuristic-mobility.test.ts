@@ -12,7 +12,7 @@ import {
   Position,
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
-import { createEmptyBoard, placePiece, createRulesState } from './helpers/kings-board';
+import { createEmptyBoard, placePiece } from './helpers/kings-board';
 
 function createRulesState(board: Board): RulesGameState {
   return { board, player1Supply: 25, player2Supply: 25 };
