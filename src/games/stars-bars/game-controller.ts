@@ -31,7 +31,9 @@ import {
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -196,7 +198,9 @@ function updateUI(controller: StarsGameController): void {
     clearBtn.className = 'stars-btn stars-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = clearSelection(state);
       controller.update();
     });
@@ -208,7 +212,9 @@ function updateUI(controller: StarsGameController): void {
     passBtn.className = 'stars-btn stars-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = passTurn(state);
       controller.update();
     });
@@ -239,7 +245,9 @@ function handleCardClick(
   controller: StarsGameController,
   cardId: string
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = selectCard(controller.state, cardId);
   controller.update();
 }
@@ -252,7 +260,9 @@ function handleCellClick(
   row: number,
   col: number
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = placeCard(controller.state, row, col);
   controller.update();
 }
@@ -267,7 +277,9 @@ function handleCellClick(
 function makeAIMove(controller: StarsGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver' || !aiPlayer) return;
+  if (state.phase === 'gameOver' || !aiPlayer) {
+    return;
+  }
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -310,7 +322,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {

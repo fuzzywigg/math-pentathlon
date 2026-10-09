@@ -23,7 +23,9 @@ import { markStatusLive } from '../../ui/board-a11y';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -64,7 +66,9 @@ function isComputerAnswering(): boolean {
 // =============================================================================
 
 function render(): void {
-  if (!gameContainer) return;
+  if (!gameContainer) {
+    return;
+  }
 
   gameContainer.innerHTML = '';
 
@@ -119,7 +123,9 @@ function render(): void {
     clearAiTimers();
     aiThinkTimer = setTimeout(() => {
       aiThinkTimer = null;
-      if (gen !== aiGeneration) return;
+      if (gen !== aiGeneration) {
+        return;
+      }
       aiTurn();
     }, 1000);
   }
@@ -130,15 +136,21 @@ function render(): void {
 // =============================================================================
 
 function handleAnswerSelect(answer: string): void {
-  if (gameState.phase !== 'answering') return;
-  if (isComputerAnswering()) return;
+  if (gameState.phase !== 'answering') {
+    return;
+  }
+  if (isComputerAnswering()) {
+    return;
+  }
 
   gameState = submitAnswer(gameState, answer);
   render();
 }
 
 function handleContinue(): void {
-  if (gameState.phase !== 'showResult') return;
+  if (gameState.phase !== 'showResult') {
+    return;
+  }
 
   gameState = nextChallenge(gameState);
   render();
@@ -155,7 +167,9 @@ function aiTurn(): void {
   ) {
     return;
   }
-  if (!gameState.currentChallenge) return;
+  if (!gameState.currentChallenge) {
+    return;
+  }
 
   // Use AI module to get answer; fall back so vs-AI never soft-locks on null.
   let selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);
@@ -165,7 +179,9 @@ function aiTurn(): void {
       choices[0] ?? gameState.currentChallenge.correctAnswer ?? null;
   }
 
-  if (!selectedAnswer) return;
+  if (!selectedAnswer) {
+    return;
+  }
 
   gameState = submitAnswer(gameState, selectedAnswer);
   render();
@@ -177,7 +193,9 @@ function aiTurn(): void {
   }
   aiContinueTimer = setTimeout(() => {
     aiContinueTimer = null;
-    if (gen !== aiGeneration) return;
+    if (gen !== aiGeneration) {
+      return;
+    }
     if (gameState.phase === 'showResult') {
       handleContinue();
     }

@@ -34,7 +34,9 @@ import {
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -262,7 +264,9 @@ function updateUI(controller: SDGameController): void {
  * Handle dice roll
  */
 function handleRoll(controller: SDGameController): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.sd-roll-btn' });
@@ -283,7 +287,9 @@ function handleDominoClick(
   controller: SDGameController,
   dominoId: string
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = selectDomino(controller.state, dominoId);
   controller.update();
 }
@@ -296,7 +302,9 @@ function handleCellClick(
   position: BoardPosition,
   orientation: 'horizontal' | 'vertical'
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = placeDomino(controller.state, position, orientation);
   controller.update();
 }
@@ -305,7 +313,9 @@ function handleCellClick(
  * Handle pass
  */
 function handlePass(controller: SDGameController): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = passTurn(controller.state);
   controller.update();
 }
@@ -320,7 +330,9 @@ function handlePass(controller: SDGameController): void {
 function makeAIMove(controller: SDGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.winner || !aiPlayer) return;
+  if (state.winner || !aiPlayer) {
+    return;
+  }
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
@@ -373,7 +385,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {

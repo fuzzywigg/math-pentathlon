@@ -31,7 +31,9 @@ import {
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -208,7 +210,9 @@ function updateUI(controller: RamrodGameController): void {
     clearBtn.className = 'ramrod-btn ramrod-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = clearSelection(state);
       controller.update();
     });
@@ -220,7 +224,9 @@ function updateUI(controller: RamrodGameController): void {
     passBtn.className = 'ramrod-btn ramrod-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = passTurn(state);
       controller.update();
     });
@@ -248,7 +254,9 @@ function updateUI(controller: RamrodGameController): void {
  * Handle rod click
  */
 function handleRodClick(controller: RamrodGameController, rodId: string): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = selectRod(controller.state, rodId);
   controller.update();
 }
@@ -261,7 +269,9 @@ function handleBoxClick(
   boxId: string,
   slot: number
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = placeRod(controller.state, boxId, slot);
   controller.update();
 }
@@ -276,7 +286,9 @@ function handleBoxClick(
 function makeAIMove(controller: RamrodGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver' || !aiPlayer) return;
+  if (state.phase === 'gameOver' || !aiPlayer) {
+    return;
+  }
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -319,7 +331,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {

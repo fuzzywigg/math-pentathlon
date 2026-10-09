@@ -97,7 +97,9 @@ function isComputerTurn(): boolean {
 }
 
 function patchDivisionPreview(): void {
-  if (!gameContainer) return;
+  if (!gameContainer) {
+    return;
+  }
   const existing = gameContainer.querySelector('.remainder-preview');
   const next = gameState.selectedIsland
     ? renderDivisionPreview(gameState)
@@ -125,7 +127,9 @@ function patchDivisionPreview(): void {
 }
 
 function render(): void {
-  if (!gameContainer) return;
+  if (!gameContainer) {
+    return;
+  }
 
   clearElement(gameContainer);
 
@@ -173,7 +177,9 @@ function render(): void {
         // Reject multi-click detail>1 so a double-click cannot roll for the
         // opponent after an empty-valid skip rebuilds this button in place.
         rollBtn.addEventListener('click', (event) => {
-          if (event.detail > 1) return;
+          if (event.detail > 1) {
+            return;
+          }
           handleRoll();
         });
         controls.appendChild(rollBtn);
@@ -236,9 +242,15 @@ function noteEmptyValidSkip(
 }
 
 function handleRoll(): void {
-  if (isComputerTurn()) return;
-  if (isHumanRollSettling()) return;
-  if (gameState.phase !== 'rolling') return;
+  if (isComputerTurn()) {
+    return;
+  }
+  if (isHumanRollSettling()) {
+    return;
+  }
+  if (gameState.phase !== 'rolling') {
+    return;
+  }
   const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
   noteEmptyValidSkip(beforePlayer);
@@ -248,9 +260,15 @@ function handleRoll(): void {
 }
 
 function handleIslandClick(islandId: string): void {
-  if (isComputerTurn()) return;
-  if (gameState.phase !== 'selectIsland') return;
-  if (!gameState.validIslands.includes(islandId)) return;
+  if (isComputerTurn()) {
+    return;
+  }
+  if (gameState.phase !== 'selectIsland') {
+    return;
+  }
+  if (!gameState.validIslands.includes(islandId)) {
+    return;
+  }
 
   skipNotice = null;
   gameState = selectIsland(gameState, islandId);
@@ -258,9 +276,15 @@ function handleIslandClick(islandId: string): void {
 }
 
 function handleIslandHover(islandId: string | null): void {
-  if (isComputerTurn()) return;
-  if (gameState.phase !== 'selectIsland') return;
-  if (gameState.selectedIsland === islandId) return;
+  if (isComputerTurn()) {
+    return;
+  }
+  if (gameState.phase !== 'selectIsland') {
+    return;
+  }
+  if (gameState.selectedIsland === islandId) {
+    return;
+  }
 
   // Update preview state without rebuilding the SVG. A full render() here
   // replaces the node under the pointer, so mouseup never becomes a click.
