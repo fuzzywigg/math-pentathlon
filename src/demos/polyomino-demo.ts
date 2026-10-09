@@ -390,6 +390,8 @@ function setupShapeSetSelector(): void {
         case 'pattern':
           currentShapeSet = HEX_PATTERN_BLOCKS;
           break;
+        default:
+          break;
       }
 
       selectedShape = null;

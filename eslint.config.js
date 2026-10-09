@@ -3,13 +3,14 @@ import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 
 /**
- * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045):
+ * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-129):
  * - Hard errors: eqeqeq, prefer-const, curly (multi-line), no-implicit-coercion,
  *   consistent-type-imports, no-floating-promises, no-misused-promises,
  *   no-unused-vars (underscore ignore for args/vars/caught errors).
  * - Ceiling (report-only / count-down) via `npm run lint:ratchet`
  *   (see scripts/check-lint-ratchet.mjs + docs/dev/lint-ratchet-ceilings.json):
- *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset).
+ *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset);
+ *   default-case (live unset; residual HOLD documented in ceilings notes).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */
