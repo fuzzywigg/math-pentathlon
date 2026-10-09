@@ -17,6 +17,7 @@ import { getAIMove, isAITurn } from './ai';
 import type { PlayerOwner } from './pieces';
 import { owlSystem } from '../../core/owl';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadKingsQuadraphagesBoard3DModule } from './board-3d-loader';
 import type { KingsQuadraphagesBoard3D } from '../../ui/three/kings-quadraphages-board-3d';
@@ -32,10 +33,18 @@ let gameMode: GameMode = 'human-vs-human';
 let aiPlayer: PlayerOwner | null = null;
 let aiDifficulty: AIDifficulty = 'medium';
 let isAIThinking: boolean = false;
+/** Invalidates in-flight AI delays after route leave / new game. */
+let aiGeneration = 0;
+/** Pending AI think/move delay — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 // AI thinking delay (ms) for better UX
 const AI_THINKING_DELAY = 500;
 const AI_MOVE_DELAY = 300;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
 
 // Track if game has ended (to prevent multiple owl notifications)
 let hasNotifiedGameEnd = false;
@@ -253,11 +262,15 @@ async function executeAITurn(): Promise<void> {
     return;
   }
 
+  const gen = aiGeneration;
   isAIThinking = true;
   render(); // Show "AI is thinking..." status
 
   // Initial thinking delay
   await delay(AI_THINKING_DELAY);
+  if (gen !== aiGeneration) {
+    return;
+  }
 
   // Get AI's move
   const aiMove = getAIMove(gameState, aiPlayer, aiDifficulty);
@@ -281,6 +294,9 @@ async function executeAITurn(): Promise<void> {
 
   // Delay before placing quadraphage
   await delay(AI_MOVE_DELAY);
+  if (gen !== aiGeneration) {
+    return;
+  }
 
   // Execute quadraphage placement (convert from 0-based to 1-based)
   const quadPos = {
@@ -296,13 +312,21 @@ async function executeAITurn(): Promise<void> {
   checkAndTriggerAITurn();
 }
 
-// Simple delay helper
+// Cancellable delay — cleared on destroy / new game via aiTimer.
 function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => {
+    clearAiTimer();
+    aiTimer = setTimeout(() => {
+      aiTimer = null;
+      resolve();
+    }, ms);
+  });
 }
 
 // Start a new game with current settings
 export function newGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameState = createInitialGameState();
   isAIThinking = false;
   hasNotifiedGameEnd = false;
@@ -420,6 +444,9 @@ export function initGame(
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  isAIThinking = false;
   if (boardContainer) {
     boardContainer.removeEventListener(
       'mp3d-context-lost',

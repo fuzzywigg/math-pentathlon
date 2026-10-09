@@ -19,6 +19,10 @@ import { owlSystem } from '../../core/owl';
 import type { AIDifficulty } from './ai';
 import { getAISelection, getAIPlacement } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import { isBoard3dEnabled } from '../../core/feature-flags';
 import { loadHexAGoneBoard3DModule } from './board-3d-loader';
 import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
@@ -43,6 +47,10 @@ let statusContainer: HTMLElement | null = null;
 let isAIThinking = false;
 let hasNotifiedGameEnd = false;
 let moveCount = 0;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI think-delay timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 let board3d: HexAGoneBoard3D | null = null;
 let board3dEnabled = false;
@@ -51,6 +59,25 @@ let board3dHost: HTMLElement | null = null;
 let selectionHost: HTMLElement | null = null;
 
 const AI_THINKING_DELAY = 800;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 function unmountBoard3d(): void {
   if (board3d) {
@@ -132,6 +159,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 
 // Start new human vs human game
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-human';
   syncOpponentChrome();
   gameState = createInitialState();
@@ -144,6 +173,8 @@ export function newGameVsHuman(): void {
 
 // Start new game vs AI
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearAiTimer();
   gameMode = 'human-vs-ai';
   syncOpponentChrome();
   aiDifficulty = difficulty;
@@ -280,7 +311,7 @@ function triggerAITurn(): void {
   isAIThinking = true;
   render();
 
-  setTimeout(() => {
+  scheduleAI(() => {
     // AI selects blocks using AI module
     const aiSelectBlocks = (): void => {
       const selection = getAISelection(gameState, 'player2', aiDifficulty);
@@ -300,7 +331,7 @@ function triggerAITurn(): void {
       render();
 
       // Place blocks after a delay
-      setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+      scheduleAI(aiPlaceBlocks, AI_THINKING_DELAY);
     };
 
     // AI places blocks one by one using AI module
@@ -337,7 +368,7 @@ function triggerAITurn(): void {
         gameState.phase === 'placeBlocks' &&
         gameState.currentPlayer === 'player2'
       ) {
-        setTimeout(aiPlaceBlocks, AI_THINKING_DELAY);
+        scheduleAI(aiPlaceBlocks, AI_THINKING_DELAY);
       } else {
         isAIThinking = false;
         render();
@@ -377,6 +408,9 @@ function render(): void {
 }
 
 export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  isAIThinking = false;
   unmountBoard3d();
   boardContainer = null;
   statusContainer = null;
