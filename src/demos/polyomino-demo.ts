@@ -1,8 +1,10 @@
 // Polyomino System Demo Page
 // Interactive demo for testing polyomino shapes, rotation, and placement
 
-import type { PolyominoShape, Rotation, Cell } from '../core/polyomino/types';
 import {
+  type PolyominoShape,
+  type Rotation,
+  type Cell,
   TETROMINOES,
   PENTOMINOES,
   SIMPLE_SHAPES,
@@ -15,8 +17,8 @@ import {
   getBoundingBox,
   getTransformedCells,
 } from '../core/polyomino/transform';
-import type { Board } from '../core/polyomino/placement';
 import {
+  type Board,
   createBoard,
   validatePlacement,
   placePolyomino,
