@@ -45,6 +45,12 @@ jobs:
         run: npm run typecheck:ratchet
       - name: Module-boundary import-graph ceilings (engine_imports_ui must stay 0)
         run: npm run check:boundaries
+      # Report-only: surface player-facing copy-pin findings in Actions without
+      # failing the required lint job (q-mp-137). Stays outside package.json
+      # "verify" so #674 (lint → npm run verify) can fold without conflict.
+      - name: Player-facing copy pins (report-only)
+        continue-on-error: true
+        run: npm run check:copy-pins -- --fail
 
   audit:
     runs-on: ubuntu-latest
