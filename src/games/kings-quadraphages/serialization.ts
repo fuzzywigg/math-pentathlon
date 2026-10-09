@@ -122,12 +122,37 @@ export function gameStateToJSON(
 }
 
 /**
+ * Result of a soft-fail game-state JSON parse (R-JSON-04).
+ * Mirrors SafeJsonParseResult so UI callers can branch without try/catch.
+ */
+export type GameStateFromJsonResult =
+  { ok: true; value: GameState } | { ok: false; error: unknown };
+
+/**
+ * Deserialize a GameState from a JSON string without throwing.
+ * Soft-fails on invalid JSON, unsupported version, or invalid board shape.
+ * Prefer this over gameStateFromJSON if/when save/load is bound to UI.
+ */
+export function tryGameStateFromJSON(json: string): GameStateFromJsonResult {
+  try {
+    const data = JSON.parse(json) as SerializedGameState;
+    return { ok: true, value: deserializeGameState(data) };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+/**
  * Deserialize a GameState from a JSON string.
  * Throws if the JSON is invalid or the state is invalid.
+ * Thin wrapper over tryGameStateFromJSON for existing test callers.
  */
 export function gameStateFromJSON(json: string): GameState {
-  const data = JSON.parse(json) as SerializedGameState;
-  return deserializeGameState(data);
+  const result = tryGameStateFromJSON(json);
+  if (!result.ok) {
+    throw result.error;
+  }
+  return result.value;
 }
 
 const VALID_TURN_PHASES: TurnPhase[] = [

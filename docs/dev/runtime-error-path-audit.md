@@ -94,7 +94,7 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | R-JSON-01 | `storage.ts` load via `safeParseJson` | Corrupt progress | **soft-fail** → defaults | shell progress | SKIP (#528); thin re-pin `safeParseJson` in audit suite |
 | R-JSON-02 | `storage.ts` cross-tab | Peer non-JSON | **soft-fail** — keep memory | shell | SKIP (#528) |
 | R-JSON-03 | `storage.ts:414-423` `importData` | Bad backup JSON | **soft-fail** → `false` | N/A (no UI caller) | `burn-wave*-storage-*.test.ts` |
-| R-JSON-04 | `kings…/serialization.ts` `gameStateFromJSON` | Invalid JSON | **throws** — dormant (tests only) | one game if wired | skip harden-if-wired |
+| R-JSON-04 | `kings…/serialization.ts` `tryGameStateFromJSON` | Invalid JSON | **soft-fail** — Result `{ok,error}` (throwing `gameStateFromJSON` kept for tests) | one game if wired | fixed pin in audit suite + `serialization.test.ts` |
 
 ## Prioritized owner fix list
 
@@ -108,7 +108,7 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | ~~**P2**~~ | ~~R-SW-01~~ | **Done in #568** — `registerPwa` guards `registerSW` throw (soft-fail + log) |
 | **P3** | R-SW-03 | Swallow/log `registration.update()` rejection |
 | **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |
-| **P3** | R-JSON-04 | Harden `gameStateFromJSON` if ever bound to UI |
+| ~~**P3**~~ | ~~R-JSON-04~~ | **Done in q-mp-120** — `tryGameStateFromJSON` Result soft-fail; throwing `gameStateFromJSON` retained for tests |
 
 ## Verification (this draft)
 
