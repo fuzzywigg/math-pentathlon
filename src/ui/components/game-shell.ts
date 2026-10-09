@@ -88,9 +88,13 @@ export function isKeyboardReachable(el: Element): boolean {
       if (node.hasAttribute('hidden') || node.hasAttribute('inert')) {
         return false;
       }
-      if (node.classList.contains('hidden')) return false;
+      if (node.classList.contains('hidden')) {
+        return false;
+      }
       const { display, visibility } = node.style;
-      if (display === 'none' || visibility === 'hidden') return false;
+      if (display === 'none' || visibility === 'hidden') {
+        return false;
+      }
     }
     node = node.parentElement;
   }
@@ -108,7 +112,9 @@ function isDisplayedWithin(el: HTMLElement, root: HTMLElement): boolean {
     ) {
       return false;
     }
-    if (cur.style.display === 'none') return false;
+    if (cur.style.display === 'none') {
+      return false;
+    }
     cur = cur.parentElement;
   }
   return true;
@@ -119,7 +125,9 @@ export function getFocusableWithin(root: Element): HTMLElement[] {
   return Array.from(
     root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
   ).filter((el) => {
-    if (el.getAttribute('aria-disabled') === 'true') return false;
+    if (el.getAttribute('aria-disabled') === 'true') {
+      return false;
+    }
     return isKeyboardReachable(el);
   });
 }
@@ -186,7 +194,9 @@ function openShellModal(
 }
 
 function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
-  if (modal.classList.contains('hidden')) return;
+  if (modal.classList.contains('hidden')) {
+    return;
+  }
   setModalHiddenState(modal, true);
   const restore = state.restoreEl;
   state.restoreEl = null;
@@ -200,13 +210,19 @@ function closeShellModal(modal: HTMLElement, state: ModalFocusState): void {
 
 /** Keep Tab cycling inside an open dialog (#491 API; used by unit tests). */
 export function trapTabKey(modal: HTMLElement, e: KeyboardEvent): void {
-  if (e.key !== 'Tab') return;
+  if (e.key !== 'Tab') {
+    return;
+  }
   const items = getFocusableWithin(modal);
-  if (items.length === 0) return;
+  if (items.length === 0) {
+    return;
+  }
 
   const first = items[0];
   const last = items[items.length - 1];
-  if (!first || !last) return;
+  if (!first || !last) {
+    return;
+  }
   const active = document.activeElement;
 
   if (e.shiftKey) {
@@ -222,7 +238,9 @@ export function trapTabKey(modal: HTMLElement, e: KeyboardEvent): void {
 
 /** Keep Tab / Shift+Tab inside an open modal (focus trap). */
 function trapModalTabKey(e: KeyboardEvent, modal: HTMLElement): void {
-  if (e.key !== 'Tab' || modal.classList.contains('hidden')) return;
+  if (e.key !== 'Tab' || modal.classList.contains('hidden')) {
+    return;
+  }
   const focusables = getModalFocusables(modal);
   if (focusables.length === 0) {
     e.preventDefault();
@@ -542,13 +560,17 @@ export function mountGameShell(
       trapModalTabKey(e, newGameModal);
     }
 
-    if (e.key !== 'Escape') return;
+    if (e.key !== 'Escape') {
+      return;
+    }
     const helpEl = helpModal;
     const newGameEl = newGameModal;
     const helpWasOpen = helpEl != null && !helpEl.classList.contains('hidden');
     const newGameWasOpen =
       newGameEl != null && !newGameEl.classList.contains('hidden');
-    if (!helpWasOpen && !newGameWasOpen) return;
+    if (!helpWasOpen && !newGameWasOpen) {
+      return;
+    }
     // Hide without per-modal focus restore; pick one opener below (#437).
     if (helpWasOpen) {
       setModalHiddenState(helpModal!, true);

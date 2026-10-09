@@ -16,7 +16,9 @@ const FALLBACK = {
 } as const;
 
 function readRootVar(name: string, fallback: string): string {
-  if (typeof document === 'undefined') return fallback;
+  if (typeof document === 'undefined') {
+    return fallback;
+  }
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue(name)
     .trim();
@@ -54,8 +56,12 @@ export function clearGameModeChrome(container: HTMLElement): void {
 export function getGameModeChromeRoot(
   root?: HTMLElement | null
 ): HTMLElement | null {
-  if (root) return root;
-  if (typeof document === 'undefined') return null;
+  if (root) {
+    return root;
+  }
+  if (typeof document === 'undefined') {
+    return null;
+  }
   return document.getElementById('app');
 }
 
@@ -68,7 +74,9 @@ export function syncAppOpponentChrome(
   aiSeat: PlayerSeat = 'player2'
 ): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   const mode: GameModeChrome =
     typeof modeOrIsAi === 'boolean'
       ? modeOrIsAi
@@ -130,6 +138,8 @@ export function colorForSeat(
 export function seatIcon(seat: PlayerSeat, root?: HTMLElement | null): string {
   const el = getGameModeChromeRoot(root);
   const aiSeat = (el?.dataset.aiSeat as PlayerSeat | undefined) ?? 'player2';
-  if (isAiOpponent(el) && seat === aiSeat) return '🟣';
+  if (isAiOpponent(el) && seat === aiSeat) {
+    return '🟣';
+  }
   return seat === 'player1' ? '🔵' : '🔴';
 }

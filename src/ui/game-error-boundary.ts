@@ -91,7 +91,9 @@ export function installGameErrorBoundary(
   let didCatch = false;
 
   const show = (reason: unknown) => {
-    if (!active || didCatch) return;
+    if (!active || didCatch) {
+      return;
+    }
     didCatch = true;
     active = false;
     removeListeners();
@@ -115,7 +117,9 @@ export function installGameErrorBoundary(
 
   const onError = (event: ErrorEvent) => {
     // Resource/load errors (img/script) have no error object — skip those.
-    if (!event.error) return;
+    if (!event.error) {
+      return;
+    }
     event.preventDefault();
     show(event.error);
   };

@@ -45,7 +45,9 @@ export function scheduleGenerationTimeout(
   const gen = handle.generation;
   handle.timer = setTimeout(() => {
     handle.timer = null;
-    if (gen !== handle.generation) return;
+    if (gen !== handle.generation) {
+      return;
+    }
     fn();
   }, delayMs);
 }
@@ -68,7 +70,9 @@ export function scheduleGenerationGated(
   opts.setTimer(
     setTimeout(() => {
       opts.setTimer(null);
-      if (gen !== opts.getGeneration()) return;
+      if (gen !== opts.getGeneration()) {
+        return;
+      }
       fn();
     }, delayMs)
   );
