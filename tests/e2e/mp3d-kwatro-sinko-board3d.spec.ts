@@ -137,7 +137,9 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
       await dismissKwatroModeIfNeeded(page);
 
       const canvas = page.locator('canvas[data-mp3d="kwatro-sinko"]');
-      await waitForMp3dReady(page, 'kwatro-sinko');
+      if ((await waitForMp3dReady(page, 'kwatro-sinko')) === 'fallback') {
+        return;
+      }
       await expect(page.locator('.kwa-board svg')).toHaveCount(0);
       await expect(page.locator('.kwa-a11y-grid [data-node-id]')).toHaveCount(
         25
@@ -168,8 +170,9 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
     await enableBoard3dLowQuality(page);
     await page.goto(board3dUrl('#/game/kwatro-sinko'));
     await dismissKwatroModeIfNeeded(page);
-    await waitForMp3dReady(page, 'kwatro-sinko');
-
+    if ((await waitForMp3dReady(page, 'kwatro-sinko')) === 'fallback') {
+      return;
+    }
     const cell = page.locator('.kwa-a11y-grid [data-node-id="n0-0"]');
     await cell.focus();
     await page.keyboard.press('Enter');
@@ -198,8 +201,10 @@ test.describe('mp3d Kwatro-Sinko 3D board', () => {
     await page.locator('#start-game-btn').click();
     await expect(modal).toHaveClass(/hidden/);
 
-    // waitForMp3dReady skips on Firefox when WebGL never mounts (harness).
-    await waitForMp3dReady(page, 'kwatro-sinko');
+    // waitForMp3dReady asserts 2D fallback when WebGL is unavailable.
+    if ((await waitForMp3dReady(page, 'kwatro-sinko')) === 'fallback') {
+      return;
+    }
     await expect(page.locator('.kwa-board')).toHaveCount(1);
     await expect(page.locator('.kwa-board')).toBeVisible();
     await expect(page.locator('.kwa-board svg')).toHaveCount(0);

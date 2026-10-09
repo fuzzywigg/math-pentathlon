@@ -11,6 +11,7 @@ import {
   dismissModeIfNeeded,
   enableBoard3dLowQuality,
   keyboardActivateA11yCell,
+  type Mp3dReadyMode,
   primeGoldValidA11yCell,
   waitForGameReady,
   waitForHumanStatus,
@@ -27,8 +28,9 @@ const VIEWPORTS = [
 
 
 
-async function waitForPrimeGold3d(page: Page) {
-  await waitForMp3dReady(page, 'prime-gold');
+async function waitForPrimeGold3d(page: Page): Promise<Mp3dReadyMode> {
+  const mode = await waitForMp3dReady(page, 'prime-gold');
+  if (mode === 'fallback') return mode;
   await page.waitForFunction(
     () =>
       typeof (
@@ -37,10 +39,13 @@ async function waitForPrimeGold3d(page: Page) {
         }
       ).__mp3dPrimeGold?.valueToClientPoint === 'function'
   );
+  return 'ready';
 }
 
 async function clickBoardValue(page: Page, value: number) {
-  await waitForPrimeGold3d(page);
+  if ((await waitForPrimeGold3d(page)) === 'fallback') {
+    throw new Error('prime-gold 3D click requested but WebGL fell back to 2D');
+  }
   const pt = await page.evaluate((v) => {
     const api = (
       window as unknown as {
@@ -130,7 +135,9 @@ test.describe('mp3d Prime Gold 3D board', () => {
       await page.goto(`/?board3d=1&board3dLQ=1&shot=${vp.name}#/game/prime-gold`);
       await waitForGameReady(page);
       await dismissModeIfNeeded(page);
-      await waitForPrimeGold3d(page);
+      if ((await waitForPrimeGold3d(page)) === 'fallback') {
+        return;
+      }
       await expect(page.locator('.pg-board .pg-cell')).toHaveCount(0);
       await expect(page.locator('.pg-a11y-grid [role="gridcell"]')).toHaveCount(
         49
@@ -245,7 +252,9 @@ test.describe('mp3d Prime Gold 3D board', () => {
     await page.goto(board3dUrl('#/game/prime-gold'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await waitForPrimeGold3d(page);
+    if ((await waitForPrimeGold3d(page)) === 'fallback') {
+      return;
+    }
     await waitForHumanStatus(page, '.pg-status', /Roll/i);
 
     const roll = page.locator('.pg-roll-btn');

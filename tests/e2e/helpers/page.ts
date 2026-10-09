@@ -159,6 +159,22 @@ export async function startHumanFresh(page: Page): Promise<void> {
   await dismissOwl(page);
 }
 
+/**
+ * Known non-app console noise (tooling + WebKit Report-Only CSP without
+ * report-to). Does **not** change CSP headers — harness filter only.
+ */
+export function isBenignConsoleNoise(text: string): boolean {
+  return (
+    /Download the React DevTools/i.test(text) ||
+    /favicon\.ico/i.test(text) ||
+    /\[vite\]/i.test(text) ||
+    // WebKit logs Content-Security-Policy-Report-Only without report-to as console.error.
+    (/content security policy/i.test(text) &&
+      /report-only/i.test(text) &&
+      /report-to/i.test(text))
+  );
+}
+
 /** Attach console / pageerror capture; returns filtered error getter. */
 export function installConsoleGuard(page: Page): () => string[] {
   const errors: string[] = [];
@@ -166,11 +182,5 @@ export function installConsoleGuard(page: Page): () => string[] {
   page.on('console', (msg) => {
     if (msg.type() === 'error') errors.push(msg.text());
   });
-  return () =>
-    errors.filter(
-      (e) =>
-        !/favicon/i.test(e) &&
-        !/Download the React DevTools/i.test(e) &&
-        !/\[vite\]/i.test(e)
-    );
+  return () => errors.filter((e) => !isBenignConsoleNoise(e));
 }

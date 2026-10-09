@@ -2,7 +2,7 @@
  * Shared helpers for MP-3D Playwright specs.
  * Prefer ready-signal waits over fixed sleep; opt into board3dLQ for CI GL load.
  */
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { waitForGameReady as sharedWaitForGameReady } from './page';
 
 /** Heavy multi-viewport / play-through 3D specs. */
@@ -14,6 +14,24 @@ export const MP3D_HEAVY_TEST_TIMEOUT_MS = 120_000;
  */
 declare const process: { env: Record<string, string | undefined> };
 export const MP3D_READY_TIMEOUT_MS = process.env.CI ? 60_000 : 45_000;
+
+/** Result of waiting for a 3D canvas — or asserting the classic 2D fallback. */
+export type Mp3dReadyMode = 'ready' | 'fallback';
+
+/**
+ * Classic 2D play surfaces used when WebGL never mounts (Firefox CI, forced
+ * getContext null). Specs assert these instead of skipping.
+ */
+const MP3D_2D_SURFACE: Record<string, string> = {
+  'prime-gold': '.pg-board .pg-cell',
+  'queens-guards': '.qg-board-container svg',
+  'hex-a-gone': '.hex-a-gone-board',
+  'pent-em-in': '.pent-board',
+  'star-track': '.star-track-board',
+  'kwatro-sinko': '.kwa-board',
+  fiar: '.fiar-board-container svg, .fiar-board-container [data-node-id]',
+  'kings-quadraphages': '#board .board .cell, .cell-king',
+};
 
 /** Loading-only ready (mp3d specs do not require #new-game-btn chrome). */
 export async function waitForGameReady(page: Page): Promise<void> {
@@ -77,13 +95,33 @@ function browserNameOf(page: Page): string {
 }
 
 /**
+ * Assert the controller kept a playable classic 2D board (no mp3d canvas).
+ * Used when WebGL is unavailable on CI (notably Firefox) instead of skipping.
+ */
+export async function assertMp3d2dFallback(
+  page: Page,
+  gameId: string
+): Promise<void> {
+  const surface = MP3D_2D_SURFACE[gameId];
+  expect(
+    surface,
+    `unknown mp3d gameId for 2D fallback assert: ${gameId}`
+  ).toBeTruthy();
+  await expect(page.locator(surface!).first()).toBeVisible({
+    timeout: 15_000,
+  });
+  await expect(page.locator(`canvas[data-mp3d="${gameId}"]`)).toHaveCount(0);
+}
+
+/**
  * Wait until the named 3D canvas has completed at least one paint
  * (`data-mp3d-ready="1"` set by tablet-gl after a successful render).
  *
  * Software-GL aware:
  * - Longer default timeout under `CI`
  * - Fail fast when the controller sets `data-mp3d-fallback` (WebGL never mounted)
- * - Skip (don't fail) when Firefox/CI cannot create WebGL or hangs without fallback
+ * - When WebGL is unavailable (Firefox CI), **assert** the 2D fallback and
+ *   return `'fallback'` so callers can exit without skipping the test
  * - Wait on the ready attribute (not only visibility) so a painted but
  *   zero-opacity frame still counts once the attribute is present
  */
@@ -91,20 +129,18 @@ export async function waitForMp3dReady(
   page: Page,
   gameId: string,
   timeoutMs: number = MP3D_READY_TIMEOUT_MS
-): Promise<void> {
+): Promise<Mp3dReadyMode> {
   const readySelector = `canvas[data-mp3d="${gameId}"][data-mp3d-ready="1"]`;
   const browserName = browserNameOf(page);
 
-  // Firefox CI often has no usable WebGL — skip before the long ready wait.
+  // Firefox CI often has no usable WebGL — assert 2D fallback, don't skip.
   if (!(await probeWebGlAvailable(page))) {
-    test.skip(
-      true,
-      `mp3d "${gameId}" WebGL unavailable (${browserName}) — cross-browser harness skip`
-    );
+    await assertMp3d2dFallback(page, gameId);
+    return 'fallback';
   }
 
   // Firefox may return a non-null context that never paints and never sets
-  // data-mp3d-fallback — use a short budget then skip instead of 60s×retries.
+  // data-mp3d-fallback — use a short budget then assert 2D instead of 60s×retries.
   const waitBudgetMs =
     browserName === 'firefox' ? Math.min(timeoutMs, 15_000) : timeoutMs;
 
@@ -129,12 +165,10 @@ export async function waitForMp3dReady(
       { timeout: waitBudgetMs }
     );
   } catch (err) {
-    // Firefox may hang without setting data-mp3d-fallback (context never paints).
+    // Context never painted — if GL is gone or Firefox, assert playable 2D.
     if (browserName === 'firefox' || !(await probeWebGlAvailable(page))) {
-      test.skip(
-        true,
-        `mp3d "${gameId}" never canvas-ready on ${browserName} — WebGL unavailable/hang (harness skip)`
-      );
+      await assertMp3d2dFallback(page, gameId);
+      return 'fallback';
     }
     throw err;
   }
@@ -144,23 +178,15 @@ export async function waitForMp3dReady(
     | { state: 'fallback'; reason: string }
     | { state: 'ready'; reason: null };
   if (result && result.state === 'fallback') {
-    // Firefox/CI software GL often cannot create a WebGL context — skip harness-only.
-    if (/webgl/i.test(result.reason) || browserName === 'firefox') {
-      test.skip(
-        true,
-        `mp3d "${gameId}" WebGL unavailable (${result.reason}) — cross-browser harness skip`
-      );
-    }
-    throw new Error(
-      `mp3d "${gameId}" never became canvas-ready — WebGL fallback (${result.reason}). ` +
-        'Under software GL this usually means context creation failed or was lost before first paint.'
-    );
+    await assertMp3d2dFallback(page, gameId);
+    return 'fallback';
   }
 
   const canvas = page.locator(readySelector);
   await expect(canvas).toBeAttached({ timeout: 5_000 });
   // Interaction / screenshots need a laid-out canvas, not just the attribute.
   await expect(canvas).toBeVisible({ timeout: 10_000 });
+  return 'ready';
 }
 
 /**

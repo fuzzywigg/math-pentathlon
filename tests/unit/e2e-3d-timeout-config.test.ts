@@ -37,6 +37,15 @@ describe('e2e 3D timeout config', () => {
     expect(helper).toMatch(/MP3D_READY_TIMEOUT_MS\s*=\s*process\.env\.CI/);
   });
 
+  it('asserts 2D fallback when WebGL is unavailable (no harness skip)', () => {
+    expect(helper).toContain('assertMp3d2dFallback');
+    expect(helper).toContain("return 'fallback'");
+    // Cross-browser: Firefox CI has no WebGL — assert playable 2D, don't skip.
+    expect(helper).not.toMatch(
+      /test\.skip\(\s*true,\s*`mp3d "\$\{gameId\}" WebGL unavailable/
+    );
+  });
+
   it('pins Chromium SwiftShader launch args for CI-like software GL', () => {
     expect(pw).toContain('enable-unsafe-swiftshader');
     expect(pw).toContain('swiftshader-webgl');
