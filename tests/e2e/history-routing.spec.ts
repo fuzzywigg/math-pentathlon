@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
-import { dismissOwlIfNeeded } from './helpers/page';
+import { dismissOwl } from './helpers/page';
 import { installE2eStability } from './helpers/stability';
 import { GAMES } from '../../src/core/game-registry';
 
@@ -109,7 +109,7 @@ test.describe('history routing (parameterized @history)', () => {
         window.location.hash = `/game/${id}`;
       }, game.id);
       await waitForGameReady(page);
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
 
       const tutorialBtn = page.locator('#tutorial-btn');
       if (await tutorialBtn.isVisible().catch(() => false)) {
@@ -122,7 +122,7 @@ test.describe('history routing (parameterized @history)', () => {
           window.location.hash = `/game/${id}`;
         }, game.id);
         await waitForGameReady(page);
-        await dismissOwlIfNeeded(page);
+        await dismissOwl(page);
       }
 
       const helpBtn = page.locator('#help-btn');

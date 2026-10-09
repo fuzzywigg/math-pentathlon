@@ -21,7 +21,7 @@ import { fileURLToPath } from 'node:url';
 import { installE2eStability } from './helpers/stability';
 import {
   waitForGameReady,
-  dismissOwlIfNeeded,
+  dismissOwl,
 } from './helpers/page';
 
 const ROOT = path.resolve(
@@ -97,7 +97,7 @@ async function waitForIdleWarm(page: Page): Promise<void> {
 /** New Game → human vs AI → Easy (keeps Hex worker reply wall time low). */
 async function startHexVsAiEasy(page: Page): Promise<void> {
   await waitForGameReady(page);
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');
   await expect(modal).toBeVisible({ timeout: 10_000 });
@@ -108,7 +108,7 @@ async function startHexVsAiEasy(page: Page): Promise<void> {
   }
   await page.locator('#start-game-btn').click();
   await expect(modal).toHaveClass(/hidden/);
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
 }
 
 /**

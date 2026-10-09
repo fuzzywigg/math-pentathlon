@@ -19,7 +19,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
-import { dismissOwlIfNeeded } from './helpers/page';
+import { dismissOwl } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'forced-colors');
@@ -95,7 +95,7 @@ async function startHuman(page: Page) {
     await page.locator('#start-game-btn').click({ force: true });
     await expect(modal).toHaveClass(/hidden/);
   }
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
 }
 
 function titleStem(game: GameInfo): string {
@@ -350,7 +350,7 @@ test.describe('forced-colors + reduced-motion smoke', () => {
     expect(game).toBeTruthy();
     await page.goto(`/#/game/${game!.id}`);
     await waitForGameReady(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     const issues: Issue[] = [];
     const notes: string[] = [];
