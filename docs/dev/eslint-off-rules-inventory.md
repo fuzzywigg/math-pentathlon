@@ -1,6 +1,6 @@
 # ESLint off / unset rules inventory (q-mp-045 → q-mp-230)
 
-Measured on tip `cursor/mp-tip-post728` after q-mp-026g folds (parent `2e5f1eea`, inventory re-run with #733/#738/#742 applied) against `src/` (probe overlay; live `eslint.config.js` unchanged for these counts). Goal: keep disabled/ceilinged rule debt visible so workers ratchet **one** rule without fixing unrelated debt.
+Measured on tip `cursor/mp-tip-post728` @ `7cb50d57` after q-mp-026g folds (#733/#738/#742 applied; inventory content commit) against `src/` (probe overlay; live `eslint.config.js` unchanged for these counts). Goal: keep disabled/ceilinged rule debt visible so workers ratchet **one** rule without fixing unrelated debt.
 
 Re-measure stamp: **q-mp-230** (2026-10-09, tip-owner re-run after fold) — tables below match `npm run lint:ratchet` live counts + one-shot overlay probes. Docs only; ceilings live in `docs/dev/lint-ratchet-ceilings.json`.
 
