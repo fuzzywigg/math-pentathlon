@@ -1,6 +1,6 @@
 # Unit coverage map (by directory)
 
-Task: `q-mp-075`. Generated `2026-10-09T10:38:58.267Z` from `coverage/coverage-summary.json`.
+Task: `q-mp-075`. Generated `2026-10-09T15:14:47.911Z` from `coverage/coverage-summary.json`.
 
 Per-directory heat table of vitest unit coverage (`json-summary`). Rows are
 parent directories under `src/` (for example `src/games/hex` for
@@ -28,14 +28,14 @@ No network; reads local coverage JSON only. No new npm dependencies.
 
 | Directory | Lines % | Branches % | Files |
 | --- | ---: | ---: | ---: |
-| `src/ui/three` | 81.61 | 57.70 | 13 |
-| `src/core/ai-worker` | 81.82 | 72.22 | 4 |
-| `src/ui/owl` | 84.89 | 67.11 | 2 |
-| `src` | 87.43 | 62.07 | 1 |
-| `src/games/juggle` | 88.95 | 84.99 | 6 |
-| `src/games/kwatro-sinko` | 90.65 | 84.29 | 7 |
-| `src/games/hex` | 90.76 | 86.98 | 8 |
-| `src/games/fiar` | 90.87 | 81.09 | 10 |
+| `src/core/ai-worker` | 79.66 | 66.67 | 4 |
+| `src` | 81.37 | 62.07 | 1 |
+| `src/ui/three` | 89.66 | 69.81 | 13 |
+| `src/games/kwatro-sinko` | 90.78 | 84.71 | 7 |
+| `src/games/juggle` | 91.00 | 85.62 | 6 |
+| `src/games/fiar` | 91.29 | 81.62 | 10 |
+| `src/ui/owl` | 92.28 | 75.17 | 2 |
+| `src/games/pent-em-in` | 92.53 | 85.11 | 7 |
 
-Directories rendered: **39**. Full heat table is in the SVG above.
+Directories rendered: **38**. Full heat table is in the SVG above.
 
