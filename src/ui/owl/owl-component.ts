@@ -37,11 +37,82 @@ export class OwlComponent {
   /** Click bounce animation timer — cleared on destroy. */
   private clickAnimTimer: ReturnType<typeof setTimeout> | null = null;
 
+  /**
+   * Cached border-box size for coast / clamp (avoids per-frame layout reads).
+   * Seeded by ResizeObserver when available; refreshed once at coast start.
+   */
+  private cachedSizeW = 64;
+  private cachedSizeH = 64;
+  private sizeObserver: ResizeObserver | null = null;
+
+  /** Docked eye-center cache — invalidated on resize / dock snap. */
+  private eyeCenterValid = false;
+  private cachedEyeCenterX = 0;
+  private cachedEyeCenterY = 0;
+
+  /** rAF-batched eye tracking (≤1 layout read per frame when docked). */
+  private eyeRaf: number | null = null;
+  private pendingEyeClientX = 0;
+  private pendingEyeClientY = 0;
+
   // Initialize the Owl UI
   init(): void {
     this.createContainer();
     this.subscribeToState();
   }
+
+  /** Sole layout-rect measure — keep forced geometry reads funneled here. */
+  private measureContainerRect(): DOMRect {
+    if (!this.container) {
+      return new DOMRect(0, 0, 64, 64);
+    }
+    return this.container.getBoundingClientRect();
+  }
+
+  private refreshSizeCache(): void {
+    const r = this.measureContainerRect();
+    this.cachedSizeW = r.width || 64;
+    this.cachedSizeH = r.height || 64;
+  }
+
+  private invalidateEyeCenter(): void {
+    this.eyeCenterValid = false;
+  }
+
+  private attachSizeObserver(): void {
+    if (!this.container) {
+      return;
+    }
+    if (typeof ResizeObserver === 'undefined') {
+      this.refreshSizeCache();
+      return;
+    }
+    this.sizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) {
+        return;
+      }
+      const box = entry.borderBoxSize?.[0];
+      if (box && (box.inlineSize > 0 || box.blockSize > 0)) {
+        this.cachedSizeW = box.inlineSize || 64;
+        this.cachedSizeH = box.blockSize || 64;
+      } else if (entry.contentRect.width > 0 || entry.contentRect.height > 0) {
+        this.cachedSizeW = entry.contentRect.width || 64;
+        this.cachedSizeH = entry.contentRect.height || 64;
+      }
+      this.invalidateEyeCenter();
+    });
+    this.sizeObserver.observe(this.container);
+  }
+
+  private detachSizeObserver(): void {
+    this.sizeObserver?.disconnect();
+    this.sizeObserver = null;
+  }
+
+  private onViewportResize = (): void => {
+    this.invalidateEyeCenter();
+  };
 
   // Create the main container
   private createContainer(): void {
@@ -57,6 +128,9 @@ export class OwlComponent {
     this.container.appendChild(owlTpl.content);
 
     document.body.appendChild(this.container);
+
+    this.attachSizeObserver();
+    this.invalidateEyeCenter();
 
     // Wire up event handlers
     this.attachEventHandlers();
@@ -164,8 +238,9 @@ export class OwlComponent {
     this.container.addEventListener('pointercancel', this.onPointerCancel);
     this.container.addEventListener('lostpointercapture', this.onPointerUp);
 
-    // Eye tracking (fun feature)
+    // Eye tracking (fun feature) + invalidate docked center on viewport resize
     document.addEventListener('mousemove', this.handleMouseMove);
+    window.addEventListener('resize', this.onViewportResize);
   }
 
   /** True when the event target is a drag handle (body / mini icon), not chrome. */
@@ -202,7 +277,11 @@ export class OwlComponent {
 
     this.stopCoast();
 
-    const rect = this.container.getBoundingClientRect();
+    // One layout read at gesture start (position + size); coast/eyes reuse cache.
+    const rect = this.measureContainerRect();
+    this.cachedSizeW = rect.width || 64;
+    this.cachedSizeH = rect.height || 64;
+    this.invalidateEyeCenter();
     this.dragOffsetX = e.clientX - rect.left;
     this.dragOffsetY = e.clientY - rect.top;
     this.dragStartX = e.clientX;
@@ -365,6 +444,7 @@ export class OwlComponent {
     this.container.style.top = '';
     this.container.style.right = '';
     this.container.style.bottom = '';
+    this.invalidateEyeCenter();
   }
 
   private stopCoast(): void {
@@ -381,12 +461,17 @@ export class OwlComponent {
     }
     this.stopCoast();
 
+    // Size is stable during coast; refresh once then reuse (no per-tick layout).
+    this.refreshSizeCache();
+    const boxW = this.cachedSizeW;
+    const boxH = this.cachedSizeH;
+    const vw = (): number => window.innerWidth || 390;
+    const vh = (): number => window.innerHeight || 844;
+
     // Reduced motion: snap to rest without coast animation.
     if (prefersReducedMotion()) {
       this.velocityX = 0;
       this.velocityY = 0;
-      const boxW = this.container.getBoundingClientRect().width || 64;
-      const boxH = this.container.getBoundingClientRect().height || 64;
       const x = parseFloat(this.container.style.left) || 0;
       const y = parseFloat(this.container.style.top) || 0;
       const clamped = clampToViewport(
@@ -407,18 +492,11 @@ export class OwlComponent {
     this.velocityX = Math.max(-maxV, Math.min(maxV, this.velocityX));
     this.velocityY = Math.max(-maxV, Math.min(maxV, this.velocityY));
 
-    const boxW = (): number =>
-      this.container?.getBoundingClientRect().width || 64;
-    const boxH = (): number =>
-      this.container?.getBoundingClientRect().height || 64;
-    const vw = (): number => window.innerWidth || 390;
-    const vh = (): number => window.innerHeight || 844;
-
     // Clamp drop position into viewport before coasting
     {
       const x = parseFloat(this.container.style.left) || 0;
       const y = parseFloat(this.container.style.top) || 0;
-      const clamped = clampToViewport(x, y, boxW(), boxH(), vw(), vh());
+      const clamped = clampToViewport(x, y, boxW, boxH, vw(), vh());
       this.container.style.left = `${clamped.x}px`;
       this.container.style.top = `${clamped.y}px`;
     }
@@ -432,14 +510,7 @@ export class OwlComponent {
       const x = parseFloat(this.container.style.left) || 0;
       const y = parseFloat(this.container.style.top) || 0;
       const next = integrate({ x, y, vx: this.velocityX, vy: this.velocityY });
-      const clamped = clampToViewport(
-        next.x,
-        next.y,
-        boxW(),
-        boxH(),
-        vw(),
-        vh()
-      );
+      const clamped = clampToViewport(next.x, next.y, boxW, boxH, vw(), vh());
 
       // Soft stop on edges (clamp only — no bounce invent)
       if (clamped.x !== next.x) {
@@ -592,8 +663,34 @@ export class OwlComponent {
     }, 500);
   }
 
-  // Eye tracking for fun
-  private handleMouseMove = (e: MouseEvent): void => {
+  /**
+   * Eye center without layout thrash: resting uses inline left/top + size cache;
+   * docked refreshes the layout rect at most once until invalidated.
+   */
+  private resolveEyeCenter(): { x: number; y: number } {
+    if (!this.container) {
+      return { x: 0, y: 0 };
+    }
+    if (this.container.classList.contains('owl-resting')) {
+      const left = parseFloat(this.container.style.left) || 0;
+      const top = parseFloat(this.container.style.top) || 0;
+      return {
+        x: left + this.cachedSizeW / 2,
+        y: top + this.cachedSizeH / 2,
+      };
+    }
+    if (!this.eyeCenterValid) {
+      const r = this.measureContainerRect();
+      this.cachedSizeW = r.width || 64;
+      this.cachedSizeH = r.height || 64;
+      this.cachedEyeCenterX = r.left + this.cachedSizeW / 2;
+      this.cachedEyeCenterY = r.top + this.cachedSizeH / 2;
+      this.eyeCenterValid = true;
+    }
+    return { x: this.cachedEyeCenterX, y: this.cachedEyeCenterY };
+  }
+
+  private applyEyeTracking(clientX: number, clientY: number): void {
     if (!this.container || this.isMinimized || this.isDragging) {
       return;
     }
@@ -602,14 +699,12 @@ export class OwlComponent {
     }
 
     const pupils = this.container.querySelectorAll('.owl-pupil');
-    const owlRect = this.container.getBoundingClientRect();
-    const owlCenterX = owlRect.left + owlRect.width / 2;
-    const owlCenterY = owlRect.top + owlRect.height / 2;
+    const { x: owlCenterX, y: owlCenterY } = this.resolveEyeCenter();
 
-    const angle = Math.atan2(e.clientY - owlCenterY, e.clientX - owlCenterX);
+    const angle = Math.atan2(clientY - owlCenterY, clientX - owlCenterX);
     const distance = Math.min(
       3,
-      Math.hypot(e.clientX - owlCenterX, e.clientY - owlCenterY) / 100
+      Math.hypot(clientX - owlCenterX, clientY - owlCenterY) / 100
     );
 
     const x = Math.cos(angle) * distance;
@@ -618,11 +713,36 @@ export class OwlComponent {
     pupils.forEach((pupil) => {
       (pupil as HTMLElement).style.transform = `translate(${x}px, ${y}px)`;
     });
+  }
+
+  // Eye tracking for fun — coalesce to one rAF (and ≤1 docked layout read).
+  private handleMouseMove = (e: MouseEvent): void => {
+    if (!this.container || this.isMinimized || this.isDragging) {
+      return;
+    }
+    if (prefersReducedMotion()) {
+      return;
+    }
+
+    this.pendingEyeClientX = e.clientX;
+    this.pendingEyeClientY = e.clientY;
+    if (this.eyeRaf !== null) {
+      return;
+    }
+    this.eyeRaf = requestAnimationFrame(() => {
+      this.eyeRaf = null;
+      this.applyEyeTracking(this.pendingEyeClientX, this.pendingEyeClientY);
+    });
   };
 
   // Clean up
   destroy(): void {
     this.stopCoast();
+
+    if (this.eyeRaf !== null) {
+      cancelAnimationFrame(this.eyeRaf);
+      this.eyeRaf = null;
+    }
 
     if (this.clickAnimTimer !== null) {
       clearTimeout(this.clickAnimTimer);
@@ -635,6 +755,9 @@ export class OwlComponent {
     }
 
     document.removeEventListener('mousemove', this.handleMouseMove);
+    window.removeEventListener('resize', this.onViewportResize);
+    this.detachSizeObserver();
+    this.invalidateEyeCenter();
 
     if (this.container) {
       this.container.removeEventListener('pointerdown', this.onPointerDown);
