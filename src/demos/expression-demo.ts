@@ -506,8 +506,5 @@ function initCardBuilder(): void {
   createInteractiveBuilder(builderArea, {
     slotCount: 7,
     availableCards: cards,
-    onComplete: (expr, result) => {
-      console.log(`Expression complete: ${expr} = ${result}`);
-    },
   });
 }
