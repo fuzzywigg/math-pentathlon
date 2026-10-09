@@ -3,13 +3,8 @@
  * Distinct from alignment clearHighlights overnight. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  createTrackGraph,
-  renderGraph,
-  highlightPath,
-  clearHighlights,
-  DEFAULT_GRAPH_CONFIG,
-} from '../../src/core/graph';
+import { createTrackGraph, DEFAULT_GRAPH_CONFIG } from '../../src/core/graph/types';
+import { renderGraph, highlightPath, clearHighlights } from '../../src/core/graph/graph-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

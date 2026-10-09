@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getRegionStats } from '../../src/core/alignment';
+import { getRegionStats } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — region stats empty/filter', () => {
   const dims = { rows: 3, cols: 3 };

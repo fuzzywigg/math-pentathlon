@@ -3,20 +3,9 @@
  * Avoids poly-ui (#180) and PR182 rotation/connected claims. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createBoard,
-  createGrid,
-  removeLastPolyomino,
-  validatePlacement,
-  isCellOccupied,
-  placePolyomino,
-  doPlacementsOverlap,
-  getShapeById,
-  getSymmetryCount,
-  SIMPLE_SHAPES,
-  PENTOMINOES,
-  type Placement,
-} from '../../src/core/polyomino';
+import { createBoard, createGrid, removeLastPolyomino, validatePlacement, isCellOccupied, placePolyomino, doPlacementsOverlap, type Placement } from '../../src/core/polyomino/placement';
+import { getShapeById, SIMPLE_SHAPES, PENTOMINOES } from '../../src/core/polyomino/types';
+import { getSymmetryCount } from '../../src/core/polyomino/transform';
 
 describe('Wave 41 poly — removeLast / validate / OOB', () => {
   it('removeLastPolyomino empty board identity', () => {

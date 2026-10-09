@@ -4,18 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTrackGraph,
-  createGridGraph,
-  createStarGraph,
-  createCircularGraph,
-  createHexLatticeGraph,
-  findComponents,
-  isConnected,
-  findReachable,
-  getNeighbors,
-  type Graph,
-} from '../../src/core/graph';
+import { createTrackGraph, createGridGraph, createStarGraph, createCircularGraph, createHexLatticeGraph, type Graph } from '../../src/core/graph/types';
+import { findComponents, isConnected, findReachable, getNeighbors } from '../../src/core/graph/algorithms';
 
 function dropEdges(g: Graph, pred: (from: string, to: string) => boolean): Graph {
   return {

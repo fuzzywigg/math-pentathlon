@@ -5,33 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COMMON_FRACTIONS,
-  createFraction,
-  fromWhole,
-  add,
-  subtract,
-  multiply,
-  divide,
-  reciprocal,
-  simplify,
-  areEqual,
-  compare,
-  toDecimal,
-  formatFraction,
-  parseFraction,
-  findLCD,
-  toCommonDenominator,
-  findEquivalentFractions,
-  sum,
-  average,
-  min,
-  max,
-  power,
-  performOperation,
-  isSimplified,
-  gcd,
-} from '../../src/core/fractions';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
+import { createFraction, fromWhole, add, subtract, multiply, divide, reciprocal, simplify, areEqual, compare, toDecimal, formatFraction, parseFraction, findLCD, toCommonDenominator, findEquivalentFractions, sum, average, min, max, power, performOperation, isSimplified, gcd } from '../../src/core/fractions/arithmetic';
 
 const commons = COMMON_FRACTIONS;
 const sample = commons.slice(0, 10);

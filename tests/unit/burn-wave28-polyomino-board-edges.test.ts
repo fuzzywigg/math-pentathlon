@@ -5,24 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  isInBounds,
-  isOccupied,
-  validatePlacement,
-  placePolyomino,
-  removeLastPolyomino,
-  findValidPlacements,
-  canPlaceShape,
-  countEmptyCells,
-  getEmptyCells,
-  isBoardFilled,
-  findPlacementAtCell,
-  TETROMINOES,
-  getPolyominoesByOrder,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, isInBounds, isOccupied, validatePlacement, placePolyomino, removeLastPolyomino, findValidPlacements, canPlaceShape, countEmptyCells, getEmptyCells, isBoardFilled, findPlacementAtCell } from '../../src/core/polyomino/placement';
+import { TETROMINOES, getPolyominoesByOrder, type Rotation } from '../../src/core/polyomino/types';
 
 describe('Wave 28 polyomino-board — isInBounds / isOccupied', () => {
   it('bounds matrix for 2x3 board', () => {

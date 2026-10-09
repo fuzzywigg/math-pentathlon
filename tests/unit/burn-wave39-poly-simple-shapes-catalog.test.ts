@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  getShapeById,
-  getShapesBySize,
-  createBoard,
-  canPlaceShape,
-  findValidPlacements,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES, getShapeById, getShapesBySize } from '../../src/core/polyomino/types';
+import { createBoard, canPlaceShape, findValidPlacements } from '../../src/core/polyomino/placement';
 
 describe('Wave 39 poly — simple shapes catalog', () => {
   it('every SIMPLE_SHAPES id resolves and placeable on open board', () => {

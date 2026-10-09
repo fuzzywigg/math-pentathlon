@@ -10,18 +10,11 @@ import {
   owlSystem,
 } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
-import {
-  createHexLatticeGraph,
-  findNodesWithinDistance,
-  getNeighbors,
-} from '../../src/core/graph';
-import {
-  prevRotation,
-  nextRotation,
-  SIMPLE_SHAPES,
-  createBoard,
-  solvePlacement,
-} from '../../src/core/polyomino';
+import { createHexLatticeGraph } from '../../src/core/graph/types';
+import { findNodesWithinDistance, getNeighbors } from '../../src/core/graph/algorithms';
+import { prevRotation, nextRotation } from '../../src/core/polyomino/transform';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createBoard, solvePlacement } from '../../src/core/polyomino/placement';
 
 beforeEach(() => {
   localStorage.clear();

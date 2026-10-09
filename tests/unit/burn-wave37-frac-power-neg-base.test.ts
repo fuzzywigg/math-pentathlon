@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  power,
-  areEqual,
-  simplify,
-  fromWhole,
-} from '../../src/core/fractions';
+import { createFraction, power, areEqual, simplify, fromWhole } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-power-neg — signed bases', () => {
   it('even exponents yield positive; odd keep sign', () => {

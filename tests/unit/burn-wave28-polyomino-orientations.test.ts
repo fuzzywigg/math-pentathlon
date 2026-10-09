@@ -6,23 +6,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getAllOrientations,
-  getAllRotations,
-  nextRotation,
-  prevRotation,
-  cellsToKey,
-  normalizeCells,
-  rotateCells,
-  getTransformedCells,
-  getCellsAtPosition,
-  TETROMINOES,
-  PENTOMINOES,
-  getPolyominoesByOrder,
-  type Cell,
-  type PolyominoShape,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { getAllOrientations, getAllRotations, nextRotation, prevRotation, cellsToKey, normalizeCells, rotateCells, getTransformedCells, getCellsAtPosition } from '../../src/core/polyomino/transform';
+import { TETROMINOES, PENTOMINOES, getPolyominoesByOrder, type Cell, type PolyominoShape, type Rotation } from '../../src/core/polyomino/types';
 
 function shapeOf(
   id: string,

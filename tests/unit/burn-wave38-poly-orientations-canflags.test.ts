@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  getShapeById,
-  getAllOrientations,
-  getAllTransformations,
-  cellsToKey,
-} from '../../src/core/polyomino';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
+import { getAllOrientations, getAllTransformations, cellsToKey } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-orientations — can flags', () => {
   it('canRotate=false canFlip=false yields single orientation', () => {

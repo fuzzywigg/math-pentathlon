@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { checkLineAlignment } from '../../src/core/alignment';
+import { checkLineAlignment } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — checkLineAlignment empty', () => {
   it('empty positions are not aligned', () => {

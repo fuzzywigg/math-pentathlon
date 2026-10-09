@@ -3,12 +3,8 @@
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { rollMultiple, getAllPossibleSums } from '../../src/core/dice';
-import {
-  createBoard,
-  placePolyomino,
-  countEmptyCells,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createBoard, placePolyomino, countEmptyCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 afterEach(() => vi.restoreAllMocks());
 

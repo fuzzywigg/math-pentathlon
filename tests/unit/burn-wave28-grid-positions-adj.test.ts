@@ -5,18 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  getAllValidPositions,
-  getPlacementCells,
-  doPlacementsOverlap,
-  getAdjacentCells,
-  SIMPLE_SHAPES,
-  getPolyominoById,
-  type Placement,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, getAllValidPositions, getPlacementCells, doPlacementsOverlap, getAdjacentCells, type Placement } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, getPolyominoById, type Rotation } from '../../src/core/polyomino/types';
 
 function mono() {
   return SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;

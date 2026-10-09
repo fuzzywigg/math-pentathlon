@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluate, tokenize, parse } from '../../src/core/expressions';
+import { evaluate, tokenize, parse } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-paren — missing closers/openers', () => {
   it('reports expected closing parenthesis', () => {

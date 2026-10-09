@@ -4,17 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  getShapeById,
-  flipPolyomino,
-  rotatePolyomino,
-  getTransformedPolyomino,
-  rotateCells90CW,
-  normalizeCells,
-  cellsToKey,
-  transformCells,
-} from '../../src/core/polyomino';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
+import { flipPolyomino, rotatePolyomino, getTransformedPolyomino, rotateCells90CW, normalizeCells, cellsToKey, transformCells } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-flip-rotate — equivalence', () => {
   it('rotatePolyomino matches transform 90 unflipped', () => {

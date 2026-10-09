@@ -4,22 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  sum,
-  average,
-  min,
-  max,
-  findLCD,
-  toCommonDenominator,
-  findEquivalentFractions,
-  areEqual,
-  compare,
-  simplify,
-  lcm,
-  gcd,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, sum, average, min, max, findLCD, toCommonDenominator, findEquivalentFractions, areEqual, compare, simplify, lcm, gcd } from '../../src/core/fractions/arithmetic';
 
 const F = createFraction;
 const flag = (n: number, d: number) => ({

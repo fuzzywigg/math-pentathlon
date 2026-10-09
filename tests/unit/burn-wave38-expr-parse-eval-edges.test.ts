@@ -4,16 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluate,
-  formatNumber,
-  astToString,
-  simplifyExpression,
-  parseEquation,
-  evaluateEquation,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluate, formatNumber, astToString, simplifyExpression, parseEquation, evaluateEquation } from '../../src/core/expressions/evaluator';
 
 describe('Wave 38 expr-eval — parentheses / unary / failure edges', () => {
   it('nested parens and unary minus evaluate correctly', () => {

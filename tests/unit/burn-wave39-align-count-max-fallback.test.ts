@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { countMaxAligned } from '../../src/core/alignment';
+import { countMaxAligned } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — countMaxAligned fallback', () => {
   const dims = { rows: 4, cols: 4 };

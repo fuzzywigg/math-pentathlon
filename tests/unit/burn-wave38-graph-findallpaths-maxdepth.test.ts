@@ -5,11 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGridGraph,
-  createCompleteGraph,
-  findAllPaths,
-} from '../../src/core/graph';
+import { createGridGraph, createCompleteGraph } from '../../src/core/graph/types';
+import { findAllPaths } from '../../src/core/graph/algorithms';
 
 describe('Wave 38 graph-paths — maxDepth', () => {
   it('maxDepth=0 rejects even the trivial start=end path (length 1)', () => {

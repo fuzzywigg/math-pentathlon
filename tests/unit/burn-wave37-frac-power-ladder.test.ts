@@ -4,15 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  power,
-  reciprocal,
-  areEqual,
-  simplify,
-  fromWhole,
-  multiply,
-} from '../../src/core/fractions';
+import { createFraction, power, reciprocal, areEqual, simplify, fromWhole, multiply } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-power — exponent ladder', () => {
   const bases = [

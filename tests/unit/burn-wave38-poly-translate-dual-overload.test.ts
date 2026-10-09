@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { translateCells, normalizeCells } from '../../src/core/polyomino';
+import { translateCells, normalizeCells } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-translate — dual overload', () => {
   const cells = [

@@ -4,15 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluate,
-  evaluateNode,
-  astToString,
-  formatNumber,
-  simplifyExpression,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluate, evaluateNode, astToString, formatNumber, simplifyExpression } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-ast-roundtrip — evaluateNode equals string eval', () => {
   const samples = [

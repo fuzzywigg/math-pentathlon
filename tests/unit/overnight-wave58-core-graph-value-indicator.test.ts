@@ -3,8 +3,9 @@
  * Distinct from wave57 player2 fill+label. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { createTrackGraph, renderGraph } from '../../src/core/graph';
-import { DEFAULT_GRAPH_CONFIG } from '../../src/core/graph';
+import { createTrackGraph } from '../../src/core/graph/types';
+import { renderGraph } from '../../src/core/graph/graph-ui';
+import { DEFAULT_GRAPH_CONFIG } from '../../src/core/graph/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

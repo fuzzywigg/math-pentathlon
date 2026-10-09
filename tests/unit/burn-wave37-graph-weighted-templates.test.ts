@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTrackGraph,
-  createGridGraph,
-  createStarGraph,
-  createCircularGraph,
-  bfs,
-  dijkstra,
-  type Graph,
-} from '../../src/core/graph';
+import { createTrackGraph, createGridGraph, createStarGraph, createCircularGraph, type Graph } from '../../src/core/graph/types';
+import { bfs, dijkstra } from '../../src/core/graph/algorithms';
 
 function withWeights(g: Graph, weightFn: (from: string, to: string) => number): Graph {
   return {

@@ -9,21 +9,12 @@ import {
   OwlEventEmitter,
   resolveInspectTarget,
 } from '../../src/core/owl';
-import {
-  createStarGraph,
-  getNeighbors,
-  findNodesAtDistance,
-  animateMove,
-  renderGraph,
-} from '../../src/core/graph';
-import {
-  TETROMINOES,
-  injectPolyominoStyles,
-  createDraggableShape,
-  getCellFromMouseEvent,
-  createBoard,
-  renderBoard,
-} from '../../src/core/polyomino';
+import { createStarGraph } from '../../src/core/graph/types';
+import { getNeighbors, findNodesAtDistance } from '../../src/core/graph/algorithms';
+import { animateMove, renderGraph } from '../../src/core/graph/graph-ui';
+import { TETROMINOES } from '../../src/core/polyomino/types';
+import { injectPolyominoStyles, createDraggableShape, getCellFromMouseEvent, renderBoard } from '../../src/core/polyomino/polyomino-ui';
+import { createBoard } from '../../src/core/polyomino/placement';
 
 afterEach(() => {
   document.getElementById('polyomino-styles')?.remove();

@@ -4,13 +4,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  getHexTriangles,
-  renderHexWithTriangles,
-  renderHexGrid,
-  renderRectHexGrid,
-  type HexLayout,
-} from '../../src/core/hex';
+import { getHexTriangles, renderHexWithTriangles, renderHexGrid, renderRectHexGrid } from '../../src/core/hex/hex-ui';
+import type { HexLayout } from '../../src/core/hex/types';
 
 const layout: HexLayout = {
   orientation: 'pointy',

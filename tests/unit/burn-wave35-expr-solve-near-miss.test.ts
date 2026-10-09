@@ -4,10 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTargetChallenge,
-  solveTargetChallenge,
-} from '../../src/core/expressions';
+import { createTargetChallenge } from '../../src/core/expressions/types';
+import { solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-solve-near — only near-miss possible', () => {
   it('with only + on [2,3] targeting 6 yields near-miss 5 only', () => {

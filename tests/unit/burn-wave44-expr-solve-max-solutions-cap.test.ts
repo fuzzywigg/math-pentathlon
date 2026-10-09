@@ -2,7 +2,7 @@
  * Wave 44 — solveTargetChallenge maxSolutions early-return leftover. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { solveTargetChallenge } from '../../src/core/expressions';
+import { solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 describe('Wave 44 expr — solve maxSolutions cap', () => {
   it('caps at maxSolutions=1 for easy target', () => {

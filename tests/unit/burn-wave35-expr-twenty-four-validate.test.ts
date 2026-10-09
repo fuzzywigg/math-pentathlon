@@ -4,11 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TWENTY_FOUR_CHALLENGES,
-  solveTargetChallenge,
-  validateSolution,
-} from '../../src/core/expressions';
+import { TWENTY_FOUR_CHALLENGES } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-24 — sampled catalog exacts validate', () => {
   it('first 5 challenges yield exact solutions that validate', () => {

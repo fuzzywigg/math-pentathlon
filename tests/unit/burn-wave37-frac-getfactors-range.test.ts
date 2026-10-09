@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getFactors } from '../../src/core/fractions';
+import { getFactors } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-factors — 1..120', () => {
   it('every n has 1 and n; all factors divide', () => {

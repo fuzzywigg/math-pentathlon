@@ -4,26 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  bfs,
-  dijkstra,
-  getNeighbors,
-  getEdge,
-  areAdjacent,
-  getNodeDegree,
-  findAllPaths,
-  findNodesAtDistance,
-  findNodesWithinDistance,
-  findReachable,
-  findPlayerRegion,
-  findLongestPlayerPath,
-  playerConnectsSets,
-  createTrackGraph,
-  type Graph,
-  type GraphBoard,
-  type GraphNode,
-  type NodeId,
-} from '../../src/core/graph';
+import { bfs, dijkstra, getNeighbors, getEdge, areAdjacent, getNodeDegree, findAllPaths, findNodesAtDistance, findNodesWithinDistance, findReachable, findPlayerRegion, findLongestPlayerPath, playerConnectsSets } from '../../src/core/graph/algorithms';
+import { createTrackGraph, type Graph, type GraphBoard, type GraphNode, type NodeId } from '../../src/core/graph/types';
 
 function node(id: NodeId): GraphNode {
   return { id, position: { x: 0, y: 0 } };

@@ -3,11 +3,8 @@
  * Distinct from wave40 negative OOB null. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import {
-  createBoard,
-  renderBoard,
-  getCellFromMouseEvent,
-} from '../../src/core/polyomino';
+import { createBoard } from '../../src/core/polyomino/placement';
+import { renderBoard, getCellFromMouseEvent } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

@@ -4,18 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  createHexagonalBoard,
-  solvePlacement,
-  countEmptyCells,
-  isBoardFilled,
-  placePolyomino,
-  SIMPLE_SHAPES,
-  getPolyominoById,
-  getPolyominoesByOrder,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, createHexagonalBoard, solvePlacement, countEmptyCells, isBoardFilled, placePolyomino } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, getPolyominoById, getPolyominoesByOrder } from '../../src/core/polyomino/types';
 
 function mono() {
   return SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;

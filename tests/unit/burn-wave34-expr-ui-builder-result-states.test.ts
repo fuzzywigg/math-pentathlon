@@ -5,12 +5,8 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  createNumberCard,
-  createOperatorCard,
-  createSlot,
-  renderExpressionBuilder,
-} from '../../src/core/expressions';
+import { createNumberCard, createOperatorCard, createSlot } from '../../src/core/expressions/types';
+import { renderExpressionBuilder } from '../../src/core/expressions/expression-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

@@ -3,9 +3,10 @@
  * Distinct from wave51 leftover board-ui name handshakes. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { DEFAULT_GRAPH_CONFIG } from '../../src/core/graph';
-import { TETROMINOES, createRotationControls } from '../../src/core/polyomino';
-import { DIRECTIONS } from '../../src/core/alignment';
+import { DEFAULT_GRAPH_CONFIG } from '../../src/core/graph/types';
+import { TETROMINOES } from '../../src/core/polyomino/types';
+import { createRotationControls } from '../../src/core/polyomino/polyomino-ui';
+import { DIRECTIONS } from '../../src/core/alignment/types';
 import { OWL_FRICTION, OWL_REST_SPEED } from '../../src/core/owl';
 
 describe('Wave 52 handshake — module names cross', () => {

@@ -5,19 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  areCellsConnected,
-  isAdjacent,
-  areCellsInBounds,
-  getCellsAtPosition,
-  getAbsoluteCells,
-  canonicalizeCells,
-  sortCells,
-  cellsToKey,
-  SIMPLE_SHAPES,
-  getPolyominoById,
-  type Cell,
-} from '../../src/core/polyomino';
+import { areCellsConnected, isAdjacent, areCellsInBounds, getCellsAtPosition, getAbsoluteCells, canonicalizeCells, sortCells, cellsToKey } from '../../src/core/polyomino/transform';
+import { SIMPLE_SHAPES, getPolyominoById, type Cell } from '../../src/core/polyomino/types';
 
 describe('Wave 28 poly-connect — areCellsConnected flood', () => {
   it('empty and singleton are connected', () => {

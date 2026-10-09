@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  centerCells,
-  getCenterOfMass,
-  getBoundingBox,
-  getBounds,
-  normalizeCells,
-} from '../../src/core/polyomino';
+import { centerCells, getCenterOfMass, getBoundingBox, getBounds, normalizeCells } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-center — empty / asymmetric', () => {
   it('empty bbox and COM are zeros; center stays empty', () => {

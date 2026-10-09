@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  wrapPosition,
-  findAlignmentFromCenter,
-  checkMoveForWin,
-  checkForWinner,
-  DIRECTIONS,
-} from '../../src/core/alignment';
+import { wrapPosition, findAlignmentFromCenter, checkMoveForWin, checkForWinner } from '../../src/core/alignment/grid-alignment';
+import { DIRECTIONS } from '../../src/core/alignment/types';
 
 describe('Wave 39 align — wrap from center / win checks', () => {
   it('wrapPosition maps negatives', () => {

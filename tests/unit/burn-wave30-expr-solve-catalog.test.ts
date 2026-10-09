@@ -5,12 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  solveTargetChallenge,
-  validateSolution,
-  MAKE_TEN_CHALLENGES,
-  TWENTY_FOUR_CHALLENGES,
-} from '../../src/core/expressions';
+import { solveTargetChallenge, validateSolution } from '../../src/core/expressions/evaluator';
+import { MAKE_TEN_CHALLENGES, TWENTY_FOUR_CHALLENGES } from '../../src/core/expressions/types';
 
 function sortedKey(numbers: number[]): string {
   return [...numbers].sort((a, b) => a - b).join(',');

@@ -11,12 +11,8 @@ import {
   getAllPossibleSums,
   getTwoDiceResults,
 } from '../../src/core/dice';
-import {
-  createTargetChallenge,
-  validateSolution,
-  evaluate,
-  solveTargetChallenge,
-} from '../../src/core/expressions';
+import { createTargetChallenge } from '../../src/core/expressions/types';
+import { validateSolution, evaluate, solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 beforeEach(() => {
   let n = 0;

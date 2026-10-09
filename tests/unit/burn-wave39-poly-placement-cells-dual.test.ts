@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  getPlacementCells,
-  createBoard,
-  placePolyomino,
-  createGrid,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { getPlacementCells, createBoard, placePolyomino, createGrid } from '../../src/core/polyomino/placement';
 
 const trominoL = () => SIMPLE_SHAPES.find((s) => s.id === 'tromino-L')!;
 

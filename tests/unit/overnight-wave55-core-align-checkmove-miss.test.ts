@@ -3,7 +3,7 @@
  * Distinct from wave24 winner matrix happy path. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { checkMoveForWin, createArrayGetter } from '../../src/core/alignment';
+import { checkMoveForWin, createArrayGetter } from '../../src/core/alignment/grid-alignment';
 
 describe('Wave 55 core align — checkMoveForWin miss', () => {
   it('isolated drop is not a win; completing a row of 3 is', () => {

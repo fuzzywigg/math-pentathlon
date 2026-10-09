@@ -5,17 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-  createBasicNumberCards,
-  createBasicOperatorCards,
-  createExpressionDeck,
-  createTargetChallenge,
-  type Operator,
-} from '../../src/core/expressions';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot, createBasicNumberCards, createBasicOperatorCards, createExpressionDeck, createTargetChallenge, type Operator } from '../../src/core/expressions/types';
 
 describe('Wave 30 expr-deck — card identity contracts', () => {
   it('stamps explicit ids and auto-ids when omitted', () => {

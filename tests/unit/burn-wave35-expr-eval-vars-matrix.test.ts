@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluate } from '../../src/core/expressions';
+import { evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-vars — multi-var formulas', () => {
   it('evaluates linear combinations', () => {

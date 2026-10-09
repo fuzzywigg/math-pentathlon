@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getLinePositions } from '../../src/core/alignment';
+import { getLinePositions } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — line positions OOB', () => {
   const dims = { rows: 4, cols: 4 };

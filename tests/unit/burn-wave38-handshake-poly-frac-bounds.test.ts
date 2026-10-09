@@ -4,19 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  placePolyomino,
-  countEmptyCells,
-  TETROMINOES,
-  getShapeById,
-} from '../../src/core/polyomino';
-import {
-  createFraction,
-  compare,
-  areEqual,
-  fromWhole,
-} from '../../src/core/fractions';
+import { createBoard, placePolyomino, countEmptyCells } from '../../src/core/polyomino/placement';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
+import { createFraction, compare, areEqual, fromWhole } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 38 handshake — poly fill vs frac', () => {
   it('empty board fill ratio is 0/N', () => {

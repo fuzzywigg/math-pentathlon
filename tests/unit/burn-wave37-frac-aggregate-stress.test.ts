@@ -4,20 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  sum,
-  average,
-  min,
-  max,
-  areEqual,
-  simplify,
-  compare,
-  COMMON_FRACTIONS,
-  add,
-  divide,
-  fromWhole,
-} from '../../src/core/fractions';
+import { createFraction, sum, average, min, max, areEqual, simplify, compare, add, divide, fromWhole } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 describe('Wave 37 frac-aggregate — stress', () => {
   it('sum of COMMON_FRACTIONS equals fold of add', () => {

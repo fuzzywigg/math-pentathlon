@@ -5,17 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  rotateCells,
-  normalizeCells,
-  sortCells,
-  cellsToKey,
-  nextRotation,
-  prevRotation,
-  rotateCells90CW,
-  type Cell,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { rotateCells, normalizeCells, sortCells, cellsToKey, nextRotation, prevRotation, rotateCells90CW } from '../../src/core/polyomino/transform';
+import type { Cell, Rotation } from '../../src/core/polyomino/types';
 
 function key(cells: Cell[]): string {
   return cellsToKey(cells);

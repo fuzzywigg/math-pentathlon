@@ -3,7 +3,8 @@
  * Distinct from wave23 click + wave52 no-flip controls. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { createShapeSelector, SIMPLE_SHAPES } from '../../src/core/polyomino';
+import { createShapeSelector } from '../../src/core/polyomino/polyomino-ui';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

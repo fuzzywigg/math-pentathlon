@@ -5,13 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COUNTDOWN_CHALLENGES,
-  createTargetChallenge,
-  solveTargetChallenge,
-  validateSolution,
-  evaluate,
-} from '../../src/core/expressions';
+import { COUNTDOWN_CHALLENGES, createTargetChallenge } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 30 expr-countdown — catalog shape', () => {
   it('entries require larger pools and allow partial number use', () => {

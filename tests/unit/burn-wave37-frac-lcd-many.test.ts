@@ -4,14 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  findLCD,
-  toCommonDenominator,
-  areEqual,
-  lcm,
-  toDecimal,
-} from '../../src/core/fractions';
+import { createFraction, findLCD, toCommonDenominator, areEqual, lcm, toDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-lcd — larger sets', () => {
   it('LCD of 1/n for n=2..12', () => {

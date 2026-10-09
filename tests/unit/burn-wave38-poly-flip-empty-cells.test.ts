@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  flipCellsHorizontal,
-  flipCellsVertical,
-  normalizeCells,
-  cellsToKey,
-} from '../../src/core/polyomino';
+import { flipCellsHorizontal, flipCellsVertical, normalizeCells, cellsToKey } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-flip — empty / singleton', () => {
   it('empty flip and normalize stay empty', () => {

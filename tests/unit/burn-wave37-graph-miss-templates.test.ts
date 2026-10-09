@@ -4,24 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTrackGraph,
-  createStarGraph,
-  createGridGraph,
-  createCompleteGraph,
-  createHexLatticeGraph,
-  getNeighbors,
-  getEdge,
-  areAdjacent,
-  bfs,
-  dijkstra,
-  findAllPaths,
-  findReachable,
-  getNodeDegree,
-  findPlayerRegion,
-  findLongestPlayerPath,
-  type GraphBoard,
-} from '../../src/core/graph';
+import { createTrackGraph, createStarGraph, createGridGraph, createCompleteGraph, createHexLatticeGraph, type GraphBoard } from '../../src/core/graph/types';
+import { getNeighbors, getEdge, areAdjacent, bfs, dijkstra, findAllPaths, findReachable, getNodeDegree, findPlayerRegion, findLongestPlayerPath } from '../../src/core/graph/algorithms';
 
 describe('Wave 37 graph-miss — ghost ids on templates', () => {
   it('neighbors/edge/adjacent miss for unknown nodes', () => {

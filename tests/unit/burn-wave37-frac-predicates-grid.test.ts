@@ -4,18 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  isProper,
-  isWholeNumber,
-  isZero,
-  isPositive,
-  isNegative,
-  isSimplified,
-  simplify,
-  COMMON_FRACTIONS,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, isProper, isWholeNumber, isZero, isPositive, isNegative, isSimplified, simplify } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 describe('Wave 37 frac-predicates — dense samples', () => {
   const samples = [

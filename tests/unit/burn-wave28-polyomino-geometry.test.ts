@@ -5,20 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  centerCells,
-  flipCellsVertical,
-  flipCellsHorizontal,
-  getBoundingBox,
-  normalizeCells,
-  rotateCells,
-  translateCells,
-  cellsToKey,
-  canonicalizeCells,
-  sortCells,
-  TETROMINOES,
-  type Cell,
-} from '../../src/core/polyomino';
+import { centerCells, flipCellsVertical, flipCellsHorizontal, getBoundingBox, normalizeCells, rotateCells, translateCells, cellsToKey, canonicalizeCells, sortCells } from '../../src/core/polyomino/transform';
+import { TETROMINOES, type Cell } from '../../src/core/polyomino/types';
 
 describe('Wave 28 polyomino-geometry — getBoundingBox', () => {
   it('empty cells return zeroed box', () => {

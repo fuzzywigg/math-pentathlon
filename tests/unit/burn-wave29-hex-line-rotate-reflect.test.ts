@@ -5,19 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  hexLine,
-  hexDistance,
-  rotateRight,
-  rotateLeft,
-  rotateAround,
-  reflect,
-  createAxial,
-  hexEquals,
-  hexInArray,
-  axialToCube,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { hexLine, hexDistance, rotateRight, rotateLeft, rotateAround, reflect, hexEquals, hexInArray, axialToCube } from '../../src/core/hex/coordinates';
+import { createAxial, type AxialCoord } from '../../src/core/hex/types';
 
 describe('Wave 29 hex-line — endpoints and length', () => {
   it('singleton when a === b', () => {

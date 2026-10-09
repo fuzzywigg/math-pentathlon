@@ -4,22 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  PENTOMINOES,
-  SIMPLE_SHAPES,
-  nextRotation,
-  prevRotation,
-  rotateCells,
-  normalizeCells,
-  cellsToKey,
-  getBoundingBox,
-  getBounds,
-  transformCells,
-  getAllRotations,
-  areCellsEquivalent,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { TETROMINOES, PENTOMINOES, SIMPLE_SHAPES, type Rotation } from '../../src/core/polyomino/types';
+import { nextRotation, prevRotation, rotateCells, normalizeCells, cellsToKey, getBoundingBox, getBounds, transformCells, getAllRotations, areCellsEquivalent } from '../../src/core/polyomino/transform';
 
 const ROTATIONS: Rotation[] = [0, 90, 180, 270];
 

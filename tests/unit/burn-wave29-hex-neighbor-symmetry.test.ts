@@ -5,19 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getNeighbors,
-  getNeighbor,
-  getDiagonalNeighbors,
-  areNeighbors,
-  hexDistance,
-  hexEquals,
-  hexInArray,
-  createAxial,
-  AXIAL_DIRECTIONS,
-  CUBE_DIAGONALS,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { getNeighbors, getNeighbor, getDiagonalNeighbors, areNeighbors, hexDistance, hexEquals, hexInArray } from '../../src/core/hex/coordinates';
+import { createAxial, AXIAL_DIRECTIONS, CUBE_DIAGONALS, type AxialCoord } from '../../src/core/hex/types';
 
 const CENTERS: AxialCoord[] = [
   { q: 0, r: 0 },

@@ -4,19 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  createHexagonalBoard,
-  solvePlacement,
-  placePolyomino,
-  countEmptyCells,
-  getEmptyCells,
-  isBoardFilled,
-  canPlaceShape,
-  SIMPLE_SHAPES,
-  TETROMINOES,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, createHexagonalBoard, solvePlacement, placePolyomino, countEmptyCells, getEmptyCells, isBoardFilled, canPlaceShape } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, TETROMINOES } from '../../src/core/polyomino/types';
 
 const mono = () => SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;
 const domino = () => SIMPLE_SHAPES.find((s) => s.id === 'domino')!;

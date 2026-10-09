@@ -5,18 +5,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  getHexCorners,
-  hexPath,
-  renderHex,
-  renderHexGrid,
-  renderRectHexGrid,
-  createInteractiveHexGrid,
-  getHexTriangles,
-  renderHexWithTriangles,
-  injectHexStyles,
-  type HexLayout,
-} from '../../src/core/hex';
+import { getHexCorners, hexPath, renderHex, renderHexGrid, renderRectHexGrid, createInteractiveHexGrid, getHexTriangles, renderHexWithTriangles, injectHexStyles } from '../../src/core/hex/hex-ui';
+import type { HexLayout } from '../../src/core/hex/types';
 
 const pointy: HexLayout = {
   orientation: 'pointy',

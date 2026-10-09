@@ -3,13 +3,8 @@
  * Distinct from burn-wave41-poly-board-throw-reasons. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createGrid,
-  createBoard,
-  placePolyomino,
-  isValidPlacement,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createGrid, createBoard, placePolyomino, isValidPlacement } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 52 core poly — grid place overwrite', () => {
   it('Grid overwrite does not throw; Board occupied throws', () => {

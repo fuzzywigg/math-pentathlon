@@ -5,15 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  performOperation,
-  areEqual,
-  simplify,
-  toDecimal,
-  formatFraction,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, performOperation, areEqual, simplify, toDecimal, formatFraction } from '../../src/core/fractions/arithmetic';
 
 const F = createFraction;
 

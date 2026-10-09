@@ -5,23 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluateNode,
-  evaluate,
-  astToString,
-  simplifyExpression,
-  formatNumber,
-  slotsToExpression,
-  validateSlots,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-  parseEquation,
-  checkEquation,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluateNode, evaluate, astToString, simplifyExpression, formatNumber, slotsToExpression, validateSlots, parseEquation, checkEquation } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot } from '../../src/core/expressions/types';
 
 describe('Wave 31 expr-handshake — string pipeline', () => {
   it.each(['1+2*3', '(4+5)*6', '2^3+1', '10/2/5', '-3*4'] as const)(
