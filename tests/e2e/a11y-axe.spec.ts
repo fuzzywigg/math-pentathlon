@@ -204,6 +204,15 @@ test.describe('axe-core game screen audit (2D, report-only)', () => {
     console.log(
       `[a11y-axe] menu-home: ${results.violations.length} violation(s)\n${summarizeViolations(results.violations)}`
     );
+    // q-mp-114: tip already dropped duplicate section aria-labelledby (q-mp-057);
+    // keep landmark-unique hard-zero so the soft hold cannot regress silently.
+    const landmarkUnique = results.violations.filter(
+      (v) => v.id === 'landmark-unique'
+    );
+    expect(
+      landmarkUnique,
+      `[a11y-axe] menu-home landmark-unique:\n${summarizeViolations(landmarkUnique)}`
+    ).toEqual([]);
     expect(results.violations).toBeDefined();
   });
 });
