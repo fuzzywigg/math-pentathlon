@@ -11,7 +11,7 @@
 > visual helpers). Re-run cleared them from the ranked list; remaining Rank-2 deferred is
 > `clearDom` only (`fake-timers.ts` module still `kept`).
 >
-> **q-mp-139 (2026-10-09):** Removed Rank-2 `tests/unit/helpers/fake-timers.ts` after live-tip
+> **q-mp-139 (2026-10-09):** Removed Rank-2 `tests/unit/helpers/fake-timers.ts (absent on tip)` after live-tip
 > re-check showed zero importers (`rg 'fake-timers|installFakeTimerHooks|withFakeTimers' tests src`).
 >
 > **q-mp-155 (2026-10-09):** Demoted Rank-2 `tests/unit/helpers/dom.ts` → `clearDom` to
@@ -47,7 +47,7 @@ Re-verified on live tip then applied (**8** items initially; **+2** CSS classes 
 | removed | export | `src/ui/game-route-mounts.ts` → `resetGameMountDepsForTests` | deleted unused test-hook export (zero refs) |
 | removed | css-class | `src/ui/styles/forced-colors.css` → `kwa-board-svg` | deleted on tip via q-mp-054 rename to live `.kwa-board` / container / 3d-host; q-mp-101 confirms + inventory sync |
 | removed | css-class | `src/ui/styles/forced-colors.css` → `tutorial-spotlight` | deleted on tip via q-mp-054 rename to live `.tutorial-highlight*` ; q-mp-101 confirms + inventory sync |
-| removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | deleted unused module (zero importers after #658 fold / tip demote); q-mp-139 |
+| removed | test-helper-module | `tests/unit/helpers/fake-timers.ts (absent on tip)` | deleted unused module (zero importers after #658 fold / tip demote); q-mp-139 |
 | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154) |
 | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | deleted Rank-1 dead CSS rule (q-mp-154) |
 
@@ -81,7 +81,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | kept | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
 | 2 | yes | removed | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | demoted in q-mp-155 — module-private; still used by installDomHooks |
-| 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
+| 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts (absent on tip)` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
 | 3 | review | kept | unused-type | `src/core/ai-worker/client.ts` → `AiWorkerRequestPayload` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/ai-worker/protocol.ts` → `AiWorkerRequestBase` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/alignment/compat.ts` → `WrapOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
@@ -103,10 +103,10 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 3 | review | kept | unused-type | `src/core/graph/graph-ui.ts` → `AnimateMoveCancel` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/graph/graph-ui.ts` → `AnimateMoveHandle` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/graph/types.ts` → `LayoutType` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
-| 3 | review | kept | unused-type | `src/core/hex/hex-ui.ts` → `HexRenderOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
-| 3 | review | kept | unused-type | `src/core/hex/hex-ui.ts` → `HexGridRenderOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
-| 3 | review | kept | unused-type | `src/core/hex/hex-ui.ts` → `InteractiveHexOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
-| 3 | review | kept | unused-type | `src/core/hex/types.ts` → `HexGrid` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
+| 3 | review | kept | unused-type | `tests/helpers/core-hex/hex-ui.ts` → `HexRenderOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API (quarantined from `src/core/hex` under q-mp-133) |
+| 3 | review | kept | unused-type | `tests/helpers/core-hex/hex-ui.ts` → `HexGridRenderOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API (quarantined from `src/core/hex` under q-mp-133) |
+| 3 | review | kept | unused-type | `tests/helpers/core-hex/hex-ui.ts` → `InteractiveHexOptions` | grep: no references outside defining module | exported type unused outside module — often intentional public API (quarantined from `src/core/hex` under q-mp-133) |
+| 3 | review | kept | unused-type | `tests/helpers/core-hex/types.ts` → `HexGrid` | grep: no references outside defining module | exported type unused outside module — often intentional public API (quarantined from `src/core/hex` under q-mp-133) |
 | 3 | review | kept | unused-type | `src/core/safe-web-storage.ts` → `WebStorageKind` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/safe-web-storage.ts` → `SafeJsonParseResult` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
 | 3 | review | kept | unused-type | `src/core/safe-web-storage.ts` → `SafeWriteResult` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
@@ -149,7 +149,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 4 | no | kept | unused-type | `src/core/alignment/compat.ts` → `AlignmentCheckResult` | grep: 2 file(s) outside defining module (src/core/alignment/types.ts, src/core/alignment/grid-alignment.ts) | external references found |
 | 4 | no | kept | feature-flag | `src/core/feature-flags.ts` → `BOARD_3D_STORAGE_KEY` | grep: 13 file(s) outside defining module (tests/unit/mutation-ui-feature-flags.test.ts, tests/unit/mp3d-queens-guards-restore.test.ts, tests/unit/mp3d-hex-a-gone-board-select.test. | flag constant used inside its defining module |
 | 4 | no | kept | feature-flag | `src/core/feature-flags.ts` → `isBoard3dEnabled` | grep: 27 file(s) outside defining module (src/games/prime-gold/game-controller.ts, src/games/hex-a-gone/game-controller.ts, src/games/star-track/game-controller.ts) | flag is read at runtime |
-| 4 | no | kept | unused-type | `src/core/hex/types.ts` → `HexCell` | grep: 6 file(s) outside defining module (src/games/queens-guards/types.ts, tests/unit/burn-wave26-success-place-chain.test.ts, tests/unit/burn-wave26-success-claim-score.test.ts) | external references found |
+| 4 | no | kept | unused-type | `tests/helpers/core-hex/types.ts` → `HexCell` | grep: 6 file(s) outside defining module (src/games/queens-guards/types.ts, tests/unit/burn-wave26-success-place-chain.test.ts, tests/unit/burn-wave26-success-claim-score.test.ts) | external references found (quarantined from `src/core/hex` under q-mp-133) |
 | 4 | no | kept | unused-type | `src/core/polyomino/types.ts` → `BoardCell` | grep: 11 file(s) outside defining module (src/games/prime-gold/rules.ts, src/games/prime-gold/types.ts, src/games/hex-a-gone/types.ts) | external references found |
 | 4 | no | kept | feature-flag | `src/core/settings-flags.ts` → `PROGRESS_STORAGE_KEY` | grep: 6 file(s) outside defining module (src/core/storage/index.ts, src/core/storage/storage.ts, tests/unit/burn-1008-ui-cov-r5-storage-shell.test.ts) | flag constant used inside its defining module |
 | 4 | no | kept | feature-flag | `src/core/settings-flags.ts` → `getUserReducedMotionFlag` | grep: 6 file(s) outside defining module (src/core/dice/dice-ui.ts, src/core/graph/graph-ui.ts, src/ui/reduced-motion.ts) | flag is read at runtime |
