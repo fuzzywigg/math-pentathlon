@@ -74,14 +74,22 @@ Coldest NON-UI core helpers by branch %:
 
 ## Aggregate (included core non-UI files, full unit suite)
 
-| Metric     | Before (r8 baseline) | After round 8 | Δ   |
-| ---------- | -------------------: | ------------: | --- |
-| Lines      |     98.17% (915/932) | _(remeasure)_ | —   |
-| Branches   |     93.67% (415/443) | _(remeasure)_ | —   |
-| Statements |               98.31% | _(remeasure)_ | —   |
-| Functions  |                 100% |          100% | —   |
+| Metric     | Before (r8 baseline) |        After round 8 | Δ            |
+| ---------- | -------------------: | -------------------: | ------------ |
+| Lines      |     98.17% (915/932) | **98.39%** (917/932) | **+2 lines** |
+| Branches   |     93.67% (415/443) | **95.48%** (423/443) | **+8 arms**  |
+| Statements |               98.31% |               98.51% | —            |
+| Functions  |                 100% |                 100% | —            |
 
-_(After table filled once `coverage-engine-r8-after` is collected.)_
+Targeted non-UI gains (full-suite before → after):
+
+| Module              |    Before branch |         After branch | Before line | After line | Δb / Δl |
+| ------------------- | ---------------: | -------------------: | ----------: | ---------: | ------- |
+| polyomino/placement | 90.09% (100/111) | **95.49%** (106/111) |      98.99% | **99.49%** | +6 / +1 |
+| polyomino/transform |   96.42% (54/56) |     **100%** (56/56) |      99.33% |   **100%** | +2 / +1 |
+| graph/algorithms    | 90.00% (117/130) |     90.00% (117/130) |      94.90% |     94.90% | 0 (doc) |
+| graph/types         |   94.11% (32/34) |       94.11% (32/34) |      98.66% |     98.66% | 0 (doc) |
+| fractions/\*        |             100% |                 100% |        100% |       100% | 0 (hot) |
 
 ## Files changed
 
