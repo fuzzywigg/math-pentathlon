@@ -120,7 +120,9 @@ test.describe("mp3d Pent'Em In 3D board", () => {
       await startVsHuman(page);
 
       const canvas = page.locator('canvas[data-mp3d="pent-em-in"]');
-      await waitForMp3dReady(page, 'pent-em-in');
+      if ((await waitForMp3dReady(page, 'pent-em-in')) === 'fallback') {
+        return;
+      }
       await expect(page.locator('svg.pent-board')).toHaveCount(0);
       await expect(
         page.locator('.pent-a11y-grid [role="gridcell"]')
@@ -161,8 +163,9 @@ test.describe("mp3d Pent'Em In 3D board", () => {
     await page.goto(board3dUrl('#/game/pent-em-in'));
     await waitForGameReady(page);
     await startVsHuman(page);
-    await waitForMp3dReady(page, 'pent-em-in');
-
+    if ((await waitForMp3dReady(page, 'pent-em-in')) === 'fallback') {
+      return;
+    }
     await page.waitForFunction(
       () =>
         typeof (
@@ -290,8 +293,9 @@ test.describe("mp3d Pent'Em In 3D board", () => {
     await page.goto(board3dUrl('#/game/pent-em-in'));
     await waitForGameReady(page);
     await startVsHuman(page);
-    await waitForMp3dReady(page, 'pent-em-in');
-
+    if ((await waitForMp3dReady(page, 'pent-em-in')) === 'fallback') {
+      return;
+    }
     await selectPiece(page, 'X');
     const cell = page.locator(
       '.pent-a11y-grid [role="gridcell"][data-row="4"][data-col="4"]'

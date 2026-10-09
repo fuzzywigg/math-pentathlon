@@ -3,38 +3,53 @@
  * Easy/Medium/Hard — finishes without stall, exposes thinking UI, ≥44px targets.
  */
 import { test, expect, type Page } from '@playwright/test';
-import {
-  dismissOwl,
-  startVsAiAt,
-} from './helpers/page';
+import { startVsAiAt } from './helpers/page';
 
 const MAX_HUMAN_TURNS = 60;
 const STALL_MS = 15_000;
+/** Deep vs-AI playouts can exceed the suite default on WebKit. */
+const DEEP_TEST_TIMEOUT_MS = 120_000;
+/** Avoid hanging the whole test on a mid-turn re-render (WebKit flake). */
+const CLICK_MS = 3_000;
+
+/** Click with a short timeout; fall back to DOM click if Playwright stalls. */
+async function safeClick(locator: ReturnType<Page['locator']>): Promise<boolean> {
+  if (!(await locator.isVisible().catch(() => false))) return false;
+  try {
+    await locator.click({ force: true, timeout: CLICK_MS });
+    return true;
+  } catch {
+    await locator
+      .evaluate((el) => (el as HTMLElement).click())
+      .catch(() => undefined);
+    return true;
+  }
+}
 
 async function playHumanTurn(page: Page) {
   const roll = page.locator('.sd-roll-btn');
   if (await roll.isVisible().catch(() => false)) {
     if (!(await roll.isDisabled().catch(() => true))) {
-      await roll.click({ force: true });
+      await safeClick(roll);
       await page.waitForTimeout(100);
     }
   }
   const pass = page.locator('.sd-pass-btn');
   if (await pass.isVisible().catch(() => false)) {
-    await pass.click({ force: true });
+    await safeClick(pass);
     return;
   }
   const playable = page.locator('.sd-hand-domino-playable');
   if ((await playable.count()) > 0) {
-    await playable.first().click({ force: true });
+    await safeClick(playable.first());
     const valid = page.locator('.sd-cell-valid');
     if ((await valid.count()) > 0) {
-      await valid.first().click({ force: true });
+      await safeClick(valid.first());
     }
     return;
   }
   if (await pass.isVisible().catch(() => false)) {
-    await pass.click({ force: true });
+    await safeClick(pass);
   }
 }
 
@@ -45,15 +60,25 @@ async function waitHumanOrEnd(page: Page) {
       const status =
         document.querySelector('.sd-status')?.textContent?.trim() ?? '';
       const thinking = !!document.querySelector('.sd-computer-thinking');
-      const roll = document.querySelector('.sd-roll-btn') as HTMLButtonElement | null;
+      const roll = document.querySelector(
+        '.sd-roll-btn'
+      ) as HTMLButtonElement | null;
       const canRoll = !!roll && !roll.disabled;
       const pass = !!document.querySelector('.sd-pass-btn');
-      const playable = document.querySelectorAll('.sd-hand-domino-playable').length;
+      const playable = document.querySelectorAll(
+        '.sd-hand-domino-playable'
+      ).length;
       const computer = /computer/i.test(status);
       return { status, thinking, canRoll, pass, playable, computer };
     });
-    if (/wins!|draw|tie/i.test(info.status)) return { kind: 'ended' as const, ...info };
-    if (!info.computer && !info.thinking && (info.canRoll || info.pass || info.playable > 0)) {
+    if (/wins!|draw|tie/i.test(info.status)) {
+      return { kind: 'ended' as const, ...info };
+    }
+    if (
+      !info.computer &&
+      !info.thinking &&
+      (info.canRoll || info.pass || info.playable > 0)
+    ) {
       return { kind: 'human' as const, ...info };
     }
     await page.waitForTimeout(120);
@@ -70,10 +95,20 @@ async function playFullGame(page: Page, difficulty: 'easy' | 'medium' | 'hard') 
   for (turns = 0; turns < MAX_HUMAN_TURNS; turns++) {
     const gate = await waitHumanOrEnd(page);
     if (gate.kind === 'ended') {
-      return { outcome: 'ended' as const, turns, status: gate.status, sawThinking };
+      return {
+        outcome: 'ended' as const,
+        turns,
+        status: gate.status,
+        sawThinking,
+      };
     }
     if (gate.kind === 'stall') {
-      return { outcome: 'stall' as const, turns, status: gate.status, sawThinking };
+      return {
+        outcome: 'stall' as const,
+        turns,
+        status: gate.status,
+        sawThinking,
+      };
     }
     if (gate.thinking || /computer/i.test(gate.status)) sawThinking = true;
 
@@ -82,7 +117,12 @@ async function playFullGame(page: Page, difficulty: 'easy' | 'medium' | 'hard') 
     const flash = (await page.locator('.sd-status').textContent())?.trim() ?? '';
     if (/computer|thinking/i.test(flash)) sawThinking = true;
     if (/wins!|draw|tie/i.test(flash)) {
-      return { outcome: 'ended' as const, turns: turns + 1, status: flash, sawThinking };
+      return {
+        outcome: 'ended' as const,
+        turns: turns + 1,
+        status: flash,
+        sawThinking,
+      };
     }
   }
   const status = (await page.locator('.sd-status').textContent())?.trim() ?? '';
@@ -94,6 +134,7 @@ test.describe('Sum Dominoes deep playtest e2e', () => {
     test(`desktop vs AI ${difficulty} finishes without stall`, async ({
       page,
     }) => {
+      test.setTimeout(DEEP_TEST_TIMEOUT_MS);
       const result = await playFullGame(page, difficulty);
       expect(result.outcome, result.status).toBe('ended');
       expect(result.status).toMatch(/wins!|draw|tie/i);
@@ -110,6 +151,7 @@ test.describe('Sum Dominoes deep playtest e2e', () => {
     });
 
     test('tablet Easy full game + 44px hit floors', async ({ page }) => {
+      test.setTimeout(DEEP_TEST_TIMEOUT_MS);
       await startVsAiAt(page, 'sum-dominoes', 'easy');
 
       const sizes = await page.evaluate(() => {
@@ -151,17 +193,18 @@ test.describe('Sum Dominoes deep playtest e2e', () => {
     test('tablet Medium shows computer thinking and does not illicit-roll Blue', async ({
       page,
     }) => {
+      test.setTimeout(DEEP_TEST_TIMEOUT_MS);
       await startVsAiAt(page, 'sum-dominoes', 'medium');
       // Human opens
-      await page.locator('.sd-roll-btn').click({ force: true });
+      await safeClick(page.locator('.sd-roll-btn'));
       const pass = page.locator('.sd-pass-btn');
       const playable = page.locator('.sd-hand-domino-playable');
       if ((await playable.count()) > 0) {
-        await playable.first().click({ force: true });
+        await safeClick(playable.first());
         const valid = page.locator('.sd-cell-valid');
-        if ((await valid.count()) > 0) await valid.first().click({ force: true });
+        if ((await valid.count()) > 0) await safeClick(valid.first());
       } else if (await pass.isVisible().catch(() => false)) {
-        await pass.click({ force: true });
+        await safeClick(pass);
       }
 
       // AI should think

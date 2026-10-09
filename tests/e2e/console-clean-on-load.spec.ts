@@ -2,26 +2,11 @@
  * Every available game route must load without console errors or pageerrors.
  * Complements the 2026-10-07 console sweep (docs/console-sweep-2026-10-07.md).
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
-import {
-  waitForGameReady,
-} from './helpers/page';
+import { isBenignConsoleNoise, waitForGameReady } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
-
-/** Ignore noisy third-party / tooling lines that are not app bugs. */
-function isIgnoredConsoleError(text: string): boolean {
-  return (
-    /Download the React DevTools/i.test(text) ||
-    /favicon\.ico/i.test(text) ||
-    /\[vite\]/i.test(text) ||
-    // WebKit logs Content-Security-Policy-Report-Only without report-to as console.error.
-    (/content security policy/i.test(text) &&
-      /report-only/i.test(text) &&
-      /report-to/i.test(text))
-  );
-}
 
 test.describe('Console clean on game load', () => {
   for (const game of AVAILABLE_GAMES) {
@@ -31,7 +16,7 @@ test.describe('Console clean on game load', () => {
       page.on('console', (msg) => {
         if (msg.type() !== 'error') return;
         const text = msg.text();
-        if (!isIgnoredConsoleError(text)) {
+        if (!isBenignConsoleNoise(text)) {
           errors.push(`[console.error] ${text}`);
         }
       });

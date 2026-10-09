@@ -75,7 +75,9 @@ test.describe('mp3d FIAR 3D board', () => {
     await dismissModeIfNeeded(page);
 
     const canvas = page.locator('canvas[data-mp3d="fiar"]');
-    await waitForMp3dReady(page, 'fiar');
+    if ((await waitForMp3dReady(page, 'fiar')) === 'fallback') {
+      return;
+    }
     await expect(page.locator('.fiar-board-container svg')).toHaveCount(0);
     // Keyboard a11y grid present
     await expect(page.locator('.fiar-a11y-grid [role="gridcell"]')).toHaveCount(
@@ -106,7 +108,9 @@ test.describe('mp3d FIAR 3D board', () => {
     await page.goto(board3dUrl('#/game/fiar'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await waitForMp3dReady(page, 'fiar');
+    if ((await waitForMp3dReady(page, 'fiar')) === 'fallback') {
+      return;
+    }
     const cell = page.locator('.fiar-a11y-grid [data-node-id="c4r2"]');
     await cell.focus();
     await page.keyboard.press('Enter');

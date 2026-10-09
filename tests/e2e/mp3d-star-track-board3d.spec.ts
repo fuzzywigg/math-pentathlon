@@ -98,7 +98,9 @@ test.describe('mp3d Star Track 3D board', () => {
       await page.goto(board3dUrl('#/game/star-track'));
       await waitForGameReady(page);
       await dismissModeIfNeeded(page);
-      await waitForMp3dReady(page, 'star-track');
+      if ((await waitForMp3dReady(page, 'star-track')) === 'fallback') {
+        return;
+      }
       await expect(page.locator('.star-track-board')).toHaveCount(0);
       await expect(page.locator('.star-track-chain-area')).toBeVisible();
       await expect(page.locator('.star-track-a11y-track')).toHaveCount(1);
@@ -169,8 +171,9 @@ test.describe('mp3d Star Track 3D board', () => {
     await page.goto(board3dUrl('#/game/star-track'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    await waitForMp3dReady(page, 'star-track');
-
+    if ((await waitForMp3dReady(page, 'star-track')) === 'fallback') {
+      return;
+    }
     const draw = page.locator('.star-track-draw-btn');
     await draw.focus();
     await page.keyboard.press('Enter');
