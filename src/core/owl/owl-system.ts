@@ -1,18 +1,20 @@
 // Owl System - Main controller for Ollie the Owl mascot
 
-import type { OwlMood, GameResult } from '../storage';
-import { storage } from '../storage';
+import { type OwlMood, type GameResult, storage } from '../storage';
 import { getGameById } from '../game-registry';
-import type {
-  OwlEvent,
-  GameStartEvent,
-  GameEndEvent,
-  AppStartEvent,
-  StreakUpdateEvent,
+import {
+  type OwlEvent,
+  type GameStartEvent,
+  type GameEndEvent,
+  type AppStartEvent,
+  type StreakUpdateEvent,
+  OwlEventEmitter,
 } from './owl-events';
-import { OwlEventEmitter } from './owl-events';
-import type { OwlMessage, MessageContext } from './owl-messages';
-import { owlMessages } from './owl-messages';
+import {
+  type OwlMessage,
+  type MessageContext,
+  owlMessages,
+} from './owl-messages';
 
 export interface OwlDisplayState {
   isVisible: boolean;

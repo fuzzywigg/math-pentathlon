@@ -19,17 +19,18 @@ import {
   MAX_PROFILE_AVATAR_LENGTH,
   MAX_PROFILE_NAME_LENGTH,
 } from './sanitize';
-import type {
-  ProgressData,
-  PlayerProfile,
-  GameStats,
-  GameResult,
-  StreakData,
-  Achievement,
-  UserSettings,
-  OwlState,
+import {
+  type ProgressData,
+  type PlayerProfile,
+  type GameStats,
+  type GameResult,
+  type StreakData,
+  type Achievement,
+  type UserSettings,
+  type OwlState,
+  createDefaultProgress,
+  createDefaultGameStats,
 } from './types';
-import { createDefaultProgress, createDefaultGameStats } from './types';
 
 /** localStorage key for the on-device progress blob. */
 export const PROGRESS_STORAGE_KEY = 'math-pentathlon-progress';

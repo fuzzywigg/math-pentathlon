@@ -1,12 +1,12 @@
 // Attribute UI - Visual rendering of attribute pieces and cards
 // SVG-based rendering for attribute-based game elements
 
-import type {
-  AttributePiece,
-  AttributeDefinition,
-  AttributeRenderConfig,
+import {
+  type AttributePiece,
+  type AttributeDefinition,
+  type AttributeRenderConfig,
+  getAttributeColor,
 } from './types';
-import { getAttributeColor } from './types';
 
 /** Default render configuration */
 const DEFAULT_CONFIG: AttributeRenderConfig = {

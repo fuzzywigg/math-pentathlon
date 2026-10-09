@@ -1,13 +1,14 @@
 // Dice Rolling Logic
 
-import type {
-  DiceConfig,
-  DiceType,
-  DieRoll,
-  RollResult,
-  RollConfig,
+import {
+  type DiceConfig,
+  type DiceType,
+  type DieRoll,
+  type RollResult,
+  type RollConfig,
+  DICE_CONFIGS,
+  DICE_FACES,
 } from './types';
-import { DICE_CONFIGS, DICE_FACES } from './types';
 
 /** Generate a unique ID */
 function generateId(): string {
