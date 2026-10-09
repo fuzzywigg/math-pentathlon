@@ -4,6 +4,7 @@ import {
   deserializeGameState,
   gameStateToJSON,
   gameStateFromJSON,
+  tryGameStateFromJSON,
   validateSerializedState,
   generateSaveFileName,
   getSaveInfo,
@@ -217,6 +218,44 @@ describe('Serialization', () => {
       serialized.board = [[null, null]]; // Wrong dimensions
 
       expect(() => deserializeGameState(serialized)).toThrow(/Invalid board size/);
+    });
+  });
+
+  describe('tryGameStateFromJSON (R-JSON-04 soft-fail)', () => {
+    it('returns ok:true for valid JSON and matches gameStateFromJSON', () => {
+      const original = createInitialGameState();
+      const json = gameStateToJSON(original);
+      const soft = tryGameStateFromJSON(json);
+      expect(soft.ok).toBe(true);
+      if (!soft.ok) return;
+      const thrown = gameStateFromJSON(json);
+      expect(soft.value).toEqual(thrown);
+    });
+
+    it('soft-fails on invalid JSON without throwing', () => {
+      expect(() => tryGameStateFromJSON('not valid json')).not.toThrow();
+      const result = tryGameStateFromJSON('not valid json');
+      expect(result.ok).toBe(false);
+      if (result.ok) return;
+      expect(result.error).toBeInstanceOf(SyntaxError);
+    });
+
+    it('soft-fails on unsupported version without throwing', () => {
+      const serialized = serializeGameState(createInitialGameState());
+      serialized.version = 999;
+      const json = JSON.stringify(serialized);
+      expect(() => tryGameStateFromJSON(json)).not.toThrow();
+      const result = tryGameStateFromJSON(json);
+      expect(result.ok).toBe(false);
+    });
+
+    it('soft-fails on invalid board size without throwing', () => {
+      const serialized = serializeGameState(createInitialGameState());
+      serialized.board = [[null, null]];
+      const json = JSON.stringify(serialized);
+      expect(() => tryGameStateFromJSON(json)).not.toThrow();
+      const result = tryGameStateFromJSON(json);
+      expect(result.ok).toBe(false);
     });
   });
 });
