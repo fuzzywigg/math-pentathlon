@@ -100,9 +100,11 @@ jobs:
             exit 1
           fi
           echo "All JS chunks under ${limit_kb} kB"
+      # Report-only ratchet: --fail-on-new-over exits 1 on novel OVER rows, but
+      # continue-on-error keeps the required build job green (q-mp-123).
       - name: Report gzip bundle budgets (non-blocking)
         continue-on-error: true
-        run: npm run size:check
+        run: npm run size:check -- --fail-on-new-over
       # Report-only: parses dist/site.webmanifest after build (burn-1008-mp-pwa-manifest).
       - name: PWA manifest installability contract (report-only)
         continue-on-error: true
