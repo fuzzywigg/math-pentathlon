@@ -24,6 +24,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
+import { dismissOwlIfNeeded } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'zoom-reflow');
@@ -112,13 +113,6 @@ type ScreenReport = {
   overflowX: number;
   screenshot: string | null;
 };
-
-async function dismissOwlIfNeeded(page: Page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el as HTMLElement).style.pointerEvents = 'none';
-  });
-}
 
 async function waitForGameReady(page: Page) {
   await expect(page.getByTestId('game-loading')).toBeHidden({
