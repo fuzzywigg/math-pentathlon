@@ -471,6 +471,18 @@ const drivers: GameDriver[] = [
           ),
         ] as HTMLElement[];
         if (dice.length) {
+          const fillMax = (() => {
+            const parse = (sel: string) => {
+              const t =
+                document.querySelector(sel)?.textContent?.replace('%', '') ||
+                '0';
+              return parseInt(t, 10) || 0;
+            };
+            return Math.max(
+              parse('.juggle-board.player1 .fill-percent'),
+              parse('.juggle-board.player2 .fill-percent')
+            );
+          })();
           dice.sort((a, b) => {
             const sa = sizeScore(
               `${a.getAttribute('aria-label') || ''} ${a.textContent || ''}`.toLowerCase()
@@ -478,6 +490,8 @@ const drivers: GameDriver[] = [
             const sb = sizeScore(
               `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
             );
+            // Late boards: strongly prefer the smallest die face available.
+            if (fillMax >= 70 && sa !== sb) return sa - sb;
             return sa - sb || Math.random() - 0.5;
           });
           click(dice[0]);
