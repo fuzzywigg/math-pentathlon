@@ -1,0 +1,363 @@
+{
+  "taskId": "q-mp-144-mutation-audit-ui-4",
+  "generatedAt": "2026-10-09T11:37:30.750Z",
+  "harness": "node_modules/.cache/mutation-ui-4/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/game-selector.ts",
+      "src/core/alignment/compat.ts",
+      "src/core/tutorial.ts",
+      "src/ui/game-loading.ts"
+    ]
+  },
+  "results": [
+    {
+      "module": "src/ui/game-loading.ts",
+      "lines": 75,
+      "tests": ["tests/unit/game-loading.test.ts"],
+      "availableMutants": 0,
+      "ranMutants": 0,
+      "killed": 0,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": null,
+      "skipped": true,
+      "skipReason": "0 AST mutants",
+      "survivors": []
+    },
+    {
+      "module": "src/core/tutorial.ts",
+      "lines": 900,
+      "tests": [
+        "tests/unit/burn-wave22-tutorial-runtime.test.ts",
+        "tests/unit/burn-wave34-tutorial-button-states.test.ts",
+        "tests/unit/burn-wave34-tutorial-callback-order.test.ts",
+        "tests/unit/burn-wave34-tutorial-cell-edges.test.ts",
+        "tests/unit/burn-wave34-tutorial-counter-format.test.ts",
+        "tests/unit/burn-wave34-tutorial-event-order.test.ts",
+        "tests/unit/burn-wave34-tutorial-events.test.ts",
+        "tests/unit/burn-wave34-tutorial-exit-escape.test.ts",
+        "tests/unit/burn-wave34-tutorial-handle-action.test.ts",
+        "tests/unit/burn-wave34-tutorial-handshake.test.ts",
+        "tests/unit/burn-wave34-tutorial-highlight-matrix.test.ts",
+        "tests/unit/burn-wave34-tutorial-idempotent.test.ts",
+        "tests/unit/burn-wave34-tutorial-lifecycle.test.ts",
+        "tests/unit/burn-wave34-tutorial-message-html.test.ts",
+        "tests/unit/burn-wave34-tutorial-nav-buttons.test.ts",
+        "tests/unit/burn-wave34-tutorial-navigation.test.ts",
+        "tests/unit/burn-wave34-tutorial-onshow-refresh.test.ts",
+        "tests/unit/burn-wave34-tutorial-overlay-dom.test.ts",
+        "tests/unit/burn-wave34-tutorial-position-enum.test.ts",
+        "tests/unit/burn-wave34-tutorial-required-gate.test.ts",
+        "tests/unit/burn-wave34-tutorial-selector-edges.test.ts",
+        "tests/unit/burn-wave34-tutorial-singleton.test.ts",
+        "tests/unit/burn-wave34-tutorial-stress-nav.test.ts",
+        "tests/unit/burn-wave34-tutorial-tooltip-chrome.test.ts",
+        "tests/unit/burn-wave40-tutorial-action-mismatch.test.ts",
+        "tests/unit/burn-wave40-tutorial-hitproxy-minsize.test.ts",
+        "tests/unit/burn-wave40-tutorial-inactive-nops.test.ts",
+        "tests/unit/burn-wave40-tutorial-missing-selector.test.ts",
+        "tests/unit/burn-wave40-tutorial-restart-cleanup.test.ts",
+        "tests/unit/burn-wave40-tutorial-tap-cue-side.test.ts",
+        "tests/unit/burn-wave40-tutorial-unsub-complete.test.ts",
+        "tests/unit/tutorial.test.ts"
+      ],
+      "availableMutants": 252,
+      "ranMutants": 20,
+      "killed": 13,
+      "survived": 7,
+      "timeout": 0,
+      "error": 0,
+      "score": 65,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "12 \u2192 13",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 50,
+          "description": "12 \u2192 11",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "36 \u2192 37",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 52,
+          "description": "36 \u2192 35",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "Logical",
+          "line": 79,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "UnaryNot",
+          "line": 103,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "Logical",
+          "line": 113,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/game-selector.ts",
+      "lines": 442,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts",
+        "tests/unit/game-selector.test.ts",
+        "tests/unit/keyboard-a11y-game-selector.test.ts"
+      ],
+      "availableMutants": 36,
+      "ranMutants": 20,
+      "killed": 7,
+      "survived": 13,
+      "timeout": 0,
+      "error": 0,
+      "score": 35,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "Arithmetic",
+          "line": 54,
+          "description": "flip + \u2192 -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "1 \u2192 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "UnaryNot",
+          "line": 60,
+          "description": "remove !",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 77,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 199,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 301,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 301,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 304,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 304,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 330,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 330,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/alignment/compat.ts",
+      "lines": 616,
+      "tests": [
+        "tests/unit/alignment.test.ts",
+        "tests/unit/burn-wave39-align-compat-region-stats.test.ts",
+        "tests/unit/burn-wave39-align-compat-wrap-matrix.test.ts"
+      ],
+      "availableMutants": 146,
+      "ranMutants": 20,
+      "killed": 5,
+      "survived": 15,
+      "timeout": 0,
+      "error": 0,
+      "score": 25,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 54,
+          "description": "flip > \u2192 >=",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 54,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "Logical",
+          "line": 69,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 69,
+          "description": "flip >= \u2192 >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 73,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "Logical",
+          "line": 73,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 73,
+          "description": "flip >= \u2192 >",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "1 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 106,
+          "description": "1 \u2192 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 107,
+          "description": "1 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "NumericBoundary",
+          "line": 107,
+          "description": "1 \u2192 0",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
