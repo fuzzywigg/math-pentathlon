@@ -138,6 +138,7 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     expect(md).toContain('# Unit coverage map (by directory)');
     expect(md).toContain('q-mp-075');
     expect(md).toContain('./coverage-map.svg');
+    expect(md).toContain('../wiki/coverage-map.md');
     expect(md).toContain('npm run test:unit:coverage');
     expect(md).toContain('npm run report:coverage-map');
     expect(md).toContain('`src/games/hex`');

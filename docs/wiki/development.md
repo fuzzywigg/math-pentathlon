@@ -18,6 +18,7 @@ npm test                         # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:unit:watch
 npm run test:unit:coverage
+npm run report:coverage-map      # rewrite docs/dev/coverage-map.{md,svg}; wiki: [heat map](./coverage-map.md)
 npm run test:e2e:chromium        # required CI e2e path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
