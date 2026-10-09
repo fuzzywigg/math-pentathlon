@@ -250,7 +250,9 @@ function handleSelectPlacement(value: number, expression: string): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    scheduleAI(() => handleRollDice(true), 500);
+    scheduleAI(() => {
+      handleRollDice(true);
+    }, 500);
   }
 }
 
@@ -289,7 +291,9 @@ function handlePass(): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    scheduleAI(() => handleRollDice(true), 500);
+    scheduleAI(() => {
+      handleRollDice(true);
+    }, 500);
   }
 }
 
@@ -317,7 +321,9 @@ function makeAIMove(): void {
       gameState.phase !== 'gameOver' &&
       gameState.currentPlayer === aiPlayer
     ) {
-      scheduleAI(() => handleRollDice(true), 500);
+      scheduleAI(() => {
+        handleRollDice(true);
+      }, 500);
     }
     return;
   }
@@ -327,7 +333,9 @@ function makeAIMove(): void {
 
   // Continue if AI's turn
   if (gameState.phase !== 'gameOver' && gameState.currentPlayer === aiPlayer) {
-    scheduleAI(() => handleRollDice(true), 500);
+    scheduleAI(() => {
+      handleRollDice(true);
+    }, 500);
   }
 }
 

@@ -113,7 +113,9 @@ export function initGame(
     newGame: () => {},
   };
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     aiGeneration += 1;
     clearAiTimer();
@@ -171,7 +173,9 @@ function buildHandColumn(
     renderHand(
       state,
       player,
-      (blockId) => handleBlockClick(controller, blockId),
+      (blockId) => {
+        handleBlockClick(controller, blockId);
+      },
       inputOpts
     )
   );
@@ -324,7 +328,9 @@ function syncChromeAroundBoard(
   syncBoard(
     board,
     state,
-    (baseId) => handleBaseClick(controller, baseId),
+    (baseId) => {
+      handleBaseClick(controller, baseId);
+    },
     inputOpts
   );
 }
@@ -363,7 +369,9 @@ function updateUI(controller: Par55GameController): void {
     gameArea.className = 'par55-game-area';
     const board = renderBoard(
       state,
-      (baseId) => handleBaseClick(controller, baseId),
+      (baseId) => {
+        handleBaseClick(controller, baseId);
+      },
       { allowInput: !computerTurn }
     );
     fillChromeAroundBoard(gameArea, controller, board, computerTurn);
@@ -385,7 +393,9 @@ function updateUI(controller: Par55GameController): void {
     controller.aiPlayer === state.currentPlayer &&
     state.phase !== 'gameOver'
   ) {
-    scheduleAI(() => makeAIMove(controller), 800);
+    scheduleAI(() => {
+      makeAIMove(controller);
+    }, 800);
   }
 }
 

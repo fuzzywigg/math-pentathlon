@@ -129,8 +129,12 @@ async function ensureBoard3d(controller: KwaGameController): Promise<void> {
     }
     const instance = await mod.createKwatroSinkoBoard3D(
       board3dHost,
-      (nodeId) => handleNodeClick(controller, nodeId),
-      (chipId) => handleChipClick(controller, chipId)
+      (nodeId) => {
+        handleNodeClick(controller, nodeId);
+      },
+      (chipId) => {
+        handleChipClick(controller, chipId);
+      }
     );
     // Awaited Three.js create — discard if a newer mount/destroy won the race.
     if (
@@ -181,7 +185,9 @@ export function initGame(
   activeController = controller;
   board3dEnabled = isBoard3dEnabled();
 
-  controller.update = () => updateUI(controller);
+  controller.update = () => {
+    updateUI(controller);
+  };
   controller.newGame = (nextVsAI: boolean, diff?: AIDifficulty) => {
     clearAiTimer();
     controller.state = createInitialState();
@@ -277,8 +283,12 @@ function updateUI(controller: KwaGameController): void {
   // Board
   const board = renderBoard(
     state,
-    (nodeId) => handleNodeClick(controller, nodeId),
-    (chipId) => handleChipClick(controller, chipId),
+    (nodeId) => {
+      handleNodeClick(controller, nodeId);
+    },
+    (chipId) => {
+      handleChipClick(controller, chipId);
+    },
     { allowInput: !isComputerTurnPending(controller) }
   );
 
@@ -408,8 +418,16 @@ function updateUI3d(controller: KwaGameController): void {
     const allowInput = !isComputerTurnPending(controller);
     board3d.update(
       state,
-      allowInput ? (nodeId) => handleNodeClick(controller, nodeId) : undefined,
-      allowInput ? (chipId) => handleChipClick(controller, chipId) : undefined
+      allowInput
+        ? (nodeId) => {
+            handleNodeClick(controller, nodeId);
+          }
+        : undefined,
+      allowInput
+        ? (chipId) => {
+            handleChipClick(controller, chipId);
+          }
+        : undefined
     );
   } else {
     board3dHost.replaceChildren();
