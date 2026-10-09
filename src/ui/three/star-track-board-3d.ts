@@ -24,6 +24,7 @@ import {
   type SelectChainCallback,
   type StarTrackGameMode,
 } from '../../games/star-track/board-ui';
+import type { CssRect } from '../coord-map';
 import { getPlayerSeatColors } from '../player-colors';
 import { prefersReducedMotion } from '../reduced-motion';
 import { loadThree, type ThreeModule } from './load-three';
@@ -348,16 +349,45 @@ export async function createStarTrackBoard3D(
     );
   };
 
-  const fitHostToViewport = (): void => {
-    // Size the canvas from remaining viewport below the board host so the
-    // chain controls stay above the fold on phone + both tablet orientations.
+  /**
+   * Cached canvas CSS box for project (role C). Invalidated on layout;
+   * lazy-seeded on first spaceToClientPoint so hooks do not force geometry
+   * when the rect is still warm.
+   */
+  let canvasCssRect: CssRect | null = null;
+
+  /** Sole canvas geometry read — keep forced layout funneled here. */
+  const measureCanvasCssRect = (): CssRect => {
+    const r = canvas.getBoundingClientRect();
+    canvasCssRect = {
+      left: r.left,
+      top: r.top,
+      width: r.width,
+      height: r.height,
+    };
+    return canvasCssRect;
+  };
+
+  const getCanvasCssRect = (): CssRect =>
+    canvasCssRect ?? measureCanvasCssRect();
+
+  /** Sole layout geometry read for viewport fit (role D). */
+  const measureLayoutCssTop = (): number => layout.getBoundingClientRect().top;
+
+  /**
+   * Size the canvas from remaining viewport below the board host so the
+   * chain controls stay above the fold on phone + both tablet orientations.
+   * Returns the authored CSS side (px) so resize can sync the renderer
+   * without a write-then-read host-box reflow.
+   */
+  const fitHostToViewport = (): number => {
     layout.style.flexDirection = 'column';
     layout.style.flexWrap = 'nowrap';
     layout.style.justifyContent = 'center';
     chainArea.style.flex = '';
     chainArea.style.maxWidth = '';
 
-    const top = layout.getBoundingClientRect().top;
+    const top = measureLayoutCssTop();
     // Budget for draw / choose-chain / taller game-over winner block under a
     // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
     const chainBudget = 230;
@@ -367,15 +397,19 @@ export async function createStarTrackBoard3D(
     canvasHost.style.width = `${side}px`;
     canvasHost.style.height = `${side}px`;
     canvasHost.style.maxHeight = `${side}px`;
+    return side;
   };
 
   const resize = (): void => {
     if (disposed) {
       return;
     }
-    fitHostToViewport();
-    const w = Math.max(canvasHost.clientWidth || 360, 120);
-    const h = Math.max(canvasHost.clientHeight || 360, 120);
+    // Invalidate only — next project re-measures (lazy seed). Seeding here
+    // would lock a pre-layout zero box in jsdom before tests stub canvas CSS.
+    canvasCssRect = null;
+    const side = fitHostToViewport();
+    const w = Math.max(side, 120);
+    const h = Math.max(side, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
@@ -569,7 +603,7 @@ export async function createStarTrackBoard3D(
     const { x, z } =
       space >= TRACK_LENGTH ? { x: 0, z: 0 } : spaceToWorld(player, space);
     projectScratch.set(x, BOARD_Y + 0.2, z).project(camera);
-    const rect = canvas.getBoundingClientRect();
+    const rect = getCanvasCssRect();
     return {
       x: rect.left + ((projectScratch.x + 1) / 2) * rect.width,
       y: rect.top + ((-projectScratch.y + 1) / 2) * rect.height,
