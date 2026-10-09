@@ -1,0 +1,363 @@
+{
+  "taskId": "q-mp-234",
+  "generatedAtUtc": "2026-10-09T20:24:35Z",
+  "liveTipBranch": "cursor/mp-tip-post748",
+  "tipSha": "ce673656202db8a9eae4e3c404c55a680bb40cd0",
+  "tipShaShort": "ce673656",
+  "priorTriage": "docs/dev/open-draft-triage-post728-2026-10-09.md",
+  "priorTriagePr": 747,
+  "markdownTwin": "docs/dev/open-draft-triage-post748-2026-10-09-v2.md",
+  "scope": "report-only; do not close PRs",
+  "contextNote": "Tip cut post748 from alpha after #748 squash-merged; remaining drafts still base post728 and need retarget",
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 254,
+    "@typescript-eslint/no-confusing-void-expression": 132,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 105,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 13,
+    "knipUnusedTypes": 89,
+    "knipUnusedExports": 3,
+    "knipDuplicates": 2,
+    "unitTestSpecFilesExclArchive": 3145
+  },
+  "summaryCounts": {
+    "openBasePost748": 0,
+    "openBasePost728": 22,
+    "holdBasePost709": 1,
+    "primaryListed": 23,
+    "containedVia748": 17,
+    "unfoldedFoldReady": 5
+  },
+  "conflictClusters": [
+    {
+      "name": "lint-ratchet-ceilings",
+      "prs": [750, 751, 727],
+      "files": ["docs/dev/lint-ratchet-ceilings.json"],
+      "note": "dup-imports #750 105→99; void #751 132→118; #727 HOLD nullish — tip owner min per key; do not fold #727"
+    },
+    {
+      "name": "knip-baseline",
+      "prs": [752],
+      "files": ["docs/dev/knip-baseline.json"],
+      "note": "duplicates 2→1; min-wins vs later knip drafts"
+    },
+    {
+      "name": "demos-sources",
+      "prs": [750, 751],
+      "files": [
+        "src/demos/attribute-demo.ts",
+        "src/demos/expression-demo.ts",
+        "src/demos/fraction-demo.ts",
+        "src/demos/graph-demo.ts",
+        "src/demos/polyomino-demo.ts"
+      ],
+      "note": "Serialize or careful combine on shared demos"
+    },
+    {
+      "name": "triage-narrative",
+      "prs": [747],
+      "files": [
+        "docs/dev/open-draft-triage-post728-2026-10-09.md",
+        "docs/dev/open-draft-triage-post728-2026-10-09.json"
+      ],
+      "note": "Leave #747 open with contained; this v2 is post748 keeper"
+    }
+  ],
+  "suggestedFoldOrder": [753, 749, 752, 750, 751],
+  "hold": [727],
+  "contained": [731, 732, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747],
+  "drafts": [
+    {
+      "number": 727,
+      "taskId": "q-mp-186",
+      "title": "q-mp-186: clear prefer-nullish-coalescing in owl-messages (−9)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/727",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post709",
+      "headRef": "cursor/q-mp-186-nullish-owl-messages-0a20",
+      "headSha": "54532ce5",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 3,
+      "files": [
+        "docs/dev/eslint-off-rules-inventory.md",
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/core/owl/owl-messages.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "HOLD",
+      "suggestedFoldOrder": null,
+      "ratchetCeilingsTouched": {
+        "@typescript-eslint/prefer-nullish-coalescing": { "from": 65, "to": 56 }
+      },
+      "notes": "Tip-owner HOLD; do not touch nullish; do not retarget/fold"
+    },
+    {
+      "number": 749,
+      "taskId": "q-mp-229",
+      "title": "q-mp-229: wire check:emit-identity npm script + document knip esbuild unlisted",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/749",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-229-emit-identity-script-e4b1",
+      "headSha": "4a06c0c4",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 6,
+      "files": [
+        ".github/copilot-instructions.md",
+        "AGENTS.md",
+        "docs/dev/ai-typeonly-option.md",
+        "docs/dev/knip-report.md",
+        "docs/wiki/development.md",
+        "package.json"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RETARGET",
+      "suggestedFoldOrder": 2,
+      "ratchetCeilingsTouched": {},
+      "notes": "Retarget post728→post748; no ceiling JSON"
+    },
+    {
+      "number": 750,
+      "taskId": "q-mp-227",
+      "title": "q-mp-227: clear no-duplicate-imports in src/demos/** (−6 → ceiling 99)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/750",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-227-demos-dup-imports-9be6",
+      "headSha": "410e83f7",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 6,
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/demos/attribute-demo.ts",
+        "src/demos/expression-demo.ts",
+        "src/demos/fraction-demo.ts",
+        "src/demos/graph-demo.ts",
+        "src/demos/polyomino-demo.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RECONCILE",
+      "suggestedFoldOrder": 4,
+      "ratchetCeilingsTouched": {
+        "no-duplicate-imports": { "from": 105, "to": 99 }
+      },
+      "notes": "Tip owner min-wins dup-imports; demos overlap #751"
+    },
+    {
+      "number": 751,
+      "taskId": "q-mp-218",
+      "title": "q-mp-218: clear no-confusing-void-expression in src/demos/** (−14 → ceiling 118)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/751",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-218-void-demos-60f0",
+      "headSha": "6a364fae",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 7,
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/demos/alignment-demo.ts",
+        "src/demos/attribute-demo.ts",
+        "src/demos/expression-demo.ts",
+        "src/demos/fraction-demo.ts",
+        "src/demos/graph-demo.ts",
+        "src/demos/polyomino-demo.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RECONCILE",
+      "suggestedFoldOrder": 5,
+      "ratchetCeilingsTouched": {
+        "@typescript-eslint/no-confusing-void-expression": { "from": 132, "to": 118 }
+      },
+      "notes": "Tip owner min-wins void; demos overlap #750"
+    },
+    {
+      "number": 752,
+      "taskId": "q-mp-228",
+      "title": "q-mp-228: collapse knip e2e dismissOwl alias pair (duplicates 2→1)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/752",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-228-dismiss-owl-alias-d8c4",
+      "headSha": "fcb7ed8d",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 14,
+      "files": [
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "tests/e2e/helpers/page.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RECONCILE",
+      "suggestedFoldOrder": 3,
+      "ratchetCeilingsTouched": {},
+      "knipBaselineTouched": {
+        "duplicates": { "from": 2, "to": 1 }
+      },
+      "notes": "Retarget; knip baseline min-wins"
+    },
+    {
+      "number": 753,
+      "taskId": "q-mp-090f",
+      "title": "q-mp-090f: Oct 9f engineering backlog round 6 (25 tasks q-mp-234..258) for tip post728",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/753",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-090f-backlog-round6-09bb",
+      "headSha": "b8c53d86",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 1,
+      "files": ["docs/dev/backlog-2026-10-09f.md (on PR #753 head; not yet on tip)"],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RETARGET",
+      "suggestedFoldOrder": 1,
+      "ratchetCeilingsTouched": {},
+      "notes": "Docs-only backlog; retarget to post748"
+    },
+    {
+      "number": 747,
+      "taskId": "q-mp-212",
+      "title": "q-mp-212: tip post728 open-draft triage snapshot (#727 HOLD + #731–#745)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/747",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-212-open-draft-triage-post728-e403",
+      "headSha": "4e79d6f4",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 2,
+      "files": [
+        "docs/dev/open-draft-triage-post728-2026-10-09.json",
+        "docs/dev/open-draft-triage-post728-2026-10-09.md"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "CONTAINED_BY_V2",
+      "suggestedFoldOrder": null,
+      "ratchetCeilingsTouched": {},
+      "notes": "Already on tip via #748; leave open; superseded for navigation by q-mp-234 v2"
+    },
+    {
+      "number": 731,
+      "taskId": "q-mp-204",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748; knip unusedTypes 89 on tip"
+    },
+    {
+      "number": 732,
+      "taskId": "q-mp-199",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 733,
+      "taskId": "q-mp-180",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748; void ceiling 132"
+    },
+    {
+      "number": 734,
+      "taskId": "q-mp-090e",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 735,
+      "taskId": "q-mp-171",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 736,
+      "taskId": "q-mp-211",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 737,
+      "taskId": "q-mp-210",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 738,
+      "taskId": "q-mp-225",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748; nnnull ceiling 254"
+    },
+    {
+      "number": 739,
+      "taskId": "q-mp-213",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 740,
+      "taskId": "q-mp-230",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 741,
+      "taskId": "q-mp-232",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 742,
+      "taskId": "q-mp-226",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748; dup-imports ceiling 105"
+    },
+    {
+      "number": 743,
+      "taskId": "q-mp-223",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 744,
+      "taskId": "q-mp-222",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 745,
+      "taskId": "q-mp-231",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    },
+    {
+      "number": 746,
+      "taskId": "q-mp-233",
+      "foldReadiness": "CONTAINED",
+      "base": "cursor/mp-tip-post728",
+      "notes": "Folded in #748"
+    }
+  ]
+}
