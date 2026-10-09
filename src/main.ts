@@ -76,13 +76,19 @@ let activeGameBoundary: GameErrorBoundaryHandle | null = null;
 // Cleanup previous view
 function cleanup(): void {
   exitTutorialIfActive();
-  if (currentCleanup) {
-    currentCleanup();
+  // R-SHELL-02: throwing currentCleanup must not skip boundary dispose.
+  try {
+    if (currentCleanup) {
+      currentCleanup();
+    }
+  } catch (err) {
+    console.error('[main] route cleanup failed', err);
+  } finally {
     currentCleanup = null;
-  }
-  if (activeGameBoundary) {
-    activeGameBoundary.dispose();
-    activeGameBoundary = null;
+    if (activeGameBoundary) {
+      activeGameBoundary.dispose();
+      activeGameBoundary = null;
+    }
   }
 }
 
@@ -105,8 +111,12 @@ function bindRouteErrorBoundary(
     onHome: () => navigate('/'),
     onBeforeShow: () => {
       exitTutorialIfActive();
-      if (currentCleanup) {
-        currentCleanup();
+      // R-SHELL-02: clear cleanup even when it throws; outer catch still shows crash UI.
+      try {
+        if (currentCleanup) {
+          currentCleanup();
+        }
+      } finally {
         currentCleanup = null;
       }
     },
