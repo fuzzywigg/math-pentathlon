@@ -1,8 +1,13 @@
 // Contig 60 Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import type { ContigState, Player, ContigWinner } from './types';
-import { createInitialState, getValidPlacements } from './types';
+import {
+  type ContigState,
+  type Player,
+  type ContigWinner,
+  createInitialState,
+  getValidPlacements,
+} from './types';
 import { doRollDice, placeChip, passTurn, hasValidMoves } from './rules';
 import {
   renderBoard,
@@ -11,8 +16,10 @@ import {
   injectContigStyles,
   getPlayerName,
 } from './board-ui';
-import type { AIDifficulty } from './ai';
-import { getAIPlacement } from './ai';
+import {
+  type AIDifficulty,
+  getAIPlacement,
+} from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { clearElement } from '../../core/dom-security';
 import { contig60Tutorial } from './tutorial';
