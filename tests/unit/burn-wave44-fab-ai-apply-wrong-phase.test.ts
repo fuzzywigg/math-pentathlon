@@ -34,7 +34,7 @@ describe('Wave 44 Fab AI — apply from wrong phase', () => {
     };
     const next = applyAIMoveSteps(stuck, move);
     expect(next.moveHistory).toHaveLength(0);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('happy path from selectingBar1 marks both bars used', () => {

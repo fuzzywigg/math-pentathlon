@@ -1,6 +1,6 @@
 // Grid-based N-in-a-row Alignment Detection
 
-import {
+import type {
   GridPosition,
   CellValue,
   CellGetter,
@@ -8,8 +8,8 @@ import {
   AlignmentConfig,
   AlignmentResult,
   AlignmentCheckResult,
-  ALL_DIRECTIONS,
 } from './types';
+import { ALL_DIRECTIONS } from './types';
 
 /**
  * Check if a position is within grid bounds
@@ -91,8 +91,8 @@ export function findAlignmentInDirection(
   if (positions.length >= targetLength) {
     return {
       value: startValue,
-      start: positions[0],
-      end: positions[positions.length - 1],
+      start: positions[0]!,
+      end: positions[positions.length - 1]!,
       positions,
       direction,
       length: positions.length,
@@ -204,7 +204,7 @@ export function checkForWinner(
   // Return the first alignment found (typically the winner)
   return {
     hasWinner: true,
-    winner: alignments[0].value,
+    winner: alignments[0]!.value,
     alignments,
   };
 }
@@ -326,8 +326,8 @@ export function findAlignmentFromCenter(
 
     return {
       value: centerValue,
-      start: positions[0],
-      end: positions[positions.length - 1],
+      start: positions[0]!,
+      end: positions[positions.length - 1]!,
       positions,
       direction,
       length: positions.length,
@@ -431,8 +431,9 @@ export function createArrayGetter<T extends CellValue>(
   board: T[][]
 ): CellGetter<T> {
   return (row, col) => {
-    if (row >= 0 && row < board.length && col >= 0 && col < board[row].length) {
-      return board[row][col];
+    const boardRow = board[row];
+    if (row >= 0 && boardRow && col >= 0 && col < boardRow.length) {
+      return boardRow[col] as T;
     }
     return null as T;
   };

@@ -38,14 +38,24 @@ let idleHandle: { kind: 'idle' | 'timeout'; id: number } | null = null;
  * Real dynamic imports must not run under Vitest. `renderGameSelector` schedules
  * idle prefetch; when that fires after a jsdom env tears down, Vitest throws
  * EnvironmentTeardownError (seen on CI with game-selector → kings/star-track).
+ * Opt-in via module-private `allowGamePrefetchImportsForTests` for isolated
+ * coverage of the idle / import / failure paths.
  */
+let allowPrefetchImportsForTests = false;
+
+function allowGamePrefetchImportsForTests(allow: boolean): void {
+  allowPrefetchImportsForTests = allow;
+}
+
 function shouldExecutePrefetchImport(): boolean {
+  if (allowPrefetchImportsForTests) return true;
   return import.meta.env.MODE !== 'test';
 }
 
 /** Reset between tests. */
 export function resetGamePrefetchForTests(): void {
   started.clear();
+  allowGamePrefetchImportsForTests(false);
   const w = typeof window === 'undefined' ? null : window;
   if (w && idleHandle) {
     if (
@@ -71,11 +81,24 @@ export function canPrefetchGame(gameId: string): boolean {
 /**
  * Kick off a background import for `gameId` (no-op if unknown / already warm).
  */
+function prefersSaveData(): boolean {
+  try {
+    const conn = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    return conn?.saveData === true;
+  } catch {
+    return false;
+  }
+}
+
 export function prefetchGameChunk(gameId: string): void {
   if (!canPrefetchGame(gameId) || started.has(gameId)) return;
+  if (prefersSaveData()) return;
   started.add(gameId);
   if (!shouldExecutePrefetchImport()) return;
   const load = loaders[gameId];
+  if (!load) return;
   void load().catch(() => {
     started.delete(gameId);
   });

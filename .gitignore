@@ -33,3 +33,6 @@ test-results/
 
 # TypeScript
 *.tsbuildinfo
+
+# Transient lint-ratchet probe config (scripts/check-lint-ratchet.mjs)
+.eslint.ratchet.probe.config.js

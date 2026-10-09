@@ -1,13 +1,15 @@
 // Expression UI Components
 // Visual rendering for expression cards, slots, and builders
 
-import {
+import type {
   ExpressionCard,
   ExpressionSlot,
   ExpressionBuilder,
   TargetChallenge,
 } from './types';
 import { validateSlots, evaluate, formatNumber } from './evaluator';
+
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 
 // =============================================================================
 // Style Injection
@@ -311,7 +313,7 @@ export function renderCardSVG(
     rparen: { bg: '#f3e5f5', border: '#7b1fa2', text: '#7b1fa2' },
   };
 
-  const color = colors[card.tokenType];
+  const color = colors[card.tokenType]!;
 
   // Card background
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -362,11 +364,15 @@ export function renderSlot(
 
   if (slot.card) {
     el.classList.add('filled');
-    el.appendChild(
-      renderCard(slot.card, {
-        onClick: options?.onClick ? () => options.onClick!(slot) : undefined,
-      })
-    );
+    const cardOpts: {
+      onClick?: (card: ExpressionCard) => void;
+      draggable?: boolean;
+      selected?: boolean;
+    } = {};
+    if (options?.onClick) {
+      cardOpts.onClick = () => options.onClick!(slot);
+    }
+    el.appendChild(renderCard(slot.card, cardOpts));
   }
 
   if (options?.highlighted) {
@@ -424,12 +430,14 @@ export function renderExpressionBuilder(
   builderEl.className = 'expression-builder';
 
   for (const slot of builder.slots) {
-    builderEl.appendChild(
-      renderSlot(slot, {
-        onClick: options?.onSlotClick,
-        onDrop: options?.onDrop,
-      })
-    );
+    const slotOpts: {
+      onDrop?: (slot: ExpressionSlot, cardId: string) => void;
+      onClick?: (slot: ExpressionSlot) => void;
+      highlighted?: boolean;
+    } = {};
+    if (options?.onSlotClick) slotOpts.onClick = options.onSlotClick;
+    if (options?.onDrop) slotOpts.onDrop = options.onDrop;
+    builderEl.appendChild(renderSlot(slot, slotOpts));
   }
 
   container.appendChild(builderEl);
@@ -446,13 +454,18 @@ export function renderExpressionBuilder(
         Math.abs(validation.result - builder.targetValue) < 0.0001;
 
       resultEl.classList.add(matchesTarget ? 'valid' : 'neutral');
-      resultEl.innerHTML = `= <strong>${formatNumber(validation.result)}</strong>`;
+      replaceWithSafeHtml(
+        resultEl,
+        safeHtml`= <strong>${formatNumber(validation.result)}</strong>`
+      );
 
       if (builder.targetValue !== undefined) {
         if (matchesTarget) {
-          resultEl.innerHTML += ' ✓';
+          resultEl.appendChild(document.createTextNode(' ✓'));
         } else {
-          resultEl.innerHTML += ` (target: ${builder.targetValue})`;
+          resultEl.appendChild(
+            document.createTextNode(` (target: ${builder.targetValue})`)
+          );
         }
       }
     } else if (!validation.isValid || validation.errors.length > 0) {
@@ -492,13 +505,16 @@ export function renderCardTray(
     const isUsed = options?.usedIds?.has(card.id);
     if (isUsed) continue;
 
-    tray.appendChild(
-      renderCard(card, {
-        onClick: options?.onClick,
-        draggable: options?.draggable,
-        selected: card.id === options?.selectedId,
-      })
-    );
+    const cardOpts: {
+      onClick?: (card: ExpressionCard) => void;
+      draggable?: boolean;
+      selected?: boolean;
+    } = { selected: card.id === options?.selectedId };
+    if (options?.onClick) cardOpts.onClick = options.onClick;
+    if (options?.draggable !== undefined) {
+      cardOpts.draggable = options.draggable;
+    }
+    tray.appendChild(renderCard(card, cardOpts));
   }
 
   return tray;
@@ -611,23 +627,28 @@ export function createInteractiveBuilder(
   const usedCardIds = new Set<string>();
 
   function render(): void {
-    container.innerHTML = '';
+    clearElement(container);
 
     // Target display
     if (options.targetValue !== undefined) {
       const targetEl = document.createElement('div');
       targetEl.className = 'target-display';
-      targetEl.innerHTML = `
+      replaceWithSafeHtml(
+        targetEl,
+        safeHtml`
         <div class="label">Target:</div>
         <div class="value">${options.targetValue}</div>
-      `;
+      `
+      );
       container.appendChild(targetEl);
     }
 
     // Expression builder
     const builder: ExpressionBuilder = {
       slots,
-      targetValue: options.targetValue,
+      ...(options.targetValue !== undefined
+        ? { targetValue: options.targetValue }
+        : {}),
     };
 
     const builderEl = renderExpressionBuilder(builder, {
@@ -660,14 +681,22 @@ export function createInteractiveBuilder(
       : 'Select a card to place';
     container.appendChild(trayLabel);
 
-    const tray = renderCardTray(options.availableCards, {
+    const trayOpts: {
+      onClick?: (card: ExpressionCard) => void;
+      draggable?: boolean;
+      selectedId?: string;
+      usedIds?: Set<string>;
+    } = {
       onClick: (card) => {
         selectedCard = selectedCard?.id === card.id ? null : card;
         render();
       },
-      selectedId: selectedCard?.id,
       usedIds: usedCardIds,
-    });
+    };
+    if (selectedCard?.id !== undefined) {
+      trayOpts.selectedId = selectedCard.id;
+    }
+    const tray = renderCardTray(options.availableCards, trayOpts);
 
     container.appendChild(tray);
 

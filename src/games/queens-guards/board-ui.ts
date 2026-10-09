@@ -1,16 +1,12 @@
 // Queens & Guards Board UI
 // SVG rendering for the hexagonal game board
 
-import {
-  QueensGuardsState,
-  CONFIG,
-  BoardCoord,
-  cellKey,
-  cellsInRing,
-  parseKey,
-} from './types';
+import { injectStylesOnce } from '../../ui/inject-styles';
+import type { QueensGuardsState, BoardCoord } from './types';
+import { CONFIG, cellKey, cellsInRing, parseKey } from './types';
 import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
+import { pointyTopHexPathD } from '../../ui/hex-svg';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -20,6 +16,8 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+import { getPlayerName } from '../../ui/seat-labels';
+export { getPlayerName };
 
 // Colors
 const COLORS = {
@@ -33,10 +31,6 @@ const COLORS = {
   selected: '#ff9800',
   queen: '#ffd700',
 };
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 /**
  * Convert ring/position to pixel coordinates
@@ -62,34 +56,10 @@ function ringPosToPixel(
 }
 
 /**
- * Get hex corners for a cell
- */
-function getHexCorners(
-  cx: number,
-  cy: number,
-  size: number
-): { x: number; y: number }[] {
-  const corners: { x: number; y: number }[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    corners.push({
-      x: cx + size * Math.cos(angle),
-      y: cy + size * Math.sin(angle),
-    });
-  }
-  return corners;
-}
-
-/**
  * Create hex path string
  */
 function hexPath(cx: number, cy: number, size: number): string {
-  const corners = getHexCorners(cx, cy, size);
-  return (
-    corners
-      .map((c, i) => (i === 0 ? `M ${c.x} ${c.y}` : `L ${c.x} ${c.y}`))
-      .join(' ') + ' Z'
-  );
+  return pointyTopHexPathD(cx, cy, size);
 }
 
 /**
@@ -107,10 +77,12 @@ export function renderBoard(
   const centerY = size / 2;
 
   svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
-  svg.setAttribute('width', '100%');
-  svg.setAttribute('height', '100%');
-  svg.style.maxWidth = `${size}px`;
-  svg.style.maxHeight = `${size}px`;
+  // Intrinsic size avoids the browser’s 300×150 replaced-element default, which
+  // previously shrunk hex cells to ~21px CSS (far under the 44px touch budget).
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('class', 'qg-board');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   markBoardAsGrid(svg);
 
   // Background
@@ -185,7 +157,7 @@ export function renderBoard(
 
     // Draw piece if present
     if (cell.piece) {
-      const seats = playerColors();
+      const seats = getPlayerSeatColors();
       const pieceColor =
         cell.piece.player === 'player1' ? seats.player1 : seats.player2;
       const pieceSize = CONFIG.HEX_SIZE * 0.6;
@@ -279,24 +251,31 @@ export function renderBoard(
         : cell.piece?.type === 'guard'
           ? 'Guard'
           : undefined;
+    const isCaptured = state.capturedPieces.some(
+      (c) => c.ring === cell.ring && c.position === cell.position
+    );
     makeGridCell(
       g,
       buildCellAriaLabel({
         coord: `ring ${cell.ring} pos ${cell.position}`,
         empty: !cell.piece,
-        owner,
-        piece: pieceName,
+        // ratchet: exactOptionalPropertyTypes — omit undefined optionals
+        // (buildCellAriaLabel treats omitted/undefined the same via filter(Boolean)).
+        ...(owner !== undefined ? { owner } : {}),
+        ...(pieceName !== undefined ? { piece: pieceName } : {}),
+        // Keep opening labels stable for handshake pins; AI-seat honesty uses
+        // aria-disabled + "not available" extras instead of selectable.
         validMove: validMoves.has(key),
         extras: [
           ...(state.selectedPiece === key ? ['selected'] : []),
-          ...(state.capturedPieces.some(
-            (c) => c.ring === cell.ring && c.position === cell.position
-          )
-            ? ['captured']
-            : []),
+          ...(isCaptured ? ['captured'] : []),
+          ...(!allowInput ? ['not available'] : []),
         ],
       })
     );
+    if (!allowInput) {
+      g.setAttribute('aria-disabled', 'true');
+    }
     if (activate) {
       bindCellActivateKeys(g, activate);
     }
@@ -323,20 +302,50 @@ export function renderBoard(
  * Inject CSS styles
  */
 export function injectQGStyles(): void {
-  const existingStyle = document.getElementById('qg-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'qg-styles';
-  style.textContent = `
-    .qg-board-container {
-      display: flex;
-      justify-content: center;
-      padding: 1rem;
+  injectStylesOnce(
+    'qg-styles',
+    `
+    /* Pin board CSS width so hex hit areas clear WCAG 2.5.5 (~44px).
+       viewBox ≈791 → 660px ⇒ scale≈0.83 ⇒ path ≈46×53. Shell #app is
+       ~700px, so allow a short horizontal scroll rather than shrinking cells. */
+    .qg-game-area {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
+      align-items: stretch;
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
     }
 
-    .qg-board-container svg {
+    /* 2D SVG only — do not pin width on .board-3d-host / .qg-board-3d-host
+       or canvas ray-picks (cellToClientPoint) drift under overflow-x. */
+    .qg-board-container:not(.board-3d-host) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      min-width: 660px;
+      width: 660px;
+      max-width: none;
+      margin: 0 auto;
+    }
+
+    .qg-board-container:not(.board-3d-host) svg.qg-board,
+    .qg-board-container:not(.board-3d-host) svg {
+      display: block;
+      min-width: 660px;
+      width: 660px;
+      max-width: none;
+      height: auto;
+      aspect-ratio: 1;
       filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    }
+
+    @media (pointer: coarse) {
+      .qg-game-area {
+        -webkit-overflow-scrolling: touch;
+      }
     }
 
     .qg-status {
@@ -347,11 +356,11 @@ export function injectQGStyles(): void {
     }
 
     .qg-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .qg-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .qg-info {
@@ -383,13 +392,10 @@ export function injectQGStyles(): void {
         animation: none !important;
       }
     }
-  `;
-  document.head.appendChild(style);
+  `
+  );
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: 'player1' | 'player2'): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

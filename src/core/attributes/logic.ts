@@ -1,7 +1,7 @@
 // Attribute Logic - Matching, filtering, and set validation
 // Core logic for attribute-based game mechanics
 
-import {
+import type {
   AttributeValue,
   AttributePiece,
   AttributeDefinition,
@@ -304,7 +304,7 @@ export function findAllValidSets(
     }
 
     for (let i = start; i < pieces.length; i++) {
-      current.push(pieces[i]);
+      current.push(pieces[i]!);
       findSets(i + 1, current);
       current.pop();
     }
@@ -403,8 +403,8 @@ export function createMathPiece(n: number): AttributePiece {
 export function groupByAttribute(
   pieces: AttributePiece[],
   attribute: string
-): Map<AttributeValue, AttributePiece[]> {
-  const groups = new Map<AttributeValue, AttributePiece[]>();
+): Map<AttributeValue | undefined, AttributePiece[]> {
+  const groups = new Map<AttributeValue | undefined, AttributePiece[]>();
 
   for (const piece of pieces) {
     const value = piece.attributes[attribute];
@@ -423,8 +423,8 @@ export function groupByAttribute(
 export function getUniqueValues(
   pieces: AttributePiece[],
   attribute: string
-): AttributeValue[] {
-  const values = new Set<AttributeValue>();
+): Array<AttributeValue | undefined> {
+  const values = new Set<AttributeValue | undefined>();
   for (const piece of pieces) {
     values.add(piece.attributes[attribute]);
   }

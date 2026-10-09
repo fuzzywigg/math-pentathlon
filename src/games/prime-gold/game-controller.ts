@@ -1,7 +1,7 @@
 // Prime Gold Game Controller
 // Manages game flow, AI, and UI updates
 
-import { PrimeGoldState, Player } from './types';
+import type { PrimeGoldState, Player } from './types';
 import {
   createInitialState,
   rollDice,
@@ -9,7 +9,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIPlacement, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIPlacement } from './ai';
 import {
   renderBoard,
   renderDice,
@@ -21,20 +22,23 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { primeGoldTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadPrimeGoldBoard3DModule } from './board-3d-loader';
 import type { PrimeGoldBoard3D } from '../../ui/three/prime-gold-board-3d';
 
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 // =============================================================================
@@ -65,10 +69,7 @@ let boardHostEl: HTMLElement | null = null;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function scheduleAI(controller: PrimeGoldController, delayMs: number): void {
@@ -80,6 +81,9 @@ function scheduleAI(controller: PrimeGoldController, delayMs: number): void {
 }
 
 function unmountBoard3d(): void {
+  if (boardHostEl) {
+    boardHostEl.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
   if (board3d) {
     board3d.unmount();
     board3d = null;
@@ -88,6 +92,20 @@ function unmountBoard3d(): void {
   board3dEnabled = false;
   boardHostEl = null;
   clearAiTimer();
+}
+
+function onBoard3dContextLost(): void {
+  if (boardHostEl) {
+    boardHostEl.removeEventListener('mp3d-context-lost', onBoard3dContextLost);
+  }
+  // Board already tore itself down via webglcontextlost → unmount.
+  board3d = null;
+  markBoard3dWebGlFallback(boardHostEl, 'context-lost');
+  board3dEnabled = false;
+  board3dLoading = null;
+  if (activeController) {
+    activeController.update();
+  }
 }
 
 async function ensureBoard3d(): Promise<void> {
@@ -112,8 +130,11 @@ async function ensureBoard3d(): Promise<void> {
     board3d = await mod.createPrimeGoldBoard3D(liveHost, (value, expr) => {
       if (activeController) handlePlacement(activeController, value, expr);
     });
+    clearBoard3dWebGlFallback(liveHost);
+    liveHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D board.
+    markBoard3dWebGlFallback(boardHostEl, 'webgl-unavailable');
     board3d = null;
     board3dEnabled = false;
   }
@@ -146,6 +167,7 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -315,8 +337,8 @@ function updateUI(controller: PrimeGoldController): void {
   container.appendChild(gameArea);
   restoreGridFocus(container, previousFocus);
 
-  // AI turn
-  if (aiThinking) {
+  // AI turn — schedule once; re-entry must not reset the think timer forever.
+  if (aiThinking && aiTimer === null) {
     scheduleAI(controller, 800);
   }
 }
@@ -374,6 +396,8 @@ function makeAIMove(controller: PrimeGoldController): void {
   if (state.phase === 'gameOver' || !aiPlayer) return;
   // Guard against stale timers after destroy / new game
   if (activeController !== controller) return;
+  // Hard seat guard — stale timers must not roll/place for Blue
+  if (!isComputerTurnPending(controller)) return;
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
@@ -446,6 +470,7 @@ export function isTutorialActive(): boolean {
 
 /** Dispose 3D resources and clear controller mounts (route change). */
 export function destroyGame(): void {
+  clearAiTimer();
   unmountBoard3d();
   activeController = null;
   activeContainer = null;

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — frac segment / clamp / divzero', () => {
   it('fraction-segment click updates interactive-value', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const segments = root.querySelectorAll(
       '#interactive-bar .fraction-segment'
@@ -37,7 +32,7 @@ describe('Overnight demos45 — frac segment / clamp / divzero', () => {
   });
 
   it('shrinking denominator clamps numerator and rebuilds segments', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const select = root.querySelector(
       '#denominator-select'
@@ -64,7 +59,7 @@ describe('Overnight demos45 — frac segment / clamp / divzero', () => {
   });
 
   it('divide op accepts zero-divisor input without auto-calc; chrome stays', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     (root.querySelector('.op-btn[data-op="divide"]') as HTMLButtonElement).click();
     expect(
@@ -91,7 +86,7 @@ describe('Overnight demos45 — frac segment / clamp / divzero', () => {
   });
 
   it('op selection changes selected class without auto-recalculating', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const before = root.querySelector('#arithmetic-result')?.innerHTML;
     (root.querySelector('.op-btn[data-op="multiply"]') as HTMLButtonElement).click();

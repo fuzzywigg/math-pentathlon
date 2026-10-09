@@ -111,6 +111,7 @@ import {
   isTutorialActive as isRemainderTutorial,
 } from '../../src/games/remainder-islands/game-controller';
 import { remainderIslandsTutorial } from '../../src/games/remainder-islands/tutorial';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   if (tutorialManager.getIsActive()) {
@@ -127,11 +128,6 @@ function mountPair(): { board: HTMLElement; status: HTMLElement } {
   return { board, status };
 }
 
-function mountContainer(): HTMLElement {
-  const el = document.createElement('div');
-  document.body.appendChild(el);
-  return el;
-}
 
 describe('Wave 22 tutorial-runtime — Hex / Calla / Star start + navigate', () => {
   it('Hex startTutorial activates first step; next/prev walk config', () => {
@@ -324,7 +320,7 @@ describe('Wave 22 tutorial-runtime — container controllers', () => {
     for (const c of cases) {
       if (tutorialManager.getIsActive()) tutorialManager.exit();
       document.body.innerHTML = '';
-      const el = mountContainer();
+      const el = mountRoot();
       c.init(el);
       c.start();
       expect(c.isActive()).toBe(true);

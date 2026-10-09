@@ -1,0 +1,291 @@
+/**
+ * WCAG 1.4.4 / 1.4.10 zoom + reflow helpers (CSS only).
+ * Task: burn-1008-mp-zoom-reflow
+ *
+ * Scoped so default desktop / phone visual baselines are unchanged:
+ * - narrow reflow: @media (max-width: 360px)
+ * - text-only 200%: html[data-zoom-reflow-text='200'] (set by e2e harness)
+ * - page zoom 200%: html[data-zoom-reflow-zoom='200'] (set by e2e harness)
+ *
+ * Dense board geometry exceptions (Hex 801px pin, etc.) keep internal
+ * scrollports — do not shrink cells. Report-only exception.
+ */
+
+/* Shared layout keepers for zoom/reflow modes (not applied at default sizes). */
+@media (max-width: 360px) {
+  /* Allow the document to shrink to the viewport (was a hard 320px floor). */
+  body {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #app,
+  #main-content,
+  .game-selector {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  /* Progressive min tracks: never force a 300px column past the content box. */
+  .game-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    max-width: 100%;
+  }
+
+  /*
+   * Open accordion: generous max-height so late layout (fonts, padding,
+   * 200% text scale) cannot clip the last game card into the next header.
+   */
+  .accordion-open > .accordion-panel {
+    max-height: 5000px !important;
+  }
+
+  .game-card,
+  .accordion-panel-inner,
+  .accordion-container,
+  .division-tabs,
+  .button-row,
+  .modal-content {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .button-row {
+    flex-wrap: wrap;
+  }
+
+  .game-header {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .game-header h1 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-size: clamp(1.25rem, 4vw + 0.5rem, 2rem);
+  }
+
+  .modal-content {
+    width: min(500px, calc(100vw - 24px));
+    max-height: min(80vh, 100dvh - 24px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 8px;
+    padding: 16px;
+  }
+
+  .mode-options,
+  .difficulty-options {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  .mode-option,
+  .difficulty-btn {
+    min-width: 0;
+  }
+
+  #app {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .game-selector {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .accordion-panel-inner {
+    padding: 0.85rem;
+  }
+
+  .accordion-container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .division-tabs {
+    gap: 0.35rem;
+    padding: 0.5rem;
+  }
+
+  .division-tab {
+    flex: 1 1 calc(50% - 0.35rem);
+    min-width: 0;
+    padding: 0.45rem 0.5rem;
+  }
+
+  .game-card {
+    padding: 0.85rem;
+    gap: 0.75rem;
+  }
+
+  .game-card-icon {
+    width: clamp(40px, 12vw, 56px);
+    height: clamp(40px, 12vw, 56px);
+    font-size: clamp(1.5rem, 8vw, 2.25rem);
+  }
+
+  .button-row button {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /*
+   * Contained board scrollports: keep page from growing past the viewport when
+   * a game pins a wide intrinsic board (Hex). Overflow stays local.
+   */
+  .hex-game-area,
+  .game-area,
+  .star-track-game-area,
+  .hex-a-gone-game-area {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Text-only 200% (harness sets data-zoom-reflow-text). */
+html[data-zoom-reflow-text='200'] body {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-text='200'] #app,
+html[data-zoom-reflow-text='200'] #main-content,
+html[data-zoom-reflow-text='200'] .game-selector {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-text='200'] .game-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-text='200'] .accordion-open > .accordion-panel {
+  max-height: 5000px !important;
+}
+
+html[data-zoom-reflow-text='200'] .game-card,
+html[data-zoom-reflow-text='200'] .accordion-panel-inner,
+html[data-zoom-reflow-text='200'] .accordion-container,
+html[data-zoom-reflow-text='200'] .division-tabs,
+html[data-zoom-reflow-text='200'] .button-row,
+html[data-zoom-reflow-text='200'] .modal-content {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-text='200'] .button-row,
+html[data-zoom-reflow-text='200'] .game-header,
+html[data-zoom-reflow-text='200'] .mode-options,
+html[data-zoom-reflow-text='200'] .difficulty-options {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-text='200'] .game-header h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.25rem, 4vw + 0.5rem, 2rem);
+}
+
+html[data-zoom-reflow-text='200'] .modal-content {
+  width: min(500px, calc(100vw - 24px));
+  max-height: min(80vh, 100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+html[data-zoom-reflow-text='200'] .mode-option,
+html[data-zoom-reflow-text='200'] .difficulty-btn {
+  min-width: 0;
+}
+
+html[data-zoom-reflow-text='200'] .owl-message {
+  font-size: 0.875rem;
+}
+
+html[data-zoom-reflow-text='200'] .hex-game-area,
+html[data-zoom-reflow-text='200'] .game-area,
+html[data-zoom-reflow-text='200'] .star-track-game-area,
+html[data-zoom-reflow-text='200'] .hex-a-gone-game-area {
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Page zoom 200% (harness sets data-zoom-reflow-zoom). */
+html[data-zoom-reflow-zoom='200'] body {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-zoom='200'] #app,
+html[data-zoom-reflow-zoom='200'] #main-content,
+html[data-zoom-reflow-zoom='200'] .game-selector {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-zoom='200'] .game-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-zoom='200'] .accordion-open > .accordion-panel {
+  max-height: 5000px !important;
+}
+
+html[data-zoom-reflow-zoom='200'] .game-card,
+html[data-zoom-reflow-zoom='200'] .accordion-panel-inner,
+html[data-zoom-reflow-zoom='200'] .accordion-container,
+html[data-zoom-reflow-zoom='200'] .division-tabs,
+html[data-zoom-reflow-zoom='200'] .button-row,
+html[data-zoom-reflow-zoom='200'] .modal-content {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-zoom='200'] .button-row,
+html[data-zoom-reflow-zoom='200'] .game-header,
+html[data-zoom-reflow-zoom='200'] .mode-options,
+html[data-zoom-reflow-zoom='200'] .difficulty-options {
+  flex-wrap: wrap;
+  max-width: 100%;
+}
+
+html[data-zoom-reflow-zoom='200'] .game-header h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: clamp(1.25rem, 4vw + 0.5rem, 2rem);
+}
+
+html[data-zoom-reflow-zoom='200'] .modal-content {
+  width: min(500px, calc(100vw - 24px));
+  max-height: min(80vh, 100dvh - 24px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+html[data-zoom-reflow-zoom='200'] .mode-option,
+html[data-zoom-reflow-zoom='200'] .difficulty-btn {
+  min-width: 0;
+}
+
+html[data-zoom-reflow-zoom='200'] .hex-game-area,
+html[data-zoom-reflow-zoom='200'] .game-area,
+html[data-zoom-reflow-zoom='200'] .star-track-game-area,
+html[data-zoom-reflow-zoom='200'] .hex-a-gone-game-area {
+  max-width: 100%;
+  min-width: 0;
+}

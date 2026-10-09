@@ -1,8 +1,8 @@
 // Juggle Game Controller
 // Orchestrates game state, UI updates, and player interactions
 
-import { JuggleState, Player } from './types';
-import { PolyominoShape } from '../../core/polyomino/types';
+import type { JuggleState, Player } from './types';
+import type { PolyominoShape } from '../../core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
@@ -12,12 +12,8 @@ import {
   flipShape,
   placeShape,
 } from './rules';
-import {
-  getAIDieChoice,
-  getAIShapeChoice,
-  getAIPlacement,
-  AIDifficulty,
-} from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
 import {
   renderBoard,
   renderDice,
@@ -387,3 +383,6 @@ export function __setStateForTests(state: JuggleState): void {
 export function __getStateForTests(): JuggleState {
   return gameState;
 }
+
+/** Tip-held destroy hook for tip mounts / #501. */
+export function destroyGame(): void {}

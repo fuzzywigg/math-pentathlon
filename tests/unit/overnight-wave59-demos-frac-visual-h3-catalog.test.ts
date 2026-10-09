@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 59 demos — frac visual h3 catalog', () => {
   it('exposes Horizontal / Vertical / Circle h3s', () => {
-    const root = mount();
+    const root = mountRoot();
     renderFractionDemo(root);
     const h3 = [...root.querySelectorAll('h3')].map((el) => el.textContent ?? '');
     expect(h3).toContain('Horizontal Bars');

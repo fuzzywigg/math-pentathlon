@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -22,7 +17,7 @@ afterEach(() => {
 
 describe('Overnight demos — align info chrome', () => {
   it('four-info alignment counts rise after a short exchange', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     const before = root.querySelector('#four-info')?.textContent ?? '';
     (
@@ -41,7 +36,7 @@ describe('Overnight demos — align info chrome', () => {
   });
 
   it('hex-info region summary updates after Blue and Red place', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     (
       root.querySelector(

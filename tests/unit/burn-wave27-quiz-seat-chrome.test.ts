@@ -23,6 +23,7 @@ import {
   newGameVsHuman as remainderVsHuman,
   getCurrentState as getRemainderState,
 } from '../../src/games/remainder-islands/game-controller';
+import { mountRoot } from './helpers/dom';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -33,12 +34,6 @@ afterEach(() => {
 function click(el: Element | null): void {
   expect(el).toBeTruthy();
   el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
-
-function mountContainer(): HTMLElement {
-  const container = document.createElement('div');
-  document.body.appendChild(container);
-  return container;
 }
 
 /** Constant Math.random hangs frac/pinball distractor loops — use a cycling sequence. */
@@ -52,7 +47,7 @@ function mockRandomCycle(seed = 0.17): void {
 
 describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () => {
   it('initGame + newGameVsHuman paints .frac-status with turn text and player class', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     expect(getFracState().phase).toBe('playing');
     expect(getFracState().currentPlayer).toBe('player1');
@@ -68,7 +63,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
   });
 
   it('newGameVsHuman resets seat chrome to player1 turn', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     fracVsHuman('easy');
     expect(getFracState().currentPlayer).toBe('player1');
@@ -80,7 +75,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
 
   it('choice click advances to showingResult and updates score chrome', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     fracVsHuman('easy');
 
@@ -114,7 +109,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
 
   it('continue after result flips seat chrome to player2 when still playing', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     fracVsHuman('easy');
 
@@ -135,7 +130,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
 
   it('full P1→P2→P1 answer cycle keeps status seat class in sync', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     fracVsHuman('medium');
 
@@ -154,7 +149,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
   });
 
   it('illegal double-continue without answer does not invent phase', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     fracVsHuman();
     expect(getFracState().phase).toBe('playing');
@@ -166,7 +161,7 @@ describe('Wave 27 quiz-seat-chrome — Frac Fact status + choice advances', () =
 
 describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => {
   it('initGame paints .pinball-status with turn text and player1 class', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     expect(getPinballState().phase).toBe('answering');
     expect(getPinballState().currentPlayer).toBe('player1');
@@ -186,7 +181,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
   });
 
   it('newGameVsHuman resets to answering / player1 chrome', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     pinballVsHuman();
     expect(getPinballState().phase).toBe('answering');
@@ -197,7 +192,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
 
   it('choice click advances to showResult and keeps score chrome', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     pinballVsHuman();
 
@@ -220,7 +215,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
 
   it('continue after result flips seat to player2 when still answering', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     pinballVsHuman();
 
@@ -238,7 +233,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
 
   it('two-answer cycle: status class tracks currentPlayer after each continue', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     pinballVsHuman();
 
@@ -257,7 +252,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
   });
 
   it('balls / round chrome remains mounted across a miss or hit', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initPinball(container);
     pinballVsHuman();
     expect(
@@ -275,7 +270,7 @@ describe('Wave 27 quiz-seat-chrome — Fraction Pinball status + choice', () => 
 
 describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chrome', () => {
   it('initGame paints .remainder-status with turn text and player1 class', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     expect(getRemainderState().phase).toBe('rolling');
     expect(getRemainderState().currentPlayer).toBe('player1');
@@ -293,7 +288,7 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
   });
 
   it('newGameVsHuman resets to rolling / player1', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     remainderVsHuman();
     expect(getRemainderState().phase).toBe('rolling');
@@ -304,7 +299,7 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
 
   it('roll advances to selectIsland and shows instruction chrome', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     remainderVsHuman();
 
@@ -318,9 +313,9 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
         container.querySelector('.remainder-instruction')?.textContent
       ).toMatch(/Select|island/i);
       expect(getRemainderState().validIslands.length).toBeGreaterThan(0);
-      expect(
-        container.querySelector('.remainder-preview, .division-equation')
-      ).toBeTruthy();
+      // Tip (#550 salvage): no empty division preview until an island is selected.
+      // On-hex R= touch hints held for Andrew (new visible copy).
+      expect(container.querySelector('.remainder-preview')).toBeNull();
       expect(
         container.querySelector('.remainder-status.player1')?.textContent
       ).toMatch(/turn/i);
@@ -329,7 +324,7 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
 
   it('valid island click flips seat back to rolling for opponent', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     remainderVsHuman();
 
@@ -357,7 +352,7 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
 
   it('invalid island click does not flip seat mid selectIsland', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     remainderVsHuman();
     click(container.querySelector('.remainder-btn-roll'));
@@ -386,7 +381,7 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
 
   it('full P1 roll→island then P2 roll keeps score chrome and status seat sync', () => {
     mockRandomCycle();
-    const container = mountContainer();
+    const container = mountRoot();
     initRemainder(container);
     remainderVsHuman();
 
@@ -422,9 +417,9 @@ describe('Wave 27 quiz-seat-chrome — Remainder Islands roll→island seat chro
 
 describe('Wave 27 quiz-seat-chrome — cross-quiz mount isolation', () => {
   it('frac then pinball then remainder each paint their own status class', () => {
-    const a = mountContainer();
-    const b = mountContainer();
-    const c = mountContainer();
+    const a = mountRoot();
+    const b = mountRoot();
+    const c = mountRoot();
     initFrac(a);
     initPinball(b);
     initRemainder(c);
@@ -445,7 +440,7 @@ describe('Wave 27 quiz-seat-chrome — cross-quiz mount isolation', () => {
   });
 
   it('re-init after answer does not leave stale continue chrome', () => {
-    const container = mountContainer();
+    const container = mountRoot();
     initFrac(container);
     click(container.querySelector('.frac-choice-btn'));
     fracVsHuman();

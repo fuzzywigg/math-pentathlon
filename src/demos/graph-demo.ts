@@ -3,10 +3,13 @@
 
 import { navigate } from '../core/router';
 import {
-  Graph,
-  GraphBoard,
-  NodeId,
-  NodeState,
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+} from '../core/dom-security';
+
+import type { Graph, GraphBoard, NodeId, NodeState } from '../core/graph/types';
+import {
   createGridGraph,
   createCircularGraph,
   createStarGraph,
@@ -32,6 +35,7 @@ import {
 export function renderGraphDemo(container: HTMLElement): void {
   injectGraphStyles();
 
+  // trusted constant markup
   container.innerHTML = `
     <header class="game-header">
       <button id="back-btn" class="back-button" aria-label="Back to home">← Back</button>
@@ -275,7 +279,7 @@ function initTemplateSection(): void {
   function renderCurrentGraph(): void {
     if (!graphContainer || !infoContainer) return;
 
-    graphContainer.innerHTML = '';
+    clearElement(graphContainer);
     const svg = renderGraph(currentGraph, undefined, {
       nodeRadius: 18,
       showLabels: true,
@@ -288,12 +292,15 @@ function initTemplateSection(): void {
     const connected = isConnected(currentGraph);
     const components = findComponents(currentGraph);
 
-    infoContainer.innerHTML = `
+    replaceWithSafeHtml(
+      infoContainer,
+      safeHtml`
       <strong>Nodes:</strong> ${nodeCount} |
       <strong>Edges:</strong> ${edgeCount} |
       <strong>Connected:</strong> ${connected ? 'Yes' : 'No'} |
       <strong>Components:</strong> ${components.length}
-    `;
+    `
+    );
   }
 
   templateBtns.forEach((btn) => {
@@ -345,7 +352,7 @@ function initPathfindingSection(): void {
   function render(): void {
     if (!graphContainer) return;
 
-    graphContainer.innerHTML = '';
+    clearElement(graphContainer);
 
     const nodeStates = new Map<NodeId, NodeState>();
 
@@ -376,14 +383,18 @@ function initPathfindingSection(): void {
         highlightPath(svg, result.path, '#4caf50');
 
         if (resultEl) {
-          resultEl.innerHTML = `
+          replaceWithSafeHtml(
+            resultEl,
+            safeHtml`
             <strong>Path found!</strong><br>
             Distance: ${result.distance} steps<br>
             Path: ${result.path.join(' → ')}
-          `;
+          `
+          );
         }
       } else {
         if (resultEl) {
+          // trusted constant markup
           resultEl.innerHTML = '<strong>No path found</strong>';
         }
       }
@@ -393,19 +404,22 @@ function initPathfindingSection(): void {
   function handleNodeClick(nodeId: NodeId): void {
     if (!startNode) {
       startNode = nodeId;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
+      }
     } else if (!endNode && nodeId !== startNode) {
       endNode = nodeId;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Path from ${startNode} to ${endNode}`;
+      }
     } else {
       // Reset and start new selection
       startNode = nodeId;
       endNode = null;
-      if (statusEl)
+      if (statusEl) {
         statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
-      if (resultEl) resultEl.innerHTML = '';
+      }
+      if (resultEl) clearElement(resultEl);
     }
 
     render();
@@ -415,7 +429,7 @@ function initPathfindingSection(): void {
     startNode = null;
     endNode = null;
     if (statusEl) statusEl.textContent = 'Click a node to set start point';
-    if (resultEl) resultEl.innerHTML = '';
+    if (resultEl) clearElement(resultEl);
     render();
   });
 
@@ -441,7 +455,7 @@ function initGameSection(): void {
   function render(): void {
     if (!graphContainer) return;
 
-    graphContainer.innerHTML = '';
+    clearElement(graphContainer);
 
     const board: GraphBoard = { graph, nodeStates };
 
@@ -493,25 +507,45 @@ function initGameSection(): void {
     const p1Connects = playerConnectsSets(board, 1, topEdge, bottomEdge);
     const p2Connects = playerConnectsSets(board, 2, topEdge, bottomEdge);
 
-    analysisContainer.innerHTML = `
+    const p1ConnectEl = p1Connects
+      ? (() => {
+          const el = document.createElement('div');
+          el.style.color = '#4caf50';
+          el.textContent = 'Connects edges!';
+          return el;
+        })()
+      : null;
+    const p2ConnectEl = p2Connects
+      ? (() => {
+          const el = document.createElement('div');
+          el.style.color = '#4caf50';
+          el.textContent = 'Connects edges!';
+          return el;
+        })()
+      : null;
+
+    replaceWithSafeHtml(
+      analysisContainer,
+      safeHtml`
       <div class="analysis-card">
         <h4>Player 1 (Blue)</h4>
         <div class="value">${p1Count} nodes</div>
         <div>${p1Regions.length} region(s)</div>
-        ${p1Connects ? '<div style="color: #4caf50;">Connects edges!</div>' : ''}
+        ${p1ConnectEl}
       </div>
       <div class="analysis-card">
         <h4>Player 2 (Red)</h4>
         <div class="value">${p2Count} nodes</div>
         <div>${p2Regions.length} region(s)</div>
-        ${p2Connects ? '<div style="color: #4caf50;">Connects edges!</div>' : ''}
+        ${p2ConnectEl}
       </div>
       <div class="analysis-card">
         <h4>Board Status</h4>
         <div class="value">${graph.nodes.size - p1Count - p2Count} empty</div>
         <div>Total: ${graph.nodes.size} nodes</div>
       </div>
-    `;
+    `
+    );
   }
 
   playerBtns.forEach((btn) => {

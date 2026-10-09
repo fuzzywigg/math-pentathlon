@@ -1,7 +1,8 @@
 // Remainder Islands Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { RemainderIslandsState, createInitialState } from './types';
+import type { RemainderIslandsState } from './types';
+import { createInitialState } from './types';
 import { performRoll, selectIsland, setSelectedIsland } from './rules';
 import {
   renderBoard,
@@ -12,16 +13,21 @@ import {
   getPlayerName,
   injectRemainderIslandsStyles,
 } from './board-ui';
-import { getAIIslandChoice, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIIslandChoice } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
-import { applyGameModeChrome } from '../../ui/player-colors';
+import { syncAppOpponentChrome } from '../../ui/player-colors';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 // =============================================================================
@@ -34,6 +40,53 @@ let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
 /** Live-status flash when a roll finds no open islands (soft-lock UX). */
 let skipNotice: string | null = null;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+/**
+ * After a human roll (esp. empty-valid skip), ignore a rapid second Roll so
+ * double-click/tap cannot operate the opponent's newly painted Roll control.
+ */
+const HUMAN_ROLL_SETTLE_MS = 250;
+let humanRollSettleTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearHumanRollSettle(): void {
+  if (humanRollSettleTimer !== null) {
+    clearTimeout(humanRollSettleTimer);
+    humanRollSettleTimer = null;
+  }
+}
+
+function markHumanRollSettle(): void {
+  clearHumanRollSettle();
+  humanRollSettleTimer = setTimeout(() => {
+    humanRollSettleTimer = null;
+  }, HUMAN_ROLL_SETTLE_MS);
+}
+
+function isHumanRollSettling(): boolean {
+  return humanRollSettleTimer !== null;
+}
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 // =============================================================================
 // Rendering
@@ -46,14 +99,35 @@ function isComputerTurn(): boolean {
 function patchDivisionPreview(): void {
   if (!gameContainer) return;
   const existing = gameContainer.querySelector('.remainder-preview');
-  if (!existing) return;
-  existing.replaceWith(renderDivisionPreview(gameState));
+  const next = gameState.selectedIsland
+    ? renderDivisionPreview(gameState)
+    : null;
+
+  if (existing && next) {
+    existing.replaceWith(next);
+    return;
+  }
+  if (existing && !next) {
+    existing.remove();
+    return;
+  }
+  if (!existing && next) {
+    // Insert ahead of controls / board so the equation stays near the dice.
+    const controls = gameContainer.querySelector('.remainder-controls');
+    if (controls) {
+      controls.before(next);
+    } else {
+      gameContainer
+        .querySelector('.remainder-game-container')
+        ?.appendChild(next);
+    }
+  }
 }
 
 function render(): void {
   if (!gameContainer) return;
 
-  gameContainer.innerHTML = '';
+  clearElement(gameContainer);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'remainder-game-container';
@@ -96,7 +170,12 @@ function render(): void {
         const rollBtn = document.createElement('button');
         rollBtn.className = 'remainder-btn remainder-btn-roll';
         rollBtn.textContent = '🎲 Roll Dice';
-        rollBtn.addEventListener('click', handleRoll);
+        // Reject multi-click detail>1 so a double-click cannot roll for the
+        // opponent after an empty-valid skip rebuilds this button in place.
+        rollBtn.addEventListener('click', (event) => {
+          if (event.detail > 1) return;
+          handleRoll();
+        });
         controls.appendChild(rollBtn);
       }
     } else if (gameState.phase === 'selectIsland') {
@@ -107,8 +186,10 @@ function render(): void {
         : 'Select an island to land on';
       controls.appendChild(instruction);
 
-      // Division preview
-      wrapper.appendChild(renderDivisionPreview(gameState));
+      // Division preview only when an island is hovered/selected (avoid empty gap).
+      if (gameState.selectedIsland) {
+        wrapper.appendChild(renderDivisionPreview(gameState));
+      }
     }
 
     wrapper.appendChild(controls);
@@ -129,9 +210,9 @@ function render(): void {
   // AI turn
   if (computerTurn && gameState.phase !== 'gameOver') {
     if (gameState.phase === 'rolling') {
-      setTimeout(aiRoll, 800);
+      scheduleAI(aiRoll, 800);
     } else if (gameState.phase === 'selectIsland') {
-      setTimeout(aiSelectIsland, 800);
+      scheduleAI(aiSelectIsland, 800);
     }
   }
 }
@@ -156,10 +237,13 @@ function noteEmptyValidSkip(
 
 function handleRoll(): void {
   if (isComputerTurn()) return;
+  if (isHumanRollSettling()) return;
   if (gameState.phase !== 'rolling') return;
   const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
   noteEmptyValidSkip(beforePlayer);
+  // Seat may have flipped on empty-valid skip — drop click-through Roll.
+  markHumanRollSettle();
   render();
 }
 
@@ -189,8 +273,9 @@ function handleIslandHover(islandId: string | null): void {
 // =============================================================================
 
 function aiRoll(): void {
-  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2')
+  if (gameState.phase !== 'rolling' || gameState.currentPlayer !== 'player2') {
     return;
+  }
   const beforePlayer = gameState.currentPlayer;
   gameState = performRoll(gameState);
   noteEmptyValidSkip(beforePlayer);
@@ -201,8 +286,9 @@ function aiSelectIsland(): void {
   if (
     gameState.phase !== 'selectIsland' ||
     gameState.currentPlayer !== 'player2'
-  )
+  ) {
     return;
+  }
 
   // Use AI module to get choice
   const choice = getAIIslandChoice(gameState, 'player2', aiDifficulty);
@@ -221,6 +307,8 @@ function aiSelectIsland(): void {
 export function initGame(containerEl: HTMLElement): void {
   injectRemainderIslandsStyles();
   gameContainer = containerEl;
+  aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = false;
   syncOpponentChrome();
@@ -228,6 +316,8 @@ export function initGame(containerEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = false;
   skipNotice = null;
@@ -236,6 +326,8 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearHumanRollSettle();
   gameState = createInitialState();
   isAIMode = true;
   skipNotice = null;
@@ -267,4 +359,12 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Cancel pending AI timeouts and drop mounts (route change / error boundary). */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  clearHumanRollSettle();
+  gameContainer = null;
 }

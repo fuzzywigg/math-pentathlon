@@ -1,9 +1,12 @@
 // Kwatro-Sinko Board UI
 // Rendering the pathway board, chips, and game state
 
-import { KwaState, BoardNode, Chip, Player } from './types';
+import type { KwaState, BoardNode, Chip } from './types';
 import { getValidMoves } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
+import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+import { getPlayerName } from '../../ui/seat-labels';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -13,14 +16,11 @@ import {
   collectGridCells,
   applyRovingTabindex,
 } from '../../ui/board-a11y';
+export { getPlayerName };
 
 // Dimensions
 const NODE_RADIUS = 22;
 const CHIP_RADIUS = 18;
-
-function playerColors() {
-  return getPlayerSeatColors();
-}
 
 /**
  * Render the game board
@@ -109,8 +109,9 @@ function renderNode(
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   const match = /^n(\d+)-(\d+)$/.exec(node.id);
-  const row = match ? match[1] : '0';
-  const col = match ? match[2] : '0';
+  // Regex always captures two groups when it matches; `!` is NUI-only.
+  const row = match ? match[1]! : '0';
+  const col = match ? match[2]! : '0';
   group.setAttribute('data-row', row);
   group.setAttribute('data-col', col);
   group.setAttribute('data-node-id', node.id);
@@ -151,11 +152,12 @@ function renderNode(
     group.addEventListener('click', () => onNodeClick(node.id));
   }
 
+  const chip = node.chip;
   const canSelect =
     allowInput &&
-    !!node.chip &&
+    chip != null &&
     state.phase === 'selectingChip' &&
-    node.chip.owner === state.currentPlayer;
+    chip.owner === state.currentPlayer;
 
   // Render chip if present
   if (node.chip) {
@@ -173,22 +175,23 @@ function renderNode(
 
   const owner = node.chip ? getPlayerName(node.chip.owner) : undefined;
   const piece = node.chip ? `chip ${node.chip.value}` : undefined;
+  const extras = [
+    node.isNumbered ? 'numbered' : '',
+    state.selectedChip && node.chip?.id === state.selectedChip
+      ? 'selected'
+      : '',
+    canSelect ? 'selectable' : '',
+    isWinning ? 'winning' : '',
+  ].filter(Boolean);
   makeGridCell(
     group,
     buildCellAriaLabel({
       coord: `${row},${col}`,
       empty: !node.chip,
-      owner,
-      piece,
+      ...(owner !== undefined ? { owner } : {}),
+      ...(piece !== undefined ? { piece } : {}),
       validMove: isValid && !node.chip,
-      extras: [
-        node.isNumbered ? 'numbered' : '',
-        state.selectedChip && node.chip?.id === state.selectedChip
-          ? 'selected'
-          : '',
-        canSelect ? 'selectable' : '',
-        isWinning ? 'winning' : '',
-      ].filter(Boolean),
+      ...(extras.length ? { extras } : {}),
     })
   );
 
@@ -238,7 +241,7 @@ function renderChip(
   circle.setAttribute('cx', String(cx));
   circle.setAttribute('cy', String(cy));
   circle.setAttribute('r', String(CHIP_RADIUS));
-  circle.setAttribute('fill', playerColors()[chip.owner]);
+  circle.setAttribute('fill', getPlayerSeatColors()[chip.owner]);
   circle.setAttribute('stroke', '#333');
   circle.setAttribute('stroke-width', '2');
 
@@ -280,11 +283,17 @@ export function renderChipInfo(_state: KwaState): HTMLElement {
 
   const p1Info = document.createElement('div');
   p1Info.className = 'kwa-player-info player1';
-  p1Info.innerHTML = `<span class="label">${seatIcon('player1')} Blue (Even):</span> 0, 2, 4, 6, 8`;
+  replaceWithSafeHtml(
+    p1Info,
+    safeHtml`<span class="label">${seatIcon('player1')} Blue (Even):</span> 0, 2, 4, 6, 8`
+  );
 
   const p2Info = document.createElement('div');
   p2Info.className = 'kwa-player-info player2';
-  p2Info.innerHTML = `<span class="label">${seatIcon('player2')} Red (Odd):</span> 1, 3, 5, 7, 9`;
+  replaceWithSafeHtml(
+    p2Info,
+    safeHtml`<span class="label">${seatIcon('player2')} Red (Odd):</span> 1, 3, 5, 7, 9`
+  );
 
   container.appendChild(p1Info);
   container.appendChild(p2Info);
@@ -317,7 +326,10 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
 
     const playerName = move.player === 'player1' ? 'Blue' : 'Red';
     const alignInfo = move.alignment ? ` → ${move.alignment.expression}` : '';
-    moveEl.innerHTML = `<strong>${move.moveNumber}.</strong> ${playerName}: ${move.chip.value}${alignInfo}`;
+    replaceWithSafeHtml(
+      moveEl,
+      safeHtml`<strong>${move.moveNumber}.</strong> ${playerName}: ${move.chip.value}${alignInfo}`
+    );
 
     list.appendChild(moveEl);
   }
@@ -330,12 +342,9 @@ export function renderMoveHistory(state: KwaState): HTMLElement {
  * Inject CSS styles
  */
 export function injectKwaStyles(): void {
-  const existingStyle = document.getElementById('kwa-styles');
-  if (existingStyle) return;
-
-  const style = document.createElement('style');
-  style.id = 'kwa-styles';
-  style.textContent = `
+  injectStylesOnce(
+    'kwa-styles',
+    `
     .kwa-game-area {
       display: flex;
       flex-direction: column;
@@ -391,11 +400,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-player-info.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-on-dark, #60a5fa);
     }
 
     .kwa-player-info.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-on-dark, #f87171);
     }
 
     .kwa-status {
@@ -406,11 +415,11 @@ export function injectKwaStyles(): void {
     }
 
     .kwa-status.player1 {
-      color: var(--color-player1, #2196f3);
+      color: var(--color-player1-text, #1d4ed8);
     }
 
     .kwa-status.player2 {
-      color: var(--color-player2, #f44336);
+      color: var(--color-player2-text, #b91c1c);
     }
 
     .kwa-winner-banner {
@@ -528,13 +537,23 @@ export function injectKwaStyles(): void {
         align-items: center;
       }
     }
-  `;
-  document.head.appendChild(style);
+
+    @media (prefers-reduced-motion: reduce) {
+      .kwa-winner-banner {
+        animation: none !important;
+      }
+      .kwa-btn {
+        transition: none !important;
+      }
+    }
+
+    html[data-reduced-motion='true'] .kwa-winner-banner {
+      animation: none !important;
+    }
+  `
+  );
 }
 
 /**
  * Get player display name
  */
-export function getPlayerName(player: Player): string {
-  return player === 'player1' ? 'Blue' : 'Red';
-}

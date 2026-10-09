@@ -1,7 +1,7 @@
 // Stars & Bars Game Controller
 // Manages game flow, AI, and UI updates
 
-import { StarsState, Player } from './types';
+import type { StarsState, Player } from './types';
 import {
   createInitialState,
   selectCard,
@@ -10,7 +10,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderPlayerHand,
@@ -327,4 +328,9 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
+export function destroyGame(): void {
+  // Minimal stub after alpha controller restore.
 }

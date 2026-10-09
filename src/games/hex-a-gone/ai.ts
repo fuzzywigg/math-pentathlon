@@ -13,12 +13,8 @@
 // 4. In late game, try to force opponent into positions where they can't place
 // 5. Sometimes selecting fewer blocks is smarter than selecting the maximum
 
-import {
-  HexAGoneGameState,
-  BlockShape,
-  Player,
-  getAvailableShapes,
-} from './types';
+import type { HexAGoneGameState, BlockShape, Player } from './types';
+import { getAvailableShapes } from './types';
 
 import {
   selectBlock,

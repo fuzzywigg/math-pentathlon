@@ -1,7 +1,7 @@
 // Tutorial content for Classic Hex
 // Division I — Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const hexTutorial: TutorialConfig = {
   id: 'hex-basics',

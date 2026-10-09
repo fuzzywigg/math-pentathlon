@@ -22,7 +22,7 @@ describe('Wave 59 handshake — fab × fiar inject chrome', () => {
     const fiarCss = document.getElementById('fiar-styles')!.textContent || '';
     expect(fabCss).toContain('font-size: 1.1rem');
     expect(fabCss).toContain('.fab-bar-used');
-    expect(fiarCss).toContain('color: var(--color-player1, #2196f3)');
+    expect(fiarCss).toContain('color: var(--color-player1-text, #1d4ed8)');
     expect(fiarCss).toContain('.fiar-board-container svg');
 
     const fabBox = document.createElement('div');

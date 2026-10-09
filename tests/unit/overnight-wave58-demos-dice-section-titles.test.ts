@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 58 demos — dice section titles', () => {
   it('exposes exact Dice System Demo h1 and catalog h2s', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     expect(root.querySelector('h1')?.textContent).toMatch(/Dice System Demo/);
     const h2 = [...root.querySelectorAll('h2')].map((el) => el.textContent ?? '');

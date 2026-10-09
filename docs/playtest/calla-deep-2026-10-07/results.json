@@ -1,0 +1,1749 @@
+{
+  "summary": {
+    "desktop/easy": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 3168,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    },
+    "desktop/medium": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 3170,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    },
+    "desktop/hard": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 1463,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    },
+    "tablet/easy": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 3155,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🔵 You Win! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    },
+    "tablet/medium": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 3170,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    },
+    "tablet/hard": {
+      "total": 5,
+      "ok": 5,
+      "stalls": 0,
+      "youWins": 0,
+      "consoleErrors": 0,
+      "pageErrors": 0,
+      "aiMax": 1464,
+      "winners": [
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉",
+        "🎉 🟣 AI Wins! 🎉"
+      ],
+      "pitMinDiameter": 88
+    }
+  },
+  "results": [
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 17,
+      "humanMoves": 10,
+      "durationMs": 18629,
+      "aiThinkMs": [
+        1443,
+        598,
+        599,
+        1450,
+        601,
+        602,
+        606
+      ],
+      "aiThinkMax": 1450,
+      "aiThinkAvg": 842.7142857142857,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 14,
+      "humanMoves": 8,
+      "durationMs": 16449,
+      "aiThinkMs": [
+        1454,
+        1464,
+        596,
+        607,
+        1451,
+        599
+      ],
+      "aiThinkMax": 1464,
+      "aiThinkAvg": 1028.5,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 7030,
+      "aiThinkMs": [
+        606,
+        597,
+        598
+      ],
+      "aiThinkMax": 606,
+      "aiThinkAvg": 600.3333333333334,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 12,
+      "humanMoves": 6,
+      "durationMs": 9815,
+      "aiThinkMs": [
+        1451,
+        603,
+        600,
+        2303,
+        3168,
+        1453
+      ],
+      "aiThinkMax": 3168,
+      "aiThinkAvg": 1596.3333333333333,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9581,
+      "aiThinkMs": [
+        1450,
+        1455,
+        1452
+      ],
+      "aiThinkMax": 1455,
+      "aiThinkAvg": 1452.3333333333333,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 10976,
+      "aiThinkMs": [
+        1462,
+        1455,
+        1451
+      ],
+      "aiThinkMax": 1462,
+      "aiThinkAvg": 1456,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 4,
+      "durationMs": 9451,
+      "aiThinkMs": [
+        1454,
+        1454,
+        3156,
+        3170
+      ],
+      "aiThinkMax": 3170,
+      "aiThinkAvg": 2308.5,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9597,
+      "aiThinkMs": [
+        1458,
+        1451,
+        1460
+      ],
+      "aiThinkMax": 1460,
+      "aiThinkAvg": 1456.3333333333333,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 4,
+      "durationMs": 9437,
+      "aiThinkMs": [
+        1460,
+        1454,
+        3170,
+        3155
+      ],
+      "aiThinkMax": 3170,
+      "aiThinkAvg": 2309.75,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9590,
+      "aiThinkMs": [
+        1455,
+        1454,
+        1455
+      ],
+      "aiThinkMax": 1455,
+      "aiThinkAvg": 1454.6666666666667,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 8,
+      "durationMs": 15683,
+      "aiThinkMs": [
+        1454,
+        604,
+        603,
+        603,
+        604
+      ],
+      "aiThinkMax": 1454,
+      "aiThinkAvg": 773.6,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 7,
+      "durationMs": 12263,
+      "aiThinkMs": [
+        1460,
+        1454,
+        1453,
+        1454,
+        605,
+        606
+      ],
+      "aiThinkMax": 1460,
+      "aiThinkAvg": 1172,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 8,
+      "durationMs": 14125,
+      "aiThinkMs": [
+        1459,
+        607,
+        606,
+        603,
+        603
+      ],
+      "aiThinkMax": 1459,
+      "aiThinkAvg": 775.6,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 7,
+      "durationMs": 12269,
+      "aiThinkMs": [
+        1463,
+        1455,
+        1454,
+        1456,
+        609,
+        602
+      ],
+      "aiThinkMax": 1463,
+      "aiThinkAvg": 1173.1666666666667,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 7874,
+      "aiThinkMs": [
+        1463,
+        602,
+        604
+      ],
+      "aiThinkMax": 1463,
+      "aiThinkAvg": 889.6666666666666,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 24,
+      "humanMoves": 13,
+      "durationMs": 16652,
+      "aiThinkMs": [
+        585,
+        1455,
+        601,
+        602,
+        599,
+        602,
+        603,
+        1453,
+        603,
+        1454,
+        605
+      ],
+      "aiThinkMax": 1455,
+      "aiThinkAvg": 832.9090909090909,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 7,
+      "durationMs": 11425,
+      "aiThinkMs": [
+        1463,
+        603,
+        1452,
+        605,
+        1454,
+        598
+      ],
+      "aiThinkMax": 1463,
+      "aiThinkAvg": 1029.1666666666667,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 11278,
+      "aiThinkMs": [
+        1455,
+        1454,
+        3155
+      ],
+      "aiThinkMax": 3155,
+      "aiThinkAvg": 2021.3333333333333,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🔵 You Win! 🎉",
+      "turns": 16,
+      "humanMoves": 8,
+      "durationMs": 6783,
+      "aiThinkMs": [
+        1458,
+        604,
+        604,
+        604,
+        1456,
+        602,
+        604,
+        603
+      ],
+      "aiThinkMax": 1458,
+      "aiThinkAvg": 816.875,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🔵 You Win! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9574,
+      "aiThinkMs": [
+        1460,
+        1454,
+        1454
+      ],
+      "aiThinkMax": 1460,
+      "aiThinkAvg": 1456,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 15803,
+      "aiThinkMs": [
+        1449,
+        598,
+        604
+      ],
+      "aiThinkMax": 1449,
+      "aiThinkAvg": 883.6666666666666,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 10,
+      "humanMoves": 5,
+      "durationMs": 7480,
+      "aiThinkMs": [
+        1459,
+        1454,
+        2303,
+        1453,
+        606
+      ],
+      "aiThinkMax": 2303,
+      "aiThinkAvg": 1455,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9577,
+      "aiThinkMs": [
+        1459,
+        1454,
+        1453
+      ],
+      "aiThinkMax": 1459,
+      "aiThinkAvg": 1455.3333333333333,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 4,
+      "durationMs": 9434,
+      "aiThinkMs": [
+        1461,
+        1452,
+        3170,
+        3155
+      ],
+      "aiThinkMax": 3170,
+      "aiThinkAvg": 2309.5,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 8727,
+      "aiThinkMs": [
+        1460,
+        1456,
+        606
+      ],
+      "aiThinkMax": 1460,
+      "aiThinkAvg": 1174,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 8,
+      "humanMoves": 5,
+      "durationMs": 9326,
+      "aiThinkMs": [
+        610,
+        606,
+        603
+      ],
+      "aiThinkMax": 610,
+      "aiThinkAvg": 606.3333333333334,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 7,
+      "durationMs": 12274,
+      "aiThinkMs": [
+        1464,
+        1456,
+        1453,
+        1456,
+        604,
+        608
+      ],
+      "aiThinkMax": 1464,
+      "aiThinkAvg": 1173.5,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 8,
+      "durationMs": 14134,
+      "aiThinkMs": [
+        1460,
+        607,
+        606,
+        604,
+        604
+      ],
+      "aiThinkMax": 1460,
+      "aiThinkAvg": 776.2,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 7,
+      "durationMs": 12287,
+      "aiThinkMs": [
+        1458,
+        1452,
+        1463,
+        1453,
+        604,
+        605
+      ],
+      "aiThinkMax": 1463,
+      "aiThinkAvg": 1172.5,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    },
+    {
+      "viewport": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "ok": true,
+      "winner": "🎉 🟣 AI Wins! 🎉",
+      "turns": 13,
+      "humanMoves": 8,
+      "durationMs": 14126,
+      "aiThinkMs": [
+        1458,
+        603,
+        604,
+        604,
+        603
+      ],
+      "aiThinkMax": 1458,
+      "aiThinkAvg": 774.4,
+      "stalled": false,
+      "stallReason": "",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pitSizes": [
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        },
+        {
+          "cssW": 88,
+          "cssH": 88,
+          "cssDiameter": 88
+        }
+      ],
+      "finalStatus": "🎉 🟣 AI Wins! 🎉",
+      "uxFlags": {
+        "youWinsGrammar": false,
+        "blueDuringHva": false
+      }
+    }
+  ]
+}

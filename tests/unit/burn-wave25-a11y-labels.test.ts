@@ -7,6 +7,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 
 import {
   buildCellAriaLabel,
+  ensureAriaGridRows,
   makeCellFocusable,
   makeSvgFocusable,
   makeGridCell,
@@ -234,5 +235,51 @@ describe('Wave 25 a11y-labels — makeGridCell / markBoardAsGrid', () => {
     expect(cell.getAttribute('role')).toBe('gridcell');
     expect(cell.getAttribute('aria-label')).toBe('new, empty, valid placement');
     expect(cell.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('ensureAriaGridRows wraps HTML gridcells in role=row (display:contents class)', () => {
+    const board = document.createElement('div');
+    markBoardAsGrid(board);
+    for (const [r, c] of [
+      [0, 0],
+      [0, 1],
+      [1, 0],
+    ] as const) {
+      const cell = document.createElement('div');
+      cell.dataset.row = String(r);
+      cell.dataset.col = String(c);
+      makeGridCell(cell, `${r},${c}`);
+      board.appendChild(cell);
+    }
+    ensureAriaGridRows(board);
+    const rows = board.querySelectorAll(':scope > [role="row"]');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]?.classList.contains('aria-grid-row')).toBe(true);
+    expect(rows[0]?.querySelectorAll('[role="gridcell"]')).toHaveLength(2);
+    expect(rows[1]?.querySelectorAll('[role="gridcell"]')).toHaveLength(1);
+    // Idempotent
+    ensureAriaGridRows(board);
+    expect(board.querySelectorAll('[role="row"]')).toHaveLength(2);
+  });
+
+  it('ensureAriaGridRows promotes single-row SVG cell parents and marks chrome presentation', () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    markBoardAsGrid(svg);
+    const chrome = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    svg.appendChild(chrome);
+    const cellsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    svg.appendChild(cellsGroup);
+    for (const col of [0, 1]) {
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('data-row', '0');
+      g.setAttribute('data-col', String(col));
+      makeGridCell(g, `0,${col}`);
+      cellsGroup.appendChild(g);
+    }
+    ensureAriaGridRows(svg);
+    expect(chrome.getAttribute('role')).toBe('presentation');
+    // One logical row under the cell parent → parent is promoted to role=row.
+    expect(cellsGroup.getAttribute('role')).toBe('row');
+    expect(svg.querySelectorAll('[role="gridcell"]')).toHaveLength(2);
   });
 });

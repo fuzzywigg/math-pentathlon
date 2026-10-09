@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { readAppCss } from './_app-css';
 import { createInitialState } from '../../src/games/contig-60/types';
 import * as types from '../../src/games/contig-60/types';
 import {
@@ -76,7 +77,7 @@ describe('Contig 60 AI seat input lock', () => {
     expect(injected).toMatch(/min-height:\s*44px/);
     expect(injected).toMatch(/\.contig-expr-option[\s\S]*min-height:\s*44px/);
 
-    const css = readFileSync(join(process.cwd(), 'src/style.css'), 'utf8');
+    const css = readAppCss();
     expect(css).toMatch(/\.contig-roll-btn\s*\{[\s\S]*?min-height:\s*44px/);
     expect(css).toMatch(/\.contig-pass-btn\s*\{[\s\S]*?min-height:\s*44px/);
   });

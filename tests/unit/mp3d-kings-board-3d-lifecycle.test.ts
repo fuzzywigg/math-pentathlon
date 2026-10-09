@@ -251,9 +251,13 @@ describe('mp3d Kings & Quadraphages board 3d lifecycle', () => {
     );
     expect(container.contains(view.canvas)).toBe(true);
 
+    // Mount schedules a one-shot rAF readiness paint (software GL); not a loop.
+    expect(raf).toHaveBeenCalled();
+    raf.mockClear();
+
     const state = createInitialGameState();
     view.update(state, onClick);
-    // Render-on-demand: no continuous RAF loop.
+    // Render-on-demand: no continuous RAF loop after updates.
     expect(raf).not.toHaveBeenCalled();
     expect(view.cellToClientPoint(1, 5)).toEqual(
       expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) })

@@ -21,7 +21,7 @@
  *   from production bundles if unused.
  */
 
-import {
+import type {
   GridPosition,
   CellValue,
   CellGetter,
@@ -51,7 +51,7 @@ export interface Dimensions {
 export function getArrayDimensions<T>(grid: T[][]): Dimensions {
   return {
     rows: grid.length,
-    cols: grid.length > 0 ? grid[0].length : 0,
+    cols: grid.length > 0 ? (grid[0]?.length ?? 0) : 0,
   };
 }
 
@@ -67,8 +67,9 @@ export function createArrayAccessor<T extends CellValue>(
 ): (row: number, col: number) => T | undefined {
   return (row, col) => {
     if (row < 0 || row >= grid.length) return undefined;
-    if (col < 0 || col >= (grid[row]?.length ?? 0)) return undefined;
-    return grid[row][col];
+    const gridRow = grid[row];
+    if (!gridRow || col < 0 || col >= gridRow.length) return undefined;
+    return gridRow[col];
   };
 }
 
@@ -239,9 +240,11 @@ export function checkLineAlignment(
   getCell: (row: number, col: number) => CellValue | undefined
 ): LineAlignmentResult {
   if (positions.length === 0) return { isAligned: false, value: null };
-  const first = getCell(positions[0].row, positions[0].col);
-  if (first === null || first === undefined)
+  const firstPos = positions[0]!;
+  const first = getCell(firstPos.row, firstPos.col);
+  if (first === null || first === undefined) {
     return { isAligned: false, value: null };
+  }
   const aligned = positions.every((p) => {
     const v = getCell(p.row, p.col);
     return v !== null && v !== undefined && v === first;

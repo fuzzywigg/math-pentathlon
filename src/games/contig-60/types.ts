@@ -63,9 +63,7 @@ export const BOARD_NUMBERS: number[][] = [
 /**
  * Get opponent
  */
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 /**
  * Get all adjacent cells for a position
@@ -75,7 +73,7 @@ export function getAdjacentPositions(
   col: number
 ): { row: number; col: number }[] {
   const adjacent: { row: number; col: number }[] = [];
-  const directions = [
+  const directions: ReadonlyArray<readonly [number, number]> = [
     [-1, -1],
     [-1, 0],
     [-1, 1],
@@ -108,10 +106,13 @@ export function createBoard(boardNumbers: number[][] = BOARD_NUMBERS): {
   const grid: (number | null)[][] = [];
 
   for (let row = 0; row < CONFIG.GRID_ROWS; row++) {
-    grid[row] = [];
+    const gridRow: (number | null)[] = [];
+    grid[row] = gridRow;
+    // Indexed access is definite for CONFIG-sized BOARD_NUMBERS; `!` is NUI-only.
+    const numberRow = boardNumbers[row]!;
     for (let col = 0; col < CONFIG.GRID_COLS; col++) {
-      const value = boardNumbers[row][col];
-      grid[row][col] = value;
+      const value = numberRow[col]!;
+      gridRow[col] = value;
 
       if (cells.has(value)) {
         throw new Error(`Duplicate board number: ${value}`);
@@ -193,7 +194,7 @@ export function getAllPossibleResults(
   const results: Map<number, string> = new Map();
 
   // Try all orderings of the three dice
-  const orderings = [
+  const orderings: Array<[number, number, number]> = [
     [a, b, c],
     [a, c, b],
     [b, a, c],

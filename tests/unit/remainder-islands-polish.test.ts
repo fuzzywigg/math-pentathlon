@@ -13,21 +13,13 @@ import {
   injectRemainderIslandsStyles,
   renderBoard,
 } from '../../src/games/remainder-islands/board-ui';
+import { mountAppShell } from './helpers/dom';
 
 afterEach(() => {
   vi.restoreAllMocks();
   document.body.innerHTML = '';
   document.getElementById('remainder-islands-styles')?.remove();
 });
-
-function mount(): HTMLElement {
-  const app = document.createElement('div');
-  app.id = 'app';
-  document.body.appendChild(app);
-  const container = document.createElement('div');
-  app.appendChild(container);
-  return container;
-}
 
 function hitPolygon(
   container: HTMLElement,
@@ -97,15 +89,15 @@ describe('Remainder Islands polish — focusable only when activatable', () => {
   });
 });
 
-describe('Remainder Islands polish — pointerdown+click claim-once', () => {
-  it('pointerdown then click activates the island only once', () => {
+describe('Remainder Islands polish — pointer tap + click claim-once', () => {
+  it('pointer tap then click activates the island only once', () => {
     let i = 0;
     vi.spyOn(Math, 'random').mockImplementation(() => {
       i += 1;
       return ((0.17 * 1000 + i * 37) % 1000) / 1000;
     });
 
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 
@@ -117,8 +109,18 @@ describe('Remainder Islands polish — pointerdown+click claim-once', () => {
     expect(islandId).toBeTruthy();
 
     const hit = hitPolygon(container, islandId);
-    hit.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    // Second event on the same hit node must not double-apply (phase already advanced).
+    const init: PointerEventInit = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      pointerType: 'touch',
+      isPrimary: true,
+      clientX: 10,
+      clientY: 10,
+    };
+    hit.dispatchEvent(new PointerEvent('pointerdown', { ...init, buttons: 1 }));
+    hit.dispatchEvent(new PointerEvent('pointerup', { ...init, buttons: 0 }));
+    // Hybrid mouse echo must not double-apply.
     hit.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(getCurrentState().moveHistory).toHaveLength(1);
@@ -135,7 +137,7 @@ describe('Remainder Islands polish — empty-valid skip status', () => {
       return ((0.41 * 1000 + i * 37) % 1000) / 1000;
     });
 
-    const container = mount();
+    const container = mountAppShell();
     initGame(container);
     newGameVsHuman();
 

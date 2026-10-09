@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickCol(root: HTMLElement, col: number): void {
 
 describe('Overnight demos45 — align four diagonal win', () => {
   it('X wins on a rising diagonal with winning-cell chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Build diagonal X at (5,0)(4,1)(3,2)(2,3) via gravity drops.
@@ -71,7 +66,7 @@ describe('Overnight demos45 — align four diagonal win', () => {
   });
 
   it('full column still rejects after diagonal setup mid-game', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     for (let i = 0; i < 6; i++) {
       clickCol(root, 6);

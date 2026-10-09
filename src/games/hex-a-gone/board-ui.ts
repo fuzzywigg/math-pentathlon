@@ -1,8 +1,21 @@
 // Hex-a-Gone! Board UI - Renders the hexagonal board and pattern blocks
 
-import { HexAGoneGameState, BlockShape, BLOCK_COLORS } from './types';
+import type { HexAGoneGameState, BlockShape } from './types';
+import { BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
+import { formatModeSeatLabel } from '../../ui/seat-labels';
+import {
+  flatTopAxialToPixel,
+  pointyTopHexPolygonPoints,
+} from '../../ui/hex-svg';
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+  setText,
+} from '../../core/dom-security';
+
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -28,21 +41,12 @@ const HEX_SIZE = 30;
 
 // Convert axial coordinates to pixel coordinates
 function axialToPixel(q: number, r: number): { x: number; y: number } {
-  const x = HEX_SIZE * ((3 / 2) * q);
-  const y = HEX_SIZE * ((Math.sqrt(3) / 2) * q + Math.sqrt(3) * r);
-  return { x, y };
+  return flatTopAxialToPixel(q, r, HEX_SIZE);
 }
 
 // Create hexagon path for SVG
 function hexagonPath(cx: number, cy: number, size: number): string {
-  const points: string[] = [];
-  for (let i = 0; i < 6; i++) {
-    const angle = (Math.PI / 3) * i - Math.PI / 6;
-    const x = cx + size * Math.cos(angle);
-    const y = cy + size * Math.sin(angle);
-    points.push(`${x},${y}`);
-  }
-  return points.join(' ');
+  return pointyTopHexPolygonPoints(cx, cy, size);
 }
 
 // Render the game board
@@ -55,7 +59,7 @@ export function renderBoard(
   options: SelectionAreaOptions = {}
 ): void {
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
   // Static/test callers omit options → keep human placing copy.
   const selectionOptions: SelectionAreaOptions = {
     interactive: options.interactive !== false,
@@ -129,14 +133,14 @@ export function renderBoard(
         : cell.filledBy === 'player2'
           ? 'Red'
           : undefined;
-    const isValidPlacement = !cell.filled && isValid && !!onCellClick;
+    const isValidPlacement = !cell.filled && isValid && Boolean(onCellClick);
 
     makeGridCell(
       hex,
       buildCellAriaLabel({
         coord: `${cell.q},${cell.r}`,
         empty: !cell.filled,
-        owner,
+        ...(owner !== undefined ? { owner } : {}),
         validPlacement: isValidPlacement,
       })
     );
@@ -209,6 +213,7 @@ export function buildSelectionArea(
     shapes.forEach((shape) => {
       const blockBtn = document.createElement('button');
       blockBtn.className = 'hex-a-gone-block-btn';
+      blockBtn.type = 'button';
       blockBtn.setAttribute('data-shape', shape);
 
       const isSelected = state.turnSelection.blocks.includes(shape);
@@ -216,21 +221,36 @@ export function buildSelectionArea(
       const isAvailable = state.bank[shape] > 0;
       const canSelect =
         state.phase === 'selectBlocks' && !state.turnSelection.committed;
+      const canPlaceSwitch =
+        state.phase === 'placeBlocks' && isSelected && Boolean(onBlockSelect);
+      const selectable =
+        interactive &&
+        ((canSelect && isAvailable && Boolean(onBlockSelect)) ||
+          canPlaceSwitch);
 
       if (isSelected) blockBtn.classList.add('selected');
       if (isCurrentPlacement) blockBtn.classList.add('placing');
       if (!isAvailable) blockBtn.classList.add('empty');
 
-      blockBtn.innerHTML = `
-        <div class="block-icon" style="background-color: ${BLOCK_COLORS[shape]}">${getShapeIcon(shape)}</div>
+      replaceWithSafeHtml(
+        blockBtn,
+        safeHtml`
+        <div class="block-icon">${getShapeIcon(shape)}</div>
         <div class="block-name">${shape}</div>
         <div class="block-count">${state.bank[shape]} left</div>
-      `;
+      `
+      );
+      const icon = blockBtn.querySelector('.block-icon');
+      if (icon instanceof HTMLElement) {
+        icon.style.backgroundColor = BLOCK_COLORS[shape];
+      }
 
-      if (canSelect && isAvailable && onBlockSelect) {
+      if (selectable && onBlockSelect) {
         blockBtn.addEventListener('click', () => onBlockSelect(shape));
-      } else if (state.phase === 'placeBlocks' && isSelected && onBlockSelect) {
-        blockBtn.addEventListener('click', () => onBlockSelect(shape));
+      } else {
+        // AI-seat / empty bank: disabled for SR honesty (no new player copy).
+        blockBtn.disabled = true;
+        blockBtn.setAttribute('aria-disabled', 'true');
       }
 
       bankBlocks.appendChild(blockBtn);
@@ -246,20 +266,36 @@ export function buildSelectionArea(
       if (state.turnSelection.blocks.length > 0) {
         const selectedList = document.createElement('div');
         selectedList.className = 'selected-blocks';
-        selectedList.innerHTML = `<strong>Selected:</strong> ${state.turnSelection.blocks
-          .map(
-            (s) =>
-              `<span class="selected-shape" style="background-color: ${BLOCK_COLORS[s]}">${getShapeIcon(s)}</span>`
-          )
-          .join(' ')}`;
+        const selectedLabel = document.createElement('strong');
+        selectedLabel.textContent = 'Selected:';
+        selectedList.appendChild(selectedLabel);
+        selectedList.appendChild(document.createTextNode(' '));
+        state.turnSelection.blocks.forEach((s, i) => {
+          if (i > 0) selectedList.appendChild(document.createTextNode(' '));
+          const shapeSpan = document.createElement('span');
+          shapeSpan.className = 'selected-shape';
+          shapeSpan.style.backgroundColor = BLOCK_COLORS[s];
+          shapeSpan.textContent = getShapeIcon(s);
+          selectedList.appendChild(shapeSpan);
+        });
         selectionStatus.appendChild(selectedList);
 
-        if (onConfirm) {
+        if (onConfirm && interactive) {
           const confirmBtn = document.createElement('button');
           confirmBtn.className = 'hex-a-gone-confirm-btn';
+          confirmBtn.type = 'button';
           confirmBtn.textContent = `Confirm (${state.turnSelection.blocks.length} block${state.turnSelection.blocks.length > 1 ? 's' : ''})`;
           confirmBtn.addEventListener('click', onConfirm);
           selectionStatus.appendChild(confirmBtn);
+          // Tablet: bank+board can push Confirm past the fold — bring it into view.
+          queueMicrotask(() => {
+            if (typeof confirmBtn.scrollIntoView === 'function') {
+              confirmBtn.scrollIntoView({
+                block: 'nearest',
+                inline: 'nearest',
+              });
+            }
+          });
         }
       } else {
         selectionStatus.textContent =
@@ -275,13 +311,21 @@ export function buildSelectionArea(
       const hint = interactive
         ? 'Click an empty cell to place'
         : 'Computer is placing…';
-      placingInfo.innerHTML = `
+      replaceWithSafeHtml(
+        placingInfo,
+        safeHtml`
         <strong>Placing:</strong>
-        <span class="placing-shape" style="background-color: ${BLOCK_COLORS[state.selectedBlockForPlacement]}">
+        <span class="placing-shape">
           ${getShapeIcon(state.selectedBlockForPlacement)} ${state.selectedBlockForPlacement}
         </span>
         <span class="placing-hint">${hint}</span>
-      `;
+      `
+      );
+      const placingShape = placingInfo.querySelector('.placing-shape');
+      if (placingShape instanceof HTMLElement) {
+        placingShape.style.backgroundColor =
+          BLOCK_COLORS[state.selectedBlockForPlacement];
+      }
       selectionArea.appendChild(placingInfo);
     }
   }
@@ -323,7 +367,7 @@ export function renderStatus(
   isAIThinking: boolean = false
 ): void {
   markStatusLive(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   const statusEl = document.createElement('div');
   statusEl.className = 'hex-a-gone-status';
@@ -334,14 +378,7 @@ export function renderStatus(
 
   if (state.winner) {
     turnEl.classList.add('status-winner');
-    const winnerName =
-      gameMode === 'human-vs-ai'
-        ? state.winner === 'player1'
-          ? 'You'
-          : 'AI'
-        : state.winner === 'player1'
-          ? 'Blue'
-          : 'Red';
+    const winnerName = formatModeSeatLabel(state.winner, gameMode);
     turnEl.textContent = `🎉 ${seatIcon(state.winner)} ${winnerName} Wins! 🎉`;
   } else if (isAIThinking) {
     turnEl.textContent = '🤖 AI is thinking...';
@@ -361,12 +398,12 @@ export function renderStatus(
 
   const p1El = document.createElement('div');
   p1El.className = `player-indicator ${state.currentPlayer === 'player1' ? 'active' : ''}`;
-  p1El.innerHTML = `${seatIcon('player1')} ${p1Label}`;
+  setText(p1El, `${seatIcon('player1')} ${p1Label}`);
   playersEl.appendChild(p1El);
 
   const p2El = document.createElement('div');
   p2El.className = `player-indicator ${state.currentPlayer === 'player2' ? 'active' : ''}`;
-  p2El.innerHTML = `${seatIcon('player2')} ${p2Label}`;
+  setText(p2El, `${seatIcon('player2')} ${p2Label}`);
   playersEl.appendChild(p2El);
 
   statusEl.appendChild(playersEl);

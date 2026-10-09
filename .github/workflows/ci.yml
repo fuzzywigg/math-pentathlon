@@ -4,32 +4,60 @@ on:
   push:
     branches: [main, development, alpha]
   pull_request:
-    branches: [main, development, alpha]
+    # Base-branch filter: stacked draft PRs targeting cursor/** also get CI.
+    branches: [main, development, alpha, 'cursor/**']
+  # Manual re-runs (cross-browser is always report-only on PR/push; no toggle needed).
+  workflow_dispatch:
+
+# Least privilege: every job only needs to read the repo checkout.
+# No job needs contents: write, deployments, or pull-requests scopes.
+# (upload-artifact already succeeds under this permission set on this repo.)
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same PR (or branch for push/dispatch).
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run lint
+      - name: Lint rule ceilings (curly:all ratchet)
+        run: npm run lint:ratchet
       - name: Check formatting
         run: npm run format:check
       - name: TypeScript type checking
-        run: npx tsc --noEmit
+        run: npm run typecheck
+      - name: TypeScript type ratchet (ui/core/demos/Batch-1/2/3/4 shells + Phase-2 ceiling)
+        run: npm run typecheck:ratchet
+      - name: Module-boundary import-graph ceilings (engine_imports_ui must stay 0)
+        run: npm run check:boundaries
 
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Security audit
         run: npm audit --audit-level=high
@@ -37,12 +65,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: audit
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Build project
         run: npm run build
@@ -68,24 +100,35 @@ jobs:
             exit 1
           fi
           echo "All JS chunks under ${limit_kb} kB"
+      - name: Report gzip bundle budgets (non-blocking)
+        continue-on-error: true
+        run: npm run size:check
+      # Report-only: parses dist/site.webmanifest after build (burn-1008-mp-pwa-manifest).
+      - name: PWA manifest installability contract (report-only)
+        continue-on-error: true
+        run: npm run check:pwa-manifest
 
-  # Unit suite pruned from ~5k TOKENMAXX files; target wall time under ~5 min.
+  # Unit suite pruned from ~5k TOKENMAXX files; tip fold suite targets ~8 min
+  # on GHA (AI benches skipped under CI; see *.bench.test.ts skipIf).
   unit:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 14
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Run unit tests
-        timeout-minutes: 8
+        timeout-minutes: 12
         run: |
           set -euo pipefail
           count="$(find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) ! -path '*/_tokenmaxx_archive/*' | wc -l | tr -d ' ')"
-          echo "unit suite: ${count} files (budget ~5 min; step timeout 8m / job 10m)"
+          echo "unit suite: ${count} files (budget ~8 min; step timeout 12m / job 14m)"
           npm run test:unit
 
   # Browser smoke + mp3d board3d guards; pruned TOKENMAXX chrome leftovers.
@@ -94,25 +137,347 @@ jobs:
     needs: build
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
       - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       - name: Run e2e tests
         timeout-minutes: 12
         run: |
           set -euo pipefail
-          count="$(find tests/e2e -name '*.spec.ts' | wc -l | tr -d ' ')"
-          echo "e2e suite: ${count} files (smoke + bug-guards + mp3d)"
-          npm run test:e2e -- --project=chromium
+          count="$(find tests/e2e -name '*.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
+          echo "e2e suite: ${count} files (smoke + bug-guards + mp3d; @fullgame excluded)"
+          npm run test:e2e:chromium
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  # Fullgame HvH: one complete human-vs-human match per game (Chromium).
+  # Report-only: failures upload artifacts but do not fail the workflow.
+  # Task: burn-1007-mp-e2e-fullgame
+  e2e-fullgame:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run fullgame HvH e2e (report-only)
+        id: fullgame
+        continue-on-error: true
+        timeout-minutes: 110
+        run: |
+          set -euo pipefail
+          count="$(find tests/e2e/fullgame -name '*.spec.ts' | wc -l | tr -d ' ')"
+          echo "e2e-fullgame: report-only — ${count} specs (burn-1007-mp-e2e-fullgame)"
+          npm run test:e2e:fullgame
+      - name: Upload fullgame Playwright report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: fullgame-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.fullgame.outcome == 'failure'
+        run: |
+          echo "::warning::fullgame findings or timeouts (report-only; workflow stays green)"
+          exit 0
+
+  # Phone + tablet touch smoke (iPhone 13 / Pixel 7 / iPad). Report-only:
+  # failures upload artifacts but do not fail the workflow.
+  mobile-touch:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run mobile touch smoke (report-only)
+        id: mobile
+        continue-on-error: true
+        timeout-minutes: 40
+        run: |
+          set -euo pipefail
+          echo "mobile-touch: report-only — see docs/mobile-2026-10-07.md"
+          npm run test:e2e:mobile
+      - name: Upload mobile touch artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: mobile-touch-report
+          path: |
+            test-results/mobile/
+            playwright-report/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.mobile.outcome == 'failure'
+        run: |
+          echo "::warning::mobile-touch findings or timeouts (report-only; workflow stays green)"
+          exit 0
+
+  # WCAG 1.4.4 / 1.4.10 zoom + reflow audit (Chromium). Report-only:
+  # findings upload as artifacts but do not fail the workflow.
+  zoom-reflow:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run zoom/reflow a11y audit (report-only)
+        id: zoom
+        continue-on-error: true
+        timeout-minutes: 55
+        run: |
+          set -euo pipefail
+          echo "zoom-reflow: report-only — see docs/zoom-reflow-2026-10-08.md"
+          npm run test:e2e:zoom-reflow
+      - name: Upload zoom-reflow artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: zoom-reflow-report
+          path: |
+            test-results/zoom-reflow/
+            playwright-report/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.zoom.outcome == 'failure'
+        run: |
+          echo "::warning::zoom-reflow findings or timeouts (report-only; workflow stays green)"
+          exit 0
+
+  # Forced-colors + reduced-motion + color-scheme smoke (Chromium).
+  # Report-only: screenshots/JSON under test-results/forced-colors; does not
+  # fail the workflow. Task: burn-1008-mp-forced-colors
+  forced-colors:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run forced-colors smoke (report-only)
+        id: forced
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          set -euo pipefail
+          echo "forced-colors: report-only — see docs/forced-colors-2026-10-08.md"
+          npm run test:e2e:forced-colors
+      - name: Upload forced-colors artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: forced-colors-report
+          path: |
+            test-results/forced-colors/
+            playwright-report/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.forced.outcome == 'failure'
+        run: |
+          echo "::warning::forced-colors findings or timeouts (report-only; workflow stays green)"
+          exit 0
+
+  # Report-only Firefox + WebKit e2e (full suite). Does not block merges.
+  # Runs after a successful build on every PR/push (and workflow_dispatch).
+  # continue-on-error keeps the required Chromium path green while we triage.
+  e2e-cross-browser:
+    runs-on: ubuntu-latest
+    needs: build
+    timeout-minutes: 60
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-ff-wk-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers (firefox + webkit)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps firefox webkit
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps firefox webkit
+      - name: Run cross-browser e2e (report-only)
+        timeout-minutes: 55
+        env:
+          CROSS_BROWSER: '1'
+        run: |
+          set -euo pipefail
+          count="$(find tests/e2e -name '*.spec.ts' ! -name 'mobile-touch-smoke.spec.ts' ! -name 'visual-baseline.spec.ts' ! -name 'zoom-reflow-a11y.spec.ts' ! -name 'forced-colors-a11y.spec.ts' ! -path '*/fullgame/*' | wc -l | tr -d ' ')"
+          echo "cross-browser e2e (report-only): ${count} specs × firefox + webkit"
+          npm run test:e2e -- --project=firefox --project=webkit
+      - name: Upload cross-browser Playwright report
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: playwright-report-cross-browser
+          path: playwright-report/
+          retention-days: 30
+
+  # Visual baselines (start screen + each game opening @ desktop + phone).
+  # Report-only for now: failures upload artifacts but do not fail the workflow.
+  visual-baseline:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps (cached browsers)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run visual regression (report-only)
+        id: visual
+        continue-on-error: true
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          echo "visual-baseline: report-only — see docs/wiki/development.md#visual-regression-baselines"
+          npm run test:e2e:visual
+      - name: Upload visual diff artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure() || steps.visual.outcome == 'failure'
+        with:
+          name: visual-baseline-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
+      - name: Surface report-only result
+        if: steps.visual.outcome == 'failure'
+        run: |
+          echo "::warning::visual-baseline diffs detected (report-only; workflow stays green)"
+          exit 0

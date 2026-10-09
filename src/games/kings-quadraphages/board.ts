@@ -1,9 +1,5 @@
-import {
-  Piece,
-  PieceType,
-  PlayerOwner,
-  INITIAL_QUADRAPHAGE_COUNT,
-} from './pieces';
+import type { Piece, PieceType, PlayerOwner } from './pieces';
+import { INITIAL_QUADRAPHAGE_COUNT } from './pieces';
 
 // Re-export piece types for convenience
 export type { Piece, PieceType, PlayerOwner };
@@ -61,13 +57,14 @@ export function createInitialGameState(): GameState {
   );
 
   // Place Player 1's King at top center (row 1, col 5 = index [0][4])
-  board[PLAYER1_KING_START.row][PLAYER1_KING_START.col] = {
+  // ratchet: board is dense BOARD_SIZE×BOARD_SIZE; start coords are constants.
+  board[PLAYER1_KING_START.row]![PLAYER1_KING_START.col] = {
     type: 'king',
     owner: 'player1',
   };
 
   // Place Player 2's King at bottom center (row 9, col 5 = index [8][4])
-  board[PLAYER2_KING_START.row][PLAYER2_KING_START.col] = {
+  board[PLAYER2_KING_START.row]![PLAYER2_KING_START.col] = {
     type: 'king',
     owner: 'player2',
   };
@@ -96,12 +93,14 @@ export function getPiece(board: Board, pos: Position): Cell {
   if (!isValidPosition(pos)) {
     return null;
   }
-  return board[pos.row][pos.col];
+  // ratchet: isValidPosition gates row/col into the dense board.
+  return board[pos.row]![pos.col]!;
 }
 
 // Check if a cell is empty
 export function isEmpty(board: Board, pos: Position): boolean {
-  return isValidPosition(pos) && board[pos.row][pos.col] === null;
+  // ratchet: isValidPosition gates row/col into the dense board.
+  return isValidPosition(pos) && board[pos.row]![pos.col] === null;
 }
 
 // Get the remaining supply for a player

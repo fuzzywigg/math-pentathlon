@@ -39,6 +39,39 @@ Names from src/core/game-registry.ts:
 19. Frac Fact
 20. Fraction Pinball
 
+## Gallery
+
+Tablet landscape (1024×768) start and mid-game screenshots for every registered game. Regenerated with Playwright (not CI):
+
+```bash
+npx playwright test -c playwright.gallery.config.ts
+```
+
+| Game | Start | Mid-game |
+|------|-------|----------|
+| Kings & Quadraphages | [start](./docs/gallery/kings-quadraphages-start.png) | [mid](./docs/gallery/kings-quadraphages-mid.png) |
+| Hex | [start](./docs/gallery/hex-start.png) | [mid](./docs/gallery/hex-mid.png) |
+| Star Track | [start](./docs/gallery/star-track-start.png) | [mid](./docs/gallery/star-track-mid.png) |
+| Hex-a-Gone! | [start](./docs/gallery/hex-a-gone-start.png) | [mid](./docs/gallery/hex-a-gone-mid.png) |
+| Calla | [start](./docs/gallery/calla-start.png) | [mid](./docs/gallery/calla-mid.png) |
+| Sum Dominoes & Dice | [start](./docs/gallery/sum-dominoes-start.png) | [mid](./docs/gallery/sum-dominoes-mid.png) |
+| Par 55 | [start](./docs/gallery/par-55-start.png) | [mid](./docs/gallery/par-55-mid.png) |
+| Ramrod | [start](./docs/gallery/ramrod-start.png) | [mid](./docs/gallery/ramrod-mid.png) |
+| Kwatro-Sinko | [start](./docs/gallery/kwatro-sinko-start.png) | [mid](./docs/gallery/kwatro-sinko-mid.png) |
+| FIAR | [start](./docs/gallery/fiar-start.png) | [mid](./docs/gallery/fiar-mid.png) |
+| Juggle | [start](./docs/gallery/juggle-start.png) | [mid](./docs/gallery/juggle-mid.png) |
+| Contig 60 | [start](./docs/gallery/contig-60-start.png) | [mid](./docs/gallery/contig-60-mid.png) |
+| Stars & Bars | [start](./docs/gallery/stars-bars-start.png) | [mid](./docs/gallery/stars-bars-mid.png) |
+| Fab-a-Diffy | [start](./docs/gallery/fab-a-diffy-start.png) | [mid](./docs/gallery/fab-a-diffy-mid.png) |
+| Queens & Guards | [start](./docs/gallery/queens-guards-start.png) | [mid](./docs/gallery/queens-guards-mid.png) |
+| Prime Gold | [start](./docs/gallery/prime-gold-start.png) | [mid](./docs/gallery/prime-gold-mid.png) |
+| Remainder Islands | [start](./docs/gallery/remainder-islands-start.png) | [mid](./docs/gallery/remainder-islands-mid.png) |
+| Pent'Em In | [start](./docs/gallery/pent-em-in-start.png) | [mid](./docs/gallery/pent-em-in-mid.png) |
+| Frac Fact | [start](./docs/gallery/frac-fact-start.png) | [mid](./docs/gallery/frac-fact-mid.png) |
+| Fraction Pinball | [start](./docs/gallery/fraction-pinball-start.png) | [mid](./docs/gallery/fraction-pinball-mid.png) |
+
+See also [docs/gallery/README.md](./docs/gallery/README.md).
+
 ## Stack
 
 - TypeScript + Vite
@@ -47,26 +80,33 @@ Names from src/core/game-registry.ts:
 
 ## Development
 
-npm install
-npm run dev
-npm test             # unit + e2e
+```bash
+npm install                 # Node.js >= 20
+npm run dev                 # Vite → http://localhost:5173
+npm test                    # unit then Chromium e2e (CI required pair)
 npm run test:unit
-npm run test:e2e
+npm run test:e2e:chromium   # required CI e2e path
+npm run lint
+npm run format:check
 npm run build
+npm run preview             # serve dist/ after build
+```
 
-`npm test` runs unit then e2e. The unit suite under `tests/unit` is sized for CI under ~5 minutes (see `docs/wiki/development.md`).
+`npm test` runs `test:unit` then `test:e2e:chromium`. Prefer `test:e2e:chromium` over bare `npm run test:e2e` (the latter runs every Playwright project). The unit suite under `tests/unit` is sized for CI under ~8 minutes (see `docs/wiki/development.md`).
+
+Contributor checklist: [CONTRIBUTING.md](./CONTRIBUTING.md). Full scripts (coverage, visual, mobile, size budgets, perf audits): [docs/wiki/development.md](./docs/wiki/development.md).
 
 ## Branches
 
 - alpha -- trunk. All development merges here.
-- main -- 315 behind / 2 ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
+- main -- `317` behind / `2` ahead of alpha (`origin/main...origin/alpha` as of 2026-10-07). Do not target main for new work.
 
-## Status (2026-10-07)
+## Status (2026-10-08)
 
 - 20 registered games in `src/core/game-registry.ts` (all `available: true`)
-- Tests: 2974 Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`); 11 Playwright specs under `tests/e2e`
-- CI (`ci.yml` on alpha): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ 250 kB JS chunk budget), unit (required; no `continue-on-error`), Chromium e2e (failures fail the workflow)
-- Latest alpha CI green at `593270b` (2026-10-06)
+- Tests: **3083** Vitest files under `tests/unit` (excl. `_tokenmaxx_archive`; **11361** passed / 19 skipped on tip CI) + **34** Playwright specs under `tests/e2e` excl. `fullgame/` (visual baselines in `tests/e2e/visual-baselines/`; required Chromium e2e **204** passed on tip CI). Plus 20 report-only `@fullgame` specs under `tests/e2e/fullgame/`.
+- CI (`ci.yml`): lint, Prettier `format:check`, `tsc --noEmit`, `npm audit --audit-level=high`, build (+ hard 250 kB JS chunk budget; report-only `size:check`), unit (required), Chromium e2e (required); report-only `mobile-touch`, `e2e-cross-browser`, `e2e-fullgame`, and `visual-baseline` (see `docs/wiki/development.md`)
+- `origin/alpha` is the trunk tip; the integration tip may be ahead of alpha.
 
 ## Agent rules
 

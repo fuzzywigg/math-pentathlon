@@ -3,6 +3,7 @@
  * Distinct from wave64 (#313) corner/center/awkward softs: locks unsaturated exacts. Tests-only.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { readAppCss } from './_app-css';
 import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tutorial';
 import { hexTutorial } from '../../src/games/hex/tutorial';
 import { hexAGoneTutorial } from '../../src/games/hex-a-gone/tutorial';
@@ -37,7 +38,7 @@ describe('Wave 67 handshake — kings/hex leftovers', () => {
       document.querySelector('style[data-board-styles]')?.textContent ?? '';
     expect(kingsCss).toContain('box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3)');
 
-    const css = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
+    const css = readAppCss();
     expect(css).toContain('filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))');
     expect(css).toContain('fill: rgba(144, 238, 144, 0.4)');
     expect(css).toContain('min-width: 55px');

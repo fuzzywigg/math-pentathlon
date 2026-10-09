@@ -1,7 +1,8 @@
 // Hex AI - Strategic AI using shortest path heuristics
 // Player 1 connects top-bottom, Player 2 connects left-right
 
-import { HexGameState, HexPosition, Player, getOpponent } from './types';
+import type { HexGameState, HexPosition, Player } from './types';
+import { getOpponent } from './types';
 import { getNeighbors, makeMove, getValidMoves } from './rules';
 import { createSeededRng } from '../../core/ai-worker/seeded-rng';
 
@@ -10,11 +11,14 @@ export type AIDifficulty = 'easy' | 'medium' | 'hard';
 /**
  * Play-facing wall-time budgets (ms). Hard still uses maxDepth when time
  * remains; iterative deepening keeps a sensible move if the budget expires.
+ * Hard targets ≤500ms wall think-time (deadline 450ms leaves abort slack;
+ * mid-game Hard benches stay move-identical to unlimited search on the
+ * hand-built mid states — see docs/ai-move-time-2026-10-07.md).
  */
 export const AI_PLAY_DEADLINE_MS: Record<AIDifficulty, number> = {
   easy: 600,
   medium: 1200,
-  hard: 2500,
+  hard: 450,
 };
 
 /** Optional search controls — defaults preserve historical Math.random behavior. */

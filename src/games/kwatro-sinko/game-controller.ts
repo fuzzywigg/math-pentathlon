@@ -1,7 +1,7 @@
 // Kwatro-Sinko Game Controller
 // Manages game flow, AI, and UI updates
 
-import { KwaState, Player } from './types';
+import type { KwaState, Player } from './types';
 import {
   createInitialState,
   selectChip,
@@ -10,7 +10,8 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import { getAIMove, isAITurn, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   renderChipInfo,
@@ -20,20 +21,25 @@ import {
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { kwatroSinkoTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import {
   captureFocusedCell,
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
 import { isBoard3dEnabled } from '../../core/feature-flags';
+import {
+  markBoard3dWebGlFallback,
+  clearBoard3dWebGlFallback,
+} from '../../ui/three/tablet-gl';
 import { loadKwatroSinkoBoard3DModule } from './board-3d-loader';
 import type { KwatroSinkoBoard3D } from '../../ui/three/kwatro-sinko-board-3d';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(isAI: boolean): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAI);
 }
 
 // =============================================================================
@@ -66,10 +72,7 @@ let board3dMountGen = 0;
 let aiTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 /** True while it is the computer's seat (including the 800ms think pause). */
@@ -101,6 +104,7 @@ function onBoard3dContextLost(): void {
   }
   // Board already tore itself down via webglcontextlost → tearDown.
   board3d = null;
+  markBoard3dWebGlFallback(board3dHost, 'context-lost');
   board3dEnabled = false;
   board3dLoading = null;
   if (activeController) {
@@ -136,9 +140,11 @@ async function ensureBoard3d(controller: KwaGameController): Promise<void> {
       return;
     }
     board3d = instance;
+    clearBoard3dWebGlFallback(board3dHost);
     board3dHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
   } catch {
     // WebGL unavailable or renderer failed — stay on 2D SVG.
+    markBoard3dWebGlFallback(board3dHost, 'webgl-unavailable');
     if (mountGen === board3dMountGen) {
       board3d = null;
       board3dEnabled = false;
@@ -213,7 +219,7 @@ function updateUI(controller: KwaGameController): void {
   }
 
   const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
+  clearElement(container);
 
   // Main game area
   const gameArea = document.createElement('div');
@@ -240,6 +246,7 @@ function updateUI(controller: KwaGameController): void {
   // Target info
   const targetInfo = document.createElement('div');
   targetInfo.className = 'kwa-target-info';
+  // trusted constant markup
   targetInfo.innerHTML =
     'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
   gameArea.appendChild(targetInfo);
@@ -357,6 +364,7 @@ function updateUI3d(controller: KwaGameController): void {
 
   const targetInfo = document.createElement('div');
   targetInfo.className = 'kwa-target-info';
+  // trusted constant markup
   targetInfo.innerHTML =
     'Create an alignment where: <strong>a + b - c = 4 or 5</strong>';
   gameArea.appendChild(targetInfo);

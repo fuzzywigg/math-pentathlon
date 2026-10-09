@@ -2,13 +2,8 @@
 // Player 1 (Blue) wins by connecting top edge to bottom edge
 // Player 2 (Red) wins by connecting left edge to right edge
 
-import {
-  HexBoard,
-  HexPosition,
-  Player,
-  HexGameState,
-  getOpponent,
-} from './types';
+import type { HexBoard, HexPosition, Player, HexGameState } from './types';
+import { getOpponent } from './types';
 
 // Check if a position is valid on the board
 export function isValidPosition(pos: HexPosition, boardSize: number): boolean {
@@ -19,7 +14,8 @@ export function isValidPosition(pos: HexPosition, boardSize: number): boolean {
 
 // Check if a cell is empty
 export function isCellEmpty(board: HexBoard, pos: HexPosition): boolean {
-  return board[pos.row][pos.col] === null;
+  // ratchet: callers validate pos against boardSize; board is dense.
+  return board[pos.row]![pos.col] === null;
 }
 
 // Check if a move is valid (cell exists and is empty)
@@ -87,7 +83,8 @@ export function checkWinner(
   if (player === 'player1') {
     // Start from top edge (row 0)
     for (let col = 0; col < boardSize; col++) {
-      if (board[0][col] === player) {
+      // ratchet: board is boardSize×boardSize dense; row 0 / col in range.
+      if (board[0]![col] === player) {
         queue.push({ row: 0, col });
         visited.add(posKey({ row: 0, col }));
       }
@@ -105,7 +102,11 @@ export function checkWinner(
       // Explore neighbors
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
-        if (!visited.has(key) && board[neighbor.row][neighbor.col] === player) {
+        // ratchet: getNeighbors only yields in-bounds positions.
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           queue.push(neighbor);
         }
@@ -114,7 +115,8 @@ export function checkWinner(
   } else {
     // Player 2: Start from left edge (col 0)
     for (let row = 0; row < boardSize; row++) {
-      if (board[row][0] === player) {
+      // ratchet: dense board; col 0 / row in range.
+      if (board[row]![0] === player) {
         queue.push({ row, col: 0 });
         visited.add(posKey({ row, col: 0 }));
       }
@@ -132,7 +134,11 @@ export function checkWinner(
       // Explore neighbors
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
-        if (!visited.has(key) && board[neighbor.row][neighbor.col] === player) {
+        // ratchet: getNeighbors only yields in-bounds positions.
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           queue.push(neighbor);
         }
@@ -151,7 +157,8 @@ export function makeMove(state: HexGameState, pos: HexPosition): HexGameState {
 
   // Create new board with the move
   const newBoard = state.board.map((row) => [...row]);
-  newBoard[pos.row][pos.col] = state.currentPlayer;
+  // ratchet: isValidMove already bounds-checked pos.
+  newBoard[pos.row]![pos.col] = state.currentPlayer;
 
   // Check for winner
   const winner = checkWinner(newBoard, state.currentPlayer, state.boardSize)
@@ -184,7 +191,8 @@ export function getValidMoves(state: HexGameState): HexPosition[] {
 
   for (let row = 0; row < state.boardSize; row++) {
     for (let col = 0; col < state.boardSize; col++) {
-      if (state.board[row][col] === null) {
+      // ratchet: board is dense boardSize×boardSize.
+      if (state.board[row]![col] === null) {
         moves.push({ row, col });
       }
     }
@@ -212,7 +220,8 @@ export function getWinningPath(
   if (player === 'player1') {
     // Start from top edge
     for (let col = 0; col < boardSize; col++) {
-      if (board[0][col] === player) {
+      // ratchet: dense board; row 0 / col in range.
+      if (board[0]![col] === player) {
         const pos = { row: 0, col };
         queue.push(pos);
         visited.add(posKey(pos));
@@ -231,7 +240,11 @@ export function getWinningPath(
 
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
-        if (!visited.has(key) && board[neighbor.row][neighbor.col] === player) {
+        // ratchet: getNeighbors only yields in-bounds positions.
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           parent.set(key, current);
           queue.push(neighbor);
@@ -241,7 +254,8 @@ export function getWinningPath(
   } else {
     // Player 2: Start from left edge
     for (let row = 0; row < boardSize; row++) {
-      if (board[row][0] === player) {
+      // ratchet: dense board; col 0 / row in range.
+      if (board[row]![0] === player) {
         const pos = { row, col: 0 };
         queue.push(pos);
         visited.add(posKey(pos));
@@ -260,7 +274,11 @@ export function getWinningPath(
 
       for (const neighbor of getNeighbors(current, boardSize)) {
         const key = posKey(neighbor);
-        if (!visited.has(key) && board[neighbor.row][neighbor.col] === player) {
+        // ratchet: getNeighbors only yields in-bounds positions.
+        if (
+          !visited.has(key) &&
+          board[neighbor.row]![neighbor.col] === player
+        ) {
           visited.add(key);
           parent.set(key, current);
           queue.push(neighbor);

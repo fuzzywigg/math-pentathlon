@@ -13,7 +13,8 @@
 // 4. Position blocks where they can score from multiple directions
 // 5. Watch what attributes are already on the board to find the best matches
 
-import { Par55State, AttributeBlock, Player, CONFIG } from './types';
+import type { Par55State, AttributeBlock, Player } from './types';
+import { CONFIG } from './types';
 import {
   selectBlock,
   placeBlock,

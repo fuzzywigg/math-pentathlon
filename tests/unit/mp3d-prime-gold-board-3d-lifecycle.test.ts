@@ -323,4 +323,33 @@ describe('mp3d Prime Gold board 3D lifecycle', () => {
     board.unmount();
     expect(host.querySelector('canvas')).toBeNull();
   });
+
+  /**
+   * R-GL-08 recovered (burn-1008 runtime-error-path-audit P0):
+   * webglcontextlost tears down and dispatches mp3d-context-lost for 2D fallback
+   * — same pattern as kings/queens/fiar/kwatro.
+   */
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
+    const three = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => three,
+    }));
+    const { createPrimeGoldBoard3D } =
+      await import('../../src/ui/three/prime-gold-board-3d');
+    const host = document.createElement('div');
+    document.body.appendChild(host);
+    const lost = vi.fn();
+    host.addEventListener('mp3d-context-lost', lost);
+
+    const board = await createPrimeGoldBoard3D(host);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    board.canvas.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
+    expect(host.querySelector('canvas')).toBeNull();
+  });
 });

@@ -38,10 +38,10 @@ describe('Wave 35 Fab-a-Diffy — format helpers', () => {
     const answerIds = [...state.answerBars.keys()];
     const formatted = formatMove(state, {
       player: 'player1',
-      bar1Id: barIds[0],
-      bar2Id: barIds[1],
+      bar1Id: barIds[0]!,
+      bar2Id: barIds[1]!,
       operation: 'multiply',
-      resultId: answerIds[0],
+      resultId: answerIds[0]!,
       moveNumber: 1,
     });
     expect(formatted).toContain('×');
@@ -51,7 +51,7 @@ describe('Wave 35 Fab-a-Diffy — format helpers', () => {
   it('getPossibleResults returns nonempty ops including reverse subtract/divide', () => {
     const state = createInitialState();
     const bars = [...state.fractionBars.values()];
-    const results = getPossibleResults(bars[0], bars[1]);
+    const results = getPossibleResults(bars[0]!, bars[1]!);
     expect(results.length).toBeGreaterThan(0);
     expect(results.length).toBeLessThanOrEqual(6);
     for (const r of results) {

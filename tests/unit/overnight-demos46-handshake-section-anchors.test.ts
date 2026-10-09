@@ -13,12 +13,7 @@ import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Overnight demos46 — handshake section anchors', () => {
   it('each demo exposes its primary interaction anchor after remount', () => {
-    const root = mount();
+    const root = mountRoot();
     const cases: Array<{
       render: (el: HTMLElement) => void;
       title: RegExp;
@@ -82,7 +77,7 @@ describe('Overnight demos46 — handshake section anchors', () => {
   });
 
   it('cross-swap poly→expr→attr leaves attribute SET chrome last', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     renderExpressionDemo(root);
     renderAttributeDemo(root);

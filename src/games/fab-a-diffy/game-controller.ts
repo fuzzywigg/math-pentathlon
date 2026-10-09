@@ -1,8 +1,8 @@
 // Fab-a-Diffy Game Controller
 // Manages game flow, AI, and UI updates
 
-import { FabADiffyState, Player } from './types';
-import { FractionOperation } from '../../core/fractions/types';
+import type { FabADiffyState, Player } from './types';
+import type { FractionOperation } from '../../core/fractions/types';
 import {
   createInitialState,
   selectBar1,
@@ -22,12 +22,14 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
-import { applyAIMoveSteps, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { applyAIMoveSteps } from './ai';
 import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
+import { scrollBehaviorForMotion } from '../../ui/reduced-motion';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -208,6 +210,21 @@ function updateUI(controller: FabGameController): void {
   }
   container.appendChild(gameArea);
 
+  // Narrow layouts: bring matchable answers on-screen (reduced-motion aware).
+  if (state.phase === 'confirmingMove') {
+    requestAnimationFrame(() => {
+      const match = container.querySelector(
+        '.fab-answer-matchable'
+      ) as HTMLElement | null;
+      if (match && typeof match.scrollIntoView === 'function') {
+        match.scrollIntoView({
+          block: 'center',
+          behavior: scrollBehaviorForMotion(),
+        });
+      }
+    });
+  }
+
   // AI turn
   if (
     controller.isAI &&
@@ -329,3 +346,6 @@ export function startTutorial(): void {
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
+
+/** Tip-held destroy hook for tip mounts / #501. */
+export function destroyGame(): void {}

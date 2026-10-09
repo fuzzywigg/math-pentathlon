@@ -353,8 +353,13 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
       )
     ).toBe(false);
 
+    // Mount schedules a one-shot rAF readiness paint (software GL); not a loop.
+    expect(raf).toHaveBeenCalled();
+    raf.mockClear();
+
     const state = createInitialState();
     view.update({ ...state, winner: 'player1' });
+    // Still render-on-demand: game-over must not start a continuous RAF pulse.
     expect(raf).not.toHaveBeenCalled();
     view.unmount();
   });
@@ -437,6 +442,31 @@ describe('mp3d Queens & Guards board 3d lifecycle', () => {
     const host = document.createElement('div');
     document.body.appendChild(host);
     await expect(createQueensGuardsBoard3D(host)).rejects.toThrow(/WebGL/);
+  });
+
+  /** R-GL-02 (burn-1008 runtime-error-path-audit): recovered context-loss path. */
+  it('dispatches mp3d-context-lost and tears down on webglcontextlost', async () => {
+    const threeMock = installThreeMock();
+    vi.doMock('../../src/ui/three/load-three', () => ({
+      loadThree: async () => threeMock,
+    }));
+
+    const { createQueensGuardsBoard3D } =
+      await import('../../src/ui/three/queens-guards-board-3d');
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    const lost = vi.fn();
+    container.addEventListener('mp3d-context-lost', lost);
+
+    const view = await createQueensGuardsBoard3D(container);
+    const event = new Event('webglcontextlost', {
+      cancelable: true,
+      bubbles: true,
+    });
+    view.canvas.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(lost).toHaveBeenCalledTimes(1);
+    expect(container.querySelector('canvas')).toBeNull();
   });
 
   it('caps pixel ratio at 1.5', async () => {

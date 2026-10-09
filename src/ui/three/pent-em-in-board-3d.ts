@@ -30,13 +30,21 @@ import {
   markBoardAsGrid,
   restoreGridFocus,
 } from '../board-a11y';
+import {
+  bindCanvasPointerTap,
+  isPrimaryActivatingPointer,
+} from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type CellClickCallback = (cell: Cell) => void;
 export type CellHoverCallback = (cell: Cell | null) => void;
@@ -142,9 +150,7 @@ export async function createPentEmInBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'pent-em-in');
@@ -247,25 +253,27 @@ export async function createPentEmInBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 400, 120);
     const h = Math.max(container.clientHeight || 400, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   const pickCell = (event: PointerEvent): Cell | null => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return null;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -281,20 +289,21 @@ export async function createPentEmInBoard3D(
     return null;
   };
 
-  const onPointerUp = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
-    const cell = pickCell(event);
-    if (cell) clickHandler(cell);
+  const clearHover = (): void => {
+    if (!hoverHandler || disposed) return;
+    hoverHandler(null);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
     if (!hoverHandler || disposed) return;
+    if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
+      return;
+    }
     hoverHandler(pickCell(event));
   };
 
   const onPointerLeave = (): void => {
-    if (!hoverHandler || disposed) return;
-    hoverHandler(null);
+    clearHover();
   };
 
   let tearDown: (() => void) | null = null;
@@ -307,15 +316,21 @@ export async function createPentEmInBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointerUp);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: (event) => {
+      if (!clickHandler || disposed) return;
+      const cell = pickCell(event);
+      if (cell) clickHandler(cell);
+    },
+    onGestureEnd: clearHover,
+  });
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const clearGroup = (group: Object3D): void => {
     while (group.children.length > 0) {
@@ -363,6 +378,18 @@ export async function createPentEmInBoard3D(
       }
     }
 
+    const legalAnchors = new Set<string>();
+    if (state.phase === 'placePiece' && state.selectedPiece) {
+      for (const pos of getValidPlacements(
+        state,
+        state.selectedPiece,
+        state.selectedRotation,
+        state.selectedFlipped
+      )) {
+        legalAnchors.add(`${pos.row},${pos.col}`);
+      }
+    }
+
     for (let row = 0; row < BOARD_SIZE; row++) {
       for (let col = 0; col < BOARD_SIZE; col++) {
         const btn = document.createElement('button');
@@ -370,16 +397,14 @@ export async function createPentEmInBoard3D(
         btn.setAttribute('data-row', String(row));
         btn.setAttribute('data-col', String(col));
         const occupant = occupancy.get(`${row},${col}`) ?? null;
-        makeGridCell(
-          btn,
-          buildCellAriaLabel({
-            coord: `${row},${col}`,
-            empty: occupant === null,
-            owner: ownerLabel(occupant),
-            validPlacement:
-              state.phase === 'placePiece' && !!state.selectedPiece,
-          })
-        );
+        const labelParts: Parameters<typeof buildCellAriaLabel>[0] = {
+          coord: `${row},${col}`,
+          empty: occupant === null,
+          validPlacement: legalAnchors.has(`${row},${col}`),
+        };
+        const owner = ownerLabel(occupant);
+        if (owner !== undefined) labelParts.owner = owner;
+        makeGridCell(btn, buildCellAriaLabel(labelParts));
         const activate = (): void => handler?.({ row, col });
         btn.addEventListener('click', activate);
         bindCellActivateKeys(btn, activate);
@@ -522,15 +547,17 @@ export async function createPentEmInBoard3D(
 
   window.__mp3dPentEmIn = { cellToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointerUp);
+    unbindPointer();
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dPentEmIn) {
       delete window.__mp3dPentEmIn;
     }
@@ -553,5 +580,6 @@ export async function createPentEmInBoard3D(
   tearDown = unmount;
 
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
   return { update, unmount, cellToClientPoint, canvas };
 }

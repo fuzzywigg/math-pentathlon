@@ -17,13 +17,21 @@ import type {
 import { BLOCK_COLORS } from '../../games/hex-a-gone/types';
 import { getValidPlacements } from '../../games/hex-a-gone/rules';
 import { getPlayerSeatColors } from '../player-colors';
+import {
+  bindCanvasPointerTap,
+  isPrimaryActivatingPointer,
+} from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 import {
   createHexAGonePieceGeometries,
   disposeHexAGonePieceGeometries,
@@ -129,9 +137,7 @@ export async function createHexAGoneBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'hex-a-gone');
@@ -232,17 +238,18 @@ export async function createHexAGoneBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 480, 120);
     const h = Math.max(container.clientHeight || 480, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
@@ -270,9 +277,10 @@ export async function createHexAGoneBoard3D(
     event: PointerEvent
   ): { q: number; r: number } | null => {
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return null;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return null;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -289,14 +297,17 @@ export async function createHexAGoneBoard3D(
     return null;
   };
 
-  const onPointerUp = (event: PointerEvent): void => {
-    if (!clickHandler || disposed) return;
-    const cell = pickCellFromEvent(event);
-    if (cell) clickHandler(cell.q, cell.r);
+  const clearHover = (): void => {
+    if (!hoverKey || !lastState) return;
+    hoverKey = null;
+    syncVisuals(lastState);
   };
 
   const onPointerMove = (event: PointerEvent): void => {
     if (disposed || !lastState) return;
+    if (event.pointerType !== 'mouse' && !isPrimaryActivatingPointer(event)) {
+      return;
+    }
     if (lastState.phase !== 'placeBlocks') {
       if (hoverKey) {
         hoverKey = null;
@@ -312,27 +323,31 @@ export async function createHexAGoneBoard3D(
   };
 
   const onPointerLeave = (): void => {
-    if (!hoverKey || !lastState) return;
-    hoverKey = null;
-    syncVisuals(lastState);
+    clearHover();
   };
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
     if (disposed) return;
-    disposed = true;
+    // Do not mark disposed here — unmount() must run to drop listeners/GPU.
     onWebglLost?.();
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  canvas.addEventListener('pointerup', onPointerUp);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: (event) => {
+      if (!clickHandler || disposed) return;
+      const cell = pickCellFromEvent(event);
+      if (cell) clickHandler(cell.q, cell.r);
+    },
+    onGestureEnd: clearHover,
+  });
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerleave', onPointerLeave);
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const syncA11y = (
     state: HexAGoneGameState,
@@ -520,15 +535,17 @@ export async function createHexAGoneBoard3D(
 
   window.__mp3dHexAGone = { cellToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
-    canvas.removeEventListener('pointerup', onPointerUp);
+    unbindPointer();
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerleave', onPointerLeave);
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     if (window.__mp3dHexAGone) {
       delete window.__mp3dHexAGone;
     }
@@ -554,6 +571,7 @@ export async function createHexAGoneBoard3D(
   };
 
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

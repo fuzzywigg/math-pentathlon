@@ -170,6 +170,6 @@ export function coordKey(coord: AxialCoord): string {
  * Parse a coordinate key back to AxialCoord
  */
 export function parseCoordKey(key: string): AxialCoord {
-  const [q, r] = key.split(',').map(Number);
-  return { q, r };
+  const parts = key.split(',').map(Number);
+  return { q: parts[0]!, r: parts[1]! };
 }

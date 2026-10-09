@@ -50,8 +50,12 @@ describe('PWA tablet install icons', () => {
     );
   });
 
-  it('Workbox includeAssets + globPatterns cover PNG icons', () => {
-    expect(viteConfig).toMatch(/includeAssets:[\s\S]*'icons\/\*\.png'/);
+  it('Workbox globPatterns cover PNG icons (no includeAssets overlap)', () => {
+    // Icons come from globPatterns only — includeManifestIcons is false and
+    // includeAssets is CNAME-only so sw.js does not get duplicate URL tails.
+    expect(viteConfig).toMatch(/includeManifestIcons:\s*false/);
+    expect(viteConfig).toMatch(/includeAssets:[\s\S]*'CNAME'/);
+    expect(viteConfig).not.toMatch(/includeAssets:[\s\S]*'icons\/\*\.png'/);
     expect(viteConfig).toMatch(
       /globPatterns:[\s\S]*\*\*\/\*\.\{[^}'"]*png[^}'"]*\}/
     );

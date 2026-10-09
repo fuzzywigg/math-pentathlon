@@ -1,7 +1,8 @@
 // Fraction Pinball Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { FractionPinballState, createInitialState } from './types';
+import type { FractionPinballState } from './types';
+import { createInitialState } from './types';
 import { submitAnswer, nextChallenge, startGame } from './rules';
 import {
   renderChallenge,
@@ -12,7 +13,8 @@ import {
   getPlayerName,
   injectFractionPinballStyles,
 } from './board-ui';
-import { getAIAnswer, AIDifficulty } from './ai';
+import type { AIDifficulty } from './ai';
+import { getAIAnswer } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
@@ -32,8 +34,21 @@ let gameState: FractionPinballState;
 let gameContainer: HTMLElement | null = null;
 let isAIMode = false;
 let aiDifficulty: AIDifficulty = 'medium';
-/** Bumped to cancel in-flight AI timeouts after new game. */
+/** Bumped to cancel in-flight AI timeouts after new game / destroy. */
 let aiGeneration = 0;
+let aiThinkTimer: ReturnType<typeof setTimeout> | null = null;
+let aiContinueTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimers(): void {
+  if (aiThinkTimer !== null) {
+    clearTimeout(aiThinkTimer);
+    aiThinkTimer = null;
+  }
+  if (aiContinueTimer !== null) {
+    clearTimeout(aiContinueTimer);
+    aiContinueTimer = null;
+  }
+}
 
 function isComputerAnswering(): boolean {
   return (
@@ -100,7 +115,9 @@ function render(): void {
   // AI turn — generation token cancels stacked timeouts
   if (isComputerAnswering()) {
     const gen = ++aiGeneration;
-    setTimeout(() => {
+    clearAiTimers();
+    aiThinkTimer = setTimeout(() => {
+      aiThinkTimer = null;
       if (gen !== aiGeneration) return;
       aiTurn();
     }, 1000);
@@ -131,8 +148,12 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'answering' || gameState.currentPlayer !== 'player2')
+  if (
+    gameState.phase !== 'answering' ||
+    gameState.currentPlayer !== 'player2'
+  ) {
     return;
+  }
   if (!gameState.currentChallenge) return;
 
   // Use AI module to get answer; fall back so vs-AI never soft-locks on null.
@@ -150,7 +171,11 @@ function aiTurn(): void {
 
   // Auto-continue after showing result
   const gen = aiGeneration;
-  setTimeout(() => {
+  if (aiContinueTimer !== null) {
+    clearTimeout(aiContinueTimer);
+  }
+  aiContinueTimer = setTimeout(() => {
+    aiContinueTimer = null;
     if (gen !== aiGeneration) return;
     if (gameState.phase === 'showResult') {
       handleContinue();
@@ -215,4 +240,11 @@ export function startTutorial(): void {
 // Check if tutorial is active
 export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
+}
+
+/** Tip-held destroy hook — invalidate AI timers so route leave cannot mutate a detached board. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimers();
+  gameContainer = null;
 }

@@ -42,6 +42,36 @@ describe('Cycle-3 a11y shell (light)', () => {
     });
   });
 
+  it('new-game and help modals expose dialog landmarks and labelled titles', () => {
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+    mountGameShell(container, {
+      title: 'Test Game',
+      helpTitle: 'How to Play',
+      helpContentHtml: '<p>Rules</p>',
+      modeRadioName: 'test-mode-dialog',
+      onNavigateHome: () => undefined,
+      onStartGame: () => undefined,
+    });
+
+    const newGame = container.querySelector('#new-game-modal');
+    expect(newGame?.getAttribute('role')).toBe('dialog');
+    expect(newGame?.getAttribute('aria-modal')).toBe('true');
+    expect(newGame?.getAttribute('aria-labelledby')).toBe('new-game-modal-title');
+    expect(container.querySelector('#new-game-modal-title')?.textContent).toBe(
+      'New Game'
+    );
+
+    const help = container.querySelector('#help-modal');
+    expect(help?.getAttribute('role')).toBe('dialog');
+    expect(help?.getAttribute('aria-modal')).toBe('true');
+    expect(help?.getAttribute('aria-labelledby')).toBe('help-modal-title');
+    expect(container.querySelector('#help-modal-title')?.textContent).toBe(
+      'How to Play'
+    );
+  });
+
   it('showDifficulty renders Easy/Medium/Hard and passes selection on vs-AI start', () => {
     container = document.createElement('div');
     document.body.appendChild(container);

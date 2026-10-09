@@ -1,13 +1,5 @@
-import {
-  GameState,
-  Position,
-  Board,
-  BOARD_SIZE,
-  isValidPosition,
-  isEmpty,
-  getSupply,
-  PlayerOwner,
-} from './board';
+import type { GameState, Position, Board, PlayerOwner } from './board';
+import { BOARD_SIZE, isValidPosition, isEmpty, getSupply } from './board';
 
 // All 8 possible directions a King can move
 const KING_DIRECTIONS: Position[] = [
@@ -28,7 +20,8 @@ export function findKingPosition(
 ): Position | null {
   for (let row = 0; row < BOARD_SIZE; row++) {
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const piece = board[row][col];
+      // ratchet: dense BOARD_SIZE×BOARD_SIZE board.
+      const piece = board[row]![col];
       if (piece && piece.type === 'king' && piece.owner === player) {
         return { row, col };
       }
@@ -201,6 +194,4 @@ export function isDrawCondition(state: GameState): boolean {
 }
 
 // Get the opponent player
-export function getOpponent(player: PlayerOwner): PlayerOwner {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';

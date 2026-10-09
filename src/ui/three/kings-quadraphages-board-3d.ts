@@ -14,6 +14,7 @@ import type {
   Position,
 } from '../../games/kings-quadraphages/game-state';
 import { getPlayerSeatColors } from '../player-colors';
+import { bindCanvasPointerTap } from '../pointer-hygiene';
 import { loadThree, type ThreeModule } from './load-three';
 import {
   assembleKingGroup,
@@ -23,10 +24,14 @@ import {
   type KingGeometries,
 } from './kings-quadraphages-pieces';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
 } from './tablet-gl';
+import { clientToNdc } from '../coord-map';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -131,9 +136,7 @@ export async function createKingsQuadraphagesBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'kings-quadraphages');
@@ -220,26 +223,28 @@ export async function createKingsQuadraphagesBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const resize = (): void => {
     if (disposed) return;
     const w = Math.max(container.clientWidth || 450, 120);
     const h = Math.max(container.clientHeight || 450, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
   const onPointer = (event: PointerEvent): void => {
     if (!clickHandler || disposed) return;
     const rect = canvas.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) return;
-    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    const ndc = clientToNdc(event.clientX, event.clientY, rect);
+    if (!ndc) return;
+    pointer.x = ndc.x;
+    pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
     const hits = raycaster.intersectObjects(root.children, true);
     for (const hit of hits) {
@@ -264,15 +269,16 @@ export async function createKingsQuadraphagesBoard3D(
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     // On-demand boards: nothing to cancel; next update/resize paints when visible.
     onVisible: () => paint(),
   });
 
-  canvas.addEventListener('pointerup', onPointer);
+  const unbindPointer = bindCanvasPointerTap(canvas, {
+    onTap: onPointer,
+  });
   canvas.addEventListener('webglcontextlost', onContextLost);
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const cellToClientPoint = (
     row: number,
@@ -374,14 +380,17 @@ export async function createKingsQuadraphagesBoard3D(
       const isLight = (row + col) % 2 === 0;
       let tileMat = isLight ? mats.light : mats.dark;
 
+      const selectedKing = state.selectedKingPosition;
       const isSelected =
-        !!state.selectedKingPosition &&
-        state.selectedKingPosition.row === row &&
-        state.selectedKingPosition.col === col;
+        selectedKing != null &&
+        selectedKing.row === row &&
+        selectedKing.col === col;
       const isValidMoveTarget = isKingMoveTarget(state, row, col);
       const isValidPlacement =
         state.turnPhase === 'placeQuadraphage' && piece === null;
-      const isLast = !!last && last.row === row && last.col === col;
+      const lastMove = last;
+      const isLast =
+        lastMove != null && lastMove.row === row && lastMove.col === col;
 
       if (isSelected) tileMat = mats.selected;
       else if (isValidMoveTarget || isValidPlacement) tileMat = mats.valid;
@@ -393,12 +402,14 @@ export async function createKingsQuadraphagesBoard3D(
     paint();
   };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
-    canvas.removeEventListener('pointerup', onPointer);
+    cancelMountPaint();
+    unbindPointer();
     canvas.removeEventListener('webglcontextlost', onContextLost);
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     unbindVisibility();
 
     if (import.meta.env.DEV && window.__mp3dKingsQuadraphages) {
@@ -431,6 +442,7 @@ export async function createKingsQuadraphagesBoard3D(
 
   tearDown = unmount;
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, cellToClientPoint, canvas };
 }

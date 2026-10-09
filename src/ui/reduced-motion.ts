@@ -4,14 +4,17 @@
  * Combines OS `prefers-reduced-motion` with the stored user setting so kids
  * who enable reduced motion in-app get the same CSS + scroll behavior even
  * when the OS preference is unset.
+ *
+ * User setting comes from `settings-flags` (tiny core module) — not the full
+ * progress store — so the menu never static-imports `core/storage`.
  */
 
-import { storage } from '../core/storage';
+import { getUserReducedMotionFlag } from '../core/settings-flags';
 
 export const REDUCED_MOTION_ATTR = 'data-reduced-motion';
 
 export type ReducedMotionOptions = {
-  /** Injected for tests; defaults to storage.getSettings().reducedMotion. */
+  /** Injected for tests; defaults to stored settings.reducedMotion. */
   userPrefersReducedMotion?: boolean;
   /** Injected for tests; defaults to matchMedia('(prefers-reduced-motion: reduce)'). */
   osPrefersReducedMotion?: boolean;
@@ -22,7 +25,7 @@ export function prefersReducedMotion(
   options: ReducedMotionOptions = {}
 ): boolean {
   const userPref =
-    options.userPrefersReducedMotion ?? storage.getSettings().reducedMotion;
+    options.userPrefersReducedMotion ?? getUserReducedMotionFlag();
   if (userPref) return true;
 
   if (typeof options.osPrefersReducedMotion === 'boolean') {
@@ -97,4 +100,16 @@ export function bindReducedMotionPreference(): () => void {
 /** Smooth scroll when motion is OK; instant jump when reduced. */
 export function scrollBehaviorForMotion(): ScrollBehavior {
   return prefersReducedMotion() ? 'auto' : 'smooth';
+}
+
+/**
+ * Duration helper for JS-driven animations / timeouts.
+ * Returns `reducedMs` (default 0) when the user prefers less motion.
+ */
+export function durationMsForMotion(
+  fullMs: number,
+  reducedMs = 0,
+  options: ReducedMotionOptions = {}
+): number {
+  return prefersReducedMotion(options) ? reducedMs : fullMs;
 }

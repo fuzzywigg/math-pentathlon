@@ -1,13 +1,14 @@
+import { clearElement, replaceWithSafeHtml, safeHtml } from '../dom-security';
 // Dice Selector - UI for selecting and combining dice results
 
-import {
+import type {
   DiceConfig,
   DiceType,
   DieRoll,
   RollResult,
   DiceSet,
-  COMMON_DICE_SETS,
 } from './types';
+import { COMMON_DICE_SETS } from './types';
 import {
   rollDice,
   toggleDiceSelection,
@@ -15,7 +16,12 @@ import {
   lockDice,
   getAllPossibleSums,
 } from './roller';
-import { renderRollResult, animateRoll, getDiceStyles } from './dice-ui';
+import {
+  renderRollResult,
+  animateRoll,
+  getDiceStyles,
+  type AnimateRollCancel,
+} from './dice-ui';
 
 export interface DiceSelectorOptions {
   /** Dice set to use */
@@ -45,11 +51,12 @@ export class DiceSelector {
   private options: Required<DiceSelectorOptions>;
   private currentResult: RollResult | null = null;
   private isRolling: boolean = false;
+  private cancelRollAnim: AnimateRollCancel | null = null;
 
   constructor(container: HTMLElement, options: DiceSelectorOptions = {}) {
     this.container = container;
     this.options = {
-      diceSet: options.diceSet || COMMON_DICE_SETS.standard,
+      diceSet: options.diceSet || COMMON_DICE_SETS.standard!,
       customDice: options.customDice || [],
       multiSelect: options.multiSelect ?? true,
       showPossibleSums: options.showPossibleSums ?? false,
@@ -129,12 +136,12 @@ export class DiceSelector {
         }
 
         .dice-btn-success {
-          background: #4caf50;
+          background: #15803d; /* AA white-on-fill (was #4caf50 ~2.8:1) */
           color: white;
         }
 
         .dice-btn-success:hover:not(:disabled) {
-          background: #43a047;
+          background: #166534;
           transform: translateY(-2px);
         }
 
@@ -188,8 +195,23 @@ export class DiceSelector {
         }
 
         .dice-placeholder {
-          color: #999;
+          color: #64748b; /* was #999 (~2.9:1); AA ≥4.5:1 */
           font-style: italic;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .dice-btn-primary:hover:not(:disabled),
+          .dice-btn-success:hover:not(:disabled) {
+            transform: none;
+          }
+          .dice-btn {
+            transition: none !important;
+          }
+        }
+
+        html[data-reduced-motion='true'] .dice-btn-primary:hover:not(:disabled),
+        html[data-reduced-motion='true'] .dice-btn-success:hover:not(:disabled) {
+          transform: none;
         }
       `;
       document.head.appendChild(style);
@@ -204,7 +226,7 @@ export class DiceSelector {
   }
 
   private render(): void {
-    this.container.innerHTML = '';
+    clearElement(this.container);
     this.container.className = 'dice-selector';
 
     // Header
@@ -226,6 +248,7 @@ export class DiceSelector {
         onDieClick: (die) => this.handleDieClick(die),
       });
     } else {
+      // trusted constant markup
       resultArea.innerHTML =
         '<span class="dice-placeholder">Click Roll to begin</span>';
     }
@@ -242,10 +265,13 @@ export class DiceSelector {
         (d) => d.isSelected
       ).length;
 
-      selectionInfo.innerHTML = `
+      replaceWithSafeHtml(
+        selectionInfo,
+        safeHtml`
         <span class="dice-selection-label">${selectedCount} dice selected</span>
         <span class="dice-selection-sum">${selectedSum}</span>
-      `;
+      `
+      );
       this.container.appendChild(selectionInfo);
 
       // Possible sums
@@ -321,6 +347,7 @@ export class DiceSelector {
     if (this.isRolling) return;
 
     this.isRolling = true;
+    this.cancelRollAnim?.();
     const types = this.getDiceTypes();
     const result = rollDice({ dice: types });
 
@@ -328,10 +355,11 @@ export class DiceSelector {
       '#dice-result-area'
     ) as HTMLElement;
     if (resultArea) {
-      animateRoll(resultArea, result, {
+      this.cancelRollAnim = animateRoll(resultArea, result, {
         duration: 800,
         dieSize: this.options.dieSize,
         onComplete: () => {
+          this.cancelRollAnim = null;
           this.currentResult = result;
           this.isRolling = false;
           this.render();
@@ -377,6 +405,8 @@ export class DiceSelector {
 
   /** Reset the selector */
   public reset(): void {
+    this.cancelRollAnim?.();
+    this.cancelRollAnim = null;
     this.currentResult = null;
     this.isRolling = false;
     this.render();
@@ -390,7 +420,10 @@ export class DiceSelector {
 
   /** Destroy the selector */
   public destroy(): void {
-    this.container.innerHTML = '';
+    this.cancelRollAnim?.();
+    this.cancelRollAnim = null;
+    this.isRolling = false;
+    clearElement(this.container);
   }
 }
 

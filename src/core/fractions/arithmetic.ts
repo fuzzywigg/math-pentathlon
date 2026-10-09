@@ -1,6 +1,6 @@
 // Fraction Arithmetic Operations
 
-import {
+import type {
   Fraction,
   MixedNumber,
   FractionOperation,
@@ -561,20 +561,23 @@ export function formatFraction(
     const remainder = absNum % denom;
     if (whole === 0) {
       const basic = `${absNum}/${denom}`;
-      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+      if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) {
         return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+      }
       return `${prefix}${basic}`;
     }
     if (remainder === 0) return `${prefix}${whole}`;
     const fracPart = `${remainder}/${denom}`;
-    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart])
+    if (options.useUnicodeFractions && UNICODE_FRACTIONS[fracPart]) {
       return `${prefix}${whole} ${UNICODE_FRACTIONS[fracPart]}`;
+    }
     return `${prefix}${whole} ${fracPart}`;
   }
 
   const basic = `${absNum}/${denom}`;
-  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic])
+  if (options.useUnicodeFractions && UNICODE_FRACTIONS[basic]) {
     return `${prefix}${UNICODE_FRACTIONS[basic]}`;
+  }
   return `${prefix}${basic}`;
 }
 
@@ -604,9 +607,9 @@ export function parseFraction(str: string): Fraction | null {
   // Try mixed number format "1 1/2"
   const mixedMatch = str.match(/^(-?\d+)\s+(\d+)\/(\d+)$/);
   if (mixedMatch) {
-    const whole = parseInt(mixedMatch[1], 10);
-    const numer = parseInt(mixedMatch[2], 10);
-    const denom = parseInt(mixedMatch[3], 10);
+    const whole = parseInt(mixedMatch[1]!, 10);
+    const numer = parseInt(mixedMatch[2]!, 10);
+    const denom = parseInt(mixedMatch[3]!, 10);
     if (denom === 0) return null;
     return fromMixedNumber(whole, numer, denom);
   }
@@ -614,8 +617,8 @@ export function parseFraction(str: string): Fraction | null {
   // Try simple fraction "3/4"
   const fractionMatch = str.match(/^(-?\d+)\/(\d+)$/);
   if (fractionMatch) {
-    const numer = parseInt(fractionMatch[1], 10);
-    const denom = parseInt(fractionMatch[2], 10);
+    const numer = parseInt(fractionMatch[1]!, 10);
+    const denom = parseInt(fractionMatch[2]!, 10);
     if (denom === 0) return null;
     return { numerator: numer, denominator: denom };
   }

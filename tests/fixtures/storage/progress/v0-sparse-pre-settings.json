@@ -1,0 +1,24 @@
+{
+  "version": 0,
+  "profile": {
+    "id": "legacy-sparse-1",
+    "name": "LegacySparse",
+    "avatar": "L",
+    "createdAt": 1,
+    "lastActiveAt": 2
+  },
+  "gameStats": {
+    "calla": {
+      "gameId": "calla",
+      "gamesPlayed": 5,
+      "gamesWon": 3,
+      "gamesLost": 2,
+      "gamesDraw": 0,
+      "totalPlayTime": 15000,
+      "bestWinStreak": 2,
+      "currentWinStreak": 0,
+      "lastPlayed": 50,
+      "firstPlayed": 10
+    }
+  }
+}

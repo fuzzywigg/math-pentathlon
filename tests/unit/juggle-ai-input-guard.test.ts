@@ -13,6 +13,7 @@ import {
   renderShapeSelector,
 } from '../../src/games/juggle/board-ui';
 import { SHAPE_POOLS } from '../../src/games/juggle/types';
+import { installDomHooks } from './helpers/dom';
 
 function stubCanvas(): void {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -24,20 +25,13 @@ function stubCanvas(): void {
 }
 
 describe('Juggle AI-turn input guard', () => {
+  installDomHooks({ fakeTimers: true, styleIds: ['juggle-styles'] });
   beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('juggle-styles')?.remove();
     stubCanvas();
-    vi.useFakeTimers();
   });
-
   afterEach(() => {
-    vi.useRealTimers();
-    document.body.innerHTML = '';
-    document.getElementById('juggle-styles')?.remove();
     vi.restoreAllMocks();
   });
-
   it('renderBoard with allowInput false skips pointer, preview, and valid aria', () => {
     const placing = selectDie(
       {

@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function emptyCount(root: HTMLElement): number {
   return parseInt(
@@ -49,7 +44,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — poly undo stack / bleed', () => {
   it('three places then three undos restore full empty count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -70,7 +65,7 @@ describe('Overnight demos45 — poly undo stack / bleed', () => {
   });
 
   it('remount resets module board to a fresh Empty: 100', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (
@@ -87,7 +82,7 @@ describe('Overnight demos45 — poly undo stack / bleed', () => {
   });
 
   it('board click with no shape selected is a no-op', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     // deselect by re-clicking selected shape if possible, else switch set clears selection

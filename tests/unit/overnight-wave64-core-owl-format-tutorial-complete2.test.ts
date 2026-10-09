@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format tutorial-complete-2', () => {
     storage.resetAll();
   });
 
-
   it('selects tutorial-complete-2 and substitutes gameName', () => {
     for (const m of owlMessages.getMessagesByCategory('tutorial:complete')) {
       if (m.id !== 'tutorial-complete-2') storage.markMessageSeen(m.id);

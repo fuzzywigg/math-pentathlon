@@ -14,8 +14,14 @@ import {
 import { CONFIG } from '../../src/games/fiar/types';
 
 afterEach(() => {
+  try {
+    vi.clearAllTimers();
+  } catch {
+    // ignore
+  }
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+  vi.clearAllMocks();
   destroyGame();
   document.body.innerHTML = '';
   document.getElementById('fiar-styles')?.remove();

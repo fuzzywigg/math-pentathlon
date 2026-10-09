@@ -13,7 +13,6 @@ import {
 } from '../../src/games/sum-dominoes/types';
 import { selectDomino, placeDomino, isValidPlacement } from '../../src/games/sum-dominoes/rules';
 
-
 afterEach(() => vi.restoreAllMocks());
 
 function emptyBoard(): (PlacedDomino | null)[][] {

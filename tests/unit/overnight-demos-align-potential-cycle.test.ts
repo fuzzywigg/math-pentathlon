@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickPot(root: HTMLElement, row: number, col: number): void {
 
 describe('Overnight demos — align potential cycle', () => {
   it('empty cell cycles null → X → O → null with potential directions', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Pre-seeded board has pieces; use a known empty corner
@@ -55,7 +50,7 @@ describe('Overnight demos — align potential cycle', () => {
   });
 
   it('reset clears board and restores click-to-see prompt', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     clickPot(root, 4, 4);
     (root.querySelector('#potential-reset') as HTMLButtonElement).click();

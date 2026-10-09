@@ -1,24 +1,45 @@
 /**
  * Wave 56 leftover after #255/#256 — FIAR vsAI 500ms place handoff. Tests-only.
  */
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fiarAiClient from '../../src/games/fiar/ai-client';
 import {
   initGame,
   newGameVsAI,
+  newGameVsHuman,
+  destroyGame,
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
 
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.clearAllTimers();
+});
+
 afterEach(() => {
+  // Invalidate in-flight AI generation + drop mounts before clearing timers.
+  try {
+    newGameVsHuman();
+  } catch {
+    // controller may not be mounted
+  }
+  destroyGame();
+  vi.clearAllTimers();
   vi.useRealTimers();
-  vi.restoreAllMocks();
+  // Targeted only — restoreAllMocks tears down hoisted vi.mock on unit-shared.
+  const rnd = Math.random as unknown as { mockRestore?: () => void };
+  rnd.mockRestore?.();
+  const ai = fiarAiClient.getAIMoveAsync as unknown as {
+    mockRestore?: () => void;
+  };
+  ai.mockRestore?.();
+  vi.clearAllMocks();
   document.body.innerHTML = '';
   document.getElementById('fiar-styles')?.remove();
 });
 
 describe('Wave 56 fiar — vsAI 500ms timer', () => {
   it('after P1 place, AI place runs at 500ms via mocked getAIMoveAsync', async () => {
-    vi.useFakeTimers();
     // Force human (player1) to start — vsAI now picks starter at random
     vi.spyOn(Math, 'random').mockReturnValue(0.1);
     vi.spyOn(fiarAiClient, 'getAIMoveAsync').mockResolvedValue({
@@ -32,6 +53,8 @@ describe('Wave 56 fiar — vsAI 500ms timer', () => {
     document.body.append(board, status);
     initGame(board, status);
     newGameVsAI('easy');
+    // Human starts — discard any stale AI handoff timers from the shared graph.
+    vi.clearAllTimers();
     expect(getCurrentState().currentPlayer).toBe('player1');
 
     board

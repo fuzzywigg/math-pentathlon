@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 function clickHex(root: HTMLElement, row: number, col: number): void {
   (
@@ -30,7 +25,7 @@ afterEach(() => {
 
 describe('Wave 51 demos — align Blue hex post-win lock', () => {
   it('Blue vertical spine wins hard; post-win click no-ops; reset restores Blue', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     for (let row = 0; row < 6; row++) {

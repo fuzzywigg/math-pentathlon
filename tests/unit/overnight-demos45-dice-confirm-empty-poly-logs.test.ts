@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos45 — dice confirm empty / poly logs', () => {
   it('Confirm stays disabled / no-op without die selection', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 
@@ -47,7 +42,7 @@ describe('Overnight demos45 — dice confirm empty / poly logs', () => {
   });
 
   it('selection toggle rewrites 2d6 Selection changed log lines', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
 
@@ -77,7 +72,7 @@ describe('Overnight demos45 — dice confirm empty / poly logs', () => {
   });
 
   it('poly selector mounts log area ready for Selection: type:value format', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     vi.advanceTimersByTime(1200);
     expect(root.querySelector('#log-poly')).toBeTruthy();

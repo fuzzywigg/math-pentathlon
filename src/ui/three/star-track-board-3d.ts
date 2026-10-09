@@ -19,14 +19,20 @@ import {
   fillChainArea,
   type DrawChainsCallback,
   type SelectChainCallback,
+  type StarTrackGameMode,
 } from '../../games/star-track/board-ui';
 import { getPlayerSeatColors } from '../player-colors';
+import { prefersReducedMotion } from '../reduced-motion';
 import { loadThree, type ThreeModule } from './load-three';
 import {
-  TABLET_PIXEL_RATIO_CAP,
+  resolveBoard3dPixelRatio,
+  paintBoard3dAndMarkReady,
+  scheduleBoard3dMountPaint,
   bindPageVisibility,
-  canPaint3d,
   shouldPreserveDrawingBuffer,
+  syncBoard3dRendererSize,
+  bindBoard3dLayout,
+  resolveCssViewportSize,
 } from './tablet-gl';
 
 type Three = ThreeModule;
@@ -40,8 +46,10 @@ const PIECE_H = 0.36;
 const BOARD_Y = 0;
 
 export interface StarTrackBoard3DCallbacks {
-  onDrawChains?: DrawChainsCallback;
-  onSelectChain?: SelectChainCallback;
+  onDrawChains?: DrawChainsCallback | undefined;
+  onSelectChain?: SelectChainCallback | undefined;
+  /** Winner-banner labels (You/AI vs Blue/Red). */
+  gameMode?: StarTrackGameMode | undefined;
 }
 
 export interface StarTrackBoard3D {
@@ -185,9 +193,7 @@ export async function createStarTrackBoard3D(
       })`
     );
   }
-  renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio || 1, TABLET_PIXEL_RATIO_CAP)
-  );
+  renderer.setPixelRatio(resolveBoard3dPixelRatio());
   const canvas = renderer.domElement;
   canvas.className = 'board-3d-canvas';
   canvas.setAttribute('data-mp3d', 'star-track');
@@ -330,8 +336,11 @@ export async function createStarTrackBoard3D(
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
-    if (disposed || !canPaint3d()) return;
-    renderer.render(scene, camera);
+    paintBoard3dAndMarkReady(
+      canvas,
+      () => renderer.render(scene, camera),
+      () => disposed
+    );
   };
 
   const fitHostToViewport = (): void => {
@@ -347,14 +356,9 @@ export async function createStarTrackBoard3D(
     // Budget for draw / choose-chain / taller game-over winner block under a
     // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
     const chainBudget = 230;
-    const available = Math.max(
-      120,
-      window.innerHeight - top - chainBudget - 12
-    );
-    const side = Math.max(
-      140,
-      Math.min(window.innerWidth * 0.92, available, 520)
-    );
+    const { width: vw, height: vh } = resolveCssViewportSize();
+    const available = Math.max(120, vh - top - chainBudget - 12);
+    const side = Math.max(140, Math.min(vw * 0.92, available, 520));
     canvasHost.style.width = `${side}px`;
     canvasHost.style.height = `${side}px`;
     canvasHost.style.maxHeight = `${side}px`;
@@ -365,17 +369,14 @@ export async function createStarTrackBoard3D(
     fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
+    syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
 
-  const onResize = (): void => resize();
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  window.addEventListener('resize', onResize);
+  const unbindLayout = bindBoard3dLayout(canvasHost, () => resize());
 
   const onLost = (event: Event): void => {
     event.preventDefault();
@@ -505,7 +506,7 @@ export async function createStarTrackBoard3D(
           : spaceToWorld(player, space);
       piece.position.set(x, BOARD_Y + 0.08 + PIECE_H / 2, z);
       piece.material = player === 'player1' ? mats.p1 : mats.p2;
-      const won = state.winner === player;
+      const won = state.winner === player && !prefersReducedMotion();
       piece.scale.set(won ? 1.12 : 1, won ? 1.15 : 1, won ? 1.12 : 1);
     };
 
@@ -523,6 +524,11 @@ export async function createStarTrackBoard3D(
         previewIndex = index;
         applyHighlights(state);
         paint();
+      },
+      {
+        ...(callbacks?.gameMode !== undefined
+          ? { gameMode: callbacks.gameMode }
+          : {}),
       }
     );
 
@@ -551,11 +557,13 @@ export async function createStarTrackBoard3D(
 
   window.__mp3dStarTrack = { spaceToClientPoint };
 
+  let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
     if (disposed) return;
     disposed = true;
+    cancelMountPaint();
     unbindVisibility();
-    window.removeEventListener('resize', onResize);
+    unbindLayout();
     canvas.removeEventListener('webglcontextlost', onLost);
     if (window.__mp3dStarTrack) {
       delete window.__mp3dStarTrack;
@@ -579,6 +587,7 @@ export async function createStarTrackBoard3D(
   };
 
   resize();
+  cancelMountPaint = scheduleBoard3dMountPaint(paint);
 
   return { update, unmount, spaceToClientPoint, canvas };
 }

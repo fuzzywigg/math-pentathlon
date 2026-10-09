@@ -18,6 +18,8 @@ export const DEFERRED_CORE_PREFIXES = [
   'hex',
   'ai-worker',
   'owl',
+  // Progress store — games/owl/stats load it on demand; menu only peeks one flag.
+  'storage',
 ] as const;
 
 /**
@@ -45,6 +47,20 @@ export function shouldPreloadMenuDependency(dep: string): boolean {
     return false;
   }
 
+  // Game route mounts + play CSS (lazy on /game/:id).
+  if (
+    name.includes('game-routes') ||
+    name.includes('game-play') ||
+    name.includes('game-route-mounts')
+  ) {
+    return false;
+  }
+
+  // Shared game chrome (header/modals/player colors) — lazy with the game route.
+  if (name.includes('game-shell') || name.includes('player-colors')) {
+    return false;
+  }
+
   for (const prefix of DEFERRED_CORE_PREFIXES) {
     if (name.includes(`core-${prefix}`) || name.includes(`/core-${prefix}`)) {
       return false;
@@ -64,7 +80,9 @@ export function coreManualChunkName(id: string): string | undefined {
 
   for (const prefix of DEFERRED_CORE_PREFIXES) {
     if (normalized.includes(`/src/core/${prefix}/`)) {
-      return prefix === 'owl' ? 'owl' : `core-${prefix}`;
+      if (prefix === 'owl') return 'owl';
+      // storage → core-storage (not folded into menu `core`)
+      return `core-${prefix}`;
     }
   }
 
@@ -81,5 +99,21 @@ export function uiManualChunkName(id: string): string | undefined {
   if (normalized.includes('/src/ui/owl/')) return 'owl-ui';
   if (normalized.includes('/src/ui/stats-dashboard')) return 'stats';
   if (normalized.includes('/src/ui/styles/stats-dashboard')) return 'stats';
+  // Keep help HTML + per-game mounts out of the menu `ui` chunk.
+  if (normalized.includes('/src/ui/game-route-mounts')) {
+    return 'game-routes';
+  }
+  // Shared game chrome — only needed after navigating to /game/:id.
+  if (
+    normalized.includes('/src/ui/components/game-shell') ||
+    normalized.includes('/src/ui/player-colors')
+  ) {
+    return 'game-shell';
+  }
+  // Dynamic play CSS — leave unnamed so Vite emits an async stylesheet
+  // instead of folding it into the menu `ui` CSS.
+  if (normalized.includes('/src/ui/styles/game-play')) {
+    return undefined;
+  }
   return 'ui';
 }

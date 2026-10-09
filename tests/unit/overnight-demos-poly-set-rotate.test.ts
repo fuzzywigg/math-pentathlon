@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Overnight demos — poly set / select / rotate', () => {
   it('each shape set refreshes gallery counts and clears prior selection chrome', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
 
@@ -47,7 +42,7 @@ describe('Overnight demos — poly set / select / rotate', () => {
   });
 
   it('selecting a shape fills info dl + rotate control advances orientation', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     (root.querySelector('#clear-board-btn') as HTMLButtonElement).click();
     (root.querySelector('#shape-gallery .shape-item') as HTMLElement).click();

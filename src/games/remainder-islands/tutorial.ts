@@ -1,7 +1,7 @@
 // Tutorial content for Remainder Islands
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const remainderIslandsTutorial: TutorialConfig = {
   id: 'remainder-islands-basics',

@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format streak-week-1', () => {
     storage.resetAll();
   });
 
-
   it('selects streak-week-1 at exact day-7', () => {
     for (const m of owlMessages.getMessagesByCategory('streak:update')) {
       if (m.id !== 'streak-week-1') storage.markMessageSeen(m.id);

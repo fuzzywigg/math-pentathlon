@@ -1,8 +1,8 @@
 // Juggle Board UI
 // Rendering the game boards, shapes, and controls
 
+import type { JuggleState } from './types';
 import {
-  JuggleState,
   CONFIG,
   getCategoryFromDie,
   getShapesForDie,
@@ -13,8 +13,12 @@ import {
   isPlacementValid,
   getBoardFillPercentage,
 } from './rules';
-import { Board } from '../../core/polyomino/placement';
-import { PolyominoShape, Rotation, Cell } from '../../core/polyomino/types';
+import type { Board } from '../../core/polyomino/placement';
+import type {
+  PolyominoShape,
+  Rotation,
+  Cell,
+} from '../../core/polyomino/types';
 import { getTransformedCells } from '../../core/polyomino/transform';
 import {
   buildCellAriaLabel,
@@ -93,7 +97,8 @@ export function renderBoard(
       cell.dataset.row = String(row);
       cell.dataset.col = String(col);
 
-      const isOccupied = board.cells[row][col];
+      // ratchet: dense GRID_SIZE×GRID_SIZE board; loops bound by CONFIG.GRID_SIZE.
+      const isOccupied = board.cells[row]![col]!;
       const isPreview = previewSet.has(`${row},${col}`);
 
       if (isOccupied) {
@@ -117,7 +122,7 @@ export function renderBoard(
           coord,
           empty: !isOccupied,
           owner: isOccupied ? getPlayerName(player) : undefined,
-          validPlacement: canPlace && isPreview && !!isPreviewValid,
+          validPlacement: canPlace && isPreview && Boolean(isPreviewValid),
         })
       );
 
@@ -176,9 +181,10 @@ export function renderDice(
 
       const die = document.createElement('div');
       die.className = 'juggle-die';
-      die.textContent = getDieFace(dice[i]);
+      // ratchet: dice is [number, number]; loop i in 0..1.
+      die.textContent = getDieFace(dice[i]!);
 
-      const category = getCategoryFromDie(dice[i]);
+      const category = getCategoryFromDie(dice[i]!);
       const label = document.createElement('div');
       label.className = 'juggle-die-label';
       label.textContent = getCategoryName(category);

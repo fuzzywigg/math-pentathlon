@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderPolyominoDemo } from '../../src/demos/polyomino-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — poly set-btn data-set catalog', () => {
   it('locks data-set attrs + tetrominoes selected idle', () => {
-    const root = mount();
+    const root = mountRoot();
     renderPolyominoDemo(root);
     const btns = [...root.querySelectorAll('.shape-set-selector .set-btn')];
     expect(btns.map((b) => b.getAttribute('data-set'))).toEqual([

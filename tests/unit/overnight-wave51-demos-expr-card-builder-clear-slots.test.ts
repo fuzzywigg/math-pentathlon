@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 51 demos — expr card-builder Clear All', () => {
   it('placed card returns to tray after Clear All', () => {
-    const root = mount();
+    const root = mountRoot();
     renderExpressionDemo(root);
     const area = root.querySelector('#card-builder-area') as HTMLElement;
     expect(area).toBeTruthy();

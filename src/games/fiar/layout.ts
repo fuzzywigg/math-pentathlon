@@ -196,11 +196,6 @@ export function createVerifiedProductionLayout(
   };
 }
 
-/** @deprecated Use createVerifiedProductionLayout — kept for import stability. */
-export function createUnverifiedProductionLayout(): BoardLayout {
-  return createVerifiedProductionLayout();
-}
-
 /**
  * Explicit test fixture: a small graph where the middle edge of a 5-node line
  * crosses the yellow center. Used to unit-test movement + win bridging rules.

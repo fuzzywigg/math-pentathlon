@@ -12,31 +12,11 @@ import {
 } from '../../src/games/kings-quadraphages/board';
 import { Piece } from '../../src/games/kings-quadraphages/pieces';
 import { getValidKingMoves } from '../../src/games/kings-quadraphages/rules';
+import { createEmptyBoard, placePiece, createRulesState, openingBoard } from './helpers/kings-board';
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
-
-function createEmptyBoard(): Board {
-  return Array.from({ length: BOARD_SIZE }, () =>
-    Array.from({ length: BOARD_SIZE }, () => null)
-  );
-}
-
-function placePiece(board: Board, pos: Position, piece: Piece): void {
-  board[pos.row][pos.col] = piece;
-}
-
-function createRulesState(board: Board): RulesGameState {
-  return { board, player1Supply: 30, player2Supply: 30 };
-}
-
-function openingBoard(): Board {
-  const board = createEmptyBoard();
-  placePiece(board, { row: 0, col: 4 }, { type: 'king', owner: 'player1' });
-  placePiece(board, { row: 8, col: 4 }, { type: 'king', owner: 'player2' });
-  return board;
-}
 
 describe('Overnight kings — easy seeded + trapped null', () => {
   it('easy with random=0 picks first valid king move', () => {

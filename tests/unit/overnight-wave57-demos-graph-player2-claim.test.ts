@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderGraphDemo } from '../../src/demos/graph-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 57 demos — graph player2 claim', () => {
   it('selecting Player 2 then claiming bumps Red node count', () => {
-    const root = mount();
+    const root = mountRoot();
     renderGraphDemo(root);
     (
       root.querySelector('.player-btn[data-player="2"]') as HTMLButtonElement

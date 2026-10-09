@@ -1,14 +1,13 @@
 // Dice Rolling Logic
 
-import {
+import type {
   DiceConfig,
   DiceType,
   DieRoll,
   RollResult,
   RollConfig,
-  DICE_CONFIGS,
-  DICE_FACES,
 } from './types';
+import { DICE_CONFIGS, DICE_FACES } from './types';
 
 /** Generate a unique ID */
 function generateId(): string {
@@ -140,13 +139,15 @@ export function isValidSelection(
   if (
     config.minSelectable !== undefined &&
     selectedCount < config.minSelectable
-  )
+  ) {
     return false;
+  }
   if (
     config.maxSelectable !== undefined &&
     selectedCount > config.maxSelectable
-  )
+  ) {
     return false;
+  }
   return true;
 }
 
@@ -157,7 +158,7 @@ export function getAllPossibleSums(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let sum = 0;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) sum += values[i];
+      if (mask & (1 << i)) sum += values[i]!;
     }
     sums.add(sum);
   }
@@ -171,7 +172,7 @@ export function getAllPossibleProducts(values: number[]): number[] {
   for (let mask = 1; mask < 1 << n; mask++) {
     let product = 1;
     for (let i = 0; i < n; i++) {
-      if (mask & (1 << i)) product *= values[i];
+      if (mask & (1 << i)) product *= values[i]!;
     }
     products.add(product);
   }

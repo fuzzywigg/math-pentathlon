@@ -5,12 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { renderAlignmentDemo } from '../../src/demos/alignment-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -30,7 +25,7 @@ function clickHex(root: HTMLElement, row: number, col: number): void {
 
 describe('Overnight demos — align hex path / regions', () => {
   it('Blue vertical spine grows region size and can win top-bottom', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
 
     // Blue (B) places down col 3; Red parks on right edge
@@ -48,7 +43,7 @@ describe('Overnight demos — align hex path / regions', () => {
   });
 
   it('occupied hex cells and post-reset board reject stale occupancy', () => {
-    const root = mount();
+    const root = mountRoot();
     renderAlignmentDemo(root);
     clickHex(root, 2, 2);
     expect(root.querySelector('#hex-board .cell-blue')).toBeTruthy();

@@ -1,0 +1,2657 @@
+{
+  "generatedAt": "2026-10-07T12:24:08.143Z",
+  "gamesPerDifficulty": 10,
+  "totalGames": 60,
+  "ended": 60,
+  "stalled": 0,
+  "crashed": 0,
+  "withConsoleErrors": 0,
+  "withPageErrors": 0,
+  "avgDurationMs": 8940,
+  "touchSamples": [
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 253,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 242,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 202,
+        "h": 59
+      },
+      "continueBtn": null
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "choice": {
+        "sel": ".pinball-choice-btn",
+        "w": 213,
+        "h": 59
+      },
+      "continueBtn": null
+    }
+  ],
+  "pageErrorSamples": [],
+  "consoleErrorSamples": [],
+  "results": [
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9139,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        789,
+        789,
+        786,
+        783,
+        782
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9145,
+      "avgAiThinkMs": 793,
+      "aiThinkSamples": [
+        800,
+        801,
+        785,
+        788,
+        789
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8905,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        789,
+        781,
+        783,
+        782,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8915,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        785,
+        786,
+        786,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8930,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        783,
+        787,
+        786,
+        782,
+        788
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8915,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        781,
+        783,
+        784,
+        789
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8931,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        789,
+        781,
+        784,
+        786,
+        787
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9106,
+      "avgAiThinkMs": 787,
+      "aiThinkSamples": [
+        786,
+        793,
+        791,
+        781,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8974,
+      "avgAiThinkMs": 789,
+      "aiThinkSamples": [
+        787,
+        785,
+        783,
+        785,
+        805
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "easy",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9058,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        784,
+        789,
+        783,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9234,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        784,
+        784,
+        783,
+        789,
+        791
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9209,
+      "avgAiThinkMs": 796,
+      "aiThinkSamples": [
+        791,
+        797,
+        800,
+        798,
+        796
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9139,
+      "avgAiThinkMs": 793,
+      "aiThinkSamples": [
+        786,
+        787,
+        793,
+        814,
+        787
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9036,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        790,
+        784,
+        782,
+        787,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8871,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        786,
+        783,
+        785,
+        786,
+        782
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8917,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        785,
+        782,
+        783,
+        787
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8881,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        787,
+        785,
+        781,
+        784,
+        789
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8888,
+      "avgAiThinkMs": 783,
+      "aiThinkSamples": [
+        784,
+        784,
+        781,
+        783,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8878,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        785,
+        785,
+        785,
+        784,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "medium",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8905,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        787,
+        783,
+        784,
+        787,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9037,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        786,
+        785,
+        786,
+        784,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8887,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        786,
+        784,
+        786,
+        784,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8879,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        790,
+        784,
+        782,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8897,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        785,
+        787,
+        788,
+        784,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8919,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        787,
+        785,
+        783,
+        785,
+        788
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8920,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        787,
+        787,
+        783,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8898,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        785,
+        784,
+        788,
+        783,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8901,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        783,
+        785,
+        790,
+        786,
+        787
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8874,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        785,
+        783,
+        785,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 253,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "desktop",
+      "difficulty": "hard",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8937,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        786,
+        783,
+        785,
+        785,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 242,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 36
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9113,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        784,
+        784,
+        784,
+        786,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8898,
+      "avgAiThinkMs": 787,
+      "aiThinkSamples": [
+        786,
+        786,
+        781,
+        798,
+        782
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8912,
+      "avgAiThinkMs": 787,
+      "aiThinkSamples": [
+        788,
+        784,
+        790,
+        784,
+        788
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8901,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        786,
+        785,
+        787,
+        786,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8876,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        784,
+        788,
+        786,
+        787,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8912,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        784,
+        788,
+        785,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8850,
+      "avgAiThinkMs": 783,
+      "aiThinkSamples": [
+        782,
+        781,
+        785,
+        786,
+        780
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8863,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        786,
+        783,
+        783,
+        784,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8879,
+      "avgAiThinkMs": 786,
+      "aiThinkSamples": [
+        788,
+        789,
+        788,
+        784,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "easy",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8986,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        787,
+        784,
+        783,
+        786,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9110,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        786,
+        784,
+        785,
+        784,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8864,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        783,
+        786,
+        783,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8864,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        783,
+        785,
+        785,
+        786,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8863,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        785,
+        783,
+        783,
+        785,
+        787
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8913,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        782,
+        783,
+        783,
+        786,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8857,
+      "avgAiThinkMs": 783,
+      "aiThinkSamples": [
+        782,
+        781,
+        781,
+        785,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8896,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        787,
+        785,
+        786,
+        783,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8869,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        783,
+        784,
+        784,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8882,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        781,
+        785,
+        782,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "medium",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8892,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        784,
+        783,
+        789,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 0,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 9110,
+      "avgAiThinkMs": 787,
+      "aiThinkSamples": [
+        786,
+        790,
+        789,
+        784,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 1,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8895,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        783,
+        786,
+        786,
+        785,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 2,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8869,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        785,
+        784,
+        783,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 3,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8897,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        785,
+        782,
+        785,
+        785,
+        785
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 4,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8889,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        783,
+        781,
+        786,
+        787,
+        784
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 5,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8844,
+      "avgAiThinkMs": 783,
+      "aiThinkSamples": [
+        780,
+        783,
+        782,
+        785,
+        783
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 6,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8867,
+      "avgAiThinkMs": 785,
+      "aiThinkSamples": [
+        784,
+        784,
+        783,
+        783,
+        791
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 7,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8887,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        786,
+        783,
+        787,
+        784,
+        782
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 8,
+      "forceWrong": false,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8876,
+      "avgAiThinkMs": 783,
+      "aiThinkSamples": [
+        784,
+        781,
+        783,
+        786,
+        781
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 202,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    },
+    {
+      "profile": "tablet",
+      "difficulty": "hard",
+      "gameIndex": 9,
+      "forceWrong": true,
+      "ended": true,
+      "stalled": false,
+      "crash": false,
+      "turns": 10,
+      "durationMs": 8917,
+      "avgAiThinkMs": 784,
+      "aiThinkSamples": [
+        783,
+        784,
+        783,
+        786,
+        786
+      ],
+      "touch": {
+        "choice": {
+          "sel": ".pinball-choice-btn",
+          "w": 213,
+          "h": 59
+        },
+        "continueBtn": null,
+        "newGame": {
+          "sel": "#new-game-btn",
+          "w": 120,
+          "h": 44
+        }
+      },
+      "consoleErrors": [],
+      "pageErrors": []
+    }
+  ]
+}

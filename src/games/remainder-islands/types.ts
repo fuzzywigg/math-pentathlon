@@ -85,8 +85,8 @@ export const INITIAL_CHIPS_PER_PLAYER = 12;
 export const TOTAL_TURNS = 24; // 12 turns each player
 
 // Hexagonal grid configuration
-export const GRID_ROWS = 5;
-export const GRID_COLS = 7;
+const GRID_ROWS = 5;
+const GRID_COLS = 7;
 
 // Create initial island grid
 function createIslands(): Island[] {
@@ -102,6 +102,7 @@ function createIslands(): Island[] {
       // Assign values in a pattern (cycling through island values)
       const value = ISLAND_VALUES[valueIndex % ISLAND_VALUES.length];
       valueIndex++;
+      if (value === undefined) continue;
 
       islands.push({
         id: `island-${row}-${col}`,
@@ -137,9 +138,7 @@ export function createInitialState(): RemainderIslandsState {
 }
 
 // Get opponent
-export function getOpponent(player: Player): Player {
-  return player === 'player1' ? 'player2' : 'player1';
-}
+export { getOpponentSeat as getOpponent } from '../../core/seats';
 
 // Get player chips
 export function getPlayerChips(

@@ -2,8 +2,12 @@
  * Regression for #375 — Kwatro-Sinko must not end on a home-row slide.
  * Official Div II Highlights: win requires ALL 5 chips off numbered spaces
  * AND a valid like+like−opposite alignment totaling 4 or 5.
+ *
+ * Hard AI uses DIFFICULTY_CONFIG.hard.randomness (3%) to occasionally pick among
+ * the top scored moves — seed Math.random in the forced-win case so the suite
+ * does not flake on chip identity (tests-only; no AI/rules changes).
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 
 import {
   createInitialState,
@@ -14,6 +18,12 @@ import {
 } from '../../src/games/kwatro-sinko/rules';
 import { getAIMove, executeAITurn } from '../../src/games/kwatro-sinko/ai';
 import type { Chip, KwaState } from '../../src/games/kwatro-sinko/types';
+
+afterEach(() => {
+  // Do not restoreAllMocks — shared isolate:false graph hosts hoisted vi.mock.
+  const randomFn = Math.random as unknown as { mockRestore?: () => void };
+  randomFn.mockRestore?.();
+});
 
 function placeChip(state: KwaState, chipId: string, nodeId: string): KwaState {
   const chip = state.chips.get(chipId);
@@ -177,6 +187,9 @@ describe('Kwatro-Sinko #375 — ends only under official conditions', () => {
 
   it('vs computer: Hard AI can convert a forced legal win', () => {
     const state = forgeLegalBlueWin();
+    // Stay off the Hard randomness branch (Math.random() < 0.03) so the
+    // top-scored win (p1-1 → n2-2) is selected deterministically.
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
     // Seat is Blue; treat Blue as the AI for this forced position
     const aiMove = getAIMove(state, 'player1', 'hard');
     expect(aiMove).not.toBeNull();

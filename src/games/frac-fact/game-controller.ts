@@ -1,7 +1,8 @@
 // Frac Fact Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import { FracFactState, createInitialState, Difficulty } from './types';
+import type { FracFactState, Difficulty } from './types';
+import { createInitialState } from './types';
 import { submitAnswer, nextProblem, startGame } from './rules';
 import {
   renderProblem,
@@ -12,17 +13,19 @@ import {
   getPlayerName,
   injectFracFactStyles,
 } from './board-ui';
-import { Fraction } from '../../core/fractions/types';
-import { getAIAnswer, isAITurn, AIDifficulty } from './ai';
+import type { Fraction } from '../../core/fractions/types';
+import type { AIDifficulty } from './ai';
+import { getAIAnswer, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fracFactTutorial } from './tutorial';
-import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
+import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';
+import { clearNullableTimeout } from '../../ui/timeout-handle';
 import { markStatusLive } from '../../ui/board-a11y';
 
+import { clearElement } from '../../core/dom-security';
+
 function syncOpponentChrome(): void {
-  const root = document.getElementById('app');
-  if (!root) return;
-  applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
+  syncAppOpponentChrome(isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
 /** True while it is the computer's seat (including the think pause). */
@@ -43,10 +46,7 @@ let aiTimer: ReturnType<typeof setTimeout> | null = null;
 let resultTimer: ReturnType<typeof setTimeout> | null = null;
 
 function clearAiTimer(): void {
-  if (aiTimer !== null) {
-    clearTimeout(aiTimer);
-    aiTimer = null;
-  }
+  aiTimer = clearNullableTimeout(aiTimer);
 }
 
 function clearResultTimer(): void {
@@ -71,7 +71,7 @@ function scheduleAiTurn(): void {
 function render(): void {
   if (!gameContainer) return;
 
-  gameContainer.innerHTML = '';
+  clearElement(gameContainer);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'frac-game-container';
@@ -142,8 +142,9 @@ function handleContinue(): void {
 // =============================================================================
 
 function aiTurn(): void {
-  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2')
+  if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2') {
     return;
+  }
   if (!gameState.currentProblem) return;
 
   // Use AI module to get answer
@@ -214,6 +215,13 @@ export function setDifficulty(difficulty: Difficulty): void {
 
 export function getCurrentState(): FracFactState {
   return gameState;
+}
+
+/** Clear pending AI/result timers and drop the mount (route change). */
+export function destroyGame(): void {
+  clearAiTimer();
+  clearResultTimer();
+  gameContainer = null;
 }
 
 /** Test helper: inject state and re-render. */

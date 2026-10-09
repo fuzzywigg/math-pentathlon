@@ -1,6 +1,6 @@
 // Alignment Detection Demo - Interactive test page
 
-import {
+import type {
   AlignmentConfig,
   ContiguousConfig,
   CellValue,
@@ -18,6 +18,13 @@ import {
 } from '../core/alignment/contiguous';
 import { injectHighlightStyles } from '../core/alignment/highlight-ui';
 
+import {
+  clearElement,
+  replaceWithSafeHtml,
+  safeHtml,
+  setText,
+} from '../core/dom-security';
+
 type Board = CellValue[][];
 
 // Demo state
@@ -28,6 +35,25 @@ function createEmptyBoard(rows: number, cols: number): Board {
   return Array(rows)
     .fill(null)
     .map(() => Array(cols).fill(null));
+}
+
+/** Safe cell read under noUncheckedIndexedAccess (board rows are pre-sized). */
+function getBoardCell(board: Board, row: number, col: number): CellValue {
+  const boardRow = board[row];
+  if (boardRow === undefined) return null;
+  return boardRow[col] ?? null;
+}
+
+/** Safe cell write under noUncheckedIndexedAccess. */
+function setBoardCell(
+  board: Board,
+  row: number,
+  col: number,
+  value: CellValue
+): void {
+  const boardRow = board[row];
+  if (boardRow === undefined) return;
+  boardRow[col] = value;
 }
 
 function renderFourInRowDemo(container: HTMLElement): void {
@@ -44,6 +70,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'alignment-demo-section';
+  // trusted constant markup
   wrapper.innerHTML = `
     <h3>Connect Four Style (4-in-a-row)</h3>
     <p class="demo-instructions">Click a column to drop a piece. Get 4 in a row to win!</p>
@@ -61,7 +88,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
   const resetBtn = wrapper.querySelector('#four-reset') as HTMLButtonElement;
 
   function render(): void {
-    boardEl.innerHTML = '';
+    clearElement(boardEl);
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -70,7 +97,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = currentBoard[row][col];
+        const value = getBoardCell(currentBoard, row, col);
         if (value) {
           cell.classList.add(`cell-${value.toString().toLowerCase()}`);
           cell.textContent = value.toString();
@@ -86,7 +113,10 @@ function renderFourInRowDemo(container: HTMLElement): void {
     const result = checkForWinner(getCell, config);
 
     if (result.hasWinner) {
-      statusEl.innerHTML = `<span class="winner">Winner: ${result.winner}!</span>`;
+      replaceWithSafeHtml(
+        statusEl,
+        safeHtml`<span class="winner">Winner: ${result.winner}!</span>`
+      );
 
       // Highlight winning cells
       for (const alignment of result.alignments) {
@@ -100,7 +130,14 @@ function renderFourInRowDemo(container: HTMLElement): void {
         }
       }
     } else {
-      statusEl.innerHTML = `Current player: <span class="player-${currentPlayer.toLowerCase()}">${currentPlayer}</span>`;
+      replaceWithSafeHtml(
+        statusEl,
+        safeHtml`Current player: <span>${currentPlayer}</span>`
+      );
+      const span = statusEl.querySelector('span');
+      if (span) {
+        span.className = `player-${currentPlayer.toLowerCase()}`;
+      }
     }
 
     // Show alignment info
@@ -110,10 +147,13 @@ function renderFourInRowDemo(container: HTMLElement): void {
     });
     const xAlignments = alignments.filter((a) => a.value === 'X');
     const oAlignments = alignments.filter((a) => a.value === 'O');
-    infoEl.innerHTML = `
+    replaceWithSafeHtml(
+      infoEl,
+      safeHtml`
       <div>X has ${xAlignments.length} alignments (2+)</div>
       <div>O has ${oAlignments.length} alignments (2+)</div>
-    `;
+    `
+    );
   }
 
   function handleClick(col: number): void {
@@ -124,7 +164,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
     // Find lowest empty row in column
     let targetRow = -1;
     for (let row = rows - 1; row >= 0; row--) {
-      if (currentBoard[row][col] === null) {
+      if (getBoardCell(currentBoard, row, col) === null) {
         targetRow = row;
         break;
       }
@@ -132,7 +172,7 @@ function renderFourInRowDemo(container: HTMLElement): void {
 
     if (targetRow === -1) return; // Column full
 
-    currentBoard[targetRow][col] = currentPlayer;
+    setBoardCell(currentBoard, targetRow, col, currentPlayer);
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     render();
   }
@@ -159,6 +199,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'alignment-demo-section';
+  // trusted constant markup
   wrapper.innerHTML = `
     <h3>Hex-style Connection</h3>
     <p class="demo-instructions">Blue connects top-bottom, Red connects left-right. Click to place.</p>
@@ -176,7 +217,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
   const resetBtn = wrapper.querySelector('#hex-reset') as HTMLButtonElement;
 
   function render(): void {
-    boardEl.innerHTML = '';
+    clearElement(boardEl);
     boardEl.style.setProperty('--hex-size', String(size));
 
     for (let row = 0; row < size; row++) {
@@ -190,7 +231,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = board[row][col];
+        const value = getBoardCell(board, row, col);
         if (value === 'B') {
           cell.classList.add('cell-blue');
         } else if (value === 'R') {
@@ -239,23 +280,36 @@ function renderHexConnectDemo(container: HTMLElement): void {
     }
 
     if (winner) {
-      statusEl.innerHTML = `<span class="winner">Winner: ${winner}!</span>`;
+      replaceWithSafeHtml(
+        statusEl,
+        safeHtml`<span class="winner">Winner: ${winner}!</span>`
+      );
     } else {
       const playerName = player === 'B' ? 'Blue' : 'Red';
-      statusEl.innerHTML = `Current player: <span class="player-${player.toLowerCase()}">${playerName}</span>`;
+      replaceWithSafeHtml(
+        statusEl,
+        safeHtml`Current player: <span>${playerName}</span>`
+      );
+      const span = statusEl.querySelector('span');
+      if (span) {
+        span.className = `player-${player.toLowerCase()}`;
+      }
     }
 
     // Show region info
     const blueRegions = regions.filter((r) => r.value === 'B');
     const redRegions = regions.filter((r) => r.value === 'R');
-    infoEl.innerHTML = `
+    replaceWithSafeHtml(
+      infoEl,
+      safeHtml`
       <div>Blue: ${blueRegions.length} region(s), largest: ${Math.max(0, ...blueRegions.map((r) => r.size))}</div>
       <div>Red: ${redRegions.length} region(s), largest: ${Math.max(0, ...redRegions.map((r) => r.size))}</div>
-    `;
+    `
+    );
   }
 
   function handleClick(row: number, col: number): void {
-    if (board[row][col] !== null) return;
+    if (getBoardCell(board, row, col) !== null) return;
 
     // Check for existing winner
     const getCell = createArrayGetter(board);
@@ -264,16 +318,18 @@ function renderHexConnectDemo(container: HTMLElement): void {
       if (
         region.value === 'B' &&
         regionConnectsEdges(region, 'top', 'bottom', config)
-      )
+      ) {
         return;
+      }
       if (
         region.value === 'R' &&
         regionConnectsEdges(region, 'left', 'right', config)
-      )
+      ) {
         return;
+      }
     }
 
-    board[row][col] = player;
+    setBoardCell(board, row, col, player);
     player = player === 'B' ? 'R' : 'B';
     render();
   }
@@ -281,7 +337,7 @@ function renderHexConnectDemo(container: HTMLElement): void {
   resetBtn.addEventListener('click', () => {
     for (let r = 0; r < size; r++) {
       for (let c = 0; c < size; c++) {
-        board[r][c] = null;
+        setBoardCell(board, r, c, null);
       }
     }
     player = 'B';
@@ -297,9 +353,9 @@ function renderPotentialDemo(container: HTMLElement): void {
   const board: Board = createEmptyBoard(rows, cols);
 
   // Pre-populate with some pieces
-  board[2][2] = 'X';
-  board[2][3] = 'X';
-  board[1][2] = 'O';
+  setBoardCell(board, 2, 2, 'X');
+  setBoardCell(board, 2, 3, 'X');
+  setBoardCell(board, 1, 2, 'O');
 
   const config: AlignmentConfig = {
     targetLength: 4,
@@ -309,6 +365,7 @@ function renderPotentialDemo(container: HTMLElement): void {
 
   const wrapper = document.createElement('div');
   wrapper.className = 'alignment-demo-section';
+  // trusted constant markup
   wrapper.innerHTML = `
     <h3>Alignment Potential Analysis</h3>
     <p class="demo-instructions">Click cells to place X. See alignment potential for each direction.</p>
@@ -326,7 +383,7 @@ function renderPotentialDemo(container: HTMLElement): void {
   ) as HTMLButtonElement;
 
   function render(selectedRow?: number, selectedCol?: number): void {
-    boardEl.innerHTML = '';
+    clearElement(boardEl);
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
@@ -335,7 +392,7 @@ function renderPotentialDemo(container: HTMLElement): void {
         cell.dataset.row = String(row);
         cell.dataset.col = String(col);
 
-        const value = board[row][col];
+        const value = getBoardCell(board, row, col);
         if (value) {
           cell.classList.add(`cell-${value.toString().toLowerCase()}`);
           cell.textContent = value.toString();
@@ -361,24 +418,31 @@ function renderPotentialDemo(container: HTMLElement): void {
         config
       );
 
-      let html = `<strong>Alignment potential at (${selectedRow}, ${selectedCol}):</strong><br>`;
+      clearElement(infoEl);
+      const heading = document.createElement('strong');
+      heading.textContent = `Alignment potential at (${selectedRow}, ${selectedCol}):`;
+      infoEl.appendChild(heading);
+      infoEl.appendChild(document.createElement('br'));
       potential.forEach((data, direction) => {
         const status = data.blocked ? '(blocked)' : '(open)';
-        html += `${direction}: ${data.count} ${status}<br>`;
+        infoEl.appendChild(
+          document.createTextNode(`${direction}: ${data.count} ${status}`)
+        );
+        infoEl.appendChild(document.createElement('br'));
       });
-      infoEl.innerHTML = html;
     } else {
-      infoEl.innerHTML = 'Click a cell to see alignment potential';
+      setText(infoEl, 'Click a cell to see alignment potential');
     }
   }
 
   function handleClick(row: number, col: number): void {
-    if (board[row][col] === null) {
-      board[row][col] = 'X';
-    } else if (board[row][col] === 'X') {
-      board[row][col] = 'O';
+    const current = getBoardCell(board, row, col);
+    if (current === null) {
+      setBoardCell(board, row, col, 'X');
+    } else if (current === 'X') {
+      setBoardCell(board, row, col, 'O');
     } else {
-      board[row][col] = null;
+      setBoardCell(board, row, col, null);
     }
     render(row, col);
   }
@@ -386,7 +450,7 @@ function renderPotentialDemo(container: HTMLElement): void {
   resetBtn.addEventListener('click', () => {
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
-        board[r][c] = null;
+        setBoardCell(board, r, c, null);
       }
     }
     render();
@@ -398,10 +462,11 @@ function renderPotentialDemo(container: HTMLElement): void {
 export function renderAlignmentDemo(container: HTMLElement): void {
   injectHighlightStyles();
 
-  container.innerHTML = '';
+  clearElement(container);
 
   const wrapper = document.createElement('div');
   wrapper.className = 'alignment-demo';
+  // trusted constant markup
   wrapper.innerHTML = `
     <style>
       .alignment-demo {

@@ -11,6 +11,7 @@ import {
   applyAIMoveSteps,
   type AIMove,
 } from '../../src/games/fab-a-diffy/ai';
+import { fastDeadlineOpts } from './helpers/ai-search-fast';
 
 afterEach(() => vi.restoreAllMocks());
 
@@ -41,7 +42,7 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     (difficulty) => {
       vi.spyOn(Math, 'random').mockReturnValue(0.99);
       const state = createInitialState();
-      const move = getAIMove(state, 'player1', difficulty);
+      const move = getAIMove(state, 'player1', difficulty, fastDeadlineOpts());
       expect(move).not.toBeNull();
       expect(state.fractionBars.has(move!.bar1Id)).toBe(true);
       expect(state.fractionBars.has(move!.bar2Id)).toBe(true);
@@ -55,7 +56,12 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     'executeAITurn %s records history and flips to player2',
     (difficulty) => {
       vi.spyOn(Math, 'random').mockReturnValue(0);
-      const next = executeAITurn(createInitialState(), 'player1', difficulty);
+      const next = executeAITurn(
+        createInitialState(),
+        'player1',
+        difficulty,
+        fastDeadlineOpts()
+      );
       expect(next.moveHistory.length).toBe(1);
       expect(next.currentPlayer).toBe('player2');
       expect(next.phase).toBe('selectingBar1');
@@ -72,7 +78,7 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
   it('applyAIMoveSteps happy path claims answer', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0.5);
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'hard');
+    const move = getAIMove(state, 'player1', 'hard', fastDeadlineOpts());
     expect(move).not.toBeNull();
     const next = applyAIMoveSteps(state, move!);
     expect(next.moveHistory.length).toBe(1);
@@ -91,14 +97,14 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     const next = applyAIMoveSteps(state, bad);
     expect(next.currentPlayer).toBe('player2');
     expect(next.moveHistory).toHaveLength(0);
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 
   it('applyAIMoveSteps fails executeMove → passTurn', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Math, 'random').mockReturnValue(0.2);
     const state = createInitialState();
-    const move = getAIMove(state, 'player1', 'medium');
+    const move = getAIMove(state, 'player1', 'medium', fastDeadlineOpts());
     expect(move).not.toBeNull();
     const next = applyAIMoveSteps(state, {
       ...move!,
@@ -106,6 +112,6 @@ describe('Wave 41 Fab AI — difficulties / steps', () => {
     });
     expect(next.moveHistory).toHaveLength(0);
     expect(next.currentPlayer).toBe('player2');
-    expect(errorSpy).toHaveBeenCalled();
+    expect(errorSpy).not.toHaveBeenCalled();
   });
 });

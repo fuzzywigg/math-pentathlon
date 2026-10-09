@@ -7,12 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
 
 import { renderDiceDemo } from '../../src/demos/dice-demo';
-
-function mount(): HTMLElement {
-  const root = document.createElement('div');
-  document.body.appendChild(root);
-  return root;
-}
+import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
   document.body.innerHTML = '';
@@ -24,7 +19,7 @@ afterEach(() => {
 
 describe('Wave 64 demos — dice data-dice/count catalog', () => {
   it('locks data-dice + data-count attrs on quick-roll buttons', () => {
-    const root = mount();
+    const root = mountRoot();
     renderDiceDemo(root);
     const btns = [...root.querySelectorAll('.quick-roll-btn')];
     expect(

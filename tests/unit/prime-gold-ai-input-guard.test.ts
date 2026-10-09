@@ -3,7 +3,7 @@
  * Human must not see Roll / Pass / valid-cell / expression chrome while Red thinks,
  * and taps during the think pause must not change state.
  */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   createInitialState,
   getValidPlacements,
@@ -16,14 +16,10 @@ import {
   renderDice,
   renderExpressions,
 } from '../../src/games/prime-gold/board-ui';
+import { installDomHooks } from './helpers/dom';
 
 describe('Prime Gold AI-turn input guard', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '';
-    document.getElementById('prime-gold-styles')?.remove();
-    vi.useFakeTimers();
-  });
-
+  installDomHooks({ fakeTimers: true, styleIds: ['prime-gold-styles'] });
   afterEach(async () => {
     vi.useRealTimers();
     document.body.innerHTML = '';

@@ -2,110 +2,21 @@
  * High-value e2e smoke: menu loads, every available game opens, and each
  * game can complete a human move with a computer reply in vs-AI mode.
  */
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test } from './fixtures';
+import { expect, type Page } from '@playwright/test';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
+import {
+  dismissOwlIfNeeded,
+  gotoGame,
+  mountLocator,
+  startHuman,
+  startVsAi,
+} from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 
-/** Primary board / play surface that proves the game mounted. */
-const MOUNT: Record<string, string> = {
-  'kings-quadraphages': '#board .board .cell, .cell-king',
-  hex: '.hex-board',
-  'star-track': '.star-track-board',
-  'hex-a-gone': '.hex-a-gone-board',
-  calla: '.calla-wrapper, .calla-pit',
-  'sum-dominoes': '.sd-board',
-  'par-55': '.par55-board',
-  ramrod: '.ramrod-board',
-  'kwatro-sinko': '.kwa-board',
-  fiar: '.fiar-board-container',
-  juggle: '.juggle-board',
-  'contig-60': '.contig-board',
-  'stars-bars': '.stars-board',
-  'fab-a-diffy': '.fab-bar-pool, .fab-answer-board',
-  'queens-guards': '.qg-board-container',
-  'prime-gold': '.pg-board, .prime-board',
-  'remainder-islands': '.remainder-board',
-  'pent-em-in': '.pent-board',
-  'frac-fact': '.frac-problem, .frac-choice-btn',
-  'fraction-pinball':
-    '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
-};
-
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  // Ensure the owl stack cannot intercept board clicks.
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
-}
-
-/** Lazy game chunks show `data-testid="game-loading"` until the shell mounts. */
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
-
-async function startVsAi(page: Page) {
-  await waitForGameReady(page);
-  await dismissOwlIfNeeded(page);
-  // Games mount in human mode; open New Game to choose vs AI.
-  await page.locator('#new-game-btn').click();
-  const modal = page.locator('#new-game-modal');
-  await expect(modal).toBeVisible({ timeout: 10_000 });
-  await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
-  const easy = page.locator('.difficulty-btn.easy');
-  if (await easy.isVisible().catch(() => false)) {
-    await easy.click();
-  }
-  await page.locator('#start-game-btn').click();
-  await expect(modal).toHaveClass(/hidden/);
-  await dismissOwlIfNeeded(page);
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  // Already playing human after lazy mount — only click Start if modal is open.
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
-  }
-  await dismissOwlIfNeeded(page);
-}
-
 function titleStem(game: GameInfo): string {
   return game.name.replace(/[!?]+$/, '').split(' (')[0];
-}
-
-function mountLocator(page: Page, gameId: string): Locator {
-  const sel = MOUNT[gameId] ?? '#board, #game-container, main';
-  return page.locator(sel).first();
 }
 
 type BoardFingerprint = {
@@ -560,6 +471,94 @@ test.describe('Menu smoke', () => {
     await expect(page.locator('.game-card').first()).toBeVisible();
     const availableCards = page.locator('.game-card:not(.game-card-disabled)');
     await expect(availableCards).toHaveCount(AVAILABLE_GAMES.length);
+  });
+});
+
+/**
+ * burn-1008: CSP Report-Only + companion headers must be present, and
+ * visiting the menu + all 20 games must produce zero CSP violations
+ * (console or SecurityPolicyViolationEvent).
+ */
+test.describe('CSP report-only smoke', () => {
+  test('headers present; menu + all games load with zero CSP violations', async ({
+    page,
+  }) => {
+    test.setTimeout(180_000);
+
+    const cspViolations: string[] = [];
+    const consoleCsp: string[] = [];
+
+    page.on('console', (msg) => {
+      const text = msg.text();
+      // WebKit warns that Report-Only CSP lacks report-to — not a violation.
+      if (
+        /content security policy/i.test(text) &&
+        /report-only/i.test(text) &&
+        /report-to/i.test(text)
+      ) {
+        return;
+      }
+      if (/content security policy|refused to|csp/i.test(text)) {
+        consoleCsp.push(`[${msg.type()}] ${text}`);
+      }
+    });
+
+    await page.addInitScript(() => {
+      const w = window as Window & { __mpCspViolations?: string[] };
+      w.__mpCspViolations = [];
+      window.addEventListener('securitypolicyviolation', (event) => {
+        w.__mpCspViolations?.push(
+          `${event.violatedDirective}: ${event.blockedURI || event.sourceFile || '(inline)'}`
+        );
+      });
+    });
+
+    const home = await page.goto('/');
+    expect(home).not.toBeNull();
+    const headers = home!.headers();
+    expect(headers['content-security-policy-report-only'] || '').toMatch(
+      /default-src\s+'self'/
+    );
+    expect(headers['content-security-policy-report-only'] || '').toMatch(
+      /frame-ancestors\s+'none'/
+    );
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    expect(headers['permissions-policy'] || '').toMatch(/camera=\(\)/);
+
+    await expect(page.locator('h1')).toContainText('Math Pentathlon');
+    await expect(page.locator('.game-card').first()).toBeVisible();
+
+    for (const game of AVAILABLE_GAMES) {
+      await gotoGame(page, game.id);
+      await expect(mountLocator(page, game.id)).toBeVisible({
+        timeout: 15_000,
+      });
+    }
+
+    // Service worker may be inactive in plain Vite dev (PWA_DEV off) —
+    // still assert the registration path does not CSP-fail when present.
+    const swCount = await page.evaluate(async () => {
+      if (!('serviceWorker' in navigator)) return 0;
+      const regs = await navigator.serviceWorker.getRegistrations();
+      return regs.length;
+    });
+    expect(swCount).toBeGreaterThanOrEqual(0);
+
+    const pageViolations = await page.evaluate(() => {
+      const w = window as Window & { __mpCspViolations?: string[] };
+      return w.__mpCspViolations ?? [];
+    });
+    cspViolations.push(...pageViolations);
+
+    expect(
+      cspViolations,
+      `CSP SecurityPolicyViolationEvent(s):\n${cspViolations.join('\n')}`
+    ).toEqual([]);
+    expect(
+      consoleCsp,
+      `CSP-related console message(s):\n${consoleCsp.join('\n')}`
+    ).toEqual([]);
   });
 });
 

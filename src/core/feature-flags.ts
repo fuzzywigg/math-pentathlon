@@ -3,54 +3,33 @@
  * unless explicitly enabled via URL or localStorage.
  */
 
+import { getWebStorage } from './safe-web-storage';
+import { readUrlOrStorageFlag, type StorageLike } from './url-flags';
+
 export const BOARD_3D_PARAM = 'board3d';
 export const BOARD_3D_STORAGE_KEY = 'mp-board3d';
-
-type StorageLike = Pick<Storage, 'getItem'>;
-
-function readParam(search: string, hash: string, key: string): string | null {
-  const fromSearch = new URLSearchParams(
-    search.startsWith('?') ? search : search ? `?${search}` : ''
-  ).get(key);
-  if (fromSearch !== null) return fromSearch;
-
-  // Hash routers often carry query after the path: #/game/foo?board3d=1
-  const hashQueryIndex = hash.indexOf('?');
-  if (hashQueryIndex >= 0) {
-    return new URLSearchParams(hash.slice(hashQueryIndex)).get(key);
-  }
-  return null;
-}
 
 /**
  * Whether the optional Three.js 3D board view is enabled.
  * Enable with `?board3d=1` (or `true`) on the search string or hash query,
  * or localStorage key `mp-board3d` = `1`.
  * Explicit `board3d=0` / `false` forces OFF even if localStorage is set.
+ * Non-allowlisted tokens are ignored (never treated as truthy strings for DOM).
+ *
+ * Default storage is resolved via `getWebStorage` so SecurityError on
+ * localStorage access (Safari private / blocked storage) fails soft → OFF
+ * instead of throwing during argument default evaluation.
  */
 export function isBoard3dEnabled(
   search: string = typeof window !== 'undefined' ? window.location.search : '',
-  storage: StorageLike | null = typeof localStorage !== 'undefined'
-    ? localStorage
-    : null,
+  storage: StorageLike | null = getWebStorage('local'),
   hash: string = typeof window !== 'undefined' ? window.location.hash : ''
 ): boolean {
-  const param = readParam(search, hash, BOARD_3D_PARAM);
-
-  if (param === '1' || param === 'true') {
-    return true;
-  }
-  if (param === '0' || param === 'false') {
-    return false;
-  }
-
-  if (!storage) {
-    return false;
-  }
-
-  try {
-    return storage.getItem(BOARD_3D_STORAGE_KEY) === '1';
-  } catch {
-    return false;
-  }
+  return readUrlOrStorageFlag(
+    BOARD_3D_PARAM,
+    BOARD_3D_STORAGE_KEY,
+    search,
+    hash,
+    storage
+  );
 }

@@ -20,7 +20,6 @@ describe('Wave 64 core owl — format return-afternoon-1', () => {
     storage.resetAll();
   });
 
-
   it('selects return-afternoon-1 and formats playerName', () => {
     for (const m of owlMessages.getMessagesByCategory('app:return')) {
       if (m.id !== 'return-afternoon-1') storage.markMessageSeen(m.id);

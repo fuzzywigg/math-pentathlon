@@ -1,7 +1,7 @@
 // Tutorial content for Queens & Guards
 // Next-only steps ported from existing How-to / helpContentHtml
 
-import { TutorialConfig } from '../../core/tutorial';
+import type { TutorialConfig } from '../../core/tutorial';
 
 export const queensGuardsTutorial: TutorialConfig = {
   id: 'queens-guards-basics',

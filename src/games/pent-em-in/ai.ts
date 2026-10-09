@@ -13,15 +13,10 @@
 // 5. Save flexible pieces (I, X) for tight spots
 // 6. The 'I' piece (5 in a row) can block long paths
 
-import {
-  PentEmInState,
-  Player,
-  getPlayerPieces,
-  getPentominoShape,
-  BOARD_SIZE,
-} from './types';
+import type { PentEmInState, Player } from './types';
+import { getPlayerPieces, getPentominoShape, BOARD_SIZE } from './types';
 import { placePiece, getValidPlacements } from './rules';
-import { Cell, Rotation } from '../../core/polyomino/types';
+import type { Cell, Rotation } from '../../core/polyomino/types';
 
 export type AIDifficulty = 'easy' | 'medium' | 'hard';
 
@@ -62,8 +57,9 @@ function countReachableEmpty(state: PentEmInState, start: Cell): number {
       cell.row >= BOARD_SIZE ||
       cell.col < 0 ||
       cell.col >= BOARD_SIZE
-    )
+    ) {
       continue;
+    }
     if (state.board[cell.row][cell.col].occupied) continue;
 
     visited.add(key);

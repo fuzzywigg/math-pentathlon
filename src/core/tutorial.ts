@@ -1,5 +1,7 @@
 // Tutorial System - Provides step-by-step guidance for learning games
 
+import { setTrustedMarkup } from './dom-security';
+
 export interface TutorialStep {
   id: string;
   title: string;
@@ -68,6 +70,8 @@ export class TutorialManager {
   private tooltipElement: HTMLElement | null = null;
   private hitProxyElement: HTMLButtonElement | null = null;
   private tapCueElement: HTMLElement | null = null;
+  /** Control that started the tutorial (usually #tutorial-btn) for focus restore. */
+  private returnFocusEl: HTMLElement | null = null;
 
   // Start a tutorial
   start(config: TutorialConfig): void {
@@ -75,11 +79,33 @@ export class TutorialManager {
     if (this.overlayElement || this.tooltipElement) {
       this.removeOverlay();
     }
+    this.returnFocusEl =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     this.config = config;
     this.currentStepIndex = 0;
     this.isActive = true;
     this.createOverlay();
     this.showCurrentStep();
+    // Move keyboard focus into the tutorial dialog chrome.
+    queueMicrotask(() => {
+      const next = this.tooltipElement?.querySelector(
+        '.tutorial-next-btn, .tutorial-exit-btn'
+      ) as HTMLElement | null;
+      next?.focus();
+    });
+  }
+
+  private restoreReturnFocus(): void {
+    const trigger = this.returnFocusEl;
+    this.returnFocusEl = null;
+    if (!trigger) return;
+    queueMicrotask(() => {
+      if (document.contains(trigger)) {
+        trigger.focus();
+      }
+    });
   }
 
   // Get current step
@@ -151,6 +177,7 @@ export class TutorialManager {
     this.removeOverlay();
     this.emit({ type: 'completed' });
     this.config = null;
+    this.restoreReturnFocus();
   }
 
   // Exit the tutorial early
@@ -159,6 +186,7 @@ export class TutorialManager {
     this.removeOverlay();
     this.emit({ type: 'exited' });
     this.config = null;
+    this.restoreReturnFocus();
   }
 
   // Handle an action (e.g., cell click) to check if it completes the current step
@@ -206,38 +234,65 @@ export class TutorialManager {
     // Create overlay container
     this.overlayElement = document.createElement('div');
     this.overlayElement.className = 'tutorial-overlay';
-    this.overlayElement.innerHTML = `
-      <div class="tutorial-backdrop"></div>
-      <div class="tutorial-highlight-ring"></div>
-    `;
+    const backdrop = document.createElement('div');
+    backdrop.className = 'tutorial-backdrop';
+    const highlightRing = document.createElement('div');
+    highlightRing.className = 'tutorial-highlight-ring';
+    this.overlayElement.append(backdrop, highlightRing);
 
     // Create tooltip
     this.tooltipElement = document.createElement('div');
     this.tooltipElement.className = 'tutorial-tooltip';
-    this.tooltipElement.innerHTML = `
-      <div class="tutorial-tooltip-header">
-        <span class="tutorial-step-counter"></span>
-        <button class="tutorial-exit-btn" aria-label="Exit tutorial">&times;</button>
-      </div>
-      <h3 class="tutorial-tooltip-title"></h3>
-      <p class="tutorial-tooltip-message"></p>
-      <div class="tutorial-tooltip-actions">
-        <button class="tutorial-prev-btn">Back</button>
-        <button class="tutorial-next-btn">Next</button>
-      </div>
-    `;
+    this.tooltipElement.setAttribute('role', 'dialog');
+    this.tooltipElement.setAttribute('aria-modal', 'true');
+    this.tooltipElement.setAttribute(
+      'aria-labelledby',
+      'tutorial-tooltip-title'
+    );
+    this.tooltipElement.setAttribute(
+      'aria-describedby',
+      'tutorial-tooltip-message'
+    );
+
+    const header = document.createElement('div');
+    header.className = 'tutorial-tooltip-header';
+    const counter = document.createElement('span');
+    counter.className = 'tutorial-step-counter';
+    const exitBtn = document.createElement('button');
+    exitBtn.className = 'tutorial-exit-btn';
+    exitBtn.type = 'button';
+    exitBtn.setAttribute('aria-label', 'Exit tutorial');
+    exitBtn.textContent = '\u00d7';
+    header.append(counter, exitBtn);
+
+    const title = document.createElement('h2');
+    title.id = 'tutorial-tooltip-title';
+    title.className = 'tutorial-tooltip-title';
+
+    const message = document.createElement('p');
+    message.id = 'tutorial-tooltip-message';
+    message.className = 'tutorial-tooltip-message';
+
+    const actions = document.createElement('div');
+    actions.className = 'tutorial-tooltip-actions';
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'tutorial-prev-btn';
+    prevBtn.type = 'button';
+    prevBtn.textContent = 'Back';
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'tutorial-next-btn';
+    nextBtn.type = 'button';
+    nextBtn.textContent = 'Next';
+    actions.append(prevBtn, nextBtn);
+
+    this.tooltipElement.append(header, title, message, actions);
 
     document.body.appendChild(this.overlayElement);
     document.body.appendChild(this.tooltipElement);
 
-    // Wire up buttons
-    const exitBtn = this.tooltipElement.querySelector('.tutorial-exit-btn');
-    const prevBtn = this.tooltipElement.querySelector('.tutorial-prev-btn');
-    const nextBtn = this.tooltipElement.querySelector('.tutorial-next-btn');
-
-    exitBtn?.addEventListener('click', () => this.exit());
-    prevBtn?.addEventListener('click', () => this.prevStep());
-    nextBtn?.addEventListener('click', () => {
+    exitBtn.addEventListener('click', () => this.exit());
+    prevBtn.addEventListener('click', () => this.prevStep());
+    nextBtn.addEventListener('click', () => {
       const step = this.getCurrentStep();
       // Only allow Next if there's no required action
       if (!step?.requiredAction) {
@@ -399,9 +454,13 @@ export class TutorialManager {
     ) as HTMLButtonElement;
 
     if (titleEl) titleEl.textContent = step.title;
-    if (messageEl) messageEl.innerHTML = step.message;
-    if (counterEl)
+    if (messageEl instanceof HTMLElement) {
+      // Author-trusted tutorial copy (allowlisted tags, no attributes).
+      setTrustedMarkup(messageEl, step.message);
+    }
+    if (counterEl) {
       counterEl.textContent = `Step ${this.currentStepIndex + 1} of ${this.getTotalSteps()}`;
+    }
 
     // Update button states
     if (prevBtn) {
@@ -412,7 +471,7 @@ export class TutorialManager {
 
     if (nextBtn) {
       const isLastStep = this.currentStepIndex === this.getTotalSteps() - 1;
-      const hasRequiredAction = !!step.requiredAction;
+      const hasRequiredAction = Boolean(step.requiredAction);
       nextBtn.textContent = isLastStep ? 'Finish' : 'Next';
       nextBtn.disabled = hasRequiredAction;
 
@@ -601,8 +660,9 @@ export class TutorialManager {
         : side === 'bottom'
           ? 'top'
           : this.preferVerticalSide(clearRect, height, margin);
-    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin))
+    if (this.tryPlaceOnSide(flip, clearRect, width, height, margin)) {
       return flip;
+    }
 
     // Last resort: clamp preferred side (proxy/cue still tappable via option 1 stacking)
     const fallback = this.computeSidePosition(
@@ -827,3 +887,13 @@ export class TutorialManager {
 
 // Singleton instance
 export const tutorialManager = new TutorialManager();
+
+/**
+ * Route / error-boundary cleanup: drop overlay, keydown, and handlers when
+ * leaving a game mid-tutorial so leftovers do not leak across mounts.
+ */
+export function exitTutorialIfActive(): void {
+  if (tutorialManager.getIsActive()) {
+    tutorialManager.exit();
+  }
+}
