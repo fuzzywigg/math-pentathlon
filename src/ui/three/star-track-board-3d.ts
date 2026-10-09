@@ -345,15 +345,17 @@ export async function createStarTrackBoard3D(
     );
   };
 
+  // Last fitted CSS side (px). Skip style writes / sync when unchanged so
+  // ResizeObserver on the outer host cannot churn through update→fit→RO.
+  let lastFittedSide = 0;
+  let lastSyncW = 0;
+  let lastSyncH = 0;
+
   const fitHostToViewport = (): void => {
     // Size the canvas from remaining viewport below the board host so the
     // chain controls stay above the fold on phone + both tablet orientations.
-    layout.style.flexDirection = 'column';
-    layout.style.flexWrap = 'nowrap';
-    layout.style.justifyContent = 'center';
-    chainArea.style.flex = '';
-    chainArea.style.maxWidth = '';
-
+    // Do not force flexDirection here — landscape row layout lives in the
+    // injected CSS media query (inline overrides fought it and forced layout).
     const top = layout.getBoundingClientRect().top;
     // Budget for draw / choose-chain / taller game-over winner block under a
     // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
@@ -361,6 +363,10 @@ export async function createStarTrackBoard3D(
     const { width: vw, height: vh } = resolveCssViewportSize();
     const available = Math.max(120, vh - top - chainBudget - 12);
     const side = Math.max(140, Math.min(vw * 0.92, available, 520));
+    if (side === lastFittedSide) {
+      return;
+    }
+    lastFittedSide = side;
     canvasHost.style.width = `${side}px`;
     canvasHost.style.height = `${side}px`;
     canvasHost.style.maxHeight = `${side}px`;
@@ -373,6 +379,11 @@ export async function createStarTrackBoard3D(
     fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
+    if (w === lastSyncW && h === lastSyncH) {
+      return;
+    }
+    lastSyncW = w;
+    lastSyncH = h;
     syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
@@ -380,7 +391,9 @@ export async function createStarTrackBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  const unbindLayout = bindBoard3dLayout(canvasHost, () => resize());
+  // Observe the outer container (peer pattern: fiar / kings), not canvasHost.
+  // Fitting writes canvasHost size; observing that node re-entered resize.
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const onLost = (event: Event): void => {
     event.preventDefault();
@@ -553,8 +566,10 @@ export async function createStarTrackBoard3D(
       syncA11y();
     }
 
-    // Re-fit after status/chain height changes (e.g. game-over winner block).
-    resize();
+    // Paint only — match fiar / kings. Viewport fit + renderer sync stay on
+    // bindBoard3dLayout / mount. Chain-area height changes that alter the host
+    // box are picked up by the outer-container ResizeObserver.
+    paint();
   };
 
   const spaceToClientPoint = (
