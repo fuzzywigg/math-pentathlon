@@ -5,6 +5,7 @@
  * #568 un-skips P1 R-SHELL-07/08 + P2 R-IMP-04/R-SW-01 (cleanup try/finally +
  * bootstrap/SW catch). q-mp-108 un-skips P3 R-SHELL-01 (#app soft-fail).
  * q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
+ * q-mp-120 un-skips P3 R-JSON-04 (tryGameStateFromJSON soft-fail).
  * Remaining P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
@@ -28,6 +29,11 @@ import {
 } from '../../src/pwa/register';
 import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
 import { safeParseJson } from '../../src/core/safe-web-storage';
+import {
+  gameStateToJSON,
+  tryGameStateFromJSON,
+} from '../../src/games/kings-quadraphages/serialization';
+import { createInitialGameState } from '../../src/games/kings-quadraphages/game-state';
 
 const root = join(import.meta.dirname, '../..');
 
@@ -123,6 +129,15 @@ describe('runtime-error-path-audit — recovered pins', () => {
     expect(safeParseJson('{not-json').ok).toBe(false);
     expect(safeParseJson(null).ok).toBe(false);
     expect(safeParseJson('{"a":1}').ok).toBe(true);
+  });
+
+  it('P3 R-JSON-04: tryGameStateFromJSON soft-fails on garbage (no throw)', () => {
+    // Dormant until UI bind; Result helper is the safe entry point.
+    expect(() => tryGameStateFromJSON('not valid json')).not.toThrow();
+    expect(tryGameStateFromJSON('not valid json').ok).toBe(false);
+    expect(tryGameStateFromJSON('{').ok).toBe(false);
+    const good = tryGameStateFromJSON(gameStateToJSON(createInitialGameState()));
+    expect(good.ok).toBe(true);
   });
 
   it('R-IMP-02: prefetch catch clears started mark (source contract)', () => {
@@ -488,12 +503,7 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
   });
 });
 
-describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it.skip('TODO(runtime-error-path P3 R-JSON-04): gameStateFromJSON should soft-fail if ever bound to UI', () => {
-    // Dormant thrower today (tests only). Harden before wiring to player UI.
-    expect(true).toBe(false);
-  });
-});
+// R-SW-03 (q-mp-109) and R-JSON-04 (q-mp-120) expected-fix TODOs resolved on tip.
 
 describe('runtime-error-path-audit — crash UI copy contract (no new player text)', () => {
   it('renderGameCrash keeps existing boundary strings (characterization)', () => {
