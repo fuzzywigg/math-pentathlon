@@ -23,6 +23,7 @@ import {
   getPlayerName,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
+import { clearElement } from '../../core/dom-security';
 import { juggleTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
@@ -30,6 +31,10 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
@@ -47,6 +52,29 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 function isComputerTurnPending(): boolean {
   return (
@@ -200,7 +228,7 @@ function handleRollDice(fromAI: boolean | Event = false): void {
 
   // AI continues after its own roll.
   if (vsAI && gameState.currentPlayer === aiPlayer) {
-    setTimeout(makeAIMove, 500);
+    scheduleAI(makeAIMove, 500);
   }
 }
 
@@ -242,7 +270,7 @@ function handleCellClick(row: number, col: number, player: Player): void {
 
   // AI turn — must pass fromAI so the roll guard does not no-op.
   if (vsAI && !gameState.winner && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), 500);
   }
 }
 
@@ -272,7 +300,7 @@ function makeAIMove(): void {
     const dieChoice = getAIDieChoice(gameState, aiPlayer, aiDifficulty);
     if (dieChoice) {
       gameState = selectDie(gameState, dieChoice.index);
-      setTimeout(makeAIMove, 300);
+      scheduleAI(makeAIMove, 300);
       updateUI();
       return;
     }
@@ -283,7 +311,7 @@ function makeAIMove(): void {
     const shapeChoice = getAIShapeChoice(gameState, aiPlayer, aiDifficulty);
     if (shapeChoice) {
       gameState = selectShape(gameState, shapeChoice.shape);
-      setTimeout(makeAIMove, 300);
+      scheduleAI(makeAIMove, 300);
       updateUI();
       return;
     }
@@ -307,7 +335,7 @@ function makeAIMove(): void {
 
       // Continue if still AI's turn
       if (!gameState.winner && gameState.currentPlayer === aiPlayer) {
-        setTimeout(() => handleRollDice(true), 500);
+        scheduleAI(() => handleRollDice(true), 500);
       }
       return;
     }
@@ -333,6 +361,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   vsAI = false;
   syncOpponentChrome();
   gameState = createInitialState();
@@ -340,6 +370,8 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearAiTimer();
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';
@@ -384,5 +416,16 @@ export function __getStateForTests(): JuggleState {
   return gameState;
 }
 
-/** Tip-held destroy hook for tip mounts / #501. */
-export function destroyGame(): void {}
+/** Tip-held destroy hook — cancel AI timers and drop mount DOM/listeners. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  if (boardContainer) {
+    clearElement(boardContainer);
+  }
+  if (statusContainer) {
+    clearElement(statusContainer);
+  }
+  boardContainer = null;
+  statusContainer = null;
+}
