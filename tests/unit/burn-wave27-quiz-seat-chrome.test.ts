@@ -5,19 +5,16 @@
  * Tests-only. Existing public APIs only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import {
   initGame as initFrac,
   newGameVsHuman as fracVsHuman,
   getCurrentState as getFracState,
 } from '../../src/games/frac-fact/game-controller';
-
 import {
   initGame as initPinball,
   newGameVsHuman as pinballVsHuman,
   getCurrentState as getPinballState,
 } from '../../src/games/fraction-pinball/game-controller';
-
 import {
   initGame as initRemainder,
   newGameVsHuman as remainderVsHuman,
@@ -25,16 +22,13 @@ import {
 } from '../../src/games/remainder-islands/game-controller';
 import { mountRoot } from './helpers/dom';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 /** Constant Math.random hangs frac/pinball distractor loops — use a cycling sequence. */
 function mockRandomCycle(seed = 0.17): void {

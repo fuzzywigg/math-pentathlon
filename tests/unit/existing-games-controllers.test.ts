@@ -162,6 +162,8 @@ import {
 } from '../../src/games/queens-guards/game-controller';
 import { tutorialManager } from '../../src/core/tutorial';
 
+import { mountPair } from '../helpers/mount-pair';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.useRealTimers();
@@ -169,14 +171,6 @@ afterEach(() => {
     tutorialManager.exit();
   }
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
 
 describe('Hex game-controller', () => {
   it('initGame / vs-human / vs-AI / reset expose a fresh board', () => {

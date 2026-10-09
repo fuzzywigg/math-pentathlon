@@ -4,7 +4,6 @@
  * via storage events, cross-tab writes, and non-JSON garbage.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
 import {
   getWebStorage,
   safeGetItem,
@@ -25,13 +24,11 @@ import {
   shouldPreserveDrawingBuffer,
 } from '../../src/ui/three/tablet-gl';
 
-function securityError(message = 'blocked'): DOMException {
-  return new DOMException(message, 'SecurityError');
-}
-
-function quotaError(message = 'quota'): DOMException {
-  return new DOMException(message, 'QuotaExceededError');
-}
+import {
+  securityError,
+  quotaError,
+  withThrowingLocalStorageAccess,
+} from '../helpers/storage-stubs';
 
 describe('safe-web-storage primitives', () => {
   beforeEach(() => {
@@ -58,24 +55,10 @@ describe('safe-web-storage primitives', () => {
     expect(getWebStorage('session')).toBeNull();
   });
 
-  it('getWebStorage returns null when accessing localStorage throws', () => {
-    const original = Object.getOwnPropertyDescriptor(
-      globalThis,
-      'localStorage'
-    );
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      get() {
-        throw securityError('Safari private');
-      },
-    });
-    try {
+  it('getWebStorage returns null when accessing localStorage throws', async () => {
+    await withThrowingLocalStorageAccess(() => {
       expect(getWebStorage('local')).toBeNull();
-    } finally {
-      if (original) {
-        Object.defineProperty(globalThis, 'localStorage', original);
-      }
-    }
+    });
   });
 
   it('safeGetItem returns null on SecurityError instead of throwing', () => {
@@ -155,25 +138,11 @@ describe('call-site routing — feature / settings / tablet flags', () => {
     resetSettingsFlagsForTests();
   });
 
-  it('isBoard3dEnabled() with no args fails soft when localStorage access throws', () => {
-    const original = Object.getOwnPropertyDescriptor(
-      globalThis,
-      'localStorage'
-    );
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      get() {
-        throw securityError('disabled');
-      },
-    });
-    try {
+  it('isBoard3dEnabled() with no args fails soft when localStorage access throws', async () => {
+    await withThrowingLocalStorageAccess(() => {
       expect(() => isBoard3dEnabled()).not.toThrow();
       expect(isBoard3dEnabled()).toBe(false);
-    } finally {
-      if (original) {
-        Object.defineProperty(globalThis, 'localStorage', original);
-      }
-    }
+    }, 'disabled');
   });
 
   it('getUserReducedMotionFlag peeks fail soft on SecurityError and garbage JSON', () => {

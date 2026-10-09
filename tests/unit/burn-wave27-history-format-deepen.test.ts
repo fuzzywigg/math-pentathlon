@@ -4,7 +4,6 @@
  * Tests-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import {
   createInitialState as createFab,
   selectBar1,
@@ -17,7 +16,6 @@ import {
 } from '../../src/games/fab-a-diffy/rules';
 import { renderMoveHistory as renderFabHistory } from '../../src/games/fab-a-diffy/board-ui';
 import type { FractionOperation } from '../../src/core/fractions/types';
-
 import {
   createInitialState as createPar,
   selectBlock,
@@ -26,7 +24,6 @@ import {
   getValidPlacements as parPlacements,
 } from '../../src/games/par-55/rules';
 import { renderMoveHistory as renderParHistory } from '../../src/games/par-55/board-ui';
-
 import {
   createInitialState as createRamrod,
   selectRod,
@@ -35,7 +32,6 @@ import {
   getValidPlacements as ramPlacements,
 } from '../../src/games/ramrod/rules';
 import { renderMoveHistory as renderRamrodHistory } from '../../src/games/ramrod/board-ui';
-
 import {
   createInitialState as createKwa,
   selectChip,
@@ -44,7 +40,6 @@ import {
   getValidMoves as kwaMoves,
 } from '../../src/games/kwatro-sinko/rules';
 import { renderMoveHistory as renderKwaHistory } from '../../src/games/kwatro-sinko/board-ui';
-
 import {
   createInitialState as createSum,
   doRollDice as sumRoll,
@@ -54,7 +49,6 @@ import {
   getValidPlacements as sumPlacements,
 } from '../../src/games/sum-dominoes/rules';
 import { getDiceSum } from '../../src/games/sum-dominoes/types';
-
 import {
   createInitialState as createStars,
   selectCard,
@@ -62,7 +56,6 @@ import {
   getValidPlacements as starsPlacements,
 } from '../../src/games/stars-bars/rules';
 import { renderMoveHistory as renderStarsHistory } from '../../src/games/stars-bars/board-ui';
-
 import {
   createInitialState as createPrime,
   rollDice as primeRoll,
@@ -70,7 +63,6 @@ import {
   getValidPlacements as primePlacements,
 } from '../../src/games/prime-gold/rules';
 import { renderMoveHistory as renderPrimeHistory } from '../../src/games/prime-gold/board-ui';
-
 import { renderMoveHistory as renderKingsHistory } from '../../src/games/kings-quadraphages/board-ui';
 import {
   initGame as initKings,
@@ -78,16 +70,13 @@ import {
   getGameState as getKingsState,
 } from '../../src/games/kings-quadraphages/game-controller';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 function claimFabMove(seed = 0.25): ReturnType<typeof createFab> | null {
   vi.spyOn(Math, 'random').mockReturnValue(seed);

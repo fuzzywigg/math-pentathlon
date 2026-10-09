@@ -4,107 +4,91 @@
  * Tests-only. No product inventing.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-
 import { tutorialManager } from '../../src/core/tutorial';
-
 import {
   initGame as initHex,
   startTutorial as startHexTutorial,
   isTutorialActive as isHexTutorial,
 } from '../../src/games/hex/game-controller';
 import { hexTutorial } from '../../src/games/hex/tutorial';
-
 import {
   initGame as initCalla,
   startTutorial as startCallaTutorial,
   isTutorialActive as isCallaTutorial,
 } from '../../src/games/calla/game-controller';
 import { callaTutorial } from '../../src/games/calla/tutorial';
-
 import {
   initGame as initStar,
   startTutorial as startStarTutorial,
   isTutorialActive as isStarTutorial,
 } from '../../src/games/star-track/game-controller';
 import { starTrackTutorial } from '../../src/games/star-track/tutorial';
-
 import {
   initGame as initHag,
   startTutorial as startHagTutorial,
   isTutorialActive as isHagTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
 import { hexAGoneTutorial } from '../../src/games/hex-a-gone/tutorial';
-
 import {
   initGame as initKings,
   startTutorial as startKingsTutorial,
   isTutorialActive as isKingsTutorial,
 } from '../../src/games/kings-quadraphages/game-controller';
 import { kingsQuadraphagesTutorial } from '../../src/games/kings-quadraphages/tutorial';
-
 import {
   initGame as initFiar,
   startTutorial as startFiarTutorial,
   isTutorialActive as isFiarTutorial,
 } from '../../src/games/fiar/game-controller';
 import { fiarTutorial } from '../../src/games/fiar/tutorial';
-
 import {
   initGame as initQueens,
   startTutorial as startQueensTutorial,
   isTutorialActive as isQueensTutorial,
 } from '../../src/games/queens-guards/game-controller';
 import { queensGuardsTutorial } from '../../src/games/queens-guards/tutorial';
-
 import {
   initGame as initJuggle,
   startTutorial as startJuggleTutorial,
   isTutorialActive as isJuggleTutorial,
 } from '../../src/games/juggle/game-controller';
 import { juggleTutorial } from '../../src/games/juggle/tutorial';
-
 import {
   initGame as initContig,
   startTutorial as startContigTutorial,
   isTutorialActive as isContigTutorial,
 } from '../../src/games/contig-60/game-controller';
 import { contig60Tutorial } from '../../src/games/contig-60/tutorial';
-
 import {
   initGame as initPent,
   startTutorial as startPentTutorial,
   isTutorialActive as isPentTutorial,
 } from '../../src/games/pent-em-in/game-controller';
 import { pentEmInTutorial } from '../../src/games/pent-em-in/tutorial';
-
 import {
   initGame as initFab,
   startTutorial as startFabTutorial,
   isTutorialActive as isFabTutorial,
 } from '../../src/games/fab-a-diffy/game-controller';
 import { fabADiffyTutorial } from '../../src/games/fab-a-diffy/tutorial';
-
 import {
   initGame as initPrime,
   startTutorial as startPrimeTutorial,
   isTutorialActive as isPrimeTutorial,
 } from '../../src/games/prime-gold/game-controller';
 import { primeGoldTutorial } from '../../src/games/prime-gold/tutorial';
-
 import {
   initGame as initFrac,
   startTutorial as startFracTutorial,
   isTutorialActive as isFracTutorial,
 } from '../../src/games/frac-fact/game-controller';
 import { fracFactTutorial } from '../../src/games/frac-fact/tutorial';
-
 import {
   initGame as initPinball,
   startTutorial as startPinballTutorial,
   isTutorialActive as isPinballTutorial,
 } from '../../src/games/fraction-pinball/game-controller';
 import { fractionPinballTutorial } from '../../src/games/fraction-pinball/tutorial';
-
 import {
   initGame as initRemainder,
   startTutorial as startRemainderTutorial,
@@ -113,21 +97,14 @@ import {
 import { remainderIslandsTutorial } from '../../src/games/remainder-islands/tutorial';
 import { mountRoot } from './helpers/dom';
 
+import { mountPair } from '../helpers/mount-pair';
+
 afterEach(() => {
   if (tutorialManager.getIsActive()) {
     tutorialManager.exit();
   }
   document.body.innerHTML = '';
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
-
 
 describe('Wave 22 tutorial-runtime — Hex / Calla / Star start + navigate', () => {
   it('Hex startTutorial activates first step; next/prev walk config', () => {

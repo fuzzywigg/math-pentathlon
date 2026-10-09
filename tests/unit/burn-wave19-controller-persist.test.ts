@@ -4,7 +4,6 @@
  * Tests-only. No product inventing.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-
 import {
   initGame as initHex,
   newGameVsHuman as hexVsHuman,
@@ -14,7 +13,6 @@ import {
   resetGame as resetHex,
   isTutorialActive as isHexTutorial,
 } from '../../src/games/hex/game-controller';
-
 import {
   initGame as initCalla,
   newGameVsHuman as callaVsHuman,
@@ -25,7 +23,6 @@ import {
   resetGame as resetCalla,
   isTutorialActive as isCallaTutorial,
 } from '../../src/games/calla/game-controller';
-
 import {
   initGame as initStar,
   newGameVsHuman as starVsHuman,
@@ -35,7 +32,6 @@ import {
   resetGame as resetStar,
   isTutorialActive as isStarTutorial,
 } from '../../src/games/star-track/game-controller';
-
 import {
   initGame as initHag,
   newGameVsHuman as hagVsHuman,
@@ -45,7 +41,6 @@ import {
   resetGame as resetHag,
   isTutorialActive as isHagTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
-
 import {
   initGame as initFrac,
   newGameVsHuman as fracVsHuman,
@@ -54,7 +49,6 @@ import {
   setDifficulty as setFracDifficulty,
   isTutorialActive as isFracTutorial,
 } from '../../src/games/frac-fact/game-controller';
-
 import {
   initGame as initPinball,
   newGameVsHuman as pinballVsHuman,
@@ -62,7 +56,6 @@ import {
   getCurrentState as getPinballState,
   isTutorialActive as isPinballTutorial,
 } from '../../src/games/fraction-pinball/game-controller';
-
 import {
   initGame as initKings,
   newGameVsAI as kingsVsAI,
@@ -74,7 +67,6 @@ import {
   newGame as kingsNewGame,
   isTutorialActive as isKingsTutorial,
 } from '../../src/games/kings-quadraphages/game-controller';
-
 import {
   initGame as initFiar,
   newGameVsAI as fiarVsAI,
@@ -83,7 +75,6 @@ import {
   setAIDifficulty as setFiarAI,
   isTutorialActive as isFiarTutorial,
 } from '../../src/games/fiar/game-controller';
-
 import {
   initGame as initQueens,
   newGameVsAI as queensVsAI,
@@ -91,20 +82,19 @@ import {
   setAIDifficulty as setQueensAI,
   isTutorialActive as isQueensTutorial,
 } from '../../src/games/queens-guards/game-controller';
-
 import {
   newGameVsHuman as fabVsHuman,
   newGameVsAI as fabVsAI,
   isTutorialActive as isFabTutorial,
 } from '../../src/games/fab-a-diffy/game-controller';
-
 import {
   newGameVsHuman as primeVsHuman,
   newGameVsAI as primeVsAI,
   isTutorialActive as isPrimeTutorial,
 } from '../../src/games/prime-gold/game-controller';
-
 import { tutorialManager } from '../../src/core/tutorial';
+
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -113,14 +103,6 @@ afterEach(() => {
     tutorialManager.exit();
   }
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
 
 describe('Wave 19 controller-persist — Hex difficulty cycle + reset', () => {
   it('easy→medium→hard then reset clears history and winner', () => {
