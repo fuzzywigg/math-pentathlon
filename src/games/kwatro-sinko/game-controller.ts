@@ -113,7 +113,9 @@ function onBoard3dContextLost(): void {
 }
 
 async function ensureBoard3d(controller: KwaGameController): Promise<void> {
-  if (!board3dHost || board3d || !board3dEnabled) return;
+  if (!board3dHost || board3d || !board3dEnabled) {
+    return;
+  }
   const mountGen = board3dMountGen;
   try {
     const mod = await loadKwatroSinkoBoard3DModule();
@@ -197,7 +199,9 @@ export function initGame(
     // While `board3d` is null the host stays empty (no nested 2D `.kwa-board`).
     controller.update();
     board3dLoading = ensureBoard3d(controller).then(() => {
-      if (activeController === controller) controller.update();
+      if (activeController === controller) {
+        controller.update();
+      }
     });
   } else {
     controller.update();
@@ -296,7 +300,9 @@ function updateUI(controller: KwaGameController): void {
     clearBtn.className = 'kwa-btn kwa-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = clearSelection(state);
       controller.update();
     });
@@ -312,7 +318,9 @@ function updateUI(controller: KwaGameController): void {
     passBtn.className = 'kwa-btn kwa-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = passTurn(state);
       controller.update();
     });
@@ -421,7 +429,9 @@ function updateUI3d(controller: KwaGameController): void {
     clearBtn.className = 'kwa-btn kwa-btn-secondary';
     clearBtn.textContent = 'Clear Selection';
     clearBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = clearSelection(state);
       controller.update();
     });
@@ -437,7 +447,9 @@ function updateUI3d(controller: KwaGameController): void {
     passBtn.className = 'kwa-btn kwa-btn-secondary';
     passBtn.textContent = 'Pass Turn';
     passBtn.addEventListener('click', () => {
-      if (isComputerTurnPending(controller)) return;
+      if (isComputerTurnPending(controller)) {
+        return;
+      }
       controller.state = passTurn(state);
       controller.update();
     });
@@ -466,7 +478,9 @@ function maybeRunAI(controller: KwaGameController): void {
   }
   // Already waiting on a computer turn — do not stack another timeout
   // (e.g. ensureBoard3d().then → update after a human move already scheduled AI).
-  if (aiTimer !== null) return;
+  if (aiTimer !== null) {
+    return;
+  }
 
   aiTimer = setTimeout(() => {
     aiTimer = null;
@@ -478,7 +492,9 @@ function maybeRunAI(controller: KwaGameController): void {
  * Handle chip click
  */
 function handleChipClick(controller: KwaGameController, chipId: string): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
 
   // Deselect when clicking the already-selected chip
   if (
@@ -497,7 +513,9 @@ function handleChipClick(controller: KwaGameController, chipId: string): void {
  * Handle node click
  */
 function handleNodeClick(controller: KwaGameController, nodeId: string): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
 
   // If clicking a chip-occupied node during select, treat as chip select
   const node = controller.state.nodes.get(nodeId);
@@ -523,10 +541,16 @@ function handleNodeClick(controller: KwaGameController, nodeId: string): void {
 function makeAIMove(controller: KwaGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver' || !aiPlayer) return;
-  if (activeController !== controller) return;
+  if (state.phase === 'gameOver' || !aiPlayer) {
+    return;
+  }
+  if (activeController !== controller) {
+    return;
+  }
   // Stale timer after a prior AI move / human turn — never pass or move for them.
-  if (state.currentPlayer !== aiPlayer) return;
+  if (state.currentPlayer !== aiPlayer) {
+    return;
+  }
 
   // Get AI move using the AI module
   const move = getAIMove(state, aiPlayer, aiDifficulty);
@@ -584,7 +608,9 @@ export function whenBoard3dReady(): Promise<void> {
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {

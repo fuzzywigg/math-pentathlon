@@ -41,7 +41,9 @@ import {
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -93,7 +95,9 @@ function isComputerTurnPending(): boolean {
 // =============================================================================
 
 function updateUI(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
@@ -166,7 +170,9 @@ function updateUI(): void {
 }
 
 function updateStatus(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   markStatusLive(statusContainer);
 
   if (gameState.winner) {
@@ -221,10 +227,14 @@ function updateStatus(): void {
 // =============================================================================
 
 function handleRollDice(fromAI: boolean | Event = false): void {
-  if (gameState.phase !== 'rolling') return;
+  if (gameState.phase !== 'rolling') {
+    return;
+  }
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
-  if (fromAI !== true && isComputerTurnPending()) return;
+  if (fromAI !== true && isComputerTurnPending()) {
+    return;
+  }
 
   gameState = doRollDice(gameState);
   updateUI();
@@ -236,37 +246,55 @@ function handleRollDice(fromAI: boolean | Event = false): void {
 }
 
 function handleSelectDie(index: 0 | 1): void {
-  if (gameState.phase !== 'selectingShape') return;
-  if (isComputerTurnPending()) return;
+  if (gameState.phase !== 'selectingShape') {
+    return;
+  }
+  if (isComputerTurnPending()) {
+    return;
+  }
 
   gameState = selectDie(gameState, index);
   updateUI();
 }
 
 function handleSelectShape(shape: PolyominoShape): void {
-  if (gameState.phase !== 'selectingShape') return;
-  if (isComputerTurnPending()) return;
+  if (gameState.phase !== 'selectingShape') {
+    return;
+  }
+  if (isComputerTurnPending()) {
+    return;
+  }
 
   gameState = selectShape(gameState, shape);
   updateUI();
 }
 
 function handleRotate(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = rotateShape(gameState);
   updateUI();
 }
 
 function handleFlip(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = flipShape(gameState);
   updateUI();
 }
 
 function handleCellClick(row: number, col: number, player: Player): void {
-  if (player !== gameState.currentPlayer) return;
-  if (gameState.phase !== 'placing') return;
-  if (isComputerTurnPending()) return;
+  if (player !== gameState.currentPlayer) {
+    return;
+  }
+  if (gameState.phase !== 'placing') {
+    return;
+  }
+  if (isComputerTurnPending()) {
+    return;
+  }
 
   gameState = placeShape(gameState, { row, col });
   updateUI();
@@ -278,15 +306,21 @@ function handleCellClick(row: number, col: number, player: Player): void {
 }
 
 function handleCellHover(row: number, col: number): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'placing') return;
+  if (isComputerTurnPending()) {
+    return;
+  }
+  if (gameState.phase !== 'placing') {
+    return;
+  }
 
   gameState = { ...gameState, hoverPosition: { row, col } };
   updateUI();
 }
 
 function handleCellLeave(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = { ...gameState, hoverPosition: null };
   updateUI();
 }
@@ -296,7 +330,9 @@ function handleCellLeave(): void {
 // =============================================================================
 
 function makeAIMove(): void {
-  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+  if (gameState.winner || gameState.currentPlayer !== aiPlayer) {
+    return;
+  }
 
   // Handle each phase using the AI module
   if (gameState.phase === 'selectingShape' && !gameState.selectedCategory) {

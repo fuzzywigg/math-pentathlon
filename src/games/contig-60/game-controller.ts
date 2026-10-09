@@ -24,7 +24,9 @@ import {
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -48,7 +50,9 @@ function isComputerTurn(): boolean {
 // =============================================================================
 
 function updateUI(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
@@ -116,7 +120,9 @@ function formatEndBanner(winner: ContigWinner | null): string {
 }
 
 function updateStatus(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   markStatusLive(statusContainer);
 
   if (gameState.phase === 'gameOver') {
@@ -169,10 +175,14 @@ function updateStatus(): void {
 // =============================================================================
 
 function handleRollDice(fromAI: boolean | Event = false): void {
-  if (gameState.phase !== 'rolling') return;
+  if (gameState.phase !== 'rolling') {
+    return;
+  }
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
-  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
@@ -196,8 +206,12 @@ function handleRollDice(fromAI: boolean | Event = false): void {
 }
 
 function handleSelectPlacement(value: number, expression: string): void {
-  if (gameState.phase !== 'calculating') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (gameState.phase !== 'calculating') {
+    return;
+  }
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   gameState = placeChip(gameState, value, expression);
   updateUI();
@@ -213,8 +227,12 @@ function handleSelectPlacement(value: number, expression: string): void {
 }
 
 function handleCellClick(value: number): void {
-  if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (gameState.phase !== 'calculating' || !gameState.currentDice) {
+    return;
+  }
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   // Find the expression for this value
   const placements = getValidPlacements(gameState, gameState.currentDice);
@@ -226,9 +244,13 @@ function handleCellClick(value: number): void {
 }
 
 function handlePass(): void {
-  if (gameState.phase !== 'calculating') return;
+  if (gameState.phase !== 'calculating') {
+    return;
+  }
   // Block human Pass Turn during the AI seat (mirrors place/roll guards).
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   gameState = passTurn(gameState);
   updateUI();
@@ -251,7 +273,9 @@ function makeAIMove(): void {
   if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer) {
     return;
   }
-  if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
+  if (gameState.phase !== 'calculating' || !gameState.currentDice) {
+    return;
+  }
 
   // Use AI module to get the best placement
   const placement = getAIPlacement(gameState, aiPlayer, aiDifficulty);

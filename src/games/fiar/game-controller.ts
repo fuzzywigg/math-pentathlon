@@ -79,10 +79,14 @@ function unmountBoard3d(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadFiarBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
     board3d = await mod.createFiarBoard3D(boardContainer, handleNodeClick);
     clearBoard3dWebGlFallback(boardContainer);
     boardContainer.addEventListener('mp3d-context-lost', onBoard3dContextLost);
@@ -109,7 +113,9 @@ function onBoard3dContextLost(): void {
 }
 
 function render(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleNodeClick);
@@ -129,8 +135,12 @@ function inventoryLine(player: Player): string {
 }
 
 function renderChipKindPicker(): DocumentFragment | null {
-  if (gameState.phase !== 'placement' || gameState.winner) return null;
-  if (isAIMode && gameState.currentPlayer === aiPlayer) return null;
+  if (gameState.phase !== 'placement' || gameState.winner) {
+    return null;
+  }
+  if (isAIMode && gameState.currentPlayer === aiPlayer) {
+    return null;
+  }
 
   const inv = gameState.chipInventory[gameState.currentPlayer];
   const plainPressed = gameState.selectedChipKind === 'plain';
@@ -146,7 +156,9 @@ function renderChipKindPicker(): DocumentFragment | null {
   plainBtn.className = 'fiar-chip-kind-btn';
   plainBtn.dataset.chipKind = 'plain';
   plainBtn.setAttribute('aria-pressed', String(plainPressed));
-  if (inv.plain <= 0) plainBtn.disabled = true;
+  if (inv.plain <= 0) {
+    plainBtn.disabled = true;
+  }
   plainBtn.textContent = `Plain (${inv.plain} left)`;
 
   const markedBtn = document.createElement('button');
@@ -154,7 +166,9 @@ function renderChipKindPicker(): DocumentFragment | null {
   markedBtn.className = 'fiar-chip-kind-btn';
   markedBtn.dataset.chipKind = 'marked';
   markedBtn.setAttribute('aria-pressed', String(markedPressed));
-  if (inv.marked <= 0) markedBtn.disabled = true;
+  if (inv.marked <= 0) {
+    markedBtn.disabled = true;
+  }
   markedBtn.textContent = `Marked · Fire Extinguisher (${inv.marked} left)`;
 
   picker.appendChild(plainBtn);
@@ -165,13 +179,17 @@ function renderChipKindPicker(): DocumentFragment | null {
 }
 
 function bindChipKindPicker(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   statusContainer
     .querySelectorAll<HTMLButtonElement>('[data-chip-kind]')
     .forEach((btn) => {
       btn.addEventListener('click', () => {
         const kind = btn.getAttribute('data-chip-kind') as ChipKind | null;
-        if (kind !== 'plain' && kind !== 'marked') return;
+        if (kind !== 'plain' && kind !== 'marked') {
+          return;
+        }
         gameState = setSelectedChipKind(gameState, kind);
         render();
       });
@@ -179,7 +197,9 @@ function bindChipKindPicker(): void {
 }
 
 function renderStatus(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   markStatusLive(statusContainer);
 
   const { phase, currentPlayer, winner, selectedNode, starter } = gameState;
@@ -249,7 +269,9 @@ function renderStatus(): void {
   statusContainer.appendChild(statusEl);
 
   const picker = renderChipKindPicker();
-  if (picker) statusContainer.appendChild(picker);
+  if (picker) {
+    statusContainer.appendChild(picker);
+  }
 
   statusContainer.appendChild(
     safeHtml`
@@ -294,9 +316,15 @@ function scheduleAiIfNeeded(): void {
 }
 
 function handleNodeClick(nodeId: string): void {
-  if (gameState.winner) return;
-  if (isAIThinking) return;
-  if (isAIMode && gameState.currentPlayer === aiPlayer) return;
+  if (gameState.winner) {
+    return;
+  }
+  if (isAIThinking) {
+    return;
+  }
+  if (isAIMode && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   const { phase, selectedNode } = gameState;
 
@@ -341,7 +369,9 @@ function handleNodeClick(nodeId: string): void {
 }
 
 async function aiTurn(): Promise<void> {
-  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+  if (gameState.winner || gameState.currentPlayer !== aiPlayer) {
+    return;
+  }
 
   // Movement jam: surface Draw immediately — do not leave the seat spinning.
   if (isDraw(gameState)) {
@@ -370,7 +400,9 @@ async function aiTurn(): Promise<void> {
     }
   }
 
-  if (gen !== aiGeneration) return;
+  if (gen !== aiGeneration) {
+    return;
+  }
   isAIThinking = false;
   if (gameState.winner || gameState.currentPlayer !== aiPlayer) {
     render();

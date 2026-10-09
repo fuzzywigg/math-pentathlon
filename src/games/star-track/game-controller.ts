@@ -16,7 +16,9 @@ import type { StarTrackBoard3D } from '../../ui/three/star-track-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, gameMode);
 }
 
@@ -59,10 +61,14 @@ function fallbackTo2dBoard(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadStarTrackBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
     board3d = await mod.createStarTrackBoard3D(boardContainer, () => {
       fallbackTo2dBoard();
     });
@@ -128,8 +134,12 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 
 // Handle draw chains action
 function handleDrawChains(): void {
-  if (!canHumanInteract()) return;
-  if (gameState.phase !== 'drawChains') return;
+  if (!canHumanInteract()) {
+    return;
+  }
+  if (gameState.phase !== 'drawChains') {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.star-track-draw-btn' });
@@ -146,8 +156,12 @@ function handleDrawChains(): void {
 
 // Handle chain selection
 function handleSelectChain(index: 0 | 1): void {
-  if (!canHumanInteract()) return;
-  if (gameState.phase !== 'selectChain') return;
+  if (!canHumanInteract()) {
+    return;
+  }
+  if (gameState.phase !== 'selectChain') {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.star-track-choices' });

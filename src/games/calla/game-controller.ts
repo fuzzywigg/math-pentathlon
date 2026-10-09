@@ -18,7 +18,9 @@ import { applyGameModeChrome } from '../../ui/player-colors';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, gameMode);
 }
 
@@ -83,8 +85,12 @@ export function getCurrentHint(): string | null {
 
 // Handle pit click
 function handlePitClick(pitIndex: number): void {
-  if (isAIThinking) return;
-  if (isGameOver(gameState)) return;
+  if (isAIThinking) {
+    return;
+  }
+  if (isGameOver(gameState)) {
+    return;
+  }
 
   const prevPlayer = gameState.currentPlayer;
   gameState = makeMove(gameState, pitIndex);
@@ -107,8 +113,12 @@ function handlePitClick(pitIndex: number): void {
 
 // AI turn logic
 function triggerAITurn(): void {
-  if (isGameOver(gameState)) return;
-  if (gameState.currentPlayer !== 'player2') return;
+  if (isGameOver(gameState)) {
+    return;
+  }
+  if (gameState.currentPlayer !== 'player2') {
+    return;
+  }
 
   isAIThinking = true;
   render();

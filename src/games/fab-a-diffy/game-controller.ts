@@ -38,7 +38,9 @@ import {
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -300,7 +302,9 @@ function handleAnswerClick(
   controller: FabGameController,
   answerId: string
 ): void {
-  if (controller.state.phase !== 'confirmingMove') return;
+  if (controller.state.phase !== 'confirmingMove') {
+    return;
+  }
 
   controller.state = executeMove(controller.state, answerId);
   controller.update();
@@ -317,7 +321,9 @@ function handleAnswerClick(
 function makeAIMove(controller: FabGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.winner || !aiPlayer) return;
+  if (state.winner || !aiPlayer) {
+    return;
+  }
 
   const gen = ++aiGeneration;
   void (async () => {
@@ -328,8 +334,12 @@ function makeAIMove(controller: FabGameController): void {
       move = null;
     }
 
-    if (gen !== aiGeneration) return;
-    if (controller.state !== state) return;
+    if (gen !== aiGeneration) {
+      return;
+    }
+    if (controller.state !== state) {
+      return;
+    }
 
     controller.state = move ? applyAIMoveSteps(state, move) : passTurn(state);
     controller.update();
@@ -359,7 +369,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {
