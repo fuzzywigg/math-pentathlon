@@ -112,7 +112,3 @@ export const COMMON_DICE_SETS: Record<string, DiceSet> = {
 
 /** Animation state for dice rolling */
 export type DiceAnimationState = 'idle' | 'rolling' | 'settled';
-
-/** Callback types */
-export type RollCallback = (result: RollResult) => void;
-export type DieSelectCallback = (dieId: string, selected: boolean) => void;
