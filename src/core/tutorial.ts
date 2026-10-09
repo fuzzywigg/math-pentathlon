@@ -893,7 +893,10 @@ export class TutorialManager {
    * read batch (or use {@link parkAndMeasureTooltip}).
    */
   private parkTooltipForAbsolutePosition(): void {
-    const tooltip = this.tooltipElement!;
+    const tooltip = this.tooltipElement;
+    if (!tooltip) {
+      return;
+    }
     const margin = 16;
     const { width: viewportWidth } = this.getViewportMetrics();
     const maxWidth = Math.max(0, viewportWidth - margin * 2);
@@ -915,10 +918,15 @@ export class TutorialManager {
    * ResizeObserver cache when still valid after park styles.
    */
   private measureParkedTooltipSize(): TooltipBox {
-    const tooltip = this.tooltipElement!;
     const margin = 16;
     const { width: viewportWidth } = this.getViewportMetrics();
     const maxWidth = Math.max(0, viewportWidth - margin * 2);
+    const empty: TooltipBox = { width: 0, height: 0 };
+
+    const tooltip = this.tooltipElement;
+    if (!tooltip) {
+      return empty;
+    }
 
     if (this.tooltipSizeValid && this.cachedTooltipW > 0) {
       return {
