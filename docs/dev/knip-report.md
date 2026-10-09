@@ -43,11 +43,11 @@ Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evid
 
 ## Unlisted script dependencies (owners)
 
-Knip flags packages imported by entry scripts that are not declared in `package.json` `dependencies` / `devDependencies`. Counts are stable at **3**; do not raise the baseline.
+Knip flags packages imported by entry scripts that are not declared in `package.json` `dependencies` / `devDependencies`. Counts are stable at **3**; do not raise the baseline. Re-measured on tip `cursor/mp-tip-post728` @ `a8a87187` (`q-mp-229`): still **3** (`esbuild` ×1 + `playwright` ×2). Left intentional — no `knip.json` allowlist / `ignoreDependencies` change (avoids fighting baseline editors; enforce stays `false`).
 
 | Package | Script(s) | Owner / disposition |
 | --- | --- | --- |
-| `esbuild` | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`). Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
+| `esbuild` | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) via `npm run check:emit-identity` | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`); resolved from `node_modules` without a direct `devDependency`. Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
 | `playwright` | [`scripts/probe-offline-resilience.mjs`](../../scripts/probe-offline-resilience.mjs), [`scripts/probe-offline-resilience-dev.mjs`](../../scripts/probe-offline-resilience-dev.mjs) | **Offline-resilience probe** (`docs/offline-resilience-2026-10-07.md`). Repo ships `@playwright/test` / `@axe-core/playwright`, not the bare `playwright` package name. Optional later: import from `@playwright/test`, or add `playwright` as a `devDependency`. |
 
 ## Duplicate export pairs (owners)
