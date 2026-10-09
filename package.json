@@ -18,6 +18,7 @@
     "report:knip": "node scripts/report-knip.mjs",
     "report:ratchet-history": "node scripts/report-ratchet-history.mjs",
     "report:coverage-map": "node scripts/report-coverage-map.mjs",
+    "report:lint-buckets": "node scripts/report-lint-buckets.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
