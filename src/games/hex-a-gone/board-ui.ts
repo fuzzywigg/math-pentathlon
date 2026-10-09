@@ -146,11 +146,14 @@ export function renderBoard(
     );
 
     if (isValidPlacement) {
-      hex.style.cursor = 'pointer';
-      const activate = () => onCellClick!(cell.q, cell.r);
-      hex.addEventListener('click', activate);
-      // Enter/Space place on the focused valid cell (same as click)
-      bindCellActivateKeys(hex, activate);
+      const placeHandler = onCellClick;
+      if (placeHandler !== undefined) {
+        hex.style.cursor = 'pointer';
+        const activate = () => placeHandler(cell.q, cell.r);
+        hex.addEventListener('click', activate);
+        // Enter/Space place on the focused valid cell (same as click)
+        bindCellActivateKeys(hex, activate);
+      }
     }
 
     cellsGroup.appendChild(hex);
@@ -228,9 +231,15 @@ export function buildSelectionArea(
         ((canSelect && isAvailable && Boolean(onBlockSelect)) ||
           canPlaceSwitch);
 
-      if (isSelected) blockBtn.classList.add('selected');
-      if (isCurrentPlacement) blockBtn.classList.add('placing');
-      if (!isAvailable) blockBtn.classList.add('empty');
+      if (isSelected) {
+        blockBtn.classList.add('selected');
+      }
+      if (isCurrentPlacement) {
+        blockBtn.classList.add('placing');
+      }
+      if (!isAvailable) {
+        blockBtn.classList.add('empty');
+      }
 
       replaceWithSafeHtml(
         blockBtn,
@@ -271,7 +280,9 @@ export function buildSelectionArea(
         selectedList.appendChild(selectedLabel);
         selectedList.appendChild(document.createTextNode(' '));
         state.turnSelection.blocks.forEach((s, i) => {
-          if (i > 0) selectedList.appendChild(document.createTextNode(' '));
+          if (i > 0) {
+            selectedList.appendChild(document.createTextNode(' '));
+          }
           const shapeSpan = document.createElement('span');
           shapeSpan.className = 'selected-shape';
           shapeSpan.style.backgroundColor = BLOCK_COLORS[s];

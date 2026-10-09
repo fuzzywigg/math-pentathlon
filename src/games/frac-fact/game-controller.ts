@@ -57,7 +57,9 @@ function clearResultTimer(): void {
 }
 
 function scheduleAiTurn(): void {
-  if (aiTimer !== null) return;
+  if (aiTimer !== null) {
+    return;
+  }
   aiTimer = setTimeout(() => {
     aiTimer = null;
     aiTurn();
@@ -69,7 +71,9 @@ function scheduleAiTurn(): void {
 // =============================================================================
 
 function render(): void {
-  if (!gameContainer) return;
+  if (!gameContainer) {
+    return;
+  }
 
   clearElement(gameContainer);
 
@@ -122,15 +126,21 @@ function render(): void {
 // =============================================================================
 
 function handleAnswerSelect(answer: Fraction): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'playing') return;
+  if (isComputerTurnPending()) {
+    return;
+  }
+  if (gameState.phase !== 'playing') {
+    return;
+  }
 
   gameState = submitAnswer(gameState, answer);
   render();
 }
 
 function handleContinue(): void {
-  if (gameState.phase !== 'showingResult') return;
+  if (gameState.phase !== 'showingResult') {
+    return;
+  }
 
   clearResultTimer();
   gameState = nextProblem(gameState);
@@ -145,7 +155,9 @@ function aiTurn(): void {
   if (gameState.phase !== 'playing' || gameState.currentPlayer !== 'player2') {
     return;
   }
-  if (!gameState.currentProblem) return;
+  if (!gameState.currentProblem) {
+    return;
+  }
 
   // Use AI module to get answer
   const selectedAnswer = getAIAnswer(gameState, 'player2', aiDifficulty);

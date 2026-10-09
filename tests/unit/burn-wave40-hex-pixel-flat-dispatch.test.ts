@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createAxial,
-  createLayout,
-  axialToPixel,
-  axialToPixelFlat,
-  axialToPixelPointy,
-  pixelToAxial,
-  hexEquals,
-} from '../../src/core/hex';
+import { createAxial, createLayout } from '../helpers/core-hex/types';
+import { axialToPixel, axialToPixelFlat, axialToPixelPointy, pixelToAxial, hexEquals } from '../helpers/core-hex/coordinates';
 
 describe('Wave 40 hex — flat/pointy pixel dispatch', () => {
   const a = createAxial(1, 1);

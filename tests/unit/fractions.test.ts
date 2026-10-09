@@ -3,52 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  // Utility functions
-  gcd,
-  lcm,
-  // Creation
-  createFraction,
-  fromWhole,
-  fromDecimal,
-  fromMixedNumber,
-  // Simplification
-  simplify,
-  isSimplified,
-  toMixedNumber,
-  toDecimal,
-  // Arithmetic
-  add,
-  subtract,
-  multiply,
-  divide,
-  reciprocal,
-  negate,
-  abs,
-  // Comparison
-  compare,
-  areEqual,
-  areEquivalent,
-  // LCD operations
-  findLCD,
-  toCommonDenominator,
-  // Predicates
-  isProper,
-  isWholeNumber,
-  isZero,
-  isPositive,
-  isNegative,
-  // Aggregates
-  min,
-  max,
-  sum,
-  average,
-  power,
-  roundToDenominator,
-  findEquivalentFractions,
-  // Display
-  formatFraction,
-} from '../../src/core/fractions';
+import { gcd, lcm, createFraction, fromWhole, fromDecimal, fromMixedNumber, simplify, isSimplified, toMixedNumber, toDecimal, add, subtract, multiply, divide, reciprocal, negate, abs, compare, areEqual, areEquivalent, findLCD, toCommonDenominator, isProper, isWholeNumber, isZero, isPositive, isNegative, min, max, sum, average, power, roundToDenominator, findEquivalentFractions, formatFraction } from '../../src/core/fractions/arithmetic';
 
 describe('gcd', () => {
   it('should calculate GCD correctly', () => {

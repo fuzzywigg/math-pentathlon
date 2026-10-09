@@ -4,11 +4,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  createTargetChallenge,
-  validateSolution,
-} from '../../src/core/expressions';
-import { rollDice, selectDice, getSelectedTotal } from '../../src/core/dice';
+import { createTargetChallenge } from '../../src/core/expressions/types';
+import { validateSolution } from '../../src/core/expressions/evaluator';
+import { rollDice, selectDice, getSelectedTotal } from '../../src/core/dice/roller';
 import { storage } from '../../src/core/storage';
 
 beforeEach(() => {

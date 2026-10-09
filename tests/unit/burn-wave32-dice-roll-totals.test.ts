@@ -4,13 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  roll,
-  rollDice,
-  rollMultiple,
-  rollDie,
-  type DiceType,
-} from '../../src/core/dice';
+import { roll, rollDice, rollMultiple, rollDie } from '../../src/core/dice/roller';
+import type { DiceType } from '../../src/core/dice/types';
 
 beforeEach(() => {
   // Distinct fractions keep Math.random().toString(36) ids unique.

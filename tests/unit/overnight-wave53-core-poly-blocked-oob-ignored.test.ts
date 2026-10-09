@@ -3,12 +3,7 @@
  * Distinct from wave52 grid overwrite / preview OOB rects. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createBoardWithBlockedCells,
-  isInBounds,
-  isOccupied,
-  countEmptyCells,
-} from '../../src/core/polyomino';
+import { createBoardWithBlockedCells, isInBounds, isOccupied, countEmptyCells } from '../../src/core/polyomino/placement';
 
 describe('Wave 53 core poly — blocked OOB ignored', () => {
   it('out-of-bounds blocked cells do not throw or shrink in-bounds empties', () => {

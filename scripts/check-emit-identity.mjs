@@ -37,9 +37,14 @@ export const EMIT_TSCONFIG_RAW = {
 /**
  * @param {string} source
  * @param {string} [sourcefile]
+ * @param {{ minify?: boolean }} [opts]
  * @returns {Promise<string>}
  */
-export async function transpileToJs(source, sourcefile = 'input.ts') {
+export async function transpileToJs(
+  source,
+  sourcefile = 'input.ts',
+  opts = {}
+) {
   const result = await esbuild.transform(source, {
     loader: sourcefile.endsWith('.tsx') ? 'tsx' : 'ts',
     format: 'esm',
@@ -48,6 +53,9 @@ export async function transpileToJs(source, sourcefile = 'input.ts') {
     sourcefile,
     // Keep legal comments out so comment-only type edits cannot drift emit.
     legalComments: 'none',
+    // Minify mode: brace-only curly:all autofixes are AST-identical after minify
+    // (proves no behavior change for mechanical brace wraps).
+    minify: opts.minify === true,
   });
   return result.code;
 }
@@ -107,9 +115,7 @@ export function unifiedDiff(a, b, labelA = 'a', labelB = 'b') {
   const r = spawnSync('diff', ['-u', pa, pb], { encoding: 'utf8' });
   fs.rmSync(tmp, { recursive: true, force: true });
   if (!r.stdout) return '';
-  return r.stdout
-    .replace(pa, labelA)
-    .replace(pb, labelB);
+  return r.stdout.replace(pa, labelA).replace(pb, labelB);
 }
 
 /**
@@ -118,11 +124,18 @@ export function unifiedDiff(a, b, labelA = 'a', labelB = 'b') {
  *   baseSource: string | null,
  *   headSource: string | null,
  *   normalize?: boolean,
+ *   minify?: boolean,
  * }} opts
  * @returns {Promise<{ file: string, status: 'identical' | 'differ' | 'missing-base' | 'missing-head' | 'error', detail?: string }>}
  */
 export async function compareFileEmit(opts) {
-  const { file, baseSource, headSource, normalize = false } = opts;
+  const {
+    file,
+    baseSource,
+    headSource,
+    normalize = false,
+    minify = false,
+  } = opts;
   if (baseSource === null) {
     return { file, status: 'missing-base' };
   }
@@ -130,8 +143,8 @@ export async function compareFileEmit(opts) {
     return { file, status: 'missing-head' };
   }
   try {
-    let baseJs = await transpileToJs(baseSource, file);
-    let headJs = await transpileToJs(headSource, file);
+    let baseJs = await transpileToJs(baseSource, file, { minify });
+    let headJs = await transpileToJs(headSource, file, { minify });
     if (normalize) {
       baseJs = stripCommentsAndCollapseWhitespace(baseJs);
       headJs = stripCommentsAndCollapseWhitespace(headJs);
@@ -171,7 +184,7 @@ export function defaultAiTouchedFiles(baseRef, headRef) {
 
 /**
  * @param {string[]} argv
- * @returns {{ base: string, head: string, files: string[], normalize: boolean, json: boolean }}
+ * @returns {{ base: string, head: string, files: string[], normalize: boolean, minify: boolean, json: boolean }}
  */
 export function parseArgs(argv) {
   let base = '';
@@ -180,6 +193,7 @@ export function parseArgs(argv) {
   /** @type {string[]} */
   const files = [];
   let normalize = false;
+  let minify = false;
   let json = false;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -191,6 +205,8 @@ export function parseArgs(argv) {
       filesFrom = argv[++i] ?? '';
     } else if (a === '--normalize') {
       normalize = true;
+    } else if (a === '--minify') {
+      minify = true;
     } else if (a === '--json') {
       json = true;
     } else if (a === '--help' || a === '-h') {
@@ -227,7 +243,7 @@ export function parseArgs(argv) {
       if (t && !t.startsWith('#')) files.push(t);
     }
   }
-  return { base, head, files, normalize, json };
+  return { base, head, files, normalize, minify, json };
 }
 
 function printHelp() {
@@ -238,6 +254,7 @@ Options:
   --head <ref>       Git ref for the "after" side (default: WORKING_TREE)
   --files-from <f>   Read file paths (one per line)
   --normalize        Collapse whitespace before compare (off by default)
+  --minify           esbuild minify before compare (brace-only curly:all proof)
   --json             Print machine-readable summary
   -h, --help         Show help
 
@@ -277,6 +294,7 @@ export async function runEmitIdentityCheck(opts) {
         baseSource,
         headSource,
         normalize: opts.normalize,
+        minify: opts.minify,
       })
     );
   }
@@ -294,11 +312,14 @@ if (isMain()) {
   const { ok, results } = await runEmitIdentityCheck(opts);
 
   if (opts.json) {
-    console.log(JSON.stringify({ ok, base: opts.base, head: opts.head, results }, null, 2));
+    console.log(
+      JSON.stringify({ ok, base: opts.base, head: opts.head, results }, null, 2)
+    );
   } else {
     console.log(`check-emit-identity`);
     console.log(`  base: ${opts.base}`);
     console.log(`  head: ${opts.head}`);
+    console.log(`  minify: ${opts.minify ? 'on' : 'off'}`);
     console.log(`  files: ${results.length}`);
     for (const r of results) {
       const mark =

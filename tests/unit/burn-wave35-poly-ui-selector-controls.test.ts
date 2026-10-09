@@ -4,13 +4,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  createShapeSelector,
-  createRotationControls,
-  injectPolyominoStyles,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES, TETROMINOES } from '../../src/core/polyomino/types';
+import { createShapeSelector, createRotationControls, injectPolyominoStyles } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

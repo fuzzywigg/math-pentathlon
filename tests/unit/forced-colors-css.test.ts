@@ -1,5 +1,6 @@
 /**
  * Keepers for forced-colors / color-scheme CSS (burn-1008-mp-forced-colors).
+ * q-mp-054: Stars & Bars RM + HTML-board adjust + ARIA selection cues.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -14,6 +15,7 @@ const gamePlay = readFileSync(
   resolve(process.cwd(), 'src/ui/styles/game-play.css'),
   'utf8'
 );
+const styleCss = readFileSync(resolve(process.cwd(), 'src/style.css'), 'utf8');
 const contig = readFileSync(
   resolve(process.cwd(), 'src/games/contig-60/board-ui.ts'),
   'utf8'
@@ -30,6 +32,10 @@ const fabCtrl = readFileSync(
   resolve(process.cwd(), 'src/games/fab-a-diffy/game-controller.ts'),
   'utf8'
 );
+const starsBars = readFileSync(
+  resolve(process.cwd(), 'src/games/stars-bars/board-ui.ts'),
+  'utf8'
+);
 
 describe('forced-colors CSS keepers', () => {
   it('imports forced-colors.css from main.ts', () => {
@@ -44,6 +50,17 @@ describe('forced-colors CSS keepers', () => {
     expect(forcedCss).toMatch(/\.game-card:focus-visible/);
     expect(forcedCss).toMatch(/\.hex-cell-p1/);
     expect(forcedCss).toMatch(/\.contig-cell-valid/);
+    expect(forcedCss).toMatch(/\.stars-board/);
+    expect(forcedCss).toMatch(/aria-pressed='true'/);
+    expect(forcedCss).toMatch(/aria-selected='true'/);
+  });
+
+  // q-mp-101: dead rename leftovers must stay gone (live classes remain).
+  it('omits dead kwa-board-svg and tutorial-spotlight selectors', () => {
+    expect(forcedCss).not.toMatch(/kwa-board-svg/);
+    expect(forcedCss).not.toMatch(/tutorial-spotlight/);
+    expect(forcedCss).toMatch(/\.kwa-board,/);
+    expect(forcedCss).toMatch(/\.tutorial-highlight-ring,/);
   });
 
   it('mirrors Hex + Star Track reduced-motion under html[data-reduced-motion]', () => {
@@ -58,6 +75,14 @@ describe('forced-colors CSS keepers', () => {
   it('Contig + Frac Fact injectors gate transitions under reduced-motion', () => {
     expect(contig).toMatch(/prefers-reduced-motion:\s*reduce/);
     expect(fracFact).toMatch(/prefers-reduced-motion:\s*reduce/);
+  });
+
+  it('Stars & Bars gates pulse under OS + in-app reduced-motion', () => {
+    expect(starsBars).toMatch(/prefers-reduced-motion:\s*reduce/);
+    expect(starsBars).toMatch(
+      /html\[data-reduced-motion='true'\]\s*\.stars-winner-banner/
+    );
+    expect(styleCss).toMatch(/\.stars-winner-banner/);
   });
 
   it('graph animateMove and Fab scroll honor reduced-motion', () => {

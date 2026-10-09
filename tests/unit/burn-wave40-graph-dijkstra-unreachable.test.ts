@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { dijkstra } from '../../src/core/graph';
-import type { Graph } from '../../src/core/graph';
+import { dijkstra } from '../../src/core/graph/algorithms';
+import type { Graph } from '../../src/core/graph/types';
 
 describe('Wave 40 graph — dijkstra unreachable', () => {
   it('disconnected components → found false distance -1', () => {

@@ -129,7 +129,9 @@ export function shuffleArray<T>(array: T[]): T[] {
     const j = Math.floor(Math.random() * (i + 1));
     const a = result[i];
     const b = result[j];
-    if (a === undefined || b === undefined) continue;
+    if (a === undefined || b === undefined) {
+      continue;
+    }
     result[i] = b;
     result[j] = a;
   }
@@ -150,10 +152,18 @@ export function countMatchingAttributes(
 ): string[] {
   const matches: string[] = [];
 
-  if (block1.shape === block2.shape) matches.push('shape');
-  if (block1.color === block2.color) matches.push('color');
-  if (block1.size === block2.size) matches.push('size');
-  if (block1.thickness === block2.thickness) matches.push('thickness');
+  if (block1.shape === block2.shape) {
+    matches.push('shape');
+  }
+  if (block1.color === block2.color) {
+    matches.push('color');
+  }
+  if (block1.size === block2.size) {
+    matches.push('size');
+  }
+  if (block1.thickness === block2.thickness) {
+    matches.push('thickness');
+  }
 
   return matches;
 }

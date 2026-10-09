@@ -80,9 +80,15 @@ describe('shell preload / chunk policy', () => {
     expect(
       uiManualChunkName('/repo/src/ui/styles/game-play.css')
     ).toBeUndefined();
-    expect(uiManualChunkName('/repo/src/ui/three/fiar-board-3d.ts')).toBe(
-      'mp3d'
-    );
+    expect(uiManualChunkName('/repo/src/ui/three/tablet-gl.ts')).toBe('mp3d');
+    expect(uiManualChunkName('/repo/src/ui/three/load-three.ts')).toBe('mp3d');
+    // Per-game boards stay unnamed to avoid mp3d ↔ game-* circular chunks.
+    expect(
+      uiManualChunkName('/repo/src/ui/three/fiar-board-3d.ts')
+    ).toBeUndefined();
+    expect(
+      uiManualChunkName('/repo/src/ui/three/prime-gold-board-3d.ts')
+    ).toBeUndefined();
   });
 
   it('assigns storage to a deferred core chunk', () => {

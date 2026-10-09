@@ -9,17 +9,14 @@ import {
   getCurrentState,
 } from '../../src/games/remainder-islands/game-controller';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
   document.getElementById('remainder-islands-styles')?.remove();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 /** Activate via board-a11y Enter binding — click target is the inner hit polygon. */
 function activateIsland(container: HTMLElement, islandId: string): void {

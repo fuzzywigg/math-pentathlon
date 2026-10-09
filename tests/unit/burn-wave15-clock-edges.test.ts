@@ -21,12 +21,12 @@ import {
   getTimerProgress,
 } from '../../src/core/timer-scoring';
 
-import { createAxial } from '../../src/core/hex/types';
+import { createAxial } from '../helpers/core-hex/types';
 import {
   rotateRight,
   rotateLeft,
   rotateAround,
-} from '../../src/core/hex/coordinates';
+} from '../helpers/core-hex/coordinates';
 
 import {
   rotateCells90CW,

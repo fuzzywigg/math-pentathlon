@@ -1,41 +1,11 @@
 /**
  * Hex Coordinates Unit Tests
- * Covers src/core/hex/coordinates.ts (#9)
+ * Covers tests/helpers/core-hex/coordinates.ts (#9)
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  axialToCube,
-  cubeToAxial,
-  axialToOffset,
-  offsetToAxial,
-  axialToPixel,
-  axialToPixelPointy,
-  axialToPixelFlat,
-  pixelToAxial,
-  pixelToAxialPointy,
-  pixelToAxialFlat,
-  cubeRound,
-  hexRound,
-  getNeighbors,
-  getNeighbor,
-  getDiagonalNeighbors,
-  areNeighbors,
-  hexDistance,
-  hexesInRange,
-  hexRing,
-  hexSpiral,
-  hexLine,
-  rotateRight,
-  rotateLeft,
-  rotateAround,
-  reflect,
-  hexEquals,
-  hexInArray,
-  createAxial,
-  createCube,
-  createLayout,
-} from '../../src/core/hex';
+import { axialToCube, cubeToAxial, axialToOffset, offsetToAxial, axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, cubeRound, hexRound, getNeighbors, getNeighbor, getDiagonalNeighbors, areNeighbors, hexDistance, hexesInRange, hexRing, hexSpiral, hexLine, rotateRight, rotateLeft, rotateAround, reflect, hexEquals, hexInArray } from '../helpers/core-hex/coordinates';
+import { createAxial, createCube, createLayout } from '../helpers/core-hex/types';
 
 describe('coordinate conversions', () => {
   it('round-trips axial ↔ cube', () => {

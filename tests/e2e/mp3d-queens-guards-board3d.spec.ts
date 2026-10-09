@@ -154,7 +154,9 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       await dismissModeIfNeeded(page);
 
       const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
-      await waitForMp3dReady(page, 'queens-guards');
+      if ((await waitForMp3dReady(page, 'queens-guards')) === 'fallback') {
+        return;
+      }
       await expect(page.locator('.qg-board-container svg')).toHaveCount(0);
       await expect(page.locator('.qg-a11y-grid [role="gridcell"]')).toHaveCount(
         91
@@ -266,8 +268,10 @@ test.describe('mp3d Queens & Guards 3D board', () => {
     await page.goto(board3dUrl('#/game/queens-guards'));
     await waitForGameReady(page);
     await dismissModeIfNeeded(page);
-    // waitForMp3dReady skips on Firefox when WebGL never mounts (harness).
-    await waitForMp3dReady(page, 'queens-guards');
+    // waitForMp3dReady asserts 2D fallback when WebGL is unavailable.
+    if ((await waitForMp3dReady(page, 'queens-guards')) === 'fallback') {
+      return;
+    }
     await page.waitForFunction(() => {
       const label = document
         .querySelector('.qg-a11y-grid [data-cell-key="5-7"]')
@@ -309,7 +313,9 @@ test.describe('mp3d Queens & Guards 3D board', () => {
       await waitForGameReady(page);
       await dismissModeIfNeeded(page);
       const canvas = page.locator('canvas[data-mp3d="queens-guards"]');
-      await waitForMp3dReady(page, 'queens-guards');
+      if ((await waitForMp3dReady(page, 'queens-guards')) === 'fallback') {
+        return;
+      }
       await seedCapturedRestore(page);
       await expect(page.locator('.qg-status')).toContainText(/outer ring/i);
       expect(await getCapturedCount(page)).toBe(1);

@@ -5,23 +5,10 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  rollDice,
-  selectDice,
-  getSelectedValues,
-  getSelectedTotal,
-  getAllPossibleSums,
-  COMMON_DICE_SETS,
-} from '../../src/core/dice';
-import {
-  createNumberCard,
-  createOperatorCard,
-  createSlot,
-  validateSlots,
-  slotsToExpression,
-  createTargetChallenge,
-  solveTargetChallenge,
-} from '../../src/core/expressions';
+import { rollDice, selectDice, getSelectedValues, getSelectedTotal, getAllPossibleSums } from '../../src/core/dice/roller';
+import { COMMON_DICE_SETS } from '../../src/core/dice/types';
+import { createNumberCard, createOperatorCard, createSlot, createTargetChallenge } from '../../src/core/expressions/types';
+import { validateSlots, slotsToExpression, solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 afterEach(() => {
   vi.restoreAllMocks();

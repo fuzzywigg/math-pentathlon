@@ -3,8 +3,8 @@
  * Distinct from wave55 validpos occupy. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { doPlacementsOverlap, type Placement } from '../../src/core/polyomino';
-import { SIMPLE_SHAPES } from '../../src/core/polyomino';
+import { doPlacementsOverlap, type Placement } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 57 core poly — placements overlap', () => {
   it('overlapping monominoes true; adjacent false', () => {

@@ -5,15 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  cubeRound,
-  hexRound,
-  axialToCube,
-  cubeToAxial,
-  createAxial,
-  hexEquals,
-  type CubeCoord,
-} from '../../src/core/hex';
+import { cubeRound, hexRound, axialToCube, cubeToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, type CubeCoord } from '../helpers/core-hex/types';
 
 function sameCube(a: CubeCoord, b: CubeCoord): boolean {
   return a.x === b.x && a.y === b.y && a.z === b.z && a.x + a.y + a.z === 0;

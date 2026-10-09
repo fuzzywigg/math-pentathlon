@@ -277,7 +277,9 @@ function initTemplateSection(): void {
   let currentGraph: Graph = createGridGraph(4, 4);
 
   function renderCurrentGraph(): void {
-    if (!graphContainer || !infoContainer) return;
+    if (!graphContainer || !infoContainer) {
+      return;
+    }
 
     clearElement(graphContainer);
     const svg = renderGraph(currentGraph, undefined, {
@@ -329,6 +331,8 @@ function initTemplateSection(): void {
         case 'complete':
           currentGraph = createCompleteGraph(5, 100);
           break;
+        default:
+          break;
       }
 
       renderCurrentGraph();
@@ -350,7 +354,9 @@ function initPathfindingSection(): void {
   let svg: SVGSVGElement | null = null;
 
   function render(): void {
-    if (!graphContainer) return;
+    if (!graphContainer) {
+      return;
+    }
 
     clearElement(graphContainer);
 
@@ -369,7 +375,9 @@ function initPathfindingSection(): void {
     // Add click handlers
     svg.querySelectorAll('.graph-node').forEach((node) => {
       const nodeId = (node as SVGElement).dataset.nodeId;
-      if (!nodeId) return;
+      if (!nodeId) {
+        return;
+      }
 
       (node as SVGElement).style.cursor = 'pointer';
       node.addEventListener('click', () => handleNodeClick(nodeId));
@@ -419,7 +427,9 @@ function initPathfindingSection(): void {
       if (statusEl) {
         statusEl.textContent = `Start: ${nodeId} - Click another node for end point`;
       }
-      if (resultEl) clearElement(resultEl);
+      if (resultEl) {
+        clearElement(resultEl);
+      }
     }
 
     render();
@@ -428,8 +438,12 @@ function initPathfindingSection(): void {
   clearBtn?.addEventListener('click', () => {
     startNode = null;
     endNode = null;
-    if (statusEl) statusEl.textContent = 'Click a node to set start point';
-    if (resultEl) clearElement(resultEl);
+    if (statusEl) {
+      statusEl.textContent = 'Click a node to set start point';
+    }
+    if (resultEl) {
+      clearElement(resultEl);
+    }
     render();
   });
 
@@ -453,7 +467,9 @@ function initGameSection(): void {
   }
 
   function render(): void {
-    if (!graphContainer) return;
+    if (!graphContainer) {
+      return;
+    }
 
     clearElement(graphContainer);
 
@@ -477,7 +493,9 @@ function initGameSection(): void {
   }
 
   function updateAnalysis(): void {
-    if (!analysisContainer) return;
+    if (!analysisContainer) {
+      return;
+    }
 
     const board: GraphBoard = { graph, nodeStates };
 
@@ -485,8 +503,12 @@ function initGameSection(): void {
     let p1Count = 0;
     let p2Count = 0;
     nodeStates.forEach((state) => {
-      if (state.owner === 1) p1Count++;
-      if (state.owner === 2) p2Count++;
+      if (state.owner === 1) {
+        p1Count++;
+      }
+      if (state.owner === 2) {
+        p2Count++;
+      }
     });
 
     // Find regions

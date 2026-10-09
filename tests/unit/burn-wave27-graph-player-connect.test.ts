@@ -5,18 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  playerConnectsSets,
-  findLongestPlayerPath,
-  createGridGraph,
-  createTrackGraph,
-  createStarGraph,
-  type Graph,
-  type GraphBoard,
-  type GraphNode,
-  type NodeId,
-  type NodeState,
-} from '../../src/core/graph';
+import { playerConnectsSets, findLongestPlayerPath } from '../../src/core/graph/algorithms';
+import { createGridGraph, createTrackGraph, createStarGraph, type Graph, type GraphBoard, type GraphNode, type NodeId, type NodeState } from '../../src/core/graph/types';
 
 function node(id: NodeId): GraphNode {
   return { id, position: { x: 0, y: 0 } };

@@ -4,26 +4,12 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  renderFractionBar,
-  createInteractiveFractionBar,
-  injectFractionBarStyles,
-} from '../../src/core/fractions';
-import {
-  SIMPLE_SHAPES,
-  createBoard,
-  placePolyomino,
-  renderBoard,
-  renderPlacementPreview,
-  injectPolyominoStyles,
-} from '../../src/core/polyomino';
-import {
-  renderHexGrid,
-  renderRectHexGrid,
-  createInteractiveHexGrid,
-  injectHexStyles,
-  type HexLayout,
-} from '../../src/core/hex';
+import { renderFractionBar, createInteractiveFractionBar, injectFractionBarStyles } from '../../src/core/fractions/fraction-bar-ui';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino } from '../../src/core/polyomino/placement';
+import { renderBoard, renderPlacementPreview, injectPolyominoStyles } from '../../src/core/polyomino/polyomino-ui';
+import { renderHexGrid, renderRectHexGrid, createInteractiveHexGrid, injectHexStyles } from '../helpers/core-hex/hex-ui';
+import type { HexLayout } from '../helpers/core-hex/types';
 
 const layout: HexLayout = {
   orientation: 'pointy',

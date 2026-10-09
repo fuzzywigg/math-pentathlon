@@ -55,7 +55,9 @@ export function bfs(graph: Graph, start: NodeId, end: NodeId): PathResult {
   while (queue.length > 0) {
     const { node, path } = queue.shift()!;
 
-    if (visited.has(node)) continue;
+    if (visited.has(node)) {
+      continue;
+    }
     visited.add(node);
 
     const neighbors = getNeighbors(graph, node);
@@ -106,15 +108,21 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
       }
     });
 
-    if (current === null || minDist === Infinity) break;
-    if (current === end) break;
+    if (current === null || minDist === Infinity) {
+      break;
+    }
+    if (current === end) {
+      break;
+    }
 
     unvisited.delete(current);
 
     // Update neighbors
     const neighbors = getNeighbors(graph, current);
     for (const neighbor of neighbors) {
-      if (!unvisited.has(neighbor)) continue;
+      if (!unvisited.has(neighbor)) {
+        continue;
+      }
 
       const edge = getEdge(graph, current, neighbor);
       const weight = edge?.weight ?? 1;
@@ -151,17 +159,23 @@ export function dijkstra(graph: Graph, start: NodeId, end: NodeId): PathResult {
  * Check if graph is connected (all nodes reachable from any node)
  */
 export function isConnected(graph: Graph): boolean {
-  if (graph.nodes.size === 0) return true;
+  if (graph.nodes.size === 0) {
+    return true;
+  }
 
   const startResult = graph.nodes.keys().next();
-  if (startResult.done) return true;
+  if (startResult.done) {
+    return true;
+  }
   const start: NodeId = startResult.value;
   const visited = new Set<NodeId>();
   const queue: NodeId[] = [start];
 
   while (queue.length > 0) {
     const node = queue.shift()!;
-    if (visited.has(node)) continue;
+    if (visited.has(node)) {
+      continue;
+    }
     visited.add(node);
 
     const neighbors = getNeighbors(graph, node);
@@ -183,14 +197,18 @@ export function findComponents(graph: Graph): NodeId[][] {
   const components: NodeId[][] = [];
 
   graph.nodes.forEach((_, nodeId) => {
-    if (visited.has(nodeId)) return;
+    if (visited.has(nodeId)) {
+      return;
+    }
 
     const component: NodeId[] = [];
     const queue: NodeId[] = [nodeId];
 
     while (queue.length > 0) {
       const node = queue.shift()!;
-      if (visited.has(node)) continue;
+      if (visited.has(node)) {
+        continue;
+      }
       visited.add(node);
       component.push(node);
 
@@ -217,7 +235,9 @@ export function findReachable(graph: Graph, start: NodeId): Set<NodeId> {
 
   while (queue.length > 0) {
     const node = queue.shift()!;
-    if (reachable.has(node)) continue;
+    if (reachable.has(node)) {
+      continue;
+    }
     reachable.add(node);
 
     const neighbors = getNeighbors(graph, node);
@@ -248,7 +268,9 @@ export function findAllPaths(
     visited: Set<NodeId>,
     weight: number
   ): void {
-    if (path.length > maxDepth) return;
+    if (path.length > maxDepth) {
+      return;
+    }
 
     if (current === end) {
       paths.push({ nodes: [...path], totalWeight: weight });
@@ -289,7 +311,9 @@ export function findNodesAtDistance(
     const node = queue.shift()!;
     const nodeDist = distances.get(node)!;
 
-    if (nodeDist >= distance) continue;
+    if (nodeDist >= distance) {
+      continue;
+    }
 
     const neighbors = getNeighbors(graph, node);
     for (const neighbor of neighbors) {
@@ -321,7 +345,9 @@ export function findNodesWithinDistance(
     const node = queue.shift()!;
     const nodeDist = distances.get(node)!;
 
-    if (nodeDist >= maxDistance) continue;
+    if (nodeDist >= maxDistance) {
+      continue;
+    }
 
     const neighbors = getNeighbors(graph, node);
     for (const neighbor of neighbors) {
@@ -356,10 +382,14 @@ export function findPlayerRegion(
 
   while (queue.length > 0) {
     const node = queue.shift()!;
-    if (visited.has(node)) continue;
+    if (visited.has(node)) {
+      continue;
+    }
 
     const state = board.nodeStates.get(node);
-    if (state?.owner !== playerId) continue;
+    if (state?.owner !== playerId) {
+      continue;
+    }
 
     visited.add(node);
     region.push(node);
@@ -415,14 +445,18 @@ export function playerConnectsSets(
 
   // Check if any node in setA connects to any node in setB through player nodes
   for (const startNode of setA) {
-    if (!playerNodes.has(startNode)) continue;
+    if (!playerNodes.has(startNode)) {
+      continue;
+    }
 
     const reachable = new Set<NodeId>();
     const queue: NodeId[] = [startNode];
 
     while (queue.length > 0) {
       const node = queue.shift()!;
-      if (reachable.has(node)) continue;
+      if (reachable.has(node)) {
+        continue;
+      }
       reachable.add(node);
 
       // Check if we reached setB

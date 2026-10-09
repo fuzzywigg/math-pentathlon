@@ -5,13 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  slotsToExpression,
-  createNumberCard,
-  createOperatorCard,
-  createSlot,
-} from '../../src/core/expressions';
+import { validateSlots, slotsToExpression } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createSlot } from '../../src/core/expressions/types';
 
 describe('Wave 30 expr-slots — empty and join', () => {
   it('rejects all-empty and joins ignoring empty slots', () => {

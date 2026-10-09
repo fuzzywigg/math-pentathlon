@@ -3,8 +3,8 @@
  */
 import { describe, it, expect } from 'vitest';
 import { getPossibleResults, calculateResult } from '../../src/games/fab-a-diffy/rules';
-import { getTwoDiceResults } from '../../src/core/dice';
-import { toDecimal } from '../../src/core/fractions';
+import { getTwoDiceResults } from '../../src/core/dice/roller';
+import { toDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 44 handshake — fab × dice two-ops', () => {
   it('integer fraction bars mirror dice integer ops', () => {

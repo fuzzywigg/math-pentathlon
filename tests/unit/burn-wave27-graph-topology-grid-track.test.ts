@@ -5,15 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGridGraph,
-  createTrackGraph,
-  getNeighbors,
-  getNodeDegree,
-  isConnected,
-  bfs,
-  findComponents,
-} from '../../src/core/graph';
+import { createGridGraph, createTrackGraph } from '../../src/core/graph/types';
+import { getNeighbors, getNodeDegree, isConnected, bfs, findComponents } from '../../src/core/graph/algorithms';
 
 describe('Wave 27 graph-topology — createGridGraph shape', () => {
   it('rows×cols nodes with row-col ids and labels', () => {

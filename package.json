@@ -15,6 +15,9 @@
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "report:licenses": "node scripts/report-licenses.mjs",
     "report:dead-code": "node scripts/report-dead-code.mjs",
+    "report:knip": "node scripts/report-knip.mjs",
+    "report:ratchet-history": "node scripts/report-ratchet-history.mjs",
+    "report:coverage-map": "node scripts/report-coverage-map.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
@@ -42,8 +45,10 @@
     "perf:runtime": "node scripts/runtime-perf.mjs",
     "audit:memory": "node scripts/memory-leak-audit.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium",
+    "verify": "npm run lint && npm run lint:ratchet && npm run format:check && npm run typecheck && npm run typecheck:ratchet && npm run check:boundaries",
     "check:dev-docs": "node scripts/check-dev-doc-links.mjs",
-    "check:workflows": "node scripts/check-workflows.mjs"
+    "check:workflows": "node scripts/check-workflows.mjs",
+    "check:copy-pins": "node scripts/check-copy-pins.mjs"
   },
   "keywords": [],
   "author": "",

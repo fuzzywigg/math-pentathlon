@@ -5,12 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluateNode,
-  evaluate,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluateNode, evaluate } from '../../src/core/expressions/evaluator';
 
 function ev(expr: string): number {
   const result = evaluate(expr);

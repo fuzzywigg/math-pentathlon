@@ -437,6 +437,25 @@ export function injectPrimeGoldStyles(): void {
         animation: none;
       }
     }
+
+    html[data-reduced-motion='true'] .pg-cell,
+    html[data-reduced-motion='true'] .pg-roll-btn,
+    html[data-reduced-motion='true'] .pg-expr-item,
+    html[data-reduced-motion='true'] .pg-btn,
+    html[data-reduced-motion='true'] .pg-winner-banner {
+      transition: none;
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .pg-cell.valid:hover,
+    html[data-reduced-motion='true'] .pg-roll-btn:hover,
+    html[data-reduced-motion='true'] .pg-expr-item:hover,
+    html[data-reduced-motion='true'] .pg-btn-primary:hover,
+    html[data-reduced-motion='true'] .pg-btn-secondary:hover {
+      transform: none;
+    }
+    html[data-reduced-motion='true'] .pg-die.rolling {
+      animation: none;
+    }
   `
   );
 }
@@ -487,9 +506,15 @@ export function renderBoard(
         cellEl.textContent = cell.value.toString();
         cellEl.dataset.value = String(cell.value);
 
-        if (cell.isPrime && !cell.owner) cellEl.classList.add('prime');
-        if (cell.owner) cellEl.classList.add(cell.owner);
-        if (cell.isPrime && cell.owner) cellEl.classList.add('prime');
+        if (cell.isPrime && !cell.owner) {
+          cellEl.classList.add('prime');
+        }
+        if (cell.owner) {
+          cellEl.classList.add(cell.owner);
+        }
+        if (cell.isPrime && cell.owner) {
+          cellEl.classList.add('prime');
+        }
 
         const expr = validMap.get(cell.value);
         const isValid = allowInput && Boolean(expr);
@@ -650,7 +675,9 @@ export function renderExpressions(
     for (const { value, expr } of placements) {
       const item = document.createElement('div');
       item.className = 'pg-expr-item';
-      if (isPrime(value)) item.classList.add('prime');
+      if (isPrime(value)) {
+        item.classList.add('prime');
+      }
       replaceWithSafeHtml(item, safeHtml`<strong>${value}</strong> = ${expr}`);
       item.setAttribute('role', 'button');
       item.tabIndex = 0;
@@ -713,8 +740,11 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
     i >= Math.max(0, state.moveHistory.length - 10);
     i--
   ) {
-    // i is in [max(0,len-10), len); assert for NUI.
-    const move = state.moveHistory[i]!;
+    // i is in [max(0,len-10), len); narrow after indexed access.
+    const move = state.moveHistory[i];
+    if (move === undefined) {
+      continue;
+    }
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;
     replaceWithSafeHtml(

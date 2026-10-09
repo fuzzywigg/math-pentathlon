@@ -90,10 +90,11 @@ describe('destroyGame unmount cleanup', () => {
     document.body.appendChild(host);
     mod.initGame(host);
     mod.newGameVsAI('easy');
-    const htmlAfterStart = host.innerHTML;
+    expect(host.innerHTML.length).toBeGreaterThan(0);
     mod.destroyGame();
-    // Nulled container + generation bump: advancing timers must not repaint / throw.
+    // Cleared mount + generation bump: advancing timers must not repaint / throw.
     expect(() => vi.advanceTimersByTime(20_000)).not.toThrow();
-    expect(host.innerHTML).toBe(htmlAfterStart);
+    expect(host.innerHTML).toBe('');
   });
 });
+

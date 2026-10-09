@@ -1,6 +1,11 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet: ceiling for curly:all while eslint.config.js enforces curly:multi-line as a hard error. Lower ceilings when cleaning up; never raise without tip-owner approval. Counted via npm run lint:ratchet. Post-#553 tip measured 1344 after brace autofix on #528/#533/#451 fold growth (was 1484 > stale 1437). Post-alpha-AI/copy-restore tip measured 1320 (was 1344).",
+  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-131: curly 539; nnnull 336; void 224; radix 6; default-case 5; no-duplicate-imports 122. Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
-    "curly": 1320
+    "curly": 539,
+    "@typescript-eslint/no-non-null-assertion": 336,
+    "@typescript-eslint/no-confusing-void-expression": 224,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 122
   }
 }

@@ -5,17 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  rotateRight,
-  rotateLeft,
-  rotateAround,
-  reflect,
-  hexDistance,
-  hexEquals,
-  axialToCube,
-  createAxial,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { rotateRight, rotateLeft, rotateAround, reflect, hexDistance, hexEquals, axialToCube } from '../helpers/core-hex/coordinates';
+import { createAxial, type AxialCoord } from '../helpers/core-hex/types';
 
 /** Object.is treats +0 and -0 as distinct; hex math can produce -0. */
 function expectSameHex(a: AxialCoord, b: AxialCoord): void {

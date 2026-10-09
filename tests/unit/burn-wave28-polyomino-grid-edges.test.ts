@@ -5,22 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  isCellOccupied,
-  isValidPlacement,
-  placePolyomino,
-  removePolyomino,
-  getAllValidPositions,
-  getPlacementCells,
-  doPlacementsOverlap,
-  getAdjacentCells,
-  TETROMINOES,
-  getPolyominoesByOrder,
-  type Cell,
-  type Placement,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { createGrid, isCellOccupied, isValidPlacement, placePolyomino, removePolyomino, getAllValidPositions, getPlacementCells, doPlacementsOverlap, getAdjacentCells, type Placement } from '../../src/core/polyomino/placement';
+import { TETROMINOES, getPolyominoesByOrder, type Cell, type Rotation } from '../../src/core/polyomino/types';
 
 const key = (c: Cell) => `${c.row},${c.col}`;
 const sortedKeys = (cs: Cell[]) => cs.map(key).sort();

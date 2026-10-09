@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  createGrid,
-  placePolyomino,
-  getPlacementCells,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createGrid, placePolyomino, getPlacementCells } from '../../src/core/polyomino/placement';
 
 describe('Wave 39 poly — grid ignores rotation', () => {
   it('Grid overload always stores rotation 0 / flipped false', () => {

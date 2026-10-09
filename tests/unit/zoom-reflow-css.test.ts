@@ -1,5 +1,5 @@
 /**
- * Guards for WCAG zoom/reflow CSS (burn-1008-mp-zoom-reflow).
+ * Guards for WCAG zoom/reflow CSS (burn-1008-mp-zoom-reflow · q-mp-053).
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -32,5 +32,16 @@ describe('zoom-reflow CSS keepers', () => {
 
   it('keeps modal content inside the viewport width', () => {
     expect(css).toMatch(/\.modal-content\s*\{[^}]*100vw/s);
+  });
+
+  it('wraps status / move-history chrome under zoom/reflow scopes', () => {
+    expect(css).toMatch(/\.move-history-entry\s*\{[^}]*white-space:\s*normal/s);
+    expect(css).toMatch(/\.status[\s\S]*overflow-wrap:\s*anywhere/);
+  });
+
+  it('caps owl bubble width under zoom/reflow scopes', () => {
+    expect(css).toMatch(
+      /\.owl-bubble\s*\{[^}]*max-width:\s*min\(\s*100vw\s*-\s*16px\s*,\s*22rem\s*\)/s
+    );
   });
 });

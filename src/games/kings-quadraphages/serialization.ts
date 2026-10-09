@@ -91,7 +91,9 @@ export function deserializeGameState(data: SerializedGameState): GameState {
 
   const board: Board = data.board.map((row) =>
     row.map((cell) => {
-      if (!cell) return null;
+      if (!cell) {
+        return null;
+      }
       return {
         type: cell.type as 'king' | 'quadraphage',
         owner: cell.owner as PlayerOwner,
@@ -122,12 +124,37 @@ export function gameStateToJSON(
 }
 
 /**
+ * Result of a soft-fail game-state JSON parse (R-JSON-04).
+ * Mirrors SafeJsonParseResult so UI callers can branch without try/catch.
+ */
+export type GameStateFromJsonResult =
+  { ok: true; value: GameState } | { ok: false; error: unknown };
+
+/**
+ * Deserialize a GameState from a JSON string without throwing.
+ * Soft-fails on invalid JSON, unsupported version, or invalid board shape.
+ * Prefer this over gameStateFromJSON if/when save/load is bound to UI.
+ */
+export function tryGameStateFromJSON(json: string): GameStateFromJsonResult {
+  try {
+    const data = JSON.parse(json) as SerializedGameState;
+    return { ok: true, value: deserializeGameState(data) };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
+/**
  * Deserialize a GameState from a JSON string.
  * Throws if the JSON is invalid or the state is invalid.
+ * Thin wrapper over tryGameStateFromJSON for existing test callers.
  */
 export function gameStateFromJSON(json: string): GameState {
-  const data = JSON.parse(json) as SerializedGameState;
-  return deserializeGameState(data);
+  const result = tryGameStateFromJSON(json);
+  if (!result.ok) {
+    throw result.error;
+  }
+  return result.value;
 }
 
 const VALID_TURN_PHASES: TurnPhase[] = [
@@ -142,15 +169,21 @@ const VALID_PLAYERS: PlayerOwner[] = ['player1', 'player2'];
  * Returns true if valid, false otherwise.
  */
 export function validateSerializedState(data: unknown): boolean {
-  if (data === null || typeof data !== 'object') return false;
+  if (data === null || typeof data !== 'object') {
+    return false;
+  }
 
   const obj = data as Record<string, unknown>;
 
-  if (typeof obj['version'] !== 'number') return false;
+  if (typeof obj['version'] !== 'number') {
+    return false;
+  }
   if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner)) {
     return false;
   }
-  if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) return false;
+  if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) {
+    return false;
+  }
 
   if (
     !Array.isArray(obj['board']) ||

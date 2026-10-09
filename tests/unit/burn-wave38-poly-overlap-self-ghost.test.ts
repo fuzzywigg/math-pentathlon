@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  getShapeById,
-  doPlacementsOverlap,
-  getPlacementCells,
-  type Placement,
-} from '../../src/core/polyomino';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
+import { doPlacementsOverlap, getPlacementCells, type Placement } from '../../src/core/polyomino/placement';
 
 function place(
   id: string,

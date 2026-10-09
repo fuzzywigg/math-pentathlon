@@ -3,10 +3,8 @@
  * Distinct from burn-wave24-align-potential wrap arm count. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  countAlignmentPotential,
-  DIRECTIONS,
-} from '../../src/core/alignment';
+import { countAlignmentPotential } from '../../src/core/alignment/grid-alignment';
+import { DIRECTIONS } from '../../src/core/alignment/types';
 
 describe('Wave 52 core align — potential wrap gap', () => {
   it('wrapped row with one null stays finite and unblocked on open arm', () => {

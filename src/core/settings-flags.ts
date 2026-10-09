@@ -16,9 +16,13 @@ let userReducedMotion: boolean | null = null;
 
 function peekReducedMotionFromLocalStorage(): boolean {
   const raw = safeGetItem(PROGRESS_STORAGE_KEY);
-  if (!raw) return false;
+  if (!raw) {
+    return false;
+  }
   const parsedResult = safeParseJson(raw);
-  if (!parsedResult.ok) return false;
+  if (!parsedResult.ok) {
+    return false;
+  }
   const parsed = parsedResult.value;
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
     return false;

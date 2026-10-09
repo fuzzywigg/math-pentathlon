@@ -4,10 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createArrayAccessor,
-  getArrayDimensions,
-} from '../../src/core/alignment';
+import { createArrayAccessor, getArrayDimensions } from '../../src/core/alignment/compat';
 import { createArrayGetter } from '../../src/core/alignment/grid-alignment';
 
 describe('Wave 39 align — accessor jagged / empty', () => {

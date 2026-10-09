@@ -75,7 +75,9 @@ async function defaultImportGame(
 }
 
 function markWarmDone(): void {
-  if (typeof document === 'undefined') return;
+  if (typeof document === 'undefined') {
+    return;
+  }
   document.documentElement.setAttribute(IDLE_WARM_DONE_ATTR, 'done');
 }
 
@@ -87,7 +89,9 @@ export function scheduleIdleGameWarm(options: IdleWarmOptions = {}): void {
     options.enabled ??
     (typeof window !== 'undefined' && typeof document !== 'undefined');
 
-  if (!enabled) return;
+  if (!enabled) {
+    return;
+  }
 
   const schedule = options.schedule ?? defaultSchedule;
   const importGame = options.importGame ?? defaultImportGame;
@@ -110,7 +114,9 @@ export function scheduleIdleGameWarm(options: IdleWarmOptions = {}): void {
         }
 
         for (const gameId of DEFAULT_WARM_GAMES) {
-          if (document.hidden || prefersSaveData()) break;
+          if (document.hidden || prefersSaveData()) {
+            break;
+          }
           try {
             await importGame(gameId);
           } catch {

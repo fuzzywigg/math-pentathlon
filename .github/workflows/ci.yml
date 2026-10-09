@@ -100,9 +100,11 @@ jobs:
             exit 1
           fi
           echo "All JS chunks under ${limit_kb} kB"
+      # Report-only ratchet: --fail-on-new-over exits 1 on novel OVER rows, but
+      # continue-on-error keeps the required build job green (q-mp-123).
       - name: Report gzip bundle budgets (non-blocking)
         continue-on-error: true
-        run: npm run size:check
+        run: npm run size:check -- --fail-on-new-over
       # Report-only: parses dist/site.webmanifest after build (burn-1008-mp-pwa-manifest).
       - name: PWA manifest installability contract (report-only)
         continue-on-error: true
@@ -430,6 +432,36 @@ jobs:
           name: playwright-report-cross-browser
           path: playwright-report/
           retention-days: 30
+
+  # Knip unused-export drift vs docs/dev/knip-baseline.json (q-mp-118).
+  # Report-only: annotates growth; never fails required lint/unit/build/e2e.
+  # Tip-owner may later set enforce:true in the baseline (ratchets only go down).
+  knip:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - name: Knip unused-export drift (report-only)
+        id: knip
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          echo "knip: report-only — see docs/dev/knip-report.md"
+          npm run report:knip
+      - name: Surface report-only result
+        if: steps.knip.outcome == 'failure'
+        run: |
+          echo "::warning::knip report step failed unexpectedly (report-only; workflow stays green)"
+          exit 0
 
   # Visual baselines (start screen + each game opening @ desktop + phone).
   # Report-only for now: failures upload artifacts but do not fail the workflow.

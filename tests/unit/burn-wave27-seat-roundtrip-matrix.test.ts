@@ -5,57 +5,41 @@
  * Distinct from core seat-handoff openers (#121 revive). Tests-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import { owlSystem } from '../../src/core/owl';
-
 import {
   initGame as initHex,
   newGameVsHuman as hexVsHuman,
   getGameState as getHexState,
 } from '../../src/games/hex/game-controller';
-
 import {
   initGame as initCalla,
   newGameVsHuman as callaVsHuman,
   getGameState as getCallaState,
 } from '../../src/games/calla/game-controller';
-
 import {
   initGame as initFiar,
   newGameVsHuman as fiarVsHuman,
   getCurrentState as getFiarState,
 } from '../../src/games/fiar/game-controller';
-
 import {
   initGame as initStar,
   newGameVsHuman as starVsHuman,
   getGameState as getStarState,
 } from '../../src/games/star-track/game-controller';
-
 import {
   initGame as initKings,
   newGameVsHuman as kingsVsHuman,
   getGameState as getKingsState,
 } from '../../src/games/kings-quadraphages/game-controller';
 
+import { mountPair } from '../helpers/mount-pair';
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 function expectedSeat(ply: number): 'player1' | 'player2' {
   return ply % 2 === 1 ? 'player2' : 'player1';

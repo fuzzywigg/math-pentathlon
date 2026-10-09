@@ -5,11 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  solveTargetChallenge,
-  createTargetChallenge,
-  evaluate,
-} from '../../src/core/expressions';
+import { solveTargetChallenge, evaluate } from '../../src/core/expressions/evaluator';
+import { createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('Wave 30 expr-solve-stress — four-number parentheses', () => {
   it('finds 24 via parenthesized forms for [1,2,3,4]', () => {

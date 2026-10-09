@@ -4,7 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { reflect, rotateAround, hexEquals, createAxial } from '../../src/core/hex';
+import { reflect, rotateAround, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Wave 39 hex — reflect involution', () => {
   it('reflect twice is identity for q|r|s', () => {

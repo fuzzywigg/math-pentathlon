@@ -5,14 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  axialToOffset,
-  offsetToAxial,
-  createAxial,
-  createOffset,
-  hexEquals,
-  type OffsetParity,
-} from '../../src/core/hex';
+import { axialToOffset, offsetToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, createOffset, type OffsetParity } from '../helpers/core-hex/types';
 
 const PARITIES: OffsetParity[] = ['odd', 'even'];
 

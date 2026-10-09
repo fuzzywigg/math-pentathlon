@@ -3,7 +3,7 @@
  * Distinct from burn-wave40-poly-ui-selector-rotate-drag. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import { createRotationControls } from '../../src/core/polyomino';
+import { createRotationControls } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

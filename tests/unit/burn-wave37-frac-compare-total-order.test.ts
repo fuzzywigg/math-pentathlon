@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COMMON_FRACTIONS,
-  compare,
-  areEqual,
-  areEquivalent,
-  toDecimal,
-  createFraction,
-} from '../../src/core/fractions';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
+import { compare, areEqual, areEquivalent, toDecimal, createFraction } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-compare — total order invariants', () => {
   it('compare is antisymmetric and agrees with decimals', () => {

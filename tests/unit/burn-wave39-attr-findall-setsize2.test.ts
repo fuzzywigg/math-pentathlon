@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { findAllValidSets } from '../../src/core/attributes';
-import type { AttributePiece, SetRule } from '../../src/core/attributes';
+import { findAllValidSets } from '../../src/core/attributes/logic';
+import type { AttributePiece, SetRule } from '../../src/core/attributes/types';
 
 describe('Wave 39 attr — findAllValidSets setSize 2', () => {
   const pieces: AttributePiece[] = [

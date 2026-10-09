@@ -4,23 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  createBoard,
-  placePolyomino,
-  isValidPlacement,
-  validatePlacement,
-  getAllValidPositions,
-  findValidPlacements,
-  getPlacementCells,
-  removePolyomino,
-  removeLastPolyomino,
-  SIMPLE_SHAPES,
-  getPolyominoById,
-  type Placement,
-  type Grid,
-  type Board,
-} from '../../src/core/polyomino';
+import { createGrid, createBoard, placePolyomino, isValidPlacement, validatePlacement, getAllValidPositions, findValidPlacements, getPlacementCells, removePolyomino, removeLastPolyomino, type Placement, type Grid, type Board } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, getPolyominoById } from '../../src/core/polyomino/types';
 
 function mono() {
   return SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;

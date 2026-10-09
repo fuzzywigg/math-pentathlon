@@ -5,12 +5,8 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  renderCardSVG,
-} from '../../src/core/expressions';
+import { createNumberCard, createOperatorCard, createParenCard } from '../../src/core/expressions/types';
+import { renderCardSVG } from '../../src/core/expressions/expression-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

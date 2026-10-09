@@ -5,17 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getNeighbor,
-  getNeighbors,
-  areNeighbors,
-  hexDistance,
-  hexEquals,
-  createAxial,
-  AXIAL_DIRECTIONS,
-  DIRECTION_NAMES,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { getNeighbor, getNeighbors, areNeighbors, hexDistance, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, AXIAL_DIRECTIONS, DIRECTION_NAMES, type AxialCoord } from '../helpers/core-hex/types';
 
 describe('Wave 29 hex-dir-table — named directions from origin', () => {
   it('maps DIRECTION_NAMES onto AXIAL_DIRECTIONS via getNeighbor', () => {

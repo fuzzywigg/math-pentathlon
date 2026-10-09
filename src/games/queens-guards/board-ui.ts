@@ -119,8 +119,11 @@ export function renderBoard(
 
     // Determine cell color
     let fillColor = cell.ring % 2 === 0 ? COLORS.cellLight : COLORS.cellDark;
-    if (cell.ring === 0) fillColor = COLORS.cellCenter;
-    else if (cell.ring === 1) fillColor = COLORS.cellRing1;
+    if (cell.ring === 0) {
+      fillColor = COLORS.cellCenter;
+    } else if (cell.ring === 1) {
+      fillColor = COLORS.cellRing1;
+    }
 
     let strokeColor = COLORS.stroke;
     let strokeWidth = 1;
@@ -230,11 +233,13 @@ export function renderBoard(
     }
 
     // Click / keyboard handler (omitted on AI seat)
-    const activate = allowInput
-      ? () => {
-          onCellClick!({ ring: cell.ring, position: cell.position });
-        }
-      : undefined;
+    const cellClickHandler = onCellClick;
+    const activate =
+      allowInput && cellClickHandler !== undefined
+        ? () => {
+            cellClickHandler({ ring: cell.ring, position: cell.position });
+          }
+        : undefined;
     if (activate) {
       g.addEventListener('click', activate);
     }
@@ -391,6 +396,10 @@ export function injectQGStyles(): void {
       .qg-winner-banner {
         animation: none !important;
       }
+    }
+
+    html[data-reduced-motion='true'] .qg-winner-banner {
+      animation: none !important;
     }
   `
   );

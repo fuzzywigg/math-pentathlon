@@ -23,7 +23,9 @@ import {
 let stylesInjected = false;
 
 export function injectStarsStyles(): void {
-  if (stylesInjected) return;
+  if (stylesInjected) {
+    return;
+  }
   stylesInjected = true;
 
   const style = document.createElement('style');
@@ -316,6 +318,33 @@ export function injectStarsStyles(): void {
       pointer-events: none;
       white-space: nowrap;
     }
+
+    /* q-mp-054: gate decorative pulse / scale under OS + in-app reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      .stars-winner-banner {
+        animation: none !important;
+      }
+      .stars-cell,
+      .stars-card,
+      .stars-btn {
+        transition: none !important;
+      }
+      .stars-card.selected {
+        transform: none;
+      }
+    }
+
+    html[data-reduced-motion='true'] .stars-winner-banner {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .stars-cell,
+    html[data-reduced-motion='true'] .stars-card,
+    html[data-reduced-motion='true'] .stars-btn {
+      transition: none !important;
+    }
+    html[data-reduced-motion='true'] .stars-card.selected {
+      transform: none;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -445,15 +474,26 @@ export function renderBoard(
 
   for (let row = 0; row < CONFIG.BOARD_SIZE; row++) {
     for (let col = 0; col < CONFIG.BOARD_SIZE; col++) {
-      // CONFIG.BOARD_SIZE rows/cols are always allocated; `!` is NUI-only.
-      const cell = state.cells[row]![col]!;
+      // CONFIG.BOARD_SIZE rows/cols are always allocated; narrow after indexed access.
+      const cellRow = state.cells[row];
+      if (cellRow === undefined) {
+        continue;
+      }
+      const cell = cellRow[col];
+      if (cell === undefined) {
+        continue;
+      }
       const cellEl = document.createElement('div');
       cellEl.className = 'stars-cell';
       cellEl.dataset.row = String(row);
       cellEl.dataset.col = String(col);
 
-      if (cell.isStar) cellEl.classList.add('star');
-      if (cell.owner) cellEl.classList.add(cell.owner);
+      if (cell.isStar) {
+        cellEl.classList.add('star');
+      }
+      if (cell.owner) {
+        cellEl.classList.add(cell.owner);
+      }
       if (
         state.lastMove &&
         state.lastMove.row === row &&
@@ -522,7 +562,11 @@ function calculatePreviewScore(
   col: number
 ): number {
   // ratchet: caller passes in-bounds row/col on dense BOARD_SIZE grid.
-  const cell = state.cells[row]![col]!;
+  const cellRow = state.cells[row];
+  const cell = cellRow?.[col];
+  if (cell === undefined) {
+    return 0;
+  }
   let score = 0;
 
   const directions = [
@@ -546,14 +590,17 @@ function calculatePreviewScore(
       adjCol >= 0 &&
       adjCol < CONFIG.BOARD_SIZE
     ) {
-      const adjCell = state.cells[adjRow]![adjCol]!;
-      if (adjCell.card) {
+      const adjRowCells = state.cells[adjRow];
+      const adjCell = adjRowCells?.[adjCol];
+      if (adjCell?.card) {
         score += countDifferences(card, adjCell.card);
       }
     }
   }
 
-  if (cell.isStar) score *= 2;
+  if (cell.isStar) {
+    score *= 2;
+  }
   return score;
 }
 
@@ -676,7 +723,10 @@ export function renderMoveHistory(state: StarsState): HTMLElement {
 
   for (let i = state.moveHistory.length - 1; i >= 0; i--) {
     // ratchet: i walks existing indices of moveHistory.
-    const move = state.moveHistory[i]!;
+    const move = state.moveHistory[i];
+    if (move === undefined) {
+      continue;
+    }
     const moveEl = document.createElement('div');
     moveEl.className = `stars-move-item ${move.player}`;
 

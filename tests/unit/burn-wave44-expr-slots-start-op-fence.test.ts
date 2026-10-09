@@ -2,12 +2,8 @@
  * Wave 44 — validateSlots start/end operator fence leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  validateSlots,
-  createSlot,
-  createNumberCard,
-  createOperatorCard,
-} from '../../src/core/expressions';
+import { validateSlots } from '../../src/core/expressions/evaluator';
+import { createSlot, createNumberCard, createOperatorCard } from '../../src/core/expressions/types';
 
 describe('Wave 44 expr — slots start/end op fence', () => {
   it('rejects leading non-minus operator', () => {

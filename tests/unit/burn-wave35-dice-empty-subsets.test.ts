@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getAllPossibleSums, getAllPossibleProducts } from '../../src/core/dice';
+import { getAllPossibleSums, getAllPossibleProducts } from '../../src/core/dice/roller';
 
 describe('Wave 35 dice-empty-subsets — empty input', () => {
   it('returns empty arrays for empty values', () => {

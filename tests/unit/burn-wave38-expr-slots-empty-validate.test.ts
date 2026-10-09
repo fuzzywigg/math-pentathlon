@@ -4,11 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  slotsToExpression,
-  type ExpressionSlot,
-} from '../../src/core/expressions';
+import { validateSlots, slotsToExpression } from '../../src/core/expressions/evaluator';
+import type { ExpressionSlot } from '../../src/core/expressions/types';
 
 function slot(
   id: string,

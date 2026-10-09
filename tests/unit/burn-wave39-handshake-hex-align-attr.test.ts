@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createAxial,
-  hexDistance,
-  hexRing,
-  hexEquals,
-} from '../../src/core/hex';
+import { createAxial } from '../helpers/core-hex/types';
+import { hexDistance, hexRing, hexEquals } from '../helpers/core-hex/coordinates';
 import {
   findRegion,
   regionTouchesEdge,

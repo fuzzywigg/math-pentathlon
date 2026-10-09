@@ -3,12 +3,9 @@
  * Distinct from wave53 selector/drag hover chrome. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  createBoard,
-  placePolyomino,
-  renderBoard,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createBoard, placePolyomino } from '../../src/core/polyomino/placement';
+import { renderBoard } from '../../src/core/polyomino/polyomino-ui';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

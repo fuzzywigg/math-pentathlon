@@ -1,6 +1,6 @@
 /**
  * WCAG 1.4.4 / 1.4.10 zoom + reflow helpers (CSS only).
- * Task: burn-1008-mp-zoom-reflow
+ * Task: burn-1008-mp-zoom-reflow · re-triage q-mp-053 (tip post-#477)
  *
  * Scoped so default desktop / phone visual baselines are unchanged:
  * - narrow reflow: @media (max-width: 360px)
@@ -145,6 +145,42 @@
     max-width: 100%;
     min-width: 0;
   }
+
+  /* Shell status / history chrome: wrap instead of forcing page width. */
+  .status,
+  .status-turn,
+  .status-supplies,
+  .status-mode,
+  .status-winner,
+  .owl-bubble,
+  .owl-message,
+  .move-history-panel,
+  .move-history-list {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .move-history-entry {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .owl-bubble {
+    max-width: min(100vw - 16px, 22rem);
+    box-sizing: border-box;
+  }
+
+  .collapse-toggle,
+  #back-btn,
+  #new-game-btn,
+  #help-btn,
+  #tutorial-btn,
+  #start-game-btn {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
 }
 
 /* Text-only 200% (harness sets data-zoom-reflow-text). */
@@ -221,6 +257,41 @@ html[data-zoom-reflow-text='200'] .hex-a-gone-game-area {
   min-width: 0;
 }
 
+html[data-zoom-reflow-text='200'] .status,
+html[data-zoom-reflow-text='200'] .status-turn,
+html[data-zoom-reflow-text='200'] .status-supplies,
+html[data-zoom-reflow-text='200'] .status-mode,
+html[data-zoom-reflow-text='200'] .status-winner,
+html[data-zoom-reflow-text='200'] .owl-bubble,
+html[data-zoom-reflow-text='200'] .owl-message,
+html[data-zoom-reflow-text='200'] .move-history-panel,
+html[data-zoom-reflow-text='200'] .move-history-list {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+html[data-zoom-reflow-text='200'] .move-history-entry {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html[data-zoom-reflow-text='200'] .owl-bubble {
+  max-width: min(100vw - 16px, 22rem);
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-text='200'] .collapse-toggle,
+html[data-zoom-reflow-text='200'] #back-btn,
+html[data-zoom-reflow-text='200'] #new-game-btn,
+html[data-zoom-reflow-text='200'] #help-btn,
+html[data-zoom-reflow-text='200'] #tutorial-btn,
+html[data-zoom-reflow-text='200'] #start-game-btn {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 /* Page zoom 200% (harness sets data-zoom-reflow-zoom). */
 html[data-zoom-reflow-zoom='200'] body {
   min-width: 0;
@@ -288,4 +359,39 @@ html[data-zoom-reflow-zoom='200'] .star-track-game-area,
 html[data-zoom-reflow-zoom='200'] .hex-a-gone-game-area {
   max-width: 100%;
   min-width: 0;
+}
+
+html[data-zoom-reflow-zoom='200'] .status,
+html[data-zoom-reflow-zoom='200'] .status-turn,
+html[data-zoom-reflow-zoom='200'] .status-supplies,
+html[data-zoom-reflow-zoom='200'] .status-mode,
+html[data-zoom-reflow-zoom='200'] .status-winner,
+html[data-zoom-reflow-zoom='200'] .owl-bubble,
+html[data-zoom-reflow-zoom='200'] .owl-message,
+html[data-zoom-reflow-zoom='200'] .move-history-panel,
+html[data-zoom-reflow-zoom='200'] .move-history-list {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+html[data-zoom-reflow-zoom='200'] .move-history-entry {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html[data-zoom-reflow-zoom='200'] .owl-bubble {
+  max-width: min(100vw - 16px, 22rem);
+  box-sizing: border-box;
+}
+
+html[data-zoom-reflow-zoom='200'] .collapse-toggle,
+html[data-zoom-reflow-zoom='200'] #back-btn,
+html[data-zoom-reflow-zoom='200'] #new-game-btn,
+html[data-zoom-reflow-zoom='200'] #help-btn,
+html[data-zoom-reflow-zoom='200'] #tutorial-btn,
+html[data-zoom-reflow-zoom='200'] #start-game-btn {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }

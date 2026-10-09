@@ -5,10 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSolution,
-  createTargetChallenge,
-} from '../../src/core/expressions';
+import { validateSolution } from '../../src/core/expressions/evaluator';
+import { createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('Wave 31 expr-validate — exact match acceptance', () => {
   it('accepts correct full-use expressions', () => {

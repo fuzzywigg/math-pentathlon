@@ -5,12 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  evaluate,
-  tokenize,
-  parse,
-  evaluateNode,
-} from '../../src/core/expressions';
+import { evaluate, tokenize, parse, evaluateNode } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-power — associativity table', () => {
   it.each([

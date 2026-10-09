@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { normalizePosition, isInBounds } from '../../src/core/alignment';
+import { normalizePosition, isInBounds } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — wrap normalize', () => {
   const dims = { rows: 5, cols: 4 };

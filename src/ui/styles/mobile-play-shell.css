@@ -93,9 +93,11 @@ body {
   }
 
   /* ----- Kings & Quadraphages ----- */
-  .board {
-    /* Use vw (not %): .game-area is shrink-to-fit, so % width collapses */
-    width: min(350px, calc(100vw - 2 * var(--play-shell-gutter)));
+  .board,
+  .board.kings-board {
+    /* Use vw (not %): .game-area is shrink-to-fit, so % width collapses.
+       420px ≈ 9×44 cells + gaps (WCAG 2.5.5 floor on coarse/phone). */
+    width: min(420px, calc(100vw - 2 * var(--play-shell-gutter)));
     height: auto;
     aspect-ratio: 1;
     max-width: 100%;

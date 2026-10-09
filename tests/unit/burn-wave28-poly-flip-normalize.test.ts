@@ -5,19 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  flipCellsHorizontal,
-  flipCellsVertical,
-  normalizeCells,
-  getBoundingBox,
-  getBounds,
-  centerCells,
-  getCenterOfMass,
-  sortCells,
-  cellsToKey,
-  translateCells,
-  type Cell,
-} from '../../src/core/polyomino';
+import { flipCellsHorizontal, flipCellsVertical, normalizeCells, getBoundingBox, getBounds, centerCells, getCenterOfMass, sortCells, cellsToKey, translateCells } from '../../src/core/polyomino/transform';
+import type { Cell } from '../../src/core/polyomino/types';
 
 function S(): Cell[] {
   return [

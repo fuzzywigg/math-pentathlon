@@ -48,7 +48,9 @@ declare global {
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -83,10 +85,14 @@ function unmountBoard3d(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadQueensGuardsBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
     board3d = await mod.createQueensGuardsBoard3D(
       boardContainer,
       handleCellClick
@@ -122,9 +128,15 @@ function humanCanAct(): boolean {
 
 /** Persist stalemate into state.winner (display already treated it as a win). */
 function settleStalemateIfNeeded(): void {
-  if (gameState.winner) return;
-  if (gameState.capturedPieces.length > 0) return;
-  if (hasValidMoves(gameState)) return;
+  if (gameState.winner) {
+    return;
+  }
+  if (gameState.capturedPieces.length > 0) {
+    return;
+  }
+  if (hasValidMoves(gameState)) {
+    return;
+  }
   gameState = {
     ...gameState,
     winner: getOpponent(gameState.currentPlayer),
@@ -133,7 +145,9 @@ function settleStalemateIfNeeded(): void {
 }
 
 function updateUI(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   settleStalemateIfNeeded();
 
@@ -152,7 +166,9 @@ function updateUI(): void {
 }
 
 function updateStatus(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   markStatusLive(statusContainer);
 
   if (gameState.winner) {
@@ -243,7 +259,9 @@ function handleRestoreClick(coord: BoardCoord): void {
   const isTarget = targets.some(
     (t) => t.ring === coord.ring && t.position === coord.position
   );
-  if (!isTarget) return;
+  if (!isTarget) {
+    return;
+  }
 
   const from = gameState.selectedPiece
     ? parseKey(gameState.selectedPiece)
@@ -257,7 +275,9 @@ function handleRestoreClick(coord: BoardCoord): void {
   }
 
   const next = restoreCapturedPiece(gameState, from, coord);
-  if (next === gameState) return;
+  if (next === gameState) {
+    return;
+  }
   gameState = {
     ...next,
     selectedPiece:
@@ -274,11 +294,17 @@ function handleRestoreClick(coord: BoardCoord): void {
 }
 
 function handleCellClick(coord: BoardCoord): void {
-  if (gameState.winner) return;
-  if (isAIThinking) return;
+  if (gameState.winner) {
+    return;
+  }
+  if (isAIThinking) {
+    return;
+  }
 
   // If playing vs AI and it's AI's turn, ignore clicks
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   // Official capture restore must finish before any other move.
   if (gameState.capturedPieces.length > 0) {
@@ -332,7 +358,9 @@ function handleCellClick(coord: BoardCoord): void {
 // =============================================================================
 
 async function performAIMove(): Promise<void> {
-  if (gameState.winner || gameState.currentPlayer !== aiPlayer) return;
+  if (gameState.winner || gameState.currentPlayer !== aiPlayer) {
+    return;
+  }
 
   const gen = ++aiGeneration;
   isAIThinking = true;
@@ -354,7 +382,9 @@ async function performAIMove(): Promise<void> {
     }
   }
 
-  if (gen !== aiGeneration) return;
+  if (gen !== aiGeneration) {
+    return;
+  }
   isAIThinking = false;
 
   if (!aiMove) {
@@ -419,7 +449,9 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
       getPieceCount: () => {
         let n = 0;
         for (const cell of gameState.cells.values()) {
-          if (cell.piece) n++;
+          if (cell.piece) {
+            n++;
+          }
         }
         return n;
       },
@@ -451,7 +483,9 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
           winner: null,
           moveHistory: [],
         };
-        if (!opts?.keepVsAI) vsAI = false;
+        if (!opts?.keepVsAI) {
+          vsAI = false;
+        }
         updateUI();
         maybeTriggerAI();
       },

@@ -3,14 +3,14 @@
  * Tests-only. After #214/#215.
  */
 import { describe, it, expect } from 'vitest';
-import { axialToCube, cubeToAxial, hexEquals } from '../../src/core/hex/coordinates';
+import { axialToCube, cubeToAxial, hexEquals } from '../helpers/core-hex/coordinates';
 import {
   AXIAL_DIRECTIONS,
   CUBE_DIRECTIONS,
   CUBE_DIAGONALS,
   DIRECTION_NAMES,
   createAxial,
-} from '../../src/core/hex/types';
+} from '../helpers/core-hex/types';
 
 describe('Overnight core hex — cube/axial dir parity', () => {
   it('each AXIAL_DIRECTIONS maps to matching CUBE_DIRECTIONS entry', () => {

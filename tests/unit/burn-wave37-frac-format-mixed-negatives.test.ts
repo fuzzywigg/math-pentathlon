@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  formatMixedNumber,
-  toMixedNumber,
-} from '../../src/core/fractions';
+import { createFraction, formatMixedNumber, toMixedNumber } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-format-mixed-neg — shapes', () => {
   it('formats negative impropers with signed whole', () => {

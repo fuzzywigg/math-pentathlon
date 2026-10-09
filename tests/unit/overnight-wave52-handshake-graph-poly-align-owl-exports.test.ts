@@ -3,13 +3,14 @@
  * Distinct from overnight-core-handshake-graph-hex-exports. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { bfs, renderGraph, createTrackGraph } from '../../src/core/graph';
-import {
-  cellsToKey,
-  createGrid,
-  getPolyominoById,
-} from '../../src/core/polyomino';
-import { wrapPosition, clearHighlights } from '../../src/core/alignment';
+import { bfs } from '../../src/core/graph/algorithms';
+import { renderGraph } from '../../src/core/graph/graph-ui';
+import { createTrackGraph } from '../../src/core/graph/types';
+import { cellsToKey } from '../../src/core/polyomino/transform';
+import { createGrid } from '../../src/core/polyomino/placement';
+import { getPolyominoById } from '../../src/core/polyomino/types';
+import { wrapPosition } from '../../src/core/alignment/grid-alignment';
+import { clearHighlights } from '../../src/core/alignment/highlight-ui';
 import { clampToViewport, resolveInspectTarget, owlMessages } from '../../src/core/owl';
 
 describe('Wave 52 handshake — graph/poly/align/owl exports', () => {

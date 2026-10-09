@@ -86,6 +86,15 @@ Blocked initially by missing `rollup-plugin-visualizer` (dev `webServer` / vite 
 
 **Evidence:** [`docs/dev/alpha-landing-preflight-2026-10-08.md`](./dev/alpha-landing-preflight-2026-10-08.md) §3 unit first-run fail. Confirmation full `test:unit` exit 0; e2e 204 passed.
 
+### 3b. q-mp-117 — restore generation-gate file after copy-restore drop (2026-10-09)
+
+| Item | Detail |
+| --- | --- |
+| **Gap on tip `7d59901c`** | `7fedc748` dropped the whole characterization file (copy pins). `vitest.config.ts` still listed it in `unit-isolated`, but the two generation-gate cases were gone — soft-hold risk if reintroduced with real awaits. |
+| **Fix** | Restore `tests/unit/ui-helper-dedupe-characterization.test.ts` with **timeout-handle only** (fake timers + `advanceTimersByTimeAsync`; clear timers in `afterEach`). No Blue/Red/You/Computer copy pins. Keep file in `unit-isolated`. **No** Vitest/`testTimeout` raise. **No** `src/` AI timing edits. |
+| **Overlap check** | No open draft already owned q-mp-117 / this filename. Sibling timeout coverage in `mutation-ui-timeout-handle` + `burn-1008-ui-cov-r5-timeout-seat-dice` already uses fake timers in `unit-shared`. |
+| **Local verify** | `npm run test:unit` ×3 green; `npm run lint` green (see draft PR body). |
+
 ## After (fixes landed)
 
 ### Full suite (7 default + 3 shuffle incl. prior-bad seed `3223`)

@@ -4,19 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTrackGraph,
-  createStarGraph,
-  createGridGraph,
-  createCircularGraph,
-  getNeighbors,
-  getEdge,
-  areAdjacent,
-  bfs,
-  findReachable,
-  findComponents,
-  isConnected,
-} from '../../src/core/graph';
+import { createTrackGraph, createStarGraph, createGridGraph, createCircularGraph } from '../../src/core/graph/types';
+import { getNeighbors, getEdge, areAdjacent, bfs, findReachable, findComponents, isConnected } from '../../src/core/graph/algorithms';
 
 describe('Wave 38 graph-miss — ghost ids on leftover templates', () => {
   it('neighbors/edge/adjacent miss for unknown nodes across templates', () => {

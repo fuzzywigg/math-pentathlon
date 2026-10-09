@@ -4,7 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { createGridGraph, findAllPaths } from '../../src/core/graph';
+import { createGridGraph } from '../../src/core/graph/types';
+import { findAllPaths } from '../../src/core/graph/algorithms';
 import {
   createScoringState,
   addPlayer,

@@ -63,7 +63,9 @@ async function mountGameShell(
 const appContainer = document.getElementById('app');
 
 if (!appContainer) {
-  throw new Error('App container not found');
+  // Soft-fail (R-SHELL-01): misconfigured hosts get a console diagnostic
+  // instead of an uncaught throw that aborts module evaluation silently.
+  console.error('[main] App container not found');
 }
 
 // Store reference to cleanup functions
@@ -74,35 +76,56 @@ let activeGameBoundary: GameErrorBoundaryHandle | null = null;
 // Cleanup previous view
 function cleanup(): void {
   exitTutorialIfActive();
-  if (currentCleanup) {
-    currentCleanup();
+  // R-SHELL-02: throwing currentCleanup must not skip boundary dispose.
+  try {
+    if (currentCleanup) {
+      currentCleanup();
+    }
+  } catch (err) {
+    console.error('[main] route cleanup failed', err);
+  } finally {
     currentCleanup = null;
-  }
-  if (activeGameBoundary) {
-    activeGameBoundary.dispose();
-    activeGameBoundary = null;
+    if (activeGameBoundary) {
+      activeGameBoundary.dispose();
+      activeGameBoundary = null;
+    }
   }
 }
 
-/** Install (or replace) the per-game error boundary for the current route. */
-function bindGameErrorBoundary(gameName: string): void {
+/**
+ * Install (or replace) the window error / rejection boundary for the current
+ * route. Same crash UI as game routes (`renderGameCrash` — no new copy).
+ */
+function bindRouteErrorBoundary(
+  displayName: string,
+  onReset: () => void
+): void {
   if (activeGameBoundary) {
     activeGameBoundary.dispose();
     activeGameBoundary = null;
   }
   activeGameBoundary = installGameErrorBoundary({
-    gameName,
+    gameName: displayName,
     container: appContainer!,
-    onReset: () => renderGame(),
+    onReset,
     onHome: () => navigate('/'),
     onBeforeShow: () => {
       exitTutorialIfActive();
-      if (currentCleanup) {
-        currentCleanup();
+      // R-SHELL-02: clear cleanup even when it throws; outer catch still shows crash UI.
+      try {
+        if (currentCleanup) {
+          currentCleanup();
+        }
+      } finally {
         currentCleanup = null;
       }
     },
   });
+}
+
+/** Per-game-route boundary: remount the same game on Try again. */
+function bindGameErrorBoundary(gameName: string): void {
+  bindRouteErrorBoundary(gameName, () => renderGame());
 }
 
 // Render the game selector (home page)
@@ -110,6 +133,8 @@ function renderHome(): void {
   nextRouteGeneration();
   cleanup();
   document.title = 'Math Pentathlon';
+  // Same recovery path as game routes (R-SHELL-04 / R-EVT-03).
+  bindRouteErrorBoundary('Math Pentathlon', () => renderHome());
   renderGameSelector(appContainer!);
 }
 
@@ -126,10 +151,14 @@ function renderStats(): void {
         import('./ui/stats-dashboard'),
         import('./ui/styles/stats-dashboard.css'),
       ]);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderStatsDashboard(appContainer!);
     } catch {
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Your Progress',
@@ -172,7 +201,9 @@ function renderGame(): void {
         import('./ui/game-route-mounts'),
         import('./ui/styles/game-play.css'),
       ]);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       initGameMountDeps({
         container: appContainer!,
         setCleanup: (fn: (() => void) | null) => {
@@ -184,7 +215,9 @@ function renderGame(): void {
       await mountGameById(gameId, routeGen);
     } catch (err) {
       console.error(`Failed to load game ${gameId}`, err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       // Load failures use the dedicated load-error UI; drop the runtime boundary.
       if (activeGameBoundary) {
         activeGameBoundary.dispose();
@@ -211,11 +244,15 @@ function renderDiceDemoPage(): void {
   void (async () => {
     try {
       const { renderDiceDemo } = await import('./demos/dice-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderDiceDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Dice System Demo',
@@ -235,11 +272,15 @@ function renderAlignmentDemoPage(): void {
   void (async () => {
     try {
       const { renderAlignmentDemo } = await import('./demos/alignment-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderAlignmentDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Alignment Detection Demo',
@@ -259,11 +300,15 @@ function renderFractionDemoPage(): void {
   void (async () => {
     try {
       const { renderFractionDemo } = await import('./demos/fraction-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderFractionDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Fraction System Demo',
@@ -283,11 +328,15 @@ function renderPolyominoDemoPage(): void {
   void (async () => {
     try {
       const { renderPolyominoDemo } = await import('./demos/polyomino-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderPolyominoDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Polyomino System Demo',
@@ -307,11 +356,15 @@ function renderGraphDemoPage(): void {
   void (async () => {
     try {
       const { renderGraphDemo } = await import('./demos/graph-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGraphDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Graph/Network System Demo',
@@ -331,11 +384,15 @@ function renderAttributeDemoPage(): void {
   void (async () => {
     try {
       const { renderAttributeDemo } = await import('./demos/attribute-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderAttributeDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Attribute Logic Demo',
@@ -355,11 +412,15 @@ function renderExpressionDemoPage(): void {
   void (async () => {
     try {
       const { renderExpressionDemo } = await import('./demos/expression-demo');
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderExpressionDemo(appContainer!);
     } catch (err) {
       console.error('Failed to load demo', err);
-      if (!isCurrentRouteGeneration(routeGen)) return;
+      if (!isCurrentRouteGeneration(routeGen)) {
+        return;
+      }
       renderGameLoadError(
         appContainer!,
         'Expression Builder Demo',
@@ -371,33 +432,37 @@ function renderExpressionDemoPage(): void {
   })();
 }
 
-// Set up routes
-addRoute('/', renderHome);
-addRoute('/stats', renderStats);
-addRoute('/game/:id', renderGame);
-addRoute('/demo/dice', renderDiceDemoPage);
-addRoute('/demo/alignment', renderAlignmentDemoPage);
-addRoute('/demo/fractions', renderFractionDemoPage);
-addRoute('/demo/polyomino', renderPolyominoDemoPage);
-addRoute('/demo/graph', renderGraphDemoPage);
-addRoute('/demo/attributes', renderAttributeDemoPage);
-addRoute('/demo/expressions', renderExpressionDemoPage);
+// Bootstrap only when the shell host exists (soft-fail above leaves the
+// module loaded so deploy/dev consoles can see the diagnostic).
+if (appContainer) {
+  // Set up routes
+  addRoute('/', renderHome);
+  addRoute('/stats', renderStats);
+  addRoute('/game/:id', renderGame);
+  addRoute('/demo/dice', renderDiceDemoPage);
+  addRoute('/demo/alignment', renderAlignmentDemoPage);
+  addRoute('/demo/fractions', renderFractionDemoPage);
+  addRoute('/demo/polyomino', renderPolyominoDemoPage);
+  addRoute('/demo/graph', renderGraphDemoPage);
+  addRoute('/demo/attributes', renderAttributeDemoPage);
+  addRoute('/demo/expressions', renderExpressionDemoPage);
 
-// Unknown hashes used to leave the previous view mounted (default console.error).
-setNotFoundHandler(() => {
-  navigate('/');
-});
+  // Unknown hashes used to leave the previous view mounted (default console.error).
+  setNotFoundHandler(() => {
+    navigate('/');
+  });
 
-// Initialize router
-initRouter();
+  // Initialize router
+  initRouter();
 
-// Offline shell + background precache — idle-deferred so first paint wins radio
-bootstrapPwa();
+  // Offline shell + background precache — idle-deferred so first paint wins radio
+  bootstrapPwa();
 
-// Tablet / a11y: sync reduced-motion + offline flags onto <html>
-bindReducedMotionPreference();
-bindOfflineDocumentFlag();
+  // Tablet / a11y: sync reduced-motion + offline flags onto <html>
+  bindReducedMotionPreference();
+  bindOfflineDocumentFlag();
 
-// Defer mascot + popular game warm-imports until after first paint
-bootstrapOwl();
-scheduleIdleGameWarm();
+  // Defer mascot + popular game warm-imports until after first paint
+  bootstrapOwl();
+  scheduleIdleGameWarm();
+}

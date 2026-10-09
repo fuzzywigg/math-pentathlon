@@ -4,12 +4,9 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  createBoard,
-  placePolyomino,
-  renderPlacementPreview,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino } from '../../src/core/polyomino/placement';
+import { renderPlacementPreview } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

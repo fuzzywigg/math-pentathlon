@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { tokenize, evaluate } from '../../src/core/expressions';
+import { tokenize, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 35 expr-decimal — leading and trailing dots', () => {
   it('parses leading-dot decimals', () => {

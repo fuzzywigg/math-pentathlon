@@ -4,17 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getNodeDegree,
-  getNeighbors,
-  createCompleteGraph,
-  createTrackGraph,
-  createStarGraph,
-  createGridGraph,
-  type Graph,
-  type GraphNode,
-  type NodeId,
-} from '../../src/core/graph';
+import { getNodeDegree, getNeighbors } from '../../src/core/graph/algorithms';
+import { createCompleteGraph, createTrackGraph, createStarGraph, createGridGraph, type Graph, type GraphNode, type NodeId } from '../../src/core/graph/types';
 
 function node(id: NodeId): GraphNode {
   return { id, position: { x: 0, y: 0 } };

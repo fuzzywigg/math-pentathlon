@@ -15,19 +15,14 @@ import {
 import { createInitialState } from '../../src/games/hex-a-gone/types';
 import { buildSelectionArea } from '../../src/games/hex-a-gone/board-ui';
 
+import { mountPair } from '../helpers/mount-pair';
+
 afterEach(() => {
   destroyGame();
   document.body.innerHTML = '';
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.append(board, status);
-  return { board, status };
-}
 
 describe('Hex-a-Gone salvage — bank a11y (#429 compliant)', () => {
   it('AI-seat bank buttons are disabled while interactive=false', () => {

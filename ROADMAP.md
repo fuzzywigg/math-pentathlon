@@ -217,16 +217,12 @@ src/core/expressions/
 - Hex pathfinding
 - Triangular subdivision (for Remainder Islands)
 
-### Enhancement needed:
-```
-src/core/hex/
-├── coordinates.ts    # Coordinate conversion utilities
-├── neighbors.ts      # Neighbor calculation
-├── pathfinding.ts    # Hex-based movement
-└── hex-triangle.ts   # Triangular subdivision
-```
+### Status (q-mp-133):
+Lattice helpers live under `tests/helpers/core-hex/` (test-only; production
+boards use `src/ui/hex-svg.ts`). Further shared production hex utilities remain
+optional / low priority.
 
-### Priority: **LOW** - Mostly exists, minor extensions
+### Priority: **LOW** - Test lattice exists; production boards use `hex-svg`
 
 ---
 

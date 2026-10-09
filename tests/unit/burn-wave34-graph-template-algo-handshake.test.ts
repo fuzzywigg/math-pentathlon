@@ -4,21 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  bfs,
-  isConnected,
-  findComponents,
-  findReachable,
-  getNodeDegree,
-  findAllPaths,
-  createGridGraph,
-  createCircularGraph,
-  createStarGraph,
-  createTrackGraph,
-  createCompleteGraph,
-  createHexLatticeGraph,
-  type Graph,
-} from '../../src/core/graph';
+import { bfs, isConnected, findComponents, findReachable, getNodeDegree, findAllPaths } from '../../src/core/graph/algorithms';
+import { createGridGraph, createCircularGraph, createStarGraph, createTrackGraph, createCompleteGraph, createHexLatticeGraph, type Graph } from '../../src/core/graph/types';
 
 function assertConnectedTemplate(g: Graph): void {
   expect(isConnected(g)).toBe(true);

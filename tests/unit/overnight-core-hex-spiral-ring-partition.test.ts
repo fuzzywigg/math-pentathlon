@@ -3,8 +3,8 @@
  * Tests-only. After #214/#215.
  */
 import { describe, it, expect } from 'vitest';
-import { hexSpiral, hexRing, hexDistance } from '../../src/core/hex/coordinates';
-import { createAxial, coordKey } from '../../src/core/hex/types';
+import { hexSpiral, hexRing, hexDistance } from '../helpers/core-hex/coordinates';
+import { createAxial, coordKey } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — spiral ring partition', () => {
   it('spiral cells unique; ring r subset equals distance==r', () => {

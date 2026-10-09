@@ -22,6 +22,8 @@ import {
   renderBoard,
 } from '../../src/games/queens-guards/board-ui';
 
+import { mountPair } from '../helpers/mount-pair';
+
 afterEach(() => {
   destroyGame();
   document.body.innerHTML = '';
@@ -29,14 +31,6 @@ afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  board.className = 'qg-board-container';
-  const status = document.createElement('div');
-  document.body.append(board, status);
-  return { board, status };
-}
 
 /** Find a legal Blue move and play it through the DOM so AI is scheduled. */
 function playOneHumanMove(board: HTMLElement): void {
@@ -68,7 +62,7 @@ describe('Queens & Guards AI soft-lock recovery', () => {
   it('falls back to sync getAIMove when the worker returns null', async () => {
     vi.useFakeTimers();
     injectQGStyles();
-    const { board, status } = mountPair();
+    const { board, status } = mountPair({ boardClass: 'qg-board-container' });
     initGame(board, status);
     newGameVsAI('easy');
 
@@ -109,7 +103,7 @@ describe('Queens & Guards AI soft-lock recovery', () => {
   it('settles stalemate into state.winner when AI has no moves', async () => {
     vi.useFakeTimers();
     injectQGStyles();
-    const { board, status } = mountPair();
+    const { board, status } = mountPair({ boardClass: 'qg-board-container' });
     initGame(board, status);
     newGameVsAI('easy');
 

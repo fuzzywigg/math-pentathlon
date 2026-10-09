@@ -4,21 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  HEX_PATTERN_BLOCKS,
-  createBoard,
-  placePolyomino,
-  validatePlacement,
-  findValidPlacements,
-  canPlaceShape,
-  getEmptyCells,
-  countEmptyCells,
-  getTransformedCells,
-  getAllOrientations,
-  areCellsConnected,
-  cellsToKey,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { HEX_PATTERN_BLOCKS, type Rotation } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino, validatePlacement, findValidPlacements, canPlaceShape, getEmptyCells, countEmptyCells } from '../../src/core/polyomino/placement';
+import { getTransformedCells, getAllOrientations, areCellsConnected, cellsToKey } from '../../src/core/polyomino/transform';
 
 const byId = (id: string) => HEX_PATTERN_BLOCKS.find((s) => s.id === id)!;
 

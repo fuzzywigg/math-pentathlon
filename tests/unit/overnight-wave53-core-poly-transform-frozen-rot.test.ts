@@ -3,7 +3,8 @@
  * canRotate is false. Distinct from wave52 absolute-flip-flag diverge. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { getTransformedCells, TETROMINOES } from '../../src/core/polyomino';
+import { getTransformedCells } from '../../src/core/polyomino/transform';
+import { TETROMINOES } from '../../src/core/polyomino/types';
 
 describe('Wave 53 core poly — transform ignores frozen rotation', () => {
   it('O-tetromino 0 and 90 share cells; frozen I 90 matches 0', () => {

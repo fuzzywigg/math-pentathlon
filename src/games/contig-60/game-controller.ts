@@ -14,6 +14,7 @@ import {
 import type { AIDifficulty } from './ai';
 import { getAIPlacement } from './ai';
 import { tutorialManager } from '../../core/tutorial';
+import { clearElement } from '../../core/dom-security';
 import { contig60Tutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
@@ -21,10 +22,16 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, vsAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -38,6 +45,29 @@ let statusContainer: HTMLElement | null = null;
 let vsAI = false;
 let aiPlayer: Player = 'player2';
 let aiDifficulty: AIDifficulty = 'medium';
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 function isComputerTurn(): boolean {
   return vsAI && gameState.currentPlayer === aiPlayer;
@@ -48,7 +78,9 @@ function isComputerTurn(): boolean {
 // =============================================================================
 
 function updateUI(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   const previousFocus = captureFocusedCell(boardContainer);
   boardContainer.innerHTML = '';
@@ -116,7 +148,9 @@ function formatEndBanner(winner: ContigWinner | null): string {
 }
 
 function updateStatus(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   markStatusLive(statusContainer);
 
   if (gameState.phase === 'gameOver') {
@@ -169,10 +203,14 @@ function updateStatus(): void {
 // =============================================================================
 
 function handleRollDice(fromAI: boolean | Event = false): void {
-  if (gameState.phase !== 'rolling') return;
+  if (gameState.phase !== 'rolling') {
+    return;
+  }
   // Block human UI clicks during the AI seat; AI schedules rolls with true.
   // (Click handlers pass an Event as the first arg — only `true` is AI.)
-  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (fromAI !== true && vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.contig-roll-btn' });
@@ -191,13 +229,17 @@ function handleRollDice(fromAI: boolean | Event = false): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(makeAIMove, 1000);
+    scheduleAI(makeAIMove, 1000);
   }
 }
 
 function handleSelectPlacement(value: number, expression: string): void {
-  if (gameState.phase !== 'calculating') return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (gameState.phase !== 'calculating') {
+    return;
+  }
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   gameState = placeChip(gameState, value, expression);
   updateUI();
@@ -208,13 +250,17 @@ function handleSelectPlacement(value: number, expression: string): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), 500);
   }
 }
 
 function handleCellClick(value: number): void {
-  if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (gameState.phase !== 'calculating' || !gameState.currentDice) {
+    return;
+  }
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   // Find the expression for this value
   const placements = getValidPlacements(gameState, gameState.currentDice);
@@ -226,9 +272,13 @@ function handleCellClick(value: number): void {
 }
 
 function handlePass(): void {
-  if (gameState.phase !== 'calculating') return;
+  if (gameState.phase !== 'calculating') {
+    return;
+  }
   // Block human Pass Turn during the AI seat (mirrors place/roll guards).
-  if (vsAI && gameState.currentPlayer === aiPlayer) return;
+  if (vsAI && gameState.currentPlayer === aiPlayer) {
+    return;
+  }
 
   gameState = passTurn(gameState);
   updateUI();
@@ -239,7 +289,7 @@ function handlePass(): void {
     gameState.phase !== 'gameOver' &&
     gameState.currentPlayer === aiPlayer
   ) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), 500);
   }
 }
 
@@ -251,7 +301,9 @@ function makeAIMove(): void {
   if (gameState.phase === 'gameOver' || gameState.currentPlayer !== aiPlayer) {
     return;
   }
-  if (gameState.phase !== 'calculating' || !gameState.currentDice) return;
+  if (gameState.phase !== 'calculating' || !gameState.currentDice) {
+    return;
+  }
 
   // Use AI module to get the best placement
   const placement = getAIPlacement(gameState, aiPlayer, aiDifficulty);
@@ -265,7 +317,7 @@ function makeAIMove(): void {
       gameState.phase !== 'gameOver' &&
       gameState.currentPlayer === aiPlayer
     ) {
-      setTimeout(() => handleRollDice(true), 500);
+      scheduleAI(() => handleRollDice(true), 500);
     }
     return;
   }
@@ -275,7 +327,7 @@ function makeAIMove(): void {
 
   // Continue if AI's turn
   if (gameState.phase !== 'gameOver' && gameState.currentPlayer === aiPlayer) {
-    setTimeout(() => handleRollDice(true), 500);
+    scheduleAI(() => handleRollDice(true), 500);
   }
 }
 
@@ -288,6 +340,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
   statusContainer = statusEl;
 
   injectContigStyles();
+  aiGeneration += 1;
+  clearAiTimer();
   gameState = createInitialState();
   vsAI = false;
   syncOpponentChrome();
@@ -296,6 +350,8 @@ export function initGame(boardEl: HTMLElement, statusEl: HTMLElement): void {
 }
 
 export function newGameVsHuman(): void {
+  aiGeneration += 1;
+  clearAiTimer();
   vsAI = false;
   syncOpponentChrome();
   gameState = createInitialState();
@@ -303,6 +359,8 @@ export function newGameVsHuman(): void {
 }
 
 export function newGameVsAI(difficulty: AIDifficulty = 'medium'): void {
+  aiGeneration += 1;
+  clearAiTimer();
   vsAI = true;
   syncOpponentChrome();
   aiPlayer = 'player2';
@@ -336,7 +394,16 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook (alpha lacked destroyGame; required by tip mounts / #501). */
+/** Cancel pending AI timers and clear mounts (route change / remount). */
 export function destroyGame(): void {
-  // Minimal stub after alpha controller restore.
+  aiGeneration += 1;
+  clearAiTimer();
+  if (boardContainer) {
+    clearElement(boardContainer);
+  }
+  if (statusContainer) {
+    clearElement(statusContainer);
+  }
+  boardContainer = null;
+  statusContainer = null;
 }

@@ -5,12 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTargetChallenge,
-  solveTargetChallenge,
-  validateSolution,
-  COUNTDOWN_CHALLENGES,
-} from '../../src/core/expressions';
+import { createTargetChallenge, COUNTDOWN_CHALLENGES } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-countdown — partial-use solves', () => {
   it('finds exact with subset of numbers when useAllNumbers=false', () => {

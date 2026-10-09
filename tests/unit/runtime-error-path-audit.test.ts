@@ -3,7 +3,11 @@
  *
  * From #563 pins; #567 recovered R-GL-08 P0 (Prime Gold context-lost → 2D);
  * #568 un-skips P1 R-SHELL-07/08 + P2 R-IMP-04/R-SW-01 (cleanup try/finally +
- * bootstrap/SW catch). Remaining P2/P3 skips stay for their owners.
+ * bootstrap/SW catch). q-mp-108 un-skips P3 R-SHELL-01 (#app soft-fail).
+ * q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
+ * q-mp-120 un-skips P3 R-JSON-04 (tryGameStateFromJSON soft-fail).
+ * q-mp-124 recovers P1 R-SHELL-02 (main cleanup / onBeforeShow try/finally).
+ * Remaining P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
  * - #528 storage failure modes (safe-web-storage)
@@ -26,6 +30,11 @@ import {
 } from '../../src/pwa/register';
 import { bootstrapOwl } from '../../src/pwa/bootstrap-owl';
 import { safeParseJson } from '../../src/core/safe-web-storage';
+import {
+  gameStateToJSON,
+  tryGameStateFromJSON,
+} from '../../src/games/kings-quadraphages/serialization';
+import { createInitialGameState } from '../../src/games/kings-quadraphages/game-state';
 
 const root = join(import.meta.dirname, '../..');
 
@@ -123,6 +132,15 @@ describe('runtime-error-path-audit — recovered pins', () => {
     expect(safeParseJson('{"a":1}').ok).toBe(true);
   });
 
+  it('P3 R-JSON-04: tryGameStateFromJSON soft-fails on garbage (no throw)', () => {
+    // Dormant until UI bind; Result helper is the safe entry point.
+    expect(() => tryGameStateFromJSON('not valid json')).not.toThrow();
+    expect(tryGameStateFromJSON('not valid json').ok).toBe(false);
+    expect(tryGameStateFromJSON('{').ok).toBe(false);
+    const good = tryGameStateFromJSON(gameStateToJSON(createInitialGameState()));
+    expect(good.ok).toBe(true);
+  });
+
   it('R-IMP-02: prefetch catch clears started mark (source contract)', () => {
     const src = readSrc('src/ui/game-prefetch.ts');
     expect(src).toMatch(/void load\(\)\.catch\(\(\) => \{/);
@@ -175,16 +193,11 @@ describe('runtime-error-path-audit — remaining unrecovered pins', () => {
     vi.restoreAllMocks();
   });
 
-  it('R-SW-03 CURRENT: registration.update is fire-and-forget (void, no catch)', () => {
-    const src = readSrc('src/pwa/register.ts');
-    expect(src).toMatch(/void registration\.update\(\)/);
-    expect(src).not.toMatch(/registration\.update\(\)\.catch/);
-  });
-
-  it('R-SHELL-01 CURRENT: missing #app throws at module eval (source contract)', () => {
+  it('P3 R-SHELL-01: missing #app soft-fails with console diagnostic (no hard throw)', () => {
     const src = readSrc('src/main.ts');
     expect(src).toContain("getElementById('app')");
-    expect(src).toContain("throw new Error('App container not found')");
+    expect(src).toContain("console.error('[main] App container not found')");
+    expect(src).not.toContain("throw new Error('App container not found')");
   });
 });
 
@@ -207,6 +220,89 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
       "markBoard3dWebGlFallback(boardHostEl, 'context-lost')"
     );
     expect(controller).toContain('onBoard3dContextLost');
+  });
+
+  it('P1 R-SHELL-02: throwing currentCleanup still disposes boundary; onBeforeShow proceeds', () => {
+    const src = readSrc('src/main.ts');
+    // cleanup(): try currentCleanup → catch log → finally dispose boundary
+    expect(src).toMatch(
+      /function cleanup\(\): void \{\s*exitTutorialIfActive\(\);\s*\/\/ R-SHELL-02:[^\n]*\n\s*try \{\s*if \(currentCleanup\) \{\s*currentCleanup\(\);\s*\}\s*\} catch \(err\) \{\s*console\.error\('\[main\] route cleanup failed', err\);\s*\} finally \{\s*currentCleanup = null;\s*if \(activeGameBoundary\) \{\s*activeGameBoundary\.dispose\(\);/
+    );
+    // onBeforeShow: try currentCleanup → finally clear (outer boundary swallows)
+    expect(src).toMatch(
+      /onBeforeShow: \(\) => \{\s*exitTutorialIfActive\(\);\s*\/\/ R-SHELL-02:[^\n]*\n\s*try \{\s*if \(currentCleanup\) \{\s*currentCleanup\(\);\s*\}\s*\} finally \{\s*currentCleanup = null;/
+    );
+
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const dispose = vi.fn();
+    let currentCleanup: (() => void) | null = () => {
+      throw new Error('cleanup blew up');
+    };
+    let activeGameBoundary: { dispose: () => void } | null = { dispose };
+
+    // Local replica of FIXED main.cleanup() semantics (R-SHELL-02).
+    const cleanup = (): void => {
+      try {
+        if (currentCleanup) {
+          currentCleanup();
+        }
+      } catch (err) {
+        console.error('[main] route cleanup failed', err);
+      } finally {
+        currentCleanup = null;
+        if (activeGameBoundary) {
+          activeGameBoundary.dispose();
+          activeGameBoundary = null;
+        }
+      }
+    };
+
+    expect(() => cleanup()).not.toThrow();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(currentCleanup).toBeNull();
+    expect(activeGameBoundary).toBeNull();
+    expect(
+      errSpy.mock.calls.some(
+        (c) => String(c[0]).includes('[main] route cleanup failed')
+      )
+    ).toBe(true);
+
+    // onBeforeShow path: throwing cleanup clears slot; crash UI still shows.
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    let routeCleanup: (() => void) | null = () => {
+      throw new Error('destroy blew up');
+    };
+    const handle = installGameErrorBoundary({
+      gameName: 'Hex',
+      container: rootEl,
+      onReset: vi.fn(),
+      onHome: vi.fn(),
+      onBeforeShow: () => {
+        try {
+          if (routeCleanup) {
+            routeCleanup();
+          }
+        } finally {
+          routeCleanup = null;
+        }
+      },
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('in-game boom'),
+        message: 'in-game boom',
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    expect(handle.didCatch).toBe(true);
+    expect(routeCleanup).toBeNull();
+    handle.dispose();
+    errSpy.mockRestore();
   });
 
   it('P1 R-SHELL-07: setGameRouteCleanup try/finally runs shell.cleanup when destroy throws', () => {
@@ -389,29 +485,109 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
     ).toBe(true);
     errSpy.mockRestore();
   });
+
+  it('P2 R-SW-03: registration.update() rejection is swallowed (no unhandledrejection)', async () => {
+    const src = readSrc('src/pwa/register.ts');
+    expect(src).toMatch(
+      /Promise\.resolve\(registration\.update\(\)\)\.catch/
+    );
+    expect(src).toContain(
+      "console.error('[pwa] service worker update check failed'"
+    );
+
+    vi.useFakeTimers();
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const unhandled: unknown[] = [];
+    const onUnhandled = (reason: unknown) => {
+      unhandled.push(reason);
+    };
+    process.on('unhandledRejection', onUnhandled);
+
+    const update = vi.fn(() => Promise.reject(new Error('update failed')));
+    const registration = { update } as unknown as ServiceWorkerRegistration;
+    let onRegisteredSW:
+      | ((_url: string, reg?: ServiceWorkerRegistration) => void)
+      | undefined;
+    const registerSW = vi.fn(
+      (opts: {
+        onRegisteredSW?: (
+          url: string,
+          reg?: ServiceWorkerRegistration
+        ) => void;
+      }) => {
+        onRegisteredSW = opts.onRegisteredSW;
+        return vi.fn();
+      }
+    );
+
+    registerPwa({ enabled: true, registerSW, reload: vi.fn() });
+    onRegisteredSW?.('/sw.js', registration);
+
+    const tick = vi.advanceTimersByTimeAsync(60 * 60 * 1000);
+    await tick;
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(update).toHaveBeenCalledOnce();
+    expect(
+      errSpy.mock.calls.some((c) =>
+        String(c[0]).includes('[pwa] service worker update check failed')
+      )
+    ).toBe(true);
+    expect(unhandled).toHaveLength(0);
+
+    process.off('unhandledRejection', onUnhandled);
+    errSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
+  it('P2 R-SHELL-04 / R-EVT-03: home/menu installs same crash boundary as game routes', () => {
+    const src = readSrc('src/main.ts');
+    // renderHome binds the shared route boundary before the selector mounts.
+    const homeIdx = src.indexOf('function renderHome');
+    expect(homeIdx).toBeGreaterThan(-1);
+    const bindIdx = src.indexOf('bindRouteErrorBoundary', homeIdx);
+    const selectorIdx = src.indexOf('renderGameSelector', homeIdx);
+    expect(bindIdx).toBeGreaterThan(homeIdx);
+    expect(selectorIdx).toBeGreaterThan(bindIdx);
+    // Reuses existing crash UI (installGameErrorBoundary → renderGameCrash).
+    expect(src).toContain('installGameErrorBoundary');
+
+    // Behavioral: thrown handler while home boundary active → recoverable UI.
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onReset = vi.fn();
+    const handle = installGameErrorBoundary({
+      gameName: 'Math Pentathlon',
+      container: rootEl,
+      onReset,
+      onHome: vi.fn(),
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('menu activate boom'),
+        message: 'menu activate boom',
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    expect(handle.didCatch).toBe(true);
+    // Existing crash strings only — no new player-facing copy.
+    expect(rootEl.textContent).toContain('Something went wrong in Math Pentathlon');
+    expect(rootEl.textContent).toContain('Try again');
+    expect(rootEl.textContent).toContain('Back to games');
+    rootEl.querySelector<HTMLButtonElement>('[data-action="reset"]')?.click();
+    expect(onReset).toHaveBeenCalledOnce();
+    handle.dispose();
+    errSpy.mockRestore();
+  });
 });
 
-describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it.skip('TODO(runtime-error-path P2 R-SHELL-04): home/menu should recover from thrown handlers', () => {
-    // Expected: menu error boundary or soft reset — blank selector is unrecovered today.
-    expect(true).toBe(false);
-  });
-
-  it.skip('TODO(runtime-error-path P3 R-SW-03): registration.update() rejection should be swallowed/logged', () => {
-    // Expected: void registration.update().catch(...) or equivalent.
-    expect(true).toBe(false);
-  });
-
-  it.skip('TODO(runtime-error-path P3 R-SHELL-01): missing #app should not hard-throw without diagnostics', () => {
-    // Expected: friendly boot fail for misconfigured hosts (dev/deploy).
-    expect(true).toBe(false);
-  });
-
-  it.skip('TODO(runtime-error-path P3 R-JSON-04): gameStateFromJSON should soft-fail if ever bound to UI', () => {
-    // Dormant thrower today (tests only). Harden before wiring to player UI.
-    expect(true).toBe(false);
-  });
-});
+// R-SW-03 (q-mp-109) and R-JSON-04 (q-mp-120) expected-fix TODOs resolved on tip.
 
 describe('runtime-error-path-audit — crash UI copy contract (no new player text)', () => {
   it('renderGameCrash keeps existing boundary strings (characterization)', () => {

@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  getPlacementCells,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, getPlacementCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 39 poly — grid ignores rot args', () => {
   it('Grid overload stores rotation:0 flipped:false even if Board args differ', () => {

@@ -45,7 +45,7 @@ import {
   offsetToAxial,
   rotateLeft,
   rotateRight,
-} from '../../src/core/hex/coordinates';
+} from '../helpers/core-hex/coordinates';
 import {
   checkEquation,
   evaluate,

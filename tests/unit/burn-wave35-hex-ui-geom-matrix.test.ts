@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getHexCorners,
-  hexPath,
-  getHexTriangles,
-} from '../../src/core/hex';
+import { getHexCorners, hexPath, getHexTriangles } from '../helpers/core-hex/hex-ui';
 
 describe('Wave 35 hex-ui-geom — corners matrix', () => {
   it.each([5, 10, 16, 20, 32])('pointy size %i: all corners on circle', (size) => {

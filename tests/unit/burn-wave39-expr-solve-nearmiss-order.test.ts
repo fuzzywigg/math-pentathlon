@@ -4,10 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  solveTargetChallenge,
-  createTargetChallenge,
-} from '../../src/core/expressions';
+import { solveTargetChallenge } from '../../src/core/expressions/evaluator';
+import { createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('Wave 39 expr — solve near-miss order', () => {
   it('empty operators yields no solutions', () => {

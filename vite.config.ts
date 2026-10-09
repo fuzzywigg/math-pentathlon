@@ -15,8 +15,9 @@ import { securityHeadersPlugin } from './vite.security-headers';
  * landing/menu does not download every game. Per-game help/mounts live in
  * game-route-mounts (lazy). Play CSS is dynamic-imported on /game/:id.
  * manualChunks emit stable per-game / shell-core / deferred-core / ui /
- * game-routes / game-shell / three files. Three.js stays under dist/vendor/
- * so the CI dist/assets 250 kB budget applies to always-loaded app chunks.
+ * game-routes / game-shell / shared-mp3d (tablet-gl + load-three) / three.
+ * Per-game board-3d modules stay unnamed (async). Three.js stays under
+ * dist/vendor/ so the CI dist/assets 250 kB budget applies to app chunks.
  *
  * Offline: Workbox precaches the full build (shell + every game/3D chunk) so
  * after one online visit any game works in airplane mode. Updates use
@@ -200,6 +201,9 @@ export default defineConfig({
   plugins,
   build: {
     sourcemap: false,
+    // three.js vendor chunk is intentionally ~750 kB (single known large dep).
+    // Raise the Rollup default (500) so the expected vendor size is not a warn.
+    chunkSizeWarningLimit: 800,
     // Menu entry should only preload shell deps (core/ui), not games or 3D.
     modulePreload: {
       resolveDependencies(filename, deps) {

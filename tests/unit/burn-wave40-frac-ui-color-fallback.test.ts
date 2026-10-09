@@ -4,15 +4,9 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  createFraction,
-  FRACTION_COLORS,
-  getFractionColor,
-  renderHorizontalBar,
-  renderCircleBar,
-  renderFractionBar,
-  injectFractionBarStyles,
-} from '../../src/core/fractions';
+import { createFraction } from '../../src/core/fractions/arithmetic';
+import { FRACTION_COLORS } from '../../src/core/fractions/types';
+import { getFractionColor, renderHorizontalBar, renderCircleBar, renderFractionBar, injectFractionBarStyles } from '../../src/core/fractions/fraction-bar-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

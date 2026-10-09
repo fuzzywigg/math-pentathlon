@@ -4,12 +4,8 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  PENTOMINOES,
-  renderPolyomino,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES, TETROMINOES, PENTOMINOES } from '../../src/core/polyomino/types';
+import { renderPolyomino } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

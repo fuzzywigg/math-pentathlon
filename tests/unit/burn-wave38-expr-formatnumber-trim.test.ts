@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { formatNumber, astToString, parse, tokenize } from '../../src/core/expressions';
+import { formatNumber, astToString, parse, tokenize } from '../../src/core/expressions/evaluator';
 
 describe('Wave 38 expr-format — trim / ast', () => {
   it('trims trailing zeros and bare decimal point', () => {

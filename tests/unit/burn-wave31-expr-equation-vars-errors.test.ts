@@ -5,11 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  parseEquation,
-  checkEquation,
-  evaluateEquation,
-} from '../../src/core/expressions';
+import { parseEquation, checkEquation, evaluateEquation } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-equation — variables', () => {
   it('solves true/false depending on map values', () => {

@@ -4,7 +4,9 @@
  */
 
 export function isBrowserOffline(): boolean {
-  if (typeof navigator === 'undefined') return false;
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
   return navigator.onLine === false;
 }
 

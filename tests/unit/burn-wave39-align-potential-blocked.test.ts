@@ -4,10 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  countAlignmentPotential,
-  DIRECTIONS,
-} from '../../src/core/alignment';
+import { countAlignmentPotential } from '../../src/core/alignment/grid-alignment';
+import { DIRECTIONS } from '../../src/core/alignment/types';
 
 describe('Wave 39 align — potential blocked', () => {
   it('opponent on both arms marks blocked', () => {

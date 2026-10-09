@@ -37,7 +37,7 @@ export const LEGAL_SAMPLE_CAP = 8;
 
 export type Seat = 'player1' | 'player2';
 
-export function extractSeat(state: unknown): Seat | null {
+function extractSeat(state: unknown): Seat | null {
   if (typeof state !== 'object' || state === null) return null;
   const seat = (state as { currentPlayer?: unknown }).currentPlayer;
   if (seat === 'player1' || seat === 'player2') return seat;

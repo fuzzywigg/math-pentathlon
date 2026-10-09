@@ -10,8 +10,8 @@ import {
   hexDistance,
   hexEquals,
   hexInArray,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight hex — neighbors / diagonals', () => {
   it('six edge neighbors are distance 1; diagonals are distance 2', () => {

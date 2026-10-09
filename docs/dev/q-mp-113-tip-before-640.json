@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-09T12:24:14.709Z",
+    "baseURL": "http://127.0.0.1:4173",
+    "moveTarget": 20,
+    "navCycles": 5,
+    "mode": "render",
+    "phase": "qmp113-tip-before-640",
+    "cpuThrottle": 4,
+    "fixedGames": [],
+    "fixNotes": []
+  },
+  "results": [
+    {
+      "gameId": "juggle",
+      "board3d": false,
+      "ttiMs": 321.60000000009313,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 107.70000000018626,
+        "p95Ms": 114.79999999981374,
+        "maxMs": 114.79999999981374,
+        "meanMs": 105.58499999998602,
+        "layoutReadsP95": 16,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 12,
+        "p50Ms": 37.39999999990687,
+        "p95Ms": 49.10000000009313,
+        "maxMs": 49.10000000009313,
+        "meanMs": 40.141666666720994,
+        "layoutReadsP95": 0,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    },
+    {
+      "gameId": "remainder-islands",
+      "board3d": false,
+      "ttiMs": 287.6999999997206,
+      "movesAttempted": 20,
+      "movesLanded": 20,
+      "longTasksOver50": 0,
+      "longTaskMaxMs": 0,
+      "error": null,
+      "move": {
+        "count": 20,
+        "p50Ms": 158.3000000002794,
+        "p95Ms": 168.5,
+        "maxMs": 168.5,
+        "meanMs": 156.0299999999348,
+        "layoutReadsP95": 199,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      },
+      "hover": {
+        "count": 0,
+        "p50Ms": null,
+        "p95Ms": null,
+        "maxMs": null,
+        "meanMs": null,
+        "layoutReadsP95": null,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
+      }
+    }
+  ],
+  "phases": {
+    "qmp113-tip-before-640": {
+      "meta": {
+        "generatedAt": "2026-10-09T12:24:14.709Z",
+        "baseURL": "http://127.0.0.1:4173",
+        "moveTarget": 20,
+        "navCycles": 5,
+        "mode": "render",
+        "phase": "qmp113-tip-before-640",
+        "cpuThrottle": 4,
+        "fixedGames": [],
+        "fixNotes": []
+      },
+      "results": [
+        {
+          "gameId": "juggle",
+          "board3d": false,
+          "ttiMs": 321.60000000009313,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 107.70000000018626,
+            "p95Ms": 114.79999999981374,
+            "maxMs": 114.79999999981374,
+            "meanMs": 105.58499999998602,
+            "layoutReadsP95": 16,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 12,
+            "p50Ms": 37.39999999990687,
+            "p95Ms": 49.10000000009313,
+            "maxMs": 49.10000000009313,
+            "meanMs": 40.141666666720994,
+            "layoutReadsP95": 0,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        },
+        {
+          "gameId": "remainder-islands",
+          "board3d": false,
+          "ttiMs": 287.6999999997206,
+          "movesAttempted": 20,
+          "movesLanded": 20,
+          "longTasksOver50": 0,
+          "longTaskMaxMs": 0,
+          "error": null,
+          "move": {
+            "count": 20,
+            "p50Ms": 158.3000000002794,
+            "p95Ms": 168.5,
+            "maxMs": 168.5,
+            "meanMs": 156.0299999999348,
+            "layoutReadsP95": 199,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        }
+      ]
+    }
+  }
+}

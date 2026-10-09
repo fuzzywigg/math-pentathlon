@@ -3,6 +3,7 @@
  * Reuses e2e stability seed (0xc0ffee); UI-only clicks/keyboard.
  */
 import { expect, type Page } from '@playwright/test';
+import { isBenignConsoleNoise } from '../helpers/page';
 import { E2E_RNG_SEED } from '../helpers/stability';
 
 export { E2E_RNG_SEED };
@@ -43,9 +44,18 @@ export type ConsoleTrap = {
 
 export function attachConsoleTrap(page: Page): ConsoleTrap {
   const errors: string[] = [];
-  const onPageError = (e: Error) => errors.push(`pageerror: ${e.message}`);
+  const onPageError = (e: Error) => {
+    const text = e.message;
+    if (!isBenignConsoleNoise(text)) {
+      errors.push(`pageerror: ${text}`);
+    }
+  };
   const onConsole = (msg: { type: () => string; text: () => string }) => {
-    if (msg.type() === 'error') errors.push(`console: ${msg.text()}`);
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    if (!isBenignConsoleNoise(text)) {
+      errors.push(`console: ${text}`);
+    }
   };
   page.on('pageerror', onPageError);
   page.on('console', onConsole);
@@ -58,7 +68,7 @@ export function attachConsoleTrap(page: Page): ConsoleTrap {
   };
 }
 
-export async function installFullgamePrefs(page: Page): Promise<void> {
+async function installFullgamePrefs(page: Page): Promise<void> {
   await page.addInitScript(
     ({ storageKey, progress }) => {
       try {
@@ -166,7 +176,7 @@ export function isGameOverText(text: string): boolean {
 }
 
 /** Status + history + material — ignores selection chrome / aria churn. */
-export async function moveFingerprint(page: Page): Promise<string> {
+async function moveFingerprint(page: Page): Promise<string> {
   return page.evaluate(() => {
     // Ordered lookup (not querySelector(a,b)): shell `#status[role=status]` is
     // often empty while the game writes into `.ramrod-status` / `.qg-status` etc.

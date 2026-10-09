@@ -4,14 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  PENTOMINOES,
-  getShapesBySize,
-  getPolyominoesByOrder,
-  getPolyominoById,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES, TETROMINOES, PENTOMINOES, getShapesBySize, getPolyominoesByOrder, getPolyominoById } from '../../src/core/polyomino/types';
 
 describe('Wave 38 poly-catalog — size / order edges', () => {
   it('order 0 and 99 return empty', () => {

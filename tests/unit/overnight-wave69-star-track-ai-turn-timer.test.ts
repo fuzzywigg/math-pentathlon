@@ -10,16 +10,13 @@ import {
   getGameState,
 } from '../../src/games/star-track/game-controller';
 
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
   document.body.innerHTML = '';
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 describe('Wave 69 star-track — AI turn timer', () => {
   it('after P1 chain pick, fake timers advance P2 through draw and select', () => {

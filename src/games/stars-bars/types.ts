@@ -81,10 +81,18 @@ export function countDifferences(
   card2: AttributeCard
 ): number {
   let diff = 0;
-  if (card1.shape !== card2.shape) diff++;
-  if (card1.color !== card2.color) diff++;
-  if (card1.size !== card2.size) diff++;
-  if (card1.thickness !== card2.thickness) diff++;
+  if (card1.shape !== card2.shape) {
+    diff++;
+  }
+  if (card1.color !== card2.color) {
+    diff++;
+  }
+  if (card1.size !== card2.size) {
+    diff++;
+  }
+  if (card1.thickness !== card2.thickness) {
+    diff++;
+  }
   return diff;
 }
 
@@ -96,9 +104,17 @@ export function getDifferenceDescription(
   card2: AttributeCard
 ): string {
   const diffs: string[] = [];
-  if (card1.shape !== card2.shape) diffs.push('shape');
-  if (card1.color !== card2.color) diffs.push('color');
-  if (card1.size !== card2.size) diffs.push('size');
-  if (card1.thickness !== card2.thickness) diffs.push('thickness');
+  if (card1.shape !== card2.shape) {
+    diffs.push('shape');
+  }
+  if (card1.color !== card2.color) {
+    diffs.push('color');
+  }
+  if (card1.size !== card2.size) {
+    diffs.push('size');
+  }
+  if (card1.thickness !== card2.thickness) {
+    diffs.push('thickness');
+  }
   return diffs.join(', ');
 }

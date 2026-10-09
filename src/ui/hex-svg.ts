@@ -1,7 +1,8 @@
 /**
  * Shared SVG hex geometry used by hex board UIs (pointy-top polygon / path).
  * Formulas match the inlined helpers in hex-a-gone / remainder / queens-guards
- * / hex board-ui (pointy-top starts at -30°), not core/hex's +30° start.
+ * / hex board-ui (pointy-top starts at -30°), not the test-only
+ * helpers/core-hex lattice (+30° start).
  */
 
 export type PixelPoint = { x: number; y: number };

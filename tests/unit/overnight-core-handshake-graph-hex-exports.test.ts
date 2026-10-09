@@ -1,13 +1,21 @@
 /**
- * Overnight TOKENMAXX — barrel exports smoke for graph + hex cores.
+ * Overnight TOKENMAXX — deep-import exports smoke for graph + hex cores.
  * Avoids dice/frac/fab/pinball. Tests-only. After #214/#215.
+ * (Former barrel imports rewritten for q-mp-104.)
  */
 import { describe, it, expect } from 'vitest';
-import * as graph from '../../src/core/graph';
-import * as hex from '../../src/core/hex';
+import * as graphTypes from '../../src/core/graph/types';
+import * as graphAlgos from '../../src/core/graph/algorithms';
+import * as graphUi from '../../src/core/graph/graph-ui';
+import * as hexTypes from '../helpers/core-hex/types';
+import * as hexCoords from '../helpers/core-hex/coordinates';
+import * as hexUi from '../helpers/core-hex/hex-ui';
+
+const graph = { ...graphTypes, ...graphAlgos, ...graphUi };
+const hex = { ...hexTypes, ...hexCoords, ...hexUi };
 
 describe('Overnight core handshake — graph/hex exports', () => {
-  it('graph barrel exposes algos, templates, and ui', () => {
+  it('graph modules expose algos, templates, and ui', () => {
     expect(typeof graph.bfs).toBe('function');
     expect(typeof graph.dijkstra).toBe('function');
     expect(typeof graph.createGridGraph).toBe('function');
@@ -16,7 +24,7 @@ describe('Overnight core handshake — graph/hex exports', () => {
     expect(graph.DEFAULT_GRAPH_CONFIG.nodeRadius).toBeGreaterThan(0);
   });
 
-  it('hex barrel exposes coords, types, and ui', () => {
+  it('hex modules expose coords, types, and ui', () => {
     expect(typeof hex.hexDistance).toBe('function');
     expect(typeof hex.hexRing).toBe('function');
     expect(typeof hex.createAxial).toBe('function');

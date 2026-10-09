@@ -400,7 +400,9 @@ export function createInteractiveFractionBar(
       // Highlight potential selection
       for (let j = 0; j <= i; j++) {
         const seg = segments[j];
-        if (seg) seg.style.opacity = '0.8';
+        if (seg) {
+          seg.style.opacity = '0.8';
+        }
       }
     });
 
@@ -538,8 +540,11 @@ export function renderFractionComparison(
   const aValue = toDecimal(a);
   const bValue = toDecimal(b);
   let symbol = '=';
-  if (aValue < bValue) symbol = '<';
-  else if (aValue > bValue) symbol = '>';
+  if (aValue < bValue) {
+    symbol = '<';
+  } else if (aValue > bValue) {
+    symbol = '>';
+  }
 
   const operator = document.createElement('span');
   operator.className = 'operator';

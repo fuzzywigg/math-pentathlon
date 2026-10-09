@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluateCompound } from '../../src/core/attributes';
-import type { AttributePiece, CompoundCondition } from '../../src/core/attributes';
+import { evaluateCompound } from '../../src/core/attributes/logic';
+import type { AttributePiece, CompoundCondition } from '../../src/core/attributes/types';
 
 describe('Wave 39 attr — compound nest / empty not', () => {
   const piece: AttributePiece = {

@@ -11,12 +11,9 @@ import {
   getGameState,
   getCurrentHint,
 } from '../../src/games/calla/game-controller';
-import {
-  createInitialState,
-  makeMove,
-  renderBoard,
-  renderStatus,
-} from '../../src/games/calla';
+import { createInitialState } from '../../src/games/calla/types';
+import { makeMove } from '../../src/games/calla/rules';
+import { renderBoard, renderStatus } from '../../src/games/calla/board-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

@@ -7,7 +7,7 @@ import {
   createInitialState,
   rollDice,
 } from '../../src/games/prime-gold/rules';
-import { rollDie, rollDice as coreRollDice } from '../../src/core/dice';
+import { rollDie, rollDice as coreRollDice } from '../../src/core/dice/roller';
 
 afterEach(() => vi.restoreAllMocks());
 

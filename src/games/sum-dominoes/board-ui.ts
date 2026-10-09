@@ -94,7 +94,11 @@ export function renderBoard(
       }
 
       // ratchet: board is always BOARD_SIZE × BOARD_SIZE dense.
-      const placed = state.board[row]![col];
+      const boardRow = state.board[row];
+      if (boardRow === undefined) {
+        continue;
+      }
+      const placed = boardRow[col];
 
       if (placed) {
         // Render domino
@@ -265,13 +269,15 @@ export function renderHand(
     Boolean(state.currentDice);
 
   for (const domino of hand) {
-    const isPlayable = canSelect
-      ? (() => {
-          const sum = getDiceSum(state.currentDice!);
-          const placements = getValidPlacements(state, domino, sum);
-          return placements.length > 0;
-        })()
-      : false;
+    const currentDice = state.currentDice;
+    const isPlayable =
+      canSelect && currentDice !== null
+        ? (() => {
+            const sum = getDiceSum(currentDice);
+            const placements = getValidPlacements(state, domino, sum);
+            return placements.length > 0;
+          })()
+        : false;
     const isSelected = state.selectedDomino === domino.id;
     const dominoEl = createHandDomino(domino, isSelected, isPlayable);
 
@@ -300,8 +306,12 @@ function createHandDomino(
   wrapper.setAttribute('role', 'listitem');
   wrapper.dataset.dominoId = domino.id;
 
-  if (isSelected) wrapper.classList.add('sd-hand-domino-selected');
-  if (isPlayable) wrapper.classList.add('sd-hand-domino-playable');
+  if (isSelected) {
+    wrapper.classList.add('sd-hand-domino-selected');
+  }
+  if (isPlayable) {
+    wrapper.classList.add('sd-hand-domino-playable');
+  }
 
   const label = `Domino ${domino.face1}-${domino.face2}${
     isPlayable ? ', playable' : ''

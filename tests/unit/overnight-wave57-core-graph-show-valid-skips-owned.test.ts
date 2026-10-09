@@ -3,12 +3,8 @@
  * Distinct from wave53 isolated / wave52 owner:0 free. Tests-only.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-import {
-  createTrackGraph,
-  renderGraph,
-  showValidMoves,
-  type GraphBoard,
-} from '../../src/core/graph';
+import { createTrackGraph, type GraphBoard } from '../../src/core/graph/types';
+import { renderGraph, showValidMoves } from '../../src/core/graph/graph-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

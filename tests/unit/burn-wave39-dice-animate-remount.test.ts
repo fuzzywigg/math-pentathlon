@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { animateRoll, renderRollResult, rollDice } from '../../src/core/dice';
+import { animateRoll, renderRollResult } from '../../src/core/dice/dice-ui';
+import { rollDice } from '../../src/core/dice/roller';
 
 beforeEach(() => {
   vi.spyOn(Math, 'random').mockReturnValue(0.42);

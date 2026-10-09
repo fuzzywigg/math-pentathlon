@@ -4,16 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  findComponents,
-  isConnected,
-  createTrackGraph,
-  createGridGraph,
-  createStarGraph,
-  type Graph,
-  type GraphNode,
-  type NodeId,
-} from '../../src/core/graph';
+import { findComponents, isConnected } from '../../src/core/graph/algorithms';
+import { createTrackGraph, createGridGraph, createStarGraph, type Graph, type GraphNode, type NodeId } from '../../src/core/graph/types';
 
 function node(id: NodeId): GraphNode {
   return { id, position: { x: 0, y: 0 } };

@@ -4,13 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  formatFraction,
-  parseFraction,
-  areEqual,
-  simplify,
-} from '../../src/core/fractions';
+import { createFraction, formatFraction, parseFraction, areEqual, simplify } from '../../src/core/fractions/arithmetic';
 
 const UNICODE: Array<{ n: number; d: number; glyph: string }> = [
   { n: 1, d: 2, glyph: '½' },

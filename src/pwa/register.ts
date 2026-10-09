@@ -65,14 +65,19 @@ export function registerPwa(
       },
       onRegisteredSW(_swUrl, registration) {
         // Periodic update check while the tab stays open (school Wi‑Fi flaps).
-        if (!registration) return;
+        if (!registration) {
+          return;
+        }
         if (updateCheckInterval !== null) {
           clearInterval(updateCheckInterval);
           updateCheckInterval = null;
         }
         const hourMs = 60 * 60 * 1000;
         updateCheckInterval = window.setInterval(() => {
-          void registration.update();
+          // Soft-fail: update() rejection must not surface as unhandledrejection.
+          void Promise.resolve(registration.update()).catch((err: unknown) => {
+            console.error('[pwa] service worker update check failed', err);
+          });
         }, hourMs);
       },
     });
@@ -86,7 +91,9 @@ export function registerPwa(
 }
 
 function scheduleReload(reload: () => void): void {
-  if (reloadScheduled) return;
+  if (reloadScheduled) {
+    return;
+  }
   reloadScheduled = true;
 
   const doReload = () => {

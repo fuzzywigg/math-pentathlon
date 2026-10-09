@@ -390,6 +390,8 @@ function setupShapeSetSelector(): void {
         case 'pattern':
           currentShapeSet = HEX_PATTERN_BLOCKS;
           break;
+        default:
+          break;
       }
 
       selectedShape = null;
@@ -404,7 +406,9 @@ function setupShapeSetSelector(): void {
 
 function renderShapeGallery(): void {
   const gallery = document.getElementById('shape-gallery');
-  if (!gallery) return;
+  if (!gallery) {
+    return;
+  }
 
   clearElement(gallery);
 
@@ -544,7 +548,9 @@ function updateSelectedShapeDisplay(): void {
 
 function updateShapeInfo(): void {
   const infoContainer = document.getElementById('shape-info');
-  if (!infoContainer) return;
+  if (!infoContainer) {
+    return;
+  }
 
   if (!selectedShape) {
     // trusted constant markup
@@ -586,7 +592,9 @@ function renderBoardSection(): void {
   const clearBtn = document.getElementById('clear-board-btn');
   const undoBtn = document.getElementById('undo-btn');
 
-  if (!boardContainer) return;
+  if (!boardContainer) {
+    return;
+  }
 
   const container = boardContainer; // Capture for nested functions
 
@@ -629,7 +637,9 @@ function renderBoardSection(): void {
       existingPreview.remove();
     }
 
-    if (!hoverCell || !selectedShape) return;
+    if (!hoverCell || !selectedShape) {
+      return;
+    }
 
     const validation = validatePlacement(
       board,
@@ -683,7 +693,9 @@ function renderBoardSection(): void {
   }
 
   function handleBoardClick(cell: Cell): void {
-    if (!selectedShape) return;
+    if (!selectedShape) {
+      return;
+    }
 
     const validation = validatePlacement(
       board,
@@ -726,7 +738,9 @@ function renderBoardSection(): void {
 
 function updateValidPositions(): void {
   const positionsInfo = document.getElementById('valid-positions');
-  if (!positionsInfo) return;
+  if (!positionsInfo) {
+    return;
+  }
 
   if (!selectedShape) {
     positionsInfo.textContent = '';

@@ -6,15 +6,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  areCellsConnected,
-  isAdjacent,
-  getCenterOfMass,
-  TETROMINOES,
-  PENTOMINOES,
-  getPolyominoesByOrder,
-  type Cell,
-} from '../../src/core/polyomino';
+import { areCellsConnected, isAdjacent, getCenterOfMass } from '../../src/core/polyomino/transform';
+import { TETROMINOES, PENTOMINOES, getPolyominoesByOrder, type Cell } from '../../src/core/polyomino/types';
 
 const key = (c: Cell) => `${c.row},${c.col}`;
 

@@ -4,16 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  HEX_PATTERN_BLOCKS,
-  PENTOMINOES,
-  createBoard,
-  placePolyomino,
-  validatePlacement,
-  canPlaceShape,
-  countEmptyCells,
-  findValidPlacements,
-} from '../../src/core/polyomino';
+import { HEX_PATTERN_BLOCKS, PENTOMINOES } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino, validatePlacement, canPlaceShape, countEmptyCells, findValidPlacements } from '../../src/core/polyomino/placement';
 
 describe('Wave 38 poly-hex — pattern blocks place on open boards', () => {
   it('every hex pattern block places at origin on 6×6', () => {

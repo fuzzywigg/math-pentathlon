@@ -4,12 +4,9 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  renderHexGrid,
-  renderRectHexGrid,
-  hexesInRange,
-  type HexLayout,
-} from '../../src/core/hex';
+import { renderHexGrid, renderRectHexGrid } from '../helpers/core-hex/hex-ui';
+import { hexesInRange } from '../helpers/core-hex/coordinates';
+import type { HexLayout } from '../helpers/core-hex/types';
 
 const pointy: HexLayout = {
   orientation: 'pointy',

@@ -4,13 +4,10 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createAxial,
-  hexesInRange,
-  hexDistance,
-} from '../../src/core/hex';
+import { createAxial } from '../helpers/core-hex/types';
+import { hexesInRange, hexDistance } from '../helpers/core-hex/coordinates';
 import { createArrayGetter } from '../../src/core/alignment/grid-alignment';
-import { areCoprime } from '../../src/core/attributes';
+import { areCoprime } from '../../src/core/attributes/logic';
 
 describe('Wave 40 handshake — hex → align → attr', () => {
   it('range size feeds getter board size; distance pairs may be coprime', () => {

@@ -68,10 +68,12 @@ export function renderFractionBarPool(
   const barsByDenom = new Map<number, FractionBar[]>();
   for (const bar of state.fractionBars.values()) {
     const denom = bar.fraction.denominator;
-    if (!barsByDenom.has(denom)) {
-      barsByDenom.set(denom, []);
+    let denomBars = barsByDenom.get(denom);
+    if (denomBars === undefined) {
+      denomBars = [];
+      barsByDenom.set(denom, denomBars);
     }
-    barsByDenom.get(denom)!.push(bar);
+    denomBars.push(bar);
   }
 
   // Sort denominators
@@ -79,7 +81,10 @@ export function renderFractionBarPool(
 
   let rowIndex = 0;
   for (const denom of denoms) {
-    const bars = barsByDenom.get(denom)!;
+    const bars = barsByDenom.get(denom);
+    if (bars === undefined) {
+      continue;
+    }
     // Sort by numerator
     bars.sort((a, b) => a.fraction.numerator - b.fraction.numerator);
 
@@ -137,9 +142,15 @@ function createFractionBarElement(
       (state.phase === 'selectingBar2' && state.selectedBar1 !== bar.id));
 
   // Apply classes
-  if (isSelected) wrapper.classList.add('fab-bar-selected');
-  if (isUsed) wrapper.classList.add('fab-bar-used');
-  if (!isSelectable) wrapper.classList.add('fab-bar-disabled');
+  if (isSelected) {
+    wrapper.classList.add('fab-bar-selected');
+  }
+  if (isUsed) {
+    wrapper.classList.add('fab-bar-used');
+  }
+  if (!isSelectable) {
+    wrapper.classList.add('fab-bar-disabled');
+  }
 
   // Create visual bar
   const svg = renderHorizontalBar(bar.fraction, {
@@ -343,7 +354,9 @@ export function renderOperationSelector(
 
   const bar1 = state.fractionBars.get(state.selectedBar1);
   const bar2 = state.fractionBars.get(state.selectedBar2);
-  if (!bar1 || !bar2) return container;
+  if (!bar1 || !bar2) {
+    return container;
+  }
 
   // Show selected fractions
   const preview = document.createElement('div');
@@ -462,7 +475,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
     const bar2 = state.fractionBars.get(move.bar2Id);
     const answer = state.answerBars.get(move.resultId);
 
-    if (!bar1 || !bar2 || !answer) continue;
+    if (!bar1 || !bar2 || !answer) {
+      continue;
+    }
 
     const moveEl = document.createElement('div');
     moveEl.className = `fab-history-move fab-history-${move.player}`;
@@ -906,6 +921,17 @@ export function injectFabStyles(): void {
       .fab-btn:hover {
         transform: none;
       }
+    }
+
+    html[data-reduced-motion='true'] .fab-answer-matchable,
+    html[data-reduced-motion='true'] .fab-winner-banner {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .fab-bar-wrapper:not(.fab-bar-disabled):hover,
+    html[data-reduced-motion='true'] .fab-answer-wrapper:hover,
+    html[data-reduced-motion='true'] .fab-op-btn:hover:not(:disabled),
+    html[data-reduced-motion='true'] .fab-btn:hover {
+      transform: none;
     }
   `
   );

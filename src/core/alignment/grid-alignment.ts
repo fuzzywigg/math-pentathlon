@@ -320,7 +320,9 @@ export function findAlignmentFromCenter(
   if (positions.length >= targetLength) {
     // Sort positions for consistent ordering
     positions.sort((a, b) => {
-      if (a.row !== b.row) return a.row - b.row;
+      if (a.row !== b.row) {
+        return a.row - b.row;
+      }
       return a.col - b.col;
     });
 

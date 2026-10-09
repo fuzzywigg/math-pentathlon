@@ -5,16 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  hexRing,
-  hexSpiral,
-  hexDistance,
-  hexesInRange,
-  createAxial,
-  hexEquals,
-  hexInArray,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { hexRing, hexSpiral, hexDistance, hexesInRange, hexEquals, hexInArray } from '../helpers/core-hex/coordinates';
+import { createAxial, type AxialCoord } from '../helpers/core-hex/types';
 
 function key(h: AxialCoord): string {
   return `${h.q},${h.r}`;

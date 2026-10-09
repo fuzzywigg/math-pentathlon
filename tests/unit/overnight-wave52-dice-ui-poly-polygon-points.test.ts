@@ -3,7 +3,8 @@
  * Wave39 catalog checked class + text only. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { renderDie, type DieRoll, type DiceType } from '../../src/core/dice';
+import { renderDie } from '../../src/core/dice/dice-ui';
+import type { DieRoll, DiceType } from '../../src/core/dice/types';
 
 function die(type: DiceType, value: number): DieRoll {
   return {

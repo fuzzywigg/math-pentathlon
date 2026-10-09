@@ -19,6 +19,7 @@ import {
   getPlayerName,
 } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
+import { clearElement } from '../../core/dom-security';
 import { sumDominoesTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import {
@@ -26,10 +27,16 @@ import {
   restoreGridFocus,
   markStatusLive,
 } from '../../ui/board-a11y';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAI ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -59,6 +66,29 @@ export interface SDGameController {
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
+/** Invalidates nested AI setTimeouts after route leave / new game. */
+let aiGeneration = 0;
+/** Single pending AI timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 /**
  * Initialize the game
@@ -83,6 +113,8 @@ export function initGame(
 
   controller.update = () => updateUI(controller);
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+    aiGeneration += 1;
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -101,6 +133,11 @@ export function initGame(
  * Update the UI
  */
 function updateUI(controller: SDGameController): void {
+  // Drop paints after destroyGame nulled the mount ref (remount safety).
+  if (!activeContainer || controller.container !== activeContainer) {
+    return;
+  }
+
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
   const computerTurn = isComputerTurnPending(controller);
@@ -219,7 +256,7 @@ function updateUI(controller: SDGameController): void {
 
   // AI turn
   if (computerTurn) {
-    setTimeout(() => makeAIMove(controller), 800);
+    scheduleAI(() => makeAIMove(controller), 800);
   }
 }
 
@@ -227,7 +264,9 @@ function updateUI(controller: SDGameController): void {
  * Handle dice roll
  */
 function handleRoll(controller: SDGameController): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
 
   if (tutorialManager.getIsActive()) {
     tutorialManager.handleAction('click', { selector: '.sd-roll-btn' });
@@ -248,7 +287,9 @@ function handleDominoClick(
   controller: SDGameController,
   dominoId: string
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = selectDomino(controller.state, dominoId);
   controller.update();
 }
@@ -261,7 +302,9 @@ function handleCellClick(
   position: BoardPosition,
   orientation: 'horizontal' | 'vertical'
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = placeDomino(controller.state, position, orientation);
   controller.update();
 }
@@ -270,7 +313,9 @@ function handleCellClick(
  * Handle pass
  */
 function handlePass(controller: SDGameController): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = passTurn(controller.state);
   controller.update();
 }
@@ -285,13 +330,15 @@ function handlePass(controller: SDGameController): void {
 function makeAIMove(controller: SDGameController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.winner || !aiPlayer) return;
+  if (state.winner || !aiPlayer) {
+    return;
+  }
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
     controller.state = doRollDice(state);
     controller.update();
-    setTimeout(() => makeAIMove(controller), 600);
+    scheduleAI(() => makeAIMove(controller), 600);
     return;
   }
 
@@ -338,7 +385,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {
@@ -358,5 +407,12 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook for tip mounts / #501. */
-export function destroyGame(): void {}
+/** Tip-held destroy hook — cancel AI timers and drop mount DOM/listeners. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  if (activeContainer) {
+    clearElement(activeContainer);
+  }
+  activeContainer = null;
+}

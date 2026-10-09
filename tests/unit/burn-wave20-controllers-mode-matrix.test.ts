@@ -4,7 +4,6 @@
  * beyond wave 19 persist smoke. Tests-only. No product inventing.
  */
 import { describe, it, expect, afterEach } from 'vitest';
-
 import {
   initGame as initHex,
   newGameVsHuman as hexVsHuman,
@@ -15,7 +14,6 @@ import {
   startTutorial as startHexTutorial,
   isTutorialActive as isHexTutorial,
 } from '../../src/games/hex/game-controller';
-
 import {
   initGame as initCalla,
   newGameVsHuman as callaVsHuman,
@@ -26,7 +24,6 @@ import {
   startTutorial as startCallaTutorial,
   isTutorialActive as isCallaTutorial,
 } from '../../src/games/calla/game-controller';
-
 import {
   initGame as initStar,
   newGameVsHuman as starVsHuman,
@@ -37,7 +34,6 @@ import {
   startTutorial as startStarTutorial,
   isTutorialActive as isStarTutorial,
 } from '../../src/games/star-track/game-controller';
-
 import {
   initGame as initHag,
   newGameVsHuman as hagVsHuman,
@@ -48,7 +44,6 @@ import {
   startTutorial as startHagTutorial,
   isTutorialActive as isHagTutorial,
 } from '../../src/games/hex-a-gone/game-controller';
-
 import {
   initGame as initContig,
   newGameVsHuman as contigVsHuman,
@@ -57,7 +52,6 @@ import {
   startTutorial as startContigTutorial,
   isTutorialActive as isContigTutorial,
 } from '../../src/games/contig-60/game-controller';
-
 import {
   initGame as initJuggle,
   newGameVsHuman as juggleVsHuman,
@@ -66,7 +60,6 @@ import {
   startTutorial as startJuggleTutorial,
   isTutorialActive as isJuggleTutorial,
 } from '../../src/games/juggle/game-controller';
-
 import {
   initGame as initQueens,
   newGameVsHuman as queensVsHuman,
@@ -75,7 +68,6 @@ import {
   startTutorial as startQueensTutorial,
   isTutorialActive as isQueensTutorial,
 } from '../../src/games/queens-guards/game-controller';
-
 import {
   initGame as initFiar,
   newGameVsHuman as fiarVsHuman,
@@ -85,7 +77,6 @@ import {
   startTutorial as startFiarTutorial,
   isTutorialActive as isFiarTutorial,
 } from '../../src/games/fiar/game-controller';
-
 import {
   initGame as initPent,
   newGameVsHuman as pentVsHuman,
@@ -94,8 +85,9 @@ import {
   startTutorial as startPentTutorial,
   isTutorialActive as isPentTutorial,
 } from '../../src/games/pent-em-in/game-controller';
-
 import { tutorialManager } from '../../src/core/tutorial';
+
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -103,14 +95,6 @@ afterEach(() => {
     tutorialManager.exit();
   }
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
 
 describe('Wave 20 mode-matrix — Hex / Calla / Star / HAG reset after vsAI', () => {
   it('Hex vsAI → setAI → vsHuman → reset keeps empty history', () => {

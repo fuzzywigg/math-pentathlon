@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import {
-  axialToOffset,
-  offsetToAxial,
-  createAxial,
-} from '../../src/core/hex';
+import { axialToOffset, offsetToAxial } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('mutation-ui2 hex coordinates parity offsets', () => {
   it('even-parity axialToOffset uses (q+1)&1 — distinct from (q+2)&1', () => {

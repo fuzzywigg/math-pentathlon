@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "taskId": "burn-1008-mp-module-boundaries",
+  "taskId": "q-mp-105",
   "description": "Import-graph / module-boundary ceilings for src/. Counts from npm run check:boundaries may only decrease.",
-  "generatedAt": "2026-10-08T06:41:00.000Z",
-  "tipSha": "7b99c2b",
-  "tipShaNote": "Re-measured after #518/#520/#521/#505 on tip; ceilings unchanged (engine_imports_ui=0, dead_barrels=8, mixed_ui_barrels=9). mp3d↔game Circular chunk stays report-only under reported_not_changed.",
+  "generatedAt": "2026-10-09T08:55:00.000Z",
+  "tipSha": "7d59901c",
+  "tipShaNote": "q-mp-105: deleted mixed UI barrel src/core/dice/index.ts (last mixed_ui_barrel); callers rewritten to deep paths (dice-ui / dice-selector / roller / types). mixed_ui_barrels 1→0; dead_barrels stays 0.",
   "commands": {
     "check": "npm run check:boundaries"
   },
@@ -18,37 +18,18 @@
     "core_imports_ui": 0,
     "ai_imports_ui": 0,
     "engine_or_ai_dom_globals": 0,
-    "dead_barrels": 8,
-    "mixed_ui_barrels": 9
+    "dead_barrels": 0,
+    "mixed_ui_barrels": 0
   },
   "notes": {
-    "dead_barrels": [
-      "src/core/alignment/index.ts",
-      "src/core/attributes/index.ts",
-      "src/core/expressions/index.ts",
-      "src/core/fractions/index.ts",
-      "src/core/graph/index.ts",
-      "src/core/hex/index.ts",
-      "src/core/polyomino/index.ts",
-      "src/games/calla/index.ts"
-    ],
-    "mixed_ui_barrels": [
-      "src/core/alignment/index.ts",
-      "src/core/attributes/index.ts",
-      "src/core/dice/index.ts",
-      "src/core/expressions/index.ts",
-      "src/core/fractions/index.ts",
-      "src/core/graph/index.ts",
-      "src/core/hex/index.ts",
-      "src/core/polyomino/index.ts",
-      "src/games/calla/index.ts"
-    ],
+    "dead_barrels": [],
+    "mixed_ui_barrels": [],
     "reported_not_changed": [
       "AI workers (fab/fiar/hex/queens) use Worker + import.meta.url — expected browser coupling; not counted as ai→ui because they do not import UI modules.",
       "src/ui/three/star-track-board-3d.ts imports star-track/board-ui helpers (UI→game-ui); left for a dedicated UI glue pass.",
-      "Core hex package (src/core/hex/*) has zero deep importers in src/ — dead alongside its barrel; removal deferred to tip owner.",
+      "q-mp-133: former src/core/hex/* (coordinates/hex-ui/types) moved to tests/helpers/core-hex/ — production src/ had zero deep importers; unit suites rewritten. Ceilings unchanged.",
       "No clear behavior-free cycles in non-AI glue; value and type-only SCC counts are already 0.",
-      "Vite build warns Circular chunk: mp3d <-> game-{star-track,hex-a-gone,fiar,queens-guards,kwatro-sinko,prime-gold,pent-em-in} from board-3d-loader (game chunk) dynamically importing ui/three which statically imports that game's rules/board-ui. Source SCCs remain 0; chunk cycle is a manualChunks packaging smell for the tip owner — do not change AI/rules."
+      "Vite manualChunks packaging smell (historical): Circular chunk mp3d <-> game-{star-track,hex-a-gone,fiar,queens-guards,kwatro-sinko,prime-gold,pent-em-in} when all ui/three was forced into mp3d. Source SCCs remain 0. Tip policy keeps only tablet-gl/load-three in mp3d (see q-mp-062 / #606 fold). Contributor note + Mermaid + captured warning text: docs/dev/vite-circular-chunks-mp3d.md (q-mp-138). Do not change AI/rules to chase chunk warnings."
     ]
   }
 }

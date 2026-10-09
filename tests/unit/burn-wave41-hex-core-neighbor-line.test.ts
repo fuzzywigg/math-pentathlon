@@ -3,14 +3,8 @@
  * Avoids PR182 range/pixel/rotate. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createAxial,
-  getNeighbor,
-  areNeighbors,
-  hexLine,
-  hexDistance,
-  hexEquals,
-} from '../../src/core/hex';
+import { createAxial } from '../helpers/core-hex/types';
+import { getNeighbor, areNeighbors, hexLine, hexDistance, hexEquals } from '../helpers/core-hex/coordinates';
 
 describe('Wave 41 hex core — neighbor / line leftovers', () => {
   it('areNeighbors self false; distance-2 false', () => {

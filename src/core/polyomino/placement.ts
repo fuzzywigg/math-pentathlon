@@ -69,7 +69,9 @@ export function createGrid(rows: number, cols: number): Grid {
  * Check if a grid cell is occupied (out-of-bounds counts as occupied)
  */
 export function isCellOccupied(grid: Grid, row: number, col: number): boolean {
-  if (row < 0 || row >= grid.rows || col < 0 || col >= grid.cols) return true;
+  if (row < 0 || row >= grid.rows || col < 0 || col >= grid.cols) {
+    return true;
+  }
   return grid.cells[row]?.[col]?.occupied ?? true;
 }
 
@@ -86,7 +88,9 @@ export function isValidPlacement(
     position
   );
   for (const c of cells) {
-    if (isCellOccupied(grid, c.row, c.col)) return false;
+    if (isCellOccupied(grid, c.row, c.col)) {
+      return false;
+    }
   }
   return true;
 }
@@ -255,7 +259,9 @@ export function getPlacementCells(
   }
   // Legacy PlacedPolyomino API
   const shape = shapes?.find((s) => s.id === placement.shapeId);
-  if (!shape) return [];
+  if (!shape) {
+    return [];
+  }
   return getCellsAtPosition(
     shape,
     placement.position,
@@ -354,7 +360,9 @@ export function isInBounds(board: Board, cell: Cell): boolean {
  * Check if a cell is occupied
  */
 export function isOccupied(board: Board, cell: Cell): boolean {
-  if (!isInBounds(board, cell)) return true; // Out of bounds counts as occupied
+  if (!isInBounds(board, cell)) {
+    return true;
+  } // Out of bounds counts as occupied
   return board.cells[cell.row]?.[cell.col] ?? true;
 }
 
@@ -398,13 +406,17 @@ export function removeLastPolyomino(
   board: Board,
   shapes: PolyominoShape[]
 ): Board {
-  if (board.placements.length === 0) return board;
+  if (board.placements.length === 0) {
+    return board;
+  }
 
   const placements = [...board.placements];
   const removed = placements.pop()!;
 
   const shape = shapes.find((s) => s.id === removed.shapeId);
-  if (!shape) return board;
+  if (!shape) {
+    return board;
+  }
 
   const cells = getCellsAtPosition(
     shape,
@@ -478,7 +490,9 @@ export function canPlaceShape(board: Board, shape: PolyominoShape): boolean {
   for (const rotation of rotations) {
     for (const flipped of flips) {
       const positions = findValidPlacements(board, shape, rotation, flipped);
-      if (positions.length > 0) return true;
+      if (positions.length > 0) {
+        return true;
+      }
     }
   }
 
@@ -492,7 +506,9 @@ export function countEmptyCells(board: Board): number {
   let count = 0;
   for (let r = 0; r < board.rows; r++) {
     for (let c = 0; c < board.cols; c++) {
-      if (!board.cells[r]?.[c]) count++;
+      if (!board.cells[r]?.[c]) {
+        count++;
+      }
     }
   }
   return count;
@@ -599,7 +615,9 @@ export function solvePlacement(
     remainingShapes: PolyominoShape[]
   ): boolean {
     // Check if we have enough solutions
-    if (solutions.length >= maxSolutions) return true;
+    if (solutions.length >= maxSolutions) {
+      return true;
+    }
 
     // Check if board is filled
     if (isBoardFilled(currentBoard)) {
@@ -608,11 +626,15 @@ export function solvePlacement(
     }
 
     // No more shapes to place
-    if (remainingShapes.length === 0) return false;
+    if (remainingShapes.length === 0) {
+      return false;
+    }
 
     // Find first empty cell
     const empty = getEmptyCells(currentBoard);
-    if (empty.length === 0) return false;
+    if (empty.length === 0) {
+      return false;
+    }
 
     const targetCell = empty[0]!;
 

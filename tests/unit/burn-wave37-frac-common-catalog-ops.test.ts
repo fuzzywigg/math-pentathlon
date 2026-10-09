@@ -4,16 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COMMON_FRACTIONS,
-  add,
-  multiply,
-  areEqual,
-  simplify,
-  isPositive,
-  toDecimal,
-  FRACTION_COLORS,
-} from '../../src/core/fractions';
+import { COMMON_FRACTIONS, FRACTION_COLORS } from '../../src/core/fractions/types';
+import { add, multiply, areEqual, simplify, isPositive, toDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-common — catalog properties', () => {
   it('all commons are positive proper-or-unit with known colors', () => {

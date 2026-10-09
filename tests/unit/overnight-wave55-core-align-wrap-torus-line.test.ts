@@ -3,11 +3,8 @@
  * torus edge. Distinct from wave52 wrap-zero-dims NaN. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  findAlignmentInDirection,
-  createArrayGetter,
-  DIRECTIONS,
-} from '../../src/core/alignment';
+import { findAlignmentInDirection, createArrayGetter } from '../../src/core/alignment/grid-alignment';
+import { DIRECTIONS } from '../../src/core/alignment/types';
 
 describe('Wave 55 core align — wrap torus line', () => {
   it('horizontal wrap joins last and first column of the same row', () => {

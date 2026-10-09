@@ -5,20 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-  createBasicNumberCards,
-  createBasicOperatorCards,
-  createExpressionDeck,
-  createTargetChallenge,
-  MAKE_TEN_CHALLENGES,
-  TWENTY_FOUR_CHALLENGES,
-  COUNTDOWN_CHALLENGES,
-  solveTargetChallenge,
-} from '../../src/core/expressions';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot, createBasicNumberCards, createBasicOperatorCards, createExpressionDeck, createTargetChallenge, MAKE_TEN_CHALLENGES, TWENTY_FOUR_CHALLENGES, COUNTDOWN_CHALLENGES } from '../../src/core/expressions/types';
+import { solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-deck — card factories isolation', () => {
   it('stamps unique ids by default and honors explicit ids', () => {

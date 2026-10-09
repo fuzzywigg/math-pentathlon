@@ -5,17 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  parseEquation,
-  checkEquation,
-  evaluateEquation,
-  formatNumber,
-  astToString,
-  simplifyExpression,
-  evaluate,
-} from '../../src/core/expressions';
+import { tokenize, parse, parseEquation, checkEquation, evaluateEquation, formatNumber, astToString, simplifyExpression, evaluate } from '../../src/core/expressions/evaluator';
 
 describe('Wave 30 expr-equation — truth table', () => {
   const cases: Array<[string, boolean]> = [

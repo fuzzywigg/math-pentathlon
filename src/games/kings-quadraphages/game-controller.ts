@@ -61,10 +61,14 @@ function unmountBoard3d(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadKingsQuadraphagesBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
     board3d = await mod.createKingsQuadraphagesBoard3D(
       boardContainer,
       onCellClick
@@ -156,7 +160,9 @@ function render(): void {
 
 // Trigger invalid click animation on a cell (skipped when reduced motion)
 function triggerInvalidAnimation(row: number, col: number): void {
-  if (!boardContainer) return;
+  if (!boardContainer) {
+    return;
+  }
   if (
     typeof window !== 'undefined' &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -226,9 +232,15 @@ function processGameClick(row: number, col: number): void {
 
 // Check if AI should play and trigger its turn
 function checkAndTriggerAITurn(): void {
-  if (gameMode !== 'human-vs-ai' || !aiPlayer) return;
-  if (gameState.turnPhase === 'gameOver') return;
-  if (isAIThinking) return;
+  if (gameMode !== 'human-vs-ai' || !aiPlayer) {
+    return;
+  }
+  if (gameState.turnPhase === 'gameOver') {
+    return;
+  }
+  if (isAIThinking) {
+    return;
+  }
 
   if (isAITurn(gameState, aiPlayer, gameMode)) {
     void executeAITurn();
@@ -237,7 +249,9 @@ function checkAndTriggerAITurn(): void {
 
 // Execute the AI's turn with delays for better UX
 async function executeAITurn(): Promise<void> {
-  if (!aiPlayer) return;
+  if (!aiPlayer) {
+    return;
+  }
 
   isAIThinking = true;
   render(); // Show "AI is thinking..." status
@@ -305,7 +319,9 @@ export function newGame(): void {
 
 function syncModeChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(
     root,
     gameMode,

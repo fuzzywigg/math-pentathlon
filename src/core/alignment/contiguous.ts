@@ -272,6 +272,10 @@ export function regionTouchesEdge(
         return pos.col === 0;
       case 'right':
         return pos.col === cols - 1;
+      default: {
+        const _exhaustive: never = edge;
+        return _exhaustive;
+      }
     }
   });
 }

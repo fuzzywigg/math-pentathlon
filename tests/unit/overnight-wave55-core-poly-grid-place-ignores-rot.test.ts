@@ -3,12 +3,8 @@
  * Board honors rotation. Distinct from wave52 overwrite / wave53 frozen I. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  createGrid,
-  createBoard,
-  placePolyomino,
-  TETROMINOES,
-} from '../../src/core/polyomino';
+import { createGrid, createBoard, placePolyomino } from '../../src/core/polyomino/placement';
+import { TETROMINOES } from '../../src/core/polyomino/types';
 
 describe('Wave 55 core poly — grid place ignores rotation', () => {
   it('I at origin with rotation 90 stays flat on Grid; Board is vertical', () => {

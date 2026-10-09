@@ -5,13 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  formatNumber,
-  astToString,
-  simplifyExpression,
-  tokenize,
-  parse,
-} from '../../src/core/expressions';
+import { formatNumber, astToString, simplifyExpression, tokenize, parse } from '../../src/core/expressions/evaluator';
 
 describe('Wave 31 expr-format — formatNumber', () => {
   it.each([

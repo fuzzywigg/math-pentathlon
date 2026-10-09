@@ -4,18 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTrackGraph,
-  createGridGraph,
-  createStarGraph,
-  createCircularGraph,
-  findNodesAtDistance,
-  findNodesWithinDistance,
-  findReachable,
-  bfs,
-  getNeighbors,
-  type Graph,
-} from '../../src/core/graph';
+import { createTrackGraph, createGridGraph, createStarGraph, createCircularGraph, type Graph } from '../../src/core/graph/types';
+import { findNodesAtDistance, findNodesWithinDistance, findReachable, bfs, getNeighbors } from '../../src/core/graph/algorithms';
 
 function asDirected(g: Graph): Graph {
   return { ...g, directed: true, edges: g.edges.map((e) => ({ ...e })) };
