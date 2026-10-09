@@ -3,7 +3,8 @@
  *
  * From #563 pins; #567 recovered R-GL-08 P0 (Prime Gold context-lost → 2D);
  * #568 un-skips P1 R-SHELL-07/08 + P2 R-IMP-04/R-SW-01 (cleanup try/finally +
- * bootstrap/SW catch). Remaining P2/P3 skips stay for their owners.
+ * bootstrap/SW catch). q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
+ * Remaining P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
  * - #528 storage failure modes (safe-web-storage)
@@ -389,14 +390,54 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
     ).toBe(true);
     errSpy.mockRestore();
   });
+
+  it('P2 R-SHELL-04 / R-EVT-03: home/menu installs same crash boundary as game routes', () => {
+    const src = readSrc('src/main.ts');
+    // renderHome binds the shared route boundary before the selector mounts.
+    const homeIdx = src.indexOf('function renderHome');
+    expect(homeIdx).toBeGreaterThan(-1);
+    const bindIdx = src.indexOf('bindRouteErrorBoundary', homeIdx);
+    const selectorIdx = src.indexOf('renderGameSelector', homeIdx);
+    expect(bindIdx).toBeGreaterThan(homeIdx);
+    expect(selectorIdx).toBeGreaterThan(bindIdx);
+    // Reuses existing crash UI (installGameErrorBoundary → renderGameCrash).
+    expect(src).toContain('installGameErrorBoundary');
+
+    // Behavioral: thrown handler while home boundary active → recoverable UI.
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onReset = vi.fn();
+    const handle = installGameErrorBoundary({
+      gameName: 'Math Pentathlon',
+      container: rootEl,
+      onReset,
+      onHome: vi.fn(),
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('menu activate boom'),
+        message: 'menu activate boom',
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    expect(handle.didCatch).toBe(true);
+    // Existing crash strings only — no new player-facing copy.
+    expect(rootEl.textContent).toContain('Something went wrong in Math Pentathlon');
+    expect(rootEl.textContent).toContain('Try again');
+    expect(rootEl.textContent).toContain('Back to games');
+    rootEl.querySelector<HTMLButtonElement>('[data-action="reset"]')?.click();
+    expect(onReset).toHaveBeenCalledOnce();
+    handle.dispose();
+    errSpy.mockRestore();
+  });
 });
 
 describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
-  it.skip('TODO(runtime-error-path P2 R-SHELL-04): home/menu should recover from thrown handlers', () => {
-    // Expected: menu error boundary or soft reset — blank selector is unrecovered today.
-    expect(true).toBe(false);
-  });
-
   it.skip('TODO(runtime-error-path P3 R-SW-03): registration.update() rejection should be swallowed/logged', () => {
     // Expected: void registration.update().catch(...) or equivalent.
     expect(true).toBe(false);
