@@ -23,6 +23,10 @@
 > media-query group ref) and `.sd-hands-container` from `src/ui/styles/game-play.css`.
 >
 > **q-mp-176 (2026-10-09):** Removed Rank-1 dead CSS `.game-card-division` from `src/style.css`.
+>
+> **q-mp-211 (2026-10-09):** Removed Rank-1 dead CSS `.move-history-panel` selector-list
+> entries from `src/ui/styles/zoom-reflow.css` (live history chrome uses `.move-history-list` /
+> `.move-history-entry` only).
 
 ## Method
 
@@ -53,6 +57,7 @@ Re-verified on live tip then applied (**8** items initially; **+2** CSS classes 
 | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154) |
 | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | deleted Rank-1 dead CSS rule (q-mp-154) |
 | removed | css-class | `src/style.css` → `game-card-division` | deleted Rank-1 dead CSS rule (q-mp-176) |
+| removed | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | deleted Rank-1 dead CSS selector-list leftovers (q-mp-211) |
 
 ## Defer — do not redo
 
@@ -82,7 +87,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 1 | yes | removed | css-class | `src/style.css` → `game-card-division` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-176 |
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
-| 1 | yes | kept | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
+| 1 | yes | removed | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-211 |
 | 2 | yes | removed | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | demoted in q-mp-155 — module-private; still used by installDomHooks |
 | 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts (absent on tip)` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
 | 3 | review | kept | unused-type | `src/core/ai-worker/client.ts` → `AiWorkerRequestPayload` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
