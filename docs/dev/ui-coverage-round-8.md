@@ -1,7 +1,10 @@
 # UI coverage round 8 (`q-mp-167`)
 
 Characterization tests for the coldest **non-AI board-3d / tablet-gl** arms under
-`src/ui/three`, stacked on tip `cursor/mp-tip-post598` @ `7922f9af`.
+`src/ui/three`, stacked on tip `cursor/mp-tip-post598`.
+
+**Primary measurement base:** tip @ `7922f9af` (pre-fold). Rebased onto tip
+@ `baccd195` before merge readiness (includes #686 r7 + #683 three/ nnnull).
 
 **Base:** `cursor/mp-tip-post598`. Draft only — tip owner folds.
 
@@ -42,12 +45,16 @@ Unchanged at 100%: `load-three.ts`, `kings-quadraphages-pieces.ts`,
 
 ## Directory / repo-wide
 
-| Metric | Before (tip) | After | Δ |
+| Metric | Before (tip `7922f9af`) | After | Δ |
 |--------|-------------:|------:|--:|
 | **`src/ui/three` lines** | **81.61%** | **89.66%** | **+8.05 pp** |
 | **`src/ui/three` branches** | **57.70%** | **69.81%** | **+12.11 pp** |
 | Repo lines | 93.60% (21738/23224) | 94.58% (21966/23224) | +0.98 pp |
 | Repo branches | 86.15% (10695/12413) | 87.27% (10833/12413) | +1.12 pp |
+
+Post-rebase on tip `baccd195` (with this PR’s tests): `src/ui/three` **89.00%**
+lines / **68.98%** branches (totals shifted by tip #683 three/ edits); map
+regenerated from that run.
 
 ## Tests added
 
