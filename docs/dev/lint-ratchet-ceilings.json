@@ -1,5 +1,5 @@
 {
-  "notes": "Tip post755 min ceilings after q-mp-205/219/194/267/316 folds: curly 538; no-non-null-assertion 246; no-confusing-void-expression 66; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post785 min ceilings after #822 no-shadow controllers (\u22126\u21923) on post755 tip: curly 538; no-non-null-assertion 246; no-confusing-void-expression 66; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
@@ -10,7 +10,7 @@
     "@typescript-eslint/prefer-nullish-coalescing": 65,
     "@typescript-eslint/prefer-optional-chain": 21,
     "@typescript-eslint/switch-exhaustiveness-check": 8,
-    "@typescript-eslint/no-shadow": 9,
+    "@typescript-eslint/no-shadow": 3,
     "eqeqeq": 1,
     "@typescript-eslint/return-await": 3
   }
