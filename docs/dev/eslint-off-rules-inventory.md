@@ -18,7 +18,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | Count | Rule | Why it matters |
 | ---: | --- | --- |
 | 387 | `@typescript-eslint/no-non-null-assertion` | `!` hides null/undefined; common crash source |
-| 229 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
+| 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
 | 95 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`) |
 | 35 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps |
@@ -42,3 +42,9 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 **`@typescript-eslint/no-non-null-assertion`** — highest-signal off rule with real crash risk; ceiling **387** (= today's count). No source fixes in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
 
 Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
+
+## Ratchet chosen for q-mp-128
+
+**`@typescript-eslint/no-confusing-void-expression`** — ceiling **230** (= tip re-measure 2026-10-09 on `cursor/mp-tip-post477`; densest: `src/ui/game-route-mounts.ts` 40, `src/main.ts` 12). No source fixes; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+
+Open-PR overlap for q-mp-128: #605 (nnnull), #665 (`no-duplicate-imports`), #659/#664 (curly ceilings). Expected additive conflict on `docs/dev/lint-ratchet-ceilings.json` / probe script with those drafts — tip owner folds both keys. No open draft already ratchets `no-confusing-void-expression`.
