@@ -33,7 +33,8 @@ describe('q-mp-167 ui-cov-r8 board update arms', () => {
   afterEach(() => {
     document.body.innerHTML = '';
     vi.restoreAllMocks();
-    delete (window as Window & { __mp3dKwatroSinko?: unknown }).__mp3dKwatroSinko;
+    delete (window as Window & { __mp3dKwatroSinko?: unknown })
+      .__mp3dKwatroSinko;
     delete (window as Window & { __mp3dStarTrack?: unknown }).__mp3dStarTrack;
     delete (window as Window & { __mp3dFiar?: unknown }).__mp3dFiar;
   });
@@ -50,9 +51,9 @@ describe('q-mp-167 ui-cov-r8 board update arms', () => {
     const board = await createKwatroSinkoBoard3D(host);
     stubCanvasLayout(board.canvas);
     board.update(createKwatroState());
-    expect(three.__createdMats.some((m) => (m.opts as { map?: unknown })?.map)).toBe(
-      true
-    );
+    expect(
+      three.__createdMats.some((m) => (m.opts as { map?: unknown })?.map)
+    ).toBe(true);
     // Resize while mounted
     window.dispatchEvent(new Event('resize'));
     // Visibility paint path

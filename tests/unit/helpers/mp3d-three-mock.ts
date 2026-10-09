@@ -4,7 +4,9 @@
  */
 import { vi } from 'vitest';
 
-export type Mp3dHit = { object: { userData?: Record<string, unknown>; parent?: unknown } };
+export type Mp3dHit = {
+  object: { userData?: Record<string, unknown>; parent?: unknown };
+};
 
 export function installCanvas2dStub(): void {
   HTMLCanvasElement.prototype.getContext = vi.fn(function (
@@ -252,20 +254,16 @@ export function installThreeMock(options?: { hitQueue?: Mp3dHit[][] }) {
   class LineBasicMaterial extends Material {}
   class MeshBasicMaterial extends Material {}
   class Mesh extends Object3D {
-    constructor(
-      public geometry?: BufferGeometry,
-      material?: Material
-    ) {
+    constructor(geometry?: BufferGeometry, material?: Material) {
       super();
+      this.geometry = geometry;
       this.material = material;
     }
   }
   class LineSegments extends Object3D {
-    constructor(
-      public geometry?: BufferGeometry,
-      material?: Material
-    ) {
+    constructor(geometry?: BufferGeometry, material?: Material) {
       super();
+      this.geometry = geometry;
       this.material = material;
     }
   }
@@ -348,7 +346,11 @@ export function stubCanvasLayout(canvas: HTMLCanvasElement): void {
   });
 }
 
-export function dispatchTap(target: HTMLElement, clientX = 200, clientY = 200): void {
+export function dispatchTap(
+  target: HTMLElement,
+  clientX = 200,
+  clientY = 200
+): void {
   const common = {
     bubbles: true,
     cancelable: true,

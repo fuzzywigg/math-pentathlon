@@ -38,7 +38,8 @@ describe('q-mp-167 ui-cov-r8 board a11y + pointer', () => {
     vi.restoreAllMocks();
     delete (window as Window & { __mp3dFiar?: unknown }).__mp3dFiar;
     delete (window as Window & { __mp3dHexAGone?: unknown }).__mp3dHexAGone;
-    delete (window as Window & { __mp3dQueensGuards?: unknown }).__mp3dQueensGuards;
+    delete (window as Window & { __mp3dQueensGuards?: unknown })
+      .__mp3dQueensGuards;
   });
 
   it('FIAR a11y click + raycast tap invoke node handler', async () => {
@@ -179,7 +180,9 @@ describe('q-mp-167 ui-cov-r8 board a11y + pointer', () => {
         isPrimary: true,
       })
     );
-    board.canvas.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    board.canvas.dispatchEvent(
+      new PointerEvent('pointerleave', { bubbles: true })
+    );
 
     onCell.mockClear();
     dispatchTap(board.canvas);
@@ -223,15 +226,15 @@ describe('q-mp-167 ui-cov-r8 board a11y + pointer', () => {
         isPrimary: true,
       })
     );
-    board.canvas.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }));
+    board.canvas.dispatchEvent(
+      new PointerEvent('pointerleave', { bubbles: true })
+    );
     expect(onHover).toHaveBeenCalledWith(null);
     board.unmount();
   });
 
   it('Prime Gold a11y click on valid placement + focus highlight', async () => {
-    const hitQueue = [
-      [{ object: { userData: { value: 1, kind: 'tile' } } }],
-    ];
+    const hitQueue = [[{ object: { userData: { value: 1, kind: 'tile' } } }]];
     const three = installThreeMock({ hitQueue });
     vi.doMock('../../src/ui/three/load-three', () => ({
       loadThree: async () => three,
