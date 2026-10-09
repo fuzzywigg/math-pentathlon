@@ -90,12 +90,28 @@ export function coreManualChunkName(id: string): string | undefined {
 }
 
 /**
+ * Shared mp3d helpers only. Per-game `*-board-3d` / `*-pieces` stay unnamed so
+ * they ride their dynamic-import graph — forcing them into `mp3d` created
+ * circular chunks when a game controller also statically imports tablet-gl
+ * (mp3d → game-* via board rules, game-* → mp3d via tablet-gl).
+ */
+export const MP3D_SHARED_MODULES = ['tablet-gl', 'load-three'] as const;
+
+/**
  * Assign a stable manual chunk name for modules under /src/ui/ (non-three).
  */
 export function uiManualChunkName(id: string): string | undefined {
   const normalized = id.replace(/\\/g, '/');
   if (!normalized.includes('/src/ui/')) return undefined;
-  if (normalized.includes('/src/ui/three/')) return 'mp3d';
+  if (normalized.includes('/src/ui/three/')) {
+    for (const name of MP3D_SHARED_MODULES) {
+      if (normalized.includes(`/src/ui/three/${name}`)) {
+        return 'mp3d';
+      }
+    }
+    // Per-game 3D boards/pieces: leave unnamed (async with board-3d-loader).
+    return undefined;
+  }
   if (normalized.includes('/src/ui/owl/')) return 'owl-ui';
   if (normalized.includes('/src/ui/stats-dashboard')) return 'stats';
   if (normalized.includes('/src/ui/styles/stats-dashboard')) return 'stats';
