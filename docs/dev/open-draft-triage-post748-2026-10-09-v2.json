@@ -218,7 +218,7 @@
       "mergeable": "MERGEABLE",
       "mergeStateStatus": "CLEAN",
       "changedFiles": 1,
-      "files": ["docs/dev/backlog-2026-10-09f.md"],
+      "files": ["docs/dev/backlog-2026-10-09f.md (on PR #753 head; not yet on tip)"],
       "checks": { "SUCCESS": 12 },
       "foldReadiness": "FOLD_READY_RETARGET",
       "suggestedFoldOrder": 1,

@@ -172,7 +172,7 @@ Retarget each keeper to `cursor/mp-tip-post748` before folding. Skip all CONTAIN
 | Title | Oct 9f engineering backlog round 6 (25 tasks q-mp-234..258) |
 | Base / head | `cursor/mp-tip-post728` / `cursor/q-mp-090f-backlog-round6-09bb` @ `b8c53d86` |
 | Mergeable | MERGEABLE / CLEAN · CI 12/12 SUCCESS |
-| Files | `docs/dev/backlog-2026-10-09f.md` |
+| Files | PR #753 adds backlog-2026-10-09f.md (not yet on tip) |
 | Ratchet ceilings touched | None |
 | Fold-readiness | Ready after retarget (docs-only). Task text still says tip post728 — tip owner may note post748 cut in fold commit message; content remains the round-6 queue. |
 | Conflicts / ordering | None. |
