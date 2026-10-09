@@ -178,9 +178,9 @@ export async function createPentEmInBoard3D(
   scene.add(ambient);
   const hemi = new THREE.HemisphereLight(0xf0f4ff, 0x2a2118, 0.55);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xfff8e7, 0.8);
-  key.position.set(5, 14, 4);
-  scene.add(key);
+  const keyLight = new THREE.DirectionalLight(0xfff8e7, 0.8);
+  keyLight.position.set(5, 14, 4);
+  scene.add(keyLight);
 
   const root = new THREE.Group();
   scene.add(root);

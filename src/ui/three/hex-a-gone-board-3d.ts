@@ -161,9 +161,9 @@ export async function createHexAGoneBoard3D(
   scene.add(ambient);
   const hemi = new THREE.HemisphereLight(0xfff4e0, 0x2a1a10, 0.5);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xffffff, 0.75);
-  key.position.set(5, 14, 4);
-  scene.add(key);
+  const keyLight = new THREE.DirectionalLight(0xffffff, 0.75);
+  keyLight.position.set(5, 14, 4);
+  scene.add(keyLight);
 
   const root = new THREE.Group();
   scene.add(root);
