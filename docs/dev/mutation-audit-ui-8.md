@@ -66,11 +66,11 @@ Nothing added to `package.json`, lockfile, or CI.
 
 ## Before → after (score %)
 
-| Module                              | Before % |   After % |  Δ pp | Killed after |
-| ----------------------------------- | -------: | --------: | ----: | -----------: |
-| `core/expressions/expression-ui.ts` |     50.0 | **100.0** | +50.0 |        20/20 |
-| `core/polyomino/polyomino-ui.ts`    |     50.0 |  **85.0** | +35.0 |        17/20 |
-| `core/graph/graph-ui.ts`            |     70.0 |  **95.0** | +25.0 |        19/20 |
+| Module                              | Before % |  After % |  Δ pp | Killed after |
+| ----------------------------------- | -------: | -------: | ----: | -----------: |
+| `core/expressions/expression-ui.ts` |     50.0 | **95.0** | +45.0 |        19/20 |
+| `core/polyomino/polyomino-ui.ts`    |     50.0 | **85.0** | +35.0 |        17/20 |
+| `core/graph/graph-ui.ts`            |     70.0 | **95.0** | +25.0 |        19/20 |
 
 **3 modules** with measurably higher scores (acceptance: ≥2).
 
@@ -79,12 +79,13 @@ JSON artifacts: `docs/dev/mutation-audit-ui-8-baseline.json`,
 
 ## Remaining survivors (not product bugs)
 
-| Module      | Survivor                         | Reason                                                                                                               |
-| ----------- | -------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `polyomino` | L22 `showGrid: true` → `false`   | `showGrid` is stored in `DEFAULT_CONFIG` but never read by render paths.                                             |
-| `polyomino` | L43 rotation default `0` → `1`   | `rotateCells` `default` branch returns cells unchanged for non-90/180/270 — equivalent to `0`.                       |
-| `polyomino` | L60 `(col - minCol)` → `+`       | `getTransformedCells` always `normalizeCells` so `minCol === 0`; `col - 0` ≡ `col + 0`.                              |
-| `graph`     | L21 `\|\|` → `&&` on typeof gate | In jsdom, both sides false → same; when `matchMedia` missing both paths still return `false` (catch/`return false`). |
+| Module       | Survivor                         | Reason                                                                                                               |
+| ------------ | -------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `expression` | L18 `stylesInjected false→true`  | Module flag + `tests/unit/setup.ts` clearing head styles each test → style-count pins flake under isolate:false.     |
+| `polyomino`  | L22 `showGrid: true` → `false`   | `showGrid` is stored in `DEFAULT_CONFIG` but never read by render paths.                                             |
+| `polyomino`  | L43 rotation default `0` → `1`   | `rotateCells` `default` branch returns cells unchanged for non-90/180/270 — equivalent to `0`.                       |
+| `polyomino`  | L60 `(col - minCol)` → `+`       | `getTransformedCells` always `normalizeCells` so `minCol === 0`; `col - 0` ≡ `col + 0`.                              |
+| `graph`      | L21 `\|\|` → `&&` on typeof gate | In jsdom, both sides false → same; when `matchMedia` missing both paths still return `false` (catch/`return false`). |
 
 No production defects confirmed.
 
