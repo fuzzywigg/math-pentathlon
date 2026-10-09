@@ -2,14 +2,14 @@
 // Rendering pentagon bases, attribute blocks, and game state
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import type {
-  Par55State,
-  Base,
-  AttributeBlock,
-  Player,
-  BlockColor,
+import {
+  type Par55State,
+  type Base,
+  type AttributeBlock,
+  type Player,
+  type BlockColor,
+  CONFIG,
 } from './types';
-import { CONFIG } from './types';
 import { getValidPlacements, calculateScore } from './rules';
 import { getPlayerSeatColors, seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';

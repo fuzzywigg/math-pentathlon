@@ -4,8 +4,13 @@
 import { pointyTopHexPolygonPoints } from '../../ui/hex-svg';
 import { getDieFaceEmojiOrQuestion } from '../../ui/die-faces';
 import { injectStylesOnce } from '../../ui/inject-styles';
-import type { RemainderIslandsState, DiceRoll, Island } from './types';
-import { getPlayerScore, getPlayerChips } from './types';
+import {
+  type RemainderIslandsState,
+  type DiceRoll,
+  type Island,
+  getPlayerScore,
+  getPlayerChips,
+} from './types';
 import { previewDivision } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';

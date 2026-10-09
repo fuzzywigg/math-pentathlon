@@ -2,13 +2,14 @@
 // Rendering dominoes, board, and dice
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import type {
-  SumDominoesState,
-  Domino,
-  PlacedDomino,
-  BoardPosition,
+import {
+  type SumDominoesState,
+  type Domino,
+  type PlacedDomino,
+  type BoardPosition,
+  CONFIG,
+  getDiceSum,
 } from './types';
-import { CONFIG, getDiceSum } from './types';
 import { getValidPlacements } from './rules';
 import {
   buildCellAriaLabel,

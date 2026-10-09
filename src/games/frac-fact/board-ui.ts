@@ -1,8 +1,7 @@
 // Frac Fact Board UI
 // Renders fraction problems, answer choices, and game status
 
-import type { FracFactState } from './types';
-import { getPlayerStats } from './types';
+import { type FracFactState, getPlayerStats } from './types';
 import type { Fraction } from '../../core/fractions/types';
 import { getOperationSymbol } from './rules';
 import { seatIcon } from '../../ui/player-colors';
