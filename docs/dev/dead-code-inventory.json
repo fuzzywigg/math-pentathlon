@@ -150,6 +150,22 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted unused module (zero importers after #658 fold / tip demote); q-mp-139"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/game-play.css",
+        "symbol": "calla-teaching-hint",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/ui/styles/game-play.css",
+        "symbol": "sd-hands-container",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule (q-mp-154)"
       }
     ]
   },
@@ -186,8 +202,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
@@ -203,8 +219,8 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover)",
-      "disposition": "kept"
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
