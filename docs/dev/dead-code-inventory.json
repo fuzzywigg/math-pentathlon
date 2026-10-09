@@ -166,6 +166,14 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted Rank-1 dead CSS rule (q-mp-154)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/style.css",
+        "symbol": "game-card-division",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule (q-mp-176)"
       }
     ]
   },
@@ -184,7 +192,7 @@
       "registryHit": false,
       "rank": 1,
       "safeToRemove": "yes",
-      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed on tip via q-mp-054 live-class rename; confirmed q-mp-101",
+      "reason": "CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-176",
       "disposition": "removed"
     },
     {

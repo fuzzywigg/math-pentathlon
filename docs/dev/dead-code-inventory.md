@@ -21,6 +21,8 @@
 >
 > **q-mp-154 (2026-10-09):** Removed Rank-1 dead CSS `.calla-teaching-hint` (including coarse-pointer
 > media-query group ref) and `.sd-hands-container` from `src/ui/styles/game-play.css`.
+>
+> **q-mp-176 (2026-10-09):** Removed Rank-1 dead CSS `.game-card-division` from `src/style.css`.
 
 ## Method
 
@@ -50,6 +52,7 @@ Re-verified on live tip then applied (**8** items initially; **+2** CSS classes 
 | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts` | deleted unused module (zero importers after #658 fold / tip demote); q-mp-139 |
 | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | deleted Rank-1 dead CSS rule + coarse-pointer media-query group ref (q-mp-154) |
 | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | deleted Rank-1 dead CSS rule (q-mp-154) |
+| removed | css-class | `src/style.css` → `game-card-division` | deleted Rank-1 dead CSS rule (q-mp-176) |
 
 ## Defer — do not redo
 
@@ -76,7 +79,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 
 | Rank | Safe? | Disposition | Kind | Path / symbol | Evidence | Reason |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | yes | kept | css-class | `src/style.css` → `game-card-division` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |
+| 1 | yes | removed | css-class | `src/style.css` → `game-card-division` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-176 |
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | kept | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover) |

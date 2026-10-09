@@ -664,15 +664,6 @@ h1 {
   letter-spacing: -0.2px;
 }
 
-.game-card-division {
-  font-size: 0.75rem;
-  color: #475569; /* was #94a3b8 (~2.6:1); AA ≥4.5:1 on white */
-  text-transform: uppercase;
-  letter-spacing: 0.75px;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-}
-
 .game-card-description {
   font-size: 0.9rem;
   color: #64748b;
