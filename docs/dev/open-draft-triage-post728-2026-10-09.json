@@ -1,6 +1,6 @@
 {
   "taskId": "q-mp-212",
-  "generatedAtUtc": "2026-10-09T19:34:13Z",
+  "generatedAtUtc": "2026-10-09T19:37:30Z",
   "liveTipBranch": "cursor/mp-tip-post728",
   "tipSha": "b5884207c41d10fa3fa7aa1ee01ec80c9bb61b4d",
   "tipShaShort": "b5884207",
@@ -25,10 +25,10 @@
     "unitTestSpecFilesExclArchive": 3140
   },
   "summaryCounts": {
-    "openBasePost728": 15,
+    "openBasePost728": 17,
     "holdBasePost709": 1,
-    "totalListed": 16,
-    "newerThan745": 0
+    "totalListed": 18,
+    "newerThan745": 2
   },
   "conflictClusters": [
     {
@@ -67,6 +67,17 @@
         "docs/wiki/development.md"
       ],
       "note": "Prefer order #737 \u2192 #732 \u2192 #735"
+    },
+    {
+      "name": "wiki-readme",
+      "prs": [
+        735,
+        746
+      ],
+      "files": [
+        "docs/wiki/README.md"
+      ],
+      "note": "Coverage-map index vs CI unit-budget pointer \u2014 reconcile on fold"
     }
   ],
   "suggestedFoldOrder": [
@@ -76,7 +87,9 @@
     736,
     737,
     732,
+    746,
     735,
+    747,
     731,
     738,
     742,
@@ -804,6 +817,61 @@
       "ratchetCeilingsTouched": {},
       "notes": "Mutation audit UI tests",
       "updatedAt": "2026-10-09T19:20:52Z"
+    },
+    {
+      "number": 746,
+      "taskId": "q-mp-233",
+      "title": "q-mp-233: refresh wiki CI unit-budget page for tip post728",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/746",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-233-ci-unit-budget-refresh-4046",
+      "headSha": "636d6b07",
+      "mergeable": "UNKNOWN",
+      "mergeStateStatus": "UNKNOWN",
+      "changedFiles": 5,
+      "additions": 83,
+      "deletions": 46,
+      "files": [
+        "docs/dev/ci-unit-budget-q-mp-175.md",
+        "docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt",
+        "docs/screenshots/ci/tip-unit-ai-benches-skipped-37972882883.txt",
+        "docs/wiki/README.md",
+        "docs/wiki/ci-unit-budget.md"
+      ],
+      "checks": {},
+      "checkNames": [],
+      "foldReadiness": "FOLD_AFTER_WIKI",
+      "suggestedFoldOrder": 7,
+      "ratchetCeilingsTouched": {},
+      "notes": "Narrow vs #732; shares docs/wiki/README.md with #735",
+      "updatedAt": "2026-10-09T19:36:00Z"
+    },
+    {
+      "number": 747,
+      "taskId": "q-mp-212",
+      "title": "q-mp-212: tip post728 open-draft triage snapshot (#727 HOLD + #731\u2013#745)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/747",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post728",
+      "headRef": "cursor/q-mp-212-open-draft-triage-post728-e403",
+      "headSha": null,
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 2,
+      "additions": null,
+      "deletions": null,
+      "files": [
+        "docs/dev/open-draft-triage-post728-2026-10-09.md",
+        "docs/dev/open-draft-triage-post728-2026-10-09.json"
+      ],
+      "checks": {},
+      "checkNames": [],
+      "foldReadiness": "FOLD_READY",
+      "suggestedFoldOrder": 9,
+      "ratchetCeilingsTouched": {},
+      "notes": "This triage PR",
+      "updatedAt": "2026-10-09T19:37:30Z"
     }
   ]
 }
