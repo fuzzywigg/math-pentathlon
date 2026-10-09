@@ -32,6 +32,11 @@
 > verified-unused `.par55-btn-primary` / `.ramrod-btn-primary` leftovers (in-board New Game
 > buttons deleted in #82; live controls use `*-btn-secondary` only). Dated residual inventory:
 > `docs/dev/dead-css-rank1-rescan-2026-10-09.md`.
+>
+> **q-mp-305 (2026-10-09):** Fresh Rank-1 CSS rescan on tip `cursor/mp-tip-post755` @ `89e40ad7`.
+> Zero verified-unused selectors after scripts corpus + dynamic exclusions (491 classes defined;
+> naive unused 8 → all kept/dynamic or script-referenced). Report-only; contains open `#766`.
+> Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post755-2026-10-09.md`.
 
 ## Method
 
