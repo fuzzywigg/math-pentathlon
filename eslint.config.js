@@ -3,10 +3,10 @@ import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 
 /**
- * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141):
+ * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-159):
  * - Hard errors: eqeqeq, prefer-const, curly (multi-line), no-implicit-coercion,
- *   consistent-type-imports, no-floating-promises, no-misused-promises,
- *   no-unused-vars (underscore ignore for args/vars/caught errors).
+ *   prefer-object-has-own, consistent-type-imports, no-floating-promises,
+ *   no-misused-promises, no-unused-vars (underscore ignore for args/vars/caught errors).
  * - Ceiling (report-only / count-down) via `npm run lint:ratchet`
  *   (see scripts/check-lint-ratchet.mjs + docs/dev/lint-ratchet-ceilings.json):
  *   curly "all"; @typescript-eslint/no-non-null-assertion (live unset);
@@ -38,6 +38,8 @@ export default tseslint.config(
       'prefer-const': 'error',
       curly: ['error', 'multi-line'],
       'no-implicit-coercion': 'error',
+      // q-mp-159: debt cleared (game-prefetch); hard-on — no ratchet ceiling.
+      'prefer-object-has-own': 'error',
       '@typescript-eslint/consistent-type-imports': [
         'error',
         {
