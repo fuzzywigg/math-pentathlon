@@ -1,20 +1,19 @@
 # Testing layers — live counts (2026-10-09)
 
-**Task id:** `q-mp-076`  
-**Measured tip:** `cursor/mp-tip-post477` @ `a023fc36` (full SHA `a023fc368f0f5b2b18e5f0b3d3f9e221b0255dc0`)  
+**Task id:** `q-mp-199`  
+**Measured tip:** `cursor/mp-tip-post728` @ `b5884207` (full SHA `b5884207c41d10fa3fa7aa1ee01ec80c9bb61b4d`)  
 **Measured on:** 2026-10-09 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of the wiki testing guide with **live tree counts**, exact `package.json` run scripts, and the **pin policy**. No `src/` or AI/copy/rules changes.
+Docs-only refresh of unit file / Vitest case counts for tip post728. Pin policy unchanged. No `src/` or AI/copy/rules changes.
 
 ## Duplicate check (open drafts)
 
 | Open draft | Overlap | Action |
 | --- | --- | --- |
-| #475 wiki testing layers | Original guide; content largely already on tip | This PR refreshes counts / pin policy on tip — leave #475 open |
-| #620 / #603 `q-mp-080` | Aligns setup/test **command names** in README / CONTRIBUTING / wiki Commands | Orthogonal; do not re-list every script here |
+| Open drafts into `cursor/mp-tip-post728` | None for testing-layers / unit counts | Proceed |
+| Prior stamps (`q-mp-076` / post477 @ `a023fc36`) | Stale **3114** / **11988** on tip | Superseded by this remeasure |
 | #658 `q-mp-063` unit CI headroom | May change **unit wall time** (fixtures / virtual clocks) | **Does not change file/case counts** — note only |
-| #634 `q-mp-100` / #643 `q-mp-115` | `check:dev-docs` path hygiene | Not this task |
 
 ## How counts were measured
 
@@ -34,17 +33,17 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `a023fc36`
+## Live counts @ `b5884207`
 
 ### Unit (Vitest)
 
 | Metric | Count | Command |
 | --- | ---: | --- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3114** | `npm run test:unit` |
-| Cases listed (`npx vitest list`) | **11988** | `npm run test:unit` |
-| → `unit-shared` files / cases | 3039 / 11165 | `npx vitest run --project unit-shared` |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3140** | `npm run test:unit` |
+| Cases listed (`npx vitest list`) | **12154** | `npm run test:unit` |
+| → `unit-shared` files / cases | 3061 / 11308 | `npx vitest run --project unit-shared` |
 | → `unit-node` files / cases | 36 / 380 | `npx vitest run --project unit-node` |
-| → `unit-isolated` files / cases | 39 / 443 | `npx vitest run --project unit-isolated` |
+| → `unit-isolated` files / cases | 43 / 466 | `npx vitest run --project unit-isolated` |
 | Watch / coverage | — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
 
 `npm test` = `test:unit` && `test:e2e:chromium`.
