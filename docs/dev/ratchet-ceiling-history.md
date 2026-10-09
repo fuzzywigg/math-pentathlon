@@ -1,6 +1,6 @@
 # Ratchet ceiling history
 
-Task: `q-mp-074` / refresh `q-mp-236`. Generated `2026-10-09T20:28:35.128Z` via `git log --all`.
+Task: `q-mp-074` / refresh `q-mp-236` / `q-mp-290`. Generated `2026-10-09T22:50:23.111Z` via `git log --all`.
 
 Tracks report-only ceilings over git history:
 
@@ -8,14 +8,14 @@ Tracks report-only ceilings over git history:
 - **type Phase-2 out-of-scope** — `docs/dev/type-ratchet-phase2-baseline.json` → `outOfScopeErrors`
 - **boundary sum** — `docs/dev/module-boundaries-ceilings.json` → sum of `ceilings.*`
 
-## Live tip snapshot (`2392693`)
+## Live tip snapshot (`02af5c5`)
 
 | Metric                                        | Ceiling |
 | --------------------------------------------- | ------: |
 | curly                                         |     538 |
-| no-confusing-void-expression                  |     118 |
-| no-non-null-assertion                         |     254 |
-| no-duplicate-imports                          |      99 |
+| no-confusing-void-expression                  |      86 |
+| no-non-null-assertion                         |     246 |
+| no-duplicate-imports                          |      78 |
 | prefer-nullish-coalescing (HOLD; not charted) |      65 |
 
 Chart series are normalized independently; raw counts are in the history table.
@@ -117,6 +117,7 @@ Regenerate with `npm run report:ratchet-history` (no network; reads local git on
 | `0454239` | 2026-10-09 |   539 |  224 |    378 | 122 |      216 |          0 | chore(tip): lower curly ceiling after #664 src/core braces → 539                   |
 | `4e459ea` | 2026-10-09 |   539 |  224 |    378 | 122 |      216 |          0 | fix(lint): clear board-ui no-non-null-assertion (q-mp-131)                         |
 | `b2c4442` | 2026-10-09 |   539 |  224 |    336 | 122 |      216 |          0 | chore(tip): lower nnnull ceiling after #666 board-ui guards → 336                  |
+| `74a1596` | 2026-10-09 |   538 |   86 |    246 |  78 |      216 |          0 | q-mp-026h: tip fold onto cursor/mp-tip-post748 (#749–#753 batch 1) (#755)          |
 | `03fff4d` | 2026-10-09 |   539 |  224 |    336 | 122 |      216 |          0 | q-mp-141: ratchet @typescript-eslint/switch-exhaustiveness-check (ceiling 8)       |
 | `f5f2fd5` | 2026-10-09 |   539 |  224 |    336 | 122 |      216 |          0 | feat(lint): q-mp-140 ratchet prefer-nullish-coalescing (ceiling 96)                |
 | `8c87c98` | 2026-10-09 |   539 |  224 |    336 | 122 |      216 |          0 | fix(lint): q-mp-150 clear three/ no-non-null-assertion (−23 ceiling)               |
@@ -144,5 +145,15 @@ Regenerate with `npm run report:ratchet-history` (no network; reads local git on
 | `3125a0b` | 2026-10-09 |   538 |  132 |    268 | 122 |      216 |          0 | chore(lint): q-mp-180 lower no-confusing-void-expression ceiling 183→132           |
 | `32ab0bd` | 2026-10-09 |   538 |  183 |    254 | 122 |      216 |          0 | fix(q-mp-225): clear graph/algorithms no-non-null-assertion (−14)                  |
 | `08d504c` | 2026-10-09 |   538 |  183 |    268 | 105 |      216 |          0 | q-mp-226: clear no-duplicate-imports in */board-ui.ts (−17 → ceiling 105)          |
+| `dbb494b` | 2026-10-09 |   538 |  132 |    268 | 122 |      216 |          0 | chore(lint): q-mp-180 lower no-confusing-void-expression ceiling 183→132           |
+| `f1f0ecc` | 2026-10-09 |   538 |  132 |    254 | 122 |      216 |          0 | fix(q-mp-225): clear graph/algorithms no-non-null-assertion (−14)                  |
+| `69ac3f3` | 2026-10-09 |   538 |  132 |    254 | 105 |      216 |          0 | q-mp-226: clear no-duplicate-imports in */board-ui.ts (−17 → ceiling 105)          |
+| `410e83f` | 2026-10-09 |   538 |  132 |    254 |  99 |      216 |          0 | fix(q-mp-227): clear no-duplicate-imports in src/demos/** (−6 → 99)                |
+| `6a364fa` | 2026-10-09 |   538 |  118 |    254 | 105 |      216 |          0 | chore(lint): q-mp-218 lower no-confusing-void-expression ceiling 132→118           |
 | `7664bcd` | 2026-10-09 |   538 |  132 |    254 |  99 |      216 |          0 | fix(q-mp-227): clear no-duplicate-imports in src/demos/** (−6 → 99)                |
 | `289bc59` | 2026-10-09 |   538 |  118 |    254 |  99 |      216 |          0 | chore(lint): q-mp-218 re-measure no-confusing-void-expression ceiling 132→118      |
+| `5426e70` | 2026-10-09 |   538 |  100 |    254 | 105 |      216 |          0 | fix(lint): q-mp-221 brace no-confusing-void-expression in board-ui.ts (−32)        |
+| `4cf6e5b` | 2026-10-09 |   538 |  118 |    247 |  99 |      216 |          0 | fix(q-mp-243): clear polyomino-demo no-non-null-assertion (−7)                     |
+| `56a838a` | 2026-10-09 |   538 |  118 |    254 |  78 |      216 |          0 | fix(q-mp-244): clear no-duplicate-imports in core/** + ui/three/** (−21 → 78)      |
+| `04347ea` | 2026-10-09 |   538 |  118 |    253 |  99 |      216 |          0 | chore(lint): tip-owner lower no-non-null-assertion ceiling 254→253                 |
+| `278b0ab` | 2026-10-09 |   538 |   86 |    246 |  78 |      216 |          0 | chore(lint): tip-owner re-measure ceilings after #754/#760/#761 folds              |
