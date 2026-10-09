@@ -553,7 +553,7 @@ export async function createQueensGuardsBoard3D(
       state.moveHistory.length > 0
         ? state.moveHistory[state.moveHistory.length - 1]
         : undefined;
-    const last = lastEntry !== undefined ? lastEntry : null;
+    const last = lastEntry ?? null;
     const lastFrom = last ? cellKey(last.from.ring, last.from.position) : null;
     const lastTo = last ? cellKey(last.to.ring, last.to.position) : null;
     const lastWasCapture = Boolean(last?.wasCapture);
