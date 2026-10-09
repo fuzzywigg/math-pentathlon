@@ -11,10 +11,17 @@ npm run dev          # Vite → http://localhost:5173
 
 ## Verify before you push
 
+Run the CI lint-job chain (same order as `.github/workflows/ci.yml` `lint`):
+
 ```bash
-npm run lint
-npm run format:check
-npx tsc --noEmit
+npm run verify
+```
+
+That runs `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`.
+
+Then the rest of the required local gates:
+
+```bash
 npm run test:unit
 npm run test:e2e:chromium   # required CI e2e path
 npm run build
