@@ -128,11 +128,15 @@ export class OwlEventEmitter {
   emit(event: OwlEvent): void {
     // Call specific handlers
     const specificHandlers = this.handlers.get(event.type) || [];
-    specificHandlers.forEach((handler) => handler(event));
+    specificHandlers.forEach((handler) => {
+      handler(event);
+    });
 
     // Call wildcard handlers
     const wildcardHandlers = this.handlers.get('*') || [];
-    wildcardHandlers.forEach((handler) => handler(event));
+    wildcardHandlers.forEach((handler) => {
+      handler(event);
+    });
   }
 
   off(type: OwlEventType | '*', handler?: OwlEventHandler): void {
