@@ -70,6 +70,7 @@ Progress dashboard (`/#/stats`):
 ## Related reading
 
 - [Game registry](./game-registry.md)
+- [Game route lifecycle (`q-mp-070`)](../dev/engines/game-lifecycle.md) — sequence + per-game destroy map
 - [How to add a game](./adding-a-game.md)
 - [Development & testing layers](./development.md)
 - [Big Toads](./big-toads.md)
