@@ -90,7 +90,9 @@ export function parseKwatroNodeId(
   id: string
 ): { row: number; col: number } | null {
   const match = /^n(\d+)-(\d+)$/.exec(id);
-  if (!match) return null;
+  if (!match) {
+    return null;
+  }
   return { row: Number(match[1]), col: Number(match[2]) };
 }
 
@@ -388,7 +390,9 @@ export async function createKwatroSinkoBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     const w = Math.max(container.clientWidth || 420, 120);
     const h = Math.max(container.clientHeight || 420, 120);
     syncBoard3dRendererSize(renderer, camera, w, h);
@@ -396,14 +400,20 @@ export async function createKwatroSinkoBoard3D(
   };
 
   const buildEdgesOnce = (state: KwaState): void => {
-    if (edgeLines) return;
+    if (edgeLines) {
+      return;
+    }
     const positions: number[] = [];
     for (const key of collectPathwayEdgeKeys(state)) {
       const [fromId, toId] = key.split('|');
-      if (!fromId || !toId) continue;
+      if (!fromId || !toId) {
+        continue;
+      }
       const a = parseKwatroNodeId(fromId);
       const b = parseKwatroNodeId(toId);
-      if (!a || !b) continue;
+      if (!a || !b) {
+        continue;
+      }
       const wa = nodeToWorld(a.row, a.col);
       const wb = nodeToWorld(b.row, b.col);
       positions.push(wa.x, BOARD_Y + 0.08, wa.z, wb.x, BOARD_Y + 0.08, wb.z);
@@ -420,7 +430,9 @@ export async function createKwatroSinkoBoard3D(
   const pickNodeId = (clientX: number, clientY: number): string | null => {
     const rect = canvas.getBoundingClientRect();
     const ndc = clientToNdc(clientX, clientY, rect);
-    if (!ndc) return null;
+    if (!ndc) {
+      return null;
+    }
     pointer.x = ndc.x;
     pointer.y = ndc.y;
     raycaster.setFromCamera(pointer, camera);
@@ -429,7 +441,9 @@ export async function createKwatroSinkoBoard3D(
       let obj: Object3D | null = hit.object;
       while (obj) {
         const id = obj.userData?.nodeId as string | undefined;
-        if (id) return id;
+        if (id) {
+          return id;
+        }
         obj = obj.parent;
       }
     }
@@ -450,17 +464,27 @@ export async function createKwatroSinkoBoard3D(
       }
     }
     const maxDist = Math.max(rect.width, rect.height) * 0.07;
-    if (bestId && bestDist <= maxDist * maxDist) return bestId;
+    if (bestId && bestDist <= maxDist * maxDist) {
+      return bestId;
+    }
     return null;
   };
 
   const onPointer = (event: PointerEvent): void => {
-    if (disposed) return;
-    if (!nodeClickHandler && !chipClickHandler) return;
+    if (disposed) {
+      return;
+    }
+    if (!nodeClickHandler && !chipClickHandler) {
+      return;
+    }
     const nodeId = pickNodeId(event.clientX, event.clientY);
-    if (!nodeId) return;
+    if (!nodeId) {
+      return;
+    }
     const nm = nodeMeshes.get(nodeId);
-    if (!nm) return;
+    if (!nm) {
+      return;
+    }
     // Prefer chip selection when a chip is present and selectable via handler
     if (nm.chipBody && chipClickHandler) {
       const chipId = nm.chipBody.userData?.chipId as string | undefined;
@@ -476,7 +500,9 @@ export async function createKwatroSinkoBoard3D(
 
   const onContextLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     tearDown?.();
     container.dispatchEvent(new CustomEvent('mp3d-context-lost'));
   };
@@ -572,7 +598,9 @@ export async function createKwatroSinkoBoard3D(
 
     for (const nm of nodeMeshes.values()) {
       const node = state.nodes.get(nm.id);
-      if (!node) continue;
+      if (!node) {
+        continue;
+      }
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.setAttribute('data-node-id', nm.id);
@@ -614,8 +642,12 @@ export async function createKwatroSinkoBoard3D(
           isWinning ? 'winning' : '',
         ].filter(Boolean),
       };
-      if (owner !== undefined) labelParts.owner = owner;
-      if (piece !== undefined) labelParts.piece = piece;
+      if (owner !== undefined) {
+        labelParts.owner = owner;
+      }
+      if (piece !== undefined) {
+        labelParts.piece = piece;
+      }
       makeGridCell(btn, buildCellAriaLabel(labelParts));
 
       if (canSelect && node.chip) {
@@ -652,7 +684,9 @@ export async function createKwatroSinkoBoard3D(
     nextNodeClick?: KwatroNodeClickCallback,
     nextChipClick?: KwatroChipClickCallback
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     nodeClickHandler = nextNodeClick;
     chipClickHandler = nextChipClick;
     buildEdgesOnce(state);
@@ -664,13 +698,17 @@ export async function createKwatroSinkoBoard3D(
 
     for (const nm of nodeMeshes.values()) {
       const node = state.nodes.get(nm.id);
-      if (!node) continue;
+      if (!node) {
+        continue;
+      }
 
       const isNumbered = node.isNumbered;
       let padMat = isNumbered ? mats.padNumbered : mats.pad;
-      if (winning.has(nm.id)) padMat = mats.winner;
-      else if (validMoves.has(nm.id) && !node.chip) padMat = mats.valid;
-      else if (node.chip && state.selectedChip === node.chip.id) {
+      if (winning.has(nm.id)) {
+        padMat = mats.winner;
+      } else if (validMoves.has(nm.id) && !node.chip) {
+        padMat = mats.valid;
+      } else if (node.chip && state.selectedChip === node.chip.id) {
         padMat = mats.selected;
       }
       nm.pad.material = padMat;
@@ -682,7 +720,9 @@ export async function createKwatroSinkoBoard3D(
         const emphasize = !prefersReducedMotion() && (selected || win);
         const scale = emphasize ? 1.08 : 1;
         nm.chipBody.scale.set(scale, 1, scale);
-        if (nm.chipLabel) nm.chipLabel.scale.set(scale, scale, scale);
+        if (nm.chipLabel) {
+          nm.chipLabel.scale.set(scale, scale, scale);
+        }
       }
     }
 
@@ -694,7 +734,9 @@ export async function createKwatroSinkoBoard3D(
     nodeId: string
   ): { x: number; y: number } | null => {
     const parsed = parseKwatroNodeId(nodeId);
-    if (!parsed) return null;
+    if (!parsed) {
+      return null;
+    }
     const { x, z } = nodeToWorld(parsed.row, parsed.col);
     projectScratch.set(x, PAD_TOP_Y + CHIP_H, z).project(camera);
     const rect = canvas.getBoundingClientRect();
@@ -708,7 +750,9 @@ export async function createKwatroSinkoBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindPointer();
@@ -728,7 +772,9 @@ export async function createKwatroSinkoBoard3D(
       }
     }
     nodeMeshes.clear();
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     padGeo.dispose();
     chipGeo.dispose();
@@ -736,15 +782,21 @@ export async function createKwatroSinkoBoard3D(
     slabGeo.dispose();
     edgeLines?.geometry.dispose();
     woodMap.dispose();
-    for (const tex of labelTextures.values()) tex.dispose();
+    for (const tex of labelTextures.values()) {
+      tex.dispose();
+    }
     labelTextures.clear();
     Object.values(mats).forEach((m) => m.dispose());
     slabMat.dispose();
     rimMat.dispose();
     renderer.dispose();
     renderer.forceContextLoss?.();
-    if (canvas.parentElement) canvas.parentElement.removeChild(canvas);
-    if (a11y.parentElement) a11y.parentElement.removeChild(a11y);
+    if (canvas.parentElement) {
+      canvas.parentElement.removeChild(canvas);
+    }
+    if (a11y.parentElement) {
+      a11y.parentElement.removeChild(a11y);
+    }
     container.classList.remove(
       'board-3d-host',
       'kwa-board-3d-host',

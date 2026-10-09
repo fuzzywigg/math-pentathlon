@@ -313,7 +313,9 @@ export async function createStarTrackBoard3D(
   for (const player of ['player1', 'player2'] as const) {
     for (let space = 0; space <= TRACK_LENGTH; space++) {
       // Shared goal pad drawn once at center (player1 ownership for picking)
-      if (space === TRACK_LENGTH && player === 'player2') continue;
+      if (space === TRACK_LENGTH && player === 'player2') {
+        continue;
+      }
       const { x, z } = spaceToWorld(player, space);
       const pad = new THREE.Mesh(spaceGeo, mats.space);
       pad.position.set(
@@ -365,7 +367,9 @@ export async function createStarTrackBoard3D(
   };
 
   const resize = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
@@ -380,7 +384,9 @@ export async function createStarTrackBoard3D(
 
   const onLost = (event: Event): void => {
     event.preventDefault();
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     onContextLost?.();
   };
   canvas.addEventListener('webglcontextlost', onLost);
@@ -406,7 +412,9 @@ export async function createStarTrackBoard3D(
     a11y.replaceChildren();
     for (const player of ['player1', 'player2'] as const) {
       for (let space = 0; space <= TRACK_LENGTH; space++) {
-        if (space === TRACK_LENGTH && player === 'player2') continue;
+        if (space === TRACK_LENGTH && player === 'player2') {
+          continue;
+        }
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.setAttribute('role', 'button');
@@ -422,13 +430,17 @@ export async function createStarTrackBoard3D(
         btn.tabIndex = space === 0 && player === 'player1' ? 0 : -1;
         btn.addEventListener('focus', () => {
           a11yFocus = { player, space };
-          if (latestState) applyHighlights(latestState);
+          if (latestState) {
+            applyHighlights(latestState);
+          }
           paint();
         });
         btn.addEventListener('blur', () => {
           if (a11yFocus?.player === player && a11yFocus.space === space) {
             a11yFocus = null;
-            if (latestState) applyHighlights(latestState);
+            if (latestState) {
+              applyHighlights(latestState);
+            }
             paint();
           }
         });
@@ -447,8 +459,11 @@ export async function createStarTrackBoard3D(
 
     for (const sm of spaceMeshes) {
       let mat: Material = mats.space;
-      if (sm.space === TRACK_LENGTH) mat = mats.spaceGoal;
-      else if (sm.space === 0) mat = mats.spaceStart;
+      if (sm.space === TRACK_LENGTH) {
+        mat = mats.spaceGoal;
+      } else if (sm.space === 0) {
+        mat = mats.spaceStart;
+      }
 
       if (
         last &&
@@ -495,7 +510,9 @@ export async function createStarTrackBoard3D(
     state: StarTrackGameState,
     callbacks?: StarTrackBoard3DCallbacks
   ): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     latestState = state;
 
     const placePiece = (player: Player, space: number): void => {
@@ -544,7 +561,9 @@ export async function createStarTrackBoard3D(
     player: Player,
     space: number
   ): { x: number; y: number } | null => {
-    if (disposed) return null;
+    if (disposed) {
+      return null;
+    }
     const { x, z } =
       space >= TRACK_LENGTH ? { x: 0, z: 0 } : spaceToWorld(player, space);
     projectScratch.set(x, BOARD_Y + 0.2, z).project(camera);
@@ -559,7 +578,9 @@ export async function createStarTrackBoard3D(
 
   let cancelMountPaint: () => void = () => undefined;
   const unmount = (): void => {
-    if (disposed) return;
+    if (disposed) {
+      return;
+    }
     disposed = true;
     cancelMountPaint();
     unbindVisibility();
@@ -568,7 +589,9 @@ export async function createStarTrackBoard3D(
     if (window.__mp3dStarTrack) {
       delete window.__mp3dStarTrack;
     }
-    while (root.children.length > 0) root.remove(root.children[0]!);
+    while (root.children.length > 0) {
+      root.remove(root.children[0]!);
+    }
     scene.remove(root);
     spaceGeo.dispose();
     pieceGeo.dispose();
