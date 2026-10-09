@@ -48,7 +48,7 @@ Workflow: `permissions: contents: read`; checkout `persist-credentials: false`.
 | **Blocking `build`** | `build`; `dist/` + `dist/health.txt`; hard 250 kB/JS chunk; soft `size:check`, `check:pwa-manifest` | `npm run build` · soft: `npm run size:check` · `npm run check:pwa-manifest` |
 | **Blocking `unit`** | Vitest under `tests/unit` | `npm run test:unit` |
 | **Blocking `e2e`** | Chromium smoke (`@fullgame` excluded) | `npm run test:e2e:chromium` |
-| **Report-only** | `e2e-fullgame`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `visual-baseline` | `npm run test:e2e:fullgame` · `npm run test:e2e:mobile` · `npm run test:e2e:zoom-reflow` · `npm run test:e2e:forced-colors` · `npm run test:e2e:firefox-webkit` (CI job runs `npm run test:e2e -- --project=firefox --project=webkit`) · `npm run test:e2e:visual` |
+| **Report-only** | `e2e-fullgame`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `knip`, `visual-baseline` | `npm run test:e2e:fullgame` · `npm run test:e2e:mobile` · `npm run test:e2e:zoom-reflow` · `npm run test:e2e:forced-colors` · `npm run test:e2e:firefox-webkit` (CI job runs `npm run test:e2e -- --project=firefox --project=webkit`) · `npm run report:knip` · `npm run test:e2e:visual` |
 
 Job graph detail: `docs/dev/ci-gates-mermaid-q-mp-073.md`. Full command list: `docs/wiki/development.md`, `CONTRIBUTING.md`.
 
