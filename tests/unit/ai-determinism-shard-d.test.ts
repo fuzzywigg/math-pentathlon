@@ -165,7 +165,7 @@ describeHarness({
         s,
         s.currentPlayer,
         'easy',
-        cappedSeedOptions(5000 + index * 10 + p, 60)
+        cappedSeedOptions(5000 + index * 10 + p, 40, 1)
       );
       if (!move) break;
       s = qgApply(s, move);
@@ -175,19 +175,19 @@ describeHarness({
       s,
       s.currentPlayer,
       'easy',
-      cappedSeedOptions(1, 60)
+      cappedSeedOptions(1, 40, 1)
     );
     return probe ? s : null;
   },
   pickSeeded: (state, difficulty, seed) =>
-    // Prefer Math.random seeding + fine virtual clock so depth-1 can score
-    // multiple roots (randomness among top-N is observable for quality).
+    // Math.random seeding + virtual clock: tick=0.1 ≈ 400 now()-checks —
+    // enough for easy/medium quality divergence, ~5× cheaper than tick=0.02.
     withSeededRandom(seed, () =>
-      qgAI(state, state.currentPlayer, difficulty, cappedClockOptions(40, 0.02))
+      qgAI(state, state.currentPlayer, difficulty, cappedClockOptions(40, 0.1))
     ),
   pickOracle: (state) =>
     withOracleRandom(() =>
-      qgAI(state, state.currentPlayer, 'hard', cappedClockOptions(40, 0.02))
+      qgAI(state, state.currentPlayer, 'hard', cappedClockOptions(40, 0.1))
     ),
 });
 describeHarness({

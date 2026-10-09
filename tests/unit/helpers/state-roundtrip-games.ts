@@ -266,6 +266,12 @@ import {
   stripLazyCaches,
   withSeededMathRandom,
 } from './state-roundtrip';
+import { fastDeadlineOpts } from './ai-search-fast';
+
+/** Soft deadline for search-engine AI parity checks (original vs restored). */
+function compareSearchOpts() {
+  return fastDeadlineOpts(AI_COMPARE_SEED, 24);
+}
 
 export interface GameFuzzAdapter<S = unknown> {
   id: string;
@@ -413,7 +419,7 @@ const fab: GameFuzzAdapter<FabADiffyState> = {
   aiChoice: (s) =>
     s.phase === 'gameOver'
       ? null
-      : fabAI(s, currentPlayer(s), 'easy', { seed: AI_COMPARE_SEED }),
+      : fabAI(s, currentPlayer(s), 'easy', compareSearchOpts()),
   normalize: (s) => jsonTrip(s),
 };
 
@@ -469,7 +475,7 @@ const fiar: GameFuzzAdapter<FiarGameState> = {
   aiChoice: (s) =>
     s.phase === 'gameOver' || s.winner
       ? null
-      : fiarAI(s, currentPlayer(s), 'easy', { seed: AI_COMPARE_SEED }),
+      : fiarAI(s, currentPlayer(s), 'easy', compareSearchOpts()),
   normalize: (s) => jsonTrip(s),
 };
 
@@ -550,7 +556,7 @@ const hex: GameFuzzAdapter<HexGameState> = {
   aiChoice: (s) =>
     s.winner
       ? null
-      : hexAI(s, currentPlayer(s), 'easy', { seed: AI_COMPARE_SEED }),
+      : hexAI(s, currentPlayer(s), 'easy', compareSearchOpts()),
   normalize: (s) => jsonTrip(s),
 };
 
@@ -935,7 +941,7 @@ const queens: GameFuzzAdapter<QueensGuardsState> = {
   aiChoice: (s) =>
     s.winner
       ? null
-      : queensAI(s, currentPlayer(s), 'easy', { seed: AI_COMPARE_SEED }),
+      : queensAI(s, currentPlayer(s), 'easy', compareSearchOpts()),
   normalize: (s) => jsonTrip(s),
 };
 

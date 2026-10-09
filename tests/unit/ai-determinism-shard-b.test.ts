@@ -172,6 +172,7 @@ describeHarness({
   pickSeeded: (state, difficulty, seed) =>
     // Math.random seeding (no options.seed) so oracle (random=0) and trial
     // streams stay comparable while remaining deterministic.
+    // Hex quality needs the original soft budget (~800 now()-checks).
     withSeededRandom(seed, () =>
       hexAI(state, state.currentPlayer, difficulty, cappedClockOptions(200, 0.25))
     ),

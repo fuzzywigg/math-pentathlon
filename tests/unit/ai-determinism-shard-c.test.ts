@@ -112,8 +112,17 @@ import { getAIMove as kwatroAI } from '../../src/games/kwatro-sinko/ai';
 import { createInitialState as createPar } from '../../src/games/par-55/rules';
 import { getAIMove as parAI } from '../../src/games/par-55/ai';
 
-import { createInitialState as createPent } from '../../src/games/pent-em-in/types';
+import {
+  createInitialState as createPent,
+  getPlayerPieces as pentPieces,
+  getPentominoShape,
+} from '../../src/games/pent-em-in/types';
 import { getAIMove as pentAI } from '../../src/games/pent-em-in/ai';
+import {
+  getValidPlacements as pentValids,
+  placePiece as pentPlace,
+} from '../../src/games/pent-em-in/rules';
+import type { Rotation } from '../../src/core/polyomino/types';
 
 import { createInitialState as createPrime } from '../../src/games/prime-gold/rules';
 import { getAIPlacement as primeAI } from '../../src/games/prime-gold/ai';
@@ -193,14 +202,52 @@ describeHarness({
 });
 describeHarness({
   label: 'pent-em-in',
-  midgame: (index) => {
-    const s = createPent();
-    void index;
-    const move = withSeededRandom(2900 + index, () =>
-      pentAI(s, s.currentPlayer, 'medium')
-    );
-    return move ? s : null;
-  },
+  // Shared mid-game fixtures via rules-only random plies (not AI). Opening
+  // evaluateMoves is the CI long-pole; fewer remaining pieces cuts cost a lot
+  // while keeping the same 50-state × difficulty asserts (q-mp-063).
+  midgame: (index) =>
+    withSeededRandom(2900 + index, () => {
+      let s = createPent();
+      const plies = 3 + (index % 5);
+      for (let p = 0; p < plies; p++) {
+        if (s.phase === 'gameOver' || s.winner) return null;
+        const available = [...pentPieces(s, s.currentPlayer).available];
+        if (available.length === 0) return null;
+        // Shuffle piece order under the seeded RNG.
+        for (let i = available.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const tmp = available[i]!;
+          available[i] = available[j]!;
+          available[j] = tmp;
+        }
+        let placed = false;
+        for (const shapeId of available) {
+          const shape = getPentominoShape(shapeId);
+          if (!shape) continue;
+          const rotations: Rotation[] = shape.canRotate
+            ? [0, 90, 180, 270]
+            : [0];
+          const flips = shape.canFlip ? [false, true] : [false];
+          for (const rotation of rotations) {
+            for (const flipped of flips) {
+              const positions = pentValids(s, shapeId, rotation, flipped);
+              if (positions.length === 0) continue;
+              const pos =
+                positions[Math.floor(Math.random() * positions.length)]!;
+              s = pentPlace(s, shapeId, pos, rotation, flipped);
+              placed = true;
+              break;
+            }
+            if (placed) break;
+          }
+          if (placed) break;
+        }
+        if (!placed) return null;
+      }
+      if (s.phase === 'gameOver' || s.winner) return null;
+      const probe = pentAI(s, s.currentPlayer, 'medium');
+      return probe ? s : null;
+    }),
   pickSeeded: (state, difficulty, seed) =>
     withSeededRandom(seed, () =>
       pentAI(state, state.currentPlayer, difficulty)

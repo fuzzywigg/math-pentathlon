@@ -15,7 +15,8 @@ const MAX_PLIES = 400;
 /**
  * Play budgets for search games (env read lazily so vitest can set vars
  * before first play() despite ESM import hoisting).
- * - CALIBRATION_WALL_CLOCK=1: real performance.now() deadlines.
+ * - CALIBRATION_WALL_CLOCK=1: soft deadline via a virtual clock (q-mp-063).
+ *   Same deadlineMs budget intent as wall time, without burning CI wall clock.
  * - Default: seeded only (no deadline) — full search, slower but ordered.
  */
 function searchOptions(seed: number, ply: number) {
@@ -25,9 +26,18 @@ function searchOptions(seed: number, ply: number) {
   if (!wall) {
     return { seed: plySeed(seed, ply) };
   }
+  const deadlineMs = Number(env?.CALIBRATION_DEADLINE_MS ?? 300);
+  // Advance virtual time by ~1/32 of the budget per now() so searches abort
+  // after a bounded node count (parity for Easy/Hard within the same budget).
+  let t = 0;
+  const tick = Math.max(deadlineMs / 32, 1);
   return {
     seed: plySeed(seed, ply),
-    deadlineMs: Number(env?.CALIBRATION_DEADLINE_MS ?? 300),
+    deadlineMs,
+    now: () => {
+      t += tick;
+      return t;
+    },
   };
 }
 

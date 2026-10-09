@@ -11,7 +11,7 @@
  * searches use a virtual clock + short deadline so truncation is
  * deterministic (no wall-clock). No rules/scoring changes.
  */
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
 import {
   MIDGAME_SAMPLES,
   DIFFICULTIES,
@@ -224,13 +224,18 @@ function pinStates(count: number): FractionPinballState[] {
   );
 }
 describe('frac-fact', () => {
+  // Shared fixture across determinism + quality (same 50 problems).
+  let fracFixture: FracFactState[] = [];
+  beforeAll(() => {
+    fracFixture = fracStates(MIDGAME_SAMPLES);
+  });
+
   it(
     `determinism: fixed seed → same answer on ${MIDGAME_SAMPLES} problems × difficulties`,
     () => {
-      const states = fracStates(MIDGAME_SAMPLES);
       for (const difficulty of DIFFICULTIES) {
-        for (let i = 0; i < states.length; i++) {
-          const state = states[i]!;
+        for (let i = 0; i < fracFixture.length; i++) {
+          const state = fracFixture[i]!;
           const seed = 11_000 + i * 13 + difficulty.length;
           const a = withSeededRandom(seed, () =>
             fracAI(state, state.currentPlayer, difficulty)
@@ -249,11 +254,10 @@ describe('frac-fact', () => {
   it(
     'quality: hard correct-rate > easy (and ≥ medium)',
     () => {
-      const states = fracStates(MIDGAME_SAMPLES);
       const correct = { easy: 0, medium: 0, hard: 0 };
       let n = 0;
-      for (let i = 0; i < states.length; i++) {
-        const state = states[i]!;
+      for (let i = 0; i < fracFixture.length; i++) {
+        const state = fracFixture[i]!;
         const problem = state.currentProblem!;
         n++;
         for (const d of DIFFICULTIES) {
@@ -274,13 +278,18 @@ describe('frac-fact', () => {
   );
 });
 describe('fraction-pinball', () => {
+  // Shared fixture across determinism + quality (same 50 challenges).
+  let pinFixture: FractionPinballState[] = [];
+  beforeAll(() => {
+    pinFixture = pinStates(MIDGAME_SAMPLES);
+  });
+
   it(
     `determinism: fixed seed → same answer on ${MIDGAME_SAMPLES} challenges × difficulties`,
     () => {
-      const states = pinStates(MIDGAME_SAMPLES);
       for (const difficulty of DIFFICULTIES) {
-        for (let i = 0; i < states.length; i++) {
-          const state = states[i]!;
+        for (let i = 0; i < pinFixture.length; i++) {
+          const state = pinFixture[i]!;
           const seed = 12_000 + i * 17 + difficulty.length;
           const a = withSeededRandom(seed, () =>
             pinAI(state, state.currentPlayer, difficulty)
@@ -299,11 +308,10 @@ describe('fraction-pinball', () => {
   it(
     'quality: hard correct-rate > easy (and ≥ medium)',
     () => {
-      const states = pinStates(MIDGAME_SAMPLES);
       const correct = { easy: 0, medium: 0, hard: 0 };
       let n = 0;
-      for (let i = 0; i < states.length; i++) {
-        const state = states[i]!;
+      for (let i = 0; i < pinFixture.length; i++) {
+        const state = pinFixture[i]!;
         n++;
         for (const d of DIFFICULTIES) {
           const ans = withSeededRandom(80_000 + i * 3 + d.length, () =>
@@ -333,14 +341,18 @@ describe('seeded-engine options.seed audit', () => {
     const fiar = createFiar();
     const spy = vi.spyOn(Math, 'random');
     hexAI(hex, hex.currentPlayer, 'medium', cappedSeedOptions(42, 100));
-    qgAI(qg, qg.currentPlayer, 'easy', cappedSeedOptions(43, 60, 0.05));
-    fabAI(fab, fab.currentPlayer, 'medium', cappedSeedOptions(44, 80));
-    fiarAI(fiar, fiar.currentPlayer, 'medium', { seed: 45 });
+    qgAI(qg, qg.currentPlayer, 'easy', cappedSeedOptions(43, 48, 1));
+    fabAI(fab, fab.currentPlayer, 'medium', cappedSeedOptions(44, 48));
+    fiarAI(fiar, fiar.currentPlayer, 'medium', {
+      seed: 45,
+      ...cappedClockOptions(48, 2),
+    });
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
   });
 
   it('options.seed: same seed → same move on 50 mid-game states × difficulties', () => {
+    // Shared mid-game fixtures built once for the whole it().
     const hexStates = collectStates(
       MIDGAME_SAMPLES,
       (index) =>
@@ -362,12 +374,15 @@ describe('seeded-engine options.seed audit', () => {
       (index) => {
         const s = createQG();
         void index;
-        return qgAI(s, s.currentPlayer, 'easy', cappedSeedOptions(1, 40, 0.05))
+        return qgAI(s, s.currentPlayer, 'easy', cappedSeedOptions(1, 40, 1))
           ? s
           : null;
       },
       'qg-seed-api'
     );
+    // Opening deal is identical across samples — share one fab/fiar board.
+    const fabOpening = createFab();
+    const fiarOpening = createFiar();
     for (const difficulty of DIFFICULTIES) {
       for (let i = 0; i < MIDGAME_SAMPLES; i++) {
         const seed = 20_000 + i * 11 + difficulty.length;
@@ -376,13 +391,13 @@ describe('seeded-engine options.seed audit', () => {
           hex,
           hex.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 200, 0.25)
+          cappedSeedOptions(seed, 48, 2)
         );
         const hb = hexAI(
           hex,
           hex.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 200, 0.25)
+          cappedSeedOptions(seed, 48, 2)
         );
         expect(moveKey(ha)).toBe(moveKey(hb));
 
@@ -391,34 +406,38 @@ describe('seeded-engine options.seed audit', () => {
           qg,
           qg.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 40, 0.05)
+          cappedSeedOptions(seed, 40, 1)
         );
         const qb = qgAI(
           qg,
           qg.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 40, 0.05)
+          cappedSeedOptions(seed, 40, 1)
         );
         expect(moveKey(qa)).toBe(moveKey(qb));
 
-        const fab = createFab();
         const fa = fabAI(
-          fab,
-          fab.currentPlayer,
+          fabOpening,
+          fabOpening.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 80)
+          cappedSeedOptions(seed, 48)
         );
         const fb = fabAI(
-          fab,
-          fab.currentPlayer,
+          fabOpening,
+          fabOpening.currentPlayer,
           difficulty,
-          cappedSeedOptions(seed, 80)
+          cappedSeedOptions(seed, 48)
         );
         expect(moveKey(fa)).toBe(moveKey(fb));
 
-        const fiar = createFiar();
-        const ia = fiarAI(fiar, fiar.currentPlayer, difficulty, { seed });
-        const ib = fiarAI(fiar, fiar.currentPlayer, difficulty, { seed });
+        const ia = fiarAI(fiarOpening, fiarOpening.currentPlayer, difficulty, {
+          seed,
+          ...cappedClockOptions(48, 2),
+        });
+        const ib = fiarAI(fiarOpening, fiarOpening.currentPlayer, difficulty, {
+          seed,
+          ...cappedClockOptions(48, 2),
+        });
         expect(moveKey(ia)).toBe(moveKey(ib));
       }
     }

@@ -251,8 +251,12 @@ describeHarness({
   },
   pickSeeded: (state, difficulty, seed) =>
     fabAI(state, state.currentPlayer, difficulty, cappedSeedOptions(seed)),
+  // Cap oracle the same way as pickSeeded — unbounded hard search was the
+  // dominant cost in this shard's quality it() (q-mp-063).
   pickOracle: (state) =>
-    withOracleRandom(() => fabAI(state, state.currentPlayer, 'hard')),
+    withOracleRandom(() =>
+      fabAI(state, state.currentPlayer, 'hard', cappedClockOptions(48, 2))
+    ),
 });
 describeHarness({
   label: 'fiar',
@@ -263,16 +267,25 @@ describeHarness({
       for (let p = 0; p < plies; p++) {
         const move = fiarAI(s, s.currentPlayer, 'easy', {
           seed: 4000 + index * 10 + p,
+          ...cappedClockOptions(48, 2),
         });
         if (!move) break;
         s = fiarApply(s, move);
         if (s.phase === 'gameOver' || s.winner) return null;
       }
-      const probe = fiarAI(s, s.currentPlayer, 'easy', { seed: 1 });
+      const probe = fiarAI(s, s.currentPlayer, 'easy', {
+        seed: 1,
+        ...cappedClockOptions(48, 2),
+      });
       return probe ? s : null;
     }),
   pickSeeded: (state, difficulty, seed) =>
-    fiarAI(state, state.currentPlayer, difficulty, { seed }),
+    fiarAI(state, state.currentPlayer, difficulty, {
+      seed,
+      ...cappedClockOptions(48, 2),
+    }),
   pickOracle: (state) =>
-    withOracleRandom(() => fiarAI(state, state.currentPlayer, 'hard')),
+    withOracleRandom(() =>
+      fiarAI(state, state.currentPlayer, 'hard', cappedClockOptions(48, 2))
+    ),
 });

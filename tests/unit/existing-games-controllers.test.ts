@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
+import { installFakeTimerHooks } from './helpers/fake-timers';
 import {
   initGame as initHex,
   newGameVsHuman as hexVsHuman,
@@ -162,9 +163,12 @@ import {
 } from '../../src/games/queens-guards/game-controller';
 import { tutorialManager } from '../../src/core/tutorial';
 
+// Fake timers: vsAI controllers schedule think delays; don't burn wall time
+// on mount/chrome asserts (q-mp-063). Shared cleanup still restores real timers.
+installFakeTimerHooks();
+
 afterEach(() => {
   document.body.innerHTML = '';
-  vi.useRealTimers();
   if (tutorialManager.getIsActive()) {
     tutorialManager.exit();
   }

@@ -32,6 +32,9 @@ export function moveKey(move: unknown): string {
  * Seeded search options with a virtual clock (for hex / queens / fab).
  * `tick` controls how fast virtual time advances per `now()` call — smaller
  * ticks allow more root moves to be scored before the deadline.
+ *
+ * Defaults keep a short soft budget (enough to score several roots) so CI
+ * unit-node shards stay under the ~8 min step budget (q-mp-063).
  */
 export function cappedSeedOptions(
   seed: number,
@@ -51,10 +54,14 @@ export function cappedSeedOptions(
   };
 }
 
-/** Deadline-only options (Math.random / withSeededRandom supplies entropy). */
+/**
+ * Deadline-only options (Math.random / withSeededRandom supplies entropy).
+ * Default tick=1 ≈ 48 now()-checks before abort — fine enough for quality
+ * divergence, coarse enough for CI headroom (was often 0.02 → ~2000 checks).
+ */
 export function cappedClockOptions(
   deadlineMs = 48,
-  tick = 0.1
+  tick = 1
 ): { deadlineMs: number; now: () => number } {
   let t = 0;
   return {
