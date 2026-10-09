@@ -83,3 +83,9 @@ Live tip probe: **35** hits. Cleared **14** non-HOLD sites (board-ui / game-stat
 **`@typescript-eslint/switch-exhaustiveness-check`** — ceiling **8** (= live tip re-measure on `cursor/mp-tip-post598` @ `7922f9af`; inventory/ticket said **9** — never raise). Hits (1 each): `attribute-ui`, `dice-ui`, `expressions/evaluator`, `owl-messages`, `owl-system`, `graph-demo`, `polyomino-demo`, `star-track/rules`. No switch rewrites in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`). Complements q-mp-129 `default-case`.
 
 Open-PR overlap for q-mp-141: no open draft already ratchets `switch-exhaustiveness-check`. Other drafts may edit `lint-ratchet-ceilings.json` additively — tip owner folds keys (min wins).
+
+## Ratchet chosen for q-mp-157
+
+**`@typescript-eslint/no-shadow`** — ceiling **13** (= live tip re-measure on `cursor/mp-tip-post700` @ `3320d897`). Hits: `contig-60/types.ts` ×2 (`a`/`b`); six `game-controller.ts` `vsAI` bind sites (fab-a-diffy, par-55, prime-gold, ramrod, stars-bars, sum-dominoes); `par-55/rules.ts` ×1 HOLD; four `src/ui/three/*-board-3d.ts` `key` shadows. No renames in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`). Follow-up clear: q-mp-174 (controllers −6).
+
+Open-PR overlap for q-mp-157: no open draft already ratchets `no-shadow`. Other drafts may edit `lint-ratchet-ceilings.json` additively — tip owner folds keys (min wins).
