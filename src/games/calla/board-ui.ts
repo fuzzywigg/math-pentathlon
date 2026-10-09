@@ -100,10 +100,14 @@ export function renderBoard(
       state.lastSownPit?.index === displayIndex;
 
     // ratchet: displayIndex in 0..PITS_PER_SIDE-1; pits always length PITS_PER_SIDE.
+    const p2Stones = state.player2Pits[displayIndex];
+    if (p2Stones === undefined) {
+      continue;
+    }
     const pitGroup = createPit(
       x,
       p2Y,
-      state.player2Pits[displayIndex]!,
+      p2Stones,
       'player2',
       displayIndex,
       isValid,
@@ -123,10 +127,14 @@ export function renderBoard(
       state.lastSownPit?.side === 'player1' && state.lastSownPit?.index === i;
 
     // ratchet: i in 0..PITS_PER_SIDE-1; pits always length PITS_PER_SIDE.
+    const p1Stones = state.player1Pits[i];
+    if (p1Stones === undefined) {
+      continue;
+    }
     const pitGroup = createPit(
       x,
       p1Y,
-      state.player1Pits[i]!,
+      p1Stones,
       'player1',
       i,
       isValid,

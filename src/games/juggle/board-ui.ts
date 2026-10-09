@@ -270,7 +270,14 @@ export function renderBoard(
       cell.dataset.col = String(col);
 
       // ratchet: dense GRID_SIZE×GRID_SIZE board; loops bound by CONFIG.GRID_SIZE.
-      const isOccupied = board.cells[row]![col]!;
+      const cellRow = board.cells[row];
+      if (cellRow === undefined) {
+        continue;
+      }
+      const isOccupied = cellRow[col];
+      if (isOccupied === undefined) {
+        continue;
+      }
       const isPreview = previewSet.has(`${row},${col}`);
 
       if (isOccupied) {
@@ -419,9 +426,13 @@ export function renderDice(
       const die = document.createElement('div');
       die.className = 'juggle-die';
       // ratchet: dice is [number, number]; loop i in 0..1.
-      die.textContent = getDieFace(dice[i]!);
+      const dieValue = dice[i];
+      if (dieValue === undefined) {
+        continue;
+      }
+      die.textContent = getDieFace(dieValue);
 
-      const category = getCategoryFromDie(dice[i]!);
+      const category = getCategoryFromDie(dieValue);
       const label = document.createElement('div');
       label.className = 'juggle-die-label';
       label.textContent = getCategoryName(category);
@@ -555,7 +566,10 @@ function renderShapePreview(
   canvas.style.width = `${width}px`;
   canvas.style.height = `${height}px`;
 
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d');
+  if (ctx === null) {
+    return canvas;
+  }
 
   for (const cell of cells) {
     const x = (cell.col - minCol) * cellSize + 2;

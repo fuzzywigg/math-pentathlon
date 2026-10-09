@@ -330,7 +330,11 @@ export function renderRodLegend(): HTMLElement {
     const color = document.createElement('div');
     color.className = 'ramrod-legend-color';
     // ratchet: loop is len 1–10; ROD_COLORS defines every key.
-    color.style.backgroundColor = ROD_COLORS[len]!;
+    const rodColor = ROD_COLORS[len];
+    if (rodColor === undefined) {
+      continue;
+    }
+    color.style.backgroundColor = rodColor;
     color.style.width = `${len * 8}px`;
     if (len === 1 || len === 5) {
       color.style.border = '1px solid #999';

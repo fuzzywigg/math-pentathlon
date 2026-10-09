@@ -740,8 +740,11 @@ export function renderMoveHistory(state: PrimeGoldState): HTMLElement {
     i >= Math.max(0, state.moveHistory.length - 10);
     i--
   ) {
-    // i is in [max(0,len-10), len); assert for NUI.
-    const move = state.moveHistory[i]!;
+    // i is in [max(0,len-10), len); narrow after indexed access.
+    const move = state.moveHistory[i];
+    if (move === undefined) {
+      continue;
+    }
     const moveEl = document.createElement('div');
     moveEl.className = `pg-move-item ${move.player}`;
     replaceWithSafeHtml(

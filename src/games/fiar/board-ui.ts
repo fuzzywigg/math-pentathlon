@@ -163,8 +163,11 @@ export function renderBoard(
   }
 
   for (const edge of state.board.edges) {
-    const from = state.board.nodes.get(edge.from)!;
-    const to = state.board.nodes.get(edge.to)!;
+    const from = state.board.nodes.get(edge.from);
+    const to = state.board.nodes.get(edge.to);
+    if (from === undefined || to === undefined) {
+      continue;
+    }
 
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', from.x.toString());
@@ -189,8 +192,10 @@ export function renderBoard(
     g.setAttribute('data-node-id', nodeId);
     const parsed = /^c(\d+)r(\d+)$/.exec(nodeId);
     if (parsed) {
-      g.setAttribute('data-col', parsed[1]!);
-      g.setAttribute('data-row', parsed[2]!);
+      const parsedCol = parsed[1] ?? '0';
+      const parsedRow = parsed[2] ?? '0';
+      g.setAttribute('data-col', parsedCol);
+      g.setAttribute('data-row', parsedRow);
     } else {
       // Synthetic fixture ids (a, b, …) — keep a stable grid cell for a11y.
       g.setAttribute('data-row', '0');

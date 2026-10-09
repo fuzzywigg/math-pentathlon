@@ -59,7 +59,11 @@ export function handleCellClick(
   // Move King phase
   if (state.turnPhase === 'moveKing') {
     // ratchet: dense BOARD_SIZE×BOARD_SIZE board; row/col are 1-based valid seats.
-    const clickedCell = state.board[row - 1]![col - 1]!; // Convert 1-based to 0-based
+    const moveRow = state.board[row - 1]; // Convert 1-based to 0-based
+    if (moveRow === undefined) {
+      return { state, isInvalidClick: false };
+    }
+    const clickedCell = moveRow[col - 1];
 
     // Check if clicked on current player's King
     if (
@@ -106,7 +110,11 @@ export function handleCellClick(
     }
 
     // ratchet: dense BOARD_SIZE×BOARD_SIZE board; row/col are 1-based valid seats.
-    const clickedCell = state.board[row - 1]![col - 1]!;
+    const placeRow = state.board[row - 1];
+    if (placeRow === undefined) {
+      return { state, isInvalidClick: true };
+    }
+    const clickedCell = placeRow[col - 1];
 
     // Only place on empty cells
     if (clickedCell === null) {
@@ -145,7 +153,14 @@ function syncKingsCell(
   cell.dataset.col = String(col);
 
   // ratchet: dense BOARD_SIZE×BOARD_SIZE board; sync loops 1..KINGS_BOARD_SIZE.
-  const piece = state.board[row - 1]![col - 1]!;
+  const syncRow = state.board[row - 1];
+  if (syncRow === undefined) {
+    return;
+  }
+  const piece = syncRow[col - 1];
+  if (piece === undefined) {
+    return;
+  }
   const colLetter = String.fromCharCode(64 + col);
   const coord = `${colLetter}${row}`;
   let owner: string | undefined;
@@ -212,8 +227,12 @@ function syncKingsCell(
 
   if (state.moveHistory.length > 0) {
     // ratchet: length > 0 ⇒ last index defined.
-    const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
-    if (lastMove.to.row === row && lastMove.to.col === col) {
+    const lastMove = state.moveHistory[state.moveHistory.length - 1];
+    if (
+      lastMove !== undefined &&
+      lastMove.to.row === row &&
+      lastMove.to.col === col
+    ) {
       cell.classList.add('cell-last-move');
     }
   }
@@ -324,7 +343,11 @@ export function renderBoard(
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {
-      syncKingsCell(cells[i++]!, state, row, col);
+      const cellEl = cells[i++];
+      if (cellEl === undefined) {
+        continue;
+      }
+      syncKingsCell(cellEl, state, row, col);
     }
   }
 

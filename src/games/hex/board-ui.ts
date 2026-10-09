@@ -214,7 +214,14 @@ export function renderBoard(
     for (let col = 0; col < size; col++) {
       const center = getHexCenter(row, col);
       // ratchet: dense size×size board; loops bound by state.boardSize.
-      const cellState = state.board[row]![col]!;
+      const boardRow = state.board[row];
+      if (boardRow === undefined) {
+        continue;
+      }
+      const cellState = boardRow[col];
+      if (cellState === undefined) {
+        continue;
+      }
       const isWinningCell = winningSet.has(`${row},${col}`);
 
       const cellGroup = document.createElementNS(
@@ -252,8 +259,12 @@ export function renderBoard(
       // Mark last move
       if (state.moveHistory.length > 0) {
         // ratchet: length > 0 ⇒ last index defined.
-        const lastMove = state.moveHistory[state.moveHistory.length - 1]!;
-        if (lastMove.position.row === row && lastMove.position.col === col) {
+        const lastMove = state.moveHistory[state.moveHistory.length - 1];
+        if (
+          lastMove !== undefined &&
+          lastMove.position.row === row &&
+          lastMove.position.col === col
+        ) {
           cellClass += ' hex-cell-last-move';
         }
       }
@@ -286,10 +297,13 @@ export function renderBoard(
 
       // Add click / keyboard activation for empty cells
       if (isValidPlacement) {
-        cellGroup.style.cursor = 'pointer';
-        const activate = () => onCellClick!(row, col);
-        cellGroup.addEventListener('click', activate);
-        bindCellActivateKeys(cellGroup, activate);
+        const placeHandler = onCellClick;
+        if (placeHandler !== undefined) {
+          cellGroup.style.cursor = 'pointer';
+          const activate = () => placeHandler(row, col);
+          cellGroup.addEventListener('click', activate);
+          bindCellActivateKeys(cellGroup, activate);
+        }
       }
 
       cellsGroup.appendChild(cellGroup);
