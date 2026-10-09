@@ -19,11 +19,7 @@ import {
   normalizeSelectedChipKind,
 } from './rules';
 import { renderBoard, injectFiarStyles, getPlayerName } from './board-ui';
-import {
-  type AIDifficulty,
-  applyAIMove,
-  getAIMove,
-} from './ai';
+import { type AIDifficulty, applyAIMove, getAIMove } from './ai';
 import {
   cancelFiarAiRequests,
   disposeFiarAiWorker,

@@ -22,10 +22,7 @@ import {
   injectFabStyles,
   getPlayerName,
 } from './board-ui';
-import {
-  type AIDifficulty,
-  applyAIMoveSteps,
-} from './ai';
+import { type AIDifficulty, applyAIMoveSteps } from './ai';
 import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
 import { clearElement } from '../../core/dom-security';

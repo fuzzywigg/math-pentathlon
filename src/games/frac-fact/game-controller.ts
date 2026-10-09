@@ -17,11 +17,7 @@ import {
   injectFracFactStyles,
 } from './board-ui';
 import type { Fraction } from '../../core/fractions/types';
-import {
-  type AIDifficulty,
-  getAIAnswer,
-  isAITurn,
-} from './ai';
+import { type AIDifficulty, getAIAnswer, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fracFactTutorial } from './tutorial';
 import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';

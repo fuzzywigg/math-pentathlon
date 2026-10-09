@@ -1,10 +1,7 @@
 // Remainder Islands Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import {
-  type RemainderIslandsState,
-  createInitialState,
-} from './types';
+import { type RemainderIslandsState, createInitialState } from './types';
 import { performRoll, selectIsland, setSelectedIsland } from './rules';
 import {
   renderBoard,
@@ -16,10 +13,7 @@ import {
   getPlayerName,
   injectRemainderIslandsStyles,
 } from './board-ui';
-import {
-  type AIDifficulty,
-  getAIIslandChoice,
-} from './ai';
+import { type AIDifficulty, getAIIslandChoice } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { remainderIslandsTutorial } from './tutorial';
 import { syncAppOpponentChrome } from '../../ui/player-colors';
