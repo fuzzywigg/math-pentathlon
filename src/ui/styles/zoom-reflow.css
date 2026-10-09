@@ -154,7 +154,6 @@
   .status-winner,
   .owl-bubble,
   .owl-message,
-  .move-history-panel,
   .move-history-list {
     max-width: 100%;
     min-width: 0;
@@ -264,7 +263,6 @@ html[data-zoom-reflow-text='200'] .status-mode,
 html[data-zoom-reflow-text='200'] .status-winner,
 html[data-zoom-reflow-text='200'] .owl-bubble,
 html[data-zoom-reflow-text='200'] .owl-message,
-html[data-zoom-reflow-text='200'] .move-history-panel,
 html[data-zoom-reflow-text='200'] .move-history-list {
   max-width: 100%;
   min-width: 0;
@@ -368,7 +366,6 @@ html[data-zoom-reflow-zoom='200'] .status-mode,
 html[data-zoom-reflow-zoom='200'] .status-winner,
 html[data-zoom-reflow-zoom='200'] .owl-bubble,
 html[data-zoom-reflow-zoom='200'] .owl-message,
-html[data-zoom-reflow-zoom='200'] .move-history-panel,
 html[data-zoom-reflow-zoom='200'] .move-history-list {
   max-width: 100%;
   min-width: 0;
