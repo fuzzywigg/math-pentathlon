@@ -6,6 +6,7 @@
  * bootstrap/SW catch). q-mp-108 un-skips P3 R-SHELL-01 (#app soft-fail).
  * q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
  * q-mp-120 un-skips P3 R-JSON-04 (tryGameStateFromJSON soft-fail).
+ * q-mp-124 recovers P1 R-SHELL-02 (main cleanup / onBeforeShow try/finally).
  * Remaining P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
@@ -219,6 +220,89 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
       "markBoard3dWebGlFallback(boardHostEl, 'context-lost')"
     );
     expect(controller).toContain('onBoard3dContextLost');
+  });
+
+  it('P1 R-SHELL-02: throwing currentCleanup still disposes boundary; onBeforeShow proceeds', () => {
+    const src = readSrc('src/main.ts');
+    // cleanup(): try currentCleanup → catch log → finally dispose boundary
+    expect(src).toMatch(
+      /function cleanup\(\): void \{\s*exitTutorialIfActive\(\);\s*\/\/ R-SHELL-02:[^\n]*\n\s*try \{\s*if \(currentCleanup\) \{\s*currentCleanup\(\);\s*\}\s*\} catch \(err\) \{\s*console\.error\('\[main\] route cleanup failed', err\);\s*\} finally \{\s*currentCleanup = null;\s*if \(activeGameBoundary\) \{\s*activeGameBoundary\.dispose\(\);/
+    );
+    // onBeforeShow: try currentCleanup → finally clear (outer boundary swallows)
+    expect(src).toMatch(
+      /onBeforeShow: \(\) => \{\s*exitTutorialIfActive\(\);\s*\/\/ R-SHELL-02:[^\n]*\n\s*try \{\s*if \(currentCleanup\) \{\s*currentCleanup\(\);\s*\}\s*\} finally \{\s*currentCleanup = null;/
+    );
+
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const dispose = vi.fn();
+    let currentCleanup: (() => void) | null = () => {
+      throw new Error('cleanup blew up');
+    };
+    let activeGameBoundary: { dispose: () => void } | null = { dispose };
+
+    // Local replica of FIXED main.cleanup() semantics (R-SHELL-02).
+    const cleanup = (): void => {
+      try {
+        if (currentCleanup) {
+          currentCleanup();
+        }
+      } catch (err) {
+        console.error('[main] route cleanup failed', err);
+      } finally {
+        currentCleanup = null;
+        if (activeGameBoundary) {
+          activeGameBoundary.dispose();
+          activeGameBoundary = null;
+        }
+      }
+    };
+
+    expect(() => cleanup()).not.toThrow();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(currentCleanup).toBeNull();
+    expect(activeGameBoundary).toBeNull();
+    expect(
+      errSpy.mock.calls.some(
+        (c) => String(c[0]).includes('[main] route cleanup failed')
+      )
+    ).toBe(true);
+
+    // onBeforeShow path: throwing cleanup clears slot; crash UI still shows.
+    const rootEl = document.createElement('div');
+    document.body.appendChild(rootEl);
+    let routeCleanup: (() => void) | null = () => {
+      throw new Error('destroy blew up');
+    };
+    const handle = installGameErrorBoundary({
+      gameName: 'Hex',
+      container: rootEl,
+      onReset: vi.fn(),
+      onHome: vi.fn(),
+      onBeforeShow: () => {
+        try {
+          if (routeCleanup) {
+            routeCleanup();
+          }
+        } finally {
+          routeCleanup = null;
+        }
+      },
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('in-game boom'),
+        message: 'in-game boom',
+      })
+    );
+
+    expect(
+      rootEl.querySelector('[data-testid="game-error-boundary"]')
+    ).not.toBeNull();
+    expect(handle.didCatch).toBe(true);
+    expect(routeCleanup).toBeNull();
+    handle.dispose();
+    errSpy.mockRestore();
   });
 
   it('P1 R-SHELL-07: setGameRouteCleanup try/finally runs shell.cleanup when destroy throws', () => {

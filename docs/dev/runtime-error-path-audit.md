@@ -33,7 +33,7 @@ Adjacent gaps **not** covered by those drafts remain in the inventory below (e.g
 | ID | file:line | Trigger | Current behavior | Blast | Tests |
 | --- | --- | --- | --- | --- | --- |
 | R-SHELL-01 | `src/main.ts:65-66` | `#app` missing at boot | **UNRECOVERED** — sync throw aborts bootstrap | shell | `runtime-error-path-audit.test.ts` (source pin + skip expected fix) |
-| R-SHELL-02 | `src/main.ts:75-84` `cleanup()` | Route leave; `currentCleanup` throws | **UNRECOVERED** — cleanup aborts; boundary may not dispose | shell | skip expected wrap; pattern pin in audit suite |
+| R-SHELL-02 | `src/main.ts` `cleanup()` / `onBeforeShow` | Route leave; `currentCleanup` throws | **recovered** — try/finally disposes boundary; cleanup failure logged; crash UI still proceeds | shell | audit suite P1 R-SHELL-02 |
 | R-SHELL-03 | `src/main.ts:88-106` + `game-error-boundary.ts:87-144` | `window` `error` / `unhandledrejection` on game route | **recovered** — crash UI; `onBeforeShow` failures swallowed (`:99-103`) | one game | `game-error-boundary.test.ts`; audit suite pins swallow |
 | R-SHELL-04 | `src/main.ts` `renderHome` | Throw / unhandled rejection on `/` | **recovered** — same `installGameErrorBoundary` / crash UI as game routes | shell | audit suite P2 R-SHELL-04 |
 | R-SHELL-05 | `src/main.ts:168-203` | Dynamic import / `mountGameById` reject | **recovered** — `game-load-error` + `location.reload` retry | one game | `burn-1007-main-shell-routes.test.ts`; audit re-pins |
@@ -101,7 +101,8 @@ In-game handler throws are recovered by the per-route boundary; home/menu uses t
 | Priority | IDs | Proposed fix (for tip owner — not in this PR) |
 | --- | --- | --- |
 | ~~**P0**~~ | ~~R-GL-08~~ | **Done in #567** — Prime Gold dispatches `mp3d-context-lost` and remounts playable 2D (kings/kwatro pattern) |
-| ~~**P1**~~ | ~~R-SHELL-07~~ | **Done in #568** — `setGameRouteCleanup` try/finally so `shell.cleanup` always runs (R-SHELL-02 still open) |
+| ~~**P1**~~ | ~~R-SHELL-02~~ | **Done in q-mp-124** — `cleanup()` / `onBeforeShow` try/finally so `activeGameBoundary.dispose` always runs when `currentCleanup` throws |
+| ~~**P1**~~ | ~~R-SHELL-07~~ | **Done in #568** — `setGameRouteCleanup` try/finally so `shell.cleanup` always runs |
 | ~~**P1**~~ | ~~R-SHELL-08~~ | **Done in #568** — `initGameWithRouteCleanup` registers cleanup before init; rethrows original error |
 | ~~**P2**~~ | ~~R-IMP-04~~ | **Done in #568** — `bootstrapOwl` try/catch + `console.error` |
 | ~~**P2**~~ | ~~R-SHELL-04, R-EVT-03~~ | **Done in q-mp-107** — `renderHome` installs shared route error boundary (reuse crash UI strings) |
