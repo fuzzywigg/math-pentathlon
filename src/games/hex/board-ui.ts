@@ -261,8 +261,7 @@ export function renderBoard(
         // ratchet: length > 0 ⇒ last index defined.
         const lastMove = state.moveHistory[state.moveHistory.length - 1];
         if (
-          lastMove !== undefined &&
-          lastMove.position.row === row &&
+          lastMove?.position.row === row &&
           lastMove.position.col === col
         ) {
           cellClass += ' hex-cell-last-move';

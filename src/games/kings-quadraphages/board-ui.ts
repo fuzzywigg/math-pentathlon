@@ -226,11 +226,7 @@ function syncKingsCell(
   if (state.moveHistory.length > 0) {
     // ratchet: length > 0 ⇒ last index defined.
     const lastMove = state.moveHistory[state.moveHistory.length - 1];
-    if (
-      lastMove !== undefined &&
-      lastMove.to.row === row &&
-      lastMove.to.col === col
-    ) {
+    if (lastMove?.to.row === row && lastMove.to.col === col) {
       cell.classList.add('cell-last-move');
     }
   }
