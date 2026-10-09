@@ -87,7 +87,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         (fillInfo.max >= 90 && noProgress > 12) ||
         (fillInfo.min >= 85 && turnsSinceRestart > 120 && noProgress > 6) ||
         jugglePlaceFails >= 2;
-      if (softlocked && restarts < 120) {
+      if (softlocked && restarts < 400) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;
@@ -95,6 +95,8 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         stalled = 0;
         turnsSinceRestart = 0;
         jugglePlaceFails = 0;
+        // Reshuffle is not a play turn — keep the progress budget for real moves.
+        i -= 1;
         continue;
       }
     }
@@ -136,7 +138,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
           `${driver.id}: stalled after ${i} turns; status=${await readStatusText(page)}`
         );
       }
-      if (stalled > 25 && driver.id === 'juggle' && restarts < 120) {
+      if (stalled > 25 && driver.id === 'juggle' && restarts < 400) {
         await startHumanVsHuman(page);
         restarts += 1;
         stalled = 0;
@@ -144,6 +146,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
         lastFill = '';
         turnsSinceRestart = 0;
         jugglePlaceFails = 0;
+        i -= 1;
       }
       continue;
     }

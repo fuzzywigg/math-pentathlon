@@ -414,7 +414,8 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 3000,
+    // Softlock reshuffles do not consume this budget (see harness).
+    maxTurns: 8000,
     playLegal: async (page) => {
       await dismissOwl(page);
       // Entire turn in one evaluate — Playwright locator loops were too slow
@@ -448,8 +449,11 @@ const drivers: GameDriver[] = [
 
         // Always prefer smaller polyominoes — late gaps need monomino/domino.
         // Seeded Math.random breaks ties so repeats explore different lines.
+        // Skip disabled options (clicking them is a no-op and starved softlock).
         const shapes = [
-          ...document.querySelectorAll('.juggle-shape-option'),
+          ...document.querySelectorAll(
+            '.juggle-shape-option:not(.disabled):not([aria-disabled="true"])'
+          ),
         ] as HTMLElement[];
         if (shapes.length) {
           shapes.sort((a, b) => {
@@ -524,13 +528,14 @@ const drivers: GameDriver[] = [
               !aria.includes('red')
             );
           }) as HTMLElement[];
-          empties.sort((a, b) => {
-            const ar = +(a.dataset.row || 0);
-            const ac = +(a.dataset.col || 0);
-            const br = +(b.dataset.row || 0);
-            const bc = +(b.dataset.col || 0);
-            return ar - br || ac - bc;
-          });
+          // Seeded shuffle explores different packings across softlock deals;
+          // top-left-only packing often leaves unfillable holes.
+          for (let i = empties.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = empties[i]!;
+            empties[i] = empties[j]!;
+            empties[j] = tmp;
+          }
           for (const cell of empties) {
             cell.click();
             const after =
