@@ -253,7 +253,9 @@ export class TutorialManager {
   }
 
   private emit(event: TutorialEvent): void {
-    this.eventHandlers.forEach((handler) => handler(event));
+    this.eventHandlers.forEach((handler) => {
+      handler(event);
+    });
   }
 
   private createOverlay(): void {
@@ -317,8 +319,12 @@ export class TutorialManager {
     document.body.appendChild(this.tooltipElement);
     this.attachTooltipSizeObserver();
 
-    exitBtn.addEventListener('click', () => this.exit());
-    prevBtn.addEventListener('click', () => this.prevStep());
+    exitBtn.addEventListener('click', () => {
+      this.exit();
+    });
+    prevBtn.addEventListener('click', () => {
+      this.prevStep();
+    });
     nextBtn.addEventListener('click', () => {
       const step = this.getCurrentStep();
       // Only allow Next if there's no required action

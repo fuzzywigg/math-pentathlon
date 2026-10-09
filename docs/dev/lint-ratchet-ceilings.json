@@ -1,9 +1,9 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + tip post748 folds through q-mp-218/227 demos + q-mp-221 board-ui void (\u221232\u219286) + q-mp-243 polyomino nnnull (\u22127\u2192246) + q-mp-244 core/three dup-imports (\u221221\u219278) + q-mp-255 (\u22121 nnnull) + q-mp-267 ui/three no-shadow (\u22124\u21929): curly 538; no-non-null-assertion 246; no-confusing-void-expression 86; radix 6; default-case 5; no-duplicate-imports 78; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9. Tip owner reconciles ceilings on fold (min wins; re-measure). + q-mp-205 game-controller dup-imports (\u221231\u219247). Tip owner min ceilings.",
+  "notes": "burn-1008-mp-lint-ratchet + tip post748 folds through q-mp-218/227 demos + q-mp-221 board-ui void (\u221232\u219286) + q-mp-243 polyomino nnnull (\u22127\u2192246) + q-mp-244 core/three dup-imports (\u221221\u219278) + q-mp-255 (\u22121 nnnull) + q-mp-267 ui/three no-shadow (\u22124\u21929): curly 538; no-non-null-assertion 246; no-confusing-void-expression 86; radix 6; default-case 5; no-duplicate-imports 78; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9. Tip owner reconciles ceilings on fold (min wins; re-measure). + q-mp-205 game-controller dup-imports (\u221231\u219247). Tip owner min ceilings. + q-mp-219 core void (\u221220\u219266). Tip owner min ceilings.",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 86,
+    "@typescript-eslint/no-confusing-void-expression": 66,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 47,

@@ -242,9 +242,15 @@ export function createInteractiveGraph(
       return;
     }
 
-    node.addEventListener('click', () => onNodeClick(nodeId));
-    node.addEventListener('mouseenter', () => onNodeHover(nodeId));
-    node.addEventListener('mouseleave', () => onNodeHover(null));
+    node.addEventListener('click', () => {
+      onNodeClick(nodeId);
+    });
+    node.addEventListener('mouseenter', () => {
+      onNodeHover(nodeId);
+    });
+    node.addEventListener('mouseleave', () => {
+      onNodeHover(null);
+    });
 
     (node as SVGElement).style.cursor = 'pointer';
   });
