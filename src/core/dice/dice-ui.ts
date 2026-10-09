@@ -266,7 +266,9 @@ export function createInteractiveDie(
 
   if (onClick && !die.isLocked) {
     wrapper.style.cursor = 'pointer';
-    wrapper.addEventListener('click', () => onClick(die));
+    wrapper.addEventListener('click', () => {
+      onClick(die);
+    });
   }
 
   return wrapper;

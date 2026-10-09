@@ -245,7 +245,9 @@ export class DiceSelector {
         dieSize: this.options.dieSize,
         showTotal: false,
         selectable: true,
-        onDieClick: (die) => this.handleDieClick(die),
+        onDieClick: (die) => {
+          this.handleDieClick(die);
+        },
       });
     } else {
       // trusted constant markup
@@ -301,7 +303,9 @@ export class DiceSelector {
       rollBtn.className = 'dice-btn dice-btn-primary';
       rollBtn.textContent = this.currentResult ? 'Roll Again' : 'Roll';
       rollBtn.disabled = this.isRolling;
-      rollBtn.addEventListener('click', () => this.roll());
+      rollBtn.addEventListener('click', () => {
+        this.roll();
+      });
       controls.appendChild(rollBtn);
     }
 
@@ -312,7 +316,9 @@ export class DiceSelector {
       confirmBtn.disabled =
         this.isRolling ||
         this.currentResult.rolls.filter((d) => d.isSelected).length === 0;
-      confirmBtn.addEventListener('click', () => this.confirm());
+      confirmBtn.addEventListener('click', () => {
+        this.confirm();
+      });
       controls.appendChild(confirmBtn);
     }
 
