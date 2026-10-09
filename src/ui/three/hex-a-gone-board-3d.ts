@@ -589,7 +589,11 @@ export async function createHexAGoneBoard3D(
     }
     cellMeshes.clear();
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     tileGeo.dispose();

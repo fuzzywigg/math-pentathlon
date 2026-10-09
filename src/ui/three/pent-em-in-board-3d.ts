@@ -348,7 +348,11 @@ export async function createPentEmInBoard3D(
 
   const clearGroup = (group: Object3D): void => {
     while (group.children.length > 0) {
-      group.remove(group.children[0]!);
+      const child = group.children[0];
+      if (child === undefined) {
+        break;
+      }
+      group.remove(child);
     }
   };
 
@@ -594,7 +598,11 @@ export async function createPentEmInBoard3D(
     clearGroup(pieceRoot);
     clearGroup(ghostRoot);
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     tileGeo.dispose();
