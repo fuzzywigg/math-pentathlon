@@ -72,7 +72,7 @@ statements 92.80%→93.01%.
 Tip’s Friday AI/copy restore removed `applyJuggleHoverPreview` from
 `juggle/board-ui` (pre-restore helper still present on the #577 working tree).
 Round-5 briefly `describe.skipIf`-gated the r4 juggle suite when that export
-was absent; tip later **deleted** `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts`
+was absent; tip later **deleted** `tests/unit/burn-1008-ui-cov-r4-juggle-board-controller.test.ts (absent on tip)`
 (`358e75e8`) so tip has neither the helper nor the orphan tests. See
 [`post-restore-orphans.md`](./post-restore-orphans.md).
 
