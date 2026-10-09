@@ -1,8 +1,11 @@
 // Fraction System Demo Page
 // Interactive demo for testing fraction arithmetic and visualization
 
-import type { Fraction } from '../core/fractions/types';
-import { COMMON_FRACTIONS, FRACTION_COLORS } from '../core/fractions/types';
+import {
+  type Fraction,
+  COMMON_FRACTIONS,
+  FRACTION_COLORS,
+} from '../core/fractions/types';
 import {
   simplify,
   toDecimal,
