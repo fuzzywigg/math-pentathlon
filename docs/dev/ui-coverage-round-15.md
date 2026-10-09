@@ -28,11 +28,17 @@ edits, `#764` canvas DPR layout binder file.
 
 ## Metrics
 
-Tip directory stamp from live `docs/dev/coverage-map.md` @ tip `74a1596f`:
-**89.00% lines / 68.98% branches** (`src/ui/three`).
+Measured with `npm run test:unit:coverage` then `npm run report:coverage-map`.
+EXIT 1 from pre-existing `ai-move-time-midgame.bench.test.ts` only —
+coverage summary still emitted (`reportOnFailure`).
 
-After this round (see PR body for measured `npm run test:unit:coverage` +
-`npm run report:coverage-map` numbers).
+| Metric | Before (tip `74a1596f` map) | After | Δ |
+| --- | ---: | ---: | ---: |
+| **`src/ui/three` lines** | **89.00%** | **93.90%** | **+4.90 pp** |
+| **`src/ui/three` branches** | **68.98%** | **79.20%** | **+10.22 pp** |
+
+Coldest residual after this round: `prime-gold-board-3d.ts` (88% lines /
+65.28% branches) — left for a later round.
 
 ## Tests added
 
