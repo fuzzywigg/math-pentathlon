@@ -20,7 +20,8 @@ describe('Wave 56 handshake — fab/fiar CI workflow', () => {
     expect(pkg.scripts['test:e2e']).toMatch(/playwright/);
     expect(ci).toContain('npm run test:unit');
     expect(ci).toContain('npm run test:e2e');
-    expect(ci).toContain('npm run typecheck');
+    expect(ci).toContain('npm run verify');
+    expect(pkg.scripts.verify).toMatch(/typecheck/);
     expect(ci).toMatch(/pull_request/);
     expect(ci).toMatch(/\balpha\b/);
   });
