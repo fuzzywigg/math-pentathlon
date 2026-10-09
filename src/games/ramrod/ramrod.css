@@ -277,16 +277,6 @@
   min-width: 44px;
 }
 
-.ramrod-btn-primary {
-  background: linear-gradient(135deg, #2196f3, #1976d2);
-  color: white;
-}
-
-.ramrod-btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
-}
-
 .ramrod-btn-secondary {
   background: #e0e0e0;
   color: #333;
@@ -445,7 +435,6 @@
     animation: none !important;
   }
 
-  .ramrod-btn-primary:hover,
   .ramrod-rod-wrapper.selectable:hover {
     transform: none;
   }
