@@ -20,7 +20,8 @@ describe('Wave 58 CI — unit/e2e gates', () => {
     expect(pkg.scripts['test:e2e']).toMatch(/playwright/);
     expect(ci).toContain('npm run test:unit');
     expect(ci).toContain('npm run test:e2e');
-    expect(ci).toContain('npm run typecheck');
+    expect(ci).toContain('npm run verify');
+    expect(pkg.scripts.verify).toMatch(/typecheck/);
     expect(ci).toMatch(/chromium/i);
     expect(ci).toMatch(/\balpha\b/);
   });
