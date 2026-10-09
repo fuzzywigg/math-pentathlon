@@ -1,7 +1,7 @@
 /**
  * Shared Playwright page helpers: waits, navigation, owl dismiss, mode start.
- * Prefer these over per-spec copies. Fullgame `_shared.ts` may adopt later
- * (leave that suite alone while PR #505 is open).
+ * Prefer these over per-spec copies. Canonical Owl dismiss lives here —
+ * e2e specs and fullgame should import (or thin-wrap) `dismissOwl`.
  */
 import { expect, type Locator, type Page } from '@playwright/test';
 import { DEFAULT_MOUNT, GAME_MOUNT } from './game-mounts';
