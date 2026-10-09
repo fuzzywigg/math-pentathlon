@@ -69,7 +69,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 | `lint` | ESLint on `src`; curly `all` ratchet ceiling; Prettier drift; `tsc --noEmit`; type-ratchet Phase-2 ceiling; module-boundary import graph (`engine_imports_ui` must stay 0) | `npm run lint` · `npm run lint:ratchet` · `npm run format:check` · `npm run typecheck` · `npm run typecheck:ratchet` · `npm run check:boundaries` |
 | `audit` | High+ npm advisory holes in the lockfile | `npm audit --audit-level=high` |
 | `build` | Production compile (`tsc && vite build`); `dist/` + `dist/health.txt`; hard **250 kB** per JS chunk under `dist/assets`; (soft) gzip budgets + PWA manifest contract | `npm run build` then confirm `dist/` + `dist/health.txt`; soft: `npm run size:check` · `npm run check:pwa-manifest` |
-| `unit` | Vitest unit suite under `tests/unit` (excl. `_tokenmaxx_archive`) — rules/state/shell regressions | `npm run test:unit` |
+| `unit` | Vitest unit suite under `tests/unit` (excl. `_tokenmaxx_archive`) — matrix by project `unit-shared` / `unit-node` / `unit-isolated` (q-mp-142); rules/state/shell regressions | `npm run test:unit` (full); CI: `npm run test:unit -- --project <name>` — [`ci-unit-shards-q-mp-142.md`](./ci-unit-shards-q-mp-142.md) |
 | `e2e` | Playwright **Chromium** smoke, bug-guards, mp3d; `@fullgame` excluded | `npm run test:e2e:chromium` |
 
 ### Report-only (browser / visual / a11y)

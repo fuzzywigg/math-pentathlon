@@ -110,9 +110,17 @@ jobs:
 
   # Unit suite pruned from ~5k TOKENMAXX files; tip fold suite targets ~8 min
   # on GHA (AI benches skipped under CI; see *.bench.test.ts skipIf).
+  # q-mp-142: matrix by vitest project (unit-shared / unit-node / unit-isolated)
+  # so each shard keeps the same 12m step / 14m job budgets without raising
+  # timeouts. Local full-suite parity remains `npm run test:unit`.
+  # Docs: docs/dev/ci-unit-shards-q-mp-142.md
   unit:
     runs-on: ubuntu-latest
     timeout-minutes: 14
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [unit-shared, unit-node, unit-isolated]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -123,13 +131,13 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
       - run: npm ci
-      - name: Run unit tests
+      - name: Run unit tests (${{ matrix.project }})
         timeout-minutes: 12
         run: |
           set -euo pipefail
           count="$(find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) ! -path '*/_tokenmaxx_archive/*' | wc -l | tr -d ' ')"
-          echo "unit suite: ${count} files (budget ~8 min; step timeout 12m / job 14m)"
-          npm run test:unit
+          echo "unit suite: ${count} files total; shard project=${{ matrix.project }} (budget ~8 min; step timeout 12m / job 14m)"
+          npm run test:unit -- --project ${{ matrix.project }}
 
   # Browser smoke + mp3d board3d guards; pruned TOKENMAXX chrome leftovers.
   e2e:

@@ -21,27 +21,35 @@ Do **not** “fix” Hex Hard by raising the deadline above 450ms. Do **not** re
 
 ## Unit job time budget (live `ci.yml`)
 
-From `.github/workflows/ci.yml` `unit` job:
+From `.github/workflows/ci.yml` `unit` job (q-mp-142: matrix by Vitest project; each cell keeps the same ceilings):
 
 | Knob | Value |
 | --- | --- |
-| Target wall | ~**8 min** (job comment + step echo) |
-| Step timeout | **12m** (`Run unit tests`) |
-| Job timeout | **14m** |
+| Target wall | ~**8 min** per shard (job comment + step echo) |
+| Step timeout | **12m** (`Run unit tests (<project>)`) — not raised |
+| Job timeout | **14m** — not raised |
+| Matrix | `unit-shared` · `unit-node` · `unit-isolated` |
+
+Shard map: [`docs/dev/ci-unit-shards-q-mp-142.md`](../dev/ci-unit-shards-q-mp-142.md).
 
 ```mermaid
 flowchart TB
-  subgraph job ["unit job — timeout-minutes: 14"]
+  subgraph job ["unit matrix — timeout-minutes: 14 each"]
     co["checkout<br/>persist-credentials: false"]
     ci["npm ci"]
-    step["Run unit tests<br/>timeout-minutes: 12"]
-    co --> ci --> step
+    shared["unit-shared<br/>timeout-minutes: 12"]
+    node["unit-node<br/>timeout-minutes: 12"]
+    isol["unit-isolated<br/>timeout-minutes: 12"]
+    co --> ci
+    ci --> shared
+    ci --> node
+    ci --> isol
   end
 
   subgraph budget ["wall budget"]
-    target["target ~8 min"]
-    observed["tip CI 37932241420<br/>Duration 360.84s ≈ 6.0 min"]
-    slack["~2 min slack before 12m step"]
+    target["target ~8 min / shard"]
+    observed["pre-matrix tip CI 37932241420<br/>Duration 360.84s ≈ 6.0 min"]
+    slack["headroom before 12m step"]
     target --- observed --- slack
   end
 
@@ -50,8 +58,9 @@ flowchart TB
     m["ai-move-time-midgame.bench<br/>1 test skipped"]
   end
 
-  step --> budget
-  step -.->|describe.skipIf CI| skip
+  shared --> budget
+  shared -.->|describe.skipIf CI| skip
+  isol -.->|describe.skipIf CI| t
 ```
 
 ## Two AI benches skipped under `CI=1`
