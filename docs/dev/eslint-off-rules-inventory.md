@@ -4,46 +4,46 @@ Measured on tip `cursor/mp-tip-post477` against `src/` (probe overlay; live `esl
 
 ## Already hard-on (examples from the task)
 
-| Rule | Live status | Notes |
-| --- | --- | --- |
-| `eqeqeq` | `error` (`always`, `null: 'ignore'`) | Stricter `always` (null not ignored) would add **15** hits |
-| `no-fallthrough` | `error` (from `@eslint/js` recommended) | **0** additional hits under default options |
-| `no-implicit-coercion` | `error` globally; `off` in AI modules | Forcing on everywhere: **0** hits on tip |
-| `curly` | hard `multi-line`; ratchet `all` | Ceiling **1320** via `npm run lint:ratchet` |
+| Rule                   | Live status                             | Notes                                                      |
+| ---------------------- | --------------------------------------- | ---------------------------------------------------------- |
+| `eqeqeq`               | `error` (`always`, `null: 'ignore'`)    | Stricter `always` (null not ignored) would add **15** hits |
+| `no-fallthrough`       | `error` (from `@eslint/js` recommended) | **0** additional hits under default options                |
+| `no-implicit-coercion` | `error` globally; `off` in AI modules   | Forcing on everywhere: **0** hits on tip                   |
+| `curly`                | hard `multi-line`; ratchet `all`        | Ceiling **1320** via `npm run lint:ratchet`                |
 
 ## Off / unset candidates that catch real bugs
 
 Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-09 tip measure).
 
-| Count | Rule | Why it matters |
-| ---: | --- | --- |
-| 387 | `@typescript-eslint/no-non-null-assertion` | `!` hides null/undefined; common crash source |
-| 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
-| 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
-| 85 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); q-mp-185 cleared `highlight-ui.ts` (−11); densest residual `fraction-bar-ui.ts` 18 (#714) |
-| 21 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`) |
-| 23 | `no-param-reassign` | Surprising mutation of caller state |
-| 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
-| 14 | `default-case` | Switches without `default` |
-| 13 | `@typescript-eslint/no-shadow` | Shadowed bindings |
-| 8 | `@typescript-eslint/switch-exhaustiveness-check` | Missing union/enum cases (q-mp-141 ratchet; tip re-measure 8 on post598) |
-| 6 | `radix` | `parseInt` without radix (q-mp-130: demo fixed; 6 HOLD) |
-| 7 | `@typescript-eslint/return-await` (`always`) | Inconsistent async error paths |
-| 2 | `no-promise-executor-return` | Misleading promise constructor returns |
-| 1 | `array-callback-return` | `map`/`filter` without return |
-| 1 | `prefer-object-has-own` | Prototype pollution footgun |
-| 0 | `@typescript-eslint/only-throw-error` | Clean |
-| 0 | `@typescript-eslint/no-base-to-string` | Clean |
-| 0 | `@typescript-eslint/prefer-includes` | Clean |
-| 0 | `@typescript-eslint/prefer-string-starts-ends-with` | Clean |
+| Count | Rule                                                | Why it matters                                                                                                                   |
+| ----: | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+|   387 | `@typescript-eslint/no-non-null-assertion`          | `!` hides null/undefined; common crash source                                                                                    |
+|   230 | `@typescript-eslint/no-confusing-void-expression`   | Accidental void returns / side-effect expressions                                                                                |
+|   124 | `no-duplicate-imports`                              | Split imports drift; merge hygiene                                                                                               |
+|    85 | `@typescript-eslint/prefer-nullish-coalescing`      | `\|\|` vs `??` falsy bugs (`0`, `''`); q-mp-185 cleared `highlight-ui.ts` (−11); densest residual `fraction-bar-ui.ts` 18 (#714) |
+|    21 | `@typescript-eslint/prefer-optional-chain`          | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`)                     |
+|    23 | `no-param-reassign`                                 | Surprising mutation of caller state                                                                                              |
+|    15 | `eqeqeq` (stricter, null not ignored)               | Residual `== null` style debt                                                                                                    |
+|    14 | `default-case`                                      | Switches without `default`                                                                                                       |
+|    13 | `@typescript-eslint/no-shadow`                      | Shadowed bindings                                                                                                                |
+|     8 | `@typescript-eslint/switch-exhaustiveness-check`    | Missing union/enum cases (q-mp-141 ratchet; tip re-measure 8 on post598)                                                         |
+|     6 | `radix`                                             | `parseInt` without radix (q-mp-130: demo fixed; 6 HOLD)                                                                          |
+|     7 | `@typescript-eslint/return-await` (`always`)        | Inconsistent async error paths                                                                                                   |
+|     2 | `no-promise-executor-return`                        | Misleading promise constructor returns                                                                                           |
+|     1 | `array-callback-return`                             | `map`/`filter` without return                                                                                                    |
+|     1 | `prefer-object-has-own`                             | Prototype pollution footgun                                                                                                      |
+|     0 | `@typescript-eslint/only-throw-error`               | Clean                                                                                                                            |
+|     0 | `@typescript-eslint/no-base-to-string`              | Clean                                                                                                                            |
+|     0 | `@typescript-eslint/prefer-includes`                | Clean                                                                                                                            |
+|     0 | `@typescript-eslint/prefer-string-starts-ends-with` | Clean                                                                                                                            |
 
 ## Ratchets already on `npm run lint:ratchet`
 
-| Rule | Ceiling | Task | Notes |
-| --- | ---: | --- | --- |
-| `curly` (`all`) | **595** | burn-1008 + curly batches | Live still `multi-line` only |
-| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605) | Live unset; count-down only |
-| `default-case` | **6** | q-mp-129 | Live unset; tip measure was **14**; cleared non-HOLD sites; residual HOLD = `fab-a-diffy`/`frac-fact` `rules.ts` (4) + `fractions/arithmetic` scoring path (1) + `hex/coordinates` conflict-avoid vs q-mp-133 (1) |
+| Rule                                       | Ceiling | Task                      | Notes                                                                                                                                                                                                             |
+| ------------------------------------------ | ------: | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `curly` (`all`)                            | **595** | burn-1008 + curly batches | Live still `multi-line` only                                                                                                                                                                                      |
+| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605)           | Live unset; count-down only                                                                                                                                                                                       |
+| `default-case`                             |   **6** | q-mp-129                  | Live unset; tip measure was **14**; cleared non-HOLD sites; residual HOLD = `fab-a-diffy`/`frac-fact` `rules.ts` (4) + `fractions/arithmetic` scoring path (1) + `hex/coordinates` conflict-avoid vs q-mp-133 (1) |
 
 Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
 
@@ -59,10 +59,10 @@ Tip probe (pre-fix): **7** `radix` hits. Fixable demo site cleared in `src/demos
 
 **HOLD** (do not edit — hard rules: no AI behavior / no `*/rules.ts` logic):
 
-| File | Lines | Why HOLD |
-| --- | ---: | --- |
-| `src/games/kwatro-sinko/ai.ts` | 106–107, 331–332 | AI path — no behavior-adjacent edits |
-| `src/games/kwatro-sinko/rules.ts` | 349–350 | Rules/legal-move path — no logic edits |
+| File                              |            Lines | Why HOLD                               |
+| --------------------------------- | ---------------: | -------------------------------------- |
+| `src/games/kwatro-sinko/ai.ts`    | 106–107, 331–332 | AI path — no behavior-adjacent edits   |
+| `src/games/kwatro-sinko/rules.ts` |          349–350 | Rules/legal-move path — no logic edits |
 
 Live `eslint.config.js` does **not** hard-enable `radix`; count-down only via `npm run lint:ratchet`.
 
@@ -83,3 +83,9 @@ Live tip probe: **35** hits. Cleared **14** non-HOLD sites (board-ui / game-stat
 **`@typescript-eslint/switch-exhaustiveness-check`** — ceiling **8** (= live tip re-measure on `cursor/mp-tip-post598` @ `7922f9af`; inventory/ticket said **9** — never raise). Hits (1 each): `attribute-ui`, `dice-ui`, `expressions/evaluator`, `owl-messages`, `owl-system`, `graph-demo`, `polyomino-demo`, `star-track/rules`. No switch rewrites in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`). Complements q-mp-129 `default-case`.
 
 Open-PR overlap for q-mp-141: no open draft already ratchets `switch-exhaustiveness-check`. Other drafts may edit `lint-ratchet-ceilings.json` additively — tip owner folds keys (min wins).
+
+## Ratchet chosen for q-mp-173 / q-mp-206
+
+**`no-console`** — tip probe was **24** (includes demo `console.log` at `src/demos/expression-demo.ts:510`). q-mp-206 deletes that demo log; ceiling **23** (= re-measure). Soft-fail `console.error` / `console.warn` in `main`, storage, register, and game-error-boundary are **keep-sites** — see `docs/dev/no-console-keep-sites.md`. Live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+
+Open-PR overlap: additive key on `lint-ratchet-ceilings.json` / probe script with other ratchet drafts (nullish #714, etc.); tip owner folds (min wins). No open draft already ratchets `no-console`.

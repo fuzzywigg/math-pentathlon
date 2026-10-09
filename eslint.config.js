@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 
 /**
- * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157 + q-mp-159):
+ * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157 + q-mp-159 + q-mp-173/q-mp-206):
  * - Hard errors: eqeqeq, prefer-const, curly (multi-line), no-implicit-coercion,
  *   prefer-object-has-own, consistent-type-imports, no-floating-promises,
  *   no-misused-promises, no-unused-vars (underscore ignore for args/vars/caught errors).
@@ -17,8 +17,10 @@ import prettierConfig from 'eslint-config-prettier';
  *   @typescript-eslint/prefer-nullish-coalescing (live unset; q-mp-140);
  *   @typescript-eslint/prefer-optional-chain (live unset; q-mp-148);
  *   @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141 ceiling 8);
- *   @typescript-eslint/no-shadow (live unset; q-mp-157 ceiling 13).
+ *   @typescript-eslint/no-shadow (live unset; q-mp-157 ceiling 13);
+ *   no-console (live unset; q-mp-173/q-mp-206 ceiling 23 — keep soft-fail sites).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
+ * - Intentional console soft-fail keep-sites: docs/dev/no-console-keep-sites.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */
 export default tseslint.config(
