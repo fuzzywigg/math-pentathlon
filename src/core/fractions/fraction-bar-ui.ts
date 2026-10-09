@@ -384,7 +384,7 @@ export function createInteractiveFractionBar(
     segment.style.cssText = `
       width: ${segmentWidth}px;
       height: ${height - 2}px;
-      background: ${i < fraction.numerator ? colors?.filled ?? getFractionColor(denominator) : colors?.empty ?? '#e0e0e0'};
+      background: ${i < fraction.numerator ? (colors?.filled ?? getFractionColor(denominator)) : (colors?.empty ?? '#e0e0e0')};
       border-right: 1px solid ${colors?.border ?? '#333'};
       display: inline-block;
       cursor: pointer;
