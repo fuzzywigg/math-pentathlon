@@ -585,7 +585,9 @@ export function renderHand(
     );
 
     if (canSelect) {
-      const activate = () => onBlockClick(block.id);
+      const activate = () => {
+        onBlockClick(block.id);
+      };
       blockEl.addEventListener('click', activate);
       bindCellActivateKeys(blockEl, activate);
     }

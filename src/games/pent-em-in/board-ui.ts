@@ -252,11 +252,17 @@ export function renderBoard(
       );
 
       if (allowInput) {
-        const activate = () => onCellClick({ row, col });
+        const activate = () => {
+          onCellClick({ row, col });
+        };
         rect.addEventListener('click', activate);
         bindCellActivateKeys(rect, activate);
-        rect.addEventListener('mouseenter', () => onCellHover({ row, col }));
-        rect.addEventListener('mouseleave', () => onCellHover(null));
+        rect.addEventListener('mouseenter', () => {
+          onCellHover({ row, col });
+        });
+        rect.addEventListener('mouseleave', () => {
+          onCellHover(null);
+        });
       }
 
       interactionGroup.appendChild(rect);
@@ -340,7 +346,9 @@ export function renderPieceSelector(
     pieceEl.appendChild(label);
 
     if (allowInput) {
-      pieceEl.addEventListener('click', () => onPieceSelect(shapeId));
+      pieceEl.addEventListener('click', () => {
+        onPieceSelect(shapeId);
+      });
       pieceEl.setAttribute('role', 'button');
       pieceEl.setAttribute('tabindex', '0');
       pieceEl.setAttribute('aria-label', `Select ${shapeId} piece`);

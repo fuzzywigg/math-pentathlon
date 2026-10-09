@@ -352,7 +352,9 @@ export function renderExpressionSelector(
       ${pointsEl}
     `
     );
-    option.addEventListener('click', () => onSelect(result, expression));
+    option.addEventListener('click', () => {
+      onSelect(result, expression);
+    });
     list.appendChild(option);
   }
 

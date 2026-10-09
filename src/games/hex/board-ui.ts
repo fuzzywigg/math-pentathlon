@@ -296,7 +296,9 @@ export function renderBoard(
         const placeHandler = onCellClick;
         if (placeHandler !== undefined) {
           cellGroup.style.cursor = 'pointer';
-          const activate = () => placeHandler(row, col);
+          const activate = () => {
+            placeHandler(row, col);
+          };
           cellGroup.addEventListener('click', activate);
           bindCellActivateKeys(cellGroup, activate);
         }

@@ -148,7 +148,9 @@ export function renderBoard(
       const placeHandler = onCellClick;
       if (placeHandler !== undefined) {
         hex.style.cursor = 'pointer';
-        const activate = () => placeHandler(cell.q, cell.r);
+        const activate = () => {
+          placeHandler(cell.q, cell.r);
+        };
         hex.addEventListener('click', activate);
         // Enter/Space place on the focused valid cell (same as click)
         bindCellActivateKeys(hex, activate);
@@ -254,7 +256,9 @@ export function buildSelectionArea(
       }
 
       if (selectable && onBlockSelect) {
-        blockBtn.addEventListener('click', () => onBlockSelect(shape));
+        blockBtn.addEventListener('click', () => {
+          onBlockSelect(shape);
+        });
       } else {
         // AI-seat / empty bank: disabled for SR honesty (no new player copy).
         blockBtn.disabled = true;
