@@ -137,8 +137,11 @@ Imports from `src/games/fab-a-diffy/` (non-exhaustive; prefer these first):
 - `tests/unit/fab-a-diffy-ai.test.ts`
 - `tests/unit/fab-a-diffy-rules.test.ts`
 - `tests/unit/burn-wave35-fab-a-diffy-format-helpers.test.ts`
-- `tests/unit/fab-a-diffy-playability-polish.test.ts`
-- `tests/unit/ai-determinism-2026-10-07.test.ts`
+- `tests/unit/ai-determinism-shard-a.test.ts`
+- `tests/unit/ai-determinism-shard-b.test.ts`
+- `tests/unit/ai-determinism-shard-c.test.ts`
+- `tests/unit/ai-determinism-shard-d.test.ts`
+- `tests/unit/ai-determinism-shard-e.test.ts`
 - `tests/unit/ai-move-time-midgame.bench.test.ts`
 - `tests/unit/ai-worker-parity-fab.test.ts`
 - `tests/unit/burn-wave10-win-draw-ai.test.ts`
