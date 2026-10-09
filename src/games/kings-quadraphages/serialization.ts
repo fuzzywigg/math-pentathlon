@@ -126,8 +126,7 @@ export function gameStateToJSON(
  * Mirrors SafeJsonParseResult so UI callers can branch without try/catch.
  */
 export type GameStateFromJsonResult =
-  | { ok: true; value: GameState }
-  | { ok: false; error: unknown };
+  { ok: true; value: GameState } | { ok: false; error: unknown };
 
 /**
  * Deserialize a GameState from a JSON string without throwing.
