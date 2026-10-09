@@ -247,8 +247,8 @@ export async function createHexAGoneBoard3D(
 
   /**
    * Cached canvas CSS box for pick (B) + project (C).
-   * Invalidated on layout; refreshed once after resize so pointermove/hover
-   * does not force geometry per frame.
+   * Invalidated on layout; lazy-seeded on first pick/project so pointermove
+   * hover does not force geometry per frame.
    */
   let canvasCssRect: CssRect | null = null;
 
@@ -278,11 +278,11 @@ export async function createHexAGoneBoard3D(
     if (disposed) {
       return;
     }
+    // Invalidate only — next pick/project re-measures (lazy seed). Seeding here
+    // would lock a pre-layout zero box in jsdom before tests stub canvas CSS.
     canvasCssRect = null;
     const { w, h } = measureHostCssSize();
     syncBoard3dRendererSize(renderer, camera, w, h);
-    // One post-sync canvas measure seeds pick/project until the next layout.
-    measureCanvasCssRect();
     paint();
   };
 
