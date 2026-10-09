@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
- * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet).
+ * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045).
  *
  * Counts violations for rules that are too widespread to hard-fail yet
- * (currently: curly "all"). Fails if any counted rule exceeds its ceiling so
- * the debt can only go down.
+ * (currently: curly "all", @typescript-eslint/no-non-null-assertion).
+ * Fails if any counted rule exceeds its ceiling so the debt can only go down.
  *
  * Usage: npm run lint:ratchet
  *
@@ -27,8 +27,10 @@ const CEILINGS_PATH = path.join(ROOT, 'docs/dev/lint-ratchet-ceilings.json');
 const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
 
 /**
- * Probe config: same base as eslint.config.js, but forces curly:all so we can
- * count the full brace debt while the live config only enforces multi-line.
+ * Probe config: same base as eslint.config.js, but forces ceilinged rules so
+ * we can count debt the live config does not hard-fail on yet:
+ * - curly:all (live enforces multi-line only)
+ * - @typescript-eslint/no-non-null-assertion (live unset; q-mp-045)
  */
 // Keep the probe config under the repo root so flat-config `import.meta.dirname`
 // / relative imports to eslint.config.js resolve; always delete in `finally`.
@@ -43,6 +45,7 @@ export default [
   {
     rules: {
       curly: ['error', 'all'],
+      '@typescript-eslint/no-non-null-assertion': 'error',
     },
   },
 ];
