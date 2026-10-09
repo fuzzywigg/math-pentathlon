@@ -67,3 +67,9 @@ Tip probe (pre-fix): **7** `radix` hits. Fixable demo site cleared in `src/demos
 Live `eslint.config.js` does **not** hard-enable `radix`; count-down only via `npm run lint:ratchet`.
 
 Open-PR overlap for q-mp-129: no open draft already fixes or ratchets `default-case`. Never touch `rules.ts`/`ai.ts`; tip owner folds.
+
+| `curly` (`all`) | **639** | burn-1008 + curly batches | Live still `multi-line` only |
+| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605) | Live unset; count-down only |
+| `no-duplicate-imports` | **124** | q-mp-127 | Live unset; tip re-measure 2026-10-09 (= inventory count); no mass fix |
+
+Open-PR overlap for q-mp-127: #605 covers nnnull only; curly batches lower `curly`. No open draft already ratchets `no-duplicate-imports`.

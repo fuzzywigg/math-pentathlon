@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
- * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129).
+ * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127).
  *
  * Counts violations for rules that are too widespread to hard-fail yet
  * (currently: curly "all", @typescript-eslint/no-non-null-assertion,
- * @typescript-eslint/no-confusing-void-expression, radix, default-case).
+ * @typescript-eslint/no-confusing-void-expression, radix, default-case,
+ * no-duplicate-imports).
  * Fails if any counted rule exceeds its ceiling so the debt can only go down.
  *
  * Usage: npm run lint:ratchet
@@ -34,7 +35,8 @@ const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
  * - @typescript-eslint/no-non-null-assertion (live unset; q-mp-045)
  * - @typescript-eslint/no-confusing-void-expression (live unset; q-mp-128)
  * - radix (live unset; q-mp-130; residual 6 HOLD on kwatro ai/rules)
- * - default-case (live unset; q-mp-129 — residual HOLD: rules.ts + arithmetic + hex)
+ * - default-case (live unset; q-mp-129 — residual HOLD: rules.ts + arithmetic)
+ * - no-duplicate-imports (live unset; q-mp-127)
  */
 // Keep the probe config under the repo root so flat-config `import.meta.dirname`
 // / relative imports to eslint.config.js resolve; always delete in `finally`.
@@ -53,6 +55,7 @@ export default [
       '@typescript-eslint/no-confusing-void-expression': 'error',
       radix: 'error',
       'default-case': 'error',
+      'no-duplicate-imports': 'error',
     },
   },
 ];
