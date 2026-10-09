@@ -74,4 +74,5 @@ Progress dashboard (`/#/stats`):
 - [injectStyles / board CSS ownership (`q-mp-122`)](../dev/engines/inject-styles-board-css.md) — `injectStylesOnce` vs `game-play.css`
 - [How to add a game](./adding-a-game.md)
 - [Development & testing layers](./development.md)
+- [Unit coverage heat map (`q-mp-171`)](./coverage-map.md) — coldest-directory table + SVG
 - [Big Toads](./big-toads.md)
