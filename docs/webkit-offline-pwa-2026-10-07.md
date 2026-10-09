@@ -19,6 +19,11 @@ PROBE_BROWSERS=webkit,firefox,chromium node scripts/webkit-offline-probe.mjs
 
 Artifact from this run: `/opt/cursor/artifacts/webkit-offline-probe.json`.
 
+**Tip re-run (q-mp-059 on `cursor/mp-tip-post477`):** Vite hashes may include `_`
+(e.g. `game-hex-DWW_girN.js`). The probe URL matcher must accept `[A-Za-z0-9_-]+`
+and exclude `game-hex-a-gone-*`. On this tip, WebKit/Firefox/Chromium all found
+the Hex precache entry and mounted Hex offline via soft-nav and `page.goto`.
+
 ### WebKit (failing shape)
 
 | Check | Result |

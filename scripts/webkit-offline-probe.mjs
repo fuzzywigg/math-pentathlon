@@ -10,7 +10,7 @@
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, firefox, webkit } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -88,9 +88,17 @@ async function probe(browserType, name, baseURL) {
       const cache = await caches.open(key);
       for (const req of await cache.keys()) urls.push(req.url);
     }
-    const hexUrl = urls.find((u) => /\/game-hex-[A-Za-z0-9]+\.js$/.test(u));
-    const routesUrl = urls.find((u) => /\/game-routes-[A-Za-z0-9]+\.js$/.test(u));
-    const workerUrl = urls.find((u) => /\/ai\.worker-[A-Za-z0-9]+\.js$/.test(u));
+    // Vite content hashes may include `_` (e.g. game-hex-DWW_girN.js). Exclude
+    // hex-a-gone so a looser pattern never picks the wrong chunk.
+    const hexUrl = urls.find((u) =>
+      /\/game-hex-(?!a-gone)[A-Za-z0-9_-]+\.js$/.test(u)
+    );
+    const routesUrl = urls.find((u) =>
+      /\/game-routes-[A-Za-z0-9_-]+\.js$/.test(u)
+    );
+    const workerUrl = urls.find((u) =>
+      /\/ai\.worker-[A-Za-z0-9_-]+\.js$/.test(u)
+    );
     return {
       cacheCount: urls.length,
       hexUrl: hexUrl ?? null,
@@ -237,6 +245,16 @@ try {
     out[name] = await probe(bt, name, baseURL);
   }
   console.log(JSON.stringify(out, null, 2));
+  try {
+    const outPath = '/opt/cursor/artifacts/webkit-offline-probe.json';
+    mkdirSync('/opt/cursor/artifacts', { recursive: true });
+    writeFileSync(outPath, JSON.stringify(out, null, 2));
+    console.error('Wrote', outPath);
+  } catch (e) {
+    console.error('artifact write skipped:', e?.message ?? e);
+  }
 } finally {
   preview.kill('SIGTERM');
+  // vite preview can keep the event loop alive after SIGTERM; force exit.
+  setTimeout(() => process.exit(0), 500).unref();
 }

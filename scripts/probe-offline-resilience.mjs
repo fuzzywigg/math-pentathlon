@@ -125,7 +125,7 @@ function classify(url) {
 async function main() {
   mkdirSync(path.dirname(OUT), { recursive: true });
   const findings = {
-    date: '2026-10-07',
+    date: new Date().toISOString().slice(0, 10),
     browser: 'chromium',
     scenarios: {},
   };
@@ -328,29 +328,33 @@ async function main() {
   }
 
   // --- Scenario C: force chunk abort (simulates flaky network) + retry ---
+  // Block SW so Workbox precache cannot satisfy the aborted asset. Prefer Calla
+  // (not Hex/Kings) so menu idle-warm cannot populate the module map first —
+  // same approach as tests/e2e/chunk-load-retry.spec.ts.
   {
-    const context = await browser.newContext();
+    const context = await browser.newContext({ serviceWorkers: 'block' });
     const page = await context.newPage();
-    await page.goto(baseURL + '/', { waitUntil: 'networkidle', timeout: 60_000 });
-    await waitForSw(page);
 
-    let blockHex = true;
-    await page.route('**/assets/game-hex-*.js*', async (route) => {
-      if (blockHex) {
+    let blockCalla = true;
+    await page.route('**/assets/game-calla-*.js*', async (route) => {
+      if (blockCalla) {
         await route.abort('failed');
         return;
       }
       await route.continue();
     });
 
-    await page.goto(baseURL + '/#/game/hex', {
+    await page.goto(baseURL + '/#/game/calla', {
       waitUntil: 'domcontentloaded',
       timeout: 30_000,
     });
     await page
-      .waitForSelector('[data-testid="game-load-error"], .hex-board', {
-        timeout: 20_000,
-      })
+      .waitForSelector(
+        '[data-testid="game-load-error"], .calla-wrapper, .calla-pit, #board',
+        {
+          timeout: 20_000,
+        }
+      )
       .catch(() => null);
     const errorVisible =
       (await page.locator('[data-testid="game-load-error"]').count()) > 0;
@@ -361,19 +365,22 @@ async function main() {
       .textContent()
       .catch(() => null);
 
-    blockHex = false;
+    blockCalla = false;
     let recovered = false;
     if (retryVisible) {
       await page.locator('[data-action="retry"]').click();
       await page
-        .waitForSelector('.hex-board, #board', { timeout: 30_000 })
+        .waitForSelector('.calla-wrapper, .calla-pit, #board', {
+          timeout: 30_000,
+        })
         .catch(() => null);
-      recovered = (await page.locator('.hex-board, #board').count()) > 0;
+      recovered =
+        (await page.locator('.calla-wrapper, .calla-pit, #board').count()) > 0;
     }
 
     findings.scenarios.chunkLoadFailureRetry = {
       description:
-        'Abort Hex JS chunk after shell load; expect friendly error + retry recovery',
+        'Abort Calla JS chunk (SW blocked); expect friendly error + retry recovery',
       errorVisible,
       retryVisible,
       hint,
@@ -412,6 +419,8 @@ async function main() {
   writeFileSync(OUT, JSON.stringify(findings, null, 2));
   console.log('Wrote', OUT);
   console.log(JSON.stringify(findings, null, 2));
+  // vite preview can keep the event loop alive after SIGTERM; force exit.
+  setTimeout(() => process.exit(0), 500).unref();
 }
 
 main().catch((err) => {

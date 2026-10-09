@@ -15,7 +15,7 @@ worker was added.
 | --- | --- |
 | Offline after first load | `browser.newContext()` → online visit → `context.setOffline(true)` → navigate |
 | Slow 3G | CDP `Network.emulateNetworkConditions` — 500 kbps down/up, 400 ms RTT |
-| Chunk failure | `page.route(...).abort('failed')` on a lazy `game-controller` module |
+| Chunk failure | `page.route(...).abort('failed')` on a lazy game chunk (prod probe: `game-calla-*.js` with `serviceWorkers: 'block'`; e2e: Calla `game-controller` on vite dev) |
 
 ## What breaks (and what does not)
 
