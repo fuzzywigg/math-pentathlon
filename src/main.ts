@@ -63,7 +63,9 @@ async function mountGameShell(
 const appContainer = document.getElementById('app');
 
 if (!appContainer) {
-  throw new Error('App container not found');
+  // Soft-fail (R-SHELL-01): misconfigured hosts get a console diagnostic
+  // instead of an uncaught throw that aborts module evaluation silently.
+  console.error('[main] App container not found');
 }
 
 // Store reference to cleanup functions
@@ -371,33 +373,37 @@ function renderExpressionDemoPage(): void {
   })();
 }
 
-// Set up routes
-addRoute('/', renderHome);
-addRoute('/stats', renderStats);
-addRoute('/game/:id', renderGame);
-addRoute('/demo/dice', renderDiceDemoPage);
-addRoute('/demo/alignment', renderAlignmentDemoPage);
-addRoute('/demo/fractions', renderFractionDemoPage);
-addRoute('/demo/polyomino', renderPolyominoDemoPage);
-addRoute('/demo/graph', renderGraphDemoPage);
-addRoute('/demo/attributes', renderAttributeDemoPage);
-addRoute('/demo/expressions', renderExpressionDemoPage);
+// Bootstrap only when the shell host exists (soft-fail above leaves the
+// module loaded so deploy/dev consoles can see the diagnostic).
+if (appContainer) {
+  // Set up routes
+  addRoute('/', renderHome);
+  addRoute('/stats', renderStats);
+  addRoute('/game/:id', renderGame);
+  addRoute('/demo/dice', renderDiceDemoPage);
+  addRoute('/demo/alignment', renderAlignmentDemoPage);
+  addRoute('/demo/fractions', renderFractionDemoPage);
+  addRoute('/demo/polyomino', renderPolyominoDemoPage);
+  addRoute('/demo/graph', renderGraphDemoPage);
+  addRoute('/demo/attributes', renderAttributeDemoPage);
+  addRoute('/demo/expressions', renderExpressionDemoPage);
 
-// Unknown hashes used to leave the previous view mounted (default console.error).
-setNotFoundHandler(() => {
-  navigate('/');
-});
+  // Unknown hashes used to leave the previous view mounted (default console.error).
+  setNotFoundHandler(() => {
+    navigate('/');
+  });
 
-// Initialize router
-initRouter();
+  // Initialize router
+  initRouter();
 
-// Offline shell + background precache — idle-deferred so first paint wins radio
-bootstrapPwa();
+  // Offline shell + background precache — idle-deferred so first paint wins radio
+  bootstrapPwa();
 
-// Tablet / a11y: sync reduced-motion + offline flags onto <html>
-bindReducedMotionPreference();
-bindOfflineDocumentFlag();
+  // Tablet / a11y: sync reduced-motion + offline flags onto <html>
+  bindReducedMotionPreference();
+  bindOfflineDocumentFlag();
 
-// Defer mascot + popular game warm-imports until after first paint
-bootstrapOwl();
-scheduleIdleGameWarm();
+  // Defer mascot + popular game warm-imports until after first paint
+  bootstrapOwl();
+  scheduleIdleGameWarm();
+}
