@@ -402,14 +402,20 @@ export function __abandonPlacementForTests(): void {
  */
 export function __placeSelectedForTests(): boolean {
   const shape = gameState.selectedShape;
-  if (gameState.phase !== 'placing' || !shape) return false;
-  if (!selectedShapeFitsAnywhere(gameState)) return false;
+  if (gameState.phase !== 'placing' || !shape) {
+    return false;
+  }
+  if (!selectedShapeFitsAnywhere(gameState)) {
+    return false;
+  }
 
   const rotations: Rotation[] = [0, 90, 180, 270];
   const flips = shape.canFlip ? [false, true] : [false];
   for (const flipped of flips) {
     for (const rotation of rotations) {
-      if (!shape.canRotate && rotation !== 0) continue;
+      if (!shape.canRotate && rotation !== 0) {
+        continue;
+      }
       gameState = {
         ...gameState,
         selectedRotation: rotation,
