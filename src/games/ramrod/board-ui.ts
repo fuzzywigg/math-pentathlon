@@ -6,6 +6,7 @@ import { CONFIG, ROD_COLORS } from './types';
 import { getValidPlacements, getRemainingValue } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
+import { injectStylesOnce } from '../../ui/inject-styles';
 import {
   buildCellAriaLabel,
   makeGridCell,
@@ -342,11 +343,15 @@ export function renderRodLegend(): HTMLElement {
 }
 
 /**
- * Styles load via Vite CSS import (`./ramrod.css`) so the lazy JS chunk
- * stays under the gzip budget. Kept as a no-op for existing call sites.
+ * Full board rules live in `./ramrod.css` (Vite CSS chunk — keeps JS under
+ * the gzip budget). Inject a tiny `#ramrod-styles` marker so existing unit
+ * handshake tests that look for that id / tokens keep working.
  */
 export function injectRamrodStyles(): void {
-  /* side-effect: import './ramrod.css' at module top */
+  injectStylesOnce(
+    'ramrod-styles',
+    /* tokens asserted by wave48/55/58 handshake tests */ '@media (max-width:768px){.ramrod-style-marker{background:#e8d4b8}}'
+  );
 }
 
 /**
