@@ -10,8 +10,7 @@ import {
   passTurn,
   hasValidMoves,
 } from './rules';
-import type { AIDifficulty } from './ai';
-import { getAIMove, isAITurn } from './ai';
+import { type AIDifficulty, getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
   syncBoard,

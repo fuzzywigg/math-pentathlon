@@ -1,14 +1,12 @@
 // Star Track Game Controller
 
-import type { StarTrackGameState } from './types';
-import { createInitialState } from './types';
+import { type StarTrackGameState, createInitialState } from './types';
 import { drawChains, selectChain, isGameOver } from './rules';
 import { renderBoard, renderStatus } from './board-ui';
 import { tutorialManager } from '../../core/tutorial';
 import { starTrackTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
-import type { AIDifficulty } from './ai';
-import { getAIChainChoice } from './ai';
+import { type AIDifficulty, getAIChainChoice } from './ai';
 import { applyGameModeChrome } from '../../ui/player-colors';
 import {
   clearNullableTimeout,
