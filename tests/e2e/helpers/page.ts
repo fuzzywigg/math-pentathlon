@@ -76,9 +76,6 @@ export async function dismissOwl(
   }
 }
 
-/** Historical alias used across smoke / a11y / keyboard specs. */
-export const dismissOwlIfNeeded = dismissOwl;
-
 export async function gotoGame(page: Page, gameId: string): Promise<void> {
   await page.goto(`/#/game/${gameId}`);
   await waitForGameReady(page);

@@ -5,7 +5,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import {
   waitForGameReady,
-  dismissOwlIfNeeded,
+  dismissOwl,
 } from './helpers/page';
 
 test.describe('Keyboard a11y reachability', () => {
@@ -52,7 +52,7 @@ test.describe('Keyboard a11y reachability', () => {
   }) => {
     await page.goto('/#/game/prime-gold');
     await waitForGameReady(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     const newGameBtn = page.locator('#new-game-btn');
     await newGameBtn.focus();
@@ -82,7 +82,7 @@ test.describe('Keyboard a11y reachability', () => {
   test('modal: Help Escape returns focus to How to Play', async ({ page }) => {
     await page.goto('/#/game/prime-gold');
     await waitForGameReady(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     const helpBtn = page.locator('#help-btn');
     await helpBtn.focus();
@@ -100,7 +100,7 @@ test.describe('Keyboard a11y reachability', () => {
   }) => {
     await page.goto('/#/game/prime-gold');
     await waitForGameReady(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     // Prime Gold: roll first, then place on a keyboard-focusable cell
     const rollBtn = page.locator('.pg-roll-btn');

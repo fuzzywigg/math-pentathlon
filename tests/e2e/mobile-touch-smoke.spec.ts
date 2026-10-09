@@ -22,7 +22,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import {
-  dismissOwlIfNeeded,
+  dismissOwl,
   gotoGame,
   mountLocator,
   startHuman,
@@ -171,7 +171,7 @@ async function playLegalTaps(page: Page, gameId: string): Promise<number> {
       break;
     }
     case 'juggle': {
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
       await tap('.juggle-roll-btn');
       await tap('.juggle-die.selectable');
       await tap('.juggle-shape-option');

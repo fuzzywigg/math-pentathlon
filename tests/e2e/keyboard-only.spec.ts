@@ -7,7 +7,7 @@ import { test, expect, type Page } from '@playwright/test';
 import {
   waitForGameReady,
   gotoGame,
-  dismissOwlIfNeeded,
+  dismissOwl,
 } from './helpers/page';
 
 /** Start human mode using keyboard on the New Game modal when it is open. */
@@ -22,7 +22,7 @@ async function startHumanKeyboard(page: Page) {
     await page.keyboard.press('Enter');
     await expect(modal).toHaveClass(/hidden/);
   }
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
 }
 
 async function liveStatusText(page: Page): Promise<string> {
@@ -48,7 +48,7 @@ test.describe('Keyboard-only playthrough (2D)', () => {
   test('New Game modal traps Tab focus', async ({ page }) => {
     await gotoGame(page, 'hex');
     await startHumanKeyboard(page);
-    await dismissOwlIfNeeded(page);
+    await dismissOwl(page);
 
     await page.locator('#new-game-btn').focus();
     await page.keyboard.press('Enter');

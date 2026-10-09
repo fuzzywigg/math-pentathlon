@@ -24,7 +24,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
-import { dismissOwlIfNeeded } from './helpers/page';
+import { dismissOwl } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'zoom-reflow');
@@ -134,7 +134,7 @@ async function startHuman(page: Page) {
     await page.locator('#start-game-btn').click({ force: true });
     await expect(modal).toHaveClass(/hidden/);
   }
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
 }
 
 function titleStem(game: GameInfo): string {
@@ -565,7 +565,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
           await expect(
             page.locator('.game-card, .menu-game-card, h1').first()
           ).toBeVisible({ timeout: 15_000 });
-          await dismissOwlIfNeeded(page);
+          await dismissOwl(page);
         });
         assertReportOnly(report);
       });
@@ -585,7 +585,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
             await expect(page.locator('#new-game-modal')).not.toHaveClass(
               /hidden/
             );
-            await dismissOwlIfNeeded(page);
+            await dismissOwl(page);
           }
         );
         assertReportOnly(report);
@@ -603,7 +603,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
             await startHuman(page);
             await page.locator('#help-btn').click({ force: true });
             await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
-            await dismissOwlIfNeeded(page);
+            await dismissOwl(page);
           }
         );
         assertReportOnly(report);
