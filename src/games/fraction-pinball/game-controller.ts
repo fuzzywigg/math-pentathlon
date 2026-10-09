@@ -17,6 +17,7 @@ import type { AIDifficulty } from './ai';
 import { getAIAnswer } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fractionPinballTutorial } from './tutorial';
+import { clearElement } from '../../core/dom-security';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 
@@ -242,9 +243,12 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook — invalidate AI timers so route leave cannot mutate a detached board. */
+/** Tip-held destroy hook — invalidate AI timers and drop mount DOM/listeners. */
 export function destroyGame(): void {
   aiGeneration += 1;
   clearAiTimers();
+  if (gameContainer) {
+    clearElement(gameContainer);
+  }
   gameContainer = null;
 }
