@@ -26,10 +26,15 @@ import type { AIDifficulty } from './ai';
 import { applyAIMoveSteps } from './ai';
 import { disposeFabAiWorker, getAIMoveAsync } from './ai-client';
 import { tutorialManager } from '../../core/tutorial';
+import { clearElement } from '../../core/dom-security';
 import { fabADiffyTutorial } from './tutorial';
 import { applyGameModeChrome, seatIcon } from '../../ui/player-colors';
 import { markStatusLive } from '../../ui/board-a11y';
 import { scrollBehaviorForMotion } from '../../ui/reduced-motion';
+import {
+  clearNullableTimeout,
+  scheduleGenerationGated,
+} from '../../ui/timeout-handle';
 
 function syncOpponentChrome(isAI: boolean): void {
   const root = document.getElementById('app');
@@ -53,8 +58,29 @@ export interface FabGameController {
 
 /** Last initialized board container — used by startTutorial. */
 let activeContainer: HTMLElement | null = null;
-/** Invalidates in-flight worker replies after new game. */
+/** Invalidates in-flight worker replies after new game / destroy. */
 let aiGeneration = 0;
+/** Single pending AI think-delay timer — cleared on destroy / re-schedule. */
+let aiTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAiTimer(): void {
+  aiTimer = clearNullableTimeout(aiTimer);
+}
+
+/** Schedule AI work; no-ops if New Game / route leave invalidated the generation. */
+function scheduleAI(fn: () => void, delayMs: number): void {
+  scheduleGenerationGated(
+    {
+      clearTimer: clearAiTimer,
+      setTimer: (t: ReturnType<typeof setTimeout> | null) => {
+        aiTimer = t;
+      },
+      getGeneration: () => aiGeneration,
+    },
+    fn,
+    delayMs
+  );
+}
 
 /**
  * Initialize the game
@@ -82,6 +108,7 @@ export function initGame(
   controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
     disposeFabAiWorker();
     aiGeneration += 1;
+    clearAiTimer();
     controller.state = createInitialState();
     controller.isAI = vsAI;
     controller.aiPlayer = vsAI ? 'player2' : null;
@@ -100,6 +127,11 @@ export function initGame(
  * Update the UI
  */
 function updateUI(controller: FabGameController): void {
+  // Drop paints after destroyGame nulled the mount ref (remount safety).
+  if (!activeContainer || controller.container !== activeContainer) {
+    return;
+  }
+
   const { container, state } = controller;
   container.innerHTML = '';
 
@@ -231,7 +263,7 @@ function updateUI(controller: FabGameController): void {
     controller.aiPlayer === state.currentPlayer &&
     !state.winner
   ) {
-    setTimeout(() => makeAIMove(controller), 800);
+    scheduleAI(() => makeAIMove(controller), 800);
   }
 }
 
@@ -347,5 +379,13 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook for tip mounts / #501. */
-export function destroyGame(): void {}
+/** Tip-held destroy hook — cancel AI timer/worker and drop mount DOM/listeners. */
+export function destroyGame(): void {
+  aiGeneration += 1;
+  clearAiTimer();
+  disposeFabAiWorker();
+  if (activeContainer) {
+    clearElement(activeContainer);
+  }
+  activeContainer = null;
+}
