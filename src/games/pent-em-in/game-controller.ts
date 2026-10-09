@@ -35,7 +35,9 @@ import type { PentEmInBoard3D } from '../../ui/three/pent-em-in-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, isAIMode ? 'human-vs-ai' : 'human-vs-human');
 }
 
@@ -76,10 +78,14 @@ function unmountBoard3d(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadPentEmInBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
     board3d = await mod.createPentEmInBoard3D(
       boardContainer,
       handleCellClick,
@@ -111,7 +117,9 @@ function onBoard3dContextLost(): void {
 // =============================================================================
 
 function render(): void {
-  if (!boardContainer || !statusContainer) return;
+  if (!boardContainer || !statusContainer) {
+    return;
+  }
 
   const inputOpts = { allowInput: !isComputerTurnPending() };
 
@@ -133,7 +141,9 @@ function render(): void {
 }
 
 function renderBoardOnly(): void {
-  if (!boardContainer) return;
+  if (!boardContainer) {
+    return;
+  }
   const inputOpts = { allowInput: !isComputerTurnPending() };
   if (board3dEnabled && board3d) {
     board3d.update(gameState, handleCellClick, handleCellHover);
@@ -150,7 +160,9 @@ function renderBoardOnly(): void {
 }
 
 function renderStatusAndControls(): void {
-  if (!statusContainer) return;
+  if (!statusContainer) {
+    return;
+  }
   statusContainer.innerHTML = '';
   markStatusLive(statusContainer);
 
@@ -245,33 +257,47 @@ function renderStatusAndControls(): void {
 // =============================================================================
 
 function handlePieceSelect(shapeId: string): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'selectPiece') return;
+  if (isComputerTurnPending()) {
+    return;
+  }
+  if (gameState.phase !== 'selectPiece') {
+    return;
+  }
   gameState = selectPiece(gameState, shapeId);
   render();
 }
 
 function handleRotate(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = rotateSelectedPiece(gameState);
   render();
 }
 
 function handleFlip(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = flipSelectedPiece(gameState);
   render();
 }
 
 function handleCancel(): void {
-  if (isComputerTurnPending()) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
   gameState = cancelSelection(gameState);
   render();
 }
 
 function handleCellClick(cell: Cell): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'placePiece' || !gameState.selectedPiece) return;
+  if (isComputerTurnPending()) {
+    return;
+  }
+  if (gameState.phase !== 'placePiece' || !gameState.selectedPiece) {
+    return;
+  }
 
   if (
     canPlacePiece(
@@ -304,8 +330,12 @@ function handleCellClick(cell: Cell): void {
 }
 
 function handleCellHover(cell: Cell | null): void {
-  if (isComputerTurnPending()) return;
-  if (gameState.phase !== 'placePiece') return;
+  if (isComputerTurnPending()) {
+    return;
+  }
+  if (gameState.phase !== 'placePiece') {
+    return;
+  }
   const prev = gameState.previewPosition;
   if (
     (prev === null && cell === null) ||
@@ -327,7 +357,9 @@ function handleCellHover(cell: Cell | null): void {
 
 function aiTurn(): void {
   aiTimer = null;
-  if (gameState.winner || gameState.currentPlayer !== 'player2') return;
+  if (gameState.winner || gameState.currentPlayer !== 'player2') {
+    return;
+  }
 
   // Use AI module to get move
   const move = getAIMove(gameState, 'player2', aiDifficulty);

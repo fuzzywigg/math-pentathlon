@@ -109,26 +109,36 @@ function onBoard3dContextLost(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!activeController || board3d || !board3dEnabled) return;
+  if (!activeController || board3d || !board3dEnabled) {
+    return;
+  }
   const host =
     boardHostEl ??
     (activeController.container.querySelector(
       '.pg-board-host'
     ) as HTMLElement | null);
-  if (!host) return;
+  if (!host) {
+    return;
+  }
   boardHostEl = host;
   try {
     const mod = await loadPrimeGoldBoard3DModule();
-    if (!activeController || !board3dEnabled) return;
+    if (!activeController || !board3dEnabled) {
+      return;
+    }
     const liveHost =
       boardHostEl ??
       (activeController.container.querySelector(
         '.pg-board-host'
       ) as HTMLElement | null);
-    if (!liveHost) return;
+    if (!liveHost) {
+      return;
+    }
     boardHostEl = liveHost;
     board3d = await mod.createPrimeGoldBoard3D(liveHost, (value, expr) => {
-      if (activeController) handlePlacement(activeController, value, expr);
+      if (activeController) {
+        handlePlacement(activeController, value, expr);
+      }
     });
     clearBoard3dWebGlFallback(liveHost);
     liveHost.addEventListener('mp3d-context-lost', onBoard3dContextLost);
@@ -182,7 +192,9 @@ export function initGame(
 
   if (board3dEnabled) {
     board3dLoading = ensureBoard3d().then(() => {
-      if (activeController) activeController.update();
+      if (activeController) {
+        activeController.update();
+      }
     });
   }
 
@@ -355,7 +367,9 @@ function isComputerTurnPending(controller: PrimeGoldController): boolean {
  * Handle dice roll
  */
 function handleRoll(controller: PrimeGoldController): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = rollDice(controller.state);
   controller.update();
 }
@@ -368,7 +382,9 @@ function handlePlacement(
   value: number,
   expr: string
 ): void {
-  if (isComputerTurnPending(controller)) return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
   controller.state = placeChip(controller.state, value, expr);
   controller.update();
 }
@@ -377,8 +393,12 @@ function handlePlacement(
  * Handle pass when no placements remain (human seat only).
  */
 function handlePass(controller: PrimeGoldController): void {
-  if (isComputerTurnPending(controller)) return;
-  if (controller.state.phase !== 'placing') return;
+  if (isComputerTurnPending(controller)) {
+    return;
+  }
+  if (controller.state.phase !== 'placing') {
+    return;
+  }
   controller.state = passTurn(controller.state);
   controller.update();
 }
@@ -393,11 +413,17 @@ function handlePass(controller: PrimeGoldController): void {
 function makeAIMove(controller: PrimeGoldController): void {
   const { state, aiPlayer, aiDifficulty } = controller;
 
-  if (state.phase === 'gameOver' || !aiPlayer) return;
+  if (state.phase === 'gameOver' || !aiPlayer) {
+    return;
+  }
   // Guard against stale timers after destroy / new game
-  if (activeController !== controller) return;
+  if (activeController !== controller) {
+    return;
+  }
   // Hard seat guard — stale timers must not roll/place for Blue
-  if (!isComputerTurnPending(controller)) return;
+  if (!isComputerTurnPending(controller)) {
+    return;
+  }
 
   // Roll dice if needed
   if (state.phase === 'rolling') {
@@ -448,7 +474,9 @@ export function newGameVsAI(
 
 // Start the tutorial (Next-only; How-to modal remains available)
 export function startTutorial(): void {
-  if (!activeContainer) return;
+  if (!activeContainer) {
+    return;
+  }
   newGameVsHuman(activeContainer);
 
   const unsubscribe = tutorialManager.on((event) => {

@@ -25,7 +25,9 @@ import type { HexAGoneBoard3D } from '../../ui/three/hex-a-gone-board-3d';
 
 function syncOpponentChrome(): void {
   const root = document.getElementById('app');
-  if (!root) return;
+  if (!root) {
+    return;
+  }
   applyGameModeChrome(root, gameMode);
 }
 
@@ -73,10 +75,14 @@ function fallBackTo2dBoard(): void {
 }
 
 async function ensureBoard3d(): Promise<void> {
-  if (!boardContainer || board3d || !board3dEnabled) return;
+  if (!boardContainer || board3d || !board3dEnabled) {
+    return;
+  }
   try {
     const mod = await loadHexAGoneBoard3DModule();
-    if (!boardContainer || !board3dEnabled) return;
+    if (!boardContainer || !board3dEnabled) {
+      return;
+    }
 
     // Structure: wrapper → 3D host + selection chrome (bank/confirm stay DOM)
     boardContainer.replaceChildren();
@@ -156,7 +162,9 @@ export function setAIDifficulty(difficulty: AIDifficulty): void {
 
 // Handle block selection from bank
 function handleBlockSelect(shape: BlockShape): void {
-  if (isAIThinking) return;
+  if (isAIThinking) {
+    return;
+  }
 
   if (gameState.phase === 'selectBlocks') {
     // Toggle selection
@@ -175,8 +183,12 @@ function handleBlockSelect(shape: BlockShape): void {
 
 // Handle confirm selection
 function handleConfirm(): void {
-  if (isAIThinking) return;
-  if (gameState.phase !== 'selectBlocks') return;
+  if (isAIThinking) {
+    return;
+  }
+  if (gameState.phase !== 'selectBlocks') {
+    return;
+  }
 
   gameState = commitSelection(gameState);
   render();
@@ -184,8 +196,12 @@ function handleConfirm(): void {
 
 // Handle cell click for placement
 function handleCellClick(q: number, r: number): void {
-  if (isAIThinking) return;
-  if (gameState.phase !== 'placeBlocks') return;
+  if (isAIThinking) {
+    return;
+  }
+  if (gameState.phase !== 'placeBlocks') {
+    return;
+  }
 
   const prevPlayer = gameState.currentPlayer;
   gameState = placeBlock(gameState, q, r);
