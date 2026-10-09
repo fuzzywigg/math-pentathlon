@@ -1,11 +1,11 @@
 {
   "knipVersion": "5.88.1",
   "enforce": false,
-  "note": "Report-only unused-export drift baseline (q-mp-118; unusedTypes 91; unusedExports 3 after q-mp-188+q-mp-187 folds; duplicates 2). Set enforce:true only after tip-owner approval; ratchets only go down.",
+  "note": "Report-only unused-export drift baseline (q-mp-118; unusedTypes 88 after q-mp-204 demote PointerTapPhase/PointerTapState/GameMode; unusedExports 3 after q-mp-188+q-mp-187 folds; duplicates 2). Set enforce:true only after tip-owner approval; ratchets only go down.",
   "metrics": {
     "unusedFiles": 0,
     "unusedExports": 3,
-    "unusedTypes": 91,
+    "unusedTypes": 88,
     "unusedDependencies": 0,
     "unusedDevDependencies": 0,
     "unlisted": 3,
