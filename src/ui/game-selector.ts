@@ -122,7 +122,8 @@ function createDivisionAccordion(
   title.id = titleId;
   title.textContent = divisionName;
   titleRow.appendChild(title);
-  section.setAttribute('aria-labelledby', titleId);
+  // Panel role=region keeps the labelled landmark; labelling the <section>
+  // too duplicates axe landmark-unique (same aria-labelledby).
 
   const grade = document.createElement('span');
   grade.className = 'division-grade';

@@ -3990,3 +3990,49 @@ html[data-reduced-motion='true'] .star-track-chain-btn:hover:not(:disabled) {
     opacity: 1;
   }
 }
+
+/* ------------------------------------------------------------------
+ * q-mp-057: post-#477 a11y keepers (ARIA / focus / 44px). Placed after
+ * lazy game-play rules so they win over earlier 350px / 44px overrides.
+ * ------------------------------------------------------------------ */
+
+/* Kings tablet/phone: restore ≥44px cells (9×44 + gaps ≈ 420). */
+@media (pointer: coarse), (hover: none) {
+  .board.kings-board {
+    width: min(420px, calc(100vw - 2 * var(--play-shell-gutter, 1rem)));
+  }
+}
+
+@media (max-width: 768px) {
+  .board.kings-board {
+    width: min(420px, calc(100vw - 2 * var(--play-shell-gutter, 1rem)));
+  }
+}
+
+/* Ollie dock scale(0.85) needs 52px pre-scale hit boxes (≥44 post-scale). */
+@media (max-width: 480px) {
+  .owl-container:not(.owl-hidden):not(.owl-dragging):not(.owl-resting) {
+    transform: scale(0.85);
+    transform-origin: top right;
+  }
+
+  .owl-bubble-dismiss,
+  .owl-minimize-btn {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    min-height: 52px;
+  }
+
+  .owl-minimize-btn {
+    opacity: 1;
+  }
+}
+
+/* Keyboard focus rings for Ollie chrome (were missing). */
+.owl-bubble-dismiss:focus-visible,
+.owl-minimize-btn:focus-visible,
+.owl-minimized:focus-visible {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 2px;
+}
