@@ -1,10 +1,10 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-126: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix \u2212200 \u2192 639; q-mp-121 types/layout/serialization curly:all autofix \u221244 \u2192 595; q-mp-126 src/main.ts curly:all autofix \u221218 \u2192 577. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045). @typescript-eslint/no-confusing-void-expression: 228 (q-mp-128). radix: 6 (q-mp-130). default-case: 6 (q-mp-129). Tip owner reconciles ceilings on fold (min wins).",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-126 + q-mp-133: ceilings for rules counted by npm run lint:ratchet. curly: 577 (q-mp-126). @typescript-eslint/no-non-null-assertion: 378 (tip re-measure after hex quarantine \u22129). @typescript-eslint/no-confusing-void-expression: 224 (tip re-measure after hex quarantine \u22124). radix: 6 (q-mp-130). default-case: 5 (q-mp-129 residual after hex/coordinates quarantine \u22121). Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
     "curly": 577,
-    "@typescript-eslint/no-non-null-assertion": 387,
-    "@typescript-eslint/no-confusing-void-expression": 228,
+    "@typescript-eslint/no-non-null-assertion": 378,
+    "@typescript-eslint/no-confusing-void-expression": 224,
     "radix": 6,
-    "default-case": 6
+    "default-case": 5
   }
 }
