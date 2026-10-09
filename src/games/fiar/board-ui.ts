@@ -348,7 +348,9 @@ export function renderBoard(
     );
 
     if (announceTargets) {
-      const activate = () => onNodeClick(nodeId);
+      const activate = () => {
+        onNodeClick(nodeId);
+      };
       g.addEventListener('click', activate);
       bindCellActivateKeys(g, activate);
 

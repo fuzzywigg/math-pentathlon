@@ -149,7 +149,9 @@ function renderNode(
 
   // Click handler for valid moves
   if (isValid && !node.chip) {
-    group.addEventListener('click', () => onNodeClick(node.id));
+    group.addEventListener('click', () => {
+      onNodeClick(node.id);
+    });
   }
 
   const chip = node.chip;
@@ -197,9 +199,13 @@ function renderNode(
 
   if (canSelect && node.chip) {
     const chipId = node.chip.id;
-    bindCellActivateKeys(group, () => onChipClick(chipId));
+    bindCellActivateKeys(group, () => {
+      onChipClick(chipId);
+    });
   } else if (isValid && !node.chip) {
-    bindCellActivateKeys(group, () => onNodeClick(node.id));
+    bindCellActivateKeys(group, () => {
+      onNodeClick(node.id);
+    });
   }
 
   return group;

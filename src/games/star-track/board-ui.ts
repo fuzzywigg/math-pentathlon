@@ -265,10 +265,16 @@ export function fillChainArea(
           'aria-label',
           `Chain of length ${chain.length}, selectable`
         );
-        chainBtn.addEventListener('click', () => select(index as 0 | 1));
+        chainBtn.addEventListener('click', () => {
+          select(index as 0 | 1);
+        });
         if (onPreviewChain) {
-          const preview = (): void => onPreviewChain(index as 0 | 1);
-          const clear = (): void => onPreviewChain(null);
+          const preview = (): void => {
+            onPreviewChain(index as 0 | 1);
+          };
+          const clear = (): void => {
+            onPreviewChain(null);
+          };
           chainBtn.addEventListener('pointerenter', preview);
           chainBtn.addEventListener('focus', preview);
           chainBtn.addEventListener('pointerleave', clear);

@@ -66,7 +66,9 @@ export function renderChallenge(
       btn.className = 'pinball-choice-btn';
       btn.textContent = choice;
       if (allowInput) {
-        btn.addEventListener('click', () => onAnswerSelect(choice));
+        btn.addEventListener('click', () => {
+          onAnswerSelect(choice);
+        });
       } else {
         btn.disabled = true;
         btn.setAttribute('aria-disabled', 'true');

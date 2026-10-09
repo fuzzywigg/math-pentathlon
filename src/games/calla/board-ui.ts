@@ -111,7 +111,11 @@ export function renderBoard(
       displayIndex,
       isValid,
       isLastSown,
-      onPitClick && isValid ? () => onPitClick(displayIndex) : undefined
+      onPitClick && isValid
+        ? () => {
+            onPitClick(displayIndex);
+          }
+        : undefined
     );
     svg.appendChild(pitGroup);
   }
@@ -138,7 +142,11 @@ export function renderBoard(
       i,
       isValid,
       isLastSown,
-      onPitClick && isValid ? () => onPitClick(i) : undefined
+      onPitClick && isValid
+        ? () => {
+            onPitClick(i);
+          }
+        : undefined
     );
     svg.appendChild(pitGroup);
   }
