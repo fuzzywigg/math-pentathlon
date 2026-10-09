@@ -97,6 +97,8 @@ const nodePureFiles = [
   'tests/unit/engine-ui-boundary-seats-characterization.test.ts',
   // Emit-identity checker imports esbuild (needs Node TextEncoder, not jsdom).
   'tests/unit/check-emit-identity.test.ts',
+  // Ratchet-history reporter is a Node script (no DOM / jsdom setup).
+  'tests/unit/report-ratchet-history.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

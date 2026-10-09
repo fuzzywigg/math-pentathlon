@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420" viewBox="0 0 920 420" role="img" aria-label="Ratchet ceiling history">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <text x="56" y="18" font-size="16" font-weight="600" fill="#24292f" font-family="ui-sans-serif, system-ui, sans-serif">Ratchet ceiling history</text>
+  <rect x="56" y="14" width="12" height="12" fill="#0b6e4f" rx="2" /><text x="74" y="24" font-size="12" fill="#24292f" font-family="ui-sans-serif, system-ui, sans-serif">curly</text>
+  <rect x="236" y="14" width="12" height="12" fill="#1d4e89" rx="2" /><text x="254" y="24" font-size="12" fill="#24292f" font-family="ui-sans-serif, system-ui, sans-serif">type Phase-2</text>
+  <rect x="416" y="14" width="12" height="12" fill="#a33b20" rx="2" /><text x="434" y="24" font-size="12" fill="#24292f" font-family="ui-sans-serif, system-ui, sans-serif">boundaries sum</text>
+  <line x1="56" y1="348" x2="896" y2="348" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="352" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">0</text>
+  <line x1="56" y1="288" x2="896" y2="288" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="292" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">291</text>
+  <line x1="56" y1="228" x2="896" y2="228" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="232" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">582</text>
+  <line x1="56" y1="168" x2="896" y2="168" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="172" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">874</text>
+  <line x1="56" y1="108" x2="896" y2="108" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="112" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">1165</text>
+  <line x1="56" y1="48" x2="896" y2="48" stroke="#d0d7de" stroke-width="1" />
+  <text x="48" y="52" text-anchor="end" font-size="11" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif">1456</text>
+  <line x1="56" y1="48" x2="56" y2="348" stroke="#24292f" stroke-width="1.25"/>
+  <line x1="56" y1="348" x2="896" y2="348" stroke="#24292f" stroke-width="1.25"/>
+  <polyline fill="none" stroke="#0b6e4f" stroke-width="2.5" points="149.33,48 196,48 242.67,48 289.33,51.91 336,51.91 382.67,51.91 429.33,51.91 476,51.91 522.67,51.91 569.33,51.91 616,51.91 662.67,71.08 709.33,71.08 756,71.08 802.67,71.08 849.33,71.08 896,76.02" />
+  <polyline fill="none" stroke="#1d4e89" stroke-width="2.5" points="56,231.79 102.67,241.27 149.33,241.27 196,241.27 242.67,258.78 289.33,258.78 336,256.72 382.67,258.78 429.33,255.28 476,271.15 522.67,302.67 569.33,348 616,289.07 662.67,289.07 709.33,302.67 756,303.49 802.67,302.67 849.33,303.49 896,303.49" />
+  <polyline fill="none" stroke="#a33b20" stroke-width="2.5" points="196,344.5 242.67,344.5 289.33,344.5 336,344.5 382.67,344.5 429.33,344.5 476,344.5 522.67,344.5 569.33,344.5 616,344.5 662.67,344.5 709.33,344.5 756,344.5 802.67,344.5 849.33,344.5 896,344.5" />
+  <circle cx="149.33" cy="48" r="3.5" fill="#0b6e4f"><title>79b59a5a curly=1456</title></circle>
+  <circle cx="196" cy="48" r="3.5" fill="#0b6e4f"><title>38e7c77a curly=1456</title></circle>
+  <circle cx="242.67" cy="48" r="3.5" fill="#0b6e4f"><title>b92b51c4 curly=1456</title></circle>
+  <circle cx="289.33" cy="51.91" r="3.5" fill="#0b6e4f"><title>e1692696 curly=1437</title></circle>
+  <circle cx="336" cy="51.91" r="3.5" fill="#0b6e4f"><title>a16a326a curly=1437</title></circle>
+  <circle cx="382.67" cy="51.91" r="3.5" fill="#0b6e4f"><title>ba5856d6 curly=1437</title></circle>
+  <circle cx="429.33" cy="51.91" r="3.5" fill="#0b6e4f"><title>1dcd8252 curly=1437</title></circle>
+  <circle cx="476" cy="51.91" r="3.5" fill="#0b6e4f"><title>785212dd curly=1437</title></circle>
+  <circle cx="522.67" cy="51.91" r="3.5" fill="#0b6e4f"><title>62a9173b curly=1437</title></circle>
+  <circle cx="569.33" cy="51.91" r="3.5" fill="#0b6e4f"><title>13812c59 curly=1437</title></circle>
+  <circle cx="616" cy="51.91" r="3.5" fill="#0b6e4f"><title>0dc1e953 curly=1437</title></circle>
+  <circle cx="662.67" cy="71.08" r="3.5" fill="#0b6e4f"><title>84f7d032 curly=1344</title></circle>
+  <circle cx="709.33" cy="71.08" r="3.5" fill="#0b6e4f"><title>6e75e5d9 curly=1344</title></circle>
+  <circle cx="756" cy="71.08" r="3.5" fill="#0b6e4f"><title>e65493c3 curly=1344</title></circle>
+  <circle cx="802.67" cy="71.08" r="3.5" fill="#0b6e4f"><title>a2f13767 curly=1344</title></circle>
+  <circle cx="849.33" cy="71.08" r="3.5" fill="#0b6e4f"><title>ff2c12a9 curly=1344</title></circle>
+  <circle cx="896" cy="76.02" r="3.5" fill="#0b6e4f"><title>5b72ec21 curly=1320</title></circle>
+  <circle cx="56" cy="231.79" r="3.5" fill="#1d4e89"><title>0842b629 type Phase-2=564</title></circle>
+  <circle cx="102.67" cy="241.27" r="3.5" fill="#1d4e89"><title>87193983 type Phase-2=518</title></circle>
+  <circle cx="149.33" cy="241.27" r="3.5" fill="#1d4e89"><title>79b59a5a type Phase-2=518</title></circle>
+  <circle cx="196" cy="241.27" r="3.5" fill="#1d4e89"><title>38e7c77a type Phase-2=518</title></circle>
+  <circle cx="242.67" cy="258.78" r="3.5" fill="#1d4e89"><title>b92b51c4 type Phase-2=433</title></circle>
+  <circle cx="289.33" cy="258.78" r="3.5" fill="#1d4e89"><title>e1692696 type Phase-2=433</title></circle>
+  <circle cx="336" cy="256.72" r="3.5" fill="#1d4e89"><title>a16a326a type Phase-2=443</title></circle>
+  <circle cx="382.67" cy="258.78" r="3.5" fill="#1d4e89"><title>ba5856d6 type Phase-2=433</title></circle>
+  <circle cx="429.33" cy="255.28" r="3.5" fill="#1d4e89"><title>1dcd8252 type Phase-2=450</title></circle>
+  <circle cx="476" cy="271.15" r="3.5" fill="#1d4e89"><title>785212dd type Phase-2=373</title></circle>
+  <circle cx="522.67" cy="302.67" r="3.5" fill="#1d4e89"><title>62a9173b type Phase-2=220</title></circle>
+  <circle cx="569.33" cy="348" r="3.5" fill="#1d4e89"><title>13812c59 type Phase-2=0</title></circle>
+  <circle cx="616" cy="289.07" r="3.5" fill="#1d4e89"><title>0dc1e953 type Phase-2=286</title></circle>
+  <circle cx="662.67" cy="289.07" r="3.5" fill="#1d4e89"><title>84f7d032 type Phase-2=286</title></circle>
+  <circle cx="709.33" cy="302.67" r="3.5" fill="#1d4e89"><title>6e75e5d9 type Phase-2=220</title></circle>
+  <circle cx="756" cy="303.49" r="3.5" fill="#1d4e89"><title>e65493c3 type Phase-2=216</title></circle>
+  <circle cx="802.67" cy="302.67" r="3.5" fill="#1d4e89"><title>a2f13767 type Phase-2=220</title></circle>
+  <circle cx="849.33" cy="303.49" r="3.5" fill="#1d4e89"><title>ff2c12a9 type Phase-2=216</title></circle>
+  <circle cx="896" cy="303.49" r="3.5" fill="#1d4e89"><title>5b72ec21 type Phase-2=216</title></circle>
+  <circle cx="196" cy="344.5" r="3.5" fill="#a33b20"><title>38e7c77a boundaries sum=17</title></circle>
+  <circle cx="242.67" cy="344.5" r="3.5" fill="#a33b20"><title>b92b51c4 boundaries sum=17</title></circle>
+  <circle cx="289.33" cy="344.5" r="3.5" fill="#a33b20"><title>e1692696 boundaries sum=17</title></circle>
+  <circle cx="336" cy="344.5" r="3.5" fill="#a33b20"><title>a16a326a boundaries sum=17</title></circle>
+  <circle cx="382.67" cy="344.5" r="3.5" fill="#a33b20"><title>ba5856d6 boundaries sum=17</title></circle>
+  <circle cx="429.33" cy="344.5" r="3.5" fill="#a33b20"><title>1dcd8252 boundaries sum=17</title></circle>
+  <circle cx="476" cy="344.5" r="3.5" fill="#a33b20"><title>785212dd boundaries sum=17</title></circle>
+  <circle cx="522.67" cy="344.5" r="3.5" fill="#a33b20"><title>62a9173b boundaries sum=17</title></circle>
+  <circle cx="569.33" cy="344.5" r="3.5" fill="#a33b20"><title>13812c59 boundaries sum=17</title></circle>
+  <circle cx="616" cy="344.5" r="3.5" fill="#a33b20"><title>0dc1e953 boundaries sum=17</title></circle>
+  <circle cx="662.67" cy="344.5" r="3.5" fill="#a33b20"><title>84f7d032 boundaries sum=17</title></circle>
+  <circle cx="709.33" cy="344.5" r="3.5" fill="#a33b20"><title>6e75e5d9 boundaries sum=17</title></circle>
+  <circle cx="756" cy="344.5" r="3.5" fill="#a33b20"><title>e65493c3 boundaries sum=17</title></circle>
+  <circle cx="802.67" cy="344.5" r="3.5" fill="#a33b20"><title>a2f13767 boundaries sum=17</title></circle>
+  <circle cx="849.33" cy="344.5" r="3.5" fill="#a33b20"><title>ff2c12a9 boundaries sum=17</title></circle>
+  <circle cx="896" cy="344.5" r="3.5" fill="#a33b20"><title>5b72ec21 boundaries sum=17</title></circle>
+  <text x="56" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 56 384)">2026-10-08</text>
+  <text x="102.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 102.67 384)">2026-10-08</text>
+  <text x="149.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 149.33 384)">2026-10-08</text>
+  <text x="196" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 196 384)">2026-10-08</text>
+  <text x="242.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 242.67 384)">2026-10-08</text>
+  <text x="289.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 289.33 384)">2026-10-08</text>
+  <text x="336" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 336 384)">2026-10-08</text>
+  <text x="382.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 382.67 384)">2026-10-08</text>
+  <text x="429.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 429.33 384)">2026-10-08</text>
+  <text x="476" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 476 384)">2026-10-08</text>
+  <text x="522.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 522.67 384)">2026-10-08</text>
+  <text x="569.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 569.33 384)">2026-10-08</text>
+  <text x="616" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 616 384)">2026-10-08</text>
+  <text x="662.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 662.67 384)">2026-10-08</text>
+  <text x="709.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 709.33 384)">2026-10-08</text>
+  <text x="756" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 756 384)">2026-10-08</text>
+  <text x="802.67" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 802.67 384)">2026-10-08</text>
+  <text x="849.33" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 849.33 384)">2026-10-08</text>
+  <text x="896" y="384" text-anchor="middle" font-size="10" fill="#57606a" font-family="ui-sans-serif, system-ui, sans-serif" transform="rotate(-35 896 384)">2026-10-08</text>
+</svg>
