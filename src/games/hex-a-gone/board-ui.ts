@@ -146,11 +146,14 @@ export function renderBoard(
     );
 
     if (isValidPlacement) {
-      hex.style.cursor = 'pointer';
-      const activate = () => onCellClick!(cell.q, cell.r);
-      hex.addEventListener('click', activate);
-      // Enter/Space place on the focused valid cell (same as click)
-      bindCellActivateKeys(hex, activate);
+      const placeHandler = onCellClick;
+      if (placeHandler !== undefined) {
+        hex.style.cursor = 'pointer';
+        const activate = () => placeHandler(cell.q, cell.r);
+        hex.addEventListener('click', activate);
+        // Enter/Space place on the focused valid cell (same as click)
+        bindCellActivateKeys(hex, activate);
+      }
     }
 
     cellsGroup.appendChild(hex);
