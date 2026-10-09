@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157).
+ * Lint-rule ceiling ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157 + q-mp-316).
  *
  * Counts violations for rules that are too widespread to hard-fail yet
  * (currently: curly "all", @typescript-eslint/no-non-null-assertion,
@@ -8,7 +8,8 @@
  * no-duplicate-imports, @typescript-eslint/prefer-nullish-coalescing,
  * @typescript-eslint/prefer-optional-chain,
  * @typescript-eslint/switch-exhaustiveness-check,
- * @typescript-eslint/no-shadow).
+ * @typescript-eslint/no-shadow,
+ * @typescript-eslint/return-await always).
  * Fails if any counted rule exceeds its ceiling so the debt can only go down.
  *
  * Usage: npm run lint:ratchet
@@ -44,6 +45,7 @@ const ceilings = JSON.parse(fs.readFileSync(CEILINGS_PATH, 'utf8'));
  * - @typescript-eslint/prefer-optional-chain (live unset; q-mp-148)
  * - @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141)
  * - @typescript-eslint/no-shadow (live unset; q-mp-157)
+ * - @typescript-eslint/return-await always (live unset; q-mp-316 ceiling 3 — fab/fiar/queens ai-client HOLD)
  */
 // Keep the probe config under the repo root so flat-config `import.meta.dirname`
 // / relative imports to eslint.config.js resolve; always delete in `finally`.
@@ -67,6 +69,7 @@ export default [
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-shadow': 'error',
+      '@typescript-eslint/return-await': ['error', 'always'],
     },
   },
 ];
