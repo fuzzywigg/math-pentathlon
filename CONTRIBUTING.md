@@ -24,6 +24,8 @@ npm run build
 
 Full script list, CI posture, and testing layers: [docs/wiki/development.md](./docs/wiki/development.md).
 
+Before adding tests that assert status/menu chrome strings, run `npm run check:copy-pins` (report-only). Prefer structural asserts over pinning `getPhaseMessage` / `getCurrentPhaseMessage` / `Coming Soon` — see [docs/dev/check-copy-pins.md](./docs/dev/check-copy-pins.md).
+
 Product and agent guardrails: [AGENTS.md](./AGENTS.md). Coding patterns: [.github/copilot-instructions.md](./.github/copilot-instructions.md).
 
 ## Escalations
