@@ -70,7 +70,7 @@ Progress dashboard (`/#/stats`):
 ## Related reading
 
 - [Game registry](./game-registry.md)
-- [Game route lifecycle (`q-mp-070`)](../dev/engines/game-lifecycle.md) — sequence + per-game destroy map
+- [Game route lifecycle (`q-mp-070` / `q-mp-146`)](../dev/engines/game-lifecycle.md) — sequence + per-game destroy map + Chromium menu/mount/destroy/crash-boundary visuals
 - [injectStyles / board CSS ownership (`q-mp-122`)](../dev/engines/inject-styles-board-css.md) — `injectStylesOnce` vs `game-play.css`
 - [How to add a game](./adding-a-game.md)
 - [Development & testing layers](./development.md)

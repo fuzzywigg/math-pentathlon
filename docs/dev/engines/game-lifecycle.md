@@ -176,13 +176,38 @@ Rows use the `| \`Symbol\` | \`path\` |` shape scanned by `npm run check:dev-doc
 | `destroyGame` | `src/games/frac-fact/game-controller.ts` |
 | `renderProblem` | `src/games/frac-fact/board-ui.ts` |
 
+## Contributor visuals (q-mp-146)
+
+Real Chromium captures from a local `npm run dev` build (1024×768). Prose map above is from `q-mp-070` ([#599](https://github.com/fuzzywigg/math-pentathlon/pull/599) draft; content already on tip). These shots are additive — regenerate with the test-only harness below (no `src/` edits).
+
+Crash UI is pinned by `tests/unit/game-error-boundary.test.ts` / `src/ui/game-error-boundary.ts` and triggered the same way as `tests/e2e/console-clean-on-load.spec.ts` (dispatch `ErrorEvent` with `.error` set). Never edit product code to force the boundary for docs.
+
+| Step | Screenshot |
+| --- | --- |
+| Menu (game selector) | ![Menu](../../visuals/2026-10/lifecycle-menu.png) |
+| Game mounted (Hex shell + board) | ![Hex mounted](../../visuals/2026-10/lifecycle-game-mounted-hex.png) |
+| After **← Games** (destroy → menu) | ![After back](../../visuals/2026-10/lifecycle-after-back-to-games.png) |
+| Crash-boundary reset UI | ![Crash UI](../../visuals/2026-10/lifecycle-crash-boundary-hex.png) |
+| After **Try again** remount | ![Reset remount](../../visuals/2026-10/lifecycle-crash-boundary-reset-hex.png) |
+
+```bash
+npx playwright test -c playwright.lifecycle-visuals.config.ts
+# optional software GL:
+PLAYWRIGHT_SWIFTSHADER=1 npx playwright test -c playwright.lifecycle-visuals.config.ts
+```
+
+Harness: `scripts/capture-lifecycle-visuals-q-mp-146.spec.ts` · config: `playwright.lifecycle-visuals.config.ts`
+
 ## Related tests (reference only)
 
 | Suite | Path on tip |
 | --- | --- |
 | Route cleanup try/finally + init-before-register | `tests/unit/runtime-error-path-audit.test.ts` |
 | destroyGame timer / generation pins | `tests/unit/destroy-game-cleanup.test.ts` |
+| Game error boundary crash / reset UI | `tests/unit/game-error-boundary.test.ts` |
+| E2E boundary probe + Try again | `tests/e2e/console-clean-on-load.spec.ts` |
 | q-mp-030 hex + pinball mount clear | Lands with [#594](https://github.com/fuzzywigg/math-pentathlon/pull/594) (not yet on tip) |
+| Lifecycle screenshot capture (docs only) | `scripts/capture-lifecycle-visuals-q-mp-146.spec.ts` |
 
 ## Link checker
 
