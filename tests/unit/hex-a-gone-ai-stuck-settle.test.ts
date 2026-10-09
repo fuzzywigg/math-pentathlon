@@ -11,19 +11,14 @@ import {
   destroyGame,
 } from '../../src/games/hex-a-gone/game-controller';
 
+import { mountPair } from '../helpers/mount-pair';
+
 afterEach(() => {
   destroyGame();
   document.body.innerHTML = '';
   vi.useRealTimers();
   vi.restoreAllMocks();
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.append(board, status);
-  return { board, status };
-}
 
 function playOneHumanTriangle(board: HTMLElement): void {
   (

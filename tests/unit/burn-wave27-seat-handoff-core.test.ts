@@ -5,60 +5,49 @@
  * Tests-only. Existing games only — no product inventing.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import { owlSystem } from '../../src/core/owl';
-
 import {
   initGame as initHex,
   newGameVsHuman as hexVsHuman,
   getGameState as getHexState,
 } from '../../src/games/hex/game-controller';
-
 import {
   initGame as initCalla,
   newGameVsHuman as callaVsHuman,
   getGameState as getCallaState,
 } from '../../src/games/calla/game-controller';
-
 import {
   initGame as initFiar,
   newGameVsHuman as fiarVsHuman,
   getCurrentState as getFiarState,
 } from '../../src/games/fiar/game-controller';
-
 import {
   initGame as initKings,
   newGameVsHuman as kingsVsHuman,
   getGameState as getKingsState,
 } from '../../src/games/kings-quadraphages/game-controller';
-
 import {
   initGame as initStar,
   newGameVsHuman as starVsHuman,
   getGameState as getStarState,
 } from '../../src/games/star-track/game-controller';
-
 import {
   initGame as initHexAGone,
   newGameVsHuman as hexAGoneVsHuman,
   getGameState as getHexAGoneState,
 } from '../../src/games/hex-a-gone/game-controller';
-
 import {
   initGame as initQueens,
   newGameVsHuman as queensVsHuman,
 } from '../../src/games/queens-guards/game-controller';
-
 import {
   initGame as initContig,
   newGameVsHuman as contigVsHuman,
 } from '../../src/games/contig-60/game-controller';
-
 import {
   initGame as initJuggle,
   newGameVsHuman as juggleVsHuman,
 } from '../../src/games/juggle/game-controller';
-
 import { newGameVsHuman as sdVsHuman } from '../../src/games/sum-dominoes/game-controller';
 import { newGameVsHuman as primeVsHuman } from '../../src/games/prime-gold/game-controller';
 import { newGameVsHuman as parVsHuman } from '../../src/games/par-55/game-controller';
@@ -67,24 +56,14 @@ import { newGameVsHuman as ramrodVsHuman } from '../../src/games/ramrod/game-con
 import { newGameVsHuman as kwaVsHuman } from '../../src/games/kwatro-sinko/game-controller';
 import { mountRoot } from './helpers/dom';
 
+import { mountPair } from '../helpers/mount-pair';
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
 
 describe('Wave 27 seat-handoff — Hex legal click flips seat + status', () => {
   it('empty cell grows history, flips to player2, Red turn chrome', () => {

@@ -4,6 +4,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
+import { withThrowingLocalStorageAccess } from '../helpers/storage-stubs';
+
 describe('safe-web-storage remount — SecurityError on localStorage access', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -11,18 +13,7 @@ describe('safe-web-storage remount — SecurityError on localStorage access', ()
   });
 
   it('StorageManager starts from defaults when localStorage getter throws', async () => {
-    const original = Object.getOwnPropertyDescriptor(
-      globalThis,
-      'localStorage'
-    );
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      get() {
-        throw new DOMException('Safari private', 'SecurityError');
-      },
-    });
-
-    try {
+    await withThrowingLocalStorageAccess(async () => {
       vi.resetModules();
       const mod = await import('../../src/core/storage/storage');
       expect(mod.storage.getProfile()).toBeNull();
@@ -33,10 +24,6 @@ describe('safe-web-storage remount — SecurityError on localStorage access', ()
       }).not.toThrow();
       expect(mod.storage.getProfile()?.name).toBe('Soft');
       mod.storage.disposeForTests();
-    } finally {
-      if (original) {
-        Object.defineProperty(globalThis, 'localStorage', original);
-      }
-    }
+    });
   });
 });

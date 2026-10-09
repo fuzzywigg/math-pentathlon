@@ -8,10 +8,11 @@
  * (same pattern as burn-wave33 / overnight-wave57 graph animate tests).
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-
 import { createCircularGraph } from '../../src/core/graph/types';
 import { createGraphLegend, showValidMoves, animateMove, renderGraph, injectGraphStyles } from '../../src/core/graph/graph-ui';
 import type { GraphBoard } from '../../src/core/graph/types';
+
+import { stubRafClock } from '../helpers/raf-clock';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -23,18 +24,6 @@ afterEach(() => {
   const nowFn = performance.now as unknown as { mockRestore?: () => void };
   nowFn.mockRestore?.();
 });
-
-function stubRafClock(): void {
-  vi.useFakeTimers();
-  let now = 0;
-  vi.spyOn(performance, 'now').mockImplementation(() => now);
-  vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
-    return setTimeout(() => {
-      now += 16;
-      cb(now);
-    }, 16) as unknown as number;
-  });
-}
 
 describe('Wave 40 graph UI — legend / valids / animate', () => {
   beforeEach(() => {

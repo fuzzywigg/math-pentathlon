@@ -4,7 +4,6 @@
  * Tests-only. Existing exports only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-
 import {
   initGame as initContig,
   newGameVsHuman as contigVsHuman,
@@ -15,7 +14,6 @@ import {
   passTurn as contigPass,
   hasValidMoves as contigHasMoves,
 } from '../../src/games/contig-60/rules';
-
 import {
   initGame as initJuggle,
   newGameVsHuman as juggleVsHuman,
@@ -25,14 +23,12 @@ import {
   doRollDice as juggleRoll,
   selectDie as juggleSelectDie,
 } from '../../src/games/juggle/rules';
-
 import { newGameVsHuman as sdVsHuman } from '../../src/games/sum-dominoes/game-controller';
 import {
   createInitialState as createSum,
   doRollDice as sumRoll,
   passTurn as sumPass,
 } from '../../src/games/sum-dominoes/rules';
-
 import { newGameVsHuman as primeVsHuman } from '../../src/games/prime-gold/game-controller';
 import {
   createInitialState as createPrime,
@@ -40,7 +36,6 @@ import {
   passTurn as primePass,
   hasValidMoves as primeHasMoves,
 } from '../../src/games/prime-gold/rules';
-
 import {
   initGame as initHexAGone,
   newGameVsHuman as hexAGoneVsHuman,
@@ -48,7 +43,6 @@ import {
 } from '../../src/games/hex-a-gone/game-controller';
 import { createInitialState as createHag } from '../../src/games/hex-a-gone/types';
 import { passTurn as hagPass } from '../../src/games/hex-a-gone/rules';
-
 import {
   initGame as initQueens,
   newGameVsHuman as queensVsHuman,
@@ -59,7 +53,6 @@ import {
   getValidMoves as qgMoves,
   makeMove as qgMove,
 } from '../../src/games/queens-guards/rules';
-
 import {
   createInitialState as createStars,
   passTurn as starsPass,
@@ -82,24 +75,14 @@ import {
 } from '../../src/games/fab-a-diffy/rules';
 import { mountRoot } from './helpers/dom';
 
+import { mountPair } from '../helpers/mount-pair';
+import { click } from '../helpers/dom-click';
+
 afterEach(() => {
   document.body.innerHTML = '';
   vi.restoreAllMocks();
   vi.useRealTimers();
 });
-
-function click(el: Element | null): void {
-  expect(el).toBeTruthy();
-  el!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-}
-
-function mountPair(): { board: HTMLElement; status: HTMLElement } {
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.appendChild(board);
-  document.body.appendChild(status);
-  return { board, status };
-}
 
 describe('Wave 27 seat-phase-pass — Contig roll → place/pass restores rolling', () => {
   it('DOM roll advances chrome; pass btn or place returns roll CTA for next seat', () => {
