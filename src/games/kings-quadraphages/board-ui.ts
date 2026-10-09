@@ -226,8 +226,10 @@ function ensureKingsBoard(container: HTMLElement): {
   let boardEl = container.querySelector(
     ':scope > .board'
   ) as HTMLElement | null;
+  // Cells may sit under .aria-grid-row wrappers after ensureAriaGridRows —
+  // do not require :scope > .cell or every paint remounts and drops focus.
   const cells = boardEl
-    ? (Array.from(boardEl.querySelectorAll(':scope > .cell')) as HTMLElement[])
+    ? (Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[])
     : [];
 
   if (boardEl && cells.length === KINGS_CELL_COUNT) {
@@ -236,7 +238,7 @@ function ensureKingsBoard(container: HTMLElement): {
 
   container.replaceChildren();
   boardEl = document.createElement('div');
-  boardEl.className = 'board';
+  boardEl.className = 'board kings-board';
   markBoardAsGrid(boardEl);
 
   const fragment = document.createDocumentFragment();
@@ -315,12 +317,10 @@ export function renderBoard(
     bindKingsBoardInteractions(boardEl, container);
   }
 
-  boardEl.className = 'board';
+  boardEl.className = 'board kings-board';
   boardEl.classList.add(`phase-${state.turnPhase}`);
 
-  const cells = Array.from(
-    boardEl.querySelectorAll(':scope > .cell')
-  ) as HTMLElement[];
+  const cells = Array.from(boardEl.querySelectorAll('.cell')) as HTMLElement[];
   let i = 0;
   for (let row = 1; row <= KINGS_BOARD_SIZE; row++) {
     for (let col = 1; col <= KINGS_BOARD_SIZE; col++) {

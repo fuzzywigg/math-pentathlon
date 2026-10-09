@@ -314,6 +314,12 @@ describe('SR semantics — game selector + stats', () => {
     expect(
       container.querySelector(`#division-title-${slug}`)?.textContent
     ).toBe(first!.name);
+    // Named <section> + region with the same labelledby → landmark-unique fail.
+    expect(
+      container
+        .querySelector(`section.division-accordion[data-division="${first!.name}"]`)
+        ?.hasAttribute('aria-labelledby')
+    ).toBe(false);
 
     expect(container.querySelector('footer.game-selector-footer')).toBeTruthy();
   });
