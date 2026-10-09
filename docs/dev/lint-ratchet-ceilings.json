@@ -1,5 +1,5 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045). @typescript-eslint/no-confusing-void-expression: 230 (q-mp-128; tip re-measure 2026-10-09).",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 (PR re-hash): ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; post-#608 tip fold re-measured curly=839; q-mp-103 game-controller curly:all autofix −200 → 639. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045). @typescript-eslint/no-confusing-void-expression: 230 (q-mp-128; tip re-measure 2026-10-09).",
   "rules": {
     "curly": 639,
     "@typescript-eslint/no-non-null-assertion": 387,
