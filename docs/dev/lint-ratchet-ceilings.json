@@ -1,5 +1,5 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-126 + q-mp-133 + q-mp-127: ceilings for rules counted by npm run lint:ratchet. curly: 577 (lowest on tip after q-mp-126; #665 draft had 639 \u2014 keep tip min). @typescript-eslint/no-non-null-assertion: 378. @typescript-eslint/no-confusing-void-expression: 224. radix: 6. default-case: 5. no-duplicate-imports: 124 (q-mp-127). Tip owner reconciles ceilings on fold (min wins).",
+  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-125: ceilings for rules counted by npm run lint:ratchet. curly lowered after src/core braces (remeasure). nnnull 378; void 224; radix 6; default-case 5; no-duplicate-imports 122. Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
     "curly": 577,
     "@typescript-eslint/no-non-null-assertion": 378,
