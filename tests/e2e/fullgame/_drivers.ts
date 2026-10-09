@@ -37,7 +37,8 @@ const drivers: GameDriver[] = [
   {
     id: 'kings-quadraphages',
     title: 'Kings & Quadraphages',
-    mount: '.board.kings-board .cell',
+    // Live board is `#board > .board .cell` (no `kings-board` class).
+    mount: '#board .board .cell, .board .cell',
     gameOver: '.status-winner, .status-turn',
     maxTurns: 120,
     playLegal: async (page) => {
@@ -413,7 +414,8 @@ const drivers: GameDriver[] = [
     title: 'Juggle',
     mount: '.juggle-board',
     gameOver: '.juggle-winner-banner',
-    maxTurns: 3000,
+    // Softlock reshuffles do not consume this budget (see harness).
+    maxTurns: 8000,
     playLegal: async (page) => {
       await dismissOwl(page);
       // Entire turn in one evaluate — Playwright locator loops were too slow
@@ -447,8 +449,11 @@ const drivers: GameDriver[] = [
 
         // Always prefer smaller polyominoes — late gaps need monomino/domino.
         // Seeded Math.random breaks ties so repeats explore different lines.
+        // Skip disabled options (clicking them is a no-op and starved softlock).
         const shapes = [
-          ...document.querySelectorAll('.juggle-shape-option'),
+          ...document.querySelectorAll(
+            '.juggle-shape-option:not(.disabled):not([aria-disabled="true"])'
+          ),
         ] as HTMLElement[];
         if (shapes.length) {
           shapes.sort((a, b) => {
@@ -470,6 +475,19 @@ const drivers: GameDriver[] = [
           ),
         ] as HTMLElement[];
         if (dice.length) {
+          const fillMax = (() => {
+            const parse = (sel: string) => {
+              const t =
+                document.querySelector(sel)?.textContent?.replace('%', '') ||
+                '0';
+              return parseInt(t, 10) || 0;
+            };
+            return Math.max(
+              parse('.juggle-board.player1 .fill-percent'),
+              parse('.juggle-board.player2 .fill-percent')
+            );
+          })();
+          const avoid = document.body.dataset.juggleAvoidDieScore;
           dice.sort((a, b) => {
             const sa = sizeScore(
               `${a.getAttribute('aria-label') || ''} ${a.textContent || ''}`.toLowerCase()
@@ -477,37 +495,116 @@ const drivers: GameDriver[] = [
             const sb = sizeScore(
               `${b.getAttribute('aria-label') || ''} ${b.textContent || ''}`.toLowerCase()
             );
+            // After abandon, try the other die face before the one that failed.
+            if (avoid != null) {
+              const av = +avoid;
+              const aBad = sa === av ? 1 : 0;
+              const bBad = sb === av ? 1 : 0;
+              if (aBad !== bBad) return aBad - bBad;
+            }
+            // Late boards: strongly prefer the smallest die face available.
+            if (fillMax >= 70 && sa !== sb) return sa - sb;
             return sa - sb || Math.random() - 0.5;
           });
-          click(dice[0]);
+          const pick = dice[0]!;
+          document.body.dataset.juggleLastDieScore = String(
+            sizeScore(
+              `${pick.getAttribute('aria-label') || ''} ${pick.textContent || ''}`.toLowerCase()
+            )
+          );
+          click(pick);
           return true;
         }
 
         const boardSel = status.includes('red')
           ? '.juggle-board.player2'
           : '.juggle-board.player1';
+        const hook = (
+          window as unknown as {
+            __mpJuggleController?: {
+              abandonPlacement?: () => void;
+              placeSelected?: () => boolean;
+            };
+          }
+        ).__mpJuggleController;
+        // Prefer DEV legal-placement helper (any orientation) over DOM search.
+        if (/place the shape/.test(status) && hook?.placeSelected) {
+          if (hook.placeSelected()) {
+            delete document.body.dataset.juggleAvoidDieScore;
+            delete document.body.dataset.juggleLastDieScore;
+            return true;
+          }
+          // Shape cannot fit — abandon to try the other die.
+          if (hook.abandonPlacement) {
+            const beforeAbandon =
+              document.querySelector('.juggle-status')?.textContent || '';
+            const last = document.body.dataset.juggleLastDieScore;
+            if (last != null) document.body.dataset.juggleAvoidDieScore = last;
+            hook.abandonPlacement();
+            const afterAbandon =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (afterAbandon !== beforeAbandon) return true;
+          }
+          return false;
+        }
         const btn = (re: RegExp) =>
           [...document.querySelectorAll('.juggle-control-btn')].find((b) =>
             re.test(b.textContent || '')
           ) as HTMLElement | undefined;
+        // Valid highlights only appear on hover (`preview-valid`); empty cells
+        // still accept clicks. Try empties until status advances (place accepted).
         const placeIfValid = (): boolean => {
           const board = document.querySelector(boardSel);
           if (!board) return false;
-          const valids = [
+          const before =
+            document.querySelector('.juggle-status')?.textContent || '';
+          const empties = [
+            ...board.querySelectorAll('.juggle-cell'),
+          ].filter((c) => {
+            const aria = (c.getAttribute('aria-label') || '').toLowerCase();
+            const cls = (c as HTMLElement).className;
+            return (
+              aria.includes('empty') &&
+              !cls.includes('occupied') &&
+              !aria.includes('blue') &&
+              !aria.includes('red')
+            );
+          }) as HTMLElement[];
+          // Seeded shuffle explores different packings across softlock deals;
+          // top-left-only packing often leaves unfillable holes.
+          for (let i = empties.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = empties[i]!;
+            empties[i] = empties[j]!;
+            empties[j] = tmp;
+          }
+          for (const cell of empties) {
+            cell.click();
+            const after =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (after !== before) {
+              delete document.body.dataset.juggleAvoidDieScore;
+              delete document.body.dataset.juggleLastDieScore;
+              return true;
+            }
+          }
+          // Hover-marked valid cells (legacy / future chrome)
+          const marked = [
             ...board.querySelectorAll(
-              '.juggle-cell-valid, .juggle-cell[aria-label*="valid"]'
+              '.juggle-cell-valid, .juggle-cell.preview-valid, .juggle-cell[aria-label*="valid"]'
             ),
           ] as HTMLElement[];
-          if (!valids.length) return false;
-          valids.sort((a, b) => {
-            const ar = +(a.dataset.row || 0);
-            const ac = +(a.dataset.col || 0);
-            const br = +(b.dataset.row || 0);
-            const bc = +(b.dataset.col || 0);
-            return ar - br || ac - bc;
-          });
-          valids[0]!.click();
-          return true;
+          for (const cell of marked) {
+            cell.click();
+            const after =
+              document.querySelector('.juggle-status')?.textContent || '';
+            if (after !== before) {
+              delete document.body.dataset.juggleAvoidDieScore;
+              delete document.body.dataset.juggleLastDieScore;
+              return true;
+            }
+          }
+          return false;
         };
         if (placeIfValid()) return true;
         for (let f = 0; f < 2; f++) {
@@ -530,6 +627,17 @@ const drivers: GameDriver[] = [
         if (abandon) {
           abandon.click();
           return true;
+        }
+        // Fallback abandon via DEV hook when DOM place path is stuck.
+        if (hook?.abandonPlacement) {
+          const beforeAbandon =
+            document.querySelector('.juggle-status')?.textContent || '';
+          const last = document.body.dataset.juggleLastDieScore;
+          if (last != null) document.body.dataset.juggleAvoidDieScore = last;
+          hook.abandonPlacement();
+          const afterAbandon =
+            document.querySelector('.juggle-status')?.textContent || '';
+          if (afterAbandon !== beforeAbandon) return true;
         }
         return false;
       });
@@ -766,9 +874,12 @@ const drivers: GameDriver[] = [
     title: "Pent'Em In",
     mount: '.pent-board',
     gameOver: '.pent-winner-banner',
-    maxTurns: 80,
+    // Select+orient+place per piece × ~12 remaining × 2 seats needs headroom.
+    maxTurns: 250,
     playLegal: async (page) => {
-      // Click interactive cells with aria valid placement (not decorative overlays).
+      // Aria marks every cell "valid placement" while a piece is selected —
+      // including occupied ones. Only empty cells can accept a place; verify
+      // status advances so illegal clicks are not counted as progress.
       return page.evaluate(() => {
         const click = (el: Element | null | undefined) =>
           el?.dispatchEvent(
@@ -778,18 +889,63 @@ const drivers: GameDriver[] = [
               view: window,
             })
           );
-        const status = (
-          document.querySelector('.pent-status')?.textContent || ''
-        ).toLowerCase();
+        const statusEl = () =>
+          document.querySelector('.pent-status')?.textContent || '';
+        const status = statusEl().toLowerCase();
         if (/wins|game over|tie/.test(status)) return false;
 
-        const place = document.querySelector(
-          '.pent-board rect[data-row][aria-label*="valid placement"], .pent-a11y-grid [role="gridcell"][aria-label*="valid placement"]'
-        );
-        if (place) {
-          click(place);
-          return true;
+        const tryPlace = (): boolean => {
+          const before = statusEl();
+          const candidates = [
+            ...document.querySelectorAll(
+              [
+                '.pent-board rect[data-row][aria-label*="empty"][aria-label*="valid placement"]',
+                '.pent-a11y-grid [role="gridcell"][aria-label*="empty"][aria-label*="valid placement"]',
+                '.pent-board rect[data-row][aria-label*="empty"]',
+                '.pent-a11y-grid [role="gridcell"][aria-label*="empty"]',
+              ].join(', ')
+            ),
+          ] as Element[];
+          // Prefer top-left for deterministic progress under the seed.
+          candidates.sort((a, b) => {
+            const ar = +(a.getAttribute('data-row') || 0);
+            const ac = +(a.getAttribute('data-col') || 0);
+            const br = +(b.getAttribute('data-row') || 0);
+            const bc = +(b.getAttribute('data-col') || 0);
+            return ar - br || ac - bc;
+          });
+          for (const cell of candidates) {
+            click(cell);
+            if (statusEl() !== before) return true;
+          }
+          return false;
+        };
+
+        if (/place the/.test(status) || /place your piece/.test(status)) {
+          if (tryPlace()) return true;
+          for (let f = 0; f < 2; f++) {
+            for (let r = 0; r < 4; r++) {
+              if (tryPlace()) return true;
+              const rotate = document.querySelector('.pent-btn-rotate');
+              if (!rotate) break;
+              click(rotate);
+            }
+            if (tryPlace()) return true;
+            if (f === 0) click(document.querySelector('.pent-btn-flip'));
+          }
+          const cancel = [
+            ...document.querySelectorAll(
+              '.pent-btn-choose-other, .pent-btn-cancel, button'
+            ),
+          ].find((b) =>
+            /cancel|choose another|can'?t place/i.test(b.textContent || '')
+          );
+          if (cancel) {
+            click(cancel);
+            return true;
+          }
         }
+
         if (/select a piece/.test(status)) {
           const opt = document.querySelector(
             '.pent-piece-option:not(.disabled)'

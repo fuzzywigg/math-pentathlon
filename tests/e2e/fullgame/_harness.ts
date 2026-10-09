@@ -44,6 +44,7 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
   let lastFill = '';
   let restarts = 0;
   let turnsSinceRestart = 0;
+  let jugglePlaceFails = 0;
   for (let i = 0; i < driver.maxTurns; i++) {
     if (await isOver(page, driver)) return;
 
@@ -61,6 +62,9 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
     // Juggle softlock: boards stall with unfillable gaps. Reshuffle when fill
     // is unchanged for a stretch (or stuck high). Do not hard-cap deal length —
     // completable slow fills need room past ~200 turns.
+    // Live UI has no abandon/choose-other control once a shape is selected
+    // (`abandonPlacement` exists in rules only), so an unplaceable tromino/
+    // tetromino at high fill must New-Game reshuffle quickly.
     if (driver.id === 'juggle') {
       turnsSinceRestart += 1;
       const fillInfo = await page.evaluate(() => {
@@ -81,14 +85,18 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
       const softlocked =
         noProgress > 30 ||
         (fillInfo.max >= 90 && noProgress > 12) ||
-        (fillInfo.min >= 85 && turnsSinceRestart > 120 && noProgress > 6);
-      if (softlocked && restarts < 80) {
+        (fillInfo.min >= 85 && turnsSinceRestart > 120 && noProgress > 6) ||
+        jugglePlaceFails >= 2;
+      if (softlocked && restarts < 400) {
         await startHumanVsHuman(page);
         restarts += 1;
         noProgress = 0;
         lastFill = '';
         stalled = 0;
         turnsSinceRestart = 0;
+        jugglePlaceFails = 0;
+        // Reshuffle is not a play turn — keep the progress budget for real moves.
+        i -= 1;
         continue;
       }
     }
@@ -97,6 +105,19 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
     const acted = await driver.playLegal(page);
     await page.waitForTimeout(40);
     const after = await boardFingerprint(page);
+
+    if (driver.id === 'juggle') {
+      const status = await readStatusText(page);
+      if (
+        !acted &&
+        before === after &&
+        /place the shape/i.test(status)
+      ) {
+        jugglePlaceFails += 1;
+      } else if (acted && before !== after) {
+        jugglePlaceFails = 0;
+      }
+    }
 
     if (!acted && before === after) {
       stalled += 1;
@@ -111,10 +132,21 @@ async function playToGameOver(page: Page, driver: GameDriver): Promise<void> {
           .catch(() => undefined);
         await page.waitForTimeout(60);
       }
-      if (stalled > 25) {
+      // Juggle: never throw on stall — softlock reshuffle handles unplaceable shapes.
+      if (stalled > 25 && driver.id !== 'juggle') {
         throw new Error(
           `${driver.id}: stalled after ${i} turns; status=${await readStatusText(page)}`
         );
+      }
+      if (stalled > 25 && driver.id === 'juggle' && restarts < 400) {
+        await startHumanVsHuman(page);
+        restarts += 1;
+        stalled = 0;
+        noProgress = 0;
+        lastFill = '';
+        turnsSinceRestart = 0;
+        jugglePlaceFails = 0;
+        i -= 1;
       }
       continue;
     }
@@ -206,10 +238,10 @@ export async function runFullgameMatch(
         flipped = true;
         break;
       }
-      // Class-based seat chrome (pent / fiar / kwa)
+      // Class-based seat chrome (pent / fiar / kwa / juggle)
       const seatClass = await page.evaluate(() => {
         const el = document.querySelector(
-          '.pent-status, .fiar-status, .kwa-status, .sd-status, .pg-status, .frac-status, .pinball-status'
+          '.pent-status, .fiar-status, .kwa-status, .sd-status, .pg-status, .frac-status, .pinball-status, .juggle-status'
         );
         if (!el) return '';
         if (el.classList.contains('player2')) return 'p2';
