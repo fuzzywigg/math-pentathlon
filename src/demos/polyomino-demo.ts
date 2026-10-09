@@ -357,7 +357,9 @@ export function renderPolyominoDemo(container: HTMLElement): void {
   // Wire up back button
   const backBtn = document.getElementById('back-btn');
   if (backBtn) {
-    backBtn.addEventListener('click', () => navigate('/'));
+    backBtn.addEventListener('click', () => {
+      navigate('/');
+    });
   }
 
   // Set up shape set selector
@@ -373,7 +375,9 @@ function setupShapeSetSelector(): void {
 
   setBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      setBtns.forEach((b) => b.classList.remove('selected'));
+      setBtns.forEach((b) => {
+        b.classList.remove('selected');
+      });
       btn.classList.add('selected');
 
       const setName = (btn as HTMLElement).dataset.set;
