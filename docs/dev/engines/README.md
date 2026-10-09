@@ -11,6 +11,7 @@ Contributor-only maps of what each game **engine module does in code**. Not play
 | [State round-trip](../../state-roundtrip-2026-10-07.md) | Mid-game serialize codecs |
 | [Rules decisions](../../RULES-DECISIONS-2026-10-07.md) | Owner yes/no checklist |
 | [Tutorial vs engine](../../tutorial-engine-mismatches-2026-10-07.md) | Copy mismatches (docs only) |
+| [Board3D WebGL lifecycle (q-mp-072)](./board3d-webgl-lifecycle.md) | `load-three` · `tablet-gl` · context-lost · dispose + SwiftShader shots |
 
 This folder does **not** replace #475 or #496 — link out instead of restating them.
 
