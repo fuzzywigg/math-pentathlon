@@ -45,7 +45,12 @@ defensive / total-function arms).
 
 ```bash
 npx vitest run tests/unit/engine-coverage-round-3-burn-1008.test.ts
+# Test Files  1 passed; Tests  43 passed (was 37 passed / 6 todo)
+
 npm run test:unit
+# Test Files  3118 passed; Tests  12026 passed | 20 skipped | 16 todo
 ```
 
-Results filled in the PR body after the run.
+Head SHA at verification: `d40edae6`. GitHub check-runs on that SHA: all
+**success** (audit, build, e2e, e2e-cross-browser, e2e-fullgame, forced-colors,
+knip, lint, mobile-touch, unit, visual-baseline, zoom-reflow).
