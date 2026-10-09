@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 import prettierConfig from 'eslint-config-prettier';
 
 /**
- * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141):
+ * Lint ratchet (burn-1008-mp-lint-ratchet + q-mp-045 + q-mp-128 + q-mp-130 + q-mp-129 + q-mp-127 + q-mp-140 + q-mp-148 + q-mp-141 + q-mp-157):
  * - Hard errors: eqeqeq, prefer-const, curly (multi-line), no-implicit-coercion,
  *   consistent-type-imports, no-floating-promises, no-misused-promises,
  *   no-unused-vars (underscore ignore for args/vars/caught errors).
@@ -16,7 +16,8 @@ import prettierConfig from 'eslint-config-prettier';
  *   no-duplicate-imports (live unset; q-mp-127);
  *   @typescript-eslint/prefer-nullish-coalescing (live unset; q-mp-140);
  *   @typescript-eslint/prefer-optional-chain (live unset; q-mp-148);
- *   @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141 ceiling 8).
+ *   @typescript-eslint/switch-exhaustiveness-check (live unset; q-mp-141 ceiling 8);
+ *   @typescript-eslint/no-shadow (live unset; q-mp-157 ceiling 13).
  * - Inventory of other off/unset bug-catchers: docs/dev/eslint-off-rules-inventory.md
  * - AI modules: promise rules off (behavior-adjacent); type-import / style rules stay on.
  */
