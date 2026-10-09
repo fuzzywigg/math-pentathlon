@@ -22,6 +22,10 @@ describe('unit timeout CI honesty', () => {
     expect(unitJob!).toMatch(/timeout-minutes:\s*14/);
     expect(unitJob!).toMatch(/timeout-minutes:\s*12/);
     expect(unitJob!).toContain('npm run test:unit');
+    // q-mp-142: matrix by vitest project; ceilings stay 12m/14m (not raised).
+    expect(unitJob!).toMatch(/matrix:\s*\n\s+project:\s*\[unit-shared,\s*unit-node,\s*unit-isolated\]/);
+    expect(unitJob!).toContain('--project ${{ matrix.project }}');
+    expect(unitJob!).toMatch(/fail-fast:\s*false/);
     expect(unitJob!).not.toMatch(/continue-on-error:\s*true/);
     expect(unitJob!).not.toMatch(/heartbeat/i);
     expect(unitJob!).not.toContain('::notice::');

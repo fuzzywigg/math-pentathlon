@@ -119,6 +119,7 @@ Workflows under `.github/workflows/`:
 Live tip `cursor/mp-tip-post477` @ `a023fc36` (2026-10-09): **3114** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; `npx vitest list` reports **11988** cases (includes skip/todo). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
+- CI matrix shards by Vitest project (`unit-shared` / `unit-node` / `unit-isolated`); each shard keeps those timeouts — [CI unit shards (q-mp-142)](../dev/ci-unit-shards-q-mp-142.md)
 - CI prints the unit file count up front
 - Mermaid + tip CI screenshot of the two AI benches skipped under `CI=1` (HOLD Hex Hard **450ms**): [CI unit budget + AI-bench skips](./ci-unit-budget.md) (`q-mp-175`)
 
