@@ -2,8 +2,14 @@
 // SVG rendering for the hexagonal game board
 
 import { injectStylesOnce } from '../../ui/inject-styles';
-import type { QueensGuardsState, BoardCoord } from './types';
-import { CONFIG, cellKey, cellsInRing, parseKey } from './types';
+import {
+  type QueensGuardsState,
+  type BoardCoord,
+  CONFIG,
+  cellKey,
+  cellsInRing,
+  parseKey,
+} from './types';
 import { getValidMoves, getRestoreTargets } from './rules';
 import { getPlayerSeatColors } from '../../ui/player-colors';
 import { pointyTopHexPathD } from '../../ui/hex-svg';

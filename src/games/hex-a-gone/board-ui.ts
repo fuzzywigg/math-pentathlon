@@ -1,7 +1,6 @@
 // Hex-a-Gone! Board UI - Renders the hexagonal board and pattern blocks
 
-import type { HexAGoneGameState, BlockShape } from './types';
-import { BLOCK_COLORS } from './types';
+import { type HexAGoneGameState, type BlockShape, BLOCK_COLORS } from './types';
 import { getPhaseMessage, getValidPlacements } from './rules';
 import { seatIcon } from '../../ui/player-colors';
 import { formatModeSeatLabel } from '../../ui/seat-labels';

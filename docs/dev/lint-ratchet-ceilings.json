@@ -1,12 +1,12 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + tip folds through q-mp-180 void (−51→132) + q-mp-225 graph/algorithms nnnull (−14→254): curly 538; no-non-null-assertion 254; no-confusing-void-expression 132; radix 6; default-case 5; no-duplicate-imports 122; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 13. Tip owner reconciles ceilings on fold (min wins).",
+  "notes": "burn-1008-mp-lint-ratchet + tip folds through q-mp-180 void (−51→132) + q-mp-225 graph nnnull (−14→254) + q-mp-226 board-ui dup-imports (−17→105): curly 538; no-non-null-assertion 254; no-confusing-void-expression 132; radix 6; default-case 5; no-duplicate-imports 105; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 13. Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 254,
     "@typescript-eslint/no-confusing-void-expression": 132,
     "radix": 6,
     "default-case": 5,
-    "no-duplicate-imports": 122,
+    "no-duplicate-imports": 105,
     "@typescript-eslint/prefer-nullish-coalescing": 65,
     "@typescript-eslint/prefer-optional-chain": 21,
     "@typescript-eslint/switch-exhaustiveness-check": 8,
