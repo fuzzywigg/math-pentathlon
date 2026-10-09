@@ -205,7 +205,7 @@ Unique compliant value not on tip. Fold order preferred (no dead-code successor;
 | 8 | #565 | docs(dev): dependency security-advisory audit (burn-1008) | `docs/dev/dependency-advisory-audit.md` (new): `@@ -0,0 +1,166 @@` |
 | 9 | #561 | docs(dev): burn-1008 compliance review 4 of tip drafts #553–#557 | `docs/dev/compliance-review-4-2026-10-08.md` (new): `@@ -0,0 +1,287 @@` |
 | 10 | #564 | docs(dev): burn-1008 compliance review 5 of OWNER OPTION drafts #559/# | `docs/dev/compliance-review-5-2026-10-08.md` (new): `@@ -0,0 +1,274 @@` |
-| 11 | #569 | docs(dev): Friday landing preflight v2 tip→alpha (burn-1008) | `docs/dev/friday-landing-preflight-v2.md` (new): `@@ -0,0 +1,402 @@` |
+| 11 | #569 | docs(dev): Friday landing preflight v2 tip→alpha (burn-1008) | `docs/dev/friday-landing-preflight-v2.md (absent on tip)` (new): `@@ -0,0 +1,402 @@` |
 | 12 | #572 | docs(dev): burn-1008 compliance review 6 of tip drafts #562–#568 | `docs/dev/burn-1008-compliance-review-6.md` (new): `@@ -0,0 +1,359 @@` |
 | 13 | #575 | docs(dev): open draft PR triage v2 for Oct 14 bulk-close (burn-1008) | `docs/dev/open-draft-triage-v2.md` (new): `@@ -0,0 +1,395 @@` |
 

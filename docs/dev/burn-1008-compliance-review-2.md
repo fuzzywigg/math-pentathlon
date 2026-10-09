@@ -185,7 +185,7 @@ No additional tip drafts `> #542` at review time (`gh pr list` → `[]`).
 | #541 removes nothing referenced dynamically (registry / lazy imports / tests / CSS templates) | **PASS** — see per-symbol table above; `difficulty-*` and all game `ai.ts` kept |
 | Nothing touches `ai/` search/scoring/difficulty/timing | **PASS** for #539–#542 |
 | No player-facing copy or rules-text changes | **PASS** |
-| Hex Hard assert still 450ms on tip | **PASS** — `src/games/hex/ai.ts` `hard: 450`; `tests/unit/hex-deep-playability.test.ts` `toBe(450)`; untouched by #539–#542 |
+| Hex Hard assert still 450ms on tip | **PASS** — `src/games/hex/ai.ts` `hard: 450`; `tests/unit/ai-hard-midgame-identity.test.ts` (`HEX_MS.hard` ≤ 450); untouched by #539–#542 |
 | No Stars & Bars history cap | **PASS** — tip still “Full history display (do not cap…)”; untouched |
 | CI workflows keep least-privilege | **PASS** — tip `contents: read` + `persist-credentials: false`; #539 only adds `npm run check:boundaries` step |
 
