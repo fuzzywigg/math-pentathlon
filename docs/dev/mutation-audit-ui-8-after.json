@@ -1,6 +1,6 @@
 {
   "taskId": "q-mp-272-mutation-audit-ui-8",
-  "generatedAt": "2026-10-09T21:39:49.033Z",
+  "generatedAt": "2026-10-09T21:54:26.408Z",
   "harness": "node_modules/.cache/mutation-ui-8/mutation-report-ui.mjs (custom AST; Stryker not used)",
   "options": {
     "max": 20,
@@ -45,13 +45,21 @@
       ],
       "availableMutants": 53,
       "ranMutants": 20,
-      "killed": 20,
-      "survived": 0,
+      "killed": 19,
+      "survived": 1,
       "timeout": 0,
       "error": 0,
-      "score": 100,
+      "score": 95,
       "skipped": false,
-      "survivors": []
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 18,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
     },
     {
       "module": "src/core/polyomino/polyomino-ui.ts",
