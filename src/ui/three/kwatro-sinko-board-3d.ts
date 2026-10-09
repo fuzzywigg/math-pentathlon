@@ -708,7 +708,7 @@ export async function createKwatroSinkoBoard3D(
         padMat = mats.winner;
       } else if (validMoves.has(nm.id) && !node.chip) {
         padMat = mats.valid;
-      } else if (node.chip && state.selectedChip === node.chip.id) {
+      } else if (state.selectedChip === node.chip?.id) {
         padMat = mats.selected;
       }
       nm.pad.material = padMat;

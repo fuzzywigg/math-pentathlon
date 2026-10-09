@@ -152,7 +152,7 @@ function wrapGridCellsInRows(grid: Element): void {
     grid.querySelectorAll('[role="gridcell"]')
   ).filter((cell) => {
     const row = cell.parentElement;
-    return !row || row.getAttribute('role') !== 'row';
+    return row?.getAttribute('role') !== 'row';
   });
 
   if (orphanCells.length > 0) {
