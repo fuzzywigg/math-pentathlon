@@ -713,6 +713,21 @@ export function injectJuggleStyles(): void {
       }
     }
 
+    html[data-reduced-motion='true'] .juggle-board,
+    html[data-reduced-motion='true'] .juggle-cell,
+    html[data-reduced-motion='true'] .juggle-die,
+    html[data-reduced-motion='true'] .juggle-roll-btn,
+    html[data-reduced-motion='true'] .juggle-shape-option,
+    html[data-reduced-motion='true'] .juggle-control-btn,
+    html[data-reduced-motion='true'] .juggle-winner-banner {
+      transition: none;
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .juggle-roll-btn:hover:not(:disabled),
+    html[data-reduced-motion='true'] .juggle-die.selectable:hover {
+      transform: none;
+    }
+
     @media (max-width: 700px) {
       .juggle-boards {
         flex-direction: column;

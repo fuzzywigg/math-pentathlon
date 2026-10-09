@@ -907,6 +907,17 @@ export function injectFabStyles(): void {
         transform: none;
       }
     }
+
+    html[data-reduced-motion='true'] .fab-answer-matchable,
+    html[data-reduced-motion='true'] .fab-winner-banner {
+      animation: none !important;
+    }
+    html[data-reduced-motion='true'] .fab-bar-wrapper:not(.fab-bar-disabled):hover,
+    html[data-reduced-motion='true'] .fab-answer-wrapper:hover,
+    html[data-reduced-motion='true'] .fab-op-btn:hover:not(:disabled),
+    html[data-reduced-motion='true'] .fab-btn:hover {
+      transform: none;
+    }
   `
   );
 }
