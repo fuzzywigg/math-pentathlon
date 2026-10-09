@@ -1,0 +1,205 @@
+{
+  "taskId": "q-mp-259",
+  "generatedAtUtc": "2026-10-09T21:51:31Z",
+  "liveTipBranch": "cursor/mp-tip-post755",
+  "tipSha": "74a1596f71aab5d6616ff486b2a4eb2a70b5123b",
+  "tipShaShort": "74a1596f",
+  "tipPr": 755,
+  "priorTriage": "docs/dev/open-draft-triage-post748-2026-10-09-v2.md",
+  "priorTriagePr": 758,
+  "markdownTwin": "docs/dev/open-draft-triage-post755-2026-10-09-v3.md",
+  "scope": "report-only; do not close PRs",
+  "contextNote": "Tip cut post755 from alpha after #755 squash-merged; remaining drafts still base post748 and need retarget; backlog q-mp-259 text still said post748 (stale)",
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 246,
+    "@typescript-eslint/no-confusing-void-expression": 86,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 78,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 13,
+    "knipUnusedTypes": 83,
+    "knipUnusedExports": 3,
+    "knipDuplicates": 1,
+    "knipUnlisted": 3,
+    "unitTestSpecFilesExclArchive": 3156
+  },
+  "summaryCounts": {
+    "openBasePost755": 0,
+    "openBasePost748": 24,
+    "holdBasePost709": 1,
+    "primaryListed": 25,
+    "containedVia755": 25,
+    "unfoldedFoldReady": 2,
+    "waitCi": 2,
+    "hold": 1
+  },
+  "conflictClusters": [
+    {
+      "name": "lint-ratchet-ceilings",
+      "prs": [727],
+      "files": ["docs/dev/lint-ratchet-ceilings.json"],
+      "note": "#727 HOLD nullish — do not fold; no other unfolded draft touches ceilings at snapshot"
+    },
+    {
+      "name": "ratchet-history-svg",
+      "prs": [763],
+      "files": [
+        "docs/dev/ratchet-ceiling-history.md",
+        "docs/dev/ratchet-ceiling-history.svg",
+        "scripts/report-ratchet-history.mjs",
+        "tests/unit/report-ratchet-history.test.ts"
+      ],
+      "note": "Tip has older blobs; fold when unit CI green; re-measure vs live ceilings"
+    },
+    {
+      "name": "triage-narrative",
+      "prs": [758],
+      "files": [
+        "docs/dev/open-draft-triage-post748-2026-10-09-v2.md",
+        "docs/dev/open-draft-triage-post748-2026-10-09-v2.json"
+      ],
+      "note": "Leave #758 open with contained; this v3 is post755 keeper"
+    }
+  ],
+  "suggestedFoldOrder": [776, 777, 778, 763],
+  "hold": [727],
+  "waitCi": [763, 778],
+  "contained": [
+    749, 750, 751, 752, 753, 754, 756, 757, 758, 759, 760, 761, 762, 764, 765, 766, 767, 768, 769, 770, 771, 772, 773, 774, 775
+  ],
+  "drafts": [
+    {
+      "number": 727,
+      "taskId": "q-mp-186",
+      "title": "q-mp-186: clear prefer-nullish-coalescing in owl-messages (−9)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/727",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post709",
+      "headRef": "cursor/q-mp-186-nullish-owl-messages-0a20",
+      "headSha": "54532ce5",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 3,
+      "files": [
+        "docs/dev/eslint-off-rules-inventory.md",
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/core/owl/owl-messages.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "HOLD",
+      "suggestedFoldOrder": null,
+      "ratchetCeilingsTouched": {
+        "@typescript-eslint/prefer-nullish-coalescing": { "from": 65, "to": 56 }
+      },
+      "notes": "Tip-owner HOLD; do not touch nullish; do not retarget/fold"
+    },
+    {
+      "number": 763,
+      "taskId": "q-mp-236",
+      "title": "q-mp-236: refresh ratchet-ceiling-history SVG for tip post748",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/763",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post748",
+      "headRef": "cursor/q-mp-236-ratchet-history-svg-3d12",
+      "headSha": "8787f001",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "UNSTABLE",
+      "changedFiles": 4,
+      "files": [
+        "docs/dev/ratchet-ceiling-history.md",
+        "docs/dev/ratchet-ceiling-history.svg",
+        "scripts/report-ratchet-history.mjs",
+        "tests/unit/report-ratchet-history.test.ts"
+      ],
+      "checks": { "SUCCESS": 11, "FAILURE": 1 },
+      "foldReadiness": "WAIT_CI",
+      "suggestedFoldOrder": 4,
+      "ratchetCeilingsTouched": {},
+      "notes": "unit FAILURE; tip has older blobs of same paths — not contained; skipped in #755 remaining table"
+    },
+    {
+      "number": 776,
+      "taskId": "q-mp-277",
+      "title": "q-mp-277: characterize game-shell soft-fail / chrome residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/776",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post748",
+      "headRef": "cursor/q-mp-277-game-shell-soft-fail-a0c6",
+      "headSha": "83321ac5",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 1,
+      "files": ["tests/unit/game-shell-soft-fail-chrome.test.ts"],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RETARGET",
+      "suggestedFoldOrder": 1,
+      "ratchetCeilingsTouched": {},
+      "notes": "MISSING on tip 74a1596f; retarget post748→post755"
+    },
+    {
+      "number": 777,
+      "taskId": "q-mp-269",
+      "title": "q-mp-269: UI coverage round 14 — juggle board-ui + controller residuals",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/777",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post748",
+      "headRef": "cursor/q-mp-269-juggle-ui-cov-r14-5e38",
+      "headSha": "8aad9e6a",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "changedFiles": 2,
+      "files": [
+        "docs/dev/ui-coverage-round-14.md",
+        "tests/unit/burn-1009-ui-cov-r14-juggle.test.ts"
+      ],
+      "checks": { "SUCCESS": 12 },
+      "foldReadiness": "FOLD_READY_RETARGET",
+      "suggestedFoldOrder": 2,
+      "ratchetCeilingsTouched": {},
+      "notes": "MISSING on tip 74a1596f; retarget post748→post755"
+    },
+    {
+      "number": 778,
+      "taskId": "q-mp-272",
+      "title": "q-mp-272: mutation audit UI wave 8 — expression/polyomino/graph (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/778",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post748",
+      "headRef": "cursor/q-mp-272-mutation-audit-ui-8-5d95",
+      "headSha": "32fb68e7",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "UNSTABLE",
+      "changedFiles": 6,
+      "files": [
+        "docs/dev/mutation-audit-ui-8-after.json",
+        "docs/dev/mutation-audit-ui-8-baseline.json",
+        "docs/dev/mutation-audit-ui-8.md",
+        "tests/unit/mutation-ui8-expression-ui.test.ts",
+        "tests/unit/mutation-ui8-graph-ui.test.ts",
+        "tests/unit/mutation-ui8-polyomino-ui.test.ts"
+      ],
+      "checks": { "SUCCESS": 10, "FAILURE": 1, "UNKNOWN": 1 },
+      "foldReadiness": "WAIT_CI",
+      "suggestedFoldOrder": 3,
+      "ratchetCeilingsTouched": {},
+      "notes": "unit FAILURE; MISSING on tip; retarget after 12/12 green"
+    },
+    {
+      "number": 758,
+      "taskId": "q-mp-234",
+      "title": "q-mp-234: tip post748 open-draft triage refresh v2 (#727 HOLD + #749–#753)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/758",
+      "isDraft": true,
+      "base": "cursor/mp-tip-post748",
+      "headRef": "cursor/q-mp-234-open-draft-triage-post748-v2-e695",
+      "headSha": "e8f7de2b",
+      "foldReadiness": "CONTAINED_BY_V3",
+      "suggestedFoldOrder": null,
+      "notes": "Payload on tip via #755; leave open; comment contained — this v3 is post755 keeper"
+    }
+  ]
+}
