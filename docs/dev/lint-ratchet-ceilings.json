@@ -1,5 +1,5 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-140: curly 539; nnnull 336; void 224; radix 6; default-case 5; no-duplicate-imports 122; prefer-nullish-coalescing 96. Tip owner reconciles ceilings on fold (min wins).",
+  "notes": "burn-1008-mp-lint-ratchet + folds through q-mp-150: curly 539; nnnull pending remeasure after three/ guards; void 224; radix 6; default-case 5; no-duplicate-imports 122; prefer-nullish-coalescing 96. Tip owner reconciles ceilings on fold (min wins).",
   "rules": {
     "curly": 539,
     "@typescript-eslint/no-non-null-assertion": 336,

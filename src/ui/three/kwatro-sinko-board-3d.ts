@@ -581,8 +581,11 @@ export async function createKwatroSinkoBoard3D(
       };
     }
 
-    nm.chipBody!.position.set(x, PAD_TOP_Y + 0.05 + CHIP_H / 2, z);
-    nm.chipLabel!.position.set(x, PAD_TOP_Y + 0.05 + CHIP_H + 0.01, z);
+    if (nm.chipBody === null || nm.chipLabel === null) {
+      return;
+    }
+    nm.chipBody.position.set(x, PAD_TOP_Y + 0.05 + CHIP_H / 2, z);
+    nm.chipLabel.position.set(x, PAD_TOP_Y + 0.05 + CHIP_H + 0.01, z);
   };
 
   const syncA11y = (state: KwaState): void => {
@@ -773,7 +776,11 @@ export async function createKwatroSinkoBoard3D(
     }
     nodeMeshes.clear();
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     padGeo.dispose();

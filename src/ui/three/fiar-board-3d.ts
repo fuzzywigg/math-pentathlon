@@ -497,7 +497,11 @@ export async function createFiarBoard3D(
     }
     nodeMeshes.clear();
     while (root.children.length > 0) {
-      root.remove(root.children[0]!);
+      const child = root.children[0];
+      if (child === undefined) {
+        break;
+      }
+      root.remove(child);
     }
     scene.remove(root);
     spaceGeo.dispose();

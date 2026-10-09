@@ -40,10 +40,17 @@ function closedPolygon(
   points: ReadonlyArray<readonly [number, number]>
 ): InstanceType<Three['Shape']> {
   const shape = new THREE.Shape();
-  const first = points[0]!;
+  const first = points[0];
+  if (first === undefined) {
+    return shape;
+  }
   shape.moveTo(first[0], first[1]);
   for (let i = 1; i < points.length; i++) {
-    shape.lineTo(points[i]![0], points[i]![1]);
+    const pt = points[i];
+    if (pt === undefined) {
+      continue;
+    }
+    shape.lineTo(pt[0], pt[1]);
   }
   shape.closePath();
   return shape;
