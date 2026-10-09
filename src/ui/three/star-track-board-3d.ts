@@ -335,6 +335,8 @@ export async function createStarTrackBoard3D(
   let a11yFocus: { player: Player; space: number } | null = null;
   let latestState: StarTrackGameState | null = null;
   let disposed = false;
+  /** Phase / chain DOM shape — re-fit only when controls height may change. */
+  let lastLayoutKey = '';
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
@@ -345,9 +347,17 @@ export async function createStarTrackBoard3D(
     );
   };
 
+  // Skip style writes / sync when the fitted CSS side is unchanged so a
+  // ResizeObserver on the outer host cannot churn through fit→write→RO.
+  let lastFittedSide = 0;
+  let lastSyncW = 0;
+  let lastSyncH = 0;
+
   const fitHostToViewport = (): void => {
     // Size the canvas from remaining viewport below the board host so the
-    // chain controls stay above the fold on phone + both tablet orientations.
+    // chain controls stay above the fold (e2e `assertChainAboveFold`). Keep
+    // column layout for that budget math; landscape CSS alone undersizes the
+    // remaining height under the top-aligned shell.
     layout.style.flexDirection = 'column';
     layout.style.flexWrap = 'nowrap';
     layout.style.justifyContent = 'center';
@@ -361,6 +371,10 @@ export async function createStarTrackBoard3D(
     const { width: vw, height: vh } = resolveCssViewportSize();
     const available = Math.max(120, vh - top - chainBudget - 12);
     const side = Math.max(140, Math.min(vw * 0.92, available, 520));
+    if (side === lastFittedSide) {
+      return;
+    }
+    lastFittedSide = side;
     canvasHost.style.width = `${side}px`;
     canvasHost.style.height = `${side}px`;
     canvasHost.style.maxHeight = `${side}px`;
@@ -370,9 +384,15 @@ export async function createStarTrackBoard3D(
     if (disposed) {
       return;
     }
+    // Layout / mount only — `update()` paints without re-fitting (q-mp-135).
     fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
+    if (w === lastSyncW && h === lastSyncH) {
+      return;
+    }
+    lastSyncW = w;
+    lastSyncH = h;
     syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
@@ -380,7 +400,9 @@ export async function createStarTrackBoard3D(
   const unbindVisibility = bindPageVisibility({
     onVisible: () => paint(),
   });
-  const unbindLayout = bindBoard3dLayout(canvasHost, () => resize());
+  // Observe the outer container (peer pattern: fiar / kings), not canvasHost.
+  // Fitting writes canvasHost size; observing that node re-entered resize.
+  const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const onLost = (event: Event): void => {
     event.preventDefault();
@@ -553,8 +575,15 @@ export async function createStarTrackBoard3D(
       syncA11y();
     }
 
-    // Re-fit after status/chain height changes (e.g. game-over winner block).
-    resize();
+    // Re-fit only when chain controls may change height (draw ↔ choose ↔
+    // game-over). Routine piece/highlight updates paint only (q-mp-135).
+    const layoutKey = `${state.phase}:${state.winner ?? ''}:${state.drawnChains?.length ?? 0}`;
+    if (layoutKey !== lastLayoutKey) {
+      lastLayoutKey = layoutKey;
+      resize();
+    } else {
+      paint();
+    }
   };
 
   const spaceToClientPoint = (
