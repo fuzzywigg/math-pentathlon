@@ -1,0 +1,935 @@
+{
+  "meta": {
+    "generatedAt": "2026-10-09T03:56:22.589Z",
+    "baseURL": "http://127.0.0.1:5179",
+    "moveTarget": 30,
+    "navCycles": 5,
+    "mode": "runtime",
+    "phase": "baseline",
+    "cpuThrottle": 1,
+    "fixedGames": [],
+    "fixNotes": []
+  },
+  "results": [
+    {
+      "gameId": "kings-quadraphages",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 2,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999891,
+        "frameP95Ms": 16.799999999999272,
+        "frameMaxMs": 16.80000000000291
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3635980
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5032860
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5090012
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5100248
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5085932
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5099940
+        }
+      ],
+      "heapGrowthBytes": 1463960,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "hex",
+      "board3d": false,
+      "movesAttempted": 30,
+      "movesLanded": 30,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.699999999999818,
+        "frameP95Ms": 16.800000000000182,
+        "frameMaxMs": 16.800000000000182
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3127968
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3434900
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3451364
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3466460
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3500504
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3501556
+        }
+      ],
+      "heapGrowthBytes": 373588,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "star-track",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 11,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3140644
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5464940
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5384488
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5384804
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5385128
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5385068
+        }
+      ],
+      "heapGrowthBytes": 2244424,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "hex-a-gone",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 5,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3178632
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5563552
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5471108
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5471312
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5472156
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5462124
+        }
+      ],
+      "heapGrowthBytes": 2283492,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "calla",
+      "board3d": false,
+      "movesAttempted": 30,
+      "movesLanded": 30,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.699999999999818,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.800000000000182
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3143216
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3434848
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3453092
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3468408
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3488788
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3504308
+        }
+      ],
+      "heapGrowthBytes": 361092,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "sum-dominoes",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 4,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3122200
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3449928
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3470532
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3493876
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3531548
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3534636
+        }
+      ],
+      "heapGrowthBytes": 412436,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "par-55",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 11,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999891,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.80000000000109
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3241864
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3585312
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3597308
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3621184
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3639056
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3646032
+        }
+      ],
+      "heapGrowthBytes": 404168,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "ramrod",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 18,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3127424
+        },
+        {
+          "label": "remount-1",
+          "bytes": 4075236
+        },
+        {
+          "label": "remount-2",
+          "bytes": 4084200
+        },
+        {
+          "label": "remount-3",
+          "bytes": 4104232
+        },
+        {
+          "label": "remount-4",
+          "bytes": 4122020
+        },
+        {
+          "label": "remount-5",
+          "bytes": 4122380
+        }
+      ],
+      "heapGrowthBytes": 994956,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "kwatro-sinko",
+      "board3d": true,
+      "movesAttempted": 30,
+      "movesLanded": 30,
+      "play": {
+        "longTaskCount": 2,
+        "longTaskMaxMs": 104,
+        "longTaskSumMs": 169,
+        "frameCount": 121,
+        "frameP50Ms": 16.699999999999818,
+        "frameP95Ms": 16.799999999999272,
+        "frameMaxMs": 16.800000000000182
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3210640
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5822620
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5809360
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5808960
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5809292
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5808608
+        }
+      ],
+      "heapGrowthBytes": 2597968,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "fiar",
+      "board3d": true,
+      "movesAttempted": 30,
+      "movesLanded": 30,
+      "play": {
+        "longTaskCount": 1,
+        "longTaskMaxMs": 56,
+        "longTaskSumMs": 56,
+        "frameCount": 121,
+        "frameP50Ms": 16.699999999999818,
+        "frameP95Ms": 16.799999999999272,
+        "frameMaxMs": 16.800000000000182
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 5632204
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5368280
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5377344
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5413376
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5376820
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5426580
+        }
+      ],
+      "heapGrowthBytes": -205624,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "juggle",
+      "board3d": false,
+      "movesAttempted": 30,
+      "movesLanded": 30,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.699999999999818,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.800000000000182
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3221888
+        },
+        {
+          "label": "remount-1",
+          "bytes": 4010852
+        },
+        {
+          "label": "remount-2",
+          "bytes": 4020576
+        },
+        {
+          "label": "remount-3",
+          "bytes": 4053284
+        },
+        {
+          "label": "remount-4",
+          "bytes": 4067744
+        },
+        {
+          "label": "remount-5",
+          "bytes": 4068224
+        }
+      ],
+      "heapGrowthBytes": 846336,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "contig-60",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 26,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.80000000000291
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3082052
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3591416
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3618584
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3637720
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3655236
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3655588
+        }
+      ],
+      "heapGrowthBytes": 573536,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "stars-bars",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 10,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.799999999999272,
+        "frameMaxMs": 16.80000000000109
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3201584
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3584316
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3593436
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3612668
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3633060
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3633476
+        }
+      ],
+      "heapGrowthBytes": 431892,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "fab-a-diffy",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 4,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999891,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.80000000000291
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3446464
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3765576
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3786120
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3804844
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3793864
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3834920
+        }
+      ],
+      "heapGrowthBytes": 388456,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "queens-guards",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 5,
+      "play": {
+        "longTaskCount": 1,
+        "longTaskMaxMs": 75,
+        "longTaskSumMs": 75,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.80000000000291
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 5624128
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5647776
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5761504
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5761612
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5725440
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5715788
+        }
+      ],
+      "heapGrowthBytes": 91660,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "prime-gold",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 3,
+      "play": {
+        "longTaskCount": 2,
+        "longTaskMaxMs": 74,
+        "longTaskSumMs": 132,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999891,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3414484
+        },
+        {
+          "label": "remount-1",
+          "bytes": 6329140
+        },
+        {
+          "label": "remount-2",
+          "bytes": 6325420
+        },
+        {
+          "label": "remount-3",
+          "bytes": 6326400
+        },
+        {
+          "label": "remount-4",
+          "bytes": 6322244
+        },
+        {
+          "label": "remount-5",
+          "bytes": 6322228
+        }
+      ],
+      "heapGrowthBytes": 2907744,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "remainder-islands",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 25,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3182000
+        },
+        {
+          "label": "remount-1",
+          "bytes": 4102996
+        },
+        {
+          "label": "remount-2",
+          "bytes": 4113796
+        },
+        {
+          "label": "remount-3",
+          "bytes": 4132684
+        },
+        {
+          "label": "remount-4",
+          "bytes": 4150476
+        },
+        {
+          "label": "remount-5",
+          "bytes": 4150664
+        }
+      ],
+      "heapGrowthBytes": 968664,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "pent-em-in",
+      "board3d": true,
+      "movesAttempted": 120,
+      "movesLanded": 3,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999891,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3261656
+        },
+        {
+          "label": "remount-1",
+          "bytes": 5491012
+        },
+        {
+          "label": "remount-2",
+          "bytes": 5451060
+        },
+        {
+          "label": "remount-3",
+          "bytes": 5461640
+        },
+        {
+          "label": "remount-4",
+          "bytes": 5461676
+        },
+        {
+          "label": "remount-5",
+          "bytes": 5462092
+        }
+      ],
+      "heapGrowthBytes": 2200436,
+      "suspects": [
+        "No strong leak signal from heap remount cycles."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "frac-fact",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 11,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.69999999999709,
+        "frameP95Ms": 16.700000000000728,
+        "frameMaxMs": 16.799999999999272
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3196188
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3543768
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3551896
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3571304
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3589968
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3590308
+        }
+      ],
+      "heapGrowthBytes": 394120,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    },
+    {
+      "gameId": "fraction-pinball",
+      "board3d": false,
+      "movesAttempted": 120,
+      "movesLanded": 10,
+      "play": {
+        "longTaskCount": 0,
+        "longTaskMaxMs": 0,
+        "longTaskSumMs": 0,
+        "frameCount": 121,
+        "frameP50Ms": 16.700000000000728,
+        "frameP95Ms": 16.799999999999272,
+        "frameMaxMs": 16.80000000000291
+      },
+      "heapSamples": [
+        {
+          "label": "after-mount",
+          "bytes": 3148424
+        },
+        {
+          "label": "remount-1",
+          "bytes": 3549160
+        },
+        {
+          "label": "remount-2",
+          "bytes": 3557992
+        },
+        {
+          "label": "remount-3",
+          "bytes": 3577020
+        },
+        {
+          "label": "remount-4",
+          "bytes": 3595584
+        },
+        {
+          "label": "remount-5",
+          "bytes": 3595920
+        }
+      ],
+      "heapGrowthBytes": 447496,
+      "suspects": [
+        "Controller cleanup audited in this PR (AI timer/generation + destroyGame wiring)."
+      ],
+      "error": null
+    }
+  ]
+}

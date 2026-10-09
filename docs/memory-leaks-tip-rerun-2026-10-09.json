@@ -1,0 +1,1929 @@
+{
+  "label": "tip-rerun",
+  "date": "2026-10-07",
+  "cycles": 10,
+  "baseURL": "http://127.0.0.1:5181",
+  "method": "Playwright menu open/close; CDP HeapProfiler.takeHeapSnapshot + Performance.getMetrics; GC before samples",
+  "results": [
+    {
+      "gameId": "kings-quadraphages",
+      "name": "Kings & Quadraphages",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 5560184,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 13577580
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 5789228,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 5927728,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 5959968,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 6055420,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 6069516,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 6075680,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 6134152,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 6474908,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 6486452,
+          "domNodes": 779
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 6509004,
+          "domNodes": 779
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 6505908,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 14562544
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 5560184,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 13577580
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 6505908,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 14562544
+      },
+      "deltaJsHeapBytes": 945724,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 984964,
+      "error": null
+    },
+    {
+      "gameId": "hex",
+      "name": "Hex",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 3951532,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 8446138
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4000288,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4038168,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4075796,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4136576,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4139928,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4121292,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4180696,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4284876,
+          "domNodes": 1077
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4273056,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4277840,
+          "domNodes": 585
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4277736,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 8764686
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 3951532,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 8446138
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4277736,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 8764686
+      },
+      "deltaJsHeapBytes": 326204,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 318548,
+      "error": null
+    },
+    {
+      "gameId": "star-track",
+      "name": "Star Track",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 5633776,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 13682886
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 5792364,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 5937512,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 5982696,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 6071280,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 6084712,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 6098084,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 6166184,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 6500100,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 6524304,
+          "domNodes": 928
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 6544316,
+          "domNodes": 928
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 6540788,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 14571287
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 5633776,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 13682886
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 6540788,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 14571287
+      },
+      "deltaJsHeapBytes": 907012,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 888401,
+      "error": null
+    },
+    {
+      "gameId": "hex-a-gone",
+      "name": "Hex-a-Gone!",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 5857968,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 14150715
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 5997348,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 6197128,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 6231116,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 6365208,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 6388196,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 6401124,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 6468904,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 6816308,
+          "domNodes": 982
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 6849484,
+          "domNodes": 585
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 6875788,
+          "domNodes": 982
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 6871540,
+          "domNodes": 585,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 15205981
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 5857968,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 14150715
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 6871540,
+        "domNodes": 585,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 15205981
+      },
+      "deltaJsHeapBytes": 1013572,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1055266,
+      "error": null
+    },
+    {
+      "gameId": "calla",
+      "name": "Calla",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 3984416,
+          "domNodes": 715,
+          "jsEventListeners": 143,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 8838707
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4028432,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4079024,
+          "domNodes": 715
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4097844,
+          "domNodes": 715
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4152144,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4158900,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4167764,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4228824,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4301772,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4313980,
+          "domNodes": 895
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4318116,
+          "domNodes": 895
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4315420,
+          "domNodes": 715,
+          "jsEventListeners": 143,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9195591
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 3984416,
+        "domNodes": 715,
+        "jsEventListeners": 143,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 8838707
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4315420,
+        "domNodes": 715,
+        "jsEventListeners": 143,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9195591
+      },
+      "deltaJsHeapBytes": 331004,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 356884,
+      "error": null
+    },
+    {
+      "gameId": "sum-dominoes",
+      "name": "Sum Dominoes & Dice",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4224620,
+          "domNodes": 898,
+          "jsEventListeners": 135,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9680039
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4679060,
+          "domNodes": 1080
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4739616,
+          "domNodes": 1092
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4752460,
+          "domNodes": 894
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4804992,
+          "domNodes": 1080
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4824992,
+          "domNodes": 1090
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4833752,
+          "domNodes": 1075
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4880764,
+          "domNodes": 1078
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4963872,
+          "domNodes": 910
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4975084,
+          "domNodes": 1073
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4979088,
+          "domNodes": 1078
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4976320,
+          "domNodes": 890,
+          "jsEventListeners": 135,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11403176
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4224620,
+        "domNodes": 898,
+        "jsEventListeners": 135,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9680039
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4976320,
+        "domNodes": 890,
+        "jsEventListeners": 135,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11403176
+      },
+      "deltaJsHeapBytes": 751700,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1723137,
+      "error": null
+    },
+    {
+      "gameId": "par-55",
+      "name": "Par 55",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4315196,
+          "domNodes": 767,
+          "jsEventListeners": 144,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9795279
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4771848,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4824680,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4842916,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4889688,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4896380,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4903332,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4945700,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 5040612,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 5050492,
+          "domNodes": 964
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 5051364,
+          "domNodes": 767
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 5051364,
+          "domNodes": 767,
+          "jsEventListeners": 144,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11476724
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4315196,
+        "domNodes": 767,
+        "jsEventListeners": 144,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9795279
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 5051364,
+        "domNodes": 767,
+        "jsEventListeners": 144,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11476724
+      },
+      "deltaJsHeapBytes": 736168,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1681445,
+      "error": null
+    },
+    {
+      "gameId": "ramrod",
+      "name": "Ramrod",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4218180,
+          "domNodes": 727,
+          "jsEventListeners": 139,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9602527
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4685876,
+          "domNodes": 727
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4728708,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4743084,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4789856,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4793932,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4803308,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4846048,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4926912,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4937824,
+          "domNodes": 944
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4948588,
+          "domNodes": 727
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4948588,
+          "domNodes": 727,
+          "jsEventListeners": 139,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11307348
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4218180,
+        "domNodes": 727,
+        "jsEventListeners": 139,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9602527
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4948588,
+        "domNodes": 727,
+        "jsEventListeners": 139,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11307348
+      },
+      "deltaJsHeapBytes": 730408,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1704821,
+      "error": null
+    },
+    {
+      "gameId": "kwatro-sinko",
+      "name": "Kwatro-Sinko",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 6448488,
+          "domNodes": 589,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 15668136
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 6967884,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 7082736,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 7109580,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 7206748,
+          "domNodes": 589
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 7218556,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 7233564,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 7291712,
+          "domNodes": 811
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 7573992,
+          "domNodes": 589
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 7587900,
+          "domNodes": 589
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 7622772,
+          "domNodes": 811
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 7619832,
+          "domNodes": 589,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 17563886
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 6448488,
+        "domNodes": 589,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 15668136
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 7619832,
+        "domNodes": 589,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 17563886
+      },
+      "deltaJsHeapBytes": 1171344,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1895750,
+      "error": null
+    },
+    {
+      "gameId": "fiar",
+      "name": "FIAR",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 6152196,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 15134755
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 6453764,
+          "domNodes": 603
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 6618224,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 6812532,
+          "domNodes": 589
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 6902492,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 6967876,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 6980984,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 7038404,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 7077152,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 7339800,
+          "domNodes": 819
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 7354492,
+          "domNodes": 819
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 7350748,
+          "domNodes": 589,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 17251616
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 6152196,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 15134755
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 7350748,
+        "domNodes": 589,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 17251616
+      },
+      "deltaJsHeapBytes": 1198552,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2116861,
+      "error": null
+    },
+    {
+      "gameId": "juggle",
+      "name": "Juggle",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4240112,
+          "domNodes": 803,
+          "jsEventListeners": 136,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9517987
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4901672,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4940520,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4959964,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 5007692,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 5018844,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 5025704,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 5070944,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 5153072,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 5160256,
+          "domNodes": 1000
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 5163732,
+          "domNodes": 1000
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 5160888,
+          "domNodes": 803,
+          "jsEventListeners": 136,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11697950
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4240112,
+        "domNodes": 803,
+        "jsEventListeners": 136,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9517987
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 5160888,
+        "domNodes": 803,
+        "jsEventListeners": 136,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11697950
+      },
+      "deltaJsHeapBytes": 920776,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2179963,
+      "error": null
+    },
+    {
+      "gameId": "contig-60",
+      "name": "Contig 60",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4232092,
+          "domNodes": 803,
+          "jsEventListeners": 137,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9463894
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4902784,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4941076,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4957948,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 5004892,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 5011584,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 5018488,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 5060800,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 5136816,
+          "domNodes": 803
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 5147200,
+          "domNodes": 1009
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 5150824,
+          "domNodes": 1009
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 5147948,
+          "domNodes": 803,
+          "jsEventListeners": 137,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11558297
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4232092,
+        "domNodes": 803,
+        "jsEventListeners": 137,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9463894
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 5147948,
+        "domNodes": 803,
+        "jsEventListeners": 137,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11558297
+      },
+      "deltaJsHeapBytes": 915856,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2094403,
+      "error": null
+    },
+    {
+      "gameId": "stars-bars",
+      "name": "Stars & Bars",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4455848,
+          "domNodes": 670,
+          "jsEventListeners": 144,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9887500
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4949564,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4988472,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 5002880,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 5049708,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 5054608,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 5063932,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 5106696,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 5187460,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 5196116,
+          "domNodes": 870
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 5208224,
+          "domNodes": 870
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 5205364,
+          "domNodes": 670,
+          "jsEventListeners": 144,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11746697
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4455848,
+        "domNodes": 670,
+        "jsEventListeners": 144,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9887500
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 5205364,
+        "domNodes": 670,
+        "jsEventListeners": 144,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11746697
+      },
+      "deltaJsHeapBytes": 749516,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1859197,
+      "error": null
+    },
+    {
+      "gameId": "fab-a-diffy",
+      "name": "Fab-a-Diffy",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4653440,
+          "domNodes": 1314,
+          "jsEventListeners": 219,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11088275
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4986740,
+          "domNodes": 1328
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 5037304,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 5075032,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 5104636,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 5146284,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 5151524,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 5196480,
+          "domNodes": 1314
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 5213072,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 5293552,
+          "domNodes": 1508
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 5302656,
+          "domNodes": 1508
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 5299360,
+          "domNodes": 1314,
+          "jsEventListeners": 219,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 12530582
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4653440,
+        "domNodes": 1314,
+        "jsEventListeners": 219,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11088275
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 5299360,
+        "domNodes": 1314,
+        "jsEventListeners": 219,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 12530582
+      },
+      "deltaJsHeapBytes": 645920,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1442307,
+      "error": null
+    },
+    {
+      "gameId": "queens-guards",
+      "name": "Queens & Guards",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 6504180,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 15542513
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 7095096,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 7278052,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 7310516,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 7470012,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 7488136,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 7513044,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 7567396,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 7921256,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 7948160,
+          "domNodes": 787
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 7971448,
+          "domNodes": 787
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 7968812,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 18009539
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 6504180,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 15542513
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 7968812,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 18009539
+      },
+      "deltaJsHeapBytes": 1464632,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2467026,
+      "error": null
+    },
+    {
+      "gameId": "prime-gold",
+      "name": "Prime Gold",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 6074972,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 14481126
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 6842988,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 7003100,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 7069116,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 7226136,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 7246696,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 7252904,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 7302888,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 7581728,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 7594260,
+          "domNodes": 816
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 7618604,
+          "domNodes": 816
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 7611856,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 17446968
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 6074972,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 14481126
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 7611856,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 17446968
+      },
+      "deltaJsHeapBytes": 1536884,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2965842,
+      "error": null
+    },
+    {
+      "gameId": "remainder-islands",
+      "name": "Remainder Islands",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4190924,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9291731
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4727736,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4760436,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4783052,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4827524,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4833564,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4842980,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4877744,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4961908,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4969252,
+          "domNodes": 938
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4972560,
+          "domNodes": 938
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4965476,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11254860
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4190924,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9291731
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4965476,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11254860
+      },
+      "deltaJsHeapBytes": 774552,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1963129,
+      "error": null
+    },
+    {
+      "gameId": "pent-em-in",
+      "name": "Pent'Em In",
+      "board3d": true,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 5967360,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 14594436
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 6400340,
+          "domNodes": 601
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 6596704,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 6835808,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 6890184,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 6945572,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 6966932,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 7007408,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 7021676,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 7368232,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 7383980,
+          "domNodes": 884
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 7376764,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 17072931
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 5967360,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 14594436
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 7376764,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 17072931
+      },
+      "deltaJsHeapBytes": 1409404,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 2478495,
+      "error": null
+    },
+    {
+      "gameId": "frac-fact",
+      "name": "Frac Fact",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4184756,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9398004
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4689856,
+          "domNodes": 587
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4743380,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4757896,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4810744,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4813676,
+          "domNodes": 881
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4828468,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4871652,
+          "domNodes": 881
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4956792,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4965900,
+          "domNodes": 884
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4970072,
+          "domNodes": 884
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4964708,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11268375
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4184756,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9398004
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4964708,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11268375
+      },
+      "deltaJsHeapBytes": 779952,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1870371,
+      "error": null
+    },
+    {
+      "gameId": "fraction-pinball",
+      "name": "Fraction Pinball",
+      "board3d": false,
+      "cycles": 10,
+      "samples": [
+        {
+          "label": "after-warm",
+          "jsHeapUsedBytes": 4137356,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 9284778
+        },
+        {
+          "label": "cycle-1",
+          "jsHeapUsedBytes": 4700368,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-2",
+          "jsHeapUsedBytes": 4741696,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-3",
+          "jsHeapUsedBytes": 4767580,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-4",
+          "jsHeapUsedBytes": 4812080,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-5",
+          "jsHeapUsedBytes": 4816596,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-6",
+          "jsHeapUsedBytes": 4826084,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-7",
+          "jsHeapUsedBytes": 4870988,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-8",
+          "jsHeapUsedBytes": 4947264,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-9",
+          "jsHeapUsedBytes": 4953368,
+          "domNodes": 861
+        },
+        {
+          "label": "cycle-10",
+          "jsHeapUsedBytes": 4957212,
+          "domNodes": 861
+        },
+        {
+          "label": "after-cycles",
+          "jsHeapUsedBytes": 4952140,
+          "domNodes": 587,
+          "jsEventListeners": 133,
+          "detachedDomNodes": 0,
+          "detachedSelfSizeBytes": 0,
+          "snapshotSelfSizeBytes": 11224713
+        }
+      ],
+      "afterWarm": {
+        "jsHeapUsedBytes": 4137356,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 9284778
+      },
+      "afterCycles": {
+        "jsHeapUsedBytes": 4952140,
+        "domNodes": 587,
+        "jsEventListeners": 133,
+        "detachedDomNodes": 0,
+        "detachedSelfSizeBytes": 0,
+        "snapshotSelfSizeBytes": 11224713
+      },
+      "deltaJsHeapBytes": 814784,
+      "deltaDetachedDom": 0,
+      "deltaSnapshotSelfBytes": 1939935,
+      "error": null
+    }
+  ]
+}
