@@ -29,7 +29,7 @@ export function setText(el: Node, value: string): void {
   el.textContent = value;
 }
 
-export type SafeHtmlValue = string | number | boolean | Node | null | undefined;
+type SafeHtmlValue = string | number | boolean | Node | null | undefined;
 
 /**
  * Tagged template: static segments are trusted HTML; interpolations become

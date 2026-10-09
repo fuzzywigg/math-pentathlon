@@ -57,9 +57,6 @@ export interface PathResult {
   distance: number;
 }
 
-/** Graph layout types */
-export type LayoutType = 'grid' | 'circular' | 'tree' | 'force' | 'custom';
-
 /** Configuration for graph rendering */
 export interface GraphRenderConfig {
   nodeRadius: number;

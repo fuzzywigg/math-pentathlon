@@ -33,7 +33,7 @@ export interface TutorialConfig {
   steps: TutorialStep[];
 }
 
-export type TutorialEventHandler = (event: TutorialEvent) => void;
+type TutorialEventHandler = (event: TutorialEvent) => void;
 
 export interface TutorialEvent {
   type: 'step-changed' | 'completed' | 'exited';
