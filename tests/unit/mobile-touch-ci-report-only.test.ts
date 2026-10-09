@@ -26,6 +26,17 @@ describe('mobile-touch CI report-only', () => {
     expect(pw).toMatch(/name:\s*'mobile-pixel-7'/);
     expect(pw).toMatch(/name:\s*'mobile-ipad'/);
     expect(pw).toMatch(/hasTouch:\s*true/);
+    // Mobile Chromium emulation must share SwiftShader with desktop chromium
+    // so mp3d boards stay WebGL-capable on CI VMs (q-mp-052 harness triage).
+    expect(pw).toMatch(
+      /name:\s*'mobile-iphone-13'[\s\S]*?use-angle=swiftshader-webgl/
+    );
+    expect(pw).toMatch(
+      /name:\s*'mobile-pixel-7'[\s\S]*?use-angle=swiftshader-webgl/
+    );
+    expect(pw).toMatch(
+      /name:\s*'mobile-ipad'[\s\S]*?use-angle=swiftshader-webgl/
+    );
     expect(ci).toMatch(/mobile-touch:/);
     expect(ci).toContain('npm run test:e2e:mobile');
     expect(ci).toMatch(/continue-on-error:\s*true/);

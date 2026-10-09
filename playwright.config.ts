@@ -118,6 +118,15 @@ export default defineConfig({
         defaultBrowserType: 'chromium',
         hasTouch: true,
         isMobile: true,
+        // Same SwiftShader opt-in as chromium: mp3d boards under software GL
+        // otherwise fall back to 2D and touch smoke can time out on CI VMs.
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
       },
     },
     {
@@ -128,6 +137,13 @@ export default defineConfig({
         defaultBrowserType: 'chromium',
         hasTouch: true,
         isMobile: true,
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
       },
     },
     {
@@ -138,6 +154,13 @@ export default defineConfig({
         defaultBrowserType: 'chromium',
         hasTouch: true,
         isMobile: true,
+        launchOptions: {
+          args: [
+            '--use-gl=angle',
+            '--use-angle=swiftshader-webgl',
+            '--enable-unsafe-swiftshader',
+          ],
+        },
       },
     },
     {
