@@ -153,7 +153,7 @@ export function createHighlightOverlay(
   style: HighlightStyle = HIGHLIGHT_STYLES.selected
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('class', `alignment-highlight ${style.className || ''}`);
+  group.setAttribute('class', `alignment-highlight ${style.className ?? ''}`);
 
   for (const pos of positions) {
     const { x, y } = cellToPixel(pos.row, pos.col);
@@ -163,10 +163,10 @@ export function createHighlightOverlay(
     rect.setAttribute('y', String(y - cellSize.height / 2));
     rect.setAttribute('width', String(cellSize.width));
     rect.setAttribute('height', String(cellSize.height));
-    rect.setAttribute('fill', style.fillColor || 'transparent');
-    rect.setAttribute('fill-opacity', String(style.fillOpacity || 0.2));
-    rect.setAttribute('stroke', style.strokeColor || 'transparent');
-    rect.setAttribute('stroke-width', String(style.strokeWidth || 0));
+    rect.setAttribute('fill', style.fillColor ?? 'transparent');
+    rect.setAttribute('fill-opacity', String(style.fillOpacity ?? 0.2));
+    rect.setAttribute('stroke', style.strokeColor ?? 'transparent');
+    rect.setAttribute('stroke-width', String(style.strokeWidth ?? 0));
     rect.setAttribute('rx', '4');
     rect.setAttribute('ry', '4');
 
@@ -192,8 +192,8 @@ export function createAlignmentLine(
   line.setAttribute('y1', String(startPixel.y));
   line.setAttribute('x2', String(endPixel.x));
   line.setAttribute('y2', String(endPixel.y));
-  line.setAttribute('stroke', style.strokeColor || '#4caf50');
-  line.setAttribute('stroke-width', String((style.strokeWidth || 2) * 2));
+  line.setAttribute('stroke', style.strokeColor ?? '#4caf50');
+  line.setAttribute('stroke-width', String((style.strokeWidth ?? 2) * 2));
   line.setAttribute('stroke-linecap', 'round');
   line.setAttribute(
     'class',
@@ -213,7 +213,7 @@ export function createAlignmentHighlight(
   style: HighlightStyle = HIGHLIGHT_STYLES.winning
 ): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-  group.setAttribute('class', `alignment-highlight ${style.className || ''}`);
+  group.setAttribute('class', `alignment-highlight ${style.className ?? ''}`);
 
   // Add cell highlights
   const cellHighlights = createHighlightOverlay(
@@ -270,14 +270,14 @@ export function createPathHighlight(
     'path'
   );
   pathElement.setAttribute('d', pathData);
-  pathElement.setAttribute('stroke', style.strokeColor || '#9c27b0');
-  pathElement.setAttribute('stroke-width', String(style.strokeWidth || 2));
+  pathElement.setAttribute('stroke', style.strokeColor ?? '#9c27b0');
+  pathElement.setAttribute('stroke-width', String(style.strokeWidth ?? 2));
   pathElement.setAttribute('fill', 'none');
   pathElement.setAttribute('stroke-linecap', 'round');
   pathElement.setAttribute('stroke-linejoin', 'round');
   pathElement.setAttribute(
     'class',
-    `highlight-line ${style.animate ? 'animated' : ''} ${style.className || ''}`
+    `highlight-line ${style.animate ? 'animated' : ''} ${style.className ?? ''}`
   );
 
   return pathElement;
