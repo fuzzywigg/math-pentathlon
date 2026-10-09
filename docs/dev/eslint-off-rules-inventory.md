@@ -26,7 +26,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
 | 14 | `default-case` | Switches without `default` |
 | 13 | `@typescript-eslint/no-shadow` | Shadowed bindings |
-| 9 | `@typescript-eslint/switch-exhaustiveness-check` | Missing union/enum cases |
+| 8 | `@typescript-eslint/switch-exhaustiveness-check` | Missing union/enum cases (q-mp-141 ratchet; tip re-measure 8 on post598) |
 | 6 | `radix` | `parseInt` without radix (q-mp-130: demo fixed; 6 HOLD) |
 | 7 | `@typescript-eslint/return-await` (`always`) | Inconsistent async error paths |
 | 2 | `no-promise-executor-return` | Misleading promise constructor returns |
@@ -77,3 +77,9 @@ Open-PR overlap for q-mp-140: #665 (`no-duplicate-imports`), #672 (`no-confusing
 ## q-mp-148 — `@typescript-eslint/prefer-optional-chain`
 
 Live tip probe: **35** hits. Cleared **14** non-HOLD sites (board-ui / game-state / types / main / board-a11y / `src/ui/three/**` only; identical boolean/`?.` semantics). Residual ceiling **21** — HOLD only in `*/rules.ts` and `*/ai.ts` (contig-60, fab-a-diffy, fiar, kings-quadraphages, kwatro-sinko, prime-gold, queens-guards, ramrod). Live `eslint.config.js` does **not** hard-enable the rule (count-down via `npm run lint:ratchet`).
+
+## Ratchet chosen for q-mp-141
+
+**`@typescript-eslint/switch-exhaustiveness-check`** — ceiling **8** (= live tip re-measure on `cursor/mp-tip-post598` @ `7922f9af`; inventory/ticket said **9** — never raise). Hits (1 each): `attribute-ui`, `dice-ui`, `expressions/evaluator`, `owl-messages`, `owl-system`, `graph-demo`, `polyomino-demo`, `star-track/rules`. No switch rewrites in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`). Complements q-mp-129 `default-case`.
+
+Open-PR overlap for q-mp-141: no open draft already ratchets `switch-exhaustiveness-check`. Other drafts may edit `lint-ratchet-ceilings.json` additively — tip owner folds keys (min wins).
