@@ -1,0 +1,212 @@
+{
+  "taskId": "q-mp-202-mutation-audit-ui-5",
+  "generatedAt": "2026-10-09T17:45:55.739Z",
+  "harness": "node_modules/.cache/mutation-ui-5/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/core/dice/dice-ui.ts",
+      "src/core/dice/roller.ts",
+      "src/ui/owl/owl-component.ts"
+    ]
+  },
+  "results": [
+    {
+      "module": "src/core/dice/dice-ui.ts",
+      "lines": 546,
+      "tests": [
+        "tests/unit/burn-wave22-dice-ui.test.ts",
+        "tests/unit/burn-wave32-dice-ui-animate-styles.test.ts",
+        "tests/unit/burn-wave32-dice-ui-render-matrix.test.ts",
+        "tests/unit/burn-wave34-dice-ui-fallback.test.ts",
+        "tests/unit/burn-wave34-dice-ui-interactive.test.ts",
+        "tests/unit/burn-wave38-dice-interactive-locked-noclick.test.ts",
+        "tests/unit/burn-wave39-dice-animate-empty-complete.test.ts",
+        "tests/unit/burn-wave39-dice-animate-remount.test.ts",
+        "tests/unit/burn-wave39-dice-ui-polyhedral-catalog.test.ts",
+        "tests/unit/burn-wave39-dice-ui-rollresult-empty.test.ts",
+        "tests/unit/burn-wave40-dice-rollresult-hidetotal.test.ts",
+        "tests/unit/burn-wave40-dice-ui-animate-total.test.ts",
+        "tests/unit/burn-wave40-dice-ui-styles-empty.test.ts",
+        "tests/unit/mutation-ui5-dice-ui.test.ts",
+        "tests/unit/overnight-dice-ui-animate-always-total.test.ts",
+        "tests/unit/overnight-dice-ui-animate-face-zero.test.ts",
+        "tests/unit/overnight-dice-ui-d4-text-y.test.ts",
+        "tests/unit/overnight-dice-ui-selectable-noclick.test.ts",
+        "tests/unit/overnight-wave52-dice-ui-poly-polygon-points.test.ts"
+      ],
+      "availableMutants": 103,
+      "ranMutants": 20,
+      "killed": 17,
+      "survived": 3,
+      "timeout": 0,
+      "error": 0,
+      "score": 85,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 15,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 15,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 16,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/dice/roller.ts",
+      "lines": 209,
+      "tests": [
+        "tests/unit/burn-wave32-dice-configs-sets.test.ts",
+        "tests/unit/burn-wave32-dice-faces-bounds.test.ts",
+        "tests/unit/burn-wave32-dice-lock-reroll.test.ts",
+        "tests/unit/burn-wave32-dice-roll-totals.test.ts",
+        "tests/unit/burn-wave32-dice-selection-matrix.test.ts",
+        "tests/unit/burn-wave32-dice-subset-products.test.ts",
+        "tests/unit/burn-wave32-dice-subset-sums.test.ts",
+        "tests/unit/burn-wave32-dice-two-ops.test.ts",
+        "tests/unit/burn-wave35-dice-config-handshake.test.ts",
+        "tests/unit/burn-wave35-dice-empty-subsets.test.ts",
+        "tests/unit/burn-wave35-dice-face-distribution.test.ts",
+        "tests/unit/burn-wave35-dice-immutability.test.ts",
+        "tests/unit/burn-wave35-dice-reroll-ghosts.test.ts",
+        "tests/unit/burn-wave35-dice-roll-equivalence.test.ts",
+        "tests/unit/burn-wave35-dice-selection-idempotent.test.ts",
+        "tests/unit/burn-wave35-dice-subset-powerset.test.ts",
+        "tests/unit/burn-wave35-dice-total-invariants.test.ts",
+        "tests/unit/burn-wave35-dice-two-ops-dense.test.ts",
+        "tests/unit/burn-wave35-dice-unlock-cycle.test.ts",
+        "tests/unit/burn-wave35-dice-valid-selection-stress.test.ts",
+        "tests/unit/burn-wave38-dice-lock-ghost-ids.test.ts",
+        "tests/unit/burn-wave38-dice-lock-select-handshake.test.ts",
+        "tests/unit/burn-wave38-dice-select-bounds.test.ts",
+        "tests/unit/burn-wave38-dice-subset-twodice.test.ts",
+        "tests/unit/burn-wave38-dice-twodice-zero-div.test.ts",
+        "tests/unit/burn-wave39-dice-config-roll-parity.test.ts",
+        "tests/unit/burn-wave39-dice-roll-empty-reroll-noop.test.ts",
+        "tests/unit/burn-wave40-dice-valid-selection-fence.test.ts",
+        "tests/unit/burn-wave41-handshake-prime-dice-roll-phase.test.ts",
+        "tests/unit/burn-wave44-dice-lock-reroll-skip.test.ts",
+        "tests/unit/burn-wave44-dice-toggle-clear-cycle.test.ts",
+        "tests/unit/burn-wave44-dice-valid-minmax-fence.test.ts",
+        "tests/unit/burn-wave44-handshake-fab-dice-two-ops.test.ts",
+        "tests/unit/dice.test.ts",
+        "tests/unit/mutation-ui5-roller.test.ts",
+        "tests/unit/overnight-dice-faces-bounds-seeded.test.ts",
+        "tests/unit/overnight-dice-lock-clear-empty-immut.test.ts",
+        "tests/unit/overnight-dice-roll-lock-reroll.test.ts",
+        "tests/unit/overnight-dice-select-empty-ids.test.ts",
+        "tests/unit/overnight-dice-subset-sums-products.test.ts",
+        "tests/unit/overnight-dice-twodice-zero-equal.test.ts",
+        "tests/unit/overnight-dice-types-values-animation.test.ts",
+        "tests/unit/overnight-dice-valid-contradictory-bounds.test.ts"
+      ],
+      "availableMutants": 73,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/owl/owl-component.ts",
+      "lines": 672,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r2-owl-idle.test.ts",
+        "tests/unit/burn-1009-ui-cov-r6-demos-owl-pwa.test.ts",
+        "tests/unit/burn-1009-ui-cov-r7-shells-owl.test.ts",
+        "tests/unit/burn-wave25-owl-component-chrome.test.ts",
+        "tests/unit/mutation-ui5-owl-component.test.ts",
+        "tests/unit/overnight-wave60-handshake-owl-msg-residual.test.ts",
+        "tests/unit/overnight-wave60-ui-owl-dismiss-minimize-aria.test.ts",
+        "tests/unit/overnight-wave60-ui-owl-open-aria-title.test.ts",
+        "tests/unit/owl-drag-shell.test.ts",
+        "tests/unit/owl-drop-inspect.test.ts"
+      ],
+      "availableMutants": 156,
+      "ranMutants": 20,
+      "killed": 12,
+      "survived": 8,
+      "timeout": 0,
+      "error": 0,
+      "score": 60,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 26,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 27,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "NumericBoundary",
+          "line": 28,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 29,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 32,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 33,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 34,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 35,
+          "description": "0 → 1",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
