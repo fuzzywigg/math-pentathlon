@@ -3,11 +3,8 @@
  * Distinct from wave56 early-resolve path length < 2. Tests-only.
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
-import {
-  createTrackGraph,
-  renderGraph,
-  animateMove,
-} from '../../src/core/graph';
+import { createTrackGraph } from '../../src/core/graph/types';
+import { renderGraph, animateMove } from '../../src/core/graph/graph-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

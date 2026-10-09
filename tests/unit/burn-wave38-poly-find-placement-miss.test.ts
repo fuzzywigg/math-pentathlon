@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  createBoardWithBlockedCells,
-  placePolyomino,
-  findPlacementAtCell,
-  removeLastPolyomino,
-  TETROMINOES,
-  getShapeById,
-} from '../../src/core/polyomino';
+import { createBoard, createBoardWithBlockedCells, placePolyomino, findPlacementAtCell, removeLastPolyomino } from '../../src/core/polyomino/placement';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
 
 describe('Wave 38 poly-find — miss / remove / blocked', () => {
   it('empty board miss returns undefined', () => {

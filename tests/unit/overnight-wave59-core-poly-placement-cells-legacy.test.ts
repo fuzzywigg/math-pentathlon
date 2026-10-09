@@ -3,11 +3,9 @@
  * Distinct from wave58 validate OOB/occupied reasons. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import {
-  getPlacementCells,
-  SIMPLE_SHAPES,
-  cellsToKey,
-} from '../../src/core/polyomino';
+import { getPlacementCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { cellsToKey } from '../../src/core/polyomino/transform';
 
 describe('Wave 59 core poly — placement cells legacy', () => {
   it('legacy shapeId resolves cells; unknown shapeId yields []', () => {

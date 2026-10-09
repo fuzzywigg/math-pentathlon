@@ -4,15 +4,9 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  isInBounds,
-  isOccupied,
-  areCellsInBounds,
-  placePolyomino,
-  TETROMINOES,
-  getShapeById,
-} from '../../src/core/polyomino';
+import { createBoard, isInBounds, isOccupied, placePolyomino } from '../../src/core/polyomino/placement';
+import { areCellsInBounds } from '../../src/core/polyomino/transform';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
 
 describe('Wave 38 poly-inbounds — OOB matrix', () => {
   it('OOB cells are out of bounds and count as occupied', () => {

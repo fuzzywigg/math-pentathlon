@@ -5,11 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createTargetChallenge,
-  solveTargetChallenge,
-  validateSolution,
-} from '../../src/core/expressions';
+import { createTargetChallenge } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution } from '../../src/core/expressions/evaluator';
 
 describe('Wave 34 expr-solve — singleton number challenges', () => {
   it('single number equal to target yields exact solution string', () => {

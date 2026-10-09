@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  parseEquation,
-  evaluateEquation,
-  checkEquation,
-} from '../../src/core/expressions';
+import { parseEquation, evaluateEquation, checkEquation } from '../../src/core/expressions/evaluator';
 
 describe('Wave 39 expr — equation malformed', () => {
   it('rejects missing / multi equals', () => {

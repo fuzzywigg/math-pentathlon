@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  groupByAttribute,
-  sortByAttribute,
-  getUniqueValues,
-  createMathPiece,
-} from '../../src/core/attributes';
+import { groupByAttribute, sortByAttribute, getUniqueValues, createMathPiece } from '../../src/core/attributes/logic';
 import { createPiece } from '../../src/core/attributes/types';
 
 describe('Wave 38 attr-group — math pieces by parity / divisibility', () => {

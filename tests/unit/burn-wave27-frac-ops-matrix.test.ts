@@ -5,22 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  add,
-  subtract,
-  multiply,
-  divide,
-  reciprocal,
-  power,
-  simplify,
-  areEqual,
-  areEquivalent,
-  toDecimal,
-  negate,
-  abs,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, add, subtract, multiply, divide, reciprocal, power, simplify, areEqual, areEquivalent, toDecimal, negate, abs } from '../../src/core/fractions/arithmetic';
 
 const F = createFraction;
 const flagNeg = (n: number, d: number) =>

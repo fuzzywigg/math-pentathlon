@@ -4,16 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGridGraph,
-  playerConnectsSets,
-  findAllPlayerRegions,
-  findLongestPlayerPath,
-  type Graph,
-  type GraphBoard,
-  type NodeId,
-  type NodeState,
-} from '../../src/core/graph';
+import { createGridGraph, type Graph, type GraphBoard, type NodeId, type NodeState } from '../../src/core/graph/types';
+import { playerConnectsSets, findAllPlayerRegions, findLongestPlayerPath } from '../../src/core/graph/algorithms';
 
 function boardFrom(
   graph: Graph,

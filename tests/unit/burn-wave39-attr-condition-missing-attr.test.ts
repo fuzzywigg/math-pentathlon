@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  evaluateCondition,
-  matchesPiece,
-  getMatchDetails,
-} from '../../src/core/attributes';
-import type { AttributePiece } from '../../src/core/attributes';
+import { evaluateCondition, matchesPiece, getMatchDetails } from '../../src/core/attributes/logic';
+import type { AttributePiece } from '../../src/core/attributes/types';
 
 describe('Wave 39 attr — missing attribute condition', () => {
   const piece: AttributePiece = {

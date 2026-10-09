@@ -10,17 +10,11 @@ import {
   owlSystem,
 } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
-import {
-  createStarGraph,
-  getNeighbors,
-  createCompleteGraph,
-} from '../../src/core/graph';
-import {
-  createRotationControls,
-  getPolyominoById,
-  validatePlacement,
-  createBoard,
-} from '../../src/core/polyomino';
+import { createStarGraph, createCompleteGraph } from '../../src/core/graph/types';
+import { getNeighbors } from '../../src/core/graph/algorithms';
+import { createRotationControls } from '../../src/core/polyomino/polyomino-ui';
+import { getPolyominoById } from '../../src/core/polyomino/types';
+import { validatePlacement, createBoard } from '../../src/core/polyomino/placement';
 
 beforeEach(() => {
   localStorage.clear();

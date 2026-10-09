@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  placePolyomino,
-  solvePlacement,
-  isBoardFilled,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createBoard, placePolyomino, solvePlacement, isBoardFilled } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 describe('Wave 39 poly — solve empty unfillable', () => {
   it('already-filled board with empty shapes → [[]] solution', () => {

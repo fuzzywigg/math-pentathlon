@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  parseEquation,
-  evaluateEquation,
-  checkEquation,
-} from '../../src/core/expressions';
+import { parseEquation, evaluateEquation, checkEquation } from '../../src/core/expressions/evaluator';
 
 describe('Wave 39 expr — equation equals count', () => {
   it('zero or multi equals → null / Invalid equation format', () => {

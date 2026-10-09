@@ -9,12 +9,7 @@ import {
   getTimerProgress,
   isTimerComplete,
 } from '../../src/core/timer-scoring';
-import {
-  fromDecimal,
-  compare,
-  roundToDenominator,
-  isZero,
-} from '../../src/core/fractions';
+import { fromDecimal, compare, roundToDenominator, isZero } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 39 handshake — frac ← timer progress', () => {
   it('progress maps to fraction compare / round', () => {

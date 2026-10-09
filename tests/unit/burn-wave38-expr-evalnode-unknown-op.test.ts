@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluateNode } from '../../src/core/expressions';
-import type { ExpressionNode } from '../../src/core/expressions';
+import { evaluateNode } from '../../src/core/expressions/evaluator';
+import type { ExpressionNode } from '../../src/core/expressions/types';
 
 describe('Wave 38 expr-evalnode — unknown / missing', () => {
   it('forged unknown binary operator throws', () => {

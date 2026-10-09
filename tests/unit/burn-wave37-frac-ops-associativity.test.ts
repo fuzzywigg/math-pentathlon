@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  add,
-  multiply,
-  areEqual,
-  simplify,
-  COMMON_FRACTIONS,
-} from '../../src/core/fractions';
+import { createFraction, add, multiply, areEqual, simplify } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 describe('Wave 37 frac-ops — associativity grids', () => {
   const sample = COMMON_FRACTIONS.slice(0, 8);

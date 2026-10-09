@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  isValidPlacement,
-  getAllValidPositions,
-  isCellOccupied,
-  TETROMINOES,
-  getShapeById,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, isValidPlacement, getAllValidPositions, isCellOccupied } from '../../src/core/polyomino/placement';
+import { TETROMINOES, getShapeById } from '../../src/core/polyomino/types';
 
 describe('Wave 38 poly-grid — valid miss', () => {
   it('tiny grid has zero valid O positions', () => {

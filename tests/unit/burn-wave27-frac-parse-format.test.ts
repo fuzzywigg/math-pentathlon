@@ -5,18 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  fromWhole,
-  fromMixedNumber,
-  toMixedNumber,
-  simplify,
-  parseFraction,
-  formatFraction,
-  formatMixedNumber,
-  areEqual,
-  COMMON_FRACTIONS,
-} from '../../src/core/fractions';
+import { createFraction, fromWhole, fromMixedNumber, toMixedNumber, simplify, parseFraction, formatFraction, formatMixedNumber, areEqual } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 describe('Wave 27 frac-parse-format — parseFraction matrix', () => {
   it('parses simple positive and negative fractions', () => {

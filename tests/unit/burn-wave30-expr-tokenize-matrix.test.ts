@@ -6,7 +6,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { tokenize, type ExpressionToken } from '../../src/core/expressions';
+import { tokenize } from '../../src/core/expressions/evaluator';
+import type { ExpressionToken } from '../../src/core/expressions/types';
 
 function types(tokens: ExpressionToken[]): string[] {
   return tokens.map((t) => {

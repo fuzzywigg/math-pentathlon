@@ -4,28 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  gcd,
-  lcm,
-  createFraction,
-  fromWhole,
-  fromMixedNumber,
-  toMixedNumber,
-  toDecimal,
-  simplify,
-  isSimplified,
-  areEqual,
-  compare,
-  isProper,
-  isWholeNumber,
-  isZero,
-  isPositive,
-  isNegative,
-  add,
-  subtract,
-  multiply,
-  COMMON_FRACTIONS,
-} from '../../src/core/fractions';
+import { gcd, lcm, createFraction, fromWhole, fromMixedNumber, toMixedNumber, toDecimal, simplify, isSimplified, areEqual, compare, isProper, isWholeNumber, isZero, isPositive, isNegative, add, subtract, multiply } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 const F = createFraction;
 

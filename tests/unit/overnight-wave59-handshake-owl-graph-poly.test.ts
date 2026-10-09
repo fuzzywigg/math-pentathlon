@@ -10,20 +10,12 @@ import {
   OWL_FRICTION,
 } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
-import {
-  createTrackGraph,
-  createInteractiveGraph,
-  findNodesAtDistance,
-  playerConnectsSets,
-  type GraphBoard,
-} from '../../src/core/graph';
-import {
-  getPlacementCells,
-  validatePlacement,
-  createBoard,
-  SIMPLE_SHAPES,
-  cellsToKey,
-} from '../../src/core/polyomino';
+import { createTrackGraph, type GraphBoard } from '../../src/core/graph/types';
+import { createInteractiveGraph } from '../../src/core/graph/graph-ui';
+import { findNodesAtDistance, playerConnectsSets } from '../../src/core/graph/algorithms';
+import { getPlacementCells, validatePlacement, createBoard } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { cellsToKey } from '../../src/core/polyomino/transform';
 
 beforeEach(() => {
   localStorage.clear();

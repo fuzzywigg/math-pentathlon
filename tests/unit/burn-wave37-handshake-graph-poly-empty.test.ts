@@ -4,23 +4,10 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createBoard,
-  placePolyomino,
-  getEmptyCells,
-  SIMPLE_SHAPES,
-  TETROMINOES,
-} from '../../src/core/polyomino';
-import {
-  isConnected,
-  findComponents,
-  bfs,
-  getNodeDegree,
-  type Graph,
-  type GraphNode,
-  type GraphEdge,
-  type NodeId,
-} from '../../src/core/graph';
+import { createBoard, placePolyomino, getEmptyCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES, TETROMINOES } from '../../src/core/polyomino/types';
+import { isConnected, findComponents, bfs, getNodeDegree } from '../../src/core/graph/algorithms';
+import type { Graph, GraphNode, GraphEdge, NodeId } from '../../src/core/graph/types';
 
 function emptyCellsGraph(
   cells: { row: number; col: number }[]

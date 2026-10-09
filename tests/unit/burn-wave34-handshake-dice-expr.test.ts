@@ -13,15 +13,8 @@ import {
   getAllPossibleSums,
   COMMON_DICE_SETS,
 } from '../../src/core/dice';
-import {
-  createNumberCard,
-  createOperatorCard,
-  createSlot,
-  validateSlots,
-  slotsToExpression,
-  createTargetChallenge,
-  solveTargetChallenge,
-} from '../../src/core/expressions';
+import { createNumberCard, createOperatorCard, createSlot, createTargetChallenge } from '../../src/core/expressions/types';
+import { validateSlots, slotsToExpression, solveTargetChallenge } from '../../src/core/expressions/evaluator';
 
 afterEach(() => {
   vi.restoreAllMocks();

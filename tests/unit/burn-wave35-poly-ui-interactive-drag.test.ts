@@ -4,15 +4,9 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  SIMPLE_SHAPES,
-  createBoard,
-  placePolyomino,
-  renderBoard,
-  createInteractiveBoard,
-  createDraggableShape,
-  getCellFromMouseEvent,
-} from '../../src/core/polyomino';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createBoard, placePolyomino } from '../../src/core/polyomino/placement';
+import { renderBoard, createInteractiveBoard, createDraggableShape, getCellFromMouseEvent } from '../../src/core/polyomino/polyomino-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

@@ -3,34 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import {
-  // Types and constants
-  DIRECTION_VECTORS,
-  CARDINAL_DIRECTIONS,
-  ALL_DIRECTIONS,
-  // Grid alignment
-  isInBounds,
-  normalizePosition,
-  getLinePositions,
-  checkLineAlignment,
-  findAlignmentAt,
-  findAllAlignments,
-  hasAlignment,
-  findAlignmentsThrough,
-  countMaxAligned,
-  createArrayAccessor,
-  getArrayDimensions,
-  // Contiguous
-  getNeighbors,
-  findRegionAt,
-  findAllRegions,
-  findLargestRegion,
-  areConnected,
-  getRegionSize,
-  isIsolated,
-  countRegions,
-  getRegionStats,
-} from '../../src/core/alignment';
+import { DIRECTION_VECTORS, CARDINAL_DIRECTIONS, ALL_DIRECTIONS_8 as ALL_DIRECTIONS, isInBounds, normalizePosition, getLinePositions, checkLineAlignment, findAlignmentAt, findAllAlignments, hasAlignment, findAlignmentsThrough, countMaxAligned, createArrayAccessor, getArrayDimensions, getNeighbors, findRegionAt, findAllRegions, findLargestRegion, areConnected, getRegionSize, isIsolated, countRegions, getRegionStats } from '../../src/core/alignment/compat';
 
 describe('Direction Constants', () => {
   it('should have correct direction vectors', () => {

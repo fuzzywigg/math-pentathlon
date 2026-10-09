@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createHexagonalBoard,
-  countEmptyCells,
-  getEmptyCells,
-} from '../../src/core/polyomino';
+import { createHexagonalBoard, countEmptyCells, getEmptyCells } from '../../src/core/polyomino/placement';
 
 describe('Wave 39 poly — hexboard radius empty', () => {
   it('radius 0 → size 1 with one empty cell', () => {

@@ -6,16 +6,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  axialToCube,
-  cubeToAxial,
-  axialToOffset,
-  offsetToAxial,
-  createAxial,
-  createCube,
-  createOffset,
-  type OffsetParity,
-} from '../../src/core/hex';
+import { axialToCube, cubeToAxial, axialToOffset, offsetToAxial } from '../../src/core/hex/coordinates';
+import { createAxial, createCube, createOffset, type OffsetParity } from '../../src/core/hex/types';
 
 const SAMPLE: Array<[number, number]> = [];
 for (let q = -4; q <= 4; q++) {

@@ -11,19 +11,10 @@ import {
   OWL_FRICTION,
   resolveInspectTarget,
 } from '../../src/core/owl';
-import {
-  createGridGraph,
-  createTrackGraph,
-  bfs,
-  DEFAULT_GRAPH_CONFIG,
-} from '../../src/core/graph';
-import {
-  SIMPLE_SHAPES,
-  TETROMINOES,
-  createGrid,
-  createBoard,
-  canPlaceShape,
-} from '../../src/core/polyomino';
+import { createGridGraph, createTrackGraph, DEFAULT_GRAPH_CONFIG } from '../../src/core/graph/types';
+import { bfs } from '../../src/core/graph/algorithms';
+import { SIMPLE_SHAPES, TETROMINOES } from '../../src/core/polyomino/types';
+import { createGrid, createBoard, canPlaceShape } from '../../src/core/polyomino/placement';
 
 describe('Wave 53 handshake — owl × graph × poly barrels', () => {
   it('owl singleton + physics constant + inspect unknown', () => {

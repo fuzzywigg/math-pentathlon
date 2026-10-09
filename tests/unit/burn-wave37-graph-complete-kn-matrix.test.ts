@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createCompleteGraph,
-  getNeighbors,
-  getNodeDegree,
-  areAdjacent,
-  bfs,
-  findAllPaths,
-  isConnected,
-} from '../../src/core/graph';
+import { createCompleteGraph } from '../../src/core/graph/types';
+import { getNeighbors, getNodeDegree, areAdjacent, bfs, findAllPaths, isConnected } from '../../src/core/graph/algorithms';
 
 describe('Wave 37 graph-complete — Kn edge/degree formulas', () => {
   it.each([1, 2, 3, 4, 5, 6, 7, 8])(

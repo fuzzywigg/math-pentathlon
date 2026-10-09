@@ -5,26 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  tokenize,
-  parse,
-  evaluate,
-  validateSlots,
-  slotsToExpression,
-  solveTargetChallenge,
-  validateSolution,
-  parseEquation,
-  checkEquation,
-  evaluateEquation,
-  formatNumber,
-  astToString,
-  simplifyExpression,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-  createTargetChallenge,
-} from '../../src/core/expressions';
+import { tokenize, parse, evaluate, validateSlots, slotsToExpression, solveTargetChallenge, validateSolution, parseEquation, checkEquation, evaluateEquation, formatNumber, astToString, simplifyExpression } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot, createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('Wave 27 expressions — tokenize/parse edges', () => {
   it('rejects trailing operators and empty parens via evaluate', () => {

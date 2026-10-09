@@ -4,12 +4,10 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { createGridGraph, bfs } from '../../src/core/graph';
-import {
-  evaluate,
-  validateSolution,
-  createTargetChallenge,
-} from '../../src/core/expressions';
+import { createGridGraph } from '../../src/core/graph/types';
+import { bfs } from '../../src/core/graph/algorithms';
+import { evaluate, validateSolution } from '../../src/core/expressions/evaluator';
+import { createTargetChallenge } from '../../src/core/expressions/types';
 
 describe('Wave 39 handshake — expr ← graph distance', () => {
   it('bfs distance feeds evaluate / validateSolution target', () => {

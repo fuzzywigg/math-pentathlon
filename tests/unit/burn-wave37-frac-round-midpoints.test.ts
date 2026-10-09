@@ -4,11 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  roundToDenominator,
-  fromDecimal,
-} from '../../src/core/fractions';
+import { createFraction, roundToDenominator, fromDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-round-mid — Math.round ties', () => {
   it('half-up style via Math.round for .5 cases', () => {

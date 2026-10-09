@@ -4,13 +4,7 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  createAlignmentHighlight,
-  createHighlightOverlay,
-  clearHighlights,
-  markCellsForHighlight,
-  HIGHLIGHT_STYLES,
-} from '../../src/core/alignment';
+import { createAlignmentHighlight, createHighlightOverlay, clearHighlights, markCellsForHighlight, HIGHLIGHT_STYLES } from '../../src/core/alignment/highlight-ui';
 
 afterEach(() => {
   document.body.innerHTML = '';

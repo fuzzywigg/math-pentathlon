@@ -5,25 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  TETROMINOES,
-  PENTOMINOES,
-  SIMPLE_SHAPES,
-  HEX_PATTERN_BLOCKS,
-  getShapeById,
-  getShapesBySize,
-  getPolyominoById,
-  getPolyominoesByOrder,
-  getSymmetryCount,
-  getAllTransformations,
-  arePolyominoesEquivalent,
-  areCellsEquivalent,
-  cellsToKey,
-  rotatePolyomino,
-  flipPolyomino,
-  areCellsConnected,
-  type PolyominoShape,
-} from '../../src/core/polyomino';
+import { TETROMINOES, PENTOMINOES, SIMPLE_SHAPES, HEX_PATTERN_BLOCKS, getShapeById, getShapesBySize, getPolyominoById, getPolyominoesByOrder, type PolyominoShape } from '../../src/core/polyomino/types';
+import { getSymmetryCount, getAllTransformations, arePolyominoesEquivalent, areCellsEquivalent, cellsToKey, rotatePolyomino, flipPolyomino, areCellsConnected } from '../../src/core/polyomino/transform';
 
 describe('Wave 28 poly-catalog — set sizes and id uniqueness', () => {
   it('standard sets have expected cardinalities', () => {

@@ -4,14 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  slotsToExpression,
-  validateSlots,
-  createSlot,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-} from '../../src/core/expressions';
+import { slotsToExpression, validateSlots } from '../../src/core/expressions/evaluator';
+import { createSlot, createNumberCard, createOperatorCard, createParenCard } from '../../src/core/expressions/types';
 
 describe('Wave 35 expr-slots-gaps — empty and sparse', () => {
   it('joins only filled cards with spaces', () => {

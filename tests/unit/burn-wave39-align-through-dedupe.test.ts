@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { findAlignmentsThrough } from '../../src/core/alignment';
+import { findAlignmentsThrough } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — alignments through dedupe', () => {
   const dims = { rows: 5, cols: 5 };

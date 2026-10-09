@@ -4,16 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createArrayAccessor,
-  getRegionStats,
-  isIsolated,
-  countMaxAligned,
-  checkLineAlignment,
-  getLinePositions,
-  findAlignmentsThrough,
-  findRegionAt,
-} from '../../src/core/alignment';
+import { createArrayAccessor, getRegionStats, isIsolated, countMaxAligned, checkLineAlignment, getLinePositions, findAlignmentsThrough, findRegionAt } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — region stats / isolation', () => {
   const grid = [

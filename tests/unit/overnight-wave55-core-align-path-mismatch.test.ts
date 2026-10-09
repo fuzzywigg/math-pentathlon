@@ -3,7 +3,8 @@
  * Distinct from wave25 areConnected same-region. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { findPath, createArrayGetter } from '../../src/core/alignment';
+import { findPath } from '../../src/core/alignment/contiguous';
+import { createArrayGetter } from '../../src/core/alignment/grid-alignment';
 
 describe('Wave 55 core align — findPath mismatch', () => {
   it('different values and empty start return null; same region returns a path', () => {

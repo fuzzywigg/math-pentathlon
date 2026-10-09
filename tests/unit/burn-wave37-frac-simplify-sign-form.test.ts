@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  simplify,
-  areEqual,
-  toDecimal,
-} from '../../src/core/fractions';
+import { createFraction, simplify, areEqual, toDecimal } from '../../src/core/fractions/arithmetic';
 
 describe('Wave 37 frac-simplify — canonical form', () => {
   const inputs = [

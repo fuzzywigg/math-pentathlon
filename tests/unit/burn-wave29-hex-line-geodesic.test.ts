@@ -5,14 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  hexLine,
-  hexDistance,
-  hexEquals,
-  hexInArray,
-  createAxial,
-  type AxialCoord,
-} from '../../src/core/hex';
+import { hexLine, hexDistance, hexEquals, hexInArray } from '../../src/core/hex/coordinates';
+import { createAxial, type AxialCoord } from '../../src/core/hex/types';
 
 function grid(lo: number, hi: number): AxialCoord[] {
   const out: AxialCoord[] = [];

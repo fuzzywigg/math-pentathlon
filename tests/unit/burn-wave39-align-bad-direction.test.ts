@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { findAlignmentAt, hasAlignment } from '../../src/core/alignment';
+import { findAlignmentAt, hasAlignment } from '../../src/core/alignment/compat';
 
 describe('Wave 39 align — bad direction / hasAlignment', () => {
   const dims = { rows: 4, cols: 4 };

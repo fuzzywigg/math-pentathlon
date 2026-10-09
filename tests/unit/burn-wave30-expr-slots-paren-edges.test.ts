@@ -5,13 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  validateSlots,
-  createNumberCard,
-  createOperatorCard,
-  createParenCard,
-  createSlot,
-} from '../../src/core/expressions';
+import { validateSlots } from '../../src/core/expressions/evaluator';
+import { createNumberCard, createOperatorCard, createParenCard, createSlot } from '../../src/core/expressions/types';
 
 describe('Wave 30 expr-slots-paren — depth matching', () => {
   it('accepts nested balanced groups', () => {

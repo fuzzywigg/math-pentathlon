@@ -5,24 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  bfs,
-  dijkstra,
-  findAllPaths,
-  findComponents,
-  findReachable,
-  findNodesAtDistance,
-  findNodesWithinDistance,
-  findAllPlayerRegions,
-  findPlayerRegion,
-  playerConnectsSets,
-  findLongestPlayerPath,
-  isConnected,
-  type Graph,
-  type GraphBoard,
-  type GraphNode,
-  type NodeId,
-} from '../../src/core/graph';
+import { bfs, dijkstra, findAllPaths, findComponents, findReachable, findNodesAtDistance, findNodesWithinDistance, findAllPlayerRegions, findPlayerRegion, playerConnectsSets, findLongestPlayerPath, isConnected } from '../../src/core/graph/algorithms';
+import type { Graph, GraphBoard, GraphNode, NodeId } from '../../src/core/graph/types';
 
 function node(id: NodeId, x = 0, y = 0): GraphNode {
   return { id, position: { x, y } };

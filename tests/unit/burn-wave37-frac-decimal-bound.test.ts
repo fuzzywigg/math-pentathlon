@@ -4,16 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  fromDecimal,
-  toDecimal,
-  areEqual,
-  createFraction,
-  fromWhole,
-  abs,
-  compare,
-  COMMON_FRACTIONS,
-} from '../../src/core/fractions';
+import { fromDecimal, toDecimal, areEqual, createFraction, fromWhole, abs, compare } from '../../src/core/fractions/arithmetic';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 const F = createFraction;
 

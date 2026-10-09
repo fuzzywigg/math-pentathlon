@@ -5,15 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  getNeighbors,
-  getEdge,
-  areAdjacent,
-  getNodeDegree,
-  type Graph,
-  type GraphNode,
-  type NodeId,
-} from '../../src/core/graph';
+import { getNeighbors, getEdge, areAdjacent, getNodeDegree } from '../../src/core/graph/algorithms';
+import type { Graph, GraphNode, NodeId } from '../../src/core/graph/types';
 
 function node(id: NodeId, x = 0, y = 0): GraphNode {
   return { id, position: { x, y } };

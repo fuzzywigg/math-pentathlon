@@ -4,15 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createGrid,
-  placePolyomino,
-  getAllValidPositions,
-  isValidPlacement,
-  TETROMINOES,
-  SIMPLE_SHAPES,
-  type Rotation,
-} from '../../src/core/polyomino';
+import { createGrid, placePolyomino, getAllValidPositions, isValidPlacement } from '../../src/core/polyomino/placement';
+import { TETROMINOES, SIMPLE_SHAPES, type Rotation } from '../../src/core/polyomino/types';
 
 const mono = SIMPLE_SHAPES.find((s) => s.id === 'monomino')!;
 const O = TETROMINOES.find((s) => s.id === 'O')!;

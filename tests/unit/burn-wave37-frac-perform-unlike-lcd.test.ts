@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  createFraction,
-  performOperation,
-  lcm,
-  areEqual,
-  type FractionOperation,
-} from '../../src/core/fractions';
+import { createFraction, performOperation, lcm, areEqual } from '../../src/core/fractions/arithmetic';
+import type { FractionOperation } from '../../src/core/fractions/types';
 
 describe('Wave 37 frac-perform-lcd — unlike dens', () => {
   const pairs = [

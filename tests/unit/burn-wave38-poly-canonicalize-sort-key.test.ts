@@ -4,12 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  canonicalizeCells,
-  sortCells,
-  cellsToKey,
-  areCellsEquivalent,
-} from '../../src/core/polyomino';
+import { canonicalizeCells, sortCells, cellsToKey, areCellsEquivalent } from '../../src/core/polyomino/transform';
 
 describe('Wave 38 poly-canonicalize — permutation / empty', () => {
   it('empty canonicalize and key are empty', () => {

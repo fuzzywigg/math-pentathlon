@@ -9,26 +9,13 @@ import {
   integrate,
   stubNarrationFor,
 } from '../../src/core/owl';
-import {
-  createGridGraph,
-  createCompleteGraph,
-  getEdge,
-  bfs,
-} from '../../src/core/graph';
-import {
-  TETROMINOES,
-  SIMPLE_SHAPES,
-  createGrid,
-  placePolyomino,
-  flipPolyomino,
-  cellsToKey,
-} from '../../src/core/polyomino';
-import {
-  wrapPosition,
-  hasAlignment,
-  createArrayAccessor,
-  getArrayDimensions,
-} from '../../src/core/alignment';
+import { createGridGraph, createCompleteGraph } from '../../src/core/graph/types';
+import { getEdge, bfs } from '../../src/core/graph/algorithms';
+import { TETROMINOES, SIMPLE_SHAPES } from '../../src/core/polyomino/types';
+import { createGrid, placePolyomino } from '../../src/core/polyomino/placement';
+import { flipPolyomino, cellsToKey } from '../../src/core/polyomino/transform';
+import { wrapPosition } from '../../src/core/alignment/grid-alignment';
+import { hasAlignment, createArrayAccessor, getArrayDimensions } from '../../src/core/alignment/compat';
 
 describe('Wave 55 handshake — owl × graph × poly × align', () => {
   it('owl speak API + inspect unknown-chrome + friction step', () => {

@@ -9,12 +9,8 @@ import {
   selectDice,
   getSelectedTotal,
 } from '../../src/core/dice';
-import {
-  createBoard,
-  canPlaceShape,
-  countEmptyCells,
-  SIMPLE_SHAPES,
-} from '../../src/core/polyomino';
+import { createBoard, canPlaceShape, countEmptyCells } from '../../src/core/polyomino/placement';
+import { SIMPLE_SHAPES } from '../../src/core/polyomino/types';
 
 beforeEach(() => {
   let n = 0;

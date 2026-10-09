@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  COUNTDOWN_CHALLENGES,
-  createTargetChallenge,
-  solveTargetChallenge,
-  validateSolution,
-} from '../../src/core/expressions';
+import { COUNTDOWN_CHALLENGES, createTargetChallenge } from '../../src/core/expressions/types';
+import { solveTargetChallenge, validateSolution } from '../../src/core/expressions/evaluator';
 
 describe('Wave 39 expr — countdown partial solve', () => {
   it('catalog challenges reject useAllNumbers enforcement', () => {

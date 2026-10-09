@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluateNode, parse, tokenize } from '../../src/core/expressions';
-import type { ExpressionNode } from '../../src/core/expressions';
+import { evaluateNode, parse, tokenize } from '../../src/core/expressions/evaluator';
+import type { ExpressionNode } from '../../src/core/expressions/types';
 
 describe('Wave 31 expr-evalnode — literal / variable / unary', () => {
   it('returns number nodes directly', () => {

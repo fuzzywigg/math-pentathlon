@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { isValidSetGameSet } from '../../src/core/attributes';
-import type { AttributeDefinition, AttributePiece } from '../../src/core/attributes';
+import { isValidSetGameSet } from '../../src/core/attributes/logic';
+import type { AttributeDefinition, AttributePiece } from '../../src/core/attributes/types';
 
 describe('Wave 39 attr — setgame length reject', () => {
   const attrs: AttributeDefinition[] = [

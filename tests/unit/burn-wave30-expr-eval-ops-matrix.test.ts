@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { evaluate, evaluateNode, parse, tokenize } from '../../src/core/expressions';
+import { evaluate, evaluateNode, parse, tokenize } from '../../src/core/expressions/evaluator';
 
 describe('Wave 30 expr-eval — binary op grid', () => {
   const pairs: Array<[number, number]> = [

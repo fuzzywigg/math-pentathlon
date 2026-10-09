@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  isConnected,
-  findComponents,
-  getNodeDegree,
-  createGridGraph,
-  type Graph,
-} from '../../src/core/graph';
+import { isConnected, findComponents, getNodeDegree } from '../../src/core/graph/algorithms';
+import { createGridGraph, type Graph } from '../../src/core/graph/types';
 
 describe('Wave 39 graph — empty connected', () => {
   it('empty graph is connected; single node is connected', () => {
