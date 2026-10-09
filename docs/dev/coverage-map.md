@@ -1,6 +1,6 @@
 # Unit coverage map (by directory)
 
-Task: `q-mp-075`. Generated `2026-10-09T18:44:58.521Z` from `coverage/coverage-summary.json`.
+Task: `q-mp-075`. Generated `2026-10-09T22:59:52.223Z` from `coverage/coverage-summary.json`.
 
 Per-directory heat table of vitest unit coverage (`json-summary`). Rows are
 parent directories under `src/` (for example `src/games/hex` for
@@ -28,16 +28,15 @@ No network; reads local coverage JSON only. No new npm dependencies.
 
 ## Coldest directories (lines %)
 
-| Directory | Lines % | Branches % | Files |
-| --- | ---: | ---: | ---: |
-| `src/core/ai-worker` | 79.66 | 66.67 | 4 |
-| `src` | 80.88 | 58.93 | 1 |
-| `src/ui/three` | 89.00 | 68.98 | 13 |
-| `src/games/juggle` | 91.17 | 86.08 | 6 |
-| `src/ui/owl` | 91.88 | 73.87 | 2 |
-| `src/games/kwatro-sinko` | 91.96 | 85.56 | 7 |
-| `src/games/fiar` | 92.62 | 82.55 | 10 |
-| `src/games/contig-60` | 92.82 | 86.10 | 6 |
+| Directory                     | Lines % | Branches % | Files |
+| ----------------------------- | ------: | ---------: | ----: |
+| `src/core/ai-worker`          |   79.66 |      66.67 |     4 |
+| `src`                         |   81.37 |      60.71 |     1 |
+| `src/ui/three`                |   89.07 |      69.06 |    13 |
+| `src/games/hex`               |   92.83 |      88.16 |     8 |
+| `src/games/pent-em-in`        |   93.82 |      85.76 |     7 |
+| `src/games/par-55`            |   93.88 |      85.98 |     6 |
+| `src/games/remainder-islands` |   94.00 |      83.99 |     6 |
+| `src/games/queens-guards`     |   94.16 |      92.13 |     9 |
 
 Directories rendered: **38**. Full heat table is in the SVG above.
-
