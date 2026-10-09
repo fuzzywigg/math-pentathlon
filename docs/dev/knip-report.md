@@ -36,9 +36,19 @@ Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evid
 | Metric | Prior baseline | Live tip | Action |
 | --- | --- | --- | --- |
 | `unusedTypes` | 95 | 91 | baseline reconciled **downward** to 91 |
-| `unusedExports` | 7 | 7 | unchanged |
+| `unusedExports` | 7 | 7 | unchanged (later: q-mp-187) |
 | `unlisted` | 3 | 3 | documented below (owners) |
 | `duplicates` | 3 | 3 | documented below (owners) |
+| `enforce` | `false` | `false` | **stays false** |
+
+## q-mp-187 unusedExports ratchet (2026-10-09)
+
+Demoted module-private constants in `src/ui/three/tablet-gl.ts` (`BOARD_3D_LQ_PARAM`, `BOARD_3D_LQ_STORAGE_KEY`, `MP3D_READY_ATTR`). Did **not** touch AI `cancelFabAiRequests`. Baseline `unusedExports` **7→3**.
+
+| Metric | Prior baseline | Live after demote | Action |
+| --- | --- | --- | --- |
+| `unusedExports` | 7 | 3 | baseline **downward** to 3 |
+| `unusedTypes` | 91 | 91 | unchanged |
 | `enforce` | `false` | `false` | **stays false** |
 
 ## Unlisted script dependencies (owners)

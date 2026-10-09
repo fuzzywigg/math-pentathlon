@@ -4,7 +4,7 @@
   "note": "Report-only unused-export drift baseline (q-mp-118; unusedTypes reconciled 95→91 in q-mp-170). Set enforce:true only after tip-owner approval; ratchets only go down.",
   "metrics": {
     "unusedFiles": 0,
-    "unusedExports": 7,
+    "unusedExports": 3,
     "unusedTypes": 91,
     "unusedDependencies": 0,
     "unusedDevDependencies": 0,
