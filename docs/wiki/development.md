@@ -50,6 +50,7 @@ npm run check:dev-docs           # engine-doc link report (report-only, exit 0)
 npm run check:workflows          # workflow YAML sanity
 npm run report:knip              # knip unused-export drift vs baseline (CI report-only; docs/dev/knip-report.md)
 npm run report:dead-code         # fuller dead-code inventory (local; docs/dev/dead-code-inventory.md)
+npm run report:lint-buckets      # per-rule path buckets (local report-only; docs/dev/lint-bucket-report.md)
 npm run perf:runtime             # runtime AI/move timing probe
                                  # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
