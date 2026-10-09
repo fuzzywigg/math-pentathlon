@@ -16,6 +16,7 @@
     "report:licenses": "node scripts/report-licenses.mjs",
     "report:dead-code": "node scripts/report-dead-code.mjs",
     "report:ratchet-history": "node scripts/report-ratchet-history.mjs",
+    "report:coverage-map": "node scripts/report-coverage-map.mjs",
     "preview": "vite preview",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
