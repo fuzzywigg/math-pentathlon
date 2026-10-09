@@ -35,7 +35,7 @@ Adjacent gaps **not** covered by those drafts remain in the inventory below (e.g
 | R-SHELL-01 | `src/main.ts:65-66` | `#app` missing at boot | **UNRECOVERED** — sync throw aborts bootstrap | shell | `runtime-error-path-audit.test.ts` (source pin + skip expected fix) |
 | R-SHELL-02 | `src/main.ts:75-84` `cleanup()` | Route leave; `currentCleanup` throws | **UNRECOVERED** — cleanup aborts; boundary may not dispose | shell | skip expected wrap; pattern pin in audit suite |
 | R-SHELL-03 | `src/main.ts:88-106` + `game-error-boundary.ts:87-144` | `window` `error` / `unhandledrejection` on game route | **recovered** — crash UI; `onBeforeShow` failures swallowed (`:99-103`) | one game | `game-error-boundary.test.ts`; audit suite pins swallow |
-| R-SHELL-04 | `src/main.ts:108-114` `renderHome` | Throw / unhandled rejection on `/` | **UNRECOVERED** — no home boundary | shell | skip expected home boundary |
+| R-SHELL-04 | `src/main.ts` `renderHome` | Throw / unhandled rejection on `/` | **recovered** — same `installGameErrorBoundary` / crash UI as game routes | shell | audit suite P2 R-SHELL-04 |
 | R-SHELL-05 | `src/main.ts:168-203` | Dynamic import / `mountGameById` reject | **recovered** — `game-load-error` + `location.reload` retry | one game | `burn-1007-main-shell-routes.test.ts`; audit re-pins |
 | R-SHELL-06 | `src/main.ts:123-140` / `:206-372` | Stats / demo chunk import fail | **recovered** — load-error UI | shell (page) | audit suite (stats reject) |
 | R-SHELL-07 | `src/ui/game-route-mounts.ts:98-105` | `destroyGame()` throws inside cleanup | **UNRECOVERED** — `shell.cleanup()` skipped | shell | skip expected try/finally; CURRENT pattern pin |
@@ -48,10 +48,10 @@ Adjacent gaps **not** covered by those drafts remain in the inventory below (e.g
 | --- | --- | --- | --- | --- | --- |
 | R-EVT-01 | `game-shell.ts` Start / Tutorial / keydown | Handler throws while game route active | **recovered** via boundary | one game | boundary suite (window error path) |
 | R-EVT-02 | `pointer-hygiene.ts` `bindPrimaryPointerActivate` | `activate()` throws | **recovered** via boundary | one game | boundary suite |
-| R-EVT-03 | `game-selector.ts` menu card activate | Throw during navigate / render | **UNRECOVERED** (no home boundary) | shell | same as R-SHELL-04 |
+| R-EVT-03 | `game-selector.ts` menu card activate | Throw during navigate / render | **recovered** via home boundary (same as R-SHELL-04) | shell | audit suite P2 R-SHELL-04 |
 | R-EVT-04 | `game-loading.ts:62-69` Retry | `location.reload()` | **recovered** (hard reload) | one game | `game-loading.test.ts` |
 
-In-game handler throws are generally recovered by the per-route boundary. Menu has no equivalent.
+In-game handler throws are recovered by the per-route boundary; home/menu uses the same boundary (q-mp-107).
 
 ### 3. Promises / dynamic import / SW / fetch
 
@@ -104,7 +104,7 @@ In-game handler throws are generally recovered by the per-route boundary. Menu h
 | ~~**P1**~~ | ~~R-SHELL-07~~ | **Done in #568** — `setGameRouteCleanup` try/finally so `shell.cleanup` always runs (R-SHELL-02 still open) |
 | ~~**P1**~~ | ~~R-SHELL-08~~ | **Done in #568** — `initGameWithRouteCleanup` registers cleanup before init; rethrows original error |
 | ~~**P2**~~ | ~~R-IMP-04~~ | **Done in #568** — `bootstrapOwl` try/catch + `console.error` |
-| **P2** | R-SHELL-04, R-EVT-03 | Optional home/menu error boundary (blank menu recovery) |
+| ~~**P2**~~ | ~~R-SHELL-04, R-EVT-03~~ | **Done in q-mp-107** — `renderHome` installs shared route error boundary (reuse crash UI strings) |
 | ~~**P2**~~ | ~~R-SW-01~~ | **Done in #568** — `registerPwa` guards `registerSW` throw (soft-fail + log) |
 | **P3** | R-SW-03 | Swallow/log `registration.update()` rejection |
 | **P3** | R-SHELL-01 | Boot-time missing `#app` friendly fail (dev only) |

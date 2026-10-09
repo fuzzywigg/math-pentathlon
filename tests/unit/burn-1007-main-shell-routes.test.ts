@@ -161,6 +161,38 @@ describe('burn-1007 main shell routes', () => {
     });
   });
 
+  it('home route recovers from thrown handlers via crash UI (R-SHELL-04)', async () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await import('../../src/main');
+    const app = document.getElementById('app')!;
+
+    await vi.waitFor(() => {
+      expect(app.querySelector('.game-selector, .division, h1, .game-card')).toBeTruthy();
+    });
+
+    window.dispatchEvent(
+      new ErrorEvent('error', {
+        error: new Error('menu handler boom'),
+        message: 'menu handler boom',
+      })
+    );
+
+    await vi.waitFor(() => {
+      expect(
+        app.querySelector('[data-testid="game-error-boundary"]')
+      ).toBeTruthy();
+    });
+    expect(app.textContent).toContain('Try again');
+    expect(app.textContent).toContain('Back to games');
+
+    app.querySelector<HTMLButtonElement>('[data-action="reset"]')?.click();
+    await vi.waitFor(() => {
+      expect(app.querySelector('.game-selector, .division, h1, .game-card')).toBeTruthy();
+    });
+
+    errSpy.mockRestore();
+  });
+
   it('shows load-error UI when game mount rejects', async () => {
     mountGameById.mockRejectedValue(new Error('chunk fail'));
     await import('../../src/main');

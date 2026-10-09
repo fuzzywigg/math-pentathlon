@@ -86,16 +86,22 @@ function cleanup(): void {
   }
 }
 
-/** Install (or replace) the per-game error boundary for the current route. */
-function bindGameErrorBoundary(gameName: string): void {
+/**
+ * Install (or replace) the window error / rejection boundary for the current
+ * route. Same crash UI as game routes (`renderGameCrash` — no new copy).
+ */
+function bindRouteErrorBoundary(
+  displayName: string,
+  onReset: () => void
+): void {
   if (activeGameBoundary) {
     activeGameBoundary.dispose();
     activeGameBoundary = null;
   }
   activeGameBoundary = installGameErrorBoundary({
-    gameName,
+    gameName: displayName,
     container: appContainer!,
-    onReset: () => renderGame(),
+    onReset,
     onHome: () => navigate('/'),
     onBeforeShow: () => {
       exitTutorialIfActive();
@@ -107,11 +113,18 @@ function bindGameErrorBoundary(gameName: string): void {
   });
 }
 
+/** Per-game-route boundary: remount the same game on Try again. */
+function bindGameErrorBoundary(gameName: string): void {
+  bindRouteErrorBoundary(gameName, () => renderGame());
+}
+
 // Render the game selector (home page)
 function renderHome(): void {
   nextRouteGeneration();
   cleanup();
   document.title = 'Math Pentathlon';
+  // Same recovery path as game routes (R-SHELL-04 / R-EVT-03).
+  bindRouteErrorBoundary('Math Pentathlon', () => renderHome());
   renderGameSelector(appContainer!);
 }
 
