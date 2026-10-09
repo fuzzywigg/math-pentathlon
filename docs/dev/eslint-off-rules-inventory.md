@@ -21,7 +21,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 230 | `@typescript-eslint/no-confusing-void-expression` | Accidental void returns / side-effect expressions |
 | 124 | `no-duplicate-imports` | Split imports drift; merge hygiene |
 | 96 | `@typescript-eslint/prefer-nullish-coalescing` | `\|\|` vs `??` falsy bugs (`0`, `''`); densest `fraction-bar-ui.ts` 18 |
-| 35 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps |
+| 21 | `@typescript-eslint/prefer-optional-chain` | Deep `&&` chains miss null gaps (q-mp-148: was 35; non-HOLD cleared; HOLD residual 21 in `rules.ts`/`ai.ts`) |
 | 23 | `no-param-reassign` | Surprising mutation of caller state |
 | 15 | `eqeqeq` (stricter, null not ignored) | Residual `== null` style debt |
 | 14 | `default-case` | Switches without `default` |
@@ -73,3 +73,7 @@ Open-PR overlap for q-mp-129: no open draft already fixes or ratchets `default-c
 **`@typescript-eslint/prefer-nullish-coalescing`** — ceiling **96** (= tip re-measure 2026-10-09 on `cursor/mp-tip-post477` @ `2083a96d`; densest: `src/core/fractions/fraction-bar-ui.ts` 18). No `||`→`??` mass rewrite (falsy `0`/`''` behavior risk); live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
 
 Open-PR overlap for q-mp-140: #665 (`no-duplicate-imports`), #672 (`no-confusing-void-expression`), #677 (`default-case`), #676 (curly `main.ts`) also edit `lint-ratchet-ceilings.json` — tip owner folds additive keys. No open draft already ratchets `prefer-nullish-coalescing`.
+
+## q-mp-148 — `@typescript-eslint/prefer-optional-chain`
+
+Live tip probe: **35** hits. Cleared **14** non-HOLD sites (board-ui / game-state / types / main / board-a11y / `src/ui/three/**` only; identical boolean/`?.` semantics). Residual ceiling **21** — HOLD only in `*/rules.ts` and `*/ai.ts` (contig-60, fab-a-diffy, fiar, kings-quadraphages, kwatro-sinko, prime-gold, queens-guards, ramrod). Live `eslint.config.js` does **not** hard-enable the rule (count-down via `npm run lint:ratchet`).

@@ -663,8 +663,7 @@ export async function createQueensGuardsBoard3D(
       const cellPiece = piece;
       const selectable = restoring
         ? captured.has(cell.key)
-        : cellPiece != null &&
-          cellPiece.player === state.currentPlayer &&
+        : cellPiece?.player === state.currentPlayer &&
           !state.winner;
       btn.tabIndex =
         selectable ||

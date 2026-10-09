@@ -253,6 +253,6 @@ export function getValidPlacements(
 
   return possible.filter(({ result }) => {
     const cell = state.cells.get(result);
-    return cell && cell.owner === null;
+    return cell?.owner === null;
   });
 }

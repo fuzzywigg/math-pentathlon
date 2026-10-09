@@ -495,8 +495,7 @@ export function renderBoard(
         cellEl.classList.add(cell.owner);
       }
       if (
-        state.lastMove &&
-        state.lastMove.row === row &&
+        state.lastMove?.row === row &&
         state.lastMove.col === col
       ) {
         cellEl.classList.add('last-move');

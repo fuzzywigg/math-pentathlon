@@ -466,8 +466,7 @@ export async function createStarTrackBoard3D(
       }
 
       if (
-        last &&
-        last.player === sm.player &&
+        last?.player === sm.player &&
         (last.toPosition === sm.space ||
           (sm.space === TRACK_LENGTH && last.toPosition >= TRACK_LENGTH))
       ) {
