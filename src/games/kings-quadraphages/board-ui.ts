@@ -27,7 +27,9 @@ import {
 /** True when vs-AI chrome is on and it is the computer's seat to act. */
 function isComputerSeatTurn(state: GameState): boolean {
   const root = getGameModeChromeRoot();
-  if (root?.dataset.opponent !== 'ai') return false;
+  if (root?.dataset.opponent !== 'ai') {
+    return false;
+  }
   const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
   return state.currentPlayer === aiSeat;
 }
@@ -258,11 +260,15 @@ function bindKingsBoardInteractions(
 ): void {
   const handleCellAction = (cellEl: BoardFocusable) => {
     const binding = boardClickBindings.get(container);
-    if (!binding?.onCellClick) return;
+    if (!binding?.onCellClick) {
+      return;
+    }
 
     const clickedRow = parseInt(cellEl.getAttribute('data-row') ?? '', 10);
     const clickedCol = parseInt(cellEl.getAttribute('data-col') ?? '', 10);
-    if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) return;
+    if (!Number.isFinite(clickedRow) || !Number.isFinite(clickedCol)) {
+      return;
+    }
     if (
       clickedRow < 1 ||
       clickedRow > KINGS_BOARD_SIZE ||
@@ -277,7 +283,9 @@ function bindKingsBoardInteractions(
   boardEl.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
     const cellEl = target.closest('.cell') as HTMLElement | null;
-    if (!cellEl || !boardEl.contains(cellEl)) return;
+    if (!cellEl || !boardEl.contains(cellEl)) {
+      return;
+    }
     handleCellAction(cellEl);
   });
 

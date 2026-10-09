@@ -398,8 +398,12 @@ function renderHandBlock(
 ): HTMLElement {
   const wrapper = document.createElement('div');
   wrapper.className = 'par55-hand-block';
-  if (isSelected) wrapper.classList.add('selected');
-  if (isClickable) wrapper.classList.add('clickable');
+  if (isSelected) {
+    wrapper.classList.add('selected');
+  }
+  if (isClickable) {
+    wrapper.classList.add('clickable');
+  }
 
   const size = 60;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

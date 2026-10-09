@@ -240,13 +240,17 @@ export function renderShapeSelector(
   const container = document.createElement('div');
   container.className = 'juggle-shape-selector';
 
-  if (!state.currentDice || !state.selectedCategory) return container;
+  if (!state.currentDice || !state.selectedCategory) {
+    return container;
+  }
 
   // Get selected die value
   const dieValue = state.currentDice.find(
     (d) => getCategoryFromDie(d) === state.selectedCategory
   );
-  if (!dieValue) return container;
+  if (!dieValue) {
+    return container;
+  }
 
   const shapes = getShapesForDie(dieValue);
 
@@ -342,7 +346,9 @@ export function renderShapeControls(
   const container = document.createElement('div');
   container.className = 'juggle-shape-controls';
 
-  if (!state.selectedShape || state.phase !== 'placing') return container;
+  if (!state.selectedShape || state.phase !== 'placing') {
+    return container;
+  }
 
   // Show current shape preview
   const preview = document.createElement('div');
@@ -408,7 +414,9 @@ function getDieFace(value: number): string {
  */
 export function injectJuggleStyles(): void {
   const existingStyle = document.getElementById('juggle-styles');
-  if (existingStyle) return;
+  if (existingStyle) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = 'juggle-styles';

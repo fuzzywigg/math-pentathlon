@@ -44,8 +44,12 @@ function getHexCenter(row: number, col: number): { x: number; y: number } {
 
 function islandFillColor(owner: Island['owner']): string {
   const seats = getPlayerSeatColors();
-  if (owner === 'player1') return seats.player1;
-  if (owner === 'player2') return seats.player2;
+  if (owner === 'player1') {
+    return seats.player1;
+  }
+  if (owner === 'player2') {
+    return seats.player2;
+  }
   return '#8bc34a';
 }
 
@@ -56,7 +60,9 @@ function applyIslandSelectionVisual(
   selected: boolean
 ): void {
   const hex = group.querySelector('polygon');
-  if (!hex) return;
+  if (!hex) {
+    return;
+  }
 
   const isValid = state.validIslands.includes(island.id);
   const { x, y } = getHexCenter(island.row, island.col);
@@ -163,8 +169,12 @@ export function renderBoard(
 
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.classList.add('island');
-    if (isValid) group.classList.add('valid');
-    if (isSelected) group.classList.add('selected');
+    if (isValid) {
+      group.classList.add('valid');
+    }
+    if (isSelected) {
+      group.classList.add('selected');
+    }
     group.setAttribute('data-island-id', island.id);
     group.setAttribute('data-row', String(island.row));
     group.setAttribute('data-col', String(island.col));
@@ -385,7 +395,9 @@ export function renderDivisionPreview(
   }
 
   const preview = previewDivision(state, state.selectedIsland);
-  if (!preview) return container;
+  if (!preview) {
+    return container;
+  }
 
   replaceWithSafeHtml(
     container,

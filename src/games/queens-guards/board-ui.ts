@@ -119,8 +119,11 @@ export function renderBoard(
 
     // Determine cell color
     let fillColor = cell.ring % 2 === 0 ? COLORS.cellLight : COLORS.cellDark;
-    if (cell.ring === 0) fillColor = COLORS.cellCenter;
-    else if (cell.ring === 1) fillColor = COLORS.cellRing1;
+    if (cell.ring === 0) {
+      fillColor = COLORS.cellCenter;
+    } else if (cell.ring === 1) {
+      fillColor = COLORS.cellRing1;
+    }
 
     let strokeColor = COLORS.stroke;
     let strokeWidth = 1;
