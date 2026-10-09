@@ -57,11 +57,19 @@ export const DICE_CONFIG = {
  * Check if a number is prime
  */
 export function isPrime(n: number): boolean {
-  if (n < 2) return false;
-  if (n === 2) return true;
-  if (n % 2 === 0) return false;
+  if (n < 2) {
+    return false;
+  }
+  if (n === 2) {
+    return true;
+  }
+  if (n % 2 === 0) {
+    return false;
+  }
   for (let i = 3; i * i <= n; i += 2) {
-    if (n % i === 0) return false;
+    if (n % i === 0) {
+      return false;
+    }
   }
   return true;
 }
@@ -70,8 +78,12 @@ export function isPrime(n: number): boolean {
  * Calculate factorial (limited to reasonable values)
  */
 export function factorial(n: number): number {
-  if (n < 0 || n > 10) return NaN;
-  if (n === 0 || n === 1) return 1;
+  if (n < 0 || n > 10) {
+    return NaN;
+  }
+  if (n === 0 || n === 1) {
+    return 1;
+  }
   let result = 1;
   for (let i = 2; i <= n; i++) {
     result *= i;
@@ -123,7 +135,9 @@ export function generateExpressions(
   // Two-value operations
   for (let i = 0; i < vals.length; i++) {
     for (let j = 0; j < vals.length; j++) {
-      if (i === j) continue;
+      if (i === j) {
+        continue;
+      }
       // Indexed access is definite under loop bounds; assert for NUI.
       const { v: a, s: sa } = vals[i]!;
       const { v: b, s: sb } = vals[j]!;
@@ -131,8 +145,12 @@ export function generateExpressions(
       addResult(`${sa} + ${sb}`, a + b);
       addResult(`${sa} - ${sb}`, a - b);
       addResult(`${sa} × ${sb}`, a * b);
-      if (b !== 0 && a % b === 0) addResult(`${sa} ÷ ${sb}`, a / b);
-      if (b <= 5 && a <= 10) addResult(`${sa}^${sb}`, Math.pow(a, b));
+      if (b !== 0 && a % b === 0) {
+        addResult(`${sa} ÷ ${sb}`, a / b);
+      }
+      if (b <= 5 && a <= 10) {
+        addResult(`${sa}^${sb}`, Math.pow(a, b));
+      }
     }
   }
 
@@ -146,7 +164,9 @@ export function generateExpressions(
   for (let i = 0; i < 3; i++) {
     for (let j = 0; j < 3; j++) {
       for (let k = 0; k < 3; k++) {
-        if (i === j || j === k || i === k) continue;
+        if (i === j || j === k || i === k) {
+          continue;
+        }
         // basicVals is length 3; i/j/k are 0..2 — assert for NUI.
         const a = basicVals[i]!;
         const b = basicVals[j]!;
@@ -178,7 +198,9 @@ export function generateExpressions(
  * Even numbers > 2 can be expressed as sum of two primes
  */
 export function isGoldbachNumber(n: number): boolean {
-  if (n <= 2 || n % 2 !== 0) return false;
+  if (n <= 2 || n % 2 !== 0) {
+    return false;
+  }
   // Check if n = p1 + p2 where both are prime
   for (let p1 = 2; p1 <= n / 2; p1++) {
     if (isPrime(p1) && isPrime(n - p1)) {

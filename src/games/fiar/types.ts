@@ -197,8 +197,11 @@ function edgeCrossesYellow(
 export function getConnectedNodes(board: FiarBoard, nodeId: string): string[] {
   const connected: string[] = [];
   for (const edge of board.edges) {
-    if (edge.from === nodeId) connected.push(edge.to);
-    else if (edge.to === nodeId) connected.push(edge.from);
+    if (edge.from === nodeId) {
+      connected.push(edge.to);
+    } else if (edge.to === nodeId) {
+      connected.push(edge.from);
+    }
   }
   return connected;
 }
@@ -216,7 +219,9 @@ export function getNodesInDirection(
 ): string[] {
   const result: string[] = [];
   const startNode = board.nodes.get(startId);
-  if (!startNode) return result;
+  if (!startNode) {
+    return result;
+  }
 
   let currentX = startNode.x;
   let currentY = startNode.y;
@@ -233,8 +238,12 @@ export function getNodesInDirection(
         Math.abs(node.y - currentY) < 10
       ) {
         const prevId = result.length > 0 ? result[result.length - 1] : startId;
-        if (prevId === undefined) break;
-        if (!areConnected(board, prevId, id)) break;
+        if (prevId === undefined) {
+          break;
+        }
+        if (!areConnected(board, prevId, id)) {
+          break;
+        }
         if (!allowYellow && edgeCrossesYellow(board, prevId, id)) {
           return result;
         }
@@ -244,7 +253,9 @@ export function getNodesInDirection(
       }
     }
 
-    if (!found) break;
+    if (!found) {
+      break;
+    }
   }
 
   return result;

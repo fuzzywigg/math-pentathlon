@@ -85,7 +85,9 @@ export function cellsInRing(ring: number): number {
  * Normalize position within a ring (handle wrap-around)
  */
 export function normalizePosition(ring: number, position: number): number {
-  if (ring === 0) return 0;
+  if (ring === 0) {
+    return 0;
+  }
   const count = cellsInRing(ring);
   return ((position % count) + count) % count;
 }
@@ -167,10 +169,14 @@ export function getAdjacent(coord: BoardCoord): BoardCoord[] {
  */
 export function isMoveValid(from: BoardCoord, to: BoardCoord): boolean {
   // Sideways in same ring: always valid
-  if (from.ring === to.ring) return true;
+  if (from.ring === to.ring) {
+    return true;
+  }
 
   // Moving inward (toward center): valid
-  if (to.ring < from.ring) return true;
+  if (to.ring < from.ring) {
+    return true;
+  }
 
   // Moving outward: only valid for captured pieces being restored
   return false;

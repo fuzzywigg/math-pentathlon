@@ -91,7 +91,9 @@ export function deserializeGameState(data: SerializedGameState): GameState {
 
   const board: Board = data.board.map((row) =>
     row.map((cell) => {
-      if (!cell) return null;
+      if (!cell) {
+        return null;
+      }
       return {
         type: cell.type as 'king' | 'quadraphage',
         owner: cell.owner as PlayerOwner,
@@ -167,15 +169,21 @@ const VALID_PLAYERS: PlayerOwner[] = ['player1', 'player2'];
  * Returns true if valid, false otherwise.
  */
 export function validateSerializedState(data: unknown): boolean {
-  if (data === null || typeof data !== 'object') return false;
+  if (data === null || typeof data !== 'object') {
+    return false;
+  }
 
   const obj = data as Record<string, unknown>;
 
-  if (typeof obj['version'] !== 'number') return false;
+  if (typeof obj['version'] !== 'number') {
+    return false;
+  }
   if (!VALID_PLAYERS.includes(obj['currentPlayer'] as PlayerOwner)) {
     return false;
   }
-  if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) return false;
+  if (!VALID_TURN_PHASES.includes(obj['turnPhase'] as TurnPhase)) {
+    return false;
+  }
 
   if (
     !Array.isArray(obj['board']) ||
