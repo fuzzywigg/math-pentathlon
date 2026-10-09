@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getTwoDiceResults } from '../../src/core/dice';
+import { getTwoDiceResults } from '../../src/core/dice/roller';
 
 describe('Wave 38 dice-two — zero division', () => {
   it('(0,b) omits divisions involving ÷0 but keeps multiply-by-zero', () => {

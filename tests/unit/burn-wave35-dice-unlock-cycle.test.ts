@@ -4,12 +4,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollMultiple,
-  lockDice,
-  unlockDice,
-  rerollDice,
-} from '../../src/core/dice';
+import { rollMultiple, lockDice, unlockDice, rerollDice } from '../../src/core/dice/roller';
 
 beforeEach(() => {
   let n = 0;

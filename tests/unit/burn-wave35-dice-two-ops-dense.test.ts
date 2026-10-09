@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getTwoDiceResults } from '../../src/core/dice';
+import { getTwoDiceResults } from '../../src/core/dice/roller';
 
 describe('Wave 35 dice-two-ops-dense — full small grid', () => {
   it('for a,b in 1..12: map keys match arithmetic rules', () => {

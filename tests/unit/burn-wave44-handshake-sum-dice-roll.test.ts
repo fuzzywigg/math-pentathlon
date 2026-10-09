@@ -3,7 +3,7 @@
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createInitialState, doRollDice } from '../../src/games/sum-dominoes/rules';
-import { rollDice } from '../../src/core/dice';
+import { rollDice } from '../../src/core/dice/roller';
 
 afterEach(() => vi.restoreAllMocks());
 

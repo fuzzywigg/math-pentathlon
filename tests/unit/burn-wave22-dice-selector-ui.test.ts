@@ -5,14 +5,9 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import {
-  DiceSelector,
-  createRollButton,
-  COMMON_DICE_SETS,
-  renderDie,
-  renderRollResult,
-  getDiceStyles,
-} from '../../src/core/dice';
+import { renderDie, renderRollResult, getDiceStyles } from '../../src/core/dice/dice-ui';
+import { DiceSelector, createRollButton } from '../../src/core/dice/dice-selector';
+import { COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 afterEach(() => {
   document.body.innerHTML = '';

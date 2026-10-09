@@ -4,13 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  DICE_CONFIGS,
-  DICE_FACES,
-  COMMON_DICE_SETS,
-  getDiceConfig,
-  type DiceType,
-} from '../../src/core/dice';
+import { getDiceConfig } from '../../src/core/dice/roller';
+import { DICE_CONFIGS, DICE_FACES, COMMON_DICE_SETS, type DiceType } from '../../src/core/dice/types';
 
 describe('Wave 35 dice-config — faces ↔ configs', () => {
   it('every DiceType config.faces matches DICE_FACES', () => {

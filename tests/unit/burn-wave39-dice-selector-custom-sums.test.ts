@@ -4,12 +4,9 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  DiceSelector,
-  DICE_CONFIGS,
-  COMMON_DICE_SETS,
-  getAllPossibleSums,
-} from '../../src/core/dice';
+import { DiceSelector } from '../../src/core/dice/dice-selector';
+import { getAllPossibleSums } from '../../src/core/dice/roller';
+import { DICE_CONFIGS, COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 beforeEach(() => {
   document.body.innerHTML = '';

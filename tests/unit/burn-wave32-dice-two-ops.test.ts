@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getTwoDiceResults } from '../../src/core/dice';
+import { getTwoDiceResults } from '../../src/core/dice/roller';
 
 describe('Wave 32 dice-two-ops — symmetric arithmetic grid', () => {
   const pairs: Array<[number, number]> = [

@@ -4,7 +4,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { rollMultiple, renderRollResult } from '../../src/core/dice';
+import { renderRollResult } from '../../src/core/dice/dice-ui';
+import { rollMultiple } from '../../src/core/dice/roller';
 
 beforeEach(() => {
   document.body.innerHTML = '';

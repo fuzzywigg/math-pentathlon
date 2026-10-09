@@ -2,7 +2,7 @@
  * Wave 44 — isValidSelection min/max fence leftovers. Tests-only.
  */
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { rollDice, selectDice, isValidSelection } from '../../src/core/dice';
+import { rollDice, selectDice, isValidSelection } from '../../src/core/dice/roller';
 
 afterEach(() => vi.restoreAllMocks());
 
