@@ -1,0 +1,45 @@
+name: Agent task
+description: Queue-style agent task (id, goal, acceptance, verification, depends-on)
+title: "[Agent task]: "
+labels: ["chore"]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: Task id
+      description: Stable queue id (e.g. q-mp-083)
+      placeholder: q-mp-000
+    validations:
+      required: true
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What the agent should accomplish
+      placeholder: One-sentence outcome
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checklist of done conditions
+      placeholder: "- Criterion one\n- Criterion two"
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: Exact commands to run and what green looks like
+      placeholder: "command · expected result"
+    validations:
+      required: true
+  - type: textarea
+    id: depends-on
+    attributes:
+      label: Depends on
+      description: Upstream task ids or PRs that must be satisfied first
+      placeholder: q-mp-003 (already satisfied)
+    validations:
+      required: false
