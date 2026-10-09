@@ -40,6 +40,55 @@ Task: `q-mp-058` (re-run vs `burn-1007-mp-render-perf` baseline)
 
 - Baseline phase only (or no fix notes provided). Re-run with `PERF_PHASE=after` after code changes.
 
+## q-mp-135 — Star Track move p95 characterization (+ 3D layout trim)
+
+Task: `q-mp-135`. Scope: board-ui / 3D host layout only. **No** AI delay/timing/search/scoring/rules edits. Hex Hard 450ms assert untouched. Does not overlap #680 (`q-mp-134` par-55 layout reads) or #674/#676.
+
+### Root cause — tip-owner HOLD on move p95
+
+Harness mode is **human-vs-human** (AI think path unused). Star Track scripted moves embed an intentional settle wait **inside** the measured window:
+
+```js
+// scripts/runtime-perf.mjs + scripts/render-perf.mjs
+if (await clickFirst('.star-track-draw-btn')) {
+  await page.waitForTimeout(200); // counted by measureMoveCost
+  return clickFirst('.star-track-chain-btn');
+}
+```
+
+Successful draw→select samples therefore floor near **~200ms + paint/settle** (~400–460ms under 4× CPU). That bimodal mix (many ~75ms misses + few ~420ms successes) is why tip **p50 ≪ p95** (74 / 412). Per hard rules: do **not** change the intentional delay — **tip-owner HOLD** for ≥25% move-p95 reduction via product code alone.
+
+Secondary (addressed here): Star Track 3D uniquely called `resize()`→`fitHostToViewport()` (`getBoundingClientRect` + style writes) from every `update()`, with ResizeObserver on the sized `canvasHost` (peer boards `paint()` only and observe the outer container).
+
+### Before / after (star-track only)
+
+| Metric | Tip before (`tip-rerun`) | After `q-mp-135` (median of css-only runs) | Δ |
+|---|---:|---:|---:|
+| Move p50 (ms) | 74.4 | 76.9 | ~flat (miss-dominated) |
+| Move p95 (ms) | **412.3** | **~423** (HOLD) | no ≥25% win — harness 200ms wait dominates |
+| Move max (ms) | 467.5 | ~442 | — |
+| Layout reads p95 | 30 | ~28 | residual ≈ longer instrumented window, not fitHost |
+| LT >50 / max LT (ms) | 2 / 128 | 3 / ~132 | 3D-normal band |
+| Moves landed / target | 9/20 | 6–7/20 | harness click variance |
+
+Raw after artifacts: `docs/dev/q-mp-135-star-track-layout.json` (phases `qmp135-css-only`, `qmp135-css-only-b`). One earlier run showed p95 **84** with only **5** landings — too few 200ms-success samples for a stable p95; discarded as flake.
+
+### Layout trim shipped (still fold-worthy)
+
+`src/ui/three/star-track-board-3d.ts`:
+
+- `update()` → `paint()` only (match fiar / kings)
+- `bindBoard3dLayout(container, …)` instead of `canvasHost`
+- Drop imperative `fitHostToViewport`; host size is CSS (`.star-track-3d-canvas-host` + landscape media query)
+- Skip `syncBoard3dRendererSize` when CSS box unchanged
+
+### Verify
+
+```bash
+PERF_MODE=render PERF_GAMES=star-track npm run perf:runtime
+npm run test:unit
+```
+
 ## How to re-run
 
 ```bash
@@ -48,4 +97,4 @@ PERF_MODE=render PERF_PHASE=after npm run perf:runtime
 # optional: PERF_GAMES=juggle,pent-em-in,hex PERF_MOVES=20
 ```
 
-Generated: 2026-10-09T04:06:11.804Z (phase=tip-rerun)
+Generated: 2026-10-09T04:06:11.804Z (phase=tip-rerun); q-mp-135 HOLD notes 2026-10-09
