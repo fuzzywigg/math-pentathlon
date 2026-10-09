@@ -27,7 +27,7 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 14 | `default-case` | Switches without `default` |
 | 13 | `@typescript-eslint/no-shadow` | Shadowed bindings |
 | 9 | `@typescript-eslint/switch-exhaustiveness-check` | Missing union/enum cases |
-| 7 | `radix` | `parseInt` without radix |
+| 6 | `radix` | `parseInt` without radix (q-mp-130: demo fixed; 6 HOLD) |
 | 7 | `@typescript-eslint/return-await` (`always`) | Inconsistent async error paths |
 | 2 | `no-promise-executor-return` | Misleading promise constructor returns |
 | 1 | `array-callback-return` | `map`/`filter` without return |
@@ -42,3 +42,16 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 **`@typescript-eslint/no-non-null-assertion`** — highest-signal off rule with real crash risk; ceiling **387** (= today's count). No source fixes in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
 
 Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
+
+## q-mp-130 · `radix` HOLD residuals
+
+Tip probe (pre-fix): **7** `radix` hits. Fixable demo site cleared in `src/demos/dice-demo.ts` (`parseInt(..., 10)`). Ceiling ratcheted to **6**.
+
+**HOLD** (do not edit — hard rules: no AI behavior / no `*/rules.ts` logic):
+
+| File | Lines | Why HOLD |
+| --- | ---: | --- |
+| `src/games/kwatro-sinko/ai.ts` | 106–107, 331–332 | AI path — no behavior-adjacent edits |
+| `src/games/kwatro-sinko/rules.ts` | 349–350 | Rules/legal-move path — no logic edits |
+
+Live `eslint.config.js` does **not** hard-enable `radix`; count-down only via `npm run lint:ratchet`.
