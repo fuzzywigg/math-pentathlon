@@ -283,9 +283,9 @@ export async function createKwatroSinkoBoard3D(
   scene.add(ambient);
   const hemi = new THREE.HemisphereLight(0xf5e6c8, 0x2a1f14, 0.55);
   scene.add(hemi);
-  const key = new THREE.DirectionalLight(0xfff4e0, 0.8);
-  key.position.set(5, 14, 4);
-  scene.add(key);
+  const keyLight = new THREE.DirectionalLight(0xfff4e0, 0.8);
+  keyLight.position.set(5, 14, 4);
+  scene.add(keyLight);
 
   const root = new THREE.Group();
   scene.add(root);
