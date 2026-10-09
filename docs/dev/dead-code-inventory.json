@@ -38,8 +38,8 @@
       "devDependencies": []
     },
     "candidateCount": 129,
-    "safeYes": 6,
-    "executedRemovals": 10,
+    "safeYes": 5,
+    "executedRemovals": 11,
     "deferredSafeHelpers": 1,
     "deferPrs": [
       {
@@ -143,6 +143,13 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted on tip via q-mp-054 rename; q-mp-101 confirms + inventory sync"
+      },
+      {
+        "kind": "test-helper-module",
+        "path": "tests/unit/helpers/fake-timers.ts",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted unused module (zero importers after #658 fold / tip demote); q-mp-139"
       }
     ]
   },
@@ -243,8 +250,8 @@
       "registryHit": false,
       "rank": 2,
       "safeToRemove": "yes",
-      "reason": "test helper with zero importers after grep",
-      "disposition": "kept"
+      "reason": "removed in q-mp-139 — zero importers on live tip after #658 fold",
+      "disposition": "removed"
     },
     {
       "kind": "unused-type",
