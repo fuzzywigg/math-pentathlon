@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-274 unusedTypes demote batch 3 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring): module-privated FIAR `BoardEdge` / `CreateInitialStateOptions`; dropped unused type re-exports `BoardLayout` / `YellowCenterEllipse` / `YellowCenterDiamond` / `YellowCenterShape` from `fiar/types.ts` (canonical exports remain on `fiar/layout.ts`); deleted unused `StarTrackPosition`. Baseline `unusedTypes` **83 → 76** (−7). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold.
+
 ## q-mp-254 unusedTypes demote batch 2 (2026-10-09)
 
 Re-measured on tip `cursor/mp-tip-post748` after Rank-3-only demotes (skip AI / `rules.ts`): deleted unused `RollCallback` / `DieSelectCallback`; module-privated `DiceSelectorOptions`, `WebStorageKind`, `SafeWriteResult`, `SafeReadResult`. Kept `SafeJsonParseResult` exported (documented mirror surface). Baseline `unusedTypes` **89 → 83** (−6). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#752` duplicates already on tip) at fold.
