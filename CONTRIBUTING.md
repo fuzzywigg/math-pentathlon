@@ -22,12 +22,21 @@ That runs `lint` → `lint:ratchet` → `format:check` → `typecheck` → `type
 Then the rest of the required local gates:
 
 ```bash
+<<<<<<< HEAD
+=======
+npm run lint
+npm run lint:ratchet         # curly:all ceiling (CI lint job)
+npm run format:check
+npm run typecheck            # tsc --noEmit (package.json)
+npm run typecheck:ratchet    # ui/core shell + Phase-2 ceiling
+npm run check:boundaries     # engine→UI import-graph ceilings
+>>>>>>> 351d9f46 (docs(q-mp-080): align setup/verify commands with package.json)
 npm run test:unit
-npm run test:e2e:chromium   # required CI e2e path
+npm run test:e2e:chromium    # required CI e2e path
 npm run build
 ```
 
-`npm test` runs unit tests then Chromium e2e (same required pair as CI). Prefer `npm run test:e2e:chromium` over bare `npm run test:e2e`, which launches every Playwright project.
+Use `npm run typecheck` (not bare `npx tsc --noEmit`) so the check matches `package.json` and CI. `npm test` runs unit tests then Chromium e2e (same required pair as CI). Prefer `npm run test:e2e:chromium` over bare `npm run test:e2e`, which launches every Playwright project.
 
 Full script list, CI posture, and testing layers: [docs/wiki/development.md](./docs/wiki/development.md).
 

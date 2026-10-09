@@ -23,6 +23,7 @@ npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
 npm run test:e2e:mobile          # phone + tablet touch smoke (report-only)
 npm run test:e2e:zoom-reflow     # WCAG 1.4.4/1.4.10 zoom+reflow (report-only)
+npm run test:e2e:forced-colors   # forced-colors / high-contrast smoke (report-only)
 npm run test:e2e:ui              # Playwright UI mode
 npm run test:visual              # opt-in 2D suite (playwright.visual.config.ts; not CI)
 npm run test:visual:update       # refresh separate-config baselines
@@ -32,17 +33,25 @@ npm run build
 npm run preview                  # serve dist/ after build
 npm run lint
 npm run lint:fix
+npm run lint:ratchet             # curly:all ceiling (CI lint job; ratchet only goes down)
 npm run format                   # Prettier write under src/
 npm run format:check
+npm run typecheck                # tsc --noEmit (same as CI)
+npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
+npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
 npm run size:check               # gzip budgets (needs dist/; report-only, exit 0)
 npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
 npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
+npm run check:build              # build reproducibility probe
+npm run check:pwa-manifest       # PWA manifest / installability (report-only)
+npm run check:dev-docs           # engine-doc link report (report-only, exit 0)
+npm run check:workflows          # workflow YAML sanity
 npm run perf:runtime             # runtime AI/move timing probe
                                  # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
 ```
 
-`npm test` = `test:unit` && `test:e2e:chromium`. Bare `npm run test:e2e` (no `--project`) runs **every** Playwright project — prefer an explicit script.
+`npm test` = `test:unit` && `test:e2e:chromium`. Bare `npm run test:e2e` (no `--project`) runs **every** Playwright project — prefer an explicit script. Prefer `npm run typecheck` over bare `npx tsc --noEmit` so local gates match `package.json` / CI.
 
 Cross-browser notes: [`docs/cross-browser-2026-10-07.md`](../cross-browser-2026-10-07.md).
 Mobile touch notes: [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md).
@@ -93,7 +102,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, Prettier `format:check`, TypeScript check, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `zoom-reflow`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
