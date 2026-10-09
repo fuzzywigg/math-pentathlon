@@ -200,11 +200,7 @@ function buildControls(
     controls.appendChild(clearBtn);
   }
 
-  if (
-    !hasValidMoves(state) &&
-    state.phase !== 'gameOver' &&
-    !computerTurn
-  ) {
+  if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
     const passBtn = document.createElement('button');
     passBtn.className = 'par55-btn par55-btn-secondary';
     passBtn.textContent = 'Pass Turn';

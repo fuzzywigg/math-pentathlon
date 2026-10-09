@@ -173,7 +173,9 @@ export function syncBoard(
     }
 
     // Block shape: replace when ownership / presence changes.
-    let blockHost = group.querySelector('g.par55-block-host') as SVGGElement | null;
+    let blockHost = group.querySelector(
+      'g.par55-block-host'
+    ) as SVGGElement | null;
     if (base.block) {
       if (!blockHost) {
         blockHost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -227,7 +229,9 @@ export function syncBoard(
     }
 
     // Hit target + interactive class for delegated click / keyboard.
-    let hit = group.querySelector('circle.par55-base-hit') as SVGCircleElement | null;
+    let hit = group.querySelector(
+      'circle.par55-base-hit'
+    ) as SVGCircleElement | null;
     if (isValid) {
       group.classList.add('par55-base-interactive');
       if (!hit) {
@@ -326,7 +330,10 @@ function renderBase(
 
   // Render block if present
   if (base.block) {
-    const blockHost = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    const blockHost = document.createElementNS(
+      'http://www.w3.org/2000/svg',
+      'g'
+    );
     blockHost.classList.add('par55-block-host');
     const blockKey = [
       base.block.id,
