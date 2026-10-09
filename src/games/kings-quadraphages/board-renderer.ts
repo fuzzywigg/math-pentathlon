@@ -71,7 +71,9 @@ function createStyles(): HTMLStyleElement {
 
 // Render a single piece
 function renderPiece(cell: Cell): HTMLElement | null {
-  if (!cell) return null;
+  if (!cell) {
+    return null;
+  }
 
   const piece = document.createElement('div');
   piece.className = `piece ${cell.type} ${cell.owner}`;
@@ -119,11 +121,17 @@ export function renderBoard(
     document.head.appendChild(styles);
   }
 
-  // Render each cell — BOARD_SIZE×BOARD_SIZE is always dense; `!` is NUI-only.
+  // Render each cell — BOARD_SIZE×BOARD_SIZE is always dense.
   for (let row = 0; row < BOARD_SIZE; row++) {
-    const rowCells = board[row]!;
+    const rowCells = board[row];
+    if (rowCells === undefined) {
+      continue;
+    }
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = rowCells[col]!;
+      const cell = rowCells[col];
+      if (cell === undefined) {
+        continue;
+      }
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }
@@ -141,9 +149,15 @@ export function updateBoard(
   clearElement(container);
 
   for (let row = 0; row < BOARD_SIZE; row++) {
-    const rowCells = board[row]!;
+    const rowCells = board[row];
+    if (rowCells === undefined) {
+      continue;
+    }
     for (let col = 0; col < BOARD_SIZE; col++) {
-      const cell = rowCells[col]!;
+      const cell = rowCells[col];
+      if (cell === undefined) {
+        continue;
+      }
       const cellElement = renderCell(cell, { row, col }, options.onCellClick);
       container.appendChild(cellElement);
     }
