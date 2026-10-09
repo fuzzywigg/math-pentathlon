@@ -14,6 +14,7 @@ import type { AIDifficulty } from './ai';
 import { getAIMove, isAITurn } from './ai';
 import {
   renderBoard,
+  syncBoard,
   renderHand,
   renderScores,
   renderMoveHistory,
@@ -130,113 +131,58 @@ export function initGame(
   return controller;
 }
 
-/**
- * Update the UI
- */
-function updateUI(controller: Par55GameController): void {
-  // Drop paints after destroyGame nulled the mount ref (remount safety).
-  if (!activeContainer || controller.container !== activeContainer) {
-    return;
-  }
-
-  const { container, state } = controller;
-  const previousFocus = captureFocusedCell(container);
-  container.innerHTML = '';
-
-  // Main game area
-  const gameArea = document.createElement('div');
-  gameArea.className = 'par55-game-area';
-
-  // Status bar
-  const status = document.createElement('div');
-  status.className = `par55-status ${state.currentPlayer}`;
-  markStatusLive(status);
-
-  const computerTurn = isComputerTurnPending(controller);
-
+function statusTextFor(
+  controller: Par55GameController,
+  computerTurn: boolean
+): string {
+  const { state } = controller;
   if (state.winner) {
-    status.textContent = `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
-  } else if (state.winner === null && state.phase === 'gameOver') {
-    status.textContent = "It's a tie!";
-  } else if (computerTurn) {
-    status.textContent = `${seatIcon(state.currentPlayer)} Computer is thinking…`;
-  } else if (state.phase === 'selectingBlock') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
-  } else if (state.phase === 'placingBlock') {
-    status.textContent = `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place block on a green base`;
+    return `${seatIcon(state.winner)} ${getPlayerName(state.winner)} wins!`;
   }
-
-  gameArea.appendChild(status);
-
-  // Scores
-  gameArea.appendChild(renderScores(state));
-
-  // Winner banner
-  if (state.phase === 'gameOver') {
-    const banner = document.createElement('div');
-    banner.className = 'par55-winner-banner';
-    if (state.winner) {
-      banner.textContent = `${getPlayerName(state.winner)} Wins! 🎉`;
-    } else {
-      banner.textContent = "It's a Tie! 🤝";
-    }
-    gameArea.appendChild(banner);
+  if (state.winner === null && state.phase === 'gameOver') {
+    return "It's a tie!";
   }
+  if (computerTurn) {
+    return `${seatIcon(state.currentPlayer)} Computer is thinking…`;
+  }
+  if (state.phase === 'selectingBlock') {
+    return `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)}'s turn - Select a block`;
+  }
+  if (state.phase === 'placingBlock') {
+    return `${seatIcon(state.currentPlayer)} ${getPlayerName(state.currentPlayer)} - Place block on a green base`;
+  }
+  return '';
+}
 
-  // Main layout
-  const mainLayout = document.createElement('div');
-  mainLayout.className = 'par55-main-layout';
-  const inputOpts = { allowInput: !computerTurn };
-
-  // Player 1 hand
-  const p1Container = document.createElement('div');
-  const p1Label = document.createElement('div');
-  p1Label.className = 'par55-hand-label player1';
-  p1Label.textContent = `${seatIcon('player1')} Blue (${state.hands.player1.length})`;
-  p1Container.appendChild(p1Label);
-  p1Container.appendChild(
+function buildHandColumn(
+  controller: Par55GameController,
+  player: Player,
+  inputOpts: { allowInput: boolean }
+): HTMLElement {
+  const { state } = controller;
+  const column = document.createElement('div');
+  column.className = `par55-hand-column par55-hand-column-${player}`;
+  const label = document.createElement('div');
+  label.className = `par55-hand-label ${player}`;
+  const name = player === 'player1' ? 'Blue' : 'Red';
+  label.textContent = `${seatIcon(player)} ${name} (${state.hands[player].length})`;
+  column.appendChild(label);
+  column.appendChild(
     renderHand(
       state,
-      'player1',
+      player,
       (blockId) => handleBlockClick(controller, blockId),
       inputOpts
     )
   );
+  return column;
+}
 
-  // Board
-  const board = renderBoard(
-    state,
-    (baseId) => handleBaseClick(controller, baseId),
-    inputOpts
-  );
-
-  // Player 2 hand
-  const p2Container = document.createElement('div');
-  const p2Label = document.createElement('div');
-  p2Label.className = 'par55-hand-label player2';
-  p2Label.textContent = `${seatIcon('player2')} Red (${state.hands.player2.length})`;
-  p2Container.appendChild(p2Label);
-  p2Container.appendChild(
-    renderHand(
-      state,
-      'player2',
-      (blockId) => handleBlockClick(controller, blockId),
-      inputOpts
-    )
-  );
-
-  mainLayout.appendChild(p1Container);
-  mainLayout.appendChild(board);
-  mainLayout.appendChild(p2Container);
-
-  gameArea.appendChild(mainLayout);
-
-  // Move history
-  if (state.moveHistory.length > 0) {
-    gameArea.appendChild(renderMoveHistory(state));
-  }
-
-  // Controls
+function buildControls(
+  controller: Par55GameController,
+  computerTurn: boolean
+): HTMLElement | null {
+  const { state } = controller;
   const controls = document.createElement('div');
   controls.className = 'par55-controls';
 
@@ -248,13 +194,17 @@ function updateUI(controller: Par55GameController): void {
       if (isComputerTurnPending(controller)) {
         return;
       }
-      controller.state = clearSelection(state);
+      controller.state = clearSelection(controller.state);
       controller.update();
     });
     controls.appendChild(clearBtn);
   }
 
-  if (!hasValidMoves(state) && state.phase !== 'gameOver' && !computerTurn) {
+  if (
+    !hasValidMoves(state) &&
+    state.phase !== 'gameOver' &&
+    !computerTurn
+  ) {
     const passBtn = document.createElement('button');
     passBtn.className = 'par55-btn par55-btn-secondary';
     passBtn.textContent = 'Pass Turn';
@@ -262,17 +212,175 @@ function updateUI(controller: Par55GameController): void {
       if (isComputerTurnPending(controller)) {
         return;
       }
-      controller.state = passTurn(state);
+      controller.state = passTurn(controller.state);
       controller.update();
     });
     controls.appendChild(passBtn);
   }
 
   // New Game lives only in shared header chrome (#new-game-btn + modal)
-  if (controls.childElementCount > 0) {
+  return controls.childElementCount > 0 ? controls : null;
+}
+
+function fillChromeAroundBoard(
+  gameArea: HTMLElement,
+  controller: Par55GameController,
+  board: HTMLElement,
+  computerTurn: boolean
+): void {
+  const { state } = controller;
+  const inputOpts = { allowInput: !computerTurn };
+
+  const status = document.createElement('div');
+  status.className = `par55-status ${state.currentPlayer}`;
+  if (computerTurn) {
+    status.classList.add('status-ai-thinking');
+  }
+  markStatusLive(status);
+  status.textContent = statusTextFor(controller, computerTurn);
+  gameArea.appendChild(status);
+  gameArea.appendChild(renderScores(state));
+
+  if (state.phase === 'gameOver') {
+    const banner = document.createElement('div');
+    banner.className = 'par55-winner-banner';
+    if (state.winner) {
+      banner.textContent = `${getPlayerName(state.winner)} Wins! 🎉`;
+    } else {
+      banner.textContent = "It's a Tie! 🤝";
+    }
+    gameArea.appendChild(banner);
+  }
+
+  const mainLayout = document.createElement('div');
+  mainLayout.className = 'par55-main-layout';
+  mainLayout.appendChild(buildHandColumn(controller, 'player1', inputOpts));
+  mainLayout.appendChild(board);
+  mainLayout.appendChild(buildHandColumn(controller, 'player2', inputOpts));
+  gameArea.appendChild(mainLayout);
+
+  if (state.moveHistory.length > 0) {
+    gameArea.appendChild(renderMoveHistory(state));
+  }
+
+  const controls = buildControls(controller, computerTurn);
+  if (controls) {
     gameArea.appendChild(controls);
   }
-  container.appendChild(gameArea);
+}
+
+function syncChromeAroundBoard(
+  gameArea: HTMLElement,
+  controller: Par55GameController,
+  board: HTMLElement,
+  computerTurn: boolean
+): void {
+  const { state } = controller;
+  const inputOpts = { allowInput: !computerTurn };
+
+  const status = gameArea.querySelector('.par55-status') as HTMLElement | null;
+  if (status) {
+    status.className = `par55-status ${state.currentPlayer}`;
+    if (computerTurn) {
+      status.classList.add('status-ai-thinking');
+    }
+    status.textContent = statusTextFor(controller, computerTurn);
+  }
+
+  gameArea.querySelector('.par55-scores')?.replaceWith(renderScores(state));
+
+  const mainLayout = gameArea.querySelector('.par55-main-layout');
+  if (mainLayout) {
+    mainLayout
+      .querySelector('.par55-hand-column-player1')
+      ?.replaceWith(buildHandColumn(controller, 'player1', inputOpts));
+    mainLayout
+      .querySelector('.par55-hand-column-player2')
+      ?.replaceWith(buildHandColumn(controller, 'player2', inputOpts));
+    // Keep the persistent board node in the middle.
+    if (!mainLayout.contains(board)) {
+      const p2 = mainLayout.querySelector('.par55-hand-column-player2');
+      if (p2) {
+        mainLayout.insertBefore(board, p2);
+      } else {
+        mainLayout.appendChild(board);
+      }
+    }
+  }
+
+  gameArea.querySelector('.par55-history')?.remove();
+  if (state.moveHistory.length > 0) {
+    const controlsEl = gameArea.querySelector('.par55-controls');
+    const history = renderMoveHistory(state);
+    if (controlsEl) {
+      gameArea.insertBefore(history, controlsEl);
+    } else {
+      gameArea.appendChild(history);
+    }
+  }
+
+  gameArea.querySelector('.par55-controls')?.remove();
+  const controls = buildControls(controller, computerTurn);
+  if (controls) {
+    gameArea.appendChild(controls);
+  }
+
+  syncBoard(
+    board,
+    state,
+    (baseId) => handleBaseClick(controller, baseId),
+    inputOpts
+  );
+}
+
+/**
+ * Update the UI
+ */
+function updateUI(controller: Par55GameController): void {
+  // Drop paints after destroyGame nulled the mount ref (remount safety).
+  if (!activeContainer || controller.container !== activeContainer) {
+    return;
+  }
+
+  const { container, state } = controller;
+  const previousFocus = captureFocusedCell(container);
+  const computerTurn = isComputerTurnPending(controller);
+
+  const existingArea = container.querySelector(
+    '.par55-game-area'
+  ) as HTMLElement | null;
+  const existingBoard = existingArea?.querySelector(
+    '.par55-board'
+  ) as HTMLElement | null;
+  const wasGameOver = Boolean(
+    existingArea?.querySelector('.par55-winner-banner')
+  );
+  const canReuseBoard =
+    Boolean(existingArea) &&
+    Boolean(existingBoard) &&
+    !wasGameOver &&
+    state.phase !== 'gameOver';
+
+  if (!canReuseBoard) {
+    clearElement(container);
+    const gameArea = document.createElement('div');
+    gameArea.className = 'par55-game-area';
+    const board = renderBoard(
+      state,
+      (baseId) => handleBaseClick(controller, baseId),
+      { allowInput: !computerTurn }
+    );
+    fillChromeAroundBoard(gameArea, controller, board, computerTurn);
+    container.appendChild(gameArea);
+  } else if (existingArea && existingBoard) {
+    syncChromeAroundBoard(
+      existingArea,
+      controller,
+      existingBoard,
+      computerTurn
+    );
+  }
+
   restoreGridFocus(container, previousFocus);
 
   // AI turn
