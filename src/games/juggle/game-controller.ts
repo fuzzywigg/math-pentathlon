@@ -2,7 +2,7 @@
 // Orchestrates game state, UI updates, and player interactions
 
 import type { JuggleState, Player } from './types';
-import type { PolyominoShape } from '../../core/polyomino/types';
+import type { PolyominoShape, Rotation } from '../../core/polyomino/types';
 import {
   createInitialState,
   doRollDice,
@@ -11,6 +11,9 @@ import {
   rotateShape,
   flipShape,
   placeShape,
+  abandonPlacement,
+  getCurrentOrientationPlacements,
+  selectedShapeFitsAnywhere,
 } from './rules';
 import type { AIDifficulty } from './ai';
 import { getAIDieChoice, getAIShapeChoice, getAIPlacement } from './ai';
