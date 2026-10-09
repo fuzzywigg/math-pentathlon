@@ -4,8 +4,9 @@
  *
  * Pins CURRENT behavior only (legal moves, apply, win/draw, scoring, serialize).
  * Builds on helpers from #465 (state-roundtrip) and patterns from #482 / #515.
- * Does not change engine source. Round-5 (q-mp-201) clears prior it.todo arms
- * via forged-state pins or documented unreachable invariants.
+ * Does not change engine source. Round-5 (q-mp-201) cleared prior it.todo arms
+ * via forged-state pins or documented unreachable invariants. Round-6 (q-mp-223)
+ * clears the last geometric it.todo (board-full-both-kings-mobile) the same way.
  */
 import { describe, it, expect, vi } from 'vitest';
 
@@ -48,6 +49,7 @@ import {
 import {
   createEmptyBoard,
   placeKing,
+  placeQuadraphage as placeQuadOnBoard,
   createCustomGameState,
 } from './helpers/kings-board';
 
@@ -399,11 +401,67 @@ describe('engine-coverage-round — kings-quadraphages', () => {
     }
   });
 
-  // Geometric impossibility: emptyCount===0 ⇒ no empty cells ⇒ kings cannot
-  // have positive move lists (isValidKingMove requires an empty destination).
-  it.todo(
-    'TODO(engine-coverage-round): isDrawCondition board-full-both-kings-mobile arm (rules.ts:185) geometrically impossible'
-  );
+  it('isDrawCondition board-full ⇒ both kings immobile (geometric invariant)', () => {
+    // Documented unreachable on the public path (round-6): emptyCount===0 means
+    // every non-king cell is occupied, so isValidKingMove never finds an empty
+    // destination and the board-full-both-kings-mobile arm cannot run.
+    const board = createEmptyBoard();
+    placeKing(board, { row: 4, col: 4 }, 'player1');
+    placeKing(board, { row: 4, col: 6 }, 'player2');
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (!board[r]![c]) {
+          placeQuadOnBoard(board, { row: r, col: c }, 'player1');
+        }
+      }
+    }
+    const state = createCustomGameState(board, 5, 5);
+    expect(getValidQuadraphagePlacements(state)).toHaveLength(0);
+    expect(getValidKingMoves(state, 'player1')).toHaveLength(0);
+    expect(getValidKingMoves(state, 'player2')).toHaveLength(0);
+    // Both-trapped arm returns true; checkWinCondition prefers p2-trap → p1.
+    expect(isDrawCondition(state)).toBe(true);
+    expect(checkWinCondition(state)).toBe('player1');
+  });
+
+  it('isDrawCondition board-full-both-kings-mobile arm via forged isEmpty phase', () => {
+    // Public path cannot reach rules.ts emptyCount===0 && both-mobile (see
+    // geometric invariant above). Forge: during the two getValidKingMoves
+    // scans return true only for the cell between the kings; once the
+    // placement scan queries a non-adjacent cell, report no empties.
+    const board = createEmptyBoard();
+    placeKing(board, { row: 4, col: 4 }, 'player1');
+    placeKing(board, { row: 4, col: 6 }, 'player2');
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (!board[r]![c]) {
+          placeQuadOnBoard(board, { row: r, col: c }, 'player1');
+        }
+      }
+    }
+    // supplies > 0 so the both-supplies-zero arm does not short-circuit first
+    const state = createCustomGameState(board, 5, 5);
+    let placementPhase = false;
+    const spy = vi
+      .spyOn(KingsBoard, 'isEmpty')
+      .mockImplementation((_b, pos) => {
+        const adjP1 =
+          Math.max(Math.abs(pos.row - 4), Math.abs(pos.col - 4)) <= 1;
+        const adjP2 =
+          Math.max(Math.abs(pos.row - 4), Math.abs(pos.col - 6)) <= 1;
+        if (!adjP1 && !adjP2) {
+          placementPhase = true;
+        }
+        if (placementPhase) return false;
+        return pos.row === 4 && pos.col === 5;
+      });
+    try {
+      expect(isDrawCondition(state)).toBe(true);
+      expect(placementPhase).toBe(true);
+    } finally {
+      spy.mockRestore();
+    }
+  });
 
   it('getCurrentPhaseMessage default arm for forged unknown TurnPhase', () => {
     const open = createInitialGameState();

@@ -1,5 +1,6 @@
-import type { GameState, Position } from './game-state';
 import {
+  type GameState,
+  type Position,
   selectKing,
   moveKing,
   placeQuadraphage,

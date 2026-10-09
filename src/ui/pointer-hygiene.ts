@@ -14,9 +14,9 @@
 /** Max movement (CSS px) still counted as a tap rather than a pan/scroll. */
 export const POINTER_TAP_SLOP_PX = 16;
 
-export type PointerTapPhase = 'idle' | 'pending' | 'cancelled';
+type PointerTapPhase = 'idle' | 'pending' | 'cancelled';
 
-export interface PointerTapState {
+interface PointerTapState {
   phase: PointerTapPhase;
   pointerId: number | null;
   startX: number;

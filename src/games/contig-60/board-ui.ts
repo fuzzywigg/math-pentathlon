@@ -3,8 +3,12 @@
 
 import { getDieFaceEmoji } from '../../ui/die-faces';
 import { injectStylesOnce } from '../../ui/inject-styles';
-import type { ContigState } from './types';
-import { CONFIG, BOARD_NUMBERS, getValidPlacements } from './types';
+import {
+  type ContigState,
+  CONFIG,
+  BOARD_NUMBERS,
+  getValidPlacements,
+} from './types';
 import { calculatePoints } from './rules';
 import { replaceWithSafeHtml, safeHtml } from '../../core/dom-security';
 

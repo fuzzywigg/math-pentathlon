@@ -18,6 +18,7 @@ npm test                         # unit then Chromium e2e (CI required pair)
 npm run test:unit
 npm run test:unit:watch
 npm run test:unit:coverage
+npm run report:coverage-map      # rewrite docs/dev/coverage-map.{md,svg}; wiki: [heat map](./coverage-map.md)
 npm run test:e2e:chromium        # required CI e2e path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
@@ -116,7 +117,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post709` @ `a1434c57` (2026-10-09): **3136** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; recent `npm run test:unit` on tip reported **12169** cases (includes skip/todo). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post728` @ `b5884207` (2026-10-09): **3140** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; `npx vitest list` on tip reported **12154** cases (includes skip/todo). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -135,11 +136,11 @@ README badges link those workflows. License is **ISC** (`package.json`).
 
 Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
 
-**Live counts** (files / listed cases) measured on tip `a023fc36` · 2026-10-09 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
+**Live counts** (files / listed cases) measured on tip `b5884207` · 2026-10-09 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
 
-| Layer | Live count (tip `a023fc36`) | Runner | Command |
+| Layer | Live count (tip `b5884207`) | Runner | Command |
 | ----- | --------------------------- | ------ | ------- |
-| Unit | **3114** files / **11988** listed cases | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit` |
+| Unit | **3140** files / **12154** listed cases | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit` |
 | E2E Chromium (required CI) | **25** files / **249** cases (`--grep-invert @fullgame`) | Playwright `chromium` | `npm run test:e2e:chromium` |
 | E2E fullgame | **20** files / **20** cases | Playwright `chromium` + `@fullgame` | `npm run test:e2e:fullgame` |
 | E2E Firefox / WebKit / iPad | **25** files / **249** cases each | `firefox` / `webkit` / `ipad-webkit` | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross` |

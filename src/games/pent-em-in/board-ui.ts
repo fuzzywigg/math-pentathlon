@@ -1,8 +1,12 @@
 // Pent'Em In Board UI
 // Renders the game board, pieces, and piece selector
 
-import type { PentEmInState } from './types';
-import { BOARD_SIZE, getPlayerPieces, getPentominoShape } from './types';
+import {
+  type PentEmInState,
+  BOARD_SIZE,
+  getPlayerPieces,
+  getPentominoShape,
+} from './types';
 import { getPieceCells, canPlacePiece } from './rules';
 import type { Cell } from '../../core/polyomino/types';
 import { normalizeCells } from '../../core/polyomino/transform';
