@@ -11,7 +11,7 @@
  * searches use a virtual clock + short deadline so truncation is
  * deterministic (no wall-clock). No rules/scoring changes.
  */
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll, vi } from 'vitest';
 import {
   MIDGAME_SAMPLES,
   DIFFICULTIES,
@@ -224,13 +224,17 @@ function pinStates(count: number): FractionPinballState[] {
   );
 }
 describe('frac-fact', () => {
+  // Shared fixture across determinism + quality (same 50 samples) — q-mp-063 headroom.
+  let fracFixture: FracFactState[] = [];
+  beforeAll(() => {
+    fracFixture = fracStates(MIDGAME_SAMPLES);
+  });
   it(
     `determinism: fixed seed → same answer on ${MIDGAME_SAMPLES} problems × difficulties`,
     () => {
-      const states = fracStates(MIDGAME_SAMPLES);
       for (const difficulty of DIFFICULTIES) {
-        for (let i = 0; i < states.length; i++) {
-          const state = states[i]!;
+        for (let i = 0; i < fracFixture.length; i++) {
+          const state = fracFixture[i]!;
           const seed = 11_000 + i * 13 + difficulty.length;
           const a = withSeededRandom(seed, () =>
             fracAI(state, state.currentPlayer, difficulty)
@@ -249,11 +253,10 @@ describe('frac-fact', () => {
   it(
     'quality: hard correct-rate > easy (and ≥ medium)',
     () => {
-      const states = fracStates(MIDGAME_SAMPLES);
       const correct = { easy: 0, medium: 0, hard: 0 };
       let n = 0;
-      for (let i = 0; i < states.length; i++) {
-        const state = states[i]!;
+      for (let i = 0; i < fracFixture.length; i++) {
+        const state = fracFixture[i]!;
         const problem = state.currentProblem!;
         n++;
         for (const d of DIFFICULTIES) {
@@ -274,13 +277,17 @@ describe('frac-fact', () => {
   );
 });
 describe('fraction-pinball', () => {
+  // Shared fixture across determinism + quality (same 50 samples) — q-mp-063 headroom.
+  let pinFixture: FractionPinballState[] = [];
+  beforeAll(() => {
+    pinFixture = pinStates(MIDGAME_SAMPLES);
+  });
   it(
     `determinism: fixed seed → same answer on ${MIDGAME_SAMPLES} challenges × difficulties`,
     () => {
-      const states = pinStates(MIDGAME_SAMPLES);
       for (const difficulty of DIFFICULTIES) {
-        for (let i = 0; i < states.length; i++) {
-          const state = states[i]!;
+        for (let i = 0; i < pinFixture.length; i++) {
+          const state = pinFixture[i]!;
           const seed = 12_000 + i * 17 + difficulty.length;
           const a = withSeededRandom(seed, () =>
             pinAI(state, state.currentPlayer, difficulty)
@@ -299,11 +306,10 @@ describe('fraction-pinball', () => {
   it(
     'quality: hard correct-rate > easy (and ≥ medium)',
     () => {
-      const states = pinStates(MIDGAME_SAMPLES);
       const correct = { easy: 0, medium: 0, hard: 0 };
       let n = 0;
-      for (let i = 0; i < states.length; i++) {
-        const state = states[i]!;
+      for (let i = 0; i < pinFixture.length; i++) {
+        const state = pinFixture[i]!;
         n++;
         for (const d of DIFFICULTIES) {
           const ans = withSeededRandom(80_000 + i * 3 + d.length, () =>
