@@ -36,7 +36,7 @@ Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evid
 | Metric | Prior baseline | Live tip | Action |
 | --- | --- | --- | --- |
 | `unusedTypes` | 95 | 91 | baseline reconciled **downward** to 91 |
-| `unusedExports` | 7 | 6 | `withSeededMathRandom` cleared in `q-mp-188` (remaining 6 pending `q-mp-187` tablet-gl demote) |
+| `unusedExports` | 7 | 3 | `q-mp-188` rng alias + `q-mp-187` tablet-gl demote (BOARD_3D_LQ_*/MP3D_READY_ATTR) |
 | `unlisted` | 3 | 3 | documented below (owners) |
 | `duplicates` | 3 | 2 | `withSeededRandom` pair cleared in `q-mp-188` |
 | `enforce` | `false` | `false` | **stays false** |
