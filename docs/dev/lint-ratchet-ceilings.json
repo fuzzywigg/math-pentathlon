@@ -1,8 +1,8 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + tip folds through q-mp-180 void (\u221251\u2192132) + q-mp-225 graph nnnull (\u221214\u2192254) + q-mp-226 board-ui dup-imports (\u221217\u2192105) + q-mp-227 demos dup-imports (\u22126\u219299) + q-mp-218 demos void (\u221214\u2192118): curly 538; no-non-null-assertion 254; no-confusing-void-expression 118; radix 6; default-case 5; no-duplicate-imports 99; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 13. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "burn-1008-mp-lint-ratchet + tip folds through q-mp-180 void (−51→132) + q-mp-225 graph nnnull (−14→254) + q-mp-226 board-ui dup-imports (−17→105) + q-mp-227 demos dup-imports (−6→99) + q-mp-218 demos void (−14→118) + q-mp-243 polyomino-demo nnnull (−7→247): curly 538; no-non-null-assertion 247; no-confusing-void-expression 118; radix 6; default-case 5; no-duplicate-imports 99; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 13. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
-    "@typescript-eslint/no-non-null-assertion": 254,
+    "@typescript-eslint/no-non-null-assertion": 247,
     "@typescript-eslint/no-confusing-void-expression": 118,
     "radix": 6,
     "default-case": 5,
