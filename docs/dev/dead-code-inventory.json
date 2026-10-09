@@ -182,6 +182,22 @@
         "disposition": "removed",
         "action": "removed",
         "note": "deleted Rank-1 dead CSS selector-list leftovers (q-mp-211)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/games/par-55/par-55.css",
+        "symbol": "par55-btn-primary",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule + reduced-motion hover leftover (q-mp-241)"
+      },
+      {
+        "kind": "css-class",
+        "path": "src/games/ramrod/ramrod.css",
+        "symbol": "ramrod-btn-primary",
+        "disposition": "removed",
+        "action": "removed",
+        "note": "deleted Rank-1 dead CSS rule + reduced-motion hover leftover (q-mp-241)"
       }
     ]
   },
@@ -1799,19 +1815,34 @@
       "path": "src/games/ramrod/ramrod.css",
       "symbol": "ramrod-btn-primary",
       "origins": [
-        "src/games/ramrod/ramrod.css",
-        "src/games/ramrod/ramrod.css",
         "src/games/ramrod/ramrod.css"
       ],
       "source": "css-scan",
-      "evidence": "grep: no references outside defining module; registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main",
+      "evidence": "grep: no references outside defining module (incl. scripts/tests)",
       "externalRefs": 0,
-      "dynamicHit": true,
-      "registryHit": true,
-      "rank": 4,
-      "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry",
-      "disposition": "kept"
+      "dynamicHit": false,
+      "registryHit": false,
+      "rank": 1,
+      "safeToRemove": "yes",
+      "reason": "CSS class never assigned after #82 New Game move to shell; removed q-mp-241",
+      "disposition": "removed"
+    },
+    {
+      "kind": "css-class",
+      "path": "src/games/par-55/par-55.css",
+      "symbol": "par55-btn-primary",
+      "origins": [
+        "src/games/par-55/par-55.css"
+      ],
+      "source": "css-scan",
+      "evidence": "grep: no references outside defining module (incl. scripts/tests)",
+      "externalRefs": 0,
+      "dynamicHit": false,
+      "registryHit": false,
+      "rank": 1,
+      "safeToRemove": "yes",
+      "reason": "CSS class never assigned after #82 New Game move to shell; removed q-mp-241",
+      "disposition": "removed"
     },
     {
       "kind": "css-class",
@@ -1828,7 +1859,7 @@
       "registryHit": true,
       "rank": 4,
       "safeToRemove": "no",
-      "reason": "reachable via dynamic import or game registry",
+      "reason": "script/e2e selector refs — keep (q-mp-241 rescan)",
       "disposition": "kept"
     },
     {

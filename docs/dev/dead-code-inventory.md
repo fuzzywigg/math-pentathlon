@@ -27,6 +27,11 @@
 > **q-mp-211 (2026-10-09):** Removed Rank-1 dead CSS `.move-history-panel` selector-list
 > entries from `src/ui/styles/zoom-reflow.css` (live history chrome uses `.move-history-list` /
 > `.move-history-entry` only).
+>
+> **q-mp-241 (2026-10-09):** Fresh Rank-1 CSS rescan on tip `cursor/mp-tip-post748`. Removed
+> verified-unused `.par55-btn-primary` / `.ramrod-btn-primary` leftovers (in-board New Game
+> buttons deleted in #82; live controls use `*-btn-secondary` only). Dated residual inventory:
+> `docs/dev/dead-css-rank1-rescan-2026-10-09.md`.
 
 ## Method
 
@@ -58,6 +63,8 @@ Re-verified on live tip then applied (**8** items initially; **+2** CSS classes 
 | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | deleted Rank-1 dead CSS rule (q-mp-154) |
 | removed | css-class | `src/style.css` → `game-card-division` | deleted Rank-1 dead CSS rule (q-mp-176) |
 | removed | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | deleted Rank-1 dead CSS selector-list leftovers (q-mp-211) |
+| removed | css-class | `src/games/par-55/par-55.css` → `par55-btn-primary` | deleted Rank-1 dead CSS rule + reduced-motion hover leftover (q-mp-241) |
+| removed | css-class | `src/games/ramrod/ramrod.css` → `ramrod-btn-primary` | deleted Rank-1 dead CSS rule + reduced-motion hover leftover (q-mp-241) |
 
 ## Defer — do not redo
 
@@ -88,6 +95,8 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `calla-teaching-hint` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | removed | css-class | `src/ui/styles/game-play.css` → `sd-hands-container` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-154 |
 | 1 | yes | removed | css-class | `src/ui/styles/zoom-reflow.css` → `move-history-panel` | grep: no references outside defining module | CSS class never assigned in TS/HTML (rule-only leftover); removed q-mp-211 |
+| 1 | yes | removed | css-class | `src/games/par-55/par-55.css` → `par55-btn-primary` | grep: no references outside defining module (incl. scripts/tests) | CSS class never assigned after #82 New Game move to shell; removed q-mp-241 |
+| 1 | yes | removed | css-class | `src/games/ramrod/ramrod.css` → `ramrod-btn-primary` | grep: no references outside defining module (incl. scripts/tests) | CSS class never assigned after #82 New Game move to shell; removed q-mp-241 |
 | 2 | yes | removed | test-helper-export | `tests/unit/helpers/dom.ts` → `clearDom` | grep: no references outside defining module | demoted in q-mp-155 — module-private; still used by installDomHooks |
 | 2 | yes | removed | test-helper-module | `tests/unit/helpers/fake-timers.ts (absent on tip)` | grep stem: no import-shaped external references | removed in q-mp-139 — zero importers on live tip after #658 fold |
 | 3 | review | kept | unused-type | `src/core/ai-worker/client.ts` → `AiWorkerRequestPayload` | grep: no references outside defining module | exported type unused outside module — often intentional public API |
@@ -197,8 +206,7 @@ This PR does **not** delete games, assets, or tests. File deletion only when `ki
 | 4 | no | kept | unused-type | `src/games/prime-gold/ai.ts` → `AIPlacement` | grep: 1 file(s) outside defining module (src/games/contig-60/ai.ts); registry: game id 'prime-gold' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
 | 4 | no | kept | unused-type | `src/games/queens-guards/ai.ts` → `AISearchResult` | grep: 3 file(s) outside defining module (src/games/hex/ai.ts, src/games/fiar/ai.ts, src/games/fab-a-diffy/ai.ts); registry: game id 'queens-guards' is registered; dynamic-import: r | reachable via dynamic import or game registry |
 | 4 | no | kept | unused-type | `src/games/ramrod/ai.ts` → `AIMove` | grep: 27 file(s) outside defining module (src/games/pent-em-in/ai.ts, src/games/calla/ai.ts, src/games/queens-guards/ai.worker.ts); registry: game id 'ramrod' is registered; dynami | reachable via dynamic import or game registry |
-| 4 | no | kept | css-class | `src/games/ramrod/ramrod.css` → `ramrod-btn-primary` | grep: no references outside defining module; registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
-| 4 | no | kept | css-class | `src/games/ramrod/ramrod.css` → `ramrod-turn-hint` | grep: 1 file(s) outside defining module (scripts/ramrod-deep-playtest.mjs); registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
+| 4 | no | kept | css-class | `src/games/ramrod/ramrod.css` → `ramrod-turn-hint` | grep: 1 file(s) outside defining module (scripts/ramrod-deep-playtest.mjs); registry: game id 'ramrod' is registered; dynamic-import: referenced from mounts/prefetch/main | script/e2e selector refs — keep (q-mp-241 rescan) |
 | 4 | no | kept | unused-type | `src/games/remainder-islands/ai.ts` → `AIIslandChoice` | grep: no references outside defining module; registry: game id 'remainder-islands' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
 | 4 | no | kept | unused-type | `src/games/star-track/ai.ts` → `AIChainChoice` | grep: no references outside defining module; registry: game id 'star-track' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
 | 4 | no | kept | unused-type | `src/games/star-track/types.ts` → `StarTrackPosition` | grep: no references outside defining module; registry: game id 'star-track' is registered; dynamic-import: referenced from mounts/prefetch/main | reachable via dynamic import or game registry |
