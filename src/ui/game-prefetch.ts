@@ -77,7 +77,7 @@ export function isGamePrefetchStarted(gameId: string): boolean {
 }
 
 export function canPrefetchGame(gameId: string): boolean {
-  return Object.prototype.hasOwnProperty.call(loaders, gameId);
+  return Object.hasOwn(loaders, gameId);
 }
 
 /**
