@@ -1,11 +1,11 @@
 {
   "meta": {
-    "generatedAt": "2026-10-09T13:27:06.506Z",
+    "generatedAt": "2026-10-09T13:42:24.331Z",
     "baseURL": "http://127.0.0.1:5179",
     "moveTarget": 20,
     "navCycles": 5,
     "mode": "render",
-    "phase": "qmp135-css-only-b",
+    "phase": "qmp135-final",
     "cpuThrottle": 4,
     "fixedGames": [],
     "fixNotes": []
@@ -14,21 +14,21 @@
     {
       "gameId": "star-track",
       "board3d": true,
-      "ttiMs": 959.5,
+      "ttiMs": 835.1000000000931,
       "movesAttempted": 80,
-      "movesLanded": 6,
-      "longTasksOver50": 3,
-      "longTaskMaxMs": 138,
+      "movesLanded": 4,
+      "longTasksOver50": 1,
+      "longTaskMaxMs": 118,
       "error": null,
       "move": {
         "count": 80,
-        "p50Ms": 75.69999999995343,
-        "p95Ms": 418.70000000018626,
-        "maxMs": 428.20000000018626,
-        "meanMs": 97.52124999999941,
-        "layoutReadsP95": 28,
-        "longTasksOver50": 1,
-        "longTaskMaxMs": 66
+        "p50Ms": 75.89999999990687,
+        "p95Ms": 90.5,
+        "maxMs": 440.39999999990687,
+        "meanMs": 83.46124999998138,
+        "layoutReadsP95": 10,
+        "longTasksOver50": 0,
+        "longTaskMaxMs": 0
       },
       "hover": {
         "count": 0,
@@ -209,6 +209,51 @@
             "layoutReadsP95": 28,
             "longTasksOver50": 1,
             "longTaskMaxMs": 66
+          },
+          "hover": {
+            "count": 0,
+            "p50Ms": null,
+            "p95Ms": null,
+            "maxMs": null,
+            "meanMs": null,
+            "layoutReadsP95": null,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
+          }
+        }
+      ]
+    },
+    "qmp135-final": {
+      "meta": {
+        "generatedAt": "2026-10-09T13:42:24.331Z",
+        "baseURL": "http://127.0.0.1:5179",
+        "moveTarget": 20,
+        "navCycles": 5,
+        "mode": "render",
+        "phase": "qmp135-final",
+        "cpuThrottle": 4,
+        "fixedGames": [],
+        "fixNotes": []
+      },
+      "results": [
+        {
+          "gameId": "star-track",
+          "board3d": true,
+          "ttiMs": 835.1000000000931,
+          "movesAttempted": 80,
+          "movesLanded": 4,
+          "longTasksOver50": 1,
+          "longTaskMaxMs": 118,
+          "error": null,
+          "move": {
+            "count": 80,
+            "p50Ms": 75.89999999990687,
+            "p95Ms": 90.5,
+            "maxMs": 440.39999999990687,
+            "meanMs": 83.46124999998138,
+            "layoutReadsP95": 10,
+            "longTasksOver50": 0,
+            "longTaskMaxMs": 0
           },
           "hover": {
             "count": 0,

@@ -77,10 +77,10 @@ Raw after artifacts: `docs/dev/q-mp-135-star-track-layout.json` (phases `qmp135-
 
 `src/ui/three/star-track-board-3d.ts`:
 
-- `update()` → `paint()` only (match fiar / kings)
-- `bindBoard3dLayout(container, …)` instead of `canvasHost`
-- Drop imperative `fitHostToViewport`; host size is CSS (`.star-track-3d-canvas-host` + landscape media query)
-- Skip `syncBoard3dRendererSize` when CSS box unchanged
+- `update()` paints only when phase/chain DOM shape is unchanged; re-fits on draw ↔ choose ↔ game-over (keeps e2e `assertChainAboveFold`)
+- `bindBoard3dLayout(container, …)` instead of `canvasHost` (stops fit→style-write→RO re-entry)
+- Skip unchanged CSS side writes + `syncBoard3dRendererSize` when the host box is unchanged
+- Keep `fitHostToViewport` for above-the-fold chain controls (CSS-only undersized the canvas under the top-aligned shell)
 
 ### Verify
 

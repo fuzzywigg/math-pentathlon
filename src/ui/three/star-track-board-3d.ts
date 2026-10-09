@@ -32,6 +32,7 @@ import {
   shouldPreserveDrawingBuffer,
   syncBoard3dRendererSize,
   bindBoard3dLayout,
+  resolveCssViewportSize,
 } from './tablet-gl';
 
 type Three = ThreeModule;
@@ -334,6 +335,8 @@ export async function createStarTrackBoard3D(
   let a11yFocus: { player: Player; space: number } | null = null;
   let latestState: StarTrackGameState | null = null;
   let disposed = false;
+  /** Phase / chain DOM shape — re-fit only when controls height may change. */
+  let lastLayoutKey = '';
   const projectScratch = new THREE.Vector3();
 
   const paint = (): void => {
@@ -344,18 +347,45 @@ export async function createStarTrackBoard3D(
     );
   };
 
-  // Last synced drawing-buffer size. Skip setSize/paint when the CSS host
-  // box is unchanged (chain-area DOM rebuilds often fire RO without a new side).
+  // Skip style writes / sync when the fitted CSS side is unchanged so a
+  // ResizeObserver on the outer host cannot churn through fit→write→RO.
+  let lastFittedSide = 0;
   let lastSyncW = 0;
   let lastSyncH = 0;
+
+  const fitHostToViewport = (): void => {
+    // Size the canvas from remaining viewport below the board host so the
+    // chain controls stay above the fold (e2e `assertChainAboveFold`). Keep
+    // column layout for that budget math; landscape CSS alone undersizes the
+    // remaining height under the top-aligned shell.
+    layout.style.flexDirection = 'column';
+    layout.style.flexWrap = 'nowrap';
+    layout.style.justifyContent = 'center';
+    chainArea.style.flex = '';
+    chainArea.style.maxWidth = '';
+
+    const top = layout.getBoundingClientRect().top;
+    // Budget for draw / choose-chain / taller game-over winner block under a
+    // top-aligned shell (menu CLS fix). 180 was enough when body was centered.
+    const chainBudget = 230;
+    const { width: vw, height: vh } = resolveCssViewportSize();
+    const available = Math.max(120, vh - top - chainBudget - 12);
+    const side = Math.max(140, Math.min(vw * 0.92, available, 520));
+    if (side === lastFittedSide) {
+      return;
+    }
+    lastFittedSide = side;
+    canvasHost.style.width = `${side}px`;
+    canvasHost.style.height = `${side}px`;
+    canvasHost.style.maxHeight = `${side}px`;
+  };
 
   const resize = (): void => {
     if (disposed) {
       return;
     }
-    // Host sizing is CSS-only (`.star-track-3d-canvas-host` + landscape media
-    // query). Imperative fitHostToViewport used getBoundingClientRect + style
-    // writes on every update/RO and re-entered ResizeObserver (q-mp-135).
+    // Layout / mount only — `update()` paints without re-fitting (q-mp-135).
+    fitHostToViewport();
     const w = Math.max(canvasHost.clientWidth || 360, 120);
     const h = Math.max(canvasHost.clientHeight || 360, 120);
     if (w === lastSyncW && h === lastSyncH) {
@@ -371,6 +401,7 @@ export async function createStarTrackBoard3D(
     onVisible: () => paint(),
   });
   // Observe the outer container (peer pattern: fiar / kings), not canvasHost.
+  // Fitting writes canvasHost size; observing that node re-entered resize.
   const unbindLayout = bindBoard3dLayout(container, () => resize());
 
   const onLost = (event: Event): void => {
@@ -544,10 +575,15 @@ export async function createStarTrackBoard3D(
       syncA11y();
     }
 
-    // Paint only — match fiar / kings. Viewport fit + renderer sync stay on
-    // bindBoard3dLayout / mount. Chain-area height changes that alter the host
-    // box are picked up by the outer-container ResizeObserver.
-    paint();
+    // Re-fit only when chain controls may change height (draw ↔ choose ↔
+    // game-over). Routine piece/highlight updates paint only (q-mp-135).
+    const layoutKey = `${state.phase}:${state.winner ?? ''}:${state.drawnChains?.length ?? 0}`;
+    if (layoutKey !== lastLayoutKey) {
+      lastLayoutKey = layoutKey;
+      resize();
+    } else {
+      paint();
+    }
   };
 
   const spaceToClientPoint = (
