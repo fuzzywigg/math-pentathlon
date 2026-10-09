@@ -38,4 +38,26 @@ describe('developer docs npm scripts', () => {
     expect(pkg.scripts.test).toMatch(/test:unit/);
     expect(pkg.scripts.test).toMatch(/test:e2e:chromium/);
   });
+
+  it('CONTRIBUTING verify path uses package.json CI gate scripts', () => {
+    const contributing = readFileSync(
+      resolve(process.cwd(), 'CONTRIBUTING.md'),
+      'utf8'
+    );
+    const required = [
+      'lint',
+      'lint:ratchet',
+      'format:check',
+      'typecheck',
+      'typecheck:ratchet',
+      'check:boundaries',
+      'test:unit',
+    ] as const;
+    for (const name of required) {
+      expect(contributing).toContain(`npm run ${name}`);
+      expect(defined.has(name), `package.json missing ${name}`).toBe(true);
+    }
+    // Prefer the package.json script over a bare tsc invoke in the checklist.
+    expect(contributing).not.toMatch(/^\s*npx tsc --noEmit\s*$/m);
+  });
 });
