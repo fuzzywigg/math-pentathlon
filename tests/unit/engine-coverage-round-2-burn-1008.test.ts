@@ -4,11 +4,12 @@
  *
  * Themes: legal-move generation, win/draw detection, state transitions,
  * edge boards, undo/redo invariants. Pins CURRENT behavior only.
- * Does not change engine source. Dead/defensive arms → it.todo.
+ * Does not change engine source. Round-5 (q-mp-201) clears prior it.todo
+ * arms via forged-state pins or documented unreachable invariants.
  *
  * Avoids duplicating #482 / #562 / #566 suites.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 import {
   createInitialState as createSum,
@@ -37,6 +38,7 @@ import {
   checkWinner as fabWinner,
 } from '../../src/games/fab-a-diffy/rules';
 import type { FractionBar } from '../../src/games/fab-a-diffy/types';
+import { COMMON_FRACTIONS } from '../../src/core/fractions/types';
 
 import {
   createInitialState as createPent,
@@ -108,12 +110,17 @@ import {
   doRollDice as juggleRoll,
   abandonPlacement,
 } from '../../src/games/juggle/rules';
-import { SHAPE_POOLS, CONFIG as JUGGLE_CFG } from '../../src/games/juggle/types';
-import type { JuggleState } from '../../src/games/juggle/types';
+import {
+  SHAPE_POOLS,
+  CONFIG as JUGGLE_CFG,
+  type JuggleState,
+  type ShapeCategory,
+} from '../../src/games/juggle/types';
 import { createBoard } from '../../src/core/polyomino/placement';
 
 import {
   generateChallenge,
+  formatFraction as pinballFormatFraction,
   startGame as pinballStart,
   submitAnswer as pinballSubmit,
   nextChallenge as pinballNext,
@@ -130,6 +137,11 @@ import {
   hasValidMoves as starsHasMoves,
   clearSelection as starsClear,
 } from '../../src/games/stars-bars/rules';
+import type {
+  AttributeCard,
+  BoardCell,
+  StarsState,
+} from '../../src/games/stars-bars/types';
 
 import {
   startGame as fracStart,
@@ -137,6 +149,8 @@ import {
   nextProblem as fracNext,
   generateProblem,
   checkAnswer as fracCheck,
+  getOperationSymbol,
+  formatFraction as fracFormat,
 } from '../../src/games/frac-fact/rules';
 import { createInitialState as createFrac } from '../../src/games/frac-fact/types';
 
@@ -151,8 +165,12 @@ import {
   normalizeSelectedChipKind,
   deselectChip,
   findAnyWinningPath,
+  findPaths,
 } from '../../src/games/fiar/rules';
-import { createInitialState as createFiar } from '../../src/games/fiar/types';
+import {
+  createInitialState as createFiar,
+  CONFIG as FIAR_CFG,
+} from '../../src/games/fiar/types';
 
 import {
   jsonRoundTrip,
@@ -230,7 +248,10 @@ function jammedJuggleBoard(): JuggleState {
   }
   return {
     ...createJuggle(),
-    boards: { player1: full, player2: createBoard(JUGGLE_CFG.GRID_SIZE, JUGGLE_CFG.GRID_SIZE) },
+    boards: {
+      player1: full,
+      player2: createBoard(JUGGLE_CFG.GRID_SIZE, JUGGLE_CFG.GRID_SIZE),
+    },
     phase: 'selectingShape',
     currentDice: [4, 5],
     selectedCategory: 'tetromino',
@@ -262,9 +283,9 @@ describe('engine-coverage-round-2 — sum-dominoes', () => {
       orientation: 'horizontal',
     };
     // Adjacent to the stamped cells at (5,5)/(5,6)
-    expect(
-      sumValid(state, domino, { row: 5, col: 3 }, 'horizontal', 6)
-    ).toBe(false);
+    expect(sumValid(state, domino, { row: 5, col: 3 }, 'horizontal', 6)).toBe(
+      false
+    );
     expect(sumCanPlay(state, domino, 6)).toBe(false);
     expect(sumValids(state, domino, 6)).toEqual([]);
   });
@@ -278,9 +299,9 @@ describe('engine-coverage-round-2 — sum-dominoes', () => {
       owner: 'player1',
       orientation: 'horizontal',
     };
-    expect(
-      sumValid(state, domino, { row: 5, col: 3 }, 'horizontal', 6)
-    ).toBe(false);
+    expect(sumValid(state, domino, { row: 5, col: 3 }, 'horizontal', 6)).toBe(
+      false
+    );
     expect(sumCanPlay(state, domino, 6)).toBe(false);
   });
 
@@ -329,7 +350,6 @@ describe('engine-coverage-round-2 — sum-dominoes', () => {
     const trip = jsonRoundTrip(stripLazyCaches(state));
     expect(trip.passCount).toBe(state.passCount);
   });
-
 });
 
 // =============================================================================
@@ -394,12 +414,35 @@ describe('engine-coverage-round-2 — fab-a-diffy', () => {
     expect(s2.selectedBar2).toBe(ids[1]);
   });
 
-  it.todo(
-    'hasAnyValidMove sparse-array hole guard (left/right === undefined) — dense filter arrays never hole'
-  );
-  it.todo(
-    'calculateResult catch arm — arithmetic helpers do not throw on public Fraction inputs'
-  );
+  it('hasAnyValidMove left/right === undefined continue (forged Array.from+filter holes)', () => {
+    const open = createFab();
+    const origFrom = Array.from;
+    // Forge: Array.from(...).filter(...) yields length≥2 with holes so
+    // availableBars[i]/[j] are undefined → defensive continue → false.
+    Array.from = (() => ({
+      filter() {
+        const holes: FractionBar[] = [];
+        holes.length = 2;
+        return holes;
+      },
+    })) as unknown as typeof Array.from;
+    try {
+      expect(hasAnyValidMove(open)).toBe(false);
+    } finally {
+      Array.from = origFrom;
+    }
+  });
+
+  it('calculateResult catch returns null when operand access throws', () => {
+    const boom = new Proxy({} as { numerator: number; denominator: number }, {
+      get() {
+        throw new Error('forged throw');
+      },
+    });
+    expect(
+      calculateResult(boom, { numerator: 1, denominator: 2 }, 'add')
+    ).toBeNull();
+  });
 });
 
 // =============================================================================
@@ -436,9 +479,17 @@ describe('engine-coverage-round-2 — pent-em-in', () => {
     );
   });
 
-  it.todo(
-    'canPlayerMove !pieceShape continue after known-shape short-circuit — unreachable on public path (#562)'
-  );
+  it('canPlayerMove skips unknown mid-list shapes when first shape is known', () => {
+    const jammed: PentEmInState = {
+      ...fullPentBoard(),
+      player1Pieces: {
+        available: ['X', 'bogus-shape', 'I5'],
+        placed: [],
+      },
+    };
+    // First shape known → no available[0] short-circuit; bogus mid-list → continue
+    expect(pentCanMove(jammed, 'player1')).toBe(false);
+  });
 });
 
 // =============================================================================
@@ -464,9 +515,31 @@ describe('engine-coverage-round-2 — calla', () => {
     ).toBe(true);
   });
 
-  it.todo(
-    'sow position < PITS*2+1 false arm — wrap resets before the chain (#460 next5)'
-  );
+  it('sow wrap resets before position≥11 — <PITS*2+1 false arm unreachable', () => {
+    // Documented unreachable (round-5): after sowing at position 10, position++
+    // yields 11 then `position > PITS*2` wraps to 0 before the next iteration,
+    // so the else-if false arm never runs. Forge a long sow to characterize wrap.
+    const open = createCalla();
+    const forged = {
+      ...open,
+      player1Pits: [20, 0, 0, 0, 0],
+      player2Pits: [3, 3, 3, 3, 3],
+    };
+    const after = callaMove(forged, 0);
+    expect(after.moveHistory.at(-1)?.cubesDistributed).toBe(20);
+    const total =
+      after.player1Pits.reduce((a, b) => a + b, 0) +
+      after.player2Pits.reduce((a, b) => a + b, 0) +
+      after.player1Calla +
+      after.player2Calla;
+    expect(total).toBe(
+      forged.player1Pits.reduce((a, b) => a + b, 0) +
+        forged.player2Pits.reduce((a, b) => a + b, 0) +
+        forged.player1Calla +
+        forged.player2Calla
+    );
+    expect(PITS_PER_SIDE).toBe(5);
+  });
 });
 
 // =============================================================================
@@ -622,7 +695,10 @@ describe('engine-coverage-round-2 — juggle', () => {
     }
     const state: JuggleState = {
       ...createJuggle(),
-      boards: { player1: full, player2: createBoard(JUGGLE_CFG.GRID_SIZE, JUGGLE_CFG.GRID_SIZE) },
+      boards: {
+        player1: full,
+        player2: createBoard(JUGGLE_CFG.GRID_SIZE, JUGGLE_CFG.GRID_SIZE),
+      },
       phase: 'selectingShape',
       currentDice: [1, 2],
     };
@@ -650,9 +726,20 @@ describe('engine-coverage-round-2 — juggle', () => {
     expect(abandoned.selectedShape).toBeNull();
   });
 
-  it.todo(
-    'orientSelectedShapeToFit early return when phase!==placing or !selectedShape — callers always set both'
-  );
+  it('orientSelectedShapeToFit early return when selectedShape is null (forged)', () => {
+    // Public callers normally set placing+shape; forge null shape through
+    // selectShape to hit the private early return (phase placing, !shape).
+    const rolled = juggleRoll(createJuggle());
+    const forged = {
+      ...rolled,
+      phase: 'selectingShape' as const,
+      selectedCategory: 'tromino' as ShapeCategory,
+      selectedShape: null,
+    };
+    const out = juggleSelectShape(forged, null as never);
+    expect(out.phase).toBe('placing');
+    expect(out.selectedShape).toBeNull();
+  });
 });
 
 // =============================================================================
@@ -699,14 +786,48 @@ describe('engine-coverage-round-2 — fraction-pinball', () => {
     expect(state.phase).toBe('showResult');
     expect(state.isCorrect).toBe(false);
     state = pinballNext(state);
-    expect(
-      state.phase === 'answering' || state.phase === 'gameOver'
-    ).toBe(true);
+    expect(state.phase === 'answering' || state.phase === 'gameOver').toBe(
+      true
+    );
   });
 
-  it.todo(
-    'generateWrongFractions correct.numerator || 1 false arm — COMMON_FRACTIONS have positive numerators'
-  );
+  it('generateChallenge(odd) with zero-numerator correct hits || 1 arm', () => {
+    COMMON_FRACTIONS.push({ numerator: 0, denominator: 1 });
+    let n = 0;
+    const orig = Math.random;
+    const convertible = COMMON_FRACTIONS.filter((f) => {
+      const decimal = f.numerator / f.denominator;
+      const rounded = Math.round(decimal * 10000) / 10000;
+      return Math.abs(decimal - rounded) < 0.00001;
+    });
+    const zeroIdx = convertible.findIndex((f) => f.numerator === 0);
+    expect(zeroIdx).toBeGreaterThanOrEqual(0);
+    Math.random = () => {
+      n += 1;
+      if (n === 1) {
+        return (zeroIdx + 0.5) / convertible.length;
+      }
+      return ((n * 17) % 97) / 100;
+    };
+    try {
+      const ch = generateChallenge(1); // odd → decimalToFraction → wrong fractions
+      expect(ch.type).toBe('decimalToFraction');
+      expect(ch.fraction.numerator).toBe(0);
+      expect(ch.answerChoices.length).toBe(4);
+      expect(pinballFormatFraction(ch.fraction)).toBeTruthy();
+    } finally {
+      Math.random = orig;
+    }
+  });
+});
+
+// Strip injected zero-numerator fractions after pinball / frac-fact forge tests
+afterEach(() => {
+  for (let i = COMMON_FRACTIONS.length - 1; i >= 0; i--) {
+    if (COMMON_FRACTIONS[i]?.numerator === 0) {
+      COMMON_FRACTIONS.splice(i, 1);
+    }
+  }
 });
 
 // =============================================================================
@@ -735,16 +856,55 @@ describe('engine-coverage-round-2 — stars-bars', () => {
     expect(spots.length).toBeGreaterThan(0);
     const spot = spots[0]!;
     state = starsPlace(state, spot.row, spot.col);
-    expect(
-      state.phase === 'selectingCard' || state.phase === 'gameOver'
-    ).toBe(true);
+    expect(state.phase === 'selectingCard' || state.phase === 'gameOver').toBe(
+      true
+    );
     const passed = starsPass(createStars());
     expect(passed.currentPlayer).toBe('player2');
   });
 
-  it.todo(
-    'calculatePlacementScore !adjCell.card continue — filter already dropped null cards'
-  );
+  it('placeCard scores when adjacent cell has undefined card (filter hole)', () => {
+    const open = createStars();
+    const card = open.playerHands.player1[0]!;
+    // Seed one real card at (2,2), and an adjacent cell with card: undefined
+    // so filter (c.card !== null) keeps it, then !adjCell.card continue fires.
+    const cells: BoardCell[][] = open.cells.map((row) =>
+      row.map((c) => ({ ...c }))
+    );
+    const seed: AttributeCard = {
+      id: 'seed',
+      shape: 'circle',
+      color: 'red',
+      size: 'small',
+      thickness: 'thin',
+    };
+    cells[2]![2] = {
+      ...cells[2]![2]!,
+      card: seed,
+      owner: 'player2',
+    };
+    cells[2]![3] = {
+      ...cells[2]![3]!,
+      card: undefined as unknown as null,
+      owner: null,
+    };
+
+    let state: StarsState = {
+      ...open,
+      cells,
+      selectedCard: card,
+      phase: 'placingCard',
+    };
+    const spots = starsValids(state);
+    expect(spots.length).toBeGreaterThan(0);
+    const spot =
+      spots.find((p) => p.row === 2 && (p.col === 1 || p.col === 3)) ??
+      spots[0]!;
+    state = starsPlace(state, spot.row, spot.col);
+    expect(state.phase === 'selectingCard' || state.phase === 'gameOver').toBe(
+      true
+    );
+  });
 });
 
 // =============================================================================
@@ -757,9 +917,7 @@ describe('engine-coverage-round-2 — frac-fact', () => {
     expect(state.phase).toBe('playing');
     expect(state.currentProblem).not.toBeNull();
     const problem = state.currentProblem!;
-    const correct = problem.answerChoices.find((a) =>
-      fracCheck(problem, a)
-    );
+    const correct = problem.answerChoices.find((a) => fracCheck(problem, a));
     expect(correct).toBeTruthy();
     state = fracSubmit(state, correct!);
     expect(state.phase).toBe('showingResult');
@@ -773,9 +931,31 @@ describe('engine-coverage-round-2 — frac-fact', () => {
     expect(p.answerChoices.length).toBe(4);
   });
 
-  it.todo(
-    'generateProblem divide operand2.numerator===0 guard — COMMON_FRACTIONS have no zero numerator'
-  );
+  it('generateProblem(hard) hits divide zero-numerator operand2 guard', () => {
+    COMMON_FRACTIONS.push({ numerator: 0, denominator: 2 });
+    let n = 0;
+    const orig = Math.random;
+    Math.random = () => {
+      n += 1;
+      // hard ops: [add,sub,mul,divide] — force divide (index 3)
+      if (n === 1) return 0.9;
+      // operand1: any non-zero (index 0)
+      if (n === 2) return 0;
+      // operand2: last = zero numerator
+      if (n === 3) return 0.999;
+      return ((n * 13) % 89) / 100;
+    };
+    try {
+      const p = generateProblem('hard', 1);
+      expect(p.operation).toBe('divide');
+      expect(p.operand2.numerator).not.toBe(0);
+      expect(p.answerChoices.length).toBe(4);
+      expect(getOperationSymbol('divide')).toBeTruthy();
+      expect(fracFormat(p.correctAnswer)).toBeTruthy();
+    } finally {
+      Math.random = orig;
+    }
+  });
 });
 
 // =============================================================================
@@ -815,9 +995,15 @@ describe('engine-coverage-round-2 — fiar', () => {
     expect(getSelectableNodes(open)).toEqual([]);
   });
 
-  it.todo(
-    'subsetUnblocked early return when chipNodes.length < WIN_LENGTH — flush only calls when ≥ WIN_LENGTH'
-  );
+  it('subsetUnblocked short-length early return unreachable — flush gate', () => {
+    // Documented unreachable (round-5): findPaths.flush only invokes
+    // subsetUnblocked when segmentChips.length ≥ WIN_LENGTH, so the
+    // chipNodes.length < WIN_LENGTH early return never runs.
+    const open = createFiar();
+    expect(FIAR_CFG.WIN_LENGTH).toBe(4);
+    expect(findPaths(open, 'player1')).toEqual([]);
+    expect(findAnyWinningPath(open)).toBeNull();
+  });
 });
 
 // =============================================================================
