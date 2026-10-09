@@ -13,6 +13,7 @@ import {
 import { tutorialManager } from '../../core/tutorial';
 import { hexTutorial } from './tutorial';
 import { owlSystem } from '../../core/owl';
+import { clearElement } from '../../core/dom-security';
 import { applyGameModeChrome } from '../../ui/player-colors';
 
 function syncOpponentChrome(): void {
@@ -216,13 +217,19 @@ export function isTutorialActive(): boolean {
   return tutorialManager.getIsActive();
 }
 
-/** Tip-held destroy hook — cancel AI timer/worker so route leave cannot mutate a detached board. */
+/** Tip-held destroy hook — cancel AI timer/worker and drop mount DOM/listeners. */
 export function destroyGame(): void {
   aiGeneration += 1;
   clearAiTimer();
   cancelHexAiRequests();
   disposeHexAiWorker();
   isAIThinking = false;
+  if (boardContainer) {
+    clearElement(boardContainer);
+  }
+  if (statusContainer) {
+    clearElement(statusContainer);
+  }
   boardContainer = null;
   statusContainer = null;
 }

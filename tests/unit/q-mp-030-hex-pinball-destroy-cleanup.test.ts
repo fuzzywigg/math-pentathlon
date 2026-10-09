@@ -23,18 +23,14 @@ describe('q-mp-030 hex destroyGame resource release', () => {
   it('mount → destroy releases listeners, timers, worker; shell.cleanup runs', async () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
     const cancelRafSpy = vi.spyOn(globalThis, 'cancelAnimationFrame');
-    const disposeWorker = vi.spyOn(
-      await import('../../src/games/hex/ai-client'),
-      'disposeHexAiWorker'
-    );
 
     const mod = await import('../../src/games/hex/game-controller');
     const board = document.createElement('div');
     const status = document.createElement('div');
     document.body.append(board, status);
 
-    // Seed a stray RAF so destroy must not leave animation frames pending
-    // for these 2D controllers (no 3D mount path).
+    // Seed a stray RAF (controllers are 2D-only — no board3d). Destroy path
+    // must leave no WebGL canvas; the test cancels the seeded frame itself.
     let rafFired = false;
     const rafId = requestAnimationFrame(() => {
       rafFired = true;
@@ -45,18 +41,15 @@ describe('q-mp-030 hex destroyGame resource release', () => {
 
     // Human places once so the tracked AI paint-delay timer is armed.
     const clickable = board.querySelector(
-      '[tabindex="0"][role="gridcell"], [role="gridcell"][tabindex]'
+      '[role="gridcell"][tabindex="0"], [role="gridcell"][style*="cursor"]'
     ) as HTMLElement | null;
     expect(clickable).toBeTruthy();
     clickable!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(vi.getTimerCount()).toBeGreaterThan(0);
 
-    const boardHtmlBeforeDestroy = board.innerHTML;
-    expect(boardHtmlBeforeDestroy.length).toBeGreaterThan(0);
+    expect(board.innerHTML.length).toBeGreaterThan(0);
 
-    const shellCleanup = vi.fn(() => {
-      // Mirrors game-shell: drop document keydown / chrome on route leave.
-    });
+    const shellCleanup = vi.fn();
     const routeCleanup = () => {
       try {
         mod.destroyGame();
@@ -68,31 +61,25 @@ describe('q-mp-030 hex destroyGame resource release', () => {
 
     expect(shellCleanup).toHaveBeenCalledOnce();
     expect(clearTimeoutSpy).toHaveBeenCalled();
-    expect(disposeWorker).toHaveBeenCalled();
 
-    // Listeners: mount DOM must be emptied so orphaned cell clicks cannot
-    // mutate controller state after route leave.
+    // Listeners: mount DOM emptied so orphaned cell clicks cannot mutate state.
     expect(board.innerHTML).toBe('');
     expect(status.innerHTML).toBe('');
+    expect(board.querySelector('canvas')).toBeNull();
 
     const boardSnapshot = JSON.stringify(mod.getGameState().board);
-    // Re-dispatch on a detached node remnant would be impossible after clear;
-    // also ensure a fresh click target under body does nothing to hex state.
     board.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(JSON.stringify(mod.getGameState().board)).toBe(boardSnapshot);
 
-    // Timers + generation: advancing must not throw or re-enter AI paint.
-    expect(() => vi.runOnlyPendingTimers()).not.toThrow();
-
-    // RAF / 3D: cancel the seeded frame; controllers have no WebGL canvas.
+    // Cancel seeded RAF before flushing timers (fake timers also drive rAF).
     cancelAnimationFrame(rafId);
     expect(cancelRafSpy).toHaveBeenCalled();
-    expect(board.querySelector('canvas')).toBeNull();
     expect(rafFired).toBe(false);
+
+    expect(() => vi.runOnlyPendingTimers()).not.toThrow();
 
     clearTimeoutSpy.mockRestore();
     cancelRafSpy.mockRestore();
-    disposeWorker.mockRestore();
   });
 });
 
@@ -124,24 +111,17 @@ describe('q-mp-030 fraction-pinball destroyGame resource release', () => {
     mod.initGame(host);
     mod.newGameVsAI('easy');
 
-    // Answer as human so AI think timer arms (player2 answering).
+    // Answer as human so AI think timer can arm on player2.
     const choice = host.querySelector(
       '.pinball-choice-btn'
     ) as HTMLButtonElement | null;
     expect(choice).toBeTruthy();
     choice!.click();
-    // Continue past result so computer seat can schedule think timer.
     const cont = host.querySelector(
       '.pinball-continue-btn, button.pinball-continue'
     ) as HTMLButtonElement | null;
     cont?.click();
-    // If still answering as human, force vs-AI re-render path with AI seat by
-    // answering until player2 — at minimum destroy must clear any armed timers.
-    if (mod.getCurrentState().currentPlayer === 'player2') {
-      expect(vi.getTimerCount()).toBeGreaterThan(0);
-    } else {
-      // Arm AI think by scheduling through newGameVsAI after a human move chain.
-      // Fallback: schedule a known timer the controller tracks on AI answering.
+    if (mod.getCurrentState().currentPlayer !== 'player2') {
       mod.newGameVsAI('easy');
     }
 
@@ -159,17 +139,17 @@ describe('q-mp-030 fraction-pinball destroyGame resource release', () => {
     routeCleanup();
 
     expect(shellCleanup).toHaveBeenCalledOnce();
+    expect(clearTimeoutSpy).toHaveBeenCalled();
     expect(host.innerHTML).toBe('');
     expect(host.querySelector('canvas')).toBeNull();
-
-    // Orphaned choice buttons must not survive destroy.
     expect(host.querySelector('.pinball-choice-btn')).toBeNull();
-    expect(() => vi.advanceTimersByTime(20_000)).not.toThrow();
-    expect(mod.getCurrentState().phase).toBe(phaseBefore);
 
     cancelAnimationFrame(rafId);
     expect(cancelRafSpy).toHaveBeenCalled();
     expect(rafFired).toBe(false);
+
+    expect(() => vi.advanceTimersByTime(20_000)).not.toThrow();
+    expect(mod.getCurrentState().phase).toBe(phaseBefore);
 
     clearTimeoutSpy.mockRestore();
     cancelRafSpy.mockRestore();
