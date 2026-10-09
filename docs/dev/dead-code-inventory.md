@@ -4,6 +4,13 @@
 **Generated:** 2026-10-09T09:29:59.317Z
 **Fold order:** **FOLD LAST** (after every other wave5 tip draft)
 
+> **q-mp-119 (2026-10-09):** Demoted/removed the prior Rank-2 deferred test-helper exports
+> (`installFullgamePrefs`, `moveFingerprint`, `startHumanFresh`, `installConsoleGuard`,
+> visual-stability helpers, `getAdapter`, `runDeterminism`/`runDefaultQuality`,
+> `placeSequence`/`withEmptyHands`, `extractSeat`, fake-timer hooks, `jsonReplacer`/`jsonReviver`,
+> visual helpers). Re-run cleared them from the ranked list; remaining Rank-2 deferred is
+> `clearDom` only (`fake-timers.ts` module still `kept`).
+
 ## Method
 
 1. `knip@5.88.1` with committed `knip.json` (HTML + `src/main.ts` + game workers + scripts/tests/docs entries so dynamic game mounts stay reachable).
