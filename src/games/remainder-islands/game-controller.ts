@@ -252,7 +252,7 @@ function render(): void {
     }
 
     gameContainer.appendChild(wrapper);
-  } else {
+  } else if (existingWrapper && existingBoard) {
     const wrapper = existingWrapper;
     const board = existingBoard;
 

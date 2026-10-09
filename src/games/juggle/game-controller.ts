@@ -318,7 +318,9 @@ function handleCellHover(row: number, col: number): void {
   if (gameState.phase !== 'placing') return;
 
   gameState = { ...gameState, hoverPosition: { row, col } };
-  if (!boardContainer) return;
+  if (!boardContainer) {
+    return;
+  }
   const boards = boardContainer.querySelector('.juggle-boards');
   if (boards) {
     applyJuggleHoverPreview(boards as HTMLElement, gameState, {
@@ -332,7 +334,9 @@ function handleCellHover(row: number, col: number): void {
 function handleCellLeave(): void {
   if (isComputerTurnPending()) return;
   gameState = { ...gameState, hoverPosition: null };
-  if (!boardContainer) return;
+  if (!boardContainer) {
+    return;
+  }
   const boards = boardContainer.querySelector('.juggle-boards');
   if (boards) {
     applyJuggleHoverPreview(boards as HTMLElement, gameState, {

@@ -107,7 +107,9 @@ export function syncJuggleBoardCells(
   }
 
   const grid = container.querySelector('.juggle-grid') as HTMLElement | null;
-  if (!grid) return;
+  if (!grid) {
+    return;
+  }
 
   const { previewSet, isPreviewValid } = previewStateForBoard(
     isCurrentPlayer,
@@ -119,10 +121,12 @@ export function syncJuggleBoardCells(
   for (let row = 0; row < CONFIG.GRID_SIZE; row++) {
     for (let col = 0; col < CONFIG.GRID_SIZE; col++) {
       const cell = cells.get(`${row},${col}`);
-      if (!cell) continue;
+      if (!cell) {
+        continue;
+      }
 
-      // ratchet: dense GRID_SIZE×GRID_SIZE board; loops bound by CONFIG.GRID_SIZE.
-      const isOccupied = board.cells[row]![col]!;
+      // Dense GRID_SIZE×GRID_SIZE board; loops bound by CONFIG.GRID_SIZE.
+      const isOccupied = board.cells[row]?.[col] ?? false;
       const isPreview = previewSet.has(`${row},${col}`);
 
       cell.className = 'juggle-cell';
@@ -165,22 +169,30 @@ export function applyJuggleHoverPreview(
   options: JuggleBoardRenderOptions = {}
 ): void {
   const allowInput = options.allowInput !== false;
-  if (!allowInput || state.phase !== 'placing') return;
+  if (!allowInput || state.phase !== 'placing') {
+    return;
+  }
 
   const player = state.currentPlayer;
   const boardEl = boardsRoot.querySelector(
     `.juggle-board.${player}`
   ) as HTMLElement | null;
-  if (!boardEl) return;
+  if (!boardEl) {
+    return;
+  }
   const grid = boardEl.querySelector('.juggle-grid') as HTMLElement | null;
-  if (!grid) return;
+  if (!grid) {
+    return;
+  }
 
   const cells = getCellMap(grid);
   const prevKeys = (boardEl.dataset.hoverKeys || '').split('|').filter(Boolean);
 
   const clearPreview = (key: string): void => {
     const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) return;
+    if (!cell || cell.classList.contains(`occupied-${player}`)) {
+      return;
+    }
     cell.classList.remove('preview-valid', 'preview-invalid');
   };
 
@@ -199,7 +211,9 @@ export function applyJuggleHoverPreview(
   for (const c of previewCells) {
     const key = `${c.row},${c.col}`;
     const cell = cells.get(key);
-    if (!cell || cell.classList.contains(`occupied-${player}`)) continue;
+    if (!cell || cell.classList.contains(`occupied-${player}`)) {
+      continue;
+    }
     cell.classList.remove('preview-valid', 'preview-invalid');
     cell.classList.add(isValid ? 'preview-valid' : 'preview-invalid');
     nextKeys.push(key);
@@ -302,8 +316,12 @@ export function renderBoard(
     const target = (e.target as HTMLElement).closest(
       '.juggle-cell'
     ) as HTMLElement | null;
-    if (!target || !grid.contains(target)) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target || !grid.contains(target)) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     const row = Number(target.dataset.row);
     const col = Number(target.dataset.col);
     if (Number.isFinite(row) && Number.isFinite(col)) {
@@ -311,10 +329,16 @@ export function renderBoard(
     }
   });
   grid.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.key !== 'Enter' && e.key !== ' ') {
+      return;
+    }
     const target = e.target as HTMLElement;
-    if (!target.classList.contains('juggle-cell')) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target.classList.contains('juggle-cell')) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     e.preventDefault();
     const row = Number(target.dataset.row);
     const col = Number(target.dataset.col);
@@ -326,8 +350,12 @@ export function renderBoard(
     'mouseenter',
     (e) => {
       const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
-      if (target.style.cursor !== 'pointer') return;
+      if (!target.classList?.contains?.('juggle-cell')) {
+        return;
+      }
+      if (target.style.cursor !== 'pointer') {
+        return;
+      }
       const row = Number(target.dataset.row);
       const col = Number(target.dataset.col);
       if (Number.isFinite(row) && Number.isFinite(col)) {
@@ -340,7 +368,9 @@ export function renderBoard(
     'mouseleave',
     (e) => {
       const target = e.target as HTMLElement;
-      if (!target.classList?.contains?.('juggle-cell')) return;
+      if (!target.classList?.contains?.('juggle-cell')) {
+        return;
+      }
       onCellLeave();
     },
     true

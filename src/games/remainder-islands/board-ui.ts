@@ -329,11 +329,15 @@ function syncIslandChips(group: SVGGElement, island: Island): void {
   const existingBadge = group.querySelector('circle.island-chip-badge');
   const chipCountEl = group.querySelector('text.island-chip-count');
   const shownChips = chipCountEl ? Number(chipCountEl.textContent) : 0;
-  if (island.chips === shownChips) return;
+  if (island.chips === shownChips) {
+    return;
+  }
 
   existingBadge?.remove();
   chipCountEl?.remove();
-  if (island.chips <= 0) return;
+  if (island.chips <= 0) {
+    return;
+  }
 
   const { x, y } = getHexCenter(island.row, island.col);
   const chipBadge = document.createElementNS(
@@ -387,7 +391,9 @@ export function syncBoard(
     const group = svg.querySelector(
       `g.island[data-island-id="${island.id}"]`
     ) as SVGGElement | null;
-    if (!group) continue;
+    if (!group) {
+      continue;
+    }
 
     const isValid = state.validIslands.includes(island.id);
     const isSelected = state.selectedIsland === island.id;
