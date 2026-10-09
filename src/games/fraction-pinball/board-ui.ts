@@ -342,7 +342,9 @@ export function getPlayerName(player: Player): string {
 // =============================================================================
 
 export function injectFractionPinballStyles(): void {
-  if (document.getElementById('fraction-pinball-styles')) return;
+  if (document.getElementById('fraction-pinball-styles')) {
+    return;
+  }
 
   const style = document.createElement('style');
   style.id = 'fraction-pinball-styles';

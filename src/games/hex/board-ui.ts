@@ -19,7 +19,9 @@ export type CellClickCallback = (row: number, col: number) => void;
 /** True when vs-AI chrome is on and it is the computer's seat to place. */
 function isComputerPlacementTurn(state: HexGameState): boolean {
   const root = getGameModeChromeRoot();
-  if (root?.dataset.opponent !== 'ai') return false;
+  if (root?.dataset.opponent !== 'ai') {
+    return false;
+  }
   const aiSeat = root.dataset.aiSeat === 'player1' ? 'player1' : 'player2';
   return state.currentPlayer === aiSeat;
 }

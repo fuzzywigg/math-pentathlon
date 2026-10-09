@@ -1,5 +1,5 @@
 {
-  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet (probe enables them; live eslint.config.js may stay softer or unset). Lower ceilings when cleaning up; never raise without tip-owner approval. curly:all while live enforces curly:multi-line \u2014 tip measured 896 post-fold #590+#592+#596. @typescript-eslint/no-non-null-assertion: tip measure 387 (q-mp-045); live rule remains unset (ratchet-only).",
+  "notes": "burn-1008-mp-lint-ratchet + q-mp-045: ceilings for rules counted by npm run lint:ratchet. curly:all tip was 896 pre-#608 board-ui fold; will re-measure after curly fold. @typescript-eslint/no-non-null-assertion: 387 (q-mp-045).",
   "rules": {
     "curly": 896,
     "@typescript-eslint/no-non-null-assertion": 387

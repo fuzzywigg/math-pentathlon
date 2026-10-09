@@ -91,7 +91,9 @@ export function syncContigBoard(
     } else if (isValid) {
       cellEl.classList.add('contig-cell-valid');
       const points = calculatePoints(state, value);
-      if (points > 0) cellEl.dataset.points = `+${points}`;
+      if (points > 0) {
+        cellEl.dataset.points = `+${points}`;
+      }
     }
 
     const ownerLabel = cell?.owner ? getPlayerName(cell.owner) : undefined;
@@ -206,20 +208,34 @@ export function renderBoard(
     const target = (e.target as HTMLElement).closest(
       '.contig-cell'
     ) as HTMLElement | null;
-    if (!target || !container.contains(target)) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target || !container.contains(target)) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     const value = Number(target.dataset.value);
-    if (!Number.isFinite(value)) return;
+    if (!Number.isFinite(value)) {
+      return;
+    }
     contigClickBindings.get(container)?.onCellClick(value);
   });
   container.addEventListener('keydown', (e) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (e.key !== 'Enter' && e.key !== ' ') {
+      return;
+    }
     const target = e.target as HTMLElement;
-    if (!target.classList.contains('contig-cell')) return;
-    if (target.style.cursor !== 'pointer') return;
+    if (!target.classList.contains('contig-cell')) {
+      return;
+    }
+    if (target.style.cursor !== 'pointer') {
+      return;
+    }
     e.preventDefault();
     const value = Number(target.dataset.value);
-    if (!Number.isFinite(value)) return;
+    if (!Number.isFinite(value)) {
+      return;
+    }
     contigClickBindings.get(container)?.onCellClick(value);
   });
 
@@ -277,7 +293,9 @@ export function renderExpressionSelector(
   const container = document.createElement('div');
   container.className = 'contig-expressions';
 
-  if (!state.currentDice) return container;
+  if (!state.currentDice) {
+    return container;
+  }
 
   const placements = getValidPlacements(state, state.currentDice);
 

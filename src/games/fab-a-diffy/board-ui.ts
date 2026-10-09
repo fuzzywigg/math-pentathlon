@@ -137,9 +137,15 @@ function createFractionBarElement(
       (state.phase === 'selectingBar2' && state.selectedBar1 !== bar.id));
 
   // Apply classes
-  if (isSelected) wrapper.classList.add('fab-bar-selected');
-  if (isUsed) wrapper.classList.add('fab-bar-used');
-  if (!isSelectable) wrapper.classList.add('fab-bar-disabled');
+  if (isSelected) {
+    wrapper.classList.add('fab-bar-selected');
+  }
+  if (isUsed) {
+    wrapper.classList.add('fab-bar-used');
+  }
+  if (!isSelectable) {
+    wrapper.classList.add('fab-bar-disabled');
+  }
 
   // Create visual bar
   const svg = renderHorizontalBar(bar.fraction, {
@@ -343,7 +349,9 @@ export function renderOperationSelector(
 
   const bar1 = state.fractionBars.get(state.selectedBar1);
   const bar2 = state.fractionBars.get(state.selectedBar2);
-  if (!bar1 || !bar2) return container;
+  if (!bar1 || !bar2) {
+    return container;
+  }
 
   // Show selected fractions
   const preview = document.createElement('div');
@@ -462,7 +470,9 @@ export function renderMoveHistory(state: FabADiffyState): HTMLElement {
     const bar2 = state.fractionBars.get(move.bar2Id);
     const answer = state.answerBars.get(move.resultId);
 
-    if (!bar1 || !bar2 || !answer) continue;
+    if (!bar1 || !bar2 || !answer) {
+      continue;
+    }
 
     const moveEl = document.createElement('div');
     moveEl.className = `fab-history-move fab-history-${move.player}`;
