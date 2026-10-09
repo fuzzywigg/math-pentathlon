@@ -1,0 +1,1939 @@
+{
+  "taskId": "q-mp-309",
+  "generatedAtUtc": "2026-10-09T23:32:29Z",
+  "liveTipBranch": "cursor/mp-tip-post755",
+  "tipSha": "89731e0c99edfa074b18e0757800411830b9418c",
+  "tipShaShort": "89731e0c",
+  "alphaSha": "74a1596f71aab5d6616ff486b2a4eb2a70b5123b",
+  "tipPr": 785,
+  "priorTriage": "docs/dev/open-draft-triage-post755-2026-10-09-v3.md",
+  "priorTriagePr": 782,
+  "markdownTwin": "docs/dev/open-draft-triage-post755-2026-10-09-v5.md",
+  "scope": "report-only; do not close PRs",
+  "supersedes": [
+    "q-mp-284",
+    "q-mp-259"
+  ],
+  "noteQmp284": "q-mp-284 v4 triage was never opened as a dedicated draft; only listed in backlog #801 (q-mp-090h). Leave #801 open; no v4 PR to comment contained on.",
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 246,
+    "@typescript-eslint/no-confusing-void-expression": 86,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 78,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 9,
+    "unitTestSpecFilesExclArchive": 3169
+  },
+  "summaryCounts": {
+    "openTotal": 245,
+    "CONTAINED": 131,
+    "SUPERSEDED": 91,
+    "FOLD-READY": 22,
+    "HELD": 1,
+    "openBasePost755": 37,
+    "containedPost755": 16,
+    "foldReadyPost755": 21
+  },
+  "methodCounts": {
+    "stale-tip-base": 89,
+    "blob-majority": 55,
+    "blob-identity": 47,
+    "topic-supersede": 2,
+    "policy": 1,
+    "prior-755+blob": 8,
+    "patch-id": 20,
+    "tip-pr": 1,
+    "blob-identity+tip-subject": 1,
+    "not-contained": 21
+  },
+  "containmentMethods": {
+    "patch-id": "git show | git patch-id --stable vs tip commits 74a1596f..TIP",
+    "blob-identity": "all changed-path blobs identical on tip",
+    "blob-majority": "majority of changed-path blobs identical on tip (old tip bases)",
+    "blob-identity+tip-subject": "code blobs identical + tip subject fold (docs tip-advanced)",
+    "prior-755+blob": "tip-owner #755 contained list + residual tip blob overlap",
+    "commit-ancestor": "PR head is git ancestor of tip or alpha",
+    "topic-supersede": "topic replaced by newer keeper (triage / tip pointers)",
+    "stale-tip-base": "open on pre-post755 tip; payload not tip-equivalent",
+    "policy": "Andrew / tip-owner HOLD",
+    "tip-pr": "tip fold PR itself",
+    "not-contained": "payload not on tip \u2014 fold candidate"
+  },
+  "byBase": {
+    "cursor/mp-tip-post477": {
+      "SUPERSEDED": 39,
+      "CONTAINED": 28
+    },
+    "cursor/mp-tip-post755": {
+      "CONTAINED": 16,
+      "FOLD-READY": 21
+    },
+    "cursor/integration-fold-wave5-tip-4af0": {
+      "SUPERSEDED": 18,
+      "CONTAINED": 11
+    },
+    "cursor/mp-tip-post598": {
+      "CONTAINED": 22,
+      "SUPERSEDED": 4
+    },
+    "cursor/mp-tip-post748": {
+      "CONTAINED": 24,
+      "SUPERSEDED": 1
+    },
+    "cursor/mp-tip-post728": {
+      "CONTAINED": 15,
+      "SUPERSEDED": 7
+    },
+    "cursor/mp-tip-post700": {
+      "SUPERSEDED": 7,
+      "CONTAINED": 7
+    },
+    "cursor/mp-tip-post709": {
+      "CONTAINED": 5,
+      "SUPERSEDED": 4,
+      "HELD": 1
+    },
+    "alpha": {
+      "SUPERSEDED": 4,
+      "CONTAINED": 1,
+      "FOLD-READY": 1
+    },
+    "cursor/overnight-polish-integration-0494": {
+      "SUPERSEDED": 4,
+      "CONTAINED": 2
+    },
+    "cursor/playtest-recheck-fixes-a6fd": {
+      "SUPERSEDED": 1
+    },
+    "cursor/integration-fold-wave4-tip-36e4": {
+      "SUPERSEDED": 1
+    },
+    "cursor/friday-landing-preflight-v2-e939": {
+      "SUPERSEDED": 1
+    }
+  },
+  "hold": [
+    727
+  ],
+  "foldReady": [
+    785,
+    797,
+    798,
+    799,
+    800,
+    801,
+    802,
+    803,
+    804,
+    805,
+    806,
+    807,
+    808,
+    809,
+    810,
+    811,
+    812,
+    813,
+    814,
+    815,
+    816,
+    817
+  ],
+  "containedPost755": [
+    780,
+    781,
+    782,
+    783,
+    784,
+    786,
+    787,
+    788,
+    789,
+    790,
+    791,
+    792,
+    793,
+    794,
+    795,
+    796
+  ],
+  "containedNumbers": [
+    420,
+    422,
+    559,
+    565,
+    572,
+    586,
+    589,
+    591,
+    592,
+    593,
+    594,
+    595,
+    597,
+    600,
+    602,
+    606,
+    609,
+    613,
+    615,
+    616,
+    617,
+    618,
+    622,
+    623,
+    624,
+    625,
+    632,
+    633,
+    634,
+    641,
+    642,
+    643,
+    644,
+    648,
+    652,
+    653,
+    656,
+    664,
+    667,
+    668,
+    674,
+    675,
+    678,
+    679,
+    680,
+    681,
+    682,
+    683,
+    684,
+    685,
+    686,
+    687,
+    688,
+    689,
+    690,
+    691,
+    692,
+    693,
+    694,
+    695,
+    696,
+    699,
+    702,
+    704,
+    705,
+    708,
+    711,
+    712,
+    715,
+    716,
+    718,
+    719,
+    723,
+    724,
+    725,
+    726,
+    731,
+    733,
+    734,
+    738,
+    739,
+    741,
+    743,
+    744,
+    745,
+    746,
+    747,
+    749,
+    751,
+    752,
+    753,
+    754,
+    756,
+    757,
+    758,
+    759,
+    760,
+    761,
+    762,
+    763,
+    764,
+    765,
+    766,
+    768,
+    769,
+    770,
+    771,
+    772,
+    773,
+    774,
+    775,
+    776,
+    777,
+    778,
+    779,
+    780,
+    781,
+    782,
+    783,
+    784,
+    786,
+    787,
+    788,
+    789,
+    790,
+    791,
+    792,
+    793,
+    794,
+    795,
+    796
+  ],
+  "supersededNumbers": [
+    393,
+    394,
+    418,
+    419,
+    428,
+    429,
+    468,
+    487,
+    488,
+    492,
+    535,
+    537,
+    557,
+    560,
+    561,
+    563,
+    564,
+    567,
+    568,
+    569,
+    570,
+    580,
+    583,
+    585,
+    587,
+    588,
+    590,
+    596,
+    599,
+    601,
+    603,
+    604,
+    605,
+    607,
+    608,
+    610,
+    612,
+    614,
+    619,
+    620,
+    621,
+    626,
+    627,
+    628,
+    629,
+    630,
+    631,
+    635,
+    636,
+    637,
+    638,
+    639,
+    645,
+    646,
+    647,
+    649,
+    650,
+    651,
+    657,
+    665,
+    666,
+    669,
+    670,
+    671,
+    672,
+    673,
+    676,
+    677,
+    697,
+    698,
+    701,
+    703,
+    706,
+    707,
+    710,
+    713,
+    714,
+    717,
+    720,
+    721,
+    722,
+    729,
+    730,
+    732,
+    735,
+    736,
+    737,
+    740,
+    742,
+    750,
+    767
+  ],
+  "suggestedFoldOrder": [
+    802,
+    805,
+    810,
+    811,
+    801,
+    812,
+    797,
+    803,
+    806,
+    809,
+    808,
+    813,
+    814,
+    815,
+    816,
+    817,
+    804,
+    807,
+    798,
+    799,
+    800
+  ],
+  "primaryDrafts": [
+    {
+      "number": 713,
+      "title": "q-mp-198: re-anchor AGENTS.md + wiki tip pointers to cursor/mp-tip-post700",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/713",
+      "base": "cursor/mp-tip-post700",
+      "headRefName": "cursor/q-mp-198-tip-pointers-f93b",
+      "head": "57f0150f",
+      "status": "SUPERSEDED",
+      "method": "topic-supersede",
+      "evidence": "superseded by tip post755 pointer re-anchor on #785 (q-mp-026i)",
+      "files": [
+        "AGENTS.md",
+        "docs/wiki/development.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-198",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 725,
+      "title": "q-mp-209: Docs \u2014 tip post700 open-draft triage snapshot (JSON + md)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/725",
+      "base": "cursor/mp-tip-post709",
+      "headRefName": "cursor/q-mp-209-open-draft-triage-ca7b",
+      "head": "71c543a7",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/open-draft-triage-post700-2026-10-09.json",
+        "docs/dev/open-draft-triage-post700-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-209",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 727,
+      "title": "q-mp-186: clear prefer-nullish-coalescing in owl-messages (\u22129)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/727",
+      "base": "cursor/mp-tip-post709",
+      "headRefName": "cursor/q-mp-186-nullish-owl-messages-0a20",
+      "head": "54532ce5",
+      "status": "HELD",
+      "method": "policy",
+      "evidence": "Andrew decision / tip-owner HOLD \u2014 prefer-nullish-coalescing owl-messages; do not touch",
+      "isDraft": true,
+      "taskId": "q-mp-186"
+    },
+    {
+      "number": 737,
+      "title": "q-mp-210: re-anchor AGENTS.md + wiki tip pointers to cursor/mp-tip-post728",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/737",
+      "base": "cursor/mp-tip-post728",
+      "headRefName": "cursor/q-mp-210-tip-pointers-d4bf",
+      "head": "acffc08f",
+      "status": "SUPERSEDED",
+      "method": "topic-supersede",
+      "evidence": "superseded by tip post755 pointer re-anchor on #785 (q-mp-026i)",
+      "files": [
+        "AGENTS.md",
+        "docs/wiki/development.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-210",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 747,
+      "title": "q-mp-212: tip post728 open-draft triage snapshot (#727 HOLD + #731\u2013#745)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/747",
+      "base": "cursor/mp-tip-post728",
+      "headRefName": "cursor/q-mp-212-open-draft-triage-post728-e403",
+      "head": "4e79d6f4",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/open-draft-triage-post728-2026-10-09.json",
+        "docs/dev/open-draft-triage-post728-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-212",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 754,
+      "title": "q-mp-221: clear no-confusing-void-expression in */board-ui.ts (\u221232 \u2192 ceiling 100)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/754",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-221-void-board-ui-d0d2",
+      "head": "5426e70c",
+      "status": "CONTAINED",
+      "method": "prior-755+blob",
+      "evidence": "contained in alpha @ 74a1596f via #755; blob same=17 diff=1",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/games/calla/board-ui.ts",
+        "src/games/contig-60/board-ui.ts",
+        "src/games/fab-a-diffy/board-ui.ts",
+        "src/games/fiar/board-ui.ts",
+        "src/games/frac-fact/board-ui.ts",
+        "src/games/fraction-pinball/board-ui.ts",
+        "src/games/hex-a-gone/board-ui.ts",
+        "src/games/hex/board-ui.ts",
+        "src/games/juggle/board-ui.ts",
+        "src/games/kwatro-sinko/board-ui.ts",
+        "src/games/par-55/board-ui.ts",
+        "src/games/pent-em-in/board-ui.ts",
+        "src/games/prime-gold/board-ui.ts",
+        "src/games/ramrod/board-ui.ts",
+        "src/games/star-track/board-ui.ts",
+        "src/games/stars-bars/board-ui.ts",
+        "src/games/sum-dominoes/board-ui.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-221",
+      "content_same": 17,
+      "content_diff": 1
+    },
+    {
+      "number": 756,
+      "title": "q-mp-237: document post-#748 bundle headroom (sum-dominoes \u221276 B)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/756",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-237-bundle-headroom-07e1",
+      "head": "f44e5c44",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/bundle-headroom-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-237",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 757,
+      "title": "q-mp-239: Docs \u2014 ui/three board-3d layout-read inventory + diagram",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/757",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-239-board3d-layout-reads-0339",
+      "head": "0407e077",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/board3d-layout-reads-inventory-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-239",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 758,
+      "title": "q-mp-234: tip post748 open-draft triage refresh v2 (#727 HOLD + #749\u2013#753)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/758",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-234-open-draft-triage-post748-v2-e695",
+      "head": "e8f7de2b",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/open-draft-triage-post748-2026-10-09-v2.json",
+        "docs/dev/open-draft-triage-post748-2026-10-09-v2.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-234",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 759,
+      "title": "q-mp-240: eslint inventory addendum for non-ceilinged residuals",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/759",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-240-eslint-nonceiling-addendum-8064",
+      "head": "b03a28ad",
+      "status": "CONTAINED",
+      "method": "prior-755+blob",
+      "evidence": "contained in alpha @ 74a1596f via #755; blob same=1 diff=1",
+      "files": [
+        "docs/dev/eslint-non-ceilinged-residuals-2026-10-09.md",
+        "docs/dev/eslint-off-rules-inventory.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-240",
+      "content_same": 1,
+      "content_diff": 1
+    },
+    {
+      "number": 760,
+      "title": "q-mp-244: clear no-duplicate-imports in core/** + ui/three/** (\u221221 \u2192 ceiling 78)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/760",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-244-dup-imports-core-three-741b",
+      "head": "56a838a7",
+      "status": "CONTAINED",
+      "method": "prior-755+blob",
+      "evidence": "contained in alpha @ 74a1596f via #755; blob same=16 diff=4",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/core/alignment/compat.ts",
+        "src/core/alignment/contiguous.ts",
+        "src/core/alignment/grid-alignment.ts",
+        "src/core/attributes/attribute-ui.ts",
+        "src/core/dice/dice-selector.ts",
+        "src/core/dice/dice-ui.ts",
+        "src/core/dice/roller.ts",
+        "src/core/fractions/fraction-bar-ui.ts",
+        "src/core/graph/graph-ui.ts",
+        "src/core/owl/owl-system.ts",
+        "src/core/polyomino/polyomino-ui.ts",
+        "src/core/storage/sanitize.ts",
+        "src/core/storage/storage.ts",
+        "src/ui/three/fiar-board-3d.ts",
+        "src/ui/three/hex-a-gone-board-3d.ts",
+        "src/ui/three/pent-em-in-board-3d.ts",
+        "src/ui/three/prime-gold-board-3d.ts",
+        "src/ui/three/queens-guards-board-3d.ts",
+        "src/ui/three/star-track-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-244",
+      "content_same": 16,
+      "content_diff": 4
+    },
+    {
+      "number": 761,
+      "title": "q-mp-243: clear polyomino-demo no-non-null-assertion (\u22127 \u2192 ceiling 247)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/761",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-243-polyomino-demo-nnnull-7f1a",
+      "head": "d26471a1",
+      "status": "CONTAINED",
+      "method": "prior-755+blob",
+      "evidence": "contained in alpha @ 74a1596f via #755; blob same=2 diff=1",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/demos/polyomino-demo.ts",
+        "tests/unit/q-mp-243-polyomino-demo-nnnull-guards.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-243",
+      "content_same": 2,
+      "content_diff": 1
+    },
+    {
+      "number": 762,
+      "title": "q-mp-254: Knip unusedTypes demote batch 2 (Rank-3 \u22126 \u2192 baseline 83)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/762",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-254-knip-unused-types-batch2-6195",
+      "head": "17dbfa6d",
+      "status": "CONTAINED",
+      "method": "prior-755+blob",
+      "evidence": "contained in alpha @ 74a1596f via #755; blob same=2 diff=3",
+      "files": [
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "src/core/dice/dice-selector.ts",
+        "src/core/dice/types.ts",
+        "src/core/safe-web-storage.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-254",
+      "content_same": 2,
+      "content_diff": 3
+    },
+    {
+      "number": 763,
+      "title": "q-mp-236: refresh ratchet-ceiling-history SVG for tip post748",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/763",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-236-ratchet-history-svg-3d12",
+      "head": "8787f001",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/ratchet-ceiling-history.md",
+        "docs/dev/ratchet-ceiling-history.svg",
+        "scripts/report-ratchet-history.mjs",
+        "tests/unit/report-ratchet-history.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-236",
+      "pid_matches": [
+        {
+          "commit": "8787f001",
+          "tipCommit": "39fcffe2"
+        }
+      ],
+      "content_same": 4,
+      "content_diff": 0
+    },
+    {
+      "number": 764,
+      "title": "q-mp-258: Canvas DPR/resize regression tests for shared helpers",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/764",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-258-canvas-dpr-resize-tests-cc5b",
+      "head": "95642253",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "tests/unit/canvas-dpr-resize-regression.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-258",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 765,
+      "title": "q-mp-256: PWA unit characterization (register / idle-warm / bootstrap soft-fail)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/765",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-256-pwa-unit-char-b14d",
+      "head": "15fa6868",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "tests/unit/q-mp-256-pwa-soft-fail.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-256",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 766,
+      "title": "q-mp-241: Rank-1 dead-CSS rescan + remove unused *-btn-primary leftovers",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/766",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-241-dead-css-rescan-1d52",
+      "head": "4870e4df",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 5 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/dead-code-inventory.json",
+        "docs/dev/dead-code-inventory.md",
+        "docs/dev/dead-css-rank1-rescan-2026-10-09.md",
+        "src/games/par-55/par-55.css",
+        "src/games/ramrod/ramrod.css"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-241",
+      "content_same": 5,
+      "content_diff": 0
+    },
+    {
+      "number": 767,
+      "title": "q-mp-235: remeasure wiki/testing-layers unit counts for tip post748",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/767",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-235-testing-layers-counts-213f",
+      "head": "9365c7f6",
+      "status": "SUPERSEDED",
+      "method": "stale-tip-base",
+      "evidence": "open on stale tip base cursor/mp-tip-post748; not tip-equivalent; outside post755 fold queue",
+      "files": [
+        "docs/dev/testing-layers-2026-10-09.md",
+        "docs/wiki/ci-unit-budget.md",
+        "docs/wiki/development.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-235",
+      "content_same": 0,
+      "content_diff": 3
+    },
+    {
+      "number": 768,
+      "title": "q-mp-257: characterize game-error-boundary soft-fail paths (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/768",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-257-error-boundary-soft-fail-bcd7",
+      "head": "fcf30507",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "tests/unit/game-error-boundary-soft-fail.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-257",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 769,
+      "title": "q-mp-255: cut tutorial.ts layout-forcing DOM reads (reflow 2\u21921)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/769",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-255-tutorial-layout-reads-d3fe",
+      "head": "0056fa3b",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/q-mp-255-tutorial-layout-reads.md",
+        "src/core/tutorial.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-255",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 770,
+      "title": "q-mp-248: UI coverage round 11 \u2014 contig-60 board-ui + controller residuals",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/770",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-248-ui-cov-r11-contig-4865",
+      "head": "9739a9bb",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/ui-coverage-round-11.md",
+        "tests/unit/burn-1009-ui-cov-r11-contig.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-248",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 771,
+      "title": "q-mp-250: UI coverage round 13 \u2014 kwatro-sinko residuals (tests only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/771",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-250-ui-cov-r13-kwatro-f466",
+      "head": "be8f39d9",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/ui-coverage-round-13.md",
+        "tests/unit/burn-1009-ui-cov-r13-kwatro.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-250",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 772,
+      "title": "q-mp-249: UI coverage round 12 \u2014 fiar board-ui + controller residuals",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/772",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-249-fiar-ui-cov-r12-488a",
+      "head": "f76f99a4",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/ui-coverage-round-12.md",
+        "tests/unit/burn-1009-ui-cov-r12-fiar.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-249",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 773,
+      "title": "q-mp-252: engine coverage round 7 \u2014 residual non-rules characterization",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/773",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-252-engine-cov-r7-b705",
+      "head": "c3624b22",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 2 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/engine-coverage-round-7.md",
+        "tests/unit/engine-coverage-round-7-burn-1008.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-252",
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 774,
+      "title": "q-mp-251: mutation audit UI wave 7 \u2014 contig/game-shell/tutorial (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/774",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-251-mutation-audit-ui-7-d220",
+      "head": "5a16f62c",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 6 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/mutation-audit-ui-7-after.json",
+        "docs/dev/mutation-audit-ui-7-baseline.json",
+        "docs/dev/mutation-audit-ui-7.md",
+        "tests/unit/mutation-ui7-contig-board-ui.test.ts",
+        "tests/unit/mutation-ui7-game-shell.test.ts",
+        "tests/unit/mutation-ui7-tutorial.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-251",
+      "content_same": 6,
+      "content_diff": 0
+    },
+    {
+      "number": 775,
+      "title": "q-mp-090g: Oct 9h engineering backlog round 7 (25 tasks q-mp-259..283) for tip post748",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/775",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-090g-backlog-09h-e114",
+      "head": "f69ad47c",
+      "status": "CONTAINED",
+      "method": "blob-identity",
+      "evidence": "all 1 changed path blob(s) identical on tip 89731e0c",
+      "files": [
+        "docs/dev/backlog-2026-10-09h.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-090g",
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 776,
+      "title": "q-mp-277: characterize game-shell soft-fail / chrome residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/776",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-277-game-shell-soft-fail-a0c6",
+      "head": "83321ac5",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "tests/unit/game-shell-soft-fail-chrome.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-277",
+      "pid_matches": [
+        {
+          "commit": "83321ac5",
+          "tipCommit": "cd752d0e"
+        }
+      ],
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 777,
+      "title": "q-mp-269: UI coverage round 14 \u2014 juggle board-ui + controller residuals",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/777",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-269-juggle-ui-cov-r14-5e38",
+      "head": "8aad9e6a",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/ui-coverage-round-14.md",
+        "tests/unit/burn-1009-ui-cov-r14-juggle.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-269",
+      "pid_matches": [
+        {
+          "commit": "8aad9e6a",
+          "tipCommit": "01f9f75d"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 778,
+      "title": "q-mp-272: mutation audit UI wave 8 \u2014 expression/polyomino/graph (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/778",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-272-mutation-audit-ui-8-5d95",
+      "head": "03156c77",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 2 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/mutation-audit-ui-8-after.json",
+        "docs/dev/mutation-audit-ui-8-baseline.json",
+        "docs/dev/mutation-audit-ui-8.md",
+        "tests/unit/mutation-ui8-expression-ui.test.ts",
+        "tests/unit/mutation-ui8-graph-ui.test.ts",
+        "tests/unit/mutation-ui8-polyomino-ui.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-272",
+      "pid_matches": [
+        {
+          "commit": "03156c77",
+          "tipCommit": "a3ed8f50"
+        },
+        {
+          "commit": "32fb68e7",
+          "tipCommit": "171b90ad"
+        }
+      ],
+      "content_same": 6,
+      "content_diff": 0
+    },
+    {
+      "number": 779,
+      "title": "q-mp-281: engine coverage round 8 \u2014 residual core characterization",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/779",
+      "base": "cursor/mp-tip-post748",
+      "headRefName": "cursor/q-mp-281-engine-cov-r8-e652",
+      "head": "df6422e5",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 2 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/engine-coverage-round-8.md",
+        "tests/unit/engine-coverage-round-8-burn-1008.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-281",
+      "pid_matches": [
+        {
+          "commit": "31124659",
+          "tipCommit": "89e40ad7"
+        },
+        {
+          "commit": "a3c8dd30",
+          "tipCommit": "534af5a7"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 780,
+      "title": "q-mp-264: emit-identity FAIL inventory (11 AI diffs) \u2014 docs only",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/780",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-264-emit-identity-inventory-a4c4",
+      "head": "b7b287b3",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/ai-typeonly-option.md",
+        "docs/dev/emit-identity-fail-inventory-2026-10-09.md",
+        "docs/wiki/development.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-264",
+      "pid_matches": [
+        {
+          "commit": "b7b287b3",
+          "tipCommit": "cece26a0"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 1
+    },
+    {
+      "number": 781,
+      "title": "q-mp-276: Docs \u2014 typecheck out-of-scope 216 HOLD map (AI residual)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/781",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-276-typecheck-oos-hold-map-f860",
+      "head": "fce453c7",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/typecheck-oos-216-hold-map-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-276",
+      "pid_matches": [
+        {
+          "commit": "fce453c7",
+          "tipCommit": "ade55c71"
+        }
+      ],
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 782,
+      "title": "q-mp-259: tip post755 open-draft triage refresh v3 (contained by #755 / still to fold / HELD)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/782",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-259-open-draft-triage-post755-v3-4543",
+      "head": "001da9c7",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/open-draft-triage-post755-2026-10-09-v3.json",
+        "docs/dev/open-draft-triage-post755-2026-10-09-v3.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-259",
+      "pid_matches": [
+        {
+          "commit": "001da9c7",
+          "tipCommit": "998557ca"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 783,
+      "title": "q-mp-279: CI permissions / persist-credentials pin audit (docs + unit pin)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/783",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-279-ci-permissions-pin-8d9b",
+      "head": "f8086a18",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-279.md",
+        "tests/unit/ci-permissions-persist-credentials-pin.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-279",
+      "pid_matches": [
+        {
+          "commit": "f8086a18",
+          "tipCommit": "93f510f5"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 784,
+      "title": "q-mp-282: batch hex-a-gone board-3d layout reads (no visual change)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/784",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-282-hex-board3d-layout-reads-23e1",
+      "head": "29f56963",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 2 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/q-mp-282-hex-board3d-layout-reads.md",
+        "src/ui/three/hex-a-gone-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-282",
+      "pid_matches": [
+        {
+          "commit": "29f56963",
+          "tipCommit": "dfac47f5"
+        },
+        {
+          "commit": "3200572b",
+          "tipCommit": "efb400f5"
+        }
+      ],
+      "content_same": 1,
+      "content_diff": 1
+    },
+    {
+      "number": 785,
+      "title": "q-mp-026i: tip fold post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/785",
+      "base": "alpha",
+      "headRefName": "cursor/mp-tip-post755",
+      "head": "89731e0c",
+      "status": "FOLD-READY",
+      "method": "tip-pr",
+      "evidence": "tip-owner fold PR cursor/mp-tip-post755 \u2192 alpha @ head 89731e0c (tip folding in progress)",
+      "isDraft": true,
+      "taskId": "q-mp-026i"
+    },
+    {
+      "number": 786,
+      "title": "q-mp-268: clear return-await in idle-warm + mounts (\u22124)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/786",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-268-return-await-idle-mounts-4927",
+      "head": "9a21d47d",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "src/pwa/idle-warm.ts",
+        "src/ui/game-route-mounts.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-268",
+      "pid_matches": [
+        {
+          "commit": "9a21d47d",
+          "tipCommit": "02af5c56"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 787,
+      "title": "q-mp-278: characterize pointer-hygiene + reduced-motion helpers (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/787",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-278-pointer-reduced-motion-b112",
+      "head": "4084d75c",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/q-mp-278-pointer-reduced-motion.md",
+        "tests/unit/q-mp-278-pointer-hygiene-reduced-motion.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-278",
+      "pid_matches": [
+        {
+          "commit": "4084d75c",
+          "tipCommit": "4e7a29ed"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 788,
+      "title": "q-mp-267: clear no-shadow in ui/three (\u22124 \u2192 ceiling 9)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/788",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-267-no-shadow-three-299e",
+      "head": "5e4d5fbc",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/ui/three/hex-a-gone-board-3d.ts",
+        "src/ui/three/kwatro-sinko-board-3d.ts",
+        "src/ui/three/pent-em-in-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-267",
+      "pid_matches": [
+        {
+          "commit": "5e4d5fbc",
+          "tipCommit": "dc429baf"
+        }
+      ],
+      "content_same": 3,
+      "content_diff": 1
+    },
+    {
+      "number": 789,
+      "title": "q-mp-273: collapse knip kings-board createRulesState alias (duplicates 1\u21920)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/789",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-273-kings-board-alias-0dfb",
+      "head": "068d1157",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "tests/unit/helpers/kings-board.ts",
+        "tests/unit/kings-quadraphages-ai.test.ts",
+        "tests/unit/overnight-kings-ai-easy-seeded-trapped.test.ts",
+        "tests/unit/overnight-kings-ai-evaluate-heuristic-mobility.test.ts",
+        "tests/unit/overnight-kings-ai-evaluate-missing-king.test.ts",
+        "tests/unit/overnight-kings-ai-evaluate-terminal.test.ts",
+        "tests/unit/overnight-kings-ai-getbestmove-ignores-difficulty-label.test.ts",
+        "tests/unit/overnight-kings-ai-medium-seeded.test.ts",
+        "tests/unit/overnight-kings-ai-medium-win-trap.test.ts",
+        "tests/unit/overnight-kings-ai-win-trap-placement.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-273",
+      "pid_matches": [
+        {
+          "commit": "068d1157",
+          "tipCommit": "769fef91"
+        }
+      ],
+      "content_same": 10,
+      "content_diff": 2
+    },
+    {
+      "number": 790,
+      "title": "q-mp-275: residual check:copy-pins inventory refresh (tip post755)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/790",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-275-copy-pins-residual-adb4",
+      "head": "69f64d80",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/copy-pins-residual-inventory-post755-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-275",
+      "pid_matches": [
+        {
+          "commit": "69f64d80",
+          "tipCommit": "d08ce17c"
+        }
+      ],
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 791,
+      "title": "q-mp-260: remeasure wiki/testing-layers unit counts for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/791",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-260-testing-layers-counts-e342",
+      "head": "7fb5166c",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/testing-layers-2026-10-09.md",
+        "docs/wiki/ci-unit-budget.md",
+        "docs/wiki/development.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-260",
+      "pid_matches": [
+        {
+          "commit": "7fb5166c",
+          "tipCommit": "d2ee449c"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 1
+    },
+    {
+      "number": 792,
+      "title": "q-mp-263: remeasure post-#755 bundle headroom (sum-dominoes \u221279 B)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/792",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-263-bundle-headroom-post755-a10d",
+      "head": "89d483dd",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/bundle-headroom-post755-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-263",
+      "pid_matches": [
+        {
+          "commit": "89d483dd",
+          "tipCommit": "94d27494"
+        }
+      ],
+      "content_same": 1,
+      "content_diff": 0
+    },
+    {
+      "number": 793,
+      "title": "q-mp-274: Knip unusedTypes demote batch 3 (Rank-3 \u22127 \u2192 baseline 76)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/793",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-274-knip-unused-types-batch3-c500",
+      "head": "e0c335c0",
+      "status": "CONTAINED",
+      "method": "blob-identity+tip-subject",
+      "evidence": "tip folded q-mp-274 @ 1eee9898; types blobs identical; knip docs tip-advanced",
+      "files": [
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "src/games/fiar/types.ts",
+        "src/games/star-track/types.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-274",
+      "content_same": 2,
+      "content_diff": 2
+    },
+    {
+      "number": 794,
+      "title": "q-mp-271: characterize ai-worker non-search surfaces (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/794",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-271-ai-worker-nonsearch-50db",
+      "head": "f5d4b408",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/q-mp-271-ai-worker-nonsearch.md",
+        "tests/unit/ai-worker-nonsearch.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-271",
+      "pid_matches": [
+        {
+          "commit": "f5d4b408",
+          "tipCommit": "8cda3022"
+        }
+      ],
+      "content_same": 2,
+      "content_diff": 0
+    },
+    {
+      "number": 795,
+      "title": "q-mp-270: UI coverage round 15 \u2014 coldest src/ui/three characterization",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/795",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-270-ui-cov-r15-three-d9a3",
+      "head": "7b32fb2a",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 2 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "docs/dev/coverage-map.md",
+        "docs/dev/coverage-map.svg",
+        "docs/dev/ui-coverage-round-15.md",
+        "tests/unit/mp3d-ui-cov-r15-hex-pent-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-kings-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-queens-kwatro-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-tablet-gl-residuals.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-270",
+      "pid_matches": [
+        {
+          "commit": "7b32fb2a",
+          "tipCommit": "a35ddb3a"
+        },
+        {
+          "commit": "58f3cf21",
+          "tipCommit": "ddad09bf"
+        }
+      ],
+      "content_same": 7,
+      "content_diff": 0
+    },
+    {
+      "number": 796,
+      "title": "q-mp-280: report-only lint-bucket summary script (dev helper)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/796",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-280-lint-bucket-report-88ee",
+      "head": "c9ef0545",
+      "status": "CONTAINED",
+      "method": "patch-id",
+      "evidence": "all 1 unique commit patch-id(s) match tip #785 @ 89731e0c",
+      "files": [
+        "AGENTS.md",
+        "docs/dev/eslint-off-rules-inventory.md",
+        "docs/dev/lint-bucket-report.md",
+        "docs/wiki/development.md",
+        "package.json",
+        "scripts/report-lint-buckets.mjs"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-280",
+      "pid_matches": [
+        {
+          "commit": "c9ef0545",
+          "tipCommit": "89731e0c"
+        }
+      ],
+      "content_same": 4,
+      "content_diff": 2
+    },
+    {
+      "number": 797,
+      "title": "q-mp-261: refresh coverage-map after tip #755 folds",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/797",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-261-coverage-map-refresh-d6f4",
+      "head": "af571ec5",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=1 diff=2 missing_on_tip=0",
+      "files": [
+        "docs/dev/coverage-map.md",
+        "docs/dev/coverage-map.svg",
+        "docs/wiki/coverage-map.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-261",
+      "content_same": 1,
+      "content_diff": 2
+    },
+    {
+      "number": 798,
+      "title": "q-mp-205: clear no-duplicate-imports in game-controller.ts (\u221231 \u2192 ceiling 47)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/798",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-205-gc-dup-imports-1379",
+      "head": "d52c4ae1",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=2; blob same=0 diff=21 missing_on_tip=0",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/games/calla/game-controller.ts",
+        "src/games/contig-60/game-controller.ts",
+        "src/games/fab-a-diffy/game-controller.ts",
+        "src/games/fiar/game-controller.ts",
+        "src/games/frac-fact/game-controller.ts",
+        "src/games/fraction-pinball/game-controller.ts",
+        "src/games/hex-a-gone/game-controller.ts",
+        "src/games/hex/game-controller.ts",
+        "src/games/juggle/game-controller.ts",
+        "src/games/kings-quadraphages/game-controller.ts",
+        "src/games/kwatro-sinko/game-controller.ts",
+        "src/games/par-55/game-controller.ts",
+        "src/games/pent-em-in/game-controller.ts",
+        "src/games/prime-gold/game-controller.ts",
+        "src/games/queens-guards/game-controller.ts",
+        "src/games/ramrod/game-controller.ts",
+        "src/games/remainder-islands/game-controller.ts",
+        "src/games/star-track/game-controller.ts",
+        "src/games/stars-bars/game-controller.ts",
+        "src/games/sum-dominoes/game-controller.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-205",
+      "content_same": 0,
+      "content_diff": 21
+    },
+    {
+      "number": 799,
+      "title": "q-mp-219: clear no-confusing-void-expression in core helpers (\u221220 \u2192 ceiling 66)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/799",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-219-void-core-helpers-2357",
+      "head": "ebf45101",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=10 missing_on_tip=0",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/core/attributes/attribute-ui.ts",
+        "src/core/dice/dice-selector.ts",
+        "src/core/dice/dice-ui.ts",
+        "src/core/expressions/expression-ui.ts",
+        "src/core/graph/graph-ui.ts",
+        "src/core/owl/owl-events.ts",
+        "src/core/owl/owl-system.ts",
+        "src/core/polyomino/polyomino-ui.ts",
+        "src/core/tutorial.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-219",
+      "content_same": 0,
+      "content_diff": 10
+    },
+    {
+      "number": 800,
+      "title": "q-mp-194: clear stricter eqeqeq outside rules.ts (\u221211 \u2192 ceiling 1)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/800",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-194-eqeqeq-residuals-7af4",
+      "head": "7351581e",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=9 missing_on_tip=0",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "eslint.config.js",
+        "scripts/check-lint-ratchet.mjs",
+        "src/core/safe-web-storage.ts",
+        "src/core/storage/storage.ts",
+        "src/games/kwatro-sinko/board-ui.ts",
+        "src/ui/board-a11y.ts",
+        "src/ui/components/game-shell.ts",
+        "src/ui/three/kwatro-sinko-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-194",
+      "content_same": 0,
+      "content_diff": 9
+    },
+    {
+      "number": 801,
+      "title": "q-mp-090h: Oct 9i engineering backlog round 8 (25 tasks q-mp-284..308) for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/801",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-090h-backlog-09i-d8c6",
+      "head": "cb8e7e14",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=1 missing_on_tip=1",
+      "files": [
+        "docs/dev/backlog-2026-10-09i.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-090h",
+      "content_same": 0,
+      "content_diff": 1
+    },
+    {
+      "number": 802,
+      "title": "q-mp-290: refresh ratchet-ceiling-history SVG for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/802",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-290-ratchet-history-svg-504d",
+      "head": "e028c5f3",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=4 missing_on_tip=0",
+      "files": [
+        "docs/dev/ratchet-ceiling-history.md",
+        "docs/dev/ratchet-ceiling-history.svg",
+        "scripts/report-ratchet-history.mjs",
+        "tests/unit/report-ratchet-history.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-290",
+      "content_same": 0,
+      "content_diff": 4
+    },
+    {
+      "number": 803,
+      "title": "q-mp-300: characterize dice-selector enable/disable soft paths (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/803",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-300-dice-selector-char-1e93",
+      "head": "53eb7f06",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=1 missing_on_tip=1",
+      "files": [
+        "tests/unit/q-mp-300-dice-selector-enable-disable.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-300",
+      "content_same": 0,
+      "content_diff": 1
+    },
+    {
+      "number": 804,
+      "title": "q-mp-303: batch queens-guards board-3d layout reads (no visual change)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/804",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-303-queens-board3d-layout-reads-9404",
+      "head": "21771351",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=1",
+      "files": [
+        "docs/dev/q-mp-303-queens-board3d-layout-reads.md",
+        "src/ui/three/queens-guards-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-303",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 805,
+      "title": "q-mp-305: Rank-1 dead-CSS rescan on tip post755 (report-only; contains #766)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/805",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-305-dead-css-rescan-7c8b",
+      "head": "d2fb79d7",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=3 missing_on_tip=2",
+      "files": [
+        "docs/dev/dead-code-inventory.md",
+        "docs/dev/dead-css-rank1-rescan-post755-2026-10-09.md",
+        "docs/dev/dead-css-rank1-rescan-post755-2026-10-09.svg"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-305",
+      "content_same": 0,
+      "content_diff": 3
+    },
+    {
+      "number": 806,
+      "title": "q-mp-307: characterize stats-dashboard soft-fail residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/806",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-307-stats-dashboard-residuals-4edf",
+      "head": "53a73256",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=2",
+      "files": [
+        "docs/dev/q-mp-307-stats-dashboard-residuals.md",
+        "tests/unit/q-mp-307-stats-dashboard-residuals.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-307",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 807,
+      "title": "q-mp-302: batch star-track board-3d layout reads (no visual change)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/807",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-302-star-track-layout-reads-d837",
+      "head": "3e6dee7d",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=1",
+      "files": [
+        "docs/dev/q-mp-302-star-track-board3d-layout-reads.md",
+        "src/ui/three/star-track-board-3d.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-302",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 808,
+      "title": "q-mp-296: UI cov r17 stars-bars board-ui + controller residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/808",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-296-stars-bars-ui-cov-r17-ed8e",
+      "head": "c753c8d5",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=2",
+      "files": [
+        "docs/dev/ui-coverage-round-17.md",
+        "tests/unit/burn-1009-ui-cov-r17-stars-bars.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-296",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 809,
+      "title": "q-mp-299: characterize main.ts soft-fail / route residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/809",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-299-main-soft-fail-4dcf",
+      "head": "5ca4742e",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=1",
+      "files": [
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "vitest.config.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-299",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 810,
+      "title": "q-mp-289: remeasure CI unit wall budget / test-speed for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/810",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-289-ci-unit-wall-budget-766c",
+      "head": "73a96e4f",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=4 missing_on_tip=1",
+      "files": [
+        "docs/dev/ci-unit-budget-q-mp-175.md",
+        "docs/screenshots/ci/tip-unit-ai-benches-skipped-37999819714.txt",
+        "docs/wiki/README.md",
+        "docs/wiki/ci-unit-budget.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-289",
+      "content_same": 0,
+      "content_diff": 4
+    },
+    {
+      "number": 811,
+      "title": "q-mp-301: slowest unit-file inventory (report-only) for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/811",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-301-slowest-unit-inventory-e55d",
+      "head": "7fe3ac97",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=1 missing_on_tip=1",
+      "files": [
+        "docs/dev/slowest-unit-file-inventory-2026-10-09.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-301",
+      "content_same": 0,
+      "content_diff": 1
+    },
+    {
+      "number": 812,
+      "title": "q-mp-090i: Oct 9j engineering backlog round 9 (25 tasks q-mp-309..333) for tip post755",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/812",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-090i-backlog-09j-a4fd",
+      "head": "232db0e6",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=1 missing_on_tip=1",
+      "files": [
+        "docs/dev/backlog-2026-10-09j.md"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-090i",
+      "content_same": 0,
+      "content_diff": 1
+    },
+    {
+      "number": 813,
+      "title": "q-mp-295: UI coverage round 16 \u2014 owl branch residuals (tests only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/813",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-295-ui-cov-r16-owl-6613",
+      "head": "7160faee",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=4 missing_on_tip=2",
+      "files": [
+        "docs/dev/coverage-map.md",
+        "docs/dev/coverage-map.svg",
+        "docs/dev/ui-coverage-round-16.md",
+        "tests/unit/burn-1010-ui-cov-r16-owl-branches.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-295",
+      "content_same": 0,
+      "content_diff": 4
+    },
+    {
+      "number": 814,
+      "title": "q-mp-298: mutation audit UI wave 9 \u2014 attribute/fraction/dice (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/814",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-298-mutation-audit-ui-9-036e",
+      "head": "1c1ea3bf",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=6 missing_on_tip=6",
+      "files": [
+        "docs/dev/mutation-audit-ui-9-after.json",
+        "docs/dev/mutation-audit-ui-9-baseline.json",
+        "docs/dev/mutation-audit-ui-9.md",
+        "tests/unit/mutation-ui9-attribute-ui.test.ts",
+        "tests/unit/mutation-ui9-dice-selector.test.ts",
+        "tests/unit/mutation-ui9-fraction-bar-ui.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-298",
+      "content_same": 0,
+      "content_diff": 6
+    },
+    {
+      "number": 815,
+      "title": "q-mp-327: characterize graph-ui soft-fail / animate-handle / empty-graph (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/815",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-327-graph-ui-soft-fail-2da8",
+      "head": "35b53547",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=1 missing_on_tip=1",
+      "files": [
+        "tests/unit/q-mp-327-graph-ui-soft-fail.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-327",
+      "content_same": 0,
+      "content_diff": 1
+    },
+    {
+      "number": 816,
+      "title": "q-mp-322: UI cov r18 prime-gold board-ui + controller residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/816",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-322-ui-cov-r18-prime-gold-067d",
+      "head": "9b10d491",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=2",
+      "files": [
+        "docs/dev/ui-coverage-round-18.md",
+        "tests/unit/burn-1009-ui-cov-r18-prime-gold.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-322",
+      "content_same": 0,
+      "content_diff": 2
+    },
+    {
+      "number": 817,
+      "title": "q-mp-323: UI cov r19 calla board-ui + controller residuals (tests-only)",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/817",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-323-calla-ui-cov-r19-c5b3",
+      "head": "25f3622c",
+      "status": "FOLD-READY",
+      "method": "not-contained",
+      "evidence": "payload not on tip; unmatched commits=1; blob same=0 diff=2 missing_on_tip=2",
+      "files": [
+        "docs/dev/ui-coverage-round-19.md",
+        "tests/unit/burn-1009-ui-cov-r19-calla.test.ts"
+      ],
+      "isDraft": true,
+      "taskId": "q-mp-323",
+      "content_same": 0,
+      "content_diff": 2
+    }
+  ]
+}
