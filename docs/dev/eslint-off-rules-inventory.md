@@ -10,6 +10,7 @@ Measured on tip `cursor/mp-tip-post477` against `src/` (probe overlay; live `esl
 | `no-fallthrough` | `error` (from `@eslint/js` recommended) | **0** additional hits under default options |
 | `no-implicit-coercion` | `error` globally; `off` in AI modules | Forcing on everywhere: **0** hits on tip |
 | `curly` | hard `multi-line`; ratchet `all` | Ceiling **1320** via `npm run lint:ratchet` |
+| `prefer-object-has-own` | `error` (q-mp-159) | Cleared sole `src/` hit in `game-prefetch.ts`; `ES2022.Object` lib for types |
 
 ## Off / unset candidates that catch real bugs
 
@@ -31,7 +32,6 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 7 | `@typescript-eslint/return-await` (`always`) | Inconsistent async error paths |
 | 2 | `no-promise-executor-return` | Misleading promise constructor returns |
 | 1 | `array-callback-return` | `map`/`filter` without return |
-| 1 | `prefer-object-has-own` | Prototype pollution footgun |
 | 0 | `@typescript-eslint/only-throw-error` | Clean |
 | 0 | `@typescript-eslint/no-base-to-string` | Clean |
 | 0 | `@typescript-eslint/prefer-includes` | Clean |
