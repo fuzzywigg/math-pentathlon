@@ -17,7 +17,7 @@ brace-only PR may touch that file).
 `src/ui/game-loading.ts` (0 AST mutants),
 `src/pwa/*` (register / idle-warm in waves 1–2; bootstrap / bootstrap-owl in #654),
 `src/ui/player-colors.ts` (100% at fresh baseline),
-`src/core/hex/hex-ui.ts` (90% — skipped),
+`tests/helpers/core-hex/hex-ui.ts` (90% — skipped; formerly `src/core/hex/hex-ui.ts (absent on tip)`, quarantined under q-mp-133),
 `src/core/dice/dice-ui.ts` / `roller.ts` (65% / 75% — deferred; enough modules).
 
 **Out:** `ai/`, `*/rules.ts`, engine legal-move/scoring, tutorials/copy,
