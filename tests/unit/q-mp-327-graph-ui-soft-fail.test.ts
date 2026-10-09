@@ -188,12 +188,7 @@ describe('q-mp-327 graph-ui — animateMove handle soft-fail', () => {
     }) as typeof graph.nodes.get;
 
     // ghost on step 1 so cancel runs after the returned handle is assigned.
-    handleRef.current = animateMove(
-      svg,
-      ['t0', 't1', 'ghost'],
-      graph,
-      80
-    );
+    handleRef.current = animateMove(svg, ['t0', 't1', 'ghost'], graph, 80);
     await vi.advanceTimersByTimeAsync(1000);
     await expect(handleRef.current).resolves.toBeUndefined();
     expect(svg.querySelectorAll('circle[fill="#ff9800"]').length).toBe(0);
@@ -277,10 +272,9 @@ describe('q-mp-327 graph-ui — interactive soft wiring', () => {
     const board: GraphBoard = { graph, nodeStates: new Map() };
     const clicks: NodeId[] = [];
     const origAppend = HTMLElement.prototype.appendChild;
-    HTMLElement.prototype.appendChild = function appendChildPatched<T extends Node>(
-      this: HTMLElement,
-      node: T
-    ): T {
+    HTMLElement.prototype.appendChild = function appendChildPatched<
+      T extends Node,
+    >(this: HTMLElement, node: T): T {
       if (node instanceof SVGSVGElement) {
         const stray = document.createElementNS(
           'http://www.w3.org/2000/svg',
@@ -299,9 +293,9 @@ describe('q-mp-327 graph-ui — interactive soft wiring', () => {
         (id) => clicks.push(id),
         () => undefined
       );
-      const anonymous = [
-        ...el.querySelectorAll('.graph-node'),
-      ].filter((n) => !(n as SVGElement).dataset.nodeId);
+      const anonymous = [...el.querySelectorAll('.graph-node')].filter(
+        (n) => !(n as SVGElement).dataset.nodeId
+      );
       expect(anonymous).toHaveLength(1);
 
       anonymous[0]!.dispatchEvent(new Event('click'));
