@@ -68,10 +68,12 @@ export function renderFractionBarPool(
   const barsByDenom = new Map<number, FractionBar[]>();
   for (const bar of state.fractionBars.values()) {
     const denom = bar.fraction.denominator;
-    if (!barsByDenom.has(denom)) {
-      barsByDenom.set(denom, []);
+    let denomBars = barsByDenom.get(denom);
+    if (denomBars === undefined) {
+      denomBars = [];
+      barsByDenom.set(denom, denomBars);
     }
-    barsByDenom.get(denom)!.push(bar);
+    denomBars.push(bar);
   }
 
   // Sort denominators
@@ -79,7 +81,10 @@ export function renderFractionBarPool(
 
   let rowIndex = 0;
   for (const denom of denoms) {
-    const bars = barsByDenom.get(denom)!;
+    const bars = barsByDenom.get(denom);
+    if (bars === undefined) {
+      continue;
+    }
     // Sort by numerator
     bars.sort((a, b) => a.fraction.numerator - b.fraction.numerator);
 

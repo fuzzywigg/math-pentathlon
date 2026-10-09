@@ -233,11 +233,13 @@ export function renderBoard(
     }
 
     // Click / keyboard handler (omitted on AI seat)
-    const activate = allowInput
-      ? () => {
-          onCellClick!({ ring: cell.ring, position: cell.position });
-        }
-      : undefined;
+    const cellClickHandler = onCellClick;
+    const activate =
+      allowInput && cellClickHandler !== undefined
+        ? () => {
+            cellClickHandler({ ring: cell.ring, position: cell.position });
+          }
+        : undefined;
     if (activate) {
       g.addEventListener('click', activate);
     }
