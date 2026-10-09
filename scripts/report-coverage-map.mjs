@@ -352,6 +352,8 @@ export function renderCoverageMapMarkdown(rows, meta = {}) {
     '',
     '![Unit coverage by directory](./coverage-map.svg)',
     '',
+    'Wiki visual (coldest-directory heat table): [Unit coverage heat map](../wiki/coverage-map.md).',
+    '',
     '## Regenerate',
     '',
     '```bash',
