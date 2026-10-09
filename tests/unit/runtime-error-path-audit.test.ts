@@ -3,7 +3,8 @@
  *
  * From #563 pins; #567 recovered R-GL-08 P0 (Prime Gold context-lost → 2D);
  * #568 un-skips P1 R-SHELL-07/08 + P2 R-IMP-04/R-SW-01 (cleanup try/finally +
- * bootstrap/SW catch). q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
+ * bootstrap/SW catch). q-mp-108 un-skips P3 R-SHELL-01 (#app soft-fail).
+ * q-mp-107 un-skips P2 R-SHELL-04 (home/menu boundary).
  * Remaining P3 skips stay for their owners.
  *
  * Skips inventory already covered by folded drafts:
@@ -182,10 +183,11 @@ describe('runtime-error-path-audit — remaining unrecovered pins', () => {
     expect(src).not.toMatch(/registration\.update\(\)\.catch/);
   });
 
-  it('R-SHELL-01 CURRENT: missing #app throws at module eval (source contract)', () => {
+  it('P3 R-SHELL-01: missing #app soft-fails with console diagnostic (no hard throw)', () => {
     const src = readSrc('src/main.ts');
     expect(src).toContain("getElementById('app')");
-    expect(src).toContain("throw new Error('App container not found')");
+    expect(src).toContain("console.error('[main] App container not found')");
+    expect(src).not.toContain("throw new Error('App container not found')");
   });
 });
 
@@ -440,11 +442,6 @@ describe('runtime-error-path-audit — P0/P1/P2 fixed pins', () => {
 describe('runtime-error-path-audit — expected fixes (todo / skip)', () => {
   it.skip('TODO(runtime-error-path P3 R-SW-03): registration.update() rejection should be swallowed/logged', () => {
     // Expected: void registration.update().catch(...) or equivalent.
-    expect(true).toBe(false);
-  });
-
-  it.skip('TODO(runtime-error-path P3 R-SHELL-01): missing #app should not hard-throw without diagnostics', () => {
-    // Expected: friendly boot fail for misconfigured hosts (dev/deploy).
     expect(true).toBe(false);
   });
 
