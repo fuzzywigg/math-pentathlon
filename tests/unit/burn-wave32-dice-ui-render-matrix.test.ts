@@ -5,15 +5,8 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 
-import {
-  renderDie,
-  createInteractiveDie,
-  renderRollResult,
-  DICE_CONFIGS,
-  type DieRoll,
-  type RollResult,
-  type DiceType,
-} from '../../src/core/dice';
+import { renderDie, createInteractiveDie, renderRollResult } from '../../src/core/dice/dice-ui';
+import { DICE_CONFIGS, type DieRoll, type RollResult, type DiceType } from '../../src/core/dice/types';
 
 function makeDie(
   partial: Partial<DieRoll> & Pick<DieRoll, 'id' | 'diceType' | 'value'>

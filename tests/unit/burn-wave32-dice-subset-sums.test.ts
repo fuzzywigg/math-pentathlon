@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getAllPossibleSums } from '../../src/core/dice';
+import { getAllPossibleSums } from '../../src/core/dice/roller';
 
 function expectedSubsetSums(values: number[]): number[] {
   const sums = new Set<number>();

@@ -5,7 +5,8 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 
-import { DiceSelector, COMMON_DICE_SETS } from '../../src/core/dice';
+import { DiceSelector } from '../../src/core/dice/dice-selector';
+import { COMMON_DICE_SETS } from '../../src/core/dice/types';
 
 function mockSteppedRandom() {
   let n = 0;

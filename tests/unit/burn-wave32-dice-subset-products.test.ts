@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getAllPossibleProducts } from '../../src/core/dice';
+import { getAllPossibleProducts } from '../../src/core/dice/roller';
 
 function expectedSubsetProducts(values: number[]): number[] {
   const products = new Set<number>();

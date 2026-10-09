@@ -5,7 +5,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 import { createInteractiveDie, renderDie } from '../../src/core/dice/dice-ui';
-import type { DieRoll } from '../../src/core/dice';
+import type { DieRoll } from '../../src/core/dice/types';
 
 function die(partial: Partial<DieRoll> & Pick<DieRoll, 'id' | 'value'>): DieRoll {
   return {

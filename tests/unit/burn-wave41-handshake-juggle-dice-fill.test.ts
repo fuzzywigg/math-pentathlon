@@ -10,7 +10,7 @@ import {
 } from '../../src/games/juggle/rules';
 import { CONFIG } from '../../src/games/juggle/types';
 import { createBoard } from '../../src/core/polyomino/placement';
-import { roll, getSelectedTotal, selectDice } from '../../src/core/dice';
+import { roll, getSelectedTotal, selectDice } from '../../src/core/dice/roller';
 
 afterEach(() => vi.restoreAllMocks());
 

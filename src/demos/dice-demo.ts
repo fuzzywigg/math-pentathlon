@@ -1,12 +1,10 @@
 import { clearElement } from '../core/dom-security';
 // Dice System Demo - Test page for dice functionality
 
-import {
-  DiceSelector,
-  COMMON_DICE_SETS,
-  rollMultiple,
-  renderRollResult,
-} from '../core/dice';
+import { renderRollResult } from '../core/dice/dice-ui';
+import { DiceSelector } from '../core/dice/dice-selector';
+import { rollMultiple } from '../core/dice/roller';
+import { COMMON_DICE_SETS } from '../core/dice/types';
 
 export function renderDiceDemo(container: HTMLElement): void {
   clearElement(container);

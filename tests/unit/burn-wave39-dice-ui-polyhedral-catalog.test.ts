@@ -4,12 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import {
-  renderDie,
-  DICE_CONFIGS,
-  type DiceType,
-  type DieRoll,
-} from '../../src/core/dice';
+import { renderDie } from '../../src/core/dice/dice-ui';
+import { DICE_CONFIGS, type DiceType, type DieRoll } from '../../src/core/dice/types';
 
 function die(type: DiceType, value: number): DieRoll {
   return {

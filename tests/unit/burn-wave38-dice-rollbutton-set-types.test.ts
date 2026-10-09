@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { createRollButton } from '../../src/core/dice/dice-selector';
-import { COMMON_DICE_SETS, type DiceSet } from '../../src/core/dice';
+import { COMMON_DICE_SETS, type DiceSet } from '../../src/core/dice/types';
 
 beforeEach(() => {
   document.body.innerHTML = '';

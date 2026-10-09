@@ -3,26 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  DiceType,
-  DICE_FACES,
-  rollDie,
-  rollDice,
-  roll,
-  rollMultiple,
-  rerollDice,
-  lockDice,
-  unlockDice,
-  toggleDiceSelection,
-  selectDice,
-  clearSelection,
-  getSelectedValues,
-  getSelectedTotal,
-  isValidSelection,
-  getAllPossibleSums,
-  getAllPossibleProducts,
-  getTwoDiceResults,
-} from '../../src/core/dice';
+import { rollDie, rollDice, roll, rollMultiple, rerollDice, lockDice, unlockDice, toggleDiceSelection, selectDice, clearSelection, getSelectedValues, getSelectedTotal, isValidSelection, getAllPossibleSums, getAllPossibleProducts, getTwoDiceResults } from '../../src/core/dice/roller';
+import { DICE_FACES, type DiceType } from '../../src/core/dice/types';
 
 describe('Dice Types', () => {
   it('should have correct face counts for all dice types', () => {

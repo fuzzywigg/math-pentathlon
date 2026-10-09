@@ -5,24 +5,8 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import {
-  rollDice,
-  rollMultiple,
-  rerollDice,
-  lockDice,
-  unlockDice,
-  toggleDiceSelection,
-  selectDice,
-  clearSelection,
-  getSelectedValues,
-  getSelectedTotal,
-  isValidSelection,
-  getAllPossibleSums,
-  getAllPossibleProducts,
-  getTwoDiceResults,
-  getDiceConfig,
-  type DiceType,
-} from '../../src/core/dice';
+import { rollDice, rollMultiple, rerollDice, lockDice, unlockDice, toggleDiceSelection, selectDice, clearSelection, getSelectedValues, getSelectedTotal, isValidSelection, getAllPossibleSums, getAllPossibleProducts, getTwoDiceResults, getDiceConfig } from '../../src/core/dice/roller';
+import type { DiceType } from '../../src/core/dice/types';
 
 beforeEach(() => {
   let n = 0;
