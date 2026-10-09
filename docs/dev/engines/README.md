@@ -5,6 +5,7 @@ Contributor-only maps of what each game **engine module does in code**. Not play
 | Related docs | Scope |
 | --- | --- |
 | [Wiki architecture (#475)](../../wiki/architecture.md) | App shell: router → registry → mounts → Big Toads |
+| [Game route lifecycle (`q-mp-070`)](./game-lifecycle.md) | Sequence: route → mount → controller → board-ui / 3D → destroy |
 | [Game registry](../../wiki/game-registry.md) | Catalog ids / divisions / menu wiring |
 | [Adding a game](../../wiki/adding-a-game.md) | Checklist for a new module |
 | [Docs sync (#496)](https://github.com/fuzzywigg/math-pentathlon/pull/496) | README / CONTRIBUTING / wiki command accuracy |
