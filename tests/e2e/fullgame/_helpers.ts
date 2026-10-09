@@ -68,7 +68,7 @@ export function attachConsoleTrap(page: Page): ConsoleTrap {
   };
 }
 
-export async function installFullgamePrefs(page: Page): Promise<void> {
+async function installFullgamePrefs(page: Page): Promise<void> {
   await page.addInitScript(
     ({ storageKey, progress }) => {
       try {
@@ -176,7 +176,7 @@ export function isGameOverText(text: string): boolean {
 }
 
 /** Status + history + material — ignores selection chrome / aria churn. */
-export async function moveFingerprint(page: Page): Promise<string> {
+async function moveFingerprint(page: Page): Promise<string> {
   return page.evaluate(() => {
     // Ordered lookup (not querySelector(a,b)): shell `#status[role=status]` is
     // often empty while the game writes into `.ramrod-status` / `.qg-status` etc.

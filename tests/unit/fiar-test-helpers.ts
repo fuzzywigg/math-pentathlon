@@ -53,18 +53,6 @@ export function placeToMovement(
   return placeMany(state, [...SAFE_PLACEMENT_TO_MOVEMENT]);
 }
 
-/** Place alternating turns with optional per-move kinds (defaults plain). */
-export function placeSequence(
-  state: FiarGameState,
-  moves: Array<{ nodeId: string; kind?: ChipKind }>
-): FiarGameState {
-  let s = state;
-  for (const m of moves) {
-    s = placeChip(s, m.nodeId, m.kind ?? 'plain');
-  }
-  return s;
-}
-
 export function forgeMovementState(
   placements: Array<{ nodeId: string; player: Player; kind?: ChipKind }>
 ): FiarGameState {
@@ -97,18 +85,3 @@ export function forgeMovementState(
   };
 }
 
-/** Fill both inventories to empty via forged counts (movement phase). */
-export function withEmptyHands(state: FiarGameState): FiarGameState {
-  return {
-    ...state,
-    phase: 'movement',
-    chipsPlaced: {
-      player1: CONFIG.CHIPS_PER_PLAYER,
-      player2: CONFIG.CHIPS_PER_PLAYER,
-    },
-    chipInventory: {
-      player1: { plain: 0, marked: 0 },
-      player2: { plain: 0, marked: 0 },
-    },
-  };
-}

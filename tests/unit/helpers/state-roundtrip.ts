@@ -45,7 +45,7 @@ function isTagged(
 }
 
 /** JSON replacer that encodes Map / Set for localStorage-shaped saves. */
-export function jsonReplacer(_key: string, value: unknown): unknown {
+function jsonReplacer(_key: string, value: unknown): unknown {
   if (value instanceof Map) {
     return { [MAP_TAG]: true, entries: Array.from(value.entries()) };
   }
@@ -56,7 +56,7 @@ export function jsonReplacer(_key: string, value: unknown): unknown {
 }
 
 /** JSON reviver that restores Map / Set from tagged plain objects. */
-export function jsonReviver(_key: string, value: unknown): unknown {
+function jsonReviver(_key: string, value: unknown): unknown {
   if (isTagged(value, MAP_TAG) && Array.isArray(value.entries)) {
     return new Map(value.entries as [unknown, unknown][]);
   }

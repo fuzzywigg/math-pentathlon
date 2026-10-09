@@ -11,12 +11,12 @@ import {
 } from './page';
 
 /** Fixed seed for Mulberry32 — same algorithm as src/core/ai-worker/seeded-rng.ts */
-export const VISUAL_RNG_SEED = 0xc0ffee;
+const VISUAL_RNG_SEED = 0xc0ffee;
 
 const STORAGE_KEY = 'math-pentathlon-progress';
 
 /** Stable localStorage payload: owl off, reduced motion on. */
-export const VISUAL_PROGRESS = {
+const VISUAL_PROGRESS = {
   version: 1,
   profile: null,
   streak: {
@@ -66,7 +66,7 @@ export async function installVisualStability(page: Page): Promise<void> {
 }
 
 /** Kill residual CSS motion that prefers-reduced-motion may not cover. */
-export async function disableCssMotion(page: Page): Promise<void> {
+async function disableCssMotion(page: Page): Promise<void> {
   await page.addStyleTag({
     content: `
       *, *::before, *::after {
@@ -81,7 +81,7 @@ export async function disableCssMotion(page: Page): Promise<void> {
   });
 }
 
-export async function waitForFonts(page: Page): Promise<void> {
+async function waitForFonts(page: Page): Promise<void> {
   await page.evaluate(async () => {
     if (document.fonts?.ready) {
       await document.fonts.ready;
@@ -90,7 +90,7 @@ export async function waitForFonts(page: Page): Promise<void> {
 }
 
 /** Hide owl stack if it still mounts despite settings. */
-export async function neutralizeOwl(page: Page): Promise<void> {
+async function neutralizeOwl(page: Page): Promise<void> {
   await dismissOwl(page, {
     minimize: false,
     pointerEventsNone: true,

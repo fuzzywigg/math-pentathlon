@@ -875,8 +875,3 @@ export const ALL_ADAPTERS: GameAdapter[] = [
   starsBars,
 ];
 
-export function getAdapter(id: string): GameAdapter {
-  const found = ALL_ADAPTERS.find((a) => a.id === id);
-  if (!found) throw new Error(`Unknown game adapter: ${id}`);
-  return found;
-}
