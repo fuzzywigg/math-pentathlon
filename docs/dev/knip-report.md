@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-304 unusedTypes demote batch 4 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): deleted unused `OrionGame` / `CamelGame` / graph `LayoutType` / polyomino `BoardCell` / `AnimateMoveHandle`; module-privated `AnimateMoveCancel`, `FormatFractionOptions`, `InteractiveBuilderOptions`, `SafeHtmlValue`, `DivisionInfo`, `TutorialEventHandler`, kings `CellClickHandler` / `BoardRendererOptions` / `GamePiece`. Baseline `unusedTypes` **75 → 61** (−14; tip had already shrunk 76→75 vs batch-3 floor). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-3 symbols already on tip (`#793`).
+
 ## q-mp-274 unusedTypes demote batch 3 (2026-10-09)
 
 Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring): module-privated FIAR `BoardEdge` / `CreateInitialStateOptions`; dropped unused type re-exports `BoardLayout` / `YellowCenterEllipse` / `YellowCenterDiamond` / `YellowCenterShape` from `fiar/types.ts` (canonical exports remain on `fiar/layout.ts`); deleted unused `StarTrackPosition`. Baseline `unusedTypes` **83 → 76** (−7). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold.

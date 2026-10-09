@@ -342,12 +342,7 @@ export function showValidMoves(
 }
 
 /** Cancel handle for {@link animateMove}. */
-export type AnimateMoveCancel = () => void;
-
-export type AnimateMoveHandle = {
-  promise: Promise<void>;
-  cancel: AnimateMoveCancel;
-};
+type AnimateMoveCancel = () => void;
 
 /**
  * Animate a move along a path.

@@ -543,7 +543,7 @@ const UNICODE_FRACTIONS: Record<string, string> = {
   '1/10': '⅒',
 };
 
-export interface FormatFractionOptions {
+interface FormatFractionOptions {
   simplify?: boolean;
   showMixedNumber?: boolean;
   useUnicodeFractions?: boolean;

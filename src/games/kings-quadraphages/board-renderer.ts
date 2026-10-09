@@ -2,9 +2,9 @@ import { clearElement } from '../../core/dom-security';
 import type { Board, Position, Cell } from './board';
 import { BOARD_SIZE } from './board';
 
-export type CellClickHandler = (position: Position) => void;
+type CellClickHandler = (position: Position) => void;
 
-export interface BoardRendererOptions {
+interface BoardRendererOptions {
   onCellClick?: CellClickHandler;
 }
 

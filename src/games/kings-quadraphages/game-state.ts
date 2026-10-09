@@ -11,7 +11,7 @@ import {
 const BOARD_SIZE = 9;
 
 // Piece on the board
-export interface GamePiece {
+interface GamePiece {
   type: 'king' | 'quadraphage';
   owner: PlayerOwner;
 }
