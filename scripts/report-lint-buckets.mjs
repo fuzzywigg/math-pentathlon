@@ -178,6 +178,7 @@ export default [
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-shadow': 'error',
+      '@typescript-eslint/return-await': ['error', 'always'],
     },
   },
 ];
