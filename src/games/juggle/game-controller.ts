@@ -249,6 +249,14 @@ function updateStatus(): void {
     case 'placing':
       instruction = 'Place the shape on your board';
       break;
+    case 'gameOver':
+      // Winner banner handled by early return above.
+      break;
+    default: {
+      const _exhaustive: never = gameState.phase;
+      void _exhaustive;
+      break;
+    }
   }
 
   statusContainer.innerHTML = `

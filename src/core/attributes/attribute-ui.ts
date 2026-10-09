@@ -399,6 +399,8 @@ function renderSetShape(
       element.setAttribute('stroke', color);
       break;
     }
+    default:
+      break;
   }
 
   element.setAttribute('stroke-width', '2');

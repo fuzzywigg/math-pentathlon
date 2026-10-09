@@ -180,6 +180,10 @@ function evaluate(a: number, op: Operator, b: number): number | null {
       return a * b;
     case '/':
       return b !== 0 && a % b === 0 ? a / b : null; // Must divide evenly
+    default: {
+      const _exhaustive: never = op;
+      return _exhaustive;
+    }
   }
 }
 

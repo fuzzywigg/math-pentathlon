@@ -37,9 +37,13 @@ Counts from a one-shot probe enabling each rule as `error` over `src/` (2026-10-
 | 0 | `@typescript-eslint/prefer-includes` | Clean |
 | 0 | `@typescript-eslint/prefer-string-starts-ends-with` | Clean |
 
-## Ratchet chosen this PR
+## Ratchets already on `npm run lint:ratchet`
 
-**`@typescript-eslint/no-non-null-assertion`** — highest-signal off rule with real crash risk; ceiling **387** (= today's count). No source fixes in this PR; live `eslint.config.js` does **not** hard-enable the rule (count-down only via `npm run lint:ratchet`).
+| Rule | Ceiling | Task | Notes |
+| --- | ---: | --- | --- |
+| `curly` (`all`) | **595** | burn-1008 + curly batches | Live still `multi-line` only |
+| `@typescript-eslint/no-non-null-assertion` | **387** | q-mp-045 (#605) | Live unset; count-down only |
+| `default-case` | **6** | q-mp-129 | Live unset; tip measure was **14**; cleared non-HOLD sites; residual HOLD = `fab-a-diffy`/`frac-fact` `rules.ts` (4) + `fractions/arithmetic` scoring path (1) + `hex/coordinates` conflict-avoid vs q-mp-133 (1) |
 
 Open-PR overlap: #520 landed the curly ratchet; #590/#592/#596 lower curly debt. No open draft already ratchets `no-non-null-assertion`.
 
@@ -61,3 +65,5 @@ Tip probe (pre-fix): **7** `radix` hits. Fixable demo site cleared in `src/demos
 | `src/games/kwatro-sinko/rules.ts` | 349–350 | Rules/legal-move path — no logic edits |
 
 Live `eslint.config.js` does **not** hard-enable `radix`; count-down only via `npm run lint:ratchet`.
+
+Open-PR overlap for q-mp-129: no open draft already fixes or ratchets `default-case`. Never touch `rules.ts`/`ai.ts`; tip owner folds.
