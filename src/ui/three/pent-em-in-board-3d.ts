@@ -11,8 +11,11 @@
  */
 
 import type { Cell } from '../../core/polyomino/types';
-import type { PentEmInState, Player } from '../../games/pent-em-in/types';
-import { BOARD_SIZE } from '../../games/pent-em-in/types';
+import {
+  type PentEmInState,
+  type Player,
+  BOARD_SIZE,
+} from '../../games/pent-em-in/types';
 import {
   canPlacePiece,
   getPieceCells,

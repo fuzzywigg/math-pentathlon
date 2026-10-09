@@ -13,8 +13,11 @@
  * Original procedural number textures only — no kit photos.
  */
 
-import type { PrimeGoldState, Player } from '../../games/prime-gold/types';
-import { CONFIG } from '../../games/prime-gold/types';
+import {
+  type PrimeGoldState,
+  type Player,
+  CONFIG,
+} from '../../games/prime-gold/types';
 import {
   getValidPlacements,
   getPrimeVeinSegments,

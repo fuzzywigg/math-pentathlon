@@ -10,11 +10,11 @@
  * - visually-hidden a11y grid mirrors state / keyboard (PR #353 Space/Enter)
  */
 
-import type {
-  BlockShape,
-  HexAGoneGameState,
+import {
+  type BlockShape,
+  type HexAGoneGameState,
+  BLOCK_COLORS,
 } from '../../games/hex-a-gone/types';
-import { BLOCK_COLORS } from '../../games/hex-a-gone/types';
 import { getValidPlacements } from '../../games/hex-a-gone/rules';
 import { getPlayerSeatColors } from '../player-colors';
 import {

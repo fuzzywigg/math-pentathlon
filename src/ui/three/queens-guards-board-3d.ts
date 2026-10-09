@@ -12,11 +12,9 @@
  * hex-mesh module is a follow-up extraction.
  */
 
-import type {
-  BoardCoord,
-  QueensGuardsState,
-} from '../../games/queens-guards/types';
 import {
+  type BoardCoord,
+  type QueensGuardsState,
   CONFIG,
   cellKey,
   cellsInRing,
