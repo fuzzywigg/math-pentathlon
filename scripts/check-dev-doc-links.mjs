@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Report-only checker for docs/dev/engines/*.md references.
+ * Report-only checker for Markdown under docs/dev/ (recursive).
+ *
+ * Scopes: every .md file under docs/dev/, including docs/dev/engines/
+ * and top-level docs/dev/*.md. Not limited to engines/.
  *
  * Verifies:
  *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/)
@@ -8,8 +11,11 @@
  *   3. Relative markdown links under docs/
  *
  * Always exits 0 (report-only). Prints a summary + any missing refs.
+ * Tip owner may later opt into fail-on-missing; do not flip that here.
  *
- * Usage: node scripts/check-dev-doc-links.mjs
+ * Usage:
+ *   npm run check:dev-docs
+ *   node scripts/check-dev-doc-links.mjs
  */
 
 import fs from 'node:fs';
@@ -18,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const DOCS_DIR = path.join(ROOT, 'docs/dev/engines');
+const DOCS_DIR = path.join(ROOT, 'docs/dev');
 
 const PATH_RE =
   /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
@@ -63,7 +69,9 @@ function resolveMdLink(fromDocAbs, href) {
     href.startsWith('http://') ||
     href.startsWith('https://') ||
     href.startsWith('#') ||
-    href.startsWith('mailto:')
+    href.startsWith('mailto:') ||
+    // Absolute FS / site-root paths are out of scope (relative md links only).
+    href.startsWith('/')
   ) {
     return { skip: true };
   }
@@ -73,12 +81,24 @@ function resolveMdLink(fromDocAbs, href) {
   return { abs, rel: path.relative(ROOT, abs) };
 }
 
-function listEngineDocs() {
-  return fs
-    .readdirSync(DOCS_DIR)
-    .filter((f) => f.endsWith('.md'))
-    .map((f) => path.join(DOCS_DIR, f))
-    .sort();
+/**
+ * Recursively collect *.md under docs/dev/.
+ * @param {string} dirAbs
+ * @returns {string[]}
+ */
+function listDevDocs(dirAbs = DOCS_DIR) {
+  /** @type {string[]} */
+  const out = [];
+  if (!fs.existsSync(dirAbs)) return out;
+  for (const entry of fs.readdirSync(dirAbs, { withFileTypes: true })) {
+    const abs = path.join(dirAbs, entry.name);
+    if (entry.isDirectory()) {
+      out.push(...listDevDocs(abs));
+    } else if (entry.isFile() && entry.name.endsWith('.md')) {
+      out.push(abs);
+    }
+  }
+  return out.sort();
 }
 
 function main() {
@@ -95,7 +115,7 @@ function main() {
   let linkChecks = 0;
   let docsScanned = 0;
 
-  for (const docAbs of listEngineDocs()) {
+  for (const docAbs of listDevDocs()) {
     docsScanned += 1;
     const docRel = path.relative(ROOT, docAbs);
     const text = fs.readFileSync(docAbs, 'utf8');
@@ -166,11 +186,24 @@ function main() {
   }
 
   console.log('check-dev-doc-links (report-only)');
+  console.log(`  docs root:       ${path.relative(ROOT, DOCS_DIR)}/`);
   console.log(`  docs scanned:    ${docsScanned}`);
   console.log(`  path checks:     ${pathChecks}`);
   console.log(`  symbol checks:   ${symbolChecks}`);
   console.log(`  md link checks:  ${linkChecks}`);
   console.log(`  problems:        ${problems.length}`);
+
+  const byKind = problems.reduce((acc, p) => {
+    acc[p.kind] = (acc[p.kind] ?? 0) + 1;
+    return acc;
+  }, /** @type {Record<string, number>} */ ({}));
+  if (Object.keys(byKind).length) {
+    console.log(
+      `  by kind:         ${Object.entries(byKind)
+        .map(([k, n]) => `${k}=${n}`)
+        .join(' ')}`
+    );
+  }
 
   if (problems.length) {
     console.log('');
