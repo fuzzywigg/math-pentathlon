@@ -128,7 +128,9 @@ export function initGame(
  */
 function updateUI(controller: FabGameController): void {
   // Drop paints after destroyGame nulled the mount ref (remount safety).
-  if (!activeContainer || controller.container !== activeContainer) return;
+  if (!activeContainer || controller.container !== activeContainer) {
+    return;
+  }
 
   const { container, state } = controller;
   container.innerHTML = '';

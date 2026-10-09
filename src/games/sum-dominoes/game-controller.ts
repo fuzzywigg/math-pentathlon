@@ -132,7 +132,9 @@ export function initGame(
  */
 function updateUI(controller: SDGameController): void {
   // Drop paints after destroyGame nulled the mount ref (remount safety).
-  if (!activeContainer || controller.container !== activeContainer) return;
+  if (!activeContainer || controller.container !== activeContainer) {
+    return;
+  }
 
   const { container, state } = controller;
   const previousFocus = captureFocusedCell(container);
