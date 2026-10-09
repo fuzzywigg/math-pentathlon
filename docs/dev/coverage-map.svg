@@ -4,7 +4,7 @@
 <desc>Per-directory unit coverage heat table from vitest json-summary (lines, branches, functions, statements).</desc>
 <rect width="100%" height="100%" fill="#f7f5f0"/>
 <text x="16" y="28" font-family="Georgia, 'Times New Roman', serif" font-size="18" fill="#1a1a1a">Unit coverage by directory</text>
-<text x="16" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#555">Generated 2026-10-09T15:46:21.143Z · sorted by lines % ascending</text>
+<text x="16" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#555">Generated 2026-10-09T16:57:45.900Z · sorted by lines % ascending</text>
 <rect x="16" y="52" width="688" height="28" fill="#e8e2d6" stroke="#c9c2b4"/>
 <text x="24" y="70" text-anchor="start" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="600" fill="#222">Directory</text>
 <text x="340" y="70" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="600" fill="#222">lines</text>
@@ -26,13 +26,13 @@
 <rect x="16" y="102" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
 <text x="24" y="117" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src</text>
 <rect x="300" y="105" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="340" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">80.9%</text>
+<text x="340" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">81.4%</text>
 <rect x="388" y="105" width="80" height="16" rx="3" fill="#c4732a"/>
-<text x="428" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#f7f5f0">58.9%</text>
+<text x="428" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#f7f5f0">60.7%</text>
 <rect x="476" y="105" width="80" height="16" rx="3" fill="#c4732a"/>
 <text x="516" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#f7f5f0">67.5%</text>
 <rect x="564" y="105" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="604" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">80.6%</text>
+<text x="604" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">81.1%</text>
 <text x="676" y="117" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">1</text>
 <rect x="16" y="124" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
 <text x="24" y="139" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui/three</text>
@@ -68,92 +68,92 @@
 <text x="604" y="183" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.8%</text>
 <text x="676" y="183" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
 <rect x="16" y="190" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="205" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/hex</text>
+<text x="24" y="205" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/fiar</text>
 <rect x="300" y="193" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.8%</text>
+<text x="340" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.7%</text>
 <rect x="388" y="193" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">88.2%</text>
-<rect x="476" y="193" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="516" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">88.7%</text>
+<text x="428" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">82.7%</text>
+<rect x="476" y="193" width="80" height="16" rx="3" fill="#3d9b5c"/>
+<text x="516" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.4%</text>
 <rect x="564" y="193" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.2%</text>
-<text x="676" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">8</text>
+<text x="604" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">91.6%</text>
+<text x="676" y="205" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">10</text>
 <rect x="16" y="212" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="227" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui/owl</text>
+<text x="24" y="227" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/contig-60</text>
 <rect x="300" y="215" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.9%</text>
-<rect x="388" y="215" width="80" height="16" rx="3" fill="#c4a035"/>
-<text x="428" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">76.5%</text>
+<text x="340" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.8%</text>
+<rect x="388" y="215" width="80" height="16" rx="3" fill="#7bb05a"/>
+<text x="428" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">86.1%</text>
 <rect x="476" y="215" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">100.0%</text>
+<text x="516" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.9%</text>
 <rect x="564" y="215" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.0%</text>
-<text x="676" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">2</text>
+<text x="604" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">91.4%</text>
+<text x="676" y="227" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="234" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="249" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/contig-60</text>
+<text x="24" y="249" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/hex</text>
 <rect x="300" y="237" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.1%</text>
+<text x="340" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.8%</text>
 <rect x="388" y="237" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">86.5%</text>
-<rect x="476" y="237" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.9%</text>
+<text x="428" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">88.2%</text>
+<rect x="476" y="237" width="80" height="16" rx="3" fill="#7bb05a"/>
+<text x="516" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">88.7%</text>
 <rect x="564" y="237" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">91.7%</text>
-<text x="676" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
+<text x="604" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.2%</text>
+<text x="676" y="249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">8</text>
 <rect x="16" y="256" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="271" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/fiar</text>
+<text x="24" y="271" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/pent-em-in</text>
 <rect x="300" y="259" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.4%</text>
+<text x="340" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.8%</text>
 <rect x="388" y="259" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">83.6%</text>
-<rect x="476" y="259" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="516" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.0%</text>
+<text x="428" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.8%</text>
+<rect x="476" y="259" width="80" height="16" rx="3" fill="#1b7f4a"/>
+<text x="516" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">97.4%</text>
 <rect x="564" y="259" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.3%</text>
-<text x="676" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">10</text>
+<text x="604" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.2%</text>
+<text x="676" y="271" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
 <rect x="16" y="278" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="293" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/pent-em-in</text>
+<text x="24" y="293" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/par-55</text>
 <rect x="300" y="281" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.8%</text>
+<text x="340" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.9%</text>
 <rect x="388" y="281" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.8%</text>
-<rect x="476" y="281" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">97.4%</text>
+<text x="428" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.5%</text>
+<rect x="476" y="281" width="80" height="16" rx="3" fill="#3d9b5c"/>
+<text x="516" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.4%</text>
 <rect x="564" y="281" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.2%</text>
-<text x="676" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
+<text x="604" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.1%</text>
+<text x="676" y="293" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="300" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="315" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/par-55</text>
+<text x="24" y="315" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/remainder-islands</text>
 <rect x="300" y="303" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.9%</text>
+<text x="340" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.0%</text>
 <rect x="388" y="303" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.7%</text>
-<rect x="476" y="303" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="516" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.4%</text>
+<text x="428" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">84.0%</text>
+<rect x="476" y="303" width="80" height="16" rx="3" fill="#1b7f4a"/>
+<text x="516" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">98.7%</text>
 <rect x="564" y="303" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.1%</text>
+<text x="604" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.1%</text>
 <text x="676" y="315" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="322" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="337" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/remainder-islands</text>
+<text x="24" y="337" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/kings-quadraphages</text>
 <rect x="300" y="325" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.0%</text>
+<text x="340" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.1%</text>
 <rect x="388" y="325" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">84.0%</text>
+<text x="428" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">87.0%</text>
 <rect x="476" y="325" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">98.7%</text>
+<text x="516" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">99.2%</text>
 <rect x="564" y="325" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.1%</text>
-<text x="676" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
+<text x="604" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.8%</text>
+<text x="676" y="337" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">11</text>
 <rect x="16" y="344" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
 <text x="24" y="359" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/queens-guards</text>
 <rect x="300" y="347" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.6%</text>
+<text x="340" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.2%</text>
 <rect x="388" y="347" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="428" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.9%</text>
+<text x="428" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">92.1%</text>
 <rect x="476" y="347" width="80" height="16" rx="3" fill="#3d9b5c"/>
 <text x="516" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.5%</text>
 <rect x="564" y="347" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.6%</text>
+<text x="604" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.2%</text>
 <text x="676" y="359" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">9</text>
 <rect x="16" y="366" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
 <text x="24" y="381" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/stars-bars</text>
@@ -167,93 +167,93 @@
 <text x="604" y="381" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.5%</text>
 <text x="676" y="381" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="388" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="403" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/kings-quadraphages</text>
+<text x="24" y="403" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/prime-gold</text>
 <rect x="300" y="391" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="340" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.8%</text>
+<text x="340" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.9%</text>
 <rect x="388" y="391" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">89.3%</text>
-<rect x="476" y="391" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">99.2%</text>
+<text x="428" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">89.7%</text>
+<rect x="476" y="391" width="80" height="16" rx="3" fill="#7bb05a"/>
+<text x="516" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">89.7%</text>
 <rect x="564" y="391" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.5%</text>
-<text x="676" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">11</text>
+<text x="604" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.6%</text>
+<text x="676" y="403" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
 <rect x="16" y="410" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="425" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/prime-gold</text>
+<text x="24" y="425" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/ramrod</text>
 <rect x="300" y="413" width="80" height="16" rx="3" fill="#1b7f4a"/>
 <text x="340" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.2%</text>
 <rect x="388" y="413" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.0%</text>
-<rect x="476" y="413" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="516" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">89.7%</text>
+<text x="428" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">89.7%</text>
+<rect x="476" y="413" width="80" height="16" rx="3" fill="#3d9b5c"/>
+<text x="516" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.9%</text>
 <rect x="564" y="413" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.9%</text>
-<text x="676" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
+<text x="604" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">94.7%</text>
+<text x="676" y="425" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="432" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="447" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/ramrod</text>
+<text x="24" y="447" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/sum-dominoes</text>
 <rect x="300" y="435" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="340" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.6%</text>
+<text x="340" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.7%</text>
 <rect x="388" y="435" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="428" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.1%</text>
-<rect x="476" y="435" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="516" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">93.9%</text>
-<rect x="564" y="435" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="604" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.0%</text>
+<text x="428" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">91.9%</text>
+<rect x="476" y="435" width="80" height="16" rx="3" fill="#1b7f4a"/>
+<text x="516" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.2%</text>
+<rect x="564" y="435" width="80" height="16" rx="3" fill="#1b7f4a"/>
+<text x="604" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.9%</text>
 <text x="676" y="447" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
 <rect x="16" y="454" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="469" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/sum-dominoes</text>
+<text x="24" y="469" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui</text>
 <rect x="300" y="457" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="340" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.8%</text>
-<rect x="388" y="457" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="428" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">91.5%</text>
+<text x="340" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.0%</text>
+<rect x="388" y="457" width="80" height="16" rx="3" fill="#7bb05a"/>
+<text x="428" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.8%</text>
 <rect x="476" y="457" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.2%</text>
+<text x="516" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">99.3%</text>
 <rect x="564" y="457" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="604" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.9%</text>
-<text x="676" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">6</text>
+<text x="604" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.0%</text>
+<text x="676" y="469" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">17</text>
 <rect x="16" y="476" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="491" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui</text>
+<text x="24" y="491" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui/components</text>
 <rect x="300" y="479" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="340" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.0%</text>
+<text x="340" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.2%</text>
 <rect x="388" y="479" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.8%</text>
+<text x="428" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.9%</text>
 <rect x="476" y="479" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">99.3%</text>
+<text x="516" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">97.6%</text>
 <rect x="564" y="479" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="604" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.0%</text>
-<text x="676" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">17</text>
+<text x="604" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.3%</text>
+<text x="676" y="491" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">1</text>
 <rect x="16" y="498" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="513" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui/components</text>
+<text x="24" y="513" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/hex-a-gone</text>
 <rect x="300" y="501" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="340" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.2%</text>
-<rect x="388" y="501" width="80" height="16" rx="3" fill="#7bb05a"/>
-<text x="428" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">85.9%</text>
+<text x="340" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.3%</text>
+<rect x="388" y="501" width="80" height="16" rx="3" fill="#3d9b5c"/>
+<text x="428" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.3%</text>
 <rect x="476" y="501" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">97.6%</text>
+<text x="516" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">100.0%</text>
 <rect x="564" y="501" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="604" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.3%</text>
-<text x="676" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">1</text>
+<text x="604" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.7%</text>
+<text x="676" y="513" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
 <rect x="16" y="520" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
-<text x="24" y="535" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/hex-a-gone</text>
+<text x="24" y="535" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/star-track</text>
 <rect x="300" y="523" width="80" height="16" rx="3" fill="#1b7f4a"/>
 <text x="340" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.3%</text>
 <rect x="388" y="523" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="428" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.3%</text>
+<text x="428" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.4%</text>
 <rect x="476" y="523" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">100.0%</text>
+<text x="516" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.5%</text>
 <rect x="564" y="523" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="604" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.7%</text>
+<text x="604" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.5%</text>
 <text x="676" y="535" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
 <rect x="16" y="542" width="688" height="22" fill="#f3efe6" stroke="#e4ddd0"/>
-<text x="24" y="557" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/star-track</text>
+<text x="24" y="557" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/ui/owl</text>
 <rect x="300" y="545" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="340" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.3%</text>
-<rect x="388" y="545" width="80" height="16" rx="3" fill="#3d9b5c"/>
-<text x="428" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">90.4%</text>
+<text x="340" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.5%</text>
+<rect x="388" y="545" width="80" height="16" rx="3" fill="#7bb05a"/>
+<text x="428" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">83.9%</text>
 <rect x="476" y="545" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="516" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.5%</text>
+<text x="516" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">100.0%</text>
 <rect x="564" y="545" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="604" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.5%</text>
-<text x="676" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">7</text>
+<text x="604" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.5%</text>
+<text x="676" y="557" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#333">2</text>
 <rect x="16" y="564" width="688" height="22" fill="#fffef9" stroke="#e4ddd0"/>
 <text x="24" y="579" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">src/games/fraction-pinball</text>
 <rect x="300" y="567" width="80" height="16" rx="3" fill="#1b7f4a"/>
@@ -281,7 +281,7 @@
 <rect x="300" y="611" width="80" height="16" rx="3" fill="#1b7f4a"/>
 <text x="340" y="623" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">97.1%</text>
 <rect x="388" y="611" width="80" height="16" rx="3" fill="#1b7f4a"/>
-<text x="428" y="623" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">95.6%</text>
+<text x="428" y="623" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">96.0%</text>
 <rect x="476" y="611" width="80" height="16" rx="3" fill="#1b7f4a"/>
 <text x="516" y="623" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11" fill="#1a1a1a">100.0%</text>
 <rect x="564" y="611" width="80" height="16" rx="3" fill="#1b7f4a"/>
