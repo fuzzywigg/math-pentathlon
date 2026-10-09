@@ -23,9 +23,9 @@ import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
 import {
   dismissOwlIfNeeded,
+  gotoGame,
   mountLocator,
   startHuman,
-  waitForGameReady,
 } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
@@ -592,7 +592,7 @@ test.describe('Mobile touch smoke (report-only)', () => {
       let ok = false;
 
       try {
-        await page.goto(`/#/game/${game.id}`);
+        await gotoGame(page, game.id);
         await startHuman(page);
         await expect(page.locator('h1').first()).toContainText(titleStem(game), {
           timeout: 10_000,
