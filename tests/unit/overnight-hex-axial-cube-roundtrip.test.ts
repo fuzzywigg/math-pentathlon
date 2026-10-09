@@ -1,10 +1,10 @@
 /**
  * Overnight TOKENMAXX — hex axial↔cube identity leftovers after #197.
- * Existing src/core/hex only. Tests-only. Not demos.
+ * Existing tests/helpers/core-hex only. Tests-only. Not demos.
  */
 import { describe, it, expect } from 'vitest';
-import { axialToCube, cubeToAxial, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial, createCube } from '../../src/core/hex/types';
+import { axialToCube, cubeToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, createCube } from '../helpers/core-hex/types';
 
 describe('Overnight hex — axial/cube roundtrip lattice', () => {
   it('axial→cube→axial preserves q/r over a ring lattice', () => {

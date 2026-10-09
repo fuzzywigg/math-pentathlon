@@ -2,7 +2,7 @@
  * Overnight TOKENMAXX — core export smoke handshake leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { cubeRound, reflect } from '../../src/core/hex/coordinates';
+import { cubeRound, reflect } from '../helpers/core-hex/coordinates';
 import { filterPieces, createMathPiece } from '../../src/core/attributes/logic';
 import { clearSelection, rollMultiple } from '../../src/core/dice/roller';
 import { findComponents } from '../../src/core/graph/algorithms';

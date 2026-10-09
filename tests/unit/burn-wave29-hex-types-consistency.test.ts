@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { createAxial, createCube, createOffset, createLayout, coordKey, parseCoordKey, AXIAL_DIRECTIONS, CUBE_DIRECTIONS, type AxialCoord } from '../../src/core/hex/types';
-import { hexEquals, hexInArray, axialToCube, cubeToAxial, axialToOffset, offsetToAxial, getNeighbors, hexDistance, hexLine, hexRing, hexesInRange, rotateAround, reflect, hexSpiral } from '../../src/core/hex/coordinates';
+import { createAxial, createCube, createOffset, createLayout, coordKey, parseCoordKey, AXIAL_DIRECTIONS, CUBE_DIRECTIONS, type AxialCoord } from '../helpers/core-hex/types';
+import { hexEquals, hexInArray, axialToCube, cubeToAxial, axialToOffset, offsetToAxial, getNeighbors, hexDistance, hexLine, hexRing, hexesInRange, rotateAround, reflect, hexSpiral } from '../helpers/core-hex/coordinates';
 
 const key = (c: AxialCoord) => `${c.q},${c.r}`;
 

@@ -8,8 +8,8 @@ import {
   hexDistance,
   hexEquals,
   areNeighbors,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — line symmetry', () => {
   it('reverse line is reverse array; consecutive cells are neighbors', () => {

@@ -2,8 +2,8 @@
  * Overnight TOKENMAXX — hex offset odd/even parity leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { axialToOffset, offsetToAxial, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+import { axialToOffset, offsetToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight hex — offset parity roundtrips', () => {
   it('odd and even parity roundtrip for q,r in [-5,5]', () => {

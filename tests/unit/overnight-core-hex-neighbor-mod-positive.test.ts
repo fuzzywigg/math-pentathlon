@@ -3,8 +3,8 @@
  * Distinct from wave41 negative-index document. Tests-only. After #214/#215.
  */
 import { describe, it, expect } from 'vitest';
-import { getNeighbor, getNeighbors, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial, AXIAL_DIRECTIONS } from '../../src/core/hex/types';
+import { getNeighbor, getNeighbors, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, AXIAL_DIRECTIONS } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — neighbor positive mod', () => {
   it('direction 6 ≡ 0; 7 ≡ 1; 12 ≡ 0', () => {

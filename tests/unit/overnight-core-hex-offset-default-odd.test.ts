@@ -7,8 +7,8 @@ import {
   axialToOffset,
   offsetToAxial,
   hexEquals,
-} from '../../src/core/hex/coordinates';
-import { createAxial } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial } from '../helpers/core-hex/types';
 
 describe('Overnight core hex — offset default odd', () => {
   it('omitted parity matches explicit odd across a disk', () => {

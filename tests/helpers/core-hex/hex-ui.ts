@@ -1,7 +1,7 @@
 // Hex Rendering UI
 // SVG-based hex grid rendering utilities
 
-import { clearElement } from '../dom-security';
+import { clearElement } from '../../../src/core/dom-security';
 import type { AxialCoord, HexLayout, PixelCoord } from './types';
 import { coordKey } from './types';
 import { axialToPixel, hexesInRange } from './coordinates';

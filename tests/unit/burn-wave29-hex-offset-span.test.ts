@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { axialToOffset, offsetToAxial, hexEquals, hexDistance } from '../../src/core/hex/coordinates';
-import { createAxial, createOffset, type OffsetParity } from '../../src/core/hex/types';
+import { axialToOffset, offsetToAxial, hexEquals, hexDistance } from '../helpers/core-hex/coordinates';
+import { createAxial, createOffset, type OffsetParity } from '../helpers/core-hex/types';
 
 describe('Wave 29 hex-offset-span — column equals axial q', () => {
   it('col is always axial.q for both parities', () => {

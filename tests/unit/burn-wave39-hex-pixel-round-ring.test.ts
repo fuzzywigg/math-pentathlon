@@ -4,8 +4,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, cubeRound, hexRound, hexRing, hexSpiral, hexLine, hexDistance, getDiagonalNeighbors, rotateAround, rotateRight, rotateLeft, hexEquals, hexInArray } from '../../src/core/hex/coordinates';
-import { createAxial, createLayout, type AxialCoord } from '../../src/core/hex/types';
+import { axialToPixel, axialToPixelPointy, axialToPixelFlat, pixelToAxial, pixelToAxialPointy, pixelToAxialFlat, cubeRound, hexRound, hexRing, hexSpiral, hexLine, hexDistance, getDiagonalNeighbors, rotateAround, rotateRight, rotateLeft, hexEquals, hexInArray } from '../helpers/core-hex/coordinates';
+import { createAxial, createLayout, type AxialCoord } from '../helpers/core-hex/types';
 
 describe('Wave 39 hex — pixel round-trip leftovers', () => {
   it('pointy and flat centers round-trip through pixel', () => {

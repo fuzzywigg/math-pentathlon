@@ -2,7 +2,7 @@
  * Overnight TOKENMAXX — cubeRound / hexRound near-boundary leftovers. Tests-only.
  */
 import { describe, it, expect } from 'vitest';
-import { cubeRound, hexRound, axialToCube } from '../../src/core/hex/coordinates';
+import { cubeRound, hexRound, axialToCube } from '../helpers/core-hex/coordinates';
 
 describe('Overnight hex — rounding boundary bands', () => {
   it('cubeRound restores x+y+z=0 and nearest integers on fractional cubes', () => {

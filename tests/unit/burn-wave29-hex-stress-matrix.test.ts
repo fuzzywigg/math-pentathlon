@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { hexDistance, hexesInRange, hexRing, hexSpiral, hexLine, getNeighbors, rotateAround, reflect, axialToOffset, offsetToAxial, axialToCube, cubeToAxial, hexEquals } from '../../src/core/hex/coordinates';
-import { createAxial, coordKey, type AxialCoord, type OffsetParity } from '../../src/core/hex/types';
+import { hexDistance, hexesInRange, hexRing, hexSpiral, hexLine, getNeighbors, rotateAround, reflect, axialToOffset, offsetToAxial, axialToCube, cubeToAxial, hexEquals } from '../helpers/core-hex/coordinates';
+import { createAxial, coordKey, type AxialCoord, type OffsetParity } from '../helpers/core-hex/types';
 
 describe('Wave 29 hex-stress — full distance table on radius-3 disk', () => {
   it('builds a consistent all-pairs distance matrix', () => {

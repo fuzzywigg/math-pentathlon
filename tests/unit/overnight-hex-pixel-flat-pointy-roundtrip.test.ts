@@ -10,8 +10,8 @@ import {
   pixelToAxialPointy,
   pixelToAxial,
   hexEquals,
-} from '../../src/core/hex/coordinates';
-import { createAxial, HexLayout } from '../../src/core/hex/types';
+} from '../helpers/core-hex/coordinates';
+import { createAxial, HexLayout } from '../helpers/core-hex/types';
 
 const pointy: HexLayout = { orientation: 'pointy', size: 20, origin: { x: 100, y: 50 } };
 const flat: HexLayout = { orientation: 'flat', size: 16, origin: { x: -10, y: 8 } };

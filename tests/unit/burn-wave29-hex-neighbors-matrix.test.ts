@@ -5,8 +5,8 @@
  */
 import { describe, it, expect } from 'vitest';
 
-import { getNeighbors, getNeighbor, getDiagonalNeighbors, areNeighbors, hexDistance, hexEquals, hexInArray, axialToCube } from '../../src/core/hex/coordinates';
-import { createAxial, AXIAL_DIRECTIONS, CUBE_DIRECTIONS, CUBE_DIAGONALS, DIRECTION_NAMES, type AxialCoord } from '../../src/core/hex/types';
+import { getNeighbors, getNeighbor, getDiagonalNeighbors, areNeighbors, hexDistance, hexEquals, hexInArray, axialToCube } from '../helpers/core-hex/coordinates';
+import { createAxial, AXIAL_DIRECTIONS, CUBE_DIRECTIONS, CUBE_DIAGONALS, DIRECTION_NAMES, type AxialCoord } from '../helpers/core-hex/types';
 
 const CENTERS: AxialCoord[] = [
   createAxial(0, 0),
