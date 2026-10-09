@@ -8,7 +8,7 @@ import { markStatusLive } from '../board-a11y';
 import { suppressBoardContextMenu } from '../pointer-hygiene';
 import { applyGameModeChrome, clearGameModeChrome } from '../player-colors';
 
-export type GameMode = 'human-vs-human' | 'human-vs-ai';
+type GameMode = 'human-vs-human' | 'human-vs-ai';
 export type AIDifficultyLevel = 'easy' | 'medium' | 'hard';
 
 export interface GameShellOptions {
