@@ -53,7 +53,7 @@ function prefersSaveData(): boolean {
 
 async function defaultImportShell(): Promise<unknown> {
   // Same dynamic-import paths as renderGame() in main.ts.
-  return Promise.all([
+  return await Promise.all([
     import('../ui/game-route-mounts'),
     import('../ui/styles/game-play.css'),
   ]);
@@ -64,9 +64,9 @@ async function defaultImportGame(
 ): Promise<unknown> {
   switch (gameId) {
     case 'hex':
-      return import('../games/hex/game-controller');
+      return await import('../games/hex/game-controller');
     case 'kings-quadraphages':
-      return import('../games/kings-quadraphages/game-controller');
+      return await import('../games/kings-quadraphages/game-controller');
     default: {
       const _exhaustive: never = gameId;
       return _exhaustive;
