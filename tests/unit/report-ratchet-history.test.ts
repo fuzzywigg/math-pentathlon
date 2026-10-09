@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   extractMetric,
+  extractLintMetrics,
   parseGitLogLines,
   mergeHistory,
   escapeXml,
@@ -8,13 +9,30 @@ import {
   renderMarkdown,
   collectHistory,
   TRACKED,
+  LINT_RULE_KEYS,
 } from '../../scripts/report-ratchet-history.mjs';
 
-describe('report-ratchet-history helpers (q-mp-074)', () => {
-  it('extracts curly / type / boundary metrics from known JSON shapes', () => {
-    expect(
-      extractMetric('curly', { rules: { curly: 1320 }, notes: 'x' })
-    ).toBe(1320);
+describe('report-ratchet-history helpers (q-mp-074 / q-mp-236)', () => {
+  it('extracts curly / void / nnnull / dup / type / boundary metrics', () => {
+    const lint = {
+      rules: {
+        curly: 538,
+        [LINT_RULE_KEYS.voidExpression]: 118,
+        [LINT_RULE_KEYS.nnnull]: 254,
+        [LINT_RULE_KEYS.dupImports]: 99,
+      },
+      notes: 'x',
+    };
+    expect(extractLintMetrics(lint)).toEqual({
+      curly: 538,
+      voidExpression: 118,
+      nnnull: 254,
+      dupImports: 99,
+    });
+    expect(extractMetric('curly', lint)).toBe(538);
+    expect(extractMetric('voidExpression', lint)).toBe(118);
+    expect(extractMetric('nnnull', lint)).toBe(254);
+    expect(extractMetric('dupImports', lint)).toBe(99);
     expect(extractMetric('curly', { rules: {} })).toBeNull();
     expect(extractMetric('typePhase2', { outOfScopeErrors: 216 })).toBe(216);
     expect(
@@ -49,18 +67,24 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
 
   it('merges per-file histories, sorts, and forward-fills metrics', () => {
     const rows = mergeHistory({
-      curly: [
+      lint: [
         {
           sha: 'aaaa',
           date: '2026-10-07T10:00:00Z',
-          subject: 'curly 1456',
-          value: 1456,
+          subject: 'lint seed',
+          curly: 1456,
+          voidExpression: 183,
+          nnnull: 268,
+          dupImports: 122,
         },
         {
           sha: 'cccc',
           date: '2026-10-08T10:00:00Z',
-          subject: 'curly 1320',
-          value: 1320,
+          subject: 'lint lower',
+          curly: 538,
+          voidExpression: 118,
+          nnnull: 254,
+          dupImports: 99,
         },
       ],
       typePhase2: [
@@ -90,17 +114,26 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
     expect(rows.map((r) => r.sha)).toEqual(['aaaa', 'bbbb', 'cccc']);
     expect(rows[0]).toMatchObject({
       curly: 1456,
+      voidExpression: 183,
+      nnnull: 268,
+      dupImports: 122,
       typeOutOfScope: null,
       boundarySum: 17,
     });
-    // forward-fill type into later rows; curly into middle row
+    // forward-fill lint + type into middle row
     expect(rows[1]).toMatchObject({
       curly: 1456,
+      voidExpression: 183,
+      nnnull: 268,
+      dupImports: 122,
       typeOutOfScope: 300,
       boundarySum: 17,
     });
     expect(rows[2]).toMatchObject({
-      curly: 1320,
+      curly: 538,
+      voidExpression: 118,
+      nnnull: 254,
+      dupImports: 99,
       typeOutOfScope: 216,
       boundarySum: 17,
     });
@@ -110,13 +143,16 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
     expect(escapeXml(`&<>"'`)).toBe('&amp;&lt;&gt;&quot;&apos;');
   });
 
-  it('renders an SVG polyline chart with legend and empty-state', () => {
+  it('renders an SVG polyline chart with lint series and empty-state', () => {
     const svg = renderSvg([
       {
         sha: 'aaaaaaaa',
         date: '2026-10-07T00:00:00Z',
         subject: 'start',
         curly: 1400,
+        voidExpression: 183,
+        nnnull: 268,
+        dupImports: 122,
         typeOutOfScope: 400,
         boundarySum: 17,
       },
@@ -124,46 +160,80 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
         sha: 'bbbbbbbb',
         date: '2026-10-08T00:00:00Z',
         subject: 'lower',
-        curly: 1320,
+        curly: 538,
+        voidExpression: 118,
+        nnnull: 254,
+        dupImports: 99,
         typeOutOfScope: 216,
         boundarySum: 17,
       },
     ]);
     expect(svg).toContain('<svg');
     expect(svg).toContain('polyline');
-    expect(svg).toContain('curly ceiling');
-    expect(svg).toContain('type Phase-2 out-of-scope');
-    expect(svg).toContain('boundary ceiling sum');
+    expect(svg).toContain('curly');
+    expect(svg).toContain('void');
+    expect(svg).toContain('nnnull');
+    expect(svg).toContain('dup-imports');
+    expect(svg).toContain('type Phase-2 oos');
+    expect(svg).toContain('boundary Σ');
     expect(svg).toContain('aaaaaaaa'.slice(0, 7));
 
     const empty = renderSvg([]);
     expect(empty).toContain('No history found');
   });
 
-  it('renders a markdown table with tracked file paths', () => {
+  it('renders a markdown table with live tip snapshot and lint columns', () => {
     const md = renderMarkdown(
       [
         {
           sha: 'deadbeef',
           date: '2026-10-08T12:00:00Z',
           subject: 'Tip fold wave5',
-          curly: 1320,
+          curly: 538,
+          voidExpression: 118,
+          nnnull: 254,
+          dupImports: 99,
           typeOutOfScope: 216,
           boundarySum: 17,
         },
       ],
-      { generatedAt: '2026-10-09T00:00:00.000Z', gitMode: 'git log --all' }
+      {
+        generatedAt: '2026-10-09T00:00:00.000Z',
+        gitMode: 'git log --all',
+        tipSha: '23926935deadbeef',
+        liveLint: {
+          curly: 538,
+          voidExpression: 118,
+          nnnull: 254,
+          dupImports: 99,
+          nullish: 65,
+        },
+      }
     );
     expect(md).toContain('# Ratchet ceiling history');
-    expect(md).toContain('q-mp-074');
-    expect(md).toContain(TRACKED.curly);
-    expect(md).toContain('| `deadbee` | 2026-10-08 | 1320 | 216 | 17 |');
+    expect(md).toContain('q-mp-236');
+    expect(md).toContain(TRACKED.lintCeilings);
+    expect(md).toContain('Live tip snapshot (`2392693`)');
+    expect(md).toContain('| curly | 538 |');
+    expect(md).toContain(
+      '| prefer-nullish-coalescing (HOLD; not charted) | 65 |'
+    );
+    expect(md).toContain(
+      '| `deadbee` | 2026-10-08 | 538 | 118 | 254 | 99 | 216 | 17 |'
+    );
     expect(md).toContain('./ratchet-ceiling-history.svg');
   });
 
   it('collectHistory uses injected git runner (no network)', () => {
     const files: Record<string, string> = {
-      [TRACKED.curly]: JSON.stringify({ rules: { curly: 1320 } }),
+      [TRACKED.lintCeilings]: JSON.stringify({
+        rules: {
+          curly: 538,
+          [LINT_RULE_KEYS.voidExpression]: 118,
+          [LINT_RULE_KEYS.nnnull]: 254,
+          [LINT_RULE_KEYS.dupImports]: 99,
+        },
+      }),
       [TRACKED.typePhase2]: JSON.stringify({ outOfScopeErrors: 216 }),
       [TRACKED.boundaries]: JSON.stringify({
         ceilings: { dead_barrels: 8, mixed_ui_barrels: 9 },
@@ -174,7 +244,7 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
       if (args[0] === 'log') {
         const file = args[args.length - 1];
         const sha =
-          file === TRACKED.curly
+          file === TRACKED.lintCeilings
             ? 'c1'
             : file === TRACKED.typePhase2
               ? 't1'
@@ -196,7 +266,10 @@ describe('report-ratchet-history helpers (q-mp-074)', () => {
     const rows = collectHistory(runGit, { firstParent: false });
     expect(rows.length).toBe(3);
     const latest = rows[rows.length - 1];
-    expect(latest.curly).toBe(1320);
+    expect(latest.curly).toBe(538);
+    expect(latest.voidExpression).toBe(118);
+    expect(latest.nnnull).toBe(254);
+    expect(latest.dupImports).toBe(99);
     expect(latest.typeOutOfScope).toBe(216);
     expect(latest.boundarySum).toBe(17);
   });
