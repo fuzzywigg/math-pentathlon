@@ -206,10 +206,10 @@ export async function runFullgameMatch(
         flipped = true;
         break;
       }
-      // Class-based seat chrome (pent / fiar / kwa)
+      // Class-based seat chrome (pent / fiar / kwa / juggle)
       const seatClass = await page.evaluate(() => {
         const el = document.querySelector(
-          '.pent-status, .fiar-status, .kwa-status, .sd-status, .pg-status, .frac-status, .pinball-status'
+          '.pent-status, .fiar-status, .kwa-status, .sd-status, .pg-status, .frac-status, .pinball-status, .juggle-status'
         );
         if (!el) return '';
         if (el.classList.contains('player2')) return 'p2';
