@@ -1,0 +1,11 @@
+# Tip-branch CI unit job evidence — run 38027675957 @ ac05edf5 (cursor/mp-tip-post830 tip-fold PR, same 3210-file suite)
+# Job: unit. ANSI stripped. Corroborating tip-PR sample for post865 wall budget.
+# Workflow: https://github.com/fuzzywigg/math-pentathlon/actions/runs/38027675957
+# Task: q-mp-388 wall-budget remeasure (post865).
+
+2026-10-10T05:30:06.4125116Z unit suite: 3210 files (budget ~8 min; step timeout 12m / job 14m)
+2026-10-10T05:30:15.2161794Z  ↓  unit-isolated  tests/unit/tablet-ai-hard-latency.bench.test.ts (10 tests | 10 skipped)
+2026-10-10T05:33:40.9876666Z  ↓  unit-shared  tests/unit/ai-move-time-midgame.bench.test.ts (1 test | 1 skipped)
+2026-10-10T05:35:55.6656275Z  Test Files  3208 passed | 2 skipped (3210)
+2026-10-10T05:35:55.6758533Z       Tests  12756 passed | 48 skipped (12804)
+2026-10-10T05:35:55.6800140Z    Duration  348.52s (transform 28.58s, setup 7.53s, import 36.98s, tests 827.79s, environment 2084.33s)

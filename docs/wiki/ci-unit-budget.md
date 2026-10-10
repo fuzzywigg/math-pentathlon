@@ -1,8 +1,8 @@
 # CI unit job budget + AI-bench skips
 
-**Task id:** `q-mp-338` (wall-budget remeasure; prior `q-mp-289` / `q-mp-233` / `q-mp-175`)  
+**Task id:** `q-mp-388` (wall-budget remeasure; prior `q-mp-338` / `q-mp-289` / `q-mp-233` / `q-mp-175`)  
 **Scope:** Docs / visuals only — no workflow edits, no AI timing or product changes.  
-**Tip at authoring:** `cursor/mp-tip-post785` @ `c9b55cff` (full SHA `c9b55cff8c3832ff502179fe66f14ecaa400e95d`). Wall-budget + AI-bench CI evidence cites green tip-fold unit job [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139) (tip SHA match) and corroborating tip-PR unit job [`38013830311`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013830311) (PR [#831](https://github.com/fuzzywigg/math-pentathlon/pull/831) → tip, docs-only). Older post755 wall draft [#810](https://github.com/fuzzywigg/math-pentathlon/pull/810) left open as **contained**.
+**Tip at authoring:** `cursor/mp-tip-post865` @ `3908809d` (full SHA `3908809d672ed70eede7b9c0ad63a6fa475e28e5`). Wall-budget + AI-bench CI evidence cites green tip-fold unit job [`38028521133`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133) (tip SHA match on alpha after [#865](https://github.com/fuzzywigg/math-pentathlon/pull/865)) and corroborating tip-fold PR unit job [`38027675957`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38027675957) (`cursor/mp-tip-post830` fold PR, same **3210**-file suite). Older wall drafts [#843](https://github.com/fuzzywigg/math-pentathlon/pull/843) / [#810](https://github.com/fuzzywigg/math-pentathlon/pull/810) left open as **contained**. Backlog `q-mp-388` targets of **3194** / **12614** were written against tip post830 mid-fold and are stale vs live post865.
 
 Short contributor page for the **unit** job wall budget and why the two AI latency benches stay skipped when `CI=1`. Orthogonal to the blocking-vs-report-only job graph in [`docs/dev/ci-gates-mermaid-q-mp-073.md`](../dev/ci-gates-mermaid-q-mp-073.md). Full CI-skip inventory + HOLD citations: [`docs/dev/ai-timing-ci-skip-inventory-2026-10-09.md`](../dev/ai-timing-ci-skip-inventory-2026-10-09.md). Layer file/case tables: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) (`q-mp-260` / open [#791](https://github.com/fuzzywigg/math-pentathlon/pull/791) / backlog `q-mp-285`); this page owns the **unit wall budget** + AI-bench skip evidence only.
 
@@ -21,7 +21,7 @@ Do **not** “fix” Hex Hard by raising the deadline above 450ms. Do **not** re
 
 ## Unit job time budget (live `ci.yml`)
 
-From `.github/workflows/ci.yml` `unit` job (re-read on tip `c9b55cff`; knobs unchanged):
+From `.github/workflows/ci.yml` `unit` job (re-read on tip `3908809d`; knobs unchanged):
 
 | Knob         | Value                                |
 | ------------ | ------------------------------------ |
@@ -40,8 +40,8 @@ flowchart TB
 
   subgraph budget ["wall budget"]
     target["target ~8 min"]
-    observed["tip-fold CI 38014419139<br/>Duration 276.08s ≈ 4.6 min"]
-    slack["~7.4 min slack before 12m step"]
+    observed["tip-fold CI 38028521133<br/>Duration 372.35s ≈ 6.2 min"]
+    slack["~5.8 min slack before 12m step"]
     target --- observed --- slack
   end
 
@@ -54,44 +54,46 @@ flowchart TB
   step -.->|describe.skipIf CI| skip
 ```
 
-## Live suite size (tip `c9b55cff`)
+## Live suite size (tip `3908809d`)
 
-Wall evidence below is from tip-fold run [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139) at **3182** files / Vitest Duration **276.08s**. Corroborating tip-PR sample [`38013830311`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013830311) (#831 docs-only) measured Duration **356.89s** at **3181** files (runner variance; both well under the ~8 min target). Count-table ownership for testing-layers stays with open [#791](https://github.com/fuzzywigg/math-pentathlon/pull/791) / `q-mp-285`.
+Wall evidence below is from tip-fold run [`38028521133`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133) at **3210** files / Vitest Duration **372.35s**. Corroborating tip-fold PR sample [`38027675957`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38027675957) measured Duration **348.52s** at the same **3210** files (runner variance; both well under the ~8 min target). Count-table ownership for testing-layers stays with open [#791](https://github.com/fuzzywigg/math-pentathlon/pull/791) / `q-mp-285`.
 
-| Metric                                             |                                                                                Count | How                                                                                                               |
-| -------------------------------------------------- | -----------------------------------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------- |
-| Unit files (excl. `_tokenmaxx_archive`)            |                                                                             **3182** | `find tests/unit … \| wc -l` on tip `c9b55cff`                                                                    |
-| Cases listed                                       |                                                                            **12490** | `npx vitest list \| wc -l` on tip `c9b55cff`                                                                      |
-| Tip-fold CI run summary (`c9b55cff`)               | **3180** passed / **2** skipped files; **12478** passed / **44** skipped (**12522**) | run [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139) — Duration **276.08s** |
-| Tip-PR CI sample (`#831` @ `47ca886d`, 3181 files) | **3179** passed / **2** skipped files; **12463** passed / **44** skipped (**12507**) | run [`38013830311`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013830311) — Duration **356.89s** |
+| Metric                                                    |                                                                                Count | How                                                                                                               |
+| --------------------------------------------------------- | -----------------------------------------------------------------------------------: | ----------------------------------------------------------------------------------------------------------------- |
+| Unit files (excl. `_tokenmaxx_archive`)                   |                                                                             **3210** | `find tests/unit … \| wc -l` on tip `3908809d`                                                                    |
+| Cases listed                                              |                                                                            **12768** | `npx vitest list \| wc -l` on tip `3908809d`                                                                      |
+| Tip-fold CI run summary (`3908809d`)                      | **3208** passed / **2** skipped files; **12756** passed / **48** skipped (**12804**) | run [`38028521133`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133) — Duration **372.35s** |
+| Tip-fold PR sample (`ac05edf5`, same 3210-file tip suite) | **3208** passed / **2** skipped files; **12756** passed / **48** skipped (**12804**) | run [`38027675957`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38027675957) — Duration **348.52s** |
 
-Vitest `list` counts and the GHA summary totals differ slightly (list includes entries that resolve differently at run time); file/case rows are tip-live. Prior post755 wall cite was Duration **348.43s** ≈ 5.8 min at **3163** files (run [`37999819714`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/37999819714)).
+Vitest `list` counts and the GHA summary totals differ slightly (list includes entries that resolve differently at run time); file/case rows are tip-live. Prior post785 wall cite was Duration **276.08s** ≈ 4.6 min at **3182** files (run [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139)).
 
-### Post785 tip-PR unit job sample (wall only)
+### Post865 tip-PR unit job sample (wall only)
 
 | Run                                                                                             | SHA        | Suite files | Vitest Duration | Unit job wall |
 | ----------------------------------------------------------------------------------------------- | ---------- | ----------: | --------------: | ------------: |
-| [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139) tip-fold | `c9b55cff` |        3182 |     **276.08s** |          295s |
+| [`38028521133`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133) tip-fold | `3908809d` |        3210 |     **372.35s** |          389s |
+| [`38027675957`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38027675957) tip-PR   | `ac05edf5` |        3210 |     **348.52s** |          370s |
+| [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139) post785  | `c9b55cff` |        3182 |     **276.08s** |          295s |
 | [`38013830311`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013830311) #831     | `47ca886d` |        3181 |     **356.89s** |          377s |
-| [`38013950389`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013950389) #832     | `e8ec224e` |        3184 |     **334.12s** |          351s |
-| [`38013190535`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013190535) #825     | `c72d61c7` |        3181 |     **281.14s** |          305s |
 
 ## Two AI benches skipped under `CI=1`
 
-| File                                              | Gate                                | Tip-fold CI evidence (run [`38014419139`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38014419139)) |
+| File                                              | Gate                                | Tip-fold CI evidence (run [`38028521133`](https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133)) |
 | ------------------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `tests/unit/tablet-ai-hard-latency.bench.test.ts` | `describe.skipIf(!!process.env.CI)` | `(10 tests \| 10 skipped)`                                                                                        |
 | `tests/unit/ai-move-time-midgame.bench.test.ts`   | `describe.skipIf(!!process.env.CI)` | `(1 test \| 1 skipped)`                                                                                           |
 
-Together they are the **2 skipped test files** in that run’s summary: `Test Files 3180 passed | 2 skipped (3182)`.
+Together they are the **2 skipped test files** in that run’s summary: `Test Files 3208 passed | 2 skipped (3210)`.
 
 ### Screenshot / log twins (real tip CI)
 
 ![Tip CI unit job: budget echo, both AI benches skipped (pattern; older run 37932241420)](../screenshots/ci/tip-unit-ai-benches-skipped-37932241420.png)
 
-Plain-text twin of the **post785 tip-fold** GHA lines (ANSI stripped): [`docs/screenshots/ci/tip-unit-ai-benches-skipped-38014419139.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-38014419139.txt) — `unit suite: 3182 files`, both benches skipped, `Duration 276.08s`.
+Plain-text twin of the **post865 tip-fold** GHA lines (ANSI stripped): [`docs/screenshots/ci/tip-unit-ai-benches-skipped-38028521133.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-38028521133.txt) — `unit suite: 3210 files`, both benches skipped, `Duration 372.35s`.
 
-Corroborating tip-PR twin: [`docs/screenshots/ci/tip-unit-ai-benches-skipped-38013830311.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-38013830311.txt) — Duration **356.89s** @ 3181 files.
+Corroborating tip-fold PR twin: [`docs/screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt) — Duration **348.52s** @ 3210 files.
+
+Historical post785 twin (left for comparison): [`docs/screenshots/ci/tip-unit-ai-benches-skipped-38014419139.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-38014419139.txt).
 
 Historical post755 twin (left for comparison): [`docs/screenshots/ci/tip-unit-ai-benches-skipped-37999819714.txt`](../screenshots/ci/tip-unit-ai-benches-skipped-37999819714.txt).
 
