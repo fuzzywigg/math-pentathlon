@@ -49,6 +49,35 @@ async function waitReady(page) {
   });
 }
 
+/** Double-rAF paint settle (no fixed sleep). */
+async function waitDoubleRaf(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
+/**
+ * After a human move vs AI: wait for thinking chrome to appear (soft) then
+ * clear, then paint-settle. Soft timeouts keep the sweep moving when a game
+ * never flashes `.status-ai-thinking`.
+ */
+async function settleAfterMove(page) {
+  await page
+    .locator('.status-ai-thinking')
+    .first()
+    .waitFor({ state: 'visible', timeout: 500 })
+    .catch(() => {});
+  await page
+    .locator('.status-ai-thinking')
+    .first()
+    .waitFor({ state: 'hidden', timeout: 8_000 })
+    .catch(() => {});
+  await waitDoubleRaf(page);
+}
+
 async function startVsAi(page) {
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
@@ -58,7 +87,11 @@ async function startVsAi(page) {
   const easy = page.locator('.difficulty-btn.easy');
   if (await easy.isVisible().catch(() => false)) await easy.click();
   await page.locator('#start-game-btn').click();
-  await page.waitForTimeout(300);
+  await page
+    .locator('#new-game-modal.hidden')
+    .waitFor({ timeout: 10_000 })
+    .catch(() => {});
+  await waitDoubleRaf(page);
   await dismissOwl(page);
 }
 
@@ -79,15 +112,22 @@ async function playMoves(page, gameId, moves = 2) {
           break;
         case 'hex':
           await page
-            .locator(`.hex-cell-group[data-row="${4 + i}"][data-col="${4 + i}"]`)
+            .locator(
+              `.hex-cell-group[data-row="${4 + i}"][data-col="${4 + i}"]`
+            )
             .click({ force: true });
           break;
         case 'star-track':
           await page.locator('.star-track-draw-btn').click({ force: true });
-          await page.locator('.star-track-chain-btn').first().click({ force: true });
+          await page
+            .locator('.star-track-chain-btn')
+            .first()
+            .click({ force: true });
           break;
         case 'hex-a-gone': {
-          const bank = page.locator('.hex-a-gone-block-btn:not(.empty)').first();
+          const bank = page
+            .locator('.hex-a-gone-block-btn:not(.empty)')
+            .first();
           if (await bank.count()) await bank.click({ force: true });
           const confirm = page.locator('.hex-a-gone-confirm-btn');
           if (await confirm.isVisible().catch(() => false))
@@ -157,8 +197,7 @@ async function playMoves(page, gameId, moves = 2) {
           const cell = page.locator(
             `.juggle-board.player1 .juggle-cell[data-row="0"][data-col="${i}"]`
           );
-          if (await cell.count())
-            await cell.evaluate((el) => el.click());
+          if (await cell.count()) await cell.evaluate((el) => el.click());
           break;
         }
         case 'contig-60': {
@@ -209,7 +248,12 @@ async function playMoves(page, gameId, moves = 2) {
             '.pg-btn-secondary, .pg-pass-btn, button:has-text("Pass")'
           );
           if (await valid.count()) await valid.click({ force: true });
-          else if (await pass.first().isVisible().catch(() => false))
+          else if (
+            await pass
+              .first()
+              .isVisible()
+              .catch(() => false)
+          )
             await pass.first().click({ force: true });
           break;
         }
@@ -235,9 +279,14 @@ async function playMoves(page, gameId, moves = 2) {
           break;
         }
         case 'pent-em-in': {
-          await page.locator('.pent-piece-option').first().click({ force: true });
+          await page
+            .locator('.pent-piece-option')
+            .first()
+            .click({ force: true });
           const cell = page
-            .locator('.pent-board .interaction rect, .pent-board rect[data-row]')
+            .locator(
+              '.pent-board .interaction rect, .pent-board rect[data-row]'
+            )
             .nth(i);
           if (await cell.count()) await cell.click({ force: true });
           break;
@@ -247,7 +296,12 @@ async function playMoves(page, gameId, moves = 2) {
           const cont = page.locator(
             '.frac-continue-btn, button:has-text("Continue")'
           );
-          if (await cont.first().isVisible().catch(() => false))
+          if (
+            await cont
+              .first()
+              .isVisible()
+              .catch(() => false)
+          )
             await cont.first().click();
           break;
         }
@@ -259,15 +313,20 @@ async function playMoves(page, gameId, moves = 2) {
           const cont = page.locator(
             '.pinball-continue-btn, button:has-text("Continue")'
           );
-          if (await cont.first().isVisible().catch(() => false))
+          if (
+            await cont
+              .first()
+              .isVisible()
+              .catch(() => false)
+          )
             await cont.first().click();
           break;
         }
         default:
           break;
       }
-      // Allow AI / animations to settle a bit
-      await page.waitForTimeout(1200);
+      // Allow AI / animations to settle (condition wait, not fixed sleep)
+      await settleAfterMove(page);
     } catch (err) {
       return `move ${i + 1} failed: ${err.message}`;
     }
@@ -311,7 +370,9 @@ async function sweepGame(browser, gameId) {
   };
 
   try {
-    await page.goto(`${BASE}/#/game/${gameId}`, { waitUntil: 'domcontentloaded' });
+    await page.goto(`${BASE}/#/game/${gameId}`, {
+      waitUntil: 'domcontentloaded',
+    });
     await waitReady(page);
     result.loadOk = true;
 
@@ -354,7 +415,10 @@ async function main() {
   }
   await browser.close();
   mkdirSync('/opt/cursor/artifacts', { recursive: true });
-  writeFileSync(OUT, JSON.stringify({ at: new Date().toISOString(), results }, null, 2));
+  writeFileSync(
+    OUT,
+    JSON.stringify({ at: new Date().toISOString(), results }, null, 2)
+  );
   console.log(`Wrote ${OUT}`);
 }
 
