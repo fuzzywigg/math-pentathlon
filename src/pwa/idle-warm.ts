@@ -34,7 +34,12 @@ function defaultSchedule(cb: () => void): void {
   ).requestIdleCallback;
 
   if (typeof ric === 'function') {
-    ric(() => cb(), { timeout: 4_000 });
+    ric(
+      () => {
+        cb();
+      },
+      { timeout: 4_000 }
+    );
     return;
   }
   window.setTimeout(cb, 1_500);
