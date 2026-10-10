@@ -6,6 +6,7 @@
 import { test } from './fixtures';
 import { expect, type Page } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
+import { waitForGameReady } from './helpers/page';
 
 const AVAILABLE = GAMES.filter((g) => g.available);
 
@@ -31,15 +32,6 @@ const BOARD_SURFACE: Record<string, string> = {
   'frac-fact': '.frac-problem, .frac-choice-btn',
   'fraction-pinball': '.pinball-board, .pinball-game-container',
 };
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
 
 async function gotoGame(page: Page, gameId: string) {
   await page.goto(`/#/game/${gameId}`);

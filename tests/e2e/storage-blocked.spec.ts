@@ -4,6 +4,7 @@
  */
 import { test, expect, type Page } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
+import { waitForGameReady } from './helpers/page';
 import { installE2eStability } from './helpers/stability';
 
 const AVAILABLE = GAMES.filter((g) => g.available);
@@ -59,15 +60,6 @@ async function blockWebStorage(page: Page): Promise<void> {
   });
 }
 
-async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 20_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
 test.describe('storage blocked — menu + games still start', () => {
   test.beforeEach(async ({ page }) => {
     await installE2eStability(page);
@@ -97,7 +89,7 @@ test.describe('storage blocked — menu + games still start', () => {
       page.on('pageerror', (err) => pageErrors.push(String(err)));
 
       await page.goto(`/#/game/${game.id}`);
-      await waitForGameReady(page);
+      await waitForGameReady(page, { timeoutMs: 20_000 });
 
       await expect(page.getByTestId('game-error-boundary')).toHaveCount(0);
       await expect(page.getByTestId('game-load-error')).toHaveCount(0);

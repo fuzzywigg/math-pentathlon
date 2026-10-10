@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
-import { dismissOwl } from './helpers/page';
+import { dismissOwl, waitForGameReady } from './helpers/page';
 import { installE2eStability } from './helpers/stability';
 import { GAMES } from '../../src/core/game-registry';
 
@@ -38,15 +38,6 @@ const MOUNT: Record<string, string> = {
   'fraction-pinball':
     '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
 };
-
-async function waitForGameReady(page: Page): Promise<void> {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
 
 async function waitForMenu(page: Page): Promise<void> {
   await expect(
