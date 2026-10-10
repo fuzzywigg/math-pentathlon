@@ -1,0 +1,11 @@
+# Tip-branch CI unit job evidence — run 38028521133 @ 3908809d (alpha tip-fold #865 / cursor/mp-tip-post865)
+# Job: unit. ANSI stripped. Live tip HEAD suite size (3210 files).
+# Workflow: https://github.com/fuzzywigg/math-pentathlon/actions/runs/38028521133
+# Task: q-mp-388 wall-budget remeasure (post865).
+
+2026-10-10T05:44:39.3212686Z unit suite: 3210 files (budget ~8 min; step timeout 12m / job 14m)
+2026-10-10T05:44:48.0497904Z  ↓  unit-isolated  tests/unit/tablet-ai-hard-latency.bench.test.ts (10 tests | 10 skipped)
+2026-10-10T05:47:59.9775790Z  ↓  unit-shared  tests/unit/ai-move-time-midgame.bench.test.ts (1 test | 1 skipped)
+2026-10-10T05:50:52.4316060Z  Test Files  3208 passed | 2 skipped (3210)
+2026-10-10T05:50:52.4452192Z       Tests  12756 passed | 48 skipped (12804)
+2026-10-10T05:50:52.4490114Z    Duration  372.35s (transform 27.48s, setup 7.38s, import 35.17s, tests 821.66s, environment 2311.70s)
