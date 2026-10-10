@@ -178,6 +178,8 @@ export default [
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-shadow': 'error',
+      // Stricter than live (null: 'ignore'): count residual ==/!= null debt.
+      eqeqeq: ['error', 'always'],
       '@typescript-eslint/return-await': ['error', 'always'],
     },
   },
