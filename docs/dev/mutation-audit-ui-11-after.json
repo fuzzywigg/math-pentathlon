@@ -1,0 +1,89 @@
+{
+  "taskId": "q-mp-350-mutation-audit-ui-11",
+  "generatedAt": "2026-10-10T04:09:01.590Z",
+  "harness": "node_modules/.cache/mutation-ui-11/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/offline.ts",
+      "src/ui/timeout-handle.ts",
+      "src/ui/coord-map.ts"
+    ],
+    "excludeTests": null
+  },
+  "results": [
+    {
+      "module": "src/ui/offline.ts",
+      "lines": 46,
+      "tests": [
+        "tests/unit/mutation-ui11-offline.test.ts",
+        "tests/unit/mutation-ui-offline.test.ts",
+        "tests/unit/burn-1008-ui-cov-r4-offline-motion-demos.test.ts",
+        "tests/unit/offline-helpers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/ai-calibration-difficulty-order.test.ts",
+        "tests/unit/ai-hard-midgame-identity.test.ts",
+        "tests/unit/check-build-helpers.test.ts",
+        "tests/unit/game-loading.test.ts",
+        "tests/unit/pwa-register.test.ts",
+        "tests/unit/q-mp-256-pwa-soft-fail.test.ts",
+        "tests/unit/runtime-error-path-audit.test.ts",
+        "tests/unit/tablet-ai-hard-latency.bench.test.ts",
+        "tests/unit/tablet-playability-css.test.ts"
+      ],
+      "availableMutants": 7,
+      "ranMutants": 7,
+      "killed": 7,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/timeout-handle.ts",
+      "lines": 80,
+      "tests": [
+        "tests/unit/mutation-ui11-timeout-handle.test.ts",
+        "tests/unit/mutation-ui-timeout-handle.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-timeout-seat-dice.test.ts",
+        "tests/unit/ui-helper-dedupe-characterization.test.ts"
+      ],
+      "availableMutants": 6,
+      "ranMutants": 6,
+      "killed": 6,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/coord-map.ts",
+      "lines": 111,
+      "tests": [
+        "tests/unit/mutation-ui11-coord-map.test.ts",
+        "tests/unit/mutation-ui-coord-map.test.ts",
+        "tests/unit/coord-map.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts",
+        "tests/unit/canvas-dpr-resize-regression.test.ts"
+      ],
+      "availableMutants": 71,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
