@@ -14,6 +14,7 @@
  *   npm run check:copy-pins -- --self-test
  *   npm run check:copy-pins -- --fail          # exit 1 when findings (opt-in)
  *   npm run check:copy-pins -- --json          # machine-readable findings
+ *   npm run check:copy-pins -- --help          # usage; unknown flags exit 2
  *
  * Docs: docs/dev/check-copy-pins.md
  */
@@ -270,7 +271,8 @@ function harvestCopyRegistry() {
         while ((rm = returnRe.exec(body)) !== null) {
           const expr = rm[1];
           const quote = expr[0];
-          const raw = expr.slice(1, -1)
+          const raw = expr
+            .slice(1, -1)
             .replace(/\\n/g, ' ')
             .replace(/\\'/g, "'")
             .replace(/\\"/g, '"')
@@ -446,9 +448,7 @@ function scanSource(fileRel, source, registry) {
         }
         const litEsc = escapeRegExp(lit);
         // Exact full-string pin in matcher arg
-        const exactRe = new RegExp(
-          String.raw`^\s*(['"\`])${litEsc}\1\s*$`
-        );
+        const exactRe = new RegExp(String.raw`^\s*(['"\`])${litEsc}\1\s*$`);
         const needles = [];
         if (lit.length >= 12) needles.push(lit);
         const fragMatch = lit.match(
@@ -489,10 +489,38 @@ function scanSource(fileRel, source, registry) {
   return findings;
 }
 
+const KNOWN_FLAGS = new Set(['--self-test', '--fail', '--json']);
+
+/**
+ * @param {typeof console.log} [write]
+ */
+function printUsage(write = console.log) {
+  write(`Usage: node scripts/check-copy-pins.mjs [options]
+
+Options:
+  --self-test   Run built-in review examples + negatives
+  --fail        Exit 1 when findings (opt-in)
+  --json        Machine-readable findings
+  -h, --help    Show help
+
+Unknown flags exit 2.`);
+}
+
 /**
  * @param {string[]} argv
  */
 function parseArgs(argv) {
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      printUsage(console.log);
+      process.exit(0);
+    }
+    if (a.startsWith('-') && !KNOWN_FLAGS.has(a)) {
+      console.error(`Unknown flag: ${a}`);
+      printUsage(console.error);
+      process.exit(2);
+    }
+  }
   return {
     selfTest: argv.includes('--self-test'),
     fail: argv.includes('--fail'),
@@ -502,7 +530,9 @@ function parseArgs(argv) {
 
 function runSelfTest(registry) {
   let ok = true;
-  console.log('check-copy-pins: --self-test (review 7/8 examples + negatives)\n');
+  console.log(
+    'check-copy-pins: --self-test (review 7/8 examples + negatives)\n'
+  );
 
   for (const ex of REVIEW_EXAMPLES) {
     const findings = scanSource(ex.path, ex.source, registry);
@@ -523,7 +553,9 @@ function runSelfTest(registry) {
       `${pass ? 'PASS' : 'FAIL'}  ${ex.id} — expected 0 findings, got ${findings.length}`
     );
     for (const f of findings) {
-      console.log(`         L${f.line} [${f.kind}] ${f.detail} :: ${f.snippet}`);
+      console.log(
+        `         L${f.line} [${f.kind}] ${f.detail} :: ${f.snippet}`
+      );
     }
     if (!pass) ok = false;
   }
