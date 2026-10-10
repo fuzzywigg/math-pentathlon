@@ -1,0 +1,150 @@
+{
+  "taskId": "q-mp-446",
+  "title": "CI unit wall-budget / test-speed remeasure (tip post898)",
+  "tipBranch": "cursor/mp-tip-post898",
+  "tipSha": "ad5a9f15ec9fcfc0b44f1e5ee000489423086181",
+  "measuredAt": "2026-10-10T08:46:35Z",
+  "wallEvidenceTipSha": "855226389f23cb95bf74bd827556ee831c3bccad",
+  "scope": "report-only docs/json/svg; no src / test-behavior / workflow / wall-raise edits",
+  "flagThresholdSeconds": 420,
+  "flagUnitWallOver420s": false,
+  "specStale": {
+    "backlog": "q-mp-446 in docs/dev/backlog-2026-10-10e.md (PR #921)",
+    "backlogEvidenceTipSha": "788e82151dd1d05d3a8227b7cab982bb07b83a03",
+    "backlogUnitFiles": 3224,
+    "backlogVitestList": 12905,
+    "note": "Live tip grew past backlog stamp during fold wave (#915\u2013#921 / #900\u2013#913 payloads)"
+  },
+  "budgets": {
+    "targetWallMinutes": 8,
+    "stepTimeoutMinutes": 12,
+    "jobTimeoutMinutes": 14,
+    "source": ".github/workflows/ci.yml unit job (re-read; knobs unchanged; workflows not edited)"
+  },
+  "hardRuleHold": {
+    "hexHardMs": 450,
+    "hexHardPinPath": "src/games/hex/ai.ts",
+    "hexHardPinLine": "hard: 450,",
+    "aiBenchesSkippedUnderCI": [
+      "tests/unit/tablet-ai-hard-latency.bench.test.ts",
+      "tests/unit/ai-move-time-midgame.bench.test.ts"
+    ],
+    "noWallRaise": true,
+    "noWorkflowEdits": true
+  },
+  "before": {
+    "label": "wiki / q-mp-388 post865 wall stamp",
+    "tipBranch": "cursor/mp-tip-post865",
+    "tipSha": "3908809d672ed70eede7b9c0ad63a6fa475e28e5",
+    "unitFiles": 3210,
+    "vitestList": 12768,
+    "primaryGhaRunId": 38028521133,
+    "vitestDurationSeconds": 372.35,
+    "unitJobWallSeconds": 389
+  },
+  "after": {
+    "label": "live tip post898 remeasure",
+    "tipBranch": "cursor/mp-tip-post898",
+    "tipSha": "ad5a9f15ec9fcfc0b44f1e5ee000489423086181",
+    "unitFiles": 3235,
+    "vitestList": 12988,
+    "primaryTipGha": {
+      "label": "tip-fold unit job succeeded before run cancel (same 3235-file suite)",
+      "sha": "855226389f23cb95bf74bd827556ee831c3bccad",
+      "ghaRunId": 38038340938,
+      "unitFiles": 3235,
+      "testFilesSummary": "3233 passed | 2 skipped (3235)",
+      "testsSummary": "12976 passed | 54 skipped (13030)",
+      "vitestDurationSeconds": 199.97,
+      "unitJobWallSeconds": 215,
+      "aiBenchesSkipped": true
+    },
+    "alphaCutBase": {
+      "label": "alpha tip-fold #898 cut base for post898",
+      "sha": "946d6f956b54de10e08240ba8b26194c2e3b779d",
+      "ghaRunId": 38034514441,
+      "unitFiles": 3222,
+      "testFilesSummary": "3220 passed | 2 skipped (3222)",
+      "testsSummary": "12866 passed | 50 skipped (12916)",
+      "vitestDurationSeconds": 341.35,
+      "unitJobWallSeconds": 359,
+      "aiBenchesSkipped": true
+    },
+    "tipPrSamples": [
+      {
+        "pr": 921,
+        "runId": 38036606903,
+        "sha": "b833d5824f2447f2c922ad0d1ff7d46843da955a",
+        "unitFiles": 3224,
+        "vitestDurationSeconds": 198.5,
+        "unitJobWallSeconds": 212
+      },
+      {
+        "pr": 917,
+        "runId": 38036200790,
+        "sha": "cf8c93731fb535dcd9ea0b57c9b475ae2425e3c5",
+        "unitFiles": 3223,
+        "vitestDurationSeconds": 362.95,
+        "unitJobWallSeconds": 384
+      },
+      {
+        "pr": 919,
+        "runId": 38036036627,
+        "sha": "362dcfe27fe2399f3f5e0bb8d5ab7cb0101e57ee",
+        "unitFiles": 3223,
+        "vitestDurationSeconds": 357.03,
+        "unitJobWallSeconds": 379
+      },
+      {
+        "pr": 918,
+        "runId": 38035979339,
+        "sha": "a310f431272a657d66c98c6a49056c0dbb699d98",
+        "unitFiles": 3223,
+        "vitestDurationSeconds": 280.99,
+        "unitJobWallSeconds": 300
+      },
+      {
+        "pr": 920,
+        "runId": 38036042498,
+        "sha": "787256b2efff886b8c8ec9c34a61ad5f7f7c7076",
+        "unitFiles": 3223,
+        "vitestDurationSeconds": 223.39,
+        "unitJobWallSeconds": 238
+      }
+    ],
+    "localCI1": {
+      "sha": "855226389f23cb95bf74bd827556ee831c3bccad",
+      "unitFiles": 3235,
+      "testFilesSummary": "3233 passed | 2 skipped (3235)",
+      "testsSummary": "12976 passed | 54 skipped (13030)",
+      "vitestDurationSeconds": 140.75,
+      "note": "Local agent host; not the GHA wall cite. Matches tip GHA suite summary under CI=1."
+    },
+    "tipFoldCiNote": "Tip-fold PR #914 CI runs are often cancelled by successive tip pushes; unit job on run 38038340938 @ 85522638 still completed successfully (Duration 199.97s) before the overall run cancelled. Rebased docs stamp onto later tip HEAD ad5a9f15 (suite size unchanged at 3235 / 12988)."
+  },
+  "maxObservedVitestDurationSeconds": 362.95,
+  "maxObservedUnitJobWallSeconds": 384,
+  "primaryTipVitestDurationSeconds": 199.97,
+  "primaryTipUnitJobWallSeconds": 215,
+  "slackBeforeStepTimeoutMinutesApprox": 5.6,
+  "containedOpenDrafts": [
+    {
+      "pr": 887,
+      "task": "q-mp-388",
+      "base": "cursor/mp-tip-post865",
+      "action": "leave open as contained (prior tip wall stamp)"
+    },
+    {
+      "pr": 843,
+      "task": "q-mp-338",
+      "base": "cursor/mp-tip-post785",
+      "action": "leave open as contained"
+    },
+    {
+      "pr": 810,
+      "task": "q-mp-289",
+      "base": "cursor/mp-tip-post755",
+      "action": "leave open as contained"
+    }
+  ]
+}
