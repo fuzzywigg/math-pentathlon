@@ -1,0 +1,348 @@
+{
+  "taskId": "q-mp-463",
+  "title": "Knip live metrics drift inventory (tip post914)",
+  "tipBranch": "cursor/mp-tip-post914",
+  "tipSha": "753052a6844e80c6264d1d2480deafa5a9e7b59c",
+  "measuredAt": "2026-10-10T09:22:35Z",
+  "knipVersion": "5.88.1",
+  "scope": "report-only docs/data/chart; no knip-baseline.json / src edits",
+  "specStale": {
+    "backlogEntry": "q-mp-463 in docs/dev/backlog-2026-10-10f.md",
+    "backlogEvidence": {
+      "tip": "cursor/mp-tip-post898",
+      "tipSha": "788b4558438f867f7aaa8161070fd1e0b64bcbf9",
+      "liveUnusedTypes": 33,
+      "baselineUnusedTypes": 36,
+      "noticeDelta": -3
+    },
+    "priorInventory": {
+      "taskId": "q-mp-394",
+      "pr": "#888",
+      "tip": "cursor/mp-tip-post865",
+      "tipSha": "3908809d672ed70eede7b9c0ad63a6fa475e28e5",
+      "liveUnusedTypes": 35,
+      "baselineUnusedTypes": 36
+    },
+    "livePost914": {
+      "liveUnusedTypes": 32,
+      "baselineUnusedTypes": 36,
+      "noticeDelta": -4
+    }
+  },
+  "metrics": {
+    "baseline": {
+      "unusedFiles": 0,
+      "unusedExports": 3,
+      "unusedTypes": 36,
+      "unusedDependencies": 0,
+      "unusedDevDependencies": 0,
+      "unlisted": 3,
+      "duplicates": 0
+    },
+    "live": {
+      "unusedFiles": 0,
+      "unusedExports": 3,
+      "unusedTypes": 32,
+      "unusedDependencies": 0,
+      "unusedDevDependencies": 0,
+      "unlisted": 3,
+      "duplicates": 0
+    },
+    "delta": {
+      "unusedTypes": -4
+    },
+    "notices": [
+      "knip unused surface within baseline (exports=3, types=32, files=0)",
+      "knip unused shrink: unusedTypes 36→32 (-4)"
+    ]
+  },
+  "dispositionCounts": {
+    "EXCLUDED_AI": 20,
+    "EXCLUDED_SCORING": 4,
+    "INTENTIONAL_KEEPER": 1,
+    "RANK3_CANDIDATE": 7,
+    "total": 32
+  },
+  "driftExplanation": {
+    "vsPost865InventoryQmp394": {
+      "priorLive": 35,
+      "liveNow": 32,
+      "delta": -3,
+      "noLongerInUnusedTypes": [
+        {
+          "name": "AIMove",
+          "file": "src/games/kings-quadraphages/ai.ts",
+          "note": "Still exported; knip unusedTypes no longer lists it on post914 (type consumers / analysis drift). AI HOLD — not a demote."
+        },
+        {
+          "name": "AIMove",
+          "file": "src/games/pent-em-in/ai.ts",
+          "note": "Still exported; knip unusedTypes no longer lists it on post914. AI HOLD — not a demote."
+        },
+        {
+          "name": "AIMove",
+          "file": "src/games/sum-dominoes/ai.ts",
+          "note": "Still exported; knip unusedTypes no longer lists it on post914. AI HOLD — not a demote."
+        }
+      ]
+    },
+    "vsBacklogQmp463Post898": {
+      "backlogLive": 33,
+      "liveNow": 32,
+      "delta": -1,
+      "note": "Backlog stamp @ 788b4558 said live 33; tip post914 @ 753052a6 measures 32. Spec stale by −1; this inventory is the tip-stamped truth."
+    }
+  },
+  "unusedTypes": [
+    {
+      "file": "src/core/ai-worker/client.ts",
+      "name": "AiWorkerRequestPayload",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/core/ai-worker/protocol.ts",
+      "name": "AiWorkerRequestBase",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "Dimensions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "WrapOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "AlignmentOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "AlignmentCheckResult",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "LineAlignmentResult",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "ConnectivityOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "RegionStats",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/safe-web-storage.ts",
+      "name": "SafeJsonParseResult",
+      "exportAlias": "SafeWebStorageModule",
+      "disposition": "INTENTIONAL_KEEPER"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "FormatTimeOptions",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "ScoreEntry",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "LeaderboardEntry",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "GameResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/games/calla/ai.ts",
+      "name": "MoveAnalysis",
+      "exportAlias": "callaAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/calla/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "callaAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/contig-60/ai.ts",
+      "name": "AIPlacement",
+      "exportAlias": "contigAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/fab-a-diffy/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/fiar/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": "fiarAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex-a-gone/ai.ts",
+      "name": "AISelectionResult",
+      "exportAlias": "hexAGoneAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex-a-gone/ai.ts",
+      "name": "AIPlacementResult",
+      "exportAlias": "hexAGoneAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIDieChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIShapeChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIPlacementChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/par-55/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "par55Ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/prime-gold/ai.ts",
+      "name": "AIPlacement",
+      "exportAlias": "primeAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/queens-guards/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": "ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/ramrod/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/star-track/ai.ts",
+      "name": "AIChainChoice",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/stars-bars/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "starsAi",
+      "disposition": "EXCLUDED_AI"
+    }
+  ],
+  "unusedExports": [
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "isPlainProgressObject",
+      "disposition": "LEAVE"
+    },
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "sanitizeSettings",
+      "disposition": "LEAVE"
+    },
+    {
+      "file": "src/games/fab-a-diffy/ai-client.ts",
+      "name": "cancelFabAiRequests",
+      "disposition": "EXCLUDED_Q_MP_253",
+      "exportAlias": "fabAiClient"
+    }
+  ],
+  "unlisted": [
+    {
+      "file": "scripts/check-emit-identity.mjs",
+      "name": "esbuild",
+      "disposition": "INTENTIONAL"
+    },
+    {
+      "file": "scripts/probe-offline-resilience-dev.mjs",
+      "name": "playwright",
+      "disposition": "INTENTIONAL"
+    },
+    {
+      "file": "scripts/probe-offline-resilience.mjs",
+      "name": "playwright",
+      "disposition": "INTENTIONAL"
+    }
+  ],
+  "outOfScope": [
+    "AI protocol / games/*/ai.ts types",
+    "timer-scoring types",
+    "SafeJsonParseResult keeper",
+    "cancelFabAiRequests",
+    "knip-baseline.json edits",
+    "src/ or test behavior changes"
+  ],
+  "related": {
+    "rank3Inventory": "docs/dev/knip-rank3-unused-types-inventory-2026-10-10.md",
+    "priorDriftInventory": "docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.md",
+    "baseline": "docs/dev/knip-baseline.json",
+    "report": "docs/dev/knip-report.md",
+    "openDraftsChecked": [
+      "#888",
+      "#921",
+      "#934",
+      "#866",
+      "#869",
+      "#935"
+    ],
+    "demoteOwners": ["#921/q-mp-458", "q-mp-479", "undrafted 433/408/381"]
+  }
+}
