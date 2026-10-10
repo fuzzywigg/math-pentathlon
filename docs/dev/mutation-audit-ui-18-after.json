@@ -1,0 +1,132 @@
+{
+  "taskId": "q-mp-527-mutation-audit-ui-18",
+  "generatedAt": "2026-10-10T12:30:34.130Z",
+  "harness": "node_modules/.cache/mutation-ui-18/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/core/dice/dice-selector.ts",
+      "src/ui/board-a11y.ts",
+      "src/ui/pointer-hygiene.ts"
+    ],
+    "excludeTests": null,
+    "preferPrefix": "mutation-ui18"
+  },
+  "results": [
+    {
+      "module": "src/core/dice/dice-selector.ts",
+      "lines": 464,
+      "tests": [
+        "tests/unit/mutation-ui18-dice-selector.test.ts",
+        "tests/unit/burn-wave22-dice-selector-ui.test.ts",
+        "tests/unit/burn-wave22-dice-selector.test.ts",
+        "tests/unit/burn-wave32-dice-selector-flow.test.ts",
+        "tests/unit/burn-wave32-dice-selector-multiselect.test.ts",
+        "tests/unit/burn-wave34-dice-selector-controls.test.ts",
+        "tests/unit/burn-wave34-dice-selector-guards.test.ts",
+        "tests/unit/burn-wave35-dice-selector-sums-panel.test.ts",
+        "tests/unit/burn-wave38-dice-selector-confirm-empty.test.ts",
+        "tests/unit/burn-wave39-dice-selector-custom-single.test.ts",
+        "tests/unit/burn-wave39-dice-selector-custom-sums.test.ts",
+        "tests/unit/burn-wave39-dice-selector-singleselect-lock.test.ts",
+        "tests/unit/burn-wave40-dice-selector-setset-destroy.test.ts",
+        "tests/unit/mutation-ui2-dice-selector.test.ts",
+        "tests/unit/mutation-ui9-dice-selector.test.ts",
+        "tests/unit/overnight-demos-dice-selector-confirm-logs.test.ts",
+        "tests/unit/overnight-dice-selector-custom-survives-set.test.ts",
+        "tests/unit/overnight-dice-selector-destroy-confirm-flags.test.ts",
+        "tests/unit/overnight-dice-selector-reset-helpers.test.ts",
+        "tests/unit/overnight-dice-selector-roll-again-confirm.test.ts",
+        "tests/unit/overnight-dice-selector-singleselect-deselect.test.ts",
+        "tests/unit/overnight-wave52-dice-selector-diesize-svg.test.ts",
+        "tests/unit/overnight-wave52-dice-selector-selection-info.test.ts",
+        "tests/unit/q-mp-300-dice-selector-enable-disable.test.ts",
+        "tests/unit/burn-wave32-dice-handshake-stress.test.ts",
+        "tests/unit/burn-wave38-dice-rollbutton-set-types.test.ts",
+        "tests/unit/overnight-wave52-handshake-dice-frac-pinball-inject.test.ts",
+        "tests/unit/overnight-wave52-handshake-dice-frac-pinball-mounts.test.ts",
+        "tests/unit/overnight-wave56-demos-dice-poly-confirmed-sum.test.ts"
+      ],
+      "availableMutants": 39,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/board-a11y.ts",
+      "lines": 546,
+      "tests": [
+        "tests/unit/mutation-ui18-board-a11y.test.ts",
+        "tests/unit/board-a11y.test.ts",
+        "tests/unit/keyboard-a11y-game-selector.test.ts",
+        "tests/unit/keyboard-a11y-shell-modals.test.ts",
+        "tests/unit/mp3d-ui-cov-r8-board-a11y-pointer.test.ts",
+        "tests/unit/mutation-ui10-board-a11y.test.ts",
+        "tests/unit/mutation-ui2-board-a11y.test.ts",
+        "tests/unit/q-mp-355-board-a11y-soft-fail.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave25-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave25-a11y-focus-remount.test.ts",
+        "tests/unit/burn-wave25-a11y-grid-nav.test.ts",
+        "tests/unit/burn-wave25-a11y-labels.test.ts",
+        "tests/unit/burn-wave25-a11y-roving-focus.test.ts",
+        "tests/unit/burn-wave25-a11y-status-live.test.ts",
+        "tests/unit/burn-wave25-a11y-svg-grid.test.ts",
+        "tests/unit/burn-wave44-handshake-a11y-shell-status.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-capture-restore-focus.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-focusable-attrs.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-grid-nav-arrows.test.ts",
+        "tests/unit/fiar-aria-selectable-movement.test.ts",
+        "tests/unit/finish-roving-fiar-queens.test.ts",
+        "tests/unit/finish-roving-juggle-ramrod-fab.test.ts",
+        "tests/unit/sr-semantics-structure.test.ts"
+      ],
+      "availableMutants": 127,
+      "ranMutants": 20,
+      "killed": 19,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 95,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 158,
+          "description": "flip > \u2192 >=",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/pointer-hygiene.ts",
+      "lines": 327,
+      "tests": [
+        "tests/unit/mutation-ui18-pointer-hygiene.test.ts",
+        "tests/unit/mutation-ui13-pointer-hygiene.test.ts",
+        "tests/unit/mutation-ui2-pointer-hygiene.test.ts",
+        "tests/unit/pointer-hygiene.test.ts",
+        "tests/unit/q-mp-278-pointer-hygiene-reduced-motion.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts"
+      ],
+      "availableMutants": 58,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
