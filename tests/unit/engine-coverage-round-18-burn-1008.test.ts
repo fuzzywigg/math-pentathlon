@@ -20,7 +20,7 @@
  * Pins CURRENT behavior only. No engine / rules.ts / AI / scoring / copy
  * edits. Hex Hard stays 450ms. No Stars & Bars history cap.
  *
- * Baseline rank (tip post949 @ a2626787 / remeasure 8698fffb, coverage-engine-r18-postr17,
+ * Baseline rank (tip post949 @ a8764a03 / remeasure 8698fffb, coverage-engine-r18-postr17,
  * unit-shared+unit-node+unit-isolated excl. AI determinism/worker/
  * calibration/move-time + bench):
  *   dom-security.ts             90.90% (20/22)    ← mutation w15
