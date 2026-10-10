@@ -4,7 +4,10 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
+vi.mock('../../src/core/router', async () => {
+  const { mockRouterNavigateModule } = await import('./helpers/router-mock');
+  return mockRouterNavigateModule();
+});
 
 import { renderExpressionDemo } from '../../src/demos/expression-demo';
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
