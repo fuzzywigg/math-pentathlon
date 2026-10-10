@@ -4,9 +4,9 @@
  * Does not duplicate #457 tap targets, #486 mobile smoke, #517 races, #529 DPR.
  */
 import { test } from './fixtures';
-import { expect, type Page } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { GAMES } from '../../src/core/game-registry';
-import { waitForGameReady } from './helpers/page';
+import { gotoGame, startHuman } from './helpers/page';
 
 const AVAILABLE = GAMES.filter((g) => g.available);
 
@@ -32,24 +32,6 @@ const BOARD_SURFACE: Record<string, string> = {
   'frac-fact': '.frac-problem, .frac-choice-btn',
   'fraction-pinball': '.pinball-board, .pinball-game-container',
 };
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
-  }
-}
 
 test.describe('Pointer edge cases', () => {
   test('every game board mount uses touch-action manipulation (or none on 3D canvas)', async ({
