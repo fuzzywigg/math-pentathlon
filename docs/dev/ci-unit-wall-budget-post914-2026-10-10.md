@@ -98,6 +98,8 @@ Primary tip wall cite: tip-fold run [`38041487792`](https://github.com/fuzzywigg
 
 Primary tip summary (`38041487792` @ `e43a25d2`): Test Files **3240** passed / **2** skipped (**3242**); Tests **13056** passed / **55** skipped (**13111**); both AI benches skipped under `CI=1`.
 
+Local corroboration on tip HEAD `5c5101f5` + this PR docs (`CI=1 npm run test:unit`): Duration **154.58s**; Test Files **3243** passed / **2** skipped (**3245**); Tests **13088** passed / **55** skipped (**13143**); `EXIT 0` (agent host; not the GHA wall cite).
+
 Local corroboration on wall-evidence SHA `e43a25d2` (`CI=1 npm run test:unit`): Duration **155.36s**; Test Files **3240** passed / **2** skipped (**3242**); Tests **13056** passed / **55** skipped (**13111**); `EXIT 0` (agent host; not the GHA wall cite).
 
 ## Budgets (unchanged)
