@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   extractMetric,
   extractLintMetrics,
@@ -8,9 +11,21 @@ import {
   renderSvg,
   renderMarkdown,
   collectHistory,
+  parseArgs,
+  writeReport,
+  USAGE,
+  OUT_MD,
+  OUT_SVG,
   TRACKED,
   LINT_RULE_KEYS,
 } from '../../scripts/report-ratchet-history.mjs';
+
+const SCRIPT = path.resolve(
+  process.cwd(),
+  'scripts/report-ratchet-history.mjs'
+);
+const MD_PATH = path.resolve(process.cwd(), OUT_MD);
+const SVG_PATH = path.resolve(process.cwd(), OUT_SVG);
 
 describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () => {
   it('extracts curly / void / nnnull / dup / type / boundary metrics', () => {
@@ -273,5 +288,121 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     expect(latest.dupImports).toBe(99);
     expect(latest.typeOutOfScope).toBe(216);
     expect(latest.boundarySum).toBe(17);
+  });
+});
+
+describe('report-ratchet-history parseArgs / CLI (q-mp-872)', () => {
+  it('parseArgs accepts known flags and defaults', () => {
+    expect(parseArgs([])).toEqual({
+      ok: true,
+      help: false,
+      dryRun: false,
+      firstParent: false,
+    });
+    expect(parseArgs(['--help'])).toMatchObject({ ok: true, help: true });
+    expect(parseArgs(['-h', '--dry-run', '--first-parent'])).toEqual({
+      ok: true,
+      help: true,
+      dryRun: true,
+      firstParent: true,
+    });
+  });
+
+  it('parseArgs rejects unknown flags and bare args', () => {
+    expect(parseArgs(['--wat'])).toEqual({
+      ok: false,
+      message: 'Unknown flag: --wat',
+    });
+    expect(parseArgs(['docs/dev/x.md']).ok).toBe(false);
+  });
+
+  it('USAGE documents help, dry-run, and default write path', () => {
+    expect(USAGE).toMatch(/--help/);
+    expect(USAGE).toMatch(/--dry-run/);
+    expect(USAGE).toMatch(/ratchet-ceiling-history/);
+  });
+
+  it('CLI --help exits 0 and does not write docs', () => {
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+    const r = spawnSync(process.execPath, [SCRIPT, '--help'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(
+      /Usage: node scripts\/report-ratchet-history\.mjs/
+    );
+    expect(r.stdout).toMatch(/--dry-run/);
+    expect(r.stdout).not.toMatch(/wrote /);
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+  });
+
+  it('writeReport({ dryRun: true }) skips writeFileSync', () => {
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+    const files: Record<string, string> = {
+      [TRACKED.lintCeilings]: JSON.stringify({
+        rules: {
+          curly: 538,
+          [LINT_RULE_KEYS.voidExpression]: 118,
+          [LINT_RULE_KEYS.nnnull]: 254,
+          [LINT_RULE_KEYS.dupImports]: 99,
+        },
+      }),
+      [TRACKED.typePhase2]: JSON.stringify({ outOfScopeErrors: 216 }),
+      [TRACKED.boundaries]: JSON.stringify({
+        ceilings: { dead_barrels: 8, mixed_ui_barrels: 9 },
+      }),
+    };
+    const runGit = (args: string[]) => {
+      if (args[0] === 'log') {
+        return {
+          status: 0,
+          stdout: `c1\t2026-10-08T12:00:00Z\tseed\n`,
+          stderr: '',
+        };
+      }
+      if (args[0] === 'show') {
+        const file = args[1].split(':').slice(1).join(':');
+        return { status: 0, stdout: files[file] ?? '{}', stderr: '' };
+      }
+      if (args[0] === 'rev-parse') {
+        return { status: 0, stdout: 'c1\n', stderr: '' };
+      }
+      return { status: 1, stdout: '', stderr: `unexpected ${args.join(' ')}` };
+    };
+    const result = writeReport({
+      dryRun: true,
+      runGit,
+      now: '2026-10-10T00:00:00.000Z',
+      liveLint: {
+        curly: 538,
+        voidExpression: 118,
+        nnnull: 254,
+        dupImports: 99,
+        nullish: 65,
+      },
+    });
+    expect(result.dryRun).toBe(true);
+    expect(result.rows.length).toBeGreaterThan(0);
+    expect(result.svg).toContain('<svg');
+    expect(result.md).toContain('# Ratchet ceiling history');
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
+  });
+
+  it('CLI unknown flag exits non-zero without writing docs', () => {
+    const mdBefore = fs.statSync(MD_PATH).mtimeMs;
+    const svgBefore = fs.statSync(SVG_PATH).mtimeMs;
+    const r = spawnSync(process.execPath, [SCRIPT, '--wat'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Unknown flag: --wat/);
+    expect(text).toMatch(/Usage:/);
+    expect(fs.statSync(MD_PATH).mtimeMs).toBe(mdBefore);
+    expect(fs.statSync(SVG_PATH).mtimeMs).toBe(svgBefore);
   });
 });
