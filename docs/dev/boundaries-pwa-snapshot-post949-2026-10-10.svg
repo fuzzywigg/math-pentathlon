@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="360" viewBox="0 0 780 360" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-514 module-boundaries + PWA-manifest tip snapshot (post949)</title>
+  <desc id="desc">Live tip post949 @ 8698fffb: check:boundaries all counts 0 / ceilings all 0; after build, check:pwa-manifest ok true (report-only). No src edits; no CI permission edits; no ceiling writes.</desc>
+  <rect width="780" height="360" fill="#f2f6f8"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2830">q-mp-514 - boundaries + PWA snapshot (post949)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c66">tip 8698fffb - report-only dual stamp - no src / CI permissions / ratchet writes</text>
+
+  <rect x="24" y="76" width="360" height="100" fill="#e4eef2" stroke="#3d6a7a" stroke-width="1"/>
+  <text x="204" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#1a2830">0 / 0</text>
+  <text x="204" y="140" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#2f4a52">check:boundaries - all 11 metrics</text>
+  <text x="204" y="160" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#3d6a7a">ceilings tipSha still 7d59901c (q-mp-105)</text>
+
+  <rect x="400" y="76" width="356" height="100" fill="#e4eef2" stroke="#3d6a7a" stroke-width="1"/>
+  <text x="578" y="112" text-anchor="middle" font-family="Georgia, serif" font-size="36" fill="#1a2830">ok: true</text>
+  <text x="578" y="140" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#2f4a52">check:pwa-manifest (after build)</text>
+  <text x="578" y="160" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#3d6a7a">reportOnly - errorCount 0</text>
+
+  <text x="24" y="210" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1a2830">Import graph (live probe)</text>
+  <rect x="200" y="222" width="520" height="18" fill="#b8d0d8"/>
+  <text x="24" y="236" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2830">src files</text>
+  <text x="730" y="236" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2830">238</text>
+  <rect x="200" y="250" width="520" height="18" fill="#9bbcc8"/>
+  <text x="24" y="264" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2830">rel-import edges</text>
+  <text x="730" y="264" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2830">798</text>
+
+  <text x="24" y="300" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#4a5c66">Stale backlog said post914 @ f5d3d04a - re-measured on post949 @ 8698fffb; both probes unchanged (zeros + ok).</text>
+  <text x="24" y="320" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c66">Leave #955 / #961 (q-mp-489 CI pin) / #971 open with contained - this stamp is boundaries + PWA only.</text>
+  <text x="24" y="340" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c66">No ceiling raises - Hex Hard 450ms untouched - scripts/check-boundaries.mjs + check-pwa-manifest.mjs</text>
+</svg>
