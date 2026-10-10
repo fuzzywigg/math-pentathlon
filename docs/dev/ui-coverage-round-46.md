@@ -34,7 +34,8 @@ product `src/` edits, AI-path file edits. Intentional residual:
 ## Per-file / directory before → after
 
 Focused contig UI suite (`tests/unit/*contig*` ± r5/r11/r27/mutation-ui7 ±
-this round; not full-repo map). Tip `cursor/mp-tip-post914` @ `e43a25d2`:
+this round; not full-repo map). Tip `cursor/mp-tip-post914` @ `b3f00cc9`
+(remeasured on tip; PR rebased after mid-fold):
 
 | File                                     | Before lines | Before branches | After lines | After branches | Δ lines (pp) | Δ branches (pp) |
 | ---------------------------------------- | -----------: | --------------: | ----------: | -------------: | -----------: | --------------: |
