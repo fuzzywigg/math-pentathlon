@@ -18,7 +18,7 @@ Source of truth for game names and divisions is `src/core/game-registry.ts`. The
 | [Big Toads](./big-toads.md) | Shared core systems under `src/core/` |
 | [Development](./development.md) | Install, CI, and testing layers with live counts (axe, visual, playtest, bench) — also [CONTRIBUTING.md](../../CONTRIBUTING.md) + [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md) |
 | [Unit coverage heat map (`q-mp-171`)](./coverage-map.md) | Coldest-directory vitest coverage table + embedded SVG from `docs/dev/coverage-map.svg` |
-| [CI unit budget + AI-bench skips (`q-mp-289`)](./ci-unit-budget.md) | Unit job ~8 min / 12m step / 14m job Mermaid; tip `post755` tip-PR CI Duration ≈5.8 min (348.43s @ 3163 files); AI benches skipped under `CI=1`; HOLD Hex Hard 450ms |
+| [CI unit budget + AI-bench skips (`q-mp-338`)](./ci-unit-budget.md) | Unit job ~8 min / 12m step / 14m job Mermaid; tip `post785` tip-fold CI Duration ≈4.6 min (276.08s @ 3182 files); AI benches skipped under `CI=1`; HOLD Hex Hard 450ms |
 | [Accessibility](./accessibility.md) | Public a11y posture and shared helpers |
 | [Roadmap](./roadmap.md) | Where to read deeper planning docs |
 
