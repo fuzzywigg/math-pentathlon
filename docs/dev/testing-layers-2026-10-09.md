@@ -1,11 +1,11 @@
 # Testing layers — live counts (2026-10-10)
 
-**Task id:** `q-mp-026r` tip-owner remasure on tip `cursor/mp-tip-post1023` (supersedes `q-mp-600` stamp **3308** / **13760**)  
-**Measured tip:** `cursor/mp-tip-post1023` @ `aa4386b4` (full `aa4386b43173f209c3531282685802296409d2f0`; cut from `alpha` @ `fb0d0ec5` after #1023)  
+**Task id:** `q-mp-026s` tip-owner remasure on tip `cursor/mp-tip-post1059` (supersedes `q-mp-026r` stamp **3341** / **14072**)  
+**Measured tip:** `cursor/mp-tip-post1059` @ `1c31a1ea` (full `1c31a1ea8cac2bb1ca69d3b3a23566963d49567c`; cut from `alpha` @ `1c31a1ea` after #1059)  
 **Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post1012. Pin policy unchanged. No `src/` or AI/copy/rules changes. Testing-layers still cited **3285** / **13502** (post977); wiki had been tip-owner stamped **3306** / **13748** @ `78c7e39b` without updating this page. Live tip HEAD remasure is **3341** files / **14072** listed cases (`unit-shared` **13027** / `unit-node` **380** / `unit-isolated` **665**). Counts move every fold — tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
+Docs-only tip re-anchor after #1059 squash-merge. Pin policy unchanged. No `src/` or AI/copy/rules changes. Live tip inherits alpha suite **3341** files / **14072** listed cases (`unit-shared` **13027** / `unit-node` **380** / `unit-isolated` **665**) until the first content fold; tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
 
 ## Duplicate check (open drafts)
 
