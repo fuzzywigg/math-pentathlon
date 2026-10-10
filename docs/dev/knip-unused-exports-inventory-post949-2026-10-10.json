@@ -1,10 +1,10 @@
 {
   "taskId": "q-mp-513",
   "title": "Knip unusedExports inventory (tip post949)",
-  "measuredAt": "2026-10-10T12:20:28Z",
+  "measuredAt": "2026-10-10T12:23:06Z",
   "tipBranch": "cursor/mp-tip-post949",
-  "tipSha": "5f24bdfe40aa1d89f07dccad1c774784b1a489cf",
-  "tipShaShort": "5f24bdfe",
+  "tipSha": "8698fffb85b1e3d2289e54a665fac6162d3bdee4",
+  "tipShaShort": "8698fffb",
   "knipPinnedVersion": "5.88.1",
   "knipUnpinnedSampleVersion": "6.41.0",
   "scope": "unusedExports inventory only; no baseline write; no src edits",
@@ -79,7 +79,13 @@
       "#955",
       "#971"
     ],
-    "openDraftsIntoPost949": []
+    "openDraftsIntoPost949": [
+      "#978",
+      "#979",
+      "#980",
+      "#981"
+    ],
+    "unusedExportsCoveredByOpenDraft": false
   },
   "specStaleness": {
     "backlogTipLabel": "cursor/mp-tip-post914",
