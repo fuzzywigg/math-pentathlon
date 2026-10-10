@@ -1,0 +1,331 @@
+{
+  "taskId": "q-mp-394",
+  "title": "Knip live metrics drift inventory (tip post865)",
+  "tipBranch": "cursor/mp-tip-post865",
+  "tipSha": "3908809d672ed70eede7b9c0ad63a6fa475e28e5",
+  "measuredAt": "2026-10-10T05:54:50Z",
+  "knipVersion": "5.88.1",
+  "scope": "report-only docs/data/chart; no knip-baseline.json / src edits",
+  "specStale": {
+    "backlogEvidence": {
+      "tip": "cursor/mp-tip-post830",
+      "tipSha": "bcf6f825de3d45dd20c242762e541101551d3f49",
+      "liveUnusedTypes": 43,
+      "baselineUnusedTypes": 47
+    },
+    "userNote": "unusedTypes baseline is now 36 after #869; re-measure on post865"
+  },
+  "metrics": {
+    "baseline": {
+      "unusedFiles": 0,
+      "unusedExports": 3,
+      "unusedTypes": 36,
+      "unusedDependencies": 0,
+      "unusedDevDependencies": 0,
+      "unlisted": 3,
+      "duplicates": 0
+    },
+    "live": {
+      "unusedFiles": 0,
+      "unusedExports": 3,
+      "unusedTypes": 35,
+      "unusedDependencies": 0,
+      "unusedDevDependencies": 0,
+      "unlisted": 3,
+      "duplicates": 0
+    },
+    "delta": {
+      "unusedTypes": -1
+    },
+    "notices": [
+      "knip unused surface within baseline (exports=3, types=35, files=0)",
+      "knip unused shrink: unusedTypes 36\u219235 (-1)"
+    ]
+  },
+  "dispositionCounts": {
+    "EXCLUDED_AI": 23,
+    "EXCLUDED_SCORING": 4,
+    "INTENTIONAL_KEEPER": 1,
+    "RANK3_CANDIDATE": 7,
+    "total": 35
+  },
+  "driftExplanation": {
+    "missingVsPost869ProjectionOfQmp365": [
+      {
+        "name": "SeatId",
+        "file": "src/core/seats.ts",
+        "note": "Canonical SeatId on core/seats; seat-labels re-export remains in source but knip unusedTypes no longer lists it on post865"
+      }
+    ],
+    "demotedByQmp356AlreadyGone": [
+      "GameMountDeps",
+      "PlayerSeat",
+      "GameModeChrome",
+      "PointerTapControllerOptions",
+      "PointerTapController",
+      "BindCanvasPointerTapOptions",
+      "GameModeLabel"
+    ]
+  },
+  "unusedTypes": [
+    {
+      "file": "src/core/ai-worker/client.ts",
+      "name": "AiWorkerRequestPayload",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/core/ai-worker/protocol.ts",
+      "name": "AiWorkerRequestBase",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "Dimensions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "WrapOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "AlignmentOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "AlignmentCheckResult",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "LineAlignmentResult",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "ConnectivityOptions",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/alignment/compat.ts",
+      "name": "RegionStats",
+      "exportAlias": null,
+      "disposition": "RANK3_CANDIDATE"
+    },
+    {
+      "file": "src/core/safe-web-storage.ts",
+      "name": "SafeJsonParseResult",
+      "exportAlias": null,
+      "disposition": "INTENTIONAL_KEEPER"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "FormatTimeOptions",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "ScoreEntry",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "LeaderboardEntry",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/core/timer-scoring.ts",
+      "name": "GameResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_SCORING"
+    },
+    {
+      "file": "src/games/calla/ai.ts",
+      "name": "MoveAnalysis",
+      "exportAlias": "callaAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/calla/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "callaAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/contig-60/ai.ts",
+      "name": "AIPlacement",
+      "exportAlias": "contigAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/fab-a-diffy/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/fiar/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": "fiarAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex-a-gone/ai.ts",
+      "name": "AISelectionResult",
+      "exportAlias": "ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex-a-gone/ai.ts",
+      "name": "AIPlacementResult",
+      "exportAlias": "ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/hex/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIDieChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIShapeChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/juggle/ai.ts",
+      "name": "AIPlacementChoice",
+      "exportAlias": "juggleAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/kings-quadraphages/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/par-55/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "par55Ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/pent-em-in/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/prime-gold/ai.ts",
+      "name": "AIPlacement",
+      "exportAlias": "primeAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/queens-guards/ai.ts",
+      "name": "AISearchResult",
+      "exportAlias": "ai",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/ramrod/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/star-track/ai.ts",
+      "name": "AIChainChoice",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/stars-bars/ai.ts",
+      "name": "AIMove",
+      "exportAlias": "starsAi",
+      "disposition": "EXCLUDED_AI"
+    },
+    {
+      "file": "src/games/sum-dominoes/ai.ts",
+      "name": "AIMove",
+      "exportAlias": null,
+      "disposition": "EXCLUDED_AI"
+    }
+  ],
+  "unusedExports": [
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "isPlainProgressObject",
+      "disposition": "LEAVE"
+    },
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "sanitizeSettings",
+      "disposition": "LEAVE"
+    },
+    {
+      "file": "src/games/fab-a-diffy/ai-client.ts",
+      "name": "cancelFabAiRequests",
+      "disposition": "EXCLUDED_Q_MP_253",
+      "exportAlias": "fabAiClient"
+    }
+  ],
+  "unlisted": [
+    {
+      "file": "scripts/check-emit-identity.mjs",
+      "name": "esbuild",
+      "disposition": "INTENTIONAL"
+    },
+    {
+      "file": "scripts/probe-offline-resilience-dev.mjs",
+      "name": "playwright",
+      "disposition": "INTENTIONAL"
+    },
+    {
+      "file": "scripts/probe-offline-resilience.mjs",
+      "name": "playwright",
+      "disposition": "INTENTIONAL"
+    }
+  ],
+  "outOfScope": [
+    "AI protocol / games/*/ai.ts types",
+    "timer-scoring types",
+    "SafeJsonParseResult keeper",
+    "cancelFabAiRequests",
+    "knip-baseline.json edits",
+    "src/ or test behavior changes"
+  ],
+  "related": {
+    "rank3Inventory": "docs/dev/knip-rank3-unused-types-inventory-2026-10-10.md",
+    "baseline": "docs/dev/knip-baseline.json",
+    "report": "docs/dev/knip-report.md",
+    "openDraftsChecked": ["#866", "#869", "#877", "#878", "#879", "#880"]
+  }
+}

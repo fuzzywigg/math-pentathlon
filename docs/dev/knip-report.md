@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-394 live metrics drift inventory (2026-10-10)
+
+Report-only metrics-drift stamp on tip `cursor/mp-tip-post865` @ `3908809d`: live `unusedTypes` **35** vs committed baseline **36** (NOTICE shrink −1). Spec backlog (`q-mp-394` / `#879`) said **43** vs **47** on post830 — **stale**; tip already carries `#869` batch-6 floor (baseline **36**). Chart + tables + machine JSON: [`knip-live-metrics-drift-inventory-post865-2026-10-10.md`](./knip-live-metrics-drift-inventory-post865-2026-10-10.md) (+ [`.svg`](./knip-live-metrics-drift-inventory-post865-2026-10-10.svg) / [`.json`](./knip-live-metrics-drift-inventory-post865-2026-10-10.json)). Residual Rank-3 candidates: alignment `compat.ts` ×**7**. AI / scoring / `SafeJsonParseResult` / `cancelFabAiRequests` marked out-of-scope. **No baseline edit in that ticket** — demotes stay with `q-mp-381` / `q-mp-408`.
+
 ## q-mp-356 unusedTypes demote batch 6 (2026-10-10)
 
 Re-measured on tip `cursor/mp-tip-post830` @ `97487de6` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / legal-move / intentional keepers): module-privated UI `GameMountDeps` / `PlayerSeat` / `GameModeChrome` / `PointerTapControllerOptions` / `PointerTapController` / `BindCanvasPointerTapOptions` / `GameModeLabel`. Baseline `unusedTypes` **47 → 36** (−7 demotes; tip live was already 43 vs baseline 47 before this batch). Spec backlog candidates (`GamePhase` aliases / hex-a-gone `PlacedBlock`/`TurnSelection`/`MoveRecord` / star-track `ChainLength`/`StarTrackMove` / fractions `FractionBarStyle`/`FractionBarColors`) are **stale** — still exported but not in live knip unusedTypes (internal importers). Skipped AI protocol / `*/ai.ts`, `timer-scoring`, `SafeJsonParseResult`, `SeatId` (test importers), and alignment/compat types. No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#829` batch 5 already on tip tree) at fold.
