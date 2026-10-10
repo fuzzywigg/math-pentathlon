@@ -49,6 +49,8 @@ const isolatedFiles = [
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
   // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
   'tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts',
+  // q-mp-653: game-prefetch residual branches — resetModules + doMock loaders.
+  'tests/unit/q-mp-653-game-prefetch-residuals.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
   'tests/unit/burn-1008-registry-module-contract.test.ts',
   // q-mp-117: generation-gated timeout characterization — fake timers +
