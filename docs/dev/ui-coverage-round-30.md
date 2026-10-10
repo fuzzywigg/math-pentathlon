@@ -40,12 +40,12 @@ tests ± this round’s suite; not full-repo map). Remeasured on tip post865:
 | File                                         | Before lines | Before branches | After lines | After branches | Δ lines (pp) | Δ branches (pp) |
 | -------------------------------------------- | -----------: | --------------: | ----------: | -------------: | -----------: | --------------: |
 | `src/games/sum-dominoes/board-ui.ts`         |       99.35% |          94.33% |    **100%** |     **98.11%** |    **+0.65** |       **+3.78** |
-| `src/games/sum-dominoes/game-controller.ts`  |       89.37% |          80.89% |  **99.37%** |     **96.62%** |   **+10.00** |      **+15.73** |
-| `src/games/sum-dominoes` (directory)         |       96.08% |          89.96% |  **99.25%** |     **95.14%** |    **+3.17** |       **+5.18** |
+| `src/games/sum-dominoes/game-controller.ts`  |       89.37% |          80.89% |    **100%** |     **96.62%** |   **+10.63** |      **+15.73** |
+| `src/games/sum-dominoes` (directory)         |       96.08% |          89.96% |  **99.44%** |     **95.14%** |    **+3.36** |       **+5.18** |
 
 Residual arms left intentional: board-ui V8 `if` arm without stable line;
 controller stub `update`/`newGame` placeholders before assignment (`:109`/
-`:110`); a few compound `??` / tutorial event branches under V8.
+`:110`); a few compound branches under V8.
 
 Focused directory still includes colder `ai.ts` / `rules.ts` residuals
 (out of scope for this UI round).
@@ -62,7 +62,11 @@ npx vitest run --project unit-shared \
 # Test Files  1 passed; Tests  6 passed; EXIT 0
 
 npm run verify
+# EXIT 0 (lint → lint:ratchet → format:check → typecheck →
+#         typecheck:ratchet → check:boundaries)
+
 npm run test:unit
+# Test Files  3211 passed; Tests  12774 passed | 36 skipped; EXIT 0
 ```
 
 ## Constraints honored
