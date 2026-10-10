@@ -1,5 +1,5 @@
 # Kings & Quadraphages — 3D board spec
-Sources read: `src/core/game-registry.ts`, `src/games/kings-quadraphages/board.ts`, `src/games/kings-quadraphages/game-state.ts`, `src/games/kings-quadraphages/rules.ts`, `src/games/kings-quadraphages/tutorial.ts`, `src/ui/board/kings-quadraphages/board-ui.ts`; Official Highlights PDF for Division I (page numbers left for Gemini cross-check).
+Sources read: `src/core/game-registry.ts`, `src/games/kings-quadraphages/board.ts`, `src/games/kings-quadraphages/game-state.ts`, `src/games/kings-quadraphages/rules.ts`, `src/games/kings-quadraphages/tutorial.ts`, `src/games/kings-quadraphages/board-ui.ts`; Official Highlights PDF for Division I (page numbers left for Gemini cross-check).
 Official vs engine discrepancies: This is a corrective spec for PR #352. The engine rules are correct, but the 3D implementation in #352 was not. It must be changed as follows:
 - The game name must be "Kings & Quadraphages" in all user-facing text, not "Kings".
 - King pieces must be lathe-profile chess kings, not cylinders.
