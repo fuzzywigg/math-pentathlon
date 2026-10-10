@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post914` (cut from `alpha` @ `753052a6`, 2026-10-10): tip-owner fold in progress on draft tip PR; prior post898 measurement was **3234** Vitest files / **12972** listed cases @ `b7e518b4` (later tip-fold stamp **3241** / **13056** passed on #914 final head). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post914` @ `1bd3290f` (2026-10-10): **3268** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; local tip-fold unit stamp **13281** passed / **45** skipped. Prior post898 measurement was **3234** / **12972** listed cases @ `b7e518b4`. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
