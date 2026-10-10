@@ -32,6 +32,8 @@ const isolatedFiles = [
   'tests/unit/storage-save-migration-fixtures.test.ts',
   // Remounts StorageManager with blocked localStorage (burn-1008 storage failure).
   'tests/unit/safe-web-storage-remount.test.ts',
+  // q-mp-420: storage soft-fail residuals — resetModules + doMock load() catch.
+  'tests/unit/q-mp-420-storage-soft-fail-residuals.test.ts',
   // Hoisted game-controller mocks must not leak into shared controller suites.
   'tests/unit/burn-1007-game-route-mounts.test.ts',
   'tests/unit/burn-1007-main-shell-routes.test.ts',
