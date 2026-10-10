@@ -7,13 +7,18 @@
  * Playwright browser cache (when Playwright is installed), consistent
  * action pinning (full SHA), and no secrets on pull_request workflows.
  *
- * Usage: npm run check:workflows
+ * Usage:
+ *   npm run check:workflows
+ *   node scripts/check-workflows.mjs [--help]
+ *
+ * Unknown flags exit 2. --help/-h exit 0 without auditing.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import yaml from 'js-yaml';
+import { helpOnlyUsage, parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -168,8 +173,7 @@ export function auditWorkflow(file, doc, raw) {
         const parsed = parseUses(step.uses);
         if (parsed) {
           actionRefs.push(parsed.ref);
-          const pinOk =
-            SHA_PIN.test(parsed.ref) || MAJOR_PIN.test(parsed.ref);
+          const pinOk = SHA_PIN.test(parsed.ref) || MAJOR_PIN.test(parsed.ref);
           if (!pinOk) {
             fail(
               `job ${jobId}: action ${step.uses} must be pinned to a full SHA or major tag (vN)`
@@ -195,7 +199,9 @@ export function auditWorkflow(file, doc, raw) {
           const depOk =
             depPath === 'package-lock.json' ||
             (typeof depPath === 'string' &&
-              depPath.split(/\n/).some((l) => l.trim() === 'package-lock.json'));
+              depPath
+                .split(/\n/)
+                .some((l) => l.trim() === 'package-lock.json'));
           if (!depOk) {
             setupNodeCacheOk = false;
           }
@@ -214,7 +220,10 @@ export function auditWorkflow(file, doc, raw) {
         }
       }
 
-      if (typeof step.run === 'string' && /playwright\s+install\b/.test(step.run)) {
+      if (
+        typeof step.run === 'string' &&
+        /playwright\s+install\b/.test(step.run)
+      ) {
         installsPlaywright = true;
       }
 
@@ -264,7 +273,9 @@ export function auditWorkflowsDir(dir = WORKFLOWS_DIR) {
   if (!fs.existsSync(dir)) {
     return {
       files: [],
-      violations: [{ file: path.relative(ROOT, dir), message: 'directory missing' }],
+      violations: [
+        { file: path.relative(ROOT, dir), message: 'directory missing' },
+      ],
     };
   }
 
@@ -277,7 +288,10 @@ export function auditWorkflowsDir(dir = WORKFLOWS_DIR) {
   const violations = [];
 
   if (files.length === 0) {
-    violations.push({ file: path.relative(ROOT, dir), message: 'no workflow files' });
+    violations.push({
+      file: path.relative(ROOT, dir),
+      message: 'no workflow files',
+    });
   }
 
   for (const file of files) {
@@ -299,7 +313,18 @@ export function auditWorkflowsDir(dir = WORKFLOWS_DIR) {
   return { files, violations };
 }
 
-function main() {
+function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'help') {
+    console.log(helpOnlyUsage('scripts/check-workflows.mjs'));
+    process.exit(0);
+  }
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(helpOnlyUsage('scripts/check-workflows.mjs'));
+    process.exit(2);
+  }
+
   const { files, violations } = auditWorkflowsDir();
   if (violations.length === 0) {
     console.log(
