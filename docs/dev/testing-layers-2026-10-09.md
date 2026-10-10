@@ -1,20 +1,22 @@
-# Testing layers — live counts (2026-10-09)
+# Testing layers — live counts (2026-10-10)
 
-**Task id:** `q-mp-260` (remeasure after `q-mp-235` / tip post748 → tip post755)  
-**Measured tip:** `cursor/mp-tip-post755` @ `74a1596f` (full SHA `74a1596f71aab5d6616ff486b2a4eb2a70b5123b`)  
-**Measured on:** 2026-10-09 (UTC)  
+**Task id:** `q-mp-335` (remeasure after `q-mp-260` / tip post755 → tip post785; supersedes undrafted `q-mp-310`)  
+**Measured tip:** `cursor/mp-tip-post785` @ `c9b55cff` (full SHA `c9b55cff8c3832ff502179fe66f14ecaa400e95d`)  
+**Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post755. Pin policy unchanged. No `src/` or AI/copy/rules changes.
+Docs-only refresh of unit file / Vitest case counts for tip post785. Pin policy unchanged. No `src/` or AI/copy/rules changes. Spec target in backlog round-10 was **3181** @ cut `21719062`; live tip HEAD is **3182** after the folded owl UI-cov r16 file.
 
 ## Duplicate check (open drafts)
 
 | Open draft | Overlap | Action |
 | --- | --- | --- |
-| [#767](https://github.com/fuzzywigg/math-pentathlon/pull/767) `q-mp-235` → post748 | Same pages; stamped **3145** / **12189** @ `23926935` | **contained** — leave open; this remeasure owns tip post755 counts |
-| [#746](https://github.com/fuzzywigg/math-pentathlon/pull/746) `q-mp-233` → post728 | Owns wall budget + AI-bench skip evidence in `ci-unit-budget.md` | Keep ownership disjoint — only suite-size count cells / tip SHA updated there |
+| [#791](https://github.com/fuzzywigg/math-pentathlon/pull/791) `q-mp-260` → post755 | Same pages; stamped **3156** / **12279** @ `74a1596f` | **contained** — leave open; this remeasure owns tip post785 counts |
+| [#767](https://github.com/fuzzywigg/math-pentathlon/pull/767) `q-mp-235` → post748 | Same pages; stamped **3145** / **12189** @ `23926935` | **contained** — leave open |
 | [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) `q-mp-199` → post728 | Same pages; stamped **3140** / **12154** @ `b5884207` | **contained** — leave open |
-| Prior stamps (`q-mp-235` / post748 @ `23926935`) | Stale **3145** / **12189** on tip | Superseded by this remeasure (**3156** / **12279**) |
+| [#810](https://github.com/fuzzywigg/math-pentathlon/pull/810) `q-mp-289` → post755 | Owns wall budget + AI-bench skip evidence in `ci-unit-budget.md` | Keep ownership disjoint — suite-size cells stay with `#810` / successor `q-mp-338`; this task does not edit that page |
+| Undrafted `q-mp-310` (round-9 → **3164**) | Stale target vs tip HEAD | **superseded** by this remeasure (**3182** / **12490**) |
+| Prior stamps (`q-mp-260` / post755 @ `74a1596f`) | Stale **3156** / **12279** on tip | Superseded by this remeasure (**3182** / **12490**) |
 | #658 `q-mp-063` unit CI headroom | May change **unit wall time** (fixtures / virtual clocks) | **Does not change file/case counts** — note only |
 
 ## How counts were measured
@@ -35,17 +37,17 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `74a1596f`
+## Live counts @ `c9b55cff`
 
 ### Unit (Vitest)
 
 | Metric | Count | Command |
 | --- | ---: | --- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3156** | `npm run test:unit` |
-| Cases listed (`npx vitest list`) | **12279** | `npm run test:unit` |
-| → `unit-shared` files / cases | 3077 / 11433 | `npx vitest run --project unit-shared` |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) | **3182** | `npm run test:unit` |
+| Cases listed (`npx vitest list`) | **12490** | `npm run test:unit` |
+| → `unit-shared` files / cases | 3098 / 11612 | `npx vitest run --project unit-shared` |
 | → `unit-node` files / cases | 36 / 380 | `npx vitest run --project unit-node` |
-| → `unit-isolated` files / cases | 43 / 466 | `npx vitest run --project unit-isolated` |
+| → `unit-isolated` files / cases | 48 / 498 | `npx vitest run --project unit-isolated` |
 | Watch / coverage | — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
 
 `npm test` = `test:unit` && `test:e2e:chromium`.
