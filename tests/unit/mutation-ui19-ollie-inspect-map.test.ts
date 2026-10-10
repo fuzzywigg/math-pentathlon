@@ -11,9 +11,7 @@ afterEach(() => {
 });
 
 describe('mutation-ui19 ollie-inspect-map', () => {
-  it('null element resolves to unknown (kills L31 remove !)', () => {
-    expect(resolveInspectTarget(null)).toEqual({ kind: 'unknown' });
-  });
+  // Dropped null→unknown pin: already owned by tip-folded #1002 / engine r19.
 
   it('hex-a-gone cell requires both q and r finite (kills L49 &&→||)', () => {
     const ok = document.createElement('div');
@@ -39,24 +37,14 @@ describe('mutation-ui19 ollie-inspect-map', () => {
     expect(resolveInspectTarget(badQ)).toEqual({ kind: 'unknown' });
   });
 
-  it('star piece / space empty player falls back via || (kills L57/L65 ||→&&)', () => {
+  it('star piece empty player falls back via || (kills L57 ||→&&)', () => {
+    // star-space L65 player||unknown already pinned by tip-folded #1002 / engine r19.
     const piece = document.createElement('div');
     piece.className = 'star-track-piece';
     piece.setAttribute('data-player', '');
     document.body.appendChild(piece);
     expect(resolveInspectTarget(piece)).toEqual({
       kind: 'star-piece',
-      player: 'unknown',
-    });
-
-    const space = document.createElement('div');
-    space.className = 'star-track-space';
-    space.setAttribute('data-space', '7');
-    space.setAttribute('data-player', '');
-    document.body.appendChild(space);
-    expect(resolveInspectTarget(space)).toEqual({
-      kind: 'star-space',
-      space: 7,
       player: 'unknown',
     });
   });
