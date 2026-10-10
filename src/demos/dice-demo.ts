@@ -223,6 +223,10 @@ function addLog(container: HTMLElement, message: string): void {
 
   // Keep only last 20 entries
   while (container.children.length > 20) {
-    container.removeChild(container.lastChild!);
+    const last = container.lastChild;
+    if (last === null) {
+      break;
+    }
+    container.removeChild(last);
   }
 }
