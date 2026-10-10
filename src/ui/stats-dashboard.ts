@@ -288,7 +288,9 @@ export function renderStatsDashboardFromSnapshot(
   wrapper.append(header, main);
   container.appendChild(wrapper);
 
-  const goHome = () => navigate('/');
+  const goHome = () => {
+    navigate('/');
+  };
   wrapper.querySelector('#back-btn')?.addEventListener('click', goHome);
   wrapper.querySelectorAll('[data-action="home"]').forEach((el) => {
     el.addEventListener('click', goHome);
