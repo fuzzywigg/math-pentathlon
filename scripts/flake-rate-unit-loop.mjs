@@ -39,10 +39,15 @@ function flag(name, def) {
   return n;
 }
 
+/** Directory flag; rejects missing values and values that look like flags. */
 function strFlag(name, def) {
   const i = args.indexOf(name);
   if (i === -1) return def;
-  return args[i + 1] ?? def;
+  const raw = args[i + 1];
+  if (raw === undefined || raw === '' || raw.startsWith('-')) {
+    usageExit(`Missing or invalid value for ${name}`);
+  }
+  return raw;
 }
 
 const defaultRuns = flag('--runs', 7);
