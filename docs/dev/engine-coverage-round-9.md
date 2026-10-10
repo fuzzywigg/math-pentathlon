@@ -64,21 +64,21 @@ Coldest NON-UI core helpers by branch % (post-r8 tip):
 
 ## Aggregate (included alignment + evaluator files, full unit suite)
 
-| Metric     | Before (r9 baseline) |         After round 9 | Δ            |
-| ---------- | -------------------: | --------------------: | ------------ |
-| Lines      |     98.81% (667/675) |  **99.70%** (673/675) | **+6 lines** |
-| Branches   |     94.95% (414/436) | **~98.4%** (429+/436) | **+15 arms** |
-| Statements |               98.84% |                99.71% | —            |
-| Functions  |                 100% |                  100% | —            |
+| Metric     | Before (r9 baseline) |        After round 9 | Δ            |
+| ---------- | -------------------: | -------------------: | ------------ |
+| Lines      |     98.81% (667/675) | **99.70%** (673/675) | **+6 lines** |
+| Branches   |     94.95% (414/436) | **98.62%** (430/436) | **+16 arms** |
+| Statements |               98.84% |               99.71% | —            |
+| Functions  |                 100% |                 100% | —            |
 
 Targeted non-UI gains (full-suite before → after):
 
-| Module                   |    Before branch |         After branch | Before line | After line | Δb / Δl   |
-| ------------------------ | ---------------: | -------------------: | ----------: | ---------: | --------- |
-| alignment/compat         |  91.42% (96/105) |  **≥99%** (104+/105) |        100% |       100% | +8..9 / 0 |
-| alignment/contiguous     |   97.18% (69/71) |     **100%** (71/71) |      98.24% |   **100%** | +2 / +2   |
-| alignment/grid-alignment |   97.84% (91/93) |     **100%** (93/93) |        100% |       100% | +2 / 0    |
-| expressions/evaluator    | 94.61% (158/167) | **96.40%** (161/167) |      97.79% | **99.26%** | +3 / +4   |
+| Module                   |    Before branch |         After branch | Before line | After line | Δb / Δl |
+| ------------------------ | ---------------: | -------------------: | ----------: | ---------: | ------- |
+| alignment/compat         |  91.42% (96/105) |   **100%** (105/105) |        100% |       100% | +9 / 0  |
+| alignment/contiguous     |   97.18% (69/71) |     **100%** (71/71) |      98.24% |   **100%** | +2 / +2 |
+| alignment/grid-alignment |   97.84% (91/93) |     **100%** (93/93) |        100% |       100% | +2 / 0  |
+| expressions/evaluator    | 94.61% (158/167) | **96.40%** (161/167) |      97.79% | **99.26%** | +3 / +4 |
 
 Remaining evaluator arms are the documented private/`??` class above (L450/L468).
 
