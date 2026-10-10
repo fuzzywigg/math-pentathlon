@@ -5,6 +5,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { initGame } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -13,9 +14,7 @@ afterEach(() => {
 
 describe('Wave 61 fiar — status placement exact', () => {
   it('opening placement status is exact with chips remaining', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(status.querySelector('.fiar-status')?.textContent?.trim()).toBe(
       `Blue's turn: Place a chip (${CONFIG.CHIPS_PER_PLAYER} left)`

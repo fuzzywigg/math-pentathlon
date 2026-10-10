@@ -7,6 +7,7 @@ import {
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -38,41 +39,38 @@ function forgeMovement(): void {
 
 describe('Wave 55 fiar — movement select deselect', () => {
   it('selects own chip, deselects on re-click, switches to other own chip', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.appendChild(board);
-    document.body.appendChild(status);
+    const { board, status } = mountPair();
     initGame(board, status);
     forgeMovement();
 
-    board.querySelector('[data-node-id="c2r1"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r1"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBe('c2r1');
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(
       /Click a green node/
     );
 
-    board.querySelector('[data-node-id="c2r1"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r1"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBeNull();
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(
       /Select a chip to move/
     );
 
-    board.querySelector('[data-node-id="c2r1"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
-    board.querySelector('[data-node-id="c6r1"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r1"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    board
+      .querySelector('[data-node-id="c6r1"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBe('c6r1');
 
     const hist = getCurrentState().moveHistory.length;
-    board.querySelector('[data-node-id="c2r5"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r5"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBe('c6r1');
     expect(getCurrentState().moveHistory.length).toBe(hist);
   });

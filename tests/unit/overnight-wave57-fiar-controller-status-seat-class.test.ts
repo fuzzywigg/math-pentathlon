@@ -6,6 +6,7 @@ import {
   initGame,
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -14,9 +15,7 @@ afterEach(() => {
 
 describe('Wave 57 fiar — status seat class', () => {
   it('opening player1; after place flips to player2', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     expect(status.querySelector('.fiar-status.player1')).toBeTruthy();
