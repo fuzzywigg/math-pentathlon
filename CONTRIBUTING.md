@@ -27,7 +27,7 @@ npm run test:e2e:chromium    # required CI e2e path
 npm run build
 ```
 
-Use `npm run typecheck` (not bare `npx tsc --noEmit`) so the check matches `package.json` and CI — `npm run verify` already covers it. `npm test` runs unit tests then Chromium e2e (same required pair as CI). Prefer `npm run test:e2e:chromium` over bare `npm run test:e2e`, which launches every Playwright project.
+Use `npm run typecheck` (not bare `npx tsc --noEmit`) so the check matches `package.json` and CI — `npm run verify` already covers it. `npm test` runs unit tests then Chromium e2e (same required pair as CI). Prefer `npm run test:e2e:chromium` over bare `npm run test:e2e`, which launches every Playwright project. For the report-only browser pair, `npm run test:e2e:firefox-webkit` matches CI (`firefox` + `webkit`). `npm run test:e2e:cross` adds `ipad-webkit` for local/cross coverage; it is not a separate CI job.
 
 Full script list, CI posture, and testing layers: [docs/wiki/development.md](./docs/wiki/development.md).
 
