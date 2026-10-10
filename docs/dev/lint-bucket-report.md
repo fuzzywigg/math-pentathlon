@@ -25,24 +25,25 @@ npm run report:lint-buckets -- --top 5
 npm run report:lint-buckets -- --json
 ```
 
-| Flag | Meaning |
-| --- | --- |
-| `--rule <id>` | Restrict output to one ceiling ruleId |
-| `--top N` | Max buckets / densest files per rule (default **10**) |
-| `--json` | Machine-readable summary (still exit **0** on success) |
-| `-h` / `--help` | Usage |
+| Flag            | Meaning                                                |
+| --------------- | ------------------------------------------------------ |
+| `--rule <id>`   | Restrict output to one ceiling ruleId                  |
+| `--top N`       | Max buckets / densest files per rule (default **10**)  |
+| `--json`        | Machine-readable summary (still exit **0** on success) |
+| `-h` / `--help` | Usage                                                  |
 
 Runs offline against the local tree (`eslint src` + probe config under the repo root; probe file is deleted in `finally`). Exit **1** only on probe/parse failure or unknown `--rule`.
 
 ## Relationship to other lint docs
 
-| Tool / doc | Role |
-| --- | --- |
-| `npm run lint:ratchet` | **Enforcing** ceiling check (CI lint job) |
-| [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json) | Ceiling numbers (ratchets only go down) |
-| [`eslint-off-rules-inventory.md`](./eslint-off-rules-inventory.md) | Human inventory of ceilinged rules |
-| [`eslint-non-ceilinged-residuals-2026-10-09.md`](./eslint-non-ceilinged-residuals-2026-10-09.md) | Non-ceilinged overlay residuals |
-| **This helper** | Fast bucket report for refill / triage |
+| Tool / doc                                                                                       | Role                                                 |
+| ------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| `npm run lint:ratchet`                                                                           | **Enforcing** ceiling check (CI lint job)            |
+| [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json)                                     | Ceiling numbers (ratchets only go down)              |
+| [`eslint-off-rules-inventory.md`](./eslint-off-rules-inventory.md)                               | Human inventory of ceilinged rules                   |
+| [`eslint-non-ceilinged-residuals-2026-10-09.md`](./eslint-non-ceilinged-residuals-2026-10-09.md) | Non-ceilinged overlay residuals                      |
+| [`lint-bucket-snapshot-post830-2026-10-10.md`](./lint-bucket-snapshot-post830-2026-10-10.md)     | Dated tip snapshot (`q-mp-364`) + chart @ `97487de6` |
+| **This helper**                                                                                  | Fast bucket report for refill / triage               |
 
 ## Sample shape (stable columns)
 
