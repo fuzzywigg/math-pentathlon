@@ -43,7 +43,7 @@ npm run check:boundaries         # engine→UI import-graph ceilings (engine_imp
 npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
 npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
-npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
+npm run check:perf               # perf summary (+ optional Lighthouse); missing dist/ → exit 2; with dist/ report-only exit 0
 npm run check:build              # build reproducibility probe
 npm run check:pwa-manifest       # PWA manifest / installability (report-only)
 npm run check:dev-docs           # docs/ (+ wiki/playtest) path/link report (report-only, exit 0)
