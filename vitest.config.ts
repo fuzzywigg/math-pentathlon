@@ -82,6 +82,9 @@ const isolatedFiles = [
   // q-mp-680: attribute-demo residual branches — hoisted router.navigate mock
   // + Math.floor NaN spy must not share isolate:false graph with restoreAllMocks.
   'tests/unit/q-mp-680-attribute-demo-residual-branches.test.ts',
+  // q-mp-697: fiar/layout residual arms — Set.prototype add/has spies must not
+  // leak into isolate:false shared workers.
+  'tests/unit/q-mp-697-fiar-layout-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
