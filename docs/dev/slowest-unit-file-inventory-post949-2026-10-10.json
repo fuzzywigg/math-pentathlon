@@ -1,0 +1,197 @@
+{
+  "taskId": "q-mp-573",
+  "role": "worker",
+  "verdict": "SAFE",
+  "reportOnly": true,
+  "tipBranch": "cursor/mp-tip-post977",
+  "tipSha": "67cc780249cafd02a336ca5fba91e3b67479ade6",
+  "tipShaShort": "67cc7802",
+  "backlogNamedTip": "cursor/mp-tip-post949",
+  "backlogNamedSha": "d7a3989a",
+  "measuredAt": "2026-10-10T14:53:28Z",
+  "suite": {
+    "unitFilesFind": 3280,
+    "vitestListCases": 13408,
+    "vitestFilesPassed": 3278,
+    "vitestFilesSkipped": 2,
+    "vitestTestsPassed": 13396,
+    "vitestTestsSkipped": 62,
+    "vitestTestsTotal": 13458,
+    "wallDurationSeconds": 258.24,
+    "reportedTestsTimeSeconds": 604.03,
+    "ci": true,
+    "aiBenchesSkippedUnderCI": [
+      "tests/unit/tablet-ai-hard-latency.bench.test.ts",
+      "tests/unit/ai-move-time-midgame.bench.test.ts"
+    ]
+  },
+  "hexHardPin": {
+    "file": "src/games/hex/ai.ts",
+    "hardMs": 450,
+    "untouched": true
+  },
+  "top20SumSeconds": 488.6,
+  "top20ShareOfReportedTestsPct": 80.9,
+  "top20": [
+    {
+      "rank": 1,
+      "basename": "ai-determinism-shard-d.test.ts",
+      "path": "tests/unit/ai-determinism-shard-d.test.ts",
+      "project": "unit-node",
+      "seconds": 132.85,
+      "tests": 8
+    },
+    {
+      "rank": 2,
+      "basename": "ai-determinism-shard-e.test.ts",
+      "path": "tests/unit/ai-determinism-shard-e.test.ts",
+      "project": "unit-node",
+      "seconds": 86.56,
+      "tests": 10
+    },
+    {
+      "rank": 3,
+      "basename": "ai-determinism-shard-a.test.ts",
+      "path": "tests/unit/ai-determinism-shard-a.test.ts",
+      "project": "unit-node",
+      "seconds": 79.56,
+      "tests": 8
+    },
+    {
+      "rank": 4,
+      "basename": "ai-determinism-shard-c.test.ts",
+      "path": "tests/unit/ai-determinism-shard-c.test.ts",
+      "project": "unit-node",
+      "seconds": 45.82,
+      "tests": 8
+    },
+    {
+      "rank": 5,
+      "basename": "ai-calibration-difficulty-order.test.ts",
+      "path": "tests/unit/ai-calibration-difficulty-order.test.ts",
+      "project": "unit-node",
+      "seconds": 34.46,
+      "tests": 20
+    },
+    {
+      "rank": 6,
+      "basename": "state-roundtrip-fuzz.test.ts",
+      "path": "tests/unit/state-roundtrip-fuzz.test.ts",
+      "project": "unit-node",
+      "seconds": 27.38,
+      "tests": 22
+    },
+    {
+      "rank": 7,
+      "basename": "engine-property-invariants.test.ts",
+      "path": "tests/unit/engine-property-invariants.test.ts",
+      "project": "unit-node",
+      "seconds": 16.0,
+      "tests": 32
+    },
+    {
+      "rank": 8,
+      "basename": "existing-games-controllers.test.ts",
+      "path": "tests/unit/existing-games-controllers.test.ts",
+      "project": "unit-isolated",
+      "seconds": 11.25,
+      "tests": 67
+    },
+    {
+      "rank": 9,
+      "basename": "burn-wave12-win-draw-ai.test.ts",
+      "path": "tests/unit/burn-wave12-win-draw-ai.test.ts",
+      "project": "unit-node",
+      "seconds": 7.51,
+      "tests": 19
+    },
+    {
+      "rank": 10,
+      "basename": "ai-determinism-shard-b.test.ts",
+      "path": "tests/unit/ai-determinism-shard-b.test.ts",
+      "project": "unit-node",
+      "seconds": 6.71,
+      "tests": 8
+    },
+    {
+      "rank": 11,
+      "basename": "queens-hex-ai-play-deadline.test.ts",
+      "path": "tests/unit/queens-hex-ai-play-deadline.test.ts",
+      "project": "unit-node",
+      "seconds": 5.59,
+      "tests": 9
+    },
+    {
+      "rank": 12,
+      "basename": "burn-1008-registry-module-contract.test.ts",
+      "path": "tests/unit/burn-1008-registry-module-contract.test.ts",
+      "project": "unit-isolated",
+      "seconds": 5.18,
+      "tests": 129
+    },
+    {
+      "rank": 13,
+      "basename": "burn-wave9-win-draw-ai.test.ts",
+      "path": "tests/unit/burn-wave9-win-draw-ai.test.ts",
+      "project": "unit-node",
+      "seconds": 5.12,
+      "tests": 24
+    },
+    {
+      "rank": 14,
+      "basename": "burn-wave16-ai-null-gates.test.ts",
+      "path": "tests/unit/burn-wave16-ai-null-gates.test.ts",
+      "project": "unit-node",
+      "seconds": 4.44,
+      "tests": 19
+    },
+    {
+      "rank": 15,
+      "basename": "burn-wave11-win-draw-ai.test.ts",
+      "path": "tests/unit/burn-wave11-win-draw-ai.test.ts",
+      "project": "unit-node",
+      "seconds": 4.28,
+      "tests": 18
+    },
+    {
+      "rank": 16,
+      "basename": "mp3d-queens-guards-board-select.test.ts",
+      "path": "tests/unit/mp3d-queens-guards-board-select.test.ts",
+      "project": "unit-isolated",
+      "seconds": 4.09,
+      "tests": 6
+    },
+    {
+      "rank": 17,
+      "basename": "burn-wave10-win-draw-ai.test.ts",
+      "path": "tests/unit/burn-wave10-win-draw-ai.test.ts",
+      "project": "unit-node",
+      "seconds": 3.29,
+      "tests": 17
+    },
+    {
+      "rank": 18,
+      "basename": "mp3d-prime-gold-full-game-ai.test.ts",
+      "path": "tests/unit/mp3d-prime-gold-full-game-ai.test.ts",
+      "project": "unit-isolated",
+      "seconds": 3.22,
+      "tests": 3
+    },
+    {
+      "rank": 19,
+      "basename": "burn-wave16-ai-pipeline.test.ts",
+      "path": "tests/unit/burn-wave16-ai-pipeline.test.ts",
+      "project": "unit-node",
+      "seconds": 2.81,
+      "tests": 23
+    },
+    {
+      "rank": 20,
+      "basename": "burn-wave41-pent-ai-difficulties.test.ts",
+      "path": "tests/unit/burn-wave41-pent-ai-difficulties.test.ts",
+      "project": "unit-node",
+      "seconds": 2.48,
+      "tests": 8
+    }
+  ]
+}
