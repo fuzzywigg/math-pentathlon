@@ -178,6 +178,16 @@
       "tabletAiHardLatency": "1 skipped file / 10 skipped tests",
       "aiMoveTimeMidgame": "1 skipped file / 1 skipped test",
       "note": "Local CI=1 skip smoke on tip HEAD; not the GHA wall cite."
+    },
+    "localCI1OnTipHead": {
+      "sha": "9623410197c1c761aaae4f52bbf303791580e8a0",
+      "prHeadSha": "7b8196ee75c64d1f014c317673ea8845951c208e",
+      "unitFiles": 3280,
+      "testFilesSummary": "3278 passed | 2 skipped (3280)",
+      "testsSummary": "13396 passed | 62 skipped (13458)",
+      "vitestDurationSeconds": 159.25,
+      "exitCode": 0,
+      "note": "Local agent host on tip HEAD + this PR docs; not the GHA wall cite. Matches tip GHA suite summary under CI=1."
     }
   },
   "maxObservedVitestDurationSeconds": 375.52,

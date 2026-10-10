@@ -98,6 +98,8 @@ Primary tip summary (`38056924144` @ `68f1548f`): Test Files **3278** passed / *
 
 Local AI-bench skip smoke on tip HEAD `96234101` (`CI=1`): both benches skipped (tablet **10** skipped; midgame **1** skipped).
 
+Local corroboration on tip HEAD `96234101` + this PR docs (`CI=1 npm run test:unit`): Duration **159.25s**; Test Files **3278** passed / **2** skipped (**3280**); Tests **13396** passed / **62** skipped (**13458**); `EXIT 0` (agent host; not the GHA wall cite).
+
 ## Budgets (unchanged)
 
 From `.github/workflows/ci.yml` `unit` job (re-read on tip `96234101`; knobs unchanged; **workflows not edited**):
