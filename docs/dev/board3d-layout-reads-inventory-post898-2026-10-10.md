@@ -1,5 +1,7 @@
 # q-mp-440 — board-3d layout-reads inventory refresh (tip post898)
 
+> **Superseded stamp:** tip post914 refresh lives in [`board3d-layout-reads-inventory-post914-2026-10-10.md`](./board3d-layout-reads-inventory-post914-2026-10-10.md) (`q-mp-490`). Counts unchanged (board-3d raw **30** + owl **1**); tip SHA / branch only.
+
 **Task id:** `q-mp-440`  
 **Role:** worker (docs / visual only)  
 **Tip audited:** `cursor/mp-tip-post898` @ `88988b18` (full `88988b18e9bcf7734ca28993958cbd373adcdc86`)  
