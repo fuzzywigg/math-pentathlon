@@ -242,9 +242,15 @@ export function createInteractiveGraph(
       return;
     }
 
-    node.addEventListener('click', () => onNodeClick(nodeId));
-    node.addEventListener('mouseenter', () => onNodeHover(nodeId));
-    node.addEventListener('mouseleave', () => onNodeHover(null));
+    node.addEventListener('click', () => {
+      onNodeClick(nodeId);
+    });
+    node.addEventListener('mouseenter', () => {
+      onNodeHover(nodeId);
+    });
+    node.addEventListener('mouseleave', () => {
+      onNodeHover(null);
+    });
 
     (node as SVGElement).style.cursor = 'pointer';
   });
@@ -336,12 +342,7 @@ export function showValidMoves(
 }
 
 /** Cancel handle for {@link animateMove}. */
-export type AnimateMoveCancel = () => void;
-
-export type AnimateMoveHandle = {
-  promise: Promise<void>;
-  cancel: AnimateMoveCancel;
-};
+type AnimateMoveCancel = () => void;
 
 /**
  * Animate a move along a path.

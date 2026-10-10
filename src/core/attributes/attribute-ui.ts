@@ -441,7 +441,9 @@ export function createPieceGrid(
       transition: all 0.2s;
     `;
 
-    wrapper.addEventListener('click', () => onSelect(piece));
+    wrapper.addEventListener('click', () => {
+      onSelect(piece);
+    });
     wrapper.addEventListener('mouseenter', () => {
       if (!selectedIds.has(piece.id)) {
         wrapper.style.borderColor = '#90caf9';

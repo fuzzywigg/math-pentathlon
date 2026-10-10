@@ -12,14 +12,6 @@ export interface ChainLink {
   id: number; // Unique identifier
 }
 
-// The star track has points and paths between them
-// The board is a 5-pointed star with players racing from opposite points to the center
-export interface StarTrackPosition {
-  // Position on the track (0 = start, increasing toward goal)
-  // Each player has their own track
-  space: number;
-}
-
 // Game phases
 export type GamePhase =
   | 'drawChains' // Player draws two chains from bucket

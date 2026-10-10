@@ -565,9 +565,9 @@ export function mountGameShell(
     }
     const helpEl = helpModal;
     const newGameEl = newGameModal;
-    const helpWasOpen = helpEl != null && !helpEl.classList.contains('hidden');
+    const helpWasOpen = helpEl !== null && !helpEl.classList.contains('hidden');
     const newGameWasOpen =
-      newGameEl != null && !newGameEl.classList.contains('hidden');
+      newGameEl !== null && !newGameEl.classList.contains('hidden');
     if (!helpWasOpen && !newGameWasOpen) {
       return;
     }

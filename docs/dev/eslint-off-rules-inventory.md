@@ -4,6 +4,8 @@ Measured on tip `cursor/mp-tip-post728` @ `7cb50d57` after q-mp-026g folds (#733
 
 Re-measure stamp: **q-mp-230** (2026-10-09, tip-owner re-run after fold) — tables below match `npm run lint:ratchet` live counts + one-shot overlay probes. Docs only; ceilings live in `docs/dev/lint-ratchet-ceilings.json`.
 
+For a live path-bucket dump of the same ceilinged rules (no ceiling writes), see [`lint-bucket-report.md`](./lint-bucket-report.md) (`npm run report:lint-buckets`, q-mp-280).
+
 ## Already hard-on (examples from the task)
 
 | Rule                    | Live status                             | Notes                                                      |

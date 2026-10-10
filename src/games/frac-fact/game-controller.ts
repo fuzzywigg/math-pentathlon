@@ -1,8 +1,11 @@
 // Frac Fact Game Controller
 // Orchestrates game state, UI, and player interactions
 
-import type { FracFactState, Difficulty } from './types';
-import { createInitialState } from './types';
+import {
+  type FracFactState,
+  type Difficulty,
+  createInitialState,
+} from './types';
 import { submitAnswer, nextProblem, startGame } from './rules';
 import {
   renderProblem,
@@ -14,8 +17,7 @@ import {
   injectFracFactStyles,
 } from './board-ui';
 import type { Fraction } from '../../core/fractions/types';
-import type { AIDifficulty } from './ai';
-import { getAIAnswer, isAITurn } from './ai';
+import { type AIDifficulty, getAIAnswer, isAITurn } from './ai';
 import { tutorialManager } from '../../core/tutorial';
 import { fracFactTutorial } from './tutorial';
 import { seatIcon, syncAppOpponentChrome } from '../../ui/player-colors';

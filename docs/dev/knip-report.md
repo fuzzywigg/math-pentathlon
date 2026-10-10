@@ -29,6 +29,14 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-304 unusedTypes demote batch 4 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): deleted unused `OrionGame` / `CamelGame` / graph `LayoutType` / polyomino `BoardCell` / `AnimateMoveHandle`; module-privated `AnimateMoveCancel`, `FormatFractionOptions`, `InteractiveBuilderOptions`, `SafeHtmlValue`, `DivisionInfo`, `TutorialEventHandler`, kings `CellClickHandler` / `BoardRendererOptions` / `GamePiece`. Baseline `unusedTypes` **75 → 61** (−14; tip had already shrunk 76→75 vs batch-3 floor). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-3 symbols already on tip (`#793`).
+
+## q-mp-274 unusedTypes demote batch 3 (2026-10-09)
+
+Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring): module-privated FIAR `BoardEdge` / `CreateInitialStateOptions`; dropped unused type re-exports `BoardLayout` / `YellowCenterEllipse` / `YellowCenterDiamond` / `YellowCenterShape` from `fiar/types.ts` (canonical exports remain on `fiar/layout.ts`); deleted unused `StarTrackPosition`. Baseline `unusedTypes` **83 → 76** (−7). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold.
+
 ## q-mp-254 unusedTypes demote batch 2 (2026-10-09)
 
 Re-measured on tip `cursor/mp-tip-post748` after Rank-3-only demotes (skip AI / `rules.ts`): deleted unused `RollCallback` / `DieSelectCallback`; module-privated `DiceSelectorOptions`, `WebStorageKind`, `SafeWriteResult`, `SafeReadResult`. Kept `SafeJsonParseResult` exported (documented mirror surface). Baseline `unusedTypes` **89 → 83** (−6). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#752` duplicates already on tip) at fold.
@@ -56,11 +64,9 @@ Knip flags packages imported by entry scripts that are not declared in `package.
 
 ## Duplicate export pairs (owners)
 
-Knip reports **1** alias pair (same binding under two export names). Cleanup is owner-scoped — do not widen this triage into helper rewrites.
+Knip reports **0** alias pairs (same binding under two export names). Floor reached after `q-mp-273`.
 
-| Pair | Module | Owner / disposition |
-| --- | --- | --- |
-| `createCustomGameState` / `createRulesState` | [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) | **Kings Quadraphages unit helpers** — intentional alias (`createRulesState = createCustomGameState`). Owner: kings unit-test maintainers / test-helper consolidation (`q-mp-084` / #656). Remaining after `q-mp-228`. |
+Cleared in `q-mp-273`: `createCustomGameState` / `createRulesState` in [`tests/unit/helpers/kings-board.ts`](../../tests/unit/helpers/kings-board.ts) — callers migrated to canonical `createCustomGameState` (`duplicates` **1 → 0**).
 
 Cleared in `q-mp-228`: `dismissOwl` / `dismissOwlIfNeeded` in [`tests/e2e/helpers/page.ts`](../../tests/e2e/helpers/page.ts) — callers migrated to canonical `dismissOwl` (narrows unfinished residue of `q-mp-166` / #691).
 

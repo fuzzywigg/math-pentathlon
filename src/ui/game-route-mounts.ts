@@ -44,7 +44,7 @@ async function mountGameShell(
   container: HTMLElement,
   options: GameShellOptions
 ): Promise<GameShellElements> {
-  return d().mountGameShell(container, options);
+  return await d().mountGameShell(container, options);
 }
 
 function resolveAIDifficulty(

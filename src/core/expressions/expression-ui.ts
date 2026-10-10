@@ -282,7 +282,9 @@ export function renderCard(
   }
 
   if (options?.onClick) {
-    el.addEventListener('click', () => options.onClick!(card));
+    el.addEventListener('click', () => {
+      options.onClick!(card);
+    });
   }
 
   return el;
@@ -372,7 +374,9 @@ export function renderSlot(
       selected?: boolean;
     } = {};
     if (options?.onClick) {
-      cardOpts.onClick = () => options.onClick!(slot);
+      cardOpts.onClick = () => {
+        options.onClick!(slot);
+      };
     }
     el.appendChild(renderCard(slot.card, cardOpts));
   }
@@ -404,7 +408,9 @@ export function renderSlot(
 
   if (options?.onClick && !slot.card) {
     el.style.cursor = 'pointer';
-    el.addEventListener('click', () => options.onClick!(slot));
+    el.addEventListener('click', () => {
+      options.onClick!(slot);
+    });
   }
 
   return el;
@@ -603,7 +609,7 @@ export function renderChallengeCard(
 // Interactive Expression Builder
 // =============================================================================
 
-export interface InteractiveBuilderOptions {
+interface InteractiveBuilderOptions {
   slotCount: number;
   availableCards: ExpressionCard[];
   targetValue?: number;

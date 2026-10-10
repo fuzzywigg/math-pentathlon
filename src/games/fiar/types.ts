@@ -17,7 +17,7 @@ export interface BoardNode {
   chipKind: ChipKind | null;
 }
 
-export interface BoardEdge {
+interface BoardEdge {
   from: string;
   to: string;
   crossesYellowCenter: boolean;
@@ -90,7 +90,7 @@ export const CONFIG = {
   EDGE_STROKE: 3,
 };
 
-export interface CreateInitialStateOptions {
+interface CreateInitialStateOptions {
   starter?: Player;
   layout?: BoardLayout;
 }
@@ -293,10 +293,4 @@ export {
   parseNodeId,
   nodeId,
   countConfirmedEdges,
-} from './layout';
-export type {
-  BoardLayout,
-  YellowCenterEllipse,
-  YellowCenterDiamond,
-  YellowCenterShape,
 } from './layout';

@@ -1,0 +1,327 @@
+{
+  "taskId": "q-mp-272-mutation-audit-ui-8",
+  "generatedAt": "2026-10-09T21:32:19.388Z",
+  "harness": "node_modules/.cache/mutation-ui-8/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/core/expressions/expression-ui.ts",
+      "src/core/polyomino/polyomino-ui.ts",
+      "src/core/graph/graph-ui.ts"
+    ],
+    "excludeTests": "mutation-ui8"
+  },
+  "results": [
+    {
+      "module": "src/core/expressions/expression-ui.ts",
+      "lines": 810,
+      "tests": [
+        "tests/unit/burn-wave22-expression-ui.test.ts",
+        "tests/unit/burn-wave34-expr-ui-builder-drop.test.ts",
+        "tests/unit/burn-wave34-expr-ui-builder-result-states.test.ts",
+        "tests/unit/burn-wave34-expr-ui-card-svg.test.ts",
+        "tests/unit/burn-wave34-expr-ui-eval-fail.test.ts",
+        "tests/unit/burn-wave34-expr-ui-interactive-deselect.test.ts",
+        "tests/unit/burn-wave34-expr-ui-interactive-remove.test.ts",
+        "tests/unit/burn-wave34-expr-ui-slot-click.test.ts",
+        "tests/unit/burn-wave34-expr-ui-slot-dnd.test.ts",
+        "tests/unit/burn-wave35-expr-ui-builder-drop.test.ts",
+        "tests/unit/burn-wave35-expr-ui-builder-result.test.ts",
+        "tests/unit/burn-wave35-expr-ui-calculator.test.ts",
+        "tests/unit/burn-wave35-expr-ui-card-matrix.test.ts",
+        "tests/unit/burn-wave35-expr-ui-challenge-display.test.ts",
+        "tests/unit/burn-wave35-expr-ui-handshake.test.ts",
+        "tests/unit/burn-wave35-expr-ui-interactive-miss.test.ts",
+        "tests/unit/burn-wave35-expr-ui-interactive.test.ts",
+        "tests/unit/burn-wave35-expr-ui-paren-builder.test.ts",
+        "tests/unit/burn-wave35-expr-ui-slot-dnd.test.ts",
+        "tests/unit/burn-wave35-expr-ui-stress-tray.test.ts",
+        "tests/unit/burn-wave35-expr-ui-tray-matrix.test.ts",
+        "tests/unit/burn-wave39-expr-builder-clear-miss.test.ts",
+        "tests/unit/burn-wave40-expr-ui-builder-reset.test.ts",
+        "tests/unit/burn-wave31-expr-tokenize-matrix.test.ts"
+      ],
+      "availableMutants": 53,
+      "ranMutants": 20,
+      "killed": 10,
+      "survived": 10,
+      "timeout": 0,
+      "error": 0,
+      "score": 50,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 18,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "Arithmetic",
+          "line": 332,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 332,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 332,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "Arithmetic",
+          "line": 333,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "Arithmetic",
+          "line": 333,
+          "description": "flip / → *",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 333,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "NumericBoundary",
+          "line": 333,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 333,
+          "description": "6 → 7",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 333,
+          "description": "6 → 5",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/polyomino/polyomino-ui.ts",
+      "lines": 575,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave23-polyomino-ui.test.ts",
+        "tests/unit/burn-wave35-poly-ui-board-matrix.test.ts",
+        "tests/unit/burn-wave35-poly-ui-interactive-drag.test.ts",
+        "tests/unit/burn-wave35-poly-ui-preview-matrix.test.ts",
+        "tests/unit/burn-wave35-poly-ui-render-matrix.test.ts",
+        "tests/unit/burn-wave35-poly-ui-selector-controls.test.ts",
+        "tests/unit/burn-wave35-ui-handshake-frac-poly-hex.test.ts",
+        "tests/unit/burn-wave40-poly-ui-mouse-oob.test.ts",
+        "tests/unit/burn-wave40-poly-ui-selector-rotate-drag.test.ts",
+        "tests/unit/overnight-wave52-core-poly-ui-noflip-controls.test.ts",
+        "tests/unit/overnight-wave52-handshake-module-names-cross.test.ts",
+        "tests/unit/overnight-wave53-core-poly-ui-selector-hover.test.ts",
+        "tests/unit/overnight-wave55-core-poly-board-unknown-shape.test.ts",
+        "tests/unit/overnight-wave56-core-poly-mouse-inbounds.test.ts",
+        "tests/unit/overnight-wave56-handshake-owl-graph-poly.test.ts",
+        "tests/unit/overnight-wave58-core-poly-interactive-click-cell.test.ts",
+        "tests/unit/overnight-wave58-handshake-owl-graph-poly.test.ts",
+        "tests/unit/polyomino-scaled-hit-test.test.ts",
+        "tests/unit/burn-wave24-hand-bank-deplete.test.ts",
+        "tests/unit/burn-wave24-piece-supply-fill.test.ts"
+      ],
+      "availableMutants": 160,
+      "ranMutants": 20,
+      "killed": 10,
+      "survived": 10,
+      "timeout": 0,
+      "error": 0,
+      "score": 50,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "NumericBoundary",
+          "line": 20,
+          "description": "30 → 31",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 20,
+          "description": "30 → 29",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "NumericBoundary",
+          "line": 21,
+          "description": "2 → 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 21,
+          "description": "2 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "BooleanLiteral",
+          "line": 22,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 43,
+          "description": "0 → 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "BooleanLiteral",
+          "line": 44,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "Arithmetic",
+          "line": 60,
+          "description": "flip + → -",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "Arithmetic",
+          "line": 60,
+          "description": "flip * → /",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "Arithmetic",
+          "line": 60,
+          "description": "flip - → +",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/graph/graph-ui.ts",
+      "lines": 601,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave33-graph-ui-animate-raf.test.ts",
+        "tests/unit/burn-wave33-graph-ui-bounds-config.test.ts",
+        "tests/unit/burn-wave33-graph-ui-clear-custom.test.ts",
+        "tests/unit/burn-wave33-graph-ui-color-priority.test.ts",
+        "tests/unit/burn-wave33-graph-ui-edge-style.test.ts",
+        "tests/unit/burn-wave33-graph-ui-handshake-stress.test.ts",
+        "tests/unit/burn-wave33-graph-ui-highlight-bidir.test.ts",
+        "tests/unit/burn-wave33-graph-ui-interactive-matrix.test.ts",
+        "tests/unit/burn-wave33-graph-ui-labels-weights.test.ts",
+        "tests/unit/burn-wave33-graph-ui-legend-custom.test.ts",
+        "tests/unit/burn-wave33-graph-ui-orphan-edges.test.ts",
+        "tests/unit/burn-wave33-graph-ui-styles-idempotent.test.ts",
+        "tests/unit/burn-wave33-graph-ui-template-render.test.ts",
+        "tests/unit/burn-wave33-graph-ui-valid-moves-matrix.test.ts",
+        "tests/unit/burn-wave34-graph-ui-animate-compose.test.ts",
+        "tests/unit/burn-wave34-graph-ui-chrome.test.ts",
+        "tests/unit/burn-wave34-graph-ui-missing-nodeid.test.ts",
+        "tests/unit/burn-wave34-graph-ui-orphan-neighbor.test.ts",
+        "tests/unit/burn-wave39-graph-ui-highlight-miss.test.ts",
+        "tests/unit/burn-wave40-graph-ui-animate-legend.test.ts",
+        "tests/unit/burn-wave40-graph-ui-legend-valids-animate.test.ts",
+        "tests/unit/burn-wave40-graph-ui-orphan-validmoves.test.ts",
+        "tests/unit/forced-colors-css.test.ts",
+        "tests/unit/overnight-core-graph-show-valid-moves-all-owned.test.ts",
+        "tests/unit/overnight-core-graph-ui-highlight-single-node.test.ts",
+        "tests/unit/overnight-core-graph-ui-interactive-hover-null.test.ts",
+        "tests/unit/overnight-core-graph-ui-legend-four-items.test.ts",
+        "tests/unit/overnight-core-graph-ui-orphan-edge-skip.test.ts",
+        "tests/unit/overnight-core-graph-ui-showweights-skip-undefined.test.ts",
+        "tests/unit/overnight-core-graph-ui-value-zero-marked.test.ts",
+        "tests/unit/overnight-core-handshake-graph-hex-exports.test.ts",
+        "tests/unit/overnight-core-handshake-templates-hex-ui.test.ts",
+        "tests/unit/overnight-wave52-core-graph-legend-no-disabled.test.ts",
+        "tests/unit/overnight-wave52-core-graph-ui-value-without-labels.test.ts"
+      ],
+      "availableMutants": 128,
+      "ranMutants": 20,
+      "killed": 14,
+      "survived": 6,
+      "timeout": 0,
+      "error": 0,
+      "score": 70,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 18,
+          "description": "true → false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 21,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 21,
+          "description": "flip === → !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 22,
+          "description": "flip !== → ===",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "BooleanLiteral",
+          "line": 24,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 29,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}

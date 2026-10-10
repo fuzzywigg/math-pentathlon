@@ -43,7 +43,9 @@ class OwlSystem {
 
   constructor() {
     // Listen to all events and process them
-    this.events.on('*', (event) => this.handleEvent(event));
+    this.events.on('*', (event) => {
+      this.handleEvent(event);
+    });
   }
 
   // Initialize the Owl system on app start
@@ -136,7 +138,9 @@ class OwlSystem {
   // Update and notify state
   private updateState(partial: Partial<OwlDisplayState>): void {
     this.currentState = { ...this.currentState, ...partial };
-    this.stateHandlers.forEach((handler) => handler(this.getState()));
+    this.stateHandlers.forEach((handler) => {
+      handler(this.getState());
+    });
   }
 
   // Handle events and trigger messages
