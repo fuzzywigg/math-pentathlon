@@ -4,6 +4,8 @@
  *
  * Uses a production `vite preview` build so the Workbox service worker is active
  * (dev mode has no SW unless PWA_DEV=1).
+ *
+ * Options: -h, --help (exits before build / browser launch)
  */
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
@@ -11,6 +13,17 @@ import { createServer } from 'node:net';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+
+const USAGE = `Usage: node scripts/probe-offline-resilience.mjs
+
+One-shot Chromium probe: offline-after-first-load + Slow 3G against vite preview.
+Runs npm run build, then launches Playwright Chromium.
+
+Options:
+  -h, --help       Show this help and exit (no build or browser launch)`;
+
+applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = '/opt/cursor/artifacts/offline-resilience-probe.json';
