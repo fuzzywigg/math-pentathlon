@@ -1,8 +1,8 @@
 {
-  "notes": "Tip post1012 min ceilings (q-mp-026p + prior + q-mp-580): curly 538; no-non-null-assertion 238 (−1 demos/dice-demo lastChild); no-confusing-void-expression 47 (−3 owl + −2 reduced-motion + −1 pointer-hygiene + −1 stats-dashboard + −1 bootstrap-owl + −1 idle-warm + −1 register + −1 pwa/bootstrap); radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post1012 min ceilings (q-mp-026p + prior + q-mp-580 + q-mp-602): curly 538; no-non-null-assertion 237 (−1 demos/dice-demo lastChild + −1 demos/graph-demo dataset.player); no-confusing-void-expression 47 (−3 owl + −2 reduced-motion + −1 pointer-hygiene + −1 stats-dashboard + −1 bootstrap-owl + −1 idle-warm + −1 register + −1 pwa/bootstrap); radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
-    "@typescript-eslint/no-non-null-assertion": 238,
+    "@typescript-eslint/no-non-null-assertion": 237,
     "@typescript-eslint/no-confusing-void-expression": 47,
     "radix": 6,
     "default-case": 5,
