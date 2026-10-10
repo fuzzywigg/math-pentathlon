@@ -1,6 +1,8 @@
 /**
  * Chromium probe against vite *dev* (no service worker): offline-after-first-load
  * and forced font / game-chunk / three.js failures. Complements the production SW probe.
+ *
+ * Options: -h, --help (exits before vite / browser launch)
  */
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
@@ -8,6 +10,17 @@ import { createServer } from 'node:net';
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+
+const USAGE = `Usage: node scripts/probe-offline-resilience-dev.mjs
+
+Chromium probe against vite dev (no service worker).
+Starts vite and launches Playwright Chromium.
+
+Options:
+  -h, --help       Show this help and exit (no build or browser launch)`;
+
+applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = '/opt/cursor/artifacts/offline-resilience-probe-dev.json';
