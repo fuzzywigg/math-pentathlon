@@ -44,9 +44,9 @@ Focused prime-gold unit suite (`tests/unit/*prime-gold*` +
 | File                                      | Before lines | Before branches | After lines | After branches | Δ lines (pp) | Δ branches (pp) |
 | ----------------------------------------- | -----------: | --------------: | ----------: | -------------: | -----------: | --------------: |
 | `src/games/prime-gold/board-ui.ts`        |         100% |          97.87% |    **100%** |       **100%** |        +0.00 |       **+2.13** |
-| `src/games/prime-gold/game-controller.ts` |       76.32% |          63.28% |  **97.58%** |     **89.06%** |   **+21.26** |      **+25.78** |
-| focused board-ui + controller             |       85.80% |          72.57% |  **98.55%** |     **92.00%** |   **+12.75** |      **+19.43** |
-| `src/games/prime-gold` (directory)        |       89.05% |          83.17% |  **96.03%** |     **91.71%** |    **+6.98** |       **+8.54** |
+| `src/games/prime-gold/game-controller.ts` |       76.32% |          63.28% |  **98.55%** |     **90.62%** |   **+22.23** |      **+27.34** |
+| focused board-ui + controller             |       85.80% |          72.57% |  **99.13%** |     **93.14%** |   **+13.33** |      **+20.57** |
+| `src/games/prime-gold` (directory)        |       89.05% |          83.17% |  **96.35%** |     **92.21%** |    **+7.30** |       **+9.05** |
 
 Residual arms left intentional: `ensureBoard3d` early returns when already
 mounted / host missing (`:112`/`:120`/`:134`) — require non-exported re-entry
