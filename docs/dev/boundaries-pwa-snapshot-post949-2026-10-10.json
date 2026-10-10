@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "taskId": "q-mp-514",
+  "series": "boundaries-pwa-snapshot",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipShaShort": "8698fffb",
+  "tipShaFull": "8698fffb85b1e3d2289e54a665fac6162d3bdee4",
+  "measuredAt": "2026-10-10T12:21:23Z",
+  "staleBacklogLabel": "tip post914",
+  "remeasuredOn": "tip post949",
+  "boundaries": {
+    "command": "npm run check:boundaries",
+    "exitCode": 0,
+    "files": 238,
+    "relativeImportEdges": 798,
+    "counts": {
+      "cycles": 0,
+      "cycles_including_type_only": 0,
+      "engine_imports_ui": 0,
+      "engine_imports_ai": 0,
+      "cross_game_imports": 0,
+      "core_imports_games": 0,
+      "core_imports_ui": 0,
+      "ai_imports_ui": 0,
+      "engine_or_ai_dom_globals": 0,
+      "dead_barrels": 0,
+      "mixed_ui_barrels": 0
+    },
+    "ceilingsFile": "docs/dev/module-boundaries-ceilings.json",
+    "ceilingsTipSha": "7d59901c",
+    "ceilingsTipShaNote": "ceiling file tipSha stamp from q-mp-105 (mixed_ui_barrels 1→0); live counts remain all 0 / ceilings all 0 — no ceiling write in this snapshot",
+    "allCountsZero": true,
+    "allAtOrUnderCeiling": true
+  },
+  "pwaManifest": {
+    "commands": ["npm run build", "npm run check:pwa-manifest"],
+    "buildExitCode": 0,
+    "checkExitCode": 0,
+    "ok": true,
+    "reportOnly": true,
+    "errorCount": 0,
+    "errors": [],
+    "manifestPath": "dist/site.webmanifest",
+    "manifest": {
+      "name": "Math Pentathlon",
+      "short_name": "Math Pentathlon",
+      "display": "standalone",
+      "start_url": "/",
+      "iconCount": 5
+    }
+  },
+  "notes": {
+    "srcEdits": false,
+    "ciPermissionsEdits": false,
+    "ratchetRaises": false,
+    "leaveContained": ["#955", "#489/#961", "#971"]
+  }
+}
