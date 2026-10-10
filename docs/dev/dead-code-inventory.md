@@ -42,6 +42,11 @@
 > Metrics unchanged vs `#805` (491 defined / naive unused 8 / zero-ref 0); no `src/**/*.css`
 > diffs since post755 scan SHA. Report-only; contains open `#805` / `#766`.
 > Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post785-2026-10-10.md`.
+>
+> **q-mp-391 (2026-10-10):** Fresh Rank-1 CSS rescan on tip `cursor/mp-tip-post865` @ `3908809d`.
+> Metrics unchanged vs `#840` (491 defined / naive unused 8 / zero-ref 0); no `src/**/*.css`
+> diffs since post785 tip fold. Report-only; contains open `#840` / `#805` / `#766`.
+> Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md`.
 
 ## Method
 
