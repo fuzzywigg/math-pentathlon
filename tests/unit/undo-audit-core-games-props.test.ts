@@ -3,6 +3,7 @@
  * apply paths (hex, calla, queens non-restore path, kings, fiar).
  */
 import { describe, it, expect } from 'vitest';
+import { mulberry32Uint } from '../helpers/rng';
 import {
   assertUndoRedoMoveLog,
   pickOne,
@@ -157,15 +158,7 @@ describe('Undo audit — queens & guards move log / replay', () => {
     // Restores are not logged (see audit doc). Property uses applied-action
     // stack for undo/redo; history length tracks only makeMove plies.
     for (let trial = 0; trial < 24; trial++) {
-      const rng = (() => {
-        let s = (trial + 3) * 7919;
-        return () => {
-          s = (s + 0x6d2b79f5) >>> 0;
-          let r = Math.imul(s ^ (s >>> 15), 1 | s);
-          r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-          return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-        };
-      })();
+      const rng = mulberry32Uint((trial + 3) * 7919);
 
       let state = createQueens();
       const snaps: string[] = [serializeState(state)];
