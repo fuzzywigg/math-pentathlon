@@ -2,7 +2,7 @@
 
 **Task id:** `q-mp-447`  
 **Role:** worker (docs / data / chart only)  
-**Tip audited:** `cursor/mp-tip-post898` @ `b7e518b4` (full `b7e518b4afe04556fa7e87ecba7ce97229b05bc7`)  
+**Tip audited:** `cursor/mp-tip-post898` @ `85522638` (full `855226389f23cb95bf74bd827556ee831c3bccad`)  
 **Measured at:** `2026-10-10T08:31:37Z` (UTC)  
 **Prior HOLD map:** [`typecheck-oos-216-hold-map-post865-2026-10-10.md`](./typecheck-oos-216-hold-map-post865-2026-10-10.md) (`q-mp-421` on tip `post865` @ `7f8a7147`; open draft [`#907`](https://github.com/fuzzywigg/math-pentathlon/pull/907)) — leave open with **contained**  
 **Earlier map:** [`typecheck-oos-216-hold-map-2026-10-09.md`](./typecheck-oos-216-hold-map-2026-10-09.md) (`q-mp-276` on tip `post755` @ `74a1596f`; open draft [`#781`](https://github.com/fuzzywigg/math-pentathlon/pull/781)) — leave open with **contained**  
@@ -13,7 +13,7 @@
 
 ## Purpose
 
-Refresh the Phase-2 type-ratchet **out-of-scope** HOLD map onto live tip `cursor/mp-tip-post898` so agents stop relying on the `post865` / `7f8a7147` stamp in `#907` / `q-mp-421` (or the older `post755` stamp in `#781` / `q-mp-276`). Spec backlog `q-mp-447` (draft `#921`) was written against tip cut evidence `@788e8215`; live HEAD at this audit is `b7e518b4` after post898 tip folds — trust the live tree.
+Refresh the Phase-2 type-ratchet **out-of-scope** HOLD map onto live tip `cursor/mp-tip-post898` so agents stop relying on the `post865` / `7f8a7147` stamp in `#907` / `q-mp-421` (or the older `post755` stamp in `#781` / `q-mp-276`). Spec backlog `q-mp-447` (draft `#921`) was written against tip cut evidence `@788e8215`; live HEAD at this audit is `85522638` after post898 tip folds — trust the live tree.
 
 Docs / data / chart only — **no** `src/` edits, **no** `tsconfig.ratchet.json` scope change, **no** Phase-2 baseline JSON rewrite, **no** AI product / emit-identity clears (emit-identity stays with open `#881` / `q-mp-393`).
 
@@ -41,11 +41,11 @@ Docs / data / chart only — **no** `src/` edits, **no** `tsconfig.ratchet.json`
 
 No open draft into `cursor/mp-tip-post898` already owns a post898-dated typecheck OOS HOLD map → full refresh proceeds.
 
-## Live tip measurements (evidence @ `b7e518b4`)
+## Live tip measurements (evidence @ `85522638`)
 
 ```text
 $ git rev-parse HEAD
-  b7e518b4afe04556fa7e87ecba7ce97229b05bc7
+  855226389f23cb95bf74bd827556ee831c3bccad
 
 $ npm run typecheck:ratchet
   Type ratchet (tsconfig.ratchet.json)
@@ -69,12 +69,12 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 
 $ find tests/unit \( -name '*.test.ts' -o -name '*.spec.ts' \) \
     ! -path '*/_tokenmaxx_archive/*' | wc -l
-  3234
+  3235
 ```
 
-Context (not owned by this ticket): tip unit-file count is now **3234** (spec note **3224** / backlog tip `@788e8215` was stale vs tip folds); emit-identity FAIL **11** stays with open `#881`.
+Context (not owned by this ticket): tip unit-file count is now **3235** (spec note **3224** / backlog tip `@788e8215` was stale vs tip folds); emit-identity FAIL **11** stays with open `#881`.
 
-**Before / after (this docs PR):** out-of-scope **216 → 216** (unchanged; report-only). In-scope stays **0**. Tip stamp **post865 `7f8a7147` → post898 `b7e518b4`**.
+**Before / after (this docs PR):** out-of-scope **216 → 216** (unchanged; report-only). In-scope stays **0**. Tip stamp **post865 `7f8a7147` → post898 `85522638`**.
 
 ## HOLD rule (explicit)
 
