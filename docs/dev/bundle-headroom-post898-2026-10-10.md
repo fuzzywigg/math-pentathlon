@@ -1,9 +1,9 @@
 # Bundle size:check — post-#898 headroom remeasure (2026-10-10)
 
 **Task id:** `q-mp-438` (remeasure after tip cut `cursor/mp-tip-post898` / fold `#898`; docs follow-up to tip-folded `#900` / `q-mp-413`)  
-**Tip measured (live):** `cursor/mp-tip-post898` @ `9b19c5e8`  
+**Tip measured (live):** `cursor/mp-tip-post898` @ `b7e518b4`  
 **Tip cut SHA (alpha after `#898`):** `946d6f95` (tip HEAD has since absorbed folded drafts `#900`–`#913` / `#915`–`#921` via tip PR `#914`)  
-**Measured on:** 2026-10-10 (UTC) · stamp `2026-10-10T08:27:08.195Z`  
+**Measured on:** 2026-10-10 (UTC) · stamp `2026-10-10T08:33:34.986Z`  
 **Scope:** Report-only headroom table on the post898 tree (live HEAD of `cursor/mp-tip-post898`). **No budget raise.** No `bundle-budgets.json` / allowlist edits.
 
 Machine-readable twin: [`bundle-headroom-post898-2026-10-10.json`](./bundle-headroom-post898-2026-10-10.json) · visual: [`bundle-headroom-post898-2026-10-10.svg`](./bundle-headroom-post898-2026-10-10.svg)
@@ -16,11 +16,11 @@ Leaves older tables **contained** (do not close those drafts):
 - `#792` / `q-mp-263` — post-#755 table @ `74a1596f` (−79 B hashes)
 - `#756` / `q-mp-237` — post-#748 table @ `ce673656` (−76 B hashes)
 
-Stale backlog evidence for `q-mp-438` cited tip `788e8215` / sum-dominoes **−77 B** / fab-a-diffy **−169 B** / contig-60 **−212 B**. Live tip HEAD `9b19c5e8` still has sum-dominoes **−77 B**; fab / contig each gained **1 B** of headroom vs that stamp (−170 / −213). Chunk hashes moved with tip folds after the post898 cut.
+Stale backlog evidence for `q-mp-438` cited tip `788e8215` / sum-dominoes **−77 B** / fab-a-diffy **−169 B** / contig-60 **−212 B**. Live tip HEAD `b7e518b4` still has sum-dominoes **−77 B**; fab / contig each gained **1 B** of headroom vs that stamp (−170 / −213). Chunk hashes moved with tip folds after the post898 cut.
 
 ## Outcome
 
-`npm run build && npm run size:check` on tip `9b19c5e8` reports **All 21 budgets within limit** (`knownOvers` still `[]`). `--fail-on-new-over` also exits **0**.
+`npm run build && npm run size:check` on tip `b7e518b4` reports **All 21 budgets within limit** (`knownOvers` still `[]`). `--fail-on-new-over` also exits **0**.
 
 Tightest residual headroom: **`game-sum-dominoes` −77 B** (6.77 / 6.85 kB).
 
@@ -34,7 +34,7 @@ Tightest residual headroom: **`game-sum-dominoes` −77 B** (6.77 / 6.85 kB).
 
 Any further growth in `game-sum-dominoes` or `game-fab-a-diffy` is the first place a NEW OVER would appear. Do **not** raise budgets to absorb drift — trim the chunk first.
 
-## Full green table (exact gzip bytes @ `9b19c5e8`)
+## Full green table (exact gzip bytes @ `b7e518b4`)
 
 Sorted tightest → widest headroom. Exact bytes use the same `zlib.gzipSync` path as `scripts/check-bundle-budgets.mjs`.
 
@@ -62,7 +62,7 @@ Sorted tightest → widest headroom. Exact bytes use the same `zlib.gzipSync` pa
 | `game-ramrod`             | `game-ramrod-DsUBfzNq.js`             |  **5504** |       7261 |  **−1757** | OK     |
 | `menu-critical-path`      | (sum of index.html JS/CSS)            | **26261** |      46822 | **−20561** | OK     |
 
-Menu critical files @ `9b19c5e8`: `core-BvnLZvlI.js` (6909) + `index-D2_JzoV2.js` (3301) + `index-PzJzeRBN.css` (4587) + `ui-CAV4hcGs.css` (3158) + `ui-GRjcKRcQ.js` (7656) + `vendor/vite-preload-BXl3LOEh.js` (650) = **26261** B.
+Menu critical files @ `b7e518b4`: `core-BvnLZvlI.js` (6909) + `index-D2_JzoV2.js` (3301) + `index-PzJzeRBN.css` (4587) + `ui-CAV4hcGs.css` (3158) + `ui-GRjcKRcQ.js` (7656) + `vendor/vite-preload-BXl3LOEh.js` (650) = **26261** B.
 
 ## Headroom visual (tightest five game chunks)
 
@@ -70,7 +70,7 @@ Menu critical files @ `9b19c5e8`: `core-BvnLZvlI.js` (6909) + `index-D2_JzoV2.js
 
 ```mermaid
 xychart-beta
-    title "Gzip headroom (budget − actual) bytes @ 9b19c5e8"
+    title "Gzip headroom (budget − actual) bytes @ b7e518b4"
     x-axis ["sum-dominoes", "fab-a-diffy", "contig-60", "hex", "stars-bars"]
     y-axis "headroom bytes" 0 --> 350
     bar [77, 170, 213, 288, 318]
@@ -78,7 +78,7 @@ xychart-beta
 
 ```mermaid
 flowchart LR
-  subgraph tight ["Tightest residuals @ tip #898 / post898 · 9b19c5e8"]
+  subgraph tight ["Tightest residuals @ tip #898 / post898 · b7e518b4"]
     S["sum-dominoes<br/>6936 / 7013 (−77)"]
     F["fab-a-diffy<br/>8241 / 8411 (−170)"]
     C["contig-60<br/>7159 / 7372 (−213)"]
@@ -93,7 +93,7 @@ flowchart LR
 
 ## Delta vs prior headroom snapshots
 
-| Bundle               | Post-#830 @ `97487de6` | Post-#865 @ `7f8a7147` | Post-#898 @ `9b19c5e8` | Δgzip (865→898) |
+| Bundle               | Post-#830 @ `97487de6` | Post-#865 @ `7f8a7147` | Post-#898 @ `b7e518b4` | Δgzip (865→898) |
 | -------------------- | ---------------------: | ---------------------: | ---------------------: | --------------: |
 | `game-sum-dominoes`  |             6936 (−77) |             6936 (−77) |         **6936 (−77)** |         **0 B** |
 | `game-fab-a-diffy`   |            8241 (−170) |            8242 (−169) |        **8241 (−170)** |        **−1 B** |
