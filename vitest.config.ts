@@ -43,6 +43,8 @@ const isolatedFiles = [
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
   // q-mp-422: router soft-fail matrix — vi.resetModules for module-default 404.
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
+  // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
+  'tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
   'tests/unit/burn-1008-registry-module-contract.test.ts',
   // q-mp-117: generation-gated timeout characterization — fake timers +
@@ -50,6 +52,8 @@ const isolatedFiles = [
   'tests/unit/ui-helper-dedupe-characterization.test.ts',
   // Hoisted game-registry mock injects unavailable card for selector coverage.
   'tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts',
+  // q-mp-454: game-selector soft-fail residuals — registry + prefetch mocks.
+  'tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
