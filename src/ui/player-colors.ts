@@ -3,8 +3,8 @@
  * Mode chrome: `#app[data-opponent="ai"]` (+ optional `data-ai-seat` for Kings flip).
  */
 
-export type PlayerSeat = 'player1' | 'player2';
-export type GameModeChrome = 'human-vs-human' | 'human-vs-ai';
+type PlayerSeat = 'player1' | 'player2';
+type GameModeChrome = 'human-vs-human' | 'human-vs-ai';
 
 const FALLBACK = {
   player1: '#3b82f6',

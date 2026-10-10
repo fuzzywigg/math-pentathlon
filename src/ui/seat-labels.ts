@@ -9,7 +9,7 @@ import type { SeatId } from '../core/seats';
 export type { SeatId } from '../core/seats';
 export { getOpponentSeat } from '../core/seats';
 
-export type GameModeLabel = 'human-vs-human' | 'human-vs-ai';
+type GameModeLabel = 'human-vs-human' | 'human-vs-ai';
 
 /**
  * Classic 2P seat names used by nearly every board-ui `getPlayerName`.

@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-356 unusedTypes demote batch 6 (2026-10-10)
+
+Re-measured on tip `cursor/mp-tip-post830` @ `97487de6` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / legal-move / intentional keepers): module-privated UI `GameMountDeps` / `PlayerSeat` / `GameModeChrome` / `PointerTapControllerOptions` / `PointerTapController` / `BindCanvasPointerTapOptions` / `GameModeLabel`. Baseline `unusedTypes` **47 → 36** (−7 demotes; tip live was already 43 vs baseline 47 before this batch). Spec backlog candidates (`GamePhase` aliases / hex-a-gone `PlacedBlock`/`TurnSelection`/`MoveRecord` / star-track `ChainLength`/`StarTrackMove` / fractions `FractionBarStyle`/`FractionBarColors`) are **stale** — still exported but not in live knip unusedTypes (internal importers). Skipped AI protocol / `*/ai.ts`, `timer-scoring`, `SafeJsonParseResult`, `SeatId` (test importers), and alignment/compat types. No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#829` batch 5 already on tip tree) at fold.
+
 ## q-mp-332 unusedTypes demote batch 5 (2026-10-10)
 
 Re-measured on tip `cursor/mp-tip-post785` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): module-privated PWA `BootstrapOwlOptions` / `BootstrapPwaOptions` / `IdleWarmOptions` / `RegisterPwaOptions` / `RegisterPwaResult`; UI `PixelPoint` / `TimeoutId` / `GenerationTimeoutHandle` / `ReducedMotionOptions` / `GameErrorBoundaryOptions` / `FocusedCellCoords`; kings `SaveInfo` / `GameStateFromJsonResult`; dropped unused `PieceType` re-export from `kings-quadraphages/board.ts` (canonical remains on `pieces.ts`). Baseline `unusedTypes` **61 → 47** (−14). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-4 symbols already on tip (`#823` / `#793`); skipped AI exports, `SafeJsonParseResult`, `timer-scoring`, and `SeatId` (test importers).
