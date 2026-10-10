@@ -37,7 +37,7 @@ npm run test:e2e:cross -- tests/e2e/smoke.spec.ts
 Job `e2e-cross-browser` in `.github/workflows/ci.yml`:
 
 - Runs after a successful `build` on every PR/push
-- Installs Firefox + WebKit and runs `npm run test:e2e -- --project=firefox --project=webkit`
+- Installs Firefox + WebKit and runs `npm run test:e2e:firefox-webkit` (equiv. `npm run test:e2e -- --project=firefox --project=webkit`)
 - `continue-on-error: true` so failures do **not** block merges
 - Uploads `playwright-report-cross-browser` on every run (`if: always()`)
 
