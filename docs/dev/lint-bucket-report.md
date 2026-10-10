@@ -43,6 +43,7 @@ Runs offline against the local tree (`eslint src` + probe config under the repo 
 | [`eslint-off-rules-inventory.md`](./eslint-off-rules-inventory.md)                                               | Human inventory of ceilinged rules                                                  |
 | [`eslint-non-ceilinged-residuals-2026-10-09.md`](./eslint-non-ceilinged-residuals-2026-10-09.md)                 | Non-ceilinged overlay residuals (post748 stamp)                                     |
 | [`eslint-non-ceilinged-residuals-post914-2026-10-10.md`](./eslint-non-ceilinged-residuals-post914-2026-10-10.md) | Non-ceilinged overlay residuals refresh (`q-mp-464`) @ tip `post914` (`753052a6`)   |
+| [`eslint-non-ceilinged-residuals-post977-2026-10-10.md`](./eslint-non-ceilinged-residuals-post977-2026-10-10.md) | Non-ceilinged overlay residuals inventory (`q-mp-558`) @ tip `post977` (`f0d0a162`) |
 | [`lint-bucket-snapshot-post830-2026-10-10.md`](./lint-bucket-snapshot-post830-2026-10-10.md)                     | Dated tip snapshot (`q-mp-364`) + chart @ `97487de6`                                |
 | [`lint-bucket-snapshot-post865-2026-10-10.md`](./lint-bucket-snapshot-post865-2026-10-10.md)                     | Dated tip snapshot (`q-mp-416`) + chart @ `7f8a7147` (void **53**)                  |
 | [`lint-bucket-snapshot-post898-2026-10-10.md`](./lint-bucket-snapshot-post898-2026-10-10.md)                     | Dated tip snapshot (`q-mp-441`) + chart @ `9b19c5e8` (void **52** / nnnull **241**) |
