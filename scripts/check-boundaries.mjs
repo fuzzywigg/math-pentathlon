@@ -13,12 +13,17 @@
  * totals may only go down. Exit 0 when at or under the ceiling; exit 1 if any
  * category rises.
  *
- * Usage: npm run check:boundaries
+ * Usage:
+ *   npm run check:boundaries
+ *   node scripts/check-boundaries.mjs [--help]
+ *
+ * Unknown flags exit 2. --help/-h exit 0 without auditing.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { helpOnlyUsage, parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -479,12 +484,25 @@ export function auditBoundaries() {
   };
 }
 
-function main() {
+function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'help') {
+    console.log(helpOnlyUsage('scripts/check-boundaries.mjs'));
+    process.exit(0);
+  }
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(helpOnlyUsage('scripts/check-boundaries.mjs'));
+    process.exit(2);
+  }
+
   const report = auditBoundaries();
   const { counts } = report;
 
   console.log('Module boundary audit (src/)');
-  console.log(`  files: ${report.files}  relative-import edges: ${report.edges}`);
+  console.log(
+    `  files: ${report.files}  relative-import edges: ${report.edges}`
+  );
   console.log('');
   console.log('Counts:');
   for (const [k, v] of Object.entries(counts)) {
@@ -549,7 +567,9 @@ function main() {
     process.exit(1);
   }
 
-  console.log('OK: all counts at or under committed ceiling (may only go down).');
+  console.log(
+    'OK: all counts at or under committed ceiling (may only go down).'
+  );
   process.exit(0);
 }
 
