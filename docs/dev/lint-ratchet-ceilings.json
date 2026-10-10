@@ -1,9 +1,9 @@
 {
-  "notes": "Tip post830 min ceilings (q-mp-026k): curly 538; no-non-null-assertion 246; no-confusing-void-expression 58; radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post830 min ceilings (q-mp-026k + q-mp-366): curly 538; no-non-null-assertion 246; no-confusing-void-expression 55; radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 58,
+    "@typescript-eslint/no-confusing-void-expression": 55,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,

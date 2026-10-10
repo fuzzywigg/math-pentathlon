@@ -201,7 +201,9 @@ export class OwlComponent {
 
     // Minimize button
     const minimizeBtn = this.container.querySelector('.owl-minimize-btn');
-    minimizeBtn?.addEventListener('click', () => this.minimize());
+    minimizeBtn?.addEventListener('click', () => {
+      this.minimize();
+    });
 
     // Minimized owl button (to expand) — skip expand if this was a drag
     const minimizedBtn = this.container.querySelector('.owl-minimized');
@@ -217,7 +219,9 @@ export class OwlComponent {
 
     // Dismiss message button
     const dismissBtn = this.container.querySelector('.owl-bubble-dismiss');
-    dismissBtn?.addEventListener('click', () => owlSystem.dismissMessage());
+    dismissBtn?.addEventListener('click', () => {
+      owlSystem.dismissMessage();
+    });
 
     // Click on owl character for interaction — skip if this was a drag
     const character = this.container.querySelector('.owl-character');
@@ -558,7 +562,9 @@ export class OwlComponent {
 
   // Subscribe to owl state changes
   private subscribeToState(): void {
-    this.unsubscribe = owlSystem.onStateChange((state) => this.updateUI(state));
+    this.unsubscribe = owlSystem.onStateChange((state) => {
+      this.updateUI(state);
+    });
   }
 
   // Update UI based on state
