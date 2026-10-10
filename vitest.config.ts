@@ -154,6 +154,8 @@ const nodePureFiles = [
   'tests/unit/help-only-cli.test.ts',
   // harness env Number() parser (q-mp-876); spawnSync CLI check needs node env.
   'tests/unit/env-number.test.ts',
+  // mutation-report argv validation (q-mp-867 / q-mp-868); spawnSync CLI check.
+  'tests/unit/mutation-report-args.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
