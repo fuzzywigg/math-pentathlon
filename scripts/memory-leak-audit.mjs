@@ -21,12 +21,13 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const LABEL = process.env.MEM_LEAK_LABEL || 'run';
-const CYCLES = Number(process.env.MEM_LEAK_CYCLES || 10);
-const PORT = Number(process.env.MEM_LEAK_PORT || 5181);
+const CYCLES = requireEnvNumber('MEM_LEAK_CYCLES', 10);
+const PORT = requireEnvNumber('MEM_LEAK_PORT', 5181);
 /** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline twins. */
 const MEM_DATE = process.env.MEM_LEAK_DATE || '2026-10-07';
 const OUT_JSON = resolve(ROOT, `docs/memory-leaks-${LABEL}-${MEM_DATE}.json`);
