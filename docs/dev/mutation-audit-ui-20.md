@@ -102,7 +102,7 @@ JSON artifacts: `docs/dev/mutation-audit-ui-20-baseline.json`,
 | ------------ | ------------------------------- | -------------------------------------------------------------------------------------------- |
 | `expression` | L18 `stylesInjected false→true` | Module flag + `tests/unit/setup.ts` clearing head styles each test → style-count pins flake. |
 
-Pinned `it.skip` in `tests/unit/mutation-ui20-expression-ui.test.ts`.
+Pinned `it.skip` in `mutation-ui20-expression-ui.test.ts` (**dropped on tip fold** — wave-19 re-pin)`.
 
 No production defects confirmed. No `src/` product edits.
 
@@ -111,8 +111,8 @@ No production defects confirmed. No `src/` product edits.
 All new files (did **not** edit wave 1–19 suites or open `#1025`/`#1027`/`#1029` chars):
 
 - `tests/unit/mutation-ui20-attribute-ui.test.ts`
-- `tests/unit/mutation-ui20-expression-ui.test.ts`
-- `tests/unit/mutation-ui20-ollie-inspect-map.test.ts`
+- `mutation-ui20-expression-ui.test.ts` (**dropped on tip fold** — wave-19 re-pin)`
+- `mutation-ui20-ollie-inspect-map.test.ts` (**dropped on tip fold** — #1002/#1010 re-pin)`
 
 Rules: no player-facing copy / aria-label / stub-narration string assertions; no
 AI move/timing policy asserts; hard-coded numeric / boolean / DOM-shape /
