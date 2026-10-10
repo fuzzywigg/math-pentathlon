@@ -1,29 +1,26 @@
 # Testing layers — live counts (2026-10-10)
 
-**Task id:** `q-mp-540` (remeasure at tip-owner fold onto `cursor/mp-tip-post977` after post949 worker drafts; supersedes post949 stamp **3280** / **13408**)  
-**Measured tip:** `cursor/mp-tip-post977` @ `50d9b4a0` (full `50d9b4a0ef4ebc2d139fe19ee75ead071fd37f16`; tip-open after alpha `f0d0a162` / #977)  
+**Task id:** `q-mp-026r` tip-owner remasure on tip `cursor/mp-tip-post1023` (supersedes `q-mp-600` stamp **3308** / **13760**)  
+**Measured tip:** `cursor/mp-tip-post1023` @ `902aafcd` (full `902aafcdfb73f5347ec99f285b84483f1860f648`; cut from `alpha` @ `fb0d0ec5` after #1023)  
 **Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post977 at fold time. Pin policy unchanged. No `src/` or AI/copy/rules changes. Draft #1004 carried **3280** / **13408** @ post949 `d6a71f95`; live tip HEAD after folding #1002/#1006/#1010 (+ docs) is **3285** / **13502**. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
+Docs-only refresh of unit file / Vitest case counts for tip post1012. Pin policy unchanged. No `src/` or AI/copy/rules changes. Testing-layers still cited **3285** / **13502** (post977); wiki had been tip-owner stamped **3306** / **13748** @ `78c7e39b` without updating this page. Live tip HEAD remasure is **3320** files / **13888** listed cases (`unit-shared` **12850** / `unit-node` **380** / `unit-isolated` **658**). Counts move every fold — tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
 
 ## Duplicate check (open drafts)
 
 | Open draft                                                                              | Overlap                                                   | Action                                                                |
 | --------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
-| [#929](https://github.com/fuzzywigg/math-pentathlon/pull/929) `q-mp-445` → post898      | Same pages; stamped **3234** / **12972** @ `b7e518b4`     | **contained** — leave open; this remeasure owns tip post949 counts    |
-| [#955](https://github.com/fuzzywigg/math-pentathlon/pull/955) `q-mp-090p` → post914     | Backlog that listed successor count tasks                 | **contained** — leave open                                            |
+| [#1041](https://github.com/fuzzywigg/math-pentathlon/pull/1041) `q-mp-090u` backlog 10u | Spec source for this task (`q-mp-600`)                    | Leave open `contained`                                                |
+| [#1004](https://github.com/fuzzywigg/math-pentathlon/pull/1004) / `q-mp-540`            | Older tip remasure inventories (**3280** / **13408**)     | **contained** — leave open                                            |
+| [#1009](https://github.com/fuzzywigg/math-pentathlon/pull/1009) / `q-mp-560`            | Older tip remasure inventories                            | **contained** — leave open                                            |
+| [#929](https://github.com/fuzzywigg/math-pentathlon/pull/929) `q-mp-445` → post898      | Same pages; stamped **3234** / **12972** @ `b7e518b4`     | **contained** — leave open                                            |
 | [#886](https://github.com/fuzzywigg/math-pentathlon/pull/886) `q-mp-386` → post865      | Same pages; stamped **3210** / **12768** @ `3908809d`     | **contained** — leave open                                            |
 | [#841](https://github.com/fuzzywigg/math-pentathlon/pull/841) `q-mp-335` → post785      | Same pages; stamped **3182** / **12490** @ `c9b55cff`     | **contained** — leave open                                            |
 | [#791](https://github.com/fuzzywigg/math-pentathlon/pull/791) `q-mp-260` → post755      | Same pages; stamped **3156** / **12279** @ `74a1596f`     | **contained** — leave open                                            |
-| [#767](https://github.com/fuzzywigg/math-pentathlon/pull/767) `q-mp-235` → post748      | Same pages; stamped **3145** / **12189** @ `23926935`     | **contained** — leave open                                            |
-| [#732](https://github.com/fuzzywigg/math-pentathlon/pull/732) `q-mp-199` → post728      | Same pages; stamped **3140** / **12154** @ `b5884207`     | **contained** — leave open                                            |
-| [#1001](https://github.com/fuzzywigg/math-pentathlon/pull/1001) `q-mp-537` coverage-map | Suite size context; not wiki count cells                  | Orthogonal; leave open                                                |
 | Wall task `q-mp-541` / #1011                                                            | Owns wall budget + AI-bench skip evidence                 | Keep ownership disjoint — this task does not edit `ci-unit-budget.md` |
-| [#995](https://github.com/fuzzywigg/math-pentathlon/pull/995) backlog 10r               | Spec source for this task                                 | Leave open `contained`                                                |
-| [#1004](https://github.com/fuzzywigg/math-pentathlon/pull/1004) draft numbers           | Carried **3280** / **13408**                              | Remeasured at tip fold to **3285** / **13502**                        |
-| Prior stamps (`q-mp-540` / post949 @ `d6a71f95`)                                        | Stale **3280** / **13408** on tip wiki                    | Superseded by this fold remasure (**3285** / **13502**)               |
-| Prior stamps (`q-mp-445` / post898 @ `b7e518b4`)                                        | Stale **3234** / **12972**                                | Superseded                                                            |
+| Prior stamps (`q-mp-540` / post977 @ `50d9b4a0`)                                        | Stale **3285** / **13502** on testing-layers              | Superseded by this remasure (**3308** / **13760**)                    |
+| Prior tip-owner wiki stamp @ `78c7e39b`                                                 | Wiki-only **3306** / **13748** (testing-layers untouched) | Superseded by live remasure (**3308** / **13760** @ `780db960`)       |
 | #658 `q-mp-063` unit CI headroom                                                        | May change **unit wall time** (fixtures / virtual clocks) | **Does not change file/case counts** — note only                      |
 | Tip-pointer / AGENTS drafts                                                             | Own tip-name pointer lines                                | Serialize: this task owns **count cells** + measurement tip SHA only  |
 
@@ -45,17 +42,17 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `50d9b4a0` (post977 fold remasure)
+## Live counts @ `902aafcd` (post1023 tip-owner remasure)
 
 ### Unit (Vitest)
 
 | Metric                                                |        Count | Command                                                  |
 | ----------------------------------------------------- | -----------: | -------------------------------------------------------- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3285** | `npm run test:unit`                                      |
-| Cases listed (`npx vitest list`)                      |    **13502** | `npm run test:unit`                                      |
-| → `unit-shared` cases (`vitest list`)                 |        12532 | `npx vitest list --project unit-shared`                  |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3320** | `npm run test:unit`                                      |
+| Cases listed (`npx vitest list`)                      |    **13888** | `npm run test:unit`                                      |
+| → `unit-shared` cases (`vitest list`)                 |        12850 | `npx vitest list --project unit-shared`                  |
 | → `unit-node` cases (`vitest list`)                   |          380 | `npx vitest list --project unit-node`                    |
-| → `unit-isolated` cases (`vitest list`)               |          590 | `npx vitest list --project unit-isolated`                |
+| → `unit-isolated` cases (`vitest list`)               |          658 | `npx vitest list --project unit-isolated`                |
 | Watch / coverage                                      |            — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
 
 `npm test` = `test:unit` && `test:e2e:chromium`.
