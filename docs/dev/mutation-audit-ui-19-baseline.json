@@ -1,0 +1,129 @@
+{
+  "taskId": "q-mp-548-mutation-audit-ui-19",
+  "generatedAt": "2026-10-10T14:21:21.108Z",
+  "harness": "node_modules/.cache/mutation-ui-19/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/game-route-mounts.ts",
+      "src/core/expressions/expression-ui.ts",
+      "src/core/owl/ollie-inspect-map.ts"
+    ],
+    "excludeTests": "mutation-ui19",
+    "preferPrefix": "mutation-ui19"
+  },
+  "results": [
+    {
+      "module": "src/ui/game-route-mounts.ts",
+      "lines": 1962,
+      "tests": [
+        "tests/unit/burn-1007-game-route-mounts.test.ts",
+        "tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1008-registry-module-contract.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/runtime-error-path-audit.test.ts",
+        "tests/unit/shell-preload-policy.test.ts"
+      ],
+      "availableMutants": 134,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/expressions/expression-ui.ts",
+      "lines": 816,
+      "tests": [
+        "tests/unit/burn-wave22-expression-ui.test.ts",
+        "tests/unit/mutation-ui8-expression-ui.test.ts",
+        "tests/unit/q-mp-326-expression-ui-residuals.test.ts",
+        "tests/unit/q-mp-406-expression-ui-residuals.test.ts",
+        "tests/unit/burn-wave34-expr-ui-builder-drop.test.ts",
+        "tests/unit/burn-wave34-expr-ui-builder-result-states.test.ts",
+        "tests/unit/burn-wave34-expr-ui-card-svg.test.ts",
+        "tests/unit/burn-wave34-expr-ui-eval-fail.test.ts",
+        "tests/unit/burn-wave34-expr-ui-interactive-deselect.test.ts",
+        "tests/unit/burn-wave34-expr-ui-interactive-remove.test.ts",
+        "tests/unit/burn-wave34-expr-ui-slot-click.test.ts",
+        "tests/unit/burn-wave34-expr-ui-slot-dnd.test.ts",
+        "tests/unit/burn-wave35-expr-ui-builder-drop.test.ts",
+        "tests/unit/burn-wave35-expr-ui-builder-result.test.ts",
+        "tests/unit/burn-wave35-expr-ui-calculator.test.ts",
+        "tests/unit/burn-wave35-expr-ui-card-matrix.test.ts",
+        "tests/unit/burn-wave35-expr-ui-challenge-display.test.ts",
+        "tests/unit/burn-wave35-expr-ui-handshake.test.ts",
+        "tests/unit/burn-wave35-expr-ui-interactive-miss.test.ts",
+        "tests/unit/burn-wave35-expr-ui-interactive.test.ts",
+        "tests/unit/burn-wave35-expr-ui-paren-builder.test.ts",
+        "tests/unit/burn-wave35-expr-ui-slot-dnd.test.ts",
+        "tests/unit/burn-wave35-expr-ui-stress-tray.test.ts",
+        "tests/unit/burn-wave35-expr-ui-tray-matrix.test.ts",
+        "tests/unit/burn-wave39-expr-builder-clear-miss.test.ts",
+        "tests/unit/burn-wave40-expr-ui-builder-reset.test.ts"
+      ],
+      "availableMutants": 53,
+      "ranMutants": 20,
+      "killed": 19,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 95,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "BooleanLiteral",
+          "line": 18,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/owl/ollie-inspect-map.ts",
+      "lines": 181,
+      "tests": [
+        "tests/unit/ollie-inspect-map.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave40-handshake-inspect-shell.test.ts"
+      ],
+      "availableMutants": 6,
+      "ranMutants": 6,
+      "killed": 3,
+      "survived": 3,
+      "timeout": 0,
+      "error": 0,
+      "score": 50,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m2",
+          "kind": "Logical",
+          "line": 49,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "Logical",
+          "line": 85,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "Logical",
+          "line": 95,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
