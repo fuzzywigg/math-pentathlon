@@ -27,3 +27,10 @@ export function auditPrecache(distRoot: string): unknown;
 export function scanEnvLeakage(distRoot: string): unknown;
 
 export function auditSourcemapsAndBase(distRoot: string): unknown;
+
+export function parseCliArgs(argv: string[]): {
+  help: boolean;
+  unknown: string | null;
+};
+
+export function printHelp(): void;

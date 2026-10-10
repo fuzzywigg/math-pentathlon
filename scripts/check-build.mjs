@@ -10,11 +10,14 @@
  *   - base-path absolute URLs are root-relative (`/...`)
  *   - no absolute workspace paths or obvious env leakage in JS/CSS/HTML
  *
- * Always exits 0 (report-only). Writes test-results/build/summary.md (+ JSON).
+ * Always exits 0 (report-only) on the default path. Writes
+ * test-results/build/summary.md (+ JSON).
  *
  * Usage:
  *   npm run check:build
  *   CHECK_BUILD_SKIP_BUILD=1 npm run check:build   # reuse existing dist-a/b
+ *   node scripts/check-build.mjs --help
+ *   node scripts/check-build.mjs -h
  */
 
 import { spawnSync } from 'node:child_process';
@@ -35,11 +38,7 @@ const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
 const SKIP_BUILD = process.env.CHECK_BUILD_SKIP_BUILD === '1';
 
 /** Deploy / SW runtime files that are not part of the Workbox precache. */
-export const PRECACHE_EXEMPT = new Set([
-  '_headers',
-  '_redirects',
-  'sw.js',
-]);
+export const PRECACHE_EXEMPT = new Set(['_headers', '_redirects', 'sw.js']);
 
 /**
  * Inter weights intentionally excluded from first-install precache
@@ -72,8 +71,7 @@ export const OFFLINE_EXTS = new Set([
  */
 export function parsePrecacheManifest(swSource) {
   const entries = [];
-  const re =
-    /\{\s*url:\s*"([^"]+)"\s*,\s*revision:\s*(?:"([^"]*)"|null)\s*\}/g;
+  const re = /\{\s*url:\s*"([^"]+)"\s*,\s*revision:\s*(?:"([^"]*)"|null)\s*\}/g;
   for (const match of swSource.matchAll(re)) {
     entries.push({
       url: match[1],
@@ -197,7 +195,9 @@ export function auditPrecache(distRoot) {
   let body = urls;
   if (
     urls.length >= expectedTail.length &&
-    expectedTail.every((u, i) => urls[urls.length - expectedTail.length + i] === u)
+    expectedTail.every(
+      (u, i) => urls[urls.length - expectedTail.length + i] === u
+    )
   ) {
     body = urls.slice(0, -expectedTail.length);
   }
@@ -257,15 +257,13 @@ export function auditSourcemapsAndBase(distRoot) {
   const maps = [...tree.keys()].filter((p) => p.endsWith('.map'));
   const htmlPath = path.join(distRoot, 'index.html');
   const manifestPath = path.join(distRoot, 'site.webmanifest');
-  const html = fs.existsSync(htmlPath)
-    ? fs.readFileSync(htmlPath, 'utf8')
-    : '';
+  const html = fs.existsSync(htmlPath) ? fs.readFileSync(htmlPath, 'utf8') : '';
   const manifest = fs.existsSync(manifestPath)
     ? fs.readFileSync(manifestPath, 'utf8')
     : '';
-  const htmlAssetRefs = [
-    ...html.matchAll(/(?:src|href)="([^"]+)"/g),
-  ].map((m) => m[1]);
+  const htmlAssetRefs = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map(
+    (m) => m[1]
+  );
   const nonRootAbsolute = htmlAssetRefs.filter(
     (href) =>
       href.startsWith('/') === false &&
@@ -334,6 +332,45 @@ function runBuild(label) {
   }
 }
 
+/**
+ * CLI argv for the entrypoint (help / unknown flags only).
+ * Default invocation takes no flags; build behavior is env-driven.
+ *
+ * @param {string[]} argv
+ * @returns {{ help: boolean, unknown: string | null }}
+ */
+export function parseCliArgs(argv) {
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      return { help: true, unknown: null };
+    }
+    if (a.startsWith('-')) {
+      return { help: false, unknown: a };
+    }
+    return { help: false, unknown: a };
+  }
+  return { help: false, unknown: null };
+}
+
+export function printHelp() {
+  console.log(`Usage: node scripts/check-build.mjs
+
+Report-only dual clean build + PWA precache audit.
+Writes test-results/build/summary.md (+ JSON). Default path always exits 0.
+
+Options:
+  -h, --help     Show this help and exit 0 (no builds)
+
+Environment:
+  CHECK_BUILD_SKIP_BUILD=1   Reuse existing test-results/build/dist-a and dist-b
+                             instead of running two production builds.
+
+Examples:
+  npm run check:build
+  CHECK_BUILD_SKIP_BUILD=1 npm run check:build
+  node scripts/check-build.mjs --help`);
+}
+
 function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const started = new Date().toISOString();
@@ -348,7 +385,9 @@ function main() {
   } else {
     console.log('check:build — CHECK_BUILD_SKIP_BUILD=1, reusing snapshots');
     if (!fs.existsSync(DIST_A) || !fs.existsSync(DIST_B)) {
-      throw new Error('dist-a/dist-b missing; run without CHECK_BUILD_SKIP_BUILD');
+      throw new Error(
+        'dist-a/dist-b missing; run without CHECK_BUILD_SKIP_BUILD'
+      );
     }
   }
 
@@ -509,7 +548,10 @@ function main() {
   );
 
   if (leaks.length === 0) {
-    md.push('_No absolute workspace paths, file:// URLs, or sourceMappingURL found._', '');
+    md.push(
+      '_No absolute workspace paths, file:// URLs, or sourceMappingURL found._',
+      ''
+    );
   } else {
     for (const hit of leaks) {
       md.push(`- \`${hit.path}\`: ${hit.finding}`);
@@ -534,6 +576,19 @@ const isMain =
   path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 
 if (isMain) {
+  const cli = parseCliArgs(process.argv.slice(2));
+  if (cli.help) {
+    printHelp();
+    process.exit(0);
+  }
+  if (cli.unknown) {
+    console.error(`Unknown flag: ${cli.unknown}`);
+    console.error('Usage: node scripts/check-build.mjs [--help]');
+    console.error(
+      'Env: CHECK_BUILD_SKIP_BUILD=1 to reuse dist-a/dist-b snapshots.'
+    );
+    process.exit(2);
+  }
   try {
     main();
   } catch (err) {
