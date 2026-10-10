@@ -1,0 +1,197 @@
+{
+  "task": "q-mp-558",
+  "tipBranch": "cursor/mp-tip-post977",
+  "tipSha": "f0d0a162620f324bfa8cef244a665555113d9f44",
+  "measuredAt": "2026-10-10T14:53:00Z",
+  "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
+  "staleSpec": {
+    "source": "docs/dev/backlog-2026-10-10s.md q-mp-558 (draft #1009)",
+    "assumedTip": "cursor/mp-tip-post949 @ d7a3989a",
+    "staleNote": "Spec named tip post949 and basename eslint-non-ceilinged-residuals-post949-2026-10-10; live tip is cursor/mp-tip-post977 @ f0d0a162 after tip fold #977 (post949 merged into alpha tip lineage). Overlay totals unchanged vs post914; ceiling context void 51→48 / nnnull 241→239.",
+    "priorPost914Totals": {
+      "no-console": 24,
+      "no-param-reassign": 23,
+      "eqeqeq": 1,
+      "@typescript-eslint/return-await": 3
+    }
+  },
+  "priorAddenda": {
+    "q-mp-240": {
+      "file": "docs/dev/eslint-non-ceilinged-residuals-2026-10-09.md",
+      "tip": "cursor/mp-tip-post748 @ ce673656",
+      "openDraft": 759,
+      "totals": {
+        "no-console": 24,
+        "no-param-reassign": 23,
+        "eqeqeq": 12,
+        "@typescript-eslint/return-await": 7
+      }
+    },
+    "q-mp-315": {
+      "file": "docs/dev/eslint-non-ceilinged-residuals-post755-2026-10-09.md",
+      "tip": "cursor/mp-tip-post755 @ dab1ac97",
+      "openDraft": 821,
+      "totals": {
+        "no-console": 24,
+        "no-param-reassign": 23,
+        "eqeqeq": 12,
+        "@typescript-eslint/return-await": 3
+      }
+    },
+    "q-mp-390": {
+      "file": "docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.md",
+      "tip": "cursor/mp-tip-post865 @ 3908809d",
+      "openDraft": 883,
+      "totals": {
+        "no-console": 24,
+        "no-param-reassign": 23,
+        "eqeqeq": 1,
+        "@typescript-eslint/return-await": 3
+      }
+    },
+    "q-mp-464": {
+      "file": "docs/dev/eslint-non-ceilinged-residuals-post914-2026-10-10.md",
+      "tip": "cursor/mp-tip-post914 @ 753052a6",
+      "openDraft": 944,
+      "totals": {
+        "no-console": 24,
+        "no-param-reassign": 23,
+        "eqeqeq": 1,
+        "@typescript-eslint/return-await": 3
+      }
+    }
+  },
+  "liveCeilings": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 239,
+    "@typescript-eslint/no-confusing-void-expression": 48,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 42,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 3,
+    "eqeqeq": 1,
+    "@typescript-eslint/return-await": 3
+  },
+  "overlayProbe": {
+    "method": "one-shot flat-config overlay over eslint.config.js (same pattern as scripts/check-lint-ratchet.mjs); temp probe deleted after run",
+    "rules": {
+      "no-console": "error",
+      "no-param-reassign": "error",
+      "eqeqeq": ["error", "always"],
+      "@typescript-eslint/return-await": ["error", "always"]
+    }
+  },
+  "stillNonCeilinged": {
+    "no-console": {
+      "total": 24,
+      "deltaVsPost914": 0,
+      "lineDriftVsPost914": {
+        "src/pwa/register.ts": { "from": [79, 88], "to": [83, 92] },
+        "src/pwa/bootstrap-owl.ts": { "from": [55], "to": [60] }
+      },
+      "files": {
+        "src/main.ts": {
+          "hits": 10,
+          "lines": [68, 85, 217, 252, 280, 308, 336, 364, 392, 420]
+        },
+        "src/core/storage/storage.ts": {
+          "hits": 7,
+          "lines": [91, 109, 121, 131, 141, 155, 169]
+        },
+        "src/pwa/register.ts": { "hits": 2, "lines": [83, 92] },
+        "src/demos/expression-demo.ts": { "hits": 1, "lines": [510] },
+        "src/pwa/bootstrap-owl.ts": { "hits": 1, "lines": [60] },
+        "src/ui/game-error-boundary.ts": { "hits": 1, "lines": [108] },
+        "src/core/router.ts": { "hits": 1, "lines": [12] },
+        "src/games/kings-quadraphages/game-controller.ts": {
+          "hits": 1,
+          "lines": [108]
+        }
+      },
+      "clearableHeadroom": 1,
+      "keepSites": 23,
+      "ceilingIntroOwnedBy": "q-mp-317"
+    },
+    "no-param-reassign": {
+      "total": 23,
+      "deltaVsPost914": 0,
+      "files": {
+        "src/core/fractions/arithmetic.ts": {
+          "hits": 11,
+          "lines": [15, 16, 20, 21, 31, 32, 54, 55, 101, 627, 685],
+          "disposition": "clearable"
+        },
+        "src/games/fiar/ai.ts": {
+          "hits": 5,
+          "lines": [327, 607, 624, 658, 675],
+          "disposition": "HOLD-AI"
+        },
+        "src/games/calla/ai.ts": {
+          "hits": 2,
+          "lines": [273, 295],
+          "disposition": "HOLD-AI"
+        },
+        "src/games/hex/ai.ts": {
+          "hits": 2,
+          "lines": [220, 240],
+          "disposition": "HOLD-AI"
+        },
+        "src/games/queens-guards/ai.ts": {
+          "hits": 2,
+          "lines": [303, 323],
+          "disposition": "HOLD-AI"
+        },
+        "src/games/fiar/rules.ts": {
+          "hits": 1,
+          "lines": [66],
+          "disposition": "HOLD-rules"
+        }
+      },
+      "clearableHeadroom": 11,
+      "holdAiRules": 12,
+      "clearOwnedBy": "q-mp-318"
+    }
+  },
+  "nowCeilingedFormerlyNonCeilinged": {
+    "eqeqeq": {
+      "total": 1,
+      "ceiling": 1,
+      "deltaVsPost914Overlay": 0,
+      "residualFile": "src/games/fiar/rules.ts",
+      "residualLine": 213,
+      "disposition": "HOLD-rules",
+      "ceilingIntro": "q-mp-194",
+      "note": "Stricter overlay (always, no null:ignore) matches lint:ratchet count 1. report:lint-buckets may show 0 when live config null:ignore suppresses the residual."
+    },
+    "@typescript-eslint/return-await": {
+      "total": 3,
+      "ceiling": 3,
+      "deltaVsPost914Overlay": 0,
+      "files": [
+        "src/games/fab-a-diffy/ai-client.ts:46",
+        "src/games/fiar/ai-client.ts:45",
+        "src/games/queens-guards/ai-client.ts:46"
+      ],
+      "disposition": "AI-client style HOLD / undrafted q-mp-247",
+      "ceilingIntro": "q-mp-316"
+    }
+  },
+  "hexHardMs": 450,
+  "duplicateCheck": {
+    "noPost977NonceilingDraft": true,
+    "leaveOpenContained": [
+      { "pr": 944, "task": "q-mp-464", "note": "post914 stamp" },
+      { "pr": 883, "task": "q-mp-390", "note": "post865 stamp" },
+      { "pr": 821, "task": "q-mp-315", "note": "post755 stamp" },
+      { "pr": 759, "task": "q-mp-240", "note": "post748 stamp" },
+      {
+        "pr": 1007,
+        "task": "q-mp-536",
+        "note": "lint-bucket ceiling snapshot — orthogonal"
+      }
+    ]
+  }
+}
