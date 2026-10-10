@@ -31,7 +31,7 @@ import {
   syncBoard3dRendererSize,
   bindBoard3dLayout,
 } from './tablet-gl';
-import { clientToNdc } from '../coord-map';
+import { clientToNdc, type CssRect } from '../coord-map';
 
 export type CellClickCallback = (row: number, col: number) => void;
 
@@ -242,12 +242,43 @@ export async function createKingsQuadraphagesBoard3D(
     );
   };
 
+  /**
+   * Cached canvas CSS box for pick (B) + project (C).
+   * Invalidated on layout; lazy-seeded on first pick/project so taps
+   * and cellToClientPoint do not force geometry twice per interaction.
+   */
+  let canvasCssRect: CssRect | null = null;
+
+  /** Sole canvas geometry read — keep forced layout funneled here. */
+  const measureCanvasCssRect = (): CssRect => {
+    const r = canvas.getBoundingClientRect();
+    canvasCssRect = {
+      left: r.left,
+      top: r.top,
+      width: r.width,
+      height: r.height,
+    };
+    return canvasCssRect;
+  };
+
+  const getCanvasCssRect = (): CssRect =>
+    canvasCssRect ?? measureCanvasCssRect();
+
+  /** Sole host size reads — keep clientWidth/Height adjacent (one layout). */
+  const measureHostCssSize = (): { w: number; h: number } => {
+    const w = Math.max(container.clientWidth || 450, 120);
+    const h = Math.max(container.clientHeight || 450, 120);
+    return { w, h };
+  };
+
   const resize = (): void => {
     if (disposed) {
       return;
     }
-    const w = Math.max(container.clientWidth || 450, 120);
-    const h = Math.max(container.clientHeight || 450, 120);
+    // Invalidate only — next pick/project re-measures (lazy seed). Seeding here
+    // would lock a pre-layout zero box in jsdom before tests stub canvas CSS.
+    canvasCssRect = null;
+    const { w, h } = measureHostCssSize();
     syncBoard3dRendererSize(renderer, camera, w, h);
     paint();
   };
@@ -256,7 +287,7 @@ export async function createKingsQuadraphagesBoard3D(
     if (!clickHandler || disposed) {
       return;
     }
-    const rect = canvas.getBoundingClientRect();
+    const rect = getCanvasCssRect();
     const ndc = clientToNdc(event.clientX, event.clientY, rect);
     if (!ndc) {
       return;
@@ -306,7 +337,7 @@ export async function createKingsQuadraphagesBoard3D(
   ): { x: number; y: number } => {
     const { x, z } = boardToWorld(row, col);
     projectScratch.set(x, TILE_TOP_Y, z).project(camera);
-    const rect = canvas.getBoundingClientRect();
+    const rect = getCanvasCssRect();
     return {
       x: rect.left + ((projectScratch.x + 1) / 2) * rect.width,
       y: rect.top + ((-projectScratch.y + 1) / 2) * rect.height,
