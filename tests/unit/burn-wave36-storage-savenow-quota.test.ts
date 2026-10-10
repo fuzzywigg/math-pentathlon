@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { storage } from '../../src/core/storage';
+import { quotaError } from '../helpers/storage-stubs';
 
 const KEY = 'math-pentathlon-progress';
 
@@ -24,7 +25,7 @@ afterEach(() => {
 describe('Wave 36 storage-quota — setItem failures', () => {
   it('saveNow does not throw when setItem throws QuotaExceededError', () => {
     storage.createProfile('Quota', 'q');
-    const err = new DOMException('quota', 'QuotaExceededError');
+    const err = quotaError();
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw err;

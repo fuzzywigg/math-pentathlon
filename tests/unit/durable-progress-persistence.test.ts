@@ -19,6 +19,7 @@ import {
   type ProgressData,
 } from '../../src/core/storage/types';
 import { resetSettingsFlagsForTests } from '../../src/core/settings-flags';
+import { quotaError, securityError } from '../helpers/storage-stubs';
 
 const STORAGE_KEY = 'math-pentathlon-progress';
 
@@ -231,7 +232,7 @@ describe('durable progress — quota / unavailable storage', () => {
   it('getItem SecurityError (private mode) yields fresh state', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('The operation is insecure.', 'SecurityError');
+      throw securityError('The operation is insecure.');
     });
 
     const storage = await loadFreshStorage();
@@ -247,10 +248,7 @@ describe('durable progress — quota / unavailable storage', () => {
 
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new DOMException(
-        'Failed to execute a storage request',
-        'QuotaExceededError'
-      );
+      throw quotaError('Failed to execute a storage request');
     });
 
     expect(() => storage.saveNow()).not.toThrow();
@@ -263,7 +261,7 @@ describe('durable progress — quota / unavailable storage', () => {
     const storage = await loadFreshStorage();
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new DOMException('insecure', 'SecurityError');
+      throw securityError('insecure');
     });
 
     storage.updateSettings({ reducedMotion: true });
