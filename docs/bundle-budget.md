@@ -44,11 +44,13 @@ The script prints a table: Bundle · Gzip · Budget · Delta · Status (`OK` / `
 
 | Mode | Exit code |
 | --- | --- |
-| Default (`npm run size:check`) | Always **0** (including known OVER, new OVER, and gaps) — safe for local scripts and does not fail the hard build path |
+| Missing `dist/` | **2** (usage error — run `npm run build` first) |
+| Default (`npm run size:check`) with `dist/` present | Always **0** (including known OVER, new OVER, and gaps) — safe for local scripts and does not fail the hard build path |
 | `--fail-on-new-over` | **1** only when at least one OVER label is **not** listed in `knownOvers`; otherwise **0** |
 
-Measurement errors (missing `dist/`, parse failures) still exit **0** with a
-usage message so a broken local tree does not look like a budget regression.
+Other measurement/parse failures still exit **0** with a message so a broken
+local tree does not look like a budget regression. Missing `dist/` is the
+exception (exit **2**).
 
 ## Known OVER allowlist (`knownOvers`)
 
