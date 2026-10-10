@@ -66,10 +66,19 @@ function mockMql(
 }
 
 describe('mutation-ui13 reduced-motion', () => {
+  // unit-shared uses isolate:false — restore matchMedia so later suites
+  // (e.g. owl click animation) do not see a stuck prefers-reduced-motion.
+  const originalMatchMedia = window.matchMedia;
+
   afterEach(() => {
     document.documentElement.removeAttribute(REDUCED_MOTION_ATTR);
     resetSettingsFlagsForTests();
     vi.restoreAllMocks();
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      writable: true,
+      value: originalMatchMedia,
+    });
   });
 
   it('attr marker is exactly data-reduced-motion / true', () => {
