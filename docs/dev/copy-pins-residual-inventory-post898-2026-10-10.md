@@ -421,8 +421,8 @@ EXIT 1   # expected while residual pins remain
 $ npm run check:dev-docs
 check-dev-doc-links (report-only)
   docs root:       docs/dev/
-  docs scanned:    215
-  path checks:     6017
+  docs scanned:    218
+  path checks:     6027
   symbol checks:   391
   md link checks:  381
   problems:        0
