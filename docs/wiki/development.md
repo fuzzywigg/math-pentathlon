@@ -69,10 +69,10 @@ Opt-in visual regression via separate config (chromium, fixed viewport, seeded, 
 
 Playwright `toHaveScreenshot` covers the **start screen** and the **opening position** of every available game at two viewports:
 
-| Project | Viewport |
-| ------- | -------- |
-| `visual-desktop` | 1280×720 Desktop Chrome |
-| `visual-phone` | iPhone 12 size (Chromium; WebKit not required) |
+| Project          | Viewport                                       |
+| ---------------- | ---------------------------------------------- |
+| `visual-desktop` | 1280×720 Desktop Chrome                        |
+| `visual-phone`   | iPhone 12 size (Chromium; WebKit not required) |
 
 Baselines live in-repo under `tests/e2e/visual-baselines/{project}/visual-baseline.spec.ts/`. Stability knobs (no production behavior change):
 
@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post865` @ `3908809d` (2026-10-10): **3210** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; `npx vitest list` on tip reported **12768** cases (includes skip/todo). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post898` @ `b7e518b4` (2026-10-10): **3234** Vitest files under `tests/unit` excl. `_tokenmaxx_archive`; `npx vitest list` on tip reported **12972** cases (includes skip/todo). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -138,24 +138,24 @@ README badges link those workflows. License is **ISC** (`package.json`).
 
 Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
 
-**Live counts** (files / listed cases) measured on tip `3908809d` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
+**Live counts** (files / listed cases) measured on tip `b7e518b4` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
 
-| Layer | Live count (tip `3908809d`) | Runner | Command |
-| ----- | --------------------------- | ------ | ------- |
-| Unit | **3210** files / **12768** listed cases | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`
-| E2E Chromium (required CI) | **25** files / **249** cases (`--grep-invert @fullgame`) | Playwright `chromium` | `npm run test:e2e:chromium` |
-| E2E fullgame | **20** files / **20** cases | Playwright `chromium` + `@fullgame` | `npm run test:e2e:fullgame` |
-| E2E Firefox / WebKit / iPad | **25** files / **249** cases each | `firefox` / `webkit` / `ipad-webkit` | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross` |
-| Mobile touch | **1** file / **20** cases × 3 projects | `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad` | `npm run test:e2e:mobile` — [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md) |
-| Zoom / reflow | **1** file / **69** cases | `zoom-reflow` | `npm run test:e2e:zoom-reflow` — [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md) |
-| Forced colors | **1** file / **25** cases | `forced-colors` | `npm run test:e2e:forced-colors` |
-| Visual baseline (e2e) | **1** spec × 2 projects / **21** + **21** cases; **42** PNGs | `visual-desktop` / `visual-phone` | `npm run test:e2e:visual` / `test:e2e:visual:update` (CI report-only) |
-| Visual (opt-in config) | **1** file / **21** cases; **21** PNGs | `playwright.visual.config.ts` | `npm run test:visual` / `test:visual:update` (**not** CI) — [`docs/visual-regression.md`](../visual-regression.md) |
-| Playtest | **4** `.mjs` harnesses · **15** report `.md` | Headless Chromium scripts (no npm script) | `node tests/playtest/…` / `node docs/playtest/…` with `npm run dev` |
-| Bench (engines) | **1** file (`tests/bench/engines-rules.bench.ts`) | Vitest engines-bench config | `npm run bench:engines` |
-| Axe a11y sweep | (inside Chromium e2e set) | `@axe-core/playwright` | `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
-| Round-trip fuzz | (inside unit set) | Vitest property tests | [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md); `tests/unit/state-roundtrip-fuzz.test.ts` |
-| Undo / move-log audit | (inside unit set) | Vitest property tests | [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md); `tests/unit/undo-audit-*.test.ts` |
+| Layer                       | Live count (tip `b7e518b4`)                                  | Runner                                                 | Command                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Unit                        | **3234** files / **12972** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
+| E2E Chromium (required CI)  | **25** files / **249** cases (`--grep-invert @fullgame`)     | Playwright `chromium`                                  | `npm run test:e2e:chromium`                                                                                                            |
+| E2E fullgame                | **20** files / **20** cases                                  | Playwright `chromium` + `@fullgame`                    | `npm run test:e2e:fullgame`                                                                                                            |
+| E2E Firefox / WebKit / iPad | **25** files / **249** cases each                            | `firefox` / `webkit` / `ipad-webkit`                   | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross`                                                                           |
+| Mobile touch                | **1** file / **20** cases × 3 projects                       | `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`  | `npm run test:e2e:mobile` — [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md)                                                     |
+| Zoom / reflow               | **1** file / **69** cases                                    | `zoom-reflow`                                          | `npm run test:e2e:zoom-reflow` — [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md)                                      |
+| Forced colors               | **1** file / **25** cases                                    | `forced-colors`                                        | `npm run test:e2e:forced-colors`                                                                                                       |
+| Visual baseline (e2e)       | **1** spec × 2 projects / **21** + **21** cases; **42** PNGs | `visual-desktop` / `visual-phone`                      | `npm run test:e2e:visual` / `test:e2e:visual:update` (CI report-only)                                                                  |
+| Visual (opt-in config)      | **1** file / **21** cases; **21** PNGs                       | `playwright.visual.config.ts`                          | `npm run test:visual` / `test:visual:update` (**not** CI) — [`docs/visual-regression.md`](../visual-regression.md)                     |
+| Playtest                    | **4** `.mjs` harnesses · **15** report `.md`                 | Headless Chromium scripts (no npm script)              | `node tests/playtest/…` / `node docs/playtest/…` with `npm run dev`                                                                    |
+| Bench (engines)             | **1** file (`tests/bench/engines-rules.bench.ts`)            | Vitest engines-bench config                            | `npm run bench:engines`                                                                                                                |
+| Axe a11y sweep              | (inside Chromium e2e set)                                    | `@axe-core/playwright`                                 | `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
+| Round-trip fuzz             | (inside unit set)                                            | Vitest property tests                                  | [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md); `tests/unit/state-roundtrip-fuzz.test.ts`                    |
+| Undo / move-log audit       | (inside unit set)                                            | Vitest property tests                                  | [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md); `tests/unit/undo-audit-*.test.ts`                                      |
 
 ### Pin policy
 
