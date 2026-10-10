@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="400" viewBox="0 0 780 400" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-488 bundle headroom remeasure (tip post914)</title>
+  <desc id="desc">Live tip e43a25d2: all 21 budgets OK. Tightest residuals: sum-dominoes -77 B, fab-a-diffy -170 B, contig-60 -213 B. No budget raise.</desc>
+  <rect width="780" height="400" fill="#f4f7f2"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2e1a">q-mp-488 / bundle headroom (post914)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c4a">tip e43a25d2 / cut 753052a6 / report-only / knownOvers [] / no budget raise</text>
+
+  <rect x="24" y="76" width="232" height="86" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="140" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#14532d">-77 B</text>
+  <text x="140" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#166534">sum-dominoes</text>
+  <text x="140" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#15803d">6936 / 7013</text>
+
+  <rect x="272" y="76" width="232" height="86" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
+  <text x="388" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1a2e1a">-170 B</text>
+  <text x="388" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f4a2f">fab-a-diffy</text>
+  <text x="388" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b7c5b">8241 / 8411</text>
+
+  <rect x="520" y="76" width="236" height="86" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
+  <text x="638" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1a2e1a">-213 B</text>
+  <text x="638" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f4a2f">contig-60</text>
+  <text x="638" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b7c5b">7159 / 7372</text>
+
+  <text x="24" y="196" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1a2e1a">Tightest five game chunks (headroom bytes)</text>
+  <rect x="200" y="208" width="126" height="20" fill="#86efac"/>
+  <text x="24" y="223" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">sum-dominoes</text>
+  <text x="730" y="223" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">77</text>
+
+  <rect x="200" y="236" width="278" height="20" fill="#a8c9a0"/>
+  <text x="24" y="251" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">fab-a-diffy</text>
+  <text x="730" y="251" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">170</text>
+
+  <rect x="200" y="264" width="348" height="20" fill="#8fb887"/>
+  <text x="24" y="279" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">contig-60</text>
+  <text x="730" y="279" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">213</text>
+
+  <rect x="200" y="292" width="471" height="20" fill="#76a76e"/>
+  <text x="24" y="307" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">hex</text>
+  <text x="730" y="307" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">288</text>
+
+  <rect x="200" y="320" width="520" height="20" fill="#5d9654"/>
+  <text x="24" y="335" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">stars-bars</text>
+  <text x="730" y="335" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">318</text>
+
+  <text x="24" y="368" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c4a">Live: npm run build &amp;&amp; npm run size:check / All 21 OK / Delta vs post898: menu +1 B gzip</text>
+  <text x="24" y="386" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c4a">Prior stamp: bundle-headroom-post898 @ b7e518b4 (-77 / -170 / -213) / open #930 contained</text>
+</svg>
