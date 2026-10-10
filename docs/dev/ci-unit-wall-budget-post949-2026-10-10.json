@@ -1,0 +1,202 @@
+{
+  "taskId": "q-mp-541",
+  "title": "CI unit wall-budget / test-speed remeasure (tip post949)",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "9623410197c1c761aaae4f52bbf303791580e8a0",
+  "measuredAt": "2026-10-10T14:22:00Z",
+  "wallEvidenceTipSha": "68f1548fd3c011f9cea2c418ca3dab8879246b17",
+  "scope": "report-only docs/json/svg; no src / test-behavior / workflow / wall-raise edits; orthogonal to slowest-file inventory",
+  "flagThresholdSeconds": 420,
+  "flagUnitWallOver420s": false,
+  "specStale": {
+    "backlog": "q-mp-541 in docs/dev/backlog-2026-10-10r.md (PR #995)",
+    "backlogEvidenceTipSha": "18ee1c96c61302259385e5f811798ba24ef9f265",
+    "backlogUnitFiles": 3270,
+    "backlogVitestListApprox": 13308,
+    "liveUnitFiles": 3280,
+    "liveVitestList": 13408,
+    "note": "Backlog stamped tip mid-fold at 3270/~13308. Live tip HEAD after further folds is 3280/13408. Primary successful tip unit wall remains 68f1548f (3280 files); later tip CI runs cancelled or still in progress before unit completed."
+  },
+  "budgets": {
+    "targetWallMinutes": 8,
+    "stepTimeoutMinutes": 12,
+    "jobTimeoutMinutes": 14,
+    "source": ".github/workflows/ci.yml unit job (re-read; knobs unchanged; workflows not edited)"
+  },
+  "hardRuleHold": {
+    "hexHardMs": 450,
+    "hexHardPinPath": "src/games/hex/ai.ts",
+    "hexHardPinLine": "hard: 450,",
+    "aiBenchesSkippedUnderCI": [
+      "tests/unit/tablet-ai-hard-latency.bench.test.ts",
+      "tests/unit/ai-move-time-midgame.bench.test.ts"
+    ],
+    "noWallRaise": true,
+    "noWorkflowEdits": true
+  },
+  "before": {
+    "label": "q-mp-496 post914 wall stamp",
+    "tipBranch": "cursor/mp-tip-post914",
+    "tipSha": "5c5101f59422d8b9f9142c7a6852b5d9d148e5f9",
+    "wallEvidenceSha": "e43a25d22b081819664bc631e4fe34f793847004",
+    "unitFiles": 3245,
+    "vitestList": 13100,
+    "primaryGhaRunId": 38041487792,
+    "vitestDurationSeconds": 357.17,
+    "unitJobWallSeconds": 378
+  },
+  "after": {
+    "label": "live tip post949 remeasure",
+    "tipBranch": "cursor/mp-tip-post949",
+    "tipSha": "9623410197c1c761aaae4f52bbf303791580e8a0",
+    "unitFiles": 3280,
+    "vitestList": 13408,
+    "primaryTipGha": {
+      "label": "latest successful tip-fold unit job at live 3280-file suite",
+      "sha": "68f1548fd3c011f9cea2c418ca3dab8879246b17",
+      "ghaRunId": 38056924144,
+      "unitFiles": 3280,
+      "testFilesSummary": "3278 passed | 2 skipped (3280)",
+      "testsSummary": "13396 passed | 62 skipped (13458)",
+      "vitestDurationSeconds": 365.55,
+      "unitJobWallSeconds": 387,
+      "runUnitTestsStepSeconds": 367,
+      "aiBenchesSkipped": true
+    },
+    "sameSizeTipPrSample": {
+      "label": "tip-PR sample at live tip file count 3280 (max Duration among 3280-file tip-PRs sampled)",
+      "pr": 998,
+      "runId": 38057127536,
+      "sha": "9ec9f9d5ca2b6677ab04b2832c34bb0dab9c37c6",
+      "unitFiles": 3280,
+      "vitestDurationSeconds": 372.71,
+      "unitJobWallSeconds": 389
+    },
+    "tipPrSamples": [
+      {
+        "pr": 987,
+        "runId": 38052293441,
+        "sha": "c268bdfd40f39fc10a05b113a04a0677aeda180e",
+        "unitFiles": 3271,
+        "vitestDurationSeconds": 375.52,
+        "unitJobWallSeconds": 396,
+        "note": "max Duration and max job wall in sampled post949 tip-PRs"
+      },
+      {
+        "pr": 991,
+        "runId": 38053969812,
+        "sha": "67f8f273bafcfd4c6c2299a2c1cf33840826071b",
+        "unitFiles": 3271,
+        "vitestDurationSeconds": 374.52,
+        "unitJobWallSeconds": 392
+      },
+      {
+        "pr": 998,
+        "runId": 38057127536,
+        "sha": "9ec9f9d5ca2b6677ab04b2832c34bb0dab9c37c6",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 372.71,
+        "unitJobWallSeconds": 389,
+        "note": "max same-size 3280-file tip-PR Duration / wall"
+      },
+      {
+        "pr": 994,
+        "runId": 38054237823,
+        "sha": "277e318e248568dd62e80e3e1e02af71938c05bb",
+        "unitFiles": 3271,
+        "vitestDurationSeconds": 367.81,
+        "unitJobWallSeconds": 390
+      },
+      {
+        "pr": 997,
+        "runId": 38057100122,
+        "sha": "4d2bdc5432adc74bffa44eb2ea91939ddea3aed7",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 363.73,
+        "unitJobWallSeconds": 381
+      },
+      {
+        "pr": 978,
+        "runId": 38051959267,
+        "sha": "fe92787ca8a84e079f327310fe6797a3789dd1ab",
+        "unitFiles": 3268,
+        "vitestDurationSeconds": 359.55,
+        "unitJobWallSeconds": 377
+      },
+      {
+        "pr": 993,
+        "runId": 38054374553,
+        "sha": "3ea9f0edf068872587c4354ba0b9a9168385ef35",
+        "unitFiles": 3271,
+        "vitestDurationSeconds": 355.81,
+        "unitJobWallSeconds": 373
+      },
+      {
+        "pr": 1000,
+        "runId": 38057209911,
+        "sha": "0f5445b5c3ba93aed94464003fed438ac6804106",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 351.42,
+        "unitJobWallSeconds": 373
+      },
+      {
+        "pr": 992,
+        "runId": 38054073230,
+        "sha": "56307c36914714ec29f0f84978732a10bc498d85",
+        "unitFiles": 3271,
+        "vitestDurationSeconds": 348.77,
+        "unitJobWallSeconds": 369
+      },
+      {
+        "pr": 999,
+        "runId": 38057194448,
+        "sha": "5c18a3eb308b42e6cce8114ccb3792999a16fcc4",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 280.79,
+        "unitJobWallSeconds": 306
+      },
+      {
+        "pr": 1001,
+        "runId": 38057615233,
+        "sha": "90d77eccbf9e6c1eedfcc8f6e3ac5ad93f3b592e",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 283.78,
+        "unitJobWallSeconds": 302
+      },
+      {
+        "pr": 996,
+        "runId": 38057090501,
+        "sha": "fc7170aeba97820fa39e88a4e75d93fc403c87fd",
+        "unitFiles": 3280,
+        "vitestDurationSeconds": 205.82,
+        "unitJobWallSeconds": 220,
+        "note": "fast sample in post949 tip-PR set at 3280 files"
+      }
+    ],
+    "tipFoldCiNote": "Tip-fold PR #977 CI runs are often cancelled by successive tip pushes. Primary wall cite is successful run 38056924144 @ 68f1548f (Duration 365.55s / wall 387s / 3280 files). Docs stamp rebased onto later tip HEAD (suite still 3280 / 13408).",
+    "localCI1AiBenchSmoke": {
+      "tabletAiHardLatency": "1 skipped file / 10 skipped tests",
+      "aiMoveTimeMidgame": "1 skipped file / 1 skipped test",
+      "note": "Local CI=1 skip smoke on tip HEAD; not the GHA wall cite."
+    }
+  },
+  "maxObservedVitestDurationSeconds": 375.52,
+  "maxObservedUnitJobWallSeconds": 396,
+  "primaryTipVitestDurationSeconds": 365.55,
+  "primaryTipUnitJobWallSeconds": 387,
+  "slackBeforeStepTimeoutMinutesApprox": 5.7,
+  "containedOpenDrafts": [
+    {
+      "pr": 973,
+      "task": "q-mp-496",
+      "base": "cursor/mp-tip-post914",
+      "action": "leave open as contained (prior tip wall stamp)"
+    },
+    {
+      "pr": 936,
+      "task": "q-mp-446",
+      "base": "cursor/mp-tip-post898",
+      "action": "leave open as contained (prior tip wall stamp)"
+    }
+  ]
+}
