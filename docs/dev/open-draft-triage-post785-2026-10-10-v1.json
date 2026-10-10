@@ -1,9 +1,9 @@
 {
   "taskId": "q-mp-334",
-  "generatedAtUtc": "2026-10-10T01:58:24Z",
+  "generatedAtUtc": "2026-10-10T02:13:24Z",
   "liveTipBranch": "cursor/mp-tip-post785",
-  "tipSha": "02926472a430627e0f4e70af7cab5f5d0a8394b8",
-  "tipShaShort": "02926472",
+  "tipSha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
+  "tipShaShort": "06126841",
   "alphaSha": "217190621fc55835bf82f5a4d3b8bd7666a25d9b",
   "tipPr": 830,
   "priorTriage": "docs/dev/open-draft-triage-post755-2026-10-09-v5.md",
@@ -46,6 +46,16 @@
       "sha": "02926472a430627e0f4e70af7cab5f5d0a8394b8",
       "subject": "docs(q-mp-313): remeasure post785 bundle headroom (sum-dominoes \u221276 B)",
       "sourcePr": 828
+    },
+    {
+      "sha": "2e126f09fe444118edfe6ddd1251ddcc3edca2f0",
+      "subject": "q-mp-332: Knip unusedTypes demote batch 5 (Rank-3 \u221214 \u2192 baseline 47)",
+      "sourcePr": 829
+    },
+    {
+      "sha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
+      "subject": "fix(q-mp-026j): drop duplicate Piece/PlayerOwner re-export after #829 fold",
+      "sourcePr": null
     }
   ],
   "tipRatchetCeilingsRemeasured": {
@@ -65,14 +75,14 @@
     "hexHardMs": 450
   },
   "openInventory": {
-    "openTotal": 275,
+    "openTotal": 277,
     "byBase": {
       "cursor/mp-tip-post477": 67,
       "cursor/mp-tip-post755": 44,
       "cursor/integration-fold-wave5-tip-4af0": 29,
       "cursor/mp-tip-post598": 26,
+      "cursor/mp-tip-post785": 25,
       "cursor/mp-tip-post748": 25,
-      "cursor/mp-tip-post785": 23,
       "cursor/mp-tip-post728": 22,
       "cursor/mp-tip-post700": 14,
       "cursor/mp-tip-post709": 10,
@@ -82,39 +92,34 @@
       "cursor/integration-fold-wave4-tip-36e4": 1,
       "cursor/playtest-recheck-fixes-a6fd": 1
     },
-    "post785Open": 23,
+    "post785Open": 25,
     "post755Open": 44
   },
   "summaryCounts": {
-    "focusClassified": 27,
-    "fold": 19,
-    "rerun": 1,
-    "superseded": 6,
+    "focusClassified": 29,
+    "fold": 21,
+    "rerun": 0,
+    "superseded": 7,
     "held": 1
   },
   "classificationLegend": {
     "fold": "Unique payload not on tip; tip owner should fold (after CI green / ceiling reconcile)",
     "rerun": "Payload still wanted, but rebase and/or CI re-run required before fold",
-    "superseded": "Payload already on tip 02926472 (or topic replaced); leave PR open",
+    "superseded": "Payload already on tip 06126841 (or topic replaced); leave PR open",
     "held": "Tip-owner / Andrew hold \u2014 do not fold / do not touch"
   },
   "unitFailureNotes": {
     "822": {
       "run": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38006694201",
       "test": "ai-calibration-difficulty-order queens-guards",
-      "detail": "Easy=100% Hard=50% n=4 flaky; already tip-folded"
-    },
-    "829": {
-      "run": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38013413416",
-      "test": "ai-calibration-difficulty-order queens-guards",
-      "detail": "Easy=100% Hard=75% n=4 flaky; re-run unit; do not change AI"
+      "detail": "flaky; already tip-folded"
     }
   },
   "suggestedFoldOrder": [
-    831, 832, 833, 834, 835, 836, 837, 839, 838, 840, 841, 845, 843, 844, 842,
-    846, 847, 848, 829
+    831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845,
+    846, 847, 848, 849, 850
   ],
-  "doNotFold": [727, 813, 822, 825, 826, 827, 828],
+  "doNotFold": [727, 813, 822, 825, 826, 827, 828, 829],
   "drafts": [
     {
       "number": 727,
@@ -220,7 +225,7 @@
       },
       "recommendation": "superseded",
       "method": "tip-subject+blob",
-      "reason": "Tip folded unique test + ui-coverage-round-16.md as d6c9d8b9; coverage-map regenerate stale; 0 check-runs; CONFLICTING",
+      "reason": "Tip folded unique test + ui-coverage-round-16.md as d6c9d8b9; coverage-map regenerate stale; 0 check-runs",
       "checks": {
         "lint": {
           "status": "missing",
@@ -304,7 +309,7 @@
       },
       "recommendation": "superseded",
       "method": "tip-subject",
-      "reason": "Tip folded as 9580765b (no-shadow\u21923). unit failure flaky ai-calibration-difficulty-order queens-guards; CONFLICTING",
+      "reason": "Tip folded as 9580765b (no-shadow\u21923). unit failure was flaky AI calib; CONFLICTING",
       "checks": {
         "lint": {
           "status": "completed",
@@ -370,7 +375,7 @@
       "headSha": "c72d61c7b19a18bb17769be115dafe65a31cbae2",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "CONFLICTING",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/825",
       "files": [
         "docs/dev/lint-ratchet-ceilings.json",
@@ -383,7 +388,7 @@
       },
       "recommendation": "superseded",
       "method": "tip-subject+blob",
-      "reason": "Tip folded as c9b55cff; game-shell.ts blob identical; tip ceilings min-wins",
+      "reason": "Tip folded as c9b55cff; game-shell.ts blob identical",
       "checks": {
         "lint": {
           "status": "completed",
@@ -449,7 +454,7 @@
       "headSha": "3a8538a16ada8b456042a1e215195527e32cabb7",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/826",
       "files": [
         "docs/dev/q-mp-329-prime-gold-board3d-layout-reads.md",
@@ -462,7 +467,7 @@
       },
       "recommendation": "superseded",
       "method": "tip-subject+blob",
-      "reason": "Tip folded as 8c81a16c; both changed paths blob-identical on tip 02926472",
+      "reason": "Tip folded as 8c81a16c; blobs identical",
       "checks": {
         "lint": {
           "status": "completed",
@@ -528,7 +533,7 @@
       "headSha": "99671e992db129bdae9890ad0cece7ca14aad61b",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "CONFLICTING",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/827",
       "files": [
         "docs/dev/lint-ratchet-ceilings.json",
@@ -539,13 +544,13 @@
         "src/ui/stats-dashboard.ts"
       ],
       "blobProbe": {
-        "same": 5,
-        "diff": 1,
+        "same": 4,
+        "diff": 2,
         "new": 0
       },
       "recommendation": "superseded",
       "method": "tip-subject+blob-majority",
-      "reason": "Tip folded as 7b30e657 (dup-imports\u219242); 5/6 blobs identical; ceilings JSON tip-advanced notes only",
+      "reason": "Tip folded as 7b30e657 (dup-imports\u219242)",
       "checks": {
         "lint": {
           "status": "completed",
@@ -611,7 +616,7 @@
       "headSha": "eb833770f4b85a4de646ae38f55b4d40683652db",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/828",
       "files": ["docs/dev/bundle-headroom-post785-2026-10-10.md"],
       "blobProbe": {
@@ -687,7 +692,7 @@
       "headSha": "cb242c1e0181153f23a037cbdaf15767ee7ace79",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "CONFLICTING",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/829",
       "files": [
         "docs/dev/knip-baseline.json",
@@ -705,13 +710,13 @@
         "src/ui/timeout-handle.ts"
       ],
       "blobProbe": {
-        "same": 0,
-        "diff": 13,
+        "same": 12,
+        "diff": 1,
         "new": 0
       },
-      "recommendation": "rerun",
-      "method": "not-contained+flaky-unit",
-      "reason": "Unique knip unusedTypes demote; unit fail flaky AI calib queens-guards; re-run unit then fold",
+      "recommendation": "superseded",
+      "method": "tip-subject+blob-majority",
+      "reason": "Tip folded as 2e126f09 (+ tip-owner 06126841 board.ts re-export fix); 12/13 blobs identical; leave open",
       "checks": {
         "lint": {
           "status": "completed",
@@ -774,7 +779,7 @@
       "title": "q-mp-026j: tip fold post785",
       "base": "alpha",
       "headRefName": "cursor/mp-tip-post785",
-      "headSha": "02926472a430627e0f4e70af7cab5f5d0a8394b8",
+      "headSha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
       "isDraft": true,
       "state": "OPEN",
       "mergeable": "MERGEABLE",
@@ -782,32 +787,44 @@
       "files": [
         "AGENTS.md",
         "docs/dev/bundle-headroom-post785-2026-10-10.md",
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
         "docs/dev/lint-ratchet-ceilings.json",
         "docs/dev/q-mp-329-prime-gold-board3d-layout-reads.md",
         "docs/dev/ui-coverage-round-16.md",
         "src/games/fab-a-diffy/game-controller.ts",
         "src/games/kings-quadraphages/board-renderer.ts",
         "src/games/kings-quadraphages/board.ts",
+        "src/games/kings-quadraphages/serialization.ts",
         "src/games/par-55/game-controller.ts",
         "src/games/prime-gold/game-controller.ts",
         "src/games/ramrod/game-controller.ts",
         "src/games/stars-bars/game-controller.ts",
         "src/games/sum-dominoes/game-controller.ts",
+        "src/pwa/bootstrap-owl.ts",
+        "src/pwa/bootstrap.ts",
+        "src/pwa/idle-warm.ts",
+        "src/pwa/register.ts",
+        "src/ui/board-a11y.ts",
         "src/ui/components/game-shell.ts",
+        "src/ui/game-error-boundary.ts",
         "src/ui/game-selector.ts",
+        "src/ui/hex-svg.ts",
         "src/ui/owl/owl-component.ts",
+        "src/ui/reduced-motion.ts",
         "src/ui/stats-dashboard.ts",
         "src/ui/three/prime-gold-board-3d.ts",
+        "src/ui/timeout-handle.ts",
         "tests/unit/burn-1010-ui-cov-r16-owl-branches.test.ts"
       ],
       "blobProbe": {
-        "same": 19,
+        "same": 31,
         "diff": 0,
         "new": 0
       },
       "recommendation": "fold",
       "method": "tip-pr",
-      "reason": "Tip fold PR post785\u2192alpha @ 02926472",
+      "reason": "Tip fold PR post785\u2192alpha @ 06126841",
       "checks": {
         "lint": {
           "status": "completed",
@@ -822,8 +839,8 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "completed",
-          "conclusion": "success"
+          "status": "in_progress",
+          "conclusion": null
         },
         "e2e": {
           "status": "completed",
@@ -859,7 +876,7 @@
         }
       },
       "checkSummary": {
-        "success": 10,
+        "success": 9,
         "failure": 0,
         "totalTracked": 12
       }
@@ -873,7 +890,7 @@
       "headSha": "47ca886d23c900ef575f657831cbe5da8dc67cfb",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/831",
       "files": ["docs/dev/backlog-2026-10-10a.md"],
       "blobProbe": {
@@ -883,7 +900,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Backlog round 10 docs; MERGEABLE",
+      "reason": "Backlog round 10 docs",
       "checks": {
         "lint": {
           "status": "completed",
@@ -949,7 +966,7 @@
       "headSha": "e8ec224efc35d4fc2c0bd95cc2a0f473efb9aeeb",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/832",
       "files": [
         "docs/dev/mutation-audit-ui-10-after.json",
@@ -966,7 +983,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Mutation audit UI wave 10 tests-only; MERGEABLE",
+      "reason": "Mutation audit UI wave 10 tests-only",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1032,7 +1049,7 @@
       "headSha": "e72798e88ad222429d0572b53c5494db15ed616f",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/833",
       "files": [
         "docs/dev/engine-coverage-round-10.md",
@@ -1045,7 +1062,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Engine cov r10 tests-only; fold when 12/12 green",
+      "reason": "Engine cov r10 tests-only",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1111,7 +1128,7 @@
       "headSha": "8ad9b94e8f6a98e0245e61254322032662815bf9",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/834",
       "files": [
         "docs/dev/q-mp-331-kings-board3d-layout-reads.md",
@@ -1124,7 +1141,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Kings board-3d layout reads; fold when green",
+      "reason": "Kings board-3d layout reads",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1190,7 +1207,7 @@
       "headSha": "338216d3cfa87435f8b03c9ea8fa58c426e6ba80",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/835",
       "files": [
         "docs/dev/q-mp-352-kwatro-sinko-board3d-layout-reads.md",
@@ -1203,7 +1220,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Kwatro-sinko board-3d layout reads; fold when green",
+      "reason": "Kwatro-sinko board-3d layout reads",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1269,7 +1286,7 @@
       "headSha": "6b77145c521b62ea5357fd137f9a6bcd3f5f47a8",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/836",
       "files": [
         "docs/dev/q-mp-351-fiar-board3d-layout-reads.md",
@@ -1348,7 +1365,7 @@
       "headSha": "b4bc21920b8935571058e87e1360cbcb694c33e5",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "CONFLICTING",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/837",
       "files": [
         "docs/dev/lint-ratchet-ceilings.json",
@@ -1427,7 +1444,7 @@
       "headSha": "576c211e275134739c32c4e66def10c74a6d953c",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/838",
       "files": [
         "docs/dev/q-mp-330-pent-em-in-board3d-layout-reads.md",
@@ -1440,7 +1457,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Pent-em-in board-3d layout reads; fold when green",
+      "reason": "Pent-em-in board-3d layout reads",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1487,12 +1504,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 11,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1506,7 +1523,7 @@
       "headSha": "78a787082c53856a8db55b4e03c162083d924622",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/839",
       "files": [
         "docs/dev/ai-typeonly-option.md",
@@ -1522,7 +1539,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Emit-identity FAIL inventory refresh docs; fold when green",
+      "reason": "Emit-identity FAIL inventory refresh docs",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1588,7 +1605,7 @@
       "headSha": "2313ada94388fd2076102a219534e2af54d162af",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/840",
       "files": [
         "docs/dev/dead-code-inventory.md",
@@ -1602,7 +1619,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Rank-1 dead-CSS rescan post785; contains #805/#766; fold when green",
+      "reason": "Rank-1 dead-CSS rescan post785; contains #805/#766",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1649,12 +1666,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 11,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1668,7 +1685,7 @@
       "headSha": "75ab398cf87dc743a69ada670b43b8f86a165a18",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/841",
       "files": [
         "docs/dev/testing-layers-2026-10-09.md",
@@ -1681,7 +1698,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=2 new=0); success=11/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=2 new=0); success=12/12; mergeable=UNKNOWN",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1728,12 +1745,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 11,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1757,7 +1774,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=0 new=1); success=7/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1772,12 +1789,12 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
@@ -1788,8 +1805,8 @@
           "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
           "status": "completed",
@@ -1800,16 +1817,16 @@
           "conclusion": "success"
         },
         "forced-colors": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 7,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1840,7 +1857,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=4 new=2); success=8/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=4 new=2); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1855,12 +1872,12 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
@@ -1871,8 +1888,8 @@
           "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
           "status": "completed",
@@ -1887,12 +1904,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 8,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1906,7 +1923,7 @@
       "headSha": "c5ee4d1b6714358ea631c4e3cb4e4e69f42a5e03",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "MERGEABLE",
+      "mergeable": "UNKNOWN",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/844",
       "files": [
         "docs/dev/q-mp-355-board-a11y-soft-fail.md",
@@ -1919,7 +1936,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=0 new=2); success=8/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=UNKNOWN",
       "checks": {
         "lint": {
           "status": "completed",
@@ -1934,12 +1951,12 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
@@ -1950,8 +1967,8 @@
           "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
           "status": "completed",
@@ -1966,12 +1983,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 8,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -1998,7 +2015,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=0 new=2); success=9/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -2017,8 +2034,8 @@
           "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
@@ -2029,8 +2046,8 @@
           "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
           "status": "completed",
@@ -2045,12 +2062,12 @@
           "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 9,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -2077,7 +2094,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=1 new=1); success=5/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=1 new=1); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -2092,12 +2109,12 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
@@ -2108,28 +2125,28 @@
           "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "zoom-reflow": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "forced-colors": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 5,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -2153,7 +2170,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=0 new=1); success=4/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -2168,44 +2185,44 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
           "conclusion": "success"
         },
         "visual-baseline": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
-          "status": "queued",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "zoom-reflow": {
-          "status": "queued",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "forced-colors": {
-          "status": "queued",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "queued",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         }
       },
       "checkSummary": {
-        "success": 4,
+        "success": 12,
         "failure": 0,
         "totalTracked": 12
       }
@@ -2232,7 +2249,7 @@
       },
       "recommendation": "fold",
       "method": "not-contained",
-      "reason": "Unique payload (same=0 diff=0 new=2); success=4/12; mergeable=MERGEABLE",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=MERGEABLE",
       "checks": {
         "lint": {
           "status": "completed",
@@ -2247,45 +2264,200 @@
           "conclusion": "success"
         },
         "unit": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "knip": {
           "status": "completed",
           "conclusion": "success"
         },
         "visual-baseline": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-fullgame": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "mobile-touch": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "zoom-reflow": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "forced-colors": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
         },
         "e2e-cross-browser": {
-          "status": "in_progress",
-          "conclusion": null
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 849,
+      "taskId": "q-mp-342",
+      "title": "q-mp-342: slowest unit-file inventory refresh (tip post785 / 3182 files)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-342-slowest-unit-inventory-9ced",
+      "headSha": "09882ac5d028d5e0c38ecb0822a4b0c99eaa588f",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/849",
+      "files": ["docs/dev/slowest-unit-file-inventory-2026-10-10.md"],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=UNKNOWN",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 850,
+      "taskId": "q-mp-334",
+      "title": "q-mp-334: tip post785 open-draft triage v1 (fold / rerun / superseded / held)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-334-open-draft-triage-post785-1e79",
+      "headSha": "78557619f925284f958874c7848ac99d353cea37",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/850",
+      "files": [
+        "docs/dev/open-draft-triage-post785-2026-10-10-v1.json",
+        "docs/dev/open-draft-triage-post785-2026-10-10-v1.md"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "self",
+      "reason": "This triage v1 draft (q-mp-334)",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "skipped"
         }
       },
       "checkSummary": {
         "success": 4,
-        "failure": 0,
+        "failure": 2,
         "totalTracked": 12
       }
     }
@@ -2297,5 +2469,6 @@
     "#727 HELD",
     "No AI/rules/copy/scoring edits",
     "Hex Hard stays 450ms"
-  ]
+  ],
+  "ciNote": "PR #850 first CI run failed lint/build on tip-base Duplicate identifier Piece/PlayerOwner in kings board.ts after #829 fold; tip-owner fixed in 06126841. This refresh rebases onto that tip."
 }
