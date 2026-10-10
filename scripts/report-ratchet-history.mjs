@@ -13,10 +13,15 @@
  *
  * No new dependencies. Usage:
  *   node scripts/report-ratchet-history.mjs
+ *   node scripts/report-ratchet-history.mjs --help
+ *   node scripts/report-ratchet-history.mjs --dry-run
  *   npm run report:ratchet-history
  *
  * By default uses `git log --all` so pre-squash tip folds still appear when
  * those refs are present locally. Pass --first-parent to restrict to HEAD.
+ *
+ * Default invocation (no --dry-run) still writes the md/svg docs intentionally.
+ * --help / -h and --dry-run must not write those files (q-mp-872).
  */
 
 import { spawnSync } from 'node:child_process';
@@ -45,6 +50,50 @@ export const LINT_RULE_KEYS = Object.freeze({
 
 export const OUT_SVG = 'docs/dev/ratchet-ceiling-history.svg';
 export const OUT_MD = 'docs/dev/ratchet-ceiling-history.md';
+
+export const USAGE = `Usage: node scripts/report-ratchet-history.mjs [options]
+
+Options:
+  --first-parent   Restrict git log to HEAD first-parent history
+  --dry-run        Compute and print summary without writing docs
+  -h, --help       Show this help
+
+Default (no --dry-run) writes docs/dev/ratchet-ceiling-history.{md,svg}.
+`;
+
+/**
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-872).
+ *
+ * @param {string[]} argv
+ * @returns {{
+ *   ok: true,
+ *   help: boolean,
+ *   dryRun: boolean,
+ *   firstParent: boolean,
+ * } | {
+ *   ok: false,
+ *   message: string,
+ * }}
+ */
+export function parseArgs(argv) {
+  let help = false;
+  let dryRun = false;
+  let firstParent = false;
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      help = true;
+    } else if (a === '--dry-run') {
+      dryRun = true;
+    } else if (a === '--first-parent') {
+      firstParent = true;
+    } else if (a.startsWith('-')) {
+      return { ok: false, message: `Unknown flag: ${a}` };
+    } else {
+      return { ok: false, message: `Unexpected argument: ${a}` };
+    }
+  }
+  return { ok: true, help, dryRun, firstParent };
+}
 
 /**
  * @typedef {{ sha: string, date: string, subject: string }} GitCommitMeta
@@ -637,9 +686,6 @@ export function runGit(args) {
 }
 
 /**
- * @param {{ firstParent?: boolean, runGit?: typeof runGit, now?: string }} [opts]
- */
-/**
  * Read live tip lint ceilings from the working tree (for the markdown snapshot).
  * @returns {{
  *   curly: number | null,
@@ -670,9 +716,19 @@ export function readLiveLintSnapshot() {
   }
 }
 
+/**
+ * @param {{
+ *   firstParent?: boolean,
+ *   dryRun?: boolean,
+ *   runGit?: typeof runGit,
+ *   now?: string,
+ *   liveLint?: ReturnType<typeof readLiveLintSnapshot>,
+ * }} [opts]
+ */
 export function writeReport(opts = {}) {
   const git = opts.runGit ?? runGit;
   const firstParent = opts.firstParent === true;
+  const dryRun = opts.dryRun === true;
   const rows = collectHistory(git, { firstParent });
   const gitMode = firstParent ? 'git log (HEAD only)' : 'git log --all';
   const tip = git(['rev-parse', 'HEAD']);
@@ -688,20 +744,37 @@ export function writeReport(opts = {}) {
   });
   const svgPath = path.join(ROOT, OUT_SVG);
   const mdPath = path.join(ROOT, OUT_MD);
-  fs.mkdirSync(path.dirname(svgPath), { recursive: true });
-  fs.writeFileSync(svgPath, svg, 'utf8');
-  fs.writeFileSync(mdPath, md, 'utf8');
-  return { rows, svgPath, mdPath, gitMode, tipSha, liveLint };
+  if (!dryRun) {
+    fs.mkdirSync(path.dirname(svgPath), { recursive: true });
+    fs.writeFileSync(svgPath, svg, 'utf8');
+    fs.writeFileSync(mdPath, md, 'utf8');
+  }
+  return { rows, svgPath, mdPath, gitMode, tipSha, liveLint, dryRun, svg, md };
 }
 
 function main() {
-  const firstParent = process.argv.includes('--first-parent');
-  const { rows, svgPath, mdPath, gitMode } = writeReport({ firstParent });
+  const parsed = parseArgs(process.argv.slice(2));
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error(USAGE.trimEnd());
+    process.exitCode = 2;
+    return;
+  }
+  if (parsed.help) {
+    console.log(USAGE.trimEnd());
+    return;
+  }
+  const { rows, svgPath, mdPath, gitMode, dryRun } = writeReport({
+    firstParent: parsed.firstParent,
+    dryRun: parsed.dryRun,
+  });
+  const verb = dryRun ? 'would write' : 'wrote';
+  const suffix = dryRun ? ' (dry-run; not writing)' : '';
   console.log(
-    `report:ratchet-history — ${rows.length} commit(s) via ${gitMode}`
+    `report:ratchet-history — ${rows.length} commit(s) via ${gitMode}${suffix}`
   );
-  console.log(`  wrote ${path.relative(ROOT, svgPath)}`);
-  console.log(`  wrote ${path.relative(ROOT, mdPath)}`);
+  console.log(`  ${verb} ${path.relative(ROOT, svgPath)}`);
+  console.log(`  ${verb} ${path.relative(ROOT, mdPath)}`);
 }
 
 const isMain =
