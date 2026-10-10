@@ -1,11 +1,11 @@
 # Testing layers — live counts (2026-10-10)
 
-**Task id:** `q-mp-026s` tip-owner remasure on tip `cursor/mp-tip-post1059` (supersedes `q-mp-026r` stamp **3341** / **14072**)  
-**Measured tip:** `cursor/mp-tip-post1059` @ `1c31a1ea` (full `1c31a1ea8cac2bb1ca69d3b3a23566963d49567c`; cut from `alpha` @ `1c31a1ea` after #1059)  
+**Task id:** `q-mp-667` (+`q-mp-668`) worker remasure on tip `cursor/mp-tip-post1059` (supersedes `q-mp-026s` inherit stamp **3341** / **14072**)  
+**Measured tip:** `cursor/mp-tip-post1059` @ `be822e75` (full `be822e75f19bfa8dbd97a2886195fd0aef8aaddf`; tip cut from `alpha` @ `1c31a1ea` after #1059)  
 **Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only tip re-anchor after #1059 squash-merge. Pin policy unchanged. No `src/` or AI/copy/rules changes. Live tip inherits alpha suite **3341** files / **14072** listed cases (`unit-shared` **13027** / `unit-node` **380** / `unit-isolated` **665**) until the first content fold; tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
+Docs-only count + SHA/split fix after tip-owner post1059 re-anchor (`be822e75`). Pin policy unchanged. No `src/` or AI/copy/rules changes. Tip-name narrative already post1059 (tip owner); this pass remasures live suite **3341** files / **14084** listed cases (`unit-shared` **13029** / `unit-node` **380** / `unit-isolated` **675**). Counts move every fold — tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
 
 ## Duplicate check (open drafts)
 
@@ -42,17 +42,17 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `aa4386b4` (post1023 tip-owner remasure)
+## Live counts @ `be822e75` (post1059 `q-mp-667`/`668` remasure)
 
 ### Unit (Vitest)
 
 | Metric                                                |        Count | Command                                                  |
 | ----------------------------------------------------- | -----------: | -------------------------------------------------------- |
 | Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3341** | `npm run test:unit`                                      |
-| Cases listed (`npx vitest list`)                      |    **14072** | `npm run test:unit`                                      |
-| → `unit-shared` cases (`vitest list`)                 |        13027 | `npx vitest list --project unit-shared`                  |
+| Cases listed (`npx vitest list`)                      |    **14084** | `npm run test:unit`                                      |
+| → `unit-shared` cases (`vitest list`)                 |        13029 | `npx vitest list --project unit-shared`                  |
 | → `unit-node` cases (`vitest list`)                   |          380 | `npx vitest list --project unit-node`                    |
-| → `unit-isolated` cases (`vitest list`)               |          665 | `npx vitest list --project unit-isolated`                |
+| → `unit-isolated` cases (`vitest list`)               |          675 | `npx vitest list --project unit-isolated`                |
 | Watch / coverage                                      |            — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
 
 `npm test` = `test:unit` && `test:e2e:chromium`.
