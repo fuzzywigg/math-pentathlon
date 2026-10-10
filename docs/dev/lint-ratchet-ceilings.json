@@ -1,17 +1,9 @@
 {
-<<<<<<< HEAD
-  "notes": "Tip post865 min ceilings (q-mp-026l + q-mp-366 + q-mp-395 + q-mp-423): curly 538; no-non-null-assertion 246; no-confusing-void-expression 52 (\u22123 owl + \u22122 reduced-motion + \u22121 pointer-hygiene); radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
-  "rules": {
-    "curly": 538,
-    "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 52,
-=======
-  "notes": "Tip post898 + q-mp-424: curly 538; no-non-null-assertion 241 (\u22125 board-a11y); no-confusing-void-expression 53 (\u22123 owl + \u22122 reduced-motion); radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post898 min ceilings (q-mp-026m + q-mp-423 + q-mp-424): curly 538; no-non-null-assertion 241 (\u22125 board-a11y); no-confusing-void-expression 52 (\u22123 owl + \u22122 reduced-motion + \u22121 pointer-hygiene); radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 241,
-    "@typescript-eslint/no-confusing-void-expression": 53,
->>>>>>> 3b1eea05 (fix(lint): q-mp-424 clear board-a11y no-non-null-assertion (−5))
+    "@typescript-eslint/no-confusing-void-expression": 52,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,
