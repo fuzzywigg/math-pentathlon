@@ -36,7 +36,10 @@ function runDeterminism<T>(h: Harness<T>, states: T[]): void {
       const a = h.pickSeeded(state, difficulty, seed);
       const b = h.pickSeeded(state, difficulty, seed);
       expect(a, `${h.label} ${difficulty} state ${i} null`).not.toBeNull();
-      expect(a, `${h.label} ${difficulty} state ${i} undef`).not.toBeUndefined();
+      expect(
+        a,
+        `${h.label} ${difficulty} state ${i} undef`
+      ).not.toBeUndefined();
       expect(moveKey(a), `${h.label} ${difficulty} state ${i}`).toBe(
         moveKey(b)
       );
@@ -61,6 +64,16 @@ function runDefaultQuality<T>(h: Harness<T>, states: T[]): void {
   assertQualityDiffers(stats, h.label);
 }
 
+/**
+ * Case timeout for determinism/quality. CI GHA hosts sit near 130–160s for
+ * queens-guards determinism under peer-shard load (q-mp-151); 180s was thin.
+ * Local stays at 180s; CI gets 300s headroom. Harness-only — no AI budgets.
+ */
+const CASE_TIMEOUT_MS = process.env.CI ? 300_000 : 180_000;
+
+/** Hook timeout for mid-game fixture collect under CI thread contention. */
+const HOOK_TIMEOUT_MS = process.env.CI ? 120_000 : 30_000;
+
 export function describeHarness<T>(h: Harness<T>): void {
   describe(h.label, () => {
     // Share the mid-game fixture across determinism + quality (same 50 states,
@@ -68,16 +81,16 @@ export function describeHarness<T>(h: Harness<T>): void {
     let states: T[] = [];
     beforeAll(() => {
       states = collectStates(MIDGAME_SAMPLES, h.midgame, h.label);
-    });
+    }, HOOK_TIMEOUT_MS);
     it(
       `determinism: fixed seed → same move on ${MIDGAME_SAMPLES} mid-game states × difficulties`,
       () => runDeterminism(h, states),
-      180_000
+      CASE_TIMEOUT_MS
     );
     it(
       'quality: easy/medium differ from hard vs oracle',
       () => runDefaultQuality(h, states),
-      180_000
+      CASE_TIMEOUT_MS
     );
   });
 }
