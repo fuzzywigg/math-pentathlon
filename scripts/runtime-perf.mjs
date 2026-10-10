@@ -21,6 +21,7 @@ import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 import {
   CPU_THROTTLE,
   MOVE_TARGET_RENDER,
@@ -90,13 +91,6 @@ const filter = (process.env.PERF_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
 
 async function waitReady(page) {
   await page

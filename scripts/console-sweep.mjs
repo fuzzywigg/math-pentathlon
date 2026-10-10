@@ -6,6 +6,7 @@
 import { chromium } from '@playwright/test';
 import { createRequire } from 'module';
 import { writeFileSync, mkdirSync } from 'fs';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 
 const require = createRequire(import.meta.url);
 // Pull game ids from compiled-ish source via dynamic import of TS is hard;
@@ -36,23 +37,6 @@ const GAMES = [
 const BASE = process.env.BASE_URL || 'http://localhost:5173';
 const OUT =
   process.env.SWEEP_OUT || '/opt/cursor/artifacts/console-sweep-raw.json';
-
-async function dismissOwl(page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
 
 async function waitReady(page) {
   await page
