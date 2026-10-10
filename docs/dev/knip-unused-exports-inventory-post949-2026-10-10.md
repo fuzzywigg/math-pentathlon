@@ -2,8 +2,8 @@
 
 **Task id:** `q-mp-513`  
 **Role:** worker (docs / data / chart only)  
-**Tip audited:** `cursor/mp-tip-post949` @ `5f24bdfe` (full `5f24bdfe40aa1d89f07dccad1c774784b1a489cf`)  
-**Measured at:** `2026-10-10T12:20:28Z` (UTC)  
+**Tip audited:** `cursor/mp-tip-post949` @ `8698fffb` (full `8698fffb85b1e3d2289e54a665fac6162d3bdee4`)  
+**Measured at:** `2026-10-10T12:23:06Z` (UTC)  
 **Machine summary:** [`knip-unused-exports-inventory-post949-2026-10-10.json`](./knip-unused-exports-inventory-post949-2026-10-10.json)  
 **Chart:** [`knip-unused-exports-inventory-post949-2026-10-10.svg`](./knip-unused-exports-inventory-post949-2026-10-10.svg)  
 **Scope:** Dated **unusedExports** inventory of live `npm run report:knip` vs committed [`knip-baseline.json`](./knip-baseline.json), plus the report-script vs knip-text count delta. **No `src/` edits. No `knip-baseline.json` edits. No AI export deletes.**
@@ -21,7 +21,7 @@ Related tip stamps (leave open; **contained** for exports ownership — do not c
 | Undrafted `q-mp-253` | Owns `cancelFabAiRequests` delete | Leave alone; **EXCLUDED** here |
 | [#971](https://github.com/fuzzywigg/math-pentathlon/pull/971) `q-mp-090q` backlog 10h | Defines this task; does not ship the inventory | Leave open |
 
-No open draft into `cursor/mp-tip-post949` already owns a post949 knip **unusedExports** inventory → full task proceeds.
+Open drafts into `cursor/mp-tip-post949` at re-measure (`#978` void idle-warm, `#979` boundaries/PWA, `#980` return-await, `#981` dice-selector) — **none** own knip unusedExports → full task proceeds.
 
 ## Hard-rule HOLD (explicit)
 
@@ -34,8 +34,8 @@ No open draft into `cursor/mp-tip-post949` already owns a post949 knip **unusedE
 ## Method (live tip)
 
 ```text
-$ git rev-parse HEAD
-  5f24bdfe40aa1d89f07dccad1c774784b1a489cf
+$ git rev-parse origin/cursor/mp-tip-post949
+  8698fffb85b1e3d2289e54a665fac6162d3bdee4
 
 $ npm run report:knip -- --json
   unusedFiles: 0
@@ -67,7 +67,7 @@ Listing captured with pinned `knip@5.88.1` / committed [`knip.json`](../../knip.
 
 ## Report-script vs knip-text count delta
 
-| Probe | Version | What it counts | Result on tip `5f24bdfe` |
+| Probe | Version | What it counts | Result on tip `8698fffb` |
 | --- | --- | --- | ---: |
 | `npm run report:knip` | pinned **5.88.1** JSON (`issue.exports` name count) | Named unused exports | **3** |
 | `npx knip@5.88.1 --include exports --reporter compact` | **5.88.1** | Named unused exports (listed) | **3** |
@@ -79,14 +79,14 @@ Listing captured with pinned `knip@5.88.1` / committed [`knip.json`](../../knip.
 
 ## Before → after metrics (report-only stamp)
 
-| Metric | Spec backlog (`q-mp-513` @ post914) | Committed baseline on tip | Live tip `5f24bdfe` / post949 | This PR |
+| Metric | Spec backlog (`q-mp-513` @ post914) | Committed baseline on tip | Live tip `8698fffb` / post949 | This PR |
 | --- | ---: | ---: | ---: | --- |
 | `unusedExports` (report:knip / 5.88.1) | **3** | **3** | **3** | Docs only; **no** baseline write |
 | knip-text (unpinned 6.x) | **1** | n/a | **1** | Documented delta only |
 | `unusedTypes` | (out of scope) | **36** | **32** (−4 NOTICE) | Owned by `#947` / demote tickets |
-| Tip SHA stamp | post914 evidence | post949 payload | **`5f24bdfe`** | inventory + SVG + JSON |
+| Tip SHA stamp | post914 evidence | post949 payload | **`8698fffb`** | inventory + SVG + JSON |
 
-**Spec staleness:** backlog tip label said post914; live tip is post949 @ `5f24bdfe`. Export counts (**3** / text **1**) are **unchanged** vs the backlog stamp after re-measure.
+**Spec staleness:** backlog tip label said post914; live tip is post949 @ `8698fffb` (tip-owner `q-mp-026o` re-anchor). Export counts (**3** / text **1**) are **unchanged** vs the backlog stamp after re-measure.
 
 ## Disposition overview (live 3)
 
