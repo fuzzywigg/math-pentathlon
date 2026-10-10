@@ -1,0 +1,240 @@
+{
+  "taskId": "q-mp-438",
+  "tipBranch": "cursor/mp-tip-post898",
+  "tipSha": "b7e518b4afe04556fa7e87ecba7ce97229b05bc7",
+  "tipShaShort": "b7e518b4",
+  "tipCutSha": "946d6f956b54de10e08240ba8b26194c2e3b779d",
+  "measuredAt": "2026-10-10T08:34:18.620Z",
+  "knownOversCount": 0,
+  "knownOvers": [],
+  "allOk": true,
+  "budgetCount": 21,
+  "tightest": [
+    {
+      "id": "game-sum-dominoes",
+      "headroomBytes": 77,
+      "gzipBytes": 6936,
+      "budgetBytes": 7013
+    },
+    {
+      "id": "game-fab-a-diffy",
+      "headroomBytes": 170,
+      "gzipBytes": 8241,
+      "budgetBytes": 8411
+    },
+    {
+      "id": "game-contig-60",
+      "headroomBytes": 213,
+      "gzipBytes": 7159,
+      "budgetBytes": 7372
+    },
+    {
+      "id": "game-hex",
+      "headroomBytes": 288,
+      "gzipBytes": 5768,
+      "budgetBytes": 6056
+    },
+    {
+      "id": "game-stars-bars",
+      "headroomBytes": 318,
+      "gzipBytes": 7100,
+      "budgetBytes": 7418
+    }
+  ],
+  "rows": [
+    {
+      "id": "game-sum-dominoes",
+      "chunk": "game-sum-dominoes-D55_Rb_E.js",
+      "gzipBytes": 6936,
+      "budgetBytes": 7013,
+      "headroomBytes": 77,
+      "status": "OK"
+    },
+    {
+      "id": "game-fab-a-diffy",
+      "chunk": "game-fab-a-diffy-BWpkF_7V.js",
+      "gzipBytes": 8241,
+      "budgetBytes": 8411,
+      "headroomBytes": 170,
+      "status": "OK"
+    },
+    {
+      "id": "game-contig-60",
+      "chunk": "game-contig-60-BjQMrZTI.js",
+      "gzipBytes": 7159,
+      "budgetBytes": 7372,
+      "headroomBytes": 213,
+      "status": "OK"
+    },
+    {
+      "id": "game-hex",
+      "chunk": "game-hex-Bw5wAGup.js",
+      "gzipBytes": 5768,
+      "budgetBytes": 6056,
+      "headroomBytes": 288,
+      "status": "OK"
+    },
+    {
+      "id": "game-stars-bars",
+      "chunk": "game-stars-bars-DcNDWAye.js",
+      "gzipBytes": 7100,
+      "budgetBytes": 7418,
+      "headroomBytes": 318,
+      "status": "OK"
+    },
+    {
+      "id": "game-par-55",
+      "chunk": "game-par-55-CVe0XwLt.js",
+      "gzipBytes": 7602,
+      "budgetBytes": 7929,
+      "headroomBytes": 327,
+      "status": "OK"
+    },
+    {
+      "id": "game-queens-guards",
+      "chunk": "game-queens-guards-BeKAdCkk.js",
+      "gzipBytes": 8278,
+      "budgetBytes": 8628,
+      "headroomBytes": 350,
+      "status": "OK"
+    },
+    {
+      "id": "game-kwatro-sinko",
+      "chunk": "game-kwatro-sinko-CFBJh9rp.js",
+      "gzipBytes": 8199,
+      "budgetBytes": 8576,
+      "headroomBytes": 377,
+      "status": "OK"
+    },
+    {
+      "id": "game-frac-fact",
+      "chunk": "game-frac-fact-2rhg_9Ei.js",
+      "gzipBytes": 5960,
+      "budgetBytes": 6350,
+      "headroomBytes": 390,
+      "status": "OK"
+    },
+    {
+      "id": "game-fraction-pinball",
+      "chunk": "game-fraction-pinball-FPV9fdZY.js",
+      "gzipBytes": 5751,
+      "budgetBytes": 6177,
+      "headroomBytes": 426,
+      "status": "OK"
+    },
+    {
+      "id": "game-calla",
+      "chunk": "game-calla-BSVbEhJG.js",
+      "gzipBytes": 6499,
+      "budgetBytes": 6967,
+      "headroomBytes": 468,
+      "status": "OK"
+    },
+    {
+      "id": "game-remainder-islands",
+      "chunk": "game-remainder-islands-F0KNhLVJ.js",
+      "gzipBytes": 6351,
+      "budgetBytes": 6878,
+      "headroomBytes": 527,
+      "status": "OK"
+    },
+    {
+      "id": "game-star-track",
+      "chunk": "game-star-track-ajZ2KdP5.js",
+      "gzipBytes": 5466,
+      "budgetBytes": 6035,
+      "headroomBytes": 569,
+      "status": "OK"
+    },
+    {
+      "id": "game-hex-a-gone",
+      "chunk": "game-hex-a-gone-Bs28tymM.js",
+      "gzipBytes": 6810,
+      "budgetBytes": 7387,
+      "headroomBytes": 577,
+      "status": "OK"
+    },
+    {
+      "id": "game-prime-gold",
+      "chunk": "game-prime-gold-BCQeZ_W-.js",
+      "gzipBytes": 8028,
+      "budgetBytes": 8686,
+      "headroomBytes": 658,
+      "status": "OK"
+    },
+    {
+      "id": "game-kings-quadraphages",
+      "chunk": "game-kings-quadraphages-BWjH5j_q.js",
+      "gzipBytes": 7222,
+      "budgetBytes": 7903,
+      "headroomBytes": 681,
+      "status": "OK"
+    },
+    {
+      "id": "game-pent-em-in",
+      "chunk": "game-pent-em-in-DUu_R3c7.js",
+      "gzipBytes": 6594,
+      "budgetBytes": 7284,
+      "headroomBytes": 690,
+      "status": "OK"
+    },
+    {
+      "id": "game-juggle",
+      "chunk": "game-juggle-C9XPAzw4.js",
+      "gzipBytes": 7380,
+      "budgetBytes": 8181,
+      "headroomBytes": 801,
+      "status": "OK"
+    },
+    {
+      "id": "game-fiar",
+      "chunk": "game-fiar-u0DKmDhW.js",
+      "gzipBytes": 11180,
+      "budgetBytes": 12156,
+      "headroomBytes": 976,
+      "status": "OK"
+    },
+    {
+      "id": "game-ramrod",
+      "chunk": "game-ramrod-DsUBfzNq.js",
+      "gzipBytes": 5504,
+      "budgetBytes": 7261,
+      "headroomBytes": 1757,
+      "status": "OK"
+    },
+    {
+      "id": "menu-critical-path",
+      "chunk": null,
+      "menuFiles": [
+        {
+          "path": "assets/core-BvnLZvlI.js",
+          "gzipBytes": 6909
+        },
+        {
+          "path": "assets/index-D2_JzoV2.js",
+          "gzipBytes": 3301
+        },
+        {
+          "path": "assets/index-PzJzeRBN.css",
+          "gzipBytes": 4587
+        },
+        {
+          "path": "assets/ui-CAV4hcGs.css",
+          "gzipBytes": 3158
+        },
+        {
+          "path": "assets/ui-GRjcKRcQ.js",
+          "gzipBytes": 7656
+        },
+        {
+          "path": "vendor/vite-preload-BXl3LOEh.js",
+          "gzipBytes": 650
+        }
+      ],
+      "gzipBytes": 26261,
+      "budgetBytes": 46822,
+      "headroomBytes": 20561,
+      "status": "OK"
+    }
+  ]
+}

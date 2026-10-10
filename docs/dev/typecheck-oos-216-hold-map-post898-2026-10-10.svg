@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="520" viewBox="0 0 820 520" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-447 typecheck out-of-scope 216 HOLD map (tip post898)</title>
+  <desc id="desc">Phase-2 type ratchet on tip 85522638: in-scope 0, out-of-scope 216 hard-rule AI residual HOLD. Basename mix ai.ts 207, ai-client.ts 5, ai.worker.ts 4 across 28 files / 20 games. Buckets identical to q-mp-421 / #907; tip stamp only.</desc>
+  <rect width="820" height="520" fill="#f4f1ea"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1c1917">q-mp-447 - typecheck OOS 216 HOLD (post898)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#57534e">tip 85522638 - report-only - AI residual - do not fix here</text>
+
+  <rect x="24" y="76" width="180" height="78" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="114" y="110" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#14532d">0</text>
+  <text x="114" y="136" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#14532d">in-scope (must stay 0)</text>
+
+  <rect x="220" y="76" width="180" height="78" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="310" y="110" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#7f1d1d">216</text>
+  <text x="310" y="136" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#7f1d1d">out-of-scope HOLD</text>
+
+  <rect x="416" y="76" width="180" height="78" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="506" y="110" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="#78350f">28</text>
+  <text x="506" y="136" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#78350f">AI files (100% kind)</text>
+
+  <rect x="612" y="76" width="184" height="78" fill="#e7e5e4" stroke="#a8a29e" stroke-width="1"/>
+  <text x="704" y="110" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1c1917">450ms</text>
+  <text x="704" y="136" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#44403c">Hex Hard (keep)</text>
+
+  <text x="24" y="186" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1c1917">By basename (216)</text>
+  <rect x="24" y="198" width="620" height="22" fill="#7f1d1d"/>
+  <text x="36" y="214" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#fafaf9">ai.ts 207</text>
+  <rect x="644" y="198" width="76" height="22" fill="#b45309"/>
+  <text x="652" y="214" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#fffbeb">client 5</text>
+  <rect x="728" y="198" width="68" height="22" fill="#92400e"/>
+  <text x="734" y="214" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#fffbeb">worker 4</text>
+
+  <text x="24" y="250" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1c1917">Top game directories (identical to #907 / #781)</text>
+  <text x="24" y="278" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">contig-60</text>
+  <rect x="140" y="266" width="520" height="16" fill="#57534e"/>
+  <text x="670" y="278" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">19</text>
+
+  <text x="24" y="300" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">fab-a-diffy</text>
+  <rect x="140" y="288" width="520" height="16" fill="#57534e"/>
+  <text x="670" y="300" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">19</text>
+
+  <text x="24" y="322" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">juggle</text>
+  <rect x="140" y="310" width="493" height="16" fill="#78716c"/>
+  <text x="670" y="322" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">18</text>
+
+  <text x="24" y="344" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">stars-bars</text>
+  <rect x="140" y="332" width="493" height="16" fill="#78716c"/>
+  <text x="670" y="344" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">18</text>
+
+  <text x="24" y="366" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">hex</text>
+  <rect x="140" y="354" width="438" height="16" fill="#a8a29e"/>
+  <text x="670" y="366" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">16</text>
+
+  <text x="24" y="388" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">kwatro-sinko</text>
+  <rect x="140" y="376" width="438" height="16" fill="#a8a29e"/>
+  <text x="670" y="388" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">16</text>
+
+  <text x="24" y="410" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#44403c">calla &amp; pinball</text>
+  <rect x="140" y="398" width="411" height="16" fill="#d6d3d1"/>
+  <text x="670" y="410" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1c1917">15&amp;2</text>
+
+  <text x="24" y="448" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#292524">Root causes: unchecked_index 202 - EOPT 11 - undefined_as_index 2 - undef iterable 1</text>
+  <text x="24" y="472" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#57534e">Delta vs #907: tip SHA/branch only (buckets unchanged). Spec tip 788e8215 superseded by live 85522638.</text>
+  <text x="24" y="496" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#78716c">npm run typecheck:ratchet -&gt; 0 / 216 - #907/#781 contained - #881 emit-identity orthogonal - no src edits</text>
+</svg>

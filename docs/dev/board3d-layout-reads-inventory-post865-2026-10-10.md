@@ -1,46 +1,47 @@
-# q-mp-384 — board-3d layout-reads inventory refresh (tip post830)
+# q-mp-415 — board-3d layout-reads inventory refresh (tip post865)
 
-> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`). Intermediate post865 stamp: [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`). Counts unchanged (board-3d raw **30** + owl **1**); tip SHA / branch only.
+> **Superseded stamp:** tip post898 refresh lives in [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`). Counts unchanged (board-3d raw **30** + owl **1**); tip SHA / branch only.
 
-
-**Task id:** `q-mp-384`  
+**Task id:** `q-mp-415`  
 **Role:** worker (docs / visual only)  
-**Tip audited:** `cursor/mp-tip-post830` @ `97487de6` (full `97487de6b6ad16a2f47a07dcff1076ff1d544aa4`)  
-**Prior inventory:** [`board3d-layout-reads-inventory-2026-10-09.md`](./board3d-layout-reads-inventory-2026-10-09.md) (`q-mp-239`, tip post748 @ `ce673656`) — leave open `#757` with `contained`  
-**Visual:** [`board3d-layout-reads-inventory-post830-2026-10-10.svg`](./board3d-layout-reads-inventory-post830-2026-10-10.svg)  
-**Scope:** Re-`rg` layout-forcing reads on live post830 tip. **No `src/` edits. No test behavior changes.**
+**Tip audited:** `cursor/mp-tip-post865` @ `7f8a7147` (full `7f8a71471306af2143c6de0b43564d6c146e2719`)  
+**Prior inventory:** [`board3d-layout-reads-inventory-post830-2026-10-10.md`](./board3d-layout-reads-inventory-post830-2026-10-10.md) (`q-mp-384`, tip post830 @ `97487de6`, folded via `#865`) — leave open `#861` with `contained`  
+**Visual:** [`board3d-layout-reads-inventory-post865-2026-10-10.svg`](./board3d-layout-reads-inventory-post865-2026-10-10.svg)  
+**Scope:** Re-`rg` layout-forcing reads on live post865 tip. **No `src/` edits. No test behavior changes.**
+
 
 ## Purpose
 
-Publish a dated inventory after the five board-3d layout batches (`#826` / `#834` / `#835` / `#836` / `#838`) landed on tip via fold `#830`, so agents stop treating the post748 inventory (all hosts unbatched, 32 raw hits) or the stale post785 backlog note (only hex/queens/prime-gold batched) as current.
+Publish a dated inventory after tip cut post865 (`#865` fold from alpha `3908809d`) so agents stop treating the post830 stamp (`#861` / `97487de6`) as the current tip measurement. Layout batch code is already on tip; this ticket is report-only.
 
 ## Spec staleness note
 
-Backlog `q-mp-384` was written against tip post785 @ `06126841` and claimed:
+Backlog `q-mp-415` (from `q-mp-090m` / `#897`) claimed:
 
-- tip already batched hex / queens / prime-gold
-- open drafts still owned fiar / kwatro / pent / kings (`#835` / `#836` / `#838` / `#834`)
-- **30** raw `rg` hits across board-3d files
+- tip cut evidence @ `3908809d`
+- live `rg` **31** layout-forcing reads across `src/ui/three/*board-3d*.ts` + owl-component (**4** on most hosts; star-track **2**; owl **1**)
+- prior inventory stamps post830
 
-**Live post830 @ `97487de6`:** all eight `*-board-3d.ts` hosts use the batched host-size / canvas-rect pattern (including the five batches above). Raw board-3d `rg` total remains **30** (comments that mention `clientWidth`/`clientHeight` still match). Trust the live tree.
+**Live post865 @ `7f8a7147`:** tip HEAD advanced past the cut SHA (docs / lint folds after `#865`). Raw board-3d `rg` total remains **30** + owl **1** = **31**. All eight `*-board-3d.ts` hosts still use the batched host-size / canvas-rect pattern. Unit-file count at audit: **3211** (prompt note **3210** — tip advanced one file). Trust the live tree.
 
 ## Duplicate check (open drafts)
 
 | Related draft / prior | Base | Overlap | Action |
 | --- | --- | --- | --- |
-| Open drafts into `cursor/mp-tip-post830` (`#853`/`#854` at audit) | post830 | CI pin / bundle headroom — not layout inventory | No overlap |
+| Open drafts into `cursor/mp-tip-post865` (`#877`–`#899` at audit) | post865 | emit-identity / dead-CSS / knip / wall-budget / coverage / backlog — not layout inventory | No overlap |
+| `#861` q-mp-384 inventory (post830 @ `97487de6`) | post830 | Same topic; older tip stamp (payload already on tip via `#865`) | Leave open; **contained** |
 | `#757` q-mp-239 inventory (post748 @ `ce673656`) | post748 | Same topic; older tip stamp | Leave open; **contained** |
-| `#826` / `#834` / `#835` / `#836` / `#838` layout batches | post785 | Code already on tip via `#830` fold | Leave open; **contained** |
-| `#784` / `#804` / `#807` hex / queens / star-track batches | post755 | Code already on tip | Leave open; **contained** |
+| `#826` / `#834` / `#835` / `#836` / `#838` / `#784` / `#804` / `#807` layout batches | older tips | Code already on tip via folds | Leave open; **contained** |
+| `#887` q-mp-388 CI unit wall budget | post865 | Wall-budget ownership — orthogonal | Leave open (per backlog) |
 | Undrafted `q-mp-328` owl-component layout | — | Outside board-3d; `:69` funnel noted below | Leave for that owner |
 
-No open draft into post830 owns a post830-dated layout-reads inventory → full refresh proceeds.
+No open draft into post865 owns a post865-dated layout-reads inventory → full refresh proceeds.
 
 ## Method (live tip)
 
 ```text
 $ git rev-parse HEAD
-  97487de6b6ad16a2f47a07dcff1076ff1d544aa4
+  7f8a71471306af2143c6de0b43564d6c146e2719
 
 $ rg -n 'getBoundingClientRect|clientWidth|clientHeight' \
     src/ui/three/*board-3d*.ts src/ui/owl/owl-component.ts src/ui/three/tablet-gl.ts
@@ -52,23 +53,25 @@ $ rg -n 'getBoundingClientRect|clientWidth|clientHeight' \
 | **board-3d raw hits** | **30** (7 hosts × 4 + star-track × 2) |
 | **board-3d code sites** | **23** (7 × 3 + star-track × 2) — excludes doc comments that mention `clientWidth`/`Height` |
 | **owl** | **1** (`owl-component.ts:69` inside `measureContainerRect`) |
+| **combined (board-3d + owl)** | **31** |
 | **tablet-gl** | **0** (viewport via `visualViewport` / `innerWidth`) |
 | **Hosts with `measureHostCssSize` / `measureCanvasCssRect`** | **8 / 8** |
+| **Unit files** (`*.test.ts`/`*.spec.ts`, excl. archive) | **3211** |
 
 ## Before → after metrics (report-only refresh)
 
-| Metric | Before (`#757` / post748 @ `ce673656`) | Spec claim (post785 @ `06126841`) | After (live post830 @ `97487de6`) |
+| Metric | Before (`#861` / post830 @ `97487de6`) | Spec claim (post865 cut @ `3908809d`) | After (live post865 @ `7f8a7147`) |
 | --- | ---: | ---: | ---: |
-| board-3d raw `rg` hits | 32 | 30 | **30** |
-| Per-host raw (typical) | 4 × 8 | 4 × most | **4** × 7 + **2** star-track |
-| Batched host-size pattern | 0 / 8 | hex / queens / prime-gold only | **8 / 8** |
-| Open draft code claims (fiar/kwatro/pent/kings) | n/a (pre-batch) | still open | **tip-contained** via `#830` |
-| owl gBCR sites | not in prior inventory | `:69` | **1** (funnel; see below) |
-| Tip SHA stamp | `ce673656` | `06126841` | **`97487de6`** |
+| board-3d raw `rg` hits | 30 | 30 (in 31 w/ owl) | **30** |
+| board-3d + owl combined | 31 | **31** | **31** |
+| Per-host raw (typical) | 4 × 7 + 2 star-track | 4 × most; star-track 2; owl 1 | **4** × 7 + **2** star-track + owl **1** |
+| Batched host-size pattern | 8 / 8 | unchanged | **8 / 8** |
+| owl gBCR sites | 1 (`:69`) | 1 | **1** (funnel; see below) |
+| Tip SHA stamp | `97487de6` | `3908809d` | **`7f8a7147`** |
 
-**Delta vs `#757`:** tip advanced through layout batches; raw count −2 (star-track dropped host `clientWidth`/`clientHeight` in favor of `fitHostToViewport` side); every board-3d host now funnels reads through measure helpers + cache.
+**Delta vs `#861`:** tip advanced post865; layout-read counts **unchanged**. Inventory value is the new tip SHA / branch stamp so agents stop citing post830 as current.
 
-## Pattern summary (post830)
+## Pattern summary (post865)
 
 | Role | Helper | APIs | When | Force layout? |
 | --- | --- | --- | --- | --- |
@@ -79,7 +82,7 @@ $ rg -n 'getBoundingClientRect|clientWidth|clientHeight' \
 
 Shared binder `bindBoard3dLayout` in `src/ui/three/tablet-gl.ts` still coalesces window / `visualViewport` / `ResizeObserver` into one `onLayout` callback.
 
-## Per-host inventory (tip `97487de6`)
+## Per-host inventory (tip `7f8a7147`)
 
 | Host | Raw `rg` | Code sites | Batched? | Site lines (code) | Notes |
 | --- | ---: | ---: | :---: | --- | --- |
@@ -98,19 +101,19 @@ Raw count includes one doc-comment match per non–star-track host (`Sole host s
 
 ## Visual — batched status bars
 
-See [`board3d-layout-reads-inventory-post830-2026-10-10.svg`](./board3d-layout-reads-inventory-post830-2026-10-10.svg): eight board-3d hosts at post830 are **batched** (green); owl remains a single funnel read (amber).
+See [`board3d-layout-reads-inventory-post865-2026-10-10.svg`](./board3d-layout-reads-inventory-post865-2026-10-10.svg): eight board-3d hosts at post865 remain **batched** (green); owl remains a single funnel read (amber). Counts match post830; tip SHA is the refresh.
 
 ```mermaid
 flowchart TB
-  subgraph tip ["tip post830 @ 97487de6"]
+  subgraph tip ["tip post865 @ 7f8a7147"]
     B["8/8 *-board-3d.ts<br/>measureHostCssSize + measureCanvasCssRect"]
     S["star-track: measureLayoutCssTop + canvas cache<br/>no clientWidth/Height"]
     O["owl-component: measureContainerRect :69<br/>q-mp-328 residual"]
   end
-  subgraph prior ["prior #757 @ ce673656"]
-    U["8/8 unbatched<br/>32 raw rg hits"]
+  subgraph prior ["prior #861 @ 97487de6"]
+    P["8/8 batched<br/>30 raw board-3d + 1 owl"]
   end
-  U -->|layout batches #784/#804/#807/#826/#834/#835/#836/#838| B
+  P -->|tip cut #865 + post865 folds| B
   B --> S
   B --> O
 ```
@@ -123,6 +126,7 @@ flowchart TB
 | P2 | Optional: stop mentioning `clientWidth`/`Height` in comments if raw `rg` noise matters | cosmetics only; not a product win |
 | Leave | Star Track `#687` p95 HOLD | timing / harness — inventory only |
 | Leave | Role C when only tests / `__mp3d*` call infrequently | already shares B cache |
+| Leave | Wall-budget / suite timing | open `#887` (`q-mp-388`) |
 
 ## Non-goals / left alone
 
@@ -145,6 +149,7 @@ npm run test:unit
 
 ## Related docs
 
+- [`board3d-layout-reads-inventory-post830-2026-10-10.md`](./board3d-layout-reads-inventory-post830-2026-10-10.md) — prior post830 inventory (`#861`)
 - [`board3d-layout-reads-inventory-2026-10-09.md`](./board3d-layout-reads-inventory-2026-10-09.md) — prior post748 inventory (`#757`)
 - `docs/dev/q-mp-282-hex-board3d-layout-reads.md` … `q-mp-352-kwatro-sinko-board3d-layout-reads.md` — per-host batch notes
 - `docs/dev/q-mp-197-owl-layout-reads.md` — owl tree (different owner)
