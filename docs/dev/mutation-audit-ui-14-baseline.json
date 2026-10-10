@@ -1,0 +1,241 @@
+{
+  "taskId": "q-mp-429-mutation-audit-ui-14",
+  "generatedAt": "2026-10-10T06:29:00.422Z",
+  "harness": "node_modules/.cache/mutation-ui-14/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/stats-dashboard.ts",
+      "src/core/storage/storage.ts",
+      "src/core/router.ts"
+    ],
+    "excludeTests": "mutation-ui14"
+  },
+  "results": [
+    {
+      "module": "src/ui/stats-dashboard.ts",
+      "lines": 301,
+      "tests": [
+        "tests/unit/mutation-ui3-stats-dashboard.test.ts",
+        "tests/unit/q-mp-307-stats-dashboard-residuals.test.ts",
+        "tests/unit/stats-dashboard.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-shell-menu.test.ts",
+        "tests/unit/burn-wave24-stats-selector-ui.test.ts",
+        "tests/unit/burn-wave40-ui-chrome-stats-format.test.ts",
+        "tests/unit/burn-wave41-handshake-remainder-stats-chrome.test.ts",
+        "tests/unit/burn-wave44-ui-stats-format-playtime-ladder.test.ts",
+        "tests/unit/burn-wave44-ui-stats-populated-escape-profile.test.ts",
+        "tests/unit/burn-wave44-ui-stats-zero-played-winrate-dash.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/shell-preload-policy.test.ts",
+        "tests/unit/sr-semantics-structure.test.ts",
+        "tests/unit/storage-sanitize-security.test.ts",
+        "tests/unit/burn-wave24-router.test.ts"
+      ],
+      "availableMutants": 35,
+      "ranMutants": 20,
+      "killed": 16,
+      "survived": 4,
+      "timeout": 0,
+      "error": 0,
+      "score": 80,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m1",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 42,
+          "description": "flip <= \u2192 <",
+          "outcome": "survived"
+        },
+        {
+          "id": "m2",
+          "kind": "NumericBoundary",
+          "line": 42,
+          "description": "0 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "NumericBoundary",
+          "line": 51,
+          "description": "60 \u2192 59",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 60,
+          "description": "flip <= \u2192 <",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/storage/storage.ts",
+      "lines": 437,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r3-storage-settings.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-storage-shell.test.ts",
+        "tests/unit/burn-wave23-storage.test.ts",
+        "tests/unit/burn-wave30-storage-achievements.test.ts",
+        "tests/unit/burn-wave30-storage-aggregates.test.ts",
+        "tests/unit/burn-wave30-storage-corrupt-migrate.test.ts",
+        "tests/unit/burn-wave30-storage-export-import.test.ts",
+        "tests/unit/burn-wave30-storage-handshake.test.ts",
+        "tests/unit/burn-wave30-storage-owl-messages.test.ts",
+        "tests/unit/burn-wave30-storage-owl-mood.test.ts",
+        "tests/unit/burn-wave30-storage-owl-stress.test.ts",
+        "tests/unit/burn-wave30-storage-owl-tutorials.test.ts",
+        "tests/unit/burn-wave30-storage-persist-debounce.test.ts",
+        "tests/unit/burn-wave30-storage-profile.test.ts",
+        "tests/unit/burn-wave30-storage-settings.test.ts",
+        "tests/unit/burn-wave30-storage-stats-record.test.ts",
+        "tests/unit/burn-wave30-storage-stats-stress.test.ts",
+        "tests/unit/burn-wave30-storage-streak-calendar.test.ts",
+        "tests/unit/burn-wave30-storage-streak-longrun.test.ts",
+        "tests/unit/burn-wave30-storage-streak-win.test.ts",
+        "tests/unit/burn-wave30-storage-types-defaults.test.ts",
+        "tests/unit/burn-wave36-storage-achievements-export.test.ts",
+        "tests/unit/burn-wave36-storage-aggregates-profile.test.ts",
+        "tests/unit/burn-wave36-storage-debounce-storm.test.ts",
+        "tests/unit/burn-wave36-storage-firstplayed-freeze.test.ts",
+        "tests/unit/burn-wave36-storage-firstplayed-sticky.test.ts",
+        "tests/unit/burn-wave36-storage-migrate-version0.test.ts",
+        "tests/unit/burn-wave36-storage-mutation-isolation.test.ts",
+        "tests/unit/burn-wave36-storage-owl-trim-window.test.ts",
+        "tests/unit/burn-wave36-storage-profile-active.test.ts",
+        "tests/unit/burn-wave36-storage-save-errors.test.ts",
+        "tests/unit/burn-wave36-storage-savenow-quota.test.ts",
+        "tests/unit/burn-wave36-storage-stats-live-ref.test.ts",
+        "tests/unit/burn-wave36-storage-streak-boundaries.test.ts",
+        "tests/unit/burn-wave36-storage-streak-utc-midnight.test.ts"
+      ],
+      "availableMutants": 72,
+      "ranMutants": 20,
+      "killed": 11,
+      "survived": 9,
+      "timeout": 0,
+      "error": 0,
+      "score": 55,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m3",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 48,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m4",
+          "kind": "BooleanLiteral",
+          "line": 48,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "Logical",
+          "line": 83,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 85,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "BooleanLiteral",
+          "line": 85,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "Logical",
+          "line": 90,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 100,
+          "description": "flip === \u2192 !==",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "BooleanLiteral",
+          "line": 100,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "UnaryNot",
+          "line": 108,
+          "description": "remove !",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/router.ts",
+      "lines": 98,
+      "tests": [
+        "tests/unit/burn-wave24-router.test.ts",
+        "tests/unit/burn-wave36-router-first-match.test.ts",
+        "tests/unit/burn-wave40-handshake-router-registry.test.ts",
+        "tests/unit/burn-wave40-router-empty-hash-404.test.ts",
+        "tests/unit/mp3d-router-hash-query.test.ts",
+        "tests/unit/mutation-ui-router.test.ts",
+        "tests/unit/mutation-ui10-router.test.ts",
+        "tests/unit/a11y-shell-menu-keepers.test.ts",
+        "tests/unit/burn-1007-game-route-mounts.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1008-registry-module-contract.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-storage-settings.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts",
+        "tests/unit/burn-wave24-stats-selector-ui.test.ts",
+        "tests/unit/burn-wave25-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave44-ui-selector-disabled-no-nav.test.ts",
+        "tests/unit/history-routing-helpers.test.ts",
+        "tests/unit/keyboard-a11y-game-selector.test.ts",
+        "tests/unit/overnight-demo-alignment-win-reset.test.ts",
+        "tests/unit/overnight-demo-attribute-filter-set.test.ts",
+        "tests/unit/overnight-demo-dice-roll-exhaust.test.ts",
+        "tests/unit/overnight-demo-empty-remount.test.ts",
+        "tests/unit/overnight-demo-expression-solver-edges.test.ts",
+        "tests/unit/overnight-demo-fraction-op-compare.test.ts",
+        "tests/unit/overnight-demo-graph-path-clear.test.ts",
+        "tests/unit/overnight-demos-attr-compare-filter.test.ts",
+        "tests/unit/overnight-demos-attr-reselect-info.test.ts",
+        "tests/unit/overnight-demos-attr-set-valid-invalid.test.ts",
+        "tests/unit/overnight-demos-expr-calc-examples.test.ts",
+        "tests/unit/overnight-demos-expr-challenge-builder.test.ts",
+        "tests/unit/overnight-demos-expr-solver-equation.test.ts",
+        "tests/unit/overnight-demos-frac-arithmetic-ops.test.ts",
+        "tests/unit/overnight-demos-frac-compare-equiv.test.ts",
+        "tests/unit/overnight-demos-frac-visual-bars.test.ts",
+        "tests/unit/overnight-demos-graph-path-claim.test.ts"
+      ],
+      "availableMutants": 11,
+      "ranMutants": 11,
+      "killed": 11,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
