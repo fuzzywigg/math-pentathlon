@@ -1,0 +1,226 @@
+{
+  "task": "q-mp-510",
+  "title": "prefer-optional-chain residual inventory (tip post949)",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "8698fffb85b1e3d2289e54a665fac6162d3bdee4",
+  "tipShaShort": "8698fffb",
+  "tipCutSha": "5f24bdfe40aa1d89f07dccad1c774784b1a489cf",
+  "measuredAt": "2026-10-10T12:20:34Z",
+  "reconfirmedAt": "2026-10-10T12:28:00Z",
+  "ruleId": "@typescript-eslint/prefer-optional-chain",
+  "ceiling": 21,
+  "total": 21,
+  "headroom": 0,
+  "specNote": "Backlog q-mp-510 named tip post914 @ f5d3d04a; re-measured on post949 (cut 5f24bdfe; tip head 8698fffb after q-mp-026o tip-pointer docs). Live optional-chain total/files unchanged vs backlog stamp (21/21).",
+  "dispositionSummary": {
+    "HOLD_RULES": 14,
+    "HOLD_AI": 7,
+    "CLEARABLE": 0
+  },
+  "buckets": {
+    "src/games/kwatro-sinko": 5,
+    "src/games/prime-gold": 5,
+    "src/games/queens-guards": 4,
+    "src/games/fiar": 2,
+    "src/games/ramrod": 2,
+    "src/games/contig-60": 1,
+    "src/games/fab-a-diffy": 1,
+    "src/games/kings-quadraphages": 1
+  },
+  "files": {
+    "src/games/kwatro-sinko/rules.ts": {
+      "count": 4,
+      "disposition": "HOLD_RULES",
+      "lines": [133, 167, 248, 323]
+    },
+    "src/games/prime-gold/ai.ts": {
+      "count": 3,
+      "disposition": "HOLD_AI",
+      "lines": [58, 94, 108]
+    },
+    "src/games/queens-guards/rules.ts": {
+      "count": 3,
+      "disposition": "HOLD_RULES",
+      "lines": [218, 354, 394]
+    },
+    "src/games/fiar/rules.ts": {
+      "count": 2,
+      "disposition": "HOLD_RULES",
+      "lines": [31, 158]
+    },
+    "src/games/prime-gold/rules.ts": {
+      "count": 2,
+      "disposition": "HOLD_RULES",
+      "lines": [175, 201]
+    },
+    "src/games/ramrod/ai.ts": {
+      "count": 2,
+      "disposition": "HOLD_AI",
+      "lines": [99, 114]
+    },
+    "src/games/contig-60/rules.ts": {
+      "count": 1,
+      "disposition": "HOLD_RULES",
+      "lines": [72]
+    },
+    "src/games/fab-a-diffy/rules.ts": {
+      "count": 1,
+      "disposition": "HOLD_RULES",
+      "lines": [270]
+    },
+    "src/games/kings-quadraphages/rules.ts": {
+      "count": 1,
+      "disposition": "HOLD_RULES",
+      "lines": [25]
+    },
+    "src/games/kwatro-sinko/ai.ts": {
+      "count": 1,
+      "disposition": "HOLD_AI",
+      "lines": [311]
+    },
+    "src/games/queens-guards/ai.ts": {
+      "count": 1,
+      "disposition": "HOLD_AI",
+      "lines": [148]
+    }
+  },
+  "hits": [
+    {
+      "file": "src/games/contig-60/rules.ts",
+      "line": 72,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/fab-a-diffy/rules.ts",
+      "line": 270,
+      "column": 25,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/fiar/rules.ts",
+      "line": 31,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/fiar/rules.ts",
+      "line": 158,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/kings-quadraphages/rules.ts",
+      "line": 25,
+      "column": 11,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 311,
+      "column": 9,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 133,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 167,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 248,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 323,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/prime-gold/ai.ts",
+      "line": 58,
+      "column": 9,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/prime-gold/ai.ts",
+      "line": 94,
+      "column": 11,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/prime-gold/ai.ts",
+      "line": 108,
+      "column": 11,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/prime-gold/rules.ts",
+      "line": 175,
+      "column": 12,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/prime-gold/rules.ts",
+      "line": 201,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/queens-guards/ai.ts",
+      "line": 148,
+      "column": 7,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/queens-guards/rules.ts",
+      "line": 218,
+      "column": 9,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/queens-guards/rules.ts",
+      "line": 354,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/queens-guards/rules.ts",
+      "line": 394,
+      "column": 7,
+      "disposition": "HOLD_RULES"
+    },
+    {
+      "file": "src/games/ramrod/ai.ts",
+      "line": 99,
+      "column": 18,
+      "disposition": "HOLD_AI"
+    },
+    {
+      "file": "src/games/ramrod/ai.ts",
+      "line": 114,
+      "column": 18,
+      "disposition": "HOLD_AI"
+    }
+  ],
+  "verification": {
+    "lintRatchet": "ok @typescript-eslint/prefer-optional-chain: 21 / ceiling 21",
+    "reportLintBuckets": "npm run report:lint-buckets -- --rule @typescript-eslint/prefer-optional-chain --top 40",
+    "checkDevDocs": "npm run check:dev-docs"
+  },
+  "related": {
+    "priorClear": "q-mp-148 prefer-optional-chain non-HOLD clear + ceiling 21",
+    "backlog": "docs/dev/backlog-2026-10-10h.md (q-mp-510)",
+    "offRulesInventory": "docs/dev/eslint-off-rules-inventory.md",
+    "lintBucketSnapshot": "docs/dev/lint-bucket-snapshot-post914-2026-10-10.md"
+  }
+}
