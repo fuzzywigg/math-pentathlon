@@ -1,0 +1,73 @@
+{
+  "taskId": "q-mp-457-mutation-audit-ui-15",
+  "generatedAt": "2026-10-10T08:33:18.456Z",
+  "harness": "node_modules/.cache/mutation-ui-15/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/core/security-headers.ts",
+      "src/ui/hex-svg.ts",
+      "src/core/dom-security.ts"
+    ],
+    "excludeTests": "mutation-ui15",
+    "preferPrefix": "mutation-ui15"
+  },
+  "results": [
+    {
+      "module": "src/core/security-headers.ts",
+      "lines": 58,
+      "tests": ["tests/unit/security-headers.test.ts"],
+      "availableMutants": 1,
+      "ranMutants": 1,
+      "killed": 1,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/hex-svg.ts",
+      "lines": 71,
+      "tests": ["tests/unit/mutation-ui2-hex-svg.test.ts"],
+      "availableMutants": 36,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/dom-security.ts",
+      "lines": 145,
+      "tests": [
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/dom-security.test.ts",
+        "tests/unit/engine-coverage-round-10-burn-1008.test.ts",
+        "tests/unit/mutation-ui-dom-security.test.ts"
+      ],
+      "availableMutants": 13,
+      "ranMutants": 13,
+      "killed": 12,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 92.3,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m5",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 55,
+          "description": "flip < → <=",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
