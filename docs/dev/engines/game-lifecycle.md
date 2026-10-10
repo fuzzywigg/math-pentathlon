@@ -191,12 +191,12 @@ Crash UI is pinned by `tests/unit/game-error-boundary.test.ts` / `src/ui/game-er
 | After **Try again** remount | ![Reset remount](../../visuals/2026-10/lifecycle-crash-boundary-reset-hex.png) |
 
 ```bash
-npx playwright test -c playwright.lifecycle-visuals.config.ts
+npm run docs:lifecycle-visuals
 # optional software GL:
-PLAYWRIGHT_SWIFTSHADER=1 npx playwright test -c playwright.lifecycle-visuals.config.ts
+PLAYWRIGHT_SWIFTSHADER=1 npm run docs:lifecycle-visuals
 ```
 
-Harness: `scripts/capture-lifecycle-visuals-q-mp-146.spec.ts` · config: `playwright.lifecycle-visuals.config.ts`
+Harness: `scripts/capture-lifecycle-visuals-q-mp-146.spec.ts` · config: `playwright.lifecycle-visuals.config.ts` · npm: `docs:lifecycle-visuals`
 
 ## Related tests (reference only)
 

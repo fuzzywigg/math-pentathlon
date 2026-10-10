@@ -44,7 +44,7 @@ Names from src/core/game-registry.ts:
 Tablet landscape (1024×768) start and mid-game screenshots for every registered game. Regenerated with Playwright (not CI):
 
 ```bash
-npx playwright test -c playwright.gallery.config.ts
+npm run docs:gallery
 ```
 
 | Game | Start | Mid-game |
