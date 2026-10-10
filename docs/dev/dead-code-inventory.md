@@ -37,6 +37,11 @@
 > Zero verified-unused selectors after scripts corpus + dynamic exclusions (491 classes defined;
 > naive unused 8 → all kept/dynamic or script-referenced). Report-only; contains open `#766`.
 > Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post755-2026-10-09.md`.
+>
+> **q-mp-341 (2026-10-10):** Fresh Rank-1 CSS rescan on tip `cursor/mp-tip-post785` @ `c9b55cff`.
+> Metrics unchanged vs `#805` (491 defined / naive unused 8 / zero-ref 0); no `src/**/*.css`
+> diffs since post755 scan SHA. Report-only; contains open `#805` / `#766`.
+> Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post785-2026-10-10.md`.
 
 ## Method
 
