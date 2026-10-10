@@ -5,33 +5,7 @@
  * a known cell and asserts the registered move/selection advanced correctly.
  */
 import { test, expect, type Page } from './fixtures';
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
-async function gotoGame(page: Page, gameId: string) {
-  await page.goto(`/#/game/${gameId}`);
-  await waitForGameReady(page);
-}
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await expect(modal).toHaveClass(/hidden/);
-  }
-}
+import { gotoGame, startHuman } from './helpers/page';
 
 /** Wait until the viewport matches and two paint frames have run (no fixed sleep). */
 async function waitForViewportSettle(
