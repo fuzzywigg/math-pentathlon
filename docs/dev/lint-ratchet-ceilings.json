@@ -1,9 +1,9 @@
 {
-  "notes": "Tip post785 min ceilings after #822 no-shadow (\u22126\u21923) + #825/#320 void game-shell (\u22124\u219262): curly 538; no-non-null-assertion 246; no-confusing-void-expression 62; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post785 min ceilings after #822 no-shadow (\u22126\u21923) + #825/#320 void game-shell (\u22124\u219262) + #344 void tablet-gl (\u22124\u219258): curly 538; no-non-null-assertion 246; no-confusing-void-expression 58; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure vs open #825).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 62,
+    "@typescript-eslint/no-confusing-void-expression": 58,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 47,
