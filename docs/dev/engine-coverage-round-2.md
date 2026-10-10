@@ -28,7 +28,9 @@ suite.
 | #465 / #515 / undo-audit | Helpers / mutation / undo props | Helpers reused; suites not cloned |
 
 New suite: `tests/unit/engine-coverage-round-2-burn-1008.test.ts`  
-Rank helper (from #562): `scripts/engine-coverage-rank.mjs`
+Rank helper (from #562): `scripts/engine-coverage-rank.mjs` — pass a
+**local** `coverage-summary.json` path; `coverage-engine-r2-*` report dirs are
+generated locally (ephemeral; do not commit).
 
 ## Method
 
@@ -109,7 +111,7 @@ Hex Hard assert remains **450ms** (untouched). Stars & Bars history cap untouche
 ## Reproduce
 
 ```bash
-# Baseline (after merging #562, before round-2 tests) — or use saved summary
+# Produce / re-measure a local summary first (ephemeral; not committed), then:
 node scripts/engine-coverage-rank.mjs coverage-engine-r2-baseline/coverage-summary.json
 
 npm run test:unit:coverage -- \
