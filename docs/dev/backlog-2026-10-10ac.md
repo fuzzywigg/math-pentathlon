@@ -2,16 +2,16 @@
 
 **Task id:** `q-mp-090ac`  
 **Role:** worker (report-only)  
-**Tip audited:** `cursor/mp-tip-post1059` @ `2c70fbc0` (full `2c70fbc0d139c0f7b8ca3c6383d572b1f53369e6`)  
-**Depends on:** tip cut after `q-mp-026r` / tip PR #1059 squash-merged; tip-owner fold `q-mp-026s` / draft tip PR `#1083` (base `alpha`) advancing live tip HEAD. Round-28 backlog (`q-mp-090ab` / draft `#1121`, ids `q-mp-767`…`779`) and round-27 (`q-mp-090aa` / tip-carried `10aa` + workers `#1116`–`#1120`) are **not** all tip-carried yet — leave with `contained`. Tip HEAD continues to move as tip-owner folds green drafts — **rebase onto latest tip before opening worker PRs**.
+**Tip audited:** `cursor/mp-tip-post1059` @ `dbe6e467` (full `dbe6e467c13e83e7357a2788a9bb161008978b31`; evidence also remeasured on prior tip HEAD `2c70fbc0` before tip-owner mid-fold of `10ab` / `748` / `745` / `747`)  
+**Depends on:** tip cut after `q-mp-026r` / tip PR #1059 squash-merged; tip-owner fold `q-mp-026s` / draft tip PR `#1083` (base `alpha`) advancing live tip HEAD. Round-28 backlog (`q-mp-090ab` / tip-carried `docs/dev/backlog-2026-10-10ab.md` @ `dbe6e467`, ids `q-mp-767`…`779`) and round-27 (`q-mp-090aa` tip-carried + workers `745`–`748` tip-carried) are **tip-carried** — leave open drafts with `contained`. Tip HEAD continues to move as tip-owner folds green drafts — **rebase onto latest tip before opening worker PRs**.
 
 ## Purpose
 
-The tip `cursor/mp-tip-post1059` @ `2c70fbc0` measures suite **3366** files / **14347** cases; nnnull **237**/237; void **47**/47; nullish **65**/65; unusedTypes live **29** vs baseline **36**; AGENTS tip **name** already **post1059**; wiki/testing-layers **count** cells still stale (owned by open `#1098`/`667`+`668` — leave with `contained`). Chromium e2e list **25** files / **249** cases. **`npm run lint:ratchet` eqeqeq 1 / ceiling 1**, but **`npm run report:lint-buckets -- --rule eqeqeq` falsely reports 0 / 1** because its probe overlay omits `eqeqeq: ['error', 'always']` while claiming identity with `check-lint-ratchet.mjs` — primary tooling bug for this refill. Knip unusedExports remain the intentional LEAVE barrel pair + AI `cancelFabAiRequests` (no SAFE deletes; unusedFiles **0**). This doc lists **16 new** concrete engineering tasks (`q-mp-792` … `q-mp-807`) mined from the **live tip tree** @ `2c70fbc0`, checked against prior refills (`q-mp-090` … `q-mp-090ab` / ids through `q-mp-779`) and against the full open draft PR list. It is the **only** deliverable of `q-mp-090ac`.
+The tip `cursor/mp-tip-post1059` @ `dbe6e467` (suite evidence @ `2c70fbc0`: **3366** files / **14347** cases) has nnnull **237**/237; void **47**/47; nullish **65**/65; unusedTypes live **29** vs baseline **36**; AGENTS tip **name** already **post1059**; wiki/testing-layers **count** cells still stale (owned by open `#1098`/`667`+`668` — leave with `contained`). Chromium e2e list **25** files / **249** cases. **`npm run lint:ratchet` eqeqeq 1 / ceiling 1**, but **`npm run report:lint-buckets -- --rule eqeqeq` falsely reports 0 / 1** because its probe overlay omits `eqeqeq: ['error', 'always']` while claiming identity with `check-lint-ratchet.mjs` — primary tooling bug for this refill (still true @ `dbe6e467`). Knip unusedExports remain the intentional LEAVE barrel pair + AI `cancelFabAiRequests` (no SAFE deletes; unusedFiles **0**). This doc lists **16 new** concrete engineering tasks (`q-mp-792` … `q-mp-807`) mined from the **live tip tree**, checked against prior refills (`q-mp-090` … `q-mp-090ab` / ids through `q-mp-779`) and against the full open draft PR list. It is the **only** deliverable of `q-mp-090ac`.
 
-**Honest count:** Only **16** tasks — not padded to 25. Round-28 already claimed the remaining fixed `waitForTimeout` e2e sites (incl. 8× mp3d HOLD-CHECK) plus wiki `#658` / a11y reproduce cells. Unit coverage / lint successors remain saturated or owned; knip has **no** SAFE unusedExports. Slowest unit wall is still AI determinism / calibration / play-deadline (hard-rule HOLD — not queued). Non-AI isolate files remeasured here are already ≤~1.6s (registry contract) / ≤~2.6s (`existing-games-controllers`) with no proven in-file speedup that is not a forbidden harness shard. This refill **does not** re-queue per-game UI coverage rounds, soft-fail characterizations, mutation-audit waves, board-3d **src** or **mp3d e2e** edits, demo coverage, harness shards, remasure/count-stamp inventories, tip-name stamps, `*types*` residuals, Queens & Guards product work, AI timing, or anything in rounds ≤28. Payoffs are freshly measured: **script/tooling probe drift**, **docs that disagree with `package.json` preferred scripts**, **test-helper adoption** of already-shared helpers (asserts unchanged), and **non-src deep-playtest / audit script** fixed-sleep hygiene away from board-3d / Queens & Guards.
+**Honest count:** Only **16** tasks — not padded to 25. Round-28 (now tip-carried) already claimed the remaining fixed `waitForTimeout` e2e sites (incl. 8× mp3d HOLD-CHECK) plus wiki `#658` / a11y reproduce cells — workers for those ids may still be open; leave with `contained`. Unit coverage / lint successors remain saturated or owned; knip has **no** SAFE unusedExports. Slowest unit wall is still AI determinism / calibration / play-deadline (hard-rule HOLD — not queued). Non-AI isolate files remeasured here are already ≤~1.6s (registry contract) / ≤~2.6s (`existing-games-controllers`) with no proven in-file speedup that is not a forbidden harness shard. This refill **does not** re-queue per-game UI coverage rounds, soft-fail characterizations, mutation-audit waves, board-3d **src** or **mp3d e2e** edits, demo coverage, harness shards, remasure/count-stamp inventories, tip-name stamps, `*types*` residuals, Queens & Guards product work, AI timing, or anything in rounds ≤28. Payoffs are freshly measured: **script/tooling probe drift**, **docs that disagree with `package.json` preferred scripts**, **test-helper adoption** of already-shared helpers (asserts unchanged), and **non-src deep-playtest / audit script** fixed-sleep hygiene away from board-3d / Queens & Guards.
 
-**Preference:** SAFE, mutually independent **tests-only**, **docs-only**, or **scripts/** tooling work. **Do not** queue another remasure of CI wall, bundle headroom, lint-bucket snapshot, copy-pins, boundaries/PWA, board-3d layout inventory, CI permissions, tip-pointer / tip-name sweep theater, open-draft triage, emit-identity, knip drift, dead-CSS Rank-1 rescan, coverage-map heat regenerate, or wiki **count** stamps (`#1098` owns `667`/`668`). **Avoid** competing tickets already owned by open `#1084`–`#1121` / tip-carried `10y`/`10z`/`10aa`. Anything in rules / AI / scoring / legal-move paths, player-facing copy, tutorials product edits, timing, Stars & Bars history cap, Hex Hard 450ms, or CI permissions widening is **HOLD**. **Do not** change fake-clock semantics (no real→fake timer product retargets).
+**Preference:** SAFE, mutually independent **tests-only**, **docs-only**, or **scripts/** tooling work. **Do not** queue another remasure of CI wall, bundle headroom, lint-bucket snapshot, copy-pins, boundaries/PWA, board-3d layout inventory, CI permissions, tip-pointer / tip-name sweep theater, open-draft triage, emit-identity, knip drift, dead-CSS Rank-1 rescan, coverage-map heat regenerate, or wiki **count** stamps (`#1098` owns `667`/`668`). **Avoid** competing tickets already owned by open `#1084`–`#1121` / tip-carried `10y`/`10z`/`10aa`/`10ab`. Anything in rules / AI / scoring / legal-move paths, player-facing copy, tutorials product edits, timing, Stars & Bars history cap, Hex Hard 450ms, or CI permissions widening is **HOLD**. **Do not** change fake-clock semantics (no real→fake timer product retargets).
 
 **Lint policy for this refill:** **no** new ceiling-key clears (board-3d src / owned singles / AI-rules HOLD). Tooling fix for `report:lint-buckets` probe drift is allowed and does **not** change ceilings.
 
@@ -21,8 +21,8 @@ Skipped topics already covered by `q-mp-176`–`q-mp-779`, open drafts, or prior
 
 | Topic family                                                                                                                                                                                                                                                | Why skipped                                                                                                       |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| round-28 backlog / wiki `#658` / queens-guards-playability waits / visual-stability waits / `waitForGameReady`+`startHuman` adoption / mp3d e2e waits / wiki a11y reproduce | open `#1121` `10ab` — leave with `contained`; **do not** re-queue `767`–`779` |
-| round-27 backlog / void queens-board-3d / nnnull owl-messages / nullish fiar-board-3d / ceilings notes tip / canvas-dpr + contig-60 + sum-dominoes waits / router mock helper | tip-carried `746` + open `#1116`/`#1117`–`#1120` — leave with `contained` |
+| round-28 backlog / wiki `#658` / queens-guards-playability waits / visual-stability waits / `waitForGameReady`+`startHuman` adoption / mp3d e2e waits / wiki a11y reproduce | tip-carried `10ab` @ `dbe6e467` (+ open `#1121` if still listed) — leave with `contained`; **do not** re-queue `767`–`779` |
+| round-27 backlog / void queens-board-3d / nnnull owl-messages / nullish fiar-board-3d / ceilings notes tip / canvas-dpr + contig-60 + sum-dominoes waits / router mock helper | tip-carried `10aa` + `745`–`748` @ tip — leave open drafts with `contained` |
 | round-26 / knip alpha inventory 717 / testing-layers H2 718 / void prime / nnnull owl-system / nullish juggle | tip-carried `717` + open `#1114` — leave with `contained` |
 | per-game UI coverage rounds / soft-fail characterizations / mutation-audit waves / board-3d **src** or **mp3d e2e** / demo coverage / harness shards / remasure inventories / tip-name stamps / `*types*` residuals | prompt hard-skip for round-29 |
 | knip unusedExports (storage barrel LEAVE + `cancelFabAiRequests` AI) / Rank-3 compat ×7 demote / unusedTypes baseline 36→29 drop                                                                                                                           | intentional LEAVE / prior demote chain / remasure theater — leave alone |
@@ -31,17 +31,18 @@ Skipped topics already covered by `q-mp-176`–`q-mp-779`, open drafts, or prior
 
 Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infrastructure`; meromhouse agents; any CI `permissions` widening, apt, or network-in-tests work. No `memory/` files.
 
-## Stale queue re-check (live tip `2c70fbc0`)
+## Stale queue re-check (live tip `dbe6e467`)
 
-| Id                                  | Title (short)                | Verdict                                                | Evidence @ `2c70fbc0`                                                                                 |
+| Id                                  | Title (short)                | Verdict                                                | Evidence @ `dbe6e467`                                                                                 |
 | ----------------------------------- | ---------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
-| `q-mp-090ab` / `#1121`              | round-28 backlog 10ab        | **still-valid (open)**                                 | Leave open with `contained` — this refill starts after `779`.                                         |
-| `q-mp-090aa` / `#1116`              | round-27 backlog 10aa        | **still-valid (open)**                                 | Leave open with `contained`.                                                                          |
-| `q-mp-767` / `#1121`                | wiki stale Open draft #658   | **still-valid (open)**                                 | `gh pr view 658` → `MERGED`; wiki L122 still claims open draft — leave `#1121`.                       |
-| `q-mp-779` / `#1121`                | wiki a11y → `test:e2e:chromium` | **still-valid (open)**                              | Wiki L156 still bare `test:e2e -- --project=chromium` — leave `#1121`; this refill owns **sibling docs**. |
-| `q-mp-770`–`771` / `#1121`          | adopt waitForGameReady / startHuman | **still-valid (open)**                          | This refill owns **`gotoGame`** adoption only — leave `#1121`.                                        |
-| `q-mp-746`                          | canvas-dpr condition waits   | **tip-carried**                                        | HEAD `2c70fbc0` is the fold; local `gotoGame`/`startHuman` dupes may remain for `801` / `#1121`.      |
-| `q-mp-717`                          | alpha-required-checks knip   | **tip-carried**                                        | Live `docs/dev/alpha-required-checks-q-mp-056.md` already lists `knip` — leave open `#1115` with `contained`. |
+| `q-mp-090ab` / `#1121`              | round-28 backlog 10ab        | **tip-carried**                                        | `docs/dev/backlog-2026-10-10ab.md` on tip @ `dbe6e467` — leave open draft with `contained`; this refill starts after `779`. |
+| `q-mp-090aa`                        | round-27 backlog 10aa        | **tip-carried**                                        | Leave open drafts with `contained`.                                                                   |
+| `q-mp-767`                          | wiki stale Open draft #658   | **still-valid (tip-queued; unworked)**                 | `gh pr view 658` → `MERGED`; wiki L122 still claims open draft — leave `767` owner alone.             |
+| `q-mp-779`                          | wiki a11y → `test:e2e:chromium` | **still-valid (tip-queued; unworked)**              | Wiki L156 still bare `test:e2e -- --project=chromium` — leave `779`; this refill owns **sibling docs**. |
+| `q-mp-770`–`771`                    | adopt waitForGameReady / startHuman | **still-valid (tip-queued; unworked)**            | Local dupes still present; this refill owns **`gotoGame`** adoption only.                             |
+| `q-mp-745`–`748`                    | ceilings notes / waits / router helper | **tip-carried**                                  | Tip log includes `745`–`748` folds; ceilings notes already **post1059**.                              |
+| `q-mp-746`                          | canvas-dpr condition waits   | **tip-carried**                                        | Local `gotoGame`/`startHuman` dupes may remain for `801` / `770`–`771`.                               |
+| `q-mp-717`                          | alpha-required-checks knip   | **tip-carried**                                        | Live inventory already lists `knip`.                                                                  |
 | `q-mp-667`–`668` / `#1098`          | wiki/testing-layers counts   | **still-valid (open)**                                 | Live **3366**/ **14347** vs docs **3341**/ **14072**; leave `#1098` — **do not** re-queue count stamps. |
 | `q-mp-543` / `#995`                 | eqeqeq ceiling 1→0           | **still-valid (HOLD product; ceiling-only undrafted)** | Ratchet **1**/1; buckets falsely **0**/1 until `792` — **do not** re-queue product clear.             |
 
@@ -57,10 +58,14 @@ Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infra
 
 **Parallel-friendly:** `q-mp-794`–`q-mp-799`, `q-mp-802`–`q-mp-807` (no shared product files). Serialize `792`→`793`; serialize `801` with `#1121`/`770`/`771`.
 
-## Live tip measurements (evidence snapshot @ `2c70fbc0`)
+## Live tip measurements (evidence snapshot @ `dbe6e467` / suite probe @ `2c70fbc0`)
 
 ```text
-$ git rev-parse HEAD
+$ git rev-parse origin/cursor/mp-tip-post1059
+  dbe6e467c13e83e7357a2788a9bb161008978b31   ← tip HEAD after 10ab fold (this PR rebases here)
+
+$ # Suite / ratchet / knip / e2e list probed on prior tip HEAD:
+$ git rev-parse HEAD   # at measure
   2c70fbc0d139c0f7b8ca3c6383d572b1f53369e6
 
 $ npm run lint:ratchet
@@ -125,7 +130,7 @@ $ rg -n 'waitForTimeout' scripts/*deep-playtest*.mjs scripts/render-perf-mode.mj
   render-perf 5 / memory-leak 4 / nav-away 3
 ```
 
-Open drafts into `cursor/mp-tip-post1059` at audit: `#1084`–`#1121` + tip-fold `#1083` on `alpha`. No open draft owns backlog `10ac` / ids `792`–`807`.
+Open drafts into `cursor/mp-tip-post1059` at audit: `#1084`–`#1121` + tip-fold `#1083` on `alpha` (tip HEAD already carries `10ab` / `745`–`748`). No open draft owns backlog `10ac` / ids `792`–`807`.
 
 ---
 
