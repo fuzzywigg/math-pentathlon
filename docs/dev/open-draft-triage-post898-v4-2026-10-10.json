@@ -1,9 +1,9 @@
 {
   "taskId": "q-mp-444",
-  "generatedAtUtc": "2026-10-10T08:33:39.254Z",
+  "generatedAtUtc": "2026-10-10T08:41:05.164Z",
   "liveTipBranch": "cursor/mp-tip-post898",
-  "tipSha": "9b19c5e8cd3cd714d745540539324766369a8688",
-  "tipShaShort": "9b19c5e8",
+  "tipSha": "855226389f23cb95bf74bd827556ee831c3bccad",
+  "tipShaShort": "85522638",
   "alphaSha": "946d6f956b54de10e08240ba8b26194c2e3b779d",
   "alphaShaShort": "946d6f95",
   "tipPrOpen": 914,
@@ -16,7 +16,7 @@
   "scope": "report-only; do not close PRs; do not comment / label from this worker task",
   "supersedesNavigation": ["q-mp-385", "q-mp-360", "q-mp-334", "q-mp-309"],
   "method": {
-    "tipCut": "cursor/mp-tip-post898 cut from alpha 946d6f95 after #898; tip #914 folding #900\u2013#913 + post898 workers; #916/#918 already on tip at measurement",
+    "tipCut": "cursor/mp-tip-post898 cut from alpha 946d6f95 after #898; tip #914 folding leftovers + post898 workers; #915\u2013#921/#916/#918 on tip at measurement",
     "classification": "three-dot tip...head blob identity; ignore AGENTS.md + lint-ratchet-ceilings.json noise; tip-ahead stale DIFF \u2192 superseded; #727 held; this PR is the v4 deliverable",
     "noComments": true,
     "noCloses": true,
@@ -35,19 +35,19 @@
     "@typescript-eslint/no-shadow": 3,
     "eqeqeq": 1,
     "@typescript-eslint/return-await": 3,
-    "unitTestSpecFilesExclArchive": 3231,
-    "vitestListCount": 12955,
+    "unitTestSpecFilesExclArchive": 3235,
+    "vitestListCount": 12988,
     "typecheckOutOfScope": 216,
     "hexHardMs": 450,
-    "checkDevDocsScannedBefore": 214,
-    "knipUnusedTypesLive": 33,
+    "checkDevDocsScannedBefore": 218,
+    "knipUnusedTypesLive": 32,
     "knipUnusedTypesBaseline": 36,
     "knipUnusedExports": 3,
     "knipUnlisted": 3,
     "knipDuplicates": 0
   },
   "openInventory": {
-    "openTotal": 350,
+    "openTotal": 356,
     "byBase": {
       "cursor/mp-tip-post477": 67,
       "cursor/mp-tip-post755": 44,
@@ -58,8 +58,8 @@
       "cursor/mp-tip-post830": 25,
       "cursor/mp-tip-post748": 25,
       "cursor/mp-tip-post728": 22,
+      "cursor/mp-tip-post898": 19,
       "cursor/mp-tip-post700": 14,
-      "cursor/mp-tip-post898": 13,
       "cursor/mp-tip-post709": 10,
       "alpha": 6,
       "cursor/overnight-polish-integration-0494": 6,
@@ -67,15 +67,15 @@
       "cursor/integration-fold-wave4-tip-36e4": 1,
       "cursor/playtest-recheck-fixes-a6fd": 1
     },
-    "openBasePost898": 13,
+    "openBasePost898": 19,
     "openBasePost865": 33,
     "openBasePost830": 25,
     "openBasePost785": 27
   },
   "classificationCounts": {
     "held": 1,
-    "superseded": 60,
-    "fold": 11
+    "superseded": 65,
+    "fold": 12
   },
   "drafts": [
     {
@@ -215,7 +215,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/853",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -253,7 +253,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/854",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -291,7 +291,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/855",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -329,7 +329,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/856",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -367,7 +367,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/857",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -405,7 +405,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/858",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -443,7 +443,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/859",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -481,7 +481,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/860",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -519,7 +519,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/861",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md); leave open with contained",
       "same": 1,
       "diff": 1,
       "new": 0,
@@ -562,7 +562,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/862",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -600,7 +600,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/863",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/lint-bucket-report.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/dev/lint-bucket-report.md); leave open with contained",
       "same": 3,
       "diff": 1,
       "new": 0,
@@ -643,7 +643,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/864",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -681,7 +681,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/866",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/knip-report.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/dev/knip-report.md); leave open with contained",
       "same": 3,
       "diff": 1,
       "new": 0,
@@ -724,7 +724,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/867",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -762,7 +762,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/868",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -800,7 +800,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/869",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/knip-report.md, src/ui/pointer-hygiene.ts); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/dev/knip-report.md, src/ui/pointer-hygiene.ts); leave open with contained",
       "same": 4,
       "diff": 2,
       "new": 0,
@@ -847,7 +847,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/870",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -885,7 +885,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/871",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 9b19c5e8",
+      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 85522638",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -923,7 +923,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/872",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 6,
       "diff": 0,
       "new": 0,
@@ -961,7 +961,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/873",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/coverage-map.md, docs/dev/coverage-map.svg, docs/wiki/coverage-map.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/dev/coverage-map.md, docs/dev/coverage-map.svg, docs/wiki/coverage-map.md); leave open with contained",
       "same": 0,
       "diff": 3,
       "new": 0,
@@ -1012,7 +1012,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/874",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1050,7 +1050,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/875",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 6,
       "diff": 0,
       "new": 0,
@@ -1088,7 +1088,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/876",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1126,7 +1126,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/878",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 9,
       "diff": 0,
       "new": 0,
@@ -1164,7 +1164,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/879",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 8,
       "diff": 0,
       "new": 0,
@@ -1202,7 +1202,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/880",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -1240,7 +1240,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/881",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 6,
       "diff": 1,
       "new": 0,
@@ -1283,7 +1283,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/882",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 3,
       "diff": 0,
       "new": 0,
@@ -1321,7 +1321,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/883",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 3,
       "diff": 0,
       "new": 0,
@@ -1359,7 +1359,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/884",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -1397,7 +1397,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/885",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1435,7 +1435,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/886",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 1,
       "diff": 1,
       "new": 0,
@@ -1478,7 +1478,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/887",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 5,
       "diff": 0,
       "new": 0,
@@ -1516,7 +1516,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/888",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 4,
       "diff": 0,
       "new": 0,
@@ -1554,7 +1554,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/889",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 9b19c5e8",
+      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 85522638",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1592,7 +1592,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/890",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1630,7 +1630,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/891",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -1668,7 +1668,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/892",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1706,7 +1706,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/893",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1744,7 +1744,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/894",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1782,7 +1782,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/895",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1820,7 +1820,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/896",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 6,
       "diff": 0,
       "new": 0,
@@ -1858,7 +1858,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/897",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -1896,7 +1896,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/899",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -1934,7 +1934,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/900",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 15,
       "diff": 1,
       "new": 0,
@@ -1977,7 +1977,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/901",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 15,
       "diff": 1,
       "new": 0,
@@ -2020,7 +2020,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/902",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 15,
       "diff": 1,
       "new": 0,
@@ -2063,7 +2063,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/903",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 16,
       "diff": 1,
       "new": 0,
@@ -2106,7 +2106,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/904",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
       "same": 15,
       "diff": 2,
       "new": 0,
@@ -2153,7 +2153,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/905",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 18,
       "diff": 1,
       "new": 0,
@@ -2196,7 +2196,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/906",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 15,
       "diff": 1,
       "new": 0,
@@ -2239,7 +2239,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/907",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 17,
       "diff": 1,
       "new": 0,
@@ -2282,7 +2282,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/908",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 17,
       "diff": 1,
       "new": 0,
@@ -2325,7 +2325,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/909",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
       "same": 15,
       "diff": 2,
       "new": 0,
@@ -2372,7 +2372,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/910",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 30,
       "diff": 0,
       "new": 0,
@@ -2410,7 +2410,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/911",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "reason": "Tip-ahead or tip-contained @ 85522638: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
       "same": 16,
       "diff": 1,
       "new": 0,
@@ -2453,7 +2453,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/912",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 32,
       "diff": 0,
       "new": 0,
@@ -2491,7 +2491,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/913",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 29,
       "diff": 0,
       "new": 0,
@@ -2528,22 +2528,13 @@
       "headSha": "6ce61084945f9af2c22e38f760b23baa8afa5a54",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/915",
       "isDraft": true,
-      "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-31.md, tests/unit/burn-1010-ui-cov-r31-stars-bars.test.ts",
-      "same": 0,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
       "diff": 0,
-      "new": 2,
+      "new": 0,
       "del": 0,
-      "materialFiles": [
-        {
-          "kind": "NEW",
-          "path": "docs/dev/ui-coverage-round-31.md"
-        },
-        {
-          "kind": "NEW",
-          "path": "tests/unit/burn-1010-ui-cov-r31-stars-bars.test.ts"
-        }
-      ],
+      "materialFiles": [],
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -2576,7 +2567,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/916",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 1,
       "diff": 0,
       "new": 0,
@@ -2613,22 +2604,13 @@
       "headSha": "cf8c93731fb535dcd9ea0b57c9b475ae2425e3c5",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/917",
       "isDraft": true,
-      "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-33.md, tests/unit/burn-1010-ui-cov-r33-fiar.test.ts",
-      "same": 0,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
       "diff": 0,
-      "new": 2,
+      "new": 0,
       "del": 0,
-      "materialFiles": [
-        {
-          "kind": "NEW",
-          "path": "docs/dev/ui-coverage-round-33.md"
-        },
-        {
-          "kind": "NEW",
-          "path": "tests/unit/burn-1010-ui-cov-r33-fiar.test.ts"
-        }
-      ],
+      "materialFiles": [],
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -2661,7 +2643,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/918",
       "isDraft": true,
       "recommendation": "superseded",
-      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
       "same": 2,
       "diff": 0,
       "new": 0,
@@ -2698,22 +2680,13 @@
       "headSha": "362dcfe27fe2399f3f5e0bb8d5ab7cb0101e57ee",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/919",
       "isDraft": true,
-      "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-32.md, tests/unit/burn-1010-ui-cov-r32-pent-em-in.test.ts",
-      "same": 0,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
       "diff": 0,
-      "new": 2,
+      "new": 0,
       "del": 0,
-      "materialFiles": [
-        {
-          "kind": "NEW",
-          "path": "docs/dev/ui-coverage-round-32.md"
-        },
-        {
-          "kind": "NEW",
-          "path": "tests/unit/burn-1010-ui-cov-r32-pent-em-in.test.ts"
-        }
-      ],
+      "materialFiles": [],
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -2745,18 +2718,13 @@
       "headSha": "787256b2efff886b8c8ec9c34a61ad5f7f7c7076",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/920",
       "isDraft": true,
-      "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-432-dice-ui-roller-residuals.test.ts",
-      "same": 0,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
       "diff": 0,
-      "new": 1,
+      "new": 0,
       "del": 0,
-      "materialFiles": [
-        {
-          "kind": "NEW",
-          "path": "tests/unit/q-mp-432-dice-ui-roller-residuals.test.ts"
-        }
-      ],
+      "materialFiles": [],
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -2788,18 +2756,13 @@
       "headSha": "b833d5824f2447f2c922ad0d1ff7d46843da955a",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/921",
       "isDraft": true,
-      "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): docs/dev/backlog-2026-10-10e.md",
-      "same": 0,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 85522638 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
       "diff": 0,
-      "new": 1,
+      "new": 0,
       "del": 0,
-      "materialFiles": [
-        {
-          "kind": "NEW",
-          "path": "docs/dev/backlog-2026-10-10e.md"
-        }
-      ],
+      "materialFiles": [],
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -2825,10 +2788,10 @@
     {
       "number": 922,
       "title": "q-mp-443: check:copy-pins residual inventory refresh (tip post898) \u2014 report-only",
-      "taskId": "q-mp-443",
+      "taskId": "?",
       "baseRefName": "cursor/mp-tip-post898",
       "headRefName": "cursor/q-mp-443-copy-pins-inventory-eed7",
-      "headSha": "661df6ede6bc86b26d22cd5cae0becef0f2ea9ed",
+      "headSha": "6399674570f58c78a758da42263bc249765aab45",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/922",
       "isDraft": true,
       "recommendation": "fold",
@@ -2894,10 +2857,10 @@
           "path": "src/ui/stats-dashboard.ts"
         }
       ],
-      "checksSummary": "9/12 (3 pending)",
+      "checksSummary": "12/12",
       "checkCounts": {
-        "success": 9,
-        "pending": 3,
+        "success": 12,
+        "pending": 0,
         "failure": 0,
         "neutral": 0
       },
@@ -2905,15 +2868,15 @@
         "lint": "success",
         "audit": "success",
         "build": "success",
-        "unit": "pending",
+        "unit": "success",
         "e2e": "success",
         "knip": "success",
         "visual-baseline": "success",
-        "e2e-fullgame": "pending",
+        "e2e-fullgame": "success",
         "mobile-touch": "success",
         "zoom-reflow": "success",
         "forced-colors": "success",
-        "e2e-cross-browser": "pending"
+        "e2e-cross-browser": "success"
       }
     },
     {
@@ -2945,10 +2908,10 @@
           "path": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.svg"
         }
       ],
-      "checksSummary": "8/12 (4 pending)",
+      "checksSummary": "12/12",
       "checkCounts": {
-        "success": 8,
-        "pending": 4,
+        "success": 12,
+        "pending": 0,
         "failure": 0,
         "neutral": 0
       },
@@ -2956,15 +2919,15 @@
         "lint": "success",
         "audit": "success",
         "build": "success",
-        "unit": "pending",
-        "e2e": "pending",
+        "unit": "success",
+        "e2e": "success",
         "knip": "success",
         "visual-baseline": "success",
-        "e2e-fullgame": "pending",
+        "e2e-fullgame": "success",
         "mobile-touch": "success",
         "zoom-reflow": "success",
         "forced-colors": "success",
-        "e2e-cross-browser": "pending"
+        "e2e-cross-browser": "success"
       }
     },
     {
@@ -2973,7 +2936,7 @@
       "taskId": "q-mp-455",
       "baseRefName": "cursor/mp-tip-post898",
       "headRefName": "cursor/q-mp-455-safe-web-storage-feature-flags-9671",
-      "headSha": "d5201f080899db84ad46173ae5b29887658281d6",
+      "headSha": "4b344f0b5905df8a3cfc0595f65aa163cf00782e",
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/925",
       "isDraft": true,
       "recommendation": "fold",
@@ -2988,10 +2951,10 @@
           "path": "tests/unit/q-mp-455-safe-web-storage-feature-flags-residuals.test.ts"
         }
       ],
-      "checksSummary": "8/12 (4 pending)",
+      "checksSummary": "9/12 (3 pending)",
       "checkCounts": {
-        "success": 8,
-        "pending": 4,
+        "success": 9,
+        "pending": 3,
         "failure": 0,
         "neutral": 0
       },
@@ -2999,7 +2962,7 @@
         "lint": "success",
         "audit": "success",
         "build": "success",
-        "unit": "pending",
+        "unit": "success",
         "e2e": "pending",
         "knip": "success",
         "visual-baseline": "success",
@@ -3047,6 +3010,206 @@
           "path": "docs/dev/board3d-layout-reads-inventory-post898-2026-10-10.svg"
         }
       ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 927,
+      "title": "q-mp-453: characterize game-prefetch soft-fail residuals (tests-only)",
+      "taskId": "q-mp-453",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-453-game-prefetch-soft-fail-e2a5",
+      "headSha": "d7e0368f9f8fe7a346d87bd9c4784b839b84e9f4",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/927",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 1 new): tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts, vitest.config.ts",
+      "same": 0,
+      "diff": 1,
+      "new": 1,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "vitest.config.ts"
+        }
+      ],
+      "checksSummary": "9/12 (3 pending)",
+      "checkCounts": {
+        "success": 9,
+        "pending": 3,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 928,
+      "title": "q-mp-441: lint-bucket measured snapshot @ tip post898 ceilings (report-only)",
+      "taskId": "q-mp-441",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-441-lint-bucket-post898-21af",
+      "headSha": "ad18e978989a9837f368941d505595d9318a02e5",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/928",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 3 new): docs/dev/lint-bucket-report.md, docs/dev/lint-bucket-snapshot-post898-2026-10-10.json, docs/dev/lint-bucket-snapshot-post898-2026-10-10.md, docs/dev/lint-bucket-snapshot-post898-2026-10-10.svg",
+      "same": 0,
+      "diff": 1,
+      "new": 3,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/lint-bucket-report.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/lint-bucket-snapshot-post898-2026-10-10.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/lint-bucket-snapshot-post898-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/lint-bucket-snapshot-post898-2026-10-10.svg"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 929,
+      "title": "q-mp-445: remeasure wiki/testing-layers unit counts to 3234 / 12972 (tip post898)",
+      "taskId": "q-mp-445",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-445-testing-layers-counts-0dc9",
+      "headSha": "330ebbde7e9bb574cf470e0d63a615c6035937ee",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/929",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 2 diff / 0 new): docs/dev/testing-layers-2026-10-09.md, docs/wiki/development.md",
+      "same": 0,
+      "diff": 2,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/testing-layers-2026-10-09.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 930,
+      "title": "q-mp-438: remeasure post898 bundle headroom (sum-dominoes \u221277 B)",
+      "taskId": "q-mp-438",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-438-bundle-headroom-post898-c7d6",
+      "headSha": "ec427d2df982b2a339d907769c28da083156242f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/930",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/bundle-headroom-post898-2026-10-10.json, docs/dev/bundle-headroom-post898-2026-10-10.md, docs/dev/bundle-headroom-post898-2026-10-10.svg",
+      "same": 0,
+      "diff": 0,
+      "new": 3,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/bundle-headroom-post898-2026-10-10.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/bundle-headroom-post898-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/bundle-headroom-post898-2026-10-10.svg"
+        }
+      ],
       "checksSummary": "8/12 (4 pending)",
       "checkCounts": {
         "success": 8,
@@ -3070,16 +3233,67 @@
       }
     },
     {
-      "number": 927,
-      "title": "q-mp-453: characterize game-prefetch soft-fail residuals (tests-only)",
-      "taskId": "q-mp-453",
+      "number": 931,
+      "title": "q-mp-447: Docs \u2014 typecheck out-of-scope 216 HOLD map refresh (tip post898)",
+      "taskId": "q-mp-447",
       "baseRefName": "cursor/mp-tip-post898",
-      "headRefName": "cursor/q-mp-453-game-prefetch-soft-fail-e2a5",
-      "headSha": "6df0e59ac77b9500929d8211ee896bf033aa2e9a",
-      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/927",
+      "headRefName": "cursor/q-mp-447-typecheck-oos-hold-post898-f1a1",
+      "headSha": "915d98e0c1981bb7c242664393ea6aea6ac8a2cc",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/931",
       "isDraft": true,
       "recommendation": "fold",
-      "reason": "Unique payload vs tip (0 same / 1 diff / 1 new): tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts, vitest.config.ts",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.json, docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.md, docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.svg",
+      "same": 0,
+      "diff": 0,
+      "new": 3,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.svg"
+        }
+      ],
+      "checksSummary": "8/12 (4 failure)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 0,
+        "failure": 4,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "failure",
+        "e2e": "failure",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "failure",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "failure"
+      }
+    },
+    {
+      "number": 932,
+      "title": "q-mp-454: characterize game-selector soft-fail residuals (tests-only)",
+      "taskId": "q-mp-454",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-454-game-selector-soft-fail-c2c2",
+      "headSha": "0067e6685bbf874c61986850200e82b8d74e46af",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/932",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 1 new): tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts, vitest.config.ts",
       "same": 0,
       "diff": 1,
       "new": 1,
@@ -3087,17 +3301,80 @@
       "materialFiles": [
         {
           "kind": "NEW",
-          "path": "tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts"
+          "path": "tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts"
         },
         {
           "kind": "DIFF",
           "path": "vitest.config.ts"
         }
       ],
-      "checksSummary": "8/12 (4 pending)",
+      "checksSummary": "7/12 (5 failure)",
       "checkCounts": {
-        "success": 8,
-        "pending": 4,
+        "success": 7,
+        "pending": 0,
+        "failure": 5,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "failure",
+        "e2e": "failure",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "failure",
+        "mobile-touch": "failure",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "failure"
+      }
+    },
+    {
+      "number": 933,
+      "title": "q-mp-457: mutation audit UI wave 15 \u2014 security-headers / hex-svg / dom-security (tests-only)",
+      "taskId": "q-mp-457",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-457-mutation-audit-ui-15-8cd9",
+      "headSha": "78205241e2be22608d9e365ab5c260df134ed911",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/933",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 6 new): docs/dev/mutation-audit-ui-15-after.json, docs/dev/mutation-audit-ui-15-baseline.json, docs/dev/mutation-audit-ui-15.md, tests/unit/mutation-ui15-dom-security.test.ts, tests/unit/mutation-ui15-hex-svg.test.ts, tests/unit/mutation-ui15-security-headers.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 6,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/mutation-audit-ui-15-after.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/mutation-audit-ui-15-baseline.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/mutation-audit-ui-15.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/mutation-ui15-dom-security.test.ts"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/mutation-ui15-hex-svg.test.ts"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/mutation-ui15-security-headers.test.ts"
+        }
+      ],
+      "checksSummary": "9/12 (3 pending)",
+      "checkCounts": {
+        "success": 9,
+        "pending": 3,
         "failure": 0,
         "neutral": 0
       },
@@ -3105,7 +3382,7 @@
         "lint": "success",
         "audit": "success",
         "build": "success",
-        "unit": "pending",
+        "unit": "success",
         "e2e": "pending",
         "knip": "success",
         "visual-baseline": "success",
