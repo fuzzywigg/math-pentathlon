@@ -22,7 +22,12 @@ function defaultSchedule(cb: () => void): void {
 
   if (typeof ric === 'function') {
     // Defer SW install/precache so first paint JS/CSS/font win the radio.
-    ric(() => cb(), { timeout: 3_000 });
+    ric(
+      () => {
+        cb();
+      },
+      { timeout: 3_000 }
+    );
     return;
   }
   window.setTimeout(cb, 1_000);

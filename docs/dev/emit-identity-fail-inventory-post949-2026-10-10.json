@@ -1,0 +1,136 @@
+{
+  "taskId": "q-mp-559",
+  "auditedAt": "2026-10-10T15:17:20Z",
+  "tipBranch": "cursor/mp-tip-post977",
+  "tipSha": "09ff62ae035793514422e22453a098ae46d5f92e",
+  "backlogBasename": "emit-identity-fail-inventory-post949-2026-10-10",
+  "backlogTipClaim": "cursor/mp-tip-post949",
+  "priorInventory": {
+    "taskId": "q-mp-462",
+    "pr": 939,
+    "path": "docs/dev/emit-identity-fail-inventory-post914-2026-10-10.md",
+    "tipBranch": "cursor/mp-tip-post914",
+    "tipSha": "753052a6844e80c6264d1d2480deafa5a9e7b59c",
+    "note": "Same 11 DIFF set; older tip stamp — leave open with contained"
+  },
+  "olderSiblings": [
+    {
+      "taskId": "q-mp-393",
+      "pr": 881,
+      "path": "docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md",
+      "tipBranch": "cursor/mp-tip-post865",
+      "note": "Same 11 DIFF set; older tip stamp — leave open with contained"
+    },
+    {
+      "taskId": "q-mp-343",
+      "pr": 839,
+      "path": "docs/dev/emit-identity-fail-inventory-2026-10-10.md",
+      "tipBranch": "cursor/mp-tip-post785",
+      "note": "Same 11 DIFF set; older tip stamp — leave open with contained"
+    }
+  ],
+  "command": "npm run check:emit-identity",
+  "base": "eec2b327c1e65586537cbe03b1c29b93065dee03",
+  "head": "WORKING_TREE",
+  "minify": false,
+  "normalize": false,
+  "normalizeSameFailCount": true,
+  "totals": {
+    "files": 21,
+    "ok": 10,
+    "fail": 11
+  },
+  "beforeAfter": {
+    "note": "Report-only refresh vs #939; FAIL count intentionally unchanged; all DIFF paths HARD RULE HOLD",
+    "beforeFail": 11,
+    "afterFail": 11,
+    "beforeOk": 10,
+    "afterOk": 10
+  },
+  "hexHardMs": 450,
+  "classCounts": {
+    "import-format": 5,
+    "curly-brace": 1,
+    "import-format+curly-brace": 1,
+    "console-strip": 1,
+    "timing-constant-intentional": 1,
+    "watchdog-client-control-flow": 1,
+    "scoring-difficulty-timing": 1
+  },
+  "diffFiles": [
+    {
+      "path": "src/games/hex-a-gone/ai.ts",
+      "class": "import-format",
+      "hold": true
+    },
+    {
+      "path": "src/games/juggle/ai.ts",
+      "class": "import-format",
+      "hold": true
+    },
+    {
+      "path": "src/games/star-track/ai.ts",
+      "class": "import-format",
+      "hold": true
+    },
+    {
+      "path": "src/games/stars-bars/ai.ts",
+      "class": "import-format",
+      "hold": true
+    },
+    {
+      "path": "src/games/sum-dominoes/ai.ts",
+      "class": "import-format",
+      "hold": true
+    },
+    {
+      "path": "src/games/calla/ai.ts",
+      "class": "curly-brace",
+      "hold": true
+    },
+    {
+      "path": "src/games/pent-em-in/ai.ts",
+      "class": "import-format+curly-brace",
+      "hold": true
+    },
+    {
+      "path": "src/games/fab-a-diffy/ai.ts",
+      "class": "console-strip",
+      "hold": true
+    },
+    {
+      "path": "src/games/hex/ai.ts",
+      "class": "timing-constant-intentional",
+      "hold": true
+    },
+    {
+      "path": "src/games/hex/ai-client.ts",
+      "class": "watchdog-client-control-flow",
+      "hold": true
+    },
+    {
+      "path": "src/games/kwatro-sinko/ai.ts",
+      "class": "scoring-difficulty-timing",
+      "hold": true
+    }
+  ],
+  "okFiles": [
+    "src/games/contig-60/ai.ts",
+    "src/games/fiar/ai.ts",
+    "src/games/frac-fact/ai.ts",
+    "src/games/fraction-pinball/ai.ts",
+    "src/games/kings-quadraphages/ai.ts",
+    "src/games/par-55/ai.ts",
+    "src/games/prime-gold/ai.ts",
+    "src/games/queens-guards/ai.ts",
+    "src/games/ramrod/ai.ts",
+    "src/games/remainder-islands/ai.ts"
+  ],
+  "disposition": "accept-historical-baseline-vs-wave5; do-not-fix-via-AI-edits; all-11-HOLD",
+  "specStaleness": {
+    "backlogTipClaim": "cursor/mp-tip-post949",
+    "liveTip": "cursor/mp-tip-post977 @ 09ff62ae",
+    "backlogClassClaim": "11 AI diffs (brace/import merge)",
+    "liveClassMix": "5 import-format + 2 curly/import+curly + 4 product emit drift"
+  }
+}
