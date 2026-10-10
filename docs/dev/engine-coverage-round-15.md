@@ -37,7 +37,7 @@ $ git rev-parse HEAD
   b7e518b4afe04556fa7e87ecba7ce97229b05bc7  (cursor/mp-tip-post898)
 
 $ find tests/unit -name '*.test.ts' | wc -l
-  3231
+  3231   # tip later 3236 after unrelated folds; r15 adds +1
 
 $ git grep -n '^\s*it\.todo' -- tests/unit/engine-coverage-round*.test.ts
 (none)
