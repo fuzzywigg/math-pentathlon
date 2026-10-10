@@ -2,7 +2,7 @@
  * Lazy Ollie bootstrap — keeps owl core/UI off the menu critical path.
  */
 
-export type BootstrapOwlOptions = {
+type BootstrapOwlOptions = {
   schedule?: (cb: () => void) => void;
   enabled?: boolean;
   /** Injected for tests. */

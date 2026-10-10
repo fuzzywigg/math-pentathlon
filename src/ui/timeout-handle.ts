@@ -3,7 +3,7 @@
  * Pure timer glue — does not change AI search, scoring, difficulty, or delays.
  */
 
-export type TimeoutId = ReturnType<typeof setTimeout>;
+type TimeoutId = ReturnType<typeof setTimeout>;
 
 /** Clear a pending timeout and return null (for `timer = clearNullableTimeout(timer)`). */
 export function clearNullableTimeout(timer: TimeoutId | null): null {
@@ -16,7 +16,7 @@ export function clearNullableTimeout(timer: TimeoutId | null): null {
 /**
  * Mutable handle for the common `aiTimer` + `aiGeneration` controller pattern.
  */
-export interface GenerationTimeoutHandle {
+interface GenerationTimeoutHandle {
   timer: TimeoutId | null;
   generation: number;
 }

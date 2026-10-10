@@ -29,6 +29,10 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-332 unusedTypes demote batch 5 (2026-10-10)
+
+Re-measured on tip `cursor/mp-tip-post785` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): module-privated PWA `BootstrapOwlOptions` / `BootstrapPwaOptions` / `IdleWarmOptions` / `RegisterPwaOptions` / `RegisterPwaResult`; UI `PixelPoint` / `TimeoutId` / `GenerationTimeoutHandle` / `ReducedMotionOptions` / `GameErrorBoundaryOptions` / `FocusedCellCoords`; kings `SaveInfo` / `GameStateFromJsonResult`; dropped unused `PieceType` re-export from `kings-quadraphages/board.ts` (canonical remains on `pieces.ts`). Baseline `unusedTypes` **61 → 47** (−14). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-4 symbols already on tip (`#823` / `#793`); skipped AI exports, `SafeJsonParseResult`, `timer-scoring`, and `SeatId` (test importers).
+
 ## q-mp-304 unusedTypes demote batch 4 (2026-10-09)
 
 Re-measured on tip `cursor/mp-tip-post755` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): deleted unused `OrionGame` / `CamelGame` / graph `LayoutType` / polyomino `BoardCell` / `AnimateMoveHandle`; module-privated `AnimateMoveCancel`, `FormatFractionOptions`, `InteractiveBuilderOptions`, `SafeHtmlValue`, `DivisionInfo`, `TutorialEventHandler`, kings `CellClickHandler` / `BoardRendererOptions` / `GamePiece`. Baseline `unusedTypes` **75 → 61** (−14; tip had already shrunk 76→75 vs batch-3 floor). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-3 symbols already on tip (`#793`).

@@ -13,7 +13,7 @@ import { getUserReducedMotionFlag } from '../core/settings-flags';
 
 export const REDUCED_MOTION_ATTR = 'data-reduced-motion';
 
-export type ReducedMotionOptions = {
+type ReducedMotionOptions = {
   /** Injected for tests; defaults to stored settings.reducedMotion. */
   userPrefersReducedMotion?: boolean;
   /** Injected for tests; defaults to matchMedia('(prefers-reduced-motion: reduce)'). */
