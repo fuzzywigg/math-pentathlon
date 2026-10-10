@@ -7,6 +7,8 @@
  * Run: node scripts/webkit-offline-probe.mjs
  * Expects an existing `dist/` from `npm run build` (skips rebuild if present
  * unless FORCE_BUILD=1).
+ *
+ * Options: -h, --help (exits before build / browser launch)
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
@@ -14,6 +16,21 @@ import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { chromium, firefox, webkit } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
+
+const USAGE = `Usage: node scripts/webkit-offline-probe.mjs
+
+Probe Playwright browsers offline vs Workbox precache (default: webkit).
+Expects dist/ from npm run build (rebuilds if FORCE_BUILD=1 or dist/sw.js missing).
+
+Env:
+  PROBE_BROWSERS   Comma-separated browsers (default: webkit)
+  FORCE_BUILD=1    Force npm run build before preview
+
+Options:
+  -h, --help       Show this help and exit (no build or browser launch)`;
+
+applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BROWSERS = process.env.PROBE_BROWSERS?.split(',') ?? ['webkit'];

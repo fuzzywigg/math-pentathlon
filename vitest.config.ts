@@ -144,6 +144,8 @@ const nodePureFiles = [
   'tests/unit/check-emit-identity.test.ts',
   // mobile-audit --out parser (q-mp-844); spawnSync CLI check needs node env.
   'tests/unit/mobile-audit-out-path.test.ts',
+  // offline probe early --help (q-mp-886); spawnSync CLI check needs node env.
+  'tests/unit/offline-probe-cli-help.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
