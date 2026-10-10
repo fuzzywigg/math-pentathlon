@@ -1,9 +1,9 @@
 {
-  "notes": "Tip post755 min ceilings after q-mp-205/219/194/267/316 folds: curly 538; no-non-null-assertion 246; no-confusing-void-expression 66; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post785 + q-mp-320 game-shell void (−4→62) on post755 min ceilings after q-mp-205/219/194/267/316 folds: curly 538; no-non-null-assertion 246; no-confusing-void-expression 62; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 66,
+    "@typescript-eslint/no-confusing-void-expression": 62,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 47,

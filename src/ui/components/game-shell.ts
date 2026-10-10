@@ -499,7 +499,9 @@ export function mountGameShell(
 
     modeOptions.forEach((option) => {
       option.addEventListener('click', () => {
-        modeOptions.forEach((o) => o.classList.remove('selected'));
+        modeOptions.forEach((o) => {
+          o.classList.remove('selected');
+        });
         option.classList.add('selected');
         const input = option.querySelector('input') as HTMLInputElement;
         input.checked = true;
@@ -513,7 +515,9 @@ export function mountGameShell(
 
     difficultyBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
-        difficultyBtns.forEach((b) => b.classList.remove('selected'));
+        difficultyBtns.forEach((b) => {
+          b.classList.remove('selected');
+        });
         btn.classList.add('selected');
         selectedDifficulty = (btn as HTMLElement).dataset
           .difficulty as AIDifficultyLevel;
@@ -589,8 +593,12 @@ export function mountGameShell(
 
   if (helpBtn && helpModal) {
     const modalClose = helpModal.querySelector('.modal-close');
-    const openHelpModal = () => openShellModal(helpModal, helpFocus, helpBtn);
-    const closeHelpModal = () => closeShellModal(helpModal, helpFocus);
+    const openHelpModal = () => {
+      openShellModal(helpModal, helpFocus, helpBtn);
+    };
+    const closeHelpModal = () => {
+      closeShellModal(helpModal, helpFocus);
+    };
 
     helpBtn.addEventListener('click', openHelpModal);
     modalClose?.addEventListener('click', closeHelpModal);
