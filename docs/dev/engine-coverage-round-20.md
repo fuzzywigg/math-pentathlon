@@ -94,14 +94,14 @@ Coldest preferred non-rules helpers by branch % (post-r19 residual view):
 
 ## Aggregate (preferred hosts + owl-system)
 
-Focused preferred-host suites (r19 overlay + this PR's new file):
+Focused preferred-host suites (tip-native r19 + this PR's new file):
 
 | Module            |    Before branch |     After branch |      Before line |         After line | Δb / Δl     |
 | ----------------- | ---------------: | ---------------: | ---------------: | -----------------: | ----------- |
 | expression-ui     |   98.95% (95/96) | **100%** (96/96) | 98.29% (230/234) | **100%** (234/234) | **+1 / +4** |
 | attribute-ui      |             100% |             100% |             100% |               100% | 0 (sat.)    |
 | ollie-inspect-map |   97.05% (66/68) |           97.05% |           94.73% |             94.73% | 0 (doc)     |
-| game-route-mounts | 75.57% (164/217) |           75.57% |           90.16% |             90.16% | 0 (smoke)   |
+| game-route-mounts | 84.79% (184/217) | 84.79% (184/217) |           90.98% |             90.98% | 0 (smoke)   |
 | owl-system L182   |  else **0** hits |   else **1** hit |                — |                  — | **+1 arm**  |
 
 `owl-system` L182 else verified with focused suites (`r20` + `burn-wave23` +
