@@ -7,9 +7,6 @@ import {
 // Re-export piece types for convenience
 export type { Piece, PlayerOwner };
 
-// Re-export piece types for convenience
-export type { Piece, PlayerOwner };
-
 // Board dimensions
 export const BOARD_SIZE = 9;
 
