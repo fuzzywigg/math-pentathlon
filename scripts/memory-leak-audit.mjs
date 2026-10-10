@@ -20,6 +20,7 @@ import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -76,13 +77,6 @@ const GAMES = filter.length
 function fmtMb(bytes) {
   if (bytes == null) return 'n/a';
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
 }
 
 async function waitMenu(page) {

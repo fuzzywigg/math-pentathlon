@@ -7,6 +7,7 @@ import { chromium, devices } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -86,13 +87,6 @@ async function waitForGameReady(page) {
   await page.locator('#new-game-btn, h1').first().waitFor({
     state: 'visible',
     timeout: 20_000,
-  });
-}
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el).style.pointerEvents = 'none';
   });
 }
 

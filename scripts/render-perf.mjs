@@ -23,6 +23,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -76,13 +77,6 @@ const filter = (process.env.PERF_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
 
 async function waitReady(page) {
   await page
