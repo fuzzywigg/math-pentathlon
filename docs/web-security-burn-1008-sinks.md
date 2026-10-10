@@ -80,7 +80,6 @@ Every former non-constant `innerHTML` interpolation in games/demos/core/UI was c
 | `src/core/tutorial.ts` | `replaced-safe-dom (setTrustedMarkup allowlist for step.message)` |
 | `src/core/dice/*` | `replaced-safe-dom` |
 | `src/core/expressions/expression-ui.ts` | `replaced-safe-dom` |
-| `src/core/hex/hex-ui.ts` | `replaced-safe-dom (clearElement)` |
 | `src/core/polyomino/polyomino-ui.ts` | `replaced-safe-dom (textContent)` |
 | `src/games/*/board-ui.ts + game-controller.ts` | `replaced-safe-dom for all former interpolations` |
 | `src/demos/*` | `replaced-safe-dom for all former interpolations` |
