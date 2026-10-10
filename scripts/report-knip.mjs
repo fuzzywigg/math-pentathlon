@@ -14,6 +14,7 @@
  *   npm run report:knip -- --json
  *   npm run report:knip -- --fail          # opt-in exit 1 on growth (not CI default)
  *   npm run report:knip -- --write-baseline  # refresh docs/dev/knip-baseline.json
+ *   npm run report:knip -- --help          # usage; unknown flags exit 2
  *
  * Full inventory (knip + CSS + helpers): npm run report:dead-code
  * Docs: docs/dev/knip-report.md
@@ -49,7 +50,9 @@ export function countIssueField(value) {
   if (Array.isArray(value)) return value.length;
   if (value && typeof value === 'object') {
     let n = 0;
-    for (const inner of Object.values(/** @type {Record<string, unknown>} */ (value))) {
+    for (const inner of Object.values(
+      /** @type {Record<string, unknown>} */ (value)
+    )) {
       n += Array.isArray(inner) ? inner.length : 1;
     }
     return n;
@@ -180,8 +183,7 @@ function writeBaseline(metrics, enforce) {
   const body = {
     knipVersion: KNIP_VERSION,
     enforce,
-    note:
-      'Report-only unused-export drift baseline (q-mp-118). Set enforce:true only after tip-owner approval; ratchets only go down.',
+    note: 'Report-only unused-export drift baseline (q-mp-118). Set enforce:true only after tip-owner approval; ratchets only go down.',
     metrics,
   };
   fs.writeFileSync(BASELINE_PATH, `${JSON.stringify(body, null, 2)}\n`, 'utf8');
@@ -202,7 +204,38 @@ function annotate(level, message) {
   }
 }
 
+const KNOWN_FLAGS = new Set(['--json', '--fail', '--write-baseline']);
+
+/**
+ * @param {typeof console.log} [write]
+ */
+function printUsage(write = console.log) {
+  write(`Usage: node scripts/report-knip.mjs [options]
+
+Options:
+  --json              Machine-readable metrics + diff
+  --fail              Opt-in exit 1 on unused growth (not CI default)
+  --write-baseline    Refresh docs/dev/knip-baseline.json
+  -h, --help          Show help
+
+Unknown flags exit 2.`);
+}
+
+/**
+ * @param {string[]} argv
+ */
 function parseArgs(argv) {
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      printUsage(console.log);
+      process.exit(0);
+    }
+    if (a.startsWith('-') && !KNOWN_FLAGS.has(a)) {
+      console.error(`Unknown flag: ${a}`);
+      printUsage(console.error);
+      process.exit(2);
+    }
+  }
   return {
     json: argv.includes('--json'),
     fail: argv.includes('--fail'),
@@ -215,12 +248,11 @@ function main() {
   console.log(`report:knip — running knip@${KNIP_VERSION} (knip.json)…`);
   const knip = runKnip();
   if (knip.error) {
-    annotate(
-      'warning',
-      `knip report failed (report-only): ${knip.error}`
-    );
+    annotate('warning', `knip report failed (report-only): ${knip.error}`);
     if (args.json) {
-      console.log(JSON.stringify({ error: knip.error, metrics: null }, null, 2));
+      console.log(
+        JSON.stringify({ error: knip.error, metrics: null }, null, 2)
+      );
     }
     process.exit(0);
   }
