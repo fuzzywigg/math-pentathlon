@@ -270,7 +270,9 @@ export function suppressBoardContextMenu(el: EventTarget): () => void {
     e.preventDefault();
   };
   el.addEventListener('contextmenu', handler);
-  return () => el.removeEventListener('contextmenu', handler);
+  return () => {
+    el.removeEventListener('contextmenu', handler);
+  };
 }
 
 /**
