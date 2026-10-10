@@ -142,6 +142,8 @@ const nodePureFiles = [
   'tests/unit/engine-ui-boundary-seats-characterization.test.ts',
   // Emit-identity checker imports esbuild (needs Node TextEncoder, not jsdom).
   'tests/unit/check-emit-identity.test.ts',
+  // mobile-audit --out parser (q-mp-844); spawnSync CLI check needs node env.
+  'tests/unit/mobile-audit-out-path.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
