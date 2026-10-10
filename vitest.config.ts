@@ -52,6 +52,8 @@ const isolatedFiles = [
   'tests/unit/ui-helper-dedupe-characterization.test.ts',
   // Hoisted game-registry mock injects unavailable card for selector coverage.
   'tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts',
+  // q-mp-454: game-selector soft-fail residuals — registry + prefetch mocks.
+  'tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
