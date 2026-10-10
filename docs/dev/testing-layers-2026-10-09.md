@@ -1,11 +1,11 @@
 # Testing layers — live counts (2026-10-10)
 
-**Task id:** `q-mp-600` (docs-accuracy remasure on tip `cursor/mp-tip-post1012`; supersedes post977 stamp **3285** / **13502** and tip-owner wiki-only stamp **3306** / **13748**)  
-**Measured tip:** `cursor/mp-tip-post1012` @ `780db960` (full `780db96024e842f0a90b180543c84d73afd202cc`; cut from `alpha` @ `dcdc0bf4` after #1012)  
+**Task id:** `q-mp-026r` tip-owner remasure on tip `cursor/mp-tip-post1023` (supersedes `q-mp-600` stamp **3308** / **13760**)  
+**Measured tip:** `cursor/mp-tip-post1023` @ `902aafcd` (full `902aafcdfb73f5347ec99f285b84483f1860f648`; cut from `alpha` @ `fb0d0ec5` after #1023)  
 **Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post1012. Pin policy unchanged. No `src/` or AI/copy/rules changes. Testing-layers still cited **3285** / **13502** (post977); wiki had been tip-owner stamped **3306** / **13748** @ `78c7e39b` without updating this page. Live tip HEAD remasure is **3308** files / **13760** listed cases (`unit-shared` **12779** / `unit-node` **380** / `unit-isolated` **601**). Counts move every fold — tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
+Docs-only refresh of unit file / Vitest case counts for tip post1012. Pin policy unchanged. No `src/` or AI/copy/rules changes. Testing-layers still cited **3285** / **13502** (post977); wiki had been tip-owner stamped **3306** / **13748** @ `78c7e39b` without updating this page. Live tip HEAD remasure is **3320** files / **13888** listed cases (`unit-shared` **12850** / `unit-node` **380** / `unit-isolated` **658**). Counts move every fold — tip owner should re-measure at fold. E2E / visual / playtest / bench rows below are carried forward from the prior post898 stamp @ `b7e518b4` (not re-listed this pass).
 
 ## Duplicate check (open drafts)
 
@@ -42,17 +42,17 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `780db960` (post1012 `q-mp-600` remasure)
+## Live counts @ `902aafcd` (post1023 tip-owner remasure)
 
 ### Unit (Vitest)
 
 | Metric                                                |        Count | Command                                                  |
 | ----------------------------------------------------- | -----------: | -------------------------------------------------------- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3308** | `npm run test:unit`                                      |
-| Cases listed (`npx vitest list`)                      |    **13760** | `npm run test:unit`                                      |
-| → `unit-shared` cases (`vitest list`)                 |        12779 | `npx vitest list --project unit-shared`                  |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3320** | `npm run test:unit`                                      |
+| Cases listed (`npx vitest list`)                      |    **13888** | `npm run test:unit`                                      |
+| → `unit-shared` cases (`vitest list`)                 |        12850 | `npx vitest list --project unit-shared`                  |
 | → `unit-node` cases (`vitest list`)                   |          380 | `npx vitest list --project unit-node`                    |
-| → `unit-isolated` cases (`vitest list`)               |          601 | `npx vitest list --project unit-isolated`                |
+| → `unit-isolated` cases (`vitest list`)               |          658 | `npx vitest list --project unit-isolated`                |
 | Watch / coverage                                      |            — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
 
 `npm test` = `test:unit` && `test:e2e:chromium`.
