@@ -28,7 +28,9 @@ suite.
 | #571 | UI coverage round 3 | Unrelated; avoided |
 
 New suite: `tests/unit/engine-coverage-round-3-burn-1008.test.ts`  
-Rank helper: `scripts/engine-coverage-rank.mjs`
+Rank helper: `scripts/engine-coverage-rank.mjs` — pass a **local**
+`coverage-summary.json` path; `coverage-engine-r3-*` report dirs are generated
+locally (ephemeral; do not commit).
 
 ## Method
 
@@ -126,6 +128,7 @@ Hex Hard assert remains **450ms** (untouched). Stars & Bars history cap untouche
 ## Reproduce
 
 ```bash
+# Produce / re-measure a local summary first (ephemeral; not committed), then:
 node scripts/engine-coverage-rank.mjs coverage-engine-r3-baseline/coverage-summary.json
 
 npm run test:unit:coverage -- \
