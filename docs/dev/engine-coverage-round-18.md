@@ -2,10 +2,11 @@
 
 Task id: `q-mp-526`
 
-Base: `cursor/mp-tip-post949` @ `a2626787` (remeasured live at `8698fffb`; tip
-then folded docs-only `#983` / `q-mp-511` radix inventory — coverage-neutral.
-Post-r17 residual view includes tip-folded r16/r17 + unit-isolated graph spies).
-**TEST-ONLY** — no `src/` edits. Draft only; tip owner folds.
+Base: `cursor/mp-tip-post949` @ `a8764a03` (remeasured live at `8698fffb`; tip
+then folded docs inventories + `#981` / `q-mp-521` dice-selector soft-fail —
+coverage-neutral for r18 hosts). Post-r17 residual view includes tip-folded
+r16/r17 + unit-isolated graph spies. **TEST-ONLY** — no `src/` edits. Draft
+only; tip owner folds.
 
 ## Goal
 
@@ -36,8 +37,8 @@ untouched.
 
 ```text
 $ git rev-parse HEAD
-  a2626787b56864307095bede78020930b51d9bd7  (cursor/mp-tip-post949)
-  # coverage remeasure @ 8698fffb (docs-only tip move to a2626787 after)
+  a8764a030842b2bdc4ce850ea207f876a1284e83  (cursor/mp-tip-post949)
+  # coverage remeasure @ 8698fffb (tip docs + #981 fold after; coverage-neutral)
 
 $ find tests/unit -name '*.test.ts' | wc -l
   3268
@@ -96,15 +97,18 @@ Coldest preferred non-rules helpers by branch % (post-r17 residual view):
 
 Full unit suite excl. AI/bench, tip-native post-r17 (unit-isolated spies included):
 
-| Module           |    Before branch |      After branch | Before line | After line | Δb / Δl            |
-| ---------------- | ---------------: | ----------------: | ----------: | ---------: | ------------------ |
-| storage/storage  |    94.28% branch | **see after run** |        100% |       100% | createProfile pins |
-| tutorial.ts      | 93.29% (167/179) |            93.29% |      98.02% |     98.02% | 0 (smoke)          |
-| graph/algorithms | 97.69% (127/130) |            97.69% |      98.82% |     98.82% | 0 (deferred 524)   |
-| fraction-bar-ui  |           99.10% |            99.10% |        100% |       100% | 0 (doc)            |
-| attributes/      |             100% |              100% |        100% |       100% | 0 (hot)            |
-| alignment/       |             100% |              100% |        100% |       100% | 0 (hot)            |
-| dice-selector    |             100% |              100% |        100% |       100% | 0 (hot)            |
+| Module           |    Before branch |       After branch | Before line | After line | Δb / Δl          |
+| ---------------- | ---------------: | -----------------: | ----------: | ---------: | ---------------- |
+| storage/storage  |   94.28% (66/70) | **97.14%** (68/70) |        100% |       100% | **+2 / 0**       |
+| tutorial.ts      | 93.29% (167/179) |             93.29% |      98.02% |     98.02% | 0 (smoke)        |
+| graph/algorithms | 97.69% (127/130) |             97.69% |      98.82% |     98.82% | 0 (deferred 524) |
+| fraction-bar-ui  |           99.10% |             99.10% |        100% |       100% | 0 (doc)          |
+| attributes/      |             100% |               100% |        100% |       100% | 0 (hot)          |
+| alignment/       |             100% |               100% |        100% |       100% | 0 (hot)          |
+| dice-selector    |             100% |               100% |        100% |       100% | 0 (hot)          |
+
+Remaining storage holes after pins: getTodayString / getYesterdayString `?? ''`
+(L291–L297) — documented unreachable.
 
 ## Files changed
 
@@ -116,11 +120,23 @@ Full unit suite excl. AI/bench, tip-native post-r17 (unit-isolated spies include
 ```bash
 rg -c 'it\.todo' tests/unit/engine-coverage-round*.test.ts
 git grep -n '^\s*it\.todo' -- tests/unit/engine-coverage-round*.test.ts || true
+# → (none active)
+
 rg -n 'hard:\s*450' src/games/hex/ai.ts
+# → 21:  hard: 450,
+
 npx vitest run --project unit-shared tests/unit/engine-coverage-round-18*.test.ts
+# → Test Files 1 passed | Tests 18 passed
+
 npx vitest run --project unit-shared tests/unit/engine-coverage-round*.test.ts
+# → Test Files 15 passed | Tests 286 passed
+
 npm run verify
+# → lint + lint:ratchet + format:check + typecheck + typecheck:ratchet + check:boundaries OK
+#   (in-scope type errors 0; out-of-scope 216 ≤ 216; ratchets unchanged)
+
 npm run test:unit
+# → Test Files 3269 passed | Tests 13299 passed | 45 skipped
 ```
 
 No engine product edits. No lint-ceiling / knip-baseline changes in this PR.
