@@ -5,7 +5,7 @@ Characterization tests for residual arms under `src/games/fraction-pinball`
 state-display over `rules.ts` / `ai.ts` product logic. No AI move-choice /
 timing asserts; no player-facing copy body asserts.
 
-**Base:** `cursor/mp-tip-post914` @ `b3f00cc9`. Draft only — tip owner folds.
+**Base:** `cursor/mp-tip-post914` @ `f5d3d04a` (remeasured @ `b3f00cc9`; tip then folded `#943`). Draft only — tip owner folds.
 
 ## Scope
 
