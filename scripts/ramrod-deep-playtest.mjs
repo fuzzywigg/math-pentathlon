@@ -39,8 +39,16 @@ async function dismissOwl(page) {
   const dismiss = page.locator(
     '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click({ force: true })
+      .catch(() => {});
   }
   const minimize = page.locator('#ollie-owl .owl-minimize-btn');
   if (await minimize.isVisible().catch(() => false)) {
@@ -53,10 +61,60 @@ async function dismissOwl(page) {
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still open');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still open');
+    });
+}
+
+/** Condition wait: human affordance, winner, or deadlock (no fixed sleep). */
+async function waitForHumanAffordanceOrEnd(page, timeoutMs = 5_000) {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
+        if (/wins|tie/i.test(status)) return true;
+        if (document.querySelector('.ramrod-winner-banner')) return true;
+        if (document.querySelector('.ramrod-deadlock-hint')) return true;
+        if (
+          document.querySelectorAll(
+            '.ramrod-player-player1 .ramrod-rod-wrapper.selectable'
+          ).length > 0
+        ) {
+          return true;
+        }
+        return [...document.querySelectorAll('.ramrod-btn-secondary')].some(
+          (b) => b.textContent?.includes('Pass Turn')
+        );
+      },
+      { timeout: timeoutMs }
+    )
+    .catch(() => {});
+}
+
+/** Condition wait: valid placement slots or a selected rod. */
+async function waitForValidSlotOrSelected(page, timeoutMs = 2_000) {
+  await page
+    .waitForFunction(
+      () =>
+        document.querySelectorAll('.ramrod-slot.valid').length > 0 ||
+        !!document.querySelector('.ramrod-rod-wrapper.selected'),
+      { timeout: timeoutMs }
+    )
+    .catch(() => {});
+}
+
+/** Condition wait: selection cleared after a deselect tap. */
+async function waitForSelectionCleared(page, timeoutMs = 2_000) {
+  await page
+    .waitForFunction(
+      () => !document.querySelector('.ramrod-rod-wrapper.selected.selectable'),
+      { timeout: timeoutMs }
+    )
+    .catch(() => {});
 }
 
 async function startVsAi(page, difficulty) {
@@ -99,20 +157,24 @@ async function measureTargets(page) {
       });
     return {
       pass: box('.ramrod-btn-secondary'),
-      clear: [...document.querySelectorAll('.ramrod-btn-secondary')].map((el) => {
-        const r = el.getBoundingClientRect();
-        return {
-          text: el.textContent?.trim(),
-          w: Math.round(r.width),
-          h: Math.round(r.height),
-        };
-      }),
+      clear: [...document.querySelectorAll('.ramrod-btn-secondary')].map(
+        (el) => {
+          const r = el.getBoundingClientRect();
+          return {
+            text: el.textContent?.trim(),
+            w: Math.round(r.width),
+            h: Math.round(r.height),
+          };
+        }
+      ),
       selectableRods: all('.ramrod-rod-wrapper.selectable'),
       validSlots: all('.ramrod-slot.valid'),
       slots: all('.ramrod-slot'),
       thinking: !!document.querySelector('.ramrod-computer-thinking'),
-      hint: document.querySelector('.ramrod-turn-hint')?.textContent?.trim() ?? '',
-      status: document.querySelector('.ramrod-status')?.textContent?.trim() ?? '',
+      hint:
+        document.querySelector('.ramrod-turn-hint')?.textContent?.trim() ?? '',
+      status:
+        document.querySelector('.ramrod-status')?.textContent?.trim() ?? '',
     };
   });
 }
@@ -124,14 +186,22 @@ async function tap(page, selector, index = 0) {
       const el = document.querySelectorAll(selector)[index];
       if (!el) return false;
       el.dispatchEvent(
-        new MouseEvent('click', { bubbles: true, cancelable: true, view: window })
+        new MouseEvent('click', {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+        })
       );
       return true;
     },
     { selector, index }
   );
   if (!ok) {
-    await page.locator(selector).nth(index).click({ force: true }).catch(() => {});
+    await page
+      .locator(selector)
+      .nth(index)
+      .click({ force: true })
+      .catch(() => {});
   }
 }
 
@@ -176,7 +246,7 @@ async function playHumanTurn(page) {
   });
 
   if (!choice) {
-    await page.waitForTimeout(200);
+    await waitForHumanAffordanceOrEnd(page, 2_000);
     return 'no-move';
   }
 
@@ -185,7 +255,7 @@ async function playHumanTurn(page) {
     '.ramrod-player-player1 .ramrod-rod-wrapper.selectable',
     choice.index
   );
-  await page.waitForTimeout(60);
+  await waitForValidSlotOrSelected(page, 2_000);
 
   let vc = await page.locator('.ramrod-slot.valid').count();
   if (vc === 0) {
@@ -204,7 +274,7 @@ async function playHumanTurn(page) {
           })
         );
       });
-      await page.waitForTimeout(40);
+      await waitForSelectionCleared(page, 2_000);
       await tap(
         page,
         '.ramrod-player-player1 .ramrod-rod-wrapper.selectable',
@@ -226,7 +296,7 @@ async function playHumanTurn(page) {
           })
         );
       }, i);
-      await page.waitForTimeout(40);
+      await waitForValidSlotOrSelected(page, 2_000);
       vc = await page.locator('.ramrod-slot.valid').count();
       if (vc > 0) break;
     }
@@ -251,33 +321,57 @@ function isEnded(statusText) {
 }
 
 async function waitForHumanOrEnd(page, deadline) {
-  while (Date.now() < deadline) {
-    const info = await page.evaluate(() => {
-      const status =
-        document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
-      const thinking = !!document.querySelector('.ramrod-computer-thinking');
-      const pass = [...document.querySelectorAll('.ramrod-btn-secondary')].some(
-        (b) => b.textContent?.includes('Pass Turn')
-      );
-      const selectable = document.querySelectorAll(
-        '.ramrod-rod-wrapper.selectable'
-      ).length;
-      const computerText = /computer|thinking/i.test(status);
-      const banner = !!document.querySelector('.ramrod-winner-banner');
-      return { status, thinking, pass, selectable, computerText, banner };
-    });
-    if (info.banner || isEnded(info.status)) return { kind: 'ended', ...info };
-    if (
-      !info.computerText &&
-      !info.thinking &&
-      (info.pass || info.selectable > 0)
-    ) {
-      return { kind: 'human', ...info };
-    }
-    await page.waitForTimeout(120);
+  const timeout = Math.max(0, deadline - Date.now());
+  try {
+    const handle = await page.waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
+        const thinking = !!document.querySelector('.ramrod-computer-thinking');
+        const pass = [
+          ...document.querySelectorAll('.ramrod-btn-secondary'),
+        ].some((b) => b.textContent?.includes('Pass Turn'));
+        const selectable = document.querySelectorAll(
+          '.ramrod-rod-wrapper.selectable'
+        ).length;
+        const computerText = /computer|thinking/i.test(status);
+        const banner = !!document.querySelector('.ramrod-winner-banner');
+        const ended = banner || /wins|tie/i.test(status);
+        const human = !computerText && !thinking && (pass || selectable > 0);
+        if (ended) {
+          return {
+            kind: 'ended',
+            status,
+            thinking,
+            pass,
+            selectable,
+            computerText,
+            banner,
+          };
+        }
+        if (human) {
+          return {
+            kind: 'human',
+            status,
+            thinking,
+            pass,
+            selectable,
+            computerText,
+            banner,
+          };
+        }
+        return false;
+      },
+      { timeout }
+    );
+    return await handle.jsonValue();
+  } catch {
+    const status = await page
+      .locator('.ramrod-status')
+      .textContent()
+      .catch(() => '');
+    return { kind: 'stall', status: status?.trim() ?? '' };
   }
-  const status = await page.locator('.ramrod-status').textContent().catch(() => '');
-  return { kind: 'stall', status: status?.trim() ?? '' };
 }
 
 async function runOneGame(browser, viewport, difficulty, gameIndex) {
@@ -309,7 +403,10 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
     if (gameIndex === 0 && difficulty === 'easy') {
       const shot = path.join(OUT, `${viewport.name}-start.png`);
       await page.screenshot({ path: shot, fullPage: false });
-      fs.copyFileSync(shot, path.join(ART, `ramrod-${viewport.name}-start.png`));
+      fs.copyFileSync(
+        shot,
+        path.join(ART, `ramrod-${viewport.name}-start.png`)
+      );
     }
 
     for (turns = 0; turns < MAX_HUMAN_TURNS; turns++) {
@@ -319,8 +416,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         return {
           status,
           blueSelect: /Blue's turn - Select a rod/.test(status),
-          history:
-            document.querySelectorAll('.ramrod-history-move').length,
+          history: document.querySelectorAll('.ramrod-history-move').length,
         };
       });
 
@@ -348,7 +444,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         const sel = page.locator('.ramrod-rod-wrapper.selectable').first();
         if (await sel.isVisible().catch(() => false)) {
           await sel.click({ force: true }).catch(() => {});
-          await page.waitForTimeout(80);
+          await waitForValidSlotOrSelected(page, 2_000);
           const shot = path.join(OUT, `${viewport.name}-placing-hint.png`);
           await page.screenshot({ path: shot, fullPage: false });
           fs.copyFileSync(
@@ -379,7 +475,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         break;
       }
       if (action === 'no-move' || action === 'no-valid-slot') {
-        await page.waitForTimeout(400);
+        await waitForHumanAffordanceOrEnd(page, 5_000);
         const again = await playHumanTurn(page);
         if (again === 'deadlock') {
           outcome = 'deadlock';
@@ -415,26 +511,36 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         }
       }
 
-      // Measure AI think flash duration roughly
+      // Measure AI think flash duration roughly (condition wait, no fixed sleep)
       const thinkStart = Date.now();
       let sawThink = false;
-      for (let i = 0; i < 40; i++) {
-        const flash = await page.evaluate(() => {
-          const status =
-            document.querySelector('.ramrod-status')?.textContent?.trim() ?? '';
-          const thinking = !!document.querySelector(
-            '.ramrod-computer-thinking'
-          );
-          return { status, thinking };
-        });
-        if (/computer|thinking/i.test(flash.status) || flash.thinking) {
-          sawThink = true;
-          aiThinkSeen.count++;
-          break;
-        }
-        if (isEnded(flash.status)) break;
-        if (/Blue's turn/.test(flash.status)) break;
-        await page.waitForTimeout(40);
+      const flash = await page
+        .waitForFunction(
+          () => {
+            const status =
+              document.querySelector('.ramrod-status')?.textContent?.trim() ??
+              '';
+            const thinking = !!document.querySelector(
+              '.ramrod-computer-thinking'
+            );
+            if (/computer|thinking/i.test(status) || thinking) {
+              return { kind: 'think', status, thinking };
+            }
+            if (/wins|tie/i.test(status)) {
+              return { kind: 'ended', status, thinking };
+            }
+            if (/Blue's turn/.test(status)) {
+              return { kind: 'human', status, thinking };
+            }
+            return false;
+          },
+          { timeout: 1_600 }
+        )
+        .then((h) => h.jsonValue())
+        .catch(() => null);
+      if (flash?.kind === 'think') {
+        sawThink = true;
+        aiThinkSeen.count++;
       }
       if (sawThink) {
         // wait until human again
@@ -454,7 +560,10 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
           break;
         }
       } else {
-        const post = await page.locator('.ramrod-status').textContent().catch(() => '');
+        const post = await page
+          .locator('.ramrod-status')
+          .textContent()
+          .catch(() => '');
         lastStatus = post?.trim() ?? '';
         if (isEnded(lastStatus)) {
           outcome = /tie/i.test(lastStatus)
@@ -478,7 +587,8 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       }
     }
 
-    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS) outcome = 'turn-budget';
+    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS)
+      outcome = 'turn-budget';
 
     if (gameIndex === 0) {
       const shot = path.join(OUT, `${viewport.name}-${difficulty}-end.png`);
@@ -581,7 +691,8 @@ async function main() {
       (r) => r.outcome === 'stall' || r.outcome === 'turn-budget'
     ),
     errors: results.filter(
-      (r) => r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
+      (r) =>
+        r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
     ),
     illicitPasses: results.filter((r) => r.illicitPassSkip > 0),
     touchSamples: results
