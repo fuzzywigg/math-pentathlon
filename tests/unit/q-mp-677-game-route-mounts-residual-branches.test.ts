@@ -142,10 +142,10 @@ vi.mock(
 );
 vi.mock('../../src/games/stars-bars/game-controller', () => mocks.stars);
 
-vi.mock('../../src/core/router', () => ({
-  navigate: vi.fn(),
-  handleRoute: vi.fn(),
-}));
+vi.mock('../../src/core/router', async () => {
+  const { mockRouterModule } = await import('./helpers/router-mock');
+  return mockRouterModule();
+});
 
 import { handleRoute, navigate } from '../../src/core/router';
 import {
