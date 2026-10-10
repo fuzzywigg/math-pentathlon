@@ -1,0 +1,115 @@
+{
+  "taskId": "q-mp-511",
+  "series": "eslint-radix",
+  "reportOnly": true,
+  "tipBase": "cursor/mp-tip-post949",
+  "tipSha": "8698fffb85b1e3d2289e54a665fac6162d3bdee4",
+  "tipShaShort": "8698fffb",
+  "measuredAtUtc": "2026-10-10T12:21:50Z",
+  "specSource": {
+    "backlog": "docs/dev/backlog-2026-10-10h.md",
+    "specTipStamp": "cursor/mp-tip-post914",
+    "specBaseline": {
+      "radixTotal": 6,
+      "radixCeiling": 6,
+      "buckets": {
+        "src/games/kwatro-sinko": 6
+      },
+      "files": {
+        "src/games/kwatro-sinko/ai.ts": 4,
+        "src/games/kwatro-sinko/rules.ts": 2
+      }
+    }
+  },
+  "ruleId": "radix",
+  "total": 6,
+  "ceiling": 6,
+  "headroom": 0,
+  "deltaVsSpec": {
+    "total": 0,
+    "ceiling": 0,
+    "bucketsChanged": false,
+    "filesChanged": false,
+    "lineMapChanged": false
+  },
+  "buckets": {
+    "src/games/kwatro-sinko": 6
+  },
+  "files": {
+    "src/games/kwatro-sinko/ai.ts": 4,
+    "src/games/kwatro-sinko/rules.ts": 2
+  },
+  "residuals": [
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 106,
+      "column": 15,
+      "message": "Missing radix parameter.",
+      "snippet": "const row = parseInt(match[1]);",
+      "disposition": "HOLD",
+      "reason": "AI path — hard rules forbid AI behavior / search / scoring / difficulty / timing edits"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 107,
+      "column": 15,
+      "message": "Missing radix parameter.",
+      "snippet": "const col = parseInt(match[2]);",
+      "disposition": "HOLD",
+      "reason": "AI path — hard rules forbid AI behavior / search / scoring / difficulty / timing edits"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 331,
+      "column": 21,
+      "message": "Missing radix parameter.",
+      "snippet": "const row = parseInt(match[1]);",
+      "disposition": "HOLD",
+      "reason": "AI path — hard rules forbid AI behavior / search / scoring / difficulty / timing edits"
+    },
+    {
+      "file": "src/games/kwatro-sinko/ai.ts",
+      "line": 332,
+      "column": 21,
+      "message": "Missing radix parameter.",
+      "snippet": "const col = parseInt(match[2]);",
+      "disposition": "HOLD",
+      "reason": "AI path — hard rules forbid AI behavior / search / scoring / difficulty / timing edits"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 349,
+      "column": 15,
+      "message": "Missing radix parameter.",
+      "snippet": "const row = parseInt(match[1]!);",
+      "disposition": "HOLD",
+      "reason": "rules / legal-move path — hard rules forbid */rules.ts logic edits"
+    },
+    {
+      "file": "src/games/kwatro-sinko/rules.ts",
+      "line": 350,
+      "column": 15,
+      "message": "Missing radix parameter.",
+      "snippet": "const col = parseInt(match[2]!);",
+      "disposition": "HOLD",
+      "reason": "rules / legal-move path — hard rules forbid */rules.ts logic edits"
+    }
+  ],
+  "holdSummary": {
+    "clearableNonAiNonRules": 0,
+    "holdAi": 4,
+    "holdRules": 2,
+    "productClearAllowed": false
+  },
+  "related": {
+    "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
+    "priorHoldNote": "docs/dev/eslint-off-rules-inventory.md#q-mp-130--radix-hold-residuals",
+    "historicalProductClearPr": 673,
+    "historicalProductClearTask": "q-mp-130"
+  },
+  "commands": [
+    "npm run report:lint-buckets -- --rule radix --top 20",
+    "npm run lint:ratchet",
+    "npm run check:dev-docs"
+  ]
+}
