@@ -261,9 +261,6 @@ describe('q-mp-454 game-selector — soft-fail residuals', () => {
   });
 
   it('progress control navigates /stats without throwing (L285–288)', () => {
-    const navigateSpy = vi
-      .spyOn(router, 'navigate')
-      .mockImplementation(() => undefined);
     renderGameSelector(root);
 
     const link = root.querySelector('.hero-progress-link') as HTMLAnchorElement;
@@ -276,7 +273,9 @@ describe('q-mp-454 game-selector — soft-fail residuals', () => {
     });
     expect(() => link.dispatchEvent(event)).not.toThrow();
     expect(event.defaultPrevented).toBe(true);
-    expect(navigateSpy).toHaveBeenCalledWith('/stats');
+    // Real router navigate writes hash — avoid flaky navigate-mock call asserts
+    // under isolate:false shuffle (same class as tip 7897185f / q-mp-605).
+    expect(window.location.hash).toBe('#/stats');
   });
 
   it('tab scroll uses auto behavior under reduced-motion (L398–403)', () => {
