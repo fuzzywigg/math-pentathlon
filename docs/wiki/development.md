@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post1059` (cut from `alpha` @ `1c31a1ea` after #1059 squash-merge, 2026-10-10): tip-owner fold on draft tip PR #1083; live unit suite **3366** files / **14335** listed cases @ `0475167a` remasure after folding #1084–#1124 (+ tip remasure). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post1083` (cut from `alpha` @ `8901cff6` after #1083 squash-merge, 2026-10-10): tip-owner fold on draft tip PR (q-mp-026t); live unit suite **3366** files / **14347** listed cases @ `548802e2` remasure at tip open (#1098). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -138,11 +138,11 @@ README badges link those workflows. License is **ISC** (`package.json`).
 
 Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
 
-**Live counts** (files / listed cases) measured on tip `0475167a` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
+**Live counts** (files / listed cases) measured on tip `548802e2` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
 
-| Layer                       | Live count (tip `0475167a`)                                  | Runner                                                 | Command                                                                                                                                |
+| Layer                       | Live count (tip `548802e2`)                                  | Runner                                                 | Command                                                                                                                                |
 | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit                        | **3366** files / **14335** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
+| Unit                        | **3366** files / **14347** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
 | E2E Chromium (required CI)  | **25** files / **249** cases (`--grep-invert @fullgame`)     | Playwright `chromium`                                  | `npm run test:e2e:chromium`                                                                                                            |
 | E2E fullgame                | **20** files / **20** cases                                  | Playwright `chromium` + `@fullgame`                    | `npm run test:e2e:fullgame`                                                                                                            |
 | E2E Firefox / WebKit / iPad | **25** files / **249** cases each                            | `firefox` / `webkit` / `ipad-webkit`                   | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross`                                                                           |
