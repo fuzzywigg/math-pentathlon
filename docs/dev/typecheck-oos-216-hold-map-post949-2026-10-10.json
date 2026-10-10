@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 1,
+  "reportOnly": true,
+  "taskId": "q-mp-542",
+  "description": "Typecheck out-of-scope 216 HOLD map refresh for tip post949. Docs/data/chart only; AI residual hard-rule HOLD.",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7",
+  "measuredAt": "2026-10-10T14:16:58.000Z",
+  "priorMap": {
+    "path": "docs/dev/typecheck-oos-216-hold-map-post914-2026-10-10.md",
+    "taskId": "q-mp-497",
+    "tipBranch": "cursor/mp-tip-post914",
+    "tipSha": "e43a25d22b081819664bc631e4fe34f793847004",
+    "pr": 963
+  },
+  "earlierMaps": [
+    {
+      "path": "docs/dev/typecheck-oos-216-hold-map-post898-2026-10-10.md",
+      "taskId": "q-mp-447",
+      "tipBranch": "cursor/mp-tip-post898",
+      "tipSha": "855226389f23cb95bf74bd827556ee831c3bccad",
+      "pr": 931
+    },
+    {
+      "path": "docs/dev/typecheck-oos-216-hold-map-post865-2026-10-10.md",
+      "taskId": "q-mp-421",
+      "tipBranch": "cursor/mp-tip-post865",
+      "tipSha": "7f8a71471306af2143c6de0b43564d6c146e2719",
+      "pr": 907
+    },
+    {
+      "path": "docs/dev/typecheck-oos-216-hold-map-2026-10-09.md",
+      "taskId": "q-mp-276",
+      "tipBranch": "cursor/mp-tip-post755",
+      "tipSha": "74a1596f71aab5d6616ff486b2a4eb2a70b5123b",
+      "pr": 781
+    }
+  ],
+  "commands": {
+    "summary": "npm run typecheck:ratchet",
+    "rawTsc": "npx tsc --noEmit -p tsconfig.ratchet.json --pretty false",
+    "baselineCheck": "node docs/dev/type-ratchet-phase2-export.mjs --check",
+    "hexHard": "rg -n 'hard:\\s*450' src/games/hex/ai.ts"
+  },
+  "inScopeErrors": 0,
+  "outOfScopeErrors": 216,
+  "phase2Ceiling": 216,
+  "fileCount": 28,
+  "byKind": {
+    "ai_search_scoring": 216
+  },
+  "byRootCause": {
+    "unchecked_index_access": 202,
+    "exact_optional_property_types": 11,
+    "undefined_as_index": 2,
+    "possibly_undefined_iterable": 1
+  },
+  "byCode": {
+    "TS2532": 88,
+    "TS18048": 59,
+    "TS2322": 44,
+    "TS2345": 11,
+    "TS2379": 9,
+    "TS2375": 2,
+    "TS2538": 2,
+    "TS2488": 1
+  },
+  "byBasename": {
+    "ai.ts": 207,
+    "ai-client.ts": 5,
+    "ai.worker.ts": 4
+  },
+  "byGame": {
+    "contig-60": 19,
+    "fab-a-diffy": 19,
+    "juggle": 18,
+    "stars-bars": 18,
+    "hex": 16,
+    "kwatro-sinko": 16,
+    "calla": 15,
+    "pent-em-in": 12,
+    "fiar": 11,
+    "kings-quadraphages": 11,
+    "hex-a-gone": 9,
+    "par-55": 8,
+    "ramrod": 8,
+    "sum-dominoes": 8,
+    "prime-gold": 7,
+    "star-track": 6,
+    "queens-guards": 5,
+    "frac-fact": 4,
+    "remainder-islands": 4,
+    "fraction-pinball": 2
+  },
+  "byFile": {
+    "src/games/contig-60/ai.ts": 19,
+    "src/games/juggle/ai.ts": 18,
+    "src/games/stars-bars/ai.ts": 18,
+    "src/games/fab-a-diffy/ai.ts": 17,
+    "src/games/kwatro-sinko/ai.ts": 16,
+    "src/games/calla/ai.ts": 15,
+    "src/games/hex/ai.ts": 13,
+    "src/games/pent-em-in/ai.ts": 12,
+    "src/games/kings-quadraphages/ai.ts": 11,
+    "src/games/fiar/ai.ts": 9,
+    "src/games/hex-a-gone/ai.ts": 9,
+    "src/games/par-55/ai.ts": 8,
+    "src/games/ramrod/ai.ts": 8,
+    "src/games/sum-dominoes/ai.ts": 8,
+    "src/games/prime-gold/ai.ts": 7,
+    "src/games/star-track/ai.ts": 6,
+    "src/games/frac-fact/ai.ts": 4,
+    "src/games/remainder-islands/ai.ts": 4,
+    "src/games/queens-guards/ai.ts": 3,
+    "src/games/fraction-pinball/ai.ts": 2,
+    "src/games/hex/ai-client.ts": 2,
+    "src/games/fab-a-diffy/ai-client.ts": 1,
+    "src/games/fab-a-diffy/ai.worker.ts": 1,
+    "src/games/fiar/ai-client.ts": 1,
+    "src/games/fiar/ai.worker.ts": 1,
+    "src/games/hex/ai.worker.ts": 1,
+    "src/games/queens-guards/ai-client.ts": 1,
+    "src/games/queens-guards/ai.worker.ts": 1
+  },
+  "hardRuleHold": {
+    "aiResidual": true,
+    "doNotFixInThisTicket": true,
+    "hexHardMs": 450,
+    "starsBarsHistoryCap": false,
+    "widenTsconfigRatchetScope": false,
+    "rewritePhase2BaselineUpward": false
+  },
+  "context": {
+    "unitTestFileCount": 3280,
+    "emitIdentityFailCount": 11,
+    "note": "Residual buckets unchanged from q-mp-497 / #963; tip stamp + unit-file count only (3242→3280)."
+  },
+  "deltaVsPriorMap": {
+    "outOfScopeErrors": 0,
+    "fileCount": 0,
+    "byGame": "identical",
+    "byFile": "identical",
+    "byBasename": "identical",
+    "byRootCause": "identical",
+    "note": "Tip SHA/branch stamp only; residual buckets unchanged from q-mp-497 / #963, q-mp-447 / #931, q-mp-421 / #907, and q-mp-276 / #781."
+  },
+  "relatedOpenDrafts": [
+    {
+      "pr": 963,
+      "taskId": "q-mp-497",
+      "action": "contained",
+      "note": "post914 HOLD map refresh; same 216 buckets (payload already tip-folded; leave open)"
+    },
+    {
+      "pr": 931,
+      "taskId": "q-mp-447",
+      "action": "contained",
+      "note": "post898 HOLD map refresh; same 216 buckets"
+    },
+    {
+      "pr": 907,
+      "taskId": "q-mp-421",
+      "action": "contained",
+      "note": "post865 HOLD map refresh; same 216 buckets"
+    },
+    {
+      "pr": 781,
+      "taskId": "q-mp-276",
+      "action": "contained",
+      "note": "post755 HOLD map; same 216 buckets"
+    },
+    {
+      "pr": 939,
+      "taskId": "q-mp-462",
+      "action": "contained",
+      "note": "emit-identity inventory on post914; separate series (FAIL 11)"
+    }
+  ]
+}
