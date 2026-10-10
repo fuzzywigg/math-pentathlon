@@ -2,8 +2,6 @@
  * Contig 60 — AI-seat input lock after official end-rules (#380).
  * Human must not see Pass / expression chrome or valid-cell targets while Red thinks.
  */
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { readAppCss } from './_app-css';
 import { createInitialState } from '../../src/games/contig-60/types';
@@ -13,6 +11,7 @@ import {
   newGameVsAI,
 } from '../../src/games/contig-60/game-controller';
 import { injectContigStyles } from '../../src/games/contig-60/board-ui';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -30,9 +29,7 @@ describe('Contig 60 AI seat input lock', () => {
       currentDice: [2, 3, 4],
     });
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsAI('easy');
 
@@ -58,9 +55,7 @@ describe('Contig 60 AI seat input lock', () => {
       currentDice: [1, 1, 1],
     });
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     expect(board.querySelector('.contig-pass-btn')?.textContent).toBe(
