@@ -25,7 +25,7 @@ interface PointerTapState {
   claimed: boolean;
 }
 
-export interface PointerTapControllerOptions {
+interface PointerTapControllerOptions {
   /** Movement budget before the gesture is treated as a pan (default 16). */
   slopPx?: number;
   /**
@@ -35,7 +35,7 @@ export interface PointerTapControllerOptions {
   requirePrimary?: boolean;
 }
 
-export interface PointerTapController {
+interface PointerTapController {
   /** Current machine state (for unit tests / debugging). */
   getState(): Readonly<PointerTapState>;
   reset(): void;
@@ -164,7 +164,7 @@ export function createPointerTapController(
   };
 }
 
-export interface BindCanvasPointerTapOptions extends PointerTapControllerOptions {
+interface BindCanvasPointerTapOptions extends PointerTapControllerOptions {
   /**
    * Called with the completing pointerup when the gesture is a valid tap.
    * Hover-only move/leave stay the caller's responsibility when needed.

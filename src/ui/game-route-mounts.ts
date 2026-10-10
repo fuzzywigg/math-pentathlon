@@ -13,7 +13,7 @@ import type {
   GameShellOptions,
 } from './components/game-shell';
 
-export type GameMountDeps = {
+type GameMountDeps = {
   container: HTMLElement;
   setCleanup: (cleanup: (() => void) | null) => void;
   mountGameShell: (

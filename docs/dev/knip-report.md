@@ -29,6 +29,14 @@ Job `knip` in [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml):
 
 Tracked metrics: `unusedFiles`, `unusedExports`, `unusedTypes`, `unusedDependencies`, `unusedDevDependencies`, `unlisted`, `duplicates`.
 
+## q-mp-356 unusedTypes demote batch 6 (2026-10-10)
+
+Re-measured on tip `cursor/mp-tip-post830` @ `97487de6` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / legal-move / intentional keepers): module-privated UI `GameMountDeps` / `PlayerSeat` / `GameModeChrome` / `PointerTapControllerOptions` / `PointerTapController` / `BindCanvasPointerTapOptions` / `GameModeLabel`. Baseline `unusedTypes` **47 → 36** (−7 demotes; tip live was already 43 vs baseline 47 before this batch). Spec backlog candidates (`GamePhase` aliases / hex-a-gone `PlacedBlock`/`TurnSelection`/`MoveRecord` / star-track `ChainLength`/`StarTrackMove` / fractions `FractionBarStyle`/`FractionBarColors`) are **stale** — still exported but not in live knip unusedTypes (internal importers). Skipped AI protocol / `*/ai.ts`, `timer-scoring`, `SafeJsonParseResult`, `SeatId` (test importers), and alignment/compat types. No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft (`#829` batch 5 already on tip tree) at fold.
+
+## q-mp-365 Rank-3 unusedTypes candidate inventory (2026-10-10)
+
+Report-only inventory on tip `cursor/mp-tip-post830` @ `97487de6`: live `unusedTypes` **43** (baseline still **47**, NOTICE shrink −4). Disposition chart + candidate tables (AI/scoring/`cancelFabAiRequests` excluded) live in [`knip-rank3-unused-types-inventory-2026-10-10.md`](./knip-rank3-unused-types-inventory-2026-10-10.md) (+ [`.svg`](./knip-rank3-unused-types-inventory-2026-10-10.svg) / [`.json`](./knip-rank3-unused-types-inventory-2026-10-10.json)). **No baseline edit in that ticket** — demotes stay with `q-mp-356` / `q-mp-381`. After `#869` fold, baseline is **36**.
+
 ## q-mp-332 unusedTypes demote batch 5 (2026-10-10)
 
 Re-measured on tip `cursor/mp-tip-post785` after Rank-3-only demotes (skip AI / `rules.ts` / scoring / intentional keepers): module-privated PWA `BootstrapOwlOptions` / `BootstrapPwaOptions` / `IdleWarmOptions` / `RegisterPwaOptions` / `RegisterPwaResult`; UI `PixelPoint` / `TimeoutId` / `GenerationTimeoutHandle` / `ReducedMotionOptions` / `GameErrorBoundaryOptions` / `FocusedCellCoords`; kings `SaveInfo` / `GameStateFromJsonResult`; dropped unused `PieceType` re-export from `kings-quadraphages/board.ts` (canonical remains on `pieces.ts`). Baseline `unusedTypes` **61 → 47** (−14). No AI/rules edits. Tip owner: take **min** with any pending knip-baseline draft at fold. Skipped batch-4 symbols already on tip (`#823` / `#793`); skipped AI exports, `SafeJsonParseResult`, `timer-scoring`, and `SeatId` (test importers).
@@ -49,22 +57,22 @@ Re-measured on tip `cursor/mp-tip-post748` after Rank-3-only demotes (skip AI / 
 
 Re-ran on live tip `cursor/mp-tip-post598` @ `7922f9af` (post-#598). Ticket evidence expected `unusedTypes` **95→96 (+1)**; live knip reported **91** (shrink vs prior baseline 95). No growth WARNING on tip. No AI public-surface type deleted (screening: report/hygiene only).
 
-| Metric | Prior baseline | Live tip | Action |
-| --- | --- | --- | --- |
-| `unusedTypes` | 95 | 91 | baseline reconciled **downward** to 91 |
-| `unusedExports` | 7 | 3 | `q-mp-188` rng alias + `q-mp-187` tablet-gl demote (BOARD_3D_LQ_*/MP3D_READY_ATTR) |
-| `unlisted` | 3 | 3 | documented below (owners) |
-| `duplicates` | 3 | 2 | `withSeededRandom` pair cleared in `q-mp-188` |
-| `enforce` | `false` | `false` | **stays false** |
+| Metric          | Prior baseline | Live tip | Action                                                                             |
+| --------------- | -------------- | -------- | ---------------------------------------------------------------------------------- |
+| `unusedTypes`   | 95             | 91       | baseline reconciled **downward** to 91                                             |
+| `unusedExports` | 7              | 3        | `q-mp-188` rng alias + `q-mp-187` tablet-gl demote (BOARD_3D_LQ_*/MP3D_READY_ATTR) |
+| `unlisted`      | 3              | 3        | documented below (owners)                                                          |
+| `duplicates`    | 3              | 2        | `withSeededRandom` pair cleared in `q-mp-188`                                      |
+| `enforce`       | `false`        | `false`  | **stays false**                                                                    |
 
 ## Unlisted script dependencies (owners)
 
 Knip flags packages imported by entry scripts that are not declared in `package.json` `dependencies` / `devDependencies`. Counts are stable at **3**; do not raise the baseline. Re-measured on tip `cursor/mp-tip-post728` @ `a8a87187` (`q-mp-229`): still **3** (`esbuild` ×1 + `playwright` ×2). Left intentional — no `knip.json` allowlist / `ignoreDependencies` change (avoids fighting baseline editors; enforce stays `false`).
 
-| Package | Script(s) | Owner / disposition |
-| --- | --- | --- |
-| `esbuild` | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) via `npm run check:emit-identity` | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`); resolved from `node_modules` without a direct `devDependency`. Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
-| `playwright` | [`scripts/probe-offline-resilience.mjs`](../../scripts/probe-offline-resilience.mjs), [`scripts/probe-offline-resilience-dev.mjs`](../../scripts/probe-offline-resilience-dev.mjs) | **Offline-resilience probe** (`docs/offline-resilience-2026-10-07.md`). Repo ships `@playwright/test` / `@axe-core/playwright`, not the bare `playwright` package name. Optional later: import from `@playwright/test`, or add `playwright` as a `devDependency`. |
+| Package      | Script(s)                                                                                                                                                                          | Owner / disposition                                                                                                                                                                                                                                                                                                                          |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `esbuild`    | [`scripts/check-emit-identity.mjs`](../../scripts/check-emit-identity.mjs) via `npm run check:emit-identity`                                                                       | **Emit-identity / type-ratchet tooling** (`docs/dev/ai-typeonly-option.md`). Present only as a Vite transitive (`vite` → `esbuild`); resolved from `node_modules` without a direct `devDependency`. Optional later: declare `esbuild` as a `devDependency`, or add to `knip.json` `ignoreDependencies` if tip owner prefers transitive-only. |
+| `playwright` | [`scripts/probe-offline-resilience.mjs`](../../scripts/probe-offline-resilience.mjs), [`scripts/probe-offline-resilience-dev.mjs`](../../scripts/probe-offline-resilience-dev.mjs) | **Offline-resilience probe** (`docs/offline-resilience-2026-10-07.md`). Repo ships `@playwright/test` / `@axe-core/playwright`, not the bare `playwright` package name. Optional later: import from `@playwright/test`, or add `playwright` as a `devDependency`.                                                                            |
 
 ## Duplicate export pairs (owners)
 

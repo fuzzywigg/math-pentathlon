@@ -3,7 +3,13 @@
  * Policies: easy | medium | hard | random (uniform legal where available).
  * Never mutates rules — only drives existing engines.
  */
-import type { Difficulty, GameAdapter, GameResult, Outcome, Policy } from './types';
+import type {
+  Difficulty,
+  GameAdapter,
+  GameResult,
+  Outcome,
+  Policy,
+} from './types';
 import {
   installSeededRandom,
   pickRandom,
@@ -16,18 +22,40 @@ const MAX_PLIES = 400;
  * Play budgets for search games (env read lazily so vitest can set vars
  * before first play() despite ESM import hoisting).
  * - CALIBRATION_WALL_CLOCK=1: real performance.now() deadlines.
+ * - CALIBRATION_VIRTUAL_CLOCK=1: deadline + synthetic `now` (load-invariant).
  * - Default: seeded only (no deadline) — full search, slower but ordered.
+ *
+ * Prefer virtual clock for Hard≥Easy order guards under CI thread contention
+ * (q-mp-151 / q-mp-359): wall-clock truncation with n=4 can invert queens-guards
+ * without changing AI search/scoring.
  */
 function searchOptions(seed: number, ply: number) {
-  const env = (globalThis as { process?: { env?: Record<string, string | undefined> } })
-    .process?.env;
+  const env = (
+    globalThis as { process?: { env?: Record<string, string | undefined> } }
+  ).process?.env;
   const wall = env?.CALIBRATION_WALL_CLOCK === '1';
-  if (!wall) {
+  const virtual = env?.CALIBRATION_VIRTUAL_CLOCK === '1';
+  if (!wall && !virtual) {
     return { seed: plySeed(seed, ply) };
+  }
+  const deadlineMs = Number(env?.CALIBRATION_DEADLINE_MS ?? 300);
+  if (virtual) {
+    // Match determinism-helper soft budgets: each now() advances a fixed tick
+    // so CPU contention cannot steal Hard search depth relative to Easy.
+    const tick = Number(env?.CALIBRATION_VIRTUAL_TICK ?? 2);
+    let t = 0;
+    return {
+      seed: plySeed(seed, ply),
+      deadlineMs,
+      now: () => {
+        t += tick;
+        return t;
+      },
+    };
   }
   return {
     seed: plySeed(seed, ply),
-    deadlineMs: Number(env?.CALIBRATION_DEADLINE_MS ?? 300),
+    deadlineMs,
   };
 }
 
@@ -45,11 +73,7 @@ function outcomeFromWinner(
   return 'draw';
 }
 
-function result(
-  winner: Outcome,
-  length: number,
-  seed: number
-): GameResult {
+function result(winner: Outcome, length: number, seed: number): GameResult {
   return { winner, length, seed };
 }
 
@@ -101,7 +125,11 @@ import { createInitialState as createFab } from '../../../src/games/fab-a-diffy/
 import { executeAITurn as fabTurn } from '../../../src/games/fab-a-diffy/ai';
 
 function playExecuteLoop(
-  create: () => { phase: string; winner?: string | null; currentPlayer: 'player1' | 'player2' },
+  create: () => {
+    phase: string;
+    winner?: string | null;
+    currentPlayer: 'player1' | 'player2';
+  },
   turn: (
     state: any,
     seat: 'player1' | 'player2',
@@ -190,8 +218,7 @@ const starsBars: GameAdapter = {
 
 const par55: GameAdapter = {
   id: 'par-55',
-  play: (p1, p2, seed) =>
-    playExecuteLoop(createPar, parTurn, seed, p1, p2),
+  play: (p1, p2, seed) => playExecuteLoop(createPar, parTurn, seed, p1, p2),
 };
 
 const ramrod: GameAdapter = {
@@ -208,14 +235,12 @@ const kwatro: GameAdapter = {
 
 const sumDominoes: GameAdapter = {
   id: 'sum-dominoes',
-  play: (p1, p2, seed) =>
-    playExecuteLoop(createSum, sumTurn, seed, p1, p2),
+  play: (p1, p2, seed) => playExecuteLoop(createSum, sumTurn, seed, p1, p2),
 };
 
 const primeGold: GameAdapter = {
   id: 'prime-gold',
-  play: (p1, p2, seed) =>
-    playExecuteLoop(createPrime, primeTurn, seed, p1, p2),
+  play: (p1, p2, seed) => playExecuteLoop(createPrime, primeTurn, seed, p1, p2),
 };
 
 const starTrack: GameAdapter = {
@@ -231,7 +256,8 @@ const starTrack: GameAdapter = {
         if (policy === 'random') {
           let s = state.phase === 'drawChains' ? drawChains(state) : state;
           if (s.phase === 'selectChain' && s.drawnChains) {
-            const idx = Math.floor(Math.random() * s.drawnChains.length) as 0 | 1;
+            const idx = Math.floor(Math.random() * s.drawnChains.length) as
+              0 | 1;
             state = selectChain(s, idx);
           } else {
             state = starTrackTurn(state, seat, 'easy');
@@ -248,8 +274,7 @@ const starTrack: GameAdapter = {
 
 const hexAGone: GameAdapter = {
   id: 'hex-a-gone',
-  play: (p1, p2, seed) =>
-    playExecuteLoop(createHag, hagTurn, seed, p1, p2),
+  play: (p1, p2, seed) => playExecuteLoop(createHag, hagTurn, seed, p1, p2),
 };
 
 const contig60: GameAdapter = {
@@ -301,7 +326,11 @@ const calla: GameAdapter = {
         }
         length += 1;
       }
-      return result(outcomeFromWinner(state.winner, [null, 'tie']), length, seed);
+      return result(
+        outcomeFromWinner(state.winner, [null, 'tie']),
+        length,
+        seed
+      );
     });
   },
 };
@@ -313,7 +342,10 @@ import {
   getBestMove,
   getRandomMove as hexRandom,
 } from '../../../src/games/hex/ai';
-import { makeMove as hexMake, getValidMoves as hexValids } from '../../../src/games/hex/rules';
+import {
+  makeMove as hexMake,
+  getValidMoves as hexValids,
+} from '../../../src/games/hex/rules';
 
 const hex: GameAdapter = {
   id: 'hex',
@@ -393,8 +425,15 @@ import {
   applyAIMove as queensApply,
 } from '../../../src/games/queens-guards/ai';
 import { getValidMoves as queensValids } from '../../../src/games/queens-guards/rules';
-import { cellKey, cellsInRing, CONFIG as queensConfig } from '../../../src/games/queens-guards/types';
-import { restoreCapturedPiece, makeMove as queensMake } from '../../../src/games/queens-guards/rules';
+import {
+  cellKey,
+  cellsInRing,
+  CONFIG as queensConfig,
+} from '../../../src/games/queens-guards/types';
+import {
+  restoreCapturedPiece,
+  makeMove as queensMake,
+} from '../../../src/games/queens-guards/rules';
 
 const queens: GameAdapter = {
   id: 'queens-guards',
@@ -423,7 +462,10 @@ const queens: GameAdapter = {
             const pieces = [...state.cells.values()].filter(
               (c) => c.piece?.player === seat
             );
-            const moves: { from: { ring: number; position: number }; to: { ring: number; position: number } }[] = [];
+            const moves: {
+              from: { ring: number; position: number };
+              to: { ring: number; position: number };
+            }[] = [];
             for (const cell of pieces) {
               const from = { ring: cell.ring, position: cell.position };
               for (const to of queensValids(state, from)) {
@@ -435,7 +477,12 @@ const queens: GameAdapter = {
             state = queensMake(state, m.from, m.to);
           }
         } else {
-          let move = queensMove(state, seat, policy, searchOptions(seed, length));
+          let move = queensMove(
+            state,
+            seat,
+            policy,
+            searchOptions(seed, length)
+          );
           if (!move) {
             // Deadline miss — legal random fallback (same as random policy path)
             if (state.capturedPieces.length > 0) {
@@ -497,12 +544,10 @@ import type { FiarGameState } from '../../../src/games/fiar/types';
 function fiarRandomMove(state: FiarGameState) {
   if (state.phase === 'placement') {
     const inv = state.chipInventory[state.currentPlayer];
-    const kinds = (
-      [
-        ...(inv.plain > 0 ? (['plain'] as const) : []),
-        ...(inv.marked > 0 ? (['marked'] as const) : []),
-      ] as const
-    );
+    const kinds = [
+      ...(inv.plain > 0 ? (['plain'] as const) : []),
+      ...(inv.marked > 0 ? (['marked'] as const) : []),
+    ] as const;
     const candidates: { nodeId: string; chipKind: 'plain' | 'marked' }[] = [];
     for (const chipKind of kinds) {
       for (const nodeId of state.board.nodes.keys()) {
@@ -874,4 +919,3 @@ export const ALL_ADAPTERS: GameAdapter[] = [
   fractionPinball,
   starsBars,
 ];
-

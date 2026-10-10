@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="420" viewBox="0 0 780 420" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-364 lint-bucket measured snapshot (tip post830)</title>
+  <desc id="desc">Live tip ceilings: void 58, dup-imports 42, no-shadow 3. Densest void bucket src/ui/three=34. Measured on tip SHA 97487de6.</desc>
+  <rect width="780" height="420" fill="#f4f7f2"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2e1a">q-mp-364 · lint-bucket snapshot (post830)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c4a">tip 97487de6 · report-only · voids 58 / dups 42 / shadow 3 · no ceiling writes</text>
+
+  <!-- Focus metric cards -->
+  <rect x="24" y="76" width="232" height="78" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
+  <text x="140" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#1a2e1a">58</text>
+  <text x="140" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f4a2f">void-expression / ceiling 58</text>
+  <text x="140" y="148" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b7c5b">stale backlog said 62 (−4)</text>
+
+  <rect x="272" y="76" width="232" height="78" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
+  <text x="388" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#1a2e1a">42</text>
+  <text x="388" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f4a2f">dup-imports / ceiling 42</text>
+  <text x="388" y="148" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b7c5b">matches tip ceiling</text>
+
+  <rect x="520" y="76" width="236" height="78" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
+  <text x="638" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#1a2e1a">3</text>
+  <text x="638" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f4a2f">no-shadow / ceiling 3</text>
+  <text x="638" y="148" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b7c5b">matches tip ceiling</text>
+
+  <text x="24" y="186" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1a2e1a">Void densest path buckets (live probe)</text>
+  <!-- max 34 → scale 34 = 520px -->
+  <rect x="200" y="198" width="520" height="20" fill="#c5dbc0"/>
+  <text x="24" y="213" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">src/ui/three</text>
+  <text x="730" y="213" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">34</text>
+
+  <rect x="200" y="226" width="183" height="20" fill="#a8c9a0"/>
+  <text x="24" y="241" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">src/</text>
+  <text x="730" y="241" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">12</text>
+
+  <rect x="200" y="254" width="107" height="20" fill="#8fb887"/>
+  <text x="24" y="269" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">src/ui</text>
+  <text x="730" y="269" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">7</text>
+
+  <rect x="200" y="282" width="61" height="20" fill="#76a76e"/>
+  <text x="24" y="297" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">src/pwa</text>
+  <text x="730" y="297" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">4</text>
+
+  <rect x="200" y="310" width="15" height="20" fill="#5d9654"/>
+  <text x="24" y="325" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">prime-gold</text>
+  <text x="730" y="325" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2e1a">1</text>
+
+  <text x="24" y="358" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" fill="#1a2e1a">Dup-import top buckets · Shadow residual</text>
+  <rect x="200" y="370" width="119" height="18" fill="#d4c4a8"/>
+  <text x="24" y="384" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1a2e1a">juggle dups</text>
+  <text x="330" y="384" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1a2e1a">5</text>
+  <rect x="380" y="370" width="71" height="18" fill="#d4c4a8"/>
+  <text x="380" y="364" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#4a5c4a">fiar/pent 3</text>
+  <rect x="520" y="370" width="48" height="18" fill="#b8a07a"/>
+  <text x="520" y="364" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#4a5c4a">shadow 3</text>
+  <text x="24" y="408" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c4a">Helper: npm run report:lint-buckets · ceilings unchanged · #796 helper contained on tip</text>
+</svg>
