@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="780" height="440" viewBox="0 0 780 440" role="img" aria-labelledby="title desc">
   <title id="title">q-mp-536 lint-bucket measured snapshot (tip post949)</title>
-  <desc id="desc">Live tip ceilings: void 48, dup-imports 42, no-shadow 3, nnnull 239. Densest void bucket src/ui/three=34. Measured on tip SHA d7a3989a. Prior post914 stamp void 51 / nnnull 241; q-mp-498/515/544 (-3 void) and q-mp-516 (-2 nnnull) already on tip.</desc>
+  <desc id="desc">Live tip ceilings: void 48, dup-imports 42, no-shadow 3, nnnull 239. Densest void bucket src/ui/three=34. Measured on tip SHA 96234101. Prior post914 stamp void 51 / nnnull 241; q-mp-498/515/544 (-3 void) and q-mp-516 (-2 nnnull) already on tip.</desc>
   <rect width="780" height="440" fill="#f4f7f2"/>
   <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2e1a">q-mp-536 - lint-bucket snapshot (post949)</text>
-  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c4a">tip d7a3989a - report-only - voids 48 / nnnull 239 / dups 42 / shadow 3 - no ceiling writes</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c4a">tip 96234101 - report-only - voids 48 / nnnull 239 / dups 42 / shadow 3 - no ceiling writes</text>
 
   <rect x="24" y="76" width="232" height="78" fill="#e8f0e4" stroke="#5b7c5b" stroke-width="1"/>
   <text x="140" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="30" fill="#1a2e1a">48</text>

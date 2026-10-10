@@ -47,7 +47,7 @@ Runs offline against the local tree (`eslint src` + probe config under the repo 
 | [`lint-bucket-snapshot-post865-2026-10-10.md`](./lint-bucket-snapshot-post865-2026-10-10.md)                     | Dated tip snapshot (`q-mp-416`) + chart @ `7f8a7147` (void **53**)                  |
 | [`lint-bucket-snapshot-post898-2026-10-10.md`](./lint-bucket-snapshot-post898-2026-10-10.md)                     | Dated tip snapshot (`q-mp-441`) + chart @ `9b19c5e8` (void **52** / nnnull **241**) |
 | [`lint-bucket-snapshot-post914-2026-10-10.md`](./lint-bucket-snapshot-post914-2026-10-10.md)                     | Dated tip snapshot (`q-mp-491`) + chart @ `e43a25d2` (void **51** / nnnull **241**) |
-| [`lint-bucket-snapshot-post949-2026-10-10.md`](./lint-bucket-snapshot-post949-2026-10-10.md)                     | Dated tip snapshot (`q-mp-536`) + chart @ `d7a3989a` (void **48** / nnnull **239**) |
+| [`lint-bucket-snapshot-post949-2026-10-10.md`](./lint-bucket-snapshot-post949-2026-10-10.md)                     | Dated tip snapshot (`q-mp-536`) + chart @ `96234101` (void **48** / nnnull **239**) |
 | **This helper**                                                                                                  | Fast bucket report for refill / triage                                              |
 
 ## Sample shape (stable columns)

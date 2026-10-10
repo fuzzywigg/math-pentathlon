@@ -2,8 +2,8 @@
   "task": "q-mp-536",
   "helperTask": "q-mp-280",
   "tipBranch": "cursor/mp-tip-post949",
-  "tipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
-  "measuredAt": "2026-10-10T14:24:19Z",
+  "tipSha": "9623410197c1c761aaae4f52bbf303791580e8a0",
+  "measuredAt": "2026-10-10T14:29:05Z",
   "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
   "ceilings": {
     "curly": 538,
@@ -531,5 +531,11 @@
         "src/games/queens-guards/ai-client.ts": 1
       }
     }
+  },
+  "remeasuredAfterTipMove": {
+    "previousTipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
+    "newTipSha": "9623410197c1c761aaae4f52bbf303791580e8a0",
+    "tipCommit": "docs(q-mp-537): refresh coverage-map after tip post949 cut",
+    "lintTotalsUnchanged": true
   }
 }
