@@ -7,7 +7,7 @@
  * Skips when the user has Save-Data enabled or when the document is hidden.
  */
 
-export type IdleWarmOptions = {
+type IdleWarmOptions = {
   /** Injected for tests. */
   schedule?: (cb: () => void) => void;
   /** Injected for tests — replaces per-game controller imports only. */

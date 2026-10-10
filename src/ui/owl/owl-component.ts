@@ -1,7 +1,7 @@
 // Owl UI Component - Visual representation of Ollie the Owl
 
-import type { OwlDisplayState } from '../../core/owl';
 import {
+  type OwlDisplayState,
   owlSystem,
   inspectDropSpeech,
   integrate,

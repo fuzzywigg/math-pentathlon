@@ -487,7 +487,7 @@ export function bindBoardCellKeys(
   });
 }
 
-export interface FocusedCellCoords {
+interface FocusedCellCoords {
   row: string;
   col: string;
 }

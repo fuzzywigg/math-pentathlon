@@ -1,8 +1,11 @@
-import type { Piece, PieceType, PlayerOwner } from './pieces';
-import { INITIAL_QUADRAPHAGE_COUNT } from './pieces';
+import {
+  type Piece,
+  type PlayerOwner,
+  INITIAL_QUADRAPHAGE_COUNT,
+} from './pieces';
 
 // Re-export piece types for convenience
-export type { Piece, PieceType, PlayerOwner };
+export type { Piece, PlayerOwner };
 
 // Board dimensions
 export const BOARD_SIZE = 9;

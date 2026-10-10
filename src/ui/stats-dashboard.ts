@@ -7,12 +7,12 @@
 import { clearElement } from '../core/dom-security';
 import { getGameById } from '../core/game-registry';
 import { navigate } from '../core/router';
-import { storage } from '../core/storage';
-import type {
-  Achievement,
-  GameStats,
-  PlayerProfile,
-  StreakData,
+import {
+  storage,
+  type Achievement,
+  type GameStats,
+  type PlayerProfile,
+  type StreakData,
 } from '../core/storage';
 
 export interface StatsDashboardSnapshot {

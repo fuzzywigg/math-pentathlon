@@ -5,7 +5,7 @@
  * helpers/core-hex lattice (+30° start).
  */
 
-export type PixelPoint = { x: number; y: number };
+type PixelPoint = { x: number; y: number };
 
 /**
  * Pointy-top hex corner pixels.

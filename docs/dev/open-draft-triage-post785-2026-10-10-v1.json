@@ -1,0 +1,2474 @@
+{
+  "taskId": "q-mp-334",
+  "generatedAtUtc": "2026-10-10T02:13:24Z",
+  "liveTipBranch": "cursor/mp-tip-post785",
+  "tipSha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
+  "tipShaShort": "06126841",
+  "alphaSha": "217190621fc55835bf82f5a4d3b8bd7666a25d9b",
+  "tipPr": 830,
+  "priorTriage": "docs/dev/open-draft-triage-post755-2026-10-09-v5.md",
+  "priorTriagePr": 819,
+  "markdownTwin": "docs/dev/open-draft-triage-post785-2026-10-10-v1.md",
+  "scope": "report-only; do not close PRs; do not comment from this worker task",
+  "supersedesNavigation": ["q-mp-309", "q-mp-259"],
+  "tipCommitsSinceCut": [
+    {
+      "sha": "9580765b86fc853cac89be59316abf07d12c13e4",
+      "subject": "q-mp-292: clear no-shadow in game-controller.ts (\u22126 \u2192 ceiling 3)",
+      "sourcePr": 822
+    },
+    {
+      "sha": "7bb3b3c1f776cb60ed0a100e72055c2483a146c5",
+      "subject": "docs(q-mp-026j): re-anchor AGENTS tip pointers to cursor/mp-tip-post785",
+      "sourcePr": null
+    },
+    {
+      "sha": "d6c9d8b992e5825f3e127db6f45986353b6bccde",
+      "subject": "test(ui): q-mp-295 UI cov r16 owl branch residuals",
+      "sourcePr": 813
+    },
+    {
+      "sha": "c9b55cff8c3832ff502179fe66f14ecaa400e95d",
+      "subject": "fix(lint): q-mp-320 brace no-confusing-void-expression in game-shell (\u22124)",
+      "sourcePr": 825
+    },
+    {
+      "sha": "8c81a16cb514142c9158589be152db5eeb079247",
+      "subject": "q-mp-329: batch prime-gold board-3d layout reads (no visual change)",
+      "sourcePr": 826
+    },
+    {
+      "sha": "7b30e6577b7e89d8c996495cd8f7ce0810b9b771",
+      "subject": "fix(q-mp-321): clear no-duplicate-imports in ui + kings helpers (\u22125 \u2192 42)",
+      "sourcePr": 827
+    },
+    {
+      "sha": "02926472a430627e0f4e70af7cab5f5d0a8394b8",
+      "subject": "docs(q-mp-313): remeasure post785 bundle headroom (sum-dominoes \u221276 B)",
+      "sourcePr": 828
+    },
+    {
+      "sha": "2e126f09fe444118edfe6ddd1251ddcc3edca2f0",
+      "subject": "q-mp-332: Knip unusedTypes demote batch 5 (Rank-3 \u221214 \u2192 baseline 47)",
+      "sourcePr": 829
+    },
+    {
+      "sha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
+      "subject": "fix(q-mp-026j): drop duplicate Piece/PlayerOwner re-export after #829 fold",
+      "sourcePr": null
+    }
+  ],
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 246,
+    "@typescript-eslint/no-confusing-void-expression": 62,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 42,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 3,
+    "eqeqeq": 1,
+    "@typescript-eslint/return-await": 3,
+    "unitTestSpecFilesExclArchive": 3182,
+    "hexHardMs": 450
+  },
+  "openInventory": {
+    "openTotal": 277,
+    "byBase": {
+      "cursor/mp-tip-post477": 67,
+      "cursor/mp-tip-post755": 44,
+      "cursor/integration-fold-wave5-tip-4af0": 29,
+      "cursor/mp-tip-post598": 26,
+      "cursor/mp-tip-post785": 25,
+      "cursor/mp-tip-post748": 25,
+      "cursor/mp-tip-post728": 22,
+      "cursor/mp-tip-post700": 14,
+      "cursor/mp-tip-post709": 10,
+      "alpha": 6,
+      "cursor/overnight-polish-integration-0494": 6,
+      "cursor/friday-landing-preflight-v2-e939": 1,
+      "cursor/integration-fold-wave4-tip-36e4": 1,
+      "cursor/playtest-recheck-fixes-a6fd": 1
+    },
+    "post785Open": 25,
+    "post755Open": 44
+  },
+  "summaryCounts": {
+    "focusClassified": 29,
+    "fold": 21,
+    "rerun": 0,
+    "superseded": 7,
+    "held": 1
+  },
+  "classificationLegend": {
+    "fold": "Unique payload not on tip; tip owner should fold (after CI green / ceiling reconcile)",
+    "rerun": "Payload still wanted, but rebase and/or CI re-run required before fold",
+    "superseded": "Payload already on tip 06126841 (or topic replaced); leave PR open",
+    "held": "Tip-owner / Andrew hold \u2014 do not fold / do not touch"
+  },
+  "unitFailureNotes": {
+    "822": {
+      "run": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38006694201",
+      "test": "ai-calibration-difficulty-order queens-guards",
+      "detail": "flaky; already tip-folded"
+    }
+  },
+  "suggestedFoldOrder": [
+    831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845,
+    846, 847, 848, 849, 850
+  ],
+  "doNotFold": [727, 813, 822, 825, 826, 827, 828, 829],
+  "drafts": [
+    {
+      "number": 727,
+      "taskId": "q-mp-186",
+      "title": "q-mp-186: clear prefer-nullish-coalescing in owl-messages (\u22129)",
+      "base": "cursor/mp-tip-post709",
+      "headRefName": "cursor/q-mp-186-nullish-owl-messages-0a20",
+      "headSha": "54532ce5459ca15d880ece9a119a909e56745ef4",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/727",
+      "files": [
+        "docs/dev/eslint-off-rules-inventory.md",
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/core/owl/owl-messages.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 3,
+        "new": 0
+      },
+      "recommendation": "held",
+      "method": "policy",
+      "reason": "Andrew HOLD; do not fold/comment/retarget; nullish ceiling 65",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 813,
+      "taskId": "q-mp-295",
+      "title": "q-mp-295: UI coverage round 16 \u2014 owl branch residuals (tests only)",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-295-ui-cov-r16-owl-6613",
+      "headSha": "7160faee6a7ee2c29ab0809b4796a88b665850b8",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "CONFLICTING",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/813",
+      "files": [
+        "docs/dev/coverage-map.md",
+        "docs/dev/coverage-map.svg",
+        "docs/dev/ui-coverage-round-16.md",
+        "tests/unit/burn-1010-ui-cov-r16-owl-branches.test.ts"
+      ],
+      "blobProbe": {
+        "same": 2,
+        "diff": 2,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob",
+      "reason": "Tip folded unique test + ui-coverage-round-16.md as d6c9d8b9; coverage-map regenerate stale; 0 check-runs",
+      "checks": {
+        "lint": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "audit": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "build": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "unit": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "e2e": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "knip": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "visual-baseline": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "e2e-fullgame": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "mobile-touch": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "zoom-reflow": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "forced-colors": {
+          "status": "missing",
+          "conclusion": null
+        },
+        "e2e-cross-browser": {
+          "status": "missing",
+          "conclusion": null
+        }
+      },
+      "checkSummary": {
+        "success": 0,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 822,
+      "taskId": "q-mp-292",
+      "title": "q-mp-292: clear no-shadow in game-controller.ts (\u22126 \u2192 ceiling 3)",
+      "base": "cursor/mp-tip-post755",
+      "headRefName": "cursor/q-mp-292-no-shadow-controllers-9e7a",
+      "headSha": "3c85400c35555b6c652a78425e590ea281b28ae7",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "CONFLICTING",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/822",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/games/fab-a-diffy/game-controller.ts",
+        "src/games/par-55/game-controller.ts",
+        "src/games/prime-gold/game-controller.ts",
+        "src/games/ramrod/game-controller.ts",
+        "src/games/stars-bars/game-controller.ts",
+        "src/games/sum-dominoes/game-controller.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 7,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject",
+      "reason": "Tip folded as 9580765b (no-shadow\u21923). unit failure was flaky AI calib; CONFLICTING",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 11,
+        "failure": 1,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 825,
+      "taskId": "q-mp-320",
+      "title": "q-mp-320: clear no-confusing-void-expression in game-shell (\u22124 \u2192 ceiling 62)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-320-void-game-shell-24ca",
+      "headSha": "c72d61c7b19a18bb17769be115dafe65a31cbae2",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/825",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/ui/components/game-shell.ts"
+      ],
+      "blobProbe": {
+        "same": 1,
+        "diff": 1,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob",
+      "reason": "Tip folded as c9b55cff; game-shell.ts blob identical",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 826,
+      "taskId": "q-mp-329",
+      "title": "q-mp-329: batch prime-gold board-3d layout reads (no visual change)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-329-prime-gold-layout-reads-1e27",
+      "headSha": "3a8538a16ada8b456042a1e215195527e32cabb7",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/826",
+      "files": [
+        "docs/dev/q-mp-329-prime-gold-board3d-layout-reads.md",
+        "src/ui/three/prime-gold-board-3d.ts"
+      ],
+      "blobProbe": {
+        "same": 2,
+        "diff": 0,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob",
+      "reason": "Tip folded as 8c81a16c; blobs identical",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 827,
+      "taskId": "q-mp-321",
+      "title": "q-mp-321: clear no-duplicate-imports in ui + kings helpers (\u22125 \u2192 ceiling 42)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-321-dup-imports-ui-kings-c377",
+      "headSha": "99671e992db129bdae9890ad0cece7ca14aad61b",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/827",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/games/kings-quadraphages/board-renderer.ts",
+        "src/games/kings-quadraphages/board.ts",
+        "src/ui/game-selector.ts",
+        "src/ui/owl/owl-component.ts",
+        "src/ui/stats-dashboard.ts"
+      ],
+      "blobProbe": {
+        "same": 4,
+        "diff": 2,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob-majority",
+      "reason": "Tip folded as 7b30e657 (dup-imports\u219242)",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 828,
+      "taskId": "q-mp-313",
+      "title": "q-mp-313: remeasure post785 bundle headroom (sum-dominoes \u221276 B)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-313-bundle-headroom-post785-920d",
+      "headSha": "eb833770f4b85a4de646ae38f55b4d40683652db",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/828",
+      "files": ["docs/dev/bundle-headroom-post785-2026-10-10.md"],
+      "blobProbe": {
+        "same": 1,
+        "diff": 0,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob",
+      "reason": "Tip folded as 02926472; docs blob identical",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 829,
+      "taskId": "q-mp-332",
+      "title": "q-mp-332: Knip unusedTypes demote batch 5 (Rank-3 \u221214 \u2192 baseline 47)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-332-knip-unused-types-batch5-6c4b",
+      "headSha": "cb242c1e0181153f23a037cbdaf15767ee7ace79",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/829",
+      "files": [
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "src/games/kings-quadraphages/board.ts",
+        "src/games/kings-quadraphages/serialization.ts",
+        "src/pwa/bootstrap-owl.ts",
+        "src/pwa/bootstrap.ts",
+        "src/pwa/idle-warm.ts",
+        "src/pwa/register.ts",
+        "src/ui/board-a11y.ts",
+        "src/ui/game-error-boundary.ts",
+        "src/ui/hex-svg.ts",
+        "src/ui/reduced-motion.ts",
+        "src/ui/timeout-handle.ts"
+      ],
+      "blobProbe": {
+        "same": 12,
+        "diff": 1,
+        "new": 0
+      },
+      "recommendation": "superseded",
+      "method": "tip-subject+blob-majority",
+      "reason": "Tip folded as 2e126f09 (+ tip-owner 06126841 board.ts re-export fix); 12/13 blobs identical; leave open",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 11,
+        "failure": 1,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 830,
+      "taskId": "q-mp-026j",
+      "title": "q-mp-026j: tip fold post785",
+      "base": "alpha",
+      "headRefName": "cursor/mp-tip-post785",
+      "headSha": "06126841f4dc3e15a0ab9e6d58df1dad8cc0a4b3",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/830",
+      "files": [
+        "AGENTS.md",
+        "docs/dev/bundle-headroom-post785-2026-10-10.md",
+        "docs/dev/knip-baseline.json",
+        "docs/dev/knip-report.md",
+        "docs/dev/lint-ratchet-ceilings.json",
+        "docs/dev/q-mp-329-prime-gold-board3d-layout-reads.md",
+        "docs/dev/ui-coverage-round-16.md",
+        "src/games/fab-a-diffy/game-controller.ts",
+        "src/games/kings-quadraphages/board-renderer.ts",
+        "src/games/kings-quadraphages/board.ts",
+        "src/games/kings-quadraphages/serialization.ts",
+        "src/games/par-55/game-controller.ts",
+        "src/games/prime-gold/game-controller.ts",
+        "src/games/ramrod/game-controller.ts",
+        "src/games/stars-bars/game-controller.ts",
+        "src/games/sum-dominoes/game-controller.ts",
+        "src/pwa/bootstrap-owl.ts",
+        "src/pwa/bootstrap.ts",
+        "src/pwa/idle-warm.ts",
+        "src/pwa/register.ts",
+        "src/ui/board-a11y.ts",
+        "src/ui/components/game-shell.ts",
+        "src/ui/game-error-boundary.ts",
+        "src/ui/game-selector.ts",
+        "src/ui/hex-svg.ts",
+        "src/ui/owl/owl-component.ts",
+        "src/ui/reduced-motion.ts",
+        "src/ui/stats-dashboard.ts",
+        "src/ui/three/prime-gold-board-3d.ts",
+        "src/ui/timeout-handle.ts",
+        "tests/unit/burn-1010-ui-cov-r16-owl-branches.test.ts"
+      ],
+      "blobProbe": {
+        "same": 31,
+        "diff": 0,
+        "new": 0
+      },
+      "recommendation": "fold",
+      "method": "tip-pr",
+      "reason": "Tip fold PR post785\u2192alpha @ 06126841",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "in_progress",
+          "conclusion": null
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "in_progress",
+          "conclusion": null
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "in_progress",
+          "conclusion": null
+        }
+      },
+      "checkSummary": {
+        "success": 9,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 831,
+      "taskId": "q-mp-090j",
+      "title": "q-mp-090j: Oct 10a engineering backlog round 10 (25 tasks q-mp-334..358) for tip post785",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-090j-backlog-10a-634f",
+      "headSha": "47ca886d23c900ef575f657831cbe5da8dc67cfb",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/831",
+      "files": ["docs/dev/backlog-2026-10-10a.md"],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Backlog round 10 docs",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 832,
+      "taskId": "q-mp-325",
+      "title": "q-mp-325: mutation audit UI wave 10 \u2014 board-a11y / storage / router (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-325-mutation-audit-ui-10-2659",
+      "headSha": "e8ec224efc35d4fc2c0bd95cc2a0f473efb9aeeb",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/832",
+      "files": [
+        "docs/dev/mutation-audit-ui-10-after.json",
+        "docs/dev/mutation-audit-ui-10-baseline.json",
+        "docs/dev/mutation-audit-ui-10.md",
+        "tests/unit/mutation-ui10-board-a11y.test.ts",
+        "tests/unit/mutation-ui10-router.test.ts",
+        "tests/unit/mutation-ui10-safe-web-storage.test.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 6
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Mutation audit UI wave 10 tests-only",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 833,
+      "taskId": "q-mp-324",
+      "title": "q-mp-324: engine coverage round 10 \u2014 timer-scoring + core residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-324-engine-cov-r10-4959",
+      "headSha": "e72798e88ad222429d0572b53c5494db15ed616f",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/833",
+      "files": [
+        "docs/dev/engine-coverage-round-10.md",
+        "tests/unit/engine-coverage-round-10-burn-1008.test.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Engine cov r10 tests-only",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 834,
+      "taskId": "q-mp-331",
+      "title": "q-mp-331: batch kings board-3d layout reads (no visual change)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-331-kings-layout-reads-32e8",
+      "headSha": "8ad9b94e8f6a98e0245e61254322032662815bf9",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/834",
+      "files": [
+        "docs/dev/q-mp-331-kings-board3d-layout-reads.md",
+        "src/ui/three/kings-quadraphages-board-3d.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Kings board-3d layout reads",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 835,
+      "taskId": "q-mp-352",
+      "title": "q-mp-352: batch kwatro-sinko board-3d layout reads (no visual change)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-352-kwatro-layout-reads-3a17",
+      "headSha": "338216d3cfa87435f8b03c9ea8fa58c426e6ba80",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/835",
+      "files": [
+        "docs/dev/q-mp-352-kwatro-sinko-board3d-layout-reads.md",
+        "src/ui/three/kwatro-sinko-board-3d.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Kwatro-sinko board-3d layout reads",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 836,
+      "taskId": "q-mp-351",
+      "title": "q-mp-351: batch fiar-board-3d layout reads (no visual change)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-351-fiar-layout-reads-9893",
+      "headSha": "6b77145c521b62ea5357fd137f9a6bcd3f5f47a8",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/836",
+      "files": [
+        "docs/dev/q-mp-351-fiar-board3d-layout-reads.md",
+        "src/ui/three/fiar-board-3d.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "FIAR board-3d layout reads",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 837,
+      "taskId": "q-mp-344",
+      "title": "q-mp-344: clear no-confusing-void-expression in tablet-gl (\u22124 \u2192 ceiling 58)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-344-void-tablet-gl-a4d0",
+      "headSha": "b4bc21920b8935571058e87e1360cbcb694c33e5",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/837",
+      "files": [
+        "docs/dev/lint-ratchet-ceilings.json",
+        "src/ui/three/tablet-gl.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 2,
+        "new": 0
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "tablet-gl void (\u22124\u219258); tip-owner min-wins void 58 on fold",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 838,
+      "taskId": "q-mp-330",
+      "title": "q-mp-330: batch pent-em-in board-3d layout reads (no visual change)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-330-pent-em-in-layout-reads-ec1b",
+      "headSha": "576c211e275134739c32c4e66def10c74a6d953c",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/838",
+      "files": [
+        "docs/dev/q-mp-330-pent-em-in-board3d-layout-reads.md",
+        "src/ui/three/pent-em-in-board-3d.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Pent-em-in board-3d layout reads",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 839,
+      "taskId": "q-mp-343",
+      "title": "q-mp-343: emit-identity FAIL inventory refresh (post785, 11 AI diffs) \u2014 docs only",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-343-emit-identity-inventory-0b23",
+      "headSha": "78a787082c53856a8db55b4e03c162083d924622",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/839",
+      "files": [
+        "docs/dev/ai-typeonly-option.md",
+        "docs/dev/emit-identity-fail-inventory-2026-10-09.md",
+        "docs/dev/emit-identity-fail-inventory-2026-10-10.json",
+        "docs/dev/emit-identity-fail-inventory-2026-10-10.md",
+        "docs/wiki/development.md"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 3,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Emit-identity FAIL inventory refresh docs",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 840,
+      "taskId": "q-mp-341",
+      "title": "q-mp-341: Rank-1 dead-CSS rescan on tip post785 (report-only; contains #805/#766)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-341-dead-css-rescan-post785-b2b7",
+      "headSha": "2313ada94388fd2076102a219534e2af54d162af",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/840",
+      "files": [
+        "docs/dev/dead-code-inventory.md",
+        "docs/dev/dead-css-rank1-rescan-post785-2026-10-10.md",
+        "docs/dev/dead-css-rank1-rescan-post785-2026-10-10.svg"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Rank-1 dead-CSS rescan post785; contains #805/#766",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 841,
+      "taskId": "q-mp-335",
+      "title": "q-mp-335: remeasure wiki/testing-layers unit counts to 3182 / 12490 (tip post785)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-335-testing-layers-counts-7f1d",
+      "headSha": "75ab398cf87dc743a69ada670b43b8f86a165a18",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/841",
+      "files": [
+        "docs/dev/testing-layers-2026-10-09.md",
+        "docs/wiki/development.md"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 2,
+        "new": 0
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=2 new=0); success=12/12; mergeable=UNKNOWN",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 842,
+      "taskId": "q-mp-358",
+      "title": "q-mp-358: characterize tablet-gl soft-fail / LQ / ready-attr residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-358-tablet-gl-soft-fail-ce3d",
+      "headSha": "1f46a93cd2f3febf112548508936fd8e150270fd",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/842",
+      "files": ["tests/unit/q-mp-358-tablet-gl-soft-fail-residuals.test.ts"],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 843,
+      "taskId": "q-mp-338",
+      "title": "q-mp-338: remeasure CI unit wall budget / test-speed for tip post785",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-338-ci-unit-wall-budget-e011",
+      "headSha": "0af20eb6774d3e9512b0f99ab4f3538b3552303e",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/843",
+      "files": [
+        "docs/dev/ci-unit-budget-q-mp-175.md",
+        "docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt",
+        "docs/screenshots/ci/tip-unit-ai-benches-skipped-38013830311.txt",
+        "docs/screenshots/ci/tip-unit-ai-benches-skipped-38014419139.txt",
+        "docs/wiki/README.md",
+        "docs/wiki/ci-unit-budget.md"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 4,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=4 new=2); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 844,
+      "taskId": "q-mp-355",
+      "title": "q-mp-355: characterize board-a11y soft-fail residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-355-board-a11y-soft-fail-12ba",
+      "headSha": "c5ee4d1b6714358ea631c4e3cb4e4e69f42a5e03",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/844",
+      "files": [
+        "docs/dev/q-mp-355-board-a11y-soft-fail.md",
+        "tests/unit/q-mp-355-board-a11y-soft-fail.test.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=UNKNOWN",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 845,
+      "taskId": "q-mp-347",
+      "title": "q-mp-347: UI coverage round 20 \u2014 remainder-islands residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-347-ui-cov-r20-remainder-2798",
+      "headSha": "481364ac71d5963f874814b7bf11e1c3e8051df9",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/845",
+      "files": [
+        "docs/dev/ui-coverage-round-20.md",
+        "tests/unit/burn-1010-ui-cov-r20-remainder-islands.test.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 846,
+      "taskId": "q-mp-353",
+      "title": "q-mp-353: characterize game-route-mounts soft-fail residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-353-game-route-mounts-soft-fail-bfc6",
+      "headSha": "968a806626846061ff4f4b599378bc0e85770d16",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/846",
+      "files": [
+        "tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts",
+        "vitest.config.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 1,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=1 new=1); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 847,
+      "taskId": "q-mp-354",
+      "title": "q-mp-354: characterize polyomino/transform edge residuals (tests-only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-354-polyomino-transform-edge-1c12",
+      "headSha": "be3c85c7800b9c7a3e9c4dc49534fdb8dc1c3642",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/847",
+      "files": ["tests/unit/q-mp-354-polyomino-transform-edge-char.test.ts"],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 848,
+      "taskId": "q-mp-348",
+      "title": "q-mp-348: UI coverage round 21 \u2014 par-55 board-ui/controller residuals (tests only)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-348-ui-cov-r21-par55-4358",
+      "headSha": "3f4e2e180b0142d53fba138dc3f5afa7926c93bd",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/848",
+      "files": [
+        "docs/dev/ui-coverage-round-21.md",
+        "tests/unit/burn-1010-ui-cov-r21-par-55.test.ts"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=2); success=12/12; mergeable=MERGEABLE",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 849,
+      "taskId": "q-mp-342",
+      "title": "q-mp-342: slowest unit-file inventory refresh (tip post785 / 3182 files)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-342-slowest-unit-inventory-9ced",
+      "headSha": "09882ac5d028d5e0c38ecb0822a4b0c99eaa588f",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/849",
+      "files": ["docs/dev/slowest-unit-file-inventory-2026-10-10.md"],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "recommendation": "fold",
+      "method": "not-contained",
+      "reason": "Unique (same=0 diff=0 new=1); success=12/12; mergeable=UNKNOWN",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "success"
+        }
+      },
+      "checkSummary": {
+        "success": 12,
+        "failure": 0,
+        "totalTracked": 12
+      }
+    },
+    {
+      "number": 850,
+      "taskId": "q-mp-334",
+      "title": "q-mp-334: tip post785 open-draft triage v1 (fold / rerun / superseded / held)",
+      "base": "cursor/mp-tip-post785",
+      "headRefName": "cursor/q-mp-334-open-draft-triage-post785-1e79",
+      "headSha": "78557619f925284f958874c7848ac99d353cea37",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "UNKNOWN",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/850",
+      "files": [
+        "docs/dev/open-draft-triage-post785-2026-10-10-v1.json",
+        "docs/dev/open-draft-triage-post785-2026-10-10-v1.md"
+      ],
+      "blobProbe": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "recommendation": "fold",
+      "method": "self",
+      "reason": "This triage v1 draft (q-mp-334)",
+      "checks": {
+        "lint": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "audit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "build": {
+          "status": "completed",
+          "conclusion": "failure"
+        },
+        "unit": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "knip": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "visual-baseline": {
+          "status": "completed",
+          "conclusion": "success"
+        },
+        "e2e-fullgame": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "mobile-touch": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "zoom-reflow": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "forced-colors": {
+          "status": "completed",
+          "conclusion": "skipped"
+        },
+        "e2e-cross-browser": {
+          "status": "completed",
+          "conclusion": "skipped"
+        }
+      },
+      "checkSummary": {
+        "success": 4,
+        "failure": 2,
+        "totalTracked": 12
+      }
+    }
+  ],
+  "hardRules": [
+    "Do not close PRs",
+    "Do not mark ready",
+    "Do not comment from this worker task",
+    "#727 HELD",
+    "No AI/rules/copy/scoring edits",
+    "Hex Hard stays 450ms"
+  ],
+  "ciNote": "PR #850 first CI run failed lint/build on tip-base Duplicate identifier Piece/PlayerOwner in kings board.ts after #829 fold; tip-owner fixed in 06126841. This refresh rebases onto that tip."
+}

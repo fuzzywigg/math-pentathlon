@@ -1,16 +1,16 @@
 {
-  "notes": "Tip post755 min ceilings after q-mp-205/219/194/267/316 folds: curly 538; no-non-null-assertion 246; no-confusing-void-expression 66; radix 6; default-case 5; no-duplicate-imports 47; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 9; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post785 min ceilings (q-mp-026j): curly 538; no-non-null-assertion 246; no-confusing-void-expression 58; radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 66,
+    "@typescript-eslint/no-confusing-void-expression": 58,
     "radix": 6,
     "default-case": 5,
-    "no-duplicate-imports": 47,
+    "no-duplicate-imports": 42,
     "@typescript-eslint/prefer-nullish-coalescing": 65,
     "@typescript-eslint/prefer-optional-chain": 21,
     "@typescript-eslint/switch-exhaustiveness-check": 8,
-    "@typescript-eslint/no-shadow": 9,
+    "@typescript-eslint/no-shadow": 3,
     "eqeqeq": 1,
     "@typescript-eslint/return-await": 3
   }

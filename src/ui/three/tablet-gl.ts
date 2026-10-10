@@ -235,7 +235,9 @@ export function bindPageVisibility(handlers: {
     }
   };
   document.addEventListener('visibilitychange', onChange);
-  return () => document.removeEventListener('visibilitychange', onChange);
+  return () => {
+    document.removeEventListener('visibilitychange', onChange);
+  };
 }
 
 /** CSS viewport size — prefer visualViewport (mobile chrome / keyboard). */
@@ -292,16 +294,22 @@ export function bindBoard3dLayout(
     return () => undefined;
   }
 
-  const onWindowResize = (): void => onLayout();
+  const onWindowResize = (): void => {
+    onLayout();
+  };
   window.addEventListener('resize', onWindowResize);
 
   const vv = window.visualViewport;
-  const onVvResize = (): void => onLayout();
+  const onVvResize = (): void => {
+    onLayout();
+  };
   vv?.addEventListener('resize', onVvResize);
 
   let ro: ResizeObserver | null = null;
   if (typeof ResizeObserver !== 'undefined') {
-    ro = new ResizeObserver(() => onLayout());
+    ro = new ResizeObserver(() => {
+      onLayout();
+    });
     ro.observe(host);
   }
 

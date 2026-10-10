@@ -177,13 +177,13 @@ export function initGame(
   controller.update = () => {
     updateUI(controller);
   };
-  controller.newGame = (vsAI: boolean, diff?: AIDifficulty) => {
+  controller.newGame = (nextVsAI: boolean, diff?: AIDifficulty) => {
     clearAiTimer();
     controller.state = createInitialState();
-    controller.isAI = vsAI;
-    controller.aiPlayer = vsAI ? 'player2' : null;
+    controller.isAI = nextVsAI;
+    controller.aiPlayer = nextVsAI ? 'player2' : null;
     controller.aiDifficulty = diff || controller.aiDifficulty;
-    syncOpponentChrome(vsAI);
+    syncOpponentChrome(nextVsAI);
     controller.update();
   };
 

@@ -6,7 +6,7 @@
 
 import { clearElement, setText } from '../core/dom-security';
 
-export interface GameErrorBoundaryOptions {
+interface GameErrorBoundaryOptions {
   /** Display name for copy (e.g. "Hex"). */
   gameName: string;
   /** Host that currently shows the game shell (usually `#app`). */

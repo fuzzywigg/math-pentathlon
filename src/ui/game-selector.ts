@@ -1,7 +1,11 @@
 // Game selector / landing page UI with accordion divisions
 
-import type { GameInfo } from '../core/game-registry';
-import { GAMES, DIVISIONS, getGamesByDivision } from '../core/game-registry';
+import {
+  type GameInfo,
+  GAMES,
+  DIVISIONS,
+  getGamesByDivision,
+} from '../core/game-registry';
 import {
   clearElement,
   replaceWithSafeHtml,

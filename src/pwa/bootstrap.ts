@@ -1,7 +1,7 @@
 import { registerSW as defaultRegisterSW } from 'virtual:pwa-register';
 import { registerPwa } from './register';
 
-export type BootstrapPwaOptions = {
+type BootstrapPwaOptions = {
   /** Injected for tests. */
   schedule?: (cb: () => void) => void;
   /** Injected for tests; defaults to vite-plugin-pwa virtual module. */

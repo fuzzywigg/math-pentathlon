@@ -1,0 +1,116 @@
+{
+  "taskId": "q-mp-325-mutation-audit-ui-10",
+  "generatedAt": "2026-10-10T01:37:15.155Z",
+  "harness": "node_modules/.cache/mutation-ui-10/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/board-a11y.ts",
+      "src/core/safe-web-storage.ts",
+      "src/core/router.ts"
+    ],
+    "excludeTests": null
+  },
+  "results": [
+    {
+      "module": "src/ui/board-a11y.ts",
+      "lines": 535,
+      "tests": [
+        "tests/unit/board-a11y.test.ts",
+        "tests/unit/mutation-ui10-board-a11y.test.ts",
+        "tests/unit/mutation-ui2-board-a11y.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave25-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave25-a11y-focus-remount.test.ts",
+        "tests/unit/burn-wave25-a11y-grid-nav.test.ts",
+        "tests/unit/burn-wave25-a11y-labels.test.ts",
+        "tests/unit/burn-wave25-a11y-roving-focus.test.ts",
+        "tests/unit/burn-wave25-a11y-status-live.test.ts",
+        "tests/unit/burn-wave25-a11y-svg-grid.test.ts",
+        "tests/unit/burn-wave44-handshake-a11y-shell-status.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-capture-restore-focus.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-focusable-attrs.test.ts",
+        "tests/unit/burn-wave44-ui-a11y-grid-nav-arrows.test.ts",
+        "tests/unit/fiar-aria-selectable-movement.test.ts",
+        "tests/unit/finish-roving-fiar-queens.test.ts",
+        "tests/unit/finish-roving-juggle-ramrod-fab.test.ts",
+        "tests/unit/overnight-wave55-juggle-placing-click-enter.test.ts",
+        "tests/unit/sr-semantics-structure.test.ts"
+      ],
+      "availableMutants": 123,
+      "ranMutants": 20,
+      "killed": 19,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 95,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "ConditionalBoundary/Equality",
+          "line": 158,
+          "description": "flip > → >=",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/safe-web-storage.ts",
+      "lines": 186,
+      "tests": [
+        "tests/unit/mutation-ui-safe-web-storage.test.ts",
+        "tests/unit/mutation-ui10-safe-web-storage.test.ts",
+        "tests/unit/safe-web-storage.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-storage-settings.test.ts",
+        "tests/unit/runtime-error-path-audit.test.ts"
+      ],
+      "availableMutants": 26,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/router.ts",
+      "lines": 98,
+      "tests": [
+        "tests/unit/burn-wave24-router.test.ts",
+        "tests/unit/burn-wave36-router-first-match.test.ts",
+        "tests/unit/burn-wave40-handshake-router-registry.test.ts",
+        "tests/unit/burn-wave40-router-empty-hash-404.test.ts",
+        "tests/unit/mp3d-router-hash-query.test.ts",
+        "tests/unit/mutation-ui-router.test.ts",
+        "tests/unit/mutation-ui10-router.test.ts",
+        "tests/unit/burn-1007-game-route-mounts.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1008-registry-module-contract.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-storage-settings.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts",
+        "tests/unit/burn-wave24-stats-selector-ui.test.ts",
+        "tests/unit/burn-wave25-a11y-activate-keys.test.ts",
+        "tests/unit/burn-wave25-a11y-focus-remount.test.ts",
+        "tests/unit/burn-wave44-ui-selector-disabled-no-nav.test.ts",
+        "tests/unit/history-routing-helpers.test.ts",
+        "tests/unit/keyboard-a11y-game-selector.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/stats-dashboard.test.ts"
+      ],
+      "availableMutants": 11,
+      "ranMutants": 11,
+      "killed": 11,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
