@@ -20,7 +20,7 @@ ceiling write (leave undrafted `q-mp-357`).
 | Prior owner                                                | Action                                                                   |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------ |
 | Tip-folded `#1010` / `q-mp-548` finite-pair + piece `\|\|` | **Do not re-add** those pins                                             |
-| Tip-folded `#1002` / `q-mp-547` empty-shape / omit player  | Leave — this suite owns empty-string / selector miss                     |
+| Tip-folded `#1002` / `q-mp-547` empty-shape / omit player  | Leave — empty-string star-space pin **dropped on tip fold** (dup L65); keep selector miss |
 | Wave40 chrome / priority / stub-speech                     | Leave — this suite owns tutorial-in-row / back-in-header / row-in-header |
 | Undrafted `q-mp-357` nullish ollie clear                   | Leave **contained**                                                      |
 | Mutation `569` / engine `568` host coordination            | Tests-only soft-fail residuals here                                      |
@@ -29,7 +29,7 @@ ceiling write (leave undrafted `q-mp-357`).
 
 - Source keep-sites for nullish `||` pair, truthy shape/nodeId gates, finite
   pair gates, chrome closest order, exhaustive `never` arms
-- Star-space empty-string `data-player` → `unknown` (orthogonal to `#1002` omit)
+- ~~Star-space empty-string `data-player` → `unknown`~~ **dropped on tip fold** (same L65 `||` as `#1002`)
 - Star-piece missing `data-player` attr → selector soft-miss → `unknown`
 - Partial axial / row-col attr soft-miss → `unknown`
 - Nested child walk-up (kings / fiar); empty-shape bank wrapping axial cell
