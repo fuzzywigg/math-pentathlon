@@ -1,17 +1,16 @@
-# q-mp-343 — `check:emit-identity` FAIL inventory refresh (2026-10-10)
+# q-mp-393 — `check:emit-identity` FAIL inventory refresh (tip post865)
 
-> **Superseded stamp:** tip post865 refresh lives in [`emit-identity-fail-inventory-post865-2026-10-10.md`](./emit-identity-fail-inventory-post865-2026-10-10.md) (`q-mp-393`). FAIL set unchanged (11); tip SHA / branch only.
-
-**Task id:** `q-mp-343`  
+**Task id:** `q-mp-393`  
 **Role:** worker (docs / report-only)  
-**Tip audited:** `cursor/mp-tip-post785` @ `c9b55cff` (full `c9b55cff8c3832ff502179fe66f14ecaa400e95d`)  
-**Prior inventory:** [`emit-identity-fail-inventory-2026-10-09.md`](./emit-identity-fail-inventory-2026-10-09.md) (`q-mp-264`, tip post755 @ `74a1596f`) — leave open `#780` with `contained`  
-**Machine summary:** [`emit-identity-fail-inventory-2026-10-10.json`](./emit-identity-fail-inventory-2026-10-10.json)  
-**Scope:** Re-measure default `npm run check:emit-identity` on live post785 tip. **No `src/` edits. No AI file edits.**
+**Tip audited:** `cursor/mp-tip-post865` @ `3908809d` (full `3908809d672ed70eede7b9c0ad63a6fa475e28e5`)  
+**Prior inventory:** [`emit-identity-fail-inventory-2026-10-10.md`](./emit-identity-fail-inventory-2026-10-10.md) (`q-mp-343`, tip post785 stamp `c9b55cff`; file landed via tip fold `#830` @ `97487de6`) — leave open `#839` with `contained`  
+**Machine summary:** [`emit-identity-fail-inventory-post865-2026-10-10.json`](./emit-identity-fail-inventory-post865-2026-10-10.json)  
+**Visual:** [`emit-identity-fail-inventory-post865-2026-10-10.svg`](./emit-identity-fail-inventory-post865-2026-10-10.svg)  
+**Scope:** Re-measure default `npm run check:emit-identity` on live post865 tip. **No `src/` edits. No AI file edits.**
 
 ## Purpose
 
-Publish a dated FAIL inventory stamped to tip post785 so agents stop relying on the post755/`74a1596f` stamp in `#780`. This PR does **not** “fix” identity by editing AI product code. Spec backlog claimed tip `21719062`; live tip HEAD at audit is `c9b55cff` (post785 tip advanced after squash-merge / folds) — trust the live tree.
+Publish a dated FAIL inventory stamped to tip post865 so agents stop relying on the post785/`c9b55cff` stamp in `#839` / `q-mp-343`. This PR does **not** “fix” identity by editing AI product code. Spec backlog `q-mp-393` was written against tip post830 @ `bcf6f825` claiming **11** brace/import-style DIFFs — live post865 HEAD at audit is `3908809d` (tip cut from alpha after `#865`); trust the live tree.
 
 ## Hard rules (explicit non-goals)
 
@@ -25,16 +24,19 @@ Publish a dated FAIL inventory stamped to tip post785 so agents stop relying on 
 
 ## Duplicate check
 
-| Related draft / prior | Overlap | Action |
-| --- | --- | --- |
-| Open drafts into `cursor/mp-tip-post785` | `#825`–`#833`, `#831` backlog | None own emit-identity FAIL inventory refresh |
-| `#780` q-mp-264 inventory (post755 @ `74a1596f`) | Same 11 DIFF set; older tip stamp | Leave open; comment `contained` |
-| `#813` owl UI cov r16 / `#822` no-shadow controllers | Orthogonal | No overlap |
-| `#749` emit-identity npm script | Tooling only | Complementary |
-| `#560` OWNER OPTION AI type-only | Different base/ref | Leave open |
-| Undrafted `q-mp-247` ai-client `return-await` | fab/fiar/queens clients | **Out of scope**; not in the 11 DIFF set |
+| Related draft / prior | Base | Overlap | Action |
+| --- | --- | --- | --- |
+| Open drafts into `cursor/mp-tip-post865` | post865 | **None** at audit (empty list) | — |
+| `#877` q-mp-366 owl void brace | post830 | Orthogonal (UI void) | Leave open |
+| `#878` q-mp-371 hex UI cov r25 | post830 | Orthogonal (tests-only) | Leave open |
+| `#879` q-mp-090l backlog 10c | post830 | Spec source only | Leave open |
+| `#839` q-mp-343 inventory (post785 stamp) | post785 | Same 11 DIFF set; older tip stamp | Leave open; **contained** |
+| `#780` q-mp-264 inventory (post755) | post755 | Same 11 DIFF set; older tip stamp | Leave open; **contained** |
+| `#749` emit-identity npm script | post728 | Tooling only | Complementary |
+| `#560` OWNER OPTION AI type-only | wave5 tip | Different base/ref | Leave open |
+| Undrafted `q-mp-247` ai-client `return-await` | — | fab/fiar/queens clients | **Out of scope**; not in the 11 DIFF set |
 
-No open draft already owns a post785-dated FAIL inventory → full refresh proceeds.
+No open draft into post865 owns a post865-dated FAIL inventory → full refresh proceeds.
 
 ## Method (live tip)
 
@@ -44,7 +46,7 @@ Default checker (`scripts/check-emit-identity.mjs` with no args):
 | --- | --- |
 | **Command** | `npm run check:emit-identity` |
 | **base** | `eec2b327c1e65586537cbe03b1c29b93065dee03` (`git merge-base HEAD origin/cursor/integration-fold-wave5-tip-4af0`) |
-| **head** | `WORKING_TREE` (= tip `c9b55cff`) |
+| **head** | `WORKING_TREE` (= tip `3908809d`) |
 | **File set** | 21 `src/games/**/ai*.ts` touched between base and head |
 | **Result** | **FAIL: 11** not emit-identical; **10** OK |
 
@@ -52,12 +54,15 @@ Default checker (`scripts/check-emit-identity.mjs` with no args):
 
 ```text
 $ git rev-parse HEAD
-  c9b55cff8c3832ff502179fe66f14ecaa400e95d
+  3908809d672ed70eede7b9c0ad63a6fa475e28e5
 
 $ npm run check:emit-identity
   base: eec2b327c1e65586537cbe03b1c29b93065dee03
   head: WORKING_TREE
   files: 21
+  FAIL: 11 file(s) not emit-identical.
+
+$ npm run check:emit-identity -- --normalize
   FAIL: 11 file(s) not emit-identical.
 
 $ rg -n 'hard:\s*450' src/games/hex/ai.ts
@@ -66,19 +71,20 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 
 ## Before → after metrics (report-only refresh)
 
-| Metric | Before (`#780` @ post755 `74a1596f`) | After (this audit @ post785 `c9b55cff`) |
+| Metric | Before (`#839` / q-mp-343 stamp) | After (this audit @ post865 `3908809d`) |
 | --- | ---: | ---: |
 | Touched AI files compared | 21 | 21 |
 | OK emit-identical | 10 | 10 |
 | FAIL (DIFF) | **11** | **11** (unchanged; intentionally not cleared) |
-| Tip SHA stamp | `74a1596f` | **`c9b55cff`** |
+| Tip branch stamp | `cursor/mp-tip-post785` | **`cursor/mp-tip-post865`** |
+| Tip SHA stamp | `c9b55cff` | **`3908809d`** |
 | Base (wave5 merge-base) | `eec2b327` | `eec2b327` (same) |
 
-**Delta vs `#780`:** tip SHA / tip branch only. DIFF path set and class mix are identical.
+**Delta vs `#839`:** tip SHA / tip branch only. DIFF path set and class mix are identical.
 
 ## Spec staleness note
 
-Backlog `q-mp-343` titles the set “11 non-emit-identical AI files (brace/import merge style).” **Live tip evidence remains mixed** (same as `q-mp-264`): five import-format-only; two curly / import+curly; four product emit drift. Hard rule: trust the live tree over the ticket summary. Evidence snapshot SHA `21719062` in the backlog is superseded by live tip `c9b55cff`.
+Backlog `q-mp-393` titles the set “11 non-emit-identical AI files (brace/import merge style)” against tip post830 @ `bcf6f825`. **Live tip evidence remains mixed** (same as `q-mp-343` / `q-mp-264`): five import-format-only; two curly / import+curly; four product emit drift. Hard rule: trust the live tree over the ticket summary. Evidence snapshot SHA `bcf6f825` in the backlog is superseded by live tip `3908809d`.
 
 ## Classification of the 11 DIFFs
 
@@ -106,7 +112,7 @@ Backlog `q-mp-343` titles the set “11 non-emit-identical AI files (brace/impor
 flowchart TB
   subgraph cmd ["npm run check:emit-identity (default)"]
     B["base: eec2b327<br/>wave5 tip merge-base"]
-    H["head: tip c9b55cff<br/>WORKING_TREE"]
+    H["head: tip 3908809d<br/>WORKING_TREE"]
     B --> C["21 touched ai*.ts"]
     H --> C
   end
@@ -119,23 +125,25 @@ flowchart TB
   IMP -.->|optional later ticket| Y["mechanical import/brace cleanup<br/>if emit-safe vs chosen base"]
 ```
 
+![Emit-identity FAIL class mix on tip post865](./emit-identity-fail-inventory-post865-2026-10-10.svg)
+
 ## Tip-owner disposition (recommendation)
 
 1. **Accept baseline for tip-vs-wave5 default run** — merge-base `eec2b327` is an old wave5 ancestor; the 11 DIFFs are accumulated tip history, not a CI-blocking ratchet (emit-identity is not in `npm run verify` / CI `lint`).
 2. **Optional future mechanical ticket (non-AI behavior)** — only for classes **import-format** and **curly-brace** (#1–#7), and only if the tip owner wants byte identity against a **chosen** base. Prove with `check:emit-identity --base <ref> --files-from …`.
 3. **Do not “fix” #8–#11 via worker AI edits** — console strip, Hex Hard **450**, hex client watchdog, and Kwatro retune are product/history; Hex Hard must stay **450ms**.
 4. **Leave `q-mp-247` alone** — fab/fiar/queens `ai-client.ts` `return-await` are not in this FAIL set.
-5. **`#780` is contained** — same FAIL set; this doc re-stamps the inventory to post785 tip `c9b55cff`.
+5. **`#839` is contained** — same FAIL set; this doc re-stamps the inventory to post865 tip `3908809d`.
 
 ## Acceptance checklist
 
-- [x] Dated inventory committed (`docs/dev/emit-identity-fail-inventory-2026-10-10.md` + `.json`)
-- [x] Tip SHA stamped (`c9b55cff` on `cursor/mp-tip-post785`)
+- [x] Dated inventory committed (`docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md` + `.json` + `.svg`)
+- [x] Tip SHA stamped (`3908809d` on `cursor/mp-tip-post865`)
 - [x] Explicit forbid of AI behavior / scoring / difficulty / timing edits
 - [x] Hex Hard **450ms** restated (tip already correct; untouched)
 - [x] Live classification supersedes stale “all brace/import” backlog wording
-- [x] Docs/data only; no `src/` / AI / test behavior edits
-- [x] `#780` left open with `contained`
+- [x] Docs/data/chart only; no `src/` / AI / test behavior edits
+- [x] `#839` left open with `contained` (noted in PR; `gh` comment blocked by integration token)
 
 ## Verify (commands for this docs PR)
 
@@ -144,4 +152,5 @@ npm run check:emit-identity
 rg -n 'hard:\s*450' src/games/hex/ai.ts
 npm run check:dev-docs
 npm run verify
+npm run test:unit
 ```

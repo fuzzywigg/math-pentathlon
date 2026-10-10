@@ -1,12 +1,12 @@
-# Local CI=1 skip smoke — tip cursor/mp-tip-post785 @ c9b55cff (q-mp-338)
+# Local CI=1 skip smoke — tip cursor/mp-tip-post865 @ 3908809d (q-mp-388)
 # Not a full suite wall; confirms the two AI benches stay skipped under CI=1.
 
 $ CI=1 npx vitest run --project unit-isolated tests/unit/tablet-ai-hard-latency.bench.test.ts
  Test Files  1 skipped (1)
       Tests  10 skipped (10)
-   Duration  1.02s
+   Duration  760ms
 
 $ CI=1 npx vitest run --project unit-shared tests/unit/ai-move-time-midgame.bench.test.ts
  Test Files  1 skipped (1)
       Tests  1 skipped (1)
-   Duration  1.12s
+   Duration  885ms

@@ -1,0 +1,127 @@
+{
+  "taskId": "q-mp-402-mutation-audit-ui-13",
+  "generatedAt": "2026-10-10T06:03:26.707Z",
+  "harness": "node_modules/.cache/mutation-ui-13/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/pwa/idle-warm.ts",
+      "src/ui/reduced-motion.ts",
+      "src/ui/pointer-hygiene.ts"
+    ],
+    "excludeTests": null
+  },
+  "results": [
+    {
+      "module": "src/pwa/idle-warm.ts",
+      "lines": 132,
+      "tests": [
+        "tests/unit/mutation-ui13-idle-warm.test.ts",
+        "tests/unit/mutation-ui2-idle-warm.test.ts",
+        "tests/unit/idle-warm-bootstrap-owl.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1007-pwa-shell-ui.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-owl-idle.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts",
+        "tests/unit/q-mp-256-pwa-soft-fail.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/runtime-error-path-audit.test.ts"
+      ],
+      "availableMutants": 14,
+      "ranMutants": 14,
+      "killed": 13,
+      "survived": 1,
+      "timeout": 0,
+      "error": 0,
+      "score": 92.9,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m6",
+          "kind": "Logical",
+          "line": 90,
+          "description": "flip && → ||",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/reduced-motion.ts",
+      "lines": 120,
+      "tests": [
+        "tests/unit/mutation-ui13-reduced-motion.test.ts",
+        "tests/unit/mutation-ui-reduced-motion.test.ts",
+        "tests/unit/mutation-ui5-dice-ui.test.ts",
+        "tests/unit/mutation-ui8-graph-ui.test.ts",
+        "tests/unit/q-mp-278-pointer-hygiene-reduced-motion.test.ts",
+        "tests/unit/reduced-motion.test.ts",
+        "tests/unit/hex-queens-kings-touch-reduced-motion.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1007-pwa-shell-ui.test.ts",
+        "tests/unit/burn-1008-ui-cov-r4-offline-motion-demos.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts",
+        "tests/unit/a11y-shell-menu-keepers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-owl-idle.test.ts",
+        "tests/unit/burn-1009-ui-cov-r7-kwatro-kings.test.ts",
+        "tests/unit/burn-1009-ui-cov-r9-owl.test.ts",
+        "tests/unit/burn-1010-ui-cov-r16-owl-branches.test.ts",
+        "tests/unit/fiar-ai-seat-aria-guard.test.ts",
+        "tests/unit/forced-colors-css.test.ts",
+        "tests/unit/juggle-ai-input-guard.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-queens-kwatro-residuals.test.ts",
+        "tests/unit/prime-gold-ai-input-guard.test.ts",
+        "tests/unit/q-mp-327-graph-ui-soft-fail.test.ts",
+        "tests/unit/queens-guards-ai-softlock-recovery.test.ts",
+        "tests/unit/remainder-islands-polish.test.ts",
+        "tests/unit/sum-dominoes-playability.test.ts",
+        "tests/unit/tablet-playability-css.test.ts"
+      ],
+      "availableMutants": 13,
+      "ranMutants": 13,
+      "killed": 11,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 84.6,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m3",
+          "kind": "Logical",
+          "line": 38,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "Logical",
+          "line": 77,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/pointer-hygiene.ts",
+      "lines": 325,
+      "tests": [
+        "tests/unit/mutation-ui13-pointer-hygiene.test.ts",
+        "tests/unit/mutation-ui2-pointer-hygiene.test.ts",
+        "tests/unit/pointer-hygiene.test.ts",
+        "tests/unit/q-mp-278-pointer-hygiene-reduced-motion.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-pwa-flags-pointer.test.ts"
+      ],
+      "availableMutants": 58,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}

@@ -93,12 +93,16 @@ export function bindReducedMotionPreference(): () => void {
 
   if (typeof mql.addEventListener === 'function') {
     mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
+    return () => {
+      mql.removeEventListener('change', onChange);
+    };
   }
 
   // Safari < 14
   mql.addListener(onChange);
-  return () => mql.removeListener(onChange);
+  return () => {
+    mql.removeListener(onChange);
+  };
 }
 
 /** Smooth scroll when motion is OK; instant jump when reduced. */
