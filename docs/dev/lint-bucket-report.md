@@ -44,7 +44,7 @@ Runs offline against the local tree (`eslint src` + probe config under the repo 
 | [`eslint-non-ceilinged-residuals-2026-10-09.md`](./eslint-non-ceilinged-residuals-2026-10-09.md) | Non-ceilinged overlay residuals                                                     |
 | [`lint-bucket-snapshot-post830-2026-10-10.md`](./lint-bucket-snapshot-post830-2026-10-10.md)     | Dated tip snapshot (`q-mp-364`) + chart @ `97487de6`                                |
 | [`lint-bucket-snapshot-post865-2026-10-10.md`](./lint-bucket-snapshot-post865-2026-10-10.md)     | Dated tip snapshot (`q-mp-416`) + chart @ `7f8a7147` (void **53**)                  |
-| [`lint-bucket-snapshot-post898-2026-10-10.md`](./lint-bucket-snapshot-post898-2026-10-10.md)     | Dated tip snapshot (`q-mp-441`) + chart @ `9b19c5e8` (void **52** / nnnull **241**) |
+| [`lint-bucket-snapshot-post898-2026-10-10.md`](./lint-bucket-snapshot-post898-2026-10-10.md)     | Dated tip snapshot (`q-mp-441`) + chart @ `788b4558` (void **51** / nnnull **241**) |
 | **This helper**                                                                                  | Fast bucket report for refill / triage                                              |
 
 ## Sample shape (stable columns)

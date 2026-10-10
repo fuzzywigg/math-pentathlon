@@ -2,61 +2,63 @@
 
 **Task id:** `q-mp-441`  
 **Role:** worker (docs / chart only)  
-**Tip measured:** `cursor/mp-tip-post898` @ `9b19c5e8` (`9b19c5e8cd3cd714d745540539324766369a8688`)  
-**Measured at:** `2026-10-10T08:28:28Z` (UTC)  
+**Tip measured:** `cursor/mp-tip-post898` @ `788b4558` (`788b4558438f867f7aaa8161070fd1e0b64bcbf9`)  
+**Measured at:** `2026-10-10T08:42:38Z` (UTC)  
 **Helper:** [`lint-bucket-report.md`](./lint-bucket-report.md) (`npm run report:lint-buckets`, `q-mp-280` helper **contained** on tip)  
 **Data:** [`lint-bucket-snapshot-post898-2026-10-10.json`](./lint-bucket-snapshot-post898-2026-10-10.json)  
 **Chart:** ![lint-bucket focus bars @ post898](./lint-bucket-snapshot-post898-2026-10-10.svg)
 
 ## Purpose
 
-Backlog `q-mp-441` (spec in draft [#921](https://github.com/fuzzywigg/math-pentathlon/pull/921) Oct 10e backlog, not yet on tip) asked for a dated tip snapshot at post898 ceilings. Stale backlog evidence (tip audited @ `788e8215`) listed void **52** / dup **42** / shadow **3** / nnnull **246** / nullish **65** and noted densest clearable residuals (stats-dashboard void **1**, placement nnnull **3**). Prior dated snapshot stamps post865 (`q-mp-416` @ `7f8a7147`, void **53** / nnnull **246**). Re-measure on the live tip head; commit report-only docs + chart. **No** `lint-ratchet-ceilings.json` edits. **No** `src/` / test behavior changes.
+Backlog `q-mp-441` (spec in draft [#921](https://github.com/fuzzywigg/math-pentathlon/pull/921) Oct 10e backlog) asked for a dated tip snapshot at post898 ceilings. Stale backlog evidence (tip audited @ `788e8215`) listed void **52** / dup **42** / shadow **3** / nnnull **246** / nullish **65** and noted densest clearable residuals (stats-dashboard void **1**, placement nnnull **3**). Prior dated snapshot stamps post865 (`q-mp-416` @ `7f8a7147`, void **53** / nnnull **246**). Re-measure on the live tip head; commit report-only docs + chart. **No** `lint-ratchet-ceilings.json` edits. **No** `src/` / test behavior changes.
 
 ## Duplicate check (open drafts)
 
-| PR                                                            | Title                                     | Overlap                                                                            |
-| ------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------- |
-| [#921](https://github.com/fuzzywigg/math-pentathlon/pull/921) | `q-mp-090n` backlog 10e                   | Spec owner only (lists `q-mp-441`); no snapshot files                              |
-| [#910](https://github.com/fuzzywigg/math-pentathlon/pull/910) | `q-mp-416` lint-bucket snapshot post865   | Prior tip stamp — **already on tip** @ `a482379e`; leave open with **contained**   |
-| [#916](https://github.com/fuzzywigg/math-pentathlon/pull/916) | `q-mp-424` board-a11y nnnull (−5)         | Code clear; **already on tip** @ `6404a8e6` + ceiling reconcile `9b19c5e8`         |
-| [#901](https://github.com/fuzzywigg/math-pentathlon/pull/901) | `q-mp-423` pointer-hygiene void (−1)      | Code clear; **already on tip** — live void **52** (prior post865 stamp was **53**) |
-| [#883](https://github.com/fuzzywigg/math-pentathlon/pull/883) | `q-mp-390` eslint non-ceilinged residuals | Orthogonal (non-ceilinged overlay); not a lint-bucket measured snapshot            |
+| PR                                                            | Title                                     | Overlap                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------- |
+| [#921](https://github.com/fuzzywigg/math-pentathlon/pull/921) | `q-mp-090n` backlog 10e                   | Spec owner; backlog now on tip — leave open with **contained**                   |
+| [#910](https://github.com/fuzzywigg/math-pentathlon/pull/910) | `q-mp-416` lint-bucket snapshot post865   | Prior tip stamp — **already on tip** @ `a482379e`; leave open with **contained** |
+| [#916](https://github.com/fuzzywigg/math-pentathlon/pull/916) | `q-mp-424` board-a11y nnnull (−5)         | Code clear; **already on tip** @ `6404a8e6`                                      |
+| [#901](https://github.com/fuzzywigg/math-pentathlon/pull/901) | `q-mp-423` pointer-hygiene void (−1)      | Code clear; **already on tip**                                                   |
+| Tip fold `q-mp-448`                                           | stats-dashboard void (−1)                 | **already on tip** @ `b1b596da` — live void **51**                               |
+| [#883](https://github.com/fuzzywigg/math-pentathlon/pull/883) | `q-mp-390` eslint non-ceilinged residuals | Orthogonal (non-ceilinged overlay); not a lint-bucket measured snapshot          |
 
-No open draft into `cursor/mp-tip-post898` owned a post898 lint-bucket measured snapshot before this PR. Leave `#910` / `#901` / `#916` open with **contained** (do not close).
+No open draft into `cursor/mp-tip-post898` owned a post898 lint-bucket measured snapshot before this PR. Leave `#910` / `#901` / `#916` / `#921` open with **contained** (do not close).
 
 ## Stale backlog → live tip (focus ceilings)
 
-| Rule                                              | Stale backlog (`q-mp-441` @ `788e8215`) | Prior snapshot (post865 @ `7f8a7147`) | Live tip (`9b19c5e8` / post898) | Δ vs prior stamp |
+| Rule                                              | Stale backlog (`q-mp-441` @ `788e8215`) | Prior snapshot (post865 @ `7f8a7147`) | Live tip (`788b4558` / post898) | Δ vs prior stamp |
 | ------------------------------------------------- | --------------------------------------: | ------------------------------------: | ------------------------------: | ---------------: |
-| `@typescript-eslint/no-confusing-void-expression` |                                      52 |                                **53** |                          **52** |           **−1** |
+| `@typescript-eslint/no-confusing-void-expression` |                                      52 |                                **53** |                          **51** |           **−2** |
 | `no-duplicate-imports`                            |                                      42 |                                **42** |                          **42** |                0 |
 | `@typescript-eslint/no-shadow`                    |                                       3 |                                 **3** |                           **3** |                0 |
 | `@typescript-eslint/no-non-null-assertion`        |                                     246 |                                   246 |                         **241** |           **−5** |
 | `@typescript-eslint/prefer-nullish-coalescing`    |                                      65 |                                    65 |                          **65** |                0 |
 
-Live ceilings come from [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json) notes (tip post898; owl −3 + reduced-motion −2 + pointer-hygiene −1 + board-a11y −5 already folded on tip). Stale backlog void **52** matches live tip; stale nnnull **246** is outdated after the `#916` fold (live **241**).
+Live ceilings come from [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json) notes (tip post898; owl −3 + reduced-motion −2 + pointer-hygiene −1 + board-a11y −5 + stats-dashboard −1 already folded on tip). Stale backlog void **52** / nnnull **246** are outdated after tip folds (live void **51** / nnnull **241**).
 
 ## Tip folds since prior snapshot — live vs post-fold
 
-| Draft                                                               | Delta | Tip commit | On tip? | Effect           |
-| ------------------------------------------------------------------- | ----: | ---------- | ------- | ---------------- |
-| [#901](https://github.com/fuzzywigg/math-pentathlon/pull/901) ptr-h |    −1 | `931acd3a` | **yes** | void 53 → 52     |
-| [#916](https://github.com/fuzzywigg/math-pentathlon/pull/916) a11y  |    −5 | `6404a8e6` | **yes** | nnnull 246 → 241 |
+| Draft / tip fold                                                              | Delta | Tip commit | On tip? | Effect           |
+| ----------------------------------------------------------------------------- | ----: | ---------- | ------- | ---------------- |
+| [#901](https://github.com/fuzzywigg/math-pentathlon/pull/901) pointer-hygiene |    −1 | `931acd3a` | **yes** | void 53 → 52     |
+| [#916](https://github.com/fuzzywigg/math-pentathlon/pull/916) board-a11y      |    −5 | `6404a8e6` | **yes** | nnnull 246 → 241 |
+| Tip `q-mp-448` stats-dashboard                                                |    −1 | `b1b596da` | **yes** | void 52 → 51     |
 
 | Scenario                                      | Void total / ceiling | Nnnull total / ceiling |
 | --------------------------------------------- | -------------------: | ---------------------: |
 | Prior post865 stamp (`q-mp-416` @ `7f8a7147`) |          **53** / 53 |          **246** / 246 |
-| Live tip measured (`9b19c5e8`)                |          **52** / 52 |          **241** / 241 |
-| Post-fold expected                            |          **52** / 52 |          **241** / 241 |
+| Live tip measured (`788b4558`)                |          **51** / 51 |          **241** / 241 |
+| Post-fold expected                            |          **51** / 51 |          **241** / 241 |
 
-Live == post-fold expected. Leave `#901` / `#916` open with **contained** (already on tip); do not close.
+Live == post-fold expected. Leave related drafts open with **contained** (already on tip); do not close.
 
 ## Chart — focus metrics + void buckets
 
 ![q-mp-441 lint-bucket focus snapshot](./lint-bucket-snapshot-post898-2026-10-10.svg)
 
 ```text
-void       ████████████████████████████████████████████████████  52 / 52
+void       ███████████████████████████████████████████████████   51 / 51
 dup-import ██████████████████████████████████████████             42 / 42
 no-shadow  ███                                                     3 /  3
 nnnull     ███████████████████████████████████████████████████   241 / 241
@@ -65,7 +67,6 @@ void path buckets:
   src/ui/three  ████████████████████████████████████  34
   src/          ████████████                          12
   src/pwa       ████                                   4
-  src/ui        █                                      1
   prime-gold    █                                      1
 ```
 
@@ -82,7 +83,7 @@ npm run lint:ratchet
 | ------------------------------------------------- | ---------: | ------: | -------: |
 | `curly`                                           |        538 |     538 |        0 |
 | `@typescript-eslint/no-non-null-assertion`        |    **241** | **241** |        0 |
-| `@typescript-eslint/no-confusing-void-expression` |     **52** |  **52** |        0 |
+| `@typescript-eslint/no-confusing-void-expression` |     **51** |  **51** |        0 |
 | `radix`                                           |          6 |       6 |        0 |
 | `default-case`                                    |          5 |       5 |        0 |
 | `no-duplicate-imports`                            |     **42** |  **42** |        0 |
@@ -100,7 +101,7 @@ npm run lint:ratchet
 
 ---
 
-## Focus: `@typescript-eslint/no-confusing-void-expression` — 52 / 52
+## Focus: `@typescript-eslint/no-confusing-void-expression` — 51 / 51
 
 ### Path buckets
 
@@ -110,9 +111,8 @@ npm run lint:ratchet
 |   12 | src/                 |
 |    4 | src/pwa              |
 |    1 | src/games/prime-gold |
-|    1 | src/ui               |
 
-### Densest files (top 15 = all residual files)
+### Densest files (top 14 = all residual files)
 
 | Hits | File                                        |
 | ---: | ------------------------------------------- |
@@ -130,9 +130,8 @@ npm run lint:ratchet
 |    1 | src/pwa/bootstrap.ts                        |
 |    1 | src/pwa/idle-warm.ts                        |
 |    1 | src/pwa/register.ts                         |
-|    1 | src/ui/stats-dashboard.ts                   |
 
-**Clearable triage pointer (matches stale backlog):** `src/ui/stats-dashboard.ts` still holds void **1** (sole remaining `src/ui` bucket hit). Pointer-hygiene is gone from the densest list (already folded via `#901`/`q-mp-423`). Do not touch AI / rules / scoring / Hex Hard **450ms**.
+**Clearable triage note:** Stale backlog pointed at `stats-dashboard.ts` void **1** — already cleared on tip (`q-mp-448` @ `b1b596da`). The `src/ui` void bucket is now empty. Remaining void debt is concentrated in `src/ui/three` (**34**) + `src/main.ts` (**12**). Do not touch AI / rules / scoring / Hex Hard **450ms**.
 
 ---
 
@@ -254,7 +253,7 @@ Nullish remains HELD — do not clear from this snapshot ticket.
 ## Verification (local)
 
 ```bash
-git rev-parse HEAD   # tip base before branch commit: 9b19c5e8cd3cd714d745540539324766369a8688
+git rev-parse HEAD   # tip base before branch commit: 788b4558438f867f7aaa8161070fd1e0b64bcbf9
 npm run report:lint-buckets -- --top 30
 npm run lint:ratchet
 npm run check:dev-docs

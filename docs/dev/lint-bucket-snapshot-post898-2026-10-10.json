@@ -2,13 +2,13 @@
   "task": "q-mp-441",
   "helperTask": "q-mp-280",
   "tipBranch": "cursor/mp-tip-post898",
-  "tipSha": "9b19c5e8cd3cd714d745540539324766369a8688",
-  "measuredAt": "2026-10-10T08:28:28Z",
+  "tipSha": "788b4558438f867f7aaa8161070fd1e0b64bcbf9",
+  "measuredAt": "2026-10-10T08:42:38Z",
   "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
   "ceilings": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 241,
-    "@typescript-eslint/no-confusing-void-expression": 52,
+    "@typescript-eslint/no-confusing-void-expression": 51,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,
@@ -20,14 +20,14 @@
     "@typescript-eslint/return-await": 3
   },
   "staleBacklogEvidence": {
-    "source": "q-mp-441 entry in Oct 10e backlog (draft PR #921 / branch cursor/q-mp-090n-backlog-10e-ba7b; file not yet on tip)",
+    "source": "q-mp-441 entry in Oct 10e backlog (draft PR #921 / branch cursor/q-mp-090n-backlog-10e-ba7b; now on tip via fold)",
     "assumedTip": "cursor/mp-tip-post898 @ 788e8215",
     "void": 52,
     "dupImports": 42,
     "noShadow": 3,
     "nnnull": 246,
     "nullish": 65,
-    "note": "Backlog flagged densest clearable residuals: stats-dashboard void 1, placement nnnull 3. Live tip still shows both. board-a11y nnnull 5 (stale backlog / open #916) already folded on tip → nnnull 241."
+    "note": "Backlog flagged densest clearable residuals: stats-dashboard void 1, placement nnnull 3. Live tip: stats-dashboard cleared (q-mp-448); placement nnnull 3 remains; board-a11y nnnull cleared (#916); void 51 / nnnull 241."
   },
   "priorSnapshot": {
     "task": "q-mp-416",
@@ -40,12 +40,12 @@
     "noShadow": 3
   },
   "liveTipCeilingsNotes": {
-    "void": 52,
+    "void": 51,
     "dupImports": 42,
     "noShadow": 3,
     "nnnull": 241,
     "nullish": 65,
-    "source": "docs/dev/lint-ratchet-ceilings.json notes (post898 tip; q-mp-366 −3 owl + q-mp-395 −2 reduced-motion + q-mp-423 −1 pointer-hygiene + q-mp-424 −5 board-a11y already on tip)"
+    "source": "docs/dev/lint-ratchet-ceilings.json notes (post898 tip; owl −3 + reduced-motion −2 + pointer-hygiene −1 + board-a11y −5 + stats-dashboard −1 already on tip)"
   },
   "tipFoldsSincePriorSnapshot": {
     "#901": {
@@ -58,19 +58,24 @@
       "title": "q-mp-424 clear board-a11y no-non-null-assertion (−5)",
       "tipCommit": "6404a8e6",
       "alreadyOnTip": true,
-      "nnnullDelta": -5,
-      "ceilingReconcileCommit": "9b19c5e8"
+      "nnnullDelta": -5
     },
-    "liveVoid": 52,
+    "q-mp-448": {
+      "title": "brace no-confusing-void-expression in stats-dashboard (−1)",
+      "tipCommit": "b1b596da",
+      "alreadyOnTip": true,
+      "voidDelta": -1
+    },
+    "liveVoid": 51,
     "liveNnnull": 241,
-    "postFoldExpectedVoid": 52,
+    "postFoldExpectedVoid": 51,
     "postFoldExpectedNnnull": 241,
-    "arithmetic": "prior post865 snapshot void 53 − 1 (#901) = 52; nnnull 246 − 5 (#916) = 241 (matches live tip + ceilings)"
+    "arithmetic": "prior post865 snapshot void 53 − 1 (#901) − 1 (q-mp-448) = 51; nnnull 246 − 5 (#916) = 241 (matches live tip + ceilings)"
   },
   "lintRatchetTotals": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 241,
-    "@typescript-eslint/no-confusing-void-expression": 52,
+    "@typescript-eslint/no-confusing-void-expression": 51,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,
@@ -83,10 +88,6 @@
   },
   "probeNote": "report:lint-buckets text mode currently prints eqeqeq: 0 / ceiling 1 (overlay mismatch); lint:ratchet probe includes eqeqeq always and reports 1 (residual HOLD on fiar/rules.ts). JSON mode of the helper currently includes the eqeqeq file hit. Docs snapshot records the ratchet total for eqeqeq and the helper totals for every other rule.",
   "densestClearablePointers": {
-    "src/ui/stats-dashboard.ts": {
-      "rule": "@typescript-eslint/no-confusing-void-expression",
-      "hits": 1
-    },
     "src/core/polyomino/placement.ts": {
       "rule": "@typescript-eslint/no-non-null-assertion",
       "hits": 3
@@ -220,15 +221,14 @@
       }
     },
     "@typescript-eslint/no-confusing-void-expression": {
-      "total": 52,
-      "ceiling": 52,
+      "total": 51,
+      "ceiling": 51,
       "headroom": 0,
       "buckets": {
         "src/ui/three": 34,
         "src/": 12,
         "src/pwa": 4,
-        "src/games/prime-gold": 1,
-        "src/ui": 1
+        "src/games/prime-gold": 1
       },
       "files": {
         "src/main.ts": 12,
@@ -244,8 +244,7 @@
         "src/pwa/bootstrap-owl.ts": 1,
         "src/pwa/bootstrap.ts": 1,
         "src/pwa/idle-warm.ts": 1,
-        "src/pwa/register.ts": 1,
-        "src/ui/stats-dashboard.ts": 1
+        "src/pwa/register.ts": 1
       }
     },
     "radix": {
