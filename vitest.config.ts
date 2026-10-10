@@ -77,6 +77,9 @@ const isolatedFiles = [
   'tests/unit/q-mp-678-expression-demo-residual-branches.test.ts',
   // q-mp-666: kings/board residual branches — Array.from spy for sparse start rows.
   'tests/unit/q-mp-666-kings-board-residual-branches.test.ts',
+  // q-mp-680: attribute-demo residual branches — hoisted router.navigate mock
+  // + Math.floor NaN spy must not share isolate:false graph with restoreAllMocks.
+  'tests/unit/q-mp-680-attribute-demo-residual-branches.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
