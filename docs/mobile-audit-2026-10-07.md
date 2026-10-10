@@ -65,7 +65,7 @@ No mouse-only drag/drop game mechanics were found that block completing a turn o
 
 ## Smoke e2e
 
-`tests/e2e/mobile-viewport-smoke.spec.ts` via Playwright projects `mobile-iphone-se` and `mobile-pixel-7` (Chromium + device emulation; see `playwright.config.ts`). CI runs both alongside `chromium`.
+`tests/e2e/mobile-touch-smoke.spec.ts` via Playwright projects `mobile-iphone-13`, `mobile-pixel-7`, and `mobile-ipad` (Chromium + device emulation; see `playwright.config.ts`). CI report-only job runs `npm run test:e2e:mobile`.
 
 For each available game:
 
