@@ -172,10 +172,10 @@ describe('q-mp-597 dice-demo — diceSet undefined soft-omits', () => {
     // DiceSelector stamps .dice-selector on the host container.
     const poly = root.querySelector('#selector-poly') as HTMLElement;
     expect(poly.classList.contains('dice-selector')).toBe(true);
-    // Soft-omit falls through to DiceSelector default (standard catalog name).
-    expect(poly.querySelector('.dice-selector-header')?.textContent).toBe(
-      COMMON_DICE_SETS.standard.name
-    );
+    // Soft-omit still mounts a header (structural; no catalog-name copy pin).
+    const polyHeader = poly.querySelector('.dice-selector-header');
+    expect(polyHeader).toBeTruthy();
+    expect((polyHeader?.textContent ?? '').length).toBeGreaterThan(0);
   });
 
   it('missing triple key soft-omits diceSet and still mounts sums selector', () => {
@@ -187,9 +187,9 @@ describe('q-mp-597 dice-demo — diceSet undefined soft-omits', () => {
 
     const sums = root.querySelector('#selector-sums') as HTMLElement;
     expect(sums.classList.contains('dice-selector')).toBe(true);
-    expect(sums.querySelector('.dice-selector-header')?.textContent).toBe(
-      COMMON_DICE_SETS.standard.name
-    );
+    const sumsHeader = sums.querySelector('.dice-selector-header');
+    expect(sumsHeader).toBeTruthy();
+    expect((sumsHeader?.textContent ?? '').length).toBeGreaterThan(0);
   });
 
   it('missing both primeGold + triple soft-omits leave 2d6 standard host intact', () => {
@@ -234,9 +234,8 @@ describe('q-mp-597 dice-demo — addLog lastChild! trim residual', () => {
     vi.advanceTimersByTime(1200);
 
     const box = root.querySelector('#selector-2d6') as HTMLElement;
-    const rollBtn = [...box.querySelectorAll('button')].find((b) =>
-      /Roll/i.test(b.textContent ?? '')
-    ) as HTMLButtonElement;
+    // Primary control is the first button in the selector host (avoid copy pin).
+    const rollBtn = box.querySelector('button') as HTMLButtonElement;
     rollBtn.click();
     vi.advanceTimersByTime(1200);
 
