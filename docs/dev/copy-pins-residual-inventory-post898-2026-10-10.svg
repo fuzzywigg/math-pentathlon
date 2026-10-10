@@ -1,16 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300" role="img" aria-labelledby="title desc">
   <title id="title">q-mp-443 check:copy-pins residual inventory (tip post898)</title>
-  <desc id="desc">Live tip 9b19c5e8: 3281 tests scanned, 16 registry entries, 192 residual findings — 180 message-api, 10 registry-string, 2 coming-soon. Flat vs post865.</desc>
+  <desc id="desc">Live tip b7e518b4: 3284 tests scanned, 16 registry entries, 192 residual findings — 180 message-api, 10 registry-string, 2 coming-soon. Flat vs post865.</desc>
   <rect width="760" height="300" fill="#f4f7f5"/>
   <text x="24" y="36" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#14231c">q-mp-443 · check:copy-pins residuals (post898)</text>
-  <text x="24" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4b6356">tip 9b19c5e8 · report-only · no new pins · no copy edits</text>
+  <text x="24" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4b6356">tip b7e518b4 · report-only · no new pins · no copy edits</text>
 
   <rect x="24" y="84" width="140" height="72" fill="#e2ebe6" stroke="#6b8f7a" stroke-width="1"/>
   <text x="94" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#14231c">192</text>
   <text x="94" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#2f463a">findings (flat)</text>
 
   <rect x="180" y="84" width="140" height="72" fill="#dce8f2" stroke="#3d6f94" stroke-width="1"/>
-  <text x="250" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#16324a">3281</text>
+  <text x="250" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#16324a">3284</text>
   <text x="250" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#16324a">tests scanned</text>
 
   <rect x="336" y="84" width="140" height="72" fill="#f3e9d8" stroke="#a67c3a" stroke-width="1"/>
@@ -18,7 +18,7 @@
   <text x="406" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#5c3d12">registry entries</text>
 
   <rect x="492" y="84" width="244" height="72" fill="#e8f0ea" stroke="#3f6b52" stroke-width="1"/>
-  <text x="614" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1f3d2c">+20</text>
+  <text x="614" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1f3d2c">+23</text>
   <text x="614" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1f3d2c">scanned vs post865 · pins +0</text>
 
   <text x="24" y="190" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#24352c">Kind mix of 192 findings</text>

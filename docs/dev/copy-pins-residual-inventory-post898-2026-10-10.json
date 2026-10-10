@@ -1,9 +1,9 @@
 {
   "taskId": "q-mp-443",
   "tipBase": "cursor/mp-tip-post898",
-  "tipSha": "9b19c5e8cd3cd714d745540539324766369a8688",
-  "tipShaShort": "9b19c5e8",
-  "measuredAtUtc": "2026-10-10T08:27:02Z",
+  "tipSha": "b7e518b4afe04556fa7e87ecba7ce97229b05bc7",
+  "tipShaShort": "b7e518b4",
+  "measuredAtUtc": "2026-10-10T08:32:07Z",
   "priorInventory": {
     "path": "docs/dev/copy-pins-residual-inventory-post865-2026-10-10.md",
     "taskId": "q-mp-418",
@@ -12,7 +12,7 @@
     "filesScanned": 3261
   },
   "reportOnly": true,
-  "filesScanned": 3281,
+  "filesScanned": 3284,
   "registrySize": 16,
   "findingCount": 192,
   "kindCounts": {
@@ -22,7 +22,7 @@
   },
   "filesWithFindings": 62,
   "deltaVsPost865": {
-    "filesScanned": 20,
+    "filesScanned": 23,
     "findingCount": 0,
     "registrySize": 0
   },
