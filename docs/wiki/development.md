@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post1012` (cut from `alpha` @ `dcdc0bf4` after #1012 squash-merge, 2026-10-10): tip-owner fold in progress on draft tip PR #1023; live unit suite **3285** files / **13502** listed cases carried from post977 fold remasure (prior post949 measurement was **3280** / **13408** @ `d6a71f95`). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post1012` (cut from `alpha` @ `dcdc0bf4` after #1012 squash-merge, 2026-10-10): tip-owner fold in progress on draft tip PR #1023; live unit suite **3306** files / **13748** listed cases @ fold remasure (prior post977 measurement was **3285** / **13502**). Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -142,7 +142,7 @@ Stack of checks builders should know. Required CI paths stay green on Chromium u
 
 | Layer                       | Live count (tip `50d9b4a0`)                                  | Runner                                                 | Command                                                                                                                                |
 | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit                        | **3285** files / **13502** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
+| Unit                        | **3306** files / **13748** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
 | E2E Chromium (required CI)  | **25** files / **249** cases (`--grep-invert @fullgame`)     | Playwright `chromium`                                  | `npm run test:e2e:chromium`                                                                                                            |
 | E2E fullgame                | **20** files / **20** cases                                  | Playwright `chromium` + `@fullgame`                    | `npm run test:e2e:fullgame`                                                                                                            |
 | E2E Firefox / WebKit / iPad | **25** files / **249** cases each                            | `firefox` / `webkit` / `ipad-webkit`                   | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross`                                                                           |
