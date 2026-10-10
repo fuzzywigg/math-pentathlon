@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -11,9 +12,7 @@ afterEach(() => {
 
 describe('Wave 59 contig — status aria-live', () => {
   it('marks status container polite on init', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(status.getAttribute('aria-live')).toBe('polite');
   });
