@@ -576,12 +576,13 @@ export function mountGameShell(
       return;
     }
     // Hide without per-modal focus restore; pick one opener below (#437).
-    if (helpWasOpen) {
-      setModalHiddenState(helpModal!, true);
+    // helpWasOpen / newGameWasOpen already imply the aliases are non-null.
+    if (helpWasOpen && helpEl) {
+      setModalHiddenState(helpEl, true);
       helpFocus.restoreEl = null;
     }
-    if (newGameWasOpen) {
-      setModalHiddenState(newGameModal!, true);
+    if (newGameWasOpen && newGameEl) {
+      setModalHiddenState(newGameEl, true);
       newGameFocus.restoreEl = null;
     }
     if (helpWasOpen) {
