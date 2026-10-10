@@ -61,7 +61,7 @@ $ npm run report:knip
   (baseline unusedTypes still 36; live shrink NOTICE 36→32)
 
 $ npm run check:dev-docs
-  docs scanned: 234; problems: 0   ← tip tree md count before this v5 md
+  docs scanned: 233; problems: 0   ← tip tree md count before this v5 md
 
 $ rg -n 'hard:\s*450' src/games/hex/ai.ts
   hard: 450   ← HOLD untouched
@@ -82,7 +82,7 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 | Focus **fold** recommendations      |                 4 |          **25** (+ this v5) |
 | Focus **superseded**                |                77 |                     **35** |
 | Focus **held**                      |          1 (#727) |               **1** (#727) |
-| `check:dev-docs` scanned (tip md)   |               225 | **234** → **237** w/ v5 md/json/svg |
+| `check:dev-docs` scanned (tip md)   |               225 | **233** → **234** w/ v5 md (+json/svg twins) |
 
 ## Classification legend
 
