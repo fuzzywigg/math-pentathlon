@@ -8,9 +8,10 @@
  *
  * Compares against committed bundle-budgets.json (current size + 10% headroom).
  * OVER rows listed in `knownOvers` are expected (warn only). Any other OVER is
- * a NEW regression — printed loudly. Default exit is still 0 so local/dev use
- * never fails the hard build path; pass `--fail-on-new-over` (CI does, under
- * continue-on-error) to exit non-zero only when a novel OVER appears.
+ * a NEW regression — printed loudly. When `dist/` exists, default exit is still
+ * 0 so soft budget overs never fail the hard build path; pass
+ * `--fail-on-new-over` (CI does, under continue-on-error) to exit non-zero only
+ * when a novel OVER appears. Missing `dist/` is a usage error (exit 2).
  *
  * Usage:
  *   npm run build && npm run size:check
@@ -276,9 +277,9 @@ function main(argv = process.argv.slice(2)) {
 
   if (!fs.existsSync(DIST)) {
     console.error('dist/ not found. Run npm run build before size:check.');
-    // Still report-only for the measurement path; missing build is a usage error.
-    process.exitCode = 0;
-    console.error('(report-only: exiting 0)');
+    // Soft budget overs stay report-only (exit 0); missing build is a usage error.
+    console.error('(usage error: exiting 2)');
+    process.exitCode = 2;
     return;
   }
 
