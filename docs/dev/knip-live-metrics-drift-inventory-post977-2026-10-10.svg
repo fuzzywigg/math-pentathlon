@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="360" viewBox="0 0 780 360" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-557 Knip live metrics drift (tip post977)</title>
+  <desc id="desc">Live unusedTypes 32 vs committed baseline 36 (NOTICE shrink -4). Spec backlog said 32 vs 36 on post949  flat on post977. Disposition: EXCLUDED AI 20, scoring 4, keeper 1, Rank-3 candidates 7.</desc>
+  <rect width="780" height="360" fill="#f3f6f4"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2e22">q-mp-557 · Knip live metrics drift (post977)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c52">tip f0d0a162 · live types 32 (baseline 36, -4) · report-only · no baseline write</text>
+
+  <!-- Metric cards: backlog / baseline / live -->
+  <rect x="24" y="78" width="232" height="86" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="140" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1e3a8a">32 / 36</text>
+  <text x="140" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1e40af">backlog stamp (post949)</text>
+  <text x="140" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#1d4ed8">q-mp-557 @ d7a3989a</text>
+
+  <rect x="272" y="78" width="232" height="86" fill="#e7e5e4" stroke="#78716c" stroke-width="1"/>
+  <text x="388" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1c1917">36</text>
+  <text x="388" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#44403c">committed baseline</text>
+  <text x="388" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#57534e">knip-baseline.json (untouched)</text>
+
+  <rect x="520" y="78" width="236" height="86" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="638" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#14532d">32</text>
+  <text x="638" y="132" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#166534">live unusedTypes</text>
+  <text x="638" y="150" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#15803d">flat vs #947 / backlog</text>
+
+  <!-- Disposition cards -->
+  <text x="24" y="196" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#1a2e22">Disposition of live unusedTypes (32)</text>
+
+  <rect x="24" y="208" width="168" height="64" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="108" y="236" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#7f1d1d">20</text>
+  <text x="108" y="256" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#7f1d1d">EXCLUDED AI</text>
+
+  <rect x="208" y="208" width="168" height="64" fill="#ffedd5" stroke="#ea580c" stroke-width="1"/>
+  <text x="292" y="236" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#9a3412">4</text>
+  <text x="292" y="256" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#9a3412">EXCLUDED scoring</text>
+
+  <rect x="392" y="208" width="168" height="64" fill="#e0e7ff" stroke="#4f46e5" stroke-width="1"/>
+  <text x="476" y="236" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#312e81">1</text>
+  <text x="476" y="256" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#312e81">intentional keeper</text>
+
+  <rect x="576" y="208" width="180" height="64" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="666" y="236" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#14532d">7</text>
+  <text x="666" y="256" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#14532d">Rank-3 (alignment)</text>
+
+  <!-- Stacked bar: 20/32*712H445, 4/32*712=89, 1/32*712H22, 7/32*712H156 -->
+  <rect x="24" y="292" width="445" height="22" fill="#fecaca" stroke="#dc2626" stroke-width="1"/>
+  <text x="36" y="307" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#7f1d1d">20 AI (games/*/ai.ts + ai-worker)</text>
+  <rect x="469" y="292" width="89" height="22" fill="#fed7aa" stroke="#ea580c" stroke-width="1"/>
+  <text x="477" y="307" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#9a3412">4 score</text>
+  <rect x="558" y="292" width="22" height="22" fill="#c7d2fe" stroke="#4f46e5" stroke-width="1"/>
+  <text x="562" y="307" font-family="ui-monospace, Menlo, monospace" font-size="10" fill="#312e81">1</text>
+  <rect x="580" y="292" width="176" height="22" fill="#bbf7d0" stroke="#16a34a" stroke-width="1"/>
+  <text x="592" y="307" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#14532d">7 Rank-3 compat</text>
+
+  <text x="24" y="340" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#57534e">-4 vs baseline 36; flat vs #947 / backlog 32; no batch-14 demote · leave #947/#888/#985/#971 contained</text>
+</svg>
