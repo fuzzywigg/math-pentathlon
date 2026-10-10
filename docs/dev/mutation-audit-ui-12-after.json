@@ -1,0 +1,128 @@
+{
+  "taskId": "q-mp-373-mutation-audit-ui-12",
+  "generatedAt": "2026-10-10T04:01:11.039Z",
+  "harness": "node_modules/.cache/mutation-ui-12/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/player-colors.ts",
+      "src/ui/game-error-boundary.ts",
+      "src/ui/die-faces.ts"
+    ],
+    "excludeTests": null
+  },
+  "results": [
+    {
+      "module": "src/ui/player-colors.ts",
+      "lines": 146,
+      "tests": [
+        "tests/unit/burn-wave44-ui-player-colors-css-var-override.test.ts",
+        "tests/unit/burn-wave44-ui-player-colors-kings-ai-seat1.test.ts",
+        "tests/unit/mutation-ui12-player-colors.test.ts",
+        "tests/unit/player-colors.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave24-player-chrome.test.ts",
+        "tests/unit/burn-wave40-player-chrome-ai-seat1.test.ts",
+        "tests/unit/burn-wave40-ui-chrome-stats-format.test.ts",
+        "tests/unit/burn-wave41-handshake-fiar-seat-chrome.test.ts",
+        "tests/unit/burn-wave41-multiplayer-desync-recovery.test.ts",
+        "tests/unit/burn-wave41-multiplayer-host-disconnect-stubs.test.ts",
+        "tests/unit/burn-wave41-multiplayer-seat-sync-matrix.test.ts",
+        "tests/unit/burn-wave41-multiplayer-sync-handshake.test.ts",
+        "tests/unit/fiar-ai-seat-aria-guard.test.ts",
+        "tests/unit/hex-aria-ai-turn-no-placement.test.ts",
+        "tests/unit/kings-ai-input-aria-guard.test.ts",
+        "tests/unit/mp3d-fiar-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-hex-a-gone-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-kings-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-kwatro-sinko-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-pent-em-in-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-prime-gold-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-queens-guards-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-star-track-board-3d-lifecycle.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-hex-pent-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-kings-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r15-queens-kwatro-residuals.test.ts",
+        "tests/unit/mp3d-ui-cov-r8-board-a11y-pointer.test.ts",
+        "tests/unit/mp3d-ui-cov-r8-board-update-arms.test.ts",
+        "tests/unit/overnight-wave51-remainder-owned-island-fill.test.ts",
+        "tests/unit/overnight-wave54-remainder-player2-fill.test.ts",
+        "tests/unit/shell-preload-policy.test.ts",
+        "tests/unit/burn-wave41-multiplayer-empty-lobby-shell.test.ts"
+      ],
+      "availableMutants": 12,
+      "ranMutants": 12,
+      "killed": 12,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/game-error-boundary.ts",
+      "lines": 150,
+      "tests": [
+        "tests/unit/game-error-boundary-soft-fail.test.ts",
+        "tests/unit/game-error-boundary.test.ts",
+        "tests/unit/mutation-ui-game-error-boundary.test.ts",
+        "tests/unit/mutation-ui12-game-error-boundary.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/runtime-error-path-audit.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts"
+      ],
+      "availableMutants": 8,
+      "ranMutants": 8,
+      "killed": 5,
+      "survived": 3,
+      "timeout": 0,
+      "error": 0,
+      "score": 62.5,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m3",
+          "kind": "Logical",
+          "line": 94,
+          "description": "flip || → &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "BooleanLiteral",
+          "line": 98,
+          "description": "false → true",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "BooleanLiteral",
+          "line": 145,
+          "description": "false → true",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/ui/die-faces.ts",
+      "lines": 23,
+      "tests": [
+        "tests/unit/mutation-ui12-die-faces.test.ts",
+        "tests/unit/mutation-ui2-die-faces.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-timeout-seat-dice.test.ts"
+      ],
+      "availableMutants": 5,
+      "ranMutants": 5,
+      "killed": 5,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
