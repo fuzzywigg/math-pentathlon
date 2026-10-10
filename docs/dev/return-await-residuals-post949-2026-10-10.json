@@ -1,0 +1,82 @@
+{
+  "task": "q-mp-512",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "8698fffb85b1e3d2289e54a665fac6162d3bdee4",
+  "tipShaShort": "8698fffb",
+  "measuredAt": "2026-10-10T12:22:01Z",
+  "staleSpec": {
+    "source": "docs/dev/backlog-2026-10-10h.md q-mp-512",
+    "namedTip": "cursor/mp-tip-post914",
+    "suggestedBasename": "return-await-residuals-post914-2026-10-10",
+    "remeasureNote": "Spec named tip post914; live tip is cursor/mp-tip-post949 @ 8698fffb (q-mp-026o tip-pointer re-anchor after #949 squash). Basename uses post949. Residual count and file set unchanged vs backlog stamp."
+  },
+  "rule": "@typescript-eslint/return-await",
+  "config": ["error", "always"],
+  "live": {
+    "count": 3,
+    "ceiling": 3,
+    "headroom": 0
+  },
+  "related": {
+    "productClear": {
+      "id": "q-mp-247",
+      "status": "undrafted",
+      "note": "AI-client style clear (−3); leave alone — this ticket is inventory only"
+    },
+    "ceilingIntro": {
+      "id": "q-mp-316",
+      "openDraft": 820,
+      "base": "cursor/mp-tip-post755",
+      "note": "Introduced return-await ceiling at 3; tip already carries the key"
+    },
+    "priorIdleClear": {
+      "id": "q-mp-268",
+      "openDraft": 786,
+      "note": "Cleared idle-warm + mounts (−4); tip-folded; residual now ai-client trio only"
+    },
+    "eslintNonceilingSection": {
+      "id": "q-mp-464",
+      "openDraft": 944,
+      "file": "docs/dev/eslint-non-ceilinged-residuals-post914-2026-10-10.md",
+      "note": "Mentions return-await 3/3 as formerly-non-ceilinged row; does not own a dedicated return-await inventory stamp"
+    }
+  },
+  "residuals": [
+    {
+      "file": "src/games/fab-a-diffy/ai-client.ts",
+      "line": 46,
+      "column": 10,
+      "hits": 1,
+      "pattern": "return getClient().request({...}) without await",
+      "disposition": "AI-client style only — undrafted q-mp-247; ZERO edits in this ticket"
+    },
+    {
+      "file": "src/games/fiar/ai-client.ts",
+      "line": 45,
+      "column": 10,
+      "hits": 1,
+      "pattern": "return getClient().request({...}) without await",
+      "disposition": "AI-client style only — undrafted q-mp-247; ZERO edits in this ticket"
+    },
+    {
+      "file": "src/games/queens-guards/ai-client.ts",
+      "line": 46,
+      "column": 10,
+      "hits": 1,
+      "pattern": "return getClient().request({...}) without await",
+      "disposition": "AI-client style only — undrafted q-mp-247; ZERO edits in this ticket"
+    }
+  ],
+  "deltaVsBacklogStamp": {
+    "count": 0,
+    "files": 0,
+    "note": "Flat vs backlog measured baseline (3/3 ai-client trio)"
+  },
+  "constraintsHonored": [
+    "report-only",
+    "zero ai-client / ai*.ts edits",
+    "no AI behavior / rules.ts / legal-move / scoring / copy changes",
+    "no ratchet raises",
+    "no memory/ files"
+  ]
+}
