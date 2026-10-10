@@ -52,7 +52,11 @@ export function registerPwa(
     return {};
   }
 
-  const reload = options.reload ?? (() => window.location.reload());
+  const reload =
+    options.reload ??
+    (() => {
+      window.location.reload();
+    });
 
   try {
     const updateSW = options.registerSW({
