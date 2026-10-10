@@ -78,6 +78,27 @@ const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
 
+
+async function waitDoubleRaf(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
+/** Soft condition wait + paint settle (no fixed sleep). */
+async function waitForReadySoft(page, selector, timeout = 2_000) {
+  await page
+    .locator(selector)
+    .first()
+    .waitFor({ state: 'visible', timeout })
+    .catch(() => {});
+  await waitDoubleRaf(page);
+}
+
+
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {
   const clickFirst = async (sel) => {
@@ -110,7 +131,7 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'star-track': {
       if (await clickFirst('.star-track-draw-btn')) {
-        await page.waitForTimeout(200);
+        await waitForReadySoft(page, '.star-track-chain-btn');
         return clickFirst('.star-track-chain-btn');
       }
       return clickFirst('.star-track-chain-btn');
@@ -234,7 +255,10 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'frac-fact': {
       if (await clickFirst('.frac-choice-btn')) {
-        await page.waitForTimeout(100);
+        await waitForReadySoft(
+          page,
+          '.frac-continue-btn, button:has-text("Continue")'
+        );
         await clickFirst('.frac-continue-btn, button:has-text("Continue")');
         return true;
       }
@@ -242,7 +266,10 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'fraction-pinball': {
       if (await clickFirst('.pinball-choice-btn')) {
-        await page.waitForTimeout(100);
+        await waitForReadySoft(
+          page,
+          '.pinball-continue-btn, button:has-text("Continue")'
+        );
         await clickFirst('.pinball-continue-btn, button:has-text("Continue")');
         return true;
       }
@@ -387,7 +414,10 @@ async function ensurePlacePhaseForHover(page, gameId) {
         .count();
       if (placing > 0) return true;
       await attemptScriptedMove(page, gameId);
-      await page.waitForTimeout(100);
+      await waitForReadySoft(
+        page,
+        '.juggle-cell-valid, .juggle-cell.preview-valid, .juggle-cell[style*="pointer"]'
+      );
     }
   }
   if (gameId === 'pent-em-in') {
@@ -402,13 +432,16 @@ async function ensurePlacePhaseForHover(page, gameId) {
         .first()
         .click({ force: true })
         .catch(() => {});
-      await page.waitForTimeout(100);
+      await waitForReadySoft(
+        page,
+        '.pent-piece-option.selected, .pent-board .interaction rect[data-row], .pent-cell-valid, .pent-board g.preview'
+      );
       const hasInteract = await page
         .locator('.pent-board .interaction rect')
         .count();
       if (hasInteract > 0) return true;
       await attemptScriptedMove(page, gameId);
-      await page.waitForTimeout(100);
+      await waitDoubleRaf(page);
     }
   }
   return false;
@@ -595,7 +628,8 @@ async function measureGame(browser, baseURL, gameId) {
       await beginMoveMeasure(page);
       const ok = await attemptScriptedMove(page, gameId);
       await endMoveMeasure(page);
-      await page.waitForTimeout(80);
+      // Extra paint settle under CPU throttle (rAF, not fixed sleep)
+      await waitDoubleRaf(page);
       const after = await page.evaluate(() => document.body.innerHTML.length);
       if (ok || before !== after) {
         landed++;
