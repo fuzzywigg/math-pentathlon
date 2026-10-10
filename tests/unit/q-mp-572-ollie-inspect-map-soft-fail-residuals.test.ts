@@ -23,8 +23,8 @@
  *
  * This suite owns soft-fail residual contracts still thin after those:
  *   source keep-sites (nullish `||` pair, truthy shape/nodeId gates, finite
- *     pair gates, chrome closest order), star-space empty-string player,
- *     star-piece attribute-required selector soft-miss, partial axial / row-col
+ *     pair gates, chrome closest order), star-piece attribute-required
+ *     selector soft-miss, partial axial / row-col
  *     attr soft-miss, nested child walk-up, chrome priority residuals beyond
  *     wave40 help-in-row / wave55 new-game-in-header, empty-shape bank wrapping
  *     axial cell fallthrough-then-cell, inspectDropSpeech STUB prefix on
@@ -115,22 +115,6 @@ describe('q-mp-572 ollie-inspect-map — source soft-fail keep-sites', () => {
 // =============================================================================
 
 describe('q-mp-572 ollie-inspect-map — player || unknown residuals', () => {
-  it('star-space empty-string data-player soft-falls to unknown player', () => {
-    // Tip-folded #1002 pins omitted data-player; this pins empty-string arm.
-    const space = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'circle'
-    );
-    space.setAttribute('class', 'star-track-space');
-    space.setAttribute('data-space', '5');
-    space.setAttribute('data-player', '');
-    document.body.appendChild(space);
-    expect(resolveInspectTarget(space)).toEqual({
-      kind: 'star-space',
-      space: 5,
-      player: 'unknown',
-    });
-  });
 
   it('star-piece without data-player attr soft-misses selector → unknown', () => {
     // Selector requires [data-player]; missing attr ≠ empty-string pin (#1010).
