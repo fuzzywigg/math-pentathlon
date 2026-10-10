@@ -5,6 +5,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createInitialState } from '../../src/games/contig-60/types';
 import * as types from '../../src/games/contig-60/types';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -20,9 +21,7 @@ describe('Wave 59 contig — Red turn status', () => {
       currentPlayer: 'player2',
       phase: 'rolling',
     });
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(status.textContent).toMatch(/Red's turn/);
     expect(status.querySelector('.contig-status.player2')).toBeTruthy();

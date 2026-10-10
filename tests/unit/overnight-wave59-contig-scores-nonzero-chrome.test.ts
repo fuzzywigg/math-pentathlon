@@ -5,6 +5,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createInitialState } from '../../src/games/contig-60/types';
 import * as types from '../../src/games/contig-60/types';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -19,9 +20,7 @@ describe('Wave 59 contig — nonzero scores', () => {
       ...base,
       scores: { player1: 7, player2: 4 },
     });
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(board.querySelector('.contig-score-p1')?.textContent).toMatch(
       /Blue:.*7.*pts/
