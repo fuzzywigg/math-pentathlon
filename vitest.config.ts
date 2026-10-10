@@ -67,6 +67,9 @@ const isolatedFiles = [
   // q-mp-506: engine r17 graph defensive spies — Array/Map/String/Array.from
   // prototype patches must not leak into isolate:false shared workers.
   'tests/unit/engine-coverage-round-17-graph-defensive-spies.test.ts',
+  // q-mp-678: expression-demo residual branches — hoisted expression-ui wrap
+  // must not leak createInteractiveBuilder into shared isolate:false suites.
+  'tests/unit/q-mp-678-expression-demo-residual-branches.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
