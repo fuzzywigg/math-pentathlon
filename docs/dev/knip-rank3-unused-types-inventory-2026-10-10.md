@@ -117,10 +117,10 @@ Zero cross-module **type imports** observed at audit (name hits in other files a
 
 ## Intentional keepers (do not demote from this inventory)
 
-| Type                  | File                           | Why kept                                                              |
-| --------------------- | ------------------------------ | --------------------------------------------------------------------- |
-| `SafeJsonParseResult` | `src/core/safe-web-storage.ts` | Documented mirror surface (`knip-report.md` batch 2 / batch 5 skip)   |
-| `SeatId`              | `src/ui/seat-labels.ts`        | Test importers + canonical twin on `src/core/seats.ts` (batch 5 skip) |
+| Type                  | File                           | Why kept                                                                                                                              |
+| --------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `SafeJsonParseResult` | `src/core/safe-web-storage.ts` | Documented mirror surface (`knip-report.md` batch 2 / batch 5 skip)                                                                   |
+| `SeatId`              | `src/core/seats.ts`            | Canonical export; knip also flags the `export type { SeatId }` re-export from `src/ui/seat-labels.ts` (batch 5 skip / test importers) |
 
 ## EXCLUDED — AI (23)
 
