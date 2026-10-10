@@ -27,7 +27,7 @@ Related prior work (already on tip; not duplicated):
 
 New suite: `tests/unit/engine-coverage-round-burn-1008.test.ts`  
 Rank helper: `scripts/engine-coverage-rank.mjs` — pass a **local**
-`coverage-summary.json` path explicitly. The helper’s default
+`coverage-summary.json` path explicitly (missing/default path exits **2** with usage). The helper’s default
 `coverage-engine-baseline/` directory is **not in the repo** (ephemeral local
 artifact; do not commit it). Default Vitest `coverage/` is gitignored; produce
 the summary with a local `test:unit:coverage` run first.
