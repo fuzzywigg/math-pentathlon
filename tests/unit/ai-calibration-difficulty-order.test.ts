@@ -8,12 +8,29 @@ import { runMatchup } from '../helpers/ai-calibration/matrix';
 
 const BASE_SEED = 20261007;
 
+type SearchBudget = {
+  games: number;
+  timeout: number;
+  deadlineMs: number;
+  /**
+   * When true, use CALIBRATION_VIRTUAL_CLOCK (synthetic now) instead of
+   * CALIBRATION_WALL_CLOCK. Keeps Hard≥Easy load-invariant under CI threads.
+   */
+  virtualClock?: boolean;
+};
+
 /**
- * Search games need a wall-clock budget or they exceed CI time.
- * Deadline is applied only inside those cases.
+ * Search games need a soft deadline or they exceed CI time.
+ * Deadline is applied only inside those cases. queens-guards uses a virtual
+ * clock (q-mp-359): wall-clock + n=4 flaked Hard below Easy under GHA load.
  */
-const SEARCH_BUDGET: Record<string, { games: number; timeout: number; deadlineMs: number }> = {
-  'queens-guards': { games: 4, timeout: 90_000, deadlineMs: 120 },
+const SEARCH_BUDGET: Record<string, SearchBudget> = {
+  'queens-guards': {
+    games: 8,
+    timeout: 120_000,
+    deadlineMs: 120,
+    virtualClock: true,
+  },
   hex: { games: 4, timeout: 60_000, deadlineMs: 200 },
   fiar: { games: 6, timeout: 120_000, deadlineMs: 1500 },
   // Hard without a deadline can exceed the case timeout under vitest workers.
@@ -21,7 +38,7 @@ const SEARCH_BUDGET: Record<string, { games: number; timeout: number; deadlineMs
   calla: { games: 4, timeout: 45_000, deadlineMs: 0 },
 };
 
-const DEFAULT = { games: 8, timeout: 30_000, deadlineMs: 0 };
+const DEFAULT: SearchBudget = { games: 8, timeout: 30_000, deadlineMs: 0 };
 
 /**
  * Tip AI still inverts Hard vs Easy on these seats (seeded samples).
@@ -39,12 +56,20 @@ describe('AI calibration — Hard >= Easy win rate vs random', () => {
       `${adapter.id}: Hard win rate >= Easy on seeded sample`,
       () => {
         const prevWall = process.env.CALIBRATION_WALL_CLOCK;
+        const prevVirtual = process.env.CALIBRATION_VIRTUAL_CLOCK;
         const prevDeadline = process.env.CALIBRATION_DEADLINE_MS;
         if (cfg.deadlineMs > 0) {
-          process.env.CALIBRATION_WALL_CLOCK = '1';
           process.env.CALIBRATION_DEADLINE_MS = String(cfg.deadlineMs);
+          if (cfg.virtualClock) {
+            process.env.CALIBRATION_VIRTUAL_CLOCK = '1';
+            delete process.env.CALIBRATION_WALL_CLOCK;
+          } else {
+            process.env.CALIBRATION_WALL_CLOCK = '1';
+            delete process.env.CALIBRATION_VIRTUAL_CLOCK;
+          }
         } else {
           delete process.env.CALIBRATION_WALL_CLOCK;
+          delete process.env.CALIBRATION_VIRTUAL_CLOCK;
           delete process.env.CALIBRATION_DEADLINE_MS;
         }
         try {
@@ -69,6 +94,11 @@ describe('AI calibration — Hard >= Easy win rate vs random', () => {
         } finally {
           if (prevWall === undefined) delete process.env.CALIBRATION_WALL_CLOCK;
           else process.env.CALIBRATION_WALL_CLOCK = prevWall;
+          if (prevVirtual === undefined) {
+            delete process.env.CALIBRATION_VIRTUAL_CLOCK;
+          } else {
+            process.env.CALIBRATION_VIRTUAL_CLOCK = prevVirtual;
+          }
           if (prevDeadline === undefined) {
             delete process.env.CALIBRATION_DEADLINE_MS;
           } else {
