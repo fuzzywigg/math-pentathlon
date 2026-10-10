@@ -1,8 +1,8 @@
 # check:copy-pins residual inventory — tip post898
 
 **Task id:** `q-mp-443` (P3, report-only refresh)  
-**Tip base:** `cursor/mp-tip-post898` @ `85522638` (`855226389f23cb95bf74bd827556ee831c3bccad`)  
-**Measured at:** `2026-10-10T08:37:14Z` (UTC)  
+**Tip base:** `cursor/mp-tip-post898` @ `697b9609` (`697b9609f5938110602e0692e1bf401e4279bd72`)  
+**Measured at:** `2026-10-10T08:54:50Z` (UTC)  
 **Prior inventory:** [`docs/dev/copy-pins-residual-inventory-post865-2026-10-10.md`](./copy-pins-residual-inventory-post865-2026-10-10.md) (`q-mp-418` / tip post865 @ `7f8a7147`, **192** findings)  
 **Machine summary:** [`copy-pins-residual-inventory-post898-2026-10-10.json`](./copy-pins-residual-inventory-post898-2026-10-10.json)  
 **Visual:** [`copy-pins-residual-inventory-post898-2026-10-10.svg`](./copy-pins-residual-inventory-post898-2026-10-10.svg)  
@@ -45,8 +45,8 @@ CI: lint job runs `npm run check:copy-pins -- --fail` with `continue-on-error: t
 
 | Metric | post865 (`q-mp-418`) | **post898 (this refresh)** | Δ |
 | --- | ---: | ---: | ---: |
-| Tip SHA | `7f8a7147` | `85522638` | tip advanced (post865 → post898 cut + folds; tip head `85522638`) |
-| Tests scanned | 3261 | **3285** | **+24** |
+| Tip SHA | `7f8a7147` | `697b9609` | tip advanced (post865 → post898 cut + folds; tip head `697b9609`) |
+| Tests scanned | 3261 | **3290** | **+29** |
 | Copy-registry entries | 16 | **16** | 0 |
 | Findings | 192 | **192** | **0 (flat)** |
 | Test files with ≥1 finding | 62 | **62** | 0 |
@@ -57,9 +57,9 @@ CI: lint job runs `npm run check:copy-pins -- --fail` with `continue-on-error: t
 | `--fail` exit | 1 | 1 | — |
 | `--self-test` | PASS (8/8) | PASS (8/8) | — |
 
-**Verdict:** Residual pin count is **flat at 192** through tip folds post755 → post785 → post830 → post865 → post898. New scanned test files landed (+24 vs post865 inventory) without adding copy pins. Kind mix and top-file ranking unchanged. `engine-coverage-round-burn-1008.test.ts` still 9 hits at lines 311, 313, 317, 324, 330, 336, 461, 847, 853 (same as post865 / post830 / post755).
+**Verdict:** Residual pin count is **flat at 192** through tip folds post755 → post785 → post830 → post865 → post898. New scanned test files landed (+29 vs post865 inventory) without adding copy pins. Kind mix and top-file ranking unchanged. `engine-coverage-round-burn-1008.test.ts` still 9 hits at lines 311, 313, 317, 324, 330, 336, 461, 847, 853 (same as post865 / post830 / post755).
 
-Spec note: backlog `q-mp-443` cited live findings **192** and tip inventories stamped post865/post830; re-measured here on live `cursor/mp-tip-post898` @ `85522638`.
+Spec note: backlog `q-mp-443` cited live findings **192** and tip inventories stamped post865/post830; re-measured here on live `cursor/mp-tip-post898` @ `697b9609`.
 
 ## Visual — residual shape
 
@@ -68,7 +68,7 @@ Spec note: backlog `q-mp-443` cited live findings **192** and tip inventories st
 ```mermaid
 %%{init: {"theme": "neutral"}}%%
 pie showData
-  title check:copy-pins findings @ 85522638 (n=192)
+  title check:copy-pins findings @ 697b9609 (n=192)
   "message-api" : 180
   "registry-string" : 10
   "coming-soon" : 2
@@ -77,7 +77,7 @@ pie showData
 ```mermaid
 %%{init: {"theme": "neutral"}}%%
 flowchart LR
-  A["Tip tests scanned<br/>3285"] --> B["Scanner<br/>check-copy-pins.mjs"]
+  A["Tip tests scanned<br/>3290"] --> B["Scanner<br/>check-copy-pins.mjs"]
   B --> C["Findings 192"]
   C --> D["message-api 180"]
   C --> E["registry-string 10"]
@@ -182,7 +182,7 @@ Do **not** “fix” these findings by editing player-facing copy or `*/rules.ts
 
 ## Full finding inventory (file / line / kind)
 
-Live tip scan @ `85522638`. Snippets truncated for readability.
+Live tip scan @ `697b9609`. Snippets truncated for readability.
 
 | File | Line | Kind | Detail | Snippet |
 | --- | ---: | --- | --- | --- |
@@ -402,7 +402,7 @@ There is no separate “failure list” beyond the 192 true-positive residual pi
 
 ```text
 $ git rev-parse HEAD
-  855226389f23cb95bf74bd827556ee831c3bccad
+  697b9609f5938110602e0692e1bf401e4279bd72
 
 $ npm run check:copy-pins -- --self-test
 Self-test OK
@@ -410,7 +410,7 @@ EXIT 0
 
 $ npm run check:copy-pins
 check-copy-pins: report-only (not a CI gate)
-  tests scanned: 3285
+  tests scanned: 3290
   copy-registry entries: 16
   findings: 192
 Report-only: exit 0
@@ -421,10 +421,10 @@ EXIT 1   # expected while residual pins remain
 $ npm run check:dev-docs
 check-dev-doc-links (report-only)
   docs root:       docs/dev/
-  docs scanned:    219
-  path checks:     6050
+  docs scanned:    225
+  path checks:     6160
   symbol checks:   391
-  md link checks:  381
+  md link checks:  417
   problems:        0
   all referenced paths/symbols resolved
 Report-only: exit 0
