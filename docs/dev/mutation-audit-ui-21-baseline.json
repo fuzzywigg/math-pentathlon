@@ -1,0 +1,219 @@
+{
+  "taskId": "q-mp-587-mutation-audit-ui-21",
+  "generatedAt": "2026-10-10T16:05:40.358Z",
+  "harness": "node_modules/.cache/mutation-ui-21/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/core/owl/owl-messages.ts",
+      "src/core/owl/owl-events.ts",
+      "src/ui/reduced-motion.ts"
+    ],
+    "excludeTests": "mutation-ui21",
+    "preferPrefix": "mutation-ui21"
+  },
+  "results": [
+    {
+      "module": "src/core/owl/owl-messages.ts",
+      "lines": 564,
+      "tests": [
+        "tests/unit/burn-wave23-owl-messages.test.ts",
+        "tests/unit/burn-wave30-storage-owl-messages.test.ts",
+        "tests/unit/burn-wave38-owl-messages-ops-matrix.test.ts",
+        "tests/unit/burn-wave40-owl-messages-categories.test.ts",
+        "tests/unit/burn-wave40-owl-messages-operator-matrix.test.ts",
+        "tests/unit/burn-wave40-owl-messages-placeholders.test.ts",
+        "tests/unit/burn-1008-ui-cov-r4-owl-poly-helpers.test.ts"
+      ],
+      "availableMutants": 85,
+      "ranMutants": 20,
+      "killed": 3,
+      "survived": 17,
+      "timeout": 0,
+      "error": 0,
+      "score": 15,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m4",
+          "kind": "NumericBoundary",
+          "line": 102,
+          "description": "2 \u2192 3",
+          "outcome": "survived"
+        },
+        {
+          "id": "m5",
+          "kind": "NumericBoundary",
+          "line": 102,
+          "description": "2 \u2192 1",
+          "outcome": "survived"
+        },
+        {
+          "id": "m6",
+          "kind": "NumericBoundary",
+          "line": 109,
+          "description": "7 \u2192 8",
+          "outcome": "survived"
+        },
+        {
+          "id": "m7",
+          "kind": "NumericBoundary",
+          "line": 109,
+          "description": "7 \u2192 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m8",
+          "kind": "BooleanLiteral",
+          "line": 138,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "BooleanLiteral",
+          "line": 145,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m10",
+          "kind": "NumericBoundary",
+          "line": 152,
+          "description": "5 \u2192 6",
+          "outcome": "survived"
+        },
+        {
+          "id": "m11",
+          "kind": "NumericBoundary",
+          "line": 152,
+          "description": "5 \u2192 4",
+          "outcome": "survived"
+        },
+        {
+          "id": "m12",
+          "kind": "NumericBoundary",
+          "line": 159,
+          "description": "3 \u2192 4",
+          "outcome": "survived"
+        },
+        {
+          "id": "m13",
+          "kind": "NumericBoundary",
+          "line": 159,
+          "description": "3 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "BooleanLiteral",
+          "line": 195,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "NumericBoundary",
+          "line": 196,
+          "description": "1 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m16",
+          "kind": "NumericBoundary",
+          "line": 196,
+          "description": "1 \u2192 0",
+          "outcome": "survived"
+        },
+        {
+          "id": "m17",
+          "kind": "BooleanLiteral",
+          "line": 205,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        },
+        {
+          "id": "m18",
+          "kind": "NumericBoundary",
+          "line": 206,
+          "description": "3 \u2192 4",
+          "outcome": "survived"
+        },
+        {
+          "id": "m19",
+          "kind": "NumericBoundary",
+          "line": 206,
+          "description": "3 \u2192 2",
+          "outcome": "survived"
+        },
+        {
+          "id": "m20",
+          "kind": "BooleanLiteral",
+          "line": 214,
+          "description": "true \u2192 false",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/owl/owl-events.ts",
+      "lines": 158,
+      "tests": [
+        "tests/unit/burn-wave23-owl-events.test.ts",
+        "tests/unit/burn-wave38-owl-events-emit-matrix.test.ts",
+        "tests/unit/burn-wave40-owl-events-off-type.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-a11y-render-helpers.test.ts",
+        "tests/unit/burn-wave38-owl-messages-ops-matrix.test.ts"
+      ],
+      "availableMutants": 8,
+      "ranMutants": 8,
+      "killed": 8,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/ui/reduced-motion.ts",
+      "lines": 124,
+      "tests": [
+        "tests/unit/hex-queens-kings-touch-reduced-motion.test.ts",
+        "tests/unit/mutation-ui-reduced-motion.test.ts",
+        "tests/unit/mutation-ui13-reduced-motion.test.ts",
+        "tests/unit/q-mp-278-pointer-hygiene-reduced-motion.test.ts",
+        "tests/unit/reduced-motion.test.ts",
+        "tests/unit/burn-1007-main-shell-routes.test.ts",
+        "tests/unit/burn-1007-pwa-shell-ui.test.ts",
+        "tests/unit/burn-1008-ui-cov-r4-offline-motion-demos.test.ts",
+        "tests/unit/q-mp-299-main-soft-fail.test.ts"
+      ],
+      "availableMutants": 13,
+      "ranMutants": 13,
+      "killed": 11,
+      "survived": 2,
+      "timeout": 0,
+      "error": 0,
+      "score": 84.6,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m3",
+          "kind": "Logical",
+          "line": 38,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m9",
+          "kind": "Logical",
+          "line": 77,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        }
+      ]
+    }
+  ]
+}
