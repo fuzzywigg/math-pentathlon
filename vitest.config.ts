@@ -35,6 +35,8 @@ const isolatedFiles = [
   // Hoisted game-controller mocks must not leak into shared controller suites.
   'tests/unit/burn-1007-game-route-mounts.test.ts',
   'tests/unit/burn-1007-main-shell-routes.test.ts',
+  // q-mp-353: game-route-mounts soft-fail matrix — same hoisted controller mocks.
+  'tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts',
   // q-mp-299: main.ts soft-fail characterization — same hoisted PWA/demo mocks.
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
