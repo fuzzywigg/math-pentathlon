@@ -54,6 +54,8 @@ const isolatedFiles = [
   'tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts',
   // q-mp-454: game-selector soft-fail residuals — registry + prefetch mocks.
   'tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts',
+  // q-mp-472: game-registry soft-fail residuals — temporary available flips.
+  'tests/unit/q-mp-472-game-registry-soft-fail-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
