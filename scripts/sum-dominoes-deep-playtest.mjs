@@ -39,8 +39,16 @@ async function dismissOwl(page) {
   const dismiss = page.locator(
     '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
   );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true }).catch(() => {});
+  if (
+    await dismiss
+      .first()
+      .isVisible()
+      .catch(() => false)
+  ) {
+    await dismiss
+      .first()
+      .click({ force: true })
+      .catch(() => {});
   }
   const minimize = page.locator('#ollie-owl .owl-minimize-btn');
   if (await minimize.isVisible().catch(() => false)) {
@@ -53,9 +61,17 @@ async function dismissOwl(page) {
 }
 
 async function startVsAi(page, difficulty) {
-  await page.goto(`${BASE}/#/game/sum-dominoes`, { waitUntil: 'domcontentloaded' });
-  await page.getByTestId('game-loading').waitFor({ state: 'hidden', timeout: 20_000 }).catch(() => {});
-  await page.locator('.sd-board, #new-game-btn').first().waitFor({ timeout: 20_000 });
+  await page.goto(`${BASE}/#/game/sum-dominoes`, {
+    waitUntil: 'domcontentloaded',
+  });
+  await page
+    .getByTestId('game-loading')
+    .waitFor({ state: 'hidden', timeout: 20_000 })
+    .catch(() => {});
+  await page
+    .locator('.sd-board, #new-game-btn')
+    .first()
+    .waitFor({ timeout: 20_000 });
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');
@@ -69,11 +85,13 @@ async function startVsAi(page, difficulty) {
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    // modal uses class "hidden"
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still open');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      // modal uses class "hidden"
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still open');
+    });
 }
 
 async function measureTargets(page) {
@@ -106,13 +124,91 @@ async function measureTargets(page) {
   });
 }
 
+function isEnded(statusText) {
+  return /wins!|draw|tie/i.test(statusText || '');
+}
+
+/** Condition wait: post-roll affordances (pass / playable / end / AI). */
+async function waitAfterRoll(page) {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie/i.test(status)) return true;
+        if (document.querySelector('.sd-pass-btn')) return true;
+        if (document.querySelectorAll('.sd-hand-domino-playable').length > 0)
+          return true;
+        if (document.querySelector('.sd-computer-thinking')) return true;
+        if (/computer/i.test(status)) return true;
+        return false;
+      },
+      { timeout: 5_000 }
+    )
+    .catch(() => {});
+}
+
+/** Condition wait: valid placement cells after hand selection. */
+async function waitForValidCellsOrBail(page) {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie/i.test(status)) return true;
+        if (document.querySelectorAll('.sd-cell-valid').length > 0) return true;
+        if (document.querySelector('.sd-pass-btn')) return true;
+        return false;
+      },
+      { timeout: 5_000 }
+    )
+    .catch(() => {});
+}
+
+/** Condition wait: human affordance or terminal status (retry / handoff). */
+async function waitForHumanAffordOrEnd(page, timeoutMs = 5_000) {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie/i.test(status)) return true;
+        const thinking = !!document.querySelector('.sd-computer-thinking');
+        if (thinking || /computer/i.test(status)) return false;
+        const roll = document.querySelector('.sd-roll-btn');
+        const canRoll = !!roll && !roll.disabled;
+        const pass = !!document.querySelector('.sd-pass-btn');
+        const playable =
+          document.querySelectorAll('.sd-hand-domino-playable').length > 0;
+        return canRoll || pass || playable;
+      },
+      { timeout: timeoutMs }
+    )
+    .catch(() => {});
+}
+
+/** Condition wait: AI thinking flash or computer/end status after human move. */
+async function waitForAiThinkOrProgress(page) {
+  await page
+    .waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        if (/wins!|draw|tie|computer|thinking/i.test(status)) return true;
+        return !!document.querySelector('.sd-computer-thinking');
+      },
+      { timeout: 5_000 }
+    )
+    .catch(() => {});
+}
+
 async function playHumanTurn(page) {
   const roll = page.locator('.sd-roll-btn');
   if (await roll.isVisible().catch(() => false)) {
     const disabled = await roll.isDisabled().catch(() => true);
     if (!disabled) {
       await roll.click({ force: true });
-      await page.waitForTimeout(120);
+      await waitAfterRoll(page);
     }
   }
 
@@ -125,8 +221,8 @@ async function playHumanTurn(page) {
   const playable = page.locator('.sd-hand-domino-playable');
   const n = await playable.count();
   if (n === 0) {
-    // Wait briefly for pass button after roll with no plays
-    await page.waitForTimeout(200);
+    // Wait for pass button after roll with no plays
+    await waitAfterRoll(page);
     if (await pass.isVisible().catch(() => false)) {
       await pass.click({ force: true });
       return 'pass';
@@ -137,7 +233,7 @@ async function playHumanTurn(page) {
   // Prefer a mid tile occasionally to exercise selection UX
   const idx = n > 2 && Math.random() < 0.35 ? 1 : 0;
   await playable.nth(idx).click({ force: true });
-  await page.waitForTimeout(80);
+  await waitForValidCellsOrBail(page);
 
   const valid = page.locator('.sd-cell-valid');
   const vc = await valid.count();
@@ -147,30 +243,49 @@ async function playHumanTurn(page) {
   return 'place';
 }
 
-function isEnded(statusText) {
-  return /wins!|draw|tie/i.test(statusText || '');
-}
-
 async function waitForHumanOrEnd(page, deadline) {
-  while (Date.now() < deadline) {
-    const info = await page.evaluate(() => {
-      const status = document.querySelector('.sd-status')?.textContent?.trim() ?? '';
-      const thinking = !!document.querySelector('.sd-computer-thinking');
-      const roll = document.querySelector('.sd-roll-btn');
-      const canRoll = !!roll && !roll.disabled;
-      const pass = !!document.querySelector('.sd-pass-btn');
-      const playable = document.querySelectorAll('.sd-hand-domino-playable').length;
-      const computerText = /computer/i.test(status);
-      return { status, thinking, canRoll, pass, playable, computerText };
-    });
-    if (isEnded(info.status)) return { kind: 'ended', ...info };
-    if (!info.computerText && !info.thinking && (info.canRoll || info.pass || info.playable > 0)) {
-      return { kind: 'human', ...info };
-    }
-    await page.waitForTimeout(150);
+  const remaining = Math.max(250, deadline - Date.now());
+  try {
+    const handle = await page.waitForFunction(
+      () => {
+        const status =
+          document.querySelector('.sd-status')?.textContent?.trim() ?? '';
+        const thinking = !!document.querySelector('.sd-computer-thinking');
+        const roll = document.querySelector('.sd-roll-btn');
+        const canRoll = !!roll && !roll.disabled;
+        const pass = !!document.querySelector('.sd-pass-btn');
+        const playable = document.querySelectorAll(
+          '.sd-hand-domino-playable'
+        ).length;
+        const computerText = /computer/i.test(status);
+        const ended = /wins!|draw|tie/i.test(status);
+        const humanReady =
+          !computerText && !thinking && (canRoll || pass || playable > 0);
+        if (ended || humanReady) {
+          return {
+            status,
+            thinking,
+            canRoll,
+            pass,
+            playable,
+            computerText,
+            ended,
+          };
+        }
+        return false;
+      },
+      { timeout: remaining }
+    );
+    const info = await handle.jsonValue();
+    if (info.ended) return { kind: 'ended', ...info };
+    return { kind: 'human', ...info };
+  } catch {
+    const status = await page
+      .locator('.sd-status')
+      .textContent()
+      .catch(() => '');
+    return { kind: 'stall', status: status?.trim() ?? '' };
   }
-  const status = await page.locator('.sd-status').textContent().catch(() => '');
-  return { kind: 'stall', status: status?.trim() ?? '' };
 }
 
 async function runOneGame(browser, viewport, difficulty, gameIndex) {
@@ -212,7 +327,11 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = /draw|tie/i.test(gate.status) ? 'draw' : /red/i.test(gate.status) ? 'ai-win' : 'human-win';
+        outcome = /draw|tie/i.test(gate.status)
+          ? 'draw'
+          : /red/i.test(gate.status)
+            ? 'ai-win'
+            : 'human-win';
         break;
       }
       if (gate.kind === 'stall') {
@@ -228,18 +347,22 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       if (turns === 2 && gameIndex === 0) {
         const shot = path.join(OUT, `${viewport.name}-${difficulty}-mid.png`);
         await page.screenshot({ path: shot, fullPage: false });
-        fs.copyFileSync(shot, path.join(ART, `sd-${viewport.name}-${difficulty}-mid.png`));
+        fs.copyFileSync(
+          shot,
+          path.join(ART, `sd-${viewport.name}-${difficulty}-mid.png`)
+        );
       }
 
       const action = await playHumanTurn(page);
       if (action === 'no-move' || action === 'no-valid-cell') {
-        // One retry after short wait — AI may still be finishing
-        await page.waitForTimeout(400);
+        // One retry after condition wait — AI may still be finishing
+        await waitForHumanAffordOrEnd(page, 5_000);
         const again = await playHumanTurn(page);
         if (again === 'no-move' || again === 'no-valid-cell') {
           // Check if AI stole the roll (dice appeared without us rolling)
           const after = await page.evaluate(() => ({
-            status: document.querySelector('.sd-status')?.textContent?.trim() ?? '',
+            status:
+              document.querySelector('.sd-status')?.textContent?.trim() ?? '',
             dice: !!document.querySelector('.sd-dice-display'),
             roll: !!document.querySelector('.sd-roll-btn'),
           }));
@@ -261,7 +384,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       }
 
       // After human action, AI should think
-      await page.waitForTimeout(100);
+      await waitForAiThinkOrProgress(page);
       const thinkFlash = await page
         .locator('.sd-computer-thinking, .sd-status')
         .first()
@@ -269,21 +392,32 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         .catch(() => '');
       if (/computer|thinking/i.test(thinkFlash || '')) aiThinkSeen.count++;
 
-      const post = await page.locator('.sd-status').textContent().catch(() => '');
+      const post = await page
+        .locator('.sd-status')
+        .textContent()
+        .catch(() => '');
       lastStatus = post?.trim() ?? '';
       if (isEnded(lastStatus)) {
-        outcome = /draw|tie/i.test(lastStatus) ? 'draw' : /red/i.test(lastStatus) ? 'ai-win' : 'human-win';
+        outcome = /draw|tie/i.test(lastStatus)
+          ? 'draw'
+          : /red/i.test(lastStatus)
+            ? 'ai-win'
+            : 'human-win';
         break;
       }
     }
 
-    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS) outcome = 'turn-budget';
+    if (outcome === 'unknown' && turns >= MAX_HUMAN_TURNS)
+      outcome = 'turn-budget';
 
     // End screenshot for first game of each combo
     if (gameIndex === 0) {
       const shot = path.join(OUT, `${viewport.name}-${difficulty}-end.png`);
       await page.screenshot({ path: shot, fullPage: false });
-      fs.copyFileSync(shot, path.join(ART, `sd-${viewport.name}-${difficulty}-end.png`));
+      fs.copyFileSync(
+        shot,
+        path.join(ART, `sd-${viewport.name}-${difficulty}-end.png`)
+      );
     }
 
     // End-state measures when roll/pass visible
@@ -292,7 +426,10 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
   } catch (err) {
     outcome = 'error';
     lastStatus = String(err?.message || err);
-    const shot = path.join(OUT, `${viewport.name}-${difficulty}-g${gameIndex}-error.png`);
+    const shot = path.join(
+      OUT,
+      `${viewport.name}-${difficulty}-g${gameIndex}-error.png`
+    );
     await page.screenshot({ path: shot, fullPage: false }).catch(() => {});
   }
 
@@ -317,7 +454,9 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
 async function main() {
   const browser = await chromium.launch({ headless: true });
   const results = [];
-  console.log(`Deep playtest Sum Dominoes — ${GAMES_PER_DIFF} games × ${DIFFS.length} diffs × ${VIEWPORTS.length} viewports`);
+  console.log(
+    `Deep playtest Sum Dominoes — ${GAMES_PER_DIFF} games × ${DIFFS.length} diffs × ${VIEWPORTS.length} viewports`
+  );
 
   for (const vp of VIEWPORTS) {
     for (const diff of DIFFS) {
@@ -339,8 +478,13 @@ async function main() {
     gamesPerDiff: GAMES_PER_DIFF,
     total: results.length,
     byOutcome: {},
-    stalls: results.filter((r) => r.outcome === 'stall' || r.outcome === 'turn-budget'),
-    errors: results.filter((r) => r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length),
+    stalls: results.filter(
+      (r) => r.outcome === 'stall' || r.outcome === 'turn-budget'
+    ),
+    errors: results.filter(
+      (r) =>
+        r.outcome === 'error' || r.consoleErrors.length || r.pageErrors.length
+    ),
     illicitRolls: results.filter((r) => r.illicitHumanRollSkip > 0),
     touchSamples: results
       .filter((r) => r.gameIndex === 0)
@@ -357,7 +501,10 @@ async function main() {
 
   const jsonPath = path.join(OUT, 'results.json');
   fs.writeFileSync(jsonPath, JSON.stringify(summary, null, 2));
-  fs.writeFileSync(path.join(ART, 'sum-dominoes-deep-results.json'), JSON.stringify(summary, null, 2));
+  fs.writeFileSync(
+    path.join(ART, 'sum-dominoes-deep-results.json'),
+    JSON.stringify(summary, null, 2)
+  );
   console.log('\nSummary by outcome:', summary.byOutcome);
   console.log('Stalls/budget:', summary.stalls.length);
   console.log('Illicit human roll skips:', summary.illicitRolls.length);
