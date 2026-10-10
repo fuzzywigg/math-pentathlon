@@ -8,9 +8,9 @@
 **Supersedes (navigation):** open draft **#871** (v2 / `q-mp-360`) — leave open; comment `contained` (do **not** close). Also navigationally supersedes **#850** (v1) / **#819** (v5) / **#782** (v3).
 **Prior triage (stale for post865 navigation):** [`open-draft-triage-post830-2026-10-10-v2.md`](./open-draft-triage-post830-2026-10-10-v2.md)
 **Machine-readable twin:** [`open-draft-triage-post865-2026-10-10-v3.json`](./open-draft-triage-post865-2026-10-10-v3.json)
-**Generated (UTC):** 2026-10-10T05:57:11.463Z
+**Generated (UTC):** 2026-10-10T06:04:58.602Z
 **Scope:** report only — **do not close PRs**, do not mark ready, do not comment / label from this worker task. Tip owner folds into `cursor/mp-tip-post865`.
-**Focus set:** HELD **#727**, open post830 drafts **#853–#879** (incl. deferred **#877/#878/#879** and tip-contained **#853–#876** / **#871**), open drafts into `cursor/mp-tip-post865` (**#880+** at snapshot).
+**Focus set:** HELD **#727**, open post830 drafts **#853–#879** (incl. deferred **#877/#878/#879** and tip-contained **#853–#876** / **#871**), open drafts into `cursor/mp-tip-post865` (**#880–#895** at snapshot, incl. this **#889**).
 
 ## Hard rule (this doc)
 
@@ -69,13 +69,13 @@ $ npm run report:knip
   (baseline unusedTypes still 36; live shrink NOTICE 36→35)
 
 $ npm run check:dev-docs
-  docs scanned: 188; problems: 0
+  docs scanned: 188; problems: 0   ← before this v3 file
 
 $ rg -n 'hard:\s*450' src/games/hex/ai.ts
   hard: 450   ← HOLD untouched
 ```
 
-### Before → after tip metrics (v2 @ post830 `97487de6` cut → v3 @ post865 `3908809d`)
+### Before → after tip metrics (v2 @ post830 cut `97487de6` → v3 @ post865 `3908809d`)
 
 | Metric                              |          v2 (post830 cut) |            v3 (post865) |
 | ----------------------------------- | ------------------------: | ----------------------: |
@@ -85,11 +85,11 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 | unit test/spec files (excl archive) |                      3192 |                **3210** |
 | Vitest list cases                   |                     12614 |               **12768** |
 | Open base `cursor/mp-tip-post830`   |                        13 |                  **26** |
-| Open base `cursor/mp-tip-post865`   |     0 (tip did not exist) |               **1** (#880) |
-| Focus **fold** recommendations      |                        13 |              **4** |
+| Open base `cursor/mp-tip-post865`   |     0 (tip did not exist) |             **16** |
+| Focus **fold** recommendations      |                        13 |             **19** |
 | Focus **superseded**                |                        26 |             **23** |
 | Focus **held**                      |                  1 (#727) |            **1** (#727) |
-| `check:dev-docs` scanned            |                       174 | **188** → **190** w/ v3 |
+| `check:dev-docs` scanned            |                       174 | **188** → **189** w/ v3 md |
 
 ## Classification legend
 
@@ -105,12 +105,12 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 | Bucket                            |   Count | Notes                                                    |
 | --------------------------------- | ------: | -------------------------------------------------------- |
 | Open drafts **total**             | **300** | `gh pr list --state open --limit 300` @ snapshot (cap)  |
-| Focus drafts classified           |  **28** | #727 + open post830 #853–#879 + open post865             |
-| **fold**                          |   **4** | Unique residual vs tip                                   |
+| Focus drafts classified           |  **43** | #727 + open post830 #853–#879 + open post865             |
+| **fold**                          |  **19** | Unique residual vs tip                                   |
 | **rerun**                         |   **0** | none at refresh                                          |
 | **superseded**                    |  **23** | Absorbed by #865 squash / tip-ahead                      |
 | **held**                          |   **1** | #727 only                                                |
-| Open base `cursor/mp-tip-post865` |   **1** | new worker drafts into live tip                          |
+| Open base `cursor/mp-tip-post865` |  **16** | new worker drafts into live tip                          |
 | Open base `cursor/mp-tip-post830` |  **26** | stale tip base; fold leftovers + tip-contained           |
 | Open base `cursor/mp-tip-post785` |  **27** | stale; leave with contained/superseded                   |
 | Open base `cursor/mp-tip-post755` |  **44** | stale; leave with contained/superseded                   |
@@ -119,7 +119,7 @@ $ rg -n 'hard:\s*450' src/games/hex/ai.ts
 
 ```mermaid
 pie title Focus draft triage v3 (post865)
-  "fold" : 4
+  "fold" : 19
   "rerun" : 0
   "superseded" : 23
   "held" : 1
@@ -130,7 +130,7 @@ flowchart LR
   alphaPrev["alpha 97487de6"] --> tip865["tip post865 3908809d"]
   tip865 --> merged865["#865 MERGED squash"]
   tip865 --> supersededStack["#853–#876 + #871 superseded / contained"]
-  tip865 --> foldReady["fold: #877 #878 #879 + #880"]
+  tip865 --> foldReady["fold: #877–#879 + post865 #880–#895"]
   held727["#727 HELD"] -.-> tip865
 ```
 
@@ -166,8 +166,23 @@ Per-draft recommendation with GitHub check-run status on the **head SHA** (12 CI
 | #876 | `q-mp-372` | `post830` | `f5408ee7bd69fa5c1eadb5cd7ab68303233d8c4a` | **superseded** | **12/12** | Payload blob-identical on tip 3908809d via #865 squash; leave open with contained |
 | #877 | `q-mp-366` | `post830` | `42ae924e382ac1641840b43f92f3dcf50dbc75f3` | **fold** | **12/12** | Unique payload vs tip (7 same / 1 diff / 0 new): src/ui/owl/owl-component.ts |
 | #878 | `q-mp-371` | `post830` | `914a723c1dac753d2d02c7a01ace88a22bdd2156` | **fold** | **12/12** | Unique payload vs tip (7 same / 0 diff / 2 new): docs/dev/ui-coverage-round-25.md, tests/unit/burn-1010-ui-cov-r25-hex.test.ts |
-| #879 | `q-mp-090l` | `post830` | `3895a6bce04731e5c7b284bd517682714ec51e5f` | **fold** | **12/12** | Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (open draft #879; not yet on tip) |
-| #880 | `q-mp-395` | `post865` | `6dd6da9ea4dbf2e98f9911cfd54143b731af1ffa` | **fold** | **3/12 (9 pending)** | Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/reduced-motion.ts |
+| #879 | `q-mp-090l` | `post830` | `3895a6bce04731e5c7b284bd517682714ec51e5f` | **fold** | **12/12** | Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (on #879 only) |
+| #880 | `q-mp-395` | `post865` | `6dd6da9ea4dbf2e98f9911cfd54143b731af1ffa` | **fold** | **12/12** | Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/reduced-motion.ts |
+| #881 | `q-mp-393` | `post865` | `ca8ceb0c4b5856b19f7580a87cdb9916e47e0c60` | **fold** | **11/12 (1 pending)** | Unique payload vs tip (0 same / 4 diff / 3 new): docs/dev/emit-identity-fail-inventory-post865-2026-10-10.json, docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md, docs/dev/emit-identity-fail-inventory-post865-2026-10-10.svg, docs/dev/ai-typeonly-option.md, docs/dev/emit-identity-fail-inventory-2026-10-09.md |
+| #882 | `q-mp-391` | `post865` | `6490c49573d157d03321fc110cc4afda193f6126` | **fold** | **11/12 (1 pending)** | Unique payload vs tip (0 same / 1 diff / 2 new): docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md, docs/dev/dead-css-rank1-rescan-post865-2026-10-10.svg, docs/dev/dead-code-inventory.md |
+| #883 | `q-mp-390` | `post865` | `db932a83735a13084c61a5a50877191618aa110e` | **fold** | **10/12 (2 pending)** | Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.json, docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.md, docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.svg |
+| #884 | `q-mp-404` | `post865` | `5b077ecca82b207887e8700b579d0a0df4a7c736` | **fold** | **11/12 (1 pending)** | Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-404-idle-warm-pwa-bootstrap-residuals.test.ts |
+| #885 | `q-mp-406` | `post865` | `ec76d833651659ee282ab72ab0a9ebb8ce0acc5c` | **fold** | **11/12 (1 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-406-expression-ui-residuals.md, tests/unit/q-mp-406-expression-ui-residuals.test.ts |
+| #886 | `q-mp-386` | `post865` | `145a6e76505f3092d9e5d1d811be61138dc0f0df` | **fold** | **11/12 (1 pending)** | Unique payload vs tip (0 same / 2 diff / 0 new): docs/dev/testing-layers-2026-10-09.md, docs/wiki/development.md |
+| #887 | `q-mp-388` | `post865` | `018d7aa0d1abf3d54cff7d25b15ce347fb9050ed` | **fold** | **8/12 (4 pending)** | Unique payload vs tip (0 same / 3 diff / 2 new): docs/screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt, docs/screenshots/ci/tip-unit-ai-benches-skipped-38028521133.txt, docs/dev/ci-unit-budget-q-mp-175.md, docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt, docs/wiki/ci-unit-budget.md |
+| #888 | `q-mp-394` | `post865` | `0d0dda77dc301ab01ac210e3e1c5585a1560a3c9` | **fold** | **8/12 (4 pending)** | Unique payload vs tip (0 same / 1 diff / 3 new): docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.json, docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.md, docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.svg, docs/dev/knip-report.md |
+| #889 | `q-mp-385` | `post865` | `564a1d24a2547acbedc124d76f7327a1202c76e1` | **fold** | **8/12 (4 pending)** | This triage v3 deliverable (docs-only); tip owner should fold after 12/12 green |
+| #890 | `q-mp-398` | `post865` | `e017342de0d211b6cd8e3cd46797bfab70037e3a` | **fold** | **7/12 (5 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-28.md, tests/unit/burn-1010-ui-cov-r28-kings.test.ts |
+| #891 | `q-mp-392` | `post865` | `5cc3c94c9f42d309a2ed08decb8e0df2ff008625` | **fold** | **5/12 (7 pending)** | Unique payload vs tip (0 same / 0 diff / 1 new): docs/dev/slowest-unit-file-inventory-2026-10-10b.md |
+| #892 | `q-mp-399` | `post865` | `81d42ae281758fa9d3ef5ae898f5b617fa29aafe` | **fold** | **5/12 (7 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-29.md, tests/unit/burn-1010-ui-cov-r29-hex-a-gone.test.ts |
+| #893 | `q-mp-403` | `post865` | `1bfbfb652cf12f883b3becafeea39acbb954d6fd` | **fold** | **4/12 (8 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-403-attribute-ui-residuals.md, tests/unit/q-mp-403-attribute-ui-residuals.test.ts |
+| #894 | `q-mp-397` | `post865` | `b162ec0897365d40a1fa4cc777f54782168b0fe0` | **fold** | **6/12 (6 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-27.md, tests/unit/burn-1010-ui-cov-r27-contig-60.test.ts |
+| #895 | `q-mp-400` | `post865` | `720b8fb23802ea0334e6e7de0ea75cafb681785b` | **fold** | **2/12 (4 pending)** | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-30.md, tests/unit/burn-1010-ui-cov-r30-sum-dominoes.test.ts |
 
 Exact per-check conclusions are also in the JSON twin (`drafts[].checks`).
 
@@ -202,7 +217,22 @@ Exact per-check conclusions are also in the JSON twin (`drafts[].checks`).
 | #877 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | #878 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | #879 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| #880 | ⏳ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
+| #880 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| #881 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ |
+| #882 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ |
+| #883 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ | ✅ | ✅ | ✅ | ⏳ |
+| #884 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ |
+| #885 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ |
+| #886 | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⏳ |
+| #887 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ✅ | ✅ | ✅ | ⏳ |
+| #888 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ✅ | ✅ | ✅ | ⏳ |
+| #889 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ✅ | ✅ | ✅ | ⏳ |
+| #890 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ✅ | ⏳ | ✅ | ⏳ |
+| #891 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
+| #892 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
+| #893 | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
+| #894 | ✅ | ✅ | ✅ | ✅ | ⏳ | ✅ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ |
+| #895 | ⏳ | ✅ | ⏳ | ⏳ | — | ✅ | ⏳ | — | — | — | — | — |
 
 ## HELD
 
@@ -222,13 +252,28 @@ Skip **superseded** / **held**. Prefer green 12/12 first. Post830-base fold left
 
 | Order |   PR | Task        | Why |
 | ----: | ---: | ----------- | --- |
-|     1 | #877 | `q-mp-366` | Unique payload vs tip (7 same / 1 diff / 0 new): src/ui/owl/owl-component.ts |
-|     2 | #878 | `q-mp-371` | Unique payload vs tip (7 same / 0 diff / 2 new): docs/dev/ui-coverage-round-25.md, tests/unit/burn-1010-ui-cov-r25-hex.test.ts |
-|     3 | #879 | `q-mp-090l` | Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (open draft #879; not yet on tip) |
-|     4 | #880 | `q-mp-395` | Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/reduced-motion.ts |
-|     — | #727 | `q-mp-186`  | **held** — do not fold                                                                                                   |
-|     — | #871 | `q-mp-360`  | **superseded** / contained by this v3 — leave open                                                                       |
-|     — | #853–#876 | (folded ids) | **superseded** — on tip via #865 — leave open with contained                                                             |
+|     1 | #889 | `q-mp-385` | This triage v3 deliverable (docs-only); tip owner should fold after 12/12 green |
+|     2 | #877 | `q-mp-366` | Unique payload vs tip (7 same / 1 diff / 0 new): src/ui/owl/owl-component.ts |
+|     3 | #878 | `q-mp-371` | Unique payload vs tip (7 same / 0 diff / 2 new): docs/dev/ui-coverage-round-25.md, tests/unit/burn-1010-ui-cov-r25-hex.test.ts |
+|     4 | #879 | `q-mp-090l` | Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (on #879 only) |
+|     5 | #880 | `q-mp-395` | Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/reduced-motion.ts |
+|     6 | #881 | `q-mp-393` | Unique payload vs tip (0 same / 4 diff / 3 new): docs/dev/emit-identity-fail-inventory-post865-2026-10-10.json, docs/dev/emit-identity-fa… |
+|     7 | #882 | `q-mp-391` | Unique payload vs tip (0 same / 1 diff / 2 new): docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md, docs/dev/dead-css-rank1-rescan-pos… |
+|     8 | #883 | `q-mp-390` | Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.json, docs/dev/eslint-non-cei… |
+|     9 | #884 | `q-mp-404` | Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-404-idle-warm-pwa-bootstrap-residuals.test.ts |
+|    10 | #885 | `q-mp-406` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-406-expression-ui-residuals.md, tests/unit/q-mp-406-expression-ui-residual… |
+|    11 | #886 | `q-mp-386` | Unique payload vs tip (0 same / 2 diff / 0 new): docs/dev/testing-layers-2026-10-09.md, docs/wiki/development.md |
+|    12 | #887 | `q-mp-388` | Unique payload vs tip (0 same / 3 diff / 2 new): docs/screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt, docs/screenshots/ci/tip… |
+|    13 | #888 | `q-mp-394` | Unique payload vs tip (0 same / 1 diff / 3 new): docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.json, docs/dev/knip-live-m… |
+|    14 | #890 | `q-mp-398` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-28.md, tests/unit/burn-1010-ui-cov-r28-kings.test.ts |
+|    15 | #891 | `q-mp-392` | Unique payload vs tip (0 same / 0 diff / 1 new): docs/dev/slowest-unit-file-inventory-2026-10-10b.md |
+|    16 | #892 | `q-mp-399` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-29.md, tests/unit/burn-1010-ui-cov-r29-hex-a-gone.test.ts |
+|    17 | #893 | `q-mp-403` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-403-attribute-ui-residuals.md, tests/unit/q-mp-403-attribute-ui-residuals.… |
+|    18 | #894 | `q-mp-397` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-27.md, tests/unit/burn-1010-ui-cov-r27-contig-60.test.ts |
+|    19 | #895 | `q-mp-400` | Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-30.md, tests/unit/burn-1010-ui-cov-r30-sum-dominoes.test.ts |
+|     — | #727 | `q-mp-186`  | **held** — do not fold |
+|     — | #871 | `q-mp-360`  | **superseded** / contained by this v3 — leave open |
+|     — | #853–#876 | (folded ids) | **superseded** — on tip via #865 — leave open with contained |
 
 ## Post830 leftovers (`#853`–`#879`) — navigation note
 
@@ -244,18 +289,19 @@ Still carrying unique tip-missing payload at this snapshot:
 
 | Cluster             | PRs                                   | Files                                                | Fold note                                      |
 | ------------------- | ------------------------------------- | ---------------------------------------------------- | ---------------------------------------------- |
-| Triage narrative    | #871 (v2) → this v3                   | `docs/dev/open-draft-triage-*`                       | Leave #871 open with `contained`; fold this v3 |
-| Nullish HOLD        | #727                                  | `docs/dev/lint-ratchet-ceilings.json` + owl-messages | **Do not fold #727**                           |
-| Void ceiling        | #877 (−3 owl) / #880 (−2 reduced-motion) | `docs/dev/lint-ratchet-ceilings.json` + hosts     | Tip owner **min** after both folds             |
-| Round-12 backlog    | #879                                  | backlog-2026-10-10c.md (on #879 only)              | Fold early so workers retarget post865         |
-| Knip report tip-ahead | #866 / #869                         | `docs/dev/knip-report.md`                            | Leave contained; tip has batch-6 baseline 36   |
+| Triage narrative    | #871 (v2) → this v3 (#889)            | open-draft-triage-* under docs/dev/                  | Leave #871 open with `contained`; fold #889    |
+| Nullish HOLD        | #727                                  | lint-ratchet-ceilings + owl-messages                 | **Do not fold #727**                           |
+| Void ceiling        | #877 (−3 owl) / #880 (−2 reduced-motion) | lint-ratchet-ceilings + hosts                     | Tip owner **min** after both folds             |
+| Round-12 backlog    | #879                                  | backlog-2026-10-10c.md (on #879 only)                | Fold early so workers retarget post865         |
+| Knip report tip-ahead | #866 / #869                         | knip-report.md                                       | Leave contained; tip has batch-6 baseline 36   |
+| Count cells         | #886 / #887                           | testing-layers / ci-unit-budget wiki                 | Keep ownership disjoint                        |
 
 ## Method
 
 1. Read `q-mp-385` from draft **#879** (basename `backlog-2026-10-10c.md`; not yet on tip) — spec base `cursor/mp-tip-post830` / tip `bcf6f825` is **stale**; re-measure on `cursor/mp-tip-post865` @ `3908809d`.
-2. Confirm open **#871** covers v2 only; no other open draft is a post865 triage v3 → proceed.
-3. Enumerate open drafts: HELD **#727**, open post830 **#853–#879**, open post865 **#880+**.
-4. Per draft: three-dot `tip...head` blob identity; ignore `AGENTS.md` + `lint-ratchet-ceilings.json` noise; tip-ahead stale DIFF → **superseded**; `mergeable`; GitHub check-runs on **head SHA**.
+2. Confirm open **#871** covers v2 only; no other open draft is a post865 triage v3 → proceed (this PR is **#889**).
+3. Enumerate open drafts: HELD **#727**, open post830 **#853–#879**, open post865 **#880–#895**.
+4. Per draft: three-dot `tip...head` blob identity; ignore `AGENTS.md` + lint-ratchet-ceilings noise; tip-ahead shared-doc DIFF → **superseded**; material `new`/`diff` → **fold**; GitHub check-runs on **head SHA**.
 5. Classify **fold** / **rerun** / **superseded** / **held**. Policy: **#727 held**.
 6. Tip re-measure: `npm run lint:ratchet` (void **58**, shadow **3**, dup **42**); unit files → **3210**; knip unusedTypes live **35** / baseline **36**; Hex Hard **450** untouched; `check:dev-docs` clean.
 7. **No PR closes, merges, ready flips, comments, or labels** by this task. Docs/JSON only.
