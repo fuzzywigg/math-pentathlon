@@ -3,7 +3,7 @@
 **Task id:** `q-mp-438` (remeasure after tip cut `cursor/mp-tip-post898` / fold `#898`; docs follow-up to tip-folded `#900` / `q-mp-413`)  
 **Tip measured (live):** `cursor/mp-tip-post898` @ `b7e518b4`  
 **Tip cut SHA (alpha after `#898`):** `946d6f95` (tip HEAD has since absorbed folded drafts `#900`–`#913` / `#915`–`#921` via tip PR `#914`)  
-**Measured on:** 2026-10-10 (UTC) · stamp `2026-10-10T08:33:34.986Z`  
+**Measured on:** 2026-10-10 (UTC) · stamp `2026-10-10T08:34:18.620Z`  
 **Scope:** Report-only headroom table on the post898 tree (live HEAD of `cursor/mp-tip-post898`). **No budget raise.** No `bundle-budgets.json` / allowlist edits.
 
 Machine-readable twin: [`bundle-headroom-post898-2026-10-10.json`](./bundle-headroom-post898-2026-10-10.json) · visual: [`bundle-headroom-post898-2026-10-10.svg`](./bundle-headroom-post898-2026-10-10.svg)
