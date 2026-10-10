@@ -4,7 +4,19 @@ iPad Pro 11 start-screen and mid-game human-vs-human captures for the twenty reg
 
 These are distinct from the shell/route shots under [`images/`](./images/) (landing, Hex shell, Kings board, stats) and from the Chromium lifecycle set linked in [game lifecycle](../dev/engines/game-lifecycle.md).
 
-Regenerate (not CI):
+## Three visual entrypoints
+
+Easy to pick the wrong suite — named `package.json` scripts and this docs capture use different configs:
+
+| Entrypoint                | Purpose                                                                                                     | How to run                                                    |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Docs / iPad capture       | Regenerates PNGs under `docs/visuals/2026-10/` (this page). Not CI.                                         | `npx playwright test -c playwright.visuals-2026-10.config.ts` |
+| Opt-in 2D visual          | Local regression baselines in `tests/visual/__screenshots__/`. Not CI.                                      | `npm run test:visual` → `playwright.visual.config.ts`         |
+| CI report-only e2e visual | `visual-desktop` / `visual-phone` in `playwright.config.ts`; baselines under `tests/e2e/visual-baselines/`. | `npm run test:e2e:visual`                                     |
+
+Named-script cheat sheet: [Development](./development.md) (visual bullets). Do not use bare `npx playwright test -c playwright.visual.config.ts` when you mean the docs gallery, or the reverse.
+
+Regenerate this gallery only (not CI; does not refresh regression baselines):
 
 ```bash
 npx playwright test -c playwright.visuals-2026-10.config.ts
