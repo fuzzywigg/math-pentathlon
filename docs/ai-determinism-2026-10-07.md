@@ -15,10 +15,16 @@ For every game under `src/games/*/ai.ts`, at each difficulty (`easy` /
 2. **Quality ladder** — easy/medium differ from hard in measurable move
    quality (oracle agreement, scored-move means, or quiz accuracy).
 
-Tests live in:
+Tests live in (monolith `ai-determinism-2026-10-07.test.ts` removed; split for
+Vitest worker parallelism):
 
 - `tests/unit/ai-determinism-helpers.ts`
-- `tests/unit/ai-determinism-2026-10-07.test.ts`
+- `tests/unit/ai-determinism-harness.ts`
+- `tests/unit/ai-determinism-shard-a.test.ts`
+- `tests/unit/ai-determinism-shard-b.test.ts`
+- `tests/unit/ai-determinism-shard-c.test.ts`
+- `tests/unit/ai-determinism-shard-d.test.ts`
+- `tests/unit/ai-determinism-shard-e.test.ts`
 
 ## Seeding model
 
@@ -139,9 +145,10 @@ only **kings-quadraphages hard** is fully RNG-free. Quiz hard accuracy is
 ## How to reproduce
 
 ```bash
-npx vitest run tests/unit/ai-determinism-2026-10-07.test.ts
+# Sample shard (or swap a→b…e / omit the path for the full unit suite)
+npm run test:unit -- tests/unit/ai-determinism-shard-a.test.ts
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
-npm run test:e2e -- --project=chromium
+npm run test:e2e:chromium
 ```
