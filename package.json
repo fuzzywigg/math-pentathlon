@@ -43,6 +43,8 @@
     "test:visual:update": "playwright test -c playwright.visual.config.ts --update-snapshots",
     "test:e2e:visual": "playwright test --project=visual-desktop --project=visual-phone",
     "test:e2e:visual:update": "playwright test --project=visual-desktop --project=visual-phone --update-snapshots",
+    "docs:gallery": "playwright test -c playwright.gallery.config.ts",
+    "docs:lifecycle-visuals": "playwright test -c playwright.lifecycle-visuals.config.ts",
     "perf:runtime": "node scripts/runtime-perf.mjs",
     "audit:memory": "node scripts/memory-leak-audit.mjs",
     "test": "npm run test:unit && npm run test:e2e:chromium",
