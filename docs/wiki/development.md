@@ -138,9 +138,9 @@ README badges link those workflows. License is **ISC** (`package.json`).
 
 Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
 
-**Live counts** (files / listed cases) measured on tip `50d9b4a0` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
+**Live counts** (files / listed cases) measured on tip `78c7e39b` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
 
-| Layer                       | Live count (tip `50d9b4a0`)                                  | Runner                                                 | Command                                                                                                                                |
+| Layer                       | Live count (tip `78c7e39b`)                                  | Runner                                                 | Command                                                                                                                                |
 | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Unit                        | **3306** files / **13748** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
 | E2E Chromium (required CI)  | **25** files / **249** cases (`--grep-invert @fullgame`)     | Playwright `chromium`                                  | `npm run test:e2e:chromium`                                                                                                            |
