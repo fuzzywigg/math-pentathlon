@@ -13,7 +13,10 @@
  *   node scripts/check-emit-identity.mjs --base <ref> [--head <ref>] [files...]
  *   node scripts/check-emit-identity.mjs --base <ref> --files-from <list>
  *
- * Exit 0 if every compared file emits identically; 1 on any mismatch or error.
+ * Exit codes:
+ *   0 — every compared file emits identically
+ *   1 — any emit mismatch
+ *   2 — usage error (unknown flag, bad --files-from path; no stack)
  */
 
 import { spawnSync } from 'node:child_process';
@@ -26,6 +29,9 @@ import * as esbuild from 'esbuild';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
+export const USAGE =
+  'Usage: node scripts/check-emit-identity.mjs [options] [files...]';
+
 /** Match tsconfig.json compilerOptions that affect emit. */
 export const EMIT_TSCONFIG_RAW = {
   compilerOptions: {
@@ -33,6 +39,74 @@ export const EMIT_TSCONFIG_RAW = {
     useDefineForClassFields: true,
   },
 };
+
+/**
+ * Friendly usage text for a bad `--files-from` path (missing / not a file).
+ * @param {string} filesFrom
+ * @param {'missing' | 'not-found' | 'not-file'} reason
+ */
+export function filesFromErrorMessage(filesFrom, reason) {
+  const detail =
+    reason === 'missing'
+      ? 'error: --files-from requires a path to a file list'
+      : reason === 'not-file'
+        ? `error: --files-from path is not a file: ${filesFrom}`
+        : `error: --files-from path not found: ${filesFrom}`;
+  return [
+    detail,
+    USAGE,
+    '  --files-from <f>   Read file paths (one per line)',
+  ].join('\n');
+}
+
+/**
+ * Read a `--files-from` list without throwing ENOENT/EISDIR stacks.
+ * @param {string} filesFrom
+ * @param {{
+ *   existsSync?: (p: string) => boolean,
+ *   statSync?: (p: string) => { isFile: () => boolean },
+ *   readFileSync?: (p: string, enc: string) => string,
+ * }} [io]
+ * @returns {{ ok: true, files: string[] } | { ok: false, message: string }}
+ */
+export function loadFilesFromList(filesFrom, io = {}) {
+  const existsSync = io.existsSync ?? ((p) => fs.existsSync(p));
+  const statSync = io.statSync ?? ((p) => fs.statSync(p));
+  const readFileSync = io.readFileSync ?? ((p, enc) => fs.readFileSync(p, enc));
+
+  if (!filesFrom) {
+    return { ok: false, message: filesFromErrorMessage('', 'missing') };
+  }
+  if (!existsSync(filesFrom)) {
+    return {
+      ok: false,
+      message: filesFromErrorMessage(filesFrom, 'not-found'),
+    };
+  }
+  let st;
+  try {
+    st = statSync(filesFrom);
+  } catch {
+    return {
+      ok: false,
+      message: filesFromErrorMessage(filesFrom, 'not-found'),
+    };
+  }
+  if (!st.isFile()) {
+    return {
+      ok: false,
+      message: filesFromErrorMessage(filesFrom, 'not-file'),
+    };
+  }
+  const text = readFileSync(filesFrom, 'utf8');
+  /** @type {string[]} */
+  const files = [];
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    if (t && !t.startsWith('#')) files.push(t);
+  }
+  return { ok: true, files };
+}
 
 /**
  * @param {string} source
@@ -189,7 +263,9 @@ export function defaultAiTouchedFiles(baseRef, headRef) {
 export function parseArgs(argv) {
   let base = '';
   let head = 'WORKING_TREE';
-  let filesFrom = '';
+  /** @type {string | undefined} */
+  let filesFrom;
+  let sawFilesFrom = false;
   /** @type {string[]} */
   const files = [];
   let normalize = false;
@@ -202,7 +278,8 @@ export function parseArgs(argv) {
     } else if (a === '--head') {
       head = argv[++i] ?? 'WORKING_TREE';
     } else if (a === '--files-from') {
-      filesFrom = argv[++i] ?? '';
+      sawFilesFrom = true;
+      filesFrom = argv[++i];
     } else if (a === '--normalize') {
       normalize = true;
     } else if (a === '--minify') {
@@ -236,18 +313,19 @@ export function parseArgs(argv) {
       base = tip.stdout.trim();
     }
   }
-  if (filesFrom) {
-    const text = fs.readFileSync(filesFrom, 'utf8');
-    for (const line of text.split('\n')) {
-      const t = line.trim();
-      if (t && !t.startsWith('#')) files.push(t);
+  if (sawFilesFrom) {
+    const loaded = loadFilesFromList(filesFrom ?? '');
+    if (!loaded.ok) {
+      console.error(loaded.message);
+      process.exit(2);
     }
+    files.push(...loaded.files);
   }
   return { base, head, files, normalize, minify, json };
 }
 
 function printHelp() {
-  console.log(`Usage: node scripts/check-emit-identity.mjs [options] [files...]
+  console.log(`${USAGE}
 
 Options:
   --base <ref>       Git ref for the "before" side (required for meaningful check)

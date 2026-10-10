@@ -11,6 +11,9 @@ import {
   compareFileEmit,
   parseArgs,
   EMIT_TSCONFIG_RAW,
+  USAGE,
+  filesFromErrorMessage,
+  loadFilesFromList,
 } from '../../scripts/check-emit-identity.mjs';
 
 describe('check-emit-identity helpers', () => {
@@ -92,5 +95,67 @@ export const n: N = 1;
       minify: true,
     });
     expect(min.status).toBe('identical');
+  });
+
+  it('filesFromErrorMessage includes Usage and path (q-mp-869)', () => {
+    expect(USAGE).toBe(
+      'Usage: node scripts/check-emit-identity.mjs [options] [files...]'
+    );
+    const missing = filesFromErrorMessage('', 'missing');
+    expect(missing).toContain(USAGE);
+    expect(missing).toMatch(/^error: --files-from requires a path/);
+    expect(missing).not.toMatch(/ENOENT|EISDIR|Error:/);
+
+    const notFound = filesFromErrorMessage(
+      '/tmp/no-files-from-xyz',
+      'not-found'
+    );
+    expect(notFound).toContain('/tmp/no-files-from-xyz');
+    expect(notFound).toContain(USAGE);
+    expect(notFound).not.toMatch(/ENOENT|EISDIR/);
+
+    const notFile = filesFromErrorMessage('/tmp', 'not-file');
+    expect(notFile).toContain('--files-from path is not a file: /tmp');
+    expect(notFile).toContain(USAGE);
+  });
+
+  it('loadFilesFromList rejects missing / non-file without throwing (q-mp-869)', () => {
+    const missing = loadFilesFromList('');
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) {
+      expect(missing.message).toContain(USAGE);
+      expect(missing.message).not.toMatch(/ENOENT|EISDIR/);
+    }
+
+    const notFound = loadFilesFromList('/tmp/no-files-from-xyz', {
+      existsSync: () => false,
+    });
+    expect(notFound.ok).toBe(false);
+    if (!notFound.ok) {
+      expect(notFound.message).toContain('not found');
+      expect(notFound.message).toContain('/tmp/no-files-from-xyz');
+    }
+
+    const notFile = loadFilesFromList('/tmp', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => false }),
+    });
+    expect(notFile.ok).toBe(false);
+    if (!notFile.ok) {
+      expect(notFile.message).toContain('not a file');
+    }
+  });
+
+  it('loadFilesFromList reads a valid list (skip comments/blanks)', () => {
+    const loaded = loadFilesFromList('/virtual/list.txt', {
+      existsSync: () => true,
+      statSync: () => ({ isFile: () => true }),
+      readFileSync: () =>
+        'src/games/hex/ai.ts\n# comment\n\nsrc/games/fiar/ai.ts\n',
+    });
+    expect(loaded).toEqual({
+      ok: true,
+      files: ['src/games/hex/ai.ts', 'src/games/fiar/ai.ts'],
+    });
   });
 });
