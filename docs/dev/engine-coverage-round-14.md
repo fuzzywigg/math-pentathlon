@@ -85,12 +85,15 @@ disjoint from `#899` and apply on tip alone.
 
 ## Aggregate (preferred hosts)
 
-| Module           | Before branch (post-r13 view) |        After branch | Notes                  |
-| ---------------- | ----------------------------: | ------------------: | ---------------------- |
-| tutorial.ts      |              86.03% (154/179) | _(remeasure after)_ | post-r13 leftover pins |
-| graph/algorithms |                        90.00% |              90.00% | 0 (doc)                |
-| graph/types      |                        94.11% |              94.11% | 0 (doc)                |
-| fraction-bar-ui  |                        99.11% |              99.11% | 0 (doc)                |
+Full unit suite excl. AI/bench, with `#899` r13 suite overlaid for post-r13 view
+(r13 file not committed on this branch):
+
+| Module           |    Before branch |         After branch |      Before line |           After line | Δb / Δl |
+| ---------------- | ---------------: | -------------------: | ---------------: | -------------------: | ------- |
+| tutorial.ts      | 86.03% (154/179) | **87.15%** (156/179) | 97.78% (397/406) | **98.03%** (398/406) | +2 / +1 |
+| graph/algorithms |           90.00% |               90.00% |           94.90% |               94.90% | 0 (doc) |
+| graph/types      |           94.11% |               94.11% |           98.66% |               98.66% | 0 (doc) |
+| fraction-bar-ui  |           99.11% |               99.11% |             100% |                 100% | 0 (doc) |
 
 ## Files changed
 
