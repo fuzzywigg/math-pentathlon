@@ -9,7 +9,7 @@
 
 Backlog and triage agents repeatedly hand-roll the same ESLint overlay probe used by `npm run lint:ratchet` to answer “where is the debt for rule X?”. This helper prints:
 
-1. **Per-rule totals** for every key in [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json) (same probe as [`scripts/check-lint-ratchet.mjs`](../../scripts/check-lint-ratchet.mjs))
+1. **Per-rule totals** for every key in [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.json) (same probe as [`scripts/check-lint-ratchet.mjs`](../../scripts/check-lint-ratchet.mjs), including stricter `eqeqeq: ['error', 'always']`)
 2. **Path buckets** (e.g. `src/games/<game>`, `src/core/<area>`, `src/ui/three`, `src/demos`, `src/pwa`, `src/` for root files like `main.ts`)
 3. **Densest files** (top N paths by hit count)
 
