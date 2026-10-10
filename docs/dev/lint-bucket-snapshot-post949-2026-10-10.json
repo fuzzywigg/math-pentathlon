@@ -2,8 +2,8 @@
   "task": "q-mp-536",
   "helperTask": "q-mp-280",
   "tipBranch": "cursor/mp-tip-post949",
-  "tipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
-  "measuredAt": "2026-10-10T14:20:36Z",
+  "tipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
+  "measuredAt": "2026-10-10T14:22:33Z",
   "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
   "ceilings": {
     "curly": 538,
@@ -528,9 +528,9 @@
     }
   },
   "remeasuredAfterTipMove": {
-    "previousTipSha": "d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7",
-    "newTipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
-    "tipCommit": "docs(q-mp-533): remeasure post949 bundle headroom",
+    "previousTipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
+    "newTipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
+    "tipCommit": "tip fold after q-mp-533; see git log",
     "lintTotalsUnchanged": true
   }
 }

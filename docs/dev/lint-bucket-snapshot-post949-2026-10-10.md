@@ -251,7 +251,7 @@ Nullish remains HELD — do not clear from this snapshot ticket.
 ## Verification (local)
 
 ```bash
-git rev-parse HEAD   # tip base before branch commit: 701cba470eb8c7b4b5cc73d56d8630df8402f486
+git rev-parse HEAD   # tip base before branch commit: d7a3989a25c15c3294c93d2fe3e5fc5f043fef66
 npm run report:lint-buckets -- --top 40
 npm run lint:ratchet
 npm run check:dev-docs
