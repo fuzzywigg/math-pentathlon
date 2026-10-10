@@ -1,6 +1,6 @@
 # q-mp-264 — `check:emit-identity` FAIL inventory (2026-10-09)
 
-> **Superseded stamp:** tip post785 refresh lives in [`emit-identity-fail-inventory-2026-10-10.md`](./emit-identity-fail-inventory-2026-10-10.md) (`q-mp-343`). FAIL set unchanged (11); tip SHA only.
+> **Superseded stamp:** tip post785 refresh lives in [`emit-identity-fail-inventory-2026-10-10.md`](./emit-identity-fail-inventory-2026-10-10.md) (`q-mp-343`); tip post865 refresh in [`emit-identity-fail-inventory-post865-2026-10-10.md`](./emit-identity-fail-inventory-post865-2026-10-10.md) (`q-mp-393`). FAIL set unchanged (11); tip SHA only.
 
 **Task id:** `q-mp-264`  
 **Role:** worker (docs / report-only)  
