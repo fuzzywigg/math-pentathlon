@@ -3,12 +3,12 @@
   "helperTask": "q-mp-280",
   "tipBranch": "cursor/mp-tip-post949",
   "tipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
-  "measuredAt": "2026-10-10T14:22:33Z",
+  "measuredAt": "2026-10-10T14:24:19Z",
   "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
   "ceilings": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 239,
-    "@typescript-eslint/no-confusing-void-expression": 49,
+    "@typescript-eslint/no-confusing-void-expression": 48,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,
@@ -29,7 +29,7 @@
     "nullish": 65,
     "eqeqeqLive": 0,
     "eqeqeqCeiling": 1,
-    "note": "Backlog baseline void 50 / nnnull 241 is stale vs live tip: void already 49 (\u22121 idle-warm q-mp-515 on tip) and nnnull 239 (\u22122 game-shell q-mp-516 on tip). Prior post914 stamp (q-mp-491 @ e43a25d2) was void 51 / nnnull 241."
+    "note": "Backlog baseline void 50 / nnnull 241 is stale vs live tip: void already 48 (q-mp-498/515/544 void clears) and nnnull 239 (q-mp-516 game-shell -2). Prior post914 stamp (q-mp-491 @ e43a25d2) was void 51 / nnnull 241."
   },
   "priorSnapshot": {
     "task": "q-mp-491",
@@ -42,42 +42,48 @@
     "noShadow": 3
   },
   "liveTipCeilingsNotes": {
-    "void": 49,
+    "void": 48,
     "dupImports": 42,
     "noShadow": 3,
     "nnnull": 239,
     "nullish": 65,
-    "source": "docs/dev/lint-ratchet-ceilings.json notes (tip post949 min ceilings incl. q-mp-498 bootstrap-owl \u22121 void, q-mp-515 idle-warm \u22121 void, q-mp-516 game-shell \u22122 nnnull)"
+    "source": "docs/dev/lint-ratchet-ceilings.json notes (tip post949 min ceilings incl. q-mp-498 bootstrap-owl -1 void, q-mp-515 idle-warm -1 void, q-mp-544 register -1 void, q-mp-516 game-shell -2 nnnull)"
   },
   "tipFoldsSincePriorSnapshot": {
     "#498-on-tip": {
-      "title": "q-mp-498 brace no-confusing-void-expression in bootstrap-owl (\u22121)",
-      "tipCommit": "7f643280 (folded via tip post914 / post949 lineage)",
+      "title": "q-mp-498 brace no-confusing-void-expression in bootstrap-owl (-1)",
+      "tipCommit": "7f643280",
       "alreadyOnTip": true,
       "voidDelta": -1
     },
     "#515-on-tip": {
-      "title": "q-mp-515 brace no-confusing-void-expression in idle-warm (\u22121)",
+      "title": "q-mp-515 brace no-confusing-void-expression in idle-warm (-1)",
       "tipCommit": "8344c551",
       "alreadyOnTip": true,
       "voidDelta": -1
     },
+    "#544-on-tip": {
+      "title": "q-mp-544 brace no-confusing-void-expression in register (-1)",
+      "tipCommit": "d7a3989a",
+      "alreadyOnTip": true,
+      "voidDelta": -1
+    },
     "#516-on-tip": {
-      "title": "q-mp-516 clear game-shell no-non-null-assertion (\u22122)",
+      "title": "q-mp-516 clear game-shell no-non-null-assertion (-2)",
       "tipCommit": "399dcfe5",
       "alreadyOnTip": true,
       "nnnullDelta": -2
     },
-    "liveVoid": 49,
+    "liveVoid": 48,
     "liveNnnull": 239,
-    "postFoldExpectedVoid": 49,
+    "postFoldExpectedVoid": 48,
     "postFoldExpectedNnnull": 239,
-    "arithmetic": "prior post914 snapshot void 51 \u2212 1 (q-mp-498 bootstrap-owl) \u2212 1 (q-mp-515 idle-warm) = 49; nnnull 241 \u2212 2 (q-mp-516 game-shell) = 239; matches live tip + ceilings"
+    "arithmetic": "prior post914 snapshot void 51 - 1 (q-mp-498) - 1 (q-mp-515) - 1 (q-mp-544) = 48; nnnull 241 - 2 (q-mp-516) = 239; matches live tip + ceilings"
   },
   "lintRatchetTotals": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 239,
-    "@typescript-eslint/no-confusing-void-expression": 49,
+    "@typescript-eslint/no-confusing-void-expression": 48,
     "radix": 6,
     "default-case": 5,
     "no-duplicate-imports": 42,
@@ -88,17 +94,17 @@
     "eqeqeq": 1,
     "@typescript-eslint/return-await": 3
   },
-  "probeNote": "report:lint-buckets text/JSON mode currently prints eqeqeq: 0 / ceiling 1 (overlay mismatch); lint:ratchet probe includes eqeqeq always and reports 1. Docs snapshot records the ratchet total for eqeqeq and the helper totals for every other rule. Residual location for the ratchet hit is outside this report-only ticket scope (no src edits).",
+  "probeNote": "report:lint-buckets text/JSON mode currently prints eqeqeq: 0 / ceiling 1 (overlay mismatch); lint:ratchet probe includes eqeqeq always and reports 1. Docs snapshot records the ratchet total for eqeqeq and the helper totals for every other rule.",
   "densestClearablePointers": {
     "src/core/polyomino/placement.ts": {
       "rule": "@typescript-eslint/no-non-null-assertion",
       "hits": 3,
-      "note": "still live; game-shell nnnull 2 cleared by q-mp-516; bootstrap-owl + idle-warm void residuals cleared (q-mp-498 / q-mp-515)"
+      "note": "still live; game-shell nnnull 2 cleared by q-mp-516; bootstrap-owl + idle-warm + register void residuals cleared (q-mp-498 / q-mp-515 / q-mp-544)"
     },
-    "src/pwa/register.ts": {
+    "src/pwa/bootstrap.ts": {
       "rule": "@typescript-eslint/no-confusing-void-expression",
       "hits": 1,
-      "note": "open draft #999 (q-mp-544) targets register void \u22121; leave that draft to own the clear"
+      "note": "last remaining PWA void single after register clear on tip"
     }
   },
   "hexHardMs": 450,
@@ -250,14 +256,14 @@
       }
     },
     "@typescript-eslint/no-confusing-void-expression": {
-      "total": 49,
-      "ceiling": 49,
+      "total": 48,
+      "ceiling": 48,
       "headroom": 0,
       "buckets": {
         "src/ui/three": 34,
         "src/": 12,
-        "src/pwa": 2,
-        "src/games/prime-gold": 1
+        "src/games/prime-gold": 1,
+        "src/pwa": 1
       },
       "files": {
         "src/main.ts": 12,
@@ -270,8 +276,7 @@
         "src/ui/three/prime-gold-board-3d.ts": 4,
         "src/ui/three/queens-guards-board-3d.ts": 4,
         "src/games/prime-gold/types.ts": 1,
-        "src/pwa/bootstrap.ts": 1,
-        "src/pwa/register.ts": 1
+        "src/pwa/bootstrap.ts": 1
       }
     },
     "radix": {
@@ -526,11 +531,5 @@
         "src/games/queens-guards/ai-client.ts": 1
       }
     }
-  },
-  "remeasuredAfterTipMove": {
-    "previousTipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
-    "newTipSha": "d7a3989a25c15c3294c93d2fe3e5fc5f043fef66",
-    "tipCommit": "tip fold after q-mp-533; see git log",
-    "lintTotalsUnchanged": true
   }
 }
