@@ -12,6 +12,7 @@ import {
   safeSetItemResult,
   subscribeStorageEvent,
 } from '../../src/core/safe-web-storage';
+import { securityError } from '../helpers/storage-stubs';
 
 describe('mutation-ui safe-web-storage', () => {
   beforeEach(() => {
@@ -50,7 +51,7 @@ describe('mutation-ui safe-web-storage', () => {
 
   it('safeGetItemResult ok:false when getItem throws', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     const result = safeGetItemResult('k');
     expect(result.ok).toBe(false);
@@ -64,7 +65,7 @@ describe('mutation-ui safe-web-storage', () => {
 
   it('safeSetItemResult ok:false when getWebStorage returns null', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     const result = safeSetItemResult('k', 'v');
     expect(result.ok).toBe(false);
@@ -76,7 +77,7 @@ describe('mutation-ui safe-web-storage', () => {
     expect(localStorage.getItem('rm')).toBeNull();
 
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     expect(safeRemoveItem('rm')).toBe(false);
   });
@@ -87,7 +88,7 @@ describe('mutation-ui safe-web-storage', () => {
     const removeSpy = vi
       .spyOn(Storage.prototype, 'removeItem')
       .mockImplementation(() => {
-        throw new DOMException('blocked', 'SecurityError');
+        throw securityError();
       });
     expect(safeRemoveItem('rm2')).toBe(false);
     removeSpy.mockRestore();
@@ -97,7 +98,7 @@ describe('mutation-ui safe-web-storage', () => {
     localStorage.setItem('sg', 'abc');
     expect(safeGetItem('sg')).toBe('abc');
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     expect(safeGetItem('sg')).toBeNull();
   });

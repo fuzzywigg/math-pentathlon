@@ -29,6 +29,7 @@ import {
   type SerializedGameState,
 } from '../../src/games/kings-quadraphages/serialization';
 import { isBoard3dEnabled } from '../../src/core/feature-flags';
+import { quotaError, securityError } from '../helpers/storage-stubs';
 
 const fixturesRoot = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -240,7 +241,7 @@ describe('save-migration — quota / unavailable soft-fail (fixture remount)', (
     );
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('The operation is insecure.', 'SecurityError');
+      throw securityError('The operation is insecure.');
     });
     const storage = await loadFreshStorage();
     expect(storage.getProfile()).toBeNull();
@@ -258,10 +259,7 @@ describe('save-migration — quota / unavailable soft-fail (fixture remount)', (
 
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new DOMException(
-        'Failed to execute a storage request',
-        'QuotaExceededError'
-      );
+      throw quotaError('Failed to execute a storage request');
     });
 
     expect(() => {
@@ -276,7 +274,7 @@ describe('save-migration — quota / unavailable soft-fail (fixture remount)', (
   it('feature-flag localStorage SecurityError fails soft (OFF)', () => {
     const boom = {
       getItem() {
-        throw new DOMException('insecure', 'SecurityError');
+        throw securityError('insecure');
       },
     };
     expect(() => isBoard3dEnabled('', boom as Storage)).not.toThrow();
