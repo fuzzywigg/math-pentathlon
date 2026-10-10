@@ -1,5 +1,7 @@
 # q-mp-239 — `src/ui/three/*-board-3d` layout-read inventory
 
+> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`). Intermediate post830 stamp: [`board3d-layout-reads-inventory-post830-2026-10-10.md`](./board3d-layout-reads-inventory-post830-2026-10-10.md).
+
 **Task id:** `q-mp-239`  
 **Role:** worker (docs / visual only)  
 **Tip audited:** `cursor/mp-tip-post748` @ `ce673656` (full `ce673656202db8a9eae4e3c404c55a680bb40cd0`)  
