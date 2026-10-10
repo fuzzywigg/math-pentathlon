@@ -17,9 +17,10 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../src/core/router', () => ({
-  navigate: vi.fn(),
-}));
+vi.mock('../../src/core/router', async () => {
+  const { mockRouterNavigateModule } = await import('./helpers/router-mock');
+  return mockRouterNavigateModule();
+});
 
 import { renderFractionDemo } from '../../src/demos/fraction-demo';
 import { mountRoot } from './helpers/dom';

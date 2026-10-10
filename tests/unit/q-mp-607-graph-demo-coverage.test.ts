@@ -5,7 +5,10 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-vi.mock('../../src/core/router', () => ({ navigate: vi.fn() }));
+vi.mock('../../src/core/router', async () => {
+  const { mockRouterNavigateModule } = await import('./helpers/router-mock');
+  return mockRouterNavigateModule();
+});
 
 import * as algorithms from '../../src/core/graph/algorithms';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
