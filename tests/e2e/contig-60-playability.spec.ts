@@ -20,7 +20,23 @@ async function humanTurn(page: Page) {
 
   const pass = page.locator('.contig-pass-btn');
   const valid = page.locator('.contig-cell-valid');
-  await page.waitForTimeout(100);
+  // Condition wait for post-roll UI: valid cell, pass, or expr option.
+  await page.waitForFunction(
+    () => {
+      if (document.querySelector('.contig-cell-valid')) return true;
+      const passBtn = document.querySelector('.contig-pass-btn');
+      if (
+        passBtn instanceof HTMLElement &&
+        passBtn.offsetParent !== null &&
+        getComputedStyle(passBtn).visibility !== 'hidden'
+      ) {
+        return true;
+      }
+      if (document.querySelector('.contig-expr-option')) return true;
+      return false;
+    },
+    { timeout: 15_000 }
+  );
   if ((await valid.count()) > 0) {
     await valid.first().click({ force: true });
   } else if (await pass.isVisible().catch(() => false)) {

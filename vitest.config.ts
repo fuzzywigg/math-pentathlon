@@ -43,8 +43,15 @@ const isolatedFiles = [
   'tests/unit/burn-1007-main-shell-routes.test.ts',
   // q-mp-353: game-route-mounts soft-fail matrix — same hoisted controller mocks.
   'tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts',
+  // mutation-ui19 + q-mp-549: same hoisted controller mocks (were shared-pool).
+  'tests/unit/mutation-ui19-game-route-mounts.test.ts',
+  'tests/unit/q-mp-549-game-route-mounts-soft-fail-residuals.test.ts',
+  // q-mp-677: residual branch matrix — same hoisted controller mocks.
+  'tests/unit/q-mp-677-game-route-mounts-residual-branches.test.ts',
   // q-mp-299: main.ts soft-fail characterization — same hoisted PWA/demo mocks.
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
+  // q-mp-685: main.ts residual branches — same hoisted PWA/demo mocks.
+  'tests/unit/q-mp-685-main-residual-branches.test.ts',
   // q-mp-422: router soft-fail matrix — vi.resetModules for module-default 404.
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
   // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
@@ -67,6 +74,19 @@ const isolatedFiles = [
   // q-mp-506: engine r17 graph defensive spies — Array/Map/String/Array.from
   // prototype patches must not leak into isolate:false shared workers.
   'tests/unit/engine-coverage-round-17-graph-defensive-spies.test.ts',
+  // q-mp-678: expression-demo residual branches — hoisted expression-ui wrap
+  // must not leak createInteractiveBuilder into shared isolate:false suites.
+  'tests/unit/q-mp-678-expression-demo-residual-branches.test.ts',
+  // q-mp-666: kings/board residual branches — Array.from spy for sparse start rows.
+  'tests/unit/q-mp-666-kings-board-residual-branches.test.ts',
+  // q-mp-680: attribute-demo residual branches — hoisted router.navigate mock
+  // + Math.floor NaN spy must not share isolate:false graph with restoreAllMocks.
+  'tests/unit/q-mp-680-attribute-demo-residual-branches.test.ts',
+  // q-mp-697: fiar/layout residual arms — Set.prototype add/has spies must not
+  // leak into isolate:false shared workers.
+  'tests/unit/q-mp-697-fiar-layout-residuals.test.ts',
+  // q-mp-703: prime-gold/types L145 — Array.prototype.filter → Proxy hole.
+  'tests/unit/q-mp-703-prime-gold-types-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */

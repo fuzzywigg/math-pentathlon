@@ -27,7 +27,7 @@
 
 - Tip fold concurrency (`cancel-in-progress: true`) cancels many superseded `cursor/**` runs; cohort (A) has a high cancel rate and understates “finished” pass rates.
 - Many open draft PRs fail `lint` / `unit` intentionally while WIP; cohort (B) pass rates are **not** flake rates for green tips.
-- Cohort (C) is the best proxy for “what lands on production-bound `alpha`,” but those runs predate several report-only jobs now present on the tip workflow (fullgame, mobile, zoom-reflow, forced-colors, cross-browser, visual-baseline).
+- Cohort (C) is the best proxy for “what lands on production-bound `alpha`,” but those runs predate several report-only jobs now present on the tip workflow (fullgame, mobile, zoom-reflow, forced-colors, cross-browser, knip, visual-baseline).
 - Jobs marked `continue-on-error: true` in `ci.yml` are **report-only**. Several also soft-succeed the job after step failure (`exit 0`), so job-level “success” ≠ underlying audit clean. `e2e-cross-browser` is the exception: job conclusion tracks real failures while the workflow stays green.
 
 ## Workflow job inventory (live `ci.yml`)
@@ -44,6 +44,7 @@
 | `zoom-reflow` | Report-only | `build` |
 | `forced-colors` | Report-only | `build` |
 | `e2e-cross-browser` | Report-only (Firefox + WebKit; job fails, workflow continues) | `build` |
+| `knip` | Report-only (`continue-on-error`; unused-export drift vs `docs/dev/knip-baseline.json`) | — |
 | `visual-baseline` | Report-only | — |
 
 ## Per-job tables
@@ -134,6 +135,7 @@ Job set on these historical runs: **`lint`, `audit`, `build`, `unit`, `e2e` only
 | `mobile-touch` | Report-only soft-success; useful signal, not a merge gate yet. |
 | `zoom-reflow` | Report-only soft-success; a11y findings should not block deploy until ratified. |
 | `forced-colors` | Report-only soft-success. |
+| `knip` | Report-only soft-success; unused-export drift vs `docs/dev/knip-baseline.json`; annotates growth, never a merge gate. |
 | `visual-baseline` | Report-only soft-success; baseline churn is expected during UI folds. |
 
 ### Optional later (not recommended now)

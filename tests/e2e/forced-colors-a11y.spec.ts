@@ -19,7 +19,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
-import { dismissOwl } from './helpers/page';
+import { dismissOwl, waitForGameReady } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'forced-colors');
@@ -73,15 +73,6 @@ type ScreenReport = {
 
 function ensureReportDirs(): void {
   fs.mkdirSync(path.join(REPORT_ROOT, 'screenshots'), { recursive: true });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
 }
 
 async function startHuman(page: Page) {

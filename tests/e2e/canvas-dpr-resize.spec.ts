@@ -33,6 +33,24 @@ async function startHuman(page: Page) {
   }
 }
 
+/** Wait until the viewport matches and two paint frames have run (no fixed sleep). */
+async function waitForViewportSettle(
+  page: Page,
+  width: number,
+  height: number
+) {
+  await page.waitForFunction(
+    ({ w, h }) => window.innerWidth === w && window.innerHeight === h,
+    { w: width, h: height }
+  );
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
 const DPR_CASES = [1, 2, 3] as const;
 
 for (const dpr of DPR_CASES) {
@@ -104,7 +122,7 @@ test.describe('Resize / orientation hit-test', () => {
 
     await page.setViewportSize({ width: 1024, height: 768 });
     // Let layout settle after orientation flip
-    await page.waitForTimeout(100);
+    await waitForViewportSettle(page, 1024, 768);
 
     await page
       .locator('.cell[data-row="2"][data-col="5"]')
@@ -125,9 +143,9 @@ test.describe('Resize / orientation hit-test', () => {
     await startHuman(page);
 
     await page.setViewportSize({ width: 1024, height: 768 });
-    await page.waitForTimeout(50);
+    await waitForViewportSettle(page, 1024, 768);
     await page.setViewportSize({ width: 768, height: 1024 });
-    await page.waitForTimeout(50);
+    await waitForViewportSettle(page, 768, 1024);
 
     const status = page.locator('.status-turn');
     const before = await status.textContent();
@@ -153,7 +171,7 @@ test.describe('Resize / orientation hit-test', () => {
     }
 
     await page.setViewportSize({ width: 1024, height: 768 });
-    await page.waitForTimeout(100);
+    await waitForViewportSettle(page, 1024, 768);
 
     const cell = page
       .locator(

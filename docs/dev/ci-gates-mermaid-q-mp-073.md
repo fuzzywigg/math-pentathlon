@@ -11,7 +11,7 @@
 | Set | Jobs | Role |
 | --- | --- | --- |
 | **Merge gate (recommended required)** | `lint`, `audit`, `build`, `unit`, `e2e` | Blocking today; #593 recommends these as alpha required checks |
-| **Report-only** | `e2e-fullgame`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `visual-baseline` | `continue-on-error: true`; do **not** require for merge |
+| **Report-only** | `e2e-fullgame`, `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser`, `knip`, `visual-baseline` | `continue-on-error: true`; do **not** require for merge |
 
 Owner still decides whether/when to enable protection on `alpha`. This doc only maps the live job graph and local repro commands.
 
@@ -30,13 +30,14 @@ flowchart TB
     build --> e2e
   end
 
-  subgraph report ["Report-only — browser / visual / a11y extras"]
+  subgraph report ["Report-only — browser / visual / a11y / knip"]
     direction TB
     fullgame["e2e-fullgame"]
     mobile["mobile-touch"]
     zoom["zoom-reflow"]
     forced["forced-colors"]
     cross["e2e-cross-browser<br/>Firefox + WebKit"]
+    knip["knip"]
     visual["visual-baseline"]
     build --> fullgame
     build --> mobile
@@ -48,14 +49,14 @@ flowchart TB
   classDef gate fill:#d4edda,stroke:#2f6f3e,color:#102418;
   classDef soft fill:#fff3cd,stroke:#8a6d1d,color:#3a2f0b;
   class lint,audit,build,unit,e2e gate;
-  class fullgame,mobile,zoom,forced,cross,visual soft;
+  class fullgame,mobile,zoom,forced,cross,knip,visual soft;
 ```
 
 Notes from the live workflow:
 
 - `lint` and `unit` have **no** `needs:` — they run in parallel with `audit`.
 - `build` `needs: audit`. All browser jobs except `visual-baseline` `needs: build`.
-- `visual-baseline` has **no** `needs:` (runs in parallel with lint/audit/unit).
+- `knip` and `visual-baseline` have **no** `needs:` (run in parallel with lint/audit/unit).
 - Inside **blocking** `build`, two steps are soft: `size:check` and `check:pwa-manifest` (`continue-on-error: true`). The job still fails on `npm run build`, missing `dist/`, or JS chunks over **250 kB**.
 
 ## Per-job: what it catches + local reproduce
@@ -72,7 +73,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 | `unit` | Vitest unit suite under `tests/unit` (excl. `_tokenmaxx_archive`) — rules/state/shell regressions | `npm run test:unit` |
 | `e2e` | Playwright **Chromium** smoke, bug-guards, mp3d; `@fullgame` excluded | `npm run test:e2e:chromium` |
 
-### Report-only (browser / visual / a11y)
+### Report-only (browser / visual / a11y / knip)
 
 | Job | Catches | Local reproduce |
 | --- | --- | --- |
@@ -81,6 +82,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 | `zoom-reflow` | WCAG 1.4.4 / 1.4.10 zoom + 320 CSS px reflow | `npm run test:e2e:zoom-reflow` |
 | `forced-colors` | Forced-colors + reduced-motion + color-scheme smoke | `npm run test:e2e:forced-colors` |
 | `e2e-cross-browser` | Full e2e suite on **Firefox + WebKit** (excludes mobile/visual/zoom/forced/fullgame specs in the CI file count) | `npm run test:e2e -- --project=firefox --project=webkit` (equiv. `npm run test:e2e:firefox-webkit`) |
+| `knip` | Unused-export drift vs `docs/dev/knip-baseline.json` (annotates growth; never fails required lint/unit/build/e2e) | `npm run report:knip` |
 | `visual-baseline` | Start screen + each game opening screenshots @ desktop + phone | `npm run test:e2e:visual` |
 
 ## Soft-success caveat
