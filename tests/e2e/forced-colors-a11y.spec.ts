@@ -19,7 +19,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
-import { dismissOwl, waitForGameReady } from './helpers/page';
+import { dismissOwl, startHuman, waitForGameReady } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'forced-colors');
@@ -75,19 +75,6 @@ function ensureReportDirs(): void {
   fs.mkdirSync(path.join(REPORT_ROOT, 'screenshots'), { recursive: true });
 }
 
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click({ force: true });
-    }
-    await page.locator('#start-game-btn').click({ force: true });
-    await expect(modal).toHaveClass(/hidden/);
-  }
-  await dismissOwl(page);
-}
 
 function titleStem(game: GameInfo): string {
   return game.name.replace(/[!?]+$/, '').split(' (')[0];
@@ -414,7 +401,7 @@ test.describe('forced-colors + reduced-motion smoke', () => {
     test(`${game.id} start under forced-colors + reduce`, async ({ page }) => {
       await applyForcedReduce(page);
       await page.goto(`/#/game/${game.id}`);
-      await startHuman(page);
+      await startHuman(page, { force: true });
 
       // Title may be truncated; ensure shell is up
       await expect(
