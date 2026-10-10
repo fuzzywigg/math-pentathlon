@@ -1,0 +1,122 @@
+{
+  "taskId": "q-mp-534",
+  "series": "ci-permissions-pin",
+  "kind": "remeasure",
+  "measuredAt": "2026-10-10T13:46:09Z",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "68f1548fd3c011f9cea2c418ca3dab8879246b17",
+  "tipShaShort": "68f1548f",
+  "priorAudits": [
+    {
+      "taskId": "q-mp-489",
+      "openDraft": 961,
+      "doc": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-489.md",
+      "json": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-489.json",
+      "svg": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-489.svg",
+      "tipStamp": "e43a25d2",
+      "base": "cursor/mp-tip-post914",
+      "status": "contained"
+    },
+    {
+      "taskId": "q-mp-439",
+      "openDraft": 924,
+      "doc": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.md",
+      "json": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.json",
+      "svg": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.svg",
+      "tipStamp": "9b19c5e8",
+      "base": "cursor/mp-tip-post898",
+      "status": "contained"
+    },
+    {
+      "taskId": "q-mp-414",
+      "openDraft": 903,
+      "doc": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-414.md",
+      "json": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-414.json",
+      "tipStamp": "7f8a7147",
+      "base": "cursor/mp-tip-post865",
+      "status": "contained"
+    },
+    {
+      "taskId": "q-mp-363",
+      "openDraft": 853,
+      "doc": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-363.md",
+      "json": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-363.json",
+      "tipStamp": "97487de6",
+      "base": "cursor/mp-tip-post830",
+      "status": "contained"
+    },
+    {
+      "taskId": "q-mp-279",
+      "openDraft": 783,
+      "doc": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-279.md",
+      "tipStamp": "74a1596f",
+      "base": "cursor/mp-tip-post755",
+      "status": "contained"
+    }
+  ],
+  "staleSpecEvidence": {
+    "backlog": "docs/dev/backlog-2026-10-10r.md",
+    "backlogBranch": "cursor/backlog-2026-10-10r-c79c",
+    "backlogDraft": 995,
+    "claimedPersistPinsInCiYml": "permissions contents:read + persist-credentials:false on every checkout; check:workflows OK",
+    "note": "Spec claims live ci.yml pins still hold; live post949 matches (12 ci.yml + 1 deploy.yml). No numeric drift vs q-mp-489/439/414/363/279. Tip head advanced via folds (q-mp-518 style commit on tip); pin sites unchanged."
+  },
+  "contextCounts": {
+    "unitTestFiles": 3298,
+    "note": "Remeasured on live tip — context only, not a workflow pin."
+  },
+  "verdict": "PASS",
+  "workflows": {
+    "ci.yml": {
+      "permissions": { "contents": "read" },
+      "permissionsLines": { "permissions": 15, "contents": 16 },
+      "checkoutCount": 12,
+      "persistCredentialsFalse": 12,
+      "persistCredentialsTrue": 0,
+      "jobs": [
+        { "job": "lint", "checkoutLine": 28, "persistLine": 30 },
+        { "job": "audit", "checkoutLine": 51, "persistLine": 53 },
+        { "job": "build", "checkoutLine": 68, "persistLine": 70 },
+        { "job": "unit", "checkoutLine": 117, "persistLine": 119 },
+        { "job": "e2e", "checkoutLine": 140, "persistLine": 142 },
+        { "job": "e2e-fullgame", "checkoutLine": 185, "persistLine": 187 },
+        { "job": "mobile-touch", "checkoutLine": 238, "persistLine": 240 },
+        { "job": "zoom-reflow", "checkoutLine": 290, "persistLine": 292 },
+        { "job": "forced-colors", "checkoutLine": 343, "persistLine": 345 },
+        { "job": "e2e-cross-browser", "checkoutLine": 396, "persistLine": 398 },
+        { "job": "knip", "checkoutLine": 442, "persistLine": 444 },
+        { "job": "visual-baseline", "checkoutLine": 471, "persistLine": 473 }
+      ]
+    },
+    "deploy.yml": {
+      "permissions": { "contents": "read", "deployments": "write" },
+      "permissionsLines": {
+        "permissions": 11,
+        "contents": 12,
+        "deployments": 13
+      },
+      "checkoutCount": 1,
+      "persistCredentialsFalse": 1,
+      "persistCredentialsTrue": 0,
+      "jobs": [{ "job": "deploy", "checkoutLine": 24, "persistLine": 26 }]
+    }
+  },
+  "hardRuleChecks": {
+    "contentsReadOnlyOnCi": true,
+    "persistCredentialsFalseEverywhere": true,
+    "noAptInWorkflows": true,
+    "noPersistCredentialsTrue": true,
+    "workflowsUnchangedByThisTask": true,
+    "noPermissionWidening": true,
+    "noNetworkInTestsEnablement": true
+  },
+  "commands": {
+    "rgCi": "rg -n 'permissions:|persist-credentials|contents:' .github/workflows/ci.yml",
+    "rgDeploy": "rg -n 'permissions:|persist-credentials|contents:|deployments:' .github/workflows/deploy.yml",
+    "checkWorkflows": "npm run check:workflows",
+    "checkDevDocs": "npm run check:dev-docs",
+    "unitPin": "npx vitest run --project unit-shared tests/unit/ci-permissions-persist-credentials-pin.test.ts",
+    "verify": "npm run verify",
+    "testUnit": "npm run test:unit"
+  }
+}
