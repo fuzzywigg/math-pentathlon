@@ -1,6 +1,6 @@
 {
   "taskId": "q-mp-385",
-  "generatedAtUtc": "2026-10-10T05:57:11.463Z",
+  "generatedAtUtc": "2026-10-10T06:04:58.602Z",
   "liveTipBranch": "cursor/mp-tip-post865",
   "tipSha": "3908809d672ed70eede7b9c0ad63a6fa475e28e5",
   "tipShaShort": "3908809d",
@@ -10,6 +10,7 @@
   "priorTriage": "docs/dev/open-draft-triage-post830-2026-10-10-v2.md",
   "priorTriagePr": 871,
   "markdownTwin": "docs/dev/open-draft-triage-post865-2026-10-10-v3.md",
+  "jsonTwin": "docs/dev/open-draft-triage-post865-2026-10-10-v3.json",
   "scope": "report-only; do not close PRs; do not comment / label from this worker task",
   "supersedesNavigation": [
     "q-mp-360",
@@ -19,37 +20,59 @@
   ],
   "method": {
     "tipCut": "cursor/mp-tip-post865 cut from alpha 3908809d right after #865 squash-merge (every fold through #876 on tip; #877/#878/#879 deferred)",
-    "classification": "three-dot tip...head blob identity; ignore AGENTS.md + lint-ratchet-ceilings.json noise; tip-ahead stale DIFF \u2192 superseded; #727 held",
+    "classification": "three-dot tip...head blob identity; ignore AGENTS.md + lint-ratchet-ceilings.json noise; tip-ahead stale DIFF \u2192 superseded; #727 held; this PR #889 is the v3 deliverable",
     "noComments": true,
     "noCloses": true,
     "noLabels": true
+  },
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 246,
+    "@typescript-eslint/no-confusing-void-expression": 58,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 42,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 3,
+    "eqeqeq": 1,
+    "@typescript-eslint/return-await": 3,
+    "unitTestSpecFilesExclArchive": 3210,
+    "vitestListCount": 12768,
+    "typecheckOutOfScope": 216,
+    "hexHardMs": 450,
+    "checkDevDocsScannedBefore": 188,
+    "knipUnusedTypesLive": 35,
+    "knipUnusedTypesBaseline": 36,
+    "knipUnusedExports": 3,
+    "knipUnlisted": 3,
+    "knipDuplicates": 0
   },
   "openInventory": {
     "openTotal": 300,
     "byBase": {
       "cursor/mp-tip-post477": 67,
       "cursor/mp-tip-post755": 44,
-      "cursor/integration-fold-wave5-tip-4af0": 29,
       "cursor/mp-tip-post785": 27,
       "cursor/mp-tip-post830": 26,
       "cursor/mp-tip-post598": 26,
       "cursor/mp-tip-post748": 25,
       "cursor/mp-tip-post728": 22,
+      "cursor/integration-fold-wave5-tip-4af0": 21,
+      "cursor/mp-tip-post865": 16,
       "cursor/mp-tip-post700": 14,
       "cursor/mp-tip-post709": 10,
-      "cursor/overnight-polish-integration-0494": 4,
-      "alpha": 3,
-      "cursor/mp-tip-post865": 1,
-      "cursor/friday-landing-preflight-v2-e939": 1,
-      "cursor/integration-fold-wave4-tip-36e4": 1
+      "alpha": 1,
+      "cursor/friday-landing-preflight-v2-e939": 1
     },
-    "openBasePost865": 1,
+    "openBasePost865": 16,
     "openBasePost830": 26,
     "openBasePost785": 27,
     "openBasePost755": 44
   },
   "classificationCounts": {
-    "fold": 4,
+    "fold": 19,
     "rerun": 0,
     "superseded": 23,
     "held": 1
@@ -473,7 +496,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/853",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -591,7 +614,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/854",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -704,7 +727,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/855",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -817,7 +840,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/856",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -930,7 +953,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/857",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1043,7 +1066,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/858",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1156,7 +1179,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/859",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1269,7 +1292,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/860",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1382,7 +1405,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/861",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1500,7 +1523,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/862",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1613,7 +1636,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/863",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1741,7 +1764,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/864",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -1854,7 +1877,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/866",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "CONFLICTING",
       "recommendation": "superseded",
       "reason": "Tip-ahead or tip-contained via #865 squash @ 3908809d: residual DIFF vs tip keeper (docs/dev/knip-report.md); leave open with contained",
       "checksSummary": "12/12",
@@ -1982,7 +2005,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/867",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2100,7 +2123,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/868",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2218,7 +2241,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/869",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "CONFLICTING",
       "recommendation": "superseded",
       "reason": "Tip-ahead or tip-contained via #865 squash @ 3908809d: residual DIFF vs tip keeper (docs/dev/knip-report.md); leave open with contained",
       "checksSummary": "12/12",
@@ -2356,7 +2379,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/870",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2592,7 +2615,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/872",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2730,7 +2753,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/873",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2853,7 +2876,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/874",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -2971,7 +2994,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/875",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -3109,7 +3132,7 @@
       "url": "https://github.com/fuzzywigg/math-pentathlon/pull/876",
       "isDraft": true,
       "state": "OPEN",
-      "mergeable": "UNKNOWN",
+      "mergeable": "MERGEABLE",
       "recommendation": "superseded",
       "reason": "Payload blob-identical on tip 3908809d via #865 squash; leave open with contained",
       "checksSummary": "12/12",
@@ -3550,7 +3573,7 @@
       "state": "OPEN",
       "mergeable": "MERGEABLE",
       "recommendation": "fold",
-      "reason": "Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (open draft #879; not yet on tip)",
+      "reason": "Unique payload vs tip (7 same / 0 diff / 1 new): backlog-2026-10-10c.md (on #879 only)",
       "checksSummary": "12/12",
       "checkCounts": {
         "success": 12,
@@ -3709,18 +3732,18 @@
       "mergeable": "MERGEABLE",
       "recommendation": "fold",
       "reason": "Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/reduced-motion.ts",
-      "checksSummary": "3/12 (9 pending)",
+      "checksSummary": "12/12",
       "checkCounts": {
-        "success": 3,
-        "pending": 9,
+        "success": 12,
+        "pending": 0,
         "failure": 0,
         "neutral": 0
       },
       "checks": {
         "lint": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114145882830"
         },
         "audit": {
@@ -3736,15 +3759,15 @@
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114145937234"
         },
         "unit": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114145882806"
         },
         "e2e": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146023001"
         },
         "knip": {
@@ -3754,39 +3777,39 @@
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114145882819"
         },
         "visual-baseline": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114145882845"
         },
         "e2e-fullgame": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146022954"
         },
         "mobile-touch": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146023060"
         },
         "zoom-reflow": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146022977"
         },
         "forced-colors": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146023025"
         },
         "e2e-cross-browser": {
-          "conclusion": null,
-          "status": "in_progress",
-          "symbol": "\u23f3",
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
           "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029028295/job/114146022984"
         }
       },
@@ -3813,31 +3836,1820 @@
           "noise": false
         }
       ]
+    },
+    {
+      "number": 881,
+      "title": "q-mp-393: emit-identity FAIL inventory refresh (post865, 11 AI diffs) \u2014 docs only",
+      "taskId": "q-mp-393",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-393-emit-identity-inventory-3a6e",
+      "headSha": "ca8ceb0c4b5856b19f7580a87cdb9916e47e0c60",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/881",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 4 diff / 3 new): docs/dev/emit-identity-fail-inventory-post865-2026-10-10.json, docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md, docs/dev/emit-identity-fail-inventory-post865-2026-10-10.svg, docs/dev/ai-typeonly-option.md, docs/dev/emit-identity-fail-inventory-2026-10-09.md",
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146241217"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146241083"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146306075"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146241226"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403518"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146241221"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146241218"
+        },
+        "e2e-fullgame": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403608"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403443"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403435"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403444"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151404/job/114146403432"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 4,
+        "new": 3,
+        "fileCount": 7
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 4,
+        "new": 3
+      },
+      "files": [
+        {
+          "path": "docs/dev/ai-typeonly-option.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/emit-identity-fail-inventory-2026-10-09.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/emit-identity-fail-inventory-2026-10-10.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/emit-identity-fail-inventory-post865-2026-10-10.json",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/emit-identity-fail-inventory-post865-2026-10-10.svg",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/wiki/development.md",
+          "status": "diff",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 882,
+      "title": "q-mp-391: Rank-1 dead-CSS rescan on tip post865 (report-only; contains #840/#805/#766)",
+      "taskId": "q-mp-391",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-391-dead-css-rescan-post865-d1f0",
+      "headSha": "6490c49573d157d03321fc110cc4afda193f6126",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/882",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 2 new): docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md, docs/dev/dead-css-rank1-rescan-post865-2026-10-10.svg, docs/dev/dead-code-inventory.md",
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146241903"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146241872"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146304785"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146241722"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387677"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146241815"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146241856"
+        },
+        "e2e-fullgame": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387712"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387747"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387734"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387716"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151661/job/114146387650"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 1,
+        "new": 2,
+        "fileCount": 3
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 1,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/dead-code-inventory.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/dead-css-rank1-rescan-post865-2026-10-10.svg",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 883,
+      "title": "q-mp-390: eslint non-ceilinged residuals refresh (report-only) for tip post865",
+      "taskId": "q-mp-390",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-390-eslint-nonceiling-post865-175a",
+      "headSha": "db932a83735a13084c61a5a50877191618aa110e",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/883",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.json, docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.md, docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.svg",
+      "checksSummary": "10/12 (2 pending)",
+      "checkCounts": {
+        "success": 10,
+        "pending": 2,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146242864"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146242706"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146303119"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146242834"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379445"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146242881"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146242909"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379481"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379472"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379438"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379442"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029151964/job/114146379456"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 3,
+        "fileCount": 3
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 3
+      },
+      "files": [
+        {
+          "path": "docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.json",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/eslint-non-ceilinged-residuals-post865-2026-10-10.svg",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 884,
+      "title": "q-mp-404: characterize idle-warm / PWA bootstrap soft-fail residuals (tests-only)",
+      "taskId": "q-mp-404",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-404-idle-warm-pwa-residuals-a677",
+      "headSha": "5b077ecca82b207887e8700b579d0a0df4a7c736",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/884",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-404-idle-warm-pwa-bootstrap-residuals.test.ts",
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146293751"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146293574"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146339728"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146293811"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420576"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146294063"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146293777"
+        },
+        "e2e-fullgame": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420531"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420587"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420593"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420596"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029168963/job/114146420598"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 1,
+        "fileCount": 1
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "files": [
+        {
+          "path": "tests/unit/q-mp-404-idle-warm-pwa-bootstrap-residuals.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 885,
+      "title": "q-mp-406: characterize expression-ui drop/slot/empty soft residuals (tests-only)",
+      "taskId": "q-mp-406",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-406-expression-ui-char-c548",
+      "headSha": "ec76d833651659ee282ab72ab0a9ebb8ce0acc5c",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/885",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-406-expression-ui-residuals.md, tests/unit/q-mp-406-expression-ui-residuals.test.ts",
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146457989"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146458012"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146512183"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146458097"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626458"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146457930"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146458086"
+        },
+        "e2e-fullgame": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626309"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626375"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626321"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626313"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029223849/job/114146626360"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/q-mp-406-expression-ui-residuals.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/q-mp-406-expression-ui-residuals.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 886,
+      "title": "q-mp-386: remeasure wiki/testing-layers unit counts to 3210 / 12768 (tip post865)",
+      "taskId": "q-mp-386",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-386-testing-layers-counts-ed39",
+      "headSha": "145a6e76505f3092d9e5d1d811be61138dc0f0df",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/886",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 2 diff / 0 new): docs/dev/testing-layers-2026-10-09.md, docs/wiki/development.md",
+      "checksSummary": "11/12 (1 pending)",
+      "checkCounts": {
+        "success": 11,
+        "pending": 1,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146462229"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146462372"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146574208"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146462443"
+        },
+        "e2e": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660527"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146462412"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146462393"
+        },
+        "e2e-fullgame": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660558"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660591"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660514"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660538"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029225257/job/114146660618"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 2,
+        "new": 0,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 2,
+        "new": 0
+      },
+      "files": [
+        {
+          "path": "docs/dev/testing-layers-2026-10-09.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/wiki/development.md",
+          "status": "diff",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 887,
+      "title": "q-mp-388: remeasure CI unit wall budget / test-speed for tip post865",
+      "taskId": "q-mp-388",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-388-ci-unit-wall-budget-ef06",
+      "headSha": "018d7aa0d1abf3d54cff7d25b15ce347fb9050ed",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/887",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 3 diff / 2 new): docs/screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt, docs/screenshots/ci/tip-unit-ai-benches-skipped-38028521133.txt, docs/dev/ci-unit-budget-q-mp-175.md, docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt, docs/wiki/ci-unit-budget.md",
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146749837"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146750031"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146824343"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146749945"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915548"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146749930"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146749957"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915480"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915530"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915500"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915533"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029324272/job/114146915564"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 3,
+        "new": 2,
+        "fileCount": 5
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 3,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/ci-unit-budget-q-mp-175.md",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/screenshots/ci/local-CI1-ai-benches-skip-smoke.txt",
+          "status": "diff",
+          "noise": false
+        },
+        {
+          "path": "docs/screenshots/ci/tip-unit-ai-benches-skipped-38027675957.txt",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/screenshots/ci/tip-unit-ai-benches-skipped-38028521133.txt",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/wiki/ci-unit-budget.md",
+          "status": "diff",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 888,
+      "title": "q-mp-394: Knip live metrics drift inventory (post865 \u2014 unusedTypes 35 vs baseline 36)",
+      "taskId": "q-mp-394",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-394-knip-metrics-drift-da2c",
+      "headSha": "0d0dda77dc301ab01ac210e3e1c5585a1560a3c9",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/888",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 3 new): docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.json, docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.md, docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.svg, docs/dev/knip-report.md",
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146796913"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146796911"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146870864"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146796783"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995958"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146796928"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146796899"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995948"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995896"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995923"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995860"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029339196/job/114146995936"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 1,
+        "new": 3,
+        "fileCount": 4
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 1,
+        "new": 3
+      },
+      "files": [
+        {
+          "path": "docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.json",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/knip-live-metrics-drift-inventory-post865-2026-10-10.svg",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/knip-report.md",
+          "status": "diff",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 889,
+      "title": "q-mp-385: tip post865 open-draft triage refresh v3 (fold / superseded / held)",
+      "taskId": "q-mp-385",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-385-open-draft-triage-post865-v3-7a49",
+      "headSha": "564a1d24a2547acbedc124d76f7327a1202c76e1",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/889",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "This triage v3 deliverable (docs-only); tip owner should fold after 12/12 green",
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146834039"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146834222"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146946382"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146834166"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093629"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146834099"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114146834195"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093559"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093569"
+        },
+        "zoom-reflow": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093661"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093564"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029351133/job/114147093621"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/open-draft-triage-post865-2026-10-10-v3.json",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "docs/dev/open-draft-triage-post865-2026-10-10-v3.md",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 890,
+      "title": "q-mp-398: UI coverage round 28 \u2014 kings-quadraphages board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-398",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-398-kings-ui-cov-r28-bc7f",
+      "headSha": "e017342de0d211b6cd8e3cd46797bfab70037e3a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/890",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-28.md, tests/unit/burn-1010-ui-cov-r28-kings.test.ts",
+      "checksSummary": "7/12 (5 pending)",
+      "checkCounts": {
+        "success": 7,
+        "pending": 5,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114146861096"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114146861105"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147079989"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114146861026"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147409985"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114146861162"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114146861152"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147409991"
+        },
+        "mobile-touch": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147409989"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147410061"
+        },
+        "forced-colors": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147409992"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029360817/job/114147410051"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/ui-coverage-round-28.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/burn-1010-ui-cov-r28-kings.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 891,
+      "title": "q-mp-392: slowest unit-file inventory refresh (tip post865 / 3210 files)",
+      "taskId": "q-mp-392",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-392-slowest-unit-inventory-7593",
+      "headSha": "5cc3c94c9f42d309a2ed08decb8e0df2ff008625",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/891",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): docs/dev/slowest-unit-file-inventory-2026-10-10b.md",
+      "checksSummary": "5/12 (7 pending)",
+      "checkCounts": {
+        "success": 5,
+        "pending": 7,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114146905431"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114146905396"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147395917"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114146905254"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642731"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114146905353"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114146905337"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642689"
+        },
+        "mobile-touch": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642734"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642799"
+        },
+        "forced-colors": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642708"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029376074/job/114147642678"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 1,
+        "fileCount": 1
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 1
+      },
+      "files": [
+        {
+          "path": "docs/dev/slowest-unit-file-inventory-2026-10-10b.md",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 892,
+      "title": "q-mp-399: UI coverage round 29 \u2014 hex-a-gone board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-399",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-399-hexagone-ui-cov-r29-60b1",
+      "headSha": "81d42ae281758fa9d3ef5ae898f5b617fa29aafe",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/892",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-29.md, tests/unit/burn-1010-ui-cov-r29-hex-a-gone.test.ts",
+      "checksSummary": "5/12 (7 pending)",
+      "checkCounts": {
+        "success": 5,
+        "pending": 7,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114146961032"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114146961215"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147298699"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114146961212"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554723"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114146961169"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114146961149"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554697"
+        },
+        "mobile-touch": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554789"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554731"
+        },
+        "forced-colors": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554738"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029393438/job/114147554716"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/ui-coverage-round-29.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/burn-1010-ui-cov-r29-hex-a-gone.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 893,
+      "title": "q-mp-403: characterize attribute-ui soft-fail / empty-board residuals (tests-only)",
+      "taskId": "q-mp-403",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-403-attribute-ui-residuals-87e9",
+      "headSha": "1bfbfb652cf12f883b3becafeea39acbb954d6fd",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/893",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/q-mp-403-attribute-ui-residuals.md, tests/unit/q-mp-403-attribute-ui-residuals.test.ts",
+      "checksSummary": "4/12 (8 pending)",
+      "checkCounts": {
+        "success": 4,
+        "pending": 8,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114146997159"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114146997391"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147357119"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114146997041"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480227"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114146997185"
+        },
+        "visual-baseline": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114146997237"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480300"
+        },
+        "mobile-touch": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480216"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480217"
+        },
+        "forced-colors": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480264"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029407391/job/114147480209"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/q-mp-403-attribute-ui-residuals.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/q-mp-403-attribute-ui-residuals.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 894,
+      "title": "q-mp-397: UI coverage round 27 \u2014 contig-60 board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-397",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-397-ui-cov-r27-contig-62ee",
+      "headSha": "b162ec0897365d40a1fa4cc777f54782168b0fe0",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/894",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-27.md, tests/unit/burn-1010-ui-cov-r27-contig-60.test.ts",
+      "checksSummary": "6/12 (6 pending)",
+      "checkCounts": {
+        "success": 6,
+        "pending": 6,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147033851"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147033497"
+        },
+        "build": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147147512"
+        },
+        "unit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147033702"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496760"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147033640"
+        },
+        "visual-baseline": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147033724"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496691"
+        },
+        "mobile-touch": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496697"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496738"
+        },
+        "forced-colors": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496694"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029420862/job/114147496704"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/ui-coverage-round-27.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/burn-1010-ui-cov-r27-contig-60.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
+    },
+    {
+      "number": 895,
+      "title": "q-mp-400: UI coverage round 30 \u2014 sum-dominoes board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-400",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-400-sum-dominoes-ui-cov-r30-f37b",
+      "headSha": "720b8fb23802ea0334e6e7de0ea75cafb681785b",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/895",
+      "isDraft": true,
+      "state": "OPEN",
+      "mergeable": "MERGEABLE",
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-30.md, tests/unit/burn-1010-ui-cov-r30-sum-dominoes.test.ts",
+      "checksSummary": "2/12 (4 pending)",
+      "checkCounts": {
+        "success": 2,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147376333"
+        },
+        "audit": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147376268"
+        },
+        "build": {
+          "conclusion": null,
+          "status": "queued",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147554277"
+        },
+        "unit": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147376275"
+        },
+        "e2e": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        },
+        "knip": {
+          "conclusion": "success",
+          "status": "completed",
+          "symbol": "\u2705",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147376206"
+        },
+        "visual-baseline": {
+          "conclusion": null,
+          "status": "in_progress",
+          "symbol": "\u23f3",
+          "html_url": "https://github.com/fuzzywigg/math-pentathlon/actions/runs/38029536663/job/114147376282"
+        },
+        "e2e-fullgame": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        },
+        "mobile-touch": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        },
+        "zoom-reflow": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        },
+        "forced-colors": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        },
+        "e2e-cross-browser": {
+          "conclusion": null,
+          "status": "missing",
+          "symbol": "\u2014"
+        }
+      },
+      "threeDot": {
+        "same": 0,
+        "diff": 0,
+        "new": 2,
+        "fileCount": 2
+      },
+      "payloadBlob": {
+        "same": 0,
+        "diff": 0,
+        "new": 2
+      },
+      "files": [
+        {
+          "path": "docs/dev/ui-coverage-round-30.md",
+          "status": "new",
+          "noise": false
+        },
+        {
+          "path": "tests/unit/burn-1010-ui-cov-r30-sum-dominoes.test.ts",
+          "status": "new",
+          "noise": false
+        }
+      ]
     }
-  ],
-  "tipRatchetCeilingsRemeasured": {
-    "curly": 538,
-    "@typescript-eslint/no-non-null-assertion": 246,
-    "@typescript-eslint/no-confusing-void-expression": 58,
-    "radix": 6,
-    "default-case": 5,
-    "no-duplicate-imports": 42,
-    "@typescript-eslint/prefer-nullish-coalescing": 65,
-    "@typescript-eslint/prefer-optional-chain": 21,
-    "@typescript-eslint/switch-exhaustiveness-check": 8,
-    "@typescript-eslint/no-shadow": 3,
-    "eqeqeq": 1,
-    "@typescript-eslint/return-await": 3,
-    "unitTestSpecFilesExclArchive": 3210,
-    "vitestListCount": 12768,
-    "typecheckOutOfScope": 216,
-    "hexHardMs": 450,
-    "checkDevDocsScannedBefore": 188,
-    "knipUnusedTypesLive": 35,
-    "knipUnusedTypesBaseline": 36,
-    "knipUnusedExports": 3,
-    "knipUnlisted": 3,
-    "knipDuplicates": 0
-  },
-  "jsonTwin": "docs/dev/open-draft-triage-post865-2026-10-10-v3.json"
+  ]
 }
