@@ -26,7 +26,7 @@ Related prior work (already on tip; not duplicated):
 | #557 | Type-ratchet batch 6 (rules/engine type-only) — cross-checked |
 
 New suite: `tests/unit/engine-coverage-round-burn-1008.test.ts`  
-Rank helper: `scripts/engine-coverage-rank.mjs`
+Rank helper: `scripts/engine-coverage-rank.mjs` (pass an explicit `coverage-summary.json` path; missing/default path exits **2** with usage — `coverage-engine-baseline/` is generated locally, not committed)
 
 ## Method
 
