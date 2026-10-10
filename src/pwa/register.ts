@@ -13,7 +13,7 @@
  * visit re-precaches. No Background Sync dependency.
  */
 
-export type RegisterPwaOptions = {
+type RegisterPwaOptions = {
   /** Injected for tests; defaults to vite-plugin-pwa virtual module. */
   registerSW?: typeof import('virtual:pwa-register').registerSW;
   reload?: () => void;
@@ -21,7 +21,7 @@ export type RegisterPwaOptions = {
   enabled?: boolean;
 };
 
-export type RegisterPwaResult = {
+type RegisterPwaResult = {
   /** Workbox `registerSW` may return a Promise-returning updater. */
   update?: () => void | Promise<void>;
 };

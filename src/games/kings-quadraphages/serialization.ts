@@ -39,7 +39,7 @@ export interface SerializedGameState {
 }
 
 /** Human-readable summary of a serialized save. */
-export interface SaveInfo {
+interface SaveInfo {
   turnCount: number;
   currentPlayer: string;
   isGameOver: boolean;
@@ -127,7 +127,7 @@ export function gameStateToJSON(
  * Result of a soft-fail game-state JSON parse (R-JSON-04).
  * Mirrors SafeJsonParseResult so UI callers can branch without try/catch.
  */
-export type GameStateFromJsonResult =
+type GameStateFromJsonResult =
   { ok: true; value: GameState } | { ok: false; error: unknown };
 
 /**
