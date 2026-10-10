@@ -76,7 +76,7 @@ npm run verify
 #         typecheck:ratchet → check:boundaries)
 
 npm run test:unit
-# (report after run)
+# Test Files  3223 passed; Tests  12884 passed | 38 skipped; EXIT 0
 ```
 
 ## Constraints honored
