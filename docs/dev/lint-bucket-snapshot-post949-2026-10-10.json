@@ -2,8 +2,8 @@
   "task": "q-mp-536",
   "helperTask": "q-mp-280",
   "tipBranch": "cursor/mp-tip-post949",
-  "tipSha": "d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7",
-  "measuredAt": "2026-10-10T14:18:22Z",
+  "tipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
+  "measuredAt": "2026-10-10T14:20:36Z",
   "ceilingsPath": "docs/dev/lint-ratchet-ceilings.json",
   "ceilings": {
     "curly": 538,
@@ -526,5 +526,11 @@
         "src/games/queens-guards/ai-client.ts": 1
       }
     }
+  },
+  "remeasuredAfterTipMove": {
+    "previousTipSha": "d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7",
+    "newTipSha": "701cba470eb8c7b4b5cc73d56d8630df8402f486",
+    "tipCommit": "docs(q-mp-533): remeasure post949 bundle headroom",
+    "lintTotalsUnchanged": true
   }
 }

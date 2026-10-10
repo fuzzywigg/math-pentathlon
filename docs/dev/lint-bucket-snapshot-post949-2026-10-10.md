@@ -2,8 +2,8 @@
 
 **Task id:** `q-mp-536`  
 **Role:** worker (docs / chart only)  
-**Tip measured:** `cursor/mp-tip-post949` @ `d6a71f95` (`d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7`)  
-**Measured at:** `2026-10-10T14:18:22Z` (UTC)  
+**Tip measured:** `cursor/mp-tip-post949` @ `701cba47` (`701cba470eb8c7b4b5cc73d56d8630df8402f486`)  
+**Measured at:** `2026-10-10T14:20:36Z` (UTC)  
 **Helper:** [`lint-bucket-report.md`](./lint-bucket-report.md) (`npm run report:lint-buckets`, `q-mp-280` helper **contained** on tip)  
 **Data:** [`lint-bucket-snapshot-post949-2026-10-10.json`](./lint-bucket-snapshot-post949-2026-10-10.json)  
 **Chart:** ![lint-bucket focus bars @ post949](./lint-bucket-snapshot-post949-2026-10-10.svg)
@@ -26,7 +26,7 @@ No open draft into `cursor/mp-tip-post949` owned a post949 lint-bucket measured 
 
 ## Stale backlog → live tip (focus ceilings)
 
-| Rule                                              | Stale backlog (`q-mp-536` @ post949) | Prior snapshot (post914 @ `e43a25d2`) | Live tip (`d6a71f95` / post949) | Δ vs prior stamp |
+| Rule                                              | Stale backlog (`q-mp-536` @ post949) | Prior snapshot (post914 @ `e43a25d2`) | Live tip (`701cba47` / post949) | Δ vs prior stamp |
 | ------------------------------------------------- | -----------------------------------: | ------------------------------------: | ------------------------------: | ---------------: |
 | `@typescript-eslint/no-confusing-void-expression` |                                   50 |                                **51** |                          **49** |           **−2** |
 | `no-duplicate-imports`                            |                                   42 |                                **42** |                          **42** |                0 |
@@ -48,7 +48,7 @@ Live ceilings come from [`lint-ratchet-ceilings.json`](./lint-ratchet-ceilings.j
 | Scenario                                      | Void total / ceiling | Nnnull total / ceiling |
 | --------------------------------------------- | -------------------: | ---------------------: |
 | Prior post914 stamp (`q-mp-491` @ `e43a25d2`) |          **51** / 51 |          **241** / 241 |
-| Live tip measured (`d6a71f95`)                |          **49** / 49 |          **239** / 239 |
+| Live tip measured (`701cba47`)                |          **49** / 49 |          **239** / 239 |
 | Post-fold expected                            |          **49** / 49 |          **239** / 239 |
 
 Live == post-fold expected. Leave `#965` open with **contained** (prior tip stamp); do not close.
@@ -251,7 +251,7 @@ Nullish remains HELD — do not clear from this snapshot ticket.
 ## Verification (local)
 
 ```bash
-git rev-parse HEAD   # tip base before branch commit: d6a71f95f1c8c9eb626c6ecf4dbd415426b1f8c7
+git rev-parse HEAD   # tip base before branch commit: 701cba470eb8c7b4b5cc73d56d8630df8402f486
 npm run report:lint-buckets -- --top 40
 npm run lint:ratchet
 npm run check:dev-docs
