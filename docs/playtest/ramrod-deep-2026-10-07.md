@@ -48,7 +48,7 @@ AI think UI (`.ramrod-computer-thinking` / “Computer is thinking…”) observ
 
 **Fix (`game-controller.ts`):** Single clearable `aiTimer` (Prime Gold pattern), `scheduleAI` / `clearAiTimer`, hard `isComputerTurnPending` guard; pass only when AI seat is truly out of moves. Think delay **800 → 550ms**.
 
-**Regression:** `tests/unit/ramrod-ai-timer-race.test.ts`, updated `ramrod-ai-input-guard.test.ts`.
+**Regression (at the time):** unit ramrod-ai-timer-race.test.ts (historical — removed from tip); live guard suite `tests/unit/ramrod-ai-input-guard.test.ts`.
 
 ### 2. Critical — Desktop hands unclickable (overflow clip)
 
@@ -93,13 +93,13 @@ Coarse / `max-width: 900px` media query enlarges slots, rod wrappers, and button
 | Desktop easy mid | ![desktop-mid](./ramrod-deep-2026-10-07/desktop-easy-mid.png) |
 | Desktop hard end | ![desktop-hard-end](./ramrod-deep-2026-10-07/desktop-hard-end.png) |
 
-## Tests added
+## Tests / reproduce (tip)
 
-- `tests/unit/ramrod-ai-timer-race.test.ts`
-- `tests/unit/ramrod-deep-playability.test.ts` (hints, deselect, CSS floors, 12× scripted Easy/Med/Hard finishes)
-- `tests/e2e/ramrod-deep.spec.ts` (desktop ×3 difficulties + tablet touch floors)
+- Surviving harness: `scripts/ramrod-deep-playtest.mjs`
+- Live related unit: `tests/unit/ramrod-ai-input-guard.test.ts`
+- Historical (removed from tip — not live paths): unit ramrod-ai-timer-race.test.ts; unit ramrod-deep-playability.test.ts; e2e ramrod-deep.spec.ts
 
 ## Files touched
 
 - `src/games/ramrod/{game-controller,board-ui}.ts`
-- Tests / docs / `scripts/ramrod-deep-playtest.mjs` only (no other games)
+- Docs / `scripts/ramrod-deep-playtest.mjs` only (no other games)

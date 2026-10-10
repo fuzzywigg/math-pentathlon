@@ -70,15 +70,13 @@ Outcomes (scripted human): Human 0 · AI 60 · draw 0
 | Desktop AI thinking | ![desktop-think](./stars-bars-deep-2026-10-07/desktop-ai-thinking.png) |
 | Desktop Easy end | ![desktop-end](./stars-bars-deep-2026-10-07/desktop-easy-end.png) |
 
-## Code / tests
+## Code / tests (tip)
 
 - `src/games/stars-bars/game-controller.ts` — AI timer, seat guard, You/Computer status copy, 450 ms think
 - `src/games/stars-bars/board-ui.ts` — seat labels, 44px floors, coarse media query, `#stars-styles`
-- `tests/unit/stars-bars-ai-timer-race.test.ts`
-- `tests/unit/stars-bars-deep-playability.test.ts`
-- `tests/unit/stars-bars-ai-input-guard.test.ts` (title/delay wording)
-- `tests/e2e/stars-bars-deep.spec.ts` (Chromium tablet + desktop)
-- `scripts/stars-bars-deep-playtest.mjs`
+- Surviving harness: `scripts/stars-bars-deep-playtest.mjs`
+- Live related unit: `tests/unit/stars-bars-ai-input-guard.test.ts`
+- Historical (removed from tip — not live paths): unit stars-bars-ai-timer-race.test.ts; unit stars-bars-deep-playability.test.ts; e2e stars-bars-deep.spec.ts
 
 ## Hard stops honored
 
