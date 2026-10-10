@@ -1,5 +1,5 @@
 {
-  "notes": "Tip post1023 min ceilings (q-mp-026r + prior + q-mp-580 + q-mp-602): curly 538; no-non-null-assertion 237 (\u22121 demos/dice-demo lastChild + \u22121 demos/graph-demo dataset.player); no-confusing-void-expression 47; radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
+  "notes": "Tip post1059 min ceilings (q-mp-026r + prior + q-mp-580 + q-mp-602): curly 538; no-non-null-assertion 237 (\u22121 demos/dice-demo lastChild + \u22121 demos/graph-demo dataset.player); no-confusing-void-expression 47; radix 6; default-case 5; no-duplicate-imports 42; prefer-nullish-coalescing 65; prefer-optional-chain 21; switch-exhaustiveness-check 8; no-shadow 3; eqeqeq 1; return-await 3. Tip owner reconciles ceilings on fold (min wins; re-measure).",
   "rules": {
     "curly": 538,
     "@typescript-eslint/no-non-null-assertion": 237,
