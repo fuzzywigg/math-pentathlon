@@ -1,5 +1,9 @@
-import type { Piece, PieceType, PlayerOwner } from './pieces';
-import { INITIAL_QUADRAPHAGE_COUNT } from './pieces';
+import {
+  type Piece,
+  type PieceType,
+  type PlayerOwner,
+  INITIAL_QUADRAPHAGE_COUNT,
+} from './pieces';
 
 // Re-export piece types for convenience
 export type { Piece, PieceType, PlayerOwner };
