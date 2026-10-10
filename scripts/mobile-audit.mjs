@@ -9,11 +9,11 @@ import { chromium, devices } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dismissOwl } from './lib/dismiss-owl.mjs';
 import {
   mobileAuditOutUsage,
   resolveMobileAuditOutPath,
 } from './lib/mobile-audit-out-path.mjs';
+import { gotoGame, startHuman } from './lib/page-ready.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -85,34 +85,6 @@ const VIEWPORTS = [
 ];
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
-
-async function waitForGameReady(page) {
-  await page
-    .getByTestId('game-loading')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({
-    state: 'visible',
-    timeout: 20_000,
-  });
-}
-
-async function startHuman(page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await page
-      .locator('#new-game-modal.hidden')
-      .waitFor({ timeout: 10_000 })
-      .catch(() => {});
-  }
-  await dismissOwl(page);
-}
 
 async function auditPage(page, gameId) {
   return page.evaluate(
@@ -341,10 +313,7 @@ async function main(outPath) {
         audit: null,
       };
       try {
-        await page.goto(`${BASE}/#/game/${gameId}`, {
-          waitUntil: 'domcontentloaded',
-          timeout: 30_000,
-        });
+        await gotoGame(page, BASE, gameId, false);
         await startHuman(page);
         const sel = MOUNT[gameId] ?? '#board, main';
         await page
