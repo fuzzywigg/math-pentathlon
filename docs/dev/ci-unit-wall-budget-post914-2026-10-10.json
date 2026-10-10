@@ -190,7 +190,17 @@
       "exitCode": 0,
       "note": "Local agent host on wall-evidence SHA; not the GHA wall cite. Matches tip GHA suite summary under CI=1."
     },
-    "tipFoldCiNote": "Tip-fold PR #949 CI runs are often cancelled by successive tip pushes. Primary wall cite is successful run 38041487792 @ e43a25d2 (Duration 357.17s / wall 378s / 3242 files). Docs stamp rebased onto later tip HEAD f5d3d04a (suite 3245 / 13100)."
+    "tipFoldCiNote": "Tip-fold PR #949 CI runs are often cancelled by successive tip pushes. Primary wall cite is successful run 38041487792 @ e43a25d2 (Duration 357.17s / wall 378s / 3242 files). Docs stamp rebased onto later tip HEAD f5d3d04a (suite 3245 / 13100).",
+    "localCI1OnTipHead": {
+      "sha": "5c5101f59422d8b9f9142c7a6852b5d9d148e5f9",
+      "prHeadSha": "405730e9428c887a6a6a98188663ce95454cf3a4",
+      "unitFiles": 3245,
+      "testFilesSummary": "3243 passed | 2 skipped (3245)",
+      "testsSummary": "13088 passed | 55 skipped (13143)",
+      "vitestDurationSeconds": 154.58,
+      "exitCode": 0,
+      "note": "Local agent host on tip HEAD + this PR docs; not the GHA wall cite."
+    }
   },
   "maxObservedVitestDurationSeconds": 369.71,
   "maxObservedUnitJobWallSeconds": 391,
