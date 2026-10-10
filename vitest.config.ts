@@ -21,6 +21,8 @@ const isolatedFiles = [
   'tests/unit/mp3d-*.test.ts',
   // q-mp-594: hex-a-gone-board-3d soft-fail — doMock load-three + installThreeMock.
   'tests/unit/q-mp-594-hex-a-gone-board-3d-soft-fail-residuals.test.ts',
+  // q-mp-616: star-track-board-3d branch residuals — doMock load-three / tablet-gl.
+  'tests/unit/q-mp-616-star-track-board-3d-branch-residuals.test.ts',
   // Hoisted router.navigate mock must not share a graph with files that call
   // restoreAllMocks under isolate:false shuffle.
   'tests/unit/burn-wave24-stats-selector-ui.test.ts',
@@ -47,6 +49,8 @@ const isolatedFiles = [
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
   // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
   'tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts',
+  // q-mp-653: game-prefetch residual branches — resetModules + doMock loaders.
+  'tests/unit/q-mp-653-game-prefetch-residuals.test.ts',
   // Real controller imports + destroyGame mutates module singletons.
   'tests/unit/burn-1008-registry-module-contract.test.ts',
   // q-mp-117: generation-gated timeout characterization — fake timers +
@@ -56,6 +60,8 @@ const isolatedFiles = [
   'tests/unit/burn-1008-ui-cov-r3-game-selector.test.ts',
   // q-mp-454: game-selector soft-fail residuals — registry + prefetch mocks.
   'tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts',
+  // q-mp-654: game-selector residual branches — empty DIVISIONS mock.
+  'tests/unit/q-mp-654-game-selector-residual-branches.test.ts',
   // q-mp-472: game-registry soft-fail residuals — temporary available flips.
   'tests/unit/q-mp-472-game-registry-soft-fail-residuals.test.ts',
   // q-mp-506: engine r17 graph defensive spies — Array/Map/String/Array.from

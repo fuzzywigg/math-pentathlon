@@ -585,7 +585,11 @@ function initGameSection(): void {
         b.classList.remove('selected');
       });
       btn.classList.add('selected');
-      currentPlayer = parseInt((btn as HTMLElement).dataset.player!, 10);
+      const playerAttr = (btn as HTMLElement).dataset.player;
+      if (playerAttr === undefined) {
+        return;
+      }
+      currentPlayer = parseInt(playerAttr, 10);
     });
   });
 
