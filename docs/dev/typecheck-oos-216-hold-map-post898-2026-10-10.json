@@ -4,8 +4,8 @@
   "taskId": "q-mp-447",
   "description": "Typecheck out-of-scope 216 HOLD map refresh for tip post898. Docs/data/chart only; AI residual hard-rule HOLD.",
   "tipBranch": "cursor/mp-tip-post898",
-  "tipSha": "b7e518b4afe04556fa7e87ecba7ce97229b05bc7",
-  "measuredAt": "2026-10-10T08:31:37.518Z",
+  "tipSha": "855226389f23cb95bf74bd827556ee831c3bccad",
+  "measuredAt": "2026-10-10T08:37:30.000Z",
   "priorMap": {
     "path": "docs/dev/typecheck-oos-216-hold-map-post865-2026-10-10.md",
     "taskId": "q-mp-421",
@@ -115,7 +115,7 @@
     "rewritePhase2BaselineUpward": false
   },
   "context": {
-    "unitTestFileCount": 3234,
+    "unitTestFileCount": 3235,
     "note": "Spec backlog tip stamp 788e8215 / unit files 3224 was stale vs live tip folds; residual buckets unchanged."
   },
   "deltaVsPriorMap": {
