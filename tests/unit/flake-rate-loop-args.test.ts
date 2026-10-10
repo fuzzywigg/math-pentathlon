@@ -74,3 +74,29 @@ describe('flake-rate loop arg validation (q-mp-843)', () => {
     }
   });
 });
+
+describe('flake-rate loop --out validation (q-mp-871)', () => {
+  it('unit loop rejects trailing --out before mkdir or spawning', () => {
+    const result = runScript(UNIT_LOOP, [
+      '--runs',
+      '1',
+      '--shuffle',
+      '1',
+      '--out',
+    ]);
+    expect(result.status).not.toBe(0);
+    const combined = `${result.stdout}${result.stderr}`;
+    expect(combined).toMatch(/Missing or invalid value for --out/);
+    expect(combined).toMatch(/Usage:/i);
+    expect(combined).not.toMatch(/\[flake-rate\] starting/);
+  });
+
+  it('e2e loop rejects flag-like --out value before mkdir or spawning', () => {
+    const result = runScript(E2E_LOOP, ['--runs', '1', '--out', '--runs']);
+    expect(result.status).not.toBe(0);
+    const combined = `${result.stdout}${result.stderr}`;
+    expect(combined).toMatch(/Missing or invalid value for --out/);
+    expect(combined).toMatch(/Usage:/i);
+    expect(combined).not.toMatch(/\[flake-rate-e2e\] starting/);
+  });
+});
