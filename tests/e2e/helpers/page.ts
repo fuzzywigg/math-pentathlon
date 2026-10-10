@@ -122,19 +122,33 @@ export async function startVsAiAt(
   await startVsAi(page, difficulty);
 }
 
+export type StartHumanOptions = {
+  /**
+   * Force-click modal controls (zoom-reflow / forced-colors overlays).
+   * Default false — same click path as smoke / bug-guards.
+   */
+  force?: boolean;
+};
+
 /**
  * Ensure human-vs-human play. If the new-game modal is already open, choose
  * human and start; otherwise leave the current human session alone.
  */
-export async function startHuman(page: Page): Promise<void> {
+export async function startHuman(
+  page: Page,
+  options: StartHumanOptions = {}
+): Promise<void> {
+  const force = options.force === true;
   await waitForGameReady(page);
   const modal = page.locator('#new-game-modal');
   if (await modal.isVisible().catch(() => false)) {
     const human = page.locator('.mode-option[data-mode="human-vs-human"]');
     if (await human.isVisible().catch(() => false)) {
-      await human.click();
+      await human.click(force ? { force: true } : undefined);
     }
-    await page.locator('#start-game-btn').click();
+    await page
+      .locator('#start-game-btn')
+      .click(force ? { force: true } : undefined);
     await expect(modal).toHaveClass(/hidden/);
   }
   await dismissOwl(page);
