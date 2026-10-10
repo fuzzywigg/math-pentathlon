@@ -24,6 +24,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -32,9 +33,9 @@ const OUT_DIR = resolve(ROOT, 'docs/dev');
 const REPORT_MD = resolve(OUT_DIR, 'render-perf-2026-10.md');
 const REPORT_JSON = resolve(OUT_DIR, `render-perf-2026-10-${PHASE}.json`);
 
-const MOVE_TARGET = Number(process.env.PERF_MOVES || 20);
+const MOVE_TARGET = requireEnvNumber('PERF_MOVES', 20);
 const TABLET = { width: 768, height: 1024 };
-const CPU_RATE = Number(process.env.PERF_CPU_RATE || 4);
+const CPU_RATE = requireEnvNumber('PERF_CPU_RATE', 4);
 
 const BOARD3D_GAMES = new Set([
   'kings-quadraphages',

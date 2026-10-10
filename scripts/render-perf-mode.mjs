@@ -10,11 +10,12 @@
 
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 export const TABLET_VIEWPORT = { width: 768, height: 1024 };
-export const CPU_THROTTLE = Number(process.env.PERF_CPU_THROTTLE || 4);
-export const HOVER_SAMPLES = Number(process.env.PERF_HOVER_SAMPLES || 12);
-export const MOVE_TARGET_RENDER = Number(process.env.PERF_MOVES || 20);
+export const CPU_THROTTLE = requireEnvNumber('PERF_CPU_THROTTLE', 4);
+export const HOVER_SAMPLES = requireEnvNumber('PERF_HOVER_SAMPLES', 12);
+export const MOVE_TARGET_RENDER = requireEnvNumber('PERF_MOVES', 20);
 
 const HOVER_GAMES = new Set(['juggle', 'pent-em-in']);
 

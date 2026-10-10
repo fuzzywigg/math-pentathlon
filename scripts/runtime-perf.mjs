@@ -22,6 +22,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 import {
   CPU_THROTTLE,
   MOVE_TARGET_RENDER,
@@ -45,9 +46,9 @@ const REPORT_JSON = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.json`);
 
 const MOVE_TARGET = RENDER_MODE
   ? MOVE_TARGET_RENDER
-  : Number(process.env.PERF_MOVES || 30);
-const NAV_CYCLES = Number(process.env.PERF_NAV_CYCLES || 5);
-const FRAME_SAMPLE_MS = Number(process.env.PERF_FRAME_MS || 2000);
+  : requireEnvNumber('PERF_MOVES', 30);
+const NAV_CYCLES = requireEnvNumber('PERF_NAV_CYCLES', 5);
+const FRAME_SAMPLE_MS = requireEnvNumber('PERF_FRAME_MS', 2000);
 const PERF_PHASE = process.env.PERF_PHASE || 'baseline';
 
 const BOARD3D_GAMES = new Set([

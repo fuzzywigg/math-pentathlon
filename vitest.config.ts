@@ -152,6 +152,8 @@ const nodePureFiles = [
   'tests/unit/offline-probe-cli-help.test.ts',
   // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
   'tests/unit/help-only-cli.test.ts',
+  // harness env Number() parser (q-mp-876); spawnSync CLI check needs node env.
+  'tests/unit/env-number.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

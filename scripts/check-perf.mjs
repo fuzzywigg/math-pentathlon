@@ -25,6 +25,7 @@ import {
   measureGameChunks,
   measureMenuCriticalPath,
 } from './check-bundle-budgets.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -34,7 +35,7 @@ const SUMMARY_MD = path.join(OUT_DIR, 'summary.md');
 const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
 
 const SKIP_LH = process.env.PERF_SKIP_LIGHTHOUSE === '1';
-const LH_TIMEOUT_MS = Number(process.env.PERF_LH_TIMEOUT_MS || 120_000);
+const LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
 
 /** Menu + 2D small + 2D heavier + 3D (FIAR board3d). */
 const LH_TARGETS = [
