@@ -1,11 +1,11 @@
 # Testing layers — live counts (2026-10-10)
 
 **Task id:** `q-mp-445` (remeasure after `q-mp-386` / tip post865 → tip post898; supersedes stale post865 stamp **3210** / **12768** and round-14 backlog target **3224** / **~12905**)  
-**Measured tip:** `cursor/mp-tip-post898` @ `b7e518b4` (full SHA `b7e518b4afe04556fa7e87ecba7ce97229b05bc7`)  
+**Measured tip:** `cursor/mp-tip-post898` @ `ad5a9f15` (full SHA `ad5a9f15ec9fcfc0b44f1e5ee000489423086181`)  
 **Measured on:** 2026-10-10 (UTC)  
 **Parent wiki:** [`docs/wiki/development.md`](../wiki/development.md) (testing guide from #475)
 
-Docs-only refresh of unit file / Vitest case counts for tip post898. Pin policy unchanged. No `src/` or AI/copy/rules changes. Round-14 backlog (`q-mp-445` / #921) cited **3224** / **~12905** @ mid-fold tip `788e8215`; live tip HEAD after folds through #915–#920 is **3234** / **12972**.
+Docs-only refresh of unit file / Vitest case counts for tip post898. Pin policy unchanged. No `src/` or AI/copy/rules changes. Round-14 backlog (`q-mp-445` / #921) cited **3224** / **~12905** @ mid-fold tip `788e8215`; live tip HEAD after tip fold of this remasure + #915–#920/#432 is **3235** / **12988**.
 
 ## Duplicate check (open drafts)
 
@@ -20,7 +20,7 @@ Docs-only refresh of unit file / Vitest case counts for tip post898. Pin policy 
 | [#915](https://github.com/fuzzywigg/math-pentathlon/pull/915)–[#920](https://github.com/fuzzywigg/math-pentathlon/pull/920) → post898 | UI cov / lint / dice residuals — not count cells                 | Orthogonal; leave open                                                                       |
 | [#921](https://github.com/fuzzywigg/math-pentathlon/pull/921) backlog 10e                                                             | Spec source for this task; not yet on tip                        | Leave open                                                                                   |
 | No open draft into `cursor/mp-tip-post898` for testing-layers counts                                                                  | —                                                                | This PR is the first post898 count remasure                                                  |
-| Prior stamps (`q-mp-386` / post865 @ `3908809d`)                                                                                      | Stale **3210** / **12768** on tip                                | Superseded by this remeasure (**3234** / **12972**)                                          |
+| Prior stamps (`q-mp-386` / post865 @ `3908809d`)                                                                                      | Stale **3210** / **12768** on tip                                | Superseded by this remeasure (**3235** / **12988**)                                          |
 | Backlog mid-fold target (`788e8215`)                                                                                                  | Stale **3224** / **~12905** vs tip HEAD                          | Remeasured live on post898                                                                   |
 | #658 `q-mp-063` unit CI headroom                                                                                                      | May change **unit wall time** (fixtures / virtual clocks)        | **Does not change file/case counts** — note only                                             |
 | `q-mp-437` tip-pointer (undrafted)                                                                                                    | Owns `AGENTS.md` + tip-name pointer lines                        | Serialize: this task owns **count cells** + measurement tip SHA only                         |
@@ -43,15 +43,15 @@ npx playwright test --project=chromium --grep-invert @fullgame --list
 npx playwright test -c playwright.visual.config.ts --list
 ```
 
-## Live counts @ `b7e518b4`
+## Live counts @ `ad5a9f15`
 
 ### Unit (Vitest)
 
 | Metric                                                |        Count | Command                                                  |
 | ----------------------------------------------------- | -----------: | -------------------------------------------------------- |
-| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3234** | `npm run test:unit`                                      |
-| Cases listed (`npx vitest list`)                      |    **12972** | `npm run test:unit`                                      |
-| → `unit-shared` files / cases                         | 3147 / 12062 | `npx vitest run --project unit-shared`                   |
+| Files under `tests/unit` (excl. `_tokenmaxx_archive`) |     **3235** | `npm run test:unit`                                      |
+| Cases listed (`npx vitest list`)                      |    **12988** | `npm run test:unit`                                      |
+| → `unit-shared` files / cases                         | 3148 / 12078 | `npx vitest run --project unit-shared`                   |
 | → `unit-node` files / cases                           |     36 / 380 | `npx vitest run --project unit-node`                     |
 | → `unit-isolated` files / cases                       |     51 / 530 | `npx vitest run --project unit-isolated`                 |
 | Watch / coverage                                      |            — | `npm run test:unit:watch` / `npm run test:unit:coverage` |
