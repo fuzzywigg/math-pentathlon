@@ -14,6 +14,9 @@
  * basenames; no comments/labels/closes per worker brief). L407 is exercised
  * via `Math.floor → NaN` (sole Math.floor sites in attribute-demo.ts).
  *
+ * Listed in `vitest.config.ts` `isolatedFiles` so hoisted router.navigate
+ * mock + Math.floor NaN spy cannot leak under isolate:false shuffle.
+ *
  * Constraints: tests only; zero `src/` edits; no copy / aria / label pins;
  * no AI / rules / scoring; no ratchet JSON; Hex Hard 450ms; no network.
  */
