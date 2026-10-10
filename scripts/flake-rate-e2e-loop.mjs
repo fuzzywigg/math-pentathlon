@@ -7,12 +7,37 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+const USAGE =
+  'Usage: node scripts/flake-rate-e2e-loop.mjs [--runs N] [--out DIR]\n' +
+  '  --runs N   positive integer (default 3)\n' +
+  '  --out DIR  output directory';
+
 const args = process.argv.slice(2);
+
+function usageExit(message) {
+  console.error(message);
+  console.error(USAGE);
+  process.exit(1);
+}
+
+/** Positive integer flag; rejects missing, non-numeric, and non-positive values. */
 function flag(name, def) {
   const i = args.indexOf(name);
   if (i === -1) return def;
-  return Number(args[i + 1] ?? def);
+  const raw = args[i + 1];
+  if (raw === undefined || raw.startsWith('--')) {
+    usageExit(`Missing value for ${name}`);
+  }
+  if (!/^\d+$/.test(raw)) {
+    usageExit(`Invalid ${name} value (need positive integer): ${raw}`);
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1) {
+    usageExit(`Invalid ${name} value (need positive integer): ${raw}`);
+  }
+  return n;
 }
+
 function strFlag(name, def) {
   const i = args.indexOf(name);
   if (i === -1) return def;
@@ -38,21 +63,35 @@ function ingest(jsonPath, runId) {
   for (const suite of data.suites || []) {
     const file = suite.file || suite.title || '';
     for (const spec of suite.specs || []) {
-      const title = [...(spec.tests?.[0]?.projectName ? [] : []), spec.title].join(' ');
+      const title = [
+        ...(spec.tests?.[0]?.projectName ? [] : []),
+        spec.title,
+      ].join(' ');
       const full = `${file}::${spec.title}`;
       for (const t of spec.tests || []) {
         for (const r of t.results || []) {
-          if (!byTest.has(full)) byTest.set(full, { passes: 0, fails: 0, durations: [], errors: [] });
+          if (!byTest.has(full))
+            byTest.set(full, {
+              passes: 0,
+              fails: 0,
+              durations: [],
+              errors: [],
+            });
           const rec = byTest.get(full);
           rec.durations.push(r.duration || 0);
           if (r.status === 'passed' || r.status === 'expected') {
             rec.passes += 1;
             passed += 1;
-          } else if (r.status === 'failed' || r.status === 'timedOut' || r.status === 'unexpected') {
+          } else if (
+            r.status === 'failed' ||
+            r.status === 'timedOut' ||
+            r.status === 'unexpected'
+          ) {
             rec.fails += 1;
             failed += 1;
             const msg = r.error?.message || r.errors?.[0]?.message || r.status;
-            if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
+            if (rec.errors.length < 3)
+              rec.errors.push(String(msg).slice(0, 400));
           }
         }
       }
@@ -100,9 +139,12 @@ for (let i = 1; i <= runs; i++) {
   fs.writeFileSync(jsonPath, result.stdout || '');
   fs.writeFileSync(
     logPath,
-    [`exit=${result.status}`, `elapsedMs=${Date.now() - started}`, '--- stderr ---', result.stderr || ''].join(
-      '\n'
-    )
+    [
+      `exit=${result.status}`,
+      `elapsedMs=${Date.now() - started}`,
+      '--- stderr ---',
+      result.stderr || '',
+    ].join('\n')
   );
   try {
     ingest(jsonPath, runId);
@@ -121,7 +163,9 @@ const failures = [...byTest.entries()]
     test: k,
     runs: v.passes + v.fails,
     failures: v.fails,
-    avgMs: Math.round(v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)),
+    avgMs: Math.round(
+      v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)
+    ),
     errors: v.errors,
   }))
   .sort((a, b) => b.failures - a.failures);
@@ -133,7 +177,10 @@ const summary = {
   failingCount: failures.length,
   generatedAt: new Date().toISOString(),
 };
-fs.writeFileSync(path.join(outDir, 'e2e-summary.json'), JSON.stringify(summary, null, 2));
+fs.writeFileSync(
+  path.join(outDir, 'e2e-summary.json'),
+  JSON.stringify(summary, null, 2)
+);
 
 const lines = [
   '# Chromium e2e flake rate summary',
@@ -143,7 +190,8 @@ const lines = [
   '| Run | OK | Passed | Failed | Flaky |',
   '| --- | --- | --- | --- | --- |',
   ...runSummaries.map(
-    (r) => `| ${r.runId} | ${r.ok} | ${r.passed ?? '?'} | ${r.failed ?? '?'} | ${r.flaky ?? 0} |`
+    (r) =>
+      `| ${r.runId} | ${r.ok} | ${r.passed ?? '?'} | ${r.failed ?? '?'} | ${r.flaky ?? 0} |`
   ),
   '',
   '## Tests with ≥1 failure',
@@ -155,8 +203,13 @@ if (failures.length === 0) {
   lines.push('| Test | Runs | Failures | Avg ms | Sample error |');
   lines.push('| --- | --- | --- | --- | --- |');
   for (const f of failures) {
-    const err = (f.errors[0] || '').replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 120);
-    lines.push(`| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.avgMs} | ${err} |`);
+    const err = (f.errors[0] || '')
+      .replace(/\|/g, '\\|')
+      .replace(/\n/g, ' ')
+      .slice(0, 120);
+    lines.push(
+      `| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.avgMs} | ${err} |`
+    );
   }
 }
 fs.writeFileSync(path.join(outDir, 'e2e-summary.md'), lines.join('\n'));
