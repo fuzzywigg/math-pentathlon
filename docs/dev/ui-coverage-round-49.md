@@ -9,7 +9,8 @@ untouched (different game: `src/games/hex`).
 **Base:** `cursor/mp-tip-post949` @ `18ee1c96` (remeasured; backlog “tip
 post914 / only 1 dedicated ui-cov file” is stale — live tip already has r29
 plus burn-wave / mp3d hosts; this round targets remaining board-ui empty-bank
-+ controller 3D/settle residual arms). Draft only — tip owner folds.
+
+- controller 3D/settle residual arms). Draft only — tip owner folds.
 
 ## Scope
 
@@ -29,11 +30,11 @@ comment/close.
 
 ## Overlap with open drafts
 
-| Draft                                                              | Action                                 |
-| ------------------------------------------------------------------ | -------------------------------------- |
-| `#892` hex-a-gone UI cov r29 (`q-mp-399`; already on tip)          | Prior round — leave open (`contained`) |
-| `#978`–`#988` tip post949 drafts (other hosts / docs / mutation)   | Orthogonal — leave open                |
-| No open draft into `cursor/mp-tip-post949` owns hex-a-gone UI r49  | —                                      |
+| Draft                                                             | Action                                 |
+| ----------------------------------------------------------------- | -------------------------------------- |
+| `#892` hex-a-gone UI cov r29 (`q-mp-399`; already on tip)         | Prior round — leave open (`contained`) |
+| `#978`–`#988` tip post949 drafts (other hosts / docs / mutation)  | Orthogonal — leave open                |
+| No open draft into `cursor/mp-tip-post949` owns hex-a-gone UI r49 | —                                      |
 
 ## Per-file / directory before → after
 
@@ -43,7 +44,7 @@ Focused hex-a-gone unit-shared suite (`tests/unit/*hex-a-gone*` under
 
 | File                                      | Before lines | Before branches | After lines | After branches | Δ lines (pp) | Δ branches (pp) |
 | ----------------------------------------- | -----------: | --------------: | ----------: | -------------: | -----------: | --------------: |
-| `src/games/hex-a-gone/board-ui.ts`        |       98.94% |          94.94% |   **100%** |     **96.96%** |    **+1.06** |       **+2.02** |
+| `src/games/hex-a-gone/board-ui.ts`        |       98.94% |          94.94% |    **100%** |     **96.96%** |    **+1.06** |       **+2.02** |
 | `src/games/hex-a-gone/game-controller.ts` |       82.05% |          75.23% |  **99.48%** |     **96.19%** |   **+17.43** |      **+20.96** |
 
 Residual arms left intentional: board-ui `placeHandler !== undefined`

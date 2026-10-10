@@ -103,7 +103,13 @@ describe('q-mp-518 ui-cov-r49 hex-a-gone board-ui residuals', () => {
       },
     };
     const el = document.createElement('div');
-    renderBoard(state, el, undefined, () => undefined, () => undefined);
+    renderBoard(
+      state,
+      el,
+      undefined,
+      () => undefined,
+      () => undefined
+    );
     const emptyHex = el.querySelector(
       '.hex-a-gone-block-btn[data-shape="hexagon"]'
     ) as HTMLButtonElement;
@@ -136,9 +142,7 @@ describe('q-mp-518 ui-cov-r49 hex-a-gone board-ui residuals', () => {
     const filled: HexAGoneGameState = {
       ...base,
       board: base.board.map((c, i) =>
-        i === 0
-          ? { ...c, filled: true, filledBy: 'player1', blockId: 99 }
-          : c
+        i === 0 ? { ...c, filled: true, filledBy: 'player1', blockId: 99 } : c
       ),
       // No placedBlocks entry at this q/r → BLOCK_COLORS fill attribute skipped.
       placedBlocks: [],
