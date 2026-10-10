@@ -44,7 +44,7 @@
     "vitestListCount": 13100,
     "typecheckOutOfScope": 216,
     "hexHardMs": 450,
-    "checkDevDocsScannedBefore": 234,
+    "checkDevDocsScannedBefore": 233,
     "knipUnusedTypesLive": 32,
     "knipUnusedTypesBaseline": 36,
     "knipUnusedExports": 3,
