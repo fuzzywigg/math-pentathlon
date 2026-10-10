@@ -189,10 +189,10 @@ function wrapGridCellsInRows(grid: Element): void {
       }
 
       for (const [, rowCells] of byRow) {
-        if (rowCells.length === 0) {
+        const first = rowCells[0];
+        if (!first) {
           continue;
         }
-        const first = rowCells[0]!;
         const row = isSvg
           ? document.createElementNS(SVG_NS, 'g')
           : document.createElement('div');
@@ -254,7 +254,10 @@ function ensureRowgroupAncestors(from: Element, grid: Element): void {
     return;
   }
 
-  const top = chain[chain.length - 1]!;
+  const top = chain[chain.length - 1];
+  if (!top) {
+    return;
+  }
   if (
     top.getAttribute('role') !== 'row' &&
     top.getAttribute('role') !== 'grid'
@@ -262,7 +265,10 @@ function ensureRowgroupAncestors(from: Element, grid: Element): void {
     top.setAttribute('role', 'rowgroup');
   }
   for (let i = 0; i < chain.length - 1; i++) {
-    const el = chain[i]!;
+    const el = chain[i];
+    if (!el) {
+      continue;
+    }
     const role = el.getAttribute('role');
     if (!role || role === 'rowgroup') {
       el.setAttribute('role', 'presentation');
@@ -414,11 +420,16 @@ export function bindGridNavigation(boardEl: Element): void {
     if (!next) {
       return;
     }
+    const nextRow = next.getAttribute('data-row');
+    const nextCol = next.getAttribute('data-col');
+    if (nextRow === null || nextCol === null) {
+      return;
+    }
 
     ke.preventDefault();
     applyRovingTabindex(cells, {
-      row: next.getAttribute('data-row')!,
-      col: next.getAttribute('data-col')!,
+      row: nextRow,
+      col: nextCol,
     });
     focusBoardEl(next);
   });
