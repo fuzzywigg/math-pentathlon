@@ -1,6 +1,6 @@
 # q-mp-239 — `src/ui/three/*-board-3d` layout-read inventory
 
-> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`). Intermediate stamps: [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`), [`board3d-layout-reads-inventory-post830-2026-10-10.md`](./board3d-layout-reads-inventory-post830-2026-10-10.md) (`q-mp-384`).
+> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post914-2026-10-10.md`](./board3d-layout-reads-inventory-post914-2026-10-10.md) (`q-mp-490`). Intermediate stamps: [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`), [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`), [`board3d-layout-reads-inventory-post830-2026-10-10.md`](./board3d-layout-reads-inventory-post830-2026-10-10.md) (`q-mp-384`).
 
 **Task id:** `q-mp-239`  
 **Role:** worker (docs / visual only)  
