@@ -98,6 +98,26 @@ async function neutralizeOwl(page: Page): Promise<void> {
   });
 }
 
+/**
+ * One paint after modal close / owl hide — condition wait, not a fixed sleep.
+ * Owl must already be neutralized (`visibility: hidden`) or absent.
+ */
+async function waitForPostNeutralizePaint(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const owl = document.getElementById('ollie-owl');
+    if (owl && (owl as HTMLElement).style.visibility !== 'hidden') {
+      return false;
+    }
+    return document.fonts?.status === 'loaded' || !document.fonts;
+  });
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
 export async function waitForGameReady(page: Page): Promise<void> {
   await sharedWaitForGameReady(page);
 }
@@ -120,8 +140,7 @@ export async function openGameOpening(page: Page, gameId: string): Promise<void>
   }
 
   await neutralizeOwl(page);
-  // One paint after modal close / owl hide.
-  await page.waitForTimeout(100);
+  await waitForPostNeutralizePaint(page);
 }
 
 export async function openStartScreen(page: Page): Promise<void> {
@@ -131,7 +150,7 @@ export async function openStartScreen(page: Page): Promise<void> {
   await disableCssMotion(page);
   await waitForFonts(page);
   await neutralizeOwl(page);
-  await page.waitForTimeout(100);
+  await waitForPostNeutralizePaint(page);
 }
 
 /** Shared toHaveScreenshot options for cross-run stability. */
