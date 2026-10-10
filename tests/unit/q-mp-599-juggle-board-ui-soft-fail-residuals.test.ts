@@ -1,7 +1,7 @@
 /**
  * q-mp-599 — Characterize `juggle/board-ui` soft-fail residuals (tests-only).
  *
- * Live tip re-measure (`cursor/mp-tip-post1012` @ `290c08bb`):
+ * Live tip re-measure (`cursor/mp-tip-post1012` @ `3f9c3e4e`):
  *   `board-ui.ts` **681** LOC (matches backlog)
  *   Dedicated `*juggle*` unit files before this suite: **83**
  *   Dedicated `*juggle*soft-fail*` residual files before: **0**
