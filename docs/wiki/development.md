@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post1059` (cut from `alpha` @ `1c31a1ea` after #1059 squash-merge, 2026-10-10): tip-owner fold in progress on draft tip PR #1083; live unit suite **3341** files / **14072** listed cases inherited from alpha @ `1c31a1ea` (remeasure after each fold). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post1059` (cut from `alpha` @ `1c31a1ea` after #1059 squash-merge, 2026-10-10): tip-owner fold in progress on draft tip PR #1083; live unit suite **3341** files / **14072** listed cases inherited from alpha @ `1c31a1ea` (remeasure after each fold). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Merged [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) (`q-mp-063`) improved unit **timing** (headroom) without changing these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -153,7 +153,7 @@ Stack of checks builders should know. Required CI paths stay green on Chromium u
 | Visual (opt-in config)      | **1** file / **21** cases; **21** PNGs                       | `playwright.visual.config.ts`                          | `npm run test:visual` / `test:visual:update` (**not** CI) — [`docs/visual-regression.md`](../visual-regression.md)                     |
 | Playtest                    | **4** `.mjs` harnesses · **15** report `.md`                 | Headless Chromium scripts (no npm script)              | `node tests/playtest/…` / `node docs/playtest/…` with `npm run dev`                                                                    |
 | Bench (engines)             | **1** file (`tests/bench/engines-rules.bench.ts`)            | Vitest engines-bench config                            | `npm run bench:engines`                                                                                                                |
-| Axe a11y sweep              | (inside Chromium e2e set)                                    | `@axe-core/playwright`                                 | `npm run test:e2e -- --project=chromium tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
+| Axe a11y sweep              | (inside Chromium e2e set)                                    | `@axe-core/playwright`                                 | `npm run test:e2e:chromium -- tests/e2e/a11y-sweep.spec.ts` — [`docs/a11y-sweep-2026-10-07.md`](../a11y-sweep-2026-10-07.md) |
 | Round-trip fuzz             | (inside unit set)                                            | Vitest property tests                                  | [`docs/state-roundtrip-2026-10-07.md`](../state-roundtrip-2026-10-07.md); `tests/unit/state-roundtrip-fuzz.test.ts`                    |
 | Undo / move-log audit       | (inside unit set)                                            | Vitest property tests                                  | [`docs/undo-audit-2026-10-07.md`](../undo-audit-2026-10-07.md); `tests/unit/undo-audit-*.test.ts`                                      |
 
