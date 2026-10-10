@@ -2,8 +2,8 @@
 
 **Task id:** `q-mp-510`  
 **Role:** worker (docs / data / chart only)  
-**Tip audited:** `cursor/mp-tip-post949` @ `5f24bdfe` (full `5f24bdfe40aa1d89f07dccad1c774784b1a489cf`)  
-**Measured at:** `2026-10-10T12:20:34Z` (UTC)  
+**Tip audited:** `cursor/mp-tip-post949` @ `8698fffb` (full `8698fffb85b1e3d2289e54a665fac6162d3bdee4`)  
+**Measured at:** `2026-10-10T12:20:34Z` (UTC; re-confirmed after tip rebase @ `8698fffb`)  
 **Machine summary:** [`optional-chain-residuals-post949-2026-10-10.json`](./optional-chain-residuals-post949-2026-10-10.json)  
 **Chart:** [`optional-chain-residuals-post949-2026-10-10.svg`](./optional-chain-residuals-post949-2026-10-10.svg)  
 **Scope:** Dated **report-only** overlay inventory of ceilinged `@typescript-eslint/prefer-optional-chain` debt. **No `src/` edits. No ceiling raises. No product clears in `*/rules.ts` / `*/ai.ts`.**
@@ -34,7 +34,7 @@ Prior context: `q-mp-148` cleared non-HOLD optional-chain debt and set ceiling *
 
 | Related draft / prior | Overlap | Action |
 | --- | --- | --- |
-| Open drafts into `cursor/mp-tip-post949` | *(none at start)* | Proceed |
+| Tip post949 peers `#978`–`#985` (void / return-await / radix / knip / …) | Sibling round-17 workers; none is optional-chain inventory | Leave open |
 | [#971](https://github.com/fuzzywigg/math-pentathlon/pull/971) `q-mp-090q` backlog 10h | Defines this task; does not ship the inventory | Leave open |
 | [#955](https://github.com/fuzzywigg/math-pentathlon/pull/955) `q-mp-090p` round-16 | Spec: did **not** claim optional-chain inventory | Leave open |
 | [#965](https://github.com/fuzzywigg/math-pentathlon/pull/965) `q-mp-491` lint-bucket snapshot | All-rule ceiling snapshot (includes optional-chain totals) | Complementary; leave open |
@@ -46,8 +46,9 @@ No open draft already owns a dedicated prefer-optional-chain residual inventory 
 ## Method (live tip)
 
 ```text
-$ git rev-parse HEAD
-  5f24bdfe40aa1d89f07dccad1c774784b1a489cf
+$ git rev-parse origin/cursor/mp-tip-post949
+  8698fffb85b1e3d2289e54a665fac6162d3bdee4
+  # tip advanced from cut SHA 5f24bdfe via q-mp-026o tip-pointer docs only
 
 $ npm run lint:ratchet
   ok   @typescript-eslint/prefer-optional-chain: 21 / ceiling 21
@@ -81,14 +82,14 @@ Probe matches [`scripts/check-lint-ratchet.mjs`](../../scripts/check-lint-ratche
 
 ## Before → after metrics (report-only stamp)
 
-| Metric | Spec backlog (`q-mp-510` @ post914) | Live tip post949 `5f24bdfe` | This PR |
+| Metric | Spec backlog (`q-mp-510` @ post914) | Live tip post949 `8698fffb` | This PR |
 | --- | ---: | ---: | --- |
 | `prefer-optional-chain` live | **21** | **21** | Docs only |
 | Ceiling | **21** | **21** | **unchanged** (no raise) |
 | Headroom | 0 | 0 | 0 |
 | Densest file | `kwatro-sinko/rules.ts` **4** | same **4** | same |
 | Hosts outside `rules.ts`/`ai.ts` | 0 | **0** | 0 clearable |
-| Tip SHA stamp | `f5d3d04a` evidence | **`5f24bdfe`** | inventory + SVG + JSON |
+| Tip SHA stamp | `f5d3d04a` evidence | **`8698fffb`** (cut `5f24bdfe`) | inventory + SVG + JSON |
 
 **Spec staleness:** backlog named tip post914; live post949 optional-chain **totals and file map are identical** to the backlog stamp (flat **21**/21). Tip-adjacent ceilings elsewhere moved (e.g. void ceiling **50** on tip vs backlog **51**) — out of scope for this inventory.
 
@@ -103,7 +104,7 @@ Probe matches [`scripts/check-lint-ratchet.mjs`](../../scripts/check-lint-ratche
 | `CLEARABLE` | **0** | No non-HOLD product hosts remain |
 | Total live | **21** | Matches `lint:ratchet` / `report:lint-buckets` |
 
-## Per-file inventory (tip `5f24bdfe`)
+## Per-file inventory (tip `8698fffb`)
 
 | File | Hits | Lines | Disposition |
 | --- | ---: | --- | --- |
