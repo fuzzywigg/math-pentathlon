@@ -23,7 +23,7 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
-import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { gotoGame, startHuman } from './lib/page-ready.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -77,35 +77,6 @@ const filter = (process.env.PERF_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
-
-async function waitReady(page) {
-  await page
-    .locator('[data-testid="game-loading"]')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 20_000 });
-}
-
-async function gotoGame(page, baseURL, gameId, board3d) {
-  const q = board3d ? '?board3d=1' : '';
-  await page.goto(`${baseURL}/${q}#/game/${gameId}`, {
-    waitUntil: 'domcontentloaded',
-  });
-  await waitReady(page);
-  await dismissOwl(page);
-}
-
-async function startHuman(page) {
-  await dismissOwl(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) await human.click();
-    await page.locator('#start-game-btn').click();
-    await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  }
-  await dismissOwl(page);
-}
 
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {
