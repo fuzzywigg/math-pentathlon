@@ -1,0 +1,89 @@
+{
+  "taskId": "q-mp-513",
+  "title": "Knip unusedExports inventory (tip post949)",
+  "measuredAt": "2026-10-10T12:20:28Z",
+  "tipBranch": "cursor/mp-tip-post949",
+  "tipSha": "5f24bdfe40aa1d89f07dccad1c774784b1a489cf",
+  "tipShaShort": "5f24bdfe",
+  "knipPinnedVersion": "5.88.1",
+  "knipUnpinnedSampleVersion": "6.41.0",
+  "scope": "unusedExports inventory only; no baseline write; no src edits",
+  "baseline": {
+    "path": "docs/dev/knip-baseline.json",
+    "unusedExports": 3,
+    "unusedTypes": 36,
+    "unlisted": 3,
+    "duplicates": 0
+  },
+  "liveReportKnip": {
+    "unusedFiles": 0,
+    "unusedExports": 3,
+    "unusedTypes": 32,
+    "unusedDependencies": 0,
+    "unusedDevDependencies": 0,
+    "unlisted": 3,
+    "duplicates": 0
+  },
+  "countDelta": {
+    "reportKnipPinned5881": 3,
+    "knip5881IncludeExportsNamed": 3,
+    "knip5881DefaultCompactFileGroups": 2,
+    "knip6410IncludeExportsNamed": 1,
+    "note": "Unpinned knip 6.x drops storage barrel pair; report:knip stays on 5.88.1 and reports 3. Backlog 'text 1' matches unpinned 6.x."
+  },
+  "hexHardMs": 450,
+  "unusedExports": [
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "isPlainProgressObject",
+      "line": 8,
+      "disposition": "LEAVE_STORAGE_BARREL",
+      "note": "Barrel re-export; canonical in migrate.ts; used by storage.ts"
+    },
+    {
+      "file": "src/core/storage/index.ts",
+      "name": "sanitizeSettings",
+      "line": 13,
+      "disposition": "LEAVE_STORAGE_BARREL",
+      "note": "Barrel re-export; canonical in sanitize.ts; used by storage.ts / migrate.ts"
+    },
+    {
+      "file": "src/games/fab-a-diffy/ai-client.ts",
+      "name": "cancelFabAiRequests",
+      "line": 59,
+      "disposition": "EXCLUDED_Q_MP_253",
+      "exportAlias": "fabAiClient",
+      "note": "Owned by undrafted q-mp-253; do not delete from this ticket"
+    }
+  ],
+  "dispositionCounts": {
+    "LEAVE_STORAGE_BARREL": 2,
+    "EXCLUDED_Q_MP_253": 1
+  },
+  "outOfScope": [
+    "cancelFabAiRequests delete (q-mp-253)",
+    "storage barrel demote/remove",
+    "unusedTypes demotes (#947 / #955 / 508)",
+    "knip-baseline.json edits",
+    "src/ or test behavior changes",
+    "AI / rules.ts / scoring / player-facing copy"
+  ],
+  "related": {
+    "baseline": "docs/dev/knip-baseline.json",
+    "report": "docs/dev/knip-report.md",
+    "metricsDriftPost914": "docs/dev/knip-live-metrics-drift-inventory-post914-2026-10-10.md",
+    "rank3Inventory": "docs/dev/knip-rank3-unused-types-inventory-2026-10-10.md",
+    "backlog": "docs/dev/backlog-2026-10-10h.md",
+    "openDraftsChecked": [
+      "#947",
+      "#955",
+      "#971"
+    ],
+    "openDraftsIntoPost949": []
+  },
+  "specStaleness": {
+    "backlogTipLabel": "cursor/mp-tip-post914",
+    "liveTip": "cursor/mp-tip-post949",
+    "exportCountsUnchanged": true
+  }
+}
