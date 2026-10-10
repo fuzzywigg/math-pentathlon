@@ -1,0 +1,135 @@
+{
+  "taskId": "q-mp-507-mutation-audit-ui-17",
+  "generatedAt": "2026-10-10T10:01:37.445Z",
+  "harness": "node_modules/.cache/mutation-ui-17/mutation-report-ui.mjs (custom AST; Stryker not used)",
+  "options": {
+    "max": 20,
+    "timeoutMs": 90000,
+    "modules": [
+      "src/ui/components/game-shell.ts",
+      "src/core/alignment/highlight-ui.ts",
+      "src/core/storage/sanitize.ts"
+    ],
+    "excludeTests": null,
+    "preferPrefix": "mutation-ui17"
+  },
+  "results": [
+    {
+      "module": "src/ui/components/game-shell.ts",
+      "lines": 639,
+      "tests": [
+        "tests/unit/mutation-ui17-game-shell.test.ts",
+        "tests/unit/a11y-shell-menu-keepers.test.ts",
+        "tests/unit/a11y-shell.test.ts",
+        "tests/unit/burn-1007-game-route-mounts.test.ts",
+        "tests/unit/burn-1008-ui-cov-r3-shell-menu.test.ts",
+        "tests/unit/burn-1008-ui-cov-r5-storage-shell.test.ts",
+        "tests/unit/burn-wave24-game-shell.test.ts",
+        "tests/unit/burn-wave36-shell-ai-default-difficulty.test.ts",
+        "tests/unit/burn-wave36-shell-newgame-backdrop.test.ts",
+        "tests/unit/burn-wave40-handshake-inspect-shell.test.ts",
+        "tests/unit/burn-wave40-shell-difficulty-toggle.test.ts",
+        "tests/unit/burn-wave40-shell-escape-help-backdrop.test.ts",
+        "tests/unit/burn-wave40-shell-optional-callbacks.test.ts",
+        "tests/unit/burn-wave41-multiplayer-empty-lobby-shell.test.ts",
+        "tests/unit/burn-wave41-multiplayer-host-disconnect-stubs.test.ts",
+        "tests/unit/burn-wave41-multiplayer-late-join-serialize.test.ts",
+        "tests/unit/burn-wave41-multiplayer-lobby-escape-coexist.test.ts",
+        "tests/unit/burn-wave41-multiplayer-sync-handshake.test.ts",
+        "tests/unit/burn-wave44-handshake-a11y-shell-status.test.ts",
+        "tests/unit/burn-wave44-handshake-fab-shell-mount.test.ts",
+        "tests/unit/burn-wave44-ui-shell-help-back-home.test.ts",
+        "tests/unit/burn-wave44-ui-shell-mode-order-ai-first.test.ts",
+        "tests/unit/burn-wave44-ui-shell-mount-defaults.test.ts",
+        "tests/unit/burn-wave44-ui-shell-start-ai-chrome.test.ts",
+        "tests/unit/burn-wave44-ui-shell-tutorial-history-flags.test.ts",
+        "tests/unit/game-shell-soft-fail-chrome.test.ts",
+        "tests/unit/keyboard-a11y-shell-modals.test.ts",
+        "tests/unit/keyboard-sr-modal-focus-trap.test.ts",
+        "tests/unit/mutation-ui7-game-shell.test.ts",
+        "tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts",
+        "tests/unit/shell-preload-policy.test.ts",
+        "tests/unit/sr-semantics-structure.test.ts"
+      ],
+      "availableMutants": 97,
+      "ranMutants": 20,
+      "killed": 17,
+      "survived": 3,
+      "timeout": 0,
+      "error": 0,
+      "score": 85,
+      "skipped": false,
+      "survivors": [
+        {
+          "id": "m13",
+          "kind": "Logical",
+          "line": 109,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m14",
+          "kind": "Logical",
+          "line": 109,
+          "description": "flip || \u2192 &&",
+          "outcome": "survived"
+        },
+        {
+          "id": "m15",
+          "kind": "BooleanLiteral",
+          "line": 113,
+          "description": "false \u2192 true",
+          "outcome": "survived"
+        }
+      ]
+    },
+    {
+      "module": "src/core/alignment/highlight-ui.ts",
+      "lines": 347,
+      "tests": [
+        "tests/unit/mutation-ui17-highlight-ui.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-demos-highlight.test.ts",
+        "tests/unit/burn-wave22-highlight-ui.test.ts",
+        "tests/unit/burn-wave39-align-highlight-empty-path.test.ts",
+        "tests/unit/burn-wave39-handshake-poly-align-empty.test.ts",
+        "tests/unit/burn-wave39-highlight-path-mark-clear.test.ts",
+        "tests/unit/burn-wave40-handshake-highlight-align.test.ts",
+        "tests/unit/burn-wave40-highlight-create-align-inject.test.ts",
+        "tests/unit/burn-wave40-highlight-custom-clear.test.ts",
+        "tests/unit/burn-wave40-highlight-overlay-empty.test.ts",
+        "tests/unit/engine-coverage-round-13-burn-1008.test.ts",
+        "tests/unit/overnight-wave52-handshake-graph-poly-align-owl-exports.test.ts",
+        "tests/unit/overnight-wave55-core-align-animate-has.test.ts"
+      ],
+      "availableMutants": 34,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    },
+    {
+      "module": "src/core/storage/sanitize.ts",
+      "lines": 255,
+      "tests": [
+        "tests/unit/mutation-ui17-storage-sanitize.test.ts",
+        "tests/unit/burn-1008-ui-cov-r2-shell-helpers.test.ts",
+        "tests/unit/engine-coverage-round-10-burn-1008.test.ts",
+        "tests/unit/mutation-ui-storage-sanitize.test.ts",
+        "tests/unit/storage-sanitize-security.test.ts"
+      ],
+      "availableMutants": 66,
+      "ranMutants": 20,
+      "killed": 20,
+      "survived": 0,
+      "timeout": 0,
+      "error": 0,
+      "score": 100,
+      "skipped": false,
+      "survivors": []
+    }
+  ]
+}
