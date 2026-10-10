@@ -43,6 +43,11 @@ const isolatedFiles = [
   'tests/unit/burn-1007-main-shell-routes.test.ts',
   // q-mp-353: game-route-mounts soft-fail matrix — same hoisted controller mocks.
   'tests/unit/q-mp-353-game-route-mounts-soft-fail.test.ts',
+  // mutation-ui19 + q-mp-549: same hoisted controller mocks (were shared-pool).
+  'tests/unit/mutation-ui19-game-route-mounts.test.ts',
+  'tests/unit/q-mp-549-game-route-mounts-soft-fail-residuals.test.ts',
+  // q-mp-677: residual branch matrix — same hoisted controller mocks.
+  'tests/unit/q-mp-677-game-route-mounts-residual-branches.test.ts',
   // q-mp-299: main.ts soft-fail characterization — same hoisted PWA/demo mocks.
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
   // q-mp-422: router soft-fail matrix — vi.resetModules for module-default 404.
