@@ -49,8 +49,7 @@ const MOUNT: Record<string, string> = {
     '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
 };
 
-type ModeId =
-  'forced-colors+reduce' | 'color-scheme-dark' | 'color-scheme-light';
+type ModeId = 'forced-colors+reduce' | 'color-scheme-dark' | 'color-scheme-light';
 
 type Issue = {
   kind:
@@ -144,10 +143,7 @@ async function probeMount(
   }, selector);
 }
 
-async function probeFocusOutline(
-  page: Page,
-  selector: string
-): Promise<{
+async function probeFocusOutline(page: Page, selector: string): Promise<{
   found: boolean;
   outlineStyle: string;
   outlineWidth: string;
@@ -174,18 +170,14 @@ async function probeFocusOutline(
   }, selector);
 }
 
-async function probeReducedTransition(
-  page: Page,
-  selector: string
-): Promise<{
+async function probeReducedTransition(page: Page, selector: string): Promise<{
   found: boolean;
   transitionMs: number;
 }> {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel) as HTMLElement | null;
     if (!el) return { found: false, transitionMs: Number.NaN };
-    const raw =
-      getComputedStyle(el).transitionDuration.split(',')[0]?.trim() ?? '';
+    const raw = getComputedStyle(el).transitionDuration.split(',')[0]?.trim() ?? '';
     let ms = Number.NaN;
     if (raw.endsWith('ms')) ms = parseFloat(raw);
     else if (raw.endsWith('s')) ms = parseFloat(raw) * 1000;
@@ -195,10 +187,7 @@ async function probeReducedTransition(
 
 function writeReport(report: ScreenReport): void {
   ensureReportDirs();
-  const file = path.join(
-    REPORT_ROOT,
-    `${report.screenId}__${report.mode.replace(/[^a-z0-9+-]+/gi, '_')}.json`
-  );
+  const file = path.join(REPORT_ROOT, `${report.screenId}__${report.mode.replace(/[^a-z0-9+-]+/gi, '_')}.json`);
   fs.writeFileSync(file, JSON.stringify(report, null, 2));
 }
 
@@ -265,9 +254,7 @@ test.describe('forced-colors + reduced-motion smoke', () => {
         detail: `.game-card outlineStyle=${focus.outlineStyle || 'missing'}`,
       });
     } else {
-      notes.push(
-        `game-card outline=${focus.outlineStyle} ${focus.outlineWidth}`
-      );
+      notes.push(`game-card outline=${focus.outlineStyle} ${focus.outlineWidth}`);
     }
 
     const motion = await probeReducedTransition(page, '.game-card');
@@ -278,11 +265,7 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       });
     }
 
-    const screenshot = await captureShot(
-      page,
-      'menu-home',
-      'forced-colors+reduce'
-    );
+    const screenshot = await captureShot(page, 'menu-home', 'forced-colors+reduce');
     const report: ScreenReport = {
       screenId: 'menu-home',
       mode: 'forced-colors+reduce',
@@ -526,10 +509,7 @@ test.describe('forced-colors + reduced-motion smoke', () => {
       const s = getComputedStyle(h1);
       const color = s.color;
       const bg = getComputedStyle(document.body).backgroundColor;
-      return {
-        ok: color !== bg && color !== 'rgba(0, 0, 0, 0)',
-        reason: `${color} vs ${bg}`,
-      };
+      return { ok: color !== bg && color !== 'rgba(0, 0, 0, 0)', reason: `${color} vs ${bg}` };
     });
     if (!contrast.ok) {
       issues.push({
