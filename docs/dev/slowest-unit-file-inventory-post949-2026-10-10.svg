@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="400" viewBox="0 0 820 400" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-573 slowest unit-file inventory (tip post977 remasure of post949 task)</title>
+  <desc id="desc">Top 10 unit files under CI=1 on tip 67cc7802. Suite 3280 files / 13458 cases. Top-20 share 80.9%% of reported test time. Hex Hard 450ms untouched.</desc>
+  <rect width="820" height="400" fill="#f2f5f8"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2533">q-mp-573 / slowest unit files (post949 task @ post977)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5a6a">tip 67cc7802 · CI=1 · 3280 files · top-20 488.6s / 604.03s (80.9%) · report-only</text>
+  <text x="24" y="96" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">shard-d</text>
+  <rect x="140" y="80" width="531" height="22" fill="#3d5a80"/>
+  <text x="679" y="96" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">132.85s</text>
+  <text x="24" y="128" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">shard-e</text>
+  <rect x="140" y="112" width="346" height="22" fill="#3d5a80"/>
+  <text x="494" y="128" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">86.56s</text>
+  <text x="24" y="160" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">shard-a</text>
+  <rect x="140" y="144" width="318" height="22" fill="#3d5a80"/>
+  <text x="466" y="160" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">79.56s</text>
+  <text x="24" y="192" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">shard-c</text>
+  <rect x="140" y="176" width="183" height="22" fill="#3d5a80"/>
+  <text x="331" y="192" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">45.82s</text>
+  <text x="24" y="224" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">calib</text>
+  <rect x="140" y="208" width="137" height="22" fill="#3d5a80"/>
+  <text x="285" y="224" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">34.46s</text>
+  <text x="24" y="256" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">roundtrip</text>
+  <rect x="140" y="240" width="109" height="22" fill="#6b8f71"/>
+  <text x="257" y="256" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">27.38s</text>
+  <text x="24" y="288" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">invariants</text>
+  <rect x="140" y="272" width="64" height="22" fill="#6b8f71"/>
+  <text x="212" y="288" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">16.00s</text>
+  <text x="24" y="320" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">controllers</text>
+  <rect x="140" y="304" width="45" height="22" fill="#6b8f71"/>
+  <text x="193" y="320" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">11.25s</text>
+  <text x="24" y="352" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">w12-ai</text>
+  <rect x="140" y="336" width="30" height="22" fill="#3d5a80"/>
+  <text x="178" y="352" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">7.51s</text>
+  <text x="24" y="384" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">shard-b</text>
+  <rect x="140" y="368" width="26" height="22" fill="#3d5a80"/>
+  <text x="174" y="384" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#1a2533">6.71s</text>
+  <text x="24" y="370" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#4a5a6a">Blue bars: AI HOLD (determinism / calibration / win-draw). Green: harness-split candidates (no AI timing edits).</text>
+  <text x="24" y="390" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#5b6b7b">Hex Hard pin stays hard: 450 — no product / AI deadline edits in this PR.</text>
+</svg>
