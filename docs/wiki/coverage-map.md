@@ -1,10 +1,10 @@
 # Unit coverage heat map
 
-**Task id:** `q-mp-442` (regenerate after tip post898 cut + suite **3224**/live **3235**; supersedes `q-mp-417` / `q-mp-336` / `q-mp-311` / `q-mp-286` / `q-mp-261`; wiki visual originally `q-mp-171`)
+**Task id:** `q-mp-492` (regenerate after tip post914 cut + suite **3242**/live **3245**; supersedes `q-mp-442` / `q-mp-417` / `q-mp-336` / `q-mp-311` / `q-mp-286` / `q-mp-261`; wiki visual originally `q-mp-171`)
 **Scope:** Dev / wiki visuals only — no `src/` product edits, no AI timing or player-facing copy changes.
 **Canonical artifacts:** [`docs/dev/coverage-map.md`](../dev/coverage-map.md) + [`docs/dev/coverage-map.svg`](../dev/coverage-map.svg).
 
-Per-directory vitest unit coverage (`json-summary`), sorted by **lines %** ascending so cold spots surface first. Regenerated on tip `cursor/mp-tip-post898` @ `788b4558` from a fresh `npm run test:unit:coverage` (stamp in the SVG title / generated-at line of the dev doc).
+Per-directory vitest unit coverage (`json-summary`), sorted by **lines %** ascending so cold spots surface first. Regenerated on tip `cursor/mp-tip-post914` @ `63322f39` from a fresh `npm run test:unit:coverage` measured at src-identical `f5d3d04a` (tip advanced docs-only after measure; stamp in the SVG title / generated-at line of the dev doc).
 
 ## Coldest directories (lines %)
 
@@ -15,13 +15,13 @@ Live tip measurement after regenerate (38 directories under `src/`):
 | `src`                     |   87.25 |      69.64 |     1 |
 | `src/games/queens-guards` |   93.42 |      91.17 |     9 |
 | `src/ui/three`            |   94.26 |      80.02 |    13 |
-| `src/games/fiar`          |   94.28 |      86.34 |    10 |
 | `src/games/hex`           |   94.63 |      92.21 |     8 |
+| `src/games/fiar`          |   94.86 |      87.10 |    10 |
+| `src/games/ramrod`        |   95.47 |      90.00 |     6 |
 | `src/games/star-track`    |   95.47 |      89.56 |     7 |
-| `src/games/ramrod`        |   95.66 |      90.34 |     6 |
 | `src/ui/owl`              |   96.10 |      85.43 |     2 |
 
-Repo-wide on that run: **97.43%** lines (23283/23897), **92.31%** branches. Coverage vitest files: **3235** (3233 passed | 2 skipped). Spec cited suite **3224**; live tip after post898 folds is **3235**.
+Repo-wide on that run: **97.45%** lines (23290/23897), **92.45%** branches. Coverage vitest files: **3245** (3243 passed | 2 skipped). Spec cited suite **3242**; live tip after post914 soft-fail characterization folds is **3245**. Hex Hard stays **450ms**; no timing/threshold edits.
 
 ## Full heat table (SVG)
 
@@ -35,7 +35,7 @@ npm run report:coverage-map
 npm run check:dev-docs
 ```
 
-Under coverage instrumentation, the local AI move-time mid-game bench can still emit **fab-a-diffy** / **fiar** / determinism `hardFlags` flakes. Do **not** change AI timing asserts or thresholds to silence those — note them in the PR instead (Hex Hard stays **450ms**). This post898 regenerate completed with EXIT 0 (no flakes).
+Under coverage instrumentation, the local AI move-time mid-game bench can still emit **fab-a-diffy** / **fiar** / determinism `hardFlags` flakes. Do **not** change AI timing asserts or thresholds to silence those — note them in the PR instead (Hex Hard stays **450ms**). This post914 regenerate completed with EXIT 0 (no flakes).
 
 ## Related
 
