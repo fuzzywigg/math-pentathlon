@@ -55,7 +55,7 @@ Existing drafts are left open (not merged, closed, or retargeted).
 
 ### Tip hygiene (not a standalone PR)
 
-- `tests/unit/hex-deep-playability.test.ts` still expected Hard `AI_PLAY_DEADLINE_MS=2500` while tip `#472/#476` sets `450`. Assertion updated to match tip (tests only; no AI behavior change).
+- Historical note (suite removed from tip — not a live path): hex-deep-playability.test.ts once expected Hard `AI_PLAY_DEADLINE_MS=2500` while tip `#472/#476` sets Hard to **450** in `src/games/hex/ai.ts`. Tip Hard remains **450** ms (not 2500); no AI behavior change from this triage note.
 
 ### #481 — fix(test): unit suite flake hunt
 

@@ -86,22 +86,22 @@ Easy intentionally misses often (teaching mode). Medium/Hard finish cleanly; Har
 | Tablet start | [png](./fraction-pinball-deep-2026-10-07/tablet-easy-start.png) | [png](./fraction-pinball-deep-2026-10-07/tablet-medium-start.png) | [png](./fraction-pinball-deep-2026-10-07/tablet-hard-start.png) |
 | Tablet game over | [png](./fraction-pinball-deep-2026-10-07/tablet-easy-gameover.png) | [png](./fraction-pinball-deep-2026-10-07/tablet-medium-gameover.png) | [png](./fraction-pinball-deep-2026-10-07/tablet-hard-gameover.png) |
 
-## Regression tests
+## Regression / reproduce (tip)
 
-| Suite | Path |
+| Kind | Path |
 | --- | --- |
-| Unit | `tests/unit/fraction-pinball-deep-playability.test.ts` |
-| Unit | `tests/unit/fraction-pinball-neg-balls-repro.test.ts` |
-| E2E | `tests/e2e/fraction-pinball-deep.spec.ts` (Chromium desktop + tablet × E/M/H) |
+| Surviving harness | `docs/playtest/fraction-pinball-deep-playtest.mjs` |
+| Historical unit (removed — not a live path) | fraction-pinball-deep-playability.test.ts |
+| Historical unit (removed — not a live path) | fraction-pinball-neg-balls-repro.test.ts |
+| Historical e2e (removed — not a live path) | fraction-pinball-deep.spec.ts |
 
 ## Verify commands
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
-npx playwright test tests/e2e/fraction-pinball-deep.spec.ts --project=chromium
-# optional dogfood:
+# optional dogfood (surviving harness; no deep e2e on tip):
 PLAYTEST_GAMES=10 node docs/playtest/fraction-pinball-deep-playtest.mjs
 ```
 
