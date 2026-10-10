@@ -11,6 +11,7 @@ import {
   getGameState,
   startPracticeGame,
 } from '../../src/games/calla/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   if (tutorialManager.getIsActive()) tutorialManager.exit();
@@ -19,9 +20,7 @@ afterEach(() => {
 
 describe('MP-FINISH item 4 — Calla practice after Finish', () => {
   it('Finish button ends tutorial and yields an interactive practice board', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     startTutorial();
@@ -51,9 +50,7 @@ describe('MP-FINISH item 4 — Calla practice after Finish', () => {
   });
 
   it('startPracticeGame mounts a clickable HvH opening position', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     startPracticeGame();

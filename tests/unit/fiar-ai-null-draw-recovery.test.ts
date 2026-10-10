@@ -12,6 +12,7 @@ import {
   destroyGame,
 } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   try {
@@ -58,9 +59,7 @@ describe('FIAR AI null / draw recovery', () => {
     vi.spyOn(fiarAiClient, 'getAIMoveAsync').mockResolvedValue(null);
     vi.spyOn(fiarAi, 'getAIMove').mockReturnValue(null);
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsAI('easy');
     jamMovementForCurrentPlayer();
@@ -82,9 +81,7 @@ describe('FIAR AI null / draw recovery', () => {
       chipKind: 'plain',
     });
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsAI('easy');
 
@@ -113,9 +110,7 @@ describe('FIAR AI null / draw recovery', () => {
         })
     );
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsAI('easy');
 
