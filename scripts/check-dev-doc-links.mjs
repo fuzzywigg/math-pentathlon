@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 /**
- * Report-only checker for Markdown under docs/dev/ (recursive).
+ * Report-only checker for Markdown under docs/ (recursive).
  *
- * Scopes: every .md file under docs/dev/, including docs/dev/engines/
- * and top-level docs/dev/*.md. Not limited to engines/.
+ * Scopes: every .md file under docs/, including:
+ *   - docs/*.md (top-level audits)
+ *   - docs/dev/** (engineering notes, engines/, backlogs)
+ *   - docs/wiki/**
+ *   - docs/playtest/**
+ *   - docs/mp3d/**, docs/gallery/**, docs/visuals/**, etc.
+ *
+ * Skipped generated dumps: none. (JSON/PNG siblings under docs/ are
+ * not walked — only *.md. Tip-vs-alpha / triage dumps stay in scope.)
  *
  * Verifies:
  *   1. Backtick paths that look like repo files (src/, tests/, docs/, scripts/)
@@ -24,7 +31,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const DOCS_DIR = path.join(ROOT, 'docs/dev');
+/** Walk root: whole docs/ tree (was docs/dev/ only before q-mp-857). */
+const DOCS_DIR = path.join(ROOT, 'docs');
 
 const PATH_RE =
   /`((?:src|tests|docs|scripts)\/[A-Za-z0-9_./@+-]+\.(?:ts|tsx|js|mjs|css|md|json))`/g;
@@ -82,23 +90,45 @@ function resolveMdLink(fromDocAbs, href) {
 }
 
 /**
- * Recursively collect *.md under docs/dev/.
+ * Recursively collect *.md under docs/ (or a subdirectory).
  * @param {string} dirAbs
  * @returns {string[]}
  */
-function listDevDocs(dirAbs = DOCS_DIR) {
+function listDocs(dirAbs = DOCS_DIR) {
   /** @type {string[]} */
   const out = [];
   if (!fs.existsSync(dirAbs)) return out;
   for (const entry of fs.readdirSync(dirAbs, { withFileTypes: true })) {
     const abs = path.join(dirAbs, entry.name);
     if (entry.isDirectory()) {
-      out.push(...listDevDocs(abs));
+      out.push(...listDocs(abs));
     } else if (entry.isFile() && entry.name.endsWith('.md')) {
       out.push(abs);
     }
   }
   return out.sort();
+}
+
+/**
+ * Summarize how many scanned docs sit under each immediate docs/ child.
+ * @param {string[]} docAbsList
+ * @returns {string}
+ */
+function subtreeSummary(docAbsList) {
+  /** @type {Record<string, number>} */
+  const counts = {};
+  const docsRootRel = path.relative(ROOT, DOCS_DIR);
+  for (const abs of docAbsList) {
+    const rel = path.relative(DOCS_DIR, abs);
+    const first = rel.includes(path.sep) ? rel.split(path.sep)[0] : '(top)';
+    counts[first] = (counts[first] ?? 0) + 1;
+  }
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([k, n]) =>
+      k === '(top)' ? `${docsRootRel}/*.md=${n}` : `${docsRootRel}/${k}/=${n}`
+    )
+    .join(' ');
 }
 
 function main() {
@@ -113,9 +143,10 @@ function main() {
   let pathChecks = 0;
   let symbolChecks = 0;
   let linkChecks = 0;
+  const docsList = listDocs();
   let docsScanned = 0;
 
-  for (const docAbs of listDevDocs()) {
+  for (const docAbs of docsList) {
     docsScanned += 1;
     const docRel = path.relative(ROOT, docAbs);
     const text = fs.readFileSync(docAbs, 'utf8');
@@ -188,6 +219,7 @@ function main() {
   console.log('check-dev-doc-links (report-only)');
   console.log(`  docs root:       ${path.relative(ROOT, DOCS_DIR)}/`);
   console.log(`  docs scanned:    ${docsScanned}`);
+  console.log(`  by subtree:      ${subtreeSummary(docsList)}`);
   console.log(`  path checks:     ${pathChecks}`);
   console.log(`  symbol checks:   ${symbolChecks}`);
   console.log(`  md link checks:  ${linkChecks}`);
