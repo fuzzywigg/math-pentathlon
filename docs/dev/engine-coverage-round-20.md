@@ -2,9 +2,9 @@
 
 Task id: `q-mp-568`
 
-Base: `cursor/mp-tip-post977` @ `f0d0a162` (remeasured live after math tip #977 /
-post949 cut). Open `#1002` / `q-mp-547` (engine r19) is being folded — residual
-math treats r19 as landed and adds **no duplicate pins**. **TEST-ONLY** — no
+Base: `cursor/mp-tip-post977` @ `d7be05ec` (remeasured live after tip-folded
+r19 `#1002` / `q-mp-547` + mounts soft-fail `#1006` / mutation w19 `#1010` with
+ollie dup pins dropped). Adds **no duplicate** r19 pins. **TEST-ONLY** — no
 `src/` edits. Draft only; tip owner folds.
 
 ## Goal
@@ -19,24 +19,24 @@ Hard assert remains **450ms**. Stars & Bars history cap untouched.
 
 ## Overlap check
 
-| PR / topic                                        | Action                                                         |
-| ------------------------------------------------- | -------------------------------------------------------------- |
-| `#1002` `q-mp-547` (engine r19)                   | Open / folding — **do not duplicate** r19 pins; leave open     |
-| `#1006` `q-mp-549` (game-route-mounts soft-fail)  | Orthogonal — r20 docs/smoke only on mounts                     |
-| `#1010` `q-mp-548` (mutation UI w19)              | Orthogonal — keep hosts coordinated; no mutation first-20 pins |
-| Undrafted `q-mp-570`–`572` (expr/attr/ollie char) | **Deferred** — soft-fail expansion stays with those chars      |
-| Undrafted `q-mp-569` (mutation UI w20)            | Orthogonal mutation scores on expression/attribute/ollie       |
-| `#988`/`526` r18 + tip-folded r9–r18              | Tip-contained — leave open `contained`                         |
-| Open drafts into `cursor/mp-tip-post977`          | None at start; no other draft owns engine coverage round 20    |
+| PR / topic                                        | Action                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------ |
+| `#1002` `q-mp-547` (engine r19)                   | Tip-folded — **do not duplicate** r19 pins; leave open `contained` |
+| `#1006` `q-mp-549` (game-route-mounts soft-fail)  | Tip-folded — r20 docs/smoke only on mounts                         |
+| `#1010` `q-mp-548` (mutation UI w19)              | Tip-folded (ollie dup pins dropped) — no mutation first-20 pins    |
+| Undrafted `q-mp-570`–`572` (expr/attr/ollie char) | **Deferred** — soft-fail expansion stays with those chars          |
+| Undrafted `q-mp-569` (mutation UI w20)            | Orthogonal mutation scores on expression/attribute/ollie           |
+| `#988`/`526` r18 + tip-folded r9–r18              | Tip-contained — leave open `contained`                             |
+| Open drafts into `cursor/mp-tip-post977`          | Docs/UI/knip inventories only — none own engine coverage round 20  |
 
 ## Live tip re-measure (before)
 
 ```text
 $ git rev-parse HEAD
-  f0d0a162620f324bfa8cef244a665555113d9f44  (cursor/mp-tip-post977)
+  d7be05ecd10c3ab64f372f657fd185cc703d78de  (cursor/mp-tip-post977)
 
 $ find tests/unit -name '*.test.ts' | wc -l
-  3280
+  3285
 
 $ git grep -n '^\s*it\.todo' -- tests/unit/engine-coverage-round*.test.ts
 (none)
@@ -44,8 +44,7 @@ $ git grep -n '^\s*it\.todo' -- tests/unit/engine-coverage-round*.test.ts
 $ rg -n 'hard:\s*450' src/games/hex/ai.ts
   21:  hard: 450,
 
-$ # post-r19 preferred-host residual view (r19 suite list + r19 overlay file;
-$ # tip does not yet contain r19 — overlay for residual math only)
+$ # post-r19 preferred-host residual view (tip-native r19 + preferred suites)
 $ npx vitest run --project unit-shared --project unit-isolated \
     tests/unit/engine-coverage-round-12-burn-1008.test.ts \
     tests/unit/engine-coverage-round-19-burn-1008.test.ts \
@@ -72,7 +71,7 @@ $ npx vitest run --project unit-shared --project unit-isolated \
 Coldest preferred non-rules helpers by branch % (post-r19 residual view):
 
 ```text
-  1 game-route-mounts.ts       75.57% (164/217)  ← soft-fail → 549 / mutation 548
+  1 game-route-mounts.ts       84.79% (184/217)  ← tip-folded 549 soft-fail; residual → char/mutation
   2 expression-ui.ts           98.95% (95/96)    ← r20 dragover/leave + tray draggable
   3 ollie-inspect-map.ts       97.05% (66/68)    ← never defaults (documented)
   4 attribute-ui.ts            100% (70/70)      ← saturated after r19

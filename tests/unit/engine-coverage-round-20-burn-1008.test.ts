@@ -1,10 +1,9 @@
 /**
  * q-mp-568 — engine coverage round 20: post-r19 residual characterization.
  *
- * Themes: cold NON-RULES leftovers after open #1002 / q-mp-547 (engine r19)
- * pins expression remove/Clear-All + attribute SET defaults + ollie fallthrough.
- * Remeasured on tip post977; r19 not tip-folded yet — treat #1002 as landed
- * for residual math and add NO duplicate pins:
+ * Themes: cold NON-RULES leftovers after tip-folded #1002 / q-mp-547 (engine
+ * r19) pins expression remove/Clear-All + attribute SET defaults + ollie
+ * fallthrough. Remeasured on tip post977 @ d7be05ec; add NO duplicate pins:
  *   - expressions/expression-ui dragover/dragleave + tray draggable!==undefined
  *     (r19 preferred-host leftover L391–396 / L530–531; not in r19 suite)
  *   - owl/owl-system game:start bus emit without prior getGameStats (L182 else)
@@ -22,9 +21,9 @@
  * Pins CURRENT behavior only. No engine / rules.ts / AI / scoring / copy
  * edits. Hex Hard stays 450ms. No Stars & Bars history cap.
  *
- * Baseline rank (tip post977 @ f0d0a162 + r19 overlay, preferred-host suites
- * matching r19 list — no burn-wave34):
- *   game-route-mounts.ts       75.57% branch (164/217)  ← soft-fail → 549
+ * Baseline rank (tip post977 @ d7be05ec with tip-folded r19, preferred-host
+ * suites matching r19 list — no burn-wave34):
+ *   game-route-mounts.ts       84.79% branch (184/217)  ← tip-folded 549; smoke
  *   expression-ui.ts           98.95% (95/96)           ← r20 drag + tray
  *   ollie-inspect-map.ts       97.05% (66/68)           ← never → documented
  *   attribute-ui.ts            100% (70/70)             ← saturated after r19
