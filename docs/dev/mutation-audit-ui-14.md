@@ -1,9 +1,10 @@
 # Mutation audit — UI / shell wave 14 (q-mp-429)
 
 Tests-only mutation measurement continuing wave 1 (`docs/dev/mutation-audit-ui.md`)
-through wave 13 (`docs/dev/mutation-audit-ui-13.md` / open `#896`). This wave
-remeasures residual hosts disjoint from wave 13’s pointer-hygiene claim:
-`stats-dashboard`, `storage`, and `router`.
+through wave 12 (`docs/dev/mutation-audit-ui-12.md`). Wave 13 is open draft
+`#896` (`q-mp-402`; report not yet on tip). This wave remeasures residual hosts
+disjoint from wave 13’s pointer-hygiene claim: `stats-dashboard`, `storage`, and
+`router`.
 
 Remeasured on tip `cursor/mp-tip-post865` @ `7f8a7147` (baseline measurement SHA;
 unit-file count **3211** then / **3216** after tip folds + this wave; knip unusedTypes tip note **35**). Spec preferred
@@ -76,11 +77,11 @@ Nothing added to `package.json`, lockfile, or CI.
 
 ### Fresh baseline (selected modules)
 
-| Module                    |   Score % | Notes                                                                  |
-| ------------------------- | --------: | ---------------------------------------------------------------------- |
-| `ui/stats-dashboard.ts`   |  **80.0** | up from wave-3 **75%**; 4 survivors (3 equivalent + hours-divisor)     |
+| Module                    |   Score % | Notes                                                                   |
+| ------------------------- | --------: | ----------------------------------------------------------------------- |
+| `ui/stats-dashboard.ts`   |  **80.0** | up from wave-3 **75%**; 4 survivors (3 equivalent + hours-divisor)      |
 | `core/storage/storage.ts` |  **55.0** | wave-1 residual first-20; cross-tab / `=== true` flag sync under-tested |
-| `core/router.ts`          | **100.0** | all 11 mutants already killed (wave-10 / wave-1 hold)                  |
+| `core/router.ts`          | **100.0** | all 11 mutants already killed (wave-10 / wave-1 hold)                   |
 
 ## Before → after (score %)
 
@@ -98,12 +99,12 @@ JSON artifacts: `docs/dev/mutation-audit-ui-14-baseline.json`,
 
 ## Remaining survivors (not product bugs)
 
-| Module            | Survivor                                                         | Reason                                                                                         |
-| ----------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `stats-dashboard` | L42 `ms <= 0` → `<`; numeric `0 → 1`                             | Non-positive and tiny positive ms both floor to `0 min`. Pinned `it.skip`.                     |
-| `stats-dashboard` | L60 `rate <= 0` → `<`                                            | `rate === 0` still formats as `0%` via `Math.round`. Pinned `it.skip`.                         |
-| `storage`         | L48 constructor `reducedMotion === true` / `true → false`        | Needs fresh module graph; `resetAll`/`updateSettings` re-sync via later unmutated lines.       |
-| `storage`         | L108 load() `!read.ok` remove `!`                                | Constructor `load()` path needs remount + blocked storage; not observable on live singleton.   |
+| Module            | Survivor                                                  | Reason                                                                                       |
+| ----------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `stats-dashboard` | L42 `ms <= 0` → `<`; numeric `0 → 1`                      | Non-positive and tiny positive ms both floor to `0 min`. Pinned `it.skip`.                   |
+| `stats-dashboard` | L60 `rate <= 0` → `<`                                     | `rate === 0` still formats as `0%` via `Math.round`. Pinned `it.skip`.                       |
+| `storage`         | L48 constructor `reducedMotion === true` / `true → false` | Needs fresh module graph; `resetAll`/`updateSettings` re-sync via later unmutated lines.     |
+| `storage`         | L108 load() `!read.ok` remove `!`                         | Constructor `load()` path needs remount + blocked storage; not observable on live singleton. |
 
 Pinned `it.skip` in `tests/unit/mutation-ui14-stats-dashboard.test.ts` and
 `tests/unit/mutation-ui14-storage.test.ts`.
