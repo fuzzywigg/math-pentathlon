@@ -123,6 +123,16 @@ async function waitDoubleRaf(page) {
   );
 }
 
+/** Soft condition wait + paint settle (no fixed sleep). */
+async function waitForReadySoft(page, selector, timeout = 2_000) {
+  await page
+    .locator(selector)
+    .first()
+    .waitFor({ state: 'visible', timeout })
+    .catch(() => {});
+  await waitDoubleRaf(page);
+}
+
 export async function measureTTI(page, navigateFn) {
   const t0 = await page.evaluate(() => performance.now());
   await navigateFn();
@@ -148,8 +158,8 @@ export async function measureMoveCost(page, attemptMove) {
 
   const ok = await attemptMove();
   await waitDoubleRaf(page);
-  // One more frame so layout/paint settle under throttle
-  await page.waitForTimeout(16);
+  // Extra paint settle under CPU throttle (rAF, not fixed sleep)
+  await waitDoubleRaf(page);
 
   const sample = await page.evaluate(() => {
     const w = window;
@@ -181,26 +191,29 @@ export async function enterHoverPhase(page, gameId) {
       .locator('.juggle-roll-btn')
       .click({ force: true })
       .catch(() => {});
-    await page.waitForTimeout(80);
+    await waitForReadySoft(page, '.juggle-die.selectable');
     await page
       .locator('.juggle-die.selectable')
       .first()
       .click({ force: true })
       .catch(() => {});
-    await page.waitForTimeout(80);
+    await waitForReadySoft(page, '.juggle-shape-option:not(.disabled)');
     await page
       .locator('.juggle-shape-option')
       .first()
       .click({ force: true })
       .catch(() => {});
-    await page.waitForTimeout(80);
+    await waitForReadySoft(page, '.juggle-cell[style*="pointer"]');
   } else if (gameId === 'pent-em-in') {
     await page
       .locator('.pent-piece-option')
       .first()
       .click({ force: true })
       .catch(() => {});
-    await page.waitForTimeout(100);
+    await waitForReadySoft(
+      page,
+      '.pent-piece-option.selected, .pent-board .interaction rect[data-row]'
+    );
   }
 }
 
