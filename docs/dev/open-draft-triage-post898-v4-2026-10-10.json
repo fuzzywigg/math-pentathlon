@@ -1,0 +1,3120 @@
+{
+  "taskId": "q-mp-444",
+  "generatedAtUtc": "2026-10-10T08:33:39.254Z",
+  "liveTipBranch": "cursor/mp-tip-post898",
+  "tipSha": "9b19c5e8cd3cd714d745540539324766369a8688",
+  "tipShaShort": "9b19c5e8",
+  "alphaSha": "946d6f956b54de10e08240ba8b26194c2e3b779d",
+  "alphaShaShort": "946d6f95",
+  "tipPrOpen": 914,
+  "priorAlphaBefore898": "946d6f956b54de10e08240ba8b26194c2e3b779d",
+  "priorTriage": "docs/dev/open-draft-triage-post865-2026-10-10-v3.md",
+  "priorTriagePr": 889,
+  "markdownTwin": "docs/dev/open-draft-triage-post898-v4-2026-10-10.md",
+  "jsonTwin": "docs/dev/open-draft-triage-post898-v4-2026-10-10.json",
+  "svgTwin": "docs/dev/open-draft-triage-post898-v4-2026-10-10.svg",
+  "scope": "report-only; do not close PRs; do not comment / label from this worker task",
+  "supersedesNavigation": ["q-mp-385", "q-mp-360", "q-mp-334", "q-mp-309"],
+  "method": {
+    "tipCut": "cursor/mp-tip-post898 cut from alpha 946d6f95 after #898; tip #914 folding #900\u2013#913 + post898 workers; #916/#918 already on tip at measurement",
+    "classification": "three-dot tip...head blob identity; ignore AGENTS.md + lint-ratchet-ceilings.json noise; tip-ahead stale DIFF \u2192 superseded; #727 held; this PR is the v4 deliverable",
+    "noComments": true,
+    "noCloses": true,
+    "noLabels": true
+  },
+  "tipRatchetCeilingsRemeasured": {
+    "curly": 538,
+    "@typescript-eslint/no-non-null-assertion": 241,
+    "@typescript-eslint/no-confusing-void-expression": 52,
+    "radix": 6,
+    "default-case": 5,
+    "no-duplicate-imports": 42,
+    "@typescript-eslint/prefer-nullish-coalescing": 65,
+    "@typescript-eslint/prefer-optional-chain": 21,
+    "@typescript-eslint/switch-exhaustiveness-check": 8,
+    "@typescript-eslint/no-shadow": 3,
+    "eqeqeq": 1,
+    "@typescript-eslint/return-await": 3,
+    "unitTestSpecFilesExclArchive": 3231,
+    "vitestListCount": 12955,
+    "typecheckOutOfScope": 216,
+    "hexHardMs": 450,
+    "checkDevDocsScannedBefore": 214,
+    "knipUnusedTypesLive": 33,
+    "knipUnusedTypesBaseline": 36,
+    "knipUnusedExports": 3,
+    "knipUnlisted": 3,
+    "knipDuplicates": 0
+  },
+  "openInventory": {
+    "openTotal": 350,
+    "byBase": {
+      "cursor/mp-tip-post477": 67,
+      "cursor/mp-tip-post755": 44,
+      "cursor/mp-tip-post865": 33,
+      "cursor/integration-fold-wave5-tip-4af0": 29,
+      "cursor/mp-tip-post785": 27,
+      "cursor/mp-tip-post598": 26,
+      "cursor/mp-tip-post830": 25,
+      "cursor/mp-tip-post748": 25,
+      "cursor/mp-tip-post728": 22,
+      "cursor/mp-tip-post700": 14,
+      "cursor/mp-tip-post898": 13,
+      "cursor/mp-tip-post709": 10,
+      "alpha": 6,
+      "cursor/overnight-polish-integration-0494": 6,
+      "cursor/friday-landing-preflight-v2-e939": 1,
+      "cursor/integration-fold-wave4-tip-36e4": 1,
+      "cursor/playtest-recheck-fixes-a6fd": 1
+    },
+    "openBasePost898": 13,
+    "openBasePost865": 33,
+    "openBasePost830": 25,
+    "openBasePost785": 27
+  },
+  "classificationCounts": {
+    "held": 1,
+    "superseded": 60,
+    "fold": 11
+  },
+  "drafts": [
+    {
+      "number": 727,
+      "title": "q-mp-186: clear prefer-nullish-coalescing in owl-messages (\u22129)",
+      "taskId": "q-mp-186",
+      "baseRefName": "cursor/mp-tip-post709",
+      "headRefName": "cursor/q-mp-186-nullish-owl-messages-0a20",
+      "headSha": "54532ce5459ca15d880ece9a119a909e56745ef4",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/727",
+      "isDraft": true,
+      "recommendation": "held",
+      "reason": "Andrew HOLD \u2014 prefer-nullish-coalescing in owl-messages (\u22129); do not fold / retarget / comment; nullish ceiling stays 65",
+      "same": 36,
+      "diff": 22,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/bundle-over-2026-10-09.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/coverage-map.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/coverage-map.svg"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/dead-code-inventory.json"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/dead-code-inventory.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/eslint-off-rules-inventory.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/knip-baseline.json"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/knip-report.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/README.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "eslint.config.js"
+        },
+        {
+          "kind": "DIFF",
+          "path": "scripts/check-lint-ratchet.mjs"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/core/fractions/fraction-bar-ui.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/core/owl/owl-messages.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/core/owl/owl-system.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/games/juggle/board-ui.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/games/par-55/board-ui.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/games/par-55/par-55.css"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/games/remainder-islands/board-ui.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/ui/owl/owl-component.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/ui/three/tablet-gl.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "tests/unit/engine-coverage-round-burn-1008.test.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 853,
+      "title": "q-mp-363: CI permissions / persist-credentials pin re-audit (post830)",
+      "taskId": "q-mp-363",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-363-ci-permissions-reaudit-6bce",
+      "headSha": "b1b1bb89b860bbb3f90d8fa314cfb2ac4eb398f6",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/853",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 854,
+      "title": "q-mp-361: remeasure post830 bundle headroom (sum-dominoes \u221277 B)",
+      "taskId": "q-mp-361",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-361-bundle-headroom-post830-3357",
+      "headSha": "0184170d3a2874caf00c8a232c999d15d5735c06",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/854",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 855,
+      "title": "q-mp-379: characterize url-flags parse/empty/conflict residuals (tests-only)",
+      "taskId": "q-mp-379",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-379-url-flags-residuals-1352",
+      "headSha": "068cd5a678ee9d236dd90f026f9de1bfc552ee76",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/855",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 856,
+      "title": "q-mp-362: check:copy-pins residual inventory refresh (tip post830)",
+      "taskId": "q-mp-362",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-362-copy-pins-inventory-2fa6",
+      "headSha": "d0a1848e74dc2c45923b8d4e6bdf4238cd922f05",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/856",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 857,
+      "title": "q-mp-377: characterize game-loading soft-fail residuals (tests-only)",
+      "taskId": "q-mp-377",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-377-game-loading-soft-fail-db01",
+      "headSha": "803fa9d00a65dfd2646492719a3c1ad7d42687cc",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/857",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 858,
+      "title": "q-mp-374: characterize grid-alignment edge residuals (tests-only)",
+      "taskId": "q-mp-374",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-374-grid-align-edge-char-9436",
+      "headSha": "44235cf61ed00616f5a4309c763a1b59e8773ee2",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/858",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 859,
+      "title": "q-mp-378: characterize settings-flags parse/cache residuals (tests-only)",
+      "taskId": "q-mp-378",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-378-settings-flags-residuals-eb6b",
+      "headSha": "aff0d520eb10dd9ff70622cebb6af48fb3c901c1",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/859",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 860,
+      "title": "q-mp-376: characterize player-colors override/seat/css-var residuals (tests-only)",
+      "taskId": "q-mp-376",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-376-player-colors-residuals-9c5d",
+      "headSha": "3a896185444743e6bb4b5fa84af117c066738ded",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/860",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 861,
+      "title": "q-mp-384: refresh board-3d layout-reads inventory (tip post830)",
+      "taskId": "q-mp-384",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-384-board3d-layout-inventory-9c80",
+      "headSha": "18de7fa76a533eb687c2b8aff0ed9d3e3edc0c6a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/861",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md); leave open with contained",
+      "same": 1,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 862,
+      "title": "q-mp-375: characterize owl-system soft-fail residuals (tests-only)",
+      "taskId": "q-mp-375",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-375-owl-system-soft-fail-c03d",
+      "headSha": "1fcb584cb448e8987ee9a61ac85de3a3a20e9f5a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/862",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 863,
+      "title": "q-mp-364: lint-bucket measured snapshot @ tip post830 ceilings (void 58 / dup 42 / shadow 3)",
+      "taskId": "q-mp-364",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-364-lint-bucket-snapshot-68ad",
+      "headSha": "2cc306812aea10fff9d2a537a5cc30cb0509ab0e",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/863",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/lint-bucket-report.md); leave open with contained",
+      "same": 3,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/lint-bucket-report.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 864,
+      "title": "q-mp-383: characterize seat-labels + die-faces residuals (tests-only)",
+      "taskId": "q-mp-383",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-383-seat-die-residuals-9862",
+      "headSha": "39bfb67347c00f0bc354783493387cc1fb01359b",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/864",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 866,
+      "title": "q-mp-365: Knip Rank-3 unusedTypes candidate inventory (post830)",
+      "taskId": "q-mp-365",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-365-knip-rank3-inventory-37ca",
+      "headSha": "e70c2d38d938f5ea30f201a8e8667d7d6b475abd",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/866",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/knip-report.md); leave open with contained",
+      "same": 3,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/knip-report.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 867,
+      "title": "q-mp-368: UI coverage round 22 \u2014 fab-a-diffy board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-368",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-368-ui-cov-r22-fab-ab71",
+      "headSha": "7ec33e0707d607b07e277acbd17defaf6ff26f4f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/867",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 868,
+      "title": "q-mp-369: UI coverage round 23 \u2014 fraction-pinball residuals (tests-only)",
+      "taskId": "q-mp-369",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-369-ui-cov-r23-pinball-bc34",
+      "headSha": "7d12795d4b7a7fbda27043ac02fff569d1eab3de",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/868",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 869,
+      "title": "q-mp-356: Knip unusedTypes demote batch 6 (Rank-3 \u22127 \u2192 baseline 36)",
+      "taskId": "q-mp-356",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-356-knip-unused-types-batch6-69c6",
+      "headSha": "d959a9b14e0754491b4dc3bca4f590ddf2b8ef7d",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/869",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/knip-report.md, src/ui/pointer-hygiene.ts); leave open with contained",
+      "same": 4,
+      "diff": 2,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/knip-report.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "src/ui/pointer-hygiene.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 870,
+      "title": "q-mp-380: UI coverage round 26 \u2014 frac-fact board-ui/controller residuals (tests only)",
+      "taskId": "q-mp-380",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-380-frac-fact-ui-cov-r26-4886",
+      "headSha": "e822aa751e3c3be873154e5282d35888cd420161",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/870",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 871,
+      "title": "q-mp-360: tip post830 open-draft triage refresh v2 (fold / superseded / held)",
+      "taskId": "q-mp-360",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-360-open-draft-triage-post830-v2-9759",
+      "headSha": "9d375d76c3aa313d8da84bfe432a4e0d40e5d08d",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/871",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 9b19c5e8",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 872,
+      "title": "q-mp-373: mutation audit UI wave 12 \u2014 player-colors / game-error-boundary / die-faces (tests-only)",
+      "taskId": "q-mp-373",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-373-mutation-audit-ui-12-37ac",
+      "headSha": "649fd8f02dc6fdcb74089f328426d8e31a7c4d66",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/872",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 6,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 873,
+      "title": "q-mp-336: refresh coverage-map after tip post830",
+      "taskId": "q-mp-336",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-336-coverage-map-post830-333b",
+      "headSha": "2d699cf967a881129c9b8e3a8344b252ca01cde9",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/873",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/dev/coverage-map.md, docs/dev/coverage-map.svg, docs/wiki/coverage-map.md); leave open with contained",
+      "same": 0,
+      "diff": 3,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/coverage-map.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/coverage-map.svg"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/coverage-map.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 874,
+      "title": "q-mp-349: engine coverage round 11 \u2014 fraction-bar-ui + polyomino-ui (tests-only)",
+      "taskId": "q-mp-349",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-349-engine-cov-r11-92fb",
+      "headSha": "8a8f4ac315cb7de81cb1050791713b455891bc7c",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/874",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 875,
+      "title": "q-mp-350: mutation audit UI wave 11 \u2014 offline / timeout-handle / coord-map (tests-only)",
+      "taskId": "q-mp-350",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-350-mutation-audit-ui-11-24cd",
+      "headSha": "3126d8c0df9d590df1e03612e9dfcab3215471e7",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/875",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 6,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 876,
+      "title": "q-mp-372: engine coverage round 12 \u2014 attributes + dice residuals (tests-only)",
+      "taskId": "q-mp-372",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-372-engine-cov-r12-67f7",
+      "headSha": "f5408ee7bd69fa5c1eadb5cd7ab68303233d8c4a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/876",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 878,
+      "title": "q-mp-371: UI coverage round 25 \u2014 hex board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-371",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-371-hex-ui-cov-r25-2560",
+      "headSha": "914a723c1dac753d2d02c7a01ace88a22bdd2156",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/878",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 9,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 879,
+      "title": "q-mp-090l: Oct 10c engineering backlog round 12 (25 tasks q-mp-385..409) for tip post830",
+      "taskId": "q-mp-090l",
+      "baseRefName": "cursor/mp-tip-post830",
+      "headRefName": "cursor/q-mp-090l-backlog-10c-d5bb",
+      "headSha": "3895a6bce04731e5c7b284bd517682714ec51e5f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/879",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 8,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 880,
+      "title": "q-mp-395: brace no-confusing-void-expression in reduced-motion (\u22122)",
+      "taskId": "q-mp-395",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-395-reduced-motion-void-65fe",
+      "headSha": "6dd6da9ea4dbf2e98f9911cfd54143b731af1ffa",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/880",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 881,
+      "title": "q-mp-393: emit-identity FAIL inventory refresh (post865, 11 AI diffs) \u2014 docs only",
+      "taskId": "q-mp-393",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-393-emit-identity-inventory-3a6e",
+      "headSha": "ca8ceb0c4b5856b19f7580a87cdb9916e47e0c60",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/881",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 6,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 882,
+      "title": "q-mp-391: Rank-1 dead-CSS rescan on tip post865 (report-only; contains #840/#805/#766)",
+      "taskId": "q-mp-391",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-391-dead-css-rescan-post865-d1f0",
+      "headSha": "6490c49573d157d03321fc110cc4afda193f6126",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/882",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 3,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 883,
+      "title": "q-mp-390: eslint non-ceilinged residuals refresh (report-only) for tip post865",
+      "taskId": "q-mp-390",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-390-eslint-nonceiling-post865-175a",
+      "headSha": "db932a83735a13084c61a5a50877191618aa110e",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/883",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 3,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 884,
+      "title": "q-mp-404: characterize idle-warm / PWA bootstrap soft-fail residuals (tests-only)",
+      "taskId": "q-mp-404",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-404-idle-warm-pwa-residuals-a677",
+      "headSha": "5b077ecca82b207887e8700b579d0a0df4a7c736",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/884",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 885,
+      "title": "q-mp-406: characterize expression-ui drop/slot/empty soft residuals (tests-only)",
+      "taskId": "q-mp-406",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-406-expression-ui-char-c548",
+      "headSha": "ec76d833651659ee282ab72ab0a9ebb8ce0acc5c",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/885",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 886,
+      "title": "q-mp-386: remeasure wiki/testing-layers unit counts to 3210 / 12768 (tip post865)",
+      "taskId": "q-mp-386",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-386-testing-layers-counts-ed39",
+      "headSha": "145a6e76505f3092d9e5d1d811be61138dc0f0df",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/886",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 1,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 887,
+      "title": "q-mp-388: remeasure CI unit wall budget / test-speed for tip post865",
+      "taskId": "q-mp-388",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-388-ci-unit-wall-budget-ef06",
+      "headSha": "018d7aa0d1abf3d54cff7d25b15ce347fb9050ed",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/887",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 5,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 888,
+      "title": "q-mp-394: Knip live metrics drift inventory (post865 \u2014 unusedTypes 35 vs baseline 36)",
+      "taskId": "q-mp-394",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-394-knip-metrics-drift-da2c",
+      "headSha": "0d0dda77dc301ab01ac210e3e1c5585a1560a3c9",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/888",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 4,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 889,
+      "title": "q-mp-385: tip post865 open-draft triage refresh v3 (fold / superseded / held)",
+      "taskId": "q-mp-385",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-385-open-draft-triage-post865-v3-7a49",
+      "headSha": "7cd8ce9808ab0ab8f6837ecad6ad9b62d4aade7a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/889",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Prior open-draft triage (v2/v3); leave open with contained \u2014 this v4 is the navigation keeper @ tip 9b19c5e8",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 890,
+      "title": "q-mp-398: UI coverage round 28 \u2014 kings-quadraphages board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-398",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-398-kings-ui-cov-r28-bc7f",
+      "headSha": "e017342de0d211b6cd8e3cd46797bfab70037e3a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/890",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 891,
+      "title": "q-mp-392: slowest unit-file inventory refresh (tip post865 / 3210 files)",
+      "taskId": "q-mp-392",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-392-slowest-unit-inventory-7593",
+      "headSha": "5cc3c94c9f42d309a2ed08decb8e0df2ff008625",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/891",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 892,
+      "title": "q-mp-399: UI coverage round 29 \u2014 hex-a-gone board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-399",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-399-hexagone-ui-cov-r29-60b1",
+      "headSha": "81d42ae281758fa9d3ef5ae898f5b617fa29aafe",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/892",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 893,
+      "title": "q-mp-403: characterize attribute-ui soft-fail / empty-board residuals (tests-only)",
+      "taskId": "q-mp-403",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-403-attribute-ui-residuals-87e9",
+      "headSha": "1bfbfb652cf12f883b3becafeea39acbb954d6fd",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/893",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 894,
+      "title": "q-mp-397: UI coverage round 27 \u2014 contig-60 board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-397",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-397-ui-cov-r27-contig-62ee",
+      "headSha": "b162ec0897365d40a1fa4cc777f54782168b0fe0",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/894",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 895,
+      "title": "q-mp-400: UI coverage round 30 \u2014 sum-dominoes board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-400",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-400-sum-dominoes-ui-cov-r30-f37b",
+      "headSha": "d7ca2d5666ac57f6ec30489e2a060f86525be073",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/895",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 896,
+      "title": "q-mp-402: mutation audit UI wave 13 \u2014 idle-warm / reduced-motion / pointer-hygiene (tests-only)",
+      "taskId": "q-mp-402",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-402-mutation-audit-ui-13-e13b",
+      "headSha": "0a45ae7ab2e93b31e06c96429e7a5fe8e915ed45",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/896",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 6,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 897,
+      "title": "q-mp-090m: Oct 10d engineering backlog round 13 (25 tasks q-mp-410..434) for tip post865",
+      "taskId": "q-mp-090m",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-090m-backlog-10d-eb6c",
+      "headSha": "c75d7dce56dd31166f3eafc5e8d5405e80179b26",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/897",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 899,
+      "title": "q-mp-401: engine coverage round 13 \u2014 tutorial + highlight residuals (tests-only)",
+      "taskId": "q-mp-401",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-401-engine-cov-r13-01fb",
+      "headSha": "a2b923098033929913de4c7b5f98f2c07d2503e5",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/899",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 900,
+      "title": "q-mp-413: remeasure post865 bundle headroom (sum-dominoes \u221277 B)",
+      "taskId": "q-mp-413",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-413-bundle-headroom-post865-2eab",
+      "headSha": "0d743ced1afb1165117eb2f54f5af689a2d119ea",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/900",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 15,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 901,
+      "title": "q-mp-423: brace no-confusing-void-expression in pointer-hygiene (\u22121)",
+      "taskId": "q-mp-423",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-423-pointer-hygiene-void-1be9",
+      "headSha": "9b7ecc715a41b0f6af3bf9c1dae0774390e7f238",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/901",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 15,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 902,
+      "title": "q-mp-430: characterize game-error-boundary + offline soft-fail residuals (tests-only)",
+      "taskId": "q-mp-430",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-430-error-boundary-offline-residuals-b2b8",
+      "headSha": "6f26d2246e197355919bcfe55571538a6d5c6fc8",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/902",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 15,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 903,
+      "title": "q-mp-414: CI permissions / persist-credentials pin re-audit (tip post865)",
+      "taskId": "q-mp-414",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-414-ci-permissions-reaudit-6152",
+      "headSha": "cca2440b27ec1a417fe67f0ab11f56958bdd8f6f",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/903",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 16,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 904,
+      "title": "q-mp-422: characterize router soft-fail residuals (tests-only)",
+      "taskId": "q-mp-422",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-422-router-soft-fail-11c6",
+      "headSha": "79b3eeaef9bbc5f2c2a85ce6533468682a3beba8",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/904",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
+      "same": 15,
+      "diff": 2,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "vitest.config.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 905,
+      "title": "q-mp-415: refresh board-3d layout-reads inventory (tip post865) \u2014 docs only",
+      "taskId": "q-mp-415",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-415-board3d-layout-inventory-2242",
+      "headSha": "fa0b94f93f91a0e50e25f5749a73bfe04f393a45",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/905",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 18,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 906,
+      "title": "q-mp-431: characterize timeout-handle + coord-map residuals (tests-only)",
+      "taskId": "q-mp-431",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-431-timeout-coord-residuals-7398",
+      "headSha": "34f933e2d2f3b361030bd8ecfa8baedde7fdb41e",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/906",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 15,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 907,
+      "title": "q-mp-421: Docs \u2014 typecheck out-of-scope 216 HOLD map refresh (tip post865)",
+      "taskId": "q-mp-421",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-421-typecheck-oos-hold-post865-1c19",
+      "headSha": "c3e90cc84efb5fb0b490f3f46fdaf5a241c8dc8c",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/907",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 17,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 908,
+      "title": "q-mp-418: check:copy-pins residual inventory refresh (tip post865) \u2014 report-only",
+      "taskId": "q-mp-418",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-418-copy-pins-inventory-b55b",
+      "headSha": "a55babb35a75c32220c92dcfdb8bd3c2f1c349b7",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/908",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 17,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 909,
+      "title": "q-mp-420: characterize storage soft-fail residuals (tests-only)",
+      "taskId": "q-mp-420",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-420-storage-soft-fail-residuals-fdc8",
+      "headSha": "e4516364f9a2c54595bf7029a885e76cf4aaac1e",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/909",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md, vitest.config.ts); leave open with contained",
+      "same": 15,
+      "diff": 2,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "vitest.config.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 910,
+      "title": "q-mp-416: lint-bucket measured snapshot @ tip post865 ceilings (report-only)",
+      "taskId": "q-mp-416",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-416-lint-bucket-snapshot-c313",
+      "headSha": "2eba17e5cbfea9a3ceffa0b4345739eef89f0c44",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/910",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 30,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 911,
+      "title": "q-mp-428: engine coverage round 14 \u2014 post-r13 residual characterization (tests-only)",
+      "taskId": "q-mp-428",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-428-engine-cov-r14-265d",
+      "headSha": "d7f7c8aaa9880bf7c22a04c4155681cbdd272bf5",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/911",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Tip-ahead or tip-contained @ 9b19c5e8: residual DIFF vs tip keeper (docs/wiki/development.md); leave open with contained",
+      "same": 16,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/wiki/development.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 912,
+      "title": "q-mp-429: mutation audit UI wave 14 \u2014 stats-dashboard / storage / router (tests-only)",
+      "taskId": "q-mp-429",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-429-mutation-audit-ui-14-316c",
+      "headSha": "d94996e07c8a05eb5484cd337d050b2134b2af08",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/912",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 32,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 913,
+      "title": "q-mp-417: refresh coverage-map after tip post865 + suite 3213",
+      "taskId": "q-mp-417",
+      "baseRefName": "cursor/mp-tip-post865",
+      "headRefName": "cursor/q-mp-417-coverage-map-post865-d100",
+      "headSha": "6149cc16aa2b8f7673b8ed47f20856d1dcef65b7",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/913",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 29,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 915,
+      "title": "q-mp-425: UI coverage round 31 \u2014 stars-bars board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-425",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-425-stars-bars-ui-cov-r31-cfc4",
+      "headSha": "6ce61084945f9af2c22e38f760b23baa8afa5a54",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/915",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-31.md, tests/unit/burn-1010-ui-cov-r31-stars-bars.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 2,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ui-coverage-round-31.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/burn-1010-ui-cov-r31-stars-bars.test.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 916,
+      "title": "q-mp-424: clear board-a11y no-non-null-assertion (\u22125 \u2192 ceiling 241)",
+      "taskId": "q-mp-424",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-424-board-a11y-nnnull-0cd3",
+      "headSha": "3b1eea0582e8fe90079bbc2bd0a0cec5cb099aa7",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/916",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 1,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 917,
+      "title": "q-mp-427: UI coverage round 33 \u2014 fiar board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-427",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-427-fiar-ui-cov-r33-ca78",
+      "headSha": "cf8c93731fb535dcd9ea0b57c9b475ae2425e3c5",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/917",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-33.md, tests/unit/burn-1010-ui-cov-r33-fiar.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 2,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ui-coverage-round-33.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/burn-1010-ui-cov-r33-fiar.test.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 918,
+      "title": "q-mp-419: UI coverage round 34 \u2014 prime-gold board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-419",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-419-prime-gold-ui-cov-r34-5524",
+      "headSha": "a310f431272a657d66c98c6a49056c0dbb699d98",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/918",
+      "isDraft": true,
+      "recommendation": "superseded",
+      "reason": "Payload blob-identical on tip 9b19c5e8 (via #898 alpha squash and/or tip #914 folds); leave open with contained",
+      "same": 2,
+      "diff": 0,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 919,
+      "title": "q-mp-426: UI coverage round 32 \u2014 pent-em-in board-ui/controller residuals (tests-only)",
+      "taskId": "q-mp-426",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-426-pent-ui-cov-r32-b568",
+      "headSha": "362dcfe27fe2399f3f5e0bb8d5ab7cb0101e57ee",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/919",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 2 new): docs/dev/ui-coverage-round-32.md, tests/unit/burn-1010-ui-cov-r32-pent-em-in.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 2,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ui-coverage-round-32.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "tests/unit/burn-1010-ui-cov-r32-pent-em-in.test.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 920,
+      "title": "q-mp-432: characterize dice-ui / roller residuals (tests-only)",
+      "taskId": "q-mp-432",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-432-dice-ui-roller-residuals-0279",
+      "headSha": "787256b2efff886b8c8ec9c34a61ad5f7f7c7076",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/920",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-432-dice-ui-roller-residuals.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 1,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "tests/unit/q-mp-432-dice-ui-roller-residuals.test.ts"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 921,
+      "title": "q-mp-090n: Oct 10e engineering backlog round 14 (25 tasks q-mp-435..459) for tip post898",
+      "taskId": "q-mp-090n",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-090n-backlog-10e-ba7b",
+      "headSha": "b833d5824f2447f2c922ad0d1ff7d46843da955a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/921",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): docs/dev/backlog-2026-10-10e.md",
+      "same": 0,
+      "diff": 0,
+      "new": 1,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/backlog-2026-10-10e.md"
+        }
+      ],
+      "checksSummary": "12/12",
+      "checkCounts": {
+        "success": 12,
+        "pending": 0,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "success",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "success",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "success"
+      }
+    },
+    {
+      "number": 922,
+      "title": "q-mp-443: check:copy-pins residual inventory refresh (tip post898) \u2014 report-only",
+      "taskId": "q-mp-443",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-443-copy-pins-inventory-eed7",
+      "headSha": "661df6ede6bc86b26d22cd5cae0becef0f2ea9ed",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/922",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/copy-pins-residual-inventory-post898-2026-10-10.json, docs/dev/copy-pins-residual-inventory-post898-2026-10-10.md, docs/dev/copy-pins-residual-inventory-post898-2026-10-10.svg",
+      "same": 0,
+      "diff": 0,
+      "new": 3,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/copy-pins-residual-inventory-post898-2026-10-10.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/copy-pins-residual-inventory-post898-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/copy-pins-residual-inventory-post898-2026-10-10.svg"
+        }
+      ],
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 923,
+      "title": "q-mp-448: brace no-confusing-void-expression in stats-dashboard (\u22121)",
+      "taskId": "q-mp-448",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-448-stats-dashboard-void-82fd",
+      "headSha": "4922453c4bae0bf93464633eb621487a08e959cc",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/923",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 0 new): src/ui/stats-dashboard.ts",
+      "same": 0,
+      "diff": 1,
+      "new": 0,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "src/ui/stats-dashboard.ts"
+        }
+      ],
+      "checksSummary": "9/12 (3 pending)",
+      "checkCounts": {
+        "success": 9,
+        "pending": 3,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "success",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 924,
+      "title": "q-mp-439: CI permissions / persist-credentials pin re-audit (tip post898)",
+      "taskId": "q-mp-439",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-439-ci-permissions-reaudit-6cb2",
+      "headSha": "8f7400db8614e81fc3d5a8ad80903db5d95ea509",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/924",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 3 new): docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.json, docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.md, docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.svg",
+      "same": 0,
+      "diff": 0,
+      "new": 3,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.json"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/ci-permissions-persist-credentials-pin-audit-q-mp-439.svg"
+        }
+      ],
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 925,
+      "title": "q-mp-455: characterize safe-web-storage + feature-flags residuals (tests-only)",
+      "taskId": "q-mp-455",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-455-safe-web-storage-feature-flags-9671",
+      "headSha": "d5201f080899db84ad46173ae5b29887658281d6",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/925",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 0 diff / 1 new): tests/unit/q-mp-455-safe-web-storage-feature-flags-residuals.test.ts",
+      "same": 0,
+      "diff": 0,
+      "new": 1,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "tests/unit/q-mp-455-safe-web-storage-feature-flags-residuals.test.ts"
+        }
+      ],
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 926,
+      "title": "q-mp-440: refresh board-3d layout-reads inventory (tip post898) \u2014 docs only",
+      "taskId": "q-mp-440",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-440-board3d-layout-inventory-0ea7",
+      "headSha": "f7b1e7845d1afdf265cfb3825830b5ebd7fade89",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/926",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 3 diff / 2 new): docs/dev/board3d-layout-reads-inventory-2026-10-09.md, docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md, docs/dev/board3d-layout-reads-inventory-post865-2026-10-10.md, docs/dev/board3d-layout-reads-inventory-post898-2026-10-10.md, docs/dev/board3d-layout-reads-inventory-post898-2026-10-10.svg",
+      "same": 0,
+      "diff": 3,
+      "new": 2,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/board3d-layout-reads-inventory-2026-10-09.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/board3d-layout-reads-inventory-post830-2026-10-10.md"
+        },
+        {
+          "kind": "DIFF",
+          "path": "docs/dev/board3d-layout-reads-inventory-post865-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/board3d-layout-reads-inventory-post898-2026-10-10.md"
+        },
+        {
+          "kind": "NEW",
+          "path": "docs/dev/board3d-layout-reads-inventory-post898-2026-10-10.svg"
+        }
+      ],
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    },
+    {
+      "number": 927,
+      "title": "q-mp-453: characterize game-prefetch soft-fail residuals (tests-only)",
+      "taskId": "q-mp-453",
+      "baseRefName": "cursor/mp-tip-post898",
+      "headRefName": "cursor/q-mp-453-game-prefetch-soft-fail-e2a5",
+      "headSha": "6df0e59ac77b9500929d8211ee896bf033aa2e9a",
+      "url": "https://github.com/fuzzywigg/math-pentathlon/pull/927",
+      "isDraft": true,
+      "recommendation": "fold",
+      "reason": "Unique payload vs tip (0 same / 1 diff / 1 new): tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts, vitest.config.ts",
+      "same": 0,
+      "diff": 1,
+      "new": 1,
+      "del": 0,
+      "materialFiles": [
+        {
+          "kind": "NEW",
+          "path": "tests/unit/q-mp-453-game-prefetch-soft-fail-residuals.test.ts"
+        },
+        {
+          "kind": "DIFF",
+          "path": "vitest.config.ts"
+        }
+      ],
+      "checksSummary": "8/12 (4 pending)",
+      "checkCounts": {
+        "success": 8,
+        "pending": 4,
+        "failure": 0,
+        "neutral": 0
+      },
+      "checks": {
+        "lint": "success",
+        "audit": "success",
+        "build": "success",
+        "unit": "pending",
+        "e2e": "pending",
+        "knip": "success",
+        "visual-baseline": "success",
+        "e2e-fullgame": "pending",
+        "mobile-touch": "success",
+        "zoom-reflow": "success",
+        "forced-colors": "success",
+        "e2e-cross-browser": "pending"
+      }
+    }
+  ]
+}
