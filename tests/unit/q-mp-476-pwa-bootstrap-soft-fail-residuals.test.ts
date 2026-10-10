@@ -9,22 +9,22 @@
  *   deferred fire). Combined stmts/lines **100%**; branch residual **91.66%**
  *   (11/12) — uncovered **L41** (`registerSW ?? defaultRegisterSW` when
  *   `registerSW` is omitted).
- * - Void residual **1** at `bootstrap.ts:25` (`ric(() => cb(), …)`) owned by
- *   undrafted `q-mp-242` — characterize keep-site only; do not clear.
+ * - Void residual at `bootstrap.ts` ric arrow was a keep-site for undrafted
+ *   `q-mp-242`; cleared by `q-mp-563` (brace-only). This suite now pins the
+ *   braced ric callback shape instead.
  *
  * This suite pins soft-fail / schedule residuals still thin after those
  * suites: omitted-registerSW default path, registerSW throw through the
  * bootstrap schedule chain, missing `serviceWorker` soft no-op, non-function
  * ric → setTimeout fallback, empty-options default enable, double schedule,
- * and structural void keep-site. No network. No real SW. No copy pins.
- * No `src/` edits. No ratchet JSON.
+ * and structural ric brace shape. No network. No real SW. No copy pins.
  *
  * Narrowed vs open drafts:
  * - `#884` q-mp-404 idle-warm / PWA bootstrap (base post865; tip-equivalent
  *   file already on tip) — leave open; this file stays on `bootstrap.ts` only
  * - `#765` q-mp-256 PWA unit char (base post748; tip-equivalent) — leave open
  * - `#935` q-mp-456 engine coverage r15 (base post898) — disjoint host
- * - Undrafted `q-mp-242` void clear + `q-mp-484` register soft-fail — leave
+ * - `q-mp-563` void clear owns the brace; `q-mp-484` register soft-fail leave
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -72,11 +72,12 @@ describe('q-mp-476 bootstrapPwa — source soft-fail keep-sites', () => {
     expect(BOOTSTRAP_SRC).toMatch(/setTimeout\(cb,\s*1_000\)/);
   });
 
-  it('keeps void ric arrow keep-site owned by undrafted q-mp-242 (do not clear)', () => {
-    // Structural pin only — product brace/void clear stays with q-mp-242.
+  it('keeps braced ric callback after q-mp-563 void clear (no arrow shorthand)', () => {
+    // Structural pin — q-mp-563 braced `() => { cb(); }` (no void expression).
     expect(BOOTSTRAP_SRC).toMatch(
-      /ric\(\(\)\s*=>\s*cb\(\),\s*\{\s*timeout:\s*3_000\s*\}\)/
+      /ric\(\s*\(\)\s*=>\s*\{\s*cb\(\);\s*\}\s*,\s*\{\s*timeout:\s*3_000\s*\}\s*\)/
     );
+    expect(BOOTSTRAP_SRC).not.toMatch(/ric\(\(\)\s*=>\s*cb\(\)/);
   });
 
   it('keeps enabled default on window && document (jsdom soft-enable)', () => {
