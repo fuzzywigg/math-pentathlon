@@ -22,7 +22,12 @@ function defaultSchedule(cb: () => void): void {
   ).requestIdleCallback;
 
   if (typeof ric === 'function') {
-    ric(() => cb(), { timeout: 2_500 });
+    ric(
+      () => {
+        cb();
+      },
+      { timeout: 2_500 }
+    );
     return;
   }
   window.setTimeout(cb, 800);

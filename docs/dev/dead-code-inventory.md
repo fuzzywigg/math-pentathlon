@@ -47,6 +47,12 @@
 > Metrics unchanged vs `#840` (491 defined / naive unused 8 / zero-ref 0); no `src/**/*.css`
 > diffs since post785 tip fold. Report-only; contains open `#840` / `#805` / `#766`.
 > Dated residual inventory: `docs/dev/dead-css-rank1-rescan-post865-2026-10-10.md`.
+>
+> **q-mp-461 (2026-10-10):** Fresh Rank-1 CSS rescan on tip `cursor/mp-tip-post914` @ `753052a6`.
+> Metrics unchanged vs `#882` (491 defined / naive unused 8 / zero-ref 0); no `src/**/*.css`
+> diffs since post865 tip fold (across post898 + post914 cuts). Report-only; contains open
+> `#882` / `#840` / `#805` / `#766`. Dated residual inventory:
+> `docs/dev/dead-css-rank1-rescan-post914-2026-10-10.md`.
 
 ## Method
 

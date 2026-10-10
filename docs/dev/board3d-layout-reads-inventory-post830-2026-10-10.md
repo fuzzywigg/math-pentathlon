@@ -1,6 +1,6 @@
 # q-mp-384 — board-3d layout-reads inventory refresh (tip post830)
 
-> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`). Intermediate post865 stamp: [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`). Counts unchanged (board-3d raw **30** + owl **1**); tip SHA / branch only.
+> **Superseded stamp:** current tip inventory is [`board3d-layout-reads-inventory-post914-2026-10-10.md`](./board3d-layout-reads-inventory-post914-2026-10-10.md) (`q-mp-490`). Intermediate stamps: [`board3d-layout-reads-inventory-post898-2026-10-10.md`](./board3d-layout-reads-inventory-post898-2026-10-10.md) (`q-mp-440`), [`board3d-layout-reads-inventory-post865-2026-10-10.md`](./board3d-layout-reads-inventory-post865-2026-10-10.md) (`q-mp-415`). Counts unchanged (board-3d raw **30** + owl **1**); tip SHA / branch only.
 
 
 **Task id:** `q-mp-384`  
