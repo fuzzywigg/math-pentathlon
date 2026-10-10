@@ -85,6 +85,8 @@ const isolatedFiles = [
   // q-mp-697: fiar/layout residual arms — Set.prototype add/has spies must not
   // leak into isolate:false shared workers.
   'tests/unit/q-mp-697-fiar-layout-residuals.test.ts',
+  // q-mp-703: prime-gold/types L145 — Array.prototype.filter → Proxy hole.
+  'tests/unit/q-mp-703-prime-gold-types-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
