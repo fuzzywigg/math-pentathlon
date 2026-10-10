@@ -56,6 +56,9 @@ const isolatedFiles = [
   'tests/unit/q-mp-454-game-selector-soft-fail-residuals.test.ts',
   // q-mp-472: game-registry soft-fail residuals — temporary available flips.
   'tests/unit/q-mp-472-game-registry-soft-fail-residuals.test.ts',
+  // q-mp-506: engine r17 graph defensive spies — Array/Map/String/Array.from
+  // prototype patches must not leak into isolate:false shared workers.
+  'tests/unit/engine-coverage-round-17-graph-defensive-spies.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
