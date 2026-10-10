@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="420" viewBox="0 0 780 420" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-440 board-3d layout-reads inventory (tip post898)</title>
+  <desc id="desc">All eight board-3d hosts batched on tip 88988b18; raw board-3d rg 30; owl funnel 1; combined 31. Same counts as post865 inventory; tip SHA refresh only.</desc>
+  <rect width="780" height="420" fill="#f4f6f3"/>
+  <text x="24" y="34" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1a2e1a">q-mp-440 - board-3d layout-reads (post898)</text>
+  <text x="24" y="56" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#4a5c4a">tip 88988b18 - report-only - contains #905/#415 (+ layout batches already on tip)</text>
+
+  <rect x="24" y="76" width="170" height="68" fill="#dcefe0" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="109" y="106" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1a3d22">8/8</text>
+  <text x="109" y="128" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1a3d22">hosts batched</text>
+
+  <rect x="210" y="76" width="170" height="68" fill="#e8eef5" stroke="#3a5f8a" stroke-width="1"/>
+  <text x="295" y="106" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1e3a5f">30</text>
+  <text x="295" y="128" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1e3a5f">raw board-3d rg</text>
+
+  <rect x="396" y="76" width="170" height="68" fill="#e8eef5" stroke="#3a5f8a" stroke-width="1"/>
+  <text x="481" y="106" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1e3a5f">31</text>
+  <text x="481" y="128" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#1e3a5f">board-3d + owl</text>
+
+  <rect x="582" y="76" width="174" height="68" fill="#f5edd8" stroke="#8a6a20" stroke-width="1"/>
+  <text x="669" y="106" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#5c4310">1</text>
+  <text x="669" y="128" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#5c4310">owl funnel :69</text>
+
+  <text x="24" y="172" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#243024">Before (#905 post865) -&gt; After (post898)</text>
+  <rect x="24" y="184" width="320" height="22" fill="#c9b8a8" stroke="#6b5344" stroke-width="1"/>
+  <text x="36" y="199" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#2a1f18">before: 8/8 batched - 30+1 - 7f8a7147</text>
+  <rect x="360" y="184" width="396" height="22" fill="#9fd0a8" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="372" y="199" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#14301a">after: 8/8 batched - 30+1 - tip 88988b18 (counts flat)</text>
+
+  <text x="24" y="234" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#243024">Per-host raw rg hits (green = batched on tip)</text>
+
+  <text x="24" y="262" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">fiar</text>
+  <rect x="140" y="250" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="310" y="262" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #836</text>
+
+  <text x="24" y="286" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">hex-a-gone</text>
+  <rect x="140" y="274" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="310" y="286" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #784</text>
+
+  <text x="24" y="310" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">kings</text>
+  <rect x="140" y="298" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="310" y="310" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #834</text>
+
+  <text x="24" y="334" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">kwatro-sinko</text>
+  <rect x="140" y="322" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="310" y="334" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #835</text>
+
+  <text x="400" y="262" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">pent-em-in</text>
+  <rect x="520" y="250" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="690" y="262" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #838</text>
+
+  <text x="400" y="286" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">prime-gold</text>
+  <rect x="520" y="274" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="690" y="286" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #826</text>
+
+  <text x="400" y="310" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">queens</text>
+  <rect x="520" y="298" width="160" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="690" y="310" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">4  #804</text>
+
+  <text x="400" y="334" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">star-track</text>
+  <rect x="520" y="322" width="80" height="16" fill="#6faf7c" stroke="#2f6f3e" stroke-width="1"/>
+  <text x="610" y="334" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">2  #807</text>
+
+  <text x="24" y="368" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">owl-component</text>
+  <rect x="140" y="356" width="40" height="16" fill="#e0c56a" stroke="#8a6a20" stroke-width="1"/>
+  <text x="190" y="368" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#243024">1  funnel :69 - q-mp-328</text>
+
+  <text x="24" y="400" font-family="ui-sans-serif, system-ui, sans-serif" font-size="11" fill="#4a5c4a">Bar width = raw rg hits (40px = 1). Docs-only; leave #905/#861/#757 open with contained.</text>
+</svg>
