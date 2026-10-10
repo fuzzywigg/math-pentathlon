@@ -4,19 +4,14 @@
  * The verify glob `tests/unit/*stats-dashboard*` does not include burn-wave24,
  * so `readStatsSnapshot` (line 30) and `renderStatsDashboard` (line 301) stay
  * uncovered there. Structural asserts only — no player-facing copy pins.
+ * Navigate wiring stays covered by isolated stats-dashboard / burn-wave suites.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   readStatsSnapshot,
   renderStatsDashboard,
 } from '../../src/ui/stats-dashboard';
 import { storage } from '../../src/core/storage';
-
-vi.mock('../../src/core/router', () => ({
-  navigate: vi.fn(),
-}));
-
-import { navigate } from '../../src/core/router';
 
 describe('q-mp-643 stats-dashboard live snapshot / render residuals', () => {
   let container: HTMLElement;
@@ -26,7 +21,6 @@ describe('q-mp-643 stats-dashboard live snapshot / render residuals', () => {
     storage.resetAll();
     container = document.createElement('div');
     document.body.appendChild(container);
-    vi.mocked(navigate).mockClear();
   });
 
   afterEach(() => {
@@ -78,9 +72,5 @@ describe('q-mp-643 stats-dashboard live snapshot / render residuals', () => {
     expect(snap.profile?.name).toBe('Pat');
     expect(snap.gameStats.hex?.gamesPlayed).toBeGreaterThanOrEqual(1);
     expect(snap.totalGamesPlayed).toBeGreaterThanOrEqual(1);
-
-    const back = container.querySelector('#back-btn') as HTMLButtonElement;
-    back.click();
-    expect(navigate).toHaveBeenCalledWith('/');
   });
 });
