@@ -46,7 +46,7 @@ npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/a
 npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
 npm run check:build              # build reproducibility probe
 npm run check:pwa-manifest       # PWA manifest / installability (report-only)
-npm run check:dev-docs           # engine-doc link report (report-only, exit 0)
+npm run check:dev-docs           # docs/ (+ wiki/playtest) path/link report (report-only, exit 0)
 npm run check:workflows          # workflow YAML sanity
 npm run report:knip              # knip unused-export drift vs baseline (CI report-only; docs/dev/knip-report.md)
 npm run report:dead-code         # fuller dead-code inventory (local; docs/dev/dead-code-inventory.md)
