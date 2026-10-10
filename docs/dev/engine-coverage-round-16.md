@@ -96,14 +96,14 @@ r14; r16 cases are disjoint from `#935` and apply on tip alone.
 Full unit suite excl. AI/bench, with `#935` r15 suite overlaid for post-r15 view
 (r15 file not committed on this branch):
 
-| Module           |    Before branch |        After branch |      Before line |          After line | Δb / Δl |
-| ---------------- | ---------------: | ------------------: | ---------------: | ------------------: | ------- |
-| tutorial.ts      | 92.17% (165/179) | _(remeasure after)_ | 98.02% (398/406) | _(remeasure after)_ | TBD     |
-| graph/algorithms |           90.00% |              90.00% |           94.90% |              94.90% | 0 (doc) |
-| graph/types      |           94.11% |              94.11% |           98.66% |              98.66% | 0 (doc) |
-| fraction-bar-ui  |           99.10% |              99.10% |             100% |                100% | 0 (doc) |
-| attributes/**    |             100% |                100% |             100% |                100% | 0 (hot) |
-| alignment/**     |             100% |                100% |             100% |                100% | 0 (hot) |
+| Module           |    Before branch |         After branch |      Before line |           After line | Δb / Δl    |
+| ---------------- | ---------------: | -------------------: | ---------------: | -------------------: | ---------- |
+| tutorial.ts      | 92.17% (165/179) | **93.29%** (167/179) | 98.02% (398/406) | **98.02%** (398/406) | **+2 / 0** |
+| graph/algorithms |           90.00% |               90.00% |           94.90% |               94.90% | 0 (doc)    |
+| graph/types      |           94.11% |               94.11% |           98.66% |               98.66% | 0 (doc)    |
+| fraction-bar-ui  |           99.10% |               99.10% |             100% |                 100% | 0 (doc)    |
+| attributes/**    |             100% |                 100% |             100% |                 100% | 0 (hot)    |
+| alignment/**     |             100% |                 100% |             100% |                 100% | 0 (hot)    |
 
 ## Files changed
 
