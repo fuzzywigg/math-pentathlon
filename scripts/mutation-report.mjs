@@ -13,8 +13,8 @@
  *   npm run mutation:report -- --games=hex,fiar --max=40
  *   npm run mutation:report -- --games=star-track --max=0   # all mutants
  *
- * NOT wired into CI. Exit code is always 0 for report-only use unless the
- * harness itself crashes before producing a report.
+ * NOT wired into CI. Successful report runs exit 0. Invalid argv (bad --max /
+ * --timeout / unknown --games= ids) exits 2 with usage before any rules.ts I/O.
  */
 
 import fs from 'node:fs';
@@ -22,6 +22,11 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import ts from 'typescript';
+import {
+  MUTATION_REPORT_USAGE,
+  parseMutationReportArgs,
+  resolveMutationReportGames,
+} from './lib/mutation-report-args.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -51,26 +56,6 @@ const LOGICAL_FLIP = new Map([
   [ts.SyntaxKind.AmpersandAmpersandToken, ts.factory.createToken(ts.SyntaxKind.BarBarToken)],
   [ts.SyntaxKind.BarBarToken, ts.factory.createToken(ts.SyntaxKind.AmpersandAmpersandToken)],
 ]);
-
-function parseArgs(argv) {
-  const opts = {
-    games: null,
-    max: 35,
-    timeoutMs: 45_000,
-    jsonOut: REPORT_JSON,
-    quietTests: true,
-  };
-  for (const arg of argv) {
-    if (arg.startsWith('--games=')) opts.games = arg.slice(8).split(',').map((s) => s.trim()).filter(Boolean);
-    else if (arg.startsWith('--max=')) opts.max = Number(arg.slice(6));
-    else if (arg.startsWith('--timeout=')) opts.timeoutMs = Number(arg.slice(10));
-    else if (arg.startsWith('--json=')) opts.jsonOut = path.resolve(ROOT, arg.slice(7));
-    else if (arg === '--verbose-tests') opts.quietTests = false;
-  }
-  if (!Number.isFinite(opts.max) || opts.max < 0) opts.max = 35;
-  if (!Number.isFinite(opts.timeoutMs) || opts.timeoutMs < 5_000) opts.timeoutMs = 45_000;
-  return opts;
-}
 
 function listGames() {
   return fs
@@ -454,9 +439,24 @@ function mutateGame(game, opts) {
   };
 }
 
+function usageExit(message) {
+  console.error(message);
+  console.error(MUTATION_REPORT_USAGE);
+  process.exit(2);
+}
+
 function main() {
-  const opts = parseArgs(process.argv.slice(2));
-  const games = opts.games ?? listGames();
+  const parsed = parseMutationReportArgs(process.argv.slice(2), {
+    defaultJsonOut: REPORT_JSON,
+    resolveJson: (p) => path.resolve(ROOT, p),
+  });
+  if (!parsed.ok) usageExit(parsed.message);
+
+  const opts = parsed.opts;
+  const resolved = resolveMutationReportGames(opts.games, listGames());
+  if (!resolved.ok) usageExit(resolved.message);
+
+  const games = resolved.games;
   console.log('Mutation report (rules engines) — report-only, not CI-gated');
   console.log(`games=${games.join(',')}`);
   console.log(`maxMutantsPerGame=${opts.max === 0 ? 'all' : opts.max} timeoutMs=${opts.timeoutMs}`);
