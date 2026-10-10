@@ -18,13 +18,18 @@
  *
  * Report-only for copyleft/unknown/install-script flags (still exit 0).
  *
- * Usage: npm run report:licenses
+ * Usage:
+ *   npm run report:licenses
+ *   node scripts/report-licenses.mjs [--help]
+ *
+ * Unknown flags exit 2. --help/-h exit 0 without scanning or writing reports.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
+import { helpOnlyUsage, parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -289,7 +294,9 @@ export function countByLicense(packages) {
     counts[key] = (counts[key] || 0) + 1;
   }
   return Object.fromEntries(
-    Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    Object.entries(counts).sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
+    )
   );
 }
 
@@ -317,12 +324,16 @@ export function inventoryBundledAssets(root, catalog = BUNDLED_ASSET_CATALOG) {
  * @param {string} root
  * @param {typeof BUNDLED_ASSET_CATALOG} catalog
  */
-export function findUncataloguedPublicMedia(root, catalog = BUNDLED_ASSET_CATALOG) {
+export function findUncataloguedPublicMedia(
+  root,
+  catalog = BUNDLED_ASSET_CATALOG
+) {
   const publicDir = path.join(root, 'public');
   const known = new Set(catalog.map((c) => c.path));
   /** @type {string[]} */
   const found = [];
-  const mediaRe = /\.(woff2?|ttf|otf|eot|mp3|wav|ogg|m4a|png|jpe?g|gif|webp|svg|ico|avif)$/i;
+  const mediaRe =
+    /\.(woff2?|ttf|otf|eot|mp3|wav|ogg|m4a|png|jpe?g|gif|webp|svg|ico|avif)$/i;
 
   /**
    * @param {string} dir
@@ -371,9 +382,7 @@ export function buildCycloneDxBom(opts) {
       'bom-ref': `pkg:npm/${purlEncoded}@${pkg.version}`,
       name: pkg.name,
       version: pkg.version || undefined,
-      licenses: pkg.license
-        ? [{ expression: pkg.license }]
-        : undefined,
+      licenses: pkg.license ? [{ expression: pkg.license }] : undefined,
       purl: pkg.version
         ? `pkg:npm/${purlEncoded}@${pkg.version}`
         : `pkg:npm/${purlEncoded}`,
@@ -506,9 +515,7 @@ export function formatSummaryMarkdown(report) {
   lines.push(
     `- Development / CI: **${report.packages.filter((p) => !p.production).length}**`
   );
-  lines.push(
-    `- With install scripts: **${report.installScripts.length}**`
-  );
+  lines.push(`- With install scripts: **${report.installScripts.length}**`);
   lines.push('');
   lines.push('## License counts (all lockfile packages)');
   lines.push('');
@@ -581,7 +588,9 @@ export function formatSummaryMarkdown(report) {
   lines.push('');
   lines.push('## Bundled assets (fonts / icons / images / sounds)');
   lines.push('');
-  lines.push('| Path | Kind | License | Third-party | Bytes | License source |');
+  lines.push(
+    '| Path | Kind | License | Third-party | Bytes | License source |'
+  );
   lines.push('| --- | --- | --- | --- | ---: | --- |');
   for (const asset of report.assets) {
     lines.push(
@@ -609,7 +618,18 @@ export function formatSummaryMarkdown(report) {
   return lines.join('\n');
 }
 
-function main() {
+function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'help') {
+    console.log(helpOnlyUsage('scripts/report-licenses.mjs'));
+    process.exit(0);
+  }
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(helpOnlyUsage('scripts/report-licenses.mjs'));
+    process.exit(2);
+  }
+
   if (!fs.existsSync(LOCK_PATH)) {
     console.error(`Missing ${LOCK_PATH}`);
     process.exit(1);

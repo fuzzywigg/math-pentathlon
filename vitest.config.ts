@@ -150,6 +150,8 @@ const nodePureFiles = [
   'tests/unit/report-lint-buckets-parse-args.test.ts',
   // offline probe early --help (q-mp-886); spawnSync CLI check needs node env.
   'tests/unit/offline-probe-cli-help.test.ts',
+  // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
+  'tests/unit/help-only-cli.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
