@@ -3,7 +3,7 @@
 **Task id:** `q-mp-447`  
 **Role:** worker (docs / data / chart only)  
 **Tip audited:** `cursor/mp-tip-post898` @ `85522638` (full `855226389f23cb95bf74bd827556ee831c3bccad`)  
-**Measured at:** `2026-10-10T08:31:37Z` (UTC)  
+**Measured at:** `2026-10-10T08:37:30Z` (UTC)  
 **Prior HOLD map:** [`typecheck-oos-216-hold-map-post865-2026-10-10.md`](./typecheck-oos-216-hold-map-post865-2026-10-10.md) (`q-mp-421` on tip `post865` @ `7f8a7147`; open draft [`#907`](https://github.com/fuzzywigg/math-pentathlon/pull/907)) — leave open with **contained**  
 **Earlier map:** [`typecheck-oos-216-hold-map-2026-10-09.md`](./typecheck-oos-216-hold-map-2026-10-09.md) (`q-mp-276` on tip `post755` @ `74a1596f`; open draft [`#781`](https://github.com/fuzzywigg/math-pentathlon/pull/781)) — leave open with **contained**  
 **Machine summary:** [`typecheck-oos-216-hold-map-post898-2026-10-10.json`](./typecheck-oos-216-hold-map-post898-2026-10-10.json)  
