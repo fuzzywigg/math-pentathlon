@@ -7,6 +7,8 @@ import {
   heatTextColor,
   renderCoverageHeatSvg,
   renderCoverageMapMarkdown,
+  missingSummaryMessage,
+  writeReport,
   DEFAULT_SUMMARY,
 } from '../../scripts/report-coverage-map.mjs';
 
@@ -142,5 +144,30 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     expect(md).toContain('npm run test:unit:coverage');
     expect(md).toContain('npm run report:coverage-map');
     expect(md).toContain('`src/games/hex`');
+  });
+
+  it('formats a friendly missing-summary hint (q-mp-847)', () => {
+    const msg = missingSummaryMessage(DEFAULT_SUMMARY);
+    expect(msg).toContain(DEFAULT_SUMMARY);
+    expect(msg).toContain('npm run test:unit:coverage');
+    expect(msg).toContain('npm run report:coverage-map');
+    expect(msg).toMatch(/explicit path/i);
+    expect(msg).not.toMatch(/ENOENT|readFileSync/);
+  });
+
+  it('writeReport throws ENOENT with friendly message when summary is missing', () => {
+    const missing = 'coverage/__no-such-summary-q-mp-847__.json';
+    try {
+      writeReport({ summaryPath: missing });
+      expect.fail('expected writeReport to throw');
+    } catch (err) {
+      expect(err).toMatchObject({ code: 'ENOENT' });
+      expect(err).toBeInstanceOf(Error);
+      const message = (err as Error).message;
+      expect(message).toContain('missing coverage summary');
+      expect(message).toContain(missing);
+      expect(message).toContain('npm run test:unit:coverage');
+      expect(message).not.toMatch(/at Object\.readFileSync/);
+    }
   });
 });
