@@ -75,6 +75,9 @@ const isolatedFiles = [
   // q-mp-678: expression-demo residual branches — hoisted expression-ui wrap
   // must not leak createInteractiveBuilder into shared isolate:false suites.
   'tests/unit/q-mp-678-expression-demo-residual-branches.test.ts',
+  // q-mp-697: fiar/layout residual arms — Set.prototype add/has spies must not
+  // leak into isolate:false shared workers.
+  'tests/unit/q-mp-697-fiar-layout-residuals.test.ts',
 ];
 
 /** vite-plugin-pwa virtual module is build-only; stub for unit tests. */
