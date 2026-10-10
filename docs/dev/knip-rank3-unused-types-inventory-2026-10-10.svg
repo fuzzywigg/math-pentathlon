@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="320" viewBox="0 0 760 320" role="img" aria-labelledby="title desc">
+  <title id="title">q-mp-365 Knip Rank-3 unusedTypes disposition (tip post830)</title>
+  <desc id="desc">Live unusedTypes 43 vs baseline 47. Excluded AI 23, scoring 4, intentional keepers 2; Rank-3 candidates alignment-compat 7 + UI 7 equals 14.</desc>
+  <rect width="760" height="320" fill="#f7f4ef"/>
+  <text x="24" y="36" font-family="Georgia, 'Times New Roman', serif" font-size="20" fill="#1c1917">q-mp-365 · Knip Rank-3 unusedTypes (post830)</text>
+  <text x="24" y="58" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#57534e">tip 97487de6 · live 43 (baseline 47, 4) · report-only · no demotes</text>
+
+  <!-- Live total -->
+  <rect x="24" y="84" width="120" height="72" fill="#e7e5e4" stroke="#a8a29e" stroke-width="1"/>
+  <text x="84" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#1c1917">43</text>
+  <text x="84" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#44403c">live unusedTypes</text>
+
+  <!-- Excluded AI -->
+  <rect x="160" y="84" width="120" height="72" fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+  <text x="220" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#7f1d1d">23</text>
+  <text x="220" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#7f1d1d">EXCLUDED AI</text>
+
+  <!-- Excluded scoring -->
+  <rect x="296" y="84" width="120" height="72" fill="#ffedd5" stroke="#ea580c" stroke-width="1"/>
+  <text x="356" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#9a3412">4</text>
+  <text x="356" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#9a3412">EXCLUDED scoring</text>
+
+  <!-- Keepers -->
+  <rect x="432" y="84" width="120" height="72" fill="#e0e7ff" stroke="#4f46e5" stroke-width="1"/>
+  <text x="492" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#312e81">2</text>
+  <text x="492" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#312e81">intentional keepers</text>
+
+  <!-- Rank-3 candidates -->
+  <rect x="568" y="84" width="168" height="72" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="652" y="114" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#14532d">14</text>
+  <text x="652" y="138" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" fill="#14532d">Rank-3 candidates</text>
+
+  <!-- Stacked bar of live 43 -->
+  <text x="24" y="190" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#292524">Disposition of live unusedTypes (43)</text>
+  <!-- widths proportional: 23/43*680H363, 4/43*680H63, 2/43*680H32, 14/43*680H221 -->
+  <rect x="24" y="204" width="363" height="22" fill="#fecaca" stroke="#dc2626" stroke-width="1"/>
+  <text x="36" y="219" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#7f1d1d">23 AI (games/*/ai.ts + ai-worker)</text>
+  <rect x="387" y="204" width="63" height="22" fill="#fed7aa" stroke="#ea580c" stroke-width="1"/>
+  <text x="394" y="219" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#9a3412">4 score</text>
+  <rect x="450" y="204" width="32" height="22" fill="#c7d2fe" stroke="#4f46e5" stroke-width="1"/>
+  <text x="455" y="219" font-family="ui-monospace, Menlo, monospace" font-size="11" fill="#312e81">2k</text>
+  <rect x="482" y="204" width="221" height="22" fill="#bbf7d0" stroke="#16a34a" stroke-width="1"/>
+  <text x="494" y="219" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#14532d">14 Rank-3 (7 compat + 7 UI)</text>
+
+  <text x="24" y="252" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#292524">Stale backlog cluster (not in live knip unusedTypes)</text>
+  <rect x="24" y="264" width="712" height="36" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+  <text x="36" y="286" font-family="ui-monospace, Menlo, monospace" font-size="12" fill="#78350f">GamePhase / PlacedBlock / TurnSelection / FractionBar* / LayoutNode / WinCondition  structural use; exclude from this inventorys demote queue</text>
+</svg>
