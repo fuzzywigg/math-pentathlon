@@ -7,6 +7,7 @@ import { injectFabStyles } from '../../src/games/fab-a-diffy/board-ui';
 import { injectFiarStyles } from '../../src/games/fiar/board-ui';
 import { newGameVsHuman as fabHuman } from '../../src/games/fab-a-diffy/game-controller';
 import { initGame as initFiar } from '../../src/games/fiar/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -32,9 +33,7 @@ describe('Wave 59 handshake — fab × fiar inject chrome', () => {
     expect(fabBox.querySelector('.fab-bar-pool')).toBeTruthy();
     expect(fabBox.querySelector('.fab-answer-board')).toBeTruthy();
 
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initFiar(board, status);
     expect(status.querySelector('.fiar-status')).toBeTruthy();
     expect(board.querySelector('svg.fiar-board, svg')).toBeTruthy();

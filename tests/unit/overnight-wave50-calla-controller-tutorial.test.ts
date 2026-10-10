@@ -10,6 +10,7 @@ import {
   getGameState,
   newGameVsHuman,
 } from '../../src/games/calla/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   if (tutorialManager.getIsActive()) tutorialManager.exit();
@@ -18,9 +19,7 @@ afterEach(() => {
 
 describe('Overnight wave50 calla — controller tutorial', () => {
   it('complete unsubscribes and remounts a fresh HvH board; exit does not', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     newGameVsHuman();
     board

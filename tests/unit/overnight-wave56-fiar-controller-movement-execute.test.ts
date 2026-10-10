@@ -7,6 +7,7 @@ import {
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -39,9 +40,7 @@ function forgeMovement(): void {
 
 describe('Wave 56 fiar — movement execute', () => {
   it('select then green destination records move with fromNodeId', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     forgeMovement();
 

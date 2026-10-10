@@ -8,6 +8,7 @@ import {
 } from '../../src/games/fiar/game-controller';
 import { CONFIG } from '../../src/games/fiar/types';
 import { getValidMoves } from '../../src/games/fiar/rules';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -21,7 +22,16 @@ function forgeBlockedCenter(): void {
   }
   // P1 at center; ring of blockers on all 8 neighbors → no valid moves
   s.board.nodes.set('c3r3', { ...s.board.nodes.get('c3r3')!, chip: 'player1' });
-  for (const id of ['c3r2', 'c4r2', 'c5r2', 'c3r3', 'c5r3', 'c3r4', 'c4r4', 'c5r4']) {
+  for (const id of [
+    'c3r2',
+    'c4r2',
+    'c5r2',
+    'c3r3',
+    'c5r3',
+    'c3r4',
+    'c4r4',
+    'c5r4',
+  ]) {
     s.board.nodes.set(id, {
       ...s.board.nodes.get(id)!,
       chip:
@@ -40,9 +50,7 @@ function forgeBlockedCenter(): void {
 
 describe('Wave 57 fiar — select no valids noop', () => {
   it('own chip with zero valid moves stays unselected', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     forgeBlockedCenter();
 
