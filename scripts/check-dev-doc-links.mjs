@@ -18,6 +18,9 @@
  *   3. Relative markdown links under docs/
  *
  * Always exits 0 (report-only). Prints a summary + any missing refs.
+ * CLI --help / unknown-flag gating is not implemented: argv flags
+ * (including --help / --wat) are ignored and a full scan still runs
+ * (exit 0). Do not treat header docs as implementing argv behavior.
  * Tip owner may later opt into fail-on-missing; do not flip that here.
  *
  * Usage:
