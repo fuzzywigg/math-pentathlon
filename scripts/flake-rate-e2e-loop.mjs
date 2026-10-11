@@ -56,14 +56,34 @@ function applyEarlyCli(argv) {
 
 applyEarlyCli(args);
 
-function usageExit(message) {
+function usageExit(message, code = 1) {
   console.error(message);
   console.error(USAGE);
-  process.exit(1);
+  process.exit(code);
+}
+
+/**
+ * Reject duplicate value flags (q-mp-1353); indexOf first-wins is not enough.
+ * Only counts flag positions (skips value slots) so `--out --runs` still hits
+ * the flag-like --out validator (q-mp-871) instead of a false duplicate --runs.
+ */
+function rejectDuplicateFlag(name) {
+  let count = 0;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (VALUE_FLAGS.has(a)) {
+      if (a === name) count += 1;
+      if (i + 1 < args.length) i += 1;
+    }
+  }
+  if (count > 1) {
+    usageExit(`Duplicate ${name}`, 2);
+  }
 }
 
 /** Positive integer flag; rejects missing, non-numeric, and non-positive values. */
 function flag(name, def) {
+  rejectDuplicateFlag(name);
   const i = args.indexOf(name);
   if (i === -1) return def;
   const raw = args[i + 1];
@@ -82,6 +102,7 @@ function flag(name, def) {
 
 /** Directory flag; rejects missing values and values that look like flags. */
 function strFlag(name, def) {
+  rejectDuplicateFlag(name);
   const i = args.indexOf(name);
   if (i === -1) return def;
   const raw = args[i + 1];
@@ -316,4 +337,12 @@ if (failures.length === 0) {
 }
 fs.writeFileSync(path.join(outDir, 'e2e-summary.md'), lines.join('\n'));
 console.log(`[flake-rate-e2e] wrote summary failing=${failures.length}`);
+// All-corrupt / zero successful parses must not look like a clean audit (q-mp-1339).
+const ingestOkCount = runSummaries.filter((r) => !r.error).length;
+if (runSummaries.length > 0 && ingestOkCount === 0) {
+  console.error(
+    `[flake-rate-e2e] all ${runSummaries.length} runs failed to ingest reporter JSON`
+  );
+  process.exit(1);
+}
 process.exit(failures.length > 0 ? 1 : 0);
