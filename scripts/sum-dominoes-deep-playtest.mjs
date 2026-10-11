@@ -9,11 +9,12 @@
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/sum-dominoes-deep-2026-10-07');
 const ART = '/opt/cursor/artifacts';
-const GAMES_PER_DIFF = Number(process.env.SD_GAMES || 10);
+const GAMES_PER_DIFF = requireEnvNumber('SD_GAMES', 10);
 const MAX_HUMAN_TURNS = 80;
 const STALL_MS = 12_000;
 

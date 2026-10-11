@@ -1,10 +1,11 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for harness env Number() validation (q-mp-876).
+ * Hermetic coverage for harness env Number() validation (q-mp-876 / q-mp-908).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   parseEnvNumber,
@@ -13,6 +14,26 @@ import {
 
 const MEM_SCRIPT = resolve(process.cwd(), 'scripts/memory-leak-audit.mjs');
 const RUNTIME_SCRIPT = resolve(process.cwd(), 'scripts/runtime-perf.mjs');
+const CALLA_PLAYTEST = resolve(
+  process.cwd(),
+  'scripts/calla-deep-playtest.mjs'
+);
+const SD_PLAYTEST = resolve(
+  process.cwd(),
+  'scripts/sum-dominoes-deep-playtest.mjs'
+);
+const RAMROD_PLAYTEST = resolve(
+  process.cwd(),
+  'scripts/ramrod-deep-playtest.mjs'
+);
+const STARS_PLAYTEST = resolve(
+  process.cwd(),
+  'scripts/stars-bars-deep-playtest.mjs'
+);
+const PAR55_PLAYTEST = resolve(
+  process.cwd(),
+  'scripts/par-55-deep-playtest.mjs'
+);
 
 describe('parseEnvNumber (q-mp-876)', () => {
   it('uses the default when the env var is unset', () => {
@@ -98,5 +119,72 @@ describe('harness CLI env rejection (q-mp-876)', () => {
     const text = `${r.stdout}\n${r.stderr}`;
     expect(text).toMatch(/Invalid PERF_MOVES="abc"/);
     expect(text).not.toMatch(/browserType\.launch/);
+  });
+});
+
+describe('deep-playtest GAMES_* env rejection (q-mp-908)', () => {
+  it('calla-deep-playtest exits non-zero on CALLA_GAMES_PER=abc before browser launch', () => {
+    const r = spawnSync(process.execPath, [CALLA_PLAYTEST], {
+      encoding: 'utf8',
+      env: { ...process.env, CALLA_GAMES_PER: 'abc' },
+    });
+    expect(r.status).toBeGreaterThan(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid CALLA_GAMES_PER="abc"/);
+    expect(text).not.toMatch(/NaN games/);
+    expect(text).not.toMatch(/browserType\.launch/);
+  });
+
+  it('sum-dominoes-deep-playtest exits non-zero on SD_GAMES=0 before browser launch', () => {
+    const r = spawnSync(process.execPath, [SD_PLAYTEST], {
+      encoding: 'utf8',
+      env: { ...process.env, SD_GAMES: '0' },
+    });
+    expect(r.status).toBeGreaterThan(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid SD_GAMES="0"/);
+    expect(text).not.toMatch(/browserType\.launch/);
+  });
+
+  it('ramrod-deep-playtest exits non-zero on RAMROD_GAMES=abc before browser launch', () => {
+    const r = spawnSync(process.execPath, [RAMROD_PLAYTEST], {
+      encoding: 'utf8',
+      env: { ...process.env, RAMROD_GAMES: 'abc' },
+    });
+    expect(r.status).toBeGreaterThan(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid RAMROD_GAMES="abc"/);
+    expect(text).not.toMatch(/browserType\.launch/);
+  });
+
+  it('stars-bars-deep-playtest exits non-zero on STARS_GAMES=-1 before browser launch', () => {
+    const r = spawnSync(process.execPath, [STARS_PLAYTEST], {
+      encoding: 'utf8',
+      env: { ...process.env, STARS_GAMES: '-1' },
+    });
+    expect(r.status).toBeGreaterThan(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid STARS_GAMES="-1"/);
+    expect(text).not.toMatch(/browserType\.launch/);
+  });
+
+  it('par-55-deep-playtest rejects PAR55_GAMES=abc when PAR55_QUICK unset', () => {
+    const env = { ...process.env, PAR55_GAMES: 'abc' };
+    delete env.PAR55_QUICK;
+    const r = spawnSync(process.execPath, [PAR55_PLAYTEST], {
+      encoding: 'utf8',
+      env,
+    });
+    expect(r.status).toBeGreaterThan(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid PAR55_GAMES="abc"/);
+    expect(text).not.toMatch(/browserType\.launch/);
+  });
+
+  it('par-55-deep-playtest preserves PAR55_QUICK truthy short-circuit before PAR55_GAMES', () => {
+    // Static: avoid spawning a real playtest when QUICK would force launch.
+    const src = readFileSync(PAR55_PLAYTEST, 'utf8');
+    expect(src).toMatch(/process\.env\.PAR55_QUICK\s*\?\s*1\s*:/);
+    expect(src).toMatch(/requireEnvNumber\(\s*['"]PAR55_GAMES['"]/);
   });
 });
