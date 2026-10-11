@@ -14,10 +14,14 @@ import { test, expect, type Page, type Locator } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../src/core/game-registry';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
+import { waitDoubleRaf } from './lib/page-settle.mjs';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const OUT_DIR = path.resolve('docs/visuals/2026-10');
 const IPAD = { width: 834, height: 1194 } as const;
+const READY_TIMEOUT_MS = 15_000;
 
 /** Primary board / play surface that proves the game mounted. */
 const MOUNT: Record<string, string> = {
@@ -44,42 +48,14 @@ const MOUNT: Record<string, string> = {
     '.pinball-board, .pinball-challenge, .pinball-game-container, .pinball-choice-btn',
 };
 
-async function dismissOwlIfNeeded(page: Page) {
-  const dismiss = page.locator(
-    '#ollie-owl button[aria-label="Dismiss message"], #ollie-owl .owl-bubble-dismiss'
-  );
-  if (await dismiss.first().isVisible().catch(() => false)) {
-    await dismiss.first().click({ force: true });
-  }
-  const minimize = page.locator('#ollie-owl .owl-minimize-btn');
-  if (await minimize.isVisible().catch(() => false)) {
-    await minimize.click({ force: true });
-  }
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) {
-      (el as HTMLElement).style.pointerEvents = 'none';
-    }
-  });
-}
-
-async function waitForGameReady(page: Page) {
-  await expect(page.getByTestId('game-loading')).toBeHidden({
-    timeout: 15_000,
-  });
-  await expect(page.locator('#new-game-btn, h1').first()).toBeVisible({
-    timeout: 15_000,
-  });
-}
-
 async function gotoGame(page: Page, gameId: string) {
   await page.setViewportSize(IPAD);
   await page.goto(`/?board3d=0#/game/${gameId}`);
-  await waitForGameReady(page);
+  await waitForGameReady(page, { timeoutMs: READY_TIMEOUT_MS });
 }
 
 async function startHuman(page: Page) {
-  await waitForGameReady(page);
+  await waitForGameReady(page, { timeoutMs: READY_TIMEOUT_MS });
   const modal = page.locator('#new-game-modal');
   const alreadyOpen = await modal.isVisible().catch(() => false);
   if (!alreadyOpen) {
@@ -92,16 +68,12 @@ async function startHuman(page: Page) {
   }
   await page.locator('#start-game-btn').click();
   await expect(modal).toHaveClass(/hidden/);
-  await dismissOwlIfNeeded(page);
+  await dismissOwl(page);
 }
 
 function mountLocator(page: Page, gameId: string): Locator {
   const sel = MOUNT[gameId] ?? '#board, #game-container, main';
   return page.locator(sel).first();
-}
-
-async function settle(page: Page, ms = 400) {
-  await page.waitForTimeout(ms);
 }
 
 /**
@@ -215,7 +187,7 @@ async function playOneHumanTurn(page: Page, gameId: string) {
       break;
     }
     case 'juggle': {
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
       await page.locator('.juggle-roll-btn').click({ force: true });
       const die = page.locator('.juggle-die.selectable').first();
       if (await die.count()) {
@@ -285,13 +257,18 @@ async function playOneHumanTurn(page: Page, gameId: string) {
       );
       if (await valid.count()) {
         await valid.click({ force: true });
-      } else if (await pass.first().isVisible().catch(() => false)) {
+      } else if (
+        await pass
+          .first()
+          .isVisible()
+          .catch(() => false)
+      ) {
         await pass.first().click({ force: true });
       }
       break;
     }
     case 'remainder-islands': {
-      await dismissOwlIfNeeded(page);
+      await dismissOwl(page);
       const roll = page
         .locator('.remainder-btn-roll, button:has-text("Roll")')
         .first();
@@ -384,9 +361,7 @@ test.describe('docs/visuals/2026-10 iPad capture', () => {
 
   test.afterAll(() => {
     writeReadme(AVAILABLE_GAMES);
-    const pngs = fs
-      .readdirSync(OUT_DIR)
-      .filter((f) => f.endsWith('.png'));
+    const pngs = fs.readdirSync(OUT_DIR).filter((f) => f.endsWith('.png'));
     expect(pngs).toHaveLength(AVAILABLE_GAMES.length * 2);
   });
 
@@ -402,11 +377,11 @@ async function captureGame(page: Page, game: GameInfo) {
   await gotoGame(page, game.id);
   await startHuman(page);
   await expect(mountLocator(page, game.id)).toBeVisible({ timeout: 10_000 });
-  await settle(page, 500);
+  await waitDoubleRaf(page);
   await captureShot(page, `${game.id}-start`);
 
   await playOneHumanTurn(page, game.id);
-  await settle(page, 600);
+  await waitDoubleRaf(page);
   await expect(mountLocator(page, game.id)).toBeVisible();
   await captureShot(page, `${game.id}-mid`);
 }
