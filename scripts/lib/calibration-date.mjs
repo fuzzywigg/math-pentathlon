@@ -8,13 +8,17 @@
 
 /**
  * Stamp for docs/ai-calibration-DATE.md and the markdown H1 date.
- * Env override wins when non-empty; else UTC YYYY-MM-DD via toISOString.
+ * Env override wins when non-empty after trim; whitespace-only / empty /
+ * unset → UTC YYYY-MM-DD via toISOString (q-mp-1409).
  *
  * @param {string|undefined|null} envDate process.env.CALIBRATION_DATE
  * @param {Date} [now]
  * @returns {string}
  */
 export function resolveCalibrationDate(envDate, now = new Date()) {
-  if (envDate) return String(envDate);
+  if (envDate != null) {
+    const trimmed = String(envDate).trim();
+    if (trimmed) return trimmed;
+  }
   return now.toISOString().slice(0, 10);
 }
