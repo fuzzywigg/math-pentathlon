@@ -150,6 +150,8 @@ export class InvalidCoverageMetricError extends Error {
 /**
  * Format covered/total for the rank table. Unknown counts (pct-only) → em dash
  * (q-mp-1084); never invent a fake 0/0 ratio beside a real pct.
+ * Non-finite or negative covered|total → em dash (q-mp-1206); null/undefined
+ * and finite non-negative ratios (including 0/0) unchanged.
  *
  * @param {number | null | undefined} covered
  * @param {number | null | undefined} total
@@ -157,6 +159,16 @@ export class InvalidCoverageMetricError extends Error {
  */
 export function formatCounts(covered, total) {
   if (covered == null || total == null) return '—';
+  if (
+    typeof covered !== 'number' ||
+    typeof total !== 'number' ||
+    !Number.isFinite(covered) ||
+    !Number.isFinite(total) ||
+    covered < 0 ||
+    total < 0
+  ) {
+    return '—';
+  }
   return `${covered}/${total}`;
 }
 

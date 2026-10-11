@@ -601,6 +601,18 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(formatCounts(0, 0)).toBe('0/0');
   });
 
+  it('formatCounts rejects NaN and negative covered|total (q-mp-1206)', () => {
+    expect(formatCounts(Number.NaN, 10)).toBe('—');
+    expect(formatCounts(10, Number.NaN)).toBe('—');
+    expect(formatCounts(Number.POSITIVE_INFINITY, 10)).toBe('—');
+    expect(formatCounts(-1, 10)).toBe('—');
+    expect(formatCounts(10, -1)).toBe('—');
+    expect(formatCounts(-0, 10)).toBe('0/10');
+    expect(formatCounts(null, 10)).toBe('—');
+    expect(formatCounts(0, 0)).toBe('0/0');
+    expect(formatCounts(9, 10)).toBe('9/10');
+  });
+
   it('resolveMetric pct-only keeps pct with unknown counts', () => {
     expect(resolveMetric({ pct: 88.5 })).toEqual({
       pct: 88.5,
