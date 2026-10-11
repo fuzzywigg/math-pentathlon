@@ -130,6 +130,12 @@ describe('engine-coverage-round-13 — tutorial ResizeObserver size cache', () =
   type ROCb = (entries: ResizeObserverEntry[]) => void;
   let observedCb: ROCb | null = null;
   let manager: TutorialManager;
+  // Direct globalThis assign is not undone by vi.restoreAllMocks (q-mp-1211).
+  const OriginalRO =
+    typeof globalThis.ResizeObserver === 'function' &&
+    !/^FakeRO/.test(globalThis.ResizeObserver.name)
+      ? globalThis.ResizeObserver
+      : undefined;
 
   beforeEach(() => {
     observedCb = null;
@@ -152,6 +158,11 @@ describe('engine-coverage-round-13 — tutorial ResizeObserver size cache', () =
 
   afterEach(() => {
     manager?.exit();
+    if (OriginalRO) {
+      globalThis.ResizeObserver = OriginalRO;
+    } else {
+      Reflect.deleteProperty(globalThis, 'ResizeObserver');
+    }
   });
 
   it('empty ResizeObserver entry is a no-op; borderBoxSize seeds cache', () => {

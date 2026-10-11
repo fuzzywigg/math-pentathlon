@@ -99,6 +99,12 @@ describe('engine-coverage-round-16 — tutorial ResizeObserver contentRect resid
   type ROCb = (entries: ResizeObserverEntry[]) => void;
   let observedCb: ROCb | null = null;
   let manager: TutorialManager;
+  // Direct globalThis assign is not undone by vi.restoreAllMocks (q-mp-1211).
+  const OriginalRO =
+    typeof globalThis.ResizeObserver === 'function' &&
+    !/^FakeRO/.test(globalThis.ResizeObserver.name)
+      ? globalThis.ResizeObserver
+      : undefined;
 
   beforeEach(() => {
     observedCb = null;
@@ -121,6 +127,11 @@ describe('engine-coverage-round-16 — tutorial ResizeObserver contentRect resid
 
   afterEach(() => {
     manager?.exit();
+    if (OriginalRO) {
+      globalThis.ResizeObserver = OriginalRO;
+    } else {
+      Reflect.deleteProperty(globalThis, 'ResizeObserver');
+    }
   });
 
   it('contentRect height-only arm seeds cache when width is zero', () => {

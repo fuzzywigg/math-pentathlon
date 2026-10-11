@@ -51,8 +51,8 @@ const isolatedFiles = [
   'tests/unit/q-mp-677-game-route-mounts-residual-branches.test.ts',
   // q-mp-299: main.ts soft-fail characterization — same hoisted PWA/demo mocks.
   'tests/unit/q-mp-299-main-soft-fail.test.ts',
-  // q-mp-685: main.ts residual branches — same hoisted PWA/demo mocks.
-  'tests/unit/q-mp-685-main-residual-branches.test.ts',
+  // q-mp-685 / q-mp-1212: main.ts residual shards — same hoisted PWA/demo mocks.
+  'tests/unit/q-mp-685-main-residual-branches*.test.ts',
   // q-mp-422: router soft-fail matrix — vi.resetModules for module-default 404.
   'tests/unit/q-mp-422-router-soft-fail.test.ts',
   // q-mp-453: game-prefetch soft-fail residuals — resetModules + doMock loaders.
@@ -182,10 +182,14 @@ const nodePureFiles = [
   'tests/unit/check-perf-cli-args.test.ts',
   // check:perf LH timeout child kill (q-mp-1090); hermetic mock child needs node env.
   'tests/unit/check-perf-lh-timeout-kill.test.ts',
+  // check:perf missing LH performance score fail-closed (q-mp-1208); fixture JSON.
+  'tests/unit/check-perf-missing-score.test.ts',
   // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.
   'tests/unit/memory-leak-page-ready.test.ts',
+  // memory-leak heap snapshot / null deltas (q-mp-1215 / 1216); hermetic fixtures.
+  'tests/unit/memory-leak-heap-snapshot.test.ts',
   // lib main-entry usage / --help (q-mp-958); spawnSync CLI check needs node env.
   'tests/unit/lib-main-entry-cli-help.test.ts',
   // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.

@@ -27,6 +27,8 @@
  * never exceeds 100 (same approach as report-coverage-map q-mp-1039).
  * Pct-only numeric rows (q-mp-1084): keep pct; covered/total stay unknown (not
  * invented 0/0) in the rank table.
+ * Nested absolute keys (q-mp-1207): slice from the last `src/games/` segment;
+ * duplicate abs paths for the same engine file keep the last row only.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -150,6 +152,8 @@ export class InvalidCoverageMetricError extends Error {
 /**
  * Format covered/total for the rank table. Unknown counts (pct-only) → em dash
  * (q-mp-1084); never invent a fake 0/0 ratio beside a real pct.
+ * Non-finite or negative covered|total → em dash (q-mp-1206); null/undefined
+ * and finite non-negative ratios (including 0/0) unchanged.
  *
  * @param {number | null | undefined} covered
  * @param {number | null | undefined} total
@@ -157,6 +161,16 @@ export class InvalidCoverageMetricError extends Error {
  */
 export function formatCounts(covered, total) {
   if (covered == null || total == null) return '—';
+  if (
+    typeof covered !== 'number' ||
+    typeof total !== 'number' ||
+    !Number.isFinite(covered) ||
+    !Number.isFinite(total) ||
+    covered < 0 ||
+    total < 0
+  ) {
+    return '—';
+  }
   return `${covered}/${total}`;
 }
 
@@ -216,7 +230,18 @@ export function resolveMetric(m) {
  *   missing/non-numeric pct that cannot be derived (q-mp-1018)
  */
 export function collectEngineRows(raw) {
-  const rows = [];
+  /** @type {Map<string, {
+   *   game: string,
+   *   kind: string,
+   *   file: string,
+   *   linePct: number,
+   *   lineCov: number | null,
+   *   lineTot: number | null,
+   *   branchPct: number,
+   *   branchCov: number | null,
+   *   branchTot: number | null,
+   * }>} */
+  const byFile = new Map();
   for (const [filePath, stats] of Object.entries(raw)) {
     if (filePath === 'total') continue;
     const norm = filePath.replace(/\\/g, '/');
@@ -226,15 +251,17 @@ export function collectEngineRows(raw) {
     const kind = m[2];
     if (norm.includes('/ai')) continue;
     const s = /** @type {{ lines?: unknown, branches?: unknown }} */ (stats);
-    const file = norm.includes('src/games/')
-      ? norm.slice(norm.indexOf('src/games/'))
-      : norm;
+    // q-mp-1207: last `src/games/` wins (nested abs keys with earlier markers).
+    const marker = 'src/games/';
+    const markerIdx = norm.lastIndexOf(marker);
+    const file = markerIdx >= 0 ? norm.slice(markerIdx) : norm;
     const lines = resolveMetric(s?.lines);
     const branches = resolveMetric(s?.branches);
     if (!lines || !branches) {
       throw new InvalidCoverageMetricError(file);
     }
-    rows.push({
+    // q-mp-1207: one row per normalized engine file; later summary key wins.
+    byFile.set(file, {
       game,
       kind,
       file,
@@ -246,6 +273,7 @@ export function collectEngineRows(raw) {
       branchTot: branches.total,
     });
   }
+  const rows = [...byFile.values()];
   rows.sort((a, b) => a.branchPct - b.branchPct || a.linePct - b.linePct);
   return rows;
 }

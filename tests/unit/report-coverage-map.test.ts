@@ -25,9 +25,65 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     expect(normalizeRepoPath('src/ui/shell.ts', '/workspace')).toBe(
       'src/ui/shell.ts'
     );
+  });
+
+  it('uses last /src/ and ignores lone outside-root /src/ (q-mp-1199)', () => {
+    // First /src/ used to invent synthetic backup/lib heat prefix.
+    expect(normalizeRepoPath('/home/src/backup/lib/foo.ts', '/workspace')).toBe(
+      '/home/src/backup/lib/foo.ts'
+    );
+    // Nested abs key: last /src/ wins.
+    expect(
+      normalizeRepoPath(
+        '/home/src/backup/lib/workspace/src/games/hex/rules.ts',
+        '/workspace'
+      )
+    ).toBe('src/games/hex/rules.ts');
+    expect(
+      normalizeRepoPath(
+        '/home/ubuntu/src/old/repo/src/ui/shell.ts',
+        '/workspace'
+      )
+    ).toBe('src/ui/shell.ts');
+    // Under root with embedded /src/: last wins.
+    expect(
+      normalizeRepoPath(
+        '/workspace/vendor/src/old/src/games/hex/rules.ts',
+        '/workspace'
+      )
+    ).toBe('src/games/hex/rules.ts');
+    // Lone /src/ outside root stays unparseable (aggregate skips).
     expect(
       normalizeRepoPath('/other/project/src/core/foo.ts', '/workspace')
-    ).toBe('src/core/foo.ts');
+    ).toBe('/other/project/src/core/foo.ts');
+  });
+
+  it('aggregate skips synthetic outside-root /src/ keys (q-mp-1199)', () => {
+    const rows = aggregateByDirectory(
+      {
+        '/home/src/backup/lib/foo.ts': {
+          lines: { total: 10, covered: 1, pct: 10 },
+          branches: { total: 0, covered: 0, pct: 100 },
+          functions: { total: 0, covered: 0, pct: 100 },
+          statements: { total: 10, covered: 1, pct: 10 },
+        },
+        '/home/src/backup/lib/workspace/src/games/hex/rules.ts': {
+          lines: { total: 40, covered: 20, pct: 50 },
+          branches: { total: 10, covered: 4, pct: 40 },
+          functions: { total: 5, covered: 3, pct: 60 },
+          statements: { total: 40, covered: 20, pct: 50 },
+        },
+        '/workspace/src/ui/shell.ts': {
+          lines: { total: 20, covered: 19, pct: 95 },
+          branches: { total: 8, covered: 7, pct: 87.5 },
+          functions: { total: 4, covered: 4, pct: 100 },
+          statements: { total: 20, covered: 19, pct: 95 },
+        },
+      },
+      { root: '/workspace' }
+    );
+    expect(rows.map((r) => r.dir)).toEqual(['src/games/hex', 'src/ui']);
+    expect(rows.map((r) => r.dir)).not.toContain('src/backup/lib');
   });
 
   it('aggregates json-summary entries by parent directory under src/', () => {

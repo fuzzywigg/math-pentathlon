@@ -134,20 +134,39 @@ export function escapeXml(s) {
 
 /**
  * Turn an absolute or relative coverage key into a repo-relative POSIX path.
+ * Prefer repo-root strip; when `/src/` appears more than once, take the last
+ * (q-mp-1199 — first `/src/` invents synthetic heat dirs like `src/backup/lib`).
+ * Absolute keys outside `root` with only a lone `/src/` stay unparseable so
+ * aggregate skips them.
  * @param {string} filePath
  * @param {string} [root]
  */
 export function normalizeRepoPath(filePath, root = ROOT) {
   const posix = filePath.replace(/\\/g, '/');
   const rootPosix = root.replace(/\\/g, '/').replace(/\/$/, '');
+
   if (posix.startsWith(`${rootPosix}/`)) {
-    return posix.slice(rootPosix.length + 1);
+    const rel = posix.slice(rootPosix.length + 1);
+    const nested = rel.lastIndexOf('/src/');
+    if (nested !== -1) return rel.slice(nested + 1);
+    return rel;
   }
-  const srcIdx = posix.indexOf('/src/');
-  if (srcIdx !== -1) {
-    return posix.slice(srcIdx + 1);
+
+  if (posix.startsWith('src/')) {
+    const nested = posix.lastIndexOf('/src/');
+    if (nested !== -1) return posix.slice(nested + 1);
+    return posix;
   }
-  if (posix.startsWith('src/')) return posix;
+
+  // Outside root: last `/src/` only when an earlier `/src/` also exists
+  // (e.g. `/home/src/…/repo/src/games/…`). A lone incidental `/src/`
+  // (`/home/src/backup/lib/foo.ts`) must not invent a heat row.
+  const firstSrc = posix.indexOf('/src/');
+  const lastSrc = posix.lastIndexOf('/src/');
+  if (firstSrc !== -1 && lastSrc > firstSrc) {
+    return posix.slice(lastSrc + 1);
+  }
+
   return posix.replace(/^\.\//, '');
 }
 

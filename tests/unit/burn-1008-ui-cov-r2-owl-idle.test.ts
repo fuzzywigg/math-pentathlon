@@ -10,6 +10,21 @@ import { storage } from '../../src/core/storage';
 import { scheduleIdleGameWarm } from '../../src/pwa/idle-warm';
 import { setUserReducedMotionFlag } from '../../src/core/settings-flags';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 function stubPointer(root: HTMLElement): void {
   vi.spyOn(root, 'getBoundingClientRect').mockReturnValue({
     x: 300,
@@ -69,6 +84,7 @@ describe('burn-1008 ui-cov-r2 owl-component gaps', () => {
     localStorage.clear();
     storage.resetAll();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 

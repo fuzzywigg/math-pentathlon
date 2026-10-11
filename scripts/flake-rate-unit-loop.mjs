@@ -108,6 +108,30 @@ function keyOf(file, name, project) {
   return `${project || 'unit'}::${file}::${name}`;
 }
 
+function isPassStatus(status) {
+  return status === 'pass' || status === 'passed';
+}
+
+function isFailStatus(status) {
+  return status === 'fail' || status === 'failed';
+}
+
+/**
+ * Record a per-test outcome. Durations are kept only for pass/fail so
+ * skip/todo/pending do not dilute avgMs (q-mp-1219).
+ */
+function recordOutcome(rec, status, duration, onPass, onFail) {
+  if (isPassStatus(status)) {
+    rec.durations.push(duration);
+    onPass();
+    return;
+  }
+  if (isFailStatus(status)) {
+    rec.durations.push(duration);
+    onFail();
+  }
+}
+
 function ingestJson(jsonPath, runId, mode) {
   const loaded = readReporterJson(jsonPath);
   if (!loaded.ok) {
@@ -117,8 +141,21 @@ function ingestJson(jsonPath, runId, mode) {
   const data = loaded.data;
   let passed = 0;
   let failed = 0;
+  /** Suite-level failures inferred from file/suite status or message (q-mp-1200). */
+  let inferredSuiteFails = 0;
   const walk = (suite, fileHint) => {
     const file = suite.filepath || fileHint || suite.name || '';
+    const suiteStatus = suite.status || suite.result?.status;
+    if (isFailStatus(suiteStatus)) {
+      inferredSuiteFails += 1;
+    } else if (
+      typeof suite.message === 'string' &&
+      suite.message.length > 0 &&
+      !(suite.tests || []).length &&
+      !(suite.suites || []).length
+    ) {
+      inferredSuiteFails += 1;
+    }
     for (const t of suite.tests || []) {
       const result = t.result || t;
       const status = result.state || t.status;
@@ -130,20 +167,25 @@ function ingestJson(jsonPath, runId, mode) {
         byTest.set(k, { passes: 0, fails: 0, durations: [], errors: [] });
       }
       const rec = byTest.get(k);
-      rec.durations.push(duration);
-      if (status === 'pass' || status === 'passed') {
-        rec.passes += 1;
-        passed += 1;
-      } else if (status === 'fail' || status === 'failed') {
-        rec.fails += 1;
-        failed += 1;
-        const msg =
-          result.errors?.[0]?.message ||
-          t.errors?.[0]?.message ||
-          result.error?.message ||
-          'failed';
-        if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
-      }
+      recordOutcome(
+        rec,
+        status,
+        duration,
+        () => {
+          rec.passes += 1;
+          passed += 1;
+        },
+        () => {
+          rec.fails += 1;
+          failed += 1;
+          const msg =
+            result.errors?.[0]?.message ||
+            t.errors?.[0]?.message ||
+            result.error?.message ||
+            'failed';
+          if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
+        }
+      );
     }
     for (const child of suite.suites || []) walk(child, file);
   };
@@ -151,7 +193,16 @@ function ingestJson(jsonPath, runId, mode) {
   if (Array.isArray(data.testResults)) {
     for (const file of data.testResults) {
       const filePath = file.name || file.file || '';
-      for (const ass of file.assertionResults || []) {
+      const assertions = file.assertionResults || [];
+      if (
+        isFailStatus(file.status) ||
+        (typeof file.message === 'string' &&
+          file.message.length > 0 &&
+          assertions.length === 0)
+      ) {
+        inferredSuiteFails += 1;
+      }
+      for (const ass of assertions) {
         const name =
           ass.fullName ||
           ass.title ||
@@ -163,25 +214,41 @@ function ingestJson(jsonPath, runId, mode) {
         if (!byTest.has(k))
           byTest.set(k, { passes: 0, fails: 0, durations: [], errors: [] });
         const rec = byTest.get(k);
-        rec.durations.push(duration);
-        if (status === 'passed' || status === 'pass') {
-          rec.passes += 1;
-          passed += 1;
-        } else if (status === 'failed' || status === 'fail') {
-          rec.fails += 1;
-          failed += 1;
-          const msg = ass.failureMessages?.[0] || 'failed';
-          if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
-        }
+        recordOutcome(
+          rec,
+          status,
+          duration,
+          () => {
+            rec.passes += 1;
+            passed += 1;
+          },
+          () => {
+            rec.fails += 1;
+            failed += 1;
+            const msg = ass.failureMessages?.[0] || 'failed';
+            if (rec.errors.length < 3)
+              rec.errors.push(String(msg).slice(0, 400));
+          }
+        );
       }
     }
   } else {
     for (const suite of data.suites || [data]) walk(suite);
   }
-  // Per-run ok must key off walked failures + numFailedTests only.
-  // Vitest `success: true` must not override a non-zero failure count (q-mp-1034).
+  // Per-run ok keys off walked failures + numFailedTests + numFailedTestSuites
+  // (and inferred suite status/message). Vitest `success: true` must not
+  // override a non-zero failure count (q-mp-1034 / q-mp-1200).
   const numFailedTests = data.numFailedTests ?? failed;
-  const ok = failed === 0 && numFailedTests === 0;
+  const reportedSuiteFails =
+    typeof data.numFailedTestSuites === 'number' &&
+    Number.isFinite(data.numFailedTestSuites)
+      ? data.numFailedTestSuites
+      : 0;
+  const ok =
+    failed === 0 &&
+    numFailedTests === 0 &&
+    reportedSuiteFails === 0 &&
+    inferredSuiteFails === 0;
   runSummaries.push({
     runId,
     mode,

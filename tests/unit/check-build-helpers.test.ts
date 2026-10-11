@@ -1,3 +1,6 @@
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import {
   parsePrecacheManifest,
@@ -6,6 +9,7 @@ import {
   listChunkNames,
   PRECACHE_FONT_IGNORES,
   collectHtmlNonRootAssetRefs,
+  scanEnvLeakage,
 } from '../../scripts/check-build.mjs';
 
 describe('check-build helpers', () => {
@@ -174,9 +178,9 @@ describe('check-build helpers', () => {
       { url: '/a.js', revision: '42' },
     ]);
     // Numeric revision + folded size/integrity extras still parse.
-    expect(
-      parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')
-    ).toEqual([{ url: '/a.js', revision: '42' }]);
+    expect(parsePrecacheManifest('{url:"/a.js",revision:42,size:12}')).toEqual([
+      { url: '/a.js', revision: '42' },
+    ]);
     expect(
       parsePrecacheManifest('{url:"/a.js",revision:0,integrity:null}')
     ).toEqual([{ url: '/a.js', revision: '0' }]);
@@ -271,5 +275,27 @@ describe('check-build helpers', () => {
       './c.css',
       './d.css',
     ]);
+  });
+
+  it('scanEnvLeakage requires a real file:/// URL token, not substring theater (q-mp-1209)', () => {
+    const dist = mkdtempSync(join(tmpdir(), 'check-build-leak-'));
+    try {
+      writeFileSync(
+        join(dist, 'prose.js'),
+        'const msg = "not a file:/// path";\n'
+      );
+      writeFileSync(
+        join(dist, 'leak.js'),
+        'const u = "file:///tmp/secret-asset";\n'
+      );
+      writeFileSync(join(dist, 'bare.js'), 'file:///\n');
+      const findings = scanEnvLeakage(dist);
+      expect(findings).toEqual([{ path: 'leak.js', finding: 'file:// URL' }]);
+      expect(
+        findings.some((f) => f.path === 'prose.js' || f.path === 'bare.js')
+      ).toBe(false);
+    } finally {
+      rmSync(dist, { recursive: true, force: true });
+    }
   });
 });

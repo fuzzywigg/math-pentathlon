@@ -601,6 +601,18 @@ describe('engine-coverage-rank pct-only counts (q-mp-1084)', () => {
     expect(formatCounts(0, 0)).toBe('0/0');
   });
 
+  it('formatCounts rejects NaN and negative covered|total (q-mp-1206)', () => {
+    expect(formatCounts(Number.NaN, 10)).toBe('—');
+    expect(formatCounts(10, Number.NaN)).toBe('—');
+    expect(formatCounts(Number.POSITIVE_INFINITY, 10)).toBe('—');
+    expect(formatCounts(-1, 10)).toBe('—');
+    expect(formatCounts(10, -1)).toBe('—');
+    expect(formatCounts(-0, 10)).toBe('0/10');
+    expect(formatCounts(null, 10)).toBe('—');
+    expect(formatCounts(0, 0)).toBe('0/0');
+    expect(formatCounts(9, 10)).toBe('9/10');
+  });
+
   it('resolveMetric pct-only keeps pct with unknown counts', () => {
     expect(resolveMetric({ pct: 88.5 })).toEqual({
       pct: 88.5,
@@ -719,5 +731,66 @@ describe('engine-coverage-rank clamp pct-only values (q-mp-1133)', () => {
     expect(out).not.toMatch(/-10\.00/);
     // q-mp-1084: still em dash, not invented 0/0.
     expect(out).not.toMatch(/100\.00\t0\/0/);
+  });
+});
+
+describe('engine-coverage-rank last src/games + dedupe (q-mp-1207)', () => {
+  it('uses the last src/games/ segment for nested absolute keys', () => {
+    const rows = collectEngineRows({
+      '/home/src/games/old/backup/workspace/src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].file).toBe('src/games/hex/rules.ts');
+    expect(rows[0].game).toBe('hex');
+    expect(rows[0].file).not.toContain('src/games/old/');
+  });
+
+  it('dedupes duplicate abs paths to one rank row (keep last)', () => {
+    const rows = collectEngineRows({
+      '/a/workspace/src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+      '/b/workspace/src/games/hex/rules.ts': {
+        lines: { pct: 91, covered: 91, total: 100 },
+        branches: { pct: 81, covered: 81, total: 100 },
+      },
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].file).toBe('src/games/hex/rules.ts');
+    expect(rows[0].linePct).toBe(91);
+    expect(rows[0].branchPct).toBe(81);
+    const out = formatRankOutput(rows);
+    expect(out).toContain(
+      '1\tsrc/games/hex/rules.ts\t91.00\t91/100\t81.00\t81/100'
+    );
+    expect(out).not.toMatch(/\n2\tsrc\/games\/hex\/rules\.ts/);
+    expect(out).not.toContain('+ rules');
+  });
+
+  it('good single-marker summaries remain unchanged', () => {
+    const rows = collectEngineRows({
+      '/abs/src/games/hex/rules.ts': {
+        lines: { pct: 90, covered: 9, total: 10 },
+        branches: { pct: 80, covered: 8, total: 10 },
+      },
+      '/abs/src/games/hex/board.ts': {
+        lines: { pct: 70, covered: 7, total: 10 },
+        branches: { pct: 60, covered: 6, total: 10 },
+      },
+    });
+    expect(rows.map((r) => r.file)).toEqual([
+      'src/games/hex/board.ts',
+      'src/games/hex/rules.ts',
+    ]);
+    expect(formatRankOutput(rows)).toContain(
+      '1\tsrc/games/hex/board.ts\t70.00\t7/10\t60.00\t6/10'
+    );
+    expect(formatRankOutput(rows)).toContain(
+      '2\tsrc/games/hex/rules.ts\t90.00\t9/10\t80.00\t8/10'
+    );
   });
 });

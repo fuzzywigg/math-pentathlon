@@ -16,3 +16,20 @@ declare module 'node:path' {
 declare module 'node:url' {
   export function fileURLToPath(url: string | URL): string;
 }
+
+declare module 'node:fs' {
+  export function mkdtempSync(prefix: string): string;
+  export function writeFileSync(
+    file: string,
+    data: string,
+    options?: string | { encoding?: string }
+  ): void;
+  export function rmSync(
+    path: string,
+    options?: { recursive?: boolean; force?: boolean }
+  ): void;
+}
+
+declare module 'node:os' {
+  export function tmpdir(): string;
+}

@@ -38,7 +38,7 @@ const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
 const SKIP_BUILD = process.env.CHECK_BUILD_SKIP_BUILD === '1';
 
 /** Deploy / SW runtime files that are not part of the Workbox precache. */
-export const PRECACHE_EXEMPT = new Set(['_headers', '_redirects', 'sw.js']);
+const PRECACHE_EXEMPT = new Set(['_headers', '_redirects', 'sw.js']);
 
 /**
  * Inter weights intentionally excluded from first-install precache
@@ -51,7 +51,7 @@ export const PRECACHE_FONT_IGNORES = new Set([
 ]);
 
 /** Extensions Workbox globPatterns cover for offline play. */
-export const OFFLINE_EXTS = new Set([
+const OFFLINE_EXTS = new Set([
   '.js',
   '.css',
   '.html',
@@ -127,7 +127,7 @@ export function parsePrecacheManifest(swSource) {
  * @param {string} root
  * @returns {Map<string, string>} relative path → sha256 hex
  */
-export function hashTree(root) {
+function hashTree(root) {
   /** @type {Map<string, string>} */
   const map = new Map();
   if (!fs.existsSync(root)) return map;
@@ -203,7 +203,7 @@ export function offlineNeededPaths(relPaths) {
 /**
  * @param {string} distRoot
  */
-export function auditPrecache(distRoot) {
+function auditPrecache(distRoot) {
   const swPath = path.join(distRoot, 'sw.js');
   if (!fs.existsSync(swPath)) {
     return {
@@ -268,6 +268,7 @@ export function auditPrecache(distRoot) {
  * @param {string} distRoot
  * @returns {{ path: string, finding: string }[]}
  */
+// Kept exported: unit helpers from q-mp-1209 import this (tip fold kept both helpers).
 export function scanEnvLeakage(distRoot) {
   /** @type {{ path: string, finding: string }[]} */
   const findings = [];
@@ -275,7 +276,9 @@ export function scanEnvLeakage(distRoot) {
     { re: /\/workspace\//, label: 'absolute /workspace path' },
     { re: /\/home\/[A-Za-z0-9._-]+\//, label: 'absolute /home path' },
     { re: /[A-Z]:\\/, label: 'Windows absolute path' },
-    { re: /file:\/\/\//, label: 'file:// URL' },
+    // URL token with a path segment after file:/// — not mid-sentence
+    // substring theater like `not a file:/// path` (q-mp-1209).
+    { re: /(?<![A-Za-z0-9])file:\/\/\/[^\s"'<>]+/, label: 'file:// URL' },
     { re: /sourceMappingURL\s*=/, label: 'sourceMappingURL' },
   ];
   for (const rel of hashTree(distRoot).keys()) {
@@ -314,7 +317,7 @@ export function collectHtmlNonRootAssetRefs(html) {
 /**
  * @param {string} distRoot
  */
-export function auditSourcemapsAndBase(distRoot) {
+function auditSourcemapsAndBase(distRoot) {
   const tree = hashTree(distRoot);
   const maps = [...tree.keys()].filter((p) => p.endsWith('.map'));
   const htmlPath = path.join(distRoot, 'index.html');

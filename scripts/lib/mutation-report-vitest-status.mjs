@@ -1,7 +1,7 @@
 /**
  * Vitest spawn status classification for scripts/mutation-report.mjs
- * (q-mp-1038, q-mp-1156, q-mp-1182). Kept free of TypeScript AST / spawn so
- * unit tests can import hermetically.
+ * (q-mp-1038, q-mp-1156, q-mp-1182, q-mp-1205). Kept free of TypeScript AST /
+ * spawn so unit tests can import hermetically.
  */
 
 /**
@@ -14,8 +14,9 @@ const NO_TEST_FILES_RE =
 
 /**
  * Classify a finished Vitest spawn for mutation scoring.
- * Filter-miss / no-test phrases → error (not killed). Empty harness
- * `testFiles` remains `no-tests` in the caller (left to q-mp-1025).
+ * Filter-miss / no-test phrases → error (not killed). Non-timeout
+ * `exitCode == null` (spawn/infra) → error, not killed (q-mp-1205). Empty
+ * harness `testFiles` remains `no-tests` in the caller (left to q-mp-1025).
  *
  * @param {{ exitCode: number|null, stdout?: string, stderr?: string, timedOut?: boolean }} result
  * @returns {'survived'|'killed'|'timeout'|'error'}
@@ -25,5 +26,7 @@ export function classifyVitestRunResult(result) {
   if (result.exitCode === 0) return 'survived';
   const combined = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
   if (NO_TEST_FILES_RE.test(combined)) return 'error';
+  // q-mp-1205: spawn ENOENT / signal death leave exitCode null — not a kill.
+  if (result.exitCode == null) return 'error';
   return 'killed';
 }

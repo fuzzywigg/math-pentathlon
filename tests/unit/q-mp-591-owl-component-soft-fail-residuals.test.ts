@@ -37,6 +37,21 @@ import { owlSystem } from '../../src/core/owl';
 import { storage } from '../../src/core/storage';
 import { OwlComponent, owlComponent } from '../../src/ui/owl/owl-component';
 
+// Direct document assign is not undone by vi.restoreAllMocks (q-mp-1210).
+const originalElementFromPoint =
+  typeof document.elementFromPoint === 'function' &&
+  !vi.isMockFunction(document.elementFromPoint)
+    ? document.elementFromPoint
+    : undefined;
+
+function restoreElementFromPoint(): void {
+  if (originalElementFromPoint) {
+    document.elementFromPoint = originalElementFromPoint;
+  } else {
+    Reflect.deleteProperty(document, 'elementFromPoint');
+  }
+}
+
 const OWL_COMPONENT_SRC = readFileSync(
   join(
     dirname(fileURLToPath(import.meta.url)),
@@ -116,6 +131,7 @@ describe('q-mp-591 owl-component soft-fail residuals', () => {
     localStorage.clear();
     storage.resetAll();
     vi.restoreAllMocks();
+    restoreElementFromPoint();
     vi.useRealTimers();
   });
 
