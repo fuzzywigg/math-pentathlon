@@ -28,6 +28,11 @@ import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { RUNTIME_PERF_USAGE } from './lib/browser-harness-script-usage.mjs';
 import {
+  clickFirst,
+  maxLongTaskMs,
+  runtimePerfMarkdownTitle,
+} from './lib/runtime-perf-helpers.mjs';
+import {
   getCpuThrottle,
   getMoveTargetRender,
   finalizeGameResult,
@@ -104,13 +109,7 @@ const GAMES = filter.length
 
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {
-  const clickFirst = async (sel) => {
-    const loc = page.locator(sel).first();
-    if ((await loc.count()) === 0) return false;
-    if (!(await loc.isVisible().catch(() => false))) return false;
-    await loc.click({ force: true }).catch(() => {});
-    return true;
-  };
+  const tap = (sel) => clickFirst(page, sel);
 
   switch (gameId) {
     case 'kings-quadraphages': {
@@ -123,43 +122,43 @@ async function attemptScriptedMove(page, gameId) {
           .click({ force: true });
         return true;
       }
-      return clickFirst('.cell:not(.cell-blocked)');
+      return tap('.cell:not(.cell-blocked)');
     }
     case 'hex':
-      return clickFirst(
+      return tap(
         '.hex-cell-group:not(.occupied), .hex-cell:not(.occupied)'
       );
     case 'star-track': {
-      if (await clickFirst('.star-track-draw-btn')) {
+      if (await tap('.star-track-draw-btn')) {
         await page.waitForTimeout(200);
-        return clickFirst('.star-track-chain-btn');
+        return tap('.star-track-chain-btn');
       }
-      return clickFirst('.star-track-chain-btn');
+      return tap('.star-track-chain-btn');
     }
     case 'hex-a-gone': {
-      await clickFirst('.hex-a-gone-block-btn:not(.empty)');
-      await clickFirst('.hex-a-gone-confirm-btn');
-      return clickFirst(
+      await tap('.hex-a-gone-block-btn:not(.empty)');
+      await tap('.hex-a-gone-confirm-btn');
+      return tap(
         '.hex-a-gone-board [data-q], .hex-a-gone-cell, [data-mp3d-a11y] button'
       );
     }
     case 'calla':
       return (
-        (await clickFirst('.calla-pit-valid')) ||
-        (await clickFirst('.calla-pit'))
+        (await tap('.calla-pit-valid')) ||
+        (await tap('.calla-pit'))
       );
     case 'sum-dominoes': {
-      await clickFirst('.sd-roll-btn');
-      if (await clickFirst('.sd-hand-domino-playable')) {
-        return clickFirst('.sd-cell-valid');
+      await tap('.sd-roll-btn');
+      if (await tap('.sd-hand-domino-playable')) {
+        return tap('.sd-cell-valid');
       }
-      return clickFirst('.sd-pass-btn');
+      return tap('.sd-pass-btn');
     }
     case 'par-55': {
-      if (await clickFirst('.par55-hand-block.clickable')) {
+      if (await tap('.par55-hand-block.clickable')) {
         return (
-          (await clickFirst('.par55-valid-base')) ||
-          (await clickFirst('.par55-cell.valid'))
+          (await tap('.par55-valid-base')) ||
+          (await tap('.par55-cell.valid'))
         );
       }
       return false;
@@ -168,24 +167,24 @@ async function attemptScriptedMove(page, gameId) {
       const rod = page.locator('.ramrod-rod-wrapper.selectable').first();
       if ((await rod.count()) > 0) {
         await rod.evaluate((el) => el.click());
-        return clickFirst('.ramrod-slot.valid');
+        return tap('.ramrod-slot.valid');
       }
       return false;
     }
     case 'kwatro-sinko': {
-      if (await clickFirst('.kwa-selectable-chip')) {
-        return clickFirst('.kwa-valid-node');
+      if (await tap('.kwa-selectable-chip')) {
+        return tap('.kwa-valid-node');
       }
       return false;
     }
     case 'fiar':
-      return clickFirst(
+      return tap(
         '[data-node-id]:has(.pulse-highlight), .fiar-board-container [data-node-id], [data-mp3d-a11y] button'
       );
     case 'juggle': {
-      await clickFirst('.juggle-roll-btn');
-      await clickFirst('.juggle-die.selectable');
-      await clickFirst('.juggle-shape-option');
+      await tap('.juggle-roll-btn');
+      await tap('.juggle-die.selectable');
+      await tap('.juggle-shape-option');
       const cell = page.locator('.juggle-cell').first();
       if ((await cell.count()) > 0) {
         await cell.evaluate((el) => el.click());
@@ -194,19 +193,19 @@ async function attemptScriptedMove(page, gameId) {
       return false;
     }
     case 'contig-60': {
-      await clickFirst('.contig-roll-btn');
-      if (await clickFirst('.contig-cell-valid')) return true;
-      return clickFirst('.contig-pass-btn');
+      await tap('.contig-roll-btn');
+      if (await tap('.contig-cell-valid')) return true;
+      return tap('.contig-pass-btn');
     }
     case 'stars-bars': {
-      if (await clickFirst('.stars-card:not(.disabled)')) {
-        return clickFirst('.stars-cell.valid');
+      if (await tap('.stars-card:not(.disabled)')) {
+        return tap('.stars-cell.valid');
       }
       return false;
     }
     case 'fab-a-diffy': {
-      if (await clickFirst('.fab-bar-wrapper:not(.fab-bar-disabled)')) {
-        return clickFirst('.fab-op-valid, .fab-op-btn:not(.fab-op-disabled)');
+      if (await tap('.fab-bar-wrapper:not(.fab-bar-disabled)')) {
+        return tap('.fab-op-valid, .fab-op-btn:not(.fab-op-disabled)');
       }
       return false;
     }
@@ -216,21 +215,21 @@ async function attemptScriptedMove(page, gameId) {
       );
       if ((await pieces.count()) > 0) {
         await pieces.first().click({ force: true });
-        return clickFirst(
+        return tap(
           '[data-cell-key][aria-label*="valid"], [data-mp3d-a11y] button'
         );
       }
       return false;
     }
     case 'prime-gold': {
-      await clickFirst('.pg-roll-btn, .prime-roll-btn');
-      if (await clickFirst('.pg-cell.valid, .prime-cell.valid')) return true;
-      return clickFirst(
+      await tap('.pg-roll-btn, .prime-roll-btn');
+      if (await tap('.pg-cell.valid, .prime-cell.valid')) return true;
+      return tap(
         '.pg-btn-secondary, .pg-pass-btn, button:has-text("Pass")'
       );
     }
     case 'remainder-islands': {
-      await clickFirst('.remainder-btn-roll, button:has-text("Roll")');
+      await tap('.remainder-btn-roll, button:has-text("Roll")');
       const island = page.locator('.island.valid').first();
       if ((await island.count()) > 0) {
         await island.evaluate((el) => {
@@ -248,23 +247,23 @@ async function attemptScriptedMove(page, gameId) {
       return false;
     }
     case 'pent-em-in': {
-      await clickFirst('.pent-piece-option');
-      return clickFirst(
+      await tap('.pent-piece-option');
+      return tap(
         '.pent-board .interaction rect, .pent-board rect[data-row], [data-mp3d-a11y] button'
       );
     }
     case 'frac-fact': {
-      if (await clickFirst('.frac-choice-btn')) {
+      if (await tap('.frac-choice-btn')) {
         await page.waitForTimeout(100);
-        await clickFirst('.frac-continue-btn, button:has-text("Continue")');
+        await tap('.frac-continue-btn, button:has-text("Continue")');
         return true;
       }
       return false;
     }
     case 'fraction-pinball': {
-      if (await clickFirst('.pinball-choice-btn')) {
+      if (await tap('.pinball-choice-btn')) {
         await page.waitForTimeout(100);
-        await clickFirst('.pinball-continue-btn, button:has-text("Continue")');
+        await tap('.pinball-continue-btn, button:has-text("Continue")');
         return true;
       }
       return false;
@@ -320,7 +319,7 @@ async function sampleFrames(page, ms) {
 }
 
 async function readPerf(page) {
-  return page.evaluate(() => {
+  const raw = await page.evaluate(() => {
     const w = window;
     const lt = w.__mpPerf?.longTasks ?? [];
     const frames = w.__mpPerf?.frames ?? [];
@@ -331,7 +330,7 @@ async function readPerf(page) {
         : null;
     return {
       longTaskCount: lt.length,
-      longTaskMaxMs: lt.reduce((m, e) => Math.max(m, e.duration), 0),
+      longTaskDurations: lt.map((e) => e.duration),
       longTaskSumMs: lt.reduce((s, e) => s + e.duration, 0),
       frameCount: frames.length,
       frameP50Ms: pct(0.5),
@@ -339,6 +338,12 @@ async function readPerf(page) {
       frameMaxMs: sorted.length ? sorted[sorted.length - 1] : null,
     };
   });
+  const { longTaskDurations, ...rest } = raw;
+  return {
+    ...rest,
+    // q-mp-1245: empty long-task list → null (same posture as frameMaxMs)
+    longTaskMaxMs: maxLongTaskMs(longTaskDurations),
+  };
 }
 
 async function heapUsed(cdp) {
@@ -592,7 +597,7 @@ async function measureGame(browser, baseURL, gameId) {
 
 function renderMarkdown(results, meta) {
   const lines = [];
-  lines.push('# Runtime perf — 2026-10-07');
+  lines.push(runtimePerfMarkdownTitle(PERF_DATE));
   lines.push('');
   lines.push(
     'Playwright + Chrome DevTools Protocol harness (`scripts/runtime-perf.mjs`). Report-only: no CI fail thresholds.'
