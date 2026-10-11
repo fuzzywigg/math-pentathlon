@@ -5,24 +5,73 @@
  * Usage: node scripts/engine-coverage-rank.mjs <path/to/coverage-summary.json>
  *
  * Exit codes:
- *   0 — ranked table printed
- *   2 — missing/unreadable summary path (prints usage; no stack)
+ *   0 — ranked table printed (or --help / -h)
+ *   2 — missing/unreadable summary path, or flag-like argv (prints usage; no stack)
  *
  * Default path when omitted: coverage-engine-baseline/coverage-summary.json
  * (generated locally; not committed).
+ *
+ * CLI (q-mp-918): `--help`/`-h` exit 0 with usage; args starting with `-`
+ * are rejected (exit 2) before path lookup — never treat `--help` as a path.
+ * Missing-summary copy (q-mp-842) is unchanged.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** One-line usage embedded in the missing-summary message (q-mp-842; keep stable). */
 export const USAGE =
   'Usage: node scripts/engine-coverage-rank.mjs <path/to/coverage-summary.json>';
 
 export const DEFAULT_SUMMARY_REL =
   'coverage-engine-baseline/coverage-summary.json';
 
+/** Full help for `--help` / `-h` and unknown-flag errors (q-mp-918). */
+export const HELP = `${USAGE}
+
+Options:
+  -h, --help    Show this help and exit 0
+
+Ranks non-AI engine modules from a vitest coverage-summary.json.
+Flag-like argv is rejected before path lookup. Default when omitted:
+${DEFAULT_SUMMARY_REL} (local; not committed).
+`;
+
 const ENGINE_RE =
   /src\/games\/([^/]+)\/(rules|types|game-state|board|pieces|serialization)\.ts$/;
+
+/**
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-918).
+ *
+ * @param {string[]} argv
+ * @returns {{
+ *   ok: true,
+ *   help: boolean,
+ *   summaryPath: string | undefined,
+ * } | {
+ *   ok: false,
+ *   message: string,
+ * }}
+ */
+export function parseArgs(argv) {
+  let help = false;
+  /** @type {string | undefined} */
+  let summaryPath;
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      help = true;
+      continue;
+    }
+    if (a.startsWith('-')) {
+      return { ok: false, message: `Unknown flag: ${a}` };
+    }
+    if (summaryPath !== undefined) {
+      return { ok: false, message: `Unexpected argument: ${a}` };
+    }
+    summaryPath = a;
+  }
+  return { ok: true, help, summaryPath };
+}
 
 /**
  * @param {string | undefined} arg
@@ -145,7 +194,18 @@ export function main(argv = process.argv.slice(2), io = {}) {
   const readFileSync = io.readFileSync ?? ((p, enc) => fs.readFileSync(p, enc));
   const cwd = io.cwd ?? process.cwd();
 
-  const summaryPath = resolveSummaryPath(argv[0], cwd);
+  const parsed = parseArgs(argv);
+  if (!parsed.ok) {
+    error(parsed.message);
+    error(HELP.trimEnd());
+    return 2;
+  }
+  if (parsed.help) {
+    log(HELP.trimEnd());
+    return 0;
+  }
+
+  const summaryPath = resolveSummaryPath(parsed.summaryPath, cwd);
   if (!existsSync(summaryPath)) {
     error(missingSummaryMessage(summaryPath));
     return 2;
