@@ -14,7 +14,8 @@
  *
  * Exit codes:
  *   0 — report completed; no explicitly denied license in the tree
- *   1 — denied license present, lockfile missing, or lockfile malformed/unreadable
+ *   1 — denied license present, lockfile missing, malformed/unreadable, or
+ *       packages null/missing/empty
  *
  * Report-only for copyleft/unknown/install-script flags (still exit 0).
  *
@@ -27,6 +28,8 @@
  * test-results/licenses (q-mp-979).
  * Malformed package-lock.json prints a short message + hint (no stack) and
  * exits 1 (q-mp-1026). Missing lock message unchanged.
+ * Null / missing / empty `packages` prints a short error and exits 1 with no
+ * artifact writes — including no --dry-run "Would write" (q-mp-1037).
  */
 
 import fs from 'node:fs';
@@ -124,6 +127,35 @@ export function malformedLockMessage(
   return [
     `report:licenses — malformed JSON in ${display}`,
     detail,
+    'Fix or regenerate package-lock.json (run `npm install`).',
+  ].join('\n');
+}
+
+/**
+ * True when lock.packages is a non-empty plain object (q-mp-1037).
+ * Null, undefined, arrays, and `{}` are not usable.
+ * @param {unknown} packages
+ * @returns {boolean}
+ */
+export function isUsableLockPackages(packages) {
+  return (
+    packages != null &&
+    typeof packages === 'object' &&
+    !Array.isArray(packages) &&
+    Object.keys(/** @type {object} */ (packages)).length > 0
+  );
+}
+
+/**
+ * Stable message for null / missing / empty lock packages (q-mp-1037).
+ * @param {string} [lockPath]
+ * @returns {string}
+ */
+export function emptyPackagesMessage(lockPath = LOCK_PATH) {
+  const display = String(lockPath).replace(/\\/g, '/');
+  return [
+    `report:licenses — empty or missing packages in ${display}`,
+    'package-lock.json must include a non-empty "packages" object.',
     'Fix or regenerate package-lock.json (run `npm install`).',
   ].join('\n');
 }
@@ -325,7 +357,9 @@ export function npmPackageNameFromLockPath(lockPath) {
  * }>}
  */
 export function collectPackagesFromLock(lock, nodeModulesRoot = '') {
-  const packages = lock.packages || {};
+  // Main rejects null/missing/empty packages (q-mp-1037) before calling this.
+  // Keep `|| {}` only as a defensive fallback for hermetic helper callers.
+  const packages = isUsableLockPackages(lock.packages) ? lock.packages : {};
   /** @type {ReturnType<typeof collectPackagesFromLock>} */
   const out = [];
 
@@ -733,6 +767,10 @@ function main(argv = process.argv.slice(2)) {
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     console.error(malformedLockMessage(LOCK_PATH, detail));
+    process.exit(1);
+  }
+  if (!isUsableLockPackages(lock.packages)) {
+    console.error(emptyPackagesMessage(LOCK_PATH));
     process.exit(1);
   }
   const rootMeta = lock.packages?.[''] || {};
