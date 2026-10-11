@@ -103,3 +103,9 @@ export function malformedLockMessage(
   lockPath?: string,
   detail?: string
 ): string;
+
+/** True when lock.packages is a non-empty plain object (q-mp-1037). */
+export function isUsableLockPackages(packages: unknown): boolean;
+
+/** Stable empty/missing packages message (q-mp-1037). */
+export function emptyPackagesMessage(lockPath?: string): string;
