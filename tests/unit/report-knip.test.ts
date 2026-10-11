@@ -104,7 +104,10 @@ describe('report-knip helpers', () => {
       duplicates: 3,
     };
     const grown = { ...baseline, unusedExports: 9, unusedTypes: 90 };
-    const { growth, shrink, same } = diffMetrics(grown, baseline);
+    const result = diffMetrics(grown, baseline);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const { growth, shrink, same } = result;
     expect(growth).toEqual([
       {
         key: 'unusedExports',
@@ -123,6 +126,61 @@ describe('report-knip helpers', () => {
     ]);
     expect(same).toContain('unusedFiles');
     expect(same).not.toContain('unusedExports');
+  });
+
+  it('diffMetrics fails closed on non-finite baseline / current (q-mp-1235)', () => {
+    const finite = {
+      unusedFiles: 0,
+      unusedExports: 3,
+      unusedTypes: 36,
+      unusedDependencies: 0,
+      unusedDevDependencies: 0,
+      unlisted: 3,
+      duplicates: 0,
+    };
+    const allFive = Object.fromEntries(
+      METRIC_KEYS.map((key) => [key, 5])
+    ) as Record<string, number>;
+    const allNaN = Object.fromEntries(
+      METRIC_KEYS.map((key) => [key, Number.NaN])
+    ) as Record<string, number>;
+
+    // Pre-fix: NaN deltas used to land every key in `same` (growth: 0).
+    const washed = diffMetrics(allFive, allNaN);
+    expect(washed.ok).toBe(false);
+    if (!washed.ok) {
+      expect(washed.message).toMatch(/schema invalid|finite number/i);
+      expect(washed.message).toMatch(/unusedFiles/);
+    }
+
+    for (const bad of [
+      Number.NaN,
+      Number.POSITIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
+    ]) {
+      const badBaseline = diffMetrics(finite, { ...finite, unusedTypes: bad });
+      expect(badBaseline.ok).toBe(false);
+      if (!badBaseline.ok) {
+        expect(badBaseline.message).toMatch(/schema invalid|finite number/i);
+        expect(badBaseline.message).toMatch(/unusedTypes/);
+      }
+
+      const badCurrent = diffMetrics({ ...finite, unusedExports: bad }, finite);
+      expect(badCurrent.ok).toBe(false);
+      if (!badCurrent.ok) {
+        expect(badCurrent.message).toMatch(/schema invalid|finite number/i);
+        expect(badCurrent.message).toMatch(/unusedExports/);
+      }
+    }
+
+    // Finite deltas unchanged.
+    const same = diffMetrics(finite, finite);
+    expect(same.ok).toBe(true);
+    if (same.ok) {
+      expect(same.growth).toEqual([]);
+      expect(same.shrink).toEqual([]);
+      expect(same.same).toEqual([...METRIC_KEYS]);
+    }
   });
 
   it('validateBaselineMetrics accepts a full numeric metrics object', () => {
@@ -165,7 +223,7 @@ describe('report-knip helpers', () => {
       expect(result.ok).toBe(false);
       if (!result.ok) {
         expect(result.message).toMatch(
-          /schema invalid|finite (number|integer)/i,
+          /schema invalid|finite (number|integer)/i
         );
       }
     }

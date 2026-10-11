@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  coerceFiniteNumber,
   extractMetric,
   extractLintMetrics,
   parseGitLogLines,
@@ -57,6 +58,64 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     ).toBe(17);
     expect(extractMetric('boundaries', { ceilings: {} })).toBeNull();
     expect(extractMetric('typePhase2', null)).toBeNull();
+  });
+
+  it('coerceFiniteNumber accepts numbers and finite numeric strings (q-mp-1230 / q-mp-1231)', () => {
+    expect(coerceFiniteNumber(10)).toBe(10);
+    expect(coerceFiniteNumber(0)).toBe(0);
+    expect(coerceFiniteNumber('10')).toBe(10);
+    expect(coerceFiniteNumber(' 2.5 ')).toBe(2.5);
+    expect(coerceFiniteNumber('')).toBeNull();
+    expect(coerceFiniteNumber('   ')).toBeNull();
+    expect(coerceFiniteNumber('x')).toBeNull();
+    expect(coerceFiniteNumber(Number.NaN)).toBeNull();
+    expect(coerceFiniteNumber(Number.POSITIVE_INFINITY)).toBeNull();
+    expect(coerceFiniteNumber(null)).toBeNull();
+    expect(coerceFiniteNumber(undefined)).toBeNull();
+    expect(coerceFiniteNumber({})).toBeNull();
+  });
+
+  it('extractMetric(boundaries) sums finite numeric string ceilings (q-mp-1230)', () => {
+    // Pre-fix undercount: string '10' ignored → 2. Now coerce → 12.
+    expect(
+      extractMetric('boundaries', { ceilings: { a: '10', b: 2 } })
+    ).toBe(12);
+    expect(
+      extractMetric('boundaries', { ceilings: { a: '10', b: '2' } })
+    ).toBe(12);
+    expect(
+      extractMetric('boundaries', {
+        ceilings: { a: '10', b: 'x', c: Number.NaN, d: 3 },
+      })
+    ).toBe(13);
+    expect(
+      extractMetric('boundaries', { ceilings: { a: 'nope', b: '' } })
+    ).toBeNull();
+  });
+
+  it('extractLintMetrics coerces finite numeric string rule ceilings (q-mp-1231)', () => {
+    // Pre-fix: string "10" → null (chart drops commit). Now → 10.
+    expect(
+      extractLintMetrics({
+        rules: {
+          curly: '10',
+          [LINT_RULE_KEYS.voidExpression]: 5,
+          [LINT_RULE_KEYS.nnnull]: '3',
+          [LINT_RULE_KEYS.dupImports]: 'x',
+        },
+      })
+    ).toEqual({
+      curly: 10,
+      voidExpression: 5,
+      nnnull: 3,
+      dupImports: null,
+    });
+    expect(extractMetric('curly', { rules: { curly: '538' } })).toBe(538);
+    expect(
+      extractMetric('voidExpression', {
+        rules: { [LINT_RULE_KEYS.voidExpression]: '118' },
+      })
+    ).toBe(118);
   });
 
   it('parses git log tab-separated lines', () => {

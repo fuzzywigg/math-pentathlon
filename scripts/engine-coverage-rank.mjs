@@ -29,6 +29,9 @@
  * invented 0/0) in the rank table.
  * Nested absolute keys (q-mp-1207): slice from the last `src/games/` segment;
  * duplicate abs paths for the same engine file keep the last row only.
+ * Missing/null metric objects (q-mp-1222): reject like coverage-map readMetric
+ * absent — never invent fake 0/0 branch rows; present covered/total 0/0 still ok.
+ * Per-game label (q-mp-1223): use primary kind (`rules-branch` / `types-branch`).
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -180,18 +183,19 @@ export function formatCounts(covered, total) {
  * When numeric covered + total are present, derive pct from them (q-mp-1033) —
  * including when a finite numeric pct contradicts the counts (stale istanbul
  * rows). Covered is clamped to [0, total] before derive so pct ≤ 100
- * (q-mp-1083). total===0 → 100. Absent metric → zeros (legacy default for
- * missing branches). Pct-only numeric (no covered/total) keeps unknown counts
- * (q-mp-1084) and clamps pct to [0, 100] for display/rank parity with
- * report-coverage-map (q-mp-1133). Non-numeric / missing pct without
- * covered/total → null (q-mp-1018).
+ * (q-mp-1083). total===0 → 100. Missing/null/non-object metric → null
+ * (q-mp-1222; align with coverage-map readMetric absent — no fake 0/0).
+ * Pct-only numeric (no covered/total) keeps unknown counts (q-mp-1084) and
+ * clamps pct to [0, 100] for display/rank parity with report-coverage-map
+ * (q-mp-1133). Non-numeric / missing pct without covered/total → null
+ * (q-mp-1018).
  *
  * @param {unknown} m
  * @returns {{ pct: number, covered: number | null, total: number | null } | null}
  */
 export function resolveMetric(m) {
   if (m == null || typeof m !== 'object') {
-    return { pct: 0, covered: 0, total: 0 };
+    return null;
   }
   const rec =
     /** @type {{ pct?: unknown, covered?: unknown, total?: unknown }} */ (m);
@@ -318,8 +322,9 @@ export function formatRankOutput(rows) {
   for (const g of games) {
     const files = byGame.get(g);
     const primary = files.find((x) => x.kind === 'rules') ?? files[0];
+    // q-mp-1223: label matches primary kind (rules preferred; else types/…).
     lines.push(
-      `${g}\trules-branch ${primary.branchPct.toFixed(2)}% (${formatCounts(primary.branchCov, primary.branchTot)})\tline ${primary.linePct.toFixed(2)}% (${formatCounts(primary.lineCov, primary.lineTot)})`
+      `${g}\t${primary.kind}-branch ${primary.branchPct.toFixed(2)}% (${formatCounts(primary.branchCov, primary.branchTot)})\tline ${primary.linePct.toFixed(2)}% (${formatCounts(primary.lineCov, primary.lineTot)})`
     );
     for (const f of files.filter((x) => x !== primary)) {
       lines.push(

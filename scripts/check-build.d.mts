@@ -18,6 +18,17 @@ export function listChunkNames(tree: Map<string, string>): string[];
 
 export function offlineNeededPaths(relPaths: Iterable<string>): string[];
 
+/**
+ * Precache OK composition (q-mp-1225). Testable without re-exporting demoted
+ * `auditPrecache` (#1213).
+ */
+export function isPrecacheAuditOk(parts: {
+  missingFromDist: readonly unknown[];
+  notPrecached: readonly unknown[];
+  duplicates: readonly unknown[];
+  orderOk: boolean;
+}): boolean;
+
 /** Retained for q-mp-1209 hermetic unit coverage (tip fold kept both helpers). */
 export function scanEnvLeakage(
   distRoot: string

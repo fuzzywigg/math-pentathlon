@@ -110,6 +110,27 @@ export function parseArgs(argv) {
  */
 
 /**
+ * Coerce a JSON ceiling/rule value to a finite number.
+ * Accepts numbers and finite numeric strings so history charts do not
+ * undercount string-encoded ceilings (q-mp-1230 / q-mp-1231).
+ *
+ * @param {unknown} value
+ * @returns {number | null}
+ */
+export function coerceFiniteNumber(value) {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') return null;
+    const n = Number(trimmed);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/**
  * @param {unknown} rules
  * @param {string} ruleKey
  * @returns {number | null}
@@ -117,7 +138,7 @@ export function parseArgs(argv) {
 function ruleNumber(rules, ruleKey) {
   if (rules == null || typeof rules !== 'object') return null;
   const n = /** @type {Record<string, unknown>} */ (rules)[ruleKey];
-  return typeof n === 'number' && Number.isFinite(n) ? n : null;
+  return coerceFiniteNumber(n);
 }
 
 /**
@@ -175,8 +196,9 @@ export function extractMetric(kind, json) {
       for (const v of Object.values(
         /** @type {Record<string, unknown>} */ (ceilings)
       )) {
-        if (typeof v === 'number' && Number.isFinite(v)) {
-          sum += v;
+        const n = coerceFiniteNumber(v);
+        if (n != null) {
+          sum += n;
           saw = true;
         }
       }

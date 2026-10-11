@@ -452,13 +452,49 @@ function formatTable(rows) {
   ].join('\n');
 }
 
-function mutateGame(game, opts) {
-  const rulesPath = path.join(GAMES_DIR, game, 'rules.ts');
-  const original = fs.readFileSync(rulesPath, 'utf8');
-  const allMutants = collectMutants(original, rulesPath);
-  const selected = opts.max === 0 ? allMutants : allMutants.slice(0, opts.max);
+/**
+ * Only a green baseline (`survived`) may proceed to mutant runs.
+ * `no-tests` and other non-survived statuses skip with score null
+ * (q-mp-1243) so zero-test games do not inflate error counts.
+ *
+ * @param {string} status
+ * @returns {boolean}
+ */
+export function baselineAllowsMutantRuns(status) {
+  return status === 'survived';
+}
 
-  const tests = expandExistingTests(testGlobsForGame(game));
+/**
+ * Apply AST mutants for one game's rules.ts and score against focused tests.
+ *
+ * Optional hermetic overrides (tests only; CLI never sets these):
+ * - `rulesPath`, `tests`, `mutants`, `runVitest`
+ *
+ * @param {string} game
+ * @param {{
+ *   max: number,
+ *   timeoutMs: number,
+ *   quietTests?: boolean,
+ *   rulesPath?: string,
+ *   tests?: string[],
+ *   mutants?: Array<{
+ *     id: string,
+ *     kind: string,
+ *     line: number,
+ *     description: string,
+ *     text: string,
+ *   }>,
+ *   runVitest?: typeof runVitest,
+ * }} opts
+ */
+export function mutateGame(game, opts) {
+  const rulesPath = opts.rulesPath ?? path.join(GAMES_DIR, game, 'rules.ts');
+  const original = fs.readFileSync(rulesPath, 'utf8');
+  const allMutants = opts.mutants ?? collectMutants(original, rulesPath);
+  const selected = opts.max === 0 ? allMutants : allMutants.slice(0, opts.max);
+  const run = typeof opts.runVitest === 'function' ? opts.runVitest : runVitest;
+
+  const tests = opts.tests ?? expandExistingTests(testGlobsForGame(game));
   console.log(`\n=== ${game} ===`);
   console.log(
     `rules: ${path.relative(ROOT, rulesPath)} (${original.split('\n').length} lines)`
@@ -468,9 +504,9 @@ function mutateGame(game, opts) {
   );
   console.log(`tests: ${tests.length ? tests.join(', ') : '(none found)'}`);
 
-  // Baseline sanity: original must pass
-  const baseline = runVitest(tests, opts.timeoutMs, opts.quietTests);
-  if (baseline.status !== 'survived' && baseline.status !== 'no-tests') {
+  // Baseline sanity: original must pass with real tests (skip no-tests / failures).
+  const baseline = run(tests, opts.timeoutMs, opts.quietTests);
+  if (!baselineAllowsMutantRuns(baseline.status)) {
     console.warn(
       `  WARN: baseline tests did not pass (${baseline.status}, exit=${baseline.exitCode}). Skipping mutants.`
     );
@@ -504,7 +540,7 @@ function mutateGame(game, opts) {
     );
     try {
       fs.writeFileSync(rulesPath, m.text);
-      const result = runVitest(tests, opts.timeoutMs, opts.quietTests);
+      const result = run(tests, opts.timeoutMs, opts.quietTests);
       if (result.status === 'killed') {
         killed++;
         console.log(`KILLED (${result.durationMs}ms)`);

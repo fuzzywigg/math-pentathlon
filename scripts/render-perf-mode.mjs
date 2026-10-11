@@ -322,8 +322,19 @@ function pct(sorted, p) {
   return sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))];
 }
 
+/** True when durationMs is a usable finite number (q-mp-1224). */
+function isFiniteDurationMs(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+/**
+ * Aggregate move/hover timing samples.
+ * Non-finite `durationMs` (undefined/null/NaN/Infinity) are excluded so
+ * means/percentiles stay finite and JSON does not emit `null` for NaN (q-mp-1224).
+ */
 function summarizeSamples(samples) {
-  if (!samples.length) {
+  const valid = samples.filter((s) => isFiniteDurationMs(s?.durationMs));
+  if (!valid.length) {
     return {
       count: 0,
       p50Ms: null,
@@ -335,17 +346,17 @@ function summarizeSamples(samples) {
       longTaskMaxMs: 0,
     };
   }
-  const durations = samples.map((s) => s.durationMs).sort((a, b) => a - b);
-  const layouts = samples.map((s) => s.layoutReads).sort((a, b) => a - b);
+  const durations = valid.map((s) => s.durationMs).sort((a, b) => a - b);
+  const layouts = valid.map((s) => s.layoutReads).sort((a, b) => a - b);
   return {
-    count: samples.length,
+    count: valid.length,
     p50Ms: pct(durations, 0.5),
     p95Ms: pct(durations, 0.95),
     maxMs: durations[durations.length - 1],
     meanMs: durations.reduce((a, b) => a + b, 0) / durations.length,
     layoutReadsP95: pct(layouts, 0.95),
-    longTasksOver50: samples.reduce((n, s) => n + (s.longTasksOver50 || 0), 0),
-    longTaskMaxMs: samples.reduce(
+    longTasksOver50: valid.reduce((n, s) => n + (s.longTasksOver50 || 0), 0),
+    longTaskMaxMs: valid.reduce(
       (m, s) => Math.max(m, s.longTaskMaxMs || 0),
       0
     ),

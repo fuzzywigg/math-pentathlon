@@ -103,6 +103,28 @@ describe('parseEnvNumber (q-mp-876)', () => {
       parseEnvNumber({ X: '0' }, 'X', 1, { requirePositive: false })
     ).toEqual({ ok: true, value: 0 });
   });
+
+  it('rejects non-integer positives for count-like envs (q-mp-1234)', () => {
+    const got = parseEnvNumber({ PERF_MOVES: '2.5' }, 'PERF_MOVES', 20);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid PERF_MOVES="2\.5"/);
+      expect(got.message).toMatch(/integer/);
+    }
+  });
+
+  it('still accepts integer positives after integer default (q-mp-1234)', () => {
+    expect(parseEnvNumber({ PERF_MOVES: '2' }, 'PERF_MOVES', 20)).toEqual({
+      ok: true,
+      value: 2,
+    });
+  });
+
+  it('allows non-integers when integer is false (q-mp-1234)', () => {
+    expect(
+      parseEnvNumber({ X: '2.5' }, 'X', 1, { integer: false })
+    ).toEqual({ ok: true, value: 2.5 });
+  });
 });
 
 describe('requireEnvNumber (q-mp-876)', () => {

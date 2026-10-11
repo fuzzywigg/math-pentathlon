@@ -190,10 +190,14 @@ const nodePureFiles = [
   'tests/unit/memory-leak-page-ready.test.ts',
   // memory-leak heap snapshot / null deltas (q-mp-1215 / 1216); hermetic fixtures.
   'tests/unit/memory-leak-heap-snapshot.test.ts',
+  // runtime-perf helpers: PERF_DATE H1 / clickFirst / empty LT max (q-mp-1239/1244/1245).
+  'tests/unit/runtime-perf-helpers.test.ts',
   // lib main-entry usage / --help (q-mp-958); spawnSync CLI check needs node env.
   'tests/unit/lib-main-entry-cli-help.test.ts',
   // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.
   'tests/unit/render-perf-mode-measure-tti.test.ts',
+  // render-perf-mode summarizeSamples invalid durationMs filter (q-mp-1224).
+  'tests/unit/render-perf-mode-duration-ms.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
