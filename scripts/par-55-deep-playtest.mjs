@@ -21,6 +21,7 @@ import {
   isPar55QuickEnabled,
 } from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { utcPlaytestDateStamp } from './lib/playtest-date.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import {
   installPageSeededRandom,
@@ -47,7 +48,9 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
-const OUT = path.resolve('docs/playtest/par-55-deep-2026-10-07');
+const OUT = path.resolve(
+  `docs/playtest/par-55-deep-${utcPlaytestDateStamp()}`
+);
 const ART = resolveArtifactDir();
 // q-mp-1260: only 1/true/yes enable quick mode; '0'/'false' use PAR55_GAMES.
 const GAMES_PER_DIFF = isPar55QuickEnabled(process.env.PAR55_QUICK)
