@@ -15,6 +15,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { GAMES } from '../../src/core/game-registry';
+import { mountPair } from '../helpers/mount-pair';
 
 const EXPECTED_GAME_COUNT = 20;
 
@@ -153,9 +154,7 @@ function mountHosts(gameId: string): MountHosts {
   const family = INIT_FAMILY[gameId];
   expect(family, `INIT_FAMILY for ${gameId}`).toBeTruthy();
   if (family === 'board-status') {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     return { primary: board, status };
   }
   const host = document.createElement('div');

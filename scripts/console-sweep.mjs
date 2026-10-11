@@ -11,6 +11,7 @@ import { writeFileSync, mkdirSync } from 'fs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
+import { waitDoubleRaf } from './lib/page-settle.mjs';
 
 const USAGE = `Usage: node scripts/console-sweep.mjs
 
@@ -55,16 +56,6 @@ const GAMES = [
 const BASE = process.env.BASE_URL || 'http://localhost:5173';
 const OUT =
   process.env.SWEEP_OUT || '/opt/cursor/artifacts/console-sweep-raw.json';
-
-/** Double-rAF paint settle (no fixed sleep). */
-async function waitDoubleRaf(page) {
-  await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
-}
 
 /**
  * After a human move vs AI: wait for thinking chrome to appear (soft) then

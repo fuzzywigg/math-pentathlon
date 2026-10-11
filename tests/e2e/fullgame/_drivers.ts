@@ -16,8 +16,19 @@ export type GameDriver = {
   maxTurns: number;
 };
 
-async function sleep(page: Page, ms: number): Promise<void> {
-  await page.waitForTimeout(ms);
+/** Wait until any selector matches; no-op on timeout (caller falls through). */
+async function waitForAny(
+  page: Page,
+  selectors: string[],
+  timeoutMs = 2_000
+): Promise<void> {
+  await page
+    .waitForFunction(
+      (sels) => sels.some((sel) => !!document.querySelector(sel)),
+      selectors,
+      { timeout: timeoutMs }
+    )
+    .catch(() => undefined);
 }
 
 async function clickFirst(page: Page, selector: string): Promise<boolean> {
@@ -49,10 +60,10 @@ const drivers: GameDriver[] = [
       const kingSel = p2 ? '.cell-king.cell-p2' : '.cell-king.cell-p1';
       if (!(await page.locator('.cell-selected').count())) {
         await clickFirst(page, kingSel);
-        await sleep(page, 30);
+        await waitForAny(page, ['.cell-selected', '.cell-valid-move']);
       }
       if (await clickFirst(page, '.cell-valid-move')) {
-        await sleep(page, 30);
+        await waitForAny(page, ['.cell-valid-placement']);
         if (await clickFirst(page, '.cell-valid-placement')) return true;
       }
       // Clear selection and retry other seat wording
@@ -110,7 +121,7 @@ const drivers: GameDriver[] = [
     maxTurns: 40,
     playLegal: async (page) => {
       if (await passIfVisible(page, '.star-track-draw-btn')) {
-        await sleep(page, 40);
+        await waitForAny(page, ['.star-track-chain-btn']);
       }
       return clickFirst(page, '.star-track-chain-btn');
     },
@@ -188,10 +199,14 @@ const drivers: GameDriver[] = [
     playLegal: async (page) => {
       await dismissOwl(page);
       if (await passIfVisible(page, '.sd-roll-btn:not([disabled])')) {
-        await sleep(page, 50);
+        await waitForAny(
+          page,
+          ['.sd-hand-domino-playable', '.sd-pass-btn', '.sd-winner-banner'],
+          5_000
+        );
       }
       if (await clickFirst(page, '.sd-hand-domino-playable')) {
-        await sleep(page, 40);
+        await waitForAny(page, ['.sd-cell-valid']);
         if (await clickFirst(page, '.sd-cell-valid')) return true;
       }
       if (await passIfVisible(page, '.sd-pass-btn')) return true;
@@ -209,7 +224,7 @@ const drivers: GameDriver[] = [
     maxTurns: 60,
     playLegal: async (page) => {
       if (await clickFirst(page, '.par55-hand-block.clickable')) {
-        await sleep(page, 40);
+        await waitForAny(page, ['.par55-valid-base', '.par55-base-hit']);
         if (await clickFirst(page, '.par55-valid-base, .par55-base-hit')) {
           return true;
         }
@@ -654,10 +669,14 @@ const drivers: GameDriver[] = [
     maxTurns: 120,
     playLegal: async (page) => {
       await passIfVisible(page, '.contig-roll-btn:not([disabled])');
-      await sleep(page, 50);
+      await waitForAny(
+        page,
+        ['.contig-cell-valid', '.contig-pass-btn', '.contig-expr-option'],
+        5_000
+      );
       if (await clickFirst(page, '.contig-cell-valid')) return true;
       if (await clickFirst(page, '.contig-expr-option')) {
-        await sleep(page, 30);
+        await waitForAny(page, ['.contig-cell-valid']);
         if (await clickFirst(page, '.contig-cell-valid')) return true;
       }
       return passIfVisible(page, '.contig-pass-btn');
@@ -674,7 +693,7 @@ const drivers: GameDriver[] = [
     maxTurns: 80,
     playLegal: async (page) => {
       if (await clickFirst(page, '.stars-card:not(.disabled)')) {
-        await sleep(page, 40);
+        await waitForAny(page, ['.stars-cell.valid']);
         if (await clickFirst(page, '.stars-cell.valid')) return true;
       }
       return passIfVisible(page, '.stars-pass-btn');
@@ -823,7 +842,16 @@ const drivers: GameDriver[] = [
     maxTurns: 80,
     playLegal: async (page) => {
       await passIfVisible(page, '.pg-roll-btn:not([disabled]), .prime-roll-btn:not([disabled])');
-      await sleep(page, 50);
+      await waitForAny(
+        page,
+        [
+          '.pg-cell.valid',
+          '.prime-cell.valid',
+          '.pg-pass-btn',
+          '.pg-btn-secondary',
+        ],
+        5_000
+      );
       if (await clickFirst(page, '.pg-cell.valid, .prime-cell.valid')) return true;
       return passIfVisible(
         page,
@@ -846,7 +874,7 @@ const drivers: GameDriver[] = [
         page,
         '.remainder-btn-roll:not([disabled]), button:has-text("Roll")'
       );
-      await sleep(page, 50);
+      await waitForAny(page, ['.island.valid'], 5_000);
       return page.evaluate(() => {
         const island = document.querySelector('.island.valid');
         if (!island) return false;
@@ -998,7 +1026,7 @@ const drivers: GameDriver[] = [
     playLegal: async (page) => {
       if (await passIfVisible(page, '.frac-continue-btn')) return true;
       if (await clickFirst(page, '.frac-choice-btn:not([disabled])')) {
-        await sleep(page, 40);
+        await waitForAny(page, ['.frac-continue-btn', '.frac-winner-banner']);
         await passIfVisible(page, '.frac-continue-btn');
         return true;
       }
@@ -1017,7 +1045,11 @@ const drivers: GameDriver[] = [
     playLegal: async (page) => {
       if (await passIfVisible(page, '.pinball-continue-btn')) return true;
       if (await clickFirst(page, '.pinball-choice-btn:not([disabled])')) {
-        await sleep(page, 40);
+        await waitForAny(page, [
+          '.pinball-continue-btn',
+          '.pinball-game-over',
+          '.pinball-winner-banner',
+        ]);
         await passIfVisible(page, '.pinball-continue-btn');
         return true;
       }

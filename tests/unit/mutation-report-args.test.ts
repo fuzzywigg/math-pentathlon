@@ -2,7 +2,7 @@
  * @vitest-environment node
  *
  * Hermetic coverage for mutation-report argv validation
- * (q-mp-867 / q-mp-868 / q-mp-892).
+ * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -119,6 +119,89 @@ describe('parseMutationReportArgs (q-mp-892 help / dry-run / unknown)', () => {
   });
 });
 
+describe('parseMutationReportArgs (q-mp-967 empty values)', () => {
+  it('rejects empty --max=', () => {
+    const got = parse(['--max=']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --max/);
+    }
+  });
+
+  it('rejects whitespace-only --max=', () => {
+    const got = parse(['--max=   ']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --max/);
+    }
+  });
+
+  it('still accepts --max=0 as all (not empty)', () => {
+    const got = parse(['--max=0']);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.opts.max).toBe(0);
+    }
+  });
+
+  it('rejects empty --games=', () => {
+    const got = parse(['--games=']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --games/);
+    }
+  });
+
+  it('rejects comma-only --games=,,,', () => {
+    const got = parse(['--games=,,,']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --games/);
+    }
+  });
+
+  it('rejects whitespace-only --games=', () => {
+    const got = parse(['--games=  ,  ']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --games/);
+    }
+  });
+
+  it('rejects empty --json=', () => {
+    const got = parse(['--json=']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --json/);
+    }
+  });
+
+  it('rejects whitespace-only --json=', () => {
+    const got = parse(['--json=   ']);
+    expect(got.ok).toBe(false);
+    if (!got.ok) {
+      expect(got.message).toMatch(/Invalid --json/);
+    }
+  });
+
+  it('accepts valid --games=calla and --json=path', () => {
+    const got = parse(['--games=calla', '--json=/tmp/out.json']);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.opts.games).toEqual(['calla']);
+      expect(got.opts.jsonOut).toBe('/tmp/out.json');
+    }
+  });
+
+  it('skips empty-value validation when --help is present', () => {
+    const got = parse(['--help', '--max=', '--games=', '--json=']);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.opts.help).toBe(true);
+    }
+  });
+});
+
 describe('resolveMutationReportGames (q-mp-868)', () => {
   it('uses the full valid list when games is null', () => {
     expect(resolveMutationReportGames(null, VALID)).toEqual({
@@ -144,7 +227,56 @@ describe('resolveMutationReportGames (q-mp-868)', () => {
   });
 });
 
-describe('mutation-report.mjs CLI argv (q-mp-867 / q-mp-868 / q-mp-892)', () => {
+describe('mutation-report.mjs CLI argv (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967)', () => {
+  it('prints usage and exits 2 for empty --max= without plan or mutation', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--max=', '--dry-run'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid --max/);
+    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
+    expect(text).not.toMatch(/would mutate/);
+    expect(text).not.toMatch(/maxMutantsPerGame=/);
+    expect(text).not.toMatch(/=== calla ===/);
+    expect(text).not.toMatch(/KILLED|SURVIVED/);
+  });
+
+  it('prints usage and exits 2 for empty --games= without plan or mutation', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--games=', '--dry-run'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid --games/);
+    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
+    expect(text).not.toMatch(/would mutate/);
+    expect(text).not.toMatch(/=== calla ===/);
+  });
+
+  it('prints usage and exits 2 for empty --json= without plan or mutation', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--json=', '--dry-run'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Invalid --json/);
+    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
+    expect(text).not.toMatch(/would mutate/);
+    expect(text).not.toMatch(/=== calla ===/);
+  });
+
+  it('lists plan with maxMutantsPerGame=all for --max=0 --dry-run', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--max=0', '--dry-run'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/would mutate \d+ games/);
+    expect(r.stdout).toMatch(/maxMutantsPerGame=all/);
+    expect(r.stdout).not.toMatch(/KILLED|SURVIVED/);
+    expect(r.stdout).not.toMatch(/Wrote /);
+  });
+
   it('prints usage and exits non-zero for --max=abc without mutating rules.ts', () => {
     const r = spawnSync(process.execPath, [SCRIPT, '--max=abc'], {
       encoding: 'utf8',

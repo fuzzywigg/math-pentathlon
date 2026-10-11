@@ -6,6 +6,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { disposeHexAiWorker } from '../../src/games/hex/ai-client';
+import { mountPair } from '../helpers/mount-pair';
 
 describe('q-mp-030 hex destroyGame resource release', () => {
   beforeEach(() => {
@@ -25,9 +26,7 @@ describe('q-mp-030 hex destroyGame resource release', () => {
     const cancelRafSpy = vi.spyOn(globalThis, 'cancelAnimationFrame');
 
     const mod = await import('../../src/games/hex/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
 
     // Seed a stray RAF (controllers are 2D-only — no board3d). Destroy path
     // must leave no WebGL canvas; the test cancels the seeded frame itself.

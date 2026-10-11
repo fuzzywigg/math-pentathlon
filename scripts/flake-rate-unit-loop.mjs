@@ -21,15 +21,19 @@ const args = process.argv.slice(2);
 
 /**
  * Early argv gate: help / unknown flags before mkdir or vitest spawn.
+ * `--help`/`-h` anywhere in argv wins before value-slot consumption (q-mp-970),
+ * so `--out --help` / `--runs --help` print usage instead of missing-value errors.
  * @param {string[]} argv
  */
 function applyEarlyCli(argv) {
-  for (let i = 0; i < argv.length; i++) {
-    const a = argv[i];
+  for (const a of argv) {
     if (a === '--help' || a === '-h') {
       console.log(USAGE);
       process.exit(0);
     }
+  }
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
     if (VALUE_FLAGS.has(a)) {
       // Consume the value slot when present; flag()/strFlag validate later.
       if (i + 1 < argv.length) i += 1;

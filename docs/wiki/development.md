@@ -19,6 +19,7 @@ npm run test:unit
 npm run test:unit:watch
 npm run test:unit:coverage
 npm run report:coverage-map      # rewrite docs/dev/coverage-map.{md,svg}; wiki: [heat map](./coverage-map.md)
+npm run report:engine-coverage-rank -- <summary.json>  # rank engine modules from a local coverage-summary.json (not CI)
 npm run test:e2e:chromium        # required CI e2e path
 npm run test:e2e:firefox-webkit  # full Firefox + WebKit suite (CI report-only)
 npm run test:e2e:cross           # Firefox + WebKit + iPad WebKit
@@ -30,6 +31,9 @@ npm run test:visual              # opt-in 2D suite (playwright.visual.config.ts;
 npm run test:visual:update       # refresh separate-config baselines
 npm run test:e2e:visual          # start + openings baselines (CI report-only)
 npm run test:e2e:visual:update   # rewrite committed e2e visual PNG baselines
+npm run docs:gallery             # tablet landscape docs gallery captures (not CI; docs/gallery/)
+npm run docs:lifecycle-visuals   # route lifecycle Chromium shots (not CI; game-lifecycle.md)
+npm run docs:visuals-2026-10     # iPad Pro 11 docs/iPad captures (not CI; docs/visuals/2026-10/)
 npm run build
 npm run preview                  # serve dist/ after build
 npm run lint
@@ -40,6 +44,7 @@ npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
 npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
 npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
+npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (CI lint job)
 npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
 npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
@@ -51,12 +56,25 @@ npm run check:workflows          # workflow YAML sanity
 npm run report:knip              # knip unused-export drift vs baseline (CI report-only; docs/dev/knip-report.md)
 npm run report:dead-code         # fuller dead-code inventory (local; docs/dev/dead-code-inventory.md)
 npm run report:lint-buckets      # per-rule path buckets (local report-only; docs/dev/lint-bucket-report.md)
+npm run report:licenses          # dependency license + SBOM-style report (local; not CI)
+npm run report:ratchet-history   # rewrite ratchet ceiling history md/svg (local; not CI)
+npm run mutation:report          # report-only rules-engine mutation harness (local; not CI)
 npm run perf:runtime             # runtime AI/move timing probe
                                  # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
+npm run perf:render              # render/input latency harness (scripts/render-perf.mjs; docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
+npm run audit:console            # console error/warn/pageerror sweep across games (local; not CI)
+npm run audit:mobile             # mobile viewport / layout audit (local; not CI)
+npm run audit:nav-away           # mid-game navigation-away sweep (local; not CI)
+npm run playtest:calla           # deep playtest harness (local; not CI)
+npm run playtest:ramrod          # deep playtest harness (local; not CI)
+npm run playtest:sum-dominoes    # deep playtest harness (local; not CI)
+npm run playtest:stars-bars      # deep playtest harness (local; not CI)
+npm run playtest:par-55          # deep playtest harness (local; not CI)
 npm run flake:unit               # local unit flake-rate loop (scripts/flake-rate-unit-loop.mjs; not CI)
 npm run flake:e2e                # local Chromium e2e flake-rate loop (scripts/flake-rate-e2e-loop.mjs; not CI)
 ```
+
 
 `npm test` = `test:unit` && `test:e2e:chromium`. Bare `npm run test:e2e` (no `--project`) runs **every** Playwright project — prefer an explicit script. Prefer `npm run typecheck` over bare `npx tsc --noEmit` so local gates match `package.json` / CI.
 

@@ -9,6 +9,7 @@ import {
   createInitialState as createJuggleState,
   selectDie,
 } from '../../src/games/juggle/rules';
+import { mountPair } from '../helpers/mount-pair';
 
 function stubCanvas(): void {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
@@ -37,9 +38,7 @@ describe('q-mp-102 juggle destroyGame remount safety', () => {
     const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
 
     const mod = await import('../../src/games/juggle/game-controller');
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
 
     mod.initGame(board, status);
     mod.newGameVsAI('easy');

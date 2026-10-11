@@ -6,6 +6,7 @@
  */
 import { test, expect, type Page } from './fixtures';
 import { gotoGame, startHuman } from './helpers/page';
+import { waitDoubleRaf } from './helpers/page-settle';
 
 /** Wait until the viewport matches and two paint frames have run (no fixed sleep). */
 async function waitForViewportSettle(
@@ -17,12 +18,7 @@ async function waitForViewportSettle(
     ({ w, h }) => window.innerWidth === w && window.innerHeight === h,
     { w: width, h: height }
   );
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
+  await waitDoubleRaf(page);
 }
 
 const DPR_CASES = [1, 2, 3] as const;

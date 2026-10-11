@@ -12,6 +12,7 @@ vi.mock('../../src/core/router', async () => {
 
 import * as algorithms from '../../src/core/graph/algorithms';
 import { renderGraphDemo } from '../../src/demos/graph-demo';
+import { click } from '../helpers/dom-click';
 import { mountRoot } from './helpers/dom';
 
 beforeEach(() => {
@@ -38,11 +39,6 @@ function pathNodes(root: HTMLElement): SVGElement[] {
 
 function gameNodes(root: HTMLElement): SVGElement[] {
   return [...root.querySelectorAll('#game-graph .graph-node')] as SVGElement[];
-}
-
-function clickEl(el: Element | null): void {
-  expect(el).toBeTruthy();
-  (el as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
 }
 
 describe('q-mp-607 graph-demo coverage', () => {
@@ -131,11 +127,11 @@ describe('q-mp-607 graph-demo coverage', () => {
     const root = mountDemo();
     const nodes = pathNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(2);
-    clickEl(nodes[0]);
+    click(nodes[0]);
     expect(
       (root.querySelector('#path-status')?.textContent ?? '').length
     ).toBeGreaterThan(0);
-    clickEl(nodes[1]);
+    click(nodes[1]);
     expect(
       (root.querySelector('#path-result')?.textContent ?? '').length
     ).toBeGreaterThan(0);
@@ -152,14 +148,14 @@ describe('q-mp-607 graph-demo coverage', () => {
     const root = mountDemo();
     const nodes = pathNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(3);
-    clickEl(nodes[0]);
-    clickEl(nodes[0]); // same as start → else reset arm
+    click(nodes[0]);
+    click(nodes[0]); // same as start → else reset arm
     expect(root.querySelector('#path-result')?.innerHTML ?? '').toBe('');
-    clickEl(nodes[1]);
+    click(nodes[1]);
     expect(
       (root.querySelector('#path-result')?.textContent ?? '').length
     ).toBeGreaterThan(0);
-    clickEl(nodes[2]); // start+end already set → reset to new start
+    click(nodes[2]); // start+end already set → reset to new start
     expect(root.querySelector('#path-result')?.innerHTML ?? '').toBe('');
     expect(
       (root.querySelector('#path-status')?.textContent ?? '').length
@@ -175,8 +171,8 @@ describe('q-mp-607 graph-demo coverage', () => {
     const root = mountDemo();
     const nodes = pathNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(2);
-    clickEl(nodes[0]);
-    clickEl(nodes[1]);
+    click(nodes[0]);
+    click(nodes[1]);
     expect(spy).toHaveBeenCalled();
     expect(
       (root.querySelector('#path-result')?.textContent ?? '').length
@@ -193,8 +189,8 @@ describe('q-mp-607 graph-demo coverage', () => {
     root.querySelector('#path-result')?.remove();
     const nodes = pathNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(2);
-    clickEl(nodes[0]);
-    clickEl(nodes[1]);
+    click(nodes[0]);
+    click(nodes[1]);
     (root.querySelector('#clear-path-btn') as HTMLButtonElement).click();
     expect(root.querySelector('#pathfinding-graph svg')).toBeTruthy();
   });
@@ -202,7 +198,7 @@ describe('q-mp-607 graph-demo coverage', () => {
   it('pathfinding: missing graph host early-returns on clear without throw', () => {
     const root = mountDemo();
     const nodes = pathNodes(root);
-    clickEl(nodes[0]);
+    click(nodes[0]);
     root.querySelector('#pathfinding-graph')?.remove();
     expect(() => {
       (root.querySelector('#clear-path-btn') as HTMLButtonElement).click();
@@ -219,14 +215,14 @@ describe('q-mp-607 graph-demo coverage', () => {
     expect(idleCards).toBeGreaterThanOrEqual(3);
 
     const firstId = nodes[0].dataset.nodeId;
-    clickEl(nodes[0]);
+    click(nodes[0]);
     const afterP1 = root.querySelector('#game-analysis')?.textContent ?? '';
     expect(afterP1.length).toBeGreaterThan(0);
 
     // Re-query after re-render; same nodeId is owned → no-op
     const owned = gameNodes(root).find((n) => n.dataset.nodeId === firstId);
     expect(owned).toBeTruthy();
-    clickEl(owned!);
+    click(owned!);
     expect(root.querySelector('#game-analysis')?.textContent).toBe(afterP1);
 
     (
@@ -246,7 +242,7 @@ describe('q-mp-607 graph-demo coverage', () => {
     // Re-query nodes after re-render from prior claim
     const nodes2 = gameNodes(root);
     const unclaimed = nodes2.find((n) => n !== nodes2[0]) ?? nodes2[1];
-    clickEl(unclaimed);
+    click(unclaimed);
     expect(
       (root.querySelector('#game-analysis')?.textContent ?? '').length
     ).toBeGreaterThan(0);
@@ -259,7 +255,7 @@ describe('q-mp-607 graph-demo coverage', () => {
     const root = mountDemo();
     const nodes = gameNodes(root);
     for (let i = 0; i < Math.min(3, nodes.length); i++) {
-      clickEl(gameNodes(root)[i]);
+      click(gameNodes(root)[i]);
     }
     (root.querySelector('#clear-game-btn') as HTMLButtonElement).click();
     expect(root.querySelectorAll('#game-analysis .analysis-card').length).toBe(
@@ -275,7 +271,7 @@ describe('q-mp-607 graph-demo coverage', () => {
     const root = mountDemo();
     const nodes = gameNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(1);
-    clickEl(nodes[0]);
+    click(nodes[0]);
     (
       root.querySelector('.player-btn[data-player="2"]') as HTMLButtonElement
     ).click();
@@ -284,7 +280,7 @@ describe('q-mp-607 graph-demo coverage', () => {
       (n) => n.dataset.nodeId !== nodes[0]?.dataset.nodeId
     );
     if (other) {
-      clickEl(other);
+      click(other);
     }
     expect(spy).toHaveBeenCalled();
     const analysis = root.querySelector('#game-analysis');
@@ -302,7 +298,7 @@ describe('q-mp-607 graph-demo coverage', () => {
     const nodes = gameNodes(root);
     expect(nodes.length).toBeGreaterThanOrEqual(1);
     expect(() => {
-      clickEl(nodes[0]);
+      click(nodes[0]);
       (root.querySelector('#clear-game-btn') as HTMLButtonElement).click();
     }).not.toThrow();
   });

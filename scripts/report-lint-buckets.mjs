@@ -12,6 +12,7 @@
  *   npm run report:lint-buckets -- --rule curly
  *   npm run report:lint-buckets -- --top 5
  *   npm run report:lint-buckets -- --json
+ *   npm run report:lint-buckets -- --help   # usage; unknown flags exit 2
  *
  * Docs: docs/dev/lint-bucket-report.md
  */
@@ -77,6 +78,9 @@ export function parseArgs(argv) {
     } else if (arg.startsWith('--top=')) {
       const n = Number.parseInt(arg.slice('--top='.length), 10);
       if (Number.isFinite(n) && n > 0) opts.top = n;
+    } else if (arg.startsWith('-')) {
+      // q-mp-943: reject typos / unknown flags before the eslint probe.
+      return { ok: false, message: `Unknown flag: ${arg}` };
     }
   }
   return { ok: true, ...opts };

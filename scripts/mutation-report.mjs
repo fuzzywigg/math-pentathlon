@@ -15,9 +15,10 @@
  *   npm run mutation:report -- --help
  *   npm run mutation:report -- --dry-run
  *
- * NOT wired into CI. Successful report runs exit 0. Invalid argv (bad --max /
- * --timeout / unknown --games= ids / unknown flags) exits 2 with usage before
- * any rules.ts I/O. --help / -h and --dry-run exit 0 without mutating.
+ * NOT wired into CI. Successful report runs exit 0. Invalid argv (empty or
+ * bad --max / --timeout / empty --games= / --json= / unknown --games= ids /
+ * unknown flags) exits 2 with usage before any rules.ts I/O. --help / -h and
+ * --dry-run exit 0 without mutating. --max=0 remains intentional “all”.
  */
 
 import fs from 'node:fs';
