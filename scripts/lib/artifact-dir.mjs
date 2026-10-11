@@ -10,9 +10,24 @@
  * not rewire harness defaults by itself.
  *
  * Kept free of Playwright so unit tests can inject a fake `mkdirSync`.
+ *
+ * This file is a library module. Direct CLI entry prints usage only:
+ *   node scripts/lib/artifact-dir.mjs [--help]
+ * Unknown flags exit 2. Import from harnesses (e.g. console-sweep, flake-rate).
  */
 import { mkdirSync as fsMkdirSync } from 'node:fs';
 import { isAbsolute, join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseHelpOnlyArgv } from './help-only-cli.mjs';
+
+export const ARTIFACT_DIR_USAGE = `Usage: node scripts/lib/artifact-dir.mjs [--help]
+
+Library module — import from harness scripts (e.g. scripts/console-sweep.mjs,
+scripts/flake-rate-unit-loop.mjs, scripts/flake-rate-e2e-loop.mjs).
+Not a standalone CLI.
+
+Options:
+  -h, --help    Show this help and exit`;
 
 /** Cursor Cloud default artifact root. */
 export const CLOUD_ARTIFACT_DIR = '/opt/cursor/artifacts';
@@ -80,4 +95,30 @@ export function resolveArtifactDir(options = {}) {
  */
 export function artifactPath(...parts) {
   return join(resolveArtifactDir(), ...parts);
+}
+
+/**
+ * CLI entry when this file is executed directly (q-mp-980).
+ * Import-as-library path is unchanged (no side effects on import).
+ *
+ * @param {string[]} [argv]
+ */
+export function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(ARTIFACT_DIR_USAGE);
+    process.exit(2);
+  }
+  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  console.log(ARTIFACT_DIR_USAGE);
+  process.exit(0);
+}
+
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
 }

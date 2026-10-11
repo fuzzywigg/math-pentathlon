@@ -94,18 +94,25 @@ Playwright UI mode: `npm run test:e2e:ui`.
 
 Opt-in visual is **not** wired into CI. E2E visual is CI job `visual-baseline` (**report-only**). Details: [`docs/visual-regression.md`](../visual-regression.md).
 
-### Playtest (headless deep harnesses — no npm script)
+### Playtest (headless deep harnesses)
 
-| Kind                        |  Count | Location / how to run                                                                                                                                                        |
-| --------------------------- | -----: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runnable harnesses (`.mjs`) |  **4** | `tests/playtest/fab-a-diffy-deep.mjs`, `tests/playtest/star-track-deep-playtest.mjs`, `docs/playtest/fraction-pinball-deep-playtest.mjs`, `docs/playtest/hex-deep-probe.mjs` |
-| Report Markdown (top-level) | **15** | `docs/playtest/*.md` (tablet sweep + per-game deep reports)                                                                                                                  |
-| Artifact dirs               | **15** | `docs/playtest/*/` (screenshots / JSON)                                                                                                                                      |
+| Kind                                      |  Count | Location / how to run                                                                                                                                                        |
+| ----------------------------------------- | -----: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Named npm scripts (`playtest:*`)          |  **5** | `npm run playtest:calla` / `playtest:ramrod` / `playtest:sum-dominoes` / `playtest:stars-bars` / `playtest:par-55` → `scripts/*-deep-playtest.mjs` (local; not CI)           |
+| Extra harnesses under `tests/playtest/`   |  **2** | `tests/playtest/fab-a-diffy-deep.mjs`, `tests/playtest/star-track-deep-playtest.mjs` (no npm alias; run with `node` + Vite up)                                               |
+| Probes under `docs/playtest/`             |  **2** | `docs/playtest/fraction-pinball-deep-playtest.mjs`, `docs/playtest/hex-deep-probe.mjs`                                                                                        |
+| Report Markdown (top-level)               | **15** | `docs/playtest/*.md` (tablet sweep + per-game deep reports)                                                                                                                  |
+| Artifact dirs                             | **15** | `docs/playtest/*/` (screenshots / JSON)                                                                                                                                      |
 
-There is **no** `package.json` playtest script. Typical local run (Vite must already be up):
+Typical local run (Vite must already be up for `node` paths; named scripts follow the same `PLAYTEST_BASE_URL` convention):
 
 ```bash
 npm run dev   # separate terminal → http://127.0.0.1:5173
+npm run playtest:calla
+npm run playtest:ramrod
+npm run playtest:sum-dominoes
+npm run playtest:stars-bars
+npm run playtest:par-55
 PLAYTEST_BASE_URL=http://127.0.0.1:5173 node tests/playtest/fab-a-diffy-deep.mjs
 PLAYTEST_BASE_URL=http://127.0.0.1:5173 node tests/playtest/star-track-deep-playtest.mjs
 PLAYTEST_BASE_URL=http://127.0.0.1:5173 node docs/playtest/hex-deep-probe.mjs

@@ -3,16 +3,20 @@
  * Repeat unit runs and aggregate per-test pass/fail + timings.
  * Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]
  * --help/-h exit 0 without spawning vitest. Unknown flags exit 2.
+ * Default --out uses shared artifact-dir (q-mp-956).
  */
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { artifactPath } from './lib/artifact-dir.mjs';
 
 const USAGE =
   'Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]\n' +
   '  --runs N      positive integer (default 7)\n' +
   '  --shuffle N   positive integer (default 3)\n' +
-  '  --out DIR     output directory\n' +
+  '  --out DIR     output directory (default: <artifact-dir>/flake-rate;\n' +
+  '                /opt/cursor/artifacts when creatable, else\n' +
+  '                test-results/agent-artifacts; --out wins)\n' +
   '  -h, --help    show this help and exit (no vitest spawn)';
 
 const VALUE_FLAGS = new Set(['--runs', '--shuffle', '--out']);
@@ -89,7 +93,10 @@ function strFlag(name, def) {
 
 const defaultRuns = flag('--runs', 7);
 const shuffleRuns = flag('--shuffle', 3);
-const outDir = strFlag('--out', '/opt/cursor/artifacts/flake-rate');
+const outDir =
+  args.indexOf('--out') === -1
+    ? artifactPath('flake-rate')
+    : strFlag('--out', '');
 fs.mkdirSync(outDir, { recursive: true });
 
 /** @type {Map<string, { passes: number, fails: number, durations: number[], errors: string[] }>} */

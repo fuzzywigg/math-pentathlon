@@ -12,10 +12,11 @@
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { chromium, firefox, webkit } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { artifactPath } from './lib/artifact-dir.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
 
 const USAGE = `Usage: node scripts/webkit-offline-probe.mjs
@@ -263,8 +264,7 @@ try {
   }
   console.log(JSON.stringify(out, null, 2));
   try {
-    const outPath = '/opt/cursor/artifacts/webkit-offline-probe.json';
-    mkdirSync('/opt/cursor/artifacts', { recursive: true });
+    const outPath = artifactPath('webkit-offline-probe.json');
     writeFileSync(outPath, JSON.stringify(out, null, 2));
     console.error('Wrote', outPath);
   } catch (e) {

@@ -2,7 +2,7 @@
  * @vitest-environment node
  *
  * Hermetic coverage for lib-module main-entry usage / --help
- * (q-mp-958 + q-mp-975).
+ * (q-mp-958 + q-mp-975 + q-mp-980).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -32,6 +32,30 @@ import {
   PWA_MANIFEST_CONTRACT_USAGE,
   main as pwaManifestContractMain,
 } from '../../scripts/lib/pwa-manifest-contract.mjs';
+import {
+  PAGE_SETTLE_USAGE,
+  main as pageSettleMain,
+} from '../../scripts/lib/page-settle.mjs';
+import {
+  ARTIFACT_DIR_USAGE,
+  main as artifactDirMain,
+} from '../../scripts/lib/artifact-dir.mjs';
+import {
+  HELP_ONLY_CLI_USAGE,
+  main as helpOnlyCliMain,
+} from '../../scripts/lib/help-only-cli.mjs';
+import {
+  BROWSER_HARNESS_CLI_USAGE,
+  main as browserHarnessCliMain,
+} from '../../scripts/lib/browser-harness-cli.mjs';
+import {
+  DEEP_PLAYTEST_CLI_USAGE,
+  main as deepPlaytestCliMain,
+} from '../../scripts/lib/deep-playtest-cli.mjs';
+import {
+  OFFLINE_PROBE_CLI_USAGE,
+  main as offlineProbeCliMain,
+} from '../../scripts/lib/offline-probe-cli.mjs';
 
 const ROOT = process.cwd();
 
@@ -72,6 +96,42 @@ const libs = [
     main: pwaManifestContractMain,
     harnessHint: /check-pwa-manifest\.mjs/,
   },
+  {
+    rel: 'scripts/lib/page-settle.mjs',
+    usage: PAGE_SETTLE_USAGE,
+    main: pageSettleMain,
+    harnessHint: /console-sweep\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/artifact-dir.mjs',
+    usage: ARTIFACT_DIR_USAGE,
+    main: artifactDirMain,
+    harnessHint: /console-sweep\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/help-only-cli.mjs',
+    usage: HELP_ONLY_CLI_USAGE,
+    main: helpOnlyCliMain,
+    harnessHint: /check-workflows\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/browser-harness-cli.mjs',
+    usage: BROWSER_HARNESS_CLI_USAGE,
+    main: browserHarnessCliMain,
+    harnessHint: /console-sweep\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/deep-playtest-cli.mjs',
+    usage: DEEP_PLAYTEST_CLI_USAGE,
+    main: deepPlaytestCliMain,
+    harnessHint: /calla-deep-playtest\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/offline-probe-cli.mjs',
+    usage: OFFLINE_PROBE_CLI_USAGE,
+    main: offlineProbeCliMain,
+    harnessHint: /probe-offline-resilience\.mjs/,
+  },
 ] as const;
 
 function runCli(rel: string, args: string[]) {
@@ -82,7 +142,7 @@ function runCli(rel: string, args: string[]) {
   });
 }
 
-describe('lib main-entry usage (q-mp-958 / q-mp-975)', () => {
+describe('lib main-entry usage (q-mp-958 / q-mp-975 / q-mp-980)', () => {
   for (const lib of libs) {
     describe(lib.rel, () => {
       it('exports usage naming the library path and a harness importer', () => {

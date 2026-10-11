@@ -10,6 +10,7 @@ import { createServer } from 'node:net';
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { artifactPath } from './lib/artifact-dir.mjs';
 import { applyOfflineProbeCli } from './lib/offline-probe-cli.mjs';
 
 const USAGE = `Usage: node scripts/probe-offline-resilience-dev.mjs
@@ -23,8 +24,8 @@ Options:
 applyOfflineProbeCli(process.argv.slice(2), USAGE);
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = '/opt/cursor/artifacts/offline-resilience-probe-dev.json';
-const PROD_OUT = '/opt/cursor/artifacts/offline-resilience-probe.json';
+const OUT = artifactPath('offline-resilience-probe-dev.json');
+const PROD_OUT = artifactPath('offline-resilience-probe.json');
 
 const SLOW_3G = {
   offline: false,

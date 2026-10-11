@@ -32,9 +32,41 @@ Options:
   -h, --help    Show this help and exit`;
 
 export const TABLET_VIEWPORT = { width: 768, height: 1024 };
-export const CPU_THROTTLE = requireEnvNumber('PERF_CPU_THROTTLE', 4);
-export const HOVER_SAMPLES = requireEnvNumber('PERF_HOVER_SAMPLES', 12);
-export const MOVE_TARGET_RENDER = requireEnvNumber('PERF_MOVES', 20);
+
+/**
+ * Lazy PERF_* env (q-mp-1000): validate on first measure / accessor call, not
+ * on import — so `import './render-perf-mode.mjs'` and `--help` stay clean under
+ * junk PERF_MOVES / PERF_CPU_THROTTLE / PERF_HOVER_SAMPLES. Defaults and
+ * requireEnvNumber messages stay byte-identical to the former module-level
+ * reads once a measurement path (or accessor) runs.
+ */
+let cachedCpuThrottle;
+let cachedHoverSamples;
+let cachedMoveTargetRender;
+
+/** @returns {number} */
+export function getCpuThrottle() {
+  if (cachedCpuThrottle === undefined) {
+    cachedCpuThrottle = requireEnvNumber('PERF_CPU_THROTTLE', 4);
+  }
+  return cachedCpuThrottle;
+}
+
+/** @returns {number} */
+export function getHoverSamples() {
+  if (cachedHoverSamples === undefined) {
+    cachedHoverSamples = requireEnvNumber('PERF_HOVER_SAMPLES', 12);
+  }
+  return cachedHoverSamples;
+}
+
+/** @returns {number} */
+export function getMoveTargetRender() {
+  if (cachedMoveTargetRender === undefined) {
+    cachedMoveTargetRender = requireEnvNumber('PERF_MOVES', 20);
+  }
+  return cachedMoveTargetRender;
+}
 
 const HOVER_GAMES = new Set(['juggle', 'pent-em-in']);
 
@@ -57,7 +89,9 @@ export async function setupRenderContext(browser, baseURL) {
   });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
-  await cdp.send('Emulation.setCPUThrottlingRate', { rate: CPU_THROTTLE });
+  await cdp.send('Emulation.setCPUThrottlingRate', {
+    rate: getCpuThrottle(),
+  });
   await cdp.send('Performance.enable').catch(() => {});
   return { context, page, cdp };
 }
@@ -230,7 +264,7 @@ export async function measureHoverCosts(page, gameId) {
   await enterHoverPhase(page, gameId);
 
   const samples = [];
-  for (let i = 0; i < HOVER_SAMPLES; i++) {
+  for (let i = 0; i < getHoverSamples(); i++) {
     const sample = await page.evaluate(async (idx) => {
       const w = window;
       const cells = Array.from(
@@ -424,7 +458,7 @@ export async function writeRenderReport(root, results, meta) {
     `- Viewport: tablet **${TABLET_VIEWPORT.width}×${TABLET_VIEWPORT.height}** (touch).`
   );
   lines.push(
-    `- CPU throttle: **${CPU_THROTTLE}×** via CDP \`Emulation.setCPUThrottlingRate\`.`
+    `- CPU throttle: **${getCpuThrottle()}×** via CDP \`Emulation.setCPUThrottlingRate\`.`
   );
   lines.push(
     `- Per game: human-vs-human, up to **${meta.moveTarget}** scripted moves; double-` +

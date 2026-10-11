@@ -1,6 +1,7 @@
 /**
  * Hermetic helpers for scripts/engine-coverage-rank.mjs
- * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection).
+ * (q-mp-842 missing-summary UX; q-mp-918 early --help / flag rejection;
+ * q-mp-992 empty / non-engine summary reject).
  */
 import { describe, it, expect, vi } from 'vitest';
 import {
@@ -10,6 +11,7 @@ import {
   parseArgs,
   resolveSummaryPath,
   missingSummaryMessage,
+  emptyEngineSummaryMessage,
   collectEngineRows,
   formatRankOutput,
   main,
@@ -219,5 +221,88 @@ describe('engine-coverage-rank CLI argv (q-mp-918)', () => {
     expect(errors.join('\n')).toContain(USAGE);
     expect(errors.join('\n')).not.toMatch(/coverage summary not found/);
     expect(existsSync).not.toHaveBeenCalled();
+  });
+});
+
+describe('engine-coverage-rank empty / non-engine summaries (q-mp-992)', () => {
+  it('emptyEngineSummaryMessage includes Usage and path', () => {
+    const msg = emptyEngineSummaryMessage('/tmp/e.json');
+    expect(msg).toContain(USAGE);
+    expect(msg).toContain('/tmp/e.json');
+    expect(msg).toMatch(
+      /^error: coverage summary has no matching engine modules:/
+    );
+    expect(msg).toMatch(/Empty objects|total-only|non-engine/);
+  });
+
+  it('collectEngineRows returns [] for empty, total-only, and non-engine', () => {
+    expect(collectEngineRows({})).toEqual([]);
+    expect(
+      collectEngineRows({
+        total: { lines: { total: 1, covered: 1, skipped: 0, pct: 100 } },
+      })
+    ).toEqual([]);
+    expect(
+      collectEngineRows({
+        '/abs/src/main.ts': {
+          lines: { pct: 100, covered: 1, total: 1 },
+          branches: { pct: 100, covered: 1, total: 1 },
+        },
+      })
+    ).toEqual([]);
+  });
+
+  it('main exits 2 for empty {} before printing a rank table', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const code = main(['/tmp/e.json'], {
+      existsSync: (p) => p === '/tmp/e.json',
+      readFileSync: () => '{}',
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toBe(emptyEngineSummaryMessage('/tmp/e.json'));
+    expect(errors.join('\n')).not.toMatch(/^rank\t/);
+  });
+
+  it('main exits 2 for total-only summary before printing a rank table', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      total: { lines: { total: 1, covered: 1, skipped: 0, pct: 100 } },
+    });
+    const code = main(['/tmp/t.json'], {
+      existsSync: (p) => p === '/tmp/t.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toBe(emptyEngineSummaryMessage('/tmp/t.json'));
+  });
+
+  it('main exits 2 for non-engine-only rows before printing a rank table', () => {
+    const logs: string[] = [];
+    const errors: string[] = [];
+    const fixture = JSON.stringify({
+      total: { lines: { pct: 100 } },
+      '/abs/src/main.ts': {
+        lines: { pct: 100, covered: 1, total: 1 },
+        branches: { pct: 100, covered: 1, total: 1 },
+      },
+    });
+    const code = main(['/tmp/n.json'], {
+      existsSync: (p) => p === '/tmp/n.json',
+      readFileSync: () => fixture,
+      log: (s) => logs.push(s),
+      error: (s) => errors.push(s),
+    });
+    expect(code).toBe(2);
+    expect(logs).toEqual([]);
+    expect(errors.join('\n')).toBe(emptyEngineSummaryMessage('/tmp/n.json'));
+    expect(errors.join('\n')).not.toContain('src/main.ts');
   });
 });
