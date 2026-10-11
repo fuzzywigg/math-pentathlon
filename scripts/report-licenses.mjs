@@ -400,7 +400,9 @@ export function npmPackageNameFromLockPath(lockPath) {
   const marker = 'node_modules/';
   const idx = lockPath.lastIndexOf(marker);
   if (idx === -1) return lockPath;
-  return lockPath.slice(idx + marker.length);
+  // Strip trailing slashes so lock paths like node_modules/lodash/ → lodash
+  // (q-mp-1284); empty after strip stays empty.
+  return lockPath.slice(idx + marker.length).replace(/\/+$/, '');
 }
 
 /**
@@ -566,17 +568,20 @@ export function buildCycloneDxBom(opts) {
     const purlEncoded = pkg.name.startsWith('@')
       ? `%40${pkg.name.slice(1)}`
       : pkg.name;
+    // bom-ref follows purl versioning: omit @ when version is empty (q-mp-1281)
+    const purl = pkg.version
+      ? `pkg:npm/${purlEncoded}@${pkg.version}`
+      : `pkg:npm/${purlEncoded}`;
     /** @type {Record<string, unknown>} */
     const component = {
       type: 'library',
-      'bom-ref': `pkg:npm/${purlEncoded}@${pkg.version}`,
+      'bom-ref': purl,
       name: pkg.name,
       version: pkg.version || undefined,
       licenses: pkg.license ? [{ expression: pkg.license }] : undefined,
-      purl: pkg.version
-        ? `pkg:npm/${purlEncoded}@${pkg.version}`
-        : `pkg:npm/${purlEncoded}`,
-      scope: pkg.production ? 'required' : 'optional',
+      purl,
+      // Optional packages stay optional even when production (q-mp-1283)
+      scope: pkg.optional || !pkg.production ? 'optional' : 'required',
     };
 
     if (pkg.integrity && pkg.integrity.includes('-')) {
@@ -589,14 +594,29 @@ export function buildCycloneDxBom(opts) {
         sha384: 'SHA-384',
         sha512: 'SHA-512',
       };
+      /** @type {Record<string, number>} */
+      const digestBytes = {
+        'SHA-1': 20,
+        'SHA-256': 32,
+        'SHA-384': 48,
+        'SHA-512': 64,
+      };
       const alg = algMap[algRaw.toLowerCase()] || algRaw.toUpperCase();
       try {
-        component.hashes = [
-          {
-            alg,
-            content: Buffer.from(hashB64, 'base64').toString('hex'),
-          },
-        ];
+        // Node Buffer base64 decode is lenient (sha256-@@@@ → empty, no throw).
+        // Omit empty / wrong-length digests so SBOM hashes stay schema-valid (q-mp-1282).
+        if (
+          hashB64 &&
+          /^[A-Za-z0-9+/]+=*$/.test(hashB64) &&
+          algMap[algRaw.toLowerCase()]
+        ) {
+          const buf = Buffer.from(hashB64, 'base64');
+          const content = buf.toString('hex');
+          const expected = digestBytes[alg];
+          if (content && expected && buf.length === expected) {
+            component.hashes = [{ alg, content }];
+          }
+        }
       } catch {
         // skip malformed integrity
       }

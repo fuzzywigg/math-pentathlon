@@ -141,6 +141,23 @@ describe('report-licenses helpers', () => {
     ).toBe('axe-core');
   });
 
+  // q-mp-1284: trailing slash on lock paths must not pollute package names
+  it('strips trailing slashes from lock-path package names (q-mp-1284)', () => {
+    expect(npmPackageNameFromLockPath('node_modules/lodash/')).toBe('lodash');
+    expect(npmPackageNameFromLockPath('node_modules/@scope/pkg/')).toBe(
+      '@scope/pkg'
+    );
+    expect(npmPackageNameFromLockPath('node_modules/@scope/')).toBe('@scope');
+    expect(npmPackageNameFromLockPath('node_modules/lodash')).toBe('lodash');
+    expect(npmPackageNameFromLockPath('node_modules/@scope/pkg')).toBe(
+      '@scope/pkg'
+    );
+    expect(npmPackageNameFromLockPath('')).toBe('');
+    expect(npmPackageNameFromLockPath('not-a-lock-path')).toBe(
+      'not-a-lock-path'
+    );
+  });
+
   it('collects packages from a lockfile fixture and counts licenses', () => {
     const lock = {
       packages: {
@@ -229,10 +246,134 @@ describe('report-licenses helpers', () => {
     expect(bom.specVersion).toBe('1.5');
     expect(bom.components.length).toBe(2);
     expect(bom.components[0]!.purl).toBe('pkg:npm/three@0.186.1');
+    expect(bom.components[0]!['bom-ref']).toBe('pkg:npm/three@0.186.1');
     expect(bom.components[0]!.licenses).toEqual([{ expression: 'MIT' }]);
     expect(bom.components[1]!['bom-ref']).toBe(
       'file:public/fonts/inter-latin-400-normal.woff2'
     );
+  });
+
+  // q-mp-1281 / 1282 / 1283: CycloneDX bom-ref, integrity hashes, optional scope
+  it('omits @ from bom-ref when version is empty (q-mp-1281)', () => {
+    const bom = buildCycloneDxBom({
+      name: 'app',
+      version: '0',
+      packages: [
+        {
+          lockPath: 'node_modules/x',
+          name: 'x',
+          version: '',
+          license: 'MIT',
+          licenseSource: 'lockfile',
+          production: true,
+          optional: false,
+          hasInstallScript: false,
+          resolved: '',
+          integrity: '',
+          classification: 'ok',
+        },
+      ],
+      assets: [],
+    });
+    expect(bom.components[0]!['bom-ref']).toBe('pkg:npm/x');
+    expect(bom.components[0]!.purl).toBe('pkg:npm/x');
+  });
+
+  it('skips invalid / empty integrity hashes (q-mp-1282)', () => {
+    const sha256Hex =
+      '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824';
+    const validB64 = Buffer.from(sha256Hex, 'hex').toString('base64');
+    const packages = [
+      {
+        lockPath: 'node_modules/bad',
+        name: 'bad',
+        version: '1.0.0',
+        license: 'MIT',
+        licenseSource: 'lockfile' as const,
+        production: true,
+        optional: false,
+        hasInstallScript: false,
+        resolved: '',
+        integrity: 'sha256-@@@@',
+        classification: 'ok' as const,
+      },
+      {
+        lockPath: 'node_modules/short',
+        name: 'short',
+        version: '1.0.0',
+        license: 'MIT',
+        licenseSource: 'lockfile' as const,
+        production: true,
+        optional: false,
+        hasInstallScript: false,
+        resolved: '',
+        integrity: 'sha512-YWJj',
+        classification: 'ok' as const,
+      },
+      {
+        lockPath: 'node_modules/good',
+        name: 'good',
+        version: '1.0.0',
+        license: 'MIT',
+        licenseSource: 'lockfile' as const,
+        production: true,
+        optional: false,
+        hasInstallScript: false,
+        resolved: '',
+        integrity: `sha256-${validB64}`,
+        classification: 'ok' as const,
+      },
+    ];
+    const bom = buildCycloneDxBom({
+      name: 'app',
+      version: '0',
+      packages,
+      assets: [],
+    });
+    expect(bom.components[0]!.hashes).toBeUndefined();
+    expect(bom.components[1]!.hashes).toBeUndefined();
+    expect(bom.components[2]!.hashes).toEqual([
+      { alg: 'SHA-256', content: sha256Hex },
+    ]);
+  });
+
+  it('sets CycloneDX scope optional when package.optional is true (q-mp-1283)', () => {
+    const base = {
+      lockPath: 'node_modules/x',
+      name: 'x',
+      version: '1.0.0',
+      license: 'MIT',
+      licenseSource: 'lockfile' as const,
+      hasInstallScript: false,
+      resolved: '',
+      integrity: '',
+      classification: 'ok' as const,
+    };
+    const bom = buildCycloneDxBom({
+      name: 'app',
+      version: '0',
+      packages: [
+        { ...base, production: true, optional: true },
+        {
+          ...base,
+          name: 'y',
+          lockPath: 'node_modules/y',
+          production: true,
+          optional: false,
+        },
+        {
+          ...base,
+          name: 'z',
+          lockPath: 'node_modules/z',
+          production: false,
+          optional: false,
+        },
+      ],
+      assets: [],
+    });
+    expect(bom.components[0]!.scope).toBe('optional');
+    expect(bom.components[1]!.scope).toBe('required');
+    expect(bom.components[2]!.scope).toBe('optional');
   });
 
   it('inventories catalogued public assets on disk', () => {
