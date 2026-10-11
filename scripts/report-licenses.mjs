@@ -14,7 +14,7 @@
  *
  * Exit codes:
  *   0 — report completed; no explicitly denied license in the tree
- *   1 — denied license present, or lockfile unreadable
+ *   1 — denied license present, lockfile missing, or lockfile malformed/unreadable
  *
  * Report-only for copyleft/unknown/install-script flags (still exit 0).
  *
@@ -25,6 +25,8 @@
  * Unknown flags exit 2. --help/-h exit 0 without scanning or writing reports.
  * --dry-run scans and prints the summary but does not write under
  * test-results/licenses (q-mp-979).
+ * Malformed package-lock.json prints a short message + hint (no stack) and
+ * exits 1 (q-mp-1026). Missing lock message unchanged.
  */
 
 import fs from 'node:fs';
@@ -106,6 +108,24 @@ export function writeLicenseArtifacts(opts) {
     fs.writeFileSync(paths.summaryJson, opts.summaryJsonText);
   }
   return { wrote: !dryRun, outDir: OUT_DIR, paths };
+}
+
+/**
+ * Stable message for malformed package-lock.json (q-mp-1026) — no stack.
+ * @param {string} [lockPath]
+ * @param {string} [detail]
+ * @returns {string}
+ */
+export function malformedLockMessage(
+  lockPath = LOCK_PATH,
+  detail = 'Unexpected end of JSON input'
+) {
+  const display = String(lockPath).replace(/\\/g, '/');
+  return [
+    `report:licenses — malformed JSON in ${display}`,
+    detail,
+    'Fix or regenerate package-lock.json (run `npm install`).',
+  ].join('\n');
 }
 
 /** Strong copyleft / source-available terms that fail the report if present. */
@@ -707,7 +727,14 @@ function main(argv = process.argv.slice(2)) {
     process.exit(1);
   }
 
-  const lock = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
+  let lock;
+  try {
+    lock = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error(malformedLockMessage(LOCK_PATH, detail));
+    process.exit(1);
+  }
   const rootMeta = lock.packages?.[''] || {};
   const appName =
     typeof lock.name === 'string'
