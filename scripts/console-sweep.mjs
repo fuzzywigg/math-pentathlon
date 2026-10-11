@@ -13,6 +13,10 @@ import { artifactPath } from './lib/artifact-dir.mjs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import { CONSOLE_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
+import {
+  formatConsoleSweepSummaryLine,
+  summarizeConsoleSweepResult,
+} from './lib/console-sweep-summary.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
 
@@ -391,15 +395,10 @@ async function main() {
   for (const id of GAMES) {
     console.error(`Sweeping ${id}…`);
     const r = await sweepGame(browser, id);
+    // Attach labeled load/play/total counts (loadConsole snapshot was unused).
+    r.errorSummary = summarizeConsoleSweepResult(r);
     results.push(r);
-    const errCount =
-      r.console.filter((m) => m.type === 'error').length +
-      r.pageErrors.length +
-      r.unhandledRejections.length;
-    const warnCount = r.console.filter((m) => m.type === 'warning').length;
-    console.error(
-      `  loadOk=${r.loadOk} errors=${errCount} warnings=${warnCount} play=${r.playNote || 'ok'}`
-    );
+    console.error(formatConsoleSweepSummaryLine(r));
   }
   await browser.close();
   mkdirSync(dirname(OUT), { recursive: true });
