@@ -13,6 +13,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
+import {
+  isDeepPlaytestDrawStatus,
+  isDeepPlaytestEndStatus,
+} from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
@@ -172,7 +176,8 @@ async function playHumanTurn(page) {
 }
 
 function isEnded(statusText) {
-  return /wins|tie|draw/i.test(statusText || '');
+  // q-mp-1259: word boundaries — avoid "Drawing" / "patience" false-ends.
+  return isDeepPlaytestEndStatus(statusText);
 }
 
 async function waitForHumanOrEnd(page, deadline) {
@@ -280,7 +285,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
       const gate = await waitForHumanOrEnd(page, Date.now() + STALL_MS);
       lastStatus = gate.status;
       if (gate.kind === 'ended') {
-        outcome = /tie|draw/i.test(gate.status)
+        outcome = isDeepPlaytestDrawStatus(gate.status)
           ? 'draw'
           : /computer/i.test(gate.status)
             ? 'ai-win'
@@ -320,7 +325,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
             .catch(() => '');
           lastStatus = after?.trim() ?? '';
           if (isEnded(lastStatus)) {
-            outcome = /tie|draw/i.test(lastStatus)
+            outcome = isDeepPlaytestDrawStatus(lastStatus)
               ? 'draw'
               : /computer/i.test(lastStatus)
                 ? 'ai-win'
@@ -351,7 +356,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
         maxAiThinkMs = Math.max(maxAiThinkMs, Date.now() - thinkStart);
         lastStatus = humanBack.status;
         if (humanBack.kind === 'ended') {
-          outcome = /tie|draw/i.test(humanBack.status)
+          outcome = isDeepPlaytestDrawStatus(humanBack.status)
             ? 'draw'
             : /computer/i.test(humanBack.status)
               ? 'ai-win'
@@ -367,7 +372,7 @@ async function runOneGame(browser, viewport, difficulty, gameIndex) {
 
       lastStatus = flash?.trim() ?? '';
       if (isEnded(lastStatus)) {
-        outcome = /tie|draw/i.test(lastStatus)
+        outcome = isDeepPlaytestDrawStatus(lastStatus)
           ? 'draw'
           : /computer/i.test(lastStatus)
             ? 'ai-win'
