@@ -228,50 +228,58 @@ async function probe(browserType, name, baseURL) {
   return { browser: name, onlineDiag, offlineImport, gotoNav, consoleMsgs: consoleMsgs.slice(0, 10) };
 }
 
-const port = await getFreePort();
-const baseURL = `http://127.0.0.1:${port}`;
+async function main() {
+  const port = await getFreePort();
+  const baseURL = `http://127.0.0.1:${port}`;
 
-if (process.env.FORCE_BUILD === '1' || !existsSync(path.join(ROOT, 'dist/sw.js'))) {
-  console.error('building…');
-  await new Promise((resolve, reject) => {
-    const build = spawn('npm', ['run', 'build'], {
-      cwd: ROOT,
-      stdio: 'inherit',
-      env: process.env,
+  if (process.env.FORCE_BUILD === '1' || !existsSync(path.join(ROOT, 'dist/sw.js'))) {
+    console.error('building…');
+    await new Promise((resolve, reject) => {
+      const build = spawn('npm', ['run', 'build'], {
+        cwd: ROOT,
+        stdio: 'inherit',
+        env: process.env,
+      });
+      build.on('exit', (code) =>
+        code === 0 ? resolve() : reject(new Error(`build ${code}`))
+      );
     });
-    build.on('exit', (code) =>
-      code === 0 ? resolve() : reject(new Error(`build ${code}`))
-    );
-  });
-}
-
-const preview = spawn(
-  'npx',
-  ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
-  { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: process.env }
-);
-try {
-  await waitForUrl(baseURL);
-  console.error('preview', baseURL);
-
-  const map = { webkit, firefox, chromium };
-  const out = {};
-  for (const name of BROWSERS) {
-    const bt = map[name];
-    if (!bt) throw new Error(`unknown browser ${name}`);
-    console.error('probing', name);
-    out[name] = await probe(bt, name, baseURL);
   }
-  console.log(JSON.stringify(out, null, 2));
+
+  const preview = spawn(
+    'npx',
+    ['vite', 'preview', '--host', '127.0.0.1', '--port', String(port), '--strictPort'],
+    { cwd: ROOT, stdio: ['ignore', 'pipe', 'pipe'], env: process.env }
+  );
   try {
-    const outPath = artifactPath('webkit-offline-probe.json');
-    writeFileSync(outPath, JSON.stringify(out, null, 2));
-    console.error('Wrote', outPath);
-  } catch (e) {
-    console.error('artifact write skipped:', e?.message ?? e);
+    await waitForUrl(baseURL);
+    console.error('preview', baseURL);
+
+    const map = { webkit, firefox, chromium };
+    const out = {};
+    for (const name of BROWSERS) {
+      const bt = map[name];
+      if (!bt) throw new Error(`unknown browser ${name}`);
+      console.error('probing', name);
+      out[name] = await probe(bt, name, baseURL);
+    }
+    console.log(JSON.stringify(out, null, 2));
+    try {
+      const outPath = artifactPath('webkit-offline-probe.json');
+      writeFileSync(outPath, JSON.stringify(out, null, 2));
+      console.error('Wrote', outPath);
+    } catch (e) {
+      console.error('artifact write skipped:', e?.message ?? e);
+    }
+  } finally {
+    preview.kill('SIGTERM');
   }
-} finally {
-  preview.kill('SIGTERM');
-  // vite preview can keep the event loop alive after SIGTERM; force exit.
+  // Success-only delayed exit (q-mp-1043). Preview keepalive must not mask throws
+  // via finally → process.exit(0). Aligns with probe-offline-resilience.mjs.
   setTimeout(() => process.exit(0), 500).unref();
 }
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
