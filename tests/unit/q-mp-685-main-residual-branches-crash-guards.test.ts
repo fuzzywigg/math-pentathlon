@@ -1,21 +1,12 @@
 /**
- * q-mp-685 — Close `src/main.ts` residual gaps (tests-only).
- *
- * Live tip re-measure (`cursor/mp-tip-post1059` @ 890a9e3f):
- *   isolated main suites (`burn-1007-main-shell-routes` + `q-mp-299-main-soft-fail`):
- *     **87.25%** lines (178/204) / **69.64%** branches (39/56)
- *   Uncovered clusters: catch-stale returns (stats + 7 demos), demo
- *     success-stale (non-dice), load-error / crash onHome+onReset
- *     shorthands, gameId-undefined guard, defensive activeBoundary skip.
- *
- * Ownership: leave main void HOLD + `#1006`-era soft-fail with **contained**
- * (this ticket is residual coverage, not void-ceiling / product). Zero `src/`
- * edits; no copy / aria / label pins; no ratchet JSON; no AI / rules /
- * scoring; Hex Hard 450ms untouched; no network.
+ * q-mp-1212 shard of q-mp-685 main.ts residual branches (tests-only).
+ * Family: game crash onHome/onReset + missing gameId guard + null boundary.
  *
  * Isolated: hoisted PWA/demo mocks must not leak into unit-shared.
  */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+import { installMainResidualHooks } from './q-mp-685-main-residual-branches.shared';
 
 vi.mock('virtual:pwa-register', () => ({
   registerSW: vi.fn(() => vi.fn()),
@@ -118,211 +109,15 @@ vi.mock('../../src/ui/game-error-boundary', async (importOriginal) => {
   };
 });
 
-type DemoRoute = {
-  hash: string;
-  attr: string;
-  load: () => Promise<ReturnType<typeof vi.fn>>;
-};
-
-const DEMO_ROUTES: DemoRoute[] = [
-  {
-    hash: '#/demo/dice',
-    attr: 'dice',
-    load: async () => {
-      const m = await import('../../src/demos/dice-demo');
-      return vi.mocked(m.renderDiceDemo);
-    },
-  },
-  {
-    hash: '#/demo/alignment',
-    attr: 'alignment',
-    load: async () => {
-      const m = await import('../../src/demos/alignment-demo');
-      return vi.mocked(m.renderAlignmentDemo);
-    },
-  },
-  {
-    hash: '#/demo/fractions',
-    attr: 'fractions',
-    load: async () => {
-      const m = await import('../../src/demos/fraction-demo');
-      return vi.mocked(m.renderFractionDemo);
-    },
-  },
-  {
-    hash: '#/demo/polyomino',
-    attr: 'polyomino',
-    load: async () => {
-      const m = await import('../../src/demos/polyomino-demo');
-      return vi.mocked(m.renderPolyominoDemo);
-    },
-  },
-  {
-    hash: '#/demo/graph',
-    attr: 'graph',
-    load: async () => {
-      const m = await import('../../src/demos/graph-demo');
-      return vi.mocked(m.renderGraphDemo);
-    },
-  },
-  {
-    hash: '#/demo/attributes',
-    attr: 'attributes',
-    load: async () => {
-      const m = await import('../../src/demos/attribute-demo');
-      return vi.mocked(m.renderAttributeDemo);
-    },
-  },
-  {
-    hash: '#/demo/expressions',
-    attr: 'expressions',
-    load: async () => {
-      const m = await import('../../src/demos/expression-demo');
-      return vi.mocked(m.renderExpressionDemo);
-    },
-  },
-];
-
-const NON_DICE_DEMOS = DEMO_ROUTES.filter((d) => d.attr !== 'dice');
-
 describe('q-mp-685 main.ts residual branches', () => {
-  beforeEach(() => {
-    document.body.innerHTML = '<div id="app"></div>';
-    window.location.hash = '';
-    mountGameById.mockReset();
-    initGameMountDeps.mockReset();
-    mountGameById.mockResolvedValue(undefined);
-    initGameMountDeps.mockImplementation(() => undefined);
-    renderStatsDashboard.mockReset();
-    renderStatsDashboard.mockImplementation((container: HTMLElement) => {
-      container.innerHTML = '<div data-testid="stats">stats</div>';
-    });
-    isBrowserOffline.mockReturnValue(false);
-    installGameErrorBoundary.mockClear();
-    installGameErrorBoundary.mockImplementation((opts) => {
-      if (!boundaryState.real) {
-        throw new Error('q-mp-685: real installGameErrorBoundary not armed');
-      }
-      return boundaryState.real(opts);
-    });
+  installMainResidualHooks({
+    mountGameById,
+    initGameMountDeps,
+    renderStatsDashboard,
+    isBrowserOffline,
+    installGameErrorBoundary,
+    boundaryState,
   });
-
-  afterEach(() => {
-    document.body.innerHTML = '';
-    window.location.hash = '';
-    vi.resetModules();
-    vi.unstubAllGlobals();
-    vi.restoreAllMocks();
-  });
-
-  it('stats catch-stale: bump during render aborts load-error paint', async () => {
-    const { nextRouteGeneration } = await import(
-      '../../src/core/route-generation'
-    );
-    renderStatsDashboard.mockImplementation(() => {
-      nextRouteGeneration();
-      throw new Error('stats boom after gen bump');
-    });
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    await import('../../src/main');
-    const { handleRoute } = await import('../../src/core/router');
-    window.location.hash = '#/stats';
-    handleRoute();
-
-    await vi.waitFor(() => {
-      expect(renderStatsDashboard).toHaveBeenCalled();
-    });
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(
-      document.querySelector('[data-testid="game-load-error"]')
-    ).toBeNull();
-    errSpy.mockRestore();
-  });
-
-  it.each(DEMO_ROUTES)(
-    'demo catch-stale ($attr): bump during render aborts load-error',
-    async (demo) => {
-      const { nextRouteGeneration } = await import(
-        '../../src/core/route-generation'
-      );
-      const render = await demo.load();
-      render.mockImplementation(() => {
-        nextRouteGeneration();
-        throw new Error(`${demo.attr} boom after gen bump`);
-      });
-      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      await import('../../src/main');
-      const { handleRoute } = await import('../../src/core/router');
-      window.location.hash = demo.hash;
-      handleRoute();
-
-      await vi.waitFor(() => {
-        expect(render).toHaveBeenCalled();
-      });
-      await Promise.resolve();
-      await Promise.resolve();
-      expect(
-        document.querySelector('[data-testid="game-load-error"]')
-      ).toBeNull();
-      expect(document.querySelector(`[data-demo="${demo.attr}"]`)).toBeNull();
-      errSpy.mockRestore();
-    }
-  );
-
-  it.each(NON_DICE_DEMOS)(
-    'demo success-stale ($attr): gen bump before paint skips demo',
-    async (demo) => {
-      const { nextRouteGeneration } = await import(
-        '../../src/core/route-generation'
-      );
-      await demo.load();
-      await import('../../src/main');
-      const { handleRoute } = await import('../../src/core/router');
-      window.location.hash = demo.hash;
-      handleRoute();
-      // Same sync turn as the async IIFE's first await yield.
-      nextRouteGeneration();
-      await Promise.resolve();
-      await Promise.resolve();
-      await Promise.resolve();
-      expect(document.querySelector(`[data-demo="${demo.attr}"]`)).toBeNull();
-    }
-  );
-
-  it.each(DEMO_ROUTES)(
-    'demo load-error onHome ($attr): home action navigates to menu',
-    async (demo) => {
-      const render = await demo.load();
-      render.mockImplementation(() => {
-        throw new Error(`${demo.attr} load boom`);
-      });
-      const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-      await import('../../src/main');
-      const { handleRoute } = await import('../../src/core/router');
-      window.location.hash = demo.hash;
-      handleRoute();
-
-      await vi.waitFor(() => {
-        expect(
-          document.querySelector('[data-testid="game-load-error"]')
-        ).toBeTruthy();
-      });
-
-      document
-        .querySelector<HTMLButtonElement>('[data-action="home"]')
-        ?.click();
-      await vi.waitFor(() => {
-        expect(
-          window.location.hash === '#/' || window.location.hash === ''
-        ).toBe(true);
-      });
-      errSpy.mockRestore();
-    }
-  );
 
   it('game crash onHome shorthand navigates to menu', async () => {
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
