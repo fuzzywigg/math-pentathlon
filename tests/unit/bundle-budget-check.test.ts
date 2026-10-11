@@ -1,9 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import {
   parseMenuCriticalRefs,
+  parseBudgetsJson,
+  isGameChunkFile,
   mapGameChunks,
+  measureGameChunks,
   partitionOvers,
   resolveSizeCheckExitCode,
   resolveSizeCheckCatchExitCode,
@@ -72,6 +76,48 @@ describe('bundle budget helpers', () => {
     expect(parseMenuCriticalRefs('<div data-SRC="/assets/x.js">')).toEqual([]);
   });
 
+  // q-mp-1385: module chunks under /assets|/vendor
+  it('includes .mjs menu-critical refs alongside .js and .css (q-mp-1385)', () => {
+    expect(
+      parseMenuCriticalRefs(
+        '<script src="/assets/app.mjs"></script><link href="/assets/a.css" rel="stylesheet">'
+      )
+    ).toEqual(['assets/a.css', 'assets/app.mjs']);
+    expect(
+      parseMenuCriticalRefs(
+        '<script src="/assets/app.js"></script><link href="/assets/a.css" rel="stylesheet">'
+      )
+    ).toEqual(['assets/a.css', 'assets/app.js']);
+    // Word-boundary still ignores data-src even for .mjs
+    expect(
+      parseMenuCriticalRefs('<img data-src="/assets/app.mjs" src="/assets/real.js">')
+    ).toEqual(['assets/real.js']);
+  });
+
+  // q-mp-1400: UTF-8 BOM on bundle-budgets.json
+  it('parseBudgetsJson strips a leading UTF-8 BOM (q-mp-1400)', () => {
+    const body = readFileSync(
+      resolve(process.cwd(), 'bundle-budgets.json'),
+      'utf8'
+    );
+    const plain = parseBudgetsJson(body);
+    const withBom = parseBudgetsJson('\uFEFF' + body);
+    expect(withBom).toEqual(plain);
+    // Non-BOM path must match JSON.parse byte-for-byte on the same text.
+    expect(plain).toEqual(JSON.parse(body));
+    expect(() => parseBudgetsJson('\uFEFF{')).toThrow();
+    // Mid-payload FEFF is not stripped (parse still fails closed).
+    expect(() => parseBudgetsJson('{\uFEFF"menuCriticalPath":1}')).toThrow();
+  });
+
+  it('isGameChunkFile accepts .js and .mjs game chunks (q-mp-1402)', () => {
+    expect(isGameChunkFile('game-hex-aaaaaaaa.js')).toBe(true);
+    expect(isGameChunkFile('game-hex-aaaaaaaa.mjs')).toBe(true);
+    expect(isGameChunkFile('game-hex-aaaaaaaa.js.map')).toBe(false);
+    expect(isGameChunkFile('index-abc.js')).toBe(false);
+    expect(isGameChunkFile('game-hex-aaaaaaaa.css')).toBe(false);
+  });
+
   it('maps game chunks without short-id stealing longer names', () => {
     const files = [
       'game-hex-aaaaaaaa.js',
@@ -120,6 +166,38 @@ describe('bundle budget helpers', () => {
     const map = mapGameChunks(files, ['hex', 'hex-a-gone']);
     expect(map.has('hex-a-gone')).toBe(false);
     expect(map.get('hex')).toBe('game-hex-aaaaaaaa.js');
+  });
+
+  // q-mp-1402: measureGameChunks / mapGameChunks .mjs parity
+  it('maps and measures game-*.mjs chunks (q-mp-1402)', () => {
+    const map = mapGameChunks(
+      ['game-hex-aaaaaaaa.mjs', 'game-calla-bbbbbbbb.js'],
+      ['hex', 'calla']
+    );
+    expect(map.get('hex')).toBe('game-hex-aaaaaaaa.mjs');
+    expect(map.get('calla')).toBe('game-calla-bbbbbbbb.js');
+
+    const root = mkdtempSync(join(tmpdir(), 'mp-bundle-mjs-'));
+    const assets = join(root, 'assets');
+    mkdirSync(assets);
+    writeFileSync(join(assets, 'game-hex-aaaaaaaa.mjs'), 'export default 1;\n');
+    writeFileSync(join(assets, 'game-calla-bbbbbbbb.js'), 'export default 2;\n');
+    const rows = measureGameChunks(root, ['hex', 'calla', 'missing-game']);
+    expect(rows.find((r) => r.id === 'hex')).toMatchObject({
+      id: 'hex',
+      file: 'assets/game-hex-aaaaaaaa.mjs',
+    });
+    expect(rows.find((r) => r.id === 'calla')).toMatchObject({
+      id: 'calla',
+      file: 'assets/game-calla-bbbbbbbb.js',
+    });
+    expect(rows.find((r) => r.id === 'missing-game')).toEqual({
+      id: 'missing-game',
+      file: '(missing)',
+      gzipBytes: -1,
+    });
+    const hexRow = rows.find((r) => r.id === 'hex');
+    expect(hexRow && hexRow.gzipBytes).toBeGreaterThan(0);
   });
 });
 
