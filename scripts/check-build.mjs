@@ -275,7 +275,9 @@ export function scanEnvLeakage(distRoot) {
     { re: /\/workspace\//, label: 'absolute /workspace path' },
     { re: /\/home\/[A-Za-z0-9._-]+\//, label: 'absolute /home path' },
     { re: /[A-Z]:\\/, label: 'Windows absolute path' },
-    { re: /file:\/\/\//, label: 'file:// URL' },
+    // URL token with a path segment after file:/// — not mid-sentence
+    // substring theater like `not a file:/// path` (q-mp-1209).
+    { re: /(?<![A-Za-z0-9])file:\/\/\/[^\s"'<>]+/, label: 'file:// URL' },
     { re: /sourceMappingURL\s*=/, label: 'sourceMappingURL' },
   ];
   for (const rel of hashTree(distRoot).keys()) {
