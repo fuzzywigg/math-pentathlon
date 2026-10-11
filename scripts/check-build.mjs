@@ -171,6 +171,8 @@ export function diffHashTrees(a, b) {
 
 /**
  * Chunk / asset basenames under assets/ and vendor/.
+ * Includes `.mjs` so dual-build chunk diffs match the offline JS-like set
+ * (`offlineNeededPaths` / OFFLINE_EXTS) — q-mp-1334.
  * @param {Map<string, string>} tree
  * @returns {string[]}
  */
@@ -179,7 +181,7 @@ export function listChunkNames(tree) {
     .filter(
       (p) =>
         (p.startsWith('assets/') || p.startsWith('vendor/')) &&
-        /\.(js|css)$/.test(p)
+        /\.(m?js|css)$/.test(p)
     )
     .sort();
 }
@@ -324,14 +326,15 @@ export function scanEnvLeakage(distRoot) {
 
 /**
  * Collect non-root absolute asset refs from HTML `src` / `href` attributes.
- * Accepts double- or single-quoted attributes (q-mp-1179).
+ * Accepts double- or single-quoted attributes (q-mp-1179) and unquoted
+ * HTML attribute values (q-mp-1335).
  * @param {string} html
  * @returns {string[]}
  */
 export function collectHtmlNonRootAssetRefs(html) {
   const htmlAssetRefs = [
-    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)')/g),
-  ].map((m) => m[1] ?? m[2]);
+    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g),
+  ].map((m) => m[1] ?? m[2] ?? m[3]);
   return htmlAssetRefs.filter((href) => {
     // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
     const isRootAbsolute = href.startsWith('/') && !href.startsWith('//');
@@ -343,6 +346,16 @@ export function collectHtmlNonRootAssetRefs(html) {
     // skip-link / in-page only; module scripts must be root-absolute with base /
     return /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
   });
+}
+
+/**
+ * CI parity: production builds must emit `dist/health.txt` (copied from
+ * `public/health.txt`). Used by `check:build` summary + exit (q-mp-1336).
+ * @param {string} distRoot
+ * @returns {boolean}
+ */
+export function hasHealthTxt(distRoot) {
+  return fs.existsSync(path.join(distRoot, 'health.txt'));
 }
 
 /**
@@ -506,6 +519,11 @@ function main() {
   const leaks = scanEnvLeakage(DIST_B);
   const policy = auditSourcemapsAndBase(DIST_B);
 
+  // CI parity with `.github/workflows/ci.yml` `test -f dist/health.txt` (q-mp-1336).
+  const healthTxtA = hasHealthTxt(DIST_A);
+  const healthTxtB = hasHealthTxt(DIST_B);
+  const healthTxtOk = healthTxtA && healthTxtB;
+
   const byteIdentical =
     fileDiff.onlyA.length === 0 &&
     fileDiff.onlyB.length === 0 &&
@@ -521,6 +539,14 @@ function main() {
     fileDiff,
     chunkNameDiff,
     manifestIdentical,
+    healthTxt: {
+      a: healthTxtA,
+      b: healthTxtB,
+      ok: healthTxtOk,
+      finding: healthTxtOk
+        ? null
+        : 'missing dist/health.txt (CI build job requires it)',
+    },
     precache: {
       countA: precacheA.entries.length,
       countB: precacheB.entries.length,
@@ -561,6 +587,7 @@ function main() {
     `| site.webmanifest identical | ${manifestIdentical ? 'YES' : 'NO'} |`,
     `| Precache URL list identical | ${precacheUrlsIdentical ? 'YES' : 'NO'} |`,
     `| Precache entries (url+revision) identical | ${precacheEntriesIdentical ? 'YES' : 'NO'} |`,
+    `| health.txt present (A / B) | ${healthTxtA ? 'YES' : 'NO'} / ${healthTxtB ? 'YES' : 'NO'} |`,
     '',
     '### File diffs',
     '',
@@ -648,13 +675,30 @@ function main() {
 
   md.push('## Notes', '', ...summary.notes.map((n) => `- ${n}`), '');
 
+  if (!healthTxtOk) {
+    md.push(
+      '## health.txt (CI parity)',
+      '',
+      `**FINDING:** ${summary.healthTxt.finding}`,
+      ''
+    );
+  }
+
   fs.writeFileSync(SUMMARY_MD, `${md.join('\n')}\n`);
 
   console.log(`check:build — wrote ${path.relative(ROOT, SUMMARY_MD)}`);
   console.log(
-    `check:build — byteIdentical=${byteIdentical} precacheOk=${precacheB.ok} leaks=${leaks.length}`
+    `check:build — byteIdentical=${byteIdentical} precacheOk=${precacheB.ok} leaks=${leaks.length} healthTxtOk=${healthTxtOk}`
   );
-  // Report-only: never fail CI / local gates.
+  // Report-only dual-build path exits 0 when audits complete; missing
+  // health.txt fails closed for CI parity (q-mp-1336) — real builds emit it.
+  if (!healthTxtOk) {
+    console.error(
+      'check:build — missing dist/health.txt (CI build job requires it)'
+    );
+    process.exitCode = 1;
+    return;
+  }
   process.exitCode = 0;
 }
 
