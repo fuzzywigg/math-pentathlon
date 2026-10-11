@@ -96,7 +96,11 @@ export function summarizeKnip(knip) {
  * @returns {{ ok: true, metrics: Record<string, number> } | { ok: false, message: string }}
  */
 export function validateBaselineMetrics(metrics) {
-  if (metrics == null || typeof metrics !== 'object' || Array.isArray(metrics)) {
+  if (
+    metrics == null ||
+    typeof metrics !== 'object' ||
+    Array.isArray(metrics)
+  ) {
     return {
       ok: false,
       message:
@@ -353,7 +357,9 @@ function main() {
     process.exit(1);
   }
   const baselineDoc =
-    loaded.kind === 'ok' || loaded.kind === 'absent-metrics' ? loaded.doc : null;
+    loaded.kind === 'ok' || loaded.kind === 'absent-metrics'
+      ? loaded.doc
+      : null;
   const baselineMetrics = loaded.kind === 'ok' ? loaded.metrics : null;
   const enforce = Boolean(args.fail || baselineDoc?.enforce);
 
