@@ -247,7 +247,8 @@ export function runCmd(args, opts = {}) {
 }
 
 /**
- * Fail closed when Lighthouse JSON lacks a finite performance score (q-mp-1208).
+ * Fail closed when Lighthouse JSON lacks a finite performance score (q-mp-1208)
+ * or when the score is outside Lighthouse's documented [0, 1] range (q-mp-1246).
  * Present numeric `0` stays representable as score `0` (unlike `score || 0`).
  *
  * @param {unknown} report
@@ -264,6 +265,14 @@ export function shapeLhPerformanceScore(report) {
     return {
       ok: false,
       error: 'missing Lighthouse performance score',
+    };
+  }
+  // Lighthouse category scores are fractions in [0, 1]; reject inflated/negative
+  // values so they cannot green-wash as 0–100 display points (q-mp-1246).
+  if (raw < 0 || raw > 1) {
+    return {
+      ok: false,
+      error: 'out-of-range Lighthouse performance score',
     };
   }
   return { ok: true, score: Math.round(raw * 100) };
