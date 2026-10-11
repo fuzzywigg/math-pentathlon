@@ -117,7 +117,8 @@ const nodePureFiles = [
   'tests/unit/state-roundtrip-fuzz-queens-a*.test.ts',
   'tests/unit/state-roundtrip-fuzz-queens-b.test.ts',
   'tests/unit/state-roundtrip-fuzz-games.test.ts',
-  'tests/unit/engine-property-invariants.test.ts',
+  // q-mp-1351: registry + heavy/mid/light game-group shards — unit-node.
+  'tests/unit/engine-property-invariants*.test.ts',
   'tests/unit/ai-worker-parity-fab.test.ts',
   'tests/unit/ai-worker-parity-queens-hex.test.ts',
   'tests/unit/ai-worker-parity-fiar.test.ts',
