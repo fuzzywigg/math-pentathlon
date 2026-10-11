@@ -56,6 +56,45 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('accepts optional trailing commas in Workbox entries (q-mp-1098)', () => {
+    expect(parsePrecacheManifest('{url: "/a.js", revision: "1",}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{"url":"/a.js","revision":"1",}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{ revision: "1", url: "/a.js", }')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+    expect(parsePrecacheManifest('{url: "/a.js", revision: null,}')).toEqual([
+      { url: '/a.js', revision: null },
+    ]);
+    // No trailing comma still parses (folded 1058 / 1087).
+    expect(parsePrecacheManifest('{url: "/a.js", revision: "1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
+  it('accepts whitespace around bare keys and colons (q-mp-1099)', () => {
+    expect(parsePrecacheManifest('{ url : "/a.js" , revision : "1" }')).toEqual(
+      [{ url: '/a.js', revision: '1' }]
+    );
+    expect(parsePrecacheManifest('{ revision : "1" , url : "/a.js" }')).toEqual(
+      [{ url: '/a.js', revision: '1' }]
+    );
+    expect(
+      parsePrecacheManifest('{ "url" : "/a.js" , "revision" : "1" }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    // Trailing comma (1098) + spaced keys coexist.
+    expect(
+      parsePrecacheManifest('{ url : "/a.js" , revision : "1" , }')
+    ).toEqual([{ url: '/a.js', revision: '1' }]);
+    // Compact bare path still works.
+    expect(parsePrecacheManifest('{url:"/a.js",revision:"1"}')).toEqual([
+      { url: '/a.js', revision: '1' },
+    ]);
+  });
+
   it('diffs hash trees for only-A / only-B / content', () => {
     const a = new Map([
       ['a.js', '111'],
