@@ -53,6 +53,23 @@ describe('isOfflineProbeMountOk (q-mp-1295 / q-mp-1296)', () => {
     ).toBe(false);
     expect(isOfflineProbeMountOk({})).toBe(false);
   });
+
+  it('rejects boolean / string coercion (q-mp-1338)', () => {
+    // Number(true)===1 / Number(false)===0 used to green-wash bool payloads.
+    expect(
+      isOfflineProbeMountOk({ mountCount: true, loadErrorCount: false })
+    ).toBe(false);
+    expect(
+      isOfflineProbeMountOk({ mountCount: '1', loadErrorCount: '0' })
+    ).toBe(false);
+    expect(isOfflineProbeMountOk({ mountCount: 1.5, loadErrorCount: 0 })).toBe(
+      false
+    );
+    // Numeric integers still accepted.
+    expect(isOfflineProbeMountOk({ mountCount: 1, loadErrorCount: 0 })).toBe(
+      true
+    );
+  });
 });
 
 describe('offline probe mount selectors (q-mp-1295 / q-mp-1296)', () => {
