@@ -32,7 +32,7 @@ icons were already on tip (#399 / overnight polish).
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
 npm run build
 npm run check:pwa-manifest   # report-only (opt-in: REPORT_ONLY=0 for local exit 1; CI soft step stays report-only unless tip-owner wires otherwise)
