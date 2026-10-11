@@ -1,7 +1,7 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for help-only CLI argv (q-mp-885).
+ * Hermetic coverage for help-only CLI argv (q-mp-885 / q-mp-1316).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -15,7 +15,7 @@ import {
 
 const ROOT = process.cwd();
 
-describe('parseHelpOnlyArgv (q-mp-885)', () => {
+describe('parseHelpOnlyArgv (q-mp-885 / q-mp-1316)', () => {
   it('empty argv means run', () => {
     expect(parseHelpOnlyArgv([])).toEqual({ kind: 'run' });
   });
@@ -33,8 +33,23 @@ describe('parseHelpOnlyArgv (q-mp-885)', () => {
     expect(parseHelpOnlyArgv(['-x'])).toEqual({ kind: 'error', flag: '-x' });
   });
 
-  it('ignores non-flag positionals (run)', () => {
-    expect(parseHelpOnlyArgv(['some-path'])).toEqual({ kind: 'run' });
+  it('rejects unknown positionals (peer CLI parity)', () => {
+    expect(parseHelpOnlyArgv(['oops'])).toEqual({
+      kind: 'error',
+      flag: 'oops',
+    });
+    expect(parseHelpOnlyArgv(['some-path'])).toEqual({
+      kind: 'error',
+      flag: 'some-path',
+    });
+    expect(parseHelpOnlyArgv(['foo', 'bar'])).toEqual({
+      kind: 'error',
+      flag: 'foo',
+    });
+  });
+
+  it('--help wins before a later positional', () => {
+    expect(parseHelpOnlyArgv(['--help', 'extra'])).toEqual({ kind: 'help' });
   });
 
   it('usage names the script', () => {
@@ -63,6 +78,24 @@ describe('help-only CLI scripts (q-mp-885)', () => {
       expect(text).toMatch(
         new RegExp(`Usage: node ${rel.replace(/\./g, '\\.')}`)
       );
+    });
+
+    it(`${rel} rejects unknown positional with exit 2 (q-mp-1316)`, () => {
+      const r = spawnSync(process.execPath, [resolve(ROOT, rel), 'oops'], {
+        encoding: 'utf8',
+        cwd: ROOT,
+      });
+      expect(r.status).toBe(2);
+      const text = `${r.stdout}\n${r.stderr}`;
+      // help-only callers: "Unknown flag:"; report-licenses own parser:
+      // "Unexpected argument:" — both must exit 2 without running work.
+      expect(text).toMatch(/(?:Unknown flag|Unexpected argument): oops/);
+      expect(text).toMatch(
+        new RegExp(`Usage: node ${rel.replace(/\./g, '\\.')}`)
+      );
+      expect(text).not.toMatch(/check:workflows OK/);
+      expect(text).not.toMatch(/Module boundary audit/);
+      expect(text).not.toMatch(/License & provenance report/);
     });
 
     it(`${rel} --help exits 0 without side-effect work`, () => {

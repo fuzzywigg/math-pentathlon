@@ -19,6 +19,7 @@ import {
   isDeepPlaytestEndStatus,
 } from './lib/deep-playtest-end.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { utcPlaytestDateStamp } from './lib/playtest-date.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import {
   installHarnessSeededRandom,
@@ -45,7 +46,9 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
 installHarnessSeededRandom(SEED);
-const OUT = path.resolve('docs/playtest/sum-dominoes-deep-2026-10-07');
+const OUT = path.resolve(
+  `docs/playtest/sum-dominoes-deep-${utcPlaytestDateStamp()}`
+);
 const ART = resolveArtifactDir();
 const GAMES_PER_DIFF = requireEnvNumber('SD_GAMES', 10);
 const MAX_HUMAN_TURNS = 80;

@@ -186,6 +186,34 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290 / q-mp-
     expect(extractMetric('typePhase2', { totals: null })).toBeNull();
   });
 
+  it('extractMetric(typePhase2) coerces finite numeric strings like lint/boundaries (q-mp-1311)', () => {
+    // Pre-fix: string '42' → null (chart drops commit). Lint already coerces.
+    expect(extractMetric('typePhase2', { outOfScopeErrors: '42' })).toBe(42);
+    expect(
+      extractMetric('typePhase2', { totals: { outOfScopeErrors: '42' } })
+    ).toBe(42);
+    expect(extractMetric('typePhase2', { outOfScopeErrors: ' 216 ' })).toBe(
+      216
+    );
+    expect(extractMetric('typePhase2', { outOfScopeErrors: 42 })).toBe(42);
+    expect(extractMetric('eqeqeq', { rules: { eqeqeq: '9' } })).toBe(9);
+    // Non-numeric / empty still null; fall through to nested when top is junk.
+    expect(extractMetric('typePhase2', { outOfScopeErrors: 'x' })).toBeNull();
+    expect(extractMetric('typePhase2', { outOfScopeErrors: '' })).toBeNull();
+    expect(
+      extractMetric('typePhase2', {
+        outOfScopeErrors: 'nope',
+        totals: { outOfScopeErrors: '216' },
+      })
+    ).toBe(216);
+    expect(
+      extractMetric('typePhase2', {
+        outOfScopeErrors: '100',
+        totals: { outOfScopeErrors: 216 },
+      })
+    ).toBe(100);
+  });
+
   it('parses git log tab-separated lines', () => {
     const stdout = [
       'abc123\t2026-10-08T12:00:00Z\tchore: lower curly',

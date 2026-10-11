@@ -43,9 +43,11 @@ export function aggregate(
   let lengthSum = 0;
   for (const r of results) {
     lengthSum += r.length;
+    // Only real draws count as draws. Unknown winners (timeout/error/…)
+    // are excluded from win/draw tallies so rates stay honest (q-mp-1327).
     if (r.winner === 'player1') p1Wins += 1;
     else if (r.winner === 'player2') p2Wins += 1;
-    else draws += 1;
+    else if (r.winner === 'draw') draws += 1;
   }
   return {
     games,

@@ -3,7 +3,7 @@
  *
  * Hermetic coverage for mutation-report argv validation
  * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064 / q-mp-1217 /
- * q-mp-1232).
+ * q-mp-1232 / q-mp-1322).
  *
  * Argv reject paths assert via parseMutationReportArgs /
  * resolveMutationReportGames in-process (q-mp-1064 wall-time cut).
@@ -116,6 +116,42 @@ describe('parseMutationReportArgs (q-mp-867)', () => {
       expect(got.message).toMatch(/integer/);
       expect(got.message).toMatch(/5000\.5/);
     }
+  });
+
+  it('rejects scientific-notation --max (q-mp-1322)', () => {
+    for (const raw of ['1e2', '1E2', '1e+2', '1e-1'] as const) {
+      const got = parse([`--max=${raw}`]);
+      expect(got.ok).toBe(false);
+      if (!got.ok) {
+        expect(got.message).toMatch(/Invalid --max/);
+        expect(got.message).toMatch(/integer/);
+        expect(got.message).toContain(raw);
+      }
+    }
+  });
+
+  it('rejects scientific-notation --timeout (q-mp-1322)', () => {
+    for (const raw of ['1e4', '5e3', '1E4'] as const) {
+      const got = parse([`--timeout=${raw}`]);
+      expect(got.ok).toBe(false);
+      if (!got.ok) {
+        expect(got.message).toMatch(/Invalid --timeout/);
+        expect(got.message).toMatch(/integer/);
+        expect(got.message).toContain(raw);
+      }
+    }
+  });
+
+  it('still accepts decimal --max=100 and --max=0 (q-mp-1322)', () => {
+    const max100 = parse(['--max=100']);
+    expect(max100.ok).toBe(true);
+    if (max100.ok) expect(max100.opts.max).toBe(100);
+    const max0 = parse(['--max=0']);
+    expect(max0.ok).toBe(true);
+    if (max0.ok) expect(max0.opts.max).toBe(0);
+    const timeout = parse(['--timeout=5000']);
+    expect(timeout.ok).toBe(true);
+    if (timeout.ok) expect(timeout.opts.timeoutMs).toBe(5000);
   });
 });
 
@@ -269,10 +305,10 @@ describe('resolveMutationReportGames (q-mp-868)', () => {
       {
         ok: true,
         games: ['hex'],
-      },
+      }
     );
     expect(
-      resolveMutationReportGames(['hex', 'fiar', 'hex', 'calla', 'fiar'], VALID),
+      resolveMutationReportGames(['hex', 'fiar', 'hex', 'calla', 'fiar'], VALID)
     ).toEqual({
       ok: true,
       games: ['hex', 'fiar', 'calla'],

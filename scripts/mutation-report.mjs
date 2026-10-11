@@ -109,12 +109,13 @@ function listGames() {
 
 /**
  * Convert a mutation test glob path to a basename RegExp (* → .*).
- * Shared by expandExistingTests and hermetic fixture asserts (q-mp-1273).
+ * Internal helper for expandExistingTests / anyMutationGlobMatchesBasename
+ * (q-mp-1323: demoted — zero external importers).
  *
  * @param {string} globPath
  * @returns {RegExp}
  */
-export function mutationTestGlobToRegExp(globPath) {
+function mutationTestGlobToRegExp(globPath) {
   const base = path.basename(globPath);
   return new RegExp(
     '^' + base.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$'
@@ -251,7 +252,37 @@ function lineOf(sourceFile, pos) {
   return sourceFile.getLineAndCharacterOfPosition(pos).line + 1;
 }
 
-function collectMutants(sourceText, filePath) {
+/**
+ * True when a binary `+` operand is string-like (literal, template expr, or
+ * no-substitution template). Used to skip ARITH flips on concatenation
+ * (q-mp-1318 adds NoSubstitutionTemplateLiteral).
+ *
+ * @param {import('typescript').Expression} node
+ * @returns {boolean}
+ */
+export function isStringConcatOperand(node) {
+  return (
+    ts.isStringLiteral(node) ||
+    ts.isTemplateExpression(node) ||
+    ts.isNoSubstitutionTemplateLiteral(node)
+  );
+}
+
+/**
+ * Collect AST mutants for a rules.ts source text.
+ * Exported for hermetic unit coverage (q-mp-1318).
+ *
+ * @param {string} sourceText
+ * @param {string} filePath
+ * @returns {Array<{
+ *   id: string,
+ *   kind: string,
+ *   line: number,
+ *   description: string,
+ *   text: string,
+ * }>}
+ */
+export function collectMutants(sourceText, filePath) {
   const sourceFile = ts.createSourceFile(
     filePath,
     sourceText,
@@ -337,11 +368,9 @@ function collectMutants(sourceText, filePath) {
         );
       }
       if (ARITH_FLIP.has(op)) {
-        // Skip string concatenation heuristics: if either side is a string literal
-        const leftStr =
-          ts.isStringLiteral(node.left) || ts.isTemplateExpression(node.left);
-        const rightStr =
-          ts.isStringLiteral(node.right) || ts.isTemplateExpression(node.right);
+        // Skip string concatenation: string / template / no-sub template on either side
+        const leftStr = isStringConcatOperand(node.left);
+        const rightStr = isStringConcatOperand(node.right);
         if (!(leftStr || rightStr) || op !== ts.SyntaxKind.PlusToken) {
           const flipped = ARITH_FLIP.get(op);
           pushMutant(
@@ -491,9 +520,33 @@ function runVitest(testFiles, timeoutMs, quiet) {
   };
 }
 
-function scoreOf(killed, total) {
+/**
+ * Mutation kill rate as a percentage (one decimal), or null when total is 0.
+ * Exported for hermetic unit coverage (q-mp-1319).
+ *
+ * @param {number} killed
+ * @param {number} total
+ * @returns {number | null}
+ */
+export function scoreOf(killed, total) {
   if (total === 0) return null;
   return Math.round((1000 * killed) / total) / 10;
+}
+
+/**
+ * Score denominator for a mutateGame run.
+ * Infra `error` is excluded; timeouts still count as not-killed (q-mp-1319).
+ *
+ * @param {{
+ *   killed: number,
+ *   survived: number,
+ *   timeout: number,
+ *   error?: number,
+ * }} counts
+ * @returns {number}
+ */
+export function mutationScoreDenominator(counts) {
+  return counts.killed + counts.survived + counts.timeout;
 }
 
 function formatTable(rows) {
@@ -656,10 +709,17 @@ export function mutateGame(game, opts) {
   }
 
   const ran = selected.length;
-  const detected = killed; // timeouts count against score as not-killed
-  const score = scoreOf(detected, ran);
+  // Timeouts count as not-killed; infra error is excluded from the denominator
+  // (q-mp-1319) so spawn/filter failures do not look like weak mutation score.
+  const scoredTotal = mutationScoreDenominator({
+    killed,
+    survived,
+    timeout,
+    error,
+  });
+  const score = scoreOf(killed, scoredTotal);
   console.log(
-    `  → killed ${killed}/${ran}  survived ${survived}  timeout ${timeout}  error ${error}  score ${score ?? 'n/a'}%`
+    `  → killed ${killed}/${ran}  survived ${survived}  timeout ${timeout}  error ${error}  score ${score ?? 'n/a'}% (denom excludes error)`
   );
 
   return {

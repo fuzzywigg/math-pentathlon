@@ -14,6 +14,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
+import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -436,7 +437,7 @@ async function main() {
   all.push(...(await runViewport('tablet')));
 
   const summary = {
-    date: '2026-10-07',
+    date: utcPlaytestDateStamp(),
     totalGames: all.length,
     completed: all.filter((r) => r.winnerText).length,
     stalled: all.filter((r) => r.stalled).length,

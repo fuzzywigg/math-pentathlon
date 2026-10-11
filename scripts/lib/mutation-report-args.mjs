@@ -43,13 +43,29 @@ Options:
  * }} MutationReportOpts
  */
 
+/** Decimal digit token only (rejects scientific notation like `1e2`). */
+const DECIMAL_INT_RE = /^\d+$/;
+
+/**
+ * True when `raw` is a non-empty decimal integer token (`0`, `35`, …).
+ * Rejects floats, signs, and scientific notation (`1e2`, `1E4`) that
+ * `Number()` would otherwise coerce to an integer (q-mp-1322).
+ *
+ * @param {string} raw
+ * @returns {boolean}
+ */
+function isDecimalIntegerToken(raw) {
+  return DECIMAL_INT_RE.test(raw);
+}
+
 /**
  * Parse CLI flags. Rejects empty / whitespace-only `--max=` / `--games=` /
  * `--json=`, non-integer / negative `--max`, non-integer / `<5000`
  * `--timeout`, and unknown flags instead of silently coercing or ignoring
  * them. `--max=0` remains intentional “all”. `--help` / `-h` and `--dry-run`
  * never mutate product trees. Floats like `--max=2.9` / `--timeout=5000.5`
- * are rejected (q-mp-1217).
+ * are rejected (q-mp-1217). Scientific notation like `--max=1e2` /
+ * `--timeout=1e4` is rejected (q-mp-1322); require a decimal digit token.
  *
  * @param {string[]} argv
  * @param {{ defaultJsonOut: string, resolveJson?: (p: string) => string }} defaults
@@ -122,19 +138,29 @@ export function parseMutationReportArgs(argv, defaults) {
     };
   }
 
-  // q-mp-1217: require integer --max (Number("2.9") is finite but truncates
-  // later via slice); keep --max=0 as intentional “all”.
-  if (maxProvided && (!Number.isInteger(opts.max) || opts.max < 0)) {
+  // q-mp-1217 / q-mp-1322: require a decimal integer token for --max
+  // (Number("2.9") is finite but truncates later; Number("1e2") is 100 and
+  // Number.isInteger(100) would green-wash scientific notation). Keep
+  // --max=0 as intentional “all”.
+  if (
+    maxProvided &&
+    (!isDecimalIntegerToken(maxRaw) ||
+      !Number.isInteger(opts.max) ||
+      opts.max < 0)
+  ) {
     return {
       ok: false,
       message: `Invalid --max value (need integer >= 0): ${maxRaw}`,
     };
   }
 
-  // q-mp-1217: require integer --timeout (reject e.g. --timeout=5000.5).
+  // q-mp-1217 / q-mp-1322: require a decimal integer token for --timeout
+  // (reject e.g. --timeout=5000.5 and --timeout=1e4).
   if (
     timeoutProvided &&
-    (!Number.isInteger(opts.timeoutMs) || opts.timeoutMs < 5_000)
+    (!isDecimalIntegerToken(timeoutRaw) ||
+      !Number.isInteger(opts.timeoutMs) ||
+      opts.timeoutMs < 5_000)
   ) {
     return {
       ok: false,

@@ -31,9 +31,14 @@ import {
   fmtMb,
   metricDelta,
 } from './lib/memory-leak-heap.mjs';
+import {
+  resolveMemLeakDate,
+  resolveMemLeakGames,
+} from './lib/memory-leak-games.mjs';
 import { waitForGameReady, startHuman } from './lib/page-ready.mjs';
 
 export { analyzeHeapSnapshot, fmtMb, metricDelta };
+export { resolveMemLeakDate, resolveMemLeakGames };
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -48,9 +53,9 @@ function auditCycles() {
 function auditPort() {
   return requireEnvNumber('MEM_LEAK_PORT', 5181);
 }
-/** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline twins. */
+/** Optional date stem; default is live UTC YYYY-MM-DD (q-mp-1315). */
 function auditDate() {
-  return process.env.MEM_LEAK_DATE || '2026-10-07';
+  return resolveMemLeakDate(process.env.MEM_LEAK_DATE);
 }
 function outJsonPath() {
   return resolve(ROOT, `docs/memory-leaks-${auditLabel()}-${auditDate()}.json`);
@@ -98,14 +103,6 @@ const ALL_GAMES = [
   { id: 'frac-fact', name: 'Frac Fact', division: 'Division IV' },
   { id: 'fraction-pinball', name: 'Fraction Pinball', division: 'Division IV' },
 ];
-
-const filter = (process.env.MEM_LEAK_GAMES || '')
-  .split(',')
-  .map((s) => s.trim())
-  .filter(Boolean);
-const GAMES = filter.length
-  ? ALL_GAMES.filter((g) => filter.includes(g.id))
-  : ALL_GAMES;
 
 async function waitMenu(page) {
   await page.locator('.game-card').first().waitFor({ timeout: 20_000 });
@@ -293,6 +290,14 @@ async function main() {
   const port = auditPort();
   const memDate = auditDate();
   const outJson = outJsonPath();
+
+  // q-mp-1314: non-empty MEM_LEAK_GAMES with zero known ids → exit 2 (no empty "success").
+  const resolved = resolveMemLeakGames(process.env.MEM_LEAK_GAMES, ALL_GAMES);
+  if (!resolved.ok) {
+    console.error(resolved.message);
+    process.exit(2);
+  }
+  const GAMES = resolved.games;
 
   let baseURL = process.env.MEM_LEAK_BASE_URL || '';
   let server = null;

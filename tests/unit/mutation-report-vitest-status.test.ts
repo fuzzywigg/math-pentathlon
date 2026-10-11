@@ -15,19 +15,27 @@
  * *difficulty* overnight suites while keeping other wave54 rules files.
  * Also covers hex globs (q-mp-1273): overnight/burn patterns must not match
  * hex-a-gone suite basenames while still matching real hex-rules files.
+ * Also covers ARITH string-concat skip for NoSubstitutionTemplateLiteral
+ * (q-mp-1318), infra error excluded from score denom (q-mp-1319), and
+ * demoted mutationTestGlobToRegExp (q-mp-1323 via anyMutationGlobMatchesBasename).
  * Leave games dedupe (#1365/1232) and Vitest classify (#1351/1217) alone.
  */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import ts from 'typescript';
 import { classifyVitestRunResult } from '../../scripts/lib/mutation-report-vitest-status.mjs';
 import {
   anyMutationGlobMatchesBasename,
   baselineAllowsMutantRuns,
+  collectMutants,
   expandExistingTests,
   isExcludedMutationSuiteName,
+  isStringConcatOperand,
   mutateGame,
+  mutationScoreDenominator,
+  scoreOf,
   testGlobsForGame,
 } from '../../scripts/mutation-report.mjs';
 
@@ -414,5 +422,166 @@ describe('testGlobsForGame hex vs hex-a-gone (q-mp-1273)', () => {
     expect(
       anyMutationGlobMatchesBasename(hagGlobs, 'burn-wave12-hex-rules.test.ts')
     ).toBe(false);
+  });
+});
+
+function firstPlusBinary(src: string) {
+  const sf = ts.createSourceFile('t.ts', src, ts.ScriptTarget.Latest, true);
+  let found: ts.BinaryExpression | null = null;
+  const visit = (n: ts.Node) => {
+    if (
+      !found &&
+      ts.isBinaryExpression(n) &&
+      n.operatorToken.kind === ts.SyntaxKind.PlusToken
+    ) {
+      found = n;
+      return;
+    }
+    ts.forEachChild(n, visit);
+  };
+  visit(sf);
+  if (!found) throw new Error(`no PlusToken in: ${src}`);
+  return found;
+}
+
+function arithPlusMutants(src: string) {
+  return collectMutants(src, 'fixture.ts').filter(
+    (m) => m.kind === 'Arithmetic' && m.description.includes('+ →')
+  );
+}
+
+describe('ARITH PlusToken string-concat skip (q-mp-1318)', () => {
+  it('treats NoSubstitutionTemplateLiteral like string literal for skip', () => {
+    const noSub = firstPlusBinary('const x = `hi` + y;');
+    expect(ts.isNoSubstitutionTemplateLiteral(noSub.left)).toBe(true);
+    expect(isStringConcatOperand(noSub.left)).toBe(true);
+    expect(
+      isStringConcatOperand(firstPlusBinary('const x = "hi" + y;').left)
+    ).toBe(true);
+    expect(
+      isStringConcatOperand(firstPlusBinary('const x = `h${1}` + y;').left)
+    ).toBe(true);
+    expect(
+      isStringConcatOperand(firstPlusBinary('const x = 1 + 2;').left)
+    ).toBe(false);
+  });
+
+  it('does not emit Arithmetic mutant for `hi` + expr (or string / template)', () => {
+    expect(arithPlusMutants('export const a = `hi` + y;\n')).toEqual([]);
+    expect(arithPlusMutants('export const a = "hi" + y;\n')).toEqual([]);
+    expect(arithPlusMutants('export const a = `h${1}` + y;\n')).toEqual([]);
+    expect(arithPlusMutants('export const a = y + `hi`;\n')).toEqual([]);
+  });
+
+  it('still mutates numeric +', () => {
+    const mutants = arithPlusMutants('export const a = 1 + 2;\n');
+    expect(mutants.length).toBeGreaterThan(0);
+    expect(mutants[0]?.description).toMatch(/\+ → -/);
+  });
+});
+
+describe('mutation score excludes infra error (q-mp-1319)', () => {
+  it('scoreOf(8,10)=80; excluding error denom yields 88.9', () => {
+    expect(scoreOf(8, 10)).toBe(80);
+    expect(
+      scoreOf(
+        8,
+        mutationScoreDenominator({
+          killed: 8,
+          survived: 1,
+          timeout: 0,
+          error: 1,
+        })
+      )
+    ).toBe(88.9);
+  });
+
+  it('timeouts remain in the denominator (not-killed)', () => {
+    expect(
+      mutationScoreDenominator({
+        killed: 8,
+        survived: 0,
+        timeout: 1,
+        error: 1,
+      })
+    ).toBe(9);
+    expect(
+      scoreOf(
+        8,
+        mutationScoreDenominator({
+          killed: 8,
+          survived: 0,
+          timeout: 1,
+          error: 1,
+        })
+      )
+    ).toBe(88.9);
+  });
+
+  it('mutateGame score ignores infra error outcomes', () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'q-mp-1319-'));
+    const rulesPath = path.join(tmpDir, 'rules.ts');
+    fs.writeFileSync(rulesPath, FIXTURE_RULES);
+    try {
+      let n = 0;
+      const mutants = [
+        fakeMutant('m1', FIXTURE_RULES.replace('>', '>=')),
+        fakeMutant('m2', FIXTURE_RULES.replace('>', '<')),
+        fakeMutant('m3', FIXTURE_RULES.replace('>', '!==')),
+      ];
+      const result = mutateGame('demo', {
+        max: 3,
+        timeoutMs: 1_000,
+        quietTests: true,
+        rulesPath,
+        tests: ['tests/unit/fake.test.ts'],
+        mutants,
+        runVitest: () => {
+          n += 1;
+          if (n === 1) {
+            return {
+              status: 'survived',
+              exitCode: 0,
+              durationMs: 1,
+              stdout: '',
+              stderr: '',
+            };
+          }
+          if (n === 2 || n === 3) {
+            return {
+              status: 'killed',
+              exitCode: 1,
+              durationMs: 2,
+              stdout: 'FAIL',
+              stderr: '',
+            };
+          }
+          // third mutant → infra error
+          return {
+            status: 'error',
+            exitCode: 1,
+            durationMs: 3,
+            stdout: '',
+            stderr: 'spawn fail',
+          };
+        },
+      });
+      // baseline + 2 killed + 1 error → killed 2 / denom 2 = 100 (error excluded)
+      expect(result.skipped).toBe(false);
+      expect(result.killed).toBe(2);
+      expect(result.error).toBe(1);
+      expect(result.ranMutants).toBe(3);
+      expect(result.score).toBe(100);
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('mutationTestGlobToRegExp demoted (q-mp-1323)', () => {
+  it('is not an own enumerable export of mutation-report.mjs', async () => {
+    const mod = await import('../../scripts/mutation-report.mjs');
+    expect(Object.hasOwn(mod, 'mutationTestGlobToRegExp')).toBe(false);
+    expect(typeof mod.anyMutationGlobMatchesBasename).toBe('function');
   });
 });

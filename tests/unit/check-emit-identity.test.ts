@@ -134,6 +134,32 @@ export const n: N = 1;
     );
   });
 
+  it('stripCommentsAndCollapseWhitespace collapses spaces after ++/-- division (q-mp-1326)', () => {
+    // Misclassifying `/` as regex left `x++ / 2` ≠ `x++/2`.
+    expect(stripCommentsAndCollapseWhitespace('return x++ / 2;')).toBe(
+      stripCommentsAndCollapseWhitespace('return x++/2;')
+    );
+    expect(stripCommentsAndCollapseWhitespace('return x-- / 2;')).toBe(
+      stripCommentsAndCollapseWhitespace('return x--/2;')
+    );
+    expect(stripCommentsAndCollapseWhitespace('return x++ / 2;')).toBe(
+      'return x++/2;\n'
+    );
+
+    // Binary + / - may still precede a true regex literal.
+    const plusRegex = 'const r = a + /x  y/;';
+    const plusRegexTight = 'const r = a + /x y/;';
+    expect(stripCommentsAndCollapseWhitespace(plusRegex)).not.toBe(
+      stripCommentsAndCollapseWhitespace(plusRegexTight)
+    );
+    expect(stripCommentsAndCollapseWhitespace(plusRegex)).toContain('/x  y/');
+
+    // Ordinary `a / b` spacing is unchanged (single spaces kept).
+    expect(stripCommentsAndCollapseWhitespace('const n = a / b;')).toBe(
+      'const n = a / b;\n'
+    );
+  });
+
   it('compareFileEmit --normalize differs when only regex bodies differ (q-mp-1086)', async () => {
     const result = await compareFileEmit({
       file: 'sample.ts',

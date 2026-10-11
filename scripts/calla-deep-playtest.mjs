@@ -15,6 +15,7 @@ import { artifactPath } from './lib/artifact-dir.mjs';
 import { isCallaEndStatus } from './lib/calla-end-status.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { utcPlaytestDateStamp } from './lib/playtest-date.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import {
   installPageSeededRandom,
@@ -40,7 +41,9 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
 const SEED = resolvePlaytestSeed(process.env);
 const GAMES_PER = requireEnvNumber('CALLA_GAMES_PER', 10);
-const OUT_DIR = path.resolve('docs/playtest/calla-deep-2026-10-07');
+const OUT_DIR = path.resolve(
+  `docs/playtest/calla-deep-${utcPlaytestDateStamp()}`
+);
 const ART_DIR = artifactPath('calla-deep-playtest');
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 

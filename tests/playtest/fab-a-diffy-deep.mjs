@@ -19,6 +19,7 @@ import path from 'node:path';
 import { artifactPath } from '../../scripts/lib/artifact-dir.mjs';
 import { dismissOwl } from '../../scripts/lib/dismiss-owl.mjs';
 import { requireEnvNumber } from '../../scripts/lib/env-number.mjs';
+import { utcPlaytestDateStamp } from '../../scripts/lib/playtest-date.mjs';
 import { joinPlaytestGameUrl } from '../../scripts/lib/playtest-url.mjs';
 import {
   isSkipExtraShotsEnabled,
@@ -29,7 +30,10 @@ import {
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
 const GAMES_PER = requireEnvNumber('PLAYTEST_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest');
-const SHOT_DIR = path.join(OUT_DIR, 'fab-a-diffy-deep-2026-10-07');
+const SHOT_DIR = path.join(
+  OUT_DIR,
+  `fab-a-diffy-deep-${utcPlaytestDateStamp()}`
+);
 const ART_DIR = artifactPath('fab-a-diffy-playtest');
 
 const ALL_VIEWPORTS = {
