@@ -11,13 +11,13 @@ npm run dev          # Vite → http://localhost:5173
 
 ## Verify before you push
 
-Run the CI lint-job chain (same order as `.github/workflows/ci.yml` `lint`):
+Run the blocking half of the CI `lint` job (`npm run verify` ⊆ lint job — same order as `.github/workflows/ci.yml`):
 
 ```bash
 npm run verify
 ```
 
-That runs `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`.
+That runs `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`. CI then runs report-only `npm run check:copy-pins -- --fail` with `continue-on-error: true` (outside `package.json` `verify`; does not fail the required lint job).
 
 Then the rest of the required local gates:
 
