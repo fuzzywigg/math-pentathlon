@@ -20,6 +20,21 @@ import { installDomHooks } from './helpers/dom';
 
 installDomHooks();
 
+// unit-shared uses isolate:false — restore navigator.serviceWorker so later
+// suites do not see a stuck stub from Object.defineProperty (q-mp-1396).
+const originalServiceWorker = Object.getOwnPropertyDescriptor(
+  navigator,
+  'serviceWorker'
+);
+
+function restoreServiceWorker(): void {
+  if (originalServiceWorker) {
+    Object.defineProperty(navigator, 'serviceWorker', originalServiceWorker);
+  } else {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+  }
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -30,6 +45,7 @@ afterEach(() => {
   } catch {
     // ignore
   }
+  restoreServiceWorker();
 });
 
 describe('burn-1008 ui-cov-r4 offline residuals', () => {
