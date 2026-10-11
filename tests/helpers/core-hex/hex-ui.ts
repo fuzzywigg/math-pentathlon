@@ -10,15 +10,16 @@ import { axialToPixel, hexesInRange } from './coordinates';
 // Style Injection
 // =============================================================================
 
-let stylesInjected = false;
+/** Marks the hex-ui helper stylesheet so reinject works after head cleanup. */
+const HEX_UI_STYLES_ATTR = 'data-mp-hex-ui-styles';
 
 export function injectHexStyles(): void {
-  if (stylesInjected) {
+  if (document.head.querySelector(`style[${HEX_UI_STYLES_ATTR}]`)) {
     return;
   }
-  stylesInjected = true;
 
   const style = document.createElement('style');
+  style.setAttribute(HEX_UI_STYLES_ATTR, '');
   style.textContent = `
     .hex-cell {
       transition: fill 0.15s, stroke 0.15s, transform 0.15s;
