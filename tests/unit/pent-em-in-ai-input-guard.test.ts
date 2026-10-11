@@ -11,6 +11,7 @@ import {
   renderBoard,
   renderPieceSelector,
 } from '../../src/games/pent-em-in/board-ui';
+import { mountPair } from '../helpers/mount-pair';
 import { installDomHooks } from './helpers/dom';
 
 describe("Pent'Em In AI-turn input guard", () => {
@@ -60,9 +61,7 @@ describe("Pent'Em In AI-turn input guard", () => {
     const app = document.createElement('div');
     app.id = 'app';
     document.body.appendChild(app);
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
 
     initGame(board, status);
     newGameVsAI('easy');
