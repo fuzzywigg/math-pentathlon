@@ -585,24 +585,28 @@ describe('ai-move-time bench OUT date stamp (q-mp-1408)', () => {
       resolve(process.cwd(), 'tests/unit/ai-move-time-midgame.bench.test.ts'),
       'utf8'
     );
-    expect(src).toMatch(/utcPlaytestDateStamp/);
-    expect(src).toMatch(/`docs\/ai-move-time-\$\{dateStamp\}\.md`/);
-    expect(src).toMatch(/`# AI move think-time — \$\{dateStamp\}`/);
-    expect(src).not.toMatch(
-      /resolve\(process\.cwd\(\),\s*'docs\/ai-move-time-2026-10-07\.md'\)/
+    // Scope to writeReport so this describe's own path literals cannot false-fail.
+    const writeReportSrc = src.slice(
+      src.indexOf('function writeReport'),
+      src.indexOf('\nafterEach')
     );
-    expect(src).not.toMatch(
-      /lines\.push\('# AI move think-time — 2026-10-07'\)/
+    expect(writeReportSrc).toMatch(/utcPlaytestDateStamp/);
+    expect(writeReportSrc).toMatch(/`docs\/ai-move-time-\$\{dateStamp\}\.md`/);
+    expect(writeReportSrc).toMatch(
+      /`# AI move think-time — \$\{dateStamp\}`/
     );
+    expect(writeReportSrc).not.toContain('2026-10-07');
     expect(utcPlaytestDateStamp()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(utcPlaytestDateStamp()).toBe(new Date().toISOString().slice(0, 10));
     // Historical artifact remains on disk for the Oct 7 record.
-    expect(
-      readFileSync(
-        resolve(process.cwd(), 'docs/ai-move-time-2026-10-07.md'),
-        'utf8'
-      )
-    ).toMatch(/^# AI move think-time — 2026-10-07\b/m);
+    const historical = resolve(
+      process.cwd(),
+      'docs',
+      'ai-move-time-2026-10-07.md'
+    );
+    expect(readFileSync(historical, 'utf8')).toMatch(
+      /^# AI move think-time — 2026-10-07\b/m
+    );
   });
 });
 
