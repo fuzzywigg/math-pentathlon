@@ -42,18 +42,49 @@ function gzipByteLength(absPath) {
  * Collect JS/CSS hrefs from the built menu shell HTML.
  * Matches real `src`/`href` only (word-boundary; not data-src/ng-src/xsrc),
  * single- or double-quoted values, case-insensitive attribute names
- * (q-mp-1132, q-mp-1150, q-mp-1151).
+ * (q-mp-1132, q-mp-1150, q-mp-1151). Includes `.mjs` module chunks (q-mp-1385).
  * @param {string} html
  * @returns {string[]} paths relative to dist/ (no leading slash)
  */
 export function parseMenuCriticalRefs(html) {
   const refs = new Set();
   for (const match of html.matchAll(
-    /(?<![A-Za-z0-9_-])(?:src|href)=(["'])(\/(?:assets|vendor)\/[^"']+\.(?:js|css))\1/gi
+    /(?<![A-Za-z0-9_-])(?:src|href)=(["'])(\/(?:assets|vendor)\/[^"']+\.(?:js|mjs|css))\1/gi
   )) {
     refs.add(match[2].slice(1));
   }
   return [...refs].sort();
+}
+
+/**
+ * Parse bundle-budgets.json text. Strip a single leading UTF-8 BOM (U+FEFF)
+ * so editor-saved budgets load; mid-payload FEFF is left alone (q-mp-1400).
+ * Non-BOM input must parse identically to JSON.parse of the same bytes.
+ *
+ * @param {string} text
+ * @returns {unknown}
+ */
+export function parseBudgetsJson(text) {
+  let raw = text;
+  if (typeof raw === 'string' && raw.charCodeAt(0) === 0xfeff) {
+    raw = raw.slice(1);
+  }
+  return JSON.parse(raw);
+}
+
+/**
+ * True for Vite game lazy chunks (`game-*.js` / `game-*.mjs`), not source maps
+ * (q-mp-1402 — parity with menu-critical / listChunkNames `.mjs` tracking).
+ * @param {string} name
+ * @returns {boolean}
+ */
+export function isGameChunkFile(name) {
+  return (
+    typeof name === 'string' &&
+    name.startsWith('game-') &&
+    /\.m?js$/.test(name) &&
+    !name.includes('.map')
+  );
 }
 
 /**
@@ -95,10 +126,10 @@ export function listGameIds(root) {
 /**
  * Find the Vite-emitted lazy chunk for a game id.
  * Match longest id first so "hex" does not steal "hex-a-gone".
- * When multiple `game-<id>-*.js` hashes exist for one id, leave that id
+ * When multiple `game-<id>-*.{js,mjs}` hashes exist for one id, leave that id
  * unmapped (measureGameChunks → MISSING) instead of picking by readdir order
  * (q-mp-1300). Ambiguous matches are still claimed so a shorter id cannot
- * steal a longer id's duplicate files.
+ * steal a longer id's duplicate files. `.mjs` accepted for emit parity (q-mp-1402).
  * @param {string[]} assetFiles
  * @param {string[]} gameIds
  * @returns {Map<string, string>}
@@ -112,8 +143,7 @@ export function mapGameChunks(assetFiles, gameIds) {
       (f) =>
         !claimed.has(f) &&
         f.startsWith(`game-${id}-`) &&
-        f.endsWith('.js') &&
-        !f.includes('.map')
+        isGameChunkFile(f)
     );
     if (matches.length === 1) {
       map.set(id, matches[0]);
@@ -136,9 +166,7 @@ export function measureGameChunks(distRoot, gameIds) {
   if (!fs.existsSync(assetsDir)) {
     throw new Error(`Missing ${assetsDir}. Run npm run build first.`);
   }
-  const assetFiles = fs
-    .readdirSync(assetsDir)
-    .filter((f) => f.startsWith('game-') && f.endsWith('.js'));
+  const assetFiles = fs.readdirSync(assetsDir).filter(isGameChunkFile);
   const chunkMap = mapGameChunks(assetFiles, gameIds);
   /** @type {{ id: string, file: string, gzipBytes: number }[]} */
   const rows = [];
@@ -341,7 +369,7 @@ function main(argv = process.argv.slice(2)) {
     return;
   }
 
-  const budgets = JSON.parse(fs.readFileSync(BUDGETS_PATH, 'utf8'));
+  const budgets = parseBudgetsJson(fs.readFileSync(BUDGETS_PATH, 'utf8'));
   const knownOvers = Array.isArray(budgets.knownOvers) ? budgets.knownOvers : [];
   const menu = measureMenuCriticalPath(DIST);
   const gameIds = listGameIds(ROOT);
