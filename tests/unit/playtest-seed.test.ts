@@ -1,5 +1,5 @@
 /**
- * Hermetic coverage for scripts/lib/playtest-seed.mjs (q-mp-1306).
+ * Hermetic coverage for scripts/lib/playtest-seed.mjs (q-mp-1306 / q-mp-1410).
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -11,7 +11,7 @@ import {
   resolvePlaytestSeed,
 } from '../../scripts/lib/playtest-seed.mjs';
 
-describe('resolvePlaytestSeed (q-mp-1306)', () => {
+describe('resolvePlaytestSeed (q-mp-1306 / q-mp-1410)', () => {
   it('defaults when PLAYTEST_SEED is unset or empty', () => {
     expect(resolvePlaytestSeed({})).toBe(DEFAULT_PLAYTEST_SEED >>> 0);
     expect(resolvePlaytestSeed({ PLAYTEST_SEED: '' })).toBe(
@@ -19,14 +19,35 @@ describe('resolvePlaytestSeed (q-mp-1306)', () => {
     );
   });
 
-  it('parses a finite integer env value as uint32', () => {
-    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '42' })).toBe(42);
-    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '0' })).toBe(0);
+  it('defaults on whitespace-only PLAYTEST_SEED (q-mp-1410)', () => {
+    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '   ' })).toBe(
+      DEFAULT_PLAYTEST_SEED >>> 0
+    );
+    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '\t\n' })).toBe(
+      DEFAULT_PLAYTEST_SEED >>> 0
+    );
   });
 
-  it('falls back to default on non-finite values', () => {
-    expect(resolvePlaytestSeed({ PLAYTEST_SEED: 'nope' })).toBe(
-      DEFAULT_PLAYTEST_SEED >>> 0
+  it('parses a decimal uint32 env value', () => {
+    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '42' })).toBe(42);
+    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '0' })).toBe(0);
+    expect(resolvePlaytestSeed({ PLAYTEST_SEED: '4294967295' })).toBe(
+      4294967295
+    );
+  });
+
+  it('rejects scientific notation, signs, hex, floats, and non-decimal (q-mp-1410)', () => {
+    const bad = ['1e3', '1E3', '-1', '+1', '0x10', '1.5', 'nope', ' 42', '42 '];
+    for (const raw of bad) {
+      expect(() => resolvePlaytestSeed({ PLAYTEST_SEED: raw })).toThrow(
+        /need decimal uint32/
+      );
+    }
+  });
+
+  it('rejects out-of-uint32 decimal tokens (q-mp-1410)', () => {
+    expect(() => resolvePlaytestSeed({ PLAYTEST_SEED: '4294967296' })).toThrow(
+      /need decimal uint32/
     );
   });
 });

@@ -20,6 +20,10 @@ import { parseHelpOnlyArgv } from './help-only-cli.mjs';
 const PLAYTEST_SEED_ENV = 'PLAYTEST_SEED';
 /** Default when `PLAYTEST_SEED` is unset/empty. */
 export const DEFAULT_PLAYTEST_SEED = 0x70a71e57;
+/** Decimal digit token only (rejects scientific notation like `1e3`). */
+const DECIMAL_UINT32_RE = /^\d+$/;
+/** Inclusive max for a uint32 seed. */
+const MAX_UINT32 = 0xffffffff;
 
 export const PLAYTEST_SEED_USAGE = `Usage: node scripts/lib/playtest-seed.mjs [--help]
 
@@ -31,6 +35,11 @@ Options:
 
 /**
  * Resolve a uint32 seed from env (or default).
+ *
+ * Unset, empty, and whitespace-only values use `defaultSeed`. Any other
+ * value must be a decimal digit token in `0..4294967295` (same honesty as
+ * mutation-report `--max=1e2` rejection — no `Number()` coercion of
+ * scientific notation, signs, hex, or floats). Invalid tokens throw.
  *
  * @param {NodeJS.ProcessEnv | Record<string, string | undefined>} [env]
  * @param {string} [envName]
@@ -46,9 +55,20 @@ export function resolvePlaytestSeed(
   if (raw === undefined || raw === '') {
     return defaultSeed >>> 0;
   }
-  const n = Number(raw);
-  if (!Number.isFinite(n)) {
+  // q-mp-1410: whitespace-only is unset (Number('   ')===0 was a false seed).
+  if (typeof raw === 'string' && raw.trim() === '') {
     return defaultSeed >>> 0;
+  }
+  if (typeof raw !== 'string' || !DECIMAL_UINT32_RE.test(raw)) {
+    throw new Error(
+      `Invalid ${envName} value (need decimal uint32 0..4294967295): ${raw}`
+    );
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0 || n > MAX_UINT32) {
+    throw new Error(
+      `Invalid ${envName} value (need decimal uint32 0..4294967295): ${raw}`
+    );
   }
   return n >>> 0;
 }
