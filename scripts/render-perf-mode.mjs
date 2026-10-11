@@ -18,6 +18,7 @@ import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { parseHelpOnlyArgv } from './lib/help-only-cli.mjs';
+import { waitDoubleRaf } from './lib/page-settle.mjs';
 
 export const RENDER_PERF_MODE_USAGE = `Usage: node scripts/render-perf-mode.mjs [--help]
 
@@ -130,15 +131,6 @@ export async function installRenderObservers(page) {
       return gcs.apply(this, args);
     };
   });
-}
-
-async function waitDoubleRaf(page) {
-  await page.evaluate(
-    () =>
-      new Promise((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
 }
 
 /** Soft condition wait + paint settle (no fixed sleep). */
