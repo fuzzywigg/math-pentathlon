@@ -95,8 +95,9 @@ export function summarizeKnip(knip) {
 }
 
 /**
- * Require every METRIC_KEYS entry to be a finite number (q-mp-1036).
+ * Require every METRIC_KEYS entry to be a finite integer ≥ 0 (q-mp-1036 + q-mp-1155).
  * Incomplete / null / "" / non-numeric values must not coerce to 0 and invent growth.
+ * Negatives / fractions must not pass schema (hand-edited baseline hygiene).
  *
  * @param {unknown} metrics
  * @returns {{ ok: true, metrics: Record<string, number> } | { ok: false, message: string }}
@@ -123,10 +124,15 @@ export function validateBaselineMetrics(metrics) {
       };
     }
     const value = record[key];
-    if (typeof value !== 'number' || !Number.isFinite(value)) {
+    if (
+      typeof value !== 'number' ||
+      !Number.isFinite(value) ||
+      !Number.isInteger(value) ||
+      value < 0
+    ) {
       return {
         ok: false,
-        message: `report:knip — baseline metrics schema invalid: "${key}" must be a finite number`,
+        message: `report:knip — baseline metrics schema invalid: "${key}" must be a finite integer ≥ 0`,
       };
     }
   }
