@@ -14,6 +14,9 @@
  *   npm run report:lint-buckets -- --json
  *   npm run report:lint-buckets -- --help   # usage; unknown flags exit 2
  *
+ * Empty eslint stdout / fatal probe exits fail closed (q-mp-1317) — never
+ * treat missing JSON as `[]` all-zero totals. Leave check-lint-ratchet alone.
+ *
  * Docs: docs/dev/lint-bucket-report.md
  */
 
@@ -98,6 +101,89 @@ export function resolveRuleHeadroom(ceilingRaw, total) {
         ? ` (+${-headroom} OVER ceiling)`
         : '';
   return { ok: true, ceiling, headroom, note };
+}
+
+/**
+ * Parse eslint `--format json` spawnSync output for report:lint-buckets (q-mp-1317).
+ *
+ * Empty / missing stdout must not become `[]` (that printed full headroom /
+ * all-zero totals on probe crash). ESLint exit **1** with a valid JSON array
+ * (rule hits) remains ok — that is the normal report path. Fail closed on
+ * spawn errors, signal kills, eslint fatal exit (≥2), empty stdout, non-JSON,
+ * or non-array JSON.
+ *
+ * @param {{
+ *   status?: number | null,
+ *   stdout?: string | null,
+ *   stderr?: string | null,
+ *   error?: Error | null,
+ *   signal?: string | null,
+ * }} result
+ * @returns {| { ok: true, report: Array<{ filePath: string, messages: Array<{ ruleId: string | null }> }> }
+ *   | { ok: false, message: string, detail: string }}
+ */
+export function parseEslintJsonReport(result) {
+  if (result.error) {
+    return {
+      ok: false,
+      message: 'report:lint-buckets: eslint probe failed to start',
+      detail: String(result.error.message || result.error).slice(0, 4000),
+    };
+  }
+  if (result.status == null && result.signal) {
+    return {
+      ok: false,
+      message: `report:lint-buckets: eslint probe killed by signal ${result.signal}`,
+      detail: (result.stderr || result.stdout || '').slice(0, 4000),
+    };
+  }
+
+  const stdout = typeof result.stdout === 'string' ? result.stdout : '';
+  const trimmed = stdout.trim();
+  if (trimmed === '') {
+    const statusLabel = result.status == null ? 'null' : String(result.status);
+    return {
+      ok: false,
+      message: `report:lint-buckets: empty eslint stdout (exit ${statusLabel}; refusing all-zero totals)`,
+      detail: (result.stderr || '').slice(0, 4000),
+    };
+  }
+
+  // ESLint uses exit 2 for fatal config / engine errors. Exit 1 means rule
+  // hits with JSON still on stdout — keep that as a successful report.
+  if (typeof result.status === 'number' && result.status >= 2) {
+    return {
+      ok: false,
+      message: `report:lint-buckets: eslint probe failed (exit ${result.status})`,
+      detail: (result.stderr || stdout).slice(0, 4000),
+    };
+  }
+
+  /** @type {unknown} */
+  let parsed;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return {
+      ok: false,
+      message: 'report:lint-buckets failed to parse eslint JSON output',
+      detail: (result.stderr || stdout).slice(0, 4000),
+    };
+  }
+  if (!Array.isArray(parsed)) {
+    return {
+      ok: false,
+      message: 'report:lint-buckets: eslint JSON was not an array',
+      detail: (result.stderr || stdout).slice(0, 4000),
+    };
+  }
+  return {
+    ok: true,
+    report:
+      /** @type {Array<{ filePath: string, messages: Array<{ ruleId: string | null }> }>} */ (
+        parsed
+      ),
+  };
 }
 
 /**
@@ -351,18 +437,17 @@ export default [
       }
     );
 
-    /** @type {Array<{ filePath: string, messages: Array<{ ruleId: string | null }> }>} */
-    let report;
-    try {
-      report = JSON.parse(result.stdout || '[]');
-    } catch {
-      console.error('report:lint-buckets failed to parse eslint JSON output');
-      console.error((result.stderr || result.stdout || '').slice(0, 4000));
+    const parsedReport = parseEslintJsonReport(result);
+    if (!parsedReport.ok) {
+      console.error(parsedReport.message);
+      if (parsedReport.detail) {
+        console.error(parsedReport.detail);
+      }
       exitCode = 1;
-      report = null;
     }
 
-    if (report) {
+    if (parsedReport.ok) {
+      const report = parsedReport.report;
       const summary = summarizeBuckets(report, ruleIds);
       const selected = opts.rule ? [opts.rule] : ruleIds;
 
