@@ -35,8 +35,6 @@ const ROOT = path.resolve(__dirname, '..');
 
 export const TRACKED = Object.freeze({
   lintCeilings: 'docs/dev/lint-ratchet-ceilings.json',
-  /** @deprecated alias — same path as lintCeilings (kept for unit tests) */
-  curly: 'docs/dev/lint-ratchet-ceilings.json',
   typePhase2: 'docs/dev/type-ratchet-phase2-baseline.json',
   boundaries: 'docs/dev/module-boundaries-ceilings.json',
 });
