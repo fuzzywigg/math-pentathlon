@@ -24,6 +24,13 @@
  * Preview ready (q-mp-1287): `waitForUrl` treats only HTTP 2xx as ready
  * (shared `offline-probe-ready`); bare 404 is not ready.
  *
+ * Malformed LH JSON (q-mp-1292): truncated / non-object output becomes a
+ * per-row `{ ok: false, error }` instead of throwing out of `runLighthouse`
+ * (which would skip the whole Lighthouse section via `main`'s outer catch).
+ *
+ * Stale LH output (q-mp-1293): unlink the output path before spawn so exit 0
+ * cannot reuse a pre-existing score JSON; missing fresh output is `ok: false`.
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
@@ -278,6 +285,52 @@ export function shapeLhPerformanceScore(report) {
 }
 
 /**
+ * Parse Lighthouse output JSON without throwing (q-mp-1292).
+ * Truncated / non-object payloads become a row error so remaining targets run.
+ *
+ * @param {string} text
+ * @returns {{ ok: true, report: Record<string, unknown> } | { ok: false, error: string }}
+ */
+export function parseLhReportJson(text) {
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    return {
+      ok: false,
+      error: `malformed Lighthouse JSON: ${detail}`.slice(0, 400),
+    };
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return {
+      ok: false,
+      error: 'malformed Lighthouse JSON: expected object',
+    };
+  }
+  return { ok: true, report: /** @type {Record<string, unknown>} */ (parsed) };
+}
+
+/**
+ * Remove a prior LH output path so exit 0 cannot reuse stale JSON (q-mp-1293).
+ * ENOENT is ignored; other errors propagate.
+ *
+ * @param {string} p
+ * @param {(path: string) => void} [unlinkSync]
+ */
+export function unlinkLhOutput(p, unlinkSync = fs.unlinkSync) {
+  try {
+    unlinkSync(p);
+  } catch (err) {
+    const code =
+      err && typeof err === 'object' && 'code' in err
+        ? /** @type {{ code?: unknown }} */ (err).code
+        : undefined;
+    if (code !== 'ENOENT') throw err;
+  }
+}
+
+/**
  * @param {string} baseUrl
  * @param {string} formFactor 'mobile' | 'desktop'
  * @param {{ id: string, path: string, label: string }} target
@@ -289,6 +342,7 @@ export function shapeLhPerformanceScore(report) {
  *   killChildProcess?: typeof killChildProcess,
  *   existsSync?: (p: string) => boolean,
  *   readFileSync?: (p: string, enc: BufferEncoding) => string,
+ *   unlinkSync?: (p: string) => void,
  *   schedule?: (fn: () => void, ms: number) => ReturnType<typeof setTimeout>,
  *   clearSchedule?: (id: ReturnType<typeof setTimeout>) => void,
  * }} [opts]
@@ -324,8 +378,12 @@ export async function runLighthouse(
   const killChild = opts.killChildProcess ?? killChildProcess;
   const fileExists = opts.existsSync ?? ((p) => fs.existsSync(p));
   const readFile = opts.readFileSync ?? ((p, enc) => fs.readFileSync(p, enc));
+  const unlinkFile = opts.unlinkSync ?? ((p) => fs.unlinkSync(p));
   const schedule = opts.schedule ?? setTimeout;
   const clearSchedule = opts.clearSchedule ?? clearTimeout;
+
+  // Invalidate any pre-existing score JSON before spawn (q-mp-1293).
+  unlinkLhOutput(outJson, unlinkFile);
 
   const { promise, child } = run(args);
   /** @type {ReturnType<typeof setTimeout> | undefined} */
@@ -345,16 +403,30 @@ export async function runLighthouse(
   if (timeoutId !== undefined) clearSchedule(timeoutId);
 
   if (result.code !== 0 || !fileExists(outJson)) {
+    const error =
+      result.code === 0 && !fileExists(outJson)
+        ? 'missing fresh Lighthouse output'
+        : result.stderr.slice(0, 400) || `exit ${result.code}`;
     return {
       id: target.id,
       label: target.label,
       formFactor,
       ok: false,
-      error: result.stderr.slice(0, 400) || `exit ${result.code}`,
+      error,
     };
   }
 
-  const report = JSON.parse(readFile(outJson, 'utf8'));
+  const parsed = parseLhReportJson(readFile(outJson, 'utf8'));
+  if (!parsed.ok) {
+    return {
+      id: target.id,
+      label: target.label,
+      formFactor,
+      ok: false,
+      error: parsed.error,
+    };
+  }
+  const report = parsed.report;
   const shaped = shapeLhPerformanceScore(report);
   if (!shaped.ok) {
     return {
@@ -365,7 +437,15 @@ export async function runLighthouse(
       error: shaped.error,
     };
   }
-  const audits = report.audits || {};
+  /** @type {{ [key: string]: { displayValue?: string, numericValue?: number } | undefined }} */
+  const audits =
+    report.audits &&
+    typeof report.audits === 'object' &&
+    !Array.isArray(report.audits)
+      ? /** @type {{ [key: string]: { displayValue?: string, numericValue?: number } | undefined }} */ (
+          report.audits
+        )
+      : {};
   return {
     id: target.id,
     label: target.label,

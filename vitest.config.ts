@@ -189,6 +189,10 @@ const nodePureFiles = [
   'tests/unit/check-perf-missing-score.test.ts',
   // check:perf out-of-range LH performance score fail-closed (q-mp-1246); fixture JSON.
   'tests/unit/check-perf-out-of-range-score.test.ts',
+  // check:perf malformed LH JSON → row error (q-mp-1292); fixture text.
+  'tests/unit/check-perf-malformed-json.test.ts',
+  // check:perf reject stale / non-fresh LH output JSON (q-mp-1293).
+  'tests/unit/check-perf-stale-output.test.ts',
   // page-settle double-rAF helper (q-mp-920); hermetic fake page.evaluate needs node.
   'tests/unit/page-settle.test.ts',
   // memory-leak-audit page-ready adoption (q-mp-923); spawnSync --check/--help.
