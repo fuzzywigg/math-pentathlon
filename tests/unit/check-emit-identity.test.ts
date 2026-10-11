@@ -5,6 +5,8 @@
  * on the unit-node project via vitest.config.ts nodePureFiles.
  */
 import { describe, it, expect } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import {
   transpileToJs,
   stripCommentsAndCollapseWhitespace,
@@ -17,7 +19,11 @@ import {
   gitDiffNameOnlyErrorMessage,
   listAiTouchedFiles,
   runEmitIdentityCheck,
+  isMissingOrFlagLikeRef,
+  refOptionErrorMessage,
 } from '../../scripts/check-emit-identity.mjs';
+
+const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
 
 describe('check-emit-identity helpers', () => {
   it('erases non-null assertions, as casts, and satisfies (byte-identical emit)', async () => {
@@ -186,6 +192,75 @@ export const n: N = 1;
     expect(opts.minify).toBe(true);
     expect(opts.files).toEqual(['src/games/hex/ai.ts']);
     expect(EMIT_TSCONFIG_RAW.compilerOptions.target).toBe('ES2020');
+  });
+
+  it('isMissingOrFlagLikeRef / refOptionErrorMessage (q-mp-1333)', () => {
+    expect(isMissingOrFlagLikeRef(undefined)).toBe(true);
+    expect(isMissingOrFlagLikeRef('')).toBe(true);
+    expect(isMissingOrFlagLikeRef('--normalize')).toBe(true);
+    expect(isMissingOrFlagLikeRef('--json')).toBe(true);
+    expect(isMissingOrFlagLikeRef('abc123')).toBe(false);
+    expect(isMissingOrFlagLikeRef('HEAD~1')).toBe(false);
+    const msg = refOptionErrorMessage('--base');
+    expect(msg).toMatch(/^error: --base requires a git ref/);
+    expect(msg).toContain(USAGE);
+    expect(refOptionErrorMessage('--head')).toMatch(
+      /^error: --head requires a git ref/
+    );
+  });
+
+  it('CLI rejects --base --normalize without eating the flag (q-mp-1333)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', '--normalize'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/error: --base requires a git ref/);
+    expect(text).toContain(USAGE);
+    expect(text).not.toMatch(/check-emit-identity\n/);
+  });
+
+  it('CLI rejects --head --json without eating the flag (q-mp-1333)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--head', '--json', '--base', 'abc'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/error: --head requires a git ref/);
+    expect(text).toContain(USAGE);
+    // Must not proceed into a JSON payload (flag was not eaten as head).
+    expect(text.trim().startsWith('{')).toBe(false);
+  });
+
+  it('CLI rejects bare --base without a value (q-mp-1333)', () => {
+    const r = spawnSync(process.execPath, [EMIT_SCRIPT, '--base'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/error: --base requires a git ref/);
+    expect(text).toContain(USAGE);
+  });
+
+  it('CLI accepts exact valid --base/--head/--normalize (q-mp-1333)', () => {
+    // Valid refs: exercise parse path only via --help-adjacent happy parseArgs
+    // (full emit compare needs real trees). Hermetic parseArgs covers refs.
+    const opts = parseArgs([
+      '--base',
+      'abc',
+      '--head',
+      'def',
+      '--normalize',
+      '--json',
+    ]);
+    expect(opts.base).toBe('abc');
+    expect(opts.head).toBe('def');
+    expect(opts.normalize).toBe(true);
+    expect(opts.json).toBe(true);
   });
 
   it('minify mode treats brace-only curly wraps as identical', async () => {
