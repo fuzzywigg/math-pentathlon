@@ -101,6 +101,7 @@ $ node scripts/mutation-report.mjs --max=abc
 
 $ node scripts/mutation-report.mjs --games=no-such-game --max=1
   → raw ENOENT stack for src/games/no-such-game/rules.ts
+  (intentional check:dev-docs missing-path negative example — do not invent that path to “fix” the report; see q-mp-868 measured baseline)
 
 $ node scripts/check-emit-identity.mjs --files-from /tmp/no-files-from-xyz
   → raw ENOENT stack from readFileSync (no usage text)
@@ -150,7 +151,7 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1161
 - **series:** script-tooling
 - **verdict:** **SAFE** — CLI validation only; **not** a mutation-audit wave; no rules/scoring edits
 - **target files:** `scripts/mutation-report.mjs` (`main` / `listGames` / `mutateGame` entry)
-- **measured baseline:** `node scripts/mutation-report.mjs --games=no-such-game --max=1` prints the header then throws raw `ENOENT` for `src/games/no-such-game/rules.ts`.
+- **measured baseline:** `node scripts/mutation-report.mjs --games=no-such-game --max=1` prints the header then throws raw `ENOENT` for `src/games/no-such-game/rules.ts` (**intentional** `check:dev-docs` missing-path negative example — keep; do not invent a real game tree to “fix” the report).
 - **acceptance criteria:** Unknown game ids print a short list of valid games (or “unknown: X”) and exit non-zero before mutation; valid `--games=calla` still runs; no `src/` edits.
 - **verification commands:** `node scripts/mutation-report.mjs --games=no-such-game --max=1 ; echo $?` ; `node --check scripts/mutation-report.mjs`
 - **conflict notes:** after `867`.
