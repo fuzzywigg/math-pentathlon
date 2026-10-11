@@ -15,6 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
 
 const USAGE = `Usage: node scripts/par-55-deep-playtest.mjs
 
@@ -93,13 +94,7 @@ async function expectHidden(locator) {
 
 async function startVsAi(page, difficulty) {
   await page.goto(`${BASE}/#/game/par-55`, { waitUntil: 'domcontentloaded' });
-  await page
-    .getByTestId('game-loading')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('.par55-board, #new-game-btn').first().waitFor({
-    timeout: 20_000,
-  });
+  await waitForGameReady(page);
   await dismissOwl(page);
   await page.locator('#new-game-btn').click();
   const modal = page.locator('#new-game-modal');
