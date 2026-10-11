@@ -118,16 +118,17 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 ## Branches
 
-| Branch  | Role                          |
-| ------- | ----------------------------- |
-| `alpha` | Trunk. Target PRs here.       |
-| `main`  | Not the default for new work. |
+| Branch            | Role                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `alpha`           | Trunk. Human / trunk PRs target here (see [`CONTRIBUTING.md`](../../CONTRIBUTING.md)).                                          |
+| `cursor/mp-tip-*` | Living tip for stacked cloud-agent **draft** PRs (see [`AGENTS.md`](../../AGENTS.md)). Tip owners fold; not the human PR base. |
+| `main`            | Not the default for new work.                                                                                                   |
 
 ## CI posture (public)
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — blocking `npm run verify` (= `lint` → `lint:ratchet` → Prettier `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`); then soft `check:copy-pins -- --fail` (`continue-on-error: true`; outside `package.json` `verify`); `npm audit --audit-level=high`; build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`); unit; Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
