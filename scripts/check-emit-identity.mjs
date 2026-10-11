@@ -17,7 +17,8 @@
  *   0 — every compared file emits identically
  *   1 — any emit mismatch
  *   2 — usage / git-ref error (unknown flag, duplicate --base/--head/boolean
- *       flags, missing/flag-like --base/--head value, bad --files-from path,
+ *       flags, missing/flag-like --base/--head value, duplicate/missing/flag-like
+ *       --files-from, bad --files-from path,
  *       non-zero `git diff` for an invalid --base/--head; no stack)
  */
 
@@ -50,12 +51,12 @@ export const EMIT_TSCONFIG_RAW = {
 /**
  * Friendly usage text for a bad `--files-from` path (missing / not a file).
  * @param {string} filesFrom
- * @param {'missing' | 'not-found' | 'not-file'} reason
+ * @param {'missing' | 'not-found' | 'not-file' | 'flag-like'} reason
  */
 export function filesFromErrorMessage(filesFrom, reason) {
   const detail =
-    reason === 'missing'
-      ? 'error: --files-from requires a path to a file list'
+    reason === 'missing' || reason === 'flag-like'
+      ? 'error: --files-from requires a path to a file list (missing or flag-like value)'
       : reason === 'not-file'
         ? `error: --files-from path is not a file: ${filesFrom}`
         : `error: --files-from path not found: ${filesFrom}`;
@@ -64,6 +65,15 @@ export function filesFromErrorMessage(filesFrom, reason) {
     USAGE,
     '  --files-from <f>   Read file paths (one per line)',
   ].join('\n');
+}
+
+/**
+ * Usage text for a repeated `--files-from` (q-mp-1381; leave --base/--head
+ * duplicate honesty to ba q-mp-1373 / #1478).
+ * @param {string} flag
+ */
+export function duplicateFilesFromErrorMessage(flag = '--files-from') {
+  return `error: Duplicate ${flag}\n${USAGE}`;
 }
 
 /**
@@ -748,12 +758,22 @@ export function parseArgs(argv) {
       }
       head = value ?? 'WORKING_TREE';
     } else if (a === '--files-from') {
+      // Duplicate --files-from must not silently last-win (q-mp-1381).
       if (sawFilesFrom) {
-        console.error(duplicateFlagErrorMessage('--files-from'));
+        console.error(duplicateFilesFromErrorMessage('--files-from'));
         process.exit(2);
       }
       sawFilesFrom = true;
-      filesFrom = argv[++i];
+      const value = argv[++i];
+      // Flag-like / missing value slot → peer --base honesty (q-mp-1382);
+      // do not report “path not found: --json”.
+      if (isMissingOrFlagLikeRef(value)) {
+        console.error(
+          filesFromErrorMessage(value ?? '', value ? 'flag-like' : 'missing')
+        );
+        process.exit(2);
+      }
+      filesFrom = value;
     } else if (a === '--normalize') {
       if (sawNormalize) {
         console.error(duplicateFlagErrorMessage('--normalize'));

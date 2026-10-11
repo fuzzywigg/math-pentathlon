@@ -22,6 +22,7 @@ import {
   isMissingOrFlagLikeRef,
   refOptionErrorMessage,
   duplicateFlagErrorMessage,
+  duplicateFilesFromErrorMessage,
   resolveDefaultMergeBase,
   DEFAULT_TIP_REMOTE,
   DEFAULT_TIP_FALLBACK_REMOTE,
@@ -384,6 +385,84 @@ export const n: N = 1;
     expect(`${r.stdout}\n${r.stderr}`).toMatch(/error: Duplicate --normalize/);
   });
 
+  it('duplicateFilesFromErrorMessage (q-mp-1381)', () => {
+    const msg = duplicateFilesFromErrorMessage('--files-from');
+    expect(msg).toMatch(/^error: Duplicate --files-from/);
+    expect(msg).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate --files-from (q-mp-1381)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [
+        EMIT_SCRIPT,
+        '--base',
+        'HEAD',
+        '--files-from',
+        '/tmp/a-list',
+        '--files-from',
+        '/tmp/b-list',
+      ],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/error: Duplicate --files-from/);
+    expect(text).toContain(USAGE);
+    // Must not proceed into path-not-found for either list (dup wins first).
+    expect(text).not.toMatch(/path not found/);
+  });
+
+  it('CLI rejects flag-like --files-from value (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', '--json'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(
+      /error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
+    expect(text).toContain(USAGE);
+    // Must not misreport the flag token as a missing filesystem path.
+    expect(text).not.toMatch(/path not found: --json/);
+  });
+
+  it('CLI rejects bare --files-from without a value (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'HEAD', '--files-from'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(
+      /error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
+    expect(text).toContain(USAGE);
+  });
+
+  it('CLI still reports path not found for a real missing list (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [
+        EMIT_SCRIPT,
+        '--base',
+        'HEAD',
+        '--files-from',
+        '/tmp/no-files-from-xyz-1382',
+      ],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toContain(
+      'error: --files-from path not found: /tmp/no-files-from-xyz-1382'
+    );
+    expect(text).not.toMatch(/flag-like value/);
+  });
+
   it('minify mode treats brace-only curly wraps as identical', async () => {
     const base = `export function f(x: number) {\n  if (x) return 1;\n  return 0;\n}\n`;
     const head = `export function f(x: number) {\n  if (x) {\n    return 1;\n  }\n  return 0;\n}\n`;
@@ -445,8 +524,13 @@ export const n: N = 1;
     );
     const missing = filesFromErrorMessage('', 'missing');
     expect(missing).toContain(USAGE);
-    expect(missing).toMatch(/^error: --files-from requires a path/);
+    expect(missing).toMatch(
+      /^error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
     expect(missing).not.toMatch(/ENOENT|EISDIR|Error:/);
+    const flagLike = filesFromErrorMessage('--json', 'flag-like');
+    expect(flagLike).toMatch(/missing or flag-like value/);
+    expect(flagLike).not.toMatch(/path not found/);
 
     const notFound = filesFromErrorMessage(
       '/tmp/no-files-from-xyz',
