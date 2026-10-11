@@ -6,8 +6,10 @@
  *
  * Exit codes:
  *   0 — ranked table printed (or --help / -h)
- *   2 — missing/unreadable summary path, flag-like argv, or empty/non-engine
- *       summary (prints usage; no stack; no fake empty rank table)
+ *   2 — missing/unreadable summary path, flag-like argv, empty/non-engine
+ *       summary, or engine rows with missing/non-numeric pct that cannot be
+ *       derived from covered/total (prints usage; no stack; no fake empty
+ *       rank table)
  *
  * Default path when omitted: coverage-engine-baseline/coverage-summary.json
  * (generated locally; not committed).
@@ -16,6 +18,11 @@
  * are rejected (exit 2) before path lookup — never treat `--help` as a path.
  * Missing-summary copy (q-mp-842) is unchanged.
  * Empty / total-only / non-engine summaries (q-mp-992) exit 2 before rank output.
+ * Missing / non-numeric pct on matching engine rows (q-mp-1018): derive from
+ * numeric covered/total when possible; otherwise exit 2 with a schema message.
+ * Contradictory numeric pct vs covered/total (q-mp-1033): when both covered and
+ * total are finite numbers, display/rank pct is always derived from them so a
+ * stale pct cannot invert rank order.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -107,8 +114,81 @@ export function emptyEngineSummaryMessage(summaryPath) {
 }
 
 /**
+ * Message when an engine row has missing/non-numeric pct that cannot be derived
+ * from covered/total (q-mp-1018).
+ * @param {string} summaryPath
+ * @param {string} filePath
+ */
+export function invalidMetricMessage(summaryPath, filePath) {
+  return [
+    `error: coverage summary has missing or non-numeric pct for engine module: ${filePath}`,
+    `summary: ${summaryPath}`,
+    USAGE,
+    'Expected lines/branches with a finite numeric pct, or numeric covered/total to derive pct. String or absent pct without covered/total is rejected (no stack).',
+  ].join('\n');
+}
+
+/**
+ * Thrown by collectEngineRows when a matching engine row has unusable metrics
+ * (q-mp-1018). main maps this to exit 2 + invalidMetricMessage (no stack).
+ */
+export class InvalidCoverageMetricError extends Error {
+  /**
+   * @param {string} filePath
+   */
+  constructor(filePath) {
+    super(`invalid coverage metric for ${filePath}`);
+    this.name = 'InvalidCoverageMetricError';
+    this.filePath = filePath;
+  }
+}
+
+/**
+ * Normalize a lines/branches metric.
+ *
+ * When numeric covered + total are present, derive pct from them (q-mp-1033) —
+ * including when a finite numeric pct contradicts the counts (stale istanbul
+ * rows). total===0 → 100. Absent metric → zeros (legacy default for missing
+ * branches). Pct-only numeric (no covered/total) keeps the supplied pct.
+ * Non-numeric / missing pct without covered/total → null (q-mp-1018).
+ *
+ * @param {unknown} m
+ * @returns {{ pct: number, covered: number, total: number } | null}
+ */
+export function resolveMetric(m) {
+  if (m == null || typeof m !== 'object') {
+    return { pct: 0, covered: 0, total: 0 };
+  }
+  const rec =
+    /** @type {{ pct?: unknown, covered?: unknown, total?: unknown }} */ (m);
+  const covered = rec.covered;
+  const total = rec.total;
+  const pct = rec.pct;
+  const coveredOk = typeof covered === 'number' && Number.isFinite(covered);
+  const totalOk = typeof total === 'number' && Number.isFinite(total);
+
+  // q-mp-1033: covered/total win over contradictory (or matching) numeric pct.
+  if (coveredOk && totalOk) {
+    const derived = total === 0 ? 100 : (100 * covered) / total;
+    return { pct: derived, covered, total };
+  }
+
+  if (typeof pct === 'number' && Number.isFinite(pct)) {
+    return {
+      pct,
+      covered: coveredOk ? covered : 0,
+      total: totalOk ? total : 0,
+    };
+  }
+
+  return null;
+}
+
+/**
  * Build rank rows from a parsed coverage-summary.json object.
  * @param {Record<string, unknown>} raw
+ * @throws {InvalidCoverageMetricError} when a matching engine row has
+ *   missing/non-numeric pct that cannot be derived (q-mp-1018)
  */
 export function collectEngineRows(raw) {
   const rows = [];
@@ -120,18 +200,19 @@ export function collectEngineRows(raw) {
     const game = m[1];
     const kind = m[2];
     if (norm.includes('/ai')) continue;
-    const s =
-      /** @type {{ lines?: { pct: number, covered: number, total: number }, branches?: { pct: number, covered: number, total: number } }} */ (
-        stats
-      );
-    const lines = s.lines ?? { pct: 0, covered: 0, total: 0 };
-    const branches = s.branches ?? { pct: 0, covered: 0, total: 0 };
+    const s = /** @type {{ lines?: unknown, branches?: unknown }} */ (stats);
+    const file = norm.includes('src/games/')
+      ? norm.slice(norm.indexOf('src/games/'))
+      : norm;
+    const lines = resolveMetric(s?.lines);
+    const branches = resolveMetric(s?.branches);
+    if (!lines || !branches) {
+      throw new InvalidCoverageMetricError(file);
+    }
     rows.push({
       game,
       kind,
-      file: norm.includes('src/games/')
-        ? norm.slice(norm.indexOf('src/games/'))
-        : norm,
+      file,
       linePct: lines.pct,
       lineCov: lines.covered,
       lineTot: lines.total,
@@ -235,7 +316,16 @@ export function main(argv = process.argv.slice(2), io = {}) {
     return 2;
   }
 
-  const rows = collectEngineRows(raw);
+  let rows;
+  try {
+    rows = collectEngineRows(raw);
+  } catch (err) {
+    if (err instanceof InvalidCoverageMetricError) {
+      error(invalidMetricMessage(summaryPath, err.filePath));
+      return 2;
+    }
+    throw err;
+  }
   if (rows.length === 0) {
     error(emptyEngineSummaryMessage(summaryPath));
     return 2;

@@ -66,17 +66,27 @@ export const OFFLINE_EXTS = new Set([
 
 /**
  * Parse Workbox precache entries from generated sw.js.
+ * Accepts url/revision in either key order and ' or " quotes (q-mp-1058).
  * @param {string} swSource
  * @returns {{ url: string, revision: string | null }[]}
  */
 export function parsePrecacheManifest(swSource) {
   const entries = [];
-  const re = /\{\s*url:\s*"([^"]+)"\s*,\s*revision:\s*(?:"([^"]*)"|null)\s*\}/g;
+  // url-first or revision-first; string values may use ' or "; revision may be null.
+  const re =
+    /\{\s*(?:url:\s*(["'])([^"']+)\1\s*,\s*revision:\s*(?:(["'])([^"']*)\3|null)|revision:\s*(?:(["'])([^"']*)\5|null)\s*,\s*url:\s*(["'])([^"']+)\7)\s*\}/g;
   for (const match of swSource.matchAll(re)) {
-    entries.push({
-      url: match[1],
-      revision: match[2] === undefined ? null : match[2],
-    });
+    if (match[2] !== undefined) {
+      entries.push({
+        url: match[2],
+        revision: match[4] === undefined ? null : match[4],
+      });
+    } else {
+      entries.push({
+        url: match[8],
+        revision: match[6] === undefined ? null : match[6],
+      });
+    }
   }
   return entries;
 }

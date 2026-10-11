@@ -15,7 +15,7 @@ Key files and patterns to inspect
 - Tests: unit tests under `tests/unit` use `vitest`+`jsdom`. E2E tests under `tests/e2e` use Playwright and expect a dev server.
 
 Draft PR into tip
-- Target **`cursor/mp-tip-post477`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
+- Target **`cursor/mp-tip-post1239`** as a **draft** PR. Do not merge, mark ready, or push to `alpha` / `main` / the tip branch. Tip owner folds; end PR bodies with `Next action: fold into tip by the tip owner`.
 - Scan open tip drafts before starting; if covered, comment `superseded` / `contained` — do not close other PRs.
 
 Developer workflows (commands)
@@ -25,7 +25,7 @@ Developer workflows (commands)
 - Coverage: `npm run test:unit:coverage`.
 - E2E (required CI path): `npm run test:e2e:chromium`. Bare `npm run test:e2e` runs **every** Playwright project — prefer an explicit script. Playwright config starts a web server with `npm run dev` and uses `http://localhost:5173` as `baseURL`.
 - Full test shortcut: `npm test` (= unit then Chromium e2e).
-- **CI lint-job chain:** `npm run verify` (= `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`). Matches `.github/workflows/ci.yml` job `lint`.
+- **CI lint-job chain:** blocking half is `npm run verify` (= `lint` → `lint:ratchet` → `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`); then soft `npm run check:copy-pins -- --fail` with `continue-on-error: true`. Verify ⊆ lint job — copy-pins stays outside `package.json` `verify`.
 - Lint alone: `npm run lint`; ceilings: `npm run lint:ratchet` (ratchet only goes down); format write: `npm run format`; CI format gate: `npm run format:check`.
 - Types: `npm run typecheck` (not bare `npx tsc`); shell/Phase-2 ceilings: `npm run typecheck:ratchet`; import-graph: `npm run check:boundaries` (`engine_imports_ui` must stay 0).
 - Emit identity (type-only / brace-only proofs): `npm run check:emit-identity` (alias for `node scripts/check-emit-identity.mjs`).

@@ -2,6 +2,8 @@
  * @vitest-environment node
  *
  * Hermetic argv + dry-run write-guard coverage for report-licenses (q-mp-979).
+ * Malformed lock message helper (q-mp-1026).
+ * Empty/missing packages gate helpers (q-mp-1037).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -10,6 +12,9 @@ import path from 'node:path';
 import {
   parseArgs,
   writeLicenseArtifacts,
+  malformedLockMessage,
+  isUsableLockPackages,
+  emptyPackagesMessage,
   USAGE,
   OUT_DIR,
   OUT_DIR_REL,
@@ -110,5 +115,33 @@ describe('report-licenses parseArgs / CLI (q-mp-979)', () => {
     expect(mtimesOrZero(SBOM_PATH)).toBe(sbomBefore);
     expect(mtimesOrZero(SUMMARY_MD_PATH)).toBe(mdBefore);
     expect(mtimesOrZero(SUMMARY_JSON_PATH)).toBe(jsonBefore);
+  });
+
+  it('malformedLockMessage is short, includes hint, and is stack-free (q-mp-1026)', () => {
+    const msg = malformedLockMessage(
+      '/tmp/package-lock.json',
+      "Expected property name or '}' in JSON at position 1"
+    );
+    expect(msg).toMatch(
+      /report:licenses — malformed JSON in \/tmp\/package-lock\.json/
+    );
+    expect(msg).toMatch(/Expected property name/);
+    expect(msg).toMatch(/npm install/);
+    expect(msg).not.toMatch(/at JSON\.parse|at main|at ModuleJob|SyntaxError/);
+  });
+
+  it('rejects null / missing / empty packages as unusable (q-mp-1037)', () => {
+    expect(isUsableLockPackages(null)).toBe(false);
+    expect(isUsableLockPackages(undefined)).toBe(false);
+    expect(isUsableLockPackages({})).toBe(false);
+    expect(isUsableLockPackages([])).toBe(false);
+    expect(isUsableLockPackages({ '': { name: 'demo' } })).toBe(true);
+    const msg = emptyPackagesMessage('/tmp/package-lock.json');
+    expect(msg).toMatch(
+      /report:licenses — empty or missing packages in \/tmp\/package-lock\.json/
+    );
+    expect(msg).toMatch(/non-empty "packages" object/);
+    expect(msg).toMatch(/npm install/);
+    expect(msg).not.toMatch(/Would write|Lockfile packages:/);
   });
 });

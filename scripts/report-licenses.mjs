@@ -14,7 +14,8 @@
  *
  * Exit codes:
  *   0 — report completed; no explicitly denied license in the tree
- *   1 — denied license present, or lockfile unreadable
+ *   1 — denied license present, lockfile missing, malformed/unreadable, or
+ *       packages null/missing/empty
  *
  * Report-only for copyleft/unknown/install-script flags (still exit 0).
  *
@@ -25,6 +26,10 @@
  * Unknown flags exit 2. --help/-h exit 0 without scanning or writing reports.
  * --dry-run scans and prints the summary but does not write under
  * test-results/licenses (q-mp-979).
+ * Malformed package-lock.json prints a short message + hint (no stack) and
+ * exits 1 (q-mp-1026). Missing lock message unchanged.
+ * Null / missing / empty `packages` prints a short error and exits 1 with no
+ * artifact writes — including no --dry-run "Would write" (q-mp-1037).
  */
 
 import fs from 'node:fs';
@@ -106,6 +111,53 @@ export function writeLicenseArtifacts(opts) {
     fs.writeFileSync(paths.summaryJson, opts.summaryJsonText);
   }
   return { wrote: !dryRun, outDir: OUT_DIR, paths };
+}
+
+/**
+ * Stable message for malformed package-lock.json (q-mp-1026) — no stack.
+ * @param {string} [lockPath]
+ * @param {string} [detail]
+ * @returns {string}
+ */
+export function malformedLockMessage(
+  lockPath = LOCK_PATH,
+  detail = 'Unexpected end of JSON input'
+) {
+  const display = String(lockPath).replace(/\\/g, '/');
+  return [
+    `report:licenses — malformed JSON in ${display}`,
+    detail,
+    'Fix or regenerate package-lock.json (run `npm install`).',
+  ].join('\n');
+}
+
+/**
+ * True when lock.packages is a non-empty plain object (q-mp-1037).
+ * Null, undefined, arrays, and `{}` are not usable.
+ * @param {unknown} packages
+ * @returns {boolean}
+ */
+export function isUsableLockPackages(packages) {
+  return (
+    packages != null &&
+    typeof packages === 'object' &&
+    !Array.isArray(packages) &&
+    Object.keys(/** @type {object} */ (packages)).length > 0
+  );
+}
+
+/**
+ * Stable message for null / missing / empty lock packages (q-mp-1037).
+ * @param {string} [lockPath]
+ * @returns {string}
+ */
+export function emptyPackagesMessage(lockPath = LOCK_PATH) {
+  const display = String(lockPath).replace(/\\/g, '/');
+  return [
+    `report:licenses — empty or missing packages in ${display}`,
+    'package-lock.json must include a non-empty "packages" object.',
+    'Fix or regenerate package-lock.json (run `npm install`).',
+  ].join('\n');
 }
 
 /** Strong copyleft / source-available terms that fail the report if present. */
@@ -305,7 +357,9 @@ export function npmPackageNameFromLockPath(lockPath) {
  * }>}
  */
 export function collectPackagesFromLock(lock, nodeModulesRoot = '') {
-  const packages = lock.packages || {};
+  // Main rejects null/missing/empty packages (q-mp-1037) before calling this.
+  // Keep `|| {}` only as a defensive fallback for hermetic helper callers.
+  const packages = isUsableLockPackages(lock.packages) ? lock.packages : {};
   /** @type {ReturnType<typeof collectPackagesFromLock>} */
   const out = [];
 
@@ -707,7 +761,18 @@ function main(argv = process.argv.slice(2)) {
     process.exit(1);
   }
 
-  const lock = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
+  let lock;
+  try {
+    lock = JSON.parse(fs.readFileSync(LOCK_PATH, 'utf8'));
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error(malformedLockMessage(LOCK_PATH, detail));
+    process.exit(1);
+  }
+  if (!isUsableLockPackages(lock.packages)) {
+    console.error(emptyPackagesMessage(LOCK_PATH));
+    process.exit(1);
+  }
   const rootMeta = lock.packages?.[''] || {};
   const appName =
     typeof lock.name === 'string'

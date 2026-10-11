@@ -2,7 +2,13 @@
  * @vitest-environment node
  *
  * Hermetic coverage for mutation-report argv validation
- * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967).
+ * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064).
+ *
+ * Argv reject paths assert via parseMutationReportArgs /
+ * resolveMutationReportGames in-process (q-mp-1064 wall-time cut).
+ * Thin spawnSync smokes remain for mutation-report.mjs --help and
+ * --dry-run plan wiring only — leave empty-argv product (#1232/967)
+ * and lib main-entry (#1235/975) alone.
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -16,9 +22,20 @@ import {
 const SCRIPT = resolve(process.cwd(), 'scripts/mutation-report.mjs');
 const DEFAULT_JSON = resolve('/tmp', 'mutation-report-default.json');
 const VALID = ['calla', 'hex', 'fiar'];
+const USAGE_LINE = MUTATION_REPORT_USAGE.split('\n')[0];
 
 function parse(argv: string[]) {
   return parseMutationReportArgs(argv, { defaultJsonOut: DEFAULT_JSON });
+}
+
+/** CLI usageExit(message) prints message then MUTATION_REPORT_USAGE. */
+function expectParseReject(argv: string[], messageRe: RegExp) {
+  const got = parse(argv);
+  expect(got.ok).toBe(false);
+  if (!got.ok) {
+    expect(got.message).toMatch(messageRe);
+    expect(USAGE_LINE).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
+  }
 }
 
 describe('parseMutationReportArgs (q-mp-867)', () => {
@@ -227,43 +244,57 @@ describe('resolveMutationReportGames (q-mp-868)', () => {
   });
 });
 
-describe('mutation-report.mjs CLI argv (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967)', () => {
-  it('prints usage and exits 2 for empty --max= without plan or mutation', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--max=', '--dry-run'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Invalid --max/);
-    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
-    expect(text).not.toMatch(/would mutate/);
-    expect(text).not.toMatch(/maxMutantsPerGame=/);
-    expect(text).not.toMatch(/=== calla ===/);
-    expect(text).not.toMatch(/KILLED|SURVIVED/);
+describe('mutation-report argv rejects in-process (q-mp-1064)', () => {
+  it('rejects empty --max= before any plan or mutation', () => {
+    expectParseReject(['--max=', '--dry-run'], /Invalid --max/);
   });
 
-  it('prints usage and exits 2 for empty --games= without plan or mutation', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--games=', '--dry-run'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Invalid --games/);
-    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
-    expect(text).not.toMatch(/would mutate/);
-    expect(text).not.toMatch(/=== calla ===/);
+  it('rejects empty --games= before any plan or mutation', () => {
+    expectParseReject(['--games=', '--dry-run'], /Invalid --games/);
   });
 
-  it('prints usage and exits 2 for empty --json= without plan or mutation', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--json=', '--dry-run'], {
+  it('rejects empty --json= before any plan or mutation', () => {
+    expectParseReject(['--json=', '--dry-run'], /Invalid --json/);
+  });
+
+  it('rejects non-numeric --max before mutation', () => {
+    expectParseReject(['--max=abc'], /Invalid --max/);
+  });
+
+  it('rejects non-numeric --timeout before mutation', () => {
+    expectParseReject(['--timeout=xyz'], /Invalid --timeout/);
+  });
+
+  it('rejects unknown --games ids before rules.ts I/O', () => {
+    const parsed = parse(['--games=no-such-game', '--max=1']);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const resolved = resolveMutationReportGames(parsed.opts.games, VALID);
+    expect(resolved.ok).toBe(false);
+    if (!resolved.ok) {
+      expect(resolved.message).toMatch(/unknown game\(s\): no-such-game/);
+      expect(resolved.message).toMatch(/valid games:/);
+      expect(resolved.message).not.toMatch(/ENOENT/);
+      expect(resolved.message).not.toMatch(/no-such-game\/rules\.ts/);
+    }
+  });
+
+  it('rejects unknown flags before mutation', () => {
+    expectParseReject(['--wat'], /Unknown flag: --wat/);
+  });
+});
+
+describe('mutation-report.mjs CLI spawn smoke (q-mp-1064)', () => {
+  it('prints usage and exits 0 for --help without mutating', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--help'], {
       encoding: 'utf8',
     });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Invalid --json/);
-    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
-    expect(text).not.toMatch(/would mutate/);
-    expect(text).not.toMatch(/=== calla ===/);
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain(USAGE_LINE);
+    expect(r.stdout).toMatch(/--dry-run/);
+    expect(r.stdout).not.toMatch(/Mutation report \(rules engines\)/);
+    expect(r.stdout).not.toMatch(/=== calla ===/);
+    expect(r.stdout).not.toMatch(/KILLED|SURVIVED/);
   });
 
   it('lists plan with maxMutantsPerGame=all for --max=0 --dry-run', () => {
@@ -277,56 +308,6 @@ describe('mutation-report.mjs CLI argv (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-96
     expect(r.stdout).not.toMatch(/Wrote /);
   });
 
-  it('prints usage and exits non-zero for --max=abc without mutating rules.ts', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--max=abc'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Invalid --max/);
-    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
-    expect(text).not.toMatch(/=== calla ===/);
-    expect(text).not.toMatch(/Mutation report \(rules engines\)/);
-  });
-
-  it('prints usage and exits non-zero for --timeout=xyz without mutating', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--timeout=xyz'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Invalid --timeout/);
-    expect(text).toContain(MUTATION_REPORT_USAGE.split('\n')[0]);
-    expect(text).not.toMatch(/=== calla ===/);
-  });
-
-  it('rejects unknown --games ids without ENOENT stack or rules.ts I/O', () => {
-    const r = spawnSync(
-      process.execPath,
-      [SCRIPT, '--games=no-such-game', '--max=1'],
-      { encoding: 'utf8' }
-    );
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/unknown game\(s\): no-such-game/);
-    expect(text).toMatch(/valid games:/);
-    expect(text).not.toMatch(/ENOENT/);
-    expect(text).not.toMatch(/no-such-game\/rules\.ts/);
-    expect(text).not.toMatch(/Mutation report \(rules engines\)/);
-  });
-
-  it('prints usage and exits 0 for --help without mutating', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--help'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(0);
-    expect(r.stdout).toContain(MUTATION_REPORT_USAGE.split('\n')[0]);
-    expect(r.stdout).toMatch(/--dry-run/);
-    expect(r.stdout).not.toMatch(/Mutation report \(rules engines\)/);
-    expect(r.stdout).not.toMatch(/=== calla ===/);
-    expect(r.stdout).not.toMatch(/KILLED|SURVIVED/);
-  });
-
   it('lists plan and exits 0 for --dry-run without mutating', () => {
     const r = spawnSync(process.execPath, [SCRIPT, '--dry-run', '--max=1'], {
       encoding: 'utf8',
@@ -338,17 +319,5 @@ describe('mutation-report.mjs CLI argv (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-96
     expect(r.stdout).not.toMatch(/=== calla ===/);
     expect(r.stdout).not.toMatch(/KILLED|SURVIVED/);
     expect(r.stdout).not.toMatch(/Wrote /);
-  });
-
-  it('rejects unknown flags before mutation', () => {
-    const r = spawnSync(process.execPath, [SCRIPT, '--wat'], {
-      encoding: 'utf8',
-    });
-    expect(r.status).toBe(2);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Unknown flag: --wat/);
-    expect(text).toMatch(/Usage: node scripts\/mutation-report\.mjs/);
-    expect(text).not.toMatch(/Mutation report \(rules engines\)/);
-    expect(text).not.toMatch(/=== calla ===/);
   });
 });

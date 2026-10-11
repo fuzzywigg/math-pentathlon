@@ -9,6 +9,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
+import { readReporterJson } from './lib/read-reporter-json.mjs';
 
 const USAGE =
   'Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]\n' +
@@ -108,11 +109,12 @@ function keyOf(file, name, project) {
 }
 
 function ingestJson(jsonPath, runId, mode) {
-  if (!fs.existsSync(jsonPath)) {
-    runSummaries.push({ runId, mode, ok: false, error: 'missing json' });
+  const loaded = readReporterJson(jsonPath);
+  if (!loaded.ok) {
+    runSummaries.push({ runId, mode, ok: false, error: loaded.error });
     return;
   }
-  const data = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+  const data = loaded.data;
   let passed = 0;
   let failed = 0;
   const walk = (suite, fileHint) => {
@@ -176,14 +178,16 @@ function ingestJson(jsonPath, runId, mode) {
   } else {
     for (const suite of data.suites || [data]) walk(suite);
   }
-  const ok =
-    data.success !== false && failed === 0 && (data.numFailedTests ?? 0) === 0;
+  // Per-run ok must key off walked failures + numFailedTests only.
+  // Vitest `success: true` must not override a non-zero failure count (q-mp-1034).
+  const numFailedTests = data.numFailedTests ?? failed;
+  const ok = failed === 0 && numFailedTests === 0;
   runSummaries.push({
     runId,
     mode,
-    ok: data.success === true || (ok && (data.numFailedTests ?? failed) === 0),
+    ok,
     passed: data.numPassedTests ?? passed,
-    failed: data.numFailedTests ?? failed,
+    failed: numFailedTests,
     durationMs: data.duration ?? null,
   });
 }

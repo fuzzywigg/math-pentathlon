@@ -11,7 +11,11 @@
  *
  * Usage:
  *   npm run build && npm run check:pwa-manifest
- *   REPORT_ONLY=0 npm run check:pwa-manifest   # fail CI on violations
+ *   REPORT_ONLY=0 npm run check:pwa-manifest   # opt-in local exit 1 on violations
+ *
+ * CI `build` soft step runs `npm run check:pwa-manifest` without REPORT_ONLY=0
+ * (report-only / continue-on-error). Tip-owner must wire REPORT_ONLY=0 if CI
+ * should fail on violations — out of scope for docs-only wording fixes.
  */
 
 import fs from 'node:fs';

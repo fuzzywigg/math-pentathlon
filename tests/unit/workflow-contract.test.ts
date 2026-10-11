@@ -6,7 +6,7 @@
  * Task: burn-1008-mp-ci-workflow-hardening
  */
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -206,6 +206,29 @@ describe('live .github/workflows contract', () => {
       cwd: process.cwd(),
     });
     expect(out).toMatch(/check:workflows OK/);
+  });
+
+  it('lint job keeps soft check:copy-pins after verify (q-mp-1029)', () => {
+    const ci = readFileSync(
+      join(process.cwd(), '.github/workflows/ci.yml'),
+      'utf8'
+    );
+    expect(ci).toContain('npm run verify');
+    // Soft report-only step: --fail + continue-on-error; outside package.json verify.
+    expect(ci).toMatch(
+      /npm run verify[\s\S]*?continue-on-error:\s*true[\s\S]*?check:copy-pins -- --fail/
+    );
+  });
+
+  it('build job keeps soft size:check --fail-on-new-over (q-mp-1041)', () => {
+    const ci = readFileSync(
+      join(process.cwd(), '.github/workflows/ci.yml'),
+      'utf8'
+    );
+    // Soft gzip ratchet: novel OVER exits 1; continue-on-error keeps build green.
+    expect(ci).toMatch(
+      /continue-on-error:\s*true[\s\S]*?size:check -- --fail-on-new-over/
+    );
   });
 
   it('fails a temp workflow that drops persist-credentials', () => {

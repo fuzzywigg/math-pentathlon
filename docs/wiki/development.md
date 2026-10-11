@@ -44,9 +44,9 @@ npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
 npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
 npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
-npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (CI lint job)
-npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
-npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
+npm run verify                   # lint → lint:ratchet → format:check → typecheck → typecheck:ratchet → check:boundaries (blocking half of CI lint job; verify ⊆ lint)
+npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; local default report-only exit 0; CI: --fail-on-new-over → exit 1 on novel OVER, soft via continue-on-error)
+npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; CI lint also runs --fail + continue-on-error after verify; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
 npm run check:perf               # perf summary (+ optional Lighthouse); missing dist/ → exit 2; with dist/ report-only exit 0
 npm run check:build              # build reproducibility probe
@@ -127,7 +127,7 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + report-only `size:check`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
@@ -139,7 +139,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post1083` (cut from `alpha` @ `8901cff6` after #1083 squash-merge, 2026-10-10): tip-owner fold on draft tip PR (q-mp-026t); live unit suite **3366** files / **14347** listed cases @ `548802e2` remasure at tip open (#1098). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post1239` (cut from `alpha` @ `1c0f831d` after #1239 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026x); live unit suite **3366** files / **14347** listed cases @ `548802e2` remasure at tip open (#1098). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front

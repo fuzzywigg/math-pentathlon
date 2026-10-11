@@ -3,6 +3,7 @@ import {
   escapeXml,
   normalizeRepoPath,
   aggregateByDirectory,
+  readMetric,
   heatColor,
   heatTextColor,
   renderCoverageHeatSvg,
@@ -72,6 +73,104 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     });
     expect(rows[1].dir).toBe('src/ui');
     expect(rows[1].lines.pct).toBe(95);
+  });
+
+  it('readMetric prefers covered/total, honors pct-only, and treats absent as absent (q-mp-1017)', () => {
+    expect(readMetric({ total: 8, covered: 1, pct: 12.5 })).toEqual({
+      kind: 'counts',
+      covered: 1,
+      total: 8,
+    });
+    expect(readMetric({ pct: 12.5 })).toEqual({ kind: 'pct', pct: 12.5 });
+    expect(readMetric({ covered: 1 })).toEqual({ kind: 'absent' });
+    expect(readMetric({})).toEqual({ kind: 'absent' });
+    expect(readMetric(undefined)).toEqual({ kind: 'absent' });
+  });
+
+  it('honors pct-only rows and never invents 100% from absent totals (q-mp-1017)', () => {
+    const rows = aggregateByDirectory(
+      {
+        'src/games/calla/board.ts': {
+          lines: { pct: 12.5 },
+          branches: { pct: 5 },
+          functions: { pct: 10 },
+          statements: { pct: 12.5 },
+        },
+        'src/games/ramrod/board.ts': {
+          lines: { total: 100, covered: 99, pct: 99 },
+          branches: { total: 20, covered: 19, pct: 95 },
+          functions: { total: 10, covered: 10, pct: 100 },
+          statements: { total: 100, covered: 99, pct: 99 },
+        },
+      },
+      { root: '/workspace' }
+    );
+
+    expect(rows.map((r) => r.dir)).toEqual([
+      'src/games/calla',
+      'src/games/ramrod',
+    ]);
+    expect(rows[0]).toMatchObject({
+      dir: 'src/games/calla',
+      files: 1,
+      lines: { covered: null, total: null, pct: 12.5 },
+      branches: { covered: null, total: null, pct: 5 },
+    });
+    expect(rows[1]).toMatchObject({
+      dir: 'src/games/ramrod',
+      files: 1,
+      lines: { covered: 99, total: 100, pct: 99 },
+    });
+  });
+
+  it('keeps explicit 0/0 counts as istanbul 100% (q-mp-1017)', () => {
+    const rows = aggregateByDirectory(
+      {
+        'src/games/hex/empty.ts': {
+          lines: { total: 0, covered: 0, pct: 100 },
+          branches: { total: 0, covered: 0, pct: 100 },
+          functions: { total: 0, covered: 0, pct: 100 },
+          statements: { total: 0, covered: 0, pct: 100 },
+        },
+      },
+      { root: '/workspace' }
+    );
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.lines).toEqual({ total: 0, covered: 0, pct: 100 });
+  });
+
+  it('clamps covered > total so display pct stays ≤ 100 (q-mp-1039)', () => {
+    const rows = aggregateByDirectory(
+      {
+        'src/games/calla/board.ts': {
+          lines: { total: 100, covered: 120, pct: 120 },
+          branches: { total: 10, covered: 10, pct: 100 },
+          functions: { total: 5, covered: 5, pct: 100 },
+          statements: { total: 100, covered: 120, pct: 120 },
+        },
+        'src/games/ramrod/board.ts': {
+          lines: { total: 100, covered: 50, pct: 50 },
+          branches: { total: 10, covered: 5, pct: 50 },
+          functions: { total: 5, covered: 2, pct: 40 },
+          statements: { total: 100, covered: 50, pct: 50 },
+        },
+      },
+      { root: '/workspace' }
+    );
+
+    expect(rows.map((r) => r.dir)).toEqual([
+      'src/games/ramrod',
+      'src/games/calla',
+    ]);
+    expect(rows[1]).toMatchObject({
+      dir: 'src/games/calla',
+      files: 1,
+      lines: { covered: 100, total: 100, pct: 100 },
+      statements: { covered: 100, total: 100, pct: 100 },
+    });
+    const md = renderCoverageMapMarkdown(rows);
+    expect(md).toContain('| `src/games/calla` | 100.00 |');
+    expect(md).not.toMatch(/120\.00/);
   });
 
   it('maps coverage percentages to heat colors', () => {

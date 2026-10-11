@@ -23,6 +23,9 @@
  * --help / -h and --dry-run must not write those files (q-mp-977).
  * Empty / array / zero-directory summaries are rejected with no doc writes (q-mp-993).
  * Malformed JSON prints a short message (no stack) and exits non-zero (q-mp-1005).
+ * Pct-only metric rows honor numeric `pct` (covered/total shown as unknown); never
+ * invent 100% from absent totals via metric(0,0) (q-mp-1017). Explicit 0/0 counts
+ * still map to istanbul's 100%.
  */
 
 import fs from 'node:fs';
@@ -87,12 +90,17 @@ export function parseArgs(argv) {
 }
 
 /**
- * @typedef {{ total: number, covered: number, skipped?: number, pct: number }} CovMetric
  * @typedef {{
- *   lines?: CovMetric,
- *   statements?: CovMetric,
- *   functions?: CovMetric,
- *   branches?: CovMetric,
+ *   total: number | null,
+ *   covered: number | null,
+ *   skipped?: number,
+ *   pct: number,
+ * }} CovMetric
+ * @typedef {{
+ *   lines?: Partial<CovMetric>,
+ *   statements?: Partial<CovMetric>,
+ *   functions?: Partial<CovMetric>,
+ *   branches?: Partial<CovMetric>,
  * }} FileCov
  * @typedef {{
  *   dir: string,
@@ -102,6 +110,13 @@ export function parseArgs(argv) {
  *   functions: CovMetric,
  *   statements: CovMetric,
  * }} DirRow
+ * @typedef {{
+ *   files: number,
+ *   linesC: number, linesT: number, linesCountFiles: number, linesPctSum: number, linesPctFiles: number,
+ *   branchesC: number, branchesT: number, branchesCountFiles: number, branchesPctSum: number, branchesPctFiles: number,
+ *   functionsC: number, functionsT: number, functionsCountFiles: number, functionsPctSum: number, functionsPctFiles: number,
+ *   statementsC: number, statementsT: number, statementsCountFiles: number, statementsPctSum: number, statementsPctFiles: number,
+ * }} DirBucket
  */
 
 /**
@@ -137,26 +152,103 @@ export function normalizeRepoPath(filePath, root = ROOT) {
 }
 
 /**
+ * Istanbul-style counts → metric. Explicit 0/0 stays 100% (empty file).
+ * Clamp covered to total so display/rank pct stays in [0, 100] (q-mp-1039).
  * @param {number} covered
  * @param {number} total
  * @returns {CovMetric}
  */
-function metric(covered, total) {
+function metricFromCounts(covered, total) {
   const t = Math.max(0, total);
-  const c = Math.max(0, covered);
+  const c = Math.min(t, Math.max(0, covered));
   const pct = t === 0 ? 100 : (100 * c) / t;
   return { total: t, covered: c, pct };
 }
 
 /**
- * @param {Partial<CovMetric> | undefined} m
- * @returns {{ covered: number, total: number }}
+ * Pct-only metric: honor numeric pct; covered/total unknown (q-mp-1017).
+ * @param {number} pct
+ * @returns {CovMetric}
  */
-function readMetric(m) {
-  if (m == null || typeof m !== 'object') return { covered: 0, total: 0 };
-  const covered = typeof m.covered === 'number' ? m.covered : 0;
-  const total = typeof m.total === 'number' ? m.total : 0;
-  return { covered, total };
+function metricFromPct(pct) {
+  return { total: null, covered: null, pct };
+}
+
+/**
+ * Parse one file-level coverage metric.
+ * Prefer covered+total when both are finite numbers; else honor numeric pct;
+ * otherwise absent (do not invent 0/0 → 100%).
+ *
+ * @param {Partial<CovMetric> | undefined} m
+ * @returns {{ kind: 'counts', covered: number, total: number }
+ *   | { kind: 'pct', pct: number }
+ *   | { kind: 'absent' }}
+ */
+export function readMetric(m) {
+  if (m == null || typeof m !== 'object') return { kind: 'absent' };
+  const hasCovered =
+    typeof m.covered === 'number' && Number.isFinite(m.covered);
+  const hasTotal = typeof m.total === 'number' && Number.isFinite(m.total);
+  if (hasCovered && hasTotal) {
+    return { kind: 'counts', covered: m.covered, total: m.total };
+  }
+  if (typeof m.pct === 'number' && Number.isFinite(m.pct)) {
+    return { kind: 'pct', pct: m.pct };
+  }
+  return { kind: 'absent' };
+}
+
+/**
+ * @param {DirBucket} bucket
+ * @param {'lines'|'branches'|'functions'|'statements'} key
+ * @param {{ kind: 'counts', covered: number, total: number }
+ *   | { kind: 'pct', pct: number }
+ *   | { kind: 'absent' }} parsed
+ */
+function accumulateMetric(bucket, key, parsed) {
+  if (parsed.kind === 'counts') {
+    // Clamp per-file covered≤total before summing (q-mp-1039).
+    const t = Math.max(0, parsed.total);
+    const c = Math.min(t, Math.max(0, parsed.covered));
+    bucket[`${key}C`] += c;
+    bucket[`${key}T`] += t;
+    bucket[`${key}CountFiles`] += 1;
+    return;
+  }
+  if (parsed.kind === 'pct') {
+    bucket[`${key}PctSum`] += parsed.pct;
+    bucket[`${key}PctFiles`] += 1;
+  }
+}
+
+/**
+ * Finalize a directory metric from count and/or pct-only contributions.
+ * @param {DirBucket} bucket
+ * @param {'lines'|'branches'|'functions'|'statements'} key
+ * @returns {CovMetric}
+ */
+function finalizeMetric(bucket, key) {
+  const countFiles = bucket[`${key}CountFiles`];
+  const pctFiles = bucket[`${key}PctFiles`];
+  if (countFiles > 0 && pctFiles === 0) {
+    return metricFromCounts(bucket[`${key}C`], bucket[`${key}T`]);
+  }
+  if (countFiles === 0 && pctFiles > 0) {
+    return metricFromPct(bucket[`${key}PctSum`] / pctFiles);
+  }
+  if (countFiles > 0 && pctFiles > 0) {
+    const countsPct = metricFromCounts(
+      bucket[`${key}C`],
+      bucket[`${key}T`]
+    ).pct;
+    const pctOnlyAvg = bucket[`${key}PctSum`] / pctFiles;
+    const combined =
+      (countsPct * countFiles + pctOnlyAvg * pctFiles) /
+      (countFiles + pctFiles);
+    return { total: null, covered: null, pct: combined };
+  }
+  // Totals absent and no pct — do not invent 100% from 0/0 (q-mp-1017).
+  return { total: null, covered: null, pct: 0 };
 }
 
 /**
@@ -170,13 +262,7 @@ function readMetric(m) {
  */
 export function aggregateByDirectory(summary, opts = {}) {
   const root = opts.root ?? ROOT;
-  /** @type {Map<string, {
-   *   files: number,
-   *   linesC: number, linesT: number,
-   *   branchesC: number, branchesT: number,
-   *   functionsC: number, functionsT: number,
-   *   statementsC: number, statementsT: number,
-   * }>} */
+  /** @type {Map<string, DirBucket>} */
   const byDir = new Map();
 
   for (const [key, stats] of Object.entries(summary)) {
@@ -193,28 +279,32 @@ export function aggregateByDirectory(summary, opts = {}) {
         files: 0,
         linesC: 0,
         linesT: 0,
+        linesCountFiles: 0,
+        linesPctSum: 0,
+        linesPctFiles: 0,
         branchesC: 0,
         branchesT: 0,
+        branchesCountFiles: 0,
+        branchesPctSum: 0,
+        branchesPctFiles: 0,
         functionsC: 0,
         functionsT: 0,
+        functionsCountFiles: 0,
+        functionsPctSum: 0,
+        functionsPctFiles: 0,
         statementsC: 0,
         statementsT: 0,
+        statementsCountFiles: 0,
+        statementsPctSum: 0,
+        statementsPctFiles: 0,
       };
       byDir.set(dir, bucket);
     }
     bucket.files += 1;
-    const lines = readMetric(stats.lines);
-    const branches = readMetric(stats.branches);
-    const functions = readMetric(stats.functions);
-    const statements = readMetric(stats.statements);
-    bucket.linesC += lines.covered;
-    bucket.linesT += lines.total;
-    bucket.branchesC += branches.covered;
-    bucket.branchesT += branches.total;
-    bucket.functionsC += functions.covered;
-    bucket.functionsT += functions.total;
-    bucket.statementsC += statements.covered;
-    bucket.statementsT += statements.total;
+    accumulateMetric(bucket, 'lines', readMetric(stats.lines));
+    accumulateMetric(bucket, 'branches', readMetric(stats.branches));
+    accumulateMetric(bucket, 'functions', readMetric(stats.functions));
+    accumulateMetric(bucket, 'statements', readMetric(stats.statements));
   }
 
   /** @type {DirRow[]} */
@@ -223,10 +313,10 @@ export function aggregateByDirectory(summary, opts = {}) {
     rows.push({
       dir,
       files: b.files,
-      lines: metric(b.linesC, b.linesT),
-      branches: metric(b.branchesC, b.branchesT),
-      functions: metric(b.functionsC, b.functionsT),
-      statements: metric(b.statementsC, b.statementsT),
+      lines: finalizeMetric(b, 'lines'),
+      branches: finalizeMetric(b, 'branches'),
+      functions: finalizeMetric(b, 'functions'),
+      statements: finalizeMetric(b, 'statements'),
     });
   }
 

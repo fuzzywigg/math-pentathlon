@@ -12,24 +12,11 @@ import { dirname } from 'node:path';
 import { artifactPath } from './lib/artifact-dir.mjs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { CONSOLE_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
 
-const USAGE = `Usage: node scripts/console-sweep.mjs
-
-One-off Playwright console sweep across available games.
-Writes JSON to SWEEP_OUT when set; otherwise <artifact-dir>/console-sweep-raw.json
-(artifact-dir: /opt/cursor/artifacts when creatable, else test-results/agent-artifacts).
-
-Options:
-  -h, --help       Show this help and exit (no browser launch)
-
-Env:
-  BASE_URL         Dev server URL (default http://localhost:5173)
-  SWEEP_OUT        Output JSON path (overrides artifact-dir default)
-  MP_ARTIFACT_DIR  Artifact root override when SWEEP_OUT is unset`;
-
-applyBrowserHarnessCli(process.argv.slice(2), USAGE);
+applyBrowserHarnessCli(process.argv.slice(2), CONSOLE_SWEEP_USAGE);
 
 const require = createRequire(import.meta.url);
 // Pull game ids from compiled-ish source via dynamic import of TS is hard;

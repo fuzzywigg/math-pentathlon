@@ -97,7 +97,7 @@ They are defensive / impossible given prior guards.
 
 ```bash
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
 npm run test:unit:coverage -- \
   --coverage.include='src/games/kwatro-sinko/rules.ts' \

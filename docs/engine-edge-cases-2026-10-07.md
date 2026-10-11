@@ -104,6 +104,6 @@ Across all 20 engines, illegal moves are rejected by **identity return** (mutato
 ```bash
 npx vitest run tests/unit/engine-edge-cases-2026-10-07.test.ts
 npm run lint
-npx tsc --noEmit
+npm run typecheck
 npm run test:unit
 ```
