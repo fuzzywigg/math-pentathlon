@@ -9,8 +9,8 @@
  *   4. Test-helper reachability (including side-effect imports)
  *   5. Grep + registry / dynamic-import verification for every candidate
  *
- * Always exits 0 on a successful report run (report-only). Writes
- * docs/dev/dead-code-inventory.md + .json by default.
+ * Successful report runs exit 0 (report-only). Unknown flags exit 2.
+ * Writes docs/dev/dead-code-inventory.md + .json by default.
  * Disposition column: removed (this PR) / kept / deferred (safe unused test-helper exports).
  *
  * Usage:
