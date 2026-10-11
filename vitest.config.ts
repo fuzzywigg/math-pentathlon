@@ -194,6 +194,8 @@ const nodePureFiles = [
   'tests/unit/lib-main-entry-cli-help.test.ts',
   // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.
   'tests/unit/render-perf-mode-measure-tti.test.ts',
+  // render-perf-mode summarizeSamples invalid durationMs filter (q-mp-1224).
+  'tests/unit/render-perf-mode-duration-ms.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
