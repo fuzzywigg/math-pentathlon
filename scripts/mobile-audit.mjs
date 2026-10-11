@@ -279,6 +279,16 @@ async function auditGesturesStatic() {
   };
 }
 
+/** Double-rAF paint settle (no fixed sleep). */
+async function waitDoubleRaf(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
+}
+
 /**
  * @param {string} outPath
  */
@@ -320,8 +330,8 @@ async function main(outPath) {
           .locator(sel)
           .first()
           .waitFor({ state: 'visible', timeout: 15_000 });
-        // Settle layout
-        await page.waitForTimeout(300);
+        // Settle layout (paint frames, not a fixed sleep)
+        await waitDoubleRaf(page);
         entry.audit = await auditPage(page, gameId);
         entry.ok = true;
       } catch (err) {
