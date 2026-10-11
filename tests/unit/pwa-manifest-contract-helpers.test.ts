@@ -73,4 +73,48 @@ describe('pwa-manifest-contract helpers', () => {
     </head></html>`;
     expect(validateIndexHtml(full)).toEqual({ ok: true, errors: [] });
   });
+
+  it('validateIndexHtml accepts theme-color when media/content precede name', () => {
+    const chrome = `
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-title" content="Math Pentathlon" />
+      <link rel="apple-touch-icon" href="/icons/icon-180.png" />`;
+    const fallback = `<meta name="theme-color" content="#102a43" />`;
+
+    const attributeOrders = [
+      // media before name (ticket baseline)
+      `<meta media="(prefers-color-scheme: light)" name="theme-color" content="#f8fafc" />
+       <meta media="(prefers-color-scheme: dark)" name="theme-color" content="#102a43" />`,
+      // media + content before name
+      `<meta media="(prefers-color-scheme: light)" content="#f8fafc" name="theme-color" />
+       <meta media="(prefers-color-scheme: dark)" content="#102a43" name="theme-color" />`,
+      // content before name
+      `<meta content="#f8fafc" name="theme-color" media="(prefers-color-scheme: light)" />
+       <meta content="#102a43" name="theme-color" media="(prefers-color-scheme: dark)" />`,
+      // content + media before name
+      `<meta content="#f8fafc" media="(prefers-color-scheme: light)" name="theme-color" />
+       <meta content="#102a43" media="(prefers-color-scheme: dark)" name="theme-color" />`,
+      // name first (still green)
+      `<meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+       <meta name="theme-color" content="#102a43" media="(prefers-color-scheme: dark)" />`,
+      // name + media before content
+      `<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
+       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#102a43" />`,
+    ];
+
+    for (const themes of attributeOrders) {
+      const html = `<html><head>${themes}${fallback}${chrome}</head></html>`;
+      expect(validateIndexHtml(html)).toEqual({ ok: true, errors: [] });
+    }
+
+    const wrongColors = `<html><head>
+      <meta media="(prefers-color-scheme: light)" name="theme-color" content="#ffffff" />
+      <meta media="(prefers-color-scheme: dark)" name="theme-color" content="#000000" />
+      ${fallback}${chrome}
+    </head></html>`;
+    const wrong = validateIndexHtml(wrongColors);
+    expect(wrong.ok).toBe(false);
+    expect(wrong.errors.join('\n')).toMatch(/prefers-color-scheme: light/);
+    expect(wrong.errors.join('\n')).toMatch(/prefers-color-scheme: dark/);
+  });
 });
