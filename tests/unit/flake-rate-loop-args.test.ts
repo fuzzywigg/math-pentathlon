@@ -142,6 +142,98 @@ describe('flake-rate loop early --help (q-mp-893)', () => {
   });
 });
 
+describe('flake-rate loop duplicate value flags (q-mp-1353)', () => {
+  it('unit loop rejects duplicate --runs with exit 2 before spawning', () => {
+    const out = mkdtempSync(join(tmpdir(), 'flake-unit-dup-runs-'));
+    try {
+      const result = runScript(UNIT_LOOP, [
+        '--runs',
+        '2',
+        '--runs',
+        '9',
+        '--shuffle',
+        '1',
+        '--out',
+        out,
+      ]);
+      expect(result.status).toBe(2);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Duplicate --runs/);
+      expect(combined).toMatch(/Usage:/i);
+      expect(existsSync(join(out, 'unit-summary.json'))).toBe(false);
+      expect(combined).not.toMatch(/\[flake-rate\] starting/);
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
+  });
+
+  it('unit loop rejects duplicate --out with exit 2 before spawning', () => {
+    const out = mkdtempSync(join(tmpdir(), 'flake-unit-dup-out-'));
+    try {
+      const result = runScript(UNIT_LOOP, [
+        '--runs',
+        '1',
+        '--shuffle',
+        '1',
+        '--out',
+        out,
+        '--out',
+        `${out}-b`,
+      ]);
+      expect(result.status).toBe(2);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Duplicate --out/);
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/\[flake-rate\] starting/);
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
+  });
+
+  it('e2e loop rejects duplicate --runs with exit 2 before spawning', () => {
+    const out = mkdtempSync(join(tmpdir(), 'flake-e2e-dup-runs-'));
+    try {
+      const result = runScript(E2E_LOOP, [
+        '--runs',
+        '2',
+        '--runs',
+        '9',
+        '--out',
+        out,
+      ]);
+      expect(result.status).toBe(2);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Duplicate --runs/);
+      expect(combined).toMatch(/Usage:/i);
+      expect(existsSync(join(out, 'e2e-summary.json'))).toBe(false);
+      expect(combined).not.toMatch(/\[flake-rate-e2e\] starting/);
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
+  });
+
+  it('e2e loop rejects duplicate --out with exit 2 before spawning', () => {
+    const out = mkdtempSync(join(tmpdir(), 'flake-e2e-dup-out-'));
+    try {
+      const result = runScript(E2E_LOOP, [
+        '--runs',
+        '1',
+        '--out',
+        out,
+        '--out',
+        `${out}-b`,
+      ]);
+      expect(result.status).toBe(2);
+      const combined = `${result.stdout}${result.stderr}`;
+      expect(combined).toMatch(/Duplicate --out/);
+      expect(combined).toMatch(/Usage:/i);
+      expect(combined).not.toMatch(/\[flake-rate-e2e\] starting/);
+    } finally {
+      rmSync(out, { recursive: true, force: true });
+    }
+  });
+});
+
 describe('flake-rate loop --help anywhere in argv (q-mp-970)', () => {
   for (const [script, label] of [
     [UNIT_LOOP, 'unit'],
