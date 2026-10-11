@@ -289,7 +289,15 @@ function rgFiles(pattern, extraPaths = []) {
 function rgLines(pattern) {
   const r = spawnSync(
     'rg',
-    ['-n', '--glob', '!node_modules', '--glob', '!dist', pattern, ...RG_PATHS],
+    [
+      '-n',
+      '--glob',
+      '!node_modules',
+      '--glob',
+      '!dist',
+      pattern,
+      ...RG_PATHS,
+    ],
     { cwd: ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }
   );
   if (r.status !== 0 && r.status !== 1) return [];
@@ -302,12 +310,16 @@ function rgLines(pattern) {
 function runKnip() {
   // Pinned via npx (not a lockfile dep): knip→fast-glob→micromatch→braces
   // currently fails npm audit; keep the app lockfile at 0 vulnerabilities.
-  const r = spawnSync('npx', ['--yes', 'knip@5.88.1', '--reporter', 'json'], {
-    cwd: ROOT,
-    encoding: 'utf8',
-    maxBuffer: 32 * 1024 * 1024,
-    shell: process.platform === 'win32',
-  });
+  const r = spawnSync(
+    'npx',
+    ['--yes', 'knip@5.88.1', '--reporter', 'json'],
+    {
+      cwd: ROOT,
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024,
+      shell: process.platform === 'win32',
+    }
+  );
   const raw = (r.stdout || '').trim();
   if (!raw) {
     return {
@@ -447,11 +459,7 @@ function runDepcheck() {
     if (start < 0) return { dependencies: [], devDependencies: [] };
     return JSON.parse(r.stdout.slice(start));
   } catch {
-    return {
-      dependencies: [],
-      devDependencies: [],
-      error: 'depcheck parse fail',
-    };
+    return { dependencies: [], devDependencies: [], error: 'depcheck parse fail' };
   }
 }
 
@@ -537,9 +545,7 @@ function verifyCandidate(cand) {
       /-p[12]$/.test(cand.symbol) ||
       cand.symbol.includes('path-p')
     ) {
-      evidence.push(
-        'note: may be built via template literal — check className patterns'
-      );
+      evidence.push('note: may be built via template literal — check className patterns');
     }
   } else if (cand.path) {
     const base = path.basename(cand.path);
@@ -550,9 +556,7 @@ function verifyCandidate(cand) {
         f !== cand.path &&
         !f.startsWith('docs/') &&
         // Prefer real imports of this helper module
-        (f.startsWith('tests/') ||
-          f.startsWith('scripts/') ||
-          f.startsWith('src/'))
+        (f.startsWith('tests/') || f.startsWith('scripts/') || f.startsWith('src/'))
     );
     // For helper modules, require import-shaped reference to the stem path
     if (cand.kind === 'test-helper-module' || cand.kind === 'file') {
@@ -588,7 +592,9 @@ function verifyCandidate(cand) {
       registryHit = true;
       evidence.push(`registry: game id '${gameId}' is registered`);
     }
-    const needle = cand.path.replace(/^src\//, '').replace(/\.ts$/, '');
+    const needle = cand.path
+      .replace(/^src\//, '')
+      .replace(/\.ts$/, '');
     if (
       dynamicImports.some(
         (d) => d.includes(needle) || dynamicImportHitsGameId(d, gameId)
@@ -616,10 +622,7 @@ function rankCandidate(cand, verification) {
       reason: 'tip-fold keeper after #497 (intentional export surface)',
     };
   }
-  if (
-    cand.kind === 'file' &&
-    /^(src\/games\/|public\/|tests\/)/.test(cand.path)
-  ) {
+  if (cand.kind === 'file' && /^(src\/games\/|public\/|tests\/)/.test(cand.path)) {
     return {
       rank: 4,
       safeToRemove: 'no',
@@ -659,8 +662,7 @@ function rankCandidate(cand, verification) {
     return {
       rank: 3,
       safeToRemove: 'review',
-      reason:
-        'exported type unused outside module — often intentional public API',
+      reason: 'exported type unused outside module — often intentional public API',
     };
   }
   if (cand.kind === 'export' && verification.externalRefs === 0) {
@@ -682,8 +684,7 @@ function rankCandidate(cand, verification) {
       return {
         rank: 2,
         safeToRemove: 'yes',
-        reason:
-          'barrel re-export unused by importers (keep implementation module)',
+        reason: 'barrel re-export unused by importers (keep implementation module)',
       };
     }
     return {
@@ -757,7 +758,10 @@ function rankCandidate(cand, verification) {
 }
 
 function scanCssClasses() {
-  const cssFiles = walk(path.join(ROOT, 'src'), (p) => p.endsWith('.css'));
+  const cssFiles = walk(
+    path.join(ROOT, 'src'),
+    (p) => p.endsWith('.css')
+  );
   /** @type {Map<string, string[]>} */
   const defined = new Map();
   const classRe = /(?<![0-9A-Za-z_-])\.([A-Za-z_][A-Za-z0-9_-]*)/g;
@@ -785,9 +789,7 @@ function scanCssClasses() {
   /** @type {Array<{kind:string,path:string,symbol:string}>} */
   const unused = [];
   for (const [cls, origins] of [...defined.entries()].sort()) {
-    const re = new RegExp(
-      `\\b${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`
-    );
+    const re = new RegExp(`\\b${cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`);
     let found = false;
     for (const { text } of corpus) {
       if (re.test(text)) {
@@ -873,8 +875,7 @@ function scanTestHelpers() {
   const helpers = walk(path.join(ROOT, 'tests'), (p) => {
     const rel = relRoot(p);
     if (!/\.(ts|mjs)$/.test(p)) return false;
-    if (/\.test\.(ts|mjs)$/.test(p) || /\.spec\.(ts|mjs)$/.test(p))
-      return false;
+    if (/\.test\.(ts|mjs)$/.test(p) || /\.spec\.(ts|mjs)$/.test(p)) return false;
     return (
       /\/helpers\//.test(rel) ||
       /helpers?\.ts$/.test(rel) ||
@@ -1167,22 +1168,12 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('');
   lines.push('## Method');
   lines.push('');
-  lines.push(
-    '1. `knip@5.88.1` with committed `knip.json` (HTML + `src/main.ts` + game workers + scripts/tests/docs entries so dynamic game mounts stay reachable).'
-  );
+  lines.push('1. `knip@5.88.1` with committed `knip.json` (HTML + `src/main.ts` + game workers + scripts/tests/docs entries so dynamic game mounts stay reachable).');
   lines.push('2. `depcheck` for unused `dependencies` / `devDependencies`.');
-  lines.push(
-    '3. CSS class scan across `src/**/*.css` vs TS/HTML corpus (templates checked in ranking).'
-  );
-  lines.push(
-    '4. Feature-flag catalog from `feature-flags` / `settings-flags` / `url-flags` / `tablet-gl`.'
-  );
-  lines.push(
-    '5. Test-helper module + export reachability (including side-effect imports).'
-  );
-  lines.push(
-    '6. Every candidate verified with `rg` plus game-registry / dynamic-import checks (`game-route-mounts`, `game-prefetch`, `main`).'
-  );
+  lines.push('3. CSS class scan across `src/**/*.css` vs TS/HTML corpus (templates checked in ranking).');
+  lines.push('4. Feature-flag catalog from `feature-flags` / `settings-flags` / `url-flags` / `tablet-gl`.');
+  lines.push('5. Test-helper module + export reachability (including side-effect imports).');
+  lines.push('6. Every candidate verified with `rg` plus game-registry / dynamic-import checks (`game-route-mounts`, `game-prefetch`, `main`).');
   lines.push('');
   lines.push('## Executed removals (this PR)');
   lines.push('');
@@ -1193,7 +1184,9 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('| Disposition | Kind | Path / symbol | Action |');
   lines.push('| --- | --- | --- | --- |');
   for (const r of summary.executedRemovalRows || []) {
-    const sym = r.symbol ? `\`${r.path}\` → \`${r.symbol}\`` : `\`${r.path}\``;
+    const sym = r.symbol
+      ? `\`${r.path}\` → \`${r.symbol}\``
+      : `\`${r.path}\``;
     lines.push(
       `| removed | ${r.kind} | ${sym} | ${(r.note || '').replace(/\|/g, '\\|')} |`
     );
@@ -1202,7 +1195,9 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('## Defer — do not redo');
   lines.push('');
   if (summary.deferPrs.length === 0) {
-    lines.push('No open PRs currently listed as adjacent cleanup blockers.');
+    lines.push(
+      'No open PRs currently listed as adjacent cleanup blockers.'
+    );
   } else {
     for (const d of summary.deferPrs) {
       lines.push(`- PR #${d.pr} (${d.topic}): ${d.note}`);
@@ -1212,7 +1207,9 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('### Historical (not open blockers)');
   lines.push('');
   for (const d of summary.deferHistoryNotes || []) {
-    lines.push(`- PR #${d.pr} **${d.state}** (${d.topic}): ${d.note}`);
+    lines.push(
+      `- PR #${d.pr} **${d.state}** (${d.topic}): ${d.note}`
+    );
   }
   lines.push('');
   lines.push('## Registry / dynamic imports');
@@ -1236,9 +1233,7 @@ function renderMarkdown(summary, rows, dynamicImports) {
   const deps = summary.depcheckUnused.dependencies;
   const devDeps = summary.depcheckUnused.devDependencies;
   if (deps.length === 0 && devDeps.length === 0) {
-    lines.push(
-      'No unused direct `dependencies` or `devDependencies` (depcheck).'
-    );
+    lines.push('No unused direct `dependencies` or `devDependencies` (depcheck).');
   } else {
     lines.push(`- dependencies: ${deps.join(', ') || '(none)'}`);
     lines.push(`- devDependencies: ${devDeps.join(', ') || '(none)'}`);
@@ -1247,15 +1242,11 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('## Ranked removal list (remaining)');
   lines.push('');
   lines.push('Rank 1 = strongest removal candidate; Rank 4 = keep.');
-  lines.push(
-    '**Safe-to-remove** applies to the *symbol/rule* unless `kind=file`.'
-  );
+  lines.push('**Safe-to-remove** applies to the *symbol/rule* unless `kind=file`.');
   lines.push(
     '**Disposition:** `removed` (this PR) / `deferred` (safe test-helper export — leave for adoption batches) / `kept` (do not remove).'
   );
-  lines.push(
-    'This PR does **not** delete games, assets, or tests. File deletion only when `kind=file` and safe-to-remove=yes.'
-  );
+  lines.push('This PR does **not** delete games, assets, or tests. File deletion only when `kind=file` and safe-to-remove=yes.');
   lines.push('');
   lines.push(
     '| Rank | Safe? | Disposition | Kind | Path / symbol | Evidence | Reason |'
@@ -1282,9 +1273,7 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('npm run report:dead-code');
   lines.push('```');
   lines.push('');
-  lines.push(
-    'Artifacts: `docs/dev/dead-code-inventory.md`, `docs/dev/dead-code-inventory.json`.'
-  );
+  lines.push('Artifacts: `docs/dev/dead-code-inventory.md`, `docs/dev/dead-code-inventory.json`.');
   lines.push('');
   return lines.join('\n');
 }
