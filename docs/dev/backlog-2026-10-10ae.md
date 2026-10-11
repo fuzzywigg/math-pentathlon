@@ -223,8 +223,8 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **depends-on:** none
 - **series:** e2e-config
 - **verdict:** **SAFE** — dead filename token in a match/ignore regex; live file is `tests/e2e/mobile-touch-smoke.spec.ts`; **no** project renames / CI check-name edits
-- **target files:** `playwright.config.ts` (header comment + regex ~L48 that still lists `mobile-viewport-smoke.spec.ts`)
-- **measured baseline:** `ls tests/e2e/mobile*.spec.ts` → only `mobile-touch-smoke.spec.ts`. Config regex still alternates `mobile-viewport-smoke\.spec\.ts`. Projects `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad` already `testMatch` the touch-smoke file.
+- **target files:** `playwright.config.ts` (header comment + regex ~L48 that still lists the stale mobile-viewport-smoke.spec.ts token)
+- **measured baseline:** `ls tests/e2e/mobile*.spec.ts` → only `tests/e2e/mobile-touch-smoke.spec.ts`. Config regex still alternates `mobile-viewport-smoke\.spec\.ts`. Projects `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad` already `testMatch` the touch-smoke file.
 - **acceptance criteria:** Stale filename removed from regex (and comment if present); `npm run test:e2e:mobile -- --list` still lists the same case count; no CI job renames.
 - **verification commands:** `rg -n 'mobile-viewport-smoke|mobile-touch-smoke' playwright.config.ts` ; `npm run test:e2e:mobile -- --list`
 - **conflict notes:** docs fix for the same rename is `849` (parallel).
@@ -239,7 +239,7 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs only; demonstrably disagrees with `playwright.config.ts` + `package.json`
 - **target files:** `docs/mobile-audit-2026-10-07.md` (§ Smoke e2e)
-- **measured baseline:** Doc claims `tests/e2e/mobile-viewport-smoke.spec.ts` via projects `mobile-iphone-se` and `mobile-pixel-7`, and that CI runs both alongside `chromium`. Live: file is `mobile-touch-smoke.spec.ts`; projects are `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`; CI report-only job uses `npm run test:e2e:mobile` (not chromium project).
+- **measured baseline:** Doc claims the stale mobile-viewport-smoke.spec.ts path via projects `mobile-iphone-se` and `mobile-pixel-7`, and that CI runs both alongside `chromium`. Live: file is `tests/e2e/mobile-touch-smoke.spec.ts`; projects are `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`; CI report-only job uses `npm run test:e2e:mobile` (not chromium project).
 - **acceptance criteria:** Doc paths/project names match live config; prefer `npm run test:e2e:mobile` as the reproduce command; no Playwright config edits in this ticket (see `848`); no count-stamp theater.
 - **verification commands:** `rg -n 'mobile-viewport-smoke|mobile-iphone-se|mobile-touch-smoke|test:e2e:mobile' docs/mobile-audit-2026-10-07.md playwright.config.ts package.json` ; `ls tests/e2e/mobile*.spec.ts`
 - **conflict notes:** parallel with `848`.
@@ -254,12 +254,12 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs path correction only; **no** AI search/scoring/difficulty/timing product edits; **no** fake-clock retargets; Hex Hard 450ms untouched
 - **target files:** `docs/ai-determinism-2026-10-07.md` (Tests live in… + reproduce command)
-- **measured baseline:** Doc lists `tests/unit/ai-determinism-2026-10-07.test.ts` (missing) and `npx vitest run tests/unit/ai-determinism-2026-10-07.test.ts`. Live shards: `ai-determinism-shard-a`…`e.test.ts` + `ai-determinism-helpers.ts` / `ai-determinism-harness.ts`.
+- **measured baseline:** Doc lists the removed monolith `tests/unit/ai-determinism-2026-10-07.test.ts (missing)` and a matching `npx vitest run` line. Live shards: `tests/unit/ai-determinism-shard-a.test.ts`…`e.test.ts` + `tests/unit/ai-determinism-helpers.ts` / `tests/unit/ai-determinism-harness.ts`.
 - **acceptance criteria:** Doc references the live helper/harness/shard files; reproduce command uses an existing path (or `npm run test:unit -- tests/unit/ai-determinism-shard-a.test.ts` sample); no AI assert / seed / clock semantic changes; no `src/games/**/ai*.ts` edits.
 - **verification commands:** `ls tests/unit/ai-determinism*.ts` ; `rg -n 'ai-determinism-2026-10-07\.test|shard-|helpers|harness' docs/ai-determinism-2026-10-07.md`
 - **conflict notes:** tip-owner glance for AI-doc adjacency; do not touch calibration benches.
 
-### q-mp-851 · Docs: web-security sinks — remove stale `src/core/hex/hex-ui.ts` rows
+### q-mp-851 · Docs: web-security sinks — remove stale `src/core/hex/hex-ui.ts (removed)` rows
 
 - **repo:** `fuzzywigg/math-pentathlon`
 - **priority:** P2 docs
@@ -268,9 +268,9 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **depends-on:** none
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs only; **do not** convert hex `innerHTML = ''` to `clearElement` in product code (out of scope / possible DOM behavior change)
-- **target files:** `docs/web-security-burn-1008-sinks.md` (table rows naming `src/core/hex/hex-ui.ts` — appears twice)
-- **measured baseline:** `src/core/hex/` has no `hex-ui.ts` (dir listing is empty / N/A — hex UI lives under `src/games/hex/board-ui.ts`). Catch-all row `src/games/*/board-ui.ts + game-controller.ts` already covers games. Stale absolute path fails `check:dev-docs` once scope expands (`857`).
-- **acceptance criteria:** Stale `hex-ui.ts` rows removed or rewritten to the live games path **without** claiming a `clearElement` conversion that is not present; other table paths left alone unless also missing; no `src/` edits.
+- **target files:** `docs/web-security-burn-1008-sinks.md` (table rows naming `src/core/hex/hex-ui.ts (removed)` — appears twice)
+- **measured baseline:** `src/core/hex/` has no hex-ui.ts (dir listing is empty / N/A — hex UI lives under `src/games/hex/board-ui.ts`). Catch-all row `src/games/*/board-ui.ts + game-controller.ts` already covers games. Stale absolute path fails `check:dev-docs` once scope expands (`857`).
+- **acceptance criteria:** Stale hex-ui.ts rows removed or rewritten to the live games path **without** claiming a `clearElement` conversion that is not present; other table paths left alone unless also missing; no `src/` edits.
 - **verification commands:** `ls src/core/hex src/games/hex/board-ui.ts` ; `rg -n 'hex-ui|games/hex/board-ui' docs/web-security-burn-1008-sinks.md`
 - **conflict notes:** none.
 
@@ -283,8 +283,8 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **depends-on:** none
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs-only path fix under `docs/mp3d/`; **no** board-3d **src** and **no** mp3d **e2e** edits
-- **target files:** `docs/mp3d/spec-kings-quadraphages.md` (Sources read line + any `src/ui/board/kings-quadraphages/board-ui.ts` mentions)
-- **measured baseline:** Spec cites `src/ui/board/kings-quadraphages/board-ui.ts`. Live file: `src/games/kings-quadraphages/board-ui.ts`. `src/ui/board/kings-quadraphages/` does not exist.
+- **target files:** `docs/mp3d/spec-kings-quadraphages.md` (Sources read line + any `src/ui/board/kings-quadraphages/board-ui.ts (stale)` mentions)
+- **measured baseline:** Spec cites `src/ui/board/kings-quadraphages/board-ui.ts (stale)`. Live file: `src/games/kings-quadraphages/board-ui.ts`. The `src/ui/board/kings-quadraphages/` tree does not exist.
 - **acceptance criteria:** Spec paths resolve on disk; no Three/board-3d source or e2e changes; no gameplay copy edits.
 - **verification commands:** `ls src/games/kings-quadraphages/board-ui.ts` ; `rg -n 'board-ui\.ts|src/ui/board' docs/mp3d/spec-kings-quadraphages.md`
 - **conflict notes:** prompt forbids board-3d src / mp3d e2e — this ticket is markdown only.
@@ -329,7 +329,7 @@ $ Open drafts into cursor/mp-tip-post1083 at audit: #1136–#1142 (round-30 impl
 - **series:** docs-accuracy
 - **verdict:** **SAFE** — docs only; Queens & Guards product work not in scope — path retarget to surviving `tests/e2e/queens-guards-playability.spec.ts` / `tests/e2e/contig-60-playability.spec.ts` only
 - **target files:** `docs/playtest/contig-60-deep-2026-10-07.md`, `docs/playtest/fraction-pinball-deep-2026-10-07.md`, `docs/playtest/queens-guards-deep-2026-10-07.md`, `docs/STANDALONE-TRIAGE-2026-10-07.md` (hex-deep-playability mention)
-- **measured baseline:** Contig cites missing ai-timer-generation + deep-playtest-ux units (survivor e2e: `contig-60-playability.spec.ts`). Fraction-pinball cites three missing paths (no survivor deep e2e). Queens cites missing touch-aria unit (survivor e2e playability). STANDALONE-TRIAGE still backticks missing `tests/unit/hex-deep-playability.test.ts`.
+- **measured baseline:** Contig cites missing ai-timer-generation + deep-playtest-ux units (survivor e2e: `tests/e2e/contig-60-playability.spec.ts`). Fraction-pinball cites three missing paths (no survivor deep e2e). Queens cites missing touch-aria unit (survivor e2e playability). STANDALONE-TRIAGE still backticks missing `tests/unit/hex-deep-playability.test.ts (absent)` — tip note already marks it historical; Hex Hard stays **450ms** in `src/games/hex/ai.ts`.
 - **acceptance criteria:** Broken paths fixed or historical; prefer surviving playability e2e where real; no Queens product / AI / mp3d e2e edits; Hex Hard 450ms note in STANDALONE-TRIAGE stays consistent with tip (450, not 2500).
 - **verification commands:** `ls tests/e2e/contig-60-playability.spec.ts tests/e2e/queens-guards-playability.spec.ts` ; `rg -n 'hex-deep-playability|fraction-pinball-deep|queens-guards-touch' docs/playtest docs/STANDALONE-TRIAGE-2026-10-07.md`
 - **conflict notes:** parallel with `853`/`854`.

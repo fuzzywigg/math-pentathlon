@@ -160,10 +160,10 @@ Open drafts into `cursor/mp-tip-post1059` at audit: `#1084`–`#1121` + tip-fold
 - **depends-on:** fold or co-land of `792` (eqeqeq must be in the shared overlay first)
 - **series:** script-tooling
 - **verdict:** **SAFE** — non-src refactor; single source of truth for the ceiling probe; behavior preserved
-- **target files:** new shared module under `scripts/` (e.g. `scripts/lint-ratchet-probe.mjs` or `scripts/lib/…`); update `scripts/check-lint-ratchet.mjs` + `scripts/report-lint-buckets.mjs` to import it; touch `docs/dev/lint-bucket-report.md` path refs if needed
+- **target files:** new shared module under `scripts/` (e.g. extract from live `scripts/check-lint-ratchet.mjs` into `scripts/lib/…`); update `scripts/check-lint-ratchet.mjs` + `scripts/report-lint-buckets.mjs` to import it; touch `docs/dev/lint-bucket-report.md` path refs if needed
 - **measured baseline:** Two nearly identical `probeSource` template strings; buckets already drifted once (missing eqeqeq). Help text in both claims they stay in sync.
 - **acceptance criteria:** One shared probe builder; both scripts import it; `lint:ratchet` green; `report:lint-buckets -- --rule eqeqeq` matches ratchet totals; no ceiling number edits; no `src/` edits.
-- **verification commands:** `npm run lint:ratchet` ; `npm run report:lint-buckets -- --rule eqeqeq` ; `npm run report:lint-buckets -- --json` ; `rg -n 'probeSource|lint-ratchet-probe' scripts/`
+- **verification commands:** `npm run lint:ratchet` ; `npm run report:lint-buckets -- --rule eqeqeq` ; `npm run report:lint-buckets -- --json` ; `rg -n 'probeSource|check-lint-ratchet' scripts/`
 - **conflict notes:** after `792`; no CI workflow edits.
 
 ### q-mp-794 · Docs: `a11y-sweep` reproduce → prefer `test:e2e:chromium`
