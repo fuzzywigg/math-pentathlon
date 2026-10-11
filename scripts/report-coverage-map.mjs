@@ -14,6 +14,9 @@
  *
  * Optional path:
  *   node scripts/report-coverage-map.mjs path/to/coverage-summary.json
+ *
+ * CLI (q-mp-906): `--help`/`-h` exit 0 with usage; args starting with `-`
+ * are rejected (exit 2) before path lookup — never treat `--help` as a path.
  */
 
 import fs from 'node:fs';
@@ -26,6 +29,48 @@ const ROOT = path.resolve(__dirname, '..');
 export const DEFAULT_SUMMARY = 'coverage/coverage-summary.json';
 export const OUT_SVG = 'docs/dev/coverage-map.svg';
 export const OUT_MD = 'docs/dev/coverage-map.md';
+
+export const USAGE = `Usage: node scripts/report-coverage-map.mjs [coverage-summary.json]
+
+Options:
+  -h, --help    Show this help and exit 0
+
+Reads vitest json-summary (default: coverage/coverage-summary.json) and writes
+docs/dev/coverage-map.{md,svg}. Flag-like argv is rejected before path lookup.
+`;
+
+/**
+ * Parse CLI argv (slice(2) form). Hermetic — no I/O, no process.exit (q-mp-906).
+ *
+ * @param {string[]} argv
+ * @returns {{
+ *   ok: true,
+ *   help: boolean,
+ *   summaryPath: string | undefined,
+ * } | {
+ *   ok: false,
+ *   message: string,
+ * }}
+ */
+export function parseArgs(argv) {
+  let help = false;
+  /** @type {string | undefined} */
+  let summaryPath;
+  for (const a of argv) {
+    if (a === '--help' || a === '-h') {
+      help = true;
+      continue;
+    }
+    if (a.startsWith('-')) {
+      return { ok: false, message: `Unknown flag: ${a}` };
+    }
+    if (summaryPath !== undefined) {
+      return { ok: false, message: `Unexpected argument: ${a}` };
+    }
+    summaryPath = a;
+  }
+  return { ok: true, help, summaryPath };
+}
 
 /**
  * @typedef {{ total: number, covered: number, skipped?: number, pct: number }} CovMetric
@@ -458,9 +503,19 @@ export function writeReport(opts = {}) {
 }
 
 function main() {
-  const argPath = process.argv[2];
+  const parsed = parseArgs(process.argv.slice(2));
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error(USAGE.trimEnd());
+    process.exitCode = 2;
+    return;
+  }
+  if (parsed.help) {
+    console.log(USAGE.trimEnd());
+    return;
+  }
   const { rows, svgPath, mdPath, summaryPath } = writeReport({
-    summaryPath: argPath,
+    summaryPath: parsed.summaryPath,
   });
   console.log(
     `report:coverage-map — ${rows.length} director${rows.length === 1 ? 'y' : 'ies'} from ${path.relative(ROOT, summaryPath)}`
