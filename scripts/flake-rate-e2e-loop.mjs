@@ -102,6 +102,49 @@ fs.mkdirSync(outDir, { recursive: true });
 const byTest = new Map();
 const runSummaries = [];
 
+/**
+ * Recurse Playwright JSONReportSuite trees (file → describe → specs).
+ * Top-level-only reports (specs on the root suite, no nested suites) stay unchanged.
+ * @param {object} suite
+ * @param {string} inheritedFile
+ * @param {{ passed: number, failed: number }} counts
+ */
+function walkSuite(suite, inheritedFile, counts) {
+  const file = suite.file || suite.title || inheritedFile || '';
+  for (const spec of suite.specs || []) {
+    const full = `${file}::${spec.title}`;
+    for (const t of spec.tests || []) {
+      for (const r of t.results || []) {
+        if (!byTest.has(full))
+          byTest.set(full, {
+            passes: 0,
+            fails: 0,
+            durations: [],
+            errors: [],
+          });
+        const rec = byTest.get(full);
+        rec.durations.push(r.duration || 0);
+        if (r.status === 'passed' || r.status === 'expected') {
+          rec.passes += 1;
+          counts.passed += 1;
+        } else if (
+          r.status === 'failed' ||
+          r.status === 'timedOut' ||
+          r.status === 'unexpected'
+        ) {
+          rec.fails += 1;
+          counts.failed += 1;
+          const msg = r.error?.message || r.errors?.[0]?.message || r.status;
+          if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
+        }
+      }
+    }
+  }
+  for (const child of suite.suites || []) {
+    walkSuite(child, file, counts);
+  }
+}
+
 function ingest(jsonPath, runId) {
   const loaded = readReporterJson(jsonPath);
   if (!loaded.ok) {
@@ -109,46 +152,11 @@ function ingest(jsonPath, runId) {
     return;
   }
   const data = loaded.data;
-  let passed = 0;
-  let failed = 0;
+  const counts = { passed: 0, failed: 0 };
   for (const suite of data.suites || []) {
-    const file = suite.file || suite.title || '';
-    for (const spec of suite.specs || []) {
-      const title = [
-        ...(spec.tests?.[0]?.projectName ? [] : []),
-        spec.title,
-      ].join(' ');
-      const full = `${file}::${spec.title}`;
-      for (const t of spec.tests || []) {
-        for (const r of t.results || []) {
-          if (!byTest.has(full))
-            byTest.set(full, {
-              passes: 0,
-              fails: 0,
-              durations: [],
-              errors: [],
-            });
-          const rec = byTest.get(full);
-          rec.durations.push(r.duration || 0);
-          if (r.status === 'passed' || r.status === 'expected') {
-            rec.passes += 1;
-            passed += 1;
-          } else if (
-            r.status === 'failed' ||
-            r.status === 'timedOut' ||
-            r.status === 'unexpected'
-          ) {
-            rec.fails += 1;
-            failed += 1;
-            const msg = r.error?.message || r.errors?.[0]?.message || r.status;
-            if (rec.errors.length < 3)
-              rec.errors.push(String(msg).slice(0, 400));
-          }
-        }
-      }
-      void title;
-    }
+    walkSuite(suite, '', counts);
   }
+  const { passed, failed } = counts;
   // Playwright JSON has stats
   const ok = (data.stats?.unexpected ?? failed) === 0 && failed === 0;
   runSummaries.push({
