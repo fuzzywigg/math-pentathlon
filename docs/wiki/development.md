@@ -60,7 +60,7 @@ npm run report:licenses          # dependency license + SBOM-style report (local
 npm run report:ratchet-history   # rewrite ratchet ceiling history md/svg (local; not CI)
 npm run mutation:report          # report-only rules-engine mutation harness (local; not CI)
 npm run perf:runtime             # runtime AI/move timing probe
-                                 # PERF_MODE=render → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
+npm run perf:runtime:render      # PERF_MODE=render wrap → tablet/CPU4× RENDER/INPUT report (docs/dev/render-perf-2026-10.md)
 npm run perf:render              # render/input latency harness (scripts/render-perf.mjs; docs/dev/render-perf-2026-10.md)
 npm run audit:memory             # heap / detach probe across game mounts
 npm run audit:console            # console error/warn/pageerror sweep across games (local; not CI)
