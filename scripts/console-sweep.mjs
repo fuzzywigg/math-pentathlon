@@ -48,7 +48,7 @@ const GAMES = [
   'fraction-pinball',
 ];
 
-const BASE = process.env.BASE_URL || 'http://localhost:5173';
+const BASE = process.env.BASE_URL || 'http://127.0.0.1:5173';
 const OUT = process.env.SWEEP_OUT || artifactPath('console-sweep-raw.json');
 
 /**
