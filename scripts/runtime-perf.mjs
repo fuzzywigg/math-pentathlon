@@ -27,8 +27,8 @@ import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
 import {
-  CPU_THROTTLE,
-  MOVE_TARGET_RENDER,
+  getCpuThrottle,
+  getMoveTargetRender,
   finalizeGameResult,
   installRenderObservers,
   measureHoverCosts,
@@ -61,11 +61,14 @@ const PERF_DATE = process.env.PERF_DATE || '2026-10-07';
 const REPORT_MD = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.md`);
 const REPORT_JSON = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.json`);
 
+// Env validated after --help (q-mp-1000): render-perf-mode accessors are lazy;
+// non-render PERF_MOVES / NAV / FRAME still resolve here post-CLI.
 const MOVE_TARGET = RENDER_MODE
-  ? MOVE_TARGET_RENDER
+  ? getMoveTargetRender()
   : requireEnvNumber('PERF_MOVES', 30);
 const NAV_CYCLES = requireEnvNumber('PERF_NAV_CYCLES', 5);
 const FRAME_SAMPLE_MS = requireEnvNumber('PERF_FRAME_MS', 2000);
+const CPU_THROTTLE = RENDER_MODE ? getCpuThrottle() : 1;
 const PERF_PHASE = process.env.PERF_PHASE || 'baseline';
 
 const BOARD3D_GAMES = new Set([
