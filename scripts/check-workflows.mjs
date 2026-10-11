@@ -43,14 +43,19 @@ function isObject(value) {
 }
 
 /**
- * js-yaml keeps quoted scalars (`"true"` / `"false"`) as strings. Accept the
- * boolean or the case-sensitive string spellings used in GHA YAML.
+ * js-yaml (YAML 1.2 / JSON schema) keeps YAML 1.1 bool tokens (`yes` / `on` /
+ * `no` / `off`, any case) and quoted `"true"` / `"false"` as strings. Accept
+ * native booleans, the case-sensitive quoted `"true"` / `"false"` spellings
+ * (q-mp-1078), and YAML 1.1-style yes/on/no/off (q-mp-1097).
  *
  * @param {unknown} value
  * @returns {boolean}
  */
 export function isYamlTrue(value) {
-  return value === true || value === 'true';
+  if (value === true || value === 'true') return true;
+  if (typeof value !== 'string') return false;
+  const token = value.toLowerCase();
+  return token === 'yes' || token === 'on';
 }
 
 /**
@@ -58,7 +63,10 @@ export function isYamlTrue(value) {
  * @returns {boolean}
  */
 export function isYamlFalse(value) {
-  return value === false || value === 'false';
+  if (value === false || value === 'false') return true;
+  if (typeof value !== 'string') return false;
+  const token = value.toLowerCase();
+  return token === 'no' || token === 'off';
 }
 
 /**
