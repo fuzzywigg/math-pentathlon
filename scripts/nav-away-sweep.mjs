@@ -6,17 +6,10 @@
  */
 import { chromium } from '@playwright/test';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { NAV_AWAY_SWEEP_USAGE } from './lib/browser-harness-script-usage.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
 
-const USAGE = `Usage: node scripts/nav-away-sweep.mjs
-
-Navigate-away sweep against a running dev server (default http://127.0.0.1:5173).
-Launches Playwright Chromium and walks the fixed game list.
-
-Options:
-  -h, --help       Show this help and exit (no browser launch)`;
-
-applyBrowserHarnessCli(process.argv.slice(2), USAGE);
+applyBrowserHarnessCli(process.argv.slice(2), NAV_AWAY_SWEEP_USAGE);
 
 const BASE = 'http://127.0.0.1:5173';
 const GAMES = [

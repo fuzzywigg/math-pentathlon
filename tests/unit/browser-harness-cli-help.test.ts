@@ -2,23 +2,20 @@
  * @vitest-environment node
  *
  * Hermetic coverage for browser harness early --help (q-mp-900).
+ * q-mp-1061: prefer in-process parse/usage; keep thin spawn smokes for wiring.
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
-import { parseBrowserHarnessArgs } from '../../scripts/lib/browser-harness-cli.mjs';
+import {
+  applyBrowserHarnessCli,
+  parseBrowserHarnessArgs,
+} from '../../scripts/lib/browser-harness-cli.mjs';
+import { HELP_ONLY_BROWSER_HARNESS_USAGES } from '../../scripts/lib/browser-harness-script-usage.mjs';
 import {
   mobileAuditOutUsage,
   resolveMobileAuditOutPath,
 } from '../../scripts/lib/mobile-audit-out-path.mjs';
-
-const HELP_ONLY_SCRIPTS = [
-  'scripts/console-sweep.mjs',
-  'scripts/nav-away-sweep.mjs',
-  'scripts/memory-leak-audit.mjs',
-  'scripts/runtime-perf.mjs',
-  'scripts/render-perf.mjs',
-] as const;
 
 function runScript(script: string, flag: string) {
   return spawnSync(process.execPath, [resolve(process.cwd(), script), flag], {
@@ -26,6 +23,50 @@ function runScript(script: string, flag: string) {
     timeout: 15_000,
     env: { ...process.env },
   });
+}
+
+type CliCapture = {
+  status: number | undefined;
+  stdout: string;
+  stderr: string;
+};
+
+/**
+ * Drive applyBrowserHarnessCli without leaving the process (exit is mocked).
+ */
+function captureApply(argv: string[], usage: string): CliCapture {
+  const logs: string[] = [];
+  const errs: string[] = [];
+  let status: number | undefined;
+  const origLog = console.log;
+  const origErr = console.error;
+  const origExit = process.exit;
+  console.log = (...args: unknown[]) => {
+    logs.push(args.map(String).join(' '));
+  };
+  console.error = (...args: unknown[]) => {
+    errs.push(args.map(String).join(' '));
+  };
+  process.exit = ((code?: number) => {
+    status = code ?? 0;
+    throw new Error(`__cli_exit__:${status}`);
+  }) as typeof process.exit;
+  try {
+    applyBrowserHarnessCli(argv, usage);
+  } catch (e) {
+    if (!(e instanceof Error && e.message.startsWith('__cli_exit__:'))) {
+      throw e;
+    }
+  } finally {
+    console.log = origLog;
+    console.error = origErr;
+    process.exit = origExit;
+  }
+  return {
+    status,
+    stdout: logs.join('\n'),
+    stderr: errs.join('\n'),
+  };
 }
 
 describe('parseBrowserHarnessArgs (q-mp-900)', () => {
@@ -50,10 +91,15 @@ describe('parseBrowserHarnessArgs (q-mp-900)', () => {
   });
 });
 
-describe('browser harness scripts early --help (q-mp-900)', () => {
-  for (const script of HELP_ONLY_SCRIPTS) {
+describe('browser harness scripts early --help (q-mp-900 / q-mp-1061)', () => {
+  for (const { script, usage } of HELP_ONLY_BROWSER_HARNESS_USAGES) {
+    it(`${script} usage mentions Usage + --help (in-process)`, () => {
+      expect(usage).toMatch(/Usage: node scripts\//);
+      expect(usage).toMatch(/-h, --help/);
+    });
+
     it(`${script} --help prints usage and exits 0 without browser launch`, () => {
-      const r = runScript(script, '--help');
+      const r = captureApply(['--help'], usage);
       expect(r.status).toBe(0);
       const text = `${r.stdout}\n${r.stderr}`;
       expect(text).toMatch(/Usage: node scripts\//);
@@ -63,7 +109,7 @@ describe('browser harness scripts early --help (q-mp-900)', () => {
     });
 
     it(`${script} --wat exits non-zero without browser launch`, () => {
-      const r = runScript(script, '--wat');
+      const r = captureApply(['--wat'], usage);
       expect(r.status).toBe(2);
       const text = `${r.stdout}\n${r.stderr}`;
       expect(text).toMatch(/Unknown flag: --wat/);
@@ -73,16 +119,40 @@ describe('browser harness scripts early --help (q-mp-900)', () => {
   }
 
   it('mobile-audit.mjs --help prints usage and exits 0 without browser launch', () => {
-    const r = runScript('scripts/mobile-audit.mjs', '--help');
-    expect(r.status).toBe(0);
-    const text = `${r.stdout}\n${r.stderr}`;
-    expect(text).toMatch(/Usage: node scripts\/mobile-audit\.mjs/);
-    expect(text).toMatch(/-h, --help/);
-    expect(text).toMatch(/--out/);
-    expect(text).not.toMatch(/browserType\.launch|Executable doesn't exist/i);
+    const usage = mobileAuditOutUsage();
+    expect(usage).toMatch(/Usage: node scripts\/mobile-audit\.mjs/);
+    expect(usage).toMatch(/-h, --help/);
+    expect(usage).toMatch(/--out/);
+    const parsed = resolveMobileAuditOutPath(
+      ['node', 'scripts/mobile-audit.mjs', '--help'],
+      resolve('/tmp', 'mobile-audit-default.json')
+    );
+    expect(parsed).toEqual({ ok: true, help: true });
   });
 
   it('mobile-audit.mjs --wat exits non-zero without browser launch', () => {
+    const parsed = resolveMobileAuditOutPath(
+      ['node', 'scripts/mobile-audit.mjs', '--wat'],
+      resolve('/tmp', 'mobile-audit-default.json')
+    );
+    expect(parsed).toEqual({ ok: false, message: 'Unknown flag: --wat' });
+    expect(mobileAuditOutUsage()).not.toMatch(
+      /browserType\.launch|Executable doesn't exist/i
+    );
+  });
+});
+
+describe('browser harness CLI spawn smoke (q-mp-1061)', () => {
+  it('console-sweep.mjs --help still wires applyBrowserHarnessCli', () => {
+    const r = runScript('scripts/console-sweep.mjs', '--help');
+    expect(r.status).toBe(0);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Usage: node scripts\/console-sweep\.mjs/);
+    expect(text).toMatch(/-h, --help/);
+    expect(text).not.toMatch(/browserType\.launch|Executable doesn't exist/i);
+  });
+
+  it('mobile-audit.mjs --wat still wires resolveMobileAuditOutPath', () => {
     const r = runScript('scripts/mobile-audit.mjs', '--wat');
     expect(r.status).toBe(2);
     const text = `${r.stdout}\n${r.stderr}`;

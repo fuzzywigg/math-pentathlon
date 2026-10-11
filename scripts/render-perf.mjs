@@ -29,19 +29,9 @@ import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { applyBrowserHarnessCli } from './lib/browser-harness-cli.mjs';
+import { RENDER_PERF_USAGE } from './lib/browser-harness-script-usage.mjs';
 
-const USAGE = `Usage: node scripts/render-perf.mjs
-
-Render / input latency harness (Playwright + CDP + Performance API).
-Prefer: npm run perf:render
-
-Options:
-  -h, --help       Show this help and exit (no browser launch)
-
-Env:
-  PERF_PHASE / PERF_GAMES / PERF_MOVES / PERF_CPU_RATE / PERF_BASE_URL`;
-
-applyBrowserHarnessCli(process.argv.slice(2), USAGE);
+applyBrowserHarnessCli(process.argv.slice(2), RENDER_PERF_USAGE);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
