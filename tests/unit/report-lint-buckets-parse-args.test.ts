@@ -1,8 +1,9 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for report-lint-buckets `--top` / `--rule` argv (q-mp-870).
- * Does not spawn the eslint probe (full report stays integration-only).
+ * Hermetic coverage for report-lint-buckets argv (q-mp-870 value hygiene;
+ * q-mp-943 unknown-flag rejection). Does not spawn the eslint probe (full
+ * report stays integration-only).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -68,6 +69,31 @@ describe('report-lint-buckets parseArgs (q-mp-870)', () => {
   });
 });
 
+describe('report-lint-buckets parseArgs unknown flags (q-mp-943)', () => {
+  it('rejects --wat', () => {
+    expect(parseArgs(['--wat'])).toEqual({
+      ok: false,
+      message: 'Unknown flag: --wat',
+    });
+  });
+
+  it('rejects --jason (typo for --json)', () => {
+    expect(parseArgs(['--jason'])).toEqual({
+      ok: false,
+      message: 'Unknown flag: --jason',
+    });
+  });
+
+  it('still accepts --help / -h without treating them as unknown', () => {
+    const help = parseArgs(['--help']);
+    expect(help.ok).toBe(true);
+    if (help.ok) expect(help.help).toBe(true);
+    const short = parseArgs(['-h']);
+    expect(short.ok).toBe(true);
+    if (short.ok) expect(short.help).toBe(true);
+  });
+});
+
 describe('report-lint-buckets.mjs CLI --top/--rule (q-mp-870)', () => {
   it('prints usage and exits non-zero for --top --json without running a text report', () => {
     const r = spawnSync(process.execPath, [SCRIPT, '--top', '--json'], {
@@ -80,5 +106,39 @@ describe('report-lint-buckets.mjs CLI --top/--rule (q-mp-870)', () => {
     expect(text).not.toMatch(/Lint bucket summary/);
     // Must not look like JSON payload either (flag was not eaten into a run).
     expect(text.trim().startsWith('{')).toBe(false);
+  });
+});
+
+describe('report-lint-buckets.mjs CLI unknown flags (q-mp-943)', () => {
+  it('--wat exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--wat'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Unknown flag: --wat/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+    expect(text.trim().startsWith('{')).toBe(false);
+  });
+
+  it('--jason exits 2 with usage before probing', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--jason'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Unknown flag: --jason/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+
+  it('--help exits 0 with usage and does not probe', () => {
+    const r = spawnSync(process.execPath, [SCRIPT, '--help'], {
+      encoding: 'utf8',
+    });
+    expect(r.status).toBe(0);
+    expect(r.stdout).toMatch(/Usage:/);
+    expect(r.stdout).not.toMatch(/Lint bucket summary/);
   });
 });
