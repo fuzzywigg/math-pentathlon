@@ -25,11 +25,20 @@ function makeDie(
   };
 }
 
+// unit-shared uses isolate:false — restore matchMedia so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1324).
+const originalMatchMedia = window.matchMedia;
+
 afterEach(() => {
   document.body.innerHTML = '';
   resetSettingsFlagsForTests();
   vi.useRealTimers();
   vi.restoreAllMocks();
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: originalMatchMedia,
+  });
 });
 
 describe('mutation-ui5 dice-ui', () => {
