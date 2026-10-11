@@ -39,6 +39,24 @@ describe('check-copy-pins + report-knip argv (q-mp-873)', () => {
     expect(text).not.toMatch(/tests scanned:/);
   });
 
+  it('check-copy-pins --fail --json does not claim reportOnly when findings force exit 1 (q-mp-1157)', () => {
+    const r = runScript(COPY_PINS, ['--fail', '--json']);
+    expect(r.status).toBe(1);
+    const payload = JSON.parse(r.stdout) as {
+      reportOnly: boolean;
+      findingCount: number;
+    };
+    expect(payload.findingCount).toBeGreaterThan(0);
+    expect(payload.reportOnly).toBe(false);
+  });
+
+  it('check-copy-pins --fail banner agrees with exit 1 when findings exist (q-mp-1157)', () => {
+    const r = runScript(COPY_PINS, ['--fail']);
+    expect(r.status).toBe(1);
+    expect(r.stdout).toMatch(/Fail mode: exit 1/);
+    expect(r.stdout).not.toMatch(/Report-only: exit 0/);
+  });
+
   it('report-knip rejects unknown flags with usage and exit 2', () => {
     const r = runScript(REPORT_KNIP, ['--wat']);
     expect(r.status).toBe(2);

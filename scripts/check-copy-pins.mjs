@@ -7,7 +7,8 @@
  *   - menu badge copy "Coming Soon"
  * plus other asserts that pin strings from those copy surfaces.
  *
- * Default: scan tests/, print findings, always exit 0 (not a CI gate).
+ * Default: scan tests/, print findings, exit 0 (report-only; not a blocking CI gate).
+ * Opt-in `--fail` exits 1 when findings exist. Unknown flags exit 2.
  *
  * Usage:
  *   npm run check:copy-pins
@@ -30,7 +31,7 @@ const TESTS_DIR = path.join(ROOT, 'tests');
 const MESSAGE_APIS = ['getPhaseMessage', 'getCurrentPhaseMessage'];
 /** Content matchers that can pin player-facing copy (incl. jest-dom / Playwright). */
 const MATCHER_RE =
-  /\.\s*(?:not\s*\.\s*)?(?:toBe|toEqual|toStrictEqual|toMatch|toContain|toHaveTextContent|toHaveAccessibleName|toHaveText)\s*\(/;
+  /\.\s*(?:not\s*\.\s*)?(?:toBeInTheDocument|toHaveAccessibleDescription|toHaveAccessibleName|toHaveTextContent|toHaveAttribute|toHaveValue|toHaveText|toBe|toEqual|toStrictEqual|toMatch|toContain)\s*\(/;
 const EXPECT_RE = /\bexpect\s*\(/;
 const COMING_SOON_LIT_RE = /(['"`])Coming Soon\1|\/Coming Soon\/[gimsuy]*/;
 /** How many lines after `expect(` to join for multi-line asserts. */
@@ -75,6 +76,43 @@ it('renders Coming Soon badge via jest-dom text matcher', () => {
     source: `
 it('pins Coming Soon accessible name', () => {
   expect(badge).toHaveAccessibleName('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toHaveAccessibleDescription',
+    path: 'virtual/jest-dom-toHaveAccessibleDescription.ts',
+    source: `
+it('pins Coming Soon accessible description', () => {
+  expect(badge).toHaveAccessibleDescription('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toHaveAttribute-coming-soon',
+    path: 'virtual/jest-dom-toHaveAttribute.ts',
+    source: `
+it('pins Coming Soon via aria-label attribute', () => {
+  expect(badge).toHaveAttribute('aria-label', 'Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toHaveValue-coming-soon',
+    path: 'virtual/jest-dom-toHaveValue.ts',
+    source: `
+it('pins Coming Soon via toHaveValue', () => {
+  expect(input).toHaveValue('Coming Soon');
+});
+`,
+  },
+  {
+    id: 'jest-dom-toBeInTheDocument-phase',
+    path: 'virtual/jest-dom-toBeInTheDocument.ts',
+    source: `
+import { getPhaseMessage } from '../../src/games/calla/rules';
+it('pins phase helper via toBeInTheDocument subject', () => {
+  expect(getPhaseMessage(state)).toBeInTheDocument();
 });
 `,
   },
@@ -150,6 +188,17 @@ it('message non-empty', () => {
 it('engine phase enum', () => {
   expect(state.phase).toBe('placeBlocks');
   expect(state.turnPhase).toBe('selectChain');
+});
+`,
+  },
+  {
+    id: 'neg-toHaveAttribute-structural',
+    path: 'virtual/neg-toHaveAttribute-structural.ts',
+    source: `
+it('dialog role is structural, not copy', async () => {
+  await expect(modal).toHaveAttribute('role', 'dialog');
+  await expect(modal).toHaveAttribute('aria-modal', 'true');
+  expect(badge).toBeInTheDocument();
 });
 `,
   },
@@ -616,11 +665,13 @@ function main() {
     a.file === b.file ? a.line - b.line : a.file.localeCompare(b.file)
   );
 
+  const failExit = args.fail && findings.length > 0;
   if (args.json) {
     console.log(
       JSON.stringify(
         {
-          reportOnly: true,
+          // reportOnly reflects default report-only posture; --fail is opt-in gate mode.
+          reportOnly: !args.fail,
           filesScanned: files.length,
           registrySize: registry.length,
           findingCount: findings.length,
@@ -631,7 +682,11 @@ function main() {
       )
     );
   } else {
-    console.log('check-copy-pins: report-only (not a CI gate)');
+    console.log(
+      args.fail
+        ? 'check-copy-pins: --fail (opt-in; exit 1 when findings)'
+        : 'check-copy-pins: report-only (not a CI gate)'
+    );
     console.log(`  tests scanned: ${files.length}`);
     console.log(`  copy-registry entries: ${registry.length}`);
     console.log(`  findings: ${findings.length}`);
@@ -658,10 +713,16 @@ function main() {
       console.log('See docs/dev/check-copy-pins.md');
     }
     console.log('');
-    console.log('Report-only: exit 0');
+    if (failExit) {
+      console.log('Fail mode: exit 1');
+    } else if (args.fail) {
+      console.log('Fail mode: exit 0 (no findings)');
+    } else {
+      console.log('Report-only: exit 0');
+    }
   }
 
-  if (args.fail && findings.length > 0) {
+  if (failExit) {
     process.exitCode = 1;
   }
 }
