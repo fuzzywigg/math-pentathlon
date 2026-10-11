@@ -505,6 +505,21 @@ export async function compareFileEmit(opts) {
     if (baseJs === headJs) {
       return { file, status: 'identical' };
     }
+    // Minify can rename locals differently across identical raw emit
+    // (e.g. `const e=1;export{e as x}` vs `const o=1;export{o as x}`).
+    // When minify differs, fall back to non-minify compare so rename-only
+    // drift is not a false DIFF; real semantic diffs still fail via raw.
+    if (minify) {
+      let baseRaw = await transpileToJs(baseSource, file, { minify: false });
+      let headRaw = await transpileToJs(headSource, file, { minify: false });
+      if (normalize) {
+        baseRaw = stripCommentsAndCollapseWhitespace(baseRaw);
+        headRaw = stripCommentsAndCollapseWhitespace(headRaw);
+      }
+      if (baseRaw === headRaw) {
+        return { file, status: 'identical' };
+      }
+    }
     const detail = unifiedDiff(baseJs, headJs, `${file}@base`, `${file}@head`);
     return { file, status: 'differ', detail };
   } catch (err) {
