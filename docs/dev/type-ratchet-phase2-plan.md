@@ -12,11 +12,11 @@
 
 ## Context
 
-Phase 1 ([#498](https://github.com/fuzzywigg/math-pentathlon/pull/498)) added `tsconfig.ratchet.json` + `npm run typecheck:ratchet`. That check **fails only** on `src/ui`, `src/core`, and listed test helpers (now **0** in-scope errors). Game AI, rules engines, most `src/games/**`, demos, and `src/main.ts` stay **out of scope**.
+Phase 1 ([#498](https://github.com/fuzzywigg/math-pentathlon/pull/498)) added `tsconfig.ratchet.json` + `npm run typecheck:ratchet`. That check **fails only** on paths in `scripts/check-type-ratchet.mjs` `IN_SCOPE` — including `src/ui`, `src/core`, **`src/demos/`**, **`src/main.ts`**, Batches 1–4 / 6–8 shells+rules+helpers, and listed test helpers (now **0** in-scope errors). Remaining **out of scope** is AI modules (`ai.ts` / `ai-client.ts` / `ai.worker.ts`) plus held/deferred paths not yet promoted into `IN_SCOPE` (see live gate output).
 
-Under the same ratchet flags (`noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`, plus the free strict flags), tip currently reports **564** out-of-scope errors (Phase 1 noted ~570; delta is from later folds on tip).
+Under the same ratchet flags (`noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`, plus the free strict flags), tip currently reports **216** out-of-scope errors (Phase-2 ceiling / `outOfScopeErrors` in the baseline JSON; 100% AI residual after Batch 9). Historical plan snapshots (dated, not live): **564** at plan capture on tip `b0d71db6` (Phase 1 noted ~570); **520** after Batch 0+1 / tip folds; **433** after Batch 2 compliant recut; Batches 6–7 lowered the ceiling to **216**.
 
-This document proposes how to clear those 564 without changing student-facing AI behavior or rules scoring — and how to keep a **report-only ceiling** so counts can only go down.
+This document tracks how those surfaces were cleared without changing student-facing AI behavior or rules scoring — and how to keep a **report-only ceiling** so counts can only go down. Residual **216** AI errors stay under the Andrew gate ([#560](https://github.com/fuzzywigg/math-pentathlon/pull/560)).
 
 ## Single reproduce command
 
@@ -24,7 +24,7 @@ This document proposes how to clear those 564 without changing student-facing AI
 npx tsc --noEmit -p tsconfig.ratchet.json --pretty false 2>&1 | tee /tmp/type-ratchet-phase2-raw.txt | rg -c "error TS"
 ```
 
-**Expected:** `433` out-of-scope after Batch 2 compliant recut (must match `outOfScopeErrors` in the baseline JSON). Plan snapshot was **564**; after Batch 0+1 / tip folds **520**; Batch 2 clears **87** non-AI errors (type-only).
+**Expected (live, after Batch 9):** `216` out-of-scope (must match `outOfScopeErrors` in the baseline JSON). Historical: plan snapshot **564**; after Batch 0+1 / tip folds **520**; after Batch 2 compliant recut **433**; Batches 6–7 → **216**.
 
 Verify against the committed baseline:
 
@@ -32,28 +32,30 @@ Verify against the committed baseline:
 node --input-type=module -e 'import fs from "node:fs"; const b=JSON.parse(fs.readFileSync("docs/dev/type-ratchet-phase2-baseline.json","utf8")); const n=fs.readFileSync("/tmp/type-ratchet-phase2-raw.txt","utf8").split("\n").filter(l=>/error TS\d+:/.test(l)).length; if(n!==b.outOfScopeErrors){console.error("MISMATCH raw="+n+" baseline="+b.outOfScopeErrors); process.exit(1);} console.log("OK outOfScopeErrors="+n);'
 ```
 
-Sanity (Phase 1 + Batch 0/1 in-scope still green):
+Sanity (Phase 1 + Phase-2 `IN_SCOPE` still green; demos/`main.ts` are **in** scope):
 
 ```bash
 npm run typecheck:ratchet
-# in-scope errors: 0 ; out-of-scope errors: 433 ; Phase-2 ceiling holds
+# in-scope errors: 0 ; out-of-scope errors: 216 ; Phase-2 ceiling holds
 ```
 
-Plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn-1008-mp-type-ratchet-p2`): **518** / **0** in-scope (later tip folds → **520**). After Batch 2 compliant recut (`burn-1008-mp-type-ratchet-batch2-compliant-recut`): **433** / **0** in-scope.
+Dated history: plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn-1008-mp-type-ratchet-p2`): **518** / **0** in-scope (later tip folds → **520**). After Batch 2 compliant recut (`burn-1008-mp-type-ratchet-batch2-compliant-recut`): **433** / **0** in-scope. After Batches 6–9 (live tip): **216** / **0** in-scope.
 
 ## Totals snapshot
 
+**Live (after Batch 9; must match `npm run typecheck:ratchet`):** in-scope **0** / out-of-scope **216**. Rows below keep historical Batch-2-era dimensional breakdowns for archaeology; do not treat NUI/EOPT/by-code/by-kind tables as the live gate.
+
 | Slice | Count |
 | --- | ---: |
-| Out-of-scope (Phase 2 surface, after Batch 2) | **433** |
-| After Batch 0+1 / tip folds | 520 |
-| Plan snapshot (pre Batch 0+1) | 564 |
+| Out-of-scope (**live**, after Batch 9; AI residual) | **216** |
+| Out-of-scope after Batch 2 (historical) | 433 |
+| After Batch 0+1 / tip folds (historical) | 520 |
+| Plan snapshot (pre Batch 0+1, historical) | 564 |
 | In-scope under ratchet (must stay 0) | **0** |
-| `noUncheckedIndexedAccess` (NUI) | 526 |
-| `exactOptionalPropertyTypes` (EOPT) | 37 |
-| Other | 1 |
-
-### By error code
+| `noUncheckedIndexedAccess` (NUI) — Batch-2-era snapshot | 526 |
+| `exactOptionalPropertyTypes` (EOPT) — Batch-2-era snapshot | 37 |
+| Other — Batch-2-era snapshot | 1 |
+### By error code (Batch-2-era snapshot; not live)
 
 | Code | Count | Typical meaning under ratchet |
 | --- | ---: | --- |
@@ -68,18 +70,20 @@ Plan capture on tip `b0d71db6`: **564** / **0** in-scope. After Batch 0+1 (`burn
 | TS2538 | 2 | `undefined` as index type |
 | TS2488 | 1 | Possibly-undefined not iterable |
 
-### By file kind
+### By file kind (Batch-2-era snapshot; not live)
+
+Live residual after Batch 9 is **216** AI-only (`byKind.ai_search_scoring` in the baseline JSON). `demo` / `entry` (`src/demos/*`, `src/main.ts`) are **IN_SCOPE** now (Batch 0) and must stay at **0** in-scope errors.
 
 | Kind | Count | Notes |
 | --- | ---: | --- |
-| `ai` | **219** | `ai.ts` / `ai-client.ts` / `ai.worker.ts` — **behavior-sensitive** |
+| `ai` | **219** | `ai.ts` / `ai-client.ts` / `ai.worker.ts` — **behavior-sensitive** (live residual ~216 after later batches) |
 | `rules` | 131 | Rules engines — escalate if scoring/end conditions could change |
 | `types` | 94 | Mostly `prime-gold/types.ts` (65) + small game type files |
 | `board-ui` | 80 | Game board UI (not Phase 1 `src/ui`) |
-| `demo` | 23 | `src/demos/*` |
+| `demo` | 23 | `src/demos/*` — **cleared / IN_SCOPE** (historical row) |
 | `engine-support` | 11 | e.g. kings `game-state` / `board` |
 | `ui` | 4 | game-controller / layout |
-| `entry` | 2 | `src/main.ts` |
+| `entry` | 2 | `src/main.ts` — **cleared / IN_SCOPE** (historical row) |
 
 ### Root-cause buckets (fix patterns)
 
@@ -245,7 +249,7 @@ File: [`type-ratchet-phase2-baseline.json`](./type-ratchet-phase2-baseline.json)
 
 | Field | Role |
 | --- | --- |
-| `totals.outOfScopeErrors` | Global ceiling (564) |
+| `totals.outOfScopeErrors` / top-level `outOfScopeErrors` | Global ceiling (**216** live; historical plan snapshot was 564) |
 | `totals.byCode` / `byKind` / `byRootCause*` | Dimensional ceilings |
 | `perGame.*.total` | Per-game ceiling |
 | `perFile` | Per-file ceiling |
@@ -285,7 +289,7 @@ Do **not** promote `noUncheckedIndexedAccess` / `exactOptionalPropertyTypes` int
    **Recommendation: WAIT until Batches 0–1 land** so the first CI signal is not a giant red report; then add report-only.
 
 5. **Eventually expand `scripts/check-type-ratchet.mjs` IN_SCOPE to include cleaned games path-by-path?**  
-   **Recommendation: YES, path-by-path after each game’s non-AI (and later AI) hits zero** — do not flip all of `src/games` at once.
+   **Recommendation: YES, path-by-path after each game’s non-AI (and later AI) hits zero** — do not flip all of `src/games` at once. **Done so far:** Batch 0 (`src/demos/`, `src/main.ts`) and Batches 1–4 / 6–8 shells+rules+helpers are already in `IN_SCOPE`; residual out-of-scope is the **216** AI modules.
 
 6. **Promote ratchet flags into main `tsconfig.json` after Phase 2?**  
    **Recommendation: NO until out-of-scope is ~0 and a full unit+e2e pass is green on tip.**
