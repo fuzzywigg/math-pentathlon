@@ -176,6 +176,8 @@ const nodePureFiles = [
   'tests/unit/memory-leak-page-ready.test.ts',
   // lib main-entry usage / --help (q-mp-958); spawnSync CLI check needs node env.
   'tests/unit/lib-main-entry-cli-help.test.ts',
+  // render-perf-mode measureTTI page-ready adoption (q-mp-948); fake page / node.
+  'tests/unit/render-perf-mode-measure-tti.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional
