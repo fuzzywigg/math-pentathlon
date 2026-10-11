@@ -14,6 +14,7 @@ import {
   mobileAuditOutUsage,
   resolveMobileAuditOutPath,
 } from './lib/mobile-audit-out-path.mjs';
+import { shapeSmallTapTargets } from './lib/mobile-audit-small-targets.mjs';
 import { gotoGame, startHuman } from './lib/page-ready.mjs';
 import { waitDoubleRaf } from './lib/page-settle.mjs';
 
@@ -89,7 +90,7 @@ const VIEWPORTS = [
 const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
 
 async function auditPage(page, gameId) {
-  return page.evaluate(
+  const raw = await page.evaluate(
     ({ gameId: gid, mountSel }) => {
       const docEl = document.documentElement;
       const body = document.body;
@@ -199,17 +200,6 @@ async function auditPage(page, gameId) {
         }
       }
 
-      // Dedupe by class+size, keep first 40
-      const seen = new Set();
-      const uniqueSmall = [];
-      for (const t of smallTargets) {
-        const key = `${t.tag}|${t.class}|${t.w}x${t.h}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        uniqueSmall.push(t);
-        if (uniqueSmall.length >= 40) break;
-      }
-
       /** Mouse-only gesture risk: listeners that look mouse-only in attributes / data. */
       const mouseOnlyHints = [];
       // Static scan of inline on* mouse handlers
@@ -239,6 +229,7 @@ async function auditPage(page, gameId) {
           })()
         : null;
 
+      // Raw small-tap hits — dedupe/count shaped in Node (q-mp-1240).
       return {
         gameId: gid,
         viewport: { w: window.innerWidth, h: window.innerHeight },
@@ -247,8 +238,7 @@ async function auditPage(page, gameId) {
         documentScrollWidth: docEl.scrollWidth,
         documentClientWidth: docEl.clientWidth,
         overflowingElements: overflowing,
-        smallTapTargets: uniqueSmall,
-        smallTapTargetCount: smallTargets.length,
+        smallTargets,
         mouseOnlyHints,
         mountVisible: !!mount,
         mountBox,
@@ -260,6 +250,8 @@ async function auditPage(page, gameId) {
     },
     { gameId, mountSel: MOUNT[gameId] ?? '#board, main' }
   );
+  const { smallTargets, ...rest } = raw;
+  return { ...rest, ...shapeSmallTapTargets(smallTargets) };
 }
 
 async function auditGesturesStatic() {
