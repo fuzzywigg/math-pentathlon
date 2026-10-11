@@ -13,6 +13,7 @@
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -34,7 +35,7 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/par-55-deep-2026-10-07');
-const ART = '/opt/cursor/artifacts';
+const ART = resolveArtifactDir();
 // PAR55_QUICK truthy → 1 game per combo (unchanged); else validate PAR55_GAMES.
 const GAMES_PER_DIFF = process.env.PAR55_QUICK
   ? 1

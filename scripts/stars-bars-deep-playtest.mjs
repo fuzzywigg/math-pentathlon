@@ -11,6 +11,7 @@
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveArtifactDir } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -31,7 +32,7 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
 const BASE = process.env.PLAYTEST_BASE || 'http://127.0.0.1:5173';
 const OUT = path.resolve('docs/playtest/stars-bars-deep-2026-10-07');
-const ART = '/opt/cursor/artifacts';
+const ART = resolveArtifactDir();
 const GAMES_PER_DIFF = requireEnvNumber('STARS_GAMES', 10);
 const MAX_HUMAN_TURNS = 80;
 const STALL_MS = 12_000;

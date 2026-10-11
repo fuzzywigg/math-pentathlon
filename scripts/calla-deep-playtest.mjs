@@ -11,6 +11,7 @@
 import { chromium, devices } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { artifactPath } from './lib/artifact-dir.mjs';
 import { applyDeepPlaytestCli } from './lib/deep-playtest-cli.mjs';
 import { requireEnvNumber } from './lib/env-number.mjs';
 import { waitForGameReady } from './lib/page-ready.mjs';
@@ -32,7 +33,7 @@ applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
 const GAMES_PER = requireEnvNumber('CALLA_GAMES_PER', 10);
 const OUT_DIR = path.resolve('docs/playtest/calla-deep-2026-10-07');
-const ART_DIR = path.resolve('/opt/cursor/artifacts/calla-deep-playtest');
+const ART_DIR = artifactPath('calla-deep-playtest');
 const DIFFICULTIES = ['easy', 'medium', 'hard'];
 
 const VIEWPORTS = {
