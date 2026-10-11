@@ -1,6 +1,6 @@
 /**
- * Unit coverage for knip report-only metric helpers (q-mp-118 / q-mp-1036).
- * No network: exercises pure summarize / diff / baseline-schema helpers only.
+ * Unit coverage for knip report-only metric helpers (q-mp-118 / q-mp-1036 / q-mp-1313).
+ * No network: exercises pure summarize / diff / baseline-schema / runner-error helpers only.
  */
 import { describe, it, expect } from 'vitest';
 import {
@@ -8,6 +8,7 @@ import {
   summarizeKnip,
   diffMetrics,
   validateBaselineMetrics,
+  exitCodeForKnipRunnerError,
   METRIC_KEYS,
 } from '../../scripts/report-knip.mjs';
 
@@ -246,5 +247,18 @@ describe('report-knip helpers', () => {
         expect(result.message).toMatch(/integer\s*≥\s*0|finite integer/i);
       }
     }
+  });
+
+  it('exitCodeForKnipRunnerError stays 0 report-only; --fail / enforce exit 1 (q-mp-1313)', () => {
+    // Simulated knip runner error payload (mocked runKnip) — decision only.
+    const knipError = { error: 'knip exit 1', files: [], issues: [] };
+    expect(knipError.error).toBeTruthy();
+
+    expect(exitCodeForKnipRunnerError({})).toBe(0);
+    expect(exitCodeForKnipRunnerError({ fail: false, enforce: false })).toBe(0);
+    expect(exitCodeForKnipRunnerError({ fail: true })).toBe(1);
+    expect(exitCodeForKnipRunnerError({ enforce: true })).toBe(1);
+    expect(exitCodeForKnipRunnerError({ fail: true, enforce: true })).toBe(1);
+    expect(exitCodeForKnipRunnerError({ fail: false, enforce: true })).toBe(1);
   });
 });
