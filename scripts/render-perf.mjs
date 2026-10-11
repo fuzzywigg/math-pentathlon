@@ -140,10 +140,7 @@ async function attemptScriptedMove(page, gameId) {
       );
     }
     case 'calla':
-      return (
-        (await tap('.calla-pit-valid')) ||
-        (await tap('.calla-pit'))
-      );
+      return (await tap('.calla-pit-valid')) || (await tap('.calla-pit'));
     case 'sum-dominoes': {
       await tap('.sd-roll-btn');
       if (await tap('.sd-hand-domino-playable')) {
@@ -154,8 +151,7 @@ async function attemptScriptedMove(page, gameId) {
     case 'par-55': {
       if (await tap('.par55-hand-block.clickable')) {
         return (
-          (await tap('.par55-valid-base')) ||
-          (await tap('.par55-cell.valid'))
+          (await tap('.par55-valid-base')) || (await tap('.par55-cell.valid'))
         );
       }
       return false;
@@ -221,9 +217,7 @@ async function attemptScriptedMove(page, gameId) {
     case 'prime-gold': {
       await tap('.pg-roll-btn, .prime-roll-btn');
       if (await tap('.pg-cell.valid, .prime-cell.valid')) return true;
-      return tap(
-        '.pg-btn-secondary, .pg-pass-btn, button:has-text("Pass")'
-      );
+      return tap('.pg-btn-secondary, .pg-pass-btn, button:has-text("Pass")');
     }
     case 'remainder-islands': {
       await tap('.remainder-btn-roll, button:has-text("Roll")');
