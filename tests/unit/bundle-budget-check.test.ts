@@ -171,10 +171,47 @@ describe('known vs NEW OVER allowlist (q-mp-123)', () => {
     expect(
       resolveSizeCheckExitCode({ novelCount: 2, failOnNewOver: true })
     ).toBe(1);
-    expect(parseSizeCheckArgs([])).toEqual({ failOnNewOver: false });
+    expect(parseSizeCheckArgs([])).toEqual({
+      ok: true,
+      failOnNewOver: false,
+    });
     expect(parseSizeCheckArgs(['--fail-on-new-over'])).toEqual({
+      ok: true,
       failOnNewOver: true,
     });
+  });
+
+  // q-mp-1312: typos / unknown argv must not silently stay report-only
+  it('rejects unknown or misspelled size:check flags (q-mp-1312)', () => {
+    const typo = parseSizeCheckArgs(['--fail-on-new-ovr']);
+    expect(typo.ok).toBe(false);
+    if (!typo.ok) {
+      expect(typo.message).toMatch(/Unknown flag: --fail-on-new-ovr/);
+      expect(typo.message).toMatch(/--fail-on-new-over/);
+    }
+    const junk = parseSizeCheckArgs(['--oops']);
+    expect(junk.ok).toBe(false);
+    if (!junk.ok) {
+      expect(junk.message).toMatch(/Unknown flag: --oops/);
+    }
+    const positional = parseSizeCheckArgs(['dist']);
+    expect(positional.ok).toBe(false);
+    // Exact flag still enables the soft gate; default empty argv stays report-only.
+    expect(parseSizeCheckArgs(['--fail-on-new-over'])).toEqual({
+      ok: true,
+      failOnNewOver: true,
+    });
+    expect(parseSizeCheckArgs([])).toEqual({
+      ok: true,
+      failOnNewOver: false,
+    });
+    // Typo must not enable failOnNewOver (would have been false + exit 0 before).
+    expect(
+      resolveSizeCheckExitCode({
+        novelCount: 2,
+        failOnNewOver: false,
+      })
+    ).toBe(0);
   });
 
   // q-mp-1253: NaN / negative / non-finite novelCount must not green-wash the soft gate
