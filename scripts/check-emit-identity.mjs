@@ -16,8 +16,9 @@
  * Exit codes:
  *   0 — every compared file emits identically
  *   1 — any emit mismatch
- *   2 — usage / git-ref error (unknown flag, bad --files-from path,
- *       non-zero `git diff` for an invalid --base/--head; no stack)
+ *   2 — usage / git-ref error (unknown flag, missing/flag-like --base/--head
+ *       value, bad --files-from path, non-zero `git diff` for an invalid
+ *       --base/--head; no stack)
  */
 
 import { spawnSync } from 'node:child_process';
@@ -634,6 +635,23 @@ export function defaultAiTouchedFiles(baseRef, headRef) {
 }
 
 /**
+ * True when a `--base` / `--head` value slot is missing, empty, or another flag
+ * (q-mp-1333: do not treat `--normalize` / `--json` as git refs).
+ * @param {string | undefined} value
+ */
+export function isMissingOrFlagLikeRef(value) {
+  return value === undefined || value === '' || value.startsWith('-');
+}
+
+/**
+ * Usage text when `--base` / `--head` is missing a git ref value.
+ * @param {'--base' | '--head'} flag
+ */
+export function refOptionErrorMessage(flag) {
+  return `error: ${flag} requires a git ref (missing or flag-like value)\n${USAGE}`;
+}
+
+/**
  * @param {string[]} argv
  * @returns {{ base: string, head: string, files: string[], normalize: boolean, minify: boolean, json: boolean }}
  */
@@ -651,9 +669,22 @@ export function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--base') {
-      base = argv[++i] ?? '';
+      // Bare `--base` must not fall through to silent merge-base (q-mp-1333).
+      const value = argv[++i];
+      if (isMissingOrFlagLikeRef(value)) {
+        console.error(refOptionErrorMessage('--base'));
+        process.exit(2);
+      }
+      base = value;
     } else if (a === '--head') {
-      head = argv[++i] ?? 'WORKING_TREE';
+      const value = argv[++i];
+      // Omitting the value (argv end) keeps default WORKING_TREE; flag-like /
+      // empty tokens must not be eaten as refs (q-mp-1333).
+      if (value !== undefined && (value === '' || value.startsWith('-'))) {
+        console.error(refOptionErrorMessage('--head'));
+        process.exit(2);
+      }
+      head = value ?? 'WORKING_TREE';
     } else if (a === '--files-from') {
       sawFilesFrom = true;
       filesFrom = argv[++i];
