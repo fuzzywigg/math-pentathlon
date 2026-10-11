@@ -132,22 +132,29 @@ export function malformedLockMessage(
 }
 
 /**
- * True when lock.packages is a non-empty plain object (q-mp-1037).
- * Null, undefined, arrays, and `{}` are not usable.
+ * True when lock.packages is a plain object with ≥1 non-root entry
+ * (q-mp-1037 empty/null; q-mp-1233 root-only inventory).
+ * Null, undefined, arrays, `{}`, and `{ '': … }` alone are not usable —
+ * collectPackagesFromLock skips the root key, so root-only yields 0 deps.
  * @param {unknown} packages
  * @returns {boolean}
  */
 export function isUsableLockPackages(packages) {
-  return (
-    packages != null &&
-    typeof packages === 'object' &&
-    !Array.isArray(packages) &&
-    Object.keys(/** @type {object} */ (packages)).length > 0
+  if (
+    packages == null ||
+    typeof packages !== 'object' ||
+    Array.isArray(packages)
+  ) {
+    return false;
+  }
+  return Object.keys(/** @type {object} */ (packages)).some(
+    (key) => key !== ''
   );
 }
 
 /**
- * Stable message for null / missing / empty lock packages (q-mp-1037).
+ * Stable message for null / missing / empty / root-only lock packages
+ * (q-mp-1037, q-mp-1233).
  * @param {string} [lockPath]
  * @returns {string}
  */
@@ -155,7 +162,7 @@ export function emptyPackagesMessage(lockPath = LOCK_PATH) {
   const display = String(lockPath).replace(/\\/g, '/');
   return [
     `report:licenses — empty or missing packages in ${display}`,
-    'package-lock.json must include a non-empty "packages" object.',
+    'package-lock.json must include a "packages" object with at least one non-root dependency entry.',
     'Fix or regenerate package-lock.json (run `npm install`).',
   ].join('\n');
 }
@@ -414,8 +421,8 @@ export function npmPackageNameFromLockPath(lockPath) {
  * }>}
  */
 export function collectPackagesFromLock(lock, nodeModulesRoot = '') {
-  // Main rejects null/missing/empty packages (q-mp-1037) before calling this.
-  // Keep `|| {}` only as a defensive fallback for hermetic helper callers.
+  // Main rejects null/missing/empty/root-only packages (q-mp-1037 / q-mp-1233)
+  // before calling this. Keep usable-check fallback for hermetic helper callers.
   const packages = isUsableLockPackages(lock.packages) ? lock.packages : {};
   /** @type {ReturnType<typeof collectPackagesFromLock>} */
   const out = [];
