@@ -31,6 +31,16 @@
  * Stale LH output (q-mp-1293): unlink the output path before spawn so exit 0
  * cannot reuse a pre-existing score JSON; missing fresh output is `ok: false`.
  *
+ * UTF-8 BOM on LH JSON (q-mp-1361): `parseLhReportJson` strips a leading
+ * U+FEFF before `JSON.parse` (parity with `readReporterJson` / q-mp-1321).
+ *
+ * Chunk table `.mjs` (q-mp-1370): `measureAllChunks` includes ESM `.mjs`
+ * beside `.js`/`.css` (parity with `listChunkNames` / q-mp-1334).
+ *
+ * String LH scores (q-mp-1375): `shapeLhPerformanceScore` coerces finite
+ * numeric strings in `[0, 1]` (peer `coerceFiniteNumber`); non-numeric still
+ * “missing”; out-of-range still rejected.
+ *
  * Usage:
  *   npm run build && npm run check:perf
  *   PERF_SKIP_LIGHTHOUSE=1 npm run check:perf   # bundles only
@@ -112,6 +122,17 @@ function gzipByteLength(absPath) {
 }
 
 /**
+ * Whether a basename belongs in the check-perf chunk size table (q-mp-1370).
+ * Includes `.mjs` beside `.js`/`.css`; skips sourcemaps (`.map` in the name).
+ *
+ * @param {string} name
+ * @returns {boolean}
+ */
+export function isPerfChunkAssetName(name) {
+  return /\.(m?js|css)$/.test(name) && !name.includes('.map');
+}
+
+/**
  * List all JS/CSS under dist/assets and dist/vendor with raw + gzip sizes.
  * @returns {{ path: string, rawBytes: number, gzipBytes: number }[]}
  */
@@ -122,7 +143,7 @@ function measureAllChunks() {
     const absDir = path.join(DIST, dir);
     if (!fs.existsSync(absDir)) continue;
     for (const name of fs.readdirSync(absDir).sort()) {
-      if (!/\.(js|css)$/.test(name) || name.includes('.map')) continue;
+      if (!isPerfChunkAssetName(name)) continue;
       // Skip AI worker blobs from the "app chunk" table (listed separately).
       const rel = path.join(dir, name);
       const abs = path.join(DIST, rel);
@@ -253,9 +274,30 @@ export function runCmd(args, opts = {}) {
 }
 
 /**
+ * Coerce a Lighthouse performance score to a finite number (q-mp-1375).
+ * Accepts numbers and finite numeric strings (peer `coerceFiniteNumber`).
+ *
+ * @param {unknown} value
+ * @returns {number | null}
+ */
+export function coerceLhPerformanceScore(value) {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '') return null;
+    const n = Number(trimmed);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/**
  * Fail closed when Lighthouse JSON lacks a finite performance score (q-mp-1208)
  * or when the score is outside Lighthouse's documented [0, 1] range (q-mp-1246).
  * Present numeric `0` stays representable as score `0` (unlike `score || 0`).
+ * Finite numeric strings in `[0, 1]` are coerced (q-mp-1375).
  *
  * @param {unknown} report
  * @returns {{ ok: true, score: number } | { ok: false, error: string }}
@@ -267,7 +309,8 @@ export function shapeLhPerformanceScore(report) {
     /** @type {{ categories?: { performance?: { score?: unknown } } }} */ (
       report
     ).categories?.performance?.score;
-  if (typeof raw !== 'number' || !Number.isFinite(raw)) {
+  const score = coerceLhPerformanceScore(raw);
+  if (score === null) {
     return {
       ok: false,
       error: 'missing Lighthouse performance score',
@@ -275,26 +318,32 @@ export function shapeLhPerformanceScore(report) {
   }
   // Lighthouse category scores are fractions in [0, 1]; reject inflated/negative
   // values so they cannot green-wash as 0–100 display points (q-mp-1246).
-  if (raw < 0 || raw > 1) {
+  if (score < 0 || score > 1) {
     return {
       ok: false,
       error: 'out-of-range Lighthouse performance score',
     };
   }
-  return { ok: true, score: Math.round(raw * 100) };
+  return { ok: true, score: Math.round(score * 100) };
 }
 
 /**
  * Parse Lighthouse output JSON without throwing (q-mp-1292).
  * Truncated / non-object payloads become a row error so remaining targets run.
+ * Leading UTF-8 BOM (U+FEFF) is stripped before parse (q-mp-1361).
  *
  * @param {string} text
  * @returns {{ ok: true, report: Record<string, unknown> } | { ok: false, error: string }}
  */
 export function parseLhReportJson(text) {
+  let raw = text;
+  // Strip a single leading UTF-8 BOM (q-mp-1361). Mid-file FEFF is left alone.
+  if (typeof raw === 'string' && raw.charCodeAt(0) === 0xfeff) {
+    raw = raw.slice(1);
+  }
   let parsed;
   try {
-    parsed = JSON.parse(text);
+    parsed = JSON.parse(raw);
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     return {

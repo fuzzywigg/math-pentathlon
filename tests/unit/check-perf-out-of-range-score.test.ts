@@ -111,6 +111,25 @@ describe('shapeLhPerformanceScore out-of-range (q-mp-1246)', () => {
       error: 'missing Lighthouse performance score',
     });
   });
+
+  it('rejects out-of-range numeric strings (q-mp-1375 / q-mp-1246)', () => {
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: '1.2' } },
+      })
+    ).toEqual({
+      ok: false,
+      error: 'out-of-range Lighthouse performance score',
+    });
+    expect(
+      shapeLhPerformanceScore({
+        categories: { performance: { score: '-0.1' } },
+      })
+    ).toEqual({
+      ok: false,
+      error: 'out-of-range Lighthouse performance score',
+    });
+  });
 });
 
 describe('runLighthouse out-of-range performance score (q-mp-1246)', () => {
