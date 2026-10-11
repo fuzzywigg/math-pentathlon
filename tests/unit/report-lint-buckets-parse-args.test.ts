@@ -3,8 +3,8 @@
  *
  * Hermetic coverage for report-lint-buckets argv (q-mp-870 value hygiene;
  * q-mp-943 unknown-flag rejection; q-mp-968 non-positive / non-integer --top
- * + empty --rule=). Does not spawn the eslint probe (full report stays
- * integration-only).
+ * + empty --rule=; q-mp-1360 duplicate --top/--rule rejection). Does not
+ * spawn the eslint probe (full report stays integration-only).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -118,6 +118,43 @@ describe('report-lint-buckets parseArgs --top/--rule value hygiene (q-mp-968)', 
   });
 });
 
+describe('report-lint-buckets parseArgs duplicate --top/--rule (q-mp-1360)', () => {
+  it('rejects --top 2 --top 9 (no last-wins)', () => {
+    const got = parseArgs(['--top', '2', '--top', '9']);
+    expect(got).toEqual({ ok: false, message: 'Duplicate --top' });
+  });
+
+  it('rejects --top=2 --top=9 mixed equals form', () => {
+    const got = parseArgs(['--top=2', '--top=9']);
+    expect(got).toEqual({ ok: false, message: 'Duplicate --top' });
+  });
+
+  it('rejects --top 2 --top=9 space then equals', () => {
+    const got = parseArgs(['--top', '2', '--top=9']);
+    expect(got).toEqual({ ok: false, message: 'Duplicate --top' });
+  });
+
+  it('rejects --rule a --rule b (no last-wins)', () => {
+    const got = parseArgs(['--rule', 'a', '--rule', 'b']);
+    expect(got).toEqual({ ok: false, message: 'Duplicate --rule' });
+  });
+
+  it('rejects --rule=a --rule=b equals form', () => {
+    const got = parseArgs(['--rule=a', '--rule=b']);
+    expect(got).toEqual({ ok: false, message: 'Duplicate --rule' });
+  });
+
+  it('still accepts a single --top and a single --rule together', () => {
+    const got = parseArgs(['--top', '5', '--rule', 'curly', '--json']);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.top).toBe(5);
+      expect(got.rule).toBe('curly');
+      expect(got.json).toBe(true);
+    }
+  });
+});
+
 describe('report-lint-buckets parseArgs unknown flags (q-mp-943)', () => {
   it('rejects --wat', () => {
     expect(parseArgs(['--wat'])).toEqual({
@@ -204,6 +241,38 @@ describe('report-lint-buckets.mjs CLI --top/--rule value hygiene (q-mp-968)', ()
   });
 });
 
+describe('report-lint-buckets.mjs CLI duplicate --top/--rule (q-mp-1360)', () => {
+  it('--top 2 --top 9 exits 2 with Duplicate before probing', () => {
+    const r = spawnSync(
+      process.execPath,
+      [SCRIPT, '--top', '2', '--top', '9'],
+      {
+        encoding: 'utf8',
+      }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Duplicate --top/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+
+  it('--rule a --rule b exits 2 with Duplicate before probing', () => {
+    const r = spawnSync(
+      process.execPath,
+      [SCRIPT, '--rule', 'a', '--rule', 'b'],
+      {
+        encoding: 'utf8',
+      }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/Duplicate --rule/);
+    expect(text).toMatch(/Usage:/);
+    expect(text).not.toMatch(/Lint bucket summary/);
+  });
+});
+
 describe('report-lint-buckets.mjs CLI unknown flags (q-mp-943)', () => {
   it('--wat exits 2 with usage before probing', () => {
     const r = spawnSync(process.execPath, [SCRIPT, '--wat'], {
@@ -237,4 +306,3 @@ describe('report-lint-buckets.mjs CLI unknown flags (q-mp-943)', () => {
     expect(r.stdout).not.toMatch(/Lint bucket summary/);
   });
 });
-
