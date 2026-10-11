@@ -14,7 +14,7 @@
  * shards so Vitest can parallelize (queens AI dominates wall when serialized).
  * Sibling shards:
  * - state-roundtrip-fuzz-queens-a.test.ts / -queens-a2.test.ts (seed A early/late)
- * - state-roundtrip-fuzz-queens-b.test.ts (seed B)
+ * - state-roundtrip-fuzz-queens-b.test.ts / -queens-b2.test.ts (seed B early/late)
  * - state-roundtrip-fuzz-games.test.ts (all other games, both seeds)
  */
 import { describe, it, expect } from 'vitest';
