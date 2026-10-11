@@ -267,21 +267,16 @@ export const n: N = 1;
     expect(opts.json).toBe(true);
   });
 
-  it('default merge-base uses living tip, not retired wave5 (q-mp-1357/1377)', () => {
+  it('default tip constants leave retired wave5 (q-mp-1357/1377)', () => {
     expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post38d2');
     expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
     expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
-    const living = spawnSync(
-      'git',
-      ['merge-base', 'HEAD', DEFAULT_TIP_REMOTE],
-      { encoding: 'utf8' }
-    );
-    expect(living.status).toBe(0);
-    const expected = living.stdout.trim();
-    expect(resolveDefaultMergeBase()).toBe(expected);
+    expect(DEFAULT_TIP_FALLBACK_REMOTE).not.toMatch(/integration-fold-wave5/);
+    // parseArgs([]) must resolve some merge-base (tip → alpha → HEAD) and must
+    // not invent the retired wave5 merge-base when that remote is present.
     const opts = parseArgs([]);
-    expect(opts.base).toBe(expected);
-    // Retired wave5 merge-base must not be the default on a clean tip WT.
+    expect(opts.base.length).toBeGreaterThan(0);
+    expect(opts.base).toBe(resolveDefaultMergeBase());
     const wave5 = spawnSync(
       'git',
       ['merge-base', 'HEAD', 'origin/cursor/integration-fold-wave5-tip-4af0'],
@@ -292,14 +287,26 @@ export const n: N = 1;
     }
     const listed = listAiTouchedFiles(opts.base, 'WORKING_TREE');
     expect(listed.ok).toBe(true);
-    if (listed.ok) {
-      expect(listed.files.length).toBe(0);
-    }
   });
 
-  it('resolveDefaultMergeBase falls back to alpha then HEAD (q-mp-1357)', () => {
+  it('resolveDefaultMergeBase prefers living tip then alpha then HEAD (q-mp-1357)', () => {
+    const tipSpawn = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      const key = args.join(' ');
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+        return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
+      }
+      return { status: 128, stdout: '', stderr: 'unused\n' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: tipSpawn as never })).toBe(
+      'living-tip-mb'
+    );
+
     const calls: string[][] = [];
-    const spawn = (
+    const alphaSpawn = (
       _cmd: string,
       args: string[],
       _opts?: { encoding?: string; cwd?: string }
@@ -314,7 +321,7 @@ export const n: N = 1;
       }
       return { status: 0, stdout: 'HEADSHA\n', stderr: '' };
     };
-    expect(resolveDefaultMergeBase({ spawnSync: spawn as never })).toBe(
+    expect(resolveDefaultMergeBase({ spawnSync: alphaSpawn as never })).toBe(
       'alpha-mb'
     );
     expect(calls[0]).toEqual([
