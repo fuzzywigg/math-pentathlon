@@ -80,10 +80,10 @@ Touched only `src/games/kings-quadraphages/*` plus kings tests/docs.
 | Desktop Hard end | ![desktop hard end](./kings-deep-2026-10-07/desktop-hard-end.png) |
 | Tablet Medium end | ![tablet medium end](./kings-deep-2026-10-07/tablet-medium-end.png) |
 
-## Regression tests
+## Regression / reproduce (tip)
 
-- Unit: `tests/unit/kings-deep-playability.test.ts` (You/AI copy, aiSeat labels, injected 44px CSS, Medium win undiluted, coarse think delay)
-- E2E: `tests/e2e/kings-deep-playability.spec.ts` (desktop + iPad Mini Chromium — cell size, AI lock, full Easy/Medium finish without Player N end copy)
+- Historical (removed from tip — not live paths): unit kings-deep-playability.test.ts; e2e kings-deep-playability.spec.ts
+- No surviving kings deep-playtest harness on tip; do **not** retarget this report into mp3d Kings e2e work.
 
 ## Hard stops
 

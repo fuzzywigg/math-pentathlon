@@ -4,8 +4,9 @@
  *
  * Measures production bundle sizes (per chunk + menu critical path) and, when
  * Chrome/Lighthouse are available, runs Lighthouse performance for the menu
- * and three representative games (one 3D). Writes test-results/perf/summary.md
- * and never fails CI (always exit 0).
+ * and three representative games (one 3D). Writes test-results/perf/summary.md.
+ * When `dist/` exists, measurement paths always exit 0 (not wired into CI fail
+ * paths). Missing `dist/` is a usage error (exit 2).
  *
  * Usage:
  *   npm run build && npm run check:perf
@@ -24,6 +25,7 @@ import {
   measureGameChunks,
   measureMenuCriticalPath,
 } from './check-bundle-budgets.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -33,7 +35,7 @@ const SUMMARY_MD = path.join(OUT_DIR, 'summary.md');
 const SUMMARY_JSON = path.join(OUT_DIR, 'summary.json');
 
 const SKIP_LH = process.env.PERF_SKIP_LIGHTHOUSE === '1';
-const LH_TIMEOUT_MS = Number(process.env.PERF_LH_TIMEOUT_MS || 120_000);
+const LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
 
 /** Menu + 2D small + 2D heavier + 3D (FIAR board3d). */
 const LH_TARGETS = [
@@ -227,7 +229,7 @@ function renderMarkdown(data) {
   lines.push(`Generated: ${data.generatedAt}`);
   lines.push('');
   lines.push(
-    'Report-only (`npm run check:perf`) — always exits 0; does not fail CI.'
+    'Report-only (`npm run check:perf`) — exits 0 when `dist/` exists; does not fail CI. Missing `dist/` is a usage error (exit 2).'
   );
   lines.push('');
 
@@ -308,11 +310,14 @@ async function main() {
       '',
       'dist/ missing — run `npm run build` before `npm run check:perf`.',
       '',
-      '(report-only: exiting 0)',
+      '(usage error: exiting 2)',
       '',
     ].join('\n');
     fs.writeFileSync(SUMMARY_MD, md);
-    console.error('dist/ not found. Wrote stub summary. (report-only)');
+    // Measurement overs stay report-only (exit 0); missing build is a usage error.
+    console.error('dist/ not found. Run npm run build before check:perf.');
+    console.error('(usage error: exiting 2)');
+    process.exitCode = 2;
     return;
   }
 
@@ -397,7 +402,10 @@ async function main() {
 
 try {
   await main();
-  process.exitCode = 0;
+  // Preserve usage-error exit 2 from missing dist/; otherwise report-only exit 0.
+  if (process.exitCode == null) {
+    process.exitCode = 0;
+  }
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
   try {

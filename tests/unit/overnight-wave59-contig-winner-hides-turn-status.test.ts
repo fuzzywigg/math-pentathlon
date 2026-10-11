@@ -5,6 +5,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { createInitialState } from '../../src/games/contig-60/types';
 import * as types from '../../src/games/contig-60/types';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -21,9 +22,7 @@ describe('Wave 59 contig — winner hides turn status', () => {
       scores: { player1: 4, player2: 1 },
       phase: 'gameOver',
     });
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(status.querySelector('.contig-winner-banner')).toBeTruthy();
     expect(status.querySelector('.contig-status')).toBeNull();

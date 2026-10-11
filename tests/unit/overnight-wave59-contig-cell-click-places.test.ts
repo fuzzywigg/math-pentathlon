@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -19,9 +20,7 @@ describe('Wave 59 contig — cell click place', () => {
       n += 1;
       return v;
     });
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     (board.querySelector('.contig-roll-btn') as HTMLButtonElement).click();
     const valid = board.querySelector('.contig-cell-valid') as HTMLElement | null;

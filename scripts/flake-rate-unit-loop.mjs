@@ -7,16 +7,47 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
+const USAGE =
+  'Usage: node scripts/flake-rate-unit-loop.mjs [--runs N] [--shuffle N] [--out DIR]\n' +
+  '  --runs N      positive integer (default 7)\n' +
+  '  --shuffle N   positive integer (default 3)\n' +
+  '  --out DIR     output directory';
+
 const args = process.argv.slice(2);
+
+function usageExit(message) {
+  console.error(message);
+  console.error(USAGE);
+  process.exit(1);
+}
+
+/** Positive integer flag; rejects missing, non-numeric, and non-positive values. */
 function flag(name, def) {
   const i = args.indexOf(name);
   if (i === -1) return def;
-  return Number(args[i + 1] ?? def);
+  const raw = args[i + 1];
+  if (raw === undefined || raw.startsWith('--')) {
+    usageExit(`Missing value for ${name}`);
+  }
+  if (!/^\d+$/.test(raw)) {
+    usageExit(`Invalid ${name} value (need positive integer): ${raw}`);
+  }
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 1) {
+    usageExit(`Invalid ${name} value (need positive integer): ${raw}`);
+  }
+  return n;
 }
+
+/** Directory flag; rejects missing values and values that look like flags. */
 function strFlag(name, def) {
   const i = args.indexOf(name);
   if (i === -1) return def;
-  return args[i + 1] ?? def;
+  const raw = args[i + 1];
+  if (raw === undefined || raw === '' || raw.startsWith('-')) {
+    usageExit(`Missing or invalid value for ${name}`);
+  }
+  return raw;
 }
 
 const defaultRuns = flag('--runs', 7);
@@ -43,7 +74,7 @@ function ingestJson(jsonPath, runId, mode) {
   const walk = (suite, fileHint) => {
     const file = suite.filepath || fileHint || suite.name || '';
     for (const t of suite.tests || []) {
-      const result = (t.result || t) ;
+      const result = t.result || t;
       const status = result.state || t.status;
       const duration = result.duration ?? t.duration ?? 0;
       const name = t.name || t.fullName || 'unknown';
@@ -75,11 +106,16 @@ function ingestJson(jsonPath, runId, mode) {
     for (const file of data.testResults) {
       const filePath = file.name || file.file || '';
       for (const ass of file.assertionResults || []) {
-        const name = ass.fullName || ass.title || ass.ancestorTitles?.concat(ass.title).join(' ') || 'unknown';
+        const name =
+          ass.fullName ||
+          ass.title ||
+          ass.ancestorTitles?.concat(ass.title).join(' ') ||
+          'unknown';
         const status = ass.status;
         const duration = ass.duration ?? 0;
         const k = keyOf(filePath, name, 'unit');
-        if (!byTest.has(k)) byTest.set(k, { passes: 0, fails: 0, durations: [], errors: [] });
+        if (!byTest.has(k))
+          byTest.set(k, { passes: 0, fails: 0, durations: [], errors: [] });
         const rec = byTest.get(k);
         rec.durations.push(duration);
         if (status === 'passed' || status === 'pass') {
@@ -96,7 +132,8 @@ function ingestJson(jsonPath, runId, mode) {
   } else {
     for (const suite of data.suites || [data]) walk(suite);
   }
-  const ok = data.success !== false && failed === 0 && (data.numFailedTests ?? 0) === 0;
+  const ok =
+    data.success !== false && failed === 0 && (data.numFailedTests ?? 0) === 0;
   runSummaries.push({
     runId,
     mode,
@@ -110,7 +147,12 @@ function ingestJson(jsonPath, runId, mode) {
 function runOnce(runId, mode) {
   const jsonPath = path.join(outDir, `unit-${runId}.json`);
   const logPath = path.join(outDir, `unit-${runId}.log`);
-  const vitestArgs = ['vitest', 'run', '--reporter=json', `--outputFile=${jsonPath}`];
+  const vitestArgs = [
+    'vitest',
+    'run',
+    '--reporter=json',
+    `--outputFile=${jsonPath}`,
+  ];
   if (mode === 'shuffle') {
     vitestArgs.push('--sequence.shuffle');
     // Vary seed for diversity
@@ -161,7 +203,9 @@ const failures = [...byTest.entries()]
     test: k,
     runs: v.passes + v.fails,
     failures: v.fails,
-    avgMs: Math.round(v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)),
+    avgMs: Math.round(
+      v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)
+    ),
     errors: v.errors,
   }))
   .sort((a, b) => b.failures - a.failures);
@@ -176,7 +220,10 @@ const summary = {
   generatedAt: new Date().toISOString(),
 };
 
-fs.writeFileSync(path.join(outDir, 'unit-summary.json'), JSON.stringify(summary, null, 2));
+fs.writeFileSync(
+  path.join(outDir, 'unit-summary.json'),
+  JSON.stringify(summary, null, 2)
+);
 
 // Markdown flake table fragment
 const lines = [
@@ -200,10 +247,17 @@ if (failures.length === 0) {
   lines.push('| Test | Runs | Failures | Avg ms | Sample error |');
   lines.push('| --- | --- | --- | --- | --- |');
   for (const f of failures) {
-    const err = (f.errors[0] || '').replace(/\|/g, '\\|').replace(/\n/g, ' ').slice(0, 120);
-    lines.push(`| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.avgMs} | ${err} |`);
+    const err = (f.errors[0] || '')
+      .replace(/\|/g, '\\|')
+      .replace(/\n/g, ' ')
+      .slice(0, 120);
+    lines.push(
+      `| \`${f.test}\` | ${f.runs} | ${f.failures} | ${f.avgMs} | ${err} |`
+    );
   }
 }
 fs.writeFileSync(path.join(outDir, 'unit-summary.md'), lines.join('\n'));
-console.log(`[flake-rate] wrote ${path.join(outDir, 'unit-summary.json')} failing=${failures.length}`);
+console.log(
+  `[flake-rate] wrote ${path.join(outDir, 'unit-summary.json')} failing=${failures.length}`
+);
 process.exit(failures.length > 0 ? 1 : 0);

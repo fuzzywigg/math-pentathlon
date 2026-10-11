@@ -2,13 +2,26 @@
  * One-shot mobile layout audit for Math Pentathlon games.
  * Emulates iPhone SE (375×667) and Pixel 7 (412×915) via Playwright.
  * Output: JSON report to stdout (and optionally --out path).
+ *
+ * Usage: node scripts/mobile-audit.mjs [--out <path>]
  */
 import { chromium, devices } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  mobileAuditOutUsage,
+  resolveMobileAuditOutPath,
+} from './lib/mobile-audit-out-path.mjs';
+import { gotoGame, startHuman } from './lib/page-ready.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** Default report path when `--out` is omitted (unchanged). */
+const DEFAULT_MOBILE_AUDIT_OUT = resolve(
+  __dirname,
+  '../docs/mobile-audit-raw-2026-10-07.json'
+);
 
 const GAMES = [
   'kings-quadraphages',
@@ -72,43 +85,6 @@ const VIEWPORTS = [
 ];
 
 const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
-const outIdx = process.argv.indexOf('--out');
-const outPath =
-  outIdx >= 0
-    ? resolve(process.argv[outIdx + 1])
-    : resolve(__dirname, '../docs/mobile-audit-raw-2026-10-07.json');
-
-async function waitForGameReady(page) {
-  await page
-    .getByTestId('game-loading')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({
-    state: 'visible',
-    timeout: 20_000,
-  });
-}
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) (el).style.pointerEvents = 'none';
-  });
-}
-
-async function startHuman(page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click();
-    }
-    await page.locator('#start-game-btn').click();
-    await page.locator('#new-game-modal.hidden').waitFor({ timeout: 10_000 }).catch(() => {});
-  }
-  await dismissOwl(page);
-}
 
 async function auditPage(page, gameId) {
   return page.evaluate(
@@ -206,7 +182,10 @@ async function auditPage(page, gameId) {
         // Skip off-screen / zero-area SVG hit targets that are decorative
         if (r.bottom < 0 || r.top > window.innerHeight) continue;
         if (r.width < 44 || r.height < 44) {
-          const cls = typeof el.className === 'string' ? el.className : el.getAttribute('class') || '';
+          const cls =
+            typeof el.className === 'string'
+              ? el.className
+              : el.getAttribute('class') || '';
           smallTargets.push({
             tag: el.tagName.toLowerCase(),
             id: el.id || null,
@@ -232,14 +211,18 @@ async function auditPage(page, gameId) {
       /** Mouse-only gesture risk: listeners that look mouse-only in attributes / data. */
       const mouseOnlyHints = [];
       // Static scan of inline on* mouse handlers
-      document.querySelectorAll('[onmouseenter],[onmouseleave],[onmousedown],[onmouseup]').forEach((el) => {
-        const cls = typeof el.className === 'string' ? el.className : '';
-        mouseOnlyHints.push({
-          kind: 'inline-mouse-handler',
-          tag: el.tagName.toLowerCase(),
-          class: cls.slice(0, 80),
+      document
+        .querySelectorAll(
+          '[onmouseenter],[onmouseleave],[onmousedown],[onmouseup]'
+        )
+        .forEach((el) => {
+          const cls = typeof el.className === 'string' ? el.className : '';
+          mouseOnlyHints.push({
+            kind: 'inline-mouse-handler',
+            tag: el.tagName.toLowerCase(),
+            class: cls.slice(0, 80),
+          });
         });
-      });
 
       const mount = document.querySelector(mountSel);
       const mountBox = mount
@@ -289,16 +272,17 @@ async function auditGesturesStatic() {
     'queens-guards': [
       'Cell hover highlight uses mouseenter/mouseleave. Moves use click/pointer.',
     ],
-    fiar: [
-      'Node hover uses mouseenter/mouseleave. Placement uses click.',
-    ],
+    fiar: ['Node hover uses mouseenter/mouseleave. Placement uses click.'],
     'remainder-islands': [
       'Uses pointerdown + click for activation (touch-friendly). Hover styles are mouseenter/mouseleave only.',
     ],
   };
 }
 
-async function main() {
+/**
+ * @param {string} outPath
+ */
+async function main(outPath) {
   const browser = await chromium.launch({ headless: true });
   const report = {
     generatedAt: new Date().toISOString(),
@@ -321,15 +305,21 @@ async function main() {
     const page = await context.newPage();
 
     for (const gameId of GAMES) {
-      const entry = { gameId, device: vp.name, ok: false, error: null, audit: null };
+      const entry = {
+        gameId,
+        device: vp.name,
+        ok: false,
+        error: null,
+        audit: null,
+      };
       try {
-        await page.goto(`${BASE}/#/game/${gameId}`, {
-          waitUntil: 'domcontentloaded',
-          timeout: 30_000,
-        });
+        await gotoGame(page, BASE, gameId, false);
         await startHuman(page);
         const sel = MOUNT[gameId] ?? '#board, main';
-        await page.locator(sel).first().waitFor({ state: 'visible', timeout: 15_000 });
+        await page
+          .locator(sel)
+          .first()
+          .waitFor({ state: 'visible', timeout: 15_000 });
         // Settle layout
         await page.waitForTimeout(300);
         entry.audit = await auditPage(page, gameId);
@@ -368,7 +358,22 @@ async function main() {
   );
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+const isMain =
+  process.argv[1] &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isMain) {
+  const parsed = resolveMobileAuditOutPath(
+    process.argv,
+    DEFAULT_MOBILE_AUDIT_OUT
+  );
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error(mobileAuditOutUsage());
+    process.exit(2);
+  }
+  main(parsed.outPath).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+}

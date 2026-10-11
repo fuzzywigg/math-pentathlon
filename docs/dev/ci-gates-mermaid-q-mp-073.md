@@ -81,7 +81,7 @@ Commands match the npm scripts / invocations in `.github/workflows/ci.yml` (plus
 | `mobile-touch` | Phone + tablet Chromium device profiles (iPhone 13 / Pixel 7 / iPad) touch smoke | `npm run test:e2e:mobile` |
 | `zoom-reflow` | WCAG 1.4.4 / 1.4.10 zoom + 320 CSS px reflow | `npm run test:e2e:zoom-reflow` |
 | `forced-colors` | Forced-colors + reduced-motion + color-scheme smoke | `npm run test:e2e:forced-colors` |
-| `e2e-cross-browser` | Full e2e suite on **Firefox + WebKit** (excludes mobile/visual/zoom/forced/fullgame specs in the CI file count) | `npm run test:e2e -- --project=firefox --project=webkit` (equiv. `npm run test:e2e:firefox-webkit`) |
+| `e2e-cross-browser` | Full e2e suite on **Firefox + WebKit** (excludes mobile/visual/zoom/forced/fullgame specs in the CI file count) | `npm run test:e2e:firefox-webkit` (equiv. `npm run test:e2e -- --project=firefox --project=webkit`) |
 | `knip` | Unused-export drift vs `docs/dev/knip-baseline.json` (annotates growth; never fails required lint/unit/build/e2e) | `npm run report:knip` |
 | `visual-baseline` | Start screen + each game opening screenshots @ desktop + phone | `npm run test:e2e:visual` |
 

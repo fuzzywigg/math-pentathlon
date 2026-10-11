@@ -61,5 +61,5 @@ worker was added.
 ```bash
 node scripts/probe-offline-resilience.mjs      # production preview + SW
 node scripts/probe-offline-resilience-dev.mjs  # vite dev, no SW
-npx playwright test --project=chromium tests/e2e/chunk-load-retry.spec.ts
+npm run test:e2e:chromium -- tests/e2e/chunk-load-retry.spec.ts
 ```

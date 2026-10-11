@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, afterEach } from 'vitest';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -11,9 +12,7 @@ afterEach(() => {
 
 describe('Wave 58 contig — scores pts label', () => {
   it('Blue/Red score lines include pts', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(board.querySelector('.contig-score-p1')?.textContent).toMatch(/pts/);
     expect(board.querySelector('.contig-score-p2')?.textContent).toMatch(/pts/);

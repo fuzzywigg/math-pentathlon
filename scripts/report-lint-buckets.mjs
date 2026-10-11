@@ -28,10 +28,20 @@ const CEILINGS_PATH = path.join(ROOT, 'docs/dev/lint-ratchet-ceilings.json');
 /** @typedef {{ rules: Record<string, number>, notes?: string }} CeilingFile */
 
 /**
- * @param {string[]} argv
- * @returns {{ rule: string | null, top: number, json: boolean, help: boolean }}
+ * True when the next argv token cannot be a value for `--top` / `--rule`
+ * (missing, empty, or another flag). q-mp-870: do not eat `--json` etc.
+ * @param {string | undefined} value
  */
-function parseArgs(argv) {
+function isMissingOrFlagLike(value) {
+  return value === undefined || value === '' || value.startsWith('-');
+}
+
+/**
+ * @param {string[]} argv
+ * @returns {| { ok: true, rule: string | null, top: number, json: boolean, help: boolean }
+ *   | { ok: false, message: string }}
+ */
+export function parseArgs(argv) {
   /** @type {{ rule: string | null, top: number, json: boolean, help: boolean }} */
   const opts = { rule: null, top: 10, json: false, help: false };
   for (let i = 0; i < argv.length; i += 1) {
@@ -41,12 +51,27 @@ function parseArgs(argv) {
     } else if (arg === '--json') {
       opts.json = true;
     } else if (arg === '--rule') {
-      opts.rule = argv[i + 1] ?? null;
+      const value = argv[i + 1];
+      if (isMissingOrFlagLike(value)) {
+        return {
+          ok: false,
+          message: 'Missing or invalid value for --rule (expected a rule id).',
+        };
+      }
+      opts.rule = value;
       i += 1;
     } else if (arg.startsWith('--rule=')) {
       opts.rule = arg.slice('--rule='.length) || null;
     } else if (arg === '--top') {
-      const n = Number.parseInt(argv[i + 1] ?? '', 10);
+      const value = argv[i + 1];
+      if (isMissingOrFlagLike(value)) {
+        return {
+          ok: false,
+          message:
+            'Missing or invalid value for --top (expected a positive integer).',
+        };
+      }
+      const n = Number.parseInt(value, 10);
       if (Number.isFinite(n) && n > 0) opts.top = n;
       i += 1;
     } else if (arg.startsWith('--top=')) {
@@ -54,7 +79,7 @@ function parseArgs(argv) {
       if (Number.isFinite(n) && n > 0) opts.top = n;
     }
   }
-  return opts;
+  return { ok: true, ...opts };
 }
 
 /**
@@ -142,7 +167,13 @@ Docs: docs/dev/lint-bucket-report.md`);
 }
 
 function main() {
-  const opts = parseArgs(process.argv.slice(2));
+  const parsed = parseArgs(process.argv.slice(2));
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    printHelp();
+    process.exit(2);
+  }
+  const opts = parsed;
   if (opts.help) {
     printHelp();
     process.exit(0);
@@ -178,6 +209,8 @@ export default [
       '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       '@typescript-eslint/no-shadow': 'error',
+      // Stricter than live (null: 'ignore'): count residual ==/!= null debt.
+      eqeqeq: ['error', 'always'],
       '@typescript-eslint/return-await': ['error', 'always'],
     },
   },

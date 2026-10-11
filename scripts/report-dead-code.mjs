@@ -10,7 +10,7 @@
  *   5. Grep + registry / dynamic-import verification for every candidate
  *
  * Always exits 0 (report-only). Writes docs/dev/dead-code-inventory.md.
- * Disposition column: removed (this PR) / kept / deferred (#526 fixtures).
+ * Disposition column: removed (this PR) / kept / deferred (safe unused test-helper exports).
  *
  * Usage: npm run report:dead-code
  */
@@ -37,25 +37,36 @@ const TIP_FOLD_KEEPERS = new Set([
   'resetSettingsFlagsForTests',
 ]);
 
-/** Open draft PRs that already cover adjacent cleanup — defer, don't redo. */
-const DEFER_TO_OPEN_PRS = [
+/**
+ * Open draft PRs that already cover adjacent cleanup — defer, don't redo.
+ * Keep only truly open blockers; drop merged/closed PR numbers.
+ * (Former entries #518 MERGED, #520 CLOSED, #523 MERGED, #526 MERGED.)
+ */
+const DEFER_TO_OPEN_PRS = [];
+
+/** Historical notes for PRs formerly listed as open defer blockers. */
+const DEFER_HISTORY_NOTES = [
   {
     pr: 518,
+    state: 'MERGED',
     topic: 'UI helper dedupe',
     note: 'Shared seat/die/hex/timeout helpers — not dead-code removal',
   },
   {
     pr: 520,
+    state: 'CLOSED',
     topic: 'lint ratchet',
     note: 'ESLint rule enablement — not unused-symbol inventory',
   },
   {
     pr: 523,
+    state: 'MERGED',
     topic: 'module boundaries (in tip)',
     note: 'Import-graph / layering ratchet already folded',
   },
   {
     pr: 526,
+    state: 'MERGED',
     topic: 'test fixture consolidation',
     note: 'Helper moves/merges — inventory lists unused helper *exports* only',
   },
@@ -356,7 +367,8 @@ function runDepcheck() {
 }
 
 /**
- * Collect dynamic-import specs and game registry ids for verification.
+ * Collect dynamic-import specs and registry ids for verification.
+ * Distinguishes playable game ids from division hub ids (not games).
  */
 function collectDynamicAndRegistry() {
   const mounts = fs.readFileSync(
@@ -378,8 +390,17 @@ function collectDynamicAndRegistry() {
       dyn.add(m[1]);
     }
   }
-  const gameIds = [...registry.matchAll(/id:\s*'([^']+)'/g)].map((m) => m[1]);
-  return { dynamicImports: [...dyn].sort(), gameIds };
+  const registryIds = [...registry.matchAll(/id:\s*'([^']+)'/g)].map(
+    (m) => m[1]
+  );
+  const divisionIds = registryIds.filter((id) => id.startsWith('division-'));
+  const gameIds = registryIds.filter((id) => !id.startsWith('division-'));
+  return {
+    dynamicImports: [...dyn].sort(),
+    registryIds,
+    gameIds,
+    divisionIds,
+  };
 }
 
 /**
@@ -451,12 +472,12 @@ function verifyCandidate(cand) {
     }
   }
 
-  const { dynamicImports, gameIds } = collectDynamicAndRegistry();
+  const { dynamicImports, registryIds } = collectDynamicAndRegistry();
   if (cand.path?.includes('/games/')) {
     const parts = cand.path.split('/');
     const gi = parts.indexOf('games');
     const gameId = gi >= 0 ? parts[gi + 1] : null;
-    if (gameId && gameIds.includes(gameId)) {
+    if (gameId && registryIds.includes(gameId)) {
       registryHit = true;
       evidence.push(`registry: game id '${gameId}' is registered`);
     }
@@ -854,7 +875,8 @@ function main() {
   console.log('dead-code inventory — depcheck…');
   const depcheck = runDepcheck();
   console.log('dead-code inventory — CSS / flags / helpers…');
-  const { dynamicImports, gameIds } = collectDynamicAndRegistry();
+  const { dynamicImports, registryIds, gameIds, divisionIds } =
+    collectDynamicAndRegistry();
   const css = scanCssClasses();
   const flags = catalogFeatureFlags();
   const helpers = scanTestHelpers();
@@ -947,7 +969,9 @@ function main() {
     generatedAt,
     taskId: 'burn-1008-mp-dead-code-removal-exec',
     foldOrder: 'fold last',
+    registryIds,
     gameIds,
+    divisionIds,
     dynamicImportCount: dynamicImports.length,
     cssClassTotal: css.total,
     cssUnusedCandidates: css.unused.length,
@@ -962,6 +986,7 @@ function main() {
     deferredSafeHelpers: rows.filter((r) => r.disposition === 'deferred')
       .length,
     deferPrs: DEFER_TO_OPEN_PRS,
+    deferHistoryNotes: DEFER_HISTORY_NOTES,
     executedRemovalRows,
   };
 
@@ -1014,7 +1039,7 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('## Executed removals (this PR)');
   lines.push('');
   lines.push(
-    `Re-verified on live tip then applied (**${summary.executedRemovals}** items). Skipped all safe-to-remove test-helper exports (coordinate with #526).`
+    `Re-verified on live tip then applied (**${summary.executedRemovals}** items). Skipped all safe-to-remove test-helper exports (leave for adoption batches such as q-mp-819/820; do not treat merged #526 as an open blocker).`
   );
   lines.push('');
   lines.push('| Disposition | Kind | Path / symbol | Action |');
@@ -1030,13 +1055,38 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('');
   lines.push('## Defer — do not redo');
   lines.push('');
-  for (const d of summary.deferPrs) {
-    lines.push(`- PR #${d.pr} (${d.topic}): ${d.note}`);
+  if (summary.deferPrs.length === 0) {
+    lines.push(
+      'No open PRs currently listed as adjacent cleanup blockers.'
+    );
+  } else {
+    for (const d of summary.deferPrs) {
+      lines.push(`- PR #${d.pr} (${d.topic}): ${d.note}`);
+    }
+  }
+  lines.push('');
+  lines.push('### Historical (not open blockers)');
+  lines.push('');
+  for (const d of summary.deferHistoryNotes || []) {
+    lines.push(
+      `- PR #${d.pr} **${d.state}** (${d.topic}): ${d.note}`
+    );
   }
   lines.push('');
   lines.push('## Registry / dynamic imports');
   lines.push('');
-  lines.push(`- Registered games: ${summary.gameIds.length} (\`${summary.gameIds.join('`, `')}\`)`);
+  const playable = summary.gameIds || [];
+  const divisions = summary.divisionIds || [];
+  const registryIds = summary.registryIds || [...playable, ...divisions];
+  lines.push(
+    `- Registry ids: ${registryIds.length} (${playable.length} playable games + ${divisions.length} division hubs)`
+  );
+  lines.push(
+    `- Playable games: ${playable.length} (\`${playable.join('`, `')}\`)`
+  );
+  lines.push(
+    `- Division hubs: ${divisions.length} (\`${divisions.join('`, `')}\`)`
+  );
   lines.push(`- Dynamic import specs observed: ${dynamicImports.length}`);
   lines.push('');
   lines.push('## Dependencies');
@@ -1055,7 +1105,7 @@ function renderMarkdown(summary, rows, dynamicImports) {
   lines.push('Rank 1 = strongest removal candidate; Rank 4 = keep.');
   lines.push('**Safe-to-remove** applies to the *symbol/rule* unless `kind=file`.');
   lines.push(
-    '**Disposition:** `removed` (this PR) / `deferred` (safe test-helper export — leave for #526) / `kept` (do not remove).'
+    '**Disposition:** `removed` (this PR) / `deferred` (safe test-helper export — leave for adoption batches) / `kept` (do not remove).'
   );
   lines.push('This PR does **not** delete games, assets, or tests. File deletion only when `kind=file` and safe-to-remove=yes.');
   lines.push('');

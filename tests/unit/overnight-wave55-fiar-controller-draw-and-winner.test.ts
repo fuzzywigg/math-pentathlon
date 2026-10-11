@@ -8,6 +8,7 @@ import {
 } from '../../src/games/fiar/game-controller';
 import { owlSystem } from '../../src/core/owl';
 import { CONFIG } from '../../src/games/fiar/types';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -17,10 +18,7 @@ afterEach(() => {
 
 describe('Wave 55 fiar — draw and winner banners', () => {
   it('jammed movement paints Draw copy; winning move paints banner and notifies owl', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.appendChild(board);
-    document.body.appendChild(status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     const jammed = getCurrentState();
@@ -37,9 +35,9 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     jammed.winner = null;
 
     // Re-click selected opponent node → selectChip identity + render → draw banner
-    board.querySelector('[data-node-id="c3r3"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c3r3"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(status.textContent).toMatch(/Draw! No valid moves available/);
 
     initGame(board, status);
@@ -69,13 +67,13 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     live.selectedNode = null;
     live.winner = null;
 
-    board.querySelector('[data-node-id="c2r5"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r5"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().selectedNode).toBe('c2r5');
-    board.querySelector('[data-node-id="c2r4"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c2r4"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().winner).toBe('player1');
     expect(status.querySelector('.fiar-winner-banner')?.textContent).toMatch(
       /Blue wins!/
@@ -86,9 +84,9 @@ describe('Wave 55 fiar — draw and winner banners', () => {
     });
 
     const hist = getCurrentState().moveHistory.length;
-    board.querySelector('[data-node-id="c3r3"]')!.dispatchEvent(
-      new MouseEvent('click', { bubbles: true })
-    );
+    board
+      .querySelector('[data-node-id="c3r3"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(getCurrentState().moveHistory.length).toBe(hist);
   });
 });

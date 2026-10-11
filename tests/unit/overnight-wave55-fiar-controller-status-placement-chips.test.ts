@@ -6,6 +6,7 @@ import {
   initGame,
   getCurrentState,
 } from '../../src/games/fiar/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -14,10 +15,7 @@ afterEach(() => {
 
 describe('Wave 55 fiar — placement status chips', () => {
   it('opening status lists Blue place remaining; place flips seat and count', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.appendChild(board);
-    document.body.appendChild(status);
+    const { board, status } = mountPair();
     initGame(board, status);
 
     expect(status.querySelector('.fiar-status')?.textContent).toMatch(

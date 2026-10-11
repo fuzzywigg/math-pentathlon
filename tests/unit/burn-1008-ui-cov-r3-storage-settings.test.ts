@@ -18,6 +18,7 @@ import {
   setNotFoundHandler,
 } from '../../src/core/router';
 import { storage } from '../../src/core/storage';
+import { securityError } from '../helpers/storage-stubs';
 
 describe('burn-1008 ui-cov-r3 safe-web-storage null store', () => {
   afterEach(() => {
@@ -59,7 +60,7 @@ describe('burn-1008 ui-cov-r3 safe-web-storage null store', () => {
 
   it('safeRemoveItem returns false when removeItem throws', () => {
     vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     expect(safeRemoveItem('any')).toBe(false);
   });

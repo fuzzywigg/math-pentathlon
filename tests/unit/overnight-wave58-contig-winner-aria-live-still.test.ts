@@ -13,6 +13,7 @@ vi.mock('../../src/games/contig-60/types', async (importOriginal) => {
 
 import { createInitialState } from '../../src/games/contig-60/types';
 import { initGame } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -28,9 +29,7 @@ async function seed(overrides: Record<string, unknown>) {
     ...actual.createInitialState(),
     ...overrides,
   } as ReturnType<typeof actual.createInitialState>);
-  const board = document.createElement('div');
-  const status = document.createElement('div');
-  document.body.append(board, status);
+  const { board, status } = mountPair();
   initGame(board, status);
   return { board, status };
 }

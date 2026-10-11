@@ -45,7 +45,7 @@ const workerLimit = process.env.CI
 
 /** Specs that belong only to dedicated projects (not chromium/cross-browser). */
 const nonDefaultSpecs =
-  /mobile-touch-smoke\.spec\.ts|mobile-viewport-smoke\.spec\.ts|visual-baseline\.spec\.ts|zoom-reflow-a11y\.spec\.ts|forced-colors-a11y\.spec\.ts/;
+  /mobile-touch-smoke\.spec\.ts|visual-baseline\.spec\.ts|zoom-reflow-a11y\.spec\.ts|forced-colors-a11y\.spec\.ts/;
 
 /**
  * Fullgame HvH specs live under tests/e2e/fullgame/ and stay on the chromium

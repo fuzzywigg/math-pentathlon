@@ -47,7 +47,7 @@ AI think UI (status “computer is thinking…” / `.sd-computer-thinking`) was
 
 **Fix (`game-controller.ts`):** Single clearable `aiTimer` (Prime Gold pattern), `scheduleAI` / `clearAiTimer`, hard `isComputerTurnPending` guard at the top of `makeAIMove`.
 
-**Regression:** `tests/unit/sum-dominoes-ai-timer-race.test.ts`, deep unit + e2e.
+**Regression (at the time):** unit sum-dominoes-ai-timer-race.test.ts (historical — removed from tip); deep unit (historical); live e2e `tests/e2e/sum-dominoes-deep.spec.ts`.
 
 ### 2. High — AI soft-lock if `getAIMove` returned null in `placing`
 
@@ -92,13 +92,13 @@ Coarse pointer / `max-width: 900px` media query enlarges the whole grid (keeps r
 | Desktop easy mid | ![desktop-mid](./sum-dominoes-deep-2026-10-07/desktop-easy-mid.png) |
 | Desktop hard end | ![desktop-hard-end](./sum-dominoes-deep-2026-10-07/desktop-hard-end.png) |
 
-## Tests added
+## Tests / reproduce (tip)
 
-- `tests/unit/sum-dominoes-ai-timer-race.test.ts`
-- `tests/unit/sum-dominoes-deep-playability.test.ts` (12× Easy/Med/Hard scripted finishes, hints, deselect, CSS floors)
-- `tests/e2e/sum-dominoes-deep.spec.ts` (desktop ×3 difficulties + tablet touch floors + no illicit roll)
+- Surviving harness: `scripts/sum-dominoes-deep-playtest.mjs`
+- Live e2e: `tests/e2e/sum-dominoes-deep.spec.ts`
+- Historical (removed from tip — not live paths): unit sum-dominoes-ai-timer-race.test.ts; unit sum-dominoes-deep-playability.test.ts
 
 ## Files touched
 
 - `src/games/sum-dominoes/{game-controller,board-ui,rules}.ts`
-- Tests / docs / `scripts/sum-dominoes-deep-playtest.mjs` only (no other games)
+- Docs / `scripts/sum-dominoes-deep-playtest.mjs` + live e2e above (no other games)

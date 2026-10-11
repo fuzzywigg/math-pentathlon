@@ -221,8 +221,7 @@ export function renderCoverageHeatSvg(rows, opts = {}) {
   const metricW = 88;
   const filesW = 56;
   const cols = ['lines', 'branches', 'functions', 'statements'];
-  const width =
-    padL + dirW + cols.length * metricW + filesW + padR;
+  const width = padL + dirW + cols.length * metricW + filesW + padR;
   const height = padT + headerH + Math.max(rows.length, 1) * rowH + padB;
 
   const parts = [];
@@ -265,8 +264,7 @@ export function renderCoverageHeatSvg(rows, opts = {}) {
     `<rect x="${padL}" y="${tableY}" width="${width - padL - padR}" height="${headerH}" fill="#e8e2d6" stroke="#c9c2b4"/>`
   );
   for (const h of headers) {
-    const tx =
-      h.anchor === 'start' ? h.x + 8 : h.x;
+    const tx = h.anchor === 'start' ? h.x + 8 : h.x;
     parts.push(
       `<text x="${tx}" y="${tableY + 18}" text-anchor="${h.anchor}" font-family="ui-sans-serif, system-ui, sans-serif" font-size="12" font-weight="600" fill="#222">${escapeXml(h.label)}</text>`
     );
@@ -288,7 +286,8 @@ export function renderCoverageHeatSvg(rows, opts = {}) {
 
     cols.forEach((col, ci) => {
       /** @type {CovMetric} */
-      const m = row[/** @type {'lines'|'branches'|'functions'|'statements'} */ (col)];
+      const m =
+        row[/** @type {'lines'|'branches'|'functions'|'statements'} */ (col)];
       const cx = padL + dirW + ci * metricW;
       const fill = heatColor(m.pct);
       const text = heatTextColor(m.pct);
@@ -393,6 +392,32 @@ export function renderCoverageMapMarkdown(rows, meta = {}) {
 }
 
 /**
+ * Friendly hint when vitest json-summary is absent (q-mp-847).
+ * @param {string} [summaryPath]
+ * @returns {string}
+ */
+export function missingSummaryMessage(summaryPath = DEFAULT_SUMMARY) {
+  const display = String(summaryPath).replace(/\\/g, '/');
+  return [
+    `report:coverage-map — missing coverage summary at ${display}`,
+    'Run `npm run test:unit:coverage` then `npm run report:coverage-map`, or pass an explicit path to a coverage-summary.json.',
+  ].join('\n');
+}
+
+/**
+ * @param {unknown} err
+ * @returns {err is Error & { code: string, path?: string }}
+ */
+function isMissingSummaryError(err) {
+  return (
+    err != null &&
+    typeof err === 'object' &&
+    'code' in err &&
+    /** @type {{ code?: unknown }} */ (err).code === 'ENOENT'
+  );
+}
+
+/**
  * @param {{
  *   summaryPath?: string,
  *   summary?: Record<string, FileCov>,
@@ -401,14 +426,21 @@ export function renderCoverageMapMarkdown(rows, meta = {}) {
  * }} [opts]
  */
 export function writeReport(opts = {}) {
-  const summaryPath = path.resolve(
-    ROOT,
-    opts.summaryPath ?? DEFAULT_SUMMARY
-  );
+  const summaryPath = path.resolve(ROOT, opts.summaryPath ?? DEFAULT_SUMMARY);
   /** @type {Record<string, FileCov>} */
-  const summary =
-    opts.summary ??
-    JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+  let summary;
+  if (opts.summary != null) {
+    summary = opts.summary;
+  } else if (!fs.existsSync(summaryPath)) {
+    const rel =
+      path.relative(ROOT, summaryPath).replace(/\\/g, '/') || DEFAULT_SUMMARY;
+    const err = new Error(missingSummaryMessage(rel));
+    err.code = 'ENOENT';
+    err.path = summaryPath;
+    throw err;
+  } else {
+    summary = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
+  }
   const rows = aggregateByDirectory(summary, { root: opts.root ?? ROOT });
   const generatedAt = opts.now ?? new Date().toISOString();
   const relSummary = path.relative(ROOT, summaryPath).replace(/\\/g, '/');
@@ -445,7 +477,21 @@ if (isMain) {
   try {
     main();
   } catch (err) {
-    console.error('report:coverage-map error:', err);
-    process.exitCode = 1;
+    if (isMissingSummaryError(err)) {
+      const display =
+        typeof err.path === 'string'
+          ? path.relative(ROOT, err.path).replace(/\\/g, '/') || DEFAULT_SUMMARY
+          : DEFAULT_SUMMARY;
+      // Hint only — no Error stack as primary UX (q-mp-847).
+      console.error(
+        err instanceof Error && err.message.startsWith('report:coverage-map')
+          ? err.message
+          : missingSummaryMessage(display)
+      );
+      process.exitCode = 1;
+    } else {
+      console.error('report:coverage-map error:', err);
+      process.exitCode = 1;
+    }
   }
 }

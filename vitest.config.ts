@@ -142,6 +142,20 @@ const nodePureFiles = [
   'tests/unit/engine-ui-boundary-seats-characterization.test.ts',
   // Emit-identity checker imports esbuild (needs Node TextEncoder, not jsdom).
   'tests/unit/check-emit-identity.test.ts',
+  // mobile-audit --out parser (q-mp-844); spawnSync CLI check needs node env.
+  'tests/unit/mobile-audit-out-path.test.ts',
+  // check-copy-pins + report-knip unknown-flag argv (q-mp-873); spawnSync needs node.
+  'tests/unit/check-copy-pins-report-knip-args.test.ts',
+  // report-lint-buckets --top/--rule argv (q-mp-870); spawnSync CLI check needs node env.
+  'tests/unit/report-lint-buckets-parse-args.test.ts',
+  // offline probe early --help (q-mp-886); spawnSync CLI check needs node env.
+  'tests/unit/offline-probe-cli-help.test.ts',
+  // help-only CLI argv (q-mp-885); spawnSync CLI check needs node env.
+  'tests/unit/help-only-cli.test.ts',
+  // harness env Number() parser (q-mp-876); spawnSync CLI check needs node env.
+  'tests/unit/env-number.test.ts',
+  // mutation-report argv validation (q-mp-867 / q-mp-868); spawnSync CLI check.
+  'tests/unit/mutation-report-args.test.ts',
 ];
 
 // Prefer Vitest's auto worker count (uses available CPUs; CI-aware). Optional

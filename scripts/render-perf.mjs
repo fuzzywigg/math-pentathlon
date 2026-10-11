@@ -23,6 +23,8 @@ import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
+import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -31,9 +33,9 @@ const OUT_DIR = resolve(ROOT, 'docs/dev');
 const REPORT_MD = resolve(OUT_DIR, 'render-perf-2026-10.md');
 const REPORT_JSON = resolve(OUT_DIR, `render-perf-2026-10-${PHASE}.json`);
 
-const MOVE_TARGET = Number(process.env.PERF_MOVES || 20);
+const MOVE_TARGET = requireEnvNumber('PERF_MOVES', 20);
 const TABLET = { width: 768, height: 1024 };
-const CPU_RATE = Number(process.env.PERF_CPU_RATE || 4);
+const CPU_RATE = requireEnvNumber('PERF_CPU_RATE', 4);
 
 const BOARD3D_GAMES = new Set([
   'kings-quadraphages',
@@ -77,41 +79,26 @@ const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
 
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
+
+async function waitDoubleRaf(page) {
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
 }
 
-async function waitReady(page) {
+/** Soft condition wait + paint settle (no fixed sleep). */
+async function waitForReadySoft(page, selector, timeout = 2_000) {
   await page
-    .locator('[data-testid="game-loading"]')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
+    .locator(selector)
+    .first()
+    .waitFor({ state: 'visible', timeout })
     .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 20_000 });
+  await waitDoubleRaf(page);
 }
 
-async function gotoGame(page, baseURL, gameId, board3d) {
-  const q = board3d ? '?board3d=1' : '';
-  await page.goto(`${baseURL}/${q}#/game/${gameId}`, {
-    waitUntil: 'domcontentloaded',
-  });
-  await waitReady(page);
-  await dismissOwl(page);
-}
-
-async function startHuman(page) {
-  await dismissOwl(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) await human.click();
-    await page.locator('#start-game-btn').click();
-    await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  }
-  await dismissOwl(page);
-}
 
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {
@@ -145,7 +132,7 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'star-track': {
       if (await clickFirst('.star-track-draw-btn')) {
-        await page.waitForTimeout(200);
+        await waitForReadySoft(page, '.star-track-chain-btn');
         return clickFirst('.star-track-chain-btn');
       }
       return clickFirst('.star-track-chain-btn');
@@ -269,7 +256,10 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'frac-fact': {
       if (await clickFirst('.frac-choice-btn')) {
-        await page.waitForTimeout(100);
+        await waitForReadySoft(
+          page,
+          '.frac-continue-btn, button:has-text("Continue")'
+        );
         await clickFirst('.frac-continue-btn, button:has-text("Continue")');
         return true;
       }
@@ -277,7 +267,10 @@ async function attemptScriptedMove(page, gameId) {
     }
     case 'fraction-pinball': {
       if (await clickFirst('.pinball-choice-btn')) {
-        await page.waitForTimeout(100);
+        await waitForReadySoft(
+          page,
+          '.pinball-continue-btn, button:has-text("Continue")'
+        );
         await clickFirst('.pinball-continue-btn, button:has-text("Continue")');
         return true;
       }
@@ -422,7 +415,10 @@ async function ensurePlacePhaseForHover(page, gameId) {
         .count();
       if (placing > 0) return true;
       await attemptScriptedMove(page, gameId);
-      await page.waitForTimeout(100);
+      await waitForReadySoft(
+        page,
+        '.juggle-cell-valid, .juggle-cell.preview-valid, .juggle-cell[style*="pointer"]'
+      );
     }
   }
   if (gameId === 'pent-em-in') {
@@ -437,13 +433,16 @@ async function ensurePlacePhaseForHover(page, gameId) {
         .first()
         .click({ force: true })
         .catch(() => {});
-      await page.waitForTimeout(100);
+      await waitForReadySoft(
+        page,
+        '.pent-piece-option.selected, .pent-board .interaction rect[data-row], .pent-cell-valid, .pent-board g.preview'
+      );
       const hasInteract = await page
         .locator('.pent-board .interaction rect')
         .count();
       if (hasInteract > 0) return true;
       await attemptScriptedMove(page, gameId);
-      await page.waitForTimeout(100);
+      await waitDoubleRaf(page);
     }
   }
   return false;
@@ -630,7 +629,8 @@ async function measureGame(browser, baseURL, gameId) {
       await beginMoveMeasure(page);
       const ok = await attemptScriptedMove(page, gameId);
       await endMoveMeasure(page);
-      await page.waitForTimeout(80);
+      // Extra paint settle under CPU throttle (rAF, not fixed sleep)
+      await waitDoubleRaf(page);
       const after = await page.evaluate(() => document.body.innerHTML.length);
       if (ok || before !== after) {
         landed++;

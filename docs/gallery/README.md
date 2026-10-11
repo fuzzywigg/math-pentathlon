@@ -5,7 +5,7 @@ Tablet landscape (1024×768) screenshots of every available game at **start** an
 Regenerate from the repo root (writes PNGs here; not run in CI):
 
 ```bash
-npx playwright test -c playwright.gallery.config.ts
+npm run docs:gallery
 ```
 
 See the [README Gallery section](../../README.md#gallery) for per-game links.

@@ -81,16 +81,15 @@ Two desktop games showed **“Red Wins!”** mid-session while files were hot-re
 | Desktop — You Win! | ![you-win](./calla-deep-2026-10-07/desktop-you-win.png) |
 | Tablet — Hard board | ![tablet](./calla-deep-2026-10-07/tablet-board.png) |
 
-## Regression tests
+## Regression / reproduce (tip)
 
-- Unit: `tests/unit/calla-deep-playability-2026-10-07.test.ts` (+ updated winner-banner exacts)
-- E2E: `tests/e2e/calla-deep.spec.ts` (desktop + tablet Chromium)
+- Surviving harness: `scripts/calla-deep-playtest.mjs` (Playwright Chromium dogfood)
+- Historical (removed from tip — not live paths): unit calla-deep-playability-2026-10-07.test.ts; e2e calla-deep.spec.ts
 
 ## Files touched
 
 - `src/games/calla/{board-ui,game-controller,rules}.ts`
 - `src/style.css` (`.calla-*` only)
-- `tests/unit/calla-deep-playability-2026-10-07.test.ts` (+ related calla banner exacts)
-- `tests/e2e/calla-deep.spec.ts`
+- Historical unit/e2e suites above (removed from tip)
 - `scripts/calla-deep-playtest.mjs`
 - `docs/playtest/calla-deep-2026-10-07.md` + screenshots

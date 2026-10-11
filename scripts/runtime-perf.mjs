@@ -21,6 +21,8 @@ import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gotoGame, startHuman } from './lib/page-ready.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 import {
   CPU_THROTTLE,
   MOVE_TARGET_RENDER,
@@ -44,9 +46,9 @@ const REPORT_JSON = resolve(ROOT, `docs/runtime-perf-${PERF_DATE}.json`);
 
 const MOVE_TARGET = RENDER_MODE
   ? MOVE_TARGET_RENDER
-  : Number(process.env.PERF_MOVES || 30);
-const NAV_CYCLES = Number(process.env.PERF_NAV_CYCLES || 5);
-const FRAME_SAMPLE_MS = Number(process.env.PERF_FRAME_MS || 2000);
+  : requireEnvNumber('PERF_MOVES', 30);
+const NAV_CYCLES = requireEnvNumber('PERF_NAV_CYCLES', 5);
+const FRAME_SAMPLE_MS = requireEnvNumber('PERF_FRAME_MS', 2000);
 const PERF_PHASE = process.env.PERF_PHASE || 'baseline';
 
 const BOARD3D_GAMES = new Set([
@@ -90,42 +92,6 @@ const filter = (process.env.PERF_GAMES || '')
 const GAMES = filter.length
   ? ALL_GAMES.filter((g) => filter.includes(g))
   : ALL_GAMES;
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
-}
-
-async function waitReady(page) {
-  await page
-    .locator('[data-testid="game-loading"]')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({ timeout: 20_000 });
-}
-
-async function gotoGame(page, baseURL, gameId, board3d) {
-  const q = board3d ? '?board3d=1' : '';
-  await page.goto(`${baseURL}/${q}#/game/${gameId}`, {
-    waitUntil: 'domcontentloaded',
-  });
-  await waitReady(page);
-  await dismissOwl(page);
-}
-
-async function startHuman(page) {
-  await dismissOwl(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) await human.click();
-    await page.locator('#start-game-btn').click();
-    await modal.waitFor({ state: 'hidden', timeout: 10_000 }).catch(() => {});
-  }
-  await dismissOwl(page);
-}
 
 /** Attempt one scripted legal action for the active seat. */
 async function attemptScriptedMove(page, gameId) {

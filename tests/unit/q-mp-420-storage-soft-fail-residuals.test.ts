@@ -10,7 +10,10 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { withThrowingLocalStorageAccess } from '../helpers/storage-stubs';
+import {
+  quotaError,
+  withThrowingLocalStorageAccess,
+} from '../helpers/storage-stubs';
 import { resetSettingsFlagsForTests } from '../../src/core/settings-flags';
 import type * as MigrateModule from '../../src/core/storage/migrate';
 import type * as SafeWebStorageModule from '../../src/core/safe-web-storage';
@@ -191,7 +194,7 @@ describe('q-mp-420 storage soft-fail residuals — save console.error belt', () 
     storage.createProfile('Quota420', 'q');
     const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new DOMException('quota', 'QuotaExceededError');
+      throw quotaError();
     });
 
     storage.updateSettings({ soundEnabled: false });

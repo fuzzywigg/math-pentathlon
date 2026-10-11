@@ -79,5 +79,5 @@ Unit keepers: `tests/unit/keyboard-sr-modal-focus-trap.test.ts`, board focus-vis
 npm run lint
 npx tsc --noEmit
 npm run test:unit
-npx playwright test --project=chromium tests/e2e/keyboard-only.spec.ts
+npm run test:e2e:chromium -- tests/e2e/keyboard-only.spec.ts
 ```

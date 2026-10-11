@@ -24,7 +24,7 @@ import { test, expect, type Page } from '@playwright/test';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { GAMES, type GameInfo } from '../../src/core/game-registry';
-import { dismissOwl, waitForGameReady } from './helpers/page';
+import { dismissOwl, startHuman, waitForGameReady } from './helpers/page';
 
 const AVAILABLE_GAMES = GAMES.filter((g) => g.available);
 const REPORT_ROOT = path.join(process.cwd(), 'test-results', 'zoom-reflow');
@@ -113,20 +113,6 @@ type ScreenReport = {
   overflowX: number;
   screenshot: string | null;
 };
-
-async function startHuman(page: Page) {
-  await waitForGameReady(page);
-  const modal = page.locator('#new-game-modal');
-  if (await modal.isVisible().catch(() => false)) {
-    const human = page.locator('.mode-option[data-mode="human-vs-human"]');
-    if (await human.isVisible().catch(() => false)) {
-      await human.click({ force: true });
-    }
-    await page.locator('#start-game-btn').click({ force: true });
-    await expect(modal).toHaveClass(/hidden/);
-  }
-  await dismissOwl(page);
-}
 
 function titleStem(game: GameInfo): string {
   return game.name.replace(/[!?]+$/, '').split(' (')[0];
@@ -571,7 +557,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
           async () => {
             await page.goto('/#/game/prime-gold');
             await waitForGameReady(page);
-            await startHuman(page);
+            await startHuman(page, { force: true });
             await page.locator('#new-game-btn').click({ force: true });
             await expect(page.locator('#new-game-modal')).not.toHaveClass(
               /hidden/
@@ -591,7 +577,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
           async () => {
             await page.goto('/#/game/prime-gold');
             await waitForGameReady(page);
-            await startHuman(page);
+            await startHuman(page, { force: true });
             await page.locator('#help-btn').click({ force: true });
             await expect(page.locator('#help-modal')).not.toHaveClass(/hidden/);
             await dismissOwl(page);
@@ -609,7 +595,7 @@ test.describe('WCAG zoom/reflow audit (report-only)', () => {
             `${game.id}-board`,
             async () => {
               await page.goto(`/#/game/${game.id}`);
-              await startHuman(page);
+              await startHuman(page, { force: true });
               await expect(page.locator('h1').first()).toContainText(
                 titleStem(game),
                 { timeout: 10_000 }

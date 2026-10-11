@@ -8,6 +8,7 @@ import {
   isTutorialActive,
 } from '../../src/games/fiar/game-controller';
 import { tutorialManager } from '../../src/core/tutorial';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   if (tutorialManager.getIsActive()) tutorialManager.exit();
@@ -17,9 +18,7 @@ afterEach(() => {
 
 describe('Wave 56 fiar — startTutorial', () => {
   it('activates welcome step then exit clears active', () => {
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(isTutorialActive()).toBe(false);
     startTutorial();

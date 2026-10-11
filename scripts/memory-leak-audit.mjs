@@ -20,12 +20,14 @@ import { createServer } from 'vite';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { requireEnvNumber } from './lib/env-number.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const LABEL = process.env.MEM_LEAK_LABEL || 'run';
-const CYCLES = Number(process.env.MEM_LEAK_CYCLES || 10);
-const PORT = Number(process.env.MEM_LEAK_PORT || 5181);
+const CYCLES = requireEnvNumber('MEM_LEAK_CYCLES', 10);
+const PORT = requireEnvNumber('MEM_LEAK_PORT', 5181);
 /** Optional date stem so re-runs can avoid clobbering the Oct 7 baseline twins. */
 const MEM_DATE = process.env.MEM_LEAK_DATE || '2026-10-07';
 const OUT_JSON = resolve(ROOT, `docs/memory-leaks-${LABEL}-${MEM_DATE}.json`);
@@ -76,13 +78,6 @@ const GAMES = filter.length
 function fmtMb(bytes) {
   if (bytes == null) return 'n/a';
   return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-async function dismissOwl(page) {
-  await page.evaluate(() => {
-    const el = document.getElementById('ollie-owl');
-    if (el) el.style.pointerEvents = 'none';
-  });
 }
 
 async function waitMenu(page) {

@@ -40,13 +40,13 @@ npm run format:check
 npm run typecheck                # tsc --noEmit (same as CI)
 npm run typecheck:ratchet        # ui/core shell + Phase-2 out-of-scope ceiling
 npm run check:boundaries         # engine→UI import-graph ceilings (engine_imports_ui = 0)
-npm run size:check               # gzip budgets (needs dist/; report-only, exit 0)
+npm run size:check               # gzip budgets (needs dist/; missing dist/ → exit 2; soft budgets report-only exit 0)
 npm run check:copy-pins          # flag tests pinning player-facing copy (report-only; docs/dev/check-copy-pins.md)
 npm run check:emit-identity      # type-only / brace-only emit proof (docs/dev/ai-typeonly-option.md; tip FAIL inventory: docs/dev/emit-identity-fail-inventory-post865-2026-10-10.md)
-npm run check:perf               # perf summary (+ optional Lighthouse); exit 0
+npm run check:perf               # perf summary (+ optional Lighthouse); missing dist/ → exit 2; with dist/ report-only exit 0
 npm run check:build              # build reproducibility probe
 npm run check:pwa-manifest       # PWA manifest / installability (report-only)
-npm run check:dev-docs           # engine-doc link report (report-only, exit 0)
+npm run check:dev-docs           # docs/ (+ wiki/playtest) path/link report (report-only, exit 0)
 npm run check:workflows          # workflow YAML sanity
 npm run report:knip              # knip unused-export drift vs baseline (CI report-only; docs/dev/knip-report.md)
 npm run report:dead-code         # fuller dead-code inventory (local; docs/dev/dead-code-inventory.md)
@@ -119,7 +119,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post1059` (cut from `alpha` @ `1c31a1ea` after #1059 squash-merge, 2026-10-10): tip-owner fold on draft tip PR #1083; live unit suite **3366** files / **14335** listed cases @ `0475167a` remasure after folding #1084–#1124 (+ tip remasure). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post1083` (cut from `alpha` @ `8901cff6` after #1083 squash-merge, 2026-10-10): tip-owner fold on draft tip PR (q-mp-026t); live unit suite **3366** files / **14347** listed cases @ `548802e2` remasure at tip open (#1098). Counts move every fold — tip owner should re-measure at fold. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front
@@ -138,14 +138,15 @@ README badges link those workflows. License is **ISC** (`package.json`).
 
 Stack of checks builders should know. Required CI paths stay green on Chromium unit + e2e; several layers are opt-in or report-only.
 
-**Live counts** (files / listed cases) measured on tip `0475167a` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
+**Live counts** (files / listed cases) measured on tip `548802e2` · 2026-10-10 — full tables, per-project Playwright numbers, playtest harnesses, and bench entrypoints: [`docs/dev/testing-layers-2026-10-09.md`](../dev/testing-layers-2026-10-09.md).
 
-| Layer                       | Live count (tip `0475167a`)                                  | Runner                                                 | Command                                                                                                                                |
+| Layer                       | Live count (tip `548802e2`)                                  | Runner                                                 | Command                                                                                                                                |
 | --------------------------- | ------------------------------------------------------------ | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Unit                        | **3366** files / **14335** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
+| Unit                        | **3366** files / **14347** listed cases                      | Vitest (`unit-shared` / `unit-node` / `unit-isolated`) | `npm run test:unit`                                                                                                                    |
 | E2E Chromium (required CI)  | **25** files / **249** cases (`--grep-invert @fullgame`)     | Playwright `chromium`                                  | `npm run test:e2e:chromium`                                                                                                            |
 | E2E fullgame                | **20** files / **20** cases                                  | Playwright `chromium` + `@fullgame`                    | `npm run test:e2e:fullgame`                                                                                                            |
-| E2E Firefox / WebKit / iPad | **25** files / **249** cases each                            | `firefox` / `webkit` / `ipad-webkit`                   | `npm run test:e2e:firefox-webkit` · `npm run test:e2e:cross`                                                                           |
+| E2E Firefox / WebKit (CI report-only) | **25** files / **249** cases each                            | `firefox` / `webkit`                                   | `npm run test:e2e:firefox-webkit`                                                                                                      |
+| E2E iPad WebKit (local / cross) | **25** files / **249** cases                                 | `ipad-webkit`                                          | `npm run test:e2e:cross` (Firefox + WebKit + `ipad-webkit`; not a separate CI job)                                                     |
 | Mobile touch                | **1** file / **20** cases × 3 projects                       | `mobile-iphone-13` / `mobile-pixel-7` / `mobile-ipad`  | `npm run test:e2e:mobile` — [`docs/mobile-2026-10-07.md`](../mobile-2026-10-07.md)                                                     |
 | Zoom / reflow               | **1** file / **69** cases                                    | `zoom-reflow`                                          | `npm run test:e2e:zoom-reflow` — [`docs/zoom-reflow-2026-10-08.md`](../zoom-reflow-2026-10-08.md)                                      |
 | Forced colors               | **1** file / **25** cases                                    | `forced-colors`                                        | `npm run test:e2e:forced-colors`                                                                                                       |

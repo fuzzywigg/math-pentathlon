@@ -8,6 +8,7 @@ import {
   initGame,
   newGameVsHuman,
 } from '../../src/games/contig-60/game-controller';
+import { mountPair } from '../helpers/mount-pair';
 
 afterEach(() => {
   document.body.innerHTML = '';
@@ -27,9 +28,7 @@ describe('Wave 58 contig — newGameVsHuman reset', () => {
     vi.spyOn(types, 'createInitialState')
       .mockReturnValueOnce(over)
       .mockReturnValue(fresh);
-    const board = document.createElement('div');
-    const status = document.createElement('div');
-    document.body.append(board, status);
+    const { board, status } = mountPair();
     initGame(board, status);
     expect(status.querySelector('.contig-winner-banner')).toBeTruthy();
     newGameVsHuman();

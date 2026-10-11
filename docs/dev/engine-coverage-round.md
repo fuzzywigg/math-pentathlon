@@ -26,15 +26,21 @@ Related prior work (already on tip; not duplicated):
 | #557 | Type-ratchet batch 6 (rules/engine type-only) — cross-checked |
 
 New suite: `tests/unit/engine-coverage-round-burn-1008.test.ts`  
-Rank helper: `scripts/engine-coverage-rank.mjs`
+Rank helper: `scripts/engine-coverage-rank.mjs` — pass a **local**
+`coverage-summary.json` path explicitly (missing/default path exits **2** with usage). The helper’s default
+`coverage-engine-baseline/` directory is **not in the repo** (ephemeral local
+artifact; do not commit it). Default Vitest `coverage/` is gitignored; produce
+the summary with a local `test:unit:coverage` run first.
 
 ## Method
 
-1. Baseline: full unit suite + coverage include above → `coverage-engine-baseline/`
+1. Baseline (**local only**): full unit suite + coverage include above → write
+   `coverage-engine-baseline/` on disk (not in git), then pass
+   `coverage-engine-baseline/coverage-summary.json` to the rank helper
 2. Rank NON-AI files by branch %; target lowest `rules.ts` (+ companions)
 3. Add hand-built / forged-state characterization tests (legal moves, apply,
    win/draw, scoring, serialize) using #465 helpers where useful
-4. Re-measure → `coverage-engine-after/`
+4. Re-measure → `coverage-engine-after/` (also local / not committed)
 5. Document remaining unreachable arms as `it.todo` (no fixes)
 
 ## Per-game rules.ts before → after
@@ -119,10 +125,32 @@ edits (as claimed by #557).
 ## Reproduce
 
 ```bash
-# Rank from a coverage-summary.json
+# 1) Produce a local coverage summary first (ephemeral; do not commit).
+#    Default Vitest coverage/ is gitignored; named coverage-engine-* dirs are
+#    local artifacts only.
+npm run test:unit:coverage -- \
+  --coverage.reportsDirectory=coverage-engine-baseline \
+  --coverage.include='src/games/*/rules.ts' \
+  --coverage.include='src/games/*/types.ts' \
+  --coverage.include='src/games/*/game-state.ts' \
+  --coverage.include='src/games/*/board.ts' \
+  --coverage.include='src/games/*/pieces.ts' \
+  --coverage.include='src/games/*/serialization.ts' \
+  --coverage.exclude='src/games/**/ai.ts' \
+  --coverage.exclude='src/games/**/ai-client.ts' \
+  --coverage.exclude='src/games/**/ai.worker.ts' \
+  --coverage.exclude='src/games/**/board-ui.ts' \
+  --coverage.exclude='src/games/**/game-controller.ts' \
+  --coverage.exclude='src/games/**/tutorial.ts' \
+  --coverage.exclude='src/games/**/board-renderer.ts' \
+  --coverage.exclude='src/games/**/board-3d-loader.ts' \
+  --coverage.exclude='src/games/**/layout.ts' \
+  --coverage.exclude='src/games/**/index.ts'
+
+# 2) Rank from that local coverage-summary.json (pass the path explicitly)
 node scripts/engine-coverage-rank.mjs coverage-engine-baseline/coverage-summary.json
 
-# Coverage (engine modules only; local)
+# 3) Re-measure after characterization (also local / not committed)
 npm run test:unit:coverage -- \
   --coverage.reportsDirectory=coverage-engine-after \
   --coverage.include='src/games/*/rules.ts' \

@@ -79,15 +79,13 @@ Four concurrent Chromium contexts + Hard search occasionally exceeded a 12s harn
 | Desktop Easy start (suite) | ![de](./queens-guards-deep-2026-10-07/desktop-easy-start.png) |
 | Game over (tablet Easy) | ![end](./queens-guards-deep-2026-10-07/tablet-easy-g0-red-win.png) |
 
-## Regression tests
+## Regression / reproduce (tip)
 
-- Unit: `tests/unit/queens-guards-touch-aria-playability.test.ts` (660px pin, aria lock, tap copy, paint delay)
-- E2E: `tests/e2e/queens-guards-playability.spec.ts` (44px tablet cells, AI-seat aria, Easy full game)
-- Existing soft-lock / play-deadline suites still green
+- Live e2e: `tests/e2e/queens-guards-playability.spec.ts` (44px tablet cells, AI-seat aria, Easy full game)
+- Historical (removed from tip — not a live path): unit queens-guards-touch-aria-playability.test.ts
+- No Queens & Guards product work in the docs retarget; existing soft-lock / play-deadline suites remain the product coverage
 
-## Verification run
+## Verification run (at the time of this report)
 
-- `eslint src/games/queens-guards` — clean
-- `tsc --noEmit` — clean
-- Queens unit suites — passed
-- `playwright test tests/e2e/queens-guards-playability.spec.ts --project=chromium` — 3 passed
+- lint / typecheck / Queens unit suites were green on the Oct 7 branch
+- Live tip reproduce: `npx playwright test tests/e2e/queens-guards-playability.spec.ts --project=chromium`

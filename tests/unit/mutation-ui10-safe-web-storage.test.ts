@@ -12,6 +12,7 @@ import {
   safeSetItemResult,
   subscribeStorageEvent,
 } from '../../src/core/safe-web-storage';
+import { securityError } from '../helpers/storage-stubs';
 
 describe('mutation-ui10 safe-web-storage', () => {
   beforeEach(() => {
@@ -46,7 +47,7 @@ describe('mutation-ui10 safe-web-storage', () => {
     expect(safeSetItemResult('w10', 'v').ok).toBe(true);
     expect(localStorage.getItem('w10')).toBe('v');
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new DOMException('blocked', 'SecurityError');
+      throw securityError();
     });
     expect(safeSetItemResult('w10b', 'v').ok).toBe(false);
     expect(safeSetItem('w10c', 'v')).toBe(false);
