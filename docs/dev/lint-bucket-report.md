@@ -66,6 +66,8 @@ Text mode prints one block per rule:
 
 JSON mode emits `{ task, ceilingsPath, ceilings, rules: { [ruleId]: { total, ceiling, headroom, buckets, files } } }`.
 
+Non-numeric ceiling values (q-mp-1254): text mode appends `(invalid ceiling: non-numeric; headroom skipped)` instead of a blank note from `NaN` arithmetic; JSON sets `headroom: null` and `headroomError: "non-numeric ceiling"`. Finite numeric strings are coerced; the ceilings file is never written.
+
 ## Hard-rule notes
 
 - No `src/` behavior edits from this helper.
