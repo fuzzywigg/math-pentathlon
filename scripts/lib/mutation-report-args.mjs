@@ -2,7 +2,15 @@
  * Argv parsing for scripts/mutation-report.mjs
  * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967).
  * Kept free of TypeScript AST / vitest so unit tests can import hermetically.
+ *
+ * This file is a library module. Direct CLI entry prints usage only:
+ *   node scripts/lib/mutation-report-args.mjs [--help]
+ * Unknown flags exit 2. Import from harnesses (e.g. mutation-report.mjs).
  */
+
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseHelpOnlyArgv } from './help-only-cli.mjs';
 
 export const MUTATION_REPORT_USAGE =
   'Usage: node scripts/mutation-report.mjs [--games=id,id] [--max=N] [--timeout=MS] [--json=path] [--verbose-tests] [--dry-run] [-h|--help]\n' +
@@ -14,6 +22,14 @@ export const MUTATION_REPORT_USAGE =
   '  --dry-run       list games/plan and exit without writing rules.ts or JSON\n' +
   '  -h, --help      show this help and exit (no rules.ts I/O)\n' +
   'Unknown flags exit 2 before any mutation.';
+
+export const MUTATION_REPORT_ARGS_USAGE = `Usage: node scripts/lib/mutation-report-args.mjs [--help]
+
+Library module — import from harness scripts (e.g. scripts/mutation-report.mjs).
+Not a standalone CLI.
+
+Options:
+  -h, --help    Show this help and exit`;
 
 /**
  * @typedef {{
@@ -167,4 +183,30 @@ export function resolveMutationReportGames(requested, validGames) {
     };
   }
   return { ok: true, games: requested };
+}
+
+/**
+ * CLI entry when this file is executed directly (q-mp-975).
+ * Import-as-library path is unchanged (no side effects on import).
+ *
+ * @param {string[]} [argv]
+ */
+export function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(MUTATION_REPORT_ARGS_USAGE);
+    process.exit(2);
+  }
+  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  console.log(MUTATION_REPORT_ARGS_USAGE);
+  process.exit(0);
+}
+
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
 }

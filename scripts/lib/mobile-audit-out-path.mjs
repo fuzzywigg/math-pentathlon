@@ -2,8 +2,22 @@
  * `--out` / `--help` flag parsing for scripts/mobile-audit.mjs
  * (q-mp-844 + q-mp-900 help/unknown).
  * Kept free of Playwright so unit tests can import it hermetically.
+ *
+ * This file is a library module. Direct CLI entry prints usage only:
+ *   node scripts/lib/mobile-audit-out-path.mjs [--help]
+ * Unknown flags exit 2. Import from harnesses (e.g. mobile-audit.mjs).
  */
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { parseHelpOnlyArgv } from './help-only-cli.mjs';
+
+export const MOBILE_AUDIT_OUT_PATH_USAGE = `Usage: node scripts/lib/mobile-audit-out-path.mjs [--help]
+
+Library module — import from harness scripts (e.g. scripts/mobile-audit.mjs).
+Not a standalone CLI.
+
+Options:
+  -h, --help    Show this help and exit`;
 
 /**
  * Resolve `--out` / `--help` from argv. Missing `--out` → default path; flag
@@ -59,4 +73,30 @@ export function mobileAuditOutUsage() {
 Options:
   --out <path>   Write JSON report to path (default under docs/)
   -h, --help     Show this help and exit (no browser launch)`;
+}
+
+/**
+ * CLI entry when this file is executed directly (q-mp-975).
+ * Import-as-library path is unchanged (no side effects on import).
+ *
+ * @param {string[]} [argv]
+ */
+export function main(argv = process.argv.slice(2)) {
+  const parsed = parseHelpOnlyArgv(argv);
+  if (parsed.kind === 'error') {
+    console.error(`Unknown flag: ${parsed.flag}`);
+    console.error(MOBILE_AUDIT_OUT_PATH_USAGE);
+    process.exit(2);
+  }
+  // --help / -h, bare main, or stray positionals: usage only (not runnable).
+  console.log(MOBILE_AUDIT_OUT_PATH_USAGE);
+  process.exit(0);
+}
+
+const isMain =
+  Boolean(process.argv[1]) &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href;
+
+if (isMain) {
+  main();
 }

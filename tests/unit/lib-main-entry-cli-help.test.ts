@@ -1,7 +1,8 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for lib-module main-entry usage / --help (q-mp-958).
+ * Hermetic coverage for lib-module main-entry usage / --help
+ * (q-mp-958 + q-mp-975).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -19,6 +20,18 @@ import {
   DISMISS_OWL_USAGE,
   main as dismissOwlMain,
 } from '../../scripts/lib/dismiss-owl.mjs';
+import {
+  MUTATION_REPORT_ARGS_USAGE,
+  main as mutationReportArgsMain,
+} from '../../scripts/lib/mutation-report-args.mjs';
+import {
+  MOBILE_AUDIT_OUT_PATH_USAGE,
+  main as mobileAuditOutPathMain,
+} from '../../scripts/lib/mobile-audit-out-path.mjs';
+import {
+  PWA_MANIFEST_CONTRACT_USAGE,
+  main as pwaManifestContractMain,
+} from '../../scripts/lib/pwa-manifest-contract.mjs';
 
 const ROOT = process.cwd();
 
@@ -41,6 +54,24 @@ const libs = [
     main: dismissOwlMain,
     harnessHint: /console-sweep\.mjs/,
   },
+  {
+    rel: 'scripts/lib/mutation-report-args.mjs',
+    usage: MUTATION_REPORT_ARGS_USAGE,
+    main: mutationReportArgsMain,
+    harnessHint: /mutation-report\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/mobile-audit-out-path.mjs',
+    usage: MOBILE_AUDIT_OUT_PATH_USAGE,
+    main: mobileAuditOutPathMain,
+    harnessHint: /mobile-audit\.mjs/,
+  },
+  {
+    rel: 'scripts/lib/pwa-manifest-contract.mjs',
+    usage: PWA_MANIFEST_CONTRACT_USAGE,
+    main: pwaManifestContractMain,
+    harnessHint: /check-pwa-manifest\.mjs/,
+  },
 ] as const;
 
 function runCli(rel: string, args: string[]) {
@@ -51,7 +82,7 @@ function runCli(rel: string, args: string[]) {
   });
 }
 
-describe('lib main-entry usage (q-mp-958)', () => {
+describe('lib main-entry usage (q-mp-958 / q-mp-975)', () => {
   for (const lib of libs) {
     describe(lib.rel, () => {
       it('exports usage naming the library path and a harness importer', () => {
