@@ -584,8 +584,6 @@ export async function writeRenderReport(root, results, meta) {
   return { md, json };
 }
 
-export { HOVER_GAMES };
-
 /**
  * CLI entry when this file is executed directly (q-mp-919).
  * Import-as-library path is unchanged (no side effects on import).
