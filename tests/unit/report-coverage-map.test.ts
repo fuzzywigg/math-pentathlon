@@ -139,6 +139,40 @@ describe('report-coverage-map helpers (q-mp-075)', () => {
     expect(rows[0]?.lines).toEqual({ total: 0, covered: 0, pct: 100 });
   });
 
+  it('clamps covered > total so display pct stays ≤ 100 (q-mp-1039)', () => {
+    const rows = aggregateByDirectory(
+      {
+        'src/games/calla/board.ts': {
+          lines: { total: 100, covered: 120, pct: 120 },
+          branches: { total: 10, covered: 10, pct: 100 },
+          functions: { total: 5, covered: 5, pct: 100 },
+          statements: { total: 100, covered: 120, pct: 120 },
+        },
+        'src/games/ramrod/board.ts': {
+          lines: { total: 100, covered: 50, pct: 50 },
+          branches: { total: 10, covered: 5, pct: 50 },
+          functions: { total: 5, covered: 2, pct: 40 },
+          statements: { total: 100, covered: 50, pct: 50 },
+        },
+      },
+      { root: '/workspace' }
+    );
+
+    expect(rows.map((r) => r.dir)).toEqual([
+      'src/games/ramrod',
+      'src/games/calla',
+    ]);
+    expect(rows[1]).toMatchObject({
+      dir: 'src/games/calla',
+      files: 1,
+      lines: { covered: 100, total: 100, pct: 100 },
+      statements: { covered: 100, total: 100, pct: 100 },
+    });
+    const md = renderCoverageMapMarkdown(rows);
+    expect(md).toContain('| `src/games/calla` | 100.00 |');
+    expect(md).not.toMatch(/120\.00/);
+  });
+
   it('maps coverage percentages to heat colors', () => {
     expect(heatColor(96)).toBe('#1b7f4a');
     expect(heatColor(91)).toBe('#3d9b5c');

@@ -153,13 +153,14 @@ export function normalizeRepoPath(filePath, root = ROOT) {
 
 /**
  * Istanbul-style counts → metric. Explicit 0/0 stays 100% (empty file).
+ * Clamp covered to total so display/rank pct stays in [0, 100] (q-mp-1039).
  * @param {number} covered
  * @param {number} total
  * @returns {CovMetric}
  */
 function metricFromCounts(covered, total) {
   const t = Math.max(0, total);
-  const c = Math.max(0, covered);
+  const c = Math.min(t, Math.max(0, covered));
   const pct = t === 0 ? 100 : (100 * c) / t;
   return { total: t, covered: c, pct };
 }
@@ -206,8 +207,11 @@ export function readMetric(m) {
  */
 function accumulateMetric(bucket, key, parsed) {
   if (parsed.kind === 'counts') {
-    bucket[`${key}C`] += parsed.covered;
-    bucket[`${key}T`] += parsed.total;
+    // Clamp per-file covered≤total before summing (q-mp-1039).
+    const t = Math.max(0, parsed.total);
+    const c = Math.min(t, Math.max(0, parsed.covered));
+    bucket[`${key}C`] += c;
+    bucket[`${key}T`] += t;
     bucket[`${key}CountFiles`] += 1;
     return;
   }
