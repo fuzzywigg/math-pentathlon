@@ -97,3 +97,9 @@ export function writeLicenseArtifacts(opts: {
   outDir: string;
   paths: { sbom: string; summaryMd: string; summaryJson: string };
 };
+
+/** Stable malformed-lock message (q-mp-1026) — no stack. */
+export function malformedLockMessage(
+  lockPath?: string,
+  detail?: string
+): string;
