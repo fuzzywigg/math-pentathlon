@@ -1,8 +1,8 @@
 /**
- * Shared runner for state round-trip fuzz shards (q-mp-1108 / q-mp-1291).
+ * Shared runner for state round-trip fuzz shards (q-mp-1108 / q-mp-1291 / q-mp-1325).
  * Same seeds, move caps, and assertion schedule as the pre-shard suite.
- * Optional assert-move windows let expensive seed-A queens work split across
- * files without dropping serialize / AI checkpoints when both shards run.
+ * Optional assert-move windows let expensive queens seed-A / seed-B work split
+ * across files without dropping serialize / AI checkpoints when both shards run.
  */
 import { expect } from 'vitest';
 
@@ -29,6 +29,12 @@ export const FUZZ_PLAY_SEED_B = FUZZ_PLAY_SEED ^ 0x9e3779b9;
  * Together they keep the same seed, move cap, and every-5th AI schedule.
  */
 export const QUEENS_SEED_A_SPLIT_MOVE = 14;
+
+/**
+ * Split point for queens-guards seed-B early/late shards (q-mp-1325).
+ * Same windowing contract as seed-A; leave seed-A files / split alone.
+ */
+export const QUEENS_SEED_B_SPLIT_MOVE = 14;
 
 const FUZZ_PLAY_SEEDS = [FUZZ_PLAY_SEED, FUZZ_PLAY_SEED_B] as const;
 
