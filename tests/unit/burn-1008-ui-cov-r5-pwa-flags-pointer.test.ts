@@ -30,6 +30,33 @@ const originalDocumentHidden = Object.getOwnPropertyDescriptor(
   'hidden'
 );
 
+// unit-shared uses isolate:false — restore visibilityState + serviceWorker so
+// later suites do not see stuck stubs from Object.defineProperty (q-mp-1395).
+const originalVisibilityState = Object.getOwnPropertyDescriptor(
+  document,
+  'visibilityState'
+);
+const originalServiceWorker = Object.getOwnPropertyDescriptor(
+  navigator,
+  'serviceWorker'
+);
+
+function restoreVisibilityState(): void {
+  if (originalVisibilityState) {
+    Object.defineProperty(document, 'visibilityState', originalVisibilityState);
+  } else {
+    Reflect.deleteProperty(document, 'visibilityState');
+  }
+}
+
+function restoreServiceWorker(): void {
+  if (originalServiceWorker) {
+    Object.defineProperty(navigator, 'serviceWorker', originalServiceWorker);
+  } else {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+  }
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
@@ -41,6 +68,8 @@ afterEach(() => {
   } else {
     Reflect.deleteProperty(document, 'hidden');
   }
+  restoreVisibilityState();
+  restoreServiceWorker();
 });
 
 describe('burn-1008 ui-cov-r5 pwa register residuals', () => {

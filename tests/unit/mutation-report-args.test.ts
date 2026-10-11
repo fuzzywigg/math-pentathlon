@@ -3,7 +3,7 @@
  *
  * Hermetic coverage for mutation-report argv validation
  * (q-mp-867 / q-mp-868 / q-mp-892 / q-mp-967 / q-mp-1064 / q-mp-1217 /
- * q-mp-1232 / q-mp-1322).
+ * q-mp-1232 / q-mp-1322 / q-mp-1358 / q-mp-1359).
  *
  * Argv reject paths assert via parseMutationReportArgs /
  * resolveMutationReportGames in-process (q-mp-1064 wall-time cut).
@@ -320,6 +320,67 @@ describe('resolveMutationReportGames (q-mp-868)', () => {
     expect(got.ok).toBe(false);
     if (!got.ok) {
       expect(got.message).toMatch(/unknown game\(s\): nope/);
+    }
+  });
+});
+
+describe('parseMutationReportArgs duplicate value flags (q-mp-1358)', () => {
+  it('rejects duplicate --max', () => {
+    expectParseReject(['--max=10', '--max=20'], /Duplicate --max/);
+  });
+
+  it('rejects duplicate --timeout', () => {
+    expectParseReject(
+      ['--timeout=5000', '--timeout=6000'],
+      /Duplicate --timeout/
+    );
+  });
+
+  it('rejects duplicate --games', () => {
+    expectParseReject(['--games=hex', '--games=pent'], /Duplicate --games/);
+  });
+
+  it('rejects duplicate --json', () => {
+    expectParseReject(['--json=a.json', '--json=b.json'], /Duplicate --json/);
+  });
+
+  it('still accepts a single valid --max / --timeout / --games / --json', () => {
+    const got = parse([
+      '--max=10',
+      '--timeout=5000',
+      '--games=hex',
+      '--json=/tmp/out.json',
+    ]);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.opts.max).toBe(10);
+      expect(got.opts.timeoutMs).toBe(5000);
+      expect(got.opts.games).toEqual(['hex']);
+      expect(got.opts.jsonOut).toBe('/tmp/out.json');
+    }
+  });
+});
+
+describe('parseMutationReportArgs flag-like --json= (q-mp-1359)', () => {
+  it('rejects --json=--dry-run', () => {
+    expectParseReject(
+      ['--json=--dry-run'],
+      /Invalid --json value \(need non-empty path, not flag-like\): --dry-run/
+    );
+  });
+
+  it('rejects --json=-out.json', () => {
+    expectParseReject(
+      ['--json=-out.json'],
+      /Invalid --json value \(need non-empty path, not flag-like\): -out\.json/
+    );
+  });
+
+  it('still accepts a normal --json= path', () => {
+    const got = parse(['--json=/tmp/mutation-out.json']);
+    expect(got.ok).toBe(true);
+    if (got.ok) {
+      expect(got.opts.jsonOut).toBe('/tmp/mutation-out.json');
     }
   });
 });

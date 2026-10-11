@@ -62,7 +62,10 @@ function isDecimalIntegerToken(raw) {
  * Parse CLI flags. Rejects empty / whitespace-only `--max=` / `--games=` /
  * `--json=`, non-integer / negative `--max`, non-integer / `<5000`
  * `--timeout`, and unknown flags instead of silently coercing or ignoring
- * them. `--max=0` remains intentional “all”. `--help` / `-h` and `--dry-run`
+ * them. Duplicate `--max` / `--timeout` / `--games` / `--json` are rejected
+ * (q-mp-1358) instead of silently last-winning. `--json=` values that are
+ * empty or flag-like (start with `-`) are rejected (q-mp-967 / q-mp-1359).
+ * `--max=0` remains intentional “all”. `--help` / `-h` and `--dry-run`
  * never mutate product trees. Floats like `--max=2.9` / `--timeout=5000.5`
  * are rejected (q-mp-1217). Scientific notation like `--max=1e2` /
  * `--timeout=1e4` is rejected (q-mp-1322); require a decimal digit token.
@@ -98,6 +101,10 @@ export function parseMutationReportArgs(argv, defaults) {
     } else if (arg === '--dry-run') {
       opts.dryRun = true;
     } else if (arg.startsWith('--games=')) {
+      // q-mp-1358: duplicate value flags must not silently last-win.
+      if (gamesProvided) {
+        return { ok: false, message: 'Duplicate --games' };
+      }
       gamesProvided = true;
       gamesRaw = arg.slice(8);
       opts.games = gamesRaw
@@ -105,14 +112,23 @@ export function parseMutationReportArgs(argv, defaults) {
         .map((s) => s.trim())
         .filter(Boolean);
     } else if (arg.startsWith('--max=')) {
+      if (maxProvided) {
+        return { ok: false, message: 'Duplicate --max' };
+      }
       maxProvided = true;
       maxRaw = arg.slice(6);
       opts.max = Number(maxRaw);
     } else if (arg.startsWith('--timeout=')) {
+      if (timeoutProvided) {
+        return { ok: false, message: 'Duplicate --timeout' };
+      }
       timeoutProvided = true;
       timeoutRaw = arg.slice(10);
       opts.timeoutMs = Number(timeoutRaw);
     } else if (arg.startsWith('--json=')) {
+      if (jsonProvided) {
+        return { ok: false, message: 'Duplicate --json' };
+      }
       jsonProvided = true;
       jsonRaw = arg.slice(7);
       opts.jsonOut = resolveJson(jsonRaw);
@@ -181,10 +197,13 @@ export function parseMutationReportArgs(argv, defaults) {
   }
 
   // q-mp-967: empty / whitespace-only --json= must not accept empty jsonOut.
-  if (jsonProvided && jsonRaw.trim() === '') {
+  // q-mp-1359: flag-like --json= values (e.g. --json=--dry-run) are not paths.
+  if (jsonProvided && (jsonRaw.trim() === '' || jsonRaw.startsWith('-'))) {
     return {
       ok: false,
-      message: 'Invalid --json value (need non-empty path)',
+      message: jsonRaw.startsWith('-')
+        ? `Invalid --json value (need non-empty path, not flag-like): ${jsonRaw}`
+        : 'Invalid --json value (need non-empty path)',
     };
   }
 

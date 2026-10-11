@@ -151,9 +151,16 @@ Stars & Bars history loop uncapped (no AI-file history-cap edit).
 
 ## Reproduce
 
+Prefer the `package.json` script (matches AGENTS / CI):
+
+```bash
+npm run typecheck:ratchet
+# in-scope 0; out-of-scope 0 ≤ baseline 0
+```
+
+Optional raw `tsc` count (diagnostic only; prefer the script above):
+
 ```bash
 npx tsc --noEmit -p tsconfig.ratchet.json --pretty false 2>&1 | rg -c "error TS"
 # expect 0
-npm run typecheck:ratchet
-# in-scope 0; out-of-scope 0 ≤ baseline 0
 ```

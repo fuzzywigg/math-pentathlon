@@ -118,16 +118,17 @@ Job `visual-baseline` in `.github/workflows/ci.yml` is **report-only** (`continu
 
 ## Branches
 
-| Branch  | Role                          |
-| ------- | ----------------------------- |
-| `alpha` | Trunk. Target PRs here.       |
-| `main`  | Not the default for new work. |
+| Branch            | Role                                                                                                                            |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `alpha`           | Trunk. Human / trunk PRs target here (see [`CONTRIBUTING.md`](../../CONTRIBUTING.md)).                                          |
+| `cursor/mp-tip-*` | Living tip for stacked cloud-agent **draft** PRs (see [`AGENTS.md`](../../AGENTS.md)). Tip owners fold; not the human PR base. |
+| `main`            | Not the default for new work.                                                                                                   |
 
 ## CI posture (public)
 
 Workflows under `.github/workflows/`:
 
-- **CI** (`ci.yml`) — lint, `lint:ratchet`, Prettier `format:check`, `typecheck`, `typecheck:ratchet`, `check:boundaries`, `npm audit --audit-level=high`, build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`), unit, Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
+- **CI** (`ci.yml`) — blocking `npm run verify` (= `lint` → `lint:ratchet` → Prettier `format:check` → `typecheck` → `typecheck:ratchet` → `check:boundaries`); then soft `check:copy-pins -- --fail` (`continue-on-error: true`; outside `package.json` `verify`); `npm audit --audit-level=high`; build (hard 250 kB JS chunk budget + soft `size:check -- --fail-on-new-over` via `continue-on-error`); unit; Chromium e2e; report-only `knip` (unused-export drift vs `docs/dev/knip-baseline.json`), `mobile-touch`, `zoom-reflow`, `forced-colors`, `e2e-cross-browser` (Firefox + WebKit), `e2e-fullgame`, and `visual-baseline` (`continue-on-error`)
 - **Deploy** (`deploy.yml`) — build and publish to Cloudflare Pages on `alpha` pushes (trunk; not `main`)
 
 ### Menu shell / offline load notes
@@ -139,7 +140,7 @@ Workflows under `.github/workflows/`:
 
 ### Unit job runtime
 
-Live tip `cursor/mp-tip-post38d2` (cut from `alpha` @ `38d22ce0` after #1449 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ag); live unit suite **3449** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
+Live tip `cursor/mp-tip-post8f8a` (cut from `alpha` @ `8f8a2122` after #1450 squash-merge, 2026-10-11): tip-owner fold on draft tip PR (q-mp-026ah); live unit suite **3458** files @ tip open (remasure). Counts move every fold — tip owner remasures; do not treat these numbers as tip-head truth between folds. Healthy GitHub Actions unit runs should finish in about **under 8 minutes** (AI latency benches are skipped under `CI=1`). Open draft [#658](https://github.com/fuzzywigg/math-pentathlon/pull/658) may change unit **timing** (headroom) but not these counts — see the measurement snapshot.
 
 - Job `timeout-minutes: 14` and step `timeout-minutes: 12` so overrun fails loudly
 - CI prints the unit file count up front

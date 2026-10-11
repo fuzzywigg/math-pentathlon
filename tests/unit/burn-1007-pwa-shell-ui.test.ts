@@ -38,6 +38,34 @@ import {
 } from '../../src/ui/game-prefetch';
 import { resetSettingsFlagsForTests } from '../../src/core/settings-flags';
 
+// unit-shared uses isolate:false — restore document.hidden + visibilityState
+// so later suites do not see stuck stubs from Object.defineProperty (q-mp-1363).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+const originalVisibilityState = Object.getOwnPropertyDescriptor(
+  document,
+  'visibilityState'
+);
+
+function restoreDocumentHiddenAndVisibilityState(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+  if (originalVisibilityState) {
+    Object.defineProperty(document, 'visibilityState', originalVisibilityState);
+  } else {
+    Reflect.deleteProperty(document, 'visibilityState');
+  }
+}
+
+afterEach(() => {
+  restoreDocumentHiddenAndVisibilityState();
+});
+
 describe('burn-1007 registerPwa edges', () => {
   afterEach(() => {
     resetPwaReloadGuardForTests();

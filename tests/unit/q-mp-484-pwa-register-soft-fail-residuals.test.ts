@@ -22,15 +22,40 @@ import {
   resetPwaReloadGuardForTests,
 } from '../../src/pwa/register';
 
+// unit-shared uses isolate:false — restore visibilityState / serviceWorker so
+// later suites do not see stuck stubs from Object.defineProperty (q-mp-1365).
+const originalVisibilityState = Object.getOwnPropertyDescriptor(
+  document,
+  'visibilityState'
+);
+const originalServiceWorker = Object.getOwnPropertyDescriptor(
+  navigator,
+  'serviceWorker'
+);
+
+function restoreVisibilityState(): void {
+  if (originalVisibilityState) {
+    Object.defineProperty(document, 'visibilityState', originalVisibilityState);
+  } else {
+    Reflect.deleteProperty(document, 'visibilityState');
+  }
+}
+
+function restoreServiceWorker(): void {
+  if (originalServiceWorker) {
+    Object.defineProperty(navigator, 'serviceWorker', originalServiceWorker);
+  } else {
+    Reflect.deleteProperty(navigator, 'serviceWorker');
+  }
+}
+
 afterEach(() => {
   resetPwaReloadGuardForTests();
   vi.useRealTimers();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-  Object.defineProperty(document, 'visibilityState', {
-    configurable: true,
-    get: () => 'visible',
-  });
+  restoreVisibilityState();
+  restoreServiceWorker();
 });
 
 describe('q-mp-484 register — visibility soft-fail residuals', () => {
@@ -99,8 +124,7 @@ describe('q-mp-484 register — hourly update soft-fail residuals', () => {
     const update = vi.fn(() => Promise.resolve());
     const registration = { update } as unknown as ServiceWorkerRegistration;
     let onRegisteredSW:
-      | ((url: string, reg?: ServiceWorkerRegistration) => void)
-      | undefined;
+      ((url: string, reg?: ServiceWorkerRegistration) => void) | undefined;
     registerPwa({
       enabled: true,
       reload: vi.fn(),
@@ -131,8 +155,7 @@ describe('q-mp-484 register — hourly update soft-fail residuals', () => {
     const update = vi.fn(() => undefined);
     const registration = { update } as unknown as ServiceWorkerRegistration;
     let onRegisteredSW:
-      | ((url: string, reg?: ServiceWorkerRegistration) => void)
-      | undefined;
+      ((url: string, reg?: ServiceWorkerRegistration) => void) | undefined;
     registerPwa({
       enabled: true,
       reload: vi.fn(),
@@ -161,8 +184,7 @@ describe('q-mp-484 register — hourly update soft-fail residuals', () => {
     const regA = { update: updateA } as unknown as ServiceWorkerRegistration;
     const regB = { update: updateB } as unknown as ServiceWorkerRegistration;
     let onRegisteredSW:
-      | ((url: string, reg?: ServiceWorkerRegistration) => void)
-      | undefined;
+      ((url: string, reg?: ServiceWorkerRegistration) => void) | undefined;
     registerPwa({
       enabled: true,
       reload: vi.fn(),
@@ -186,8 +208,7 @@ describe('q-mp-484 register — hourly update soft-fail residuals', () => {
     const update = vi.fn(() => Promise.resolve());
     const registration = { update } as unknown as ServiceWorkerRegistration;
     let onRegisteredSW:
-      | ((url: string, reg?: ServiceWorkerRegistration) => void)
-      | undefined;
+      ((url: string, reg?: ServiceWorkerRegistration) => void) | undefined;
     registerPwa({
       enabled: true,
       reload: vi.fn(),

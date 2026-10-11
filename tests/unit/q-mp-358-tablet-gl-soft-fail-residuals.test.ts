@@ -26,6 +26,21 @@ import {
 
 const READY_ATTR = 'data-mp3d-ready';
 
+// unit-shared uses isolate:false — restore document.hidden so later suites
+// do not see a stuck stub from Object.defineProperty (q-mp-1364).
+const originalDocumentHidden = Object.getOwnPropertyDescriptor(
+  document,
+  'hidden'
+);
+
+function restoreDocumentHidden(): void {
+  if (originalDocumentHidden) {
+    Object.defineProperty(document, 'hidden', originalDocumentHidden);
+  } else {
+    Reflect.deleteProperty(document, 'hidden');
+  }
+}
+
 describe('q-mp-358 tablet-gl soft-fail / LQ / ready-attr residuals', () => {
   const originalWebdriver = navigator.webdriver;
 
@@ -47,6 +62,7 @@ describe('q-mp-358 tablet-gl soft-fail / LQ / ready-attr residuals', () => {
       configurable: true,
       get: () => originalWebdriver,
     });
+    restoreDocumentHidden();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     vi.useRealTimers();

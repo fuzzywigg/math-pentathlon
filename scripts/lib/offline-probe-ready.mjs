@@ -24,13 +24,20 @@ Options:
   -h, --help    Show this help and exit`;
 
 /**
- * True only for HTTP 2xx (`Response.ok`). Bare 404 is not ready.
+ * True only for HTTP 2xx. Requires `ok === true`; when `status` is a finite
+ * number, also require 2xx so mocks that set `ok: true` with a non-2xx status
+ * (e.g. `{ ok: true, status: 404 }`) are not treated as ready. When `status`
+ * is absent, keep `ok === true` for real `Response` objects.
  *
  * @param {{ ok?: boolean, status?: number } | null | undefined} res
  * @returns {boolean}
  */
 export function isHttpResponseReady(res) {
-  return Boolean(res && res.ok === true);
+  if (!res || res.ok !== true) return false;
+  if (typeof res.status === 'number' && Number.isFinite(res.status)) {
+    return res.status >= 200 && res.status < 300;
+  }
+  return true;
 }
 
 /**

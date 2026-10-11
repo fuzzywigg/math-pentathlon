@@ -23,6 +23,8 @@
  * --help / -h and --dry-run must not write those files (q-mp-977).
  * Empty / array / zero-directory summaries are rejected with no doc writes (q-mp-993).
  * Malformed JSON prints a short message (no stack) and exits non-zero (q-mp-1005).
+ * Leading UTF-8 BOM (U+FEFF) on the summary file is stripped before parse so
+ * editor-prefixed JSON is accepted; non-BOM input is unchanged (q-mp-1388).
  * Pct-only metric rows honor numeric `pct` (covered/total shown as unknown); never
  * invent 100% from absent totals via metric(0,0) (q-mp-1017). Explicit 0/0 counts
  * still map to istanbul's 100%.
@@ -699,7 +701,11 @@ export function writeReport(opts = {}) {
     err.path = summaryPath;
     throw err;
   } else {
-    const raw = fs.readFileSync(summaryPath, 'utf8');
+    let raw = fs.readFileSync(summaryPath, 'utf8');
+    // Strip a single leading UTF-8 BOM (q-mp-1388). Mid-file FEFF is left alone.
+    if (raw.charCodeAt(0) === 0xfeff) {
+      raw = raw.slice(1);
+    }
     try {
       summary = JSON.parse(raw);
     } catch (err) {

@@ -14,8 +14,10 @@
  *   npm run report:lint-buckets -- --json
  *   npm run report:lint-buckets -- --help   # usage; unknown flags exit 2
  *
- * Empty eslint stdout / fatal probe exits fail closed (q-mp-1317) — never
- * treat missing JSON as `[]` all-zero totals. Leave check-lint-ratchet alone.
+ * Duplicate `--top` / `--rule` (space or `=` form) exit 2 (q-mp-1360) — never
+ * last-wins. Empty eslint stdout / fatal probe exits fail closed (q-mp-1317) —
+ * never treat missing JSON as `[]` all-zero totals. Leave check-lint-ratchet
+ * alone.
  *
  * Docs: docs/dev/lint-bucket-report.md
  */
@@ -228,6 +230,9 @@ function parsePositiveIntTop(raw) {
 export function parseArgs(argv) {
   /** @type {{ rule: string | null, top: number, json: boolean, help: boolean }} */
   const opts = { rule: null, top: 10, json: false, help: false };
+  // q-mp-1360: reject duplicate --top / --rule (space or = form); no last-wins.
+  let sawTop = false;
+  let sawRule = false;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--help' || arg === '-h') {
@@ -235,6 +240,9 @@ export function parseArgs(argv) {
     } else if (arg === '--json') {
       opts.json = true;
     } else if (arg === '--rule') {
+      if (sawRule) {
+        return { ok: false, message: 'Duplicate --rule' };
+      }
       const value = argv[i + 1];
       if (isMissingOrFlagLike(value)) {
         return {
@@ -243,9 +251,13 @@ export function parseArgs(argv) {
         };
       }
       opts.rule = value;
+      sawRule = true;
       i += 1;
     } else if (arg.startsWith('--rule=')) {
       // q-mp-968: empty `--rule=` must not silently mean "all rules".
+      if (sawRule) {
+        return { ok: false, message: 'Duplicate --rule' };
+      }
       const value = arg.slice('--rule='.length);
       if (value === '') {
         return {
@@ -254,7 +266,11 @@ export function parseArgs(argv) {
         };
       }
       opts.rule = value;
+      sawRule = true;
     } else if (arg === '--top') {
+      if (sawTop) {
+        return { ok: false, message: 'Duplicate --top' };
+      }
       const value = argv[i + 1];
       if (isMissingOrFlagLike(value)) {
         return {
@@ -266,11 +282,16 @@ export function parseArgs(argv) {
       const parsedTop = parsePositiveIntTop(value);
       if (!parsedTop.ok) return parsedTop;
       opts.top = parsedTop.value;
+      sawTop = true;
       i += 1;
     } else if (arg.startsWith('--top=')) {
+      if (sawTop) {
+        return { ok: false, message: 'Duplicate --top' };
+      }
       const parsedTop = parsePositiveIntTop(arg.slice('--top='.length));
       if (!parsedTop.ok) return parsedTop;
       opts.top = parsedTop.value;
+      sawTop = true;
     } else if (arg.startsWith('-')) {
       // q-mp-943: reject typos / unknown flags before the eslint probe.
       return { ok: false, message: `Unknown flag: ${arg}` };

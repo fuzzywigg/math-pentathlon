@@ -10,9 +10,18 @@ import {
 } from '../../src/ui/offline';
 
 describe('mutation-ui offline', () => {
+  // unit-shared uses isolate:false — restore navigator.onLine so later suites
+  // do not see a stuck getter from Object.defineProperty (q-mp-1397).
+  const originalOnLine = Object.getOwnPropertyDescriptor(navigator, 'onLine');
+
   afterEach(() => {
     document.documentElement.removeAttribute('data-offline');
     vi.restoreAllMocks();
+    if (originalOnLine) {
+      Object.defineProperty(navigator, 'onLine', originalOnLine);
+    } else {
+      Reflect.deleteProperty(navigator, 'onLine');
+    }
   });
 
   it('isBrowserOffline is false when navigator is undefined', () => {

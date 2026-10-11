@@ -3,12 +3,17 @@
  *
  * Hermetic coverage for q-mp-1292: runLighthouse must not throw on malformed /
  * non-object Lighthouse JSON — return a per-row ok:false so remaining targets
- * continue. Fixture text only — no network, no real Lighthouse, no Chrome.
+ * continue. Also q-mp-1361 (UTF-8 BOM ingest) and q-mp-1370 (`.mjs` chunk
+ * filter). Fixture text only — no network, no real Lighthouse, no Chrome.
  * Leave waitForUrl (q-mp-1287) and score-range paths alone.
  */
 import { EventEmitter } from 'node:events';
 import { describe, expect, it } from 'vitest';
-import { parseLhReportJson, runLighthouse } from '../../scripts/check-perf.mjs';
+import {
+  isPerfChunkAssetName,
+  parseLhReportJson,
+  runLighthouse,
+} from '../../scripts/check-perf.mjs';
 
 type MockChild = EventEmitter & {
   killed: boolean;
@@ -88,6 +93,36 @@ describe('parseLhReportJson (q-mp-1292)', () => {
     if (parsed.ok) {
       expect(parsed.report.categories).toEqual(VALID_REPORT.categories);
     }
+  });
+
+  it('accepts BOM-prefixed valid LH JSON (q-mp-1361)', () => {
+    const parsed = parseLhReportJson(
+      `\uFEFF${JSON.stringify({ categories: { performance: { score: 0.5 } } })}`
+    );
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.report).toEqual({
+        categories: { performance: { score: 0.5 } },
+      });
+    }
+  });
+
+  it('still fails closed on BOM + truncated JSON (q-mp-1361)', () => {
+    const parsed = parseLhReportJson('\uFEFF{not-json');
+    expect(parsed.ok).toBe(false);
+    if (!parsed.ok) {
+      expect(parsed.error).toMatch(/malformed Lighthouse JSON/);
+    }
+  });
+});
+
+describe('isPerfChunkAssetName .mjs (q-mp-1370)', () => {
+  it('includes .js, .mjs, and .css; skips maps and other ext', () => {
+    expect(
+      ['a.js', 'b.mjs', 'c.css', 'd.js.map', 'e.json'].filter(
+        isPerfChunkAssetName
+      )
+    ).toEqual(['a.js', 'b.mjs', 'c.css']);
   });
 });
 

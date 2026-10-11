@@ -4,7 +4,7 @@
  * records outcomes, stalls, console errors, AI think times, touch metrics.
  *
  * Usage: node scripts/calla-deep-playtest.mjs
- * Requires: npm run dev on :5173 (or PLAYTEST_BASE_URL).
+ * Requires: npm run dev on :5173 (or PLAYTEST_BASE; PLAYTEST_BASE_URL alias).
  *
  * Options: -h, --help (exits before mkdir / browser launch)
  */
@@ -26,10 +26,11 @@ import { joinPlaytestGameUrl } from './lib/playtest-url.mjs';
 const USAGE = `Usage: node scripts/calla-deep-playtest.mjs
 
 Deep playtest for Calla (human-vs-AI, Easy/Medium/Hard, desktop + tablet).
-Requires Vite on PLAYTEST_BASE_URL (default http://localhost:5173).
+Requires Vite on PLAYTEST_BASE (default http://127.0.0.1:5173).
 
 Env:
-  PLAYTEST_BASE_URL   Base URL (default http://localhost:5173)
+  PLAYTEST_BASE       Base URL (default http://127.0.0.1:5173)
+  PLAYTEST_BASE_URL   Alias for PLAYTEST_BASE (fallback if PLAYTEST_BASE unset)
   CALLA_GAMES_PER     Games per difficulty×viewport (default 10)
   PLAYTEST_SEED       Move/AI RNG seed (default 0x70a71e57); written to results
 
@@ -38,7 +39,12 @@ Options:
 
 applyDeepPlaytestCli(process.argv.slice(2), USAGE);
 
-const BASE = process.env.PLAYTEST_BASE_URL || 'http://localhost:5173';
+// Peer harnesses (ramrod/par-55/stars-bars/sum-dominoes) use PLAYTEST_BASE +
+// 127.0.0.1. Keep PLAYTEST_BASE_URL as a fallback alias for older callers.
+const BASE =
+  process.env.PLAYTEST_BASE ||
+  process.env.PLAYTEST_BASE_URL ||
+  'http://127.0.0.1:5173';
 const SEED = resolvePlaytestSeed(process.env);
 const GAMES_PER = requireEnvNumber('CALLA_GAMES_PER', 10);
 const OUT_DIR = path.resolve(
@@ -79,20 +85,27 @@ async function startVsAi(page, difficulty) {
   await page.locator('#start-game-btn').click();
   await expectHidden(modal);
   await dismissOwl(page);
-  await page.locator('.calla-wrapper, .calla-pit').first().waitFor({ timeout: 10_000 });
+  await page
+    .locator('.calla-wrapper, .calla-pit')
+    .first()
+    .waitFor({ timeout: 10_000 });
   // Confirm vs-AI chrome (scores say You/AI — not Blue/Red)
   const scores = await page.locator('.calla-scores').textContent();
   if (!/You/i.test(scores || '') || !/AI/i.test(scores || '')) {
-    throw new Error(`Expected You/AI score labels after vs-AI start; got "${scores}"`);
+    throw new Error(
+      `Expected You/AI score labels after vs-AI start; got "${scores}"`
+    );
   }
 }
 
 async function expectHidden(locator) {
-  await locator.waitFor({ state: 'hidden', timeout: 10_000 }).catch(async () => {
-    // modal uses .hidden class
-    const cls = await locator.getAttribute('class');
-    if (!cls?.includes('hidden')) throw new Error('modal still visible');
-  });
+  await locator
+    .waitFor({ state: 'hidden', timeout: 10_000 })
+    .catch(async () => {
+      // modal uses .hidden class
+      const cls = await locator.getAttribute('class');
+      if (!cls?.includes('hidden')) throw new Error('modal still visible');
+    });
 }
 
 async function statusText(page) {
@@ -110,7 +123,8 @@ async function measurePits(page) {
     const board = document.querySelector('.calla-board');
     const boardRect = board?.getBoundingClientRect();
     return pits.slice(0, 5).map((g) => {
-      const hit = g.querySelector('.calla-pit-hit') || g.querySelector('circle');
+      const hit =
+        g.querySelector('.calla-pit-hit') || g.querySelector('circle');
       const r = hit?.getBoundingClientRect();
       const vb = board?.viewBox?.baseVal;
       const svgW = boardRect?.width || 0;
@@ -150,10 +164,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
 
     // Screenshot first game of each combo
     if (gameIndex === 0) {
-      const shot = path.join(
-        OUT_DIR,
-        `${viewport}-${difficulty}-start.png`
-      );
+      const shot = path.join(OUT_DIR, `${viewport}-${difficulty}-start.png`);
       await page.screenshot({ path: shot, fullPage: true });
       fs.copyFileSync(shot, path.join(ART_DIR, path.basename(shot)));
     }
@@ -235,9 +246,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
               .replace(/\s+/g, ' ')
               .trim();
             return (
-              t !== prev ||
-              /thinking/i.test(t) ||
-              /\b(?:wins?|tie)\b/i.test(t)
+              t !== prev || /thinking/i.test(t) || /\b(?:wins?|tie)\b/i.test(t)
             );
           },
           before,
@@ -270,9 +279,7 @@ async function playOneGame(page, { viewport, difficulty, gameIndex }) {
       humanMoves,
       durationMs: Date.now() - t0,
       aiThinkMs: aiThinkSamples,
-      aiThinkMax: aiThinkSamples.length
-        ? Math.max(...aiThinkSamples)
-        : 0,
+      aiThinkMax: aiThinkSamples.length ? Math.max(...aiThinkSamples) : 0,
       aiThinkAvg: aiThinkSamples.length
         ? aiThinkSamples.reduce((a, b) => a + b, 0) / aiThinkSamples.length
         : 0,
@@ -386,7 +393,9 @@ function summarize(results) {
 }
 
 const all = [];
-console.log(`Calla deep playtest → ${BASE} (${GAMES_PER} games × 3 diffs × 2 viewports)`);
+console.log(
+  `Calla deep playtest → ${BASE} (${GAMES_PER} games × 3 diffs × 2 viewports)`
+);
 for (const [name, opts] of Object.entries(VIEWPORTS)) {
   console.log(`\n=== ${name} ===`);
   all.push(...(await runViewport(name, opts)));

@@ -1,16 +1,60 @@
 /**
- * Unit coverage for knip report-only metric helpers (q-mp-118 / q-mp-1036 / q-mp-1313).
- * No network: exercises pure summarize / diff / baseline-schema / runner-error helpers only.
+ * Unit coverage for knip report-only metric helpers (q-mp-118 / q-mp-1036 / q-mp-1313 / q-mp-1387).
+ * No network: exercises pure summarize / diff / baseline-schema / runner-error / loadBaseline helpers only.
  */
-import { describe, it, expect } from 'vitest';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { afterEach, describe, it, expect } from 'vitest';
 import {
   countIssueField,
   summarizeKnip,
   diffMetrics,
   validateBaselineMetrics,
   exitCodeForKnipRunnerError,
+  loadBaseline,
   METRIC_KEYS,
 } from '../../scripts/report-knip.mjs';
+
+const tempDirs: string[] = [];
+
+afterEach(() => {
+  while (tempDirs.length > 0) {
+    const dir = tempDirs.pop();
+    if (dir) rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function writeBaselineFixture(body: string): string {
+  const dir = mkdtempSync(join(tmpdir(), 'knip-baseline-'));
+  tempDirs.push(dir);
+  const path = join(dir, 'knip-baseline.json');
+  writeFileSync(path, body);
+  return path;
+}
+
+const FULL_METRICS = {
+  unusedFiles: 0,
+  unusedExports: 3,
+  unusedTypes: 36,
+  unusedDependencies: 0,
+  unusedDevDependencies: 0,
+  unlisted: 3,
+  duplicates: 0,
+};
+
+function baselineDocJson(metrics = FULL_METRICS): string {
+  return `${JSON.stringify(
+    {
+      knipVersion: '5.88.1',
+      enforce: false,
+      note: 'fixture',
+      metrics,
+    },
+    null,
+    2
+  )}\n`;
+}
 
 describe('report-knip helpers', () => {
   it('countIssueField handles arrays and enumMembers-style objects', () => {
@@ -260,5 +304,42 @@ describe('report-knip helpers', () => {
     expect(exitCodeForKnipRunnerError({ enforce: true })).toBe(1);
     expect(exitCodeForKnipRunnerError({ fail: true, enforce: true })).toBe(1);
     expect(exitCodeForKnipRunnerError({ fail: false, enforce: true })).toBe(1);
+  });
+
+  it('loadBaseline accepts UTF-8 BOM and matches non-BOM byte-identical results (q-mp-1387)', () => {
+    const body = baselineDocJson();
+    const withoutBom = loadBaseline({
+      baselinePath: writeBaselineFixture(body),
+    });
+    const withBom = loadBaseline({
+      baselinePath: writeBaselineFixture(`\uFEFF${body}`),
+    });
+
+    expect(withoutBom.kind).toBe('ok');
+    expect(withBom.kind).toBe('ok');
+    if (withoutBom.kind !== 'ok' || withBom.kind !== 'ok') return;
+    expect(withBom).toEqual(withoutBom);
+    expect(withBom.metrics).toEqual(FULL_METRICS);
+  });
+
+  it('loadBaseline still fails closed on malformed / mid-payload FEFF (q-mp-1387)', () => {
+    const corrupt = loadBaseline({
+      baselinePath: writeBaselineFixture('\uFEFF{'),
+    });
+    expect(corrupt.kind).toBe('corrupt');
+    if (corrupt.kind === 'corrupt') {
+      expect(corrupt.message).toMatch(/unparseable/i);
+    }
+
+    // Leading char is '{', not BOM — FEFF inside remains and JSON.parse fails closed.
+    const midFeff = loadBaseline({
+      baselinePath: writeBaselineFixture('{\uFEFF"metrics":{}}'),
+    });
+    expect(midFeff.kind).toBe('corrupt');
+
+    const missing = loadBaseline({
+      baselinePath: join(tmpdir(), 'knip-baseline-missing-nope.json'),
+    });
+    expect(missing).toEqual({ kind: 'missing' });
   });
 });

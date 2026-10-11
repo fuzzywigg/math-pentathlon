@@ -5,6 +5,7 @@
  * - q-mp-923: memory-leak-audit adopts shared page-ready helpers
  * - q-mp-1314: MEM_LEAK_GAMES all-unknown → exit 2 (no empty success)
  * - q-mp-1315: MEM_LEAK_DATE default stamps live UTC YYYY-MM-DD
+ * - q-mp-1372: prepareMenu strips trailing-slash baseURL before join
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -15,6 +16,7 @@ import {
   resolveMemLeakDate,
   resolveMemLeakGames,
 } from '../../scripts/lib/memory-leak-games.mjs';
+import { joinMemoryLeakMenuUrl } from '../../scripts/memory-leak-audit.mjs';
 
 const ROOT = process.cwd();
 const SCRIPT = resolve(ROOT, 'scripts/memory-leak-audit.mjs');
@@ -126,6 +128,42 @@ describe('parseMemLeakGamesFilter / resolveMemLeakGames (q-mp-1314)', () => {
     });
     expect(r.status).toBe(0);
     expect(`${r.stdout}\n${r.stderr}`).toMatch(/MEM_LEAK_GAMES/);
+  });
+});
+
+describe('joinMemoryLeakMenuUrl (q-mp-1372)', () => {
+  it('strips a trailing slash so baseURL/ does not become //?board3d=1#/', () => {
+    expect(joinMemoryLeakMenuUrl('http://127.0.0.1:4173/', true)).toBe(
+      'http://127.0.0.1:4173/?board3d=1#/'
+    );
+  });
+
+  it('keeps a single slash when baseURL has no trailing slash', () => {
+    expect(joinMemoryLeakMenuUrl('http://127.0.0.1:4173', true)).toBe(
+      'http://127.0.0.1:4173/?board3d=1#/'
+    );
+  });
+
+  it('omits board3d query when board3d is false', () => {
+    expect(joinMemoryLeakMenuUrl('http://127.0.0.1:4173/', false)).toBe(
+      'http://127.0.0.1:4173/#/'
+    );
+  });
+
+  it('strips multiple trailing slashes', () => {
+    expect(joinMemoryLeakMenuUrl('http://127.0.0.1:4173///', true)).toBe(
+      'http://127.0.0.1:4173/?board3d=1#/'
+    );
+  });
+
+  it('prepareMenu uses joinMemoryLeakMenuUrl (source pin)', () => {
+    const src = readFileSync(SCRIPT, 'utf8');
+    expect(src).toMatch(/export function joinMemoryLeakMenuUrl\b/);
+    expect(src).toMatch(/replace\(\s*\/\\\/\+\$\/\s*,\s*''\s*\)/);
+    expect(src).toMatch(
+      /page\.goto\(\s*joinMemoryLeakMenuUrl\(\s*baseURL\s*,\s*board3d\s*\)/
+    );
+    expect(src).not.toMatch(/\$\{baseURL\}\/\$\{q\}#\//);
   });
 });
 

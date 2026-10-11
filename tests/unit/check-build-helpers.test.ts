@@ -9,6 +9,7 @@ import {
   listChunkNames,
   PRECACHE_FONT_IGNORES,
   collectHtmlNonRootAssetRefs,
+  parseWebmanifestJson,
   isPrecacheAuditOk,
   scanEnvLeakage,
   hasHealthTxt,
@@ -374,6 +375,47 @@ describe('check-build helpers', () => {
     ]);
   });
 
+  it('ignores data-src / ng-src / xsrc (word-boundary; q-mp-1383)', () => {
+    const html = [
+      '<img data-src="assets/x.png" src="assets/y.png">',
+      '<img ng-src="assets/x.png" src="assets/y.png">',
+      '<img xsrc="assets/x.png" src="assets/z.png">',
+      '<script src="assets/keep.js"></script>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/y.png',
+      'assets/y.png',
+      'assets/z.png',
+      'assets/keep.js',
+    ]);
+  });
+
+  it('collects .mjs / .cjs module script refs (q-mp-1384)', () => {
+    const html = [
+      '<script src="assets/a.mjs"></script>',
+      '<script src="assets/b.cjs"></script>',
+      '<script src="assets/c.js"></script>',
+      '<script src="/assets/root.mjs"></script>',
+      '<link href="assets/d.css">',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/a.mjs',
+      'assets/b.cjs',
+      'assets/c.js',
+      'assets/d.css',
+    ]);
+  });
+
+  it('parseWebmanifestJson accepts leading UTF-8 BOM (q-mp-1401)', () => {
+    const body = '{"start_url":"/","scope":"/"}';
+    expect(parseWebmanifestJson('\uFEFF' + body)).toEqual(JSON.parse(body));
+    // Non-BOM input must match JSON.parse(raw || '{}') exactly.
+    expect(parseWebmanifestJson(body)).toEqual(JSON.parse(body));
+    expect(parseWebmanifestJson('')).toEqual({});
+    expect(parseWebmanifestJson('\uFEFF')).toEqual({});
+    expect(() => parseWebmanifestJson('{\uFEFF"start_url":"/"}')).toThrow();
+  });
+
   it('scanEnvLeakage requires a real file:/// URL token, not substring theater (q-mp-1209)', () => {
     const dist = mkdtempSync(join(tmpdir(), 'check-build-leak-'));
     try {
@@ -394,6 +436,52 @@ describe('check-build helpers', () => {
     } finally {
       rmSync(dist, { recursive: true, force: true });
     }
+  });
+
+  it('scanEnvLeakage scans .mjs and .cjs assets (q-mp-1356)', () => {
+    const dist = mkdtempSync(join(tmpdir(), 'check-build-leak-mjs-'));
+    try {
+      // Flat fixture — ratchet node-minimal.d.ts has no mkdirSync.
+      writeFileSync(join(dist, 'keep.json'), 'const x="/workspace/skip";\n');
+      writeFileSync(join(dist, 'a.js'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'b.mjs'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'c.cjs'), 'const x="/workspace/secret";\n');
+      writeFileSync(join(dist, 'ok.mjs'), 'const x="relative/path";\n');
+      const findings = scanEnvLeakage(dist);
+      expect(findings).toEqual(
+        expect.arrayContaining([
+          { path: 'a.js', finding: 'absolute /workspace path' },
+          { path: 'b.mjs', finding: 'absolute /workspace path' },
+          { path: 'c.cjs', finding: 'absolute /workspace path' },
+        ])
+      );
+      expect(findings).toHaveLength(3);
+      expect(findings.some((f) => f.path === 'keep.json')).toBe(false);
+      expect(findings.some((f) => f.path === 'ok.mjs')).toBe(false);
+    } finally {
+      rmSync(dist, { recursive: true, force: true });
+    }
+  });
+
+  it('collects relative poster and srcset asset refs (q-mp-1369)', () => {
+    const html = [
+      '<video poster="assets/p.png"></video>',
+      "<video poster='assets/q.png'></video>",
+      '<video poster=/root.png></video>',
+      '<img srcset="assets/a.png 1x, assets/b.png 2x">',
+      "<img srcset='assets/c.png 100w, /root-d.png 200w'>",
+      '<img src="assets/quoted.png">',
+      '<script src="assets/keep.js"></script>',
+    ].join('');
+    expect(collectHtmlNonRootAssetRefs(html)).toEqual([
+      'assets/p.png',
+      'assets/q.png',
+      'assets/a.png',
+      'assets/b.png',
+      'assets/c.png',
+      'assets/quoted.png',
+      'assets/keep.js',
+    ]);
   });
 
   it('hasHealthTxt reports presence of dist/health.txt (q-mp-1336)', () => {

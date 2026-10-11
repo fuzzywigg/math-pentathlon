@@ -21,6 +21,11 @@ import {
   runEmitIdentityCheck,
   isMissingOrFlagLikeRef,
   refOptionErrorMessage,
+  duplicateFlagErrorMessage,
+  duplicateFilesFromErrorMessage,
+  resolveDefaultMergeBase,
+  DEFAULT_TIP_REMOTE,
+  DEFAULT_TIP_FALLBACK_REMOTE,
 } from '../../scripts/check-emit-identity.mjs';
 
 const EMIT_SCRIPT = resolve(process.cwd(), 'scripts/check-emit-identity.mjs');
@@ -263,6 +268,201 @@ export const n: N = 1;
     expect(opts.json).toBe(true);
   });
 
+  it('default tip constants leave retired wave5 (q-mp-1357/1377)', () => {
+    expect(DEFAULT_TIP_REMOTE).toBe('origin/cursor/mp-tip-post38d2');
+    expect(DEFAULT_TIP_FALLBACK_REMOTE).toBe('origin/alpha');
+    expect(DEFAULT_TIP_REMOTE).not.toMatch(/integration-fold-wave5/);
+    expect(DEFAULT_TIP_FALLBACK_REMOTE).not.toMatch(/integration-fold-wave5/);
+    // parseArgs([]) must resolve some merge-base (tip → alpha → HEAD) and must
+    // not invent the retired wave5 merge-base when that remote is present.
+    const opts = parseArgs([]);
+    expect(opts.base.length).toBeGreaterThan(0);
+    expect(opts.base).toBe(resolveDefaultMergeBase());
+    const wave5 = spawnSync(
+      'git',
+      ['merge-base', 'HEAD', 'origin/cursor/integration-fold-wave5-tip-4af0'],
+      { encoding: 'utf8' }
+    );
+    if (wave5.status === 0 && wave5.stdout.trim()) {
+      expect(opts.base).not.toBe(wave5.stdout.trim());
+    }
+    const listed = listAiTouchedFiles(opts.base, 'WORKING_TREE');
+    expect(listed.ok).toBe(true);
+  });
+
+  it('resolveDefaultMergeBase prefers living tip then alpha then HEAD (q-mp-1357)', () => {
+    const tipSpawn = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      const key = args.join(' ');
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+        return { status: 0, stdout: 'living-tip-mb\n', stderr: '' };
+      }
+      return { status: 128, stdout: '', stderr: 'unused\n' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: tipSpawn as never })).toBe(
+      'living-tip-mb'
+    );
+
+    const calls: string[][] = [];
+    const alphaSpawn = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      calls.push(args);
+      const key = args.join(' ');
+      if (key === 'merge-base HEAD origin/cursor/mp-tip-post38d2') {
+        return { status: 128, stdout: '', stderr: 'missing tip\n' };
+      }
+      if (key === 'merge-base HEAD origin/alpha') {
+        return { status: 0, stdout: 'alpha-mb\n', stderr: '' };
+      }
+      return { status: 0, stdout: 'HEADSHA\n', stderr: '' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: alphaSpawn as never })).toBe(
+      'alpha-mb'
+    );
+    expect(calls[0]).toEqual([
+      'merge-base',
+      'HEAD',
+      'origin/cursor/mp-tip-post38d2',
+    ]);
+    expect(calls[1]).toEqual(['merge-base', 'HEAD', 'origin/alpha']);
+
+    const spawnHeadOnly = (
+      _cmd: string,
+      args: string[],
+      _opts?: { encoding?: string; cwd?: string }
+    ) => {
+      if (args[0] === 'rev-parse') {
+        return { status: 0, stdout: 'only-head\n', stderr: '' };
+      }
+      return { status: 128, stdout: '', stderr: 'no tip\n' };
+    };
+    expect(resolveDefaultMergeBase({ spawnSync: spawnHeadOnly as never })).toBe(
+      'only-head'
+    );
+  });
+
+  it('duplicateFlagErrorMessage names the flag (q-mp-1373)', () => {
+    const msg = duplicateFlagErrorMessage('--base');
+    expect(msg).toMatch(/^error: Duplicate --base/);
+    expect(msg).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate --base / --head (q-mp-1373)', () => {
+    const dupBase = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--base', 'bbb'],
+      { encoding: 'utf8' }
+    );
+    expect(dupBase.status).toBe(2);
+    const baseText = `${dupBase.stdout}\n${dupBase.stderr}`;
+    expect(baseText).toMatch(/error: Duplicate --base/);
+    expect(baseText).toContain(USAGE);
+
+    const dupHead = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--head', 'h1', '--head', 'h2'],
+      { encoding: 'utf8' }
+    );
+    expect(dupHead.status).toBe(2);
+    const headText = `${dupHead.stdout}\n${dupHead.stderr}`;
+    expect(headText).toMatch(/error: Duplicate --head/);
+    expect(headText).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate boolean flags (q-mp-1373)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'aaa', '--normalize', '--normalize'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    expect(`${r.stdout}\n${r.stderr}`).toMatch(/error: Duplicate --normalize/);
+  });
+
+  it('duplicateFilesFromErrorMessage (q-mp-1381)', () => {
+    const msg = duplicateFilesFromErrorMessage('--files-from');
+    expect(msg).toMatch(/^error: Duplicate --files-from/);
+    expect(msg).toContain(USAGE);
+  });
+
+  it('CLI rejects duplicate --files-from (q-mp-1381)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [
+        EMIT_SCRIPT,
+        '--base',
+        'HEAD',
+        '--files-from',
+        '/tmp/a-list',
+        '--files-from',
+        '/tmp/b-list',
+      ],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(/error: Duplicate --files-from/);
+    expect(text).toContain(USAGE);
+    // Must not proceed into path-not-found for either list (dup wins first).
+    expect(text).not.toMatch(/path not found/);
+  });
+
+  it('CLI rejects flag-like --files-from value (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'HEAD', '--files-from', '--json'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(
+      /error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
+    expect(text).toContain(USAGE);
+    // Must not misreport the flag token as a missing filesystem path.
+    expect(text).not.toMatch(/path not found: --json/);
+  });
+
+  it('CLI rejects bare --files-from without a value (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [EMIT_SCRIPT, '--base', 'HEAD', '--files-from'],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toMatch(
+      /error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
+    expect(text).toContain(USAGE);
+  });
+
+  it('CLI still reports path not found for a real missing list (q-mp-1382)', () => {
+    const r = spawnSync(
+      process.execPath,
+      [
+        EMIT_SCRIPT,
+        '--base',
+        'HEAD',
+        '--files-from',
+        '/tmp/no-files-from-xyz-1382',
+      ],
+      { encoding: 'utf8' }
+    );
+    expect(r.status).toBe(2);
+    const text = `${r.stdout}\n${r.stderr}`;
+    expect(text).toContain(
+      'error: --files-from path not found: /tmp/no-files-from-xyz-1382'
+    );
+    expect(text).not.toMatch(/flag-like value/);
+  });
+
   it('minify mode treats brace-only curly wraps as identical', async () => {
     const base = `export function f(x: number) {\n  if (x) return 1;\n  return 0;\n}\n`;
     const head = `export function f(x: number) {\n  if (x) {\n    return 1;\n  }\n  return 0;\n}\n`;
@@ -324,8 +524,13 @@ export const n: N = 1;
     );
     const missing = filesFromErrorMessage('', 'missing');
     expect(missing).toContain(USAGE);
-    expect(missing).toMatch(/^error: --files-from requires a path/);
+    expect(missing).toMatch(
+      /^error: --files-from requires a path to a file list \(missing or flag-like value\)/
+    );
     expect(missing).not.toMatch(/ENOENT|EISDIR|Error:/);
+    const flagLike = filesFromErrorMessage('--json', 'flag-like');
+    expect(flagLike).toMatch(/missing or flag-like value/);
+    expect(flagLike).not.toMatch(/path not found/);
 
     const notFound = filesFromErrorMessage(
       '/tmp/no-files-from-xyz',

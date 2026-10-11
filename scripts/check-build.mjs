@@ -312,7 +312,9 @@ export function scanEnvLeakage(distRoot) {
     { re: /sourceMappingURL\s*=/, label: 'sourceMappingURL' },
   ];
   for (const rel of hashTree(distRoot).keys()) {
-    if (!/\.(js|css|html|webmanifest|txt)$/.test(rel)) continue;
+    // Include .mjs/.cjs alongside .js — offlineNeededPaths already tracks
+    // module chunks; skipping them false-negatives env leaks (q-mp-1356).
+    if (!/\.(js|mjs|cjs|css|html|webmanifest|txt)$/.test(rel)) continue;
     if (rel.startsWith('workbox-') || rel === 'sw.js') continue;
     const text = fs.readFileSync(path.join(distRoot, rel), 'utf8');
     for (const { re, label } of needles) {
@@ -325,16 +327,37 @@ export function scanEnvLeakage(distRoot) {
 }
 
 /**
- * Collect non-root absolute asset refs from HTML `src` / `href` attributes.
+ * Collect non-root absolute asset refs from HTML `src` / `href` / `poster`
+ * attributes and `srcset` candidate URLs.
  * Accepts double- or single-quoted attributes (q-mp-1179) and unquoted
- * HTML attribute values (q-mp-1335).
+ * HTML attribute values (q-mp-1335). `poster` / `srcset` added in q-mp-1369
+ * (srcset before src in the alternation so `srcset=` is not eaten as `src`).
+ * Attribute names require a word-boundary lookbehind so `data-src` / `ng-src`
+ * / `xsrc` are not false-positive `src` matches (q-mp-1383; peer
+ * `parseMenuCriticalRefs`). Extension set includes `.mjs` / `.cjs` so module
+ * script refs are audited with `.js` (q-mp-1384). webp/jpg stay out until a
+ * tip build ships them.
  * @param {string} html
  * @returns {string[]}
  */
 export function collectHtmlNonRootAssetRefs(html) {
-  const htmlAssetRefs = [
-    ...html.matchAll(/(?:src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g),
-  ].map((m) => m[1] ?? m[2] ?? m[3]);
+  /** @type {string[]} */
+  const htmlAssetRefs = [];
+  for (const m of html.matchAll(
+    /(?<![A-Za-z0-9_-])(?:srcset|poster|src|href)=(?:"([^"]+)"|'([^']+)'|([^\s"'=<>`]+))/g
+  )) {
+    const raw = m[1] ?? m[2] ?? m[3];
+    const attr = m[0].slice(0, m[0].indexOf('=')).toLowerCase();
+    if (attr === 'srcset') {
+      // Tokenizer-lite: comma-separated candidates; URL is the first token.
+      for (const part of raw.split(',')) {
+        const url = part.trim().split(/\s+/, 1)[0];
+        if (url) htmlAssetRefs.push(url);
+      }
+    } else {
+      htmlAssetRefs.push(raw);
+    }
+  }
   return htmlAssetRefs.filter((href) => {
     // Protocol-relative `//host/…` is not root-absolute (q-mp-1228).
     const isRootAbsolute = href.startsWith('/') && !href.startsWith('//');
@@ -344,8 +367,23 @@ export function collectHtmlNonRootAssetRefs(html) {
     // Strip ?query / #hash before the extension test (q-mp-1227).
     const pathOnly = href.split(/[?#]/, 1)[0];
     // skip-link / in-page only; module scripts must be root-absolute with base /
-    return /\.(js|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
+    return /\.(js|mjs|cjs|css|webmanifest|ico|svg|png|woff2?)$/.test(pathOnly);
   });
+}
+
+/**
+ * Parse `site.webmanifest` JSON, stripping a single leading UTF-8 BOM
+ * (q-mp-1401). Non-BOM input matches `JSON.parse(raw || '{}')` byte-for-byte
+ * on the parse path (empty → `{}`). Mid-payload FEFF is left alone.
+ * @param {string} raw
+ * @returns {Record<string, unknown>}
+ */
+export function parseWebmanifestJson(raw) {
+  let text = raw ?? '';
+  if (text.charCodeAt(0) === 0xfeff) {
+    text = text.slice(1);
+  }
+  return JSON.parse(text || '{}');
 }
 
 /**
@@ -375,7 +413,7 @@ function auditSourcemapsAndBase(distRoot) {
   /** @type {string[]} */
   const manifestIssues = [];
   try {
-    const m = JSON.parse(manifest || '{}');
+    const m = parseWebmanifestJson(manifest);
     if (m.start_url !== '/') {
       manifestOk = false;
       manifestIssues.push(`start_url=${JSON.stringify(m.start_url)}`);
