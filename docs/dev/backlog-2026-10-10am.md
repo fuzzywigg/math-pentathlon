@@ -11,7 +11,7 @@ The tip `cursor/mp-tip-post1218` @ `39bed214` measures unit files **3392**; Chro
 
 **Honest count:** Only **19** tasks — not padded to 25. Id range starts at `q-mp-1033` per round-39 brief (`1008`–`1016` and `981`–`991` remain unused / reserved). Round-38 already claimed coverage-map pct-only fake 100%, engine-rank missing/non-numeric pct crash, knip baseline `{}`, size budgets schema, lint-buckets ceilings `{}`, boundaries non-JSON stack, flake-rate corrupt JSON parse, mutation `no-tests` baseline, licenses malformed lock, tip-name pointers, verify≠lint+copy-pins docs + workflow pin, star-track / docs-playtest waits — **do not** re-queue `1017`–`1032` (leave `#1253` + open `#1254`–`#1260` + unworked al gaps with `contained`). This refill **does not** re-queue page-ready / double-rAF / artifact-dir / mountPair adoptions, npm aliases, `--help` / `--dry-run` / unknown-flag argv sweeps, empty-input / malformed-JSON guards as a family, lib main-entry guards, tip-stamp **count** remasures, knip unusedTypes baseline drop, Rank-3 demote theater, CI `e2e-cross-browser` named script (`800`), dismissOwl deep-playtest (`879`), deep-playtest `waitForTimeout` families already owned by `803`–`807` / `883`/`884`/`909`/`937`/`938`/`951`/`952`/`973`/`1030`/`1031`, stars-bars / nav-away / memory-leak / runtime-perf / webkit-offline / probe-offline **fixed waits** (prior HOLD/skip — this refill’s `1043` is **only** the `finally` forced `exit(0)` bug), emit-identity wave5 merge-base tip retarget (tip-owner HOLD-CHECK — not queued), or anything in rounds ≤38.
 
-**Fresh payoffs on this tip (re-measured after `090al` fold + tip CI `38107348270`):** **`engine-coverage-rank` trusts stale numeric `pct` over `covered`/`total` (calla 90/100 ranked at 10%)**, **`flake-rate-unit-loop` records `ok: true` when Vitest JSON has `success: true` despite walked failures**, **`report-ratchet-history --first-parent` never passes `--first-parent` to `git log`**, **`report-knip` incomplete `metrics` keys coerce to 0 → fake growth under `--fail`; corrupt baseline JSON claims “no baseline file” and exits 0 under `--fail`**, **`report-licenses` accepts `packages: null` / `{}` → empty SBOM exit 0**, **`mutation-report` classifies Vitest “No test files found” (exit 1) as `killed`**, **`report-coverage-map` emits markdown `120.00` when `covered > total` (SVG heat clamps; table does not)**, **AGENTS / wiki / mermaid describe soft `size:check` without CI’s `--fail-on-new-over`**, **workflow-contract tests do not pin that CI flag**, **`check-pwa-manifest` header still says `REPORT_ONLY=0` “fail CI” while CI never sets it**, **`webkit-offline-probe` `finally` always schedules `process.exit(0)`**, **`docs/dev/knip-report.md` cheat line still says unconditional exit 0**, **`readme-npm-scripts` treats `npm run playtest:*` as missing script `playtest:` (worker CI `38106654481` failure class)**, **`ai-move-time-midgame.bench.test.ts` hardcodes `/workspace/docs/…`**, **`tests/unit/example.test.ts` is a placeholder with zero product imports**, **active audit docs still prescribe bare `npx tsc --noEmit`**, **`TRACKED.curly` path alias has zero callers**, tip CI **visual-baseline 42 failed**, and **canvas-dpr-resize permanently `test.skip`s on WebKit flake**.
+**Fresh payoffs on this tip (re-measured after `090al` fold + tip CI `38107348270`):** **`engine-coverage-rank` trusts stale numeric `pct` over `covered`/`total` (calla 90/100 ranked at 10%)**, **`flake-rate-unit-loop` records `ok: true` when Vitest JSON has `success: true` despite walked failures**, **`report-ratchet-history --first-parent` never passes `--first-parent` to `git log`**, **`report-knip` incomplete `metrics` keys coerce to 0 → fake growth under `--fail`; corrupt baseline JSON claims “no baseline file” and exits 0 under `--fail`**, **`report-licenses` accepts `packages: null` / `{}` → empty SBOM exit 0**, **`mutation-report` classifies Vitest “No test files found” (exit 1) as `killed`**, **`report-coverage-map` emits markdown `120.00` when `covered > total` (SVG heat clamps; table does not)**, **AGENTS / wiki / mermaid describe soft `size:check` without CI’s `--fail-on-new-over`**, **workflow-contract tests do not pin that CI flag**, **`check-pwa-manifest` header still says `REPORT_ONLY=0` “fail CI” while CI never sets it**, **`webkit-offline-probe` `finally` always schedules `process.exit(0)`**, **`docs/dev/knip-report.md` cheat line still says unconditional exit 0**, **`readme-npm-scripts` treats `npm run playtest:*` as missing script `playtest:` (worker CI `38106654481` failure class)**, **`ai-move-time-midgame.bench.test.ts` hardcodes `/workspace/docs/…`**, **`tests/unit/example.test.ts (deleted on tip)` was a placeholder with zero product imports**, **active audit docs still prescribe bare `npx tsc --noEmit`**, **`TRACKED.curly` path alias has zero callers**, tip CI **visual-baseline 42 failed**, and **canvas-dpr-resize permanently `test.skip`s on WebKit flake**.
 
 **Preference:** SAFE, mutually independent **scripts/** wrong-results fixes, **docs-only** accuracy, or **tests-only** flake/contract hygiene. **Do not** queue another remasure of CI wall, bundle headroom, lint-bucket snapshot, copy-pins findings totals, boundaries/PWA thresholds, board-3d layout inventory, CI permissions, tip-pointer **count** stamps, open-draft triage, emit-identity inventory remasure, knip drift, dead-CSS Rank-1 rescan, or wiki **count** cells. Anything in rules / AI / scoring / legal-move paths, player-facing copy, tutorials product edits, timing, Stars & Bars history cap, Hex Hard 450ms, board-3d **src** / **mp3d e2e**, or CI permissions widening is **HOLD**. **Do not** change fake-clock semantics. **Do not** edit `*/rules.ts`.
 
@@ -42,7 +42,7 @@ Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infra
 | `q-mp-1019`–`1023`/`1025`/`1031` | al gaps still valid on tip | **still-valid; need workers** | knip `{}`, size budgets schema, lint-buckets ceilings, boundaries non-JSON, mutation `no-tests`, docs/playtest waits — leave prior ids; do not sibling. |
 | `q-mp-800` | CI cross-browser named script | **tip-queued; unworked** | Live `ci.yml` still bare `test:e2e -- --project=firefox --project=webkit` — **do not** re-queue. |
 | `q-mp-879` | dismissOwl deep-playtest adopters | **still-valid; no open PR** | Leave prior id. |
-| Dead-code Rank-2 yes | live dry-run | **0 yes** | No SAFE delete ticket beyond placeholder `example.test.ts` / `TRACKED.curly`. |
+| Dead-code Rank-2 yes | live dry-run | **0 yes** | No SAFE delete ticket beyond placeholder example.test.ts / `TRACKED.curly`. |
 | Tip CI `38107348270` | blocking green; visual 42 failed | **report-only drift** | Queued as `1050` HOLD-CHECK. |
 
 ## Shared-file conflict flags
@@ -63,7 +63,7 @@ Also skipped: Merom / Sullivan / data-center / grants / nonprofit; `pappas-infra
 | `docs/dev/knip-report.md` | `1044` only; prefer after `1036` if both touch fail semantics prose |
 | `tests/unit/readme-npm-scripts.test.ts` | `1045` only |
 | `tests/unit/ai-move-time-midgame.bench.test.ts` | `1046` only — path fix only; no AI timing/product edits |
-| `tests/unit/example.test.ts` | `1047` only |
+| `tests/unit/example.test.ts (deleted on tip)` | `1047` only |
 | Active audit docs (`docs/*-2026-10-0*.md`) | `1048` only — `npx tsc` → `npm run typecheck`; leave `1007` check:build exit wording alone |
 | `tests/e2e/visual-baseline.spec.ts` / `tests/e2e/visual-baselines/**` | `1050` only |
 | `tests/e2e/canvas-dpr-resize.spec.ts` | `1051` only |
@@ -346,7 +346,7 @@ $ Tip→alpha fold open at audit: (none)
 - **verification commands:** `rg -n '/workspace' tests/unit/ai-move-time-midgame.bench.test.ts` ; `CI=1 npx vitest run tests/unit/ai-move-time-midgame.bench.test.ts`
 - **conflict notes:** HOLD if the change would alter measured mid-game timing tables — path-only edits stay SAFE.
 
-### q-mp-1047 · Tests: delete placeholder `tests/unit/example.test.ts`
+### q-mp-1047 · Tests: delete placeholder `tests/unit/example.test.ts (deleted on tip)`
 
 - **repo:** `fuzzywigg/math-pentathlon`
 - **priority:** P3 dead-code
@@ -354,10 +354,10 @@ $ Tip→alpha fold open at audit: (none)
 - **base:** `{MP_TIP}` (`cursor/mp-tip-post1218`)
 - **depends-on:** none
 - **series:** dead-code
-- **verdict:** **SAFE** — zero product imports; `1+1` / string-concat only; tip CI still executes it
+- **verdict:** **SAFE** — zero product imports; `1+1` / string-concat only; tip CI still executes it (pre-delete)
 - **CI / package.json callers:** `package.json` → `test:unit` (blocking `unit` job)
-- **target files:** `tests/unit/example.test.ts` (delete)
-- **measured baseline:** File is scaffold-only; no `src/` imports; knip unusedFiles **0** (still discovered by vitest include). Dead-code Rank-2 yes remains **0** for `src/` — this is test scaffold, not Rank-2 inventory.
+- **target files:** `tests/unit/example.test.ts (delete)` — tip-folded via `#1264`
+- **measured baseline:** File was scaffold-only; no `src/` imports; knip unusedFiles **0** (still discovered by vitest include). Dead-code Rank-2 yes remains **0** for `src/` — this is test scaffold, not Rank-2 inventory.
 - **acceptance criteria:** File removed; unit suite discovers one fewer file / two fewer tests; no other edits; `npm run test:unit` still green for an unrelated smoke file if needed.
 - **verification commands:** `test ! -f tests/unit/example.test.ts` ; `CI=1 npx vitest run tests/unit/example.test.ts` (expect not found / no tests) ; `rg -n 'Example Unit Tests' tests/unit || true`
 - **conflict notes:** do not touch knip baseline / unusedTypes.
