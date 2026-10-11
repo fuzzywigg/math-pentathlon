@@ -4,6 +4,12 @@ import { DIVISIONS } from '../../src/core/game-registry';
 
 describe('game-selector division tabs', () => {
   let container: HTMLElement;
+  // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
+    Element.prototype,
+    'scrollIntoView'
+  );
+  const originalScrollIntoView = Element.prototype.scrollIntoView;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -14,6 +20,11 @@ describe('game-selector division tabs', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
+    if (hadScrollIntoView) {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    } else {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
   });
 
   it('opens the matching accordion when a Division II+ tab is clicked', () => {

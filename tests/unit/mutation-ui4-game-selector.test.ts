@@ -11,6 +11,12 @@ import { renderGameSelector } from '../../src/ui/game-selector';
 
 describe('mutation-ui4 game-selector', () => {
   let container: HTMLElement;
+  // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
+    Element.prototype,
+    'scrollIntoView'
+  );
+  const originalScrollIntoView = Element.prototype.scrollIntoView;
 
   beforeEach(() => {
     container = document.createElement('div');
@@ -21,6 +27,11 @@ describe('mutation-ui4 game-selector', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
+    if (hadScrollIntoView) {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    } else {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
   });
 
   it('opens only the first division on initial render (index === 0)', () => {

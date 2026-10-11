@@ -67,63 +67,76 @@ function playHumanTriangleTurn(board: HTMLElement): void {
 describe('q-mp-399 ui-cov-r29 hex-a-gone board-ui residuals', () => {
   it('confirm scrollIntoView arm + p2 winner banner + filled-cell block color', async () => {
     const scrollSpy = vi.fn();
+    // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+    const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
+      HTMLElement.prototype,
+      'scrollIntoView'
+    );
+    const originalScrollIntoView = HTMLElement.prototype.scrollIntoView;
     HTMLElement.prototype.scrollIntoView = scrollSpy;
+    try {
+      let state = createInitialState();
+      assertExportedShapeContracts(state);
+      state = selectBlock(state, 'triangle');
+      state = selectBlock(state, 'square');
 
-    let state = createInitialState();
-    assertExportedShapeContracts(state);
-    state = selectBlock(state, 'triangle');
-    state = selectBlock(state, 'square');
+      const el = document.createElement('div');
+      renderBoard(
+        state,
+        el,
+        undefined,
+        () => undefined,
+        () => undefined
+      );
+      expect(el.querySelector('.hex-a-gone-confirm-btn')).toBeTruthy();
+      await Promise.resolve();
+      expect(scrollSpy).toHaveBeenCalled();
 
-    const el = document.createElement('div');
-    renderBoard(
-      state,
-      el,
-      undefined,
-      () => undefined,
-      () => undefined
-    );
-    expect(el.querySelector('.hex-a-gone-confirm-btn')).toBeTruthy();
-    await Promise.resolve();
-    expect(scrollSpy).toHaveBeenCalled();
+      // Filled p2 cell with matching placedBlock → BLOCK_COLORS fill attribute.
+      const filled: HexAGoneGameState = {
+        ...createInitialState(),
+        board: createInitialState().board.map((c, i) =>
+          i === 0 ? { ...c, filled: true, filledBy: 'player2', blockId: 1 } : c
+        ),
+        placedBlocks: [
+          {
+            shape: 'rhombus',
+            player: 'player2',
+            q: createInitialState().board[0]!.q,
+            r: createInitialState().board[0]!.r,
+            rotation: 0,
+          },
+        ],
+        nextBlockId: 2,
+      };
+      renderBoard(filled, el);
+      const poly = el.querySelector(
+        `.hex-a-gone-cell-p2[data-q="${filled.board[0]!.q}"][data-r="${filled.board[0]!.r}"]`
+      );
+      expect(poly).toBeTruthy();
+      expect(poly!.getAttribute('fill')).toBeTruthy();
 
-    // Filled p2 cell with matching placedBlock → BLOCK_COLORS fill attribute.
-    const filled: HexAGoneGameState = {
-      ...createInitialState(),
-      board: createInitialState().board.map((c, i) =>
-        i === 0 ? { ...c, filled: true, filledBy: 'player2', blockId: 1 } : c
-      ),
-      placedBlocks: [
-        {
-          shape: 'rhombus',
-          player: 'player2',
-          q: createInitialState().board[0]!.q,
-          r: createInitialState().board[0]!.r,
-          rotation: 0,
-        },
-      ],
-      nextBlockId: 2,
-    };
-    renderBoard(filled, el);
-    const poly = el.querySelector(
-      `.hex-a-gone-cell-p2[data-q="${filled.board[0]!.q}"][data-r="${filled.board[0]!.r}"]`
-    );
-    expect(poly).toBeTruthy();
-    expect(poly!.getAttribute('fill')).toBeTruthy();
+      // gameOver winner chrome (class only; no copy body assert).
+      const over: HexAGoneGameState = {
+        ...createInitialState(),
+        phase: 'gameOver',
+        winner: 'player2',
+      };
+      const area = buildSelectionArea(over);
+      expect(area.querySelector('.hex-a-gone-winner')).toBeTruthy();
+      expect(area.querySelector('.game-winner-banner')).toBeTruthy();
 
-    // gameOver winner chrome (class only; no copy body assert).
-    const over: HexAGoneGameState = {
-      ...createInitialState(),
-      phase: 'gameOver',
-      winner: 'player2',
-    };
-    const area = buildSelectionArea(over);
-    expect(area.querySelector('.hex-a-gone-winner')).toBeTruthy();
-    expect(area.querySelector('.game-winner-banner')).toBeTruthy();
-
-    renderStatus(over, el, 'human-vs-human', false);
-    expect(el.querySelector('.status-winner')).toBeTruthy();
-    renderStatus(createInitialState(), el, 'human-vs-ai', true);
-    expect(el.querySelector('.status-ai-thinking')).toBeTruthy();
+      renderStatus(over, el, 'human-vs-human', false);
+      expect(el.querySelector('.status-winner')).toBeTruthy();
+      renderStatus(createInitialState(), el, 'human-vs-ai', true);
+      expect(el.querySelector('.status-ai-thinking')).toBeTruthy();
+    } finally {
+      if (hadScrollIntoView) {
+        HTMLElement.prototype.scrollIntoView = originalScrollIntoView;
+      } else {
+        Reflect.deleteProperty(HTMLElement.prototype, 'scrollIntoView');
+      }
+    }
   });
 
   it('placing-info interactive=false + empty select status chrome', () => {

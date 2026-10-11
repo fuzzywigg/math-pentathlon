@@ -7,6 +7,12 @@ import { DIVISIONS, GAMES } from '../../src/core/game-registry';
 
 describe('Wave 44 UI — selector hero/divisions', () => {
   let container: HTMLElement;
+  // Direct prototype assign is not undone by vi.restoreAllMocks (q-mp-1180).
+  const hadScrollIntoView = Object.prototype.hasOwnProperty.call(
+    Element.prototype,
+    'scrollIntoView'
+  );
+  const originalScrollIntoView = Element.prototype.scrollIntoView;
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -15,6 +21,11 @@ describe('Wave 44 UI — selector hero/divisions', () => {
   afterEach(() => {
     container.remove();
     vi.restoreAllMocks();
+    if (hadScrollIntoView) {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    } else {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
   });
 
   it('renders hero and one accordion per division', () => {
