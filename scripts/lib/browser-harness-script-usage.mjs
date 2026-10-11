@@ -23,7 +23,10 @@ Navigate-away sweep against a running dev server (default http://127.0.0.1:5173)
 Launches Playwright Chromium and walks the fixed game list.
 
 Options:
-  -h, --help       Show this help and exit (no browser launch)`;
+  -h, --help       Show this help and exit (no browser launch)
+
+Env:
+  BASE_URL         Dev server URL (default http://127.0.0.1:5173)`;
 
 export const MEMORY_LEAK_AUDIT_USAGE = `Usage: node scripts/memory-leak-audit.mjs
 
