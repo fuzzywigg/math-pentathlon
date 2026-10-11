@@ -48,6 +48,7 @@
     "docs:lifecycle-visuals": "playwright test -c playwright.lifecycle-visuals.config.ts",
     "docs:visuals-2026-10": "playwright test -c playwright.visuals-2026-10.config.ts",
     "perf:runtime": "node scripts/runtime-perf.mjs",
+    "perf:render": "node scripts/render-perf.mjs",
     "audit:memory": "node scripts/memory-leak-audit.mjs",
     "audit:console": "node scripts/console-sweep.mjs",
     "audit:mobile": "node scripts/mobile-audit.mjs",
