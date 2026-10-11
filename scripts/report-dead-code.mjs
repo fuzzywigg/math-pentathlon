@@ -349,8 +349,25 @@ function runKnip() {
 }
 
 /**
+ * Symbol name from a knip nested entry (string or `{ name }`).
+ * Null / non-object / nameless entries return undefined (q-mp-1274).
+ * @param {*} entry
+ * @returns {string|undefined}
+ */
+function knipEntryName(entry) {
+  if (entry == null) return undefined;
+  if (typeof entry === 'string') return entry || undefined;
+  if (typeof entry === 'object' && typeof entry.name === 'string') {
+    return entry.name || undefined;
+  }
+  return undefined;
+}
+
+/**
  * Normalize knip JSON ({ files, issues[] }) into flat candidate records.
  * Null / non-object `files` entries are skipped (q-mp-1255).
+ * Null / non-object `issues` rows and null nested export/type/dep entries
+ * are skipped without throwing (q-mp-1274).
  * @param {*} knip
  */
 export function flattenKnip(knip) {
@@ -374,16 +391,17 @@ export function flattenKnip(knip) {
     });
   }
   for (const issue of knip.issues || []) {
+    if (issue == null || typeof issue !== 'object') continue;
     const file = issue.file;
-    if (!file) continue;
+    if (typeof file !== 'string' || !file) continue;
     for (const exp of issue.exports || []) {
-      const name = typeof exp === 'string' ? exp : exp.name;
+      const name = knipEntryName(exp);
       if (name) {
         out.push({ kind: 'export', path: file, symbol: name, source: 'knip' });
       }
     }
     for (const typ of issue.types || []) {
-      const name = typeof typ === 'string' ? typ : typ.name;
+      const name = knipEntryName(typ);
       if (name) {
         out.push({
           kind: 'unused-type',
@@ -394,7 +412,7 @@ export function flattenKnip(knip) {
       }
     }
     for (const dep of issue.dependencies || []) {
-      const name = typeof dep === 'string' ? dep : dep.name;
+      const name = knipEntryName(dep);
       if (name) {
         out.push({
           kind: 'dependency',
@@ -405,7 +423,7 @@ export function flattenKnip(knip) {
       }
     }
     for (const dep of issue.devDependencies || []) {
-      const name = typeof dep === 'string' ? dep : dep.name;
+      const name = knipEntryName(dep);
       if (name) {
         out.push({
           kind: 'dependency',
