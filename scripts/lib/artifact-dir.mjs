@@ -71,12 +71,16 @@ export function resolveArtifactDir(options = {}) {
   const localRel = options.localRel ?? LOCAL_ARTIFACT_DIR;
 
   const fromEnv = env.MP_ARTIFACT_DIR;
-  if (typeof fromEnv === 'string' && fromEnv.trim() !== '') {
-    const target = isAbsolute(fromEnv) ? fromEnv : resolve(cwd, fromEnv);
-    try {
-      return ensureDir(target, mkdirSync);
-    } catch {
-      // Fall through when the explicit override is not creatable.
+  // Trim before path use (q-mp-1263): emptiness used to trim, but mkdir kept spaces.
+  if (typeof fromEnv === 'string') {
+    const trimmed = fromEnv.trim();
+    if (trimmed !== '') {
+      const target = isAbsolute(trimmed) ? trimmed : resolve(cwd, trimmed);
+      try {
+        return ensureDir(target, mkdirSync);
+      } catch {
+        // Fall through when the explicit override is not creatable.
+      }
     }
   }
 
