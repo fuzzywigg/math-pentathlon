@@ -32,11 +32,20 @@ import {
   isBrowserOffline,
 } from '../../src/ui/offline';
 
+// unit-shared uses isolate:false — restore navigator.onLine so later suites
+// do not see a stuck getter from Object.defineProperty (q-mp-1397).
+const originalOnLine = Object.getOwnPropertyDescriptor(navigator, 'onLine');
+
 afterEach(() => {
   document.body.innerHTML = '';
   document.documentElement.removeAttribute('data-offline');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
+  if (originalOnLine) {
+    Object.defineProperty(navigator, 'onLine', originalOnLine);
+  } else {
+    Reflect.deleteProperty(navigator, 'onLine');
+  }
 });
 
 describe('q-mp-430 game-error-boundary — soft-fail residuals', () => {
