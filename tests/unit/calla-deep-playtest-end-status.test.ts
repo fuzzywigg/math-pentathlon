@@ -1,7 +1,6 @@
 /**
- * @vitest-environment node
- *
  * q-mp-1258: Calla deep-playtest end regex must not match "Drawing" / "patience".
+ * Pure matcher + source wiring — safe under unit-shared jsdom (no vitest.config edit).
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
