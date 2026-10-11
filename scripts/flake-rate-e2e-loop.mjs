@@ -98,18 +98,19 @@ const outDir =
     : strFlag('--out', '');
 fs.mkdirSync(outDir, { recursive: true });
 
-/** @type {Map<string, { passes: number, fails: number, flakes: number, durations: number[], errors: string[] }>} */
+/** @type {Map<string, { passes: number, fails: number, flakes: number, skips: number, durations: number[], errors: string[] }>} */
 const byTest = new Map();
 const runSummaries = [];
 
 /**
  * Recurse Playwright JSONReportSuite trees (file → describe → specs).
  * Top-level-only reports (specs on the root suite, no nested suites) stay unchanged.
- * Per-result `status: "flaky"` increments flake counters (q-mp-1183); nested suite
- * recursion is owned by q-mp-1052.
+ * Per-result `status: "flaky"` increments flake counters (q-mp-1183 / folded #1343).
+ * `interrupted` counts as fail; `skipped` is tracked without diluting pass/fail
+ * (q-mp-1218). Nested suite recursion is owned by q-mp-1052.
  * @param {object} suite
  * @param {string} inheritedFile
- * @param {{ passed: number, failed: number, flaky: number }} counts
+ * @param {{ passed: number, failed: number, flaky: number, skipped: number }} counts
  */
 function walkSuite(suite, inheritedFile, counts) {
   const file = suite.file || suite.title || inheritedFile || '';
@@ -122,6 +123,7 @@ function walkSuite(suite, inheritedFile, counts) {
             passes: 0,
             fails: 0,
             flakes: 0,
+            skips: 0,
             durations: [],
             errors: [],
           });
@@ -133,8 +135,11 @@ function walkSuite(suite, inheritedFile, counts) {
         } else if (
           r.status === 'failed' ||
           r.status === 'timedOut' ||
-          r.status === 'unexpected'
+          r.status === 'unexpected' ||
+          r.status === 'interrupted'
         ) {
+          // interrupted is a hard abort (worker crash / SIGINT); count as fail
+          // so flake-rate ok fails closed (q-mp-1218).
           rec.fails += 1;
           counts.failed += 1;
           const msg = r.error?.message || r.errors?.[0]?.message || r.status;
@@ -146,6 +151,10 @@ function walkSuite(suite, inheritedFile, counts) {
           counts.flaky += 1;
           const msg = r.error?.message || r.errors?.[0]?.message || r.status;
           if (rec.errors.length < 3) rec.errors.push(String(msg).slice(0, 400));
+        } else if (r.status === 'skipped') {
+          // Track skips separately — do not dilute pass/fail (q-mp-1218).
+          rec.skips += 1;
+          counts.skipped += 1;
         }
       }
     }
@@ -162,25 +171,34 @@ function ingest(jsonPath, runId) {
     return;
   }
   const data = loaded.data;
-  const counts = { passed: 0, failed: 0, flaky: 0 };
+  const counts = { passed: 0, failed: 0, flaky: 0, skipped: 0 };
   for (const suite of data.suites || []) {
     walkSuite(suite, '', counts);
   }
-  const { passed, failed, flaky } = counts;
-  const unexpected = data.stats?.unexpected ?? failed;
+  const { passed, failed, flaky, skipped } = counts;
+  // Prefer the larger of root stats.unexpected and walked fails so an explicit
+  // stats.unexpected:0 cannot mask result rows with status "interrupted".
+  const statsUnexpected =
+    typeof data.stats?.unexpected === 'number' ? data.stats.unexpected : 0;
+  const failedTotal = Math.max(statsUnexpected, failed);
   // Prefer the larger of root stats.flaky and walked per-result flaky counts so
   // an explicit stats.flaky:0 cannot mask result rows with status "flaky".
   const statsFlaky =
     typeof data.stats?.flaky === 'number' ? data.stats.flaky : 0;
   const flakyTotal = Math.max(statsFlaky, flaky);
+  const statsSkipped =
+    typeof data.stats?.skipped === 'number' ? data.stats.skipped : 0;
+  const skippedTotal = Math.max(statsSkipped, skipped);
   // Flakes undercount when walkSuite ignores status "flaky"; ok must fail closed.
-  const ok = unexpected === 0 && failed === 0 && flakyTotal === 0;
+  // Skipped does not affect ok (report-only track).
+  const ok = failedTotal === 0 && flakyTotal === 0;
   runSummaries.push({
     runId,
     ok,
     passed: data.stats?.expected ?? passed,
-    failed: unexpected,
+    failed: failedTotal,
     flaky: flakyTotal,
+    skipped: skippedTotal,
     durationMs: data.stats?.duration ?? null,
   });
 }
@@ -234,7 +252,7 @@ for (let i = 1; i <= runs; i++) {
   }
   const last = runSummaries[runSummaries.length - 1];
   console.log(
-    `[flake-rate-e2e] ${runId} exit=${result.status} ok=${last?.ok} passed=${last?.passed} failed=${last?.failed} ${Date.now() - started}ms`
+    `[flake-rate-e2e] ${runId} exit=${result.status} ok=${last?.ok} passed=${last?.passed} failed=${last?.failed} flaky=${last?.flaky ?? 0} skipped=${last?.skipped ?? 0} ${Date.now() - started}ms`
   );
 }
 
@@ -242,9 +260,11 @@ const failures = [...byTest.entries()]
   .filter(([, v]) => v.fails > 0 || v.flakes > 0)
   .map(([k, v]) => ({
     test: k,
+    // Skips omitted from runs so they do not dilute pass/fail denominators.
     runs: v.passes + v.fails + v.flakes,
     failures: v.fails,
     flakes: v.flakes,
+    skips: v.skips,
     avgMs: Math.round(
       v.durations.reduce((a, b) => a + b, 0) / Math.max(1, v.durations.length)
     ),
@@ -269,11 +289,11 @@ const lines = [
   '',
   `Runs: ${runs} (retries=0)`,
   '',
-  '| Run | OK | Passed | Failed | Flaky |',
-  '| --- | --- | --- | --- | --- |',
+  '| Run | OK | Passed | Failed | Flaky | Skipped |',
+  '| --- | --- | --- | --- | --- | --- |',
   ...runSummaries.map(
     (r) =>
-      `| ${r.runId} | ${r.ok} | ${r.passed ?? '?'} | ${r.failed ?? '?'} | ${r.flaky ?? 0} |`
+      `| ${r.runId} | ${r.ok} | ${r.passed ?? '?'} | ${r.failed ?? '?'} | ${r.flaky ?? 0} | ${r.skipped ?? 0} |`
   ),
   '',
   '## Tests with ≥1 failure or flake',
