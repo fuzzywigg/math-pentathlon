@@ -127,7 +127,7 @@ export function parseArgs(argv) {
  * @param {string} filePath
  * @returns {{ rel: string, bucket: string }}
  */
-export function pathBucket(filePath) {
+function pathBucket(filePath) {
   const rel = path.relative(ROOT, filePath).split(path.sep).join('/');
   if (!rel.startsWith('src/')) {
     return { rel, bucket: '(outside-src)' };
@@ -158,7 +158,7 @@ export function pathBucket(filePath) {
  * @param {string[]} ruleIds
  * @returns {Record<string, { total: number, buckets: Record<string, number>, files: Record<string, number> }>}
  */
-export function summarizeBuckets(report, ruleIds) {
+function summarizeBuckets(report, ruleIds) {
   /** @type {Record<string, { total: number, buckets: Record<string, number>, files: Record<string, number> }>} */
   const out = {};
   for (const rule of ruleIds) {
