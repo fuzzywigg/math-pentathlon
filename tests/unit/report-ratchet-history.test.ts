@@ -77,12 +77,12 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
 
   it('extractMetric(boundaries) sums finite numeric string ceilings (q-mp-1230)', () => {
     // Pre-fix undercount: string '10' ignored → 2. Now coerce → 12.
-    expect(
-      extractMetric('boundaries', { ceilings: { a: '10', b: 2 } })
-    ).toBe(12);
-    expect(
-      extractMetric('boundaries', { ceilings: { a: '10', b: '2' } })
-    ).toBe(12);
+    expect(extractMetric('boundaries', { ceilings: { a: '10', b: 2 } })).toBe(
+      12
+    );
+    expect(extractMetric('boundaries', { ceilings: { a: '10', b: '2' } })).toBe(
+      12
+    );
     expect(
       extractMetric('boundaries', {
         ceilings: { a: '10', b: 'x', c: Number.NaN, d: 3 },
@@ -118,6 +118,29 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
     ).toBe(118);
   });
 
+  it('extractMetric(typePhase2) honors nested totals.outOfScopeErrors (q-mp-1247)', () => {
+    // Pre-fix: nested shape (check-type-ratchet) → null; top-level still works.
+    expect(
+      extractMetric('typePhase2', { totals: { outOfScopeErrors: 216 } })
+    ).toBe(216);
+    expect(extractMetric('typePhase2', { outOfScopeErrors: 216 })).toBe(216);
+    // Prefer top-level when both present (same order as check-type-ratchet).
+    expect(
+      extractMetric('typePhase2', {
+        outOfScopeErrors: 100,
+        totals: { outOfScopeErrors: 216 },
+      })
+    ).toBe(100);
+    expect(
+      extractMetric('typePhase2', { totals: { outOfScopeErrors: 'x' } })
+    ).toBeNull();
+    expect(
+      extractMetric('typePhase2', { totals: { outOfScopeErrors: Number.NaN } })
+    ).toBeNull();
+    expect(extractMetric('typePhase2', { totals: {} })).toBeNull();
+    expect(extractMetric('typePhase2', { totals: null })).toBeNull();
+  });
+
   it('parses git log tab-separated lines', () => {
     const stdout = [
       'abc123\t2026-10-08T12:00:00Z\tchore: lower curly',
@@ -136,6 +159,109 @@ describe('report-ratchet-history helpers (q-mp-074 / q-mp-236 / q-mp-290)', () =
         date: '2026-10-07T09:00:00Z',
         subject: 'feat: add ceilings',
       },
+    ]);
+  });
+
+  it('mergeHistory does not null-overwrite prior metrics for the same sha (q-mp-1248)', () => {
+    // Pre-fix: later null wiped curly:12 / type / boundaries for the same sha.
+    const rows = mergeHistory({
+      lint: [
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'lint seed',
+          curly: 12,
+          voidExpression: 5,
+          nnnull: 3,
+          dupImports: 1,
+        },
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'lint seed',
+          curly: null,
+          voidExpression: null,
+          nnnull: null,
+          dupImports: null,
+        },
+      ],
+      typePhase2: [
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'type seed',
+          value: 216,
+        },
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'type seed',
+          value: null,
+        },
+      ],
+      boundaries: [
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'bound seed',
+          value: 17,
+        },
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'bound seed',
+          value: null,
+        },
+      ],
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      sha: 'aaaa',
+      curly: 12,
+      voidExpression: 5,
+      nnnull: 3,
+      dupImports: 1,
+      typeOutOfScope: 216,
+      boundarySum: 17,
+    });
+
+    // Later non-null still overwrites; distinct shas still forward-fill.
+    const lowered = mergeHistory({
+      lint: [
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'lint seed',
+          curly: 12,
+          voidExpression: null,
+          nnnull: null,
+          dupImports: null,
+        },
+        {
+          sha: 'aaaa',
+          date: '2026-10-07T10:00:00Z',
+          subject: 'lint lower',
+          curly: 8,
+          voidExpression: null,
+          nnnull: null,
+          dupImports: null,
+        },
+        {
+          sha: 'bbbb',
+          date: '2026-10-08T10:00:00Z',
+          subject: 'later sha null lint',
+          curly: null,
+          voidExpression: null,
+          nnnull: null,
+          dupImports: null,
+        },
+      ],
+      typePhase2: [],
+      boundaries: [],
+    });
+    expect(lowered.map((r) => ({ sha: r.sha, curly: r.curly }))).toEqual([
+      { sha: 'aaaa', curly: 8 },
+      { sha: 'bbbb', curly: 8 },
     ]);
   });
 
