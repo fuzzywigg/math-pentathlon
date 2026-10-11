@@ -4,6 +4,7 @@
  * Hermetic argv + dry-run write-guard coverage for report-licenses (q-mp-979).
  * Malformed lock message helper (q-mp-1026).
  * Empty/missing packages gate helpers (q-mp-1037).
+ * Root-only packages rejected as unusable (q-mp-1233).
  */
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
@@ -15,6 +16,7 @@ import {
   malformedLockMessage,
   isUsableLockPackages,
   emptyPackagesMessage,
+  collectPackagesFromLock,
   USAGE,
   OUT_DIR,
   OUT_DIR_REL,
@@ -135,13 +137,29 @@ describe('report-licenses parseArgs / CLI (q-mp-979)', () => {
     expect(isUsableLockPackages(undefined)).toBe(false);
     expect(isUsableLockPackages({})).toBe(false);
     expect(isUsableLockPackages([])).toBe(false);
-    expect(isUsableLockPackages({ '': { name: 'demo' } })).toBe(true);
     const msg = emptyPackagesMessage('/tmp/package-lock.json');
     expect(msg).toMatch(
       /report:licenses — empty or missing packages in \/tmp\/package-lock\.json/
     );
-    expect(msg).toMatch(/non-empty "packages" object/);
+    expect(msg).toMatch(/non-root dependency entry/);
     expect(msg).toMatch(/npm install/);
     expect(msg).not.toMatch(/Would write|Lockfile packages:/);
+  });
+
+  it('rejects root-only packages as unusable inventory (q-mp-1233)', () => {
+    expect(
+      isUsableLockPackages({ '': { name: 'demo', version: '0.0.0' } })
+    ).toBe(false);
+    expect(
+      isUsableLockPackages({
+        '': { name: 'demo' },
+        'node_modules/foo': { version: '1.0.0', license: 'MIT' },
+      })
+    ).toBe(true);
+    expect(
+      collectPackagesFromLock({
+        packages: { '': { name: 'demo', version: '0.0.0', license: 'MIT' } },
+      })
+    ).toHaveLength(0);
   });
 });
