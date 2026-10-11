@@ -7,11 +7,27 @@ import {
   resetPwaReloadGuardForTests,
 } from '../../src/pwa/register';
 
+// unit-shared uses isolate:false — restore visibilityState so later suites
+// do not see a stuck getter from Object.defineProperty (q-mp-1354).
+const originalVisibilityState = Object.getOwnPropertyDescriptor(
+  document,
+  'visibilityState'
+);
+
+function restoreVisibilityState(): void {
+  if (originalVisibilityState) {
+    Object.defineProperty(document, 'visibilityState', originalVisibilityState);
+  } else {
+    Reflect.deleteProperty(document, 'visibilityState');
+  }
+}
+
 describe('mutation-ui pwa register', () => {
   afterEach(() => {
     resetPwaReloadGuardForTests();
     vi.useRealTimers();
     vi.restoreAllMocks();
+    restoreVisibilityState();
   });
 
   it('resetPwaReloadGuardForTests clears reloadScheduled to false', () => {

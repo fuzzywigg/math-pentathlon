@@ -12,6 +12,21 @@ async function loadPwa(): Promise<typeof import('../../src/pwa/register')> {
   return import('../../src/pwa/register');
 }
 
+// unit-shared uses isolate:false — restore visibilityState so later suites
+// do not see a stuck getter from Object.defineProperty (q-mp-1354).
+const originalVisibilityState = Object.getOwnPropertyDescriptor(
+  document,
+  'visibilityState'
+);
+
+function restoreVisibilityState(): void {
+  if (originalVisibilityState) {
+    Object.defineProperty(document, 'visibilityState', originalVisibilityState);
+  } else {
+    Reflect.deleteProperty(document, 'visibilityState');
+  }
+}
+
 describe('mutation-ui16 pwa register', () => {
   afterEach(async () => {
     try {
@@ -22,6 +37,7 @@ describe('mutation-ui16 pwa register', () => {
     }
     vi.useRealTimers();
     vi.restoreAllMocks();
+    restoreVisibilityState();
   });
 
   it('fresh module: first onNeedRefresh reloads (kills L29 false→true init)', async () => {
