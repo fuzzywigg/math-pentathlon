@@ -12,6 +12,8 @@
  * 0 so soft budget overs never fail the hard build path; pass
  * `--fail-on-new-over` (CI does, under continue-on-error) to exit non-zero only
  * when a novel OVER appears. Missing `dist/` is a usage error (exit 2).
+ * Unknown / misspelled argv (e.g. `--fail-on-new-ovr`) is a usage error
+ * (exit 2) — never silently stay report-only (q-mp-1312).
  *
  * Usage:
  *   npm run build && npm run size:check
@@ -256,11 +258,28 @@ export function resolveSizeCheckCatchExitCode(failOnNewOver) {
 }
 
 /**
+ * Parse CLI argv. Exact `--fail-on-new-over` enables the soft gate; any other
+ * token (typos / unknown flags / unexpected positionals) fails closed so CI
+ * cannot silently stay report-only (q-mp-1312).
+ *
  * @param {string[]} argv
- * @returns {{ failOnNewOver: boolean }}
+ * @returns {{ ok: true, failOnNewOver: boolean } | { ok: false, message: string }}
  */
 export function parseSizeCheckArgs(argv) {
-  return { failOnNewOver: argv.includes('--fail-on-new-over') };
+  let failOnNewOver = false;
+  for (const arg of argv) {
+    if (arg === '--fail-on-new-over') {
+      failOnNewOver = true;
+      continue;
+    }
+    return {
+      ok: false,
+      message:
+        `Unknown flag: ${arg}\n` +
+        'Usage: node scripts/check-bundle-budgets.mjs [--fail-on-new-over]',
+    };
+  }
+  return { ok: true, failOnNewOver };
 }
 
 /**
@@ -305,7 +324,14 @@ function printTable(rows) {
 }
 
 function main(argv = process.argv.slice(2)) {
-  const { failOnNewOver } = parseSizeCheckArgs(argv);
+  const parsed = parseSizeCheckArgs(argv);
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error('(usage error: exiting 2)');
+    process.exitCode = 2;
+    return;
+  }
+  const { failOnNewOver } = parsed;
 
   if (!fs.existsSync(DIST)) {
     console.error('dist/ not found. Run npm run build before size:check.');
@@ -430,19 +456,25 @@ const isMain =
 
 if (isMain) {
   const argv = process.argv.slice(2);
-  const { failOnNewOver } = parseSizeCheckArgs(argv);
-  try {
-    main(argv);
-  } catch (err) {
-    console.error(err instanceof Error ? err.message : err);
-    const code = resolveSizeCheckCatchExitCode(failOnNewOver);
-    if (code === 0) {
-      console.error('(report-only: exiting 0)');
-    } else {
-      console.error(
-        `(fail-on-new-over: exiting ${code} after measurement error)`
-      );
+  const parsed = parseSizeCheckArgs(argv);
+  if (!parsed.ok) {
+    console.error(parsed.message);
+    console.error('(usage error: exiting 2)');
+    process.exitCode = 2;
+  } else {
+    try {
+      main(argv);
+    } catch (err) {
+      console.error(err instanceof Error ? err.message : err);
+      const code = resolveSizeCheckCatchExitCode(parsed.failOnNewOver);
+      if (code === 0) {
+        console.error('(report-only: exiting 0)');
+      } else {
+        console.error(
+          `(fail-on-new-over: exiting ${code} after measurement error)`
+        );
+      }
+      process.exitCode = code;
     }
-    process.exitCode = code;
   }
 }

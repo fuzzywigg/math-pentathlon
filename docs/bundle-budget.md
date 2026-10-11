@@ -45,12 +45,13 @@ The script prints a table: Bundle · Gzip · Budget · Delta · Status (`OK` / `
 | Mode | Exit code |
 | --- | --- |
 | Missing `dist/` | **2** (usage error — run `npm run build` first) |
+| Unknown / misspelled argv (e.g. `--fail-on-new-ovr`) | **2** (usage error — do not silently stay report-only) |
 | Default (`npm run size:check`) with `dist/` present | Always **0** (including known OVER, new OVER, and gaps) — safe for local scripts and does not fail the hard build path |
-| `--fail-on-new-over` | **1** only when at least one OVER label is **not** listed in `knownOvers`; otherwise **0** |
+| Exact `--fail-on-new-over` | **1** only when at least one OVER label is **not** listed in `knownOvers`; otherwise **0** |
 
 Other measurement/parse failures still exit **0** with a message so a broken
-local tree does not look like a budget regression. Missing `dist/` is the
-exception (exit **2**).
+local tree does not look like a budget regression. Missing `dist/` and unknown
+argv are the usage-error exceptions (exit **2**).
 
 ## Known OVER allowlist (`knownOvers`)
 
