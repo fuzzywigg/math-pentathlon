@@ -7,6 +7,7 @@ import { chromium } from '@playwright/test';
 import { createRequire } from 'module';
 import { writeFileSync, mkdirSync } from 'fs';
 import { dismissOwl } from './lib/dismiss-owl.mjs';
+import { waitForGameReady } from './lib/page-ready.mjs';
 
 const require = createRequire(import.meta.url);
 // Pull game ids from compiled-ish source via dynamic import of TS is hard;
@@ -37,17 +38,6 @@ const GAMES = [
 const BASE = process.env.BASE_URL || 'http://localhost:5173';
 const OUT =
   process.env.SWEEP_OUT || '/opt/cursor/artifacts/console-sweep-raw.json';
-
-async function waitReady(page) {
-  await page
-    .getByTestId('game-loading')
-    .waitFor({ state: 'hidden', timeout: 20_000 })
-    .catch(() => {});
-  await page.locator('#new-game-btn, h1').first().waitFor({
-    state: 'visible',
-    timeout: 20_000,
-  });
-}
 
 /** Double-rAF paint settle (no fixed sleep). */
 async function waitDoubleRaf(page) {
@@ -373,7 +363,7 @@ async function sweepGame(browser, gameId) {
     await page.goto(`${BASE}/#/game/${gameId}`, {
       waitUntil: 'domcontentloaded',
     });
-    await waitReady(page);
+    await waitForGameReady(page);
     result.loadOk = true;
 
     // Capture load-only snapshot

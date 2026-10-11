@@ -1,4 +1,5 @@
 import { chromium } from '@playwright/test';
+import { waitForGameReady } from './lib/page-ready.mjs';
 const BASE = 'http://127.0.0.1:5173';
 const GAMES = [
   'hex','calla','contig-60','juggle','fab-a-diffy','sum-dominoes','par-55',
@@ -17,7 +18,7 @@ for (const id of GAMES) {
   });
   try {
     await page.goto(`${BASE}/#/game/${id}`);
-    await page.getByTestId('game-loading').waitFor({state:'hidden',timeout:15000}).catch(()=>{});
+    await waitForGameReady(page, { timeoutMs: 15_000 });
     await page.locator('#new-game-btn').click();
     await page.locator('.mode-option[data-mode="human-vs-ai"]').click();
     const easy = page.locator('.difficulty-btn.easy');
