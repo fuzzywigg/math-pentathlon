@@ -178,14 +178,16 @@ function ingestJson(jsonPath, runId, mode) {
   } else {
     for (const suite of data.suites || [data]) walk(suite);
   }
-  const ok =
-    data.success !== false && failed === 0 && (data.numFailedTests ?? 0) === 0;
+  // Per-run ok must key off walked failures + numFailedTests only.
+  // Vitest `success: true` must not override a non-zero failure count (q-mp-1034).
+  const numFailedTests = data.numFailedTests ?? failed;
+  const ok = failed === 0 && numFailedTests === 0;
   runSummaries.push({
     runId,
     mode,
-    ok: data.success === true || (ok && (data.numFailedTests ?? failed) === 0),
+    ok,
     passed: data.numPassedTests ?? passed,
-    failed: data.numFailedTests ?? failed,
+    failed: numFailedTests,
     durationMs: data.duration ?? null,
   });
 }
