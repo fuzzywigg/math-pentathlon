@@ -280,9 +280,11 @@ describe('report-licenses helpers', () => {
   });
 
   it('skips invalid / empty integrity hashes (q-mp-1282)', () => {
+    // sha256("hello") — hardcoded so the test stays free of Node Buffer types
+    // (file is in typecheck:ratchet scope).
     const sha256Hex =
       '2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824';
-    const validB64 = Buffer.from(sha256Hex, 'hex').toString('base64');
+    const validB64 = 'LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=';
     const packages = [
       {
         lockPath: 'node_modules/bad',
