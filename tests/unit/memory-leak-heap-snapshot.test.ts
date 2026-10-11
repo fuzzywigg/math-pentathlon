@@ -1,9 +1,11 @@
 /**
  * @vitest-environment node
  *
- * Hermetic coverage for q-mp-1215 + q-mp-1216:
+ * Hermetic coverage for q-mp-1215 + q-mp-1216 + q-mp-1310:
  *  - analyzeHeapSnapshot fail-closed when self_size (or name) is missing
  *  - metricDelta never coerces null heap metrics to 0
+ *  - non-finite / non-number self_size coerced to 0 (no concat / NaN)
+ *  - fmtMb returns n/a for non-finite
  * Fixture JSON only — no Playwright / CDP / vite.
  */
 import { describe, it, expect } from 'vitest';
@@ -92,13 +94,66 @@ describe('metricDelta (q-mp-1216)', () => {
   });
 });
 
-describe('fmtMb null printer (q-mp-1216)', () => {
+describe('fmtMb null printer (q-mp-1216 / q-mp-1310)', () => {
   it('prints n/a for null deltas', () => {
     expect(fmtMb(null)).toBe('n/a');
     expect(fmtMb(undefined)).toBe('n/a');
   });
 
+  it('prints n/a for non-finite numbers (never "NaN MB")', () => {
+    expect(fmtMb(Number.NaN)).toBe('n/a');
+    expect(fmtMb(Number.POSITIVE_INFINITY)).toBe('n/a');
+    expect(fmtMb(Number.NEGATIVE_INFINITY)).toBe('n/a');
+  });
+
   it('formats finite byte counts', () => {
     expect(fmtMb(2 * 1024 * 1024)).toBe('2.00 MB');
+    expect(fmtMb(0)).toBe('0.00 MB');
+  });
+});
+
+describe('analyzeHeapSnapshot finite self_size (q-mp-1310)', () => {
+  it('coerces string self_size to 0 (no string concat totals)', () => {
+    const snap = {
+      snapshot: { meta: { node_fields: ['type', 'name', 'self_size'] } },
+      // "12" must not yield totalSelfSize "012" via +=
+      nodes: [1, 0, '12', 1, 1, 32, 2, 2, 8],
+      strings: ['Object', 'Detached HTMLDivElement', 'Window'],
+    };
+    const r = analyzeHeapSnapshot(JSON.stringify(snap));
+    expect(typeof r.totalSelfSize).toBe('number');
+    expect(Number.isFinite(r.totalSelfSize)).toBe(true);
+    expect(r).toEqual({
+      detachedDomNodes: 1,
+      detachedSelfSize: 32,
+      totalSelfSize: 40, // 0 + 32 + 8
+    });
+  });
+
+  it('coerces null / NaN / Infinity self_size to 0 with finite totals', () => {
+    const snap = {
+      snapshot: { meta: { node_fields: ['type', 'name', 'self_size'] } },
+      nodes: [
+        1,
+        0,
+        null,
+        1,
+        1,
+        Number.NaN,
+        2,
+        2,
+        Number.POSITIVE_INFINITY,
+        1,
+        0,
+        16,
+      ],
+      strings: ['Object', 'Detached HTMLDivElement', 'Window'],
+    };
+    const r = analyzeHeapSnapshot(JSON.stringify(snap));
+    expect(r.totalSelfSize).toBe(16);
+    expect(r.detachedDomNodes).toBe(1);
+    expect(r.detachedSelfSize).toBe(0);
+    expect(Number.isFinite(r.totalSelfSize)).toBe(true);
+    expect(Number.isFinite(r.detachedSelfSize)).toBe(true);
   });
 });
