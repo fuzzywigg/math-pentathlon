@@ -8,8 +8,9 @@
  * When `dist/` exists, measurement paths always exit 0 (not wired into CI fail
  * paths). Missing `dist/` is a usage error (exit 2).
  *
- * CLI (q-mp-917): `--help` / `-h` exit 0 before the `dist/` check and before
- * any summary writes. Unknown flags exit 2. Valid default path unchanged.
+ * CLI (q-mp-917 / q-mp-1001): `--help` / `-h` exit 0 before env-number
+ * validation (`PERF_LH_TIMEOUT_MS`), before the `dist/` check, and before any
+ * summary writes. Unknown flags exit 2. Valid default path unchanged.
  *
  * Usage:
  *   npm run build && npm run check:perf
@@ -57,7 +58,8 @@ Env:
   PERF_LH_TIMEOUT_MS=<ms>             Lighthouse timeout (default 120000)`;
 
 const SKIP_LH = process.env.PERF_SKIP_LIGHTHOUSE === '1';
-const LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
+/** Set after CLI help/unknown-flag parse (q-mp-1001); unused on --help / -h. */
+let LH_TIMEOUT_MS = 120_000;
 
 /** Menu + 2D small + 2D heavier + 3D (FIAR board3d). */
 const LH_TARGETS = [
@@ -432,6 +434,9 @@ if (cli.kind === 'error') {
   console.error(USAGE);
   process.exit(2);
 }
+
+// Validate PERF_LH_TIMEOUT_MS only on real runs (after --help / unknown flags).
+LH_TIMEOUT_MS = requireEnvNumber('PERF_LH_TIMEOUT_MS', 120_000);
 
 try {
   await main();
